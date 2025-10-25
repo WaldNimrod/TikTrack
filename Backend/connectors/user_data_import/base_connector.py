@@ -42,7 +42,7 @@ class BaseConnector(ABC):
         pass
     
     @abstractmethod
-    def parse_file(self, file_content: str) -> List[Dict[str, Any]]:
+    def parse_file(self, file_content: str, file_name: str = None) -> List[Dict[str, Any]]:
         """
         Parse the file content and extract raw data records.
         
@@ -184,8 +184,7 @@ class BaseConnector(ABC):
                     errors.append("Quantity cannot be zero")
                 elif qty < 0 and record.get('action') == 'buy':
                     errors.append("Buy action cannot have negative quantity")
-                elif qty > 0 and record.get('action') == 'sell':
-                    errors.append("Sell action cannot have positive quantity")
+                # Note: Sell actions can have positive quantities (normalized from negative)
             except (ValueError, TypeError):
                 errors.append(f"Invalid quantity: {record['quantity']}")
         

@@ -277,6 +277,56 @@
     border-left: 4px solid #f44336;
 }
 
+/* Error Details */
+.error-details {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.error-section {
+    margin-bottom: 20px;
+}
+
+.error-section h4 {
+    color: #dc3545;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.error-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background: white;
+}
+
+.error-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.error-item:last-child {
+    border-bottom: none;
+}
+
+.error-item strong {
+    color: #495057;
+    font-weight: 600;
+}
+
+.no-errors {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 20px;
+}
+
 .result-icon {
     font-size: 1.5rem;
     margin-right: 15px;

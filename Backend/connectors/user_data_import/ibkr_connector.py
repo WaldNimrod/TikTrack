@@ -39,11 +39,11 @@ class IBKRConnector(BaseConnector):
             return False
 
         # Check for common IBKR statement indicators
-        if "Interactive Brokers" not in file_content and "Activity Statement" not in file_content:
+        if "Interactive Brokers" not in file_content or "Activity Statement" not in file_content:
             return False
 
         # Check for the "Trades" section header
-        if "Trades,Data,Order" not in file_content:
+        if "Trades,Header,DataDiscriminator" not in file_content:
             return False
 
         return True
@@ -82,7 +82,7 @@ class IBKRConnector(BaseConnector):
         except Exception:
             return False
     
-    def parse_file(self, file_content: str) -> List[Dict[str, Any]]:
+    def parse_file(self, file_content: str, file_name: str = None) -> List[Dict[str, Any]]:
         """
         Parse the IBKR CSV file content.
         
@@ -95,13 +95,59 @@ class IBKRConnector(BaseConnector):
         records = []
         
         try:
-            reader = csv.DictReader(io.StringIO(file_content))
+            # Handle empty file
+            if not file_content or not file_content.strip():
+                return []
             
-            for row_num, row in enumerate(reader, 1):
-                # Look for trade records
-                if self._is_trade_record(row):
+            lines = file_content.strip().split('\n')
+            
+            # Find the Trades section
+            trades_start = None
+            for i, line in enumerate(lines):
+                if line.startswith('Trades,Header,DataDiscriminator'):
+                    trades_start = i
+                    break
+            
+            if trades_start is None:
+                raise ValueError("Trades section not found in IBKR file")
+            
+            # Get the header row (the line with Trades,Header)
+            if trades_start >= len(lines):
+                raise ValueError("Trades header not found")
+            
+            # Parse header using CSV reader to handle any quoted fields
+            import csv
+            from io import StringIO
+            
+            header_line = lines[trades_start]
+            csv_reader = csv.reader(StringIO(header_line))
+            headers = [col.strip() for col in next(csv_reader)]
+            
+            # Parse trade records starting from the line after header
+            for i in range(trades_start + 2, len(lines)):
+                line = lines[i].strip()
+                if not line or line.startswith('Trades,Total'):
+                    break
+                
+                if line.startswith('Trades,Data,Order'):
+                    # Parse the trade record using CSV parser to handle quoted values
+                    import csv
+                    from io import StringIO
+                    
+                    # Create a CSV reader for this line
+                    csv_reader = csv.reader(StringIO(line))
+                    values = next(csv_reader)
+                    
+                    # Create a dictionary mapping headers to values
+                    row = {}
+                    for j, header in enumerate(headers):
+                        if j < len(values):
+                            row[header] = values[j].strip()
+                        else:
+                            row[header] = ''
+                    
                     # Add row number for tracking
-                    row['_row_number'] = row_num
+                    row['_row_number'] = i + 1
                     records.append(row)
                     
         except Exception as e:

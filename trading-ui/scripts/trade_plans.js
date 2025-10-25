@@ -246,59 +246,87 @@ window.tradePlansLoaded = false;
  */
 // Helper functions for form field management
 function enableFormFields() {
-  const formFields = [
-    'type', 'side', 'quantity', 'price', 'notes'
-  ];
-  
-  formFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.disabled = false;
-      field.classList.remove('disabled');
+  try {
+    const formFields = [
+      'type', 'side', 'quantity', 'price', 'notes'
+    ];
+    
+    formFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = false;
+        field.classList.remove('disabled');
+      }
+    });
+  } catch (error) {
+    window.Logger.error('שגיאה בהפעלת שדות טופס:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהפעלת שדות טופס', error.message);
     }
-  });
+  }
 }
 
 function disableFormFields() {
-  const formFields = [
-    'type', 'side', 'quantity', 'price', 'notes'
-  ];
-  
-  formFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.disabled = true;
-      field.classList.add('disabled');
+  try {
+    const formFields = [
+      'type', 'side', 'quantity', 'price', 'notes'
+    ];
+    
+    formFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = true;
+        field.classList.add('disabled');
+      }
+    });
+  } catch (error) {
+    window.Logger.error('שגיאה בהשבתת שדות טופס:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהשבתת שדות טופס', error.message);
     }
-  });
+  }
 }
 
 function enableEditFieldsWrapper() {
-  const formFields = [
-    'editType', 'editSide', 'editQuantity', 'editPrice', 'editNotes'
-  ];
-  
-  formFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.disabled = false;
-      field.classList.remove('disabled');
+  try {
+    const formFields = [
+      'editType', 'editSide', 'editQuantity', 'editPrice', 'editNotes'
+    ];
+    
+    formFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = false;
+        field.classList.remove('disabled');
+      }
+    });
+  } catch (error) {
+    window.Logger.error('שגיאה בהפעלת שדות עריכה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהפעלת שדות עריכה', error.message);
     }
-  });
+  }
 }
 
 function disableEditFields() {
-  const formFields = [
-    'editType', 'editSide', 'editQuantity', 'editPrice', 'editNotes'
-  ];
-  
-  formFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.disabled = true;
-      field.classList.add('disabled');
+  try {
+    const formFields = [
+      'editType', 'editSide', 'editQuantity', 'editPrice', 'editNotes'
+    ];
+    
+    formFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = true;
+        field.classList.add('disabled');
+      }
+    });
+  } catch (error) {
+    window.Logger.error('שגיאה בהשבתת שדות עריכה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהשבתת שדות עריכה', error.message);
     }
-  });
+  }
 }
 
 // Ticker info functions
@@ -368,9 +396,16 @@ async function displayTickerInfo(ticker) {
 }
 
 function hideTickerInfo() {
-  const tickerInfo = document.getElementById('tickerInfo');
-  if (tickerInfo) {
-    tickerInfo.style.display = 'none';
+  try {
+    const tickerInfo = document.getElementById('tickerInfo');
+    if (tickerInfo) {
+      tickerInfo.style.display = 'none';
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהסתרת מידע טיקר:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהסתרת מידע טיקר', error.message);
+    }
   }
 }
 
@@ -521,9 +556,16 @@ async function displayEditTickerInfo(ticker) {
 }
 
 function hideEditTickerInfo() {
-  const tickerInfo = document.getElementById('editTickerInfo');
-  if (tickerInfo) {
-    tickerInfo.style.display = 'none';
+  try {
+    const tickerInfo = document.getElementById('editTickerInfo');
+    if (tickerInfo) {
+      tickerInfo.style.display = 'none';
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהסתרת מידע טיקר בעריכה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהסתרת מידע טיקר בעריכה', error.message);
+    }
   }
 }
 
@@ -902,11 +944,12 @@ async function updateEditTickerInfo() {
  * עדכון מספר מניות מסכום מתוכנן במודל העריכה
  */
 function updateEditSharesFromAmount() {
-  const amountInput = document.getElementById('editTradePlanPlannedAmount');
-  const sharesInput = document.getElementById('editTradePlanShares');
-  const priceDisplay = document.getElementById('editCurrentPriceDisplay');
+  try {
+    const amountInput = document.getElementById('editTradePlanPlannedAmount');
+    const sharesInput = document.getElementById('editTradePlanShares');
+    const priceDisplay = document.getElementById('editCurrentPriceDisplay');
 
-  if (!amountInput || !sharesInput || !priceDisplay) {return;}
+    if (!amountInput || !sharesInput || !priceDisplay) {return;}
 
   const amount = parseFloat(amountInput.value) || 0;
   const priceText = priceDisplay.textContent;
@@ -916,17 +959,25 @@ function updateEditSharesFromAmount() {
     const result = convertAmountToShares(amount, price);
     sharesInput.value = result.shares;
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון מניות מסכום בעריכה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון מניות מסכום בעריכה', error.message);
+    }
+  }
 }
 
 /**
  * עדכון סכום מתוכנן ממספר מניות במודל העריכה
  */
 function updateEditAmountFromShares() {
-  const amountInput = document.getElementById('editTradePlanPlannedAmount');
-  const sharesInput = document.getElementById('editTradePlanShares');
-  const priceDisplay = document.getElementById('editCurrentPriceDisplay');
+  try {
+    const amountInput = document.getElementById('editTradePlanPlannedAmount');
+    const sharesInput = document.getElementById('editTradePlanShares');
+    const priceDisplay = document.getElementById('editCurrentPriceDisplay');
 
-  if (!amountInput || !sharesInput || !priceDisplay) {return;}
+    if (!amountInput || !sharesInput || !priceDisplay) {return;}
 
   const shares = parseFloat(sharesInput.value) || 0;
   const priceText = priceDisplay.textContent;
@@ -935,6 +986,13 @@ function updateEditAmountFromShares() {
   if (price > 0) {
     const amount = convertSharesToAmount(shares, price);
     amountInput.value = amount;
+  }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון סכום ממניות בעריכה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון סכום ממניות בעריכה', error.message);
+    }
   }
 }
 
@@ -1145,20 +1203,41 @@ async function reactivateTradePlan(tradePlanId) {
  * פונקציות עזר למודל העריכה
  */
 function addEditCondition() {
-  if (typeof window.showNotification === 'function') {
-    window.showNotification('פונקציונליות זו תהיה זמינה בקרוב', 'info');
+  try {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('פונקציונליות זו תהיה זמינה בקרוב', 'info');
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהוספת תנאי בעריכה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת תנאי בעריכה', error.message);
+    }
   }
 }
 
 function addEditReason() {
-  if (typeof window.showNotification === 'function') {
-    window.showNotification('פונקציונליות זו תהיה זמינה בקרוב', 'info');
+  try {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('פונקציונליות זו תהיה זמינה בקרוב', 'info');
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהוספת סיבה בעריכה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת סיבה בעריכה', error.message);
+    }
   }
 }
 
 function addEditImportantNote() {
-  if (typeof window.showNotification === 'function') {
-    window.showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית', 'info');
+  try {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית', 'info');
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהוספת הערה חשובה בעריכה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת הערה חשובה בעריכה', error.message);
+    }
   }
 }
 

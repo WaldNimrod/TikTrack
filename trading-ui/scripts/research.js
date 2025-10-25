@@ -1,90 +1,204 @@
 // Research page functions
 
 // Initialize research page
+/**
+ * Initialize the research page
+ * Loads data and sets up event listeners
+ */
 function initializeResearchPage() {
-    window.Logger.info('🔍 Initializing Research Page...', { page: "research" });
-    
-    // Load initial research data
-    loadResearchData();
-    
-    // Set up event listeners
-    setupResearchEventListeners();
+    try {
+        window.Logger.info('🔍 Initializing Research Page...', { page: "research" });
+        
+        // Load initial research data
+        loadResearchData();
+        
+        // Set up event listeners
+        setupResearchEventListeners();
+    } catch (error) {
+        window.Logger.error('שגיאה באתחול עמוד המחקר:', error, { page: "research" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה באתחול עמוד המחקר', error.message);
+        }
+    }
 }
 
 // Load research data
+/**
+ * Load research data from the server
+ * Fetches market data, news, and analysis
+ */
 function loadResearchData() {
-    window.Logger.info('📊 Loading research data...', { page: "research" });
-    
-    // Simulate loading data
-    setTimeout(() => {
-        showSuccessNotification('נתוני התחקיר נטענו בהצלחה', '', 4000, 'business');
-    }, 1000);
+    try {
+        window.Logger.info('📊 Loading research data...', { page: "research" });
+        
+        // Simulate loading data
+        setTimeout(() => {
+            showSuccessNotification('נתוני התחקיר נטענו בהצלחה', '', 4000, 'business');
+        }, 1000);
+    } catch (error) {
+        window.Logger.error('שגיאה בטעינת נתוני המחקר:', error, { page: "research" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת נתוני המחקר', error.message);
+        }
+    }
 }
 
 // Setup event listeners
+/**
+ * Set up event listeners for research page
+ * Handles user interactions and form submissions
+ */
 function setupResearchEventListeners() {
-    // Add any specific event listeners for research page
-    window.Logger.info('🎯 Setting up research event listeners...', { page: "research" });
+    try {
+        // Add any specific event listeners for research page
+        window.Logger.info('🎯 Setting up research event listeners...', { page: "research" });
+    } catch (error) {
+        window.Logger.error('שגיאה בהגדרת אירועי המחקר:', error, { page: "research" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בהגדרת אירועי המחקר', error.message);
+        }
+    }
 }
 
 // Research tool functions
+/**
+ * Analyze market trends
+ * Performs technical analysis on market data
+ */
 function analyzeMarketTrends() {
-    showInfoNotification('מנתח מגמות שוק...');
-    // Simulate analysis
-    setTimeout(() => {
-        showSuccessNotification('ניתוח מגמות הושלם', '', 4000, 'business');
-    }, 2000);
+    try {
+        showInfoNotification('מנתח מגמות שוק...');
+        // Simulate analysis
+        setTimeout(() => {
+            showSuccessNotification('ניתוח מגמות הושלם', '', 4000, 'business');
+        }, 2000);
+    } catch (error) {
+        window.Logger.error('שגיאה בניתוח מגמות שוק:', error, { page: "research" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בניתוח מגמות שוק', error.message);
+        }
+    }
 }
 
+/**
+ * Compare tickers
+ * Compares performance of different tickers
+ */
 function compareTickers() {
-    showInfoNotification('משווה טיקרים...');
-    // Simulate comparison
-    setTimeout(() => {
-        showSuccessNotification('השוואת טיקרים הושלמה', '', 4000, 'business');
-    }, 1500);
+    try {
+        showInfoNotification('משווה טיקרים...');
+        // Simulate comparison
+        setTimeout(() => {
+            showSuccessNotification('השוואת טיקרים הושלמה', '', 4000, 'business');
+        }, 1500);
+    } catch (error) {
+        window.Logger.error('שגיאה בהשוואת טיקרים:', error, { page: "research" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בהשוואת טיקרים', error.message);
+        }
+    }
 }
 
+/**
+ * Perform technical analysis
+ * Analyzes technical indicators and patterns
+ */
 function technicalAnalysis() {
-    showInfoNotification('מבצע ניתוח טכני...');
-    // Simulate analysis
-    setTimeout(() => {
-        showSuccessNotification('ניתוח טכני הושלם', '', 4000, 'business');
-    }, 2500);
+    try {
+        showInfoNotification('מבצע ניתוח טכני...');
+        // Simulate analysis
+        setTimeout(() => {
+            showSuccessNotification('ניתוח טכני הושלם', '', 4000, 'business');
+        }, 2500);
+    } catch (error) {
+        window.Logger.error('שגיאה בניתוח טכני:', error, { page: "research" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בניתוח טכני', error.message);
+        }
+    }
 }
 
+/**
+ * Get market overview
+ * Retrieves and displays market summary data
+ */
 function getMarketOverview() {
-    showInfoNotification('טוען סקירת שוק...');
-    // Simulate loading
-    setTimeout(() => {
-        showSuccessNotification('סקירת שוק נטענה');
-    }, 1200);
+    try {
+        showInfoNotification('טוען סקירת שוק...');
+        // Simulate loading
+        setTimeout(() => {
+            showSuccessNotification('סקירת שוק נטענה');
+        }, 1200);
+    } catch (error) {
+        window.Logger.error('שגיאה בקבלת סקירת שוק:', error, { page: "research" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בקבלת סקירת שוק', error.message);
+        }
+    }
 }
 
+/**
+ * Get volatility index
+ * Calculates and displays market volatility metrics
+ */
 function getVolatilityIndex() {
-    showInfoNotification('מחשב מדד תנודתיות...');
-    // Simulate calculation
-    setTimeout(() => {
-        showSuccessNotification('מדד תנודתיות חושב');
-    }, 1800);
+    try {
+        showInfoNotification('מחשב מדד תנודתיות...');
+        // Simulate calculation
+        setTimeout(() => {
+            showSuccessNotification('מדד תנודתיות חושב');
+        }, 1800);
+    } catch (error) {
+        window.Logger.error('שגיאה בחישוב מדד תנודתיות:', error, { page: "research" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בחישוב מדד תנודתיות', error.message);
+        }
+    }
 }
 
+/**
+ * Get news feed
+ * Retrieves and displays relevant market news
+ */
 function getNewsFeed() {
-    showInfoNotification('טוען חדשות שוק...');
-    // Simulate loading
-    setTimeout(() => {
-        showSuccessNotification('חדשות שוק נטענו');
-    }, 1000);
+    try {
+        showInfoNotification('טוען חדשות שוק...');
+        // Simulate loading
+        setTimeout(() => {
+            showSuccessNotification('חדשות שוק נטענו');
+        }, 1000);
+    } catch (error) {
+        window.Logger.error('שגיאה בטעינת חדשות שוק:', error, { page: "research" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת חדשות שוק', error.message);
+        }
+    }
 }
 
+/**
+ * Export research data
+ * Exports research data in various formats
+ */
 function exportResearchData() {
-    showInfoNotification('מייצא נתוני תחקיר...');
-    // Simulate export
-    setTimeout(() => {
-        showSuccessNotification('נתוני התחקיר יוצאו בהצלחה');
-    }, 2000);
+    try {
+        showInfoNotification('מייצא נתוני תחקיר...');
+        // Simulate export
+        setTimeout(() => {
+            showSuccessNotification('נתוני התחקיר יוצאו בהצלחה');
+        }, 2000);
+    } catch (error) {
+        window.Logger.error('שגיאה בייצוא נתוני תחקיר:', error, { page: "research" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בייצוא נתוני תחקיר', error.message);
+        }
+    }
 }
 
 // Detailed Log Functions for Research Page
+/**
+ * Generate detailed log
+ * Creates a comprehensive log of research activities
+ */
 function generateDetailedLog() {
     try {
         const logData = {

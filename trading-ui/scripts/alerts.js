@@ -189,18 +189,19 @@ const demoAlerts = [
  * @returns {Array} מערך של התראות דמו
  */
 function getDemoAlertsData() {
-  return [
-    {
-      id: 1,
-      title: 'התראה על מחיר AAPL',
-      status: 'open',
-      related_type_id: 4, // טיקר
-      related_id: 1, // מזהה טיקר AAPL
-      related_object_id: 1, // מזהה הטיקר הספציפי
-      ticker_id: 1, // מזהה הטיקר
-      condition: 'מחיר יותר מ 150',
-      condition_attribute: 'price',
-      condition_operator: 'more_than',
+  try {
+    return [
+      {
+        id: 1,
+        title: 'התראה על מחיר AAPL',
+        status: 'open',
+        related_type_id: 4, // טיקר
+        related_id: 1, // מזהה טיקר AAPL
+        related_object_id: 1, // מזהה הטיקר הספציפי
+        ticker_id: 1, // מזהה הטיקר
+        condition: 'מחיר יותר מ 150',
+        condition_attribute: 'price',
+        condition_operator: 'more_than',
       condition_number: 150,
       message: 'מחיר AAPL עלה מעל 150$',
       created_at: '2025-01-09T10:00:00Z',
@@ -310,17 +311,26 @@ async function loadAlertsData() {
     
     return alertsData;
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בקבלת נתוני דמו להתראות:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בקבלת נתוני דמו להתראות', error.message);
+    }
+    return [];
+  }
 }
 
 /**
  * פילטור מקומי להתראות
  */
 function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-  let filteredAlerts = [...alerts];
+  try {
+    let filteredAlerts = [...alerts];
 
-  // Extracting start and end dates
-  let startDate = null;
-  let endDate = null;
+    // Extracting start and end dates
+    let startDate = null;
+    let endDate = null;
 
   if (selectedDateRange && selectedDateRange !== 'כל זמן') {
     const dateRange = window.translateDateRangeToDates
@@ -444,6 +454,14 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
   }
 
   return filteredAlerts;
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בפילטור מקומי של התראות:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפילטור מקומי של התראות', error.message);
+    }
+    return alerts; // החזרת הנתונים המקוריים במקרה של שגיאה
+  }
 }
 
 /**
@@ -455,11 +473,12 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
  * @param {Array} alerts - מערך של התראות לעדכון
  */
 function updateAlertsTable(alerts) {
-  const tbody = document.querySelector('#alertsTable tbody');
-  if (!tbody) {
-    // No alerts table found on this page - skipping table update
-    return;
-  }
+  try {
+    const tbody = document.querySelector('#alertsTable tbody');
+    if (!tbody) {
+      // No alerts table found on this page - skipping table update
+      return;
+    }
 
   // טעינת נתונים נוספים לצורך הצגת סימבולים
   let accounts = [];
@@ -670,16 +689,24 @@ function updateAlertsTable(alerts) {
     
 
   });
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון טבלת התראות:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון טבלת התראות', error.message);
+    }
+  }
 }
 
 /**
  * עדכון סטטיסטיקות סיכום
  */
 function updatePageSummaryStats() {
-  // מערכת מאוחדת לסיכום נתונים
-  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
-    const config = window.INFO_SUMMARY_CONFIGS.alerts;
-    window.InfoSummarySystem.calculateAndRender(alertsData, config);
+  try {
+    // מערכת מאוחדת לסיכום נתונים
+    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+      const config = window.INFO_SUMMARY_CONFIGS.alerts;
+      window.InfoSummarySystem.calculateAndRender(alertsData, config);
   } else {
     // מערכת סיכום נתונים לא זמינה
     const summaryStatsElement = document.getElementById('summaryStats');
@@ -691,6 +718,13 @@ function updatePageSummaryStats() {
       `;
     }
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון סטטיסטיקות סיכום:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון סטטיסטיקות סיכום', error.message);
+    }
+  }
 }
 
 
@@ -698,14 +732,15 @@ function updatePageSummaryStats() {
  * הצגת מודל הוספת התראה
  */
 function showAddAlertModal() {
-  // טעינת נתונים למודל
-  loadModalData();
+  try {
+    // טעינת נתונים למודל
+    loadModalData();
 
-  // ניקוי הטופס
-  const form = document.getElementById('addAlertForm');
-  if (form) {
-    form.reset();
-  }
+    // ניקוי הטופס
+    const form = document.getElementById('addAlertForm');
+    if (form) {
+      form.reset();
+    }
 
   // ניקוי ולידציה
   clearAlertValidation();
@@ -770,21 +805,29 @@ function showAddAlertModal() {
   } else {
     // window.Logger.error('Modal element not found', { page: "alerts" });
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהצגת מודל הוספת התראה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהצגת מודל הוספת התראה', error.message);
+    }
+  }
 }
 
 /**
  * ניקוי ולידציה של טפסי התראות
  */
 function clearAlertValidation() {
-  // ניקוי ולידציה למודל הוספה
-  const addFormFields = [
-    'alertRelationType',
-    'alertRelatedObjectSelect',
-    'conditionAttribute',
-    'conditionOperator',
-    'conditionNumber',
-    'alertMessage',
-  ];
+  try {
+    // ניקוי ולידציה למודל הוספה
+    const addFormFields = [
+      'alertRelationType',
+      'alertRelatedObjectSelect',
+      'conditionAttribute',
+      'conditionOperator',
+      'conditionNumber',
+      'alertMessage',
+    ];
 
   addFormFields.forEach(fieldId => {
     const field = document.getElementById(fieldId);
@@ -894,15 +937,23 @@ async function loadModalData() {
       window.Logger.error('שגיאה ב-fallback:', fallbackError, { page: "alerts" });
     }
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בניקוי ולידציה של התראות:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בניקוי ולידציה של התראות', error.message);
+    }
+  }
 }
 
 /**
  * עדכון רדיו באטונים
  */
 function updateRadioButtons(accounts, trades, tradePlans, tickers) {
-  // עדכון רדיו באטון לחשבונות
-  const accountRadio = document.getElementById('alertRelationAccount');
-  const editAccountRadio = document.getElementById('editAlertRelationAccount');
+  try {
+    // עדכון רדיו באטון לחשבונות
+    const accountRadio = document.getElementById('alertRelationAccount');
+    const editAccountRadio = document.getElementById('editAlertRelationAccount');
 
   if (accountRadio) {
     accountRadio.addEventListener('change', () => {
@@ -963,19 +1014,27 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
       populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol', '');
     });
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון רדיו באטונים:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון רדיו באטונים', error.message);
+    }
+  }
 }
 
 /**
  * מילוי select עם נתונים
  */
 function populateSelect(selectId, data, field, prefix = '') {
-  // window.Logger.info('🔧 populateSelect called:', { selectId, dataLength: data?.length, field, prefix }, { page: "alerts" });
+  try {
+    // window.Logger.info('🔧 populateSelect called:', { selectId, dataLength: data?.length, field, prefix }, { page: "alerts" });
 
-  const select = document.getElementById(selectId);
-  if (!select) {
-    // window.Logger.error('🔧 Select element not found:', selectId, { page: "alerts" });
-    return;
-  }
+    const select = document.getElementById(selectId);
+    if (!select) {
+      // window.Logger.error('🔧 Select element not found:', selectId, { page: "alerts" });
+      return;
+    }
 
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
@@ -1027,6 +1086,13 @@ function populateSelect(selectId, data, field, prefix = '') {
   });
 
   // window.Logger.info('🔧 populateSelect completed for:', selectId, 'with', data.length, 'items', { page: "alerts" });
+  
+  } catch (error) {
+    window.Logger.error('שגיאה במילוי select:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במילוי select', error.message);
+    }
+  }
 }
 
 
@@ -1035,17 +1101,25 @@ function populateSelect(selectId, data, field, prefix = '') {
  * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
  */
 function onRelationTypeChange(radioElement) {
-  // window.Logger.info('🔧 Relation type changed:', radioElement.value, { page: "alerts" });
+  try {
+    // window.Logger.info('🔧 Relation type changed:', radioElement.value, { page: "alerts" });
 
-  // הפעלת שדה בחירת אובייקט
-  const relatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
-  if (relatedObjectSelect) {
-    relatedObjectSelect.disabled = false;
-    relatedObjectSelect.classList.remove('disabled-field');
-  }
+    // הפעלת שדה בחירת אובייקט
+    const relatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
+    if (relatedObjectSelect) {
+      relatedObjectSelect.disabled = false;
+      relatedObjectSelect.classList.remove('disabled-field');
+    }
 
   // מילוי רשימת האובייקטים לפי הסוג שנבחר
   populateRelatedObjects(parseInt(radioElement.value));
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בשינוי סוג שיוך:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בשינוי סוג שיוך', error.message);
+    }
+  }
 }
 
 /**
@@ -1053,14 +1127,21 @@ function onRelationTypeChange(radioElement) {
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
 function onRelatedObjectChange(selectElement) {
-  // window.Logger.info('🔧 Related object changed:', selectElement.value, { page: "alerts" });
+  try {
+    // window.Logger.info('🔧 Related object changed:', selectElement.value, { page: "alerts" });
 
-  if (selectElement.value) {
-    // הפעלת שדות התנאי ישירות
-    enableConditionFields();
-  } else {
-    // השבתת שדות התנאי
-    disableConditionFields();
+    if (selectElement.value) {
+      // הפעלת שדות התנאי ישירות
+      enableConditionFields();
+    } else {
+      // השבתת שדות התנאי
+      disableConditionFields();
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בבחירת אובייקט:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בבחירת אובייקט', error.message);
+    }
   }
 }
 
@@ -1069,10 +1150,11 @@ function onRelatedObjectChange(selectElement) {
  * הפעלת שדות התנאי
  */
 function enableConditionFields() {
-  const conditionAttribute = document.getElementById('conditionAttribute');
-  const conditionOperator = document.getElementById('conditionOperator');
-  const conditionNumber = document.getElementById('conditionNumber');
-  const alertMessage = document.getElementById('alertMessage');
+  try {
+    const conditionAttribute = document.getElementById('conditionAttribute');
+    const conditionOperator = document.getElementById('conditionOperator');
+    const conditionNumber = document.getElementById('conditionNumber');
+    const alertMessage = document.getElementById('alertMessage');
 
   if (conditionAttribute) {
     conditionAttribute.disabled = false;
@@ -1090,16 +1172,24 @@ function enableConditionFields() {
     alertMessage.disabled = false;
     alertMessage.classList.remove('disabled-field');
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהפעלת שדות התנאי:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהפעלת שדות התנאי', error.message);
+    }
+  }
 }
 
 /**
  * השבתת שדות התנאי
  */
 function disableConditionFields() {
-  const conditionAttribute = document.getElementById('conditionAttribute');
-  const conditionOperator = document.getElementById('conditionOperator');
-  const conditionNumber = document.getElementById('conditionNumber');
-  const alertMessage = document.getElementById('alertMessage');
+  try {
+    const conditionAttribute = document.getElementById('conditionAttribute');
+    const conditionOperator = document.getElementById('conditionOperator');
+    const conditionNumber = document.getElementById('conditionNumber');
+    const alertMessage = document.getElementById('alertMessage');
 
   if (conditionAttribute) {
     conditionAttribute.disabled = true;
@@ -1121,6 +1211,13 @@ function disableConditionFields() {
     alertMessage.classList.add('disabled-field');
     alertMessage.value = '';
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהשבתת שדות התנאי:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהשבתת שדות התנאי', error.message);
+    }
+  }
 }
 
 /**
@@ -1128,11 +1225,12 @@ function disableConditionFields() {
  * @param {number} relationTypeId - מזהה סוג השיוך
  */
 function populateRelatedObjects(relationTypeId) {
-  const selectElement = document.getElementById('alertRelatedObjectSelect');
-  if (!selectElement) {return;}
+  try {
+    const selectElement = document.getElementById('alertRelatedObjectSelect');
+    if (!selectElement) {return;}
 
-  // ניקוי הרשימה
-  selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+    // ניקוי הרשימה
+    selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
   // מילוי לפי סוג השיוך
   switch (relationTypeId) {
@@ -1151,6 +1249,13 @@ function populateRelatedObjects(relationTypeId) {
   case 4: // טיקר
     populateSelect('alertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
     break;
+  }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה במילוי אובייקטים קשורים:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במילוי אובייקטים קשורים', error.message);
+    }
   }
 }
 

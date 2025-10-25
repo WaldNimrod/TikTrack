@@ -96,6 +96,7 @@ class ImportOrchestrator:
                 'file_content': file_content,
                 'connector_type': connector.get_provider_name().lower()
             })
+            self.db_session.commit()
             
             return {
                 'success': True,
@@ -177,6 +178,7 @@ class ImportOrchestrator:
             # Update session
             session.add_summary_data(analysis_results)
             session.update_status('ready')
+            self.db_session.commit()
             
             return {
                 'success': True,

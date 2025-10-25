@@ -18,6 +18,7 @@ from typing import Dict, Any
 
 from config.database import get_db
 from services.user_data_import import ImportOrchestrator
+from models.import_session import ImportSession
 from models.trading_account import TradingAccount
 
 logger = logging.getLogger(__name__)
@@ -172,6 +173,14 @@ def upload_file():
                     'message': analysis_result['error']
                 }), 500
             
+            # Save analysis results to session
+            session = db_session.query(ImportSession).filter(
+                ImportSession.id == result['session_id']
+            ).first()
+            if session:
+                session.add_summary_data(analysis_result['analysis_results'])
+                db_session.commit()
+            
             return jsonify({
                 'status': 'success',
                 'session_id': result['session_id'],
@@ -225,6 +234,45 @@ def analyze_session(session_id: int):
         return jsonify({
             'status': 'error',
             'message': f'Analysis failed: {str(e)}'
+        }), 500
+
+@user_data_import_bp.route('/session/<int:session_id>', methods=['GET'])
+def get_session(session_id: int):
+    """
+    Get session details.
+    
+    Args:
+        session_id: Import session ID
+        
+    Returns:
+        JSON response with session data
+    """
+    try:
+        db_session = next(get_db())
+        try:
+            session = db_session.query(ImportSession).filter(
+                ImportSession.id == session_id
+            ).first()
+            
+            if not session:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Session not found'
+                }), 404
+            
+            return jsonify({
+                'status': 'success',
+                'session': session.to_dict()
+            }), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Failed to get session: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Failed to get session: {str(e)}'
         }), 500
 
 @user_data_import_bp.route('/session/<int:session_id>/preview', methods=['GET'])

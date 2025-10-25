@@ -446,11 +446,82 @@ async function generateImportPreview() {
  */
 function displayImportAnalysisResults(results) {
     document.getElementById('import-valid-count').textContent = results.valid_records || 0;
-    document.getElementById('import-missing-tickers-count').textContent = results.missing_tickers || 0;
+    document.getElementById('import-missing-tickers-count').textContent = 0; // TODO: Add missing tickers logic
     document.getElementById('import-duplicates-count').textContent = results.duplicate_records || 0;
     document.getElementById('import-errors-count').textContent = results.invalid_records || 0;
     
+    // Display detailed error information
+    displayDetailedErrors(results);
+    
     document.getElementById('import-analysis-results').style.display = 'block';
+    
+    // Enable next button if there are valid records
+    if (results.valid_records > 0) {
+        document.getElementById('import-next-btn').disabled = false;
+        document.getElementById('import-next-btn').style.display = 'inline-block';
+    } else {
+        document.getElementById('import-next-btn').disabled = true;
+        document.getElementById('import-next-btn').style.display = 'none';
+    }
+}
+
+/**
+ * Display detailed error information
+ */
+function displayDetailedErrors(results) {
+    const errorContainer = document.getElementById('import-error-details');
+    if (!errorContainer) return;
+    
+    let errorHtml = '';
+    
+    // Normalization errors
+    if (results.normalization_errors && results.normalization_errors.length > 0) {
+        errorHtml += '<div class="error-section">';
+        errorHtml += '<h4>שגיאות נורמליזציה:</h4>';
+        errorHtml += '<div class="error-list">';
+        results.normalization_errors.forEach((error, index) => {
+            errorHtml += `<div class="error-item">`;
+            errorHtml += `<strong>שורה ${error.record_index + 1}:</strong> `;
+            errorHtml += error.errors.join(', ');
+            errorHtml += `</div>`;
+        });
+        errorHtml += '</div></div>';
+    }
+    
+    // Validation errors
+    if (results.validation_errors && results.validation_errors.length > 0) {
+        errorHtml += '<div class="error-section">';
+        errorHtml += '<h4>שגיאות ולידציה:</h4>';
+        errorHtml += '<div class="error-list">';
+        results.validation_errors.forEach((error, index) => {
+            errorHtml += `<div class="error-item">`;
+            errorHtml += `<strong>רשומה ${index + 1}:</strong> `;
+            errorHtml += error.errors.join(', ');
+            errorHtml += `</div>`;
+        });
+        errorHtml += '</div></div>';
+    }
+    
+    // Duplicate details
+    if (results.duplicate_details && results.duplicate_details.within_file_duplicates && results.duplicate_details.within_file_duplicates.length > 0) {
+        errorHtml += '<div class="error-section">';
+        errorHtml += '<h4>כפילויות זוהו:</h4>';
+        errorHtml += '<div class="error-list">';
+        results.duplicate_details.within_file_duplicates.forEach((dup, index) => {
+            errorHtml += `<div class="error-item">`;
+            errorHtml += `<strong>כפילות ${index + 1}:</strong> `;
+            errorHtml += `${dup.record.symbol} - ${dup.record.action} - ${dup.record.quantity} (ביטחון: ${dup.confidence_score}%)`;
+            errorHtml += `</div>`;
+        });
+        errorHtml += '</div></div>';
+    }
+    
+    if (errorHtml === '') {
+        errorHtml = '<div class="no-errors">אין שגיאות לפרט</div>';
+    }
+    
+    errorContainer.innerHTML = errorHtml;
+    errorContainer.style.display = errorHtml.includes('no-errors') ? 'none' : 'block';
 }
 
 /**

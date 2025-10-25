@@ -64,8 +64,8 @@ window.loadNotesData = async function() {
 };
 
 /**
- * הוספת הערה חדשה
- * פותח מודל להוספת הערה חדשה
+ * Add a new note to the system
+ * Opens the add note modal for user input
  */
 function addNote() {
   try {
@@ -152,10 +152,9 @@ function uploadFile(noteId) {
 }
 
 /**
- * הורדת קובץ
- * מוריד קובץ מהערה
- * @param {number} noteId - מזהה ההערה
- * @param {string} fileName - שם הקובץ
+ * Download a file associated with a note
+ * @param {number} noteId - The ID of the note
+ * @param {string} fileName - The name of the file to download
  */
 function downloadFile(noteId, fileName) {
   try {
@@ -259,14 +258,33 @@ function viewLinkedItems(noteId) {
  */
 
 // פונקציות בסיסיות
+/**
+ * Open note details modal
+ * @param {number} _id - The ID of the note
+ */
 function openNoteDetails(_id) {
-  showAddNoteModal();
+  try {
+    showAddNoteModal();
+  } catch (error) {
+    window.Logger.error('שגיאה בפתיחת פרטי הערה:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפתיחת פרטי הערה', error.message);
+    }
+  }
 }
 
+/**
+ * Edit a note
+ * @param {number} _id - The ID of the note to edit
+ */
 function editNote(_id) {
   showEditNoteModal(_id);
 }
 
+/**
+ * Delete a note
+ * @param {number} id - The ID of the note to delete
+ */
 function deleteNote(id) {
   // שימוש במערכת הגלובלית למחיקה
   if (typeof window.showDeleteWarning === 'function') {
@@ -318,9 +336,14 @@ function deleteNote(id) {
 // toggleSection function removed - use toggleSection('main') instead
 
 // פונקציה לשחזור מצב הסגירה
+/**
+ * Restore the state of notes sections from localStorage
+ * Restores the collapsed/expanded state of various sections
+ */
 function restoreNotesSectionState() {
-  // שחזור מצב top-section (התראות וסיכום)
-  const topCollapsed = localStorage.getItem('notesTopSectionHidden') === 'true';
+  try {
+    // שחזור מצב top-section (התראות וסיכום)
+    const topCollapsed = localStorage.getItem('notesTopSectionHidden') === 'true';
   const topSection = document.querySelector('.top-section');
 
   if (topSection) {
@@ -351,6 +374,13 @@ function restoreNotesSectionState() {
       if (icon) {
         icon.textContent = '▼';
       }
+    }
+  }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בשחזור מצב סקשנים:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בשחזור מצב סקשנים', error.message);
     }
   }
 }
@@ -481,10 +511,19 @@ async function loadNotesData() {
 }
 
 // פונקציה לעדכון הטבלה
+/**
+ * Update the notes table with new data
+ * @param {Array} notes - Array of notes to display
+ * @param {Array} accounts - Array of accounts for linking
+ * @param {Array} trades - Array of trades for linking
+ * @param {Array} tradePlans - Array of trade plans for linking
+ * @param {Array} tickers - Array of tickers for linking
+ */
 function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], tickers = []) {
-  window.Logger.info('🚀🚀🚀 updateNotesTable התחיל עם', notes ? notes.length : 0, 'הערות 🚀🚀🚀', { page: "notes" });
-  
-  const tbody = document.querySelector('#notesTable tbody');
+  try {
+    window.Logger.info('🚀🚀🚀 updateNotesTable התחיל עם', notes ? notes.length : 0, 'הערות 🚀🚀🚀', { page: "notes" });
+    
+    const tbody = document.querySelector('#notesTable tbody');
   if (!tbody) {
     window.Logger.error('❌ לא נמצא tbody בטבלה', { page: "notes" });
     handleElementNotFound('updateNotesTable', 'לא נמצא tbody בטבלה');
@@ -649,12 +688,24 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
   if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
     window.ButtonSystem.initializeButtons();
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון טבלת הערות:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון טבלת הערות', error.message);
+    }
+  }
 }
 
 // פונקציה לעדכון סיכום הערות
+/**
+ * Update the notes summary section
+ * @param {Array} notes - Array of notes to summarize
+ */
 function updateNotesSummary(notes) {
-  // שמירת המספר המקורי לחיפוש
-  window.originalNotesCount = notes.length;
+  try {
+    // שמירת המספר המקורי לחיפוש
+    window.originalNotesCount = notes.length;
 
   // עדכון table-count
   const tableCountElement = document.querySelector('.table-count');
@@ -677,10 +728,24 @@ function updateNotesSummary(notes) {
       `;
     }
   }
-
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון סיכום הערות:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון סיכום הערות', error.message);
+    }
+  }
 }
 
 // פונקציה לעדכון גלובלי של הטבלה (נדרשת עבור הפילטרים)
+/**
+ * Update grid from component filters
+ * @param {Array} _selectedStatuses - Selected statuses filter
+ * @param {Array} _selectedTypes - Selected types filter
+ * @param {Array} _selectedAccounts - Selected accounts filter
+ * @param {Object} _selectedDateRange - Selected date range filter
+ * @param {string} _searchTerm - Search term filter
+ */
 function updateGridFromComponent(
   _selectedStatuses,
   _selectedTypes,
@@ -688,14 +753,26 @@ function updateGridFromComponent(
   _selectedDateRange,
   _searchTerm,
 ) {
-  // כרגע רק נטען מחדש את הנתונים
-  loadNotesData();
+  try {
+    // כרגע רק נטען מחדש את הנתונים
+    loadNotesData();
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון גריד מהקומפוננט:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון גריד מהקומפוננט', error.message);
+    }
+  }
 }
 
 // פונקציות מודלים
+/**
+ * Show add note modal
+ * Opens the modal for adding a new note
+ */
 function showAddNoteModal() {
-  // איפוס הטופס
-  document.getElementById('addNoteForm').reset();
+  try {
+    // איפוס הטופס
+    document.getElementById('addNoteForm').reset();
 
   // ניקוי עורך הטקסט
   setEditorContent('', 'add');
@@ -725,12 +802,24 @@ function showAddNoteModal() {
   // הצגת המודל
   const modal = new bootstrap.Modal(document.getElementById('addNoteModal'));
   modal.show();
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בפתיחת מודל הוספת הערה:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפתיחת מודל הוספת הערה', error.message);
+    }
+  }
 }
 
+/**
+ * Show edit note modal
+ * @param {number} noteId - The ID of the note to edit
+ */
 function showEditNoteModal(noteId) {
-  // ניקוי דגלים
-  window.removeAttachmentFlag = false;
-  window.replaceAttachmentFlag = false;
+  try {
+    // ניקוי דגלים
+    window.removeAttachmentFlag = false;
+    window.replaceAttachmentFlag = false;
 
   // טעינת נתוני ההערה
   loadNoteData(noteId);
@@ -738,6 +827,13 @@ function showEditNoteModal(noteId) {
   // הצגת המודל
   const modal = new bootstrap.Modal(document.getElementById('editNoteModal'));
   modal.show();
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בפתיחת מודל עריכת הערה:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפתיחת מודל עריכת הערה', error.message);
+    }
+  }
 }
 
 async function loadNoteData(noteId) {
@@ -828,8 +924,9 @@ async function loadModalData() {
  * עדכון רדיו באטונים
  */
 function updateRadioButtons(accounts, trades, tradePlans, tickers) {
-  // עדכון רדיו באטון לחשבונות
-  const accountRadio = document.getElementById('noteRelationAccount');
+  try {
+    // עדכון רדיו באטון לחשבונות
+    const accountRadio = document.getElementById('noteRelationAccount');
   const editAccountRadio = document.getElementById('editNoteRelationAccount');
 
   if (accountRadio) {
@@ -891,14 +988,22 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
       populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
     });
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון רדיו באטונים:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון רדיו באטונים', error.message);
+    }
+  }
 }
 
 /**
  * מילוי select עם נתונים
  */
 function populateSelect(selectId, data, field, prefix = '') {
-  const select = document.getElementById(selectId);
-  if (!select) {return;}
+  try {
+    const select = document.getElementById(selectId);
+    if (!select) {return;}
 
   if (data.length > 0) {
     // Data available for population
@@ -938,8 +1043,19 @@ function populateSelect(selectId, data, field, prefix = '') {
     option.textContent = displayText;
     select.appendChild(option);
   });
+  
+  } catch (error) {
+    window.Logger.error('שגיאה במילוי select:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במילוי select', error.message);
+    }
+  }
 }
 
+/**
+ * Handle note relation type change
+ * Called when radio button for relation type changes
+ */
 function onNoteRelationTypeChange() {
   // הפונקציה הזו נקראת בעת שינוי רדיו באטון
   // הלוגיקה האמיתית נמצאת ב-updateRadioButtons
@@ -1006,11 +1122,20 @@ async function populateEditSelectByType(relationType, selectedId) {
 }
 
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
+/**
+ * Validate note form
+ * @param {string} content - Note content
+ * @param {string} relationType - Type of relation
+ * @param {string} relatedId - ID of related object
+ * @param {File} attachment - Attachment file
+ * @returns {boolean} Whether the form is valid
+ */
 function validateNoteForm(content, relationType, relatedId, attachment) {
-  let isValid = true;
+  try {
+    let isValid = true;
 
-  // ניקוי שגיאות קודמות
-  clearNoteValidationErrors();
+    // ניקוי שגיאות קודמות
+    clearNoteValidationErrors();
 
   // וולידציה של תוכן
   if (!content) {
@@ -1057,14 +1182,31 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
   }
 
   return isValid;
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בוולידציה של טופס הערה:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בוולידציה של טופס הערה', error.message);
+    }
+    return false;
+  }
 }
 
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
+/**
+ * Validate edit note form
+ * @param {string} content - Note content
+ * @param {string} relationType - Type of relation
+ * @param {string} relatedId - ID of related object
+ * @param {File} attachment - Attachment file
+ * @returns {boolean} Whether the form is valid
+ */
 function validateEditNoteForm(content, relationType, relatedId, attachment) {
-  let isValid = true;
+  try {
+    let isValid = true;
 
-  // ניקוי שגיאות קודמות
-  clearNoteValidationErrors();
+    // ניקוי שגיאות קודמות
+    clearNoteValidationErrors();
 
   // וולידציה של תוכן
   if (!content) {
@@ -1109,6 +1251,14 @@ function validateEditNoteForm(content, relationType, relatedId, attachment) {
   }
 
   return isValid;
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בוולידציה של טופס עריכת הערה:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בוולידציה של טופס עריכת הערה', error.message);
+    }
+    return false;
+  }
 }
 
 // פונקציות שמירה ומחיקה
@@ -1284,10 +1434,15 @@ async function deleteNoteFromServer(noteId) {
 
 // פונקציות ולידציה
 
+/**
+ * Clear note validation errors
+ * Uses global validation system or fallback to local system
+ */
 function clearNoteValidationErrors() {
-  // שימוש במערכת הגלובלית לוולידציה
-  if (typeof window.clearValidation === 'function') {
-    window.clearValidation();
+  try {
+    // שימוש במערכת הגלובלית לוולידציה
+    if (typeof window.clearValidation === 'function') {
+      window.clearValidation();
   } else {
     // fallback למערכת המקומית
     const errorElements = document.querySelectorAll('.invalid-feedback');
@@ -1301,6 +1456,13 @@ function clearNoteValidationErrors() {
     fields.forEach(field => {
       field.classList.remove('is-invalid');
     });
+  }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בניקוי שגיאות ולידציה:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בניקוי שגיאות ולידציה', error.message);
+    }
   }
 }
 
@@ -1344,9 +1506,14 @@ window.populateSelect = populateSelect;
 
 
 // פונקציה להגדרת אירועי ולידציה
+/**
+ * Setup note validation events
+ * Sets up event listeners for form validation
+ */
 function setupNoteValidationEvents() {
-  // ולידציה לשדה תוכן (עורך טקסט עשיר)
-  const contentField = document.getElementById('noteContent');
+  try {
+    // ולידציה לשדה תוכן (עורך טקסט עשיר)
+    const contentField = document.getElementById('noteContent');
   if (contentField) {
     contentField.addEventListener('input', function () {
       const content = this.innerText || this.textContent || '';
@@ -1476,13 +1643,21 @@ function setupNoteValidationEvents() {
       }
     });
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהגדרת אירועי ולידציה:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהגדרת אירועי ולידציה', error.message);
+    }
+  }
 }
 
 // פונקציה לביטול בחירת קובץ
 function clearSelectedFile() {
-  const fileInput = document.getElementById('editNoteAttachment');
-  const displayElement = document.getElementById('currentAttachmentDisplay');
-  const actionsElement = document.getElementById('attachmentActions');
+  try {
+    const fileInput = document.getElementById('editNoteAttachment');
+    const displayElement = document.getElementById('currentAttachmentDisplay');
+    const actionsElement = document.getElementById('attachmentActions');
 
   if (fileInput) {
     fileInput.value = '';
@@ -1499,6 +1674,13 @@ function clearSelectedFile() {
   // ניקוי דגלים
   window.removeAttachmentFlag = false;
   window.replaceAttachmentFlag = false;
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בניקוי קובץ נבחר:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בניקוי קובץ נבחר', error.message);
+    }
+  }
 }
 
 // ===== פונקציות סידור =====
@@ -1520,16 +1702,24 @@ function clearSelectedFile() {
  * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
-  // בדיקה אם יש נתונים לפני שחזור סידור
-  if (!window.notesData || window.notesData.length === 0) {
-    // אין נתונים לשחזור סידור - ממתין לטעינת נתונים
-    return;
+  try {
+    // בדיקה אם יש נתונים לפני שחזור סידור
+    if (!window.notesData || window.notesData.length === 0) {
+      // אין נתונים לשחזור סידור - ממתין לטעינת נתונים
+      return;
   }
 
   if (typeof window.restoreAnyTableSort === 'function') {
     window.restoreAnyTableSort('notes', window.notesData || [], updateNotesTable);
   } else {
     handleFunctionNotFound('restoreAnyTableSort', 'פונקציית שחזור מיון טבלה לא נמצאה');
+  }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בשחזור מצב סידור:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בשחזור מצב סידור', error.message);
+    }
   }
 }
 
@@ -1541,10 +1731,18 @@ function restoreSortState() {
  * @param {string} symbol - סמל הטיקר
  */
 function showTickerPage(symbol) {
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', `דף הטיקר ${symbol} נמצא בפיתוח`);
+  try {
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('מידע', `דף הטיקר ${symbol} נמצא בפיתוח`);
   } else {
     // Fallback notification
+  }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהצגת דף טיקר:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהצגת דף טיקר', error.message);
+    }
   }
 }
 
@@ -1561,8 +1759,9 @@ window.showTickerPage = showTickerPage;
  * @param {string} mode - 'add' או 'edit'
  */
 function formatText(command, mode = 'add') {
-  const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
-  const editor = document.getElementById(editorId);
+  try {
+    const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
+    const editor = document.getElementById(editorId);
 
   if (!editor) {
     return;
@@ -1628,6 +1827,13 @@ function formatText(command, mode = 'add') {
   default:
     // window.Logger.warn(`⚠️ פקודה לא מוכרת: ${command}`, { page: "notes" });
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעיצוב טקסט:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעיצוב טקסט', error.message);
+    }
+  }
 }
 
 /**
@@ -1635,8 +1841,9 @@ function formatText(command, mode = 'add') {
  * @param {string} mode - 'add' או 'edit'
  */
 function clearFormatting(mode = 'add') {
-  const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
-  const editor = document.getElementById(editorId);
+  try {
+    const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
+    const editor = document.getElementById(editorId);
 
   if (!editor) {
     return;
@@ -1644,6 +1851,13 @@ function clearFormatting(mode = 'add') {
 
   editor.focus();
   document.execCommand('removeFormat', false, null);
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בניקוי עיצוב:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בניקוי עיצוב', error.message);
+    }
+  }
 }
 
 /**
@@ -1652,8 +1866,9 @@ function clearFormatting(mode = 'add') {
  * @returns {string} תוכן העורך
  */
 function getEditorContent(mode = 'add') {
-  const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
-  const editor = document.getElementById(editorId);
+  try {
+    const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
+    const editor = document.getElementById(editorId);
 
   if (!editor) {
     return '';
@@ -1669,6 +1884,14 @@ function getEditorContent(mode = 'add') {
   }
 
   return content;
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בקבלת תוכן עורך:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בקבלת תוכן עורך', error.message);
+    }
+    return '';
+  }
 }
 
 /**
@@ -1677,14 +1900,22 @@ function getEditorContent(mode = 'add') {
  * @param {string} mode - 'add' או 'edit'
  */
 function setEditorContent(content, mode = 'add') {
-  const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
-  const editor = document.getElementById(editorId);
+  try {
+    const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
+    const editor = document.getElementById(editorId);
 
   if (!editor) {
     return;
   }
 
   editor.innerHTML = content || '';
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהגדרת תוכן עורך:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהגדרת תוכן עורך', error.message);
+    }
+  }
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -1705,10 +1936,15 @@ window.replaceCurrentAttachment = replaceCurrentAttachment;
 window.clearSelectedFile = clearSelectedFile;
 
 // פונקציה לסינון הערות לפי חיפוש
+/**
+ * Filter notes data by search term
+ * @param {string} searchTerm - Search term to filter by
+ */
 function filterNotesData(searchTerm) {
-  if (!window.notesData) {
-    // window.Logger.warn('⚠️ אין נתוני הערות זמינים לסינון', { page: "notes" });
-    return;
+  try {
+    if (!window.notesData) {
+      // window.Logger.warn('⚠️ אין נתוני הערות זמינים לסינון', { page: "notes" });
+      return;
   }
 
   const filteredNotes = window.notesData.filter(note => {
@@ -1726,13 +1962,25 @@ function filterNotesData(searchTerm) {
     window.tradePlansData || [],
     window.tickersData || [],
   );
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בסינון נתוני הערות:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בסינון נתוני הערות', error.message);
+    }
+  }
 }
 
 // פונקציה לסינון הערות לפי סוג
+/**
+ * Filter notes by type
+ * @param {string} type - Type to filter by
+ */
 function filterNotesByType(type) {
-  if (!window.notesData) {
-    // window.Logger.warn('⚠️ אין נתוני הערות זמינים לסינון', { page: "notes" });
-    return;
+  try {
+    if (!window.notesData) {
+      // window.Logger.warn('⚠️ אין נתוני הערות זמינים לסינון', { page: "notes" });
+      return;
   }
 
   // עדכון מצב הכפתורים
@@ -1788,23 +2036,48 @@ function filterNotesByType(type) {
     window.tradePlansData || [],
     window.tickersData || [],
   );
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בסינון הערות לפי סוג:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בסינון הערות לפי סוג', error.message);
+    }
+  }
 }
 
 // פונקציה לקבלת שם תצוגה לסוג
+/**
+ * Get display name for type
+ * @param {string} type - Type to get display name for
+ * @returns {string} Display name
+ */
 function getTypeDisplayName(type) {
-  switch (type) {
-  case 'account': return 'חשבונות';
-  case 'trade': return 'טריידים';
-  case 'trade_plan': return 'תוכניות';
-  case 'ticker': return 'טיקרים';
-  default: return type;
+  try {
+    switch (type) {
+    case 'account': return 'חשבונות';
+    case 'trade': return 'טריידים';
+    case 'trade_plan': return 'תוכניות';
+    case 'ticker': return 'טיקרים';
+    default: return type;
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בקבלת שם תצוגה לסוג:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בקבלת שם תצוגה לסוג', error.message);
+    }
+    return type;
   }
 }
 
 // פונקציה לצפייה בהערה
+/**
+ * View a note
+ * @param {number} noteId - ID of the note to view
+ */
 function viewNote(noteId) {
-  // שמירת מזהה ההערה הנוכחית
-  window.currentViewingNoteId = noteId;
+  try {
+    // שמירת מזהה ההערה הנוכחית
+    window.currentViewingNoteId = noteId;
 
   // טעינת נתוני ההערה
   loadNoteForViewing(noteId);
@@ -1812,6 +2085,13 @@ function viewNote(noteId) {
   // הצגת המודל
   const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
   modal.show();
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בצפייה בהערה:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בצפייה בהערה', error.message);
+    }
+  }
 }
 
 // פונקציה לטעינת נתוני הערה לצפייה
@@ -1866,9 +2146,15 @@ async function loadNoteForViewing(noteId) {
 }
 
 // פונקציה לקבלת תצוגת הקשר של הערה - משתמשת במערכת הכללית
+/**
+ * Get related object display for note
+ * @param {Object} note - Note object
+ * @returns {string} Display name of related object
+ */
 function getNoteRelatedDisplay(note) {
-  if (!note.related_type_id || !note.related_id) {
-    return 'כללי';
+  try {
+    if (!note.related_type_id || !note.related_id) {
+      return 'כללי';
   }
 
   // שימוש במערכת הכללית אם זמינה
@@ -1896,25 +2182,50 @@ function getNoteRelatedDisplay(note) {
   case 4: return `📊 טיקר ${note.related_id}`;
   default: return `אובייקט ${note.related_id}`;
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בקבלת תצוגת אובייקט קשור:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בקבלת תצוגת אובייקט קשור', error.message);
+    }
+    return 'כללי';
+  }
 }
 
 // פונקציה לעריכת הערה נוכחית
+/**
+ * Edit current note
+ * Opens edit modal for the currently viewing note
+ */
 function editCurrentNote() {
-  const noteId = window.currentViewingNoteId;
-  if (noteId) {
-    // סגירת מודל הצפייה
-    const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewNoteModal'));
-    viewModal.hide();
+  try {
+    const noteId = window.currentViewingNoteId;
+    if (noteId) {
+      // סגירת מודל הצפייה
+      const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewNoteModal'));
+      viewModal.hide();
 
     // פתיחת מודל העריכה
     showEditNoteModal(noteId);
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעריכת הערה הנוכחית:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעריכת הערה הנוכחית', error.message);
+    }
+  }
 }
 
 // פונקציה להצגת קובץ מצורף נוכחי במודל עריכה
+/**
+ * Display current attachment in edit modal
+ * @param {Object} attachment - Attachment object to display
+ */
 function displayCurrentAttachment(attachment) {
-  const displayElement = document.getElementById('currentAttachmentDisplay');
-  const actionsElement = document.getElementById('attachmentActions');
+  try {
+    const displayElement = document.getElementById('currentAttachmentDisplay');
+    const actionsElement = document.getElementById('attachmentActions');
 
   if (!displayElement || !actionsElement) {
     return;
@@ -1954,13 +2265,25 @@ function displayCurrentAttachment(attachment) {
     displayElement.textContent = 'אין קובץ מצורף';
     actionsElement.style.display = 'none';
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהצגת קובץ מצורף נוכחי:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהצגת קובץ מצורף נוכחי', error.message);
+    }
+  }
 }
 
 // פונקציה למחיקת קובץ מצורף נוכחי
+/**
+ * Remove current attachment
+ * Removes the current attachment from edit modal
+ */
 function removeCurrentAttachment() {
-  const displayElement = document.getElementById('currentAttachmentDisplay');
-  const actionsElement = document.getElementById('attachmentActions');
-  const fileInput = document.getElementById('editNoteAttachment');
+  try {
+    const displayElement = document.getElementById('currentAttachmentDisplay');
+    const actionsElement = document.getElementById('attachmentActions');
+    const fileInput = document.getElementById('editNoteAttachment');
 
   if (displayElement) {
     displayElement.textContent = 'אין קובץ מצורף';
@@ -1982,9 +2305,20 @@ function removeCurrentAttachment() {
   } else {
     // Fallback notification
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהסרת קובץ מצורף נוכחי:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהסרת קובץ מצורף נוכחי', error.message);
+    }
+  }
 }
 
 // פונקציה להחלפת קובץ מצורף
+/**
+ * Replace current attachment
+ * Opens file picker to replace current attachment
+ */
 function replaceCurrentAttachment() {
   const fileInput = document.getElementById('editNoteAttachment');
   if (fileInput) {
@@ -1998,6 +2332,10 @@ function replaceCurrentAttachment() {
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
 
 // Toggle functions
+/**
+ * Toggle section using global function
+ * Uses global toggleSection function if available
+ */
 function toggleSection() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection();
@@ -2009,6 +2347,10 @@ function toggleSection() {
 // toggleSection function removed - use toggleSection('main') instead
 
 // Note CRUD functions
+/**
+ * Open note details wrapper
+ * Uses global openNoteDetails function if available
+ */
 function openNoteDetailsWrapper() {
     if (typeof window.openNoteDetails === 'function') {
         window.openNoteDetails();
@@ -2025,6 +2367,10 @@ function editNote(id) {
     }
 }
 
+/**
+ * Delete note wrapper
+ * @param {number} id - ID of note to delete
+ */
 function deleteNote(id) {
     if (typeof window.deleteNote === 'function') {
         window.deleteNote(id);
@@ -2034,6 +2380,10 @@ function deleteNote(id) {
 }
 
 // Filter functions
+/**
+ * Filter notes by related object type
+ * @param {string} type - Type to filter by
+ */
 function filterNotesByRelatedObjectType(type) {
     if (typeof window.filterNotesByRelatedObjectType === 'function') {
         window.filterNotesByRelatedObjectType(type);
@@ -2043,6 +2393,10 @@ function filterNotesByRelatedObjectType(type) {
 }
 
 // Text formatting functions
+/**
+ * Format text using global formatText function
+ * @param {string} format - Format command
+ */
 function formatText(format) {
     if (typeof window.formatText === 'function') {
         window.formatText(format);
@@ -2052,6 +2406,10 @@ function formatText(format) {
 }
 
 // Data loading functions
+/**
+ * Load notes data
+ * Fetches notes data from server
+ */
 function loadNotesData() {
     if (typeof window.loadNotesData === 'function') {
         window.loadNotesData();
@@ -2067,6 +2425,10 @@ function loadNotesData() {
 window.openNoteDetails = openNoteDetails;
 window.editNote = editNote;
 // Detailed Log Functions for Notes Page
+/**
+ * Generate detailed log
+ * Creates comprehensive log of notes activities
+ */
 function generateDetailedLog() {
     try {
         const logData = {

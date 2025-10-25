@@ -17,7 +17,10 @@ let homeCharts = {
     mixedChart: null
 };
 
-// Function to switch between table tabs
+/**
+ * Switch between table tabs on the index page
+ * @param {string} tabName - The name of the tab to switch to
+ */
 function switchTableTab(tabName) {
     // Hide all table contents
     document.querySelectorAll('.table-content').forEach(table => {
@@ -39,14 +42,20 @@ function switchTableTab(tabName) {
     event.target.classList.add('active');
 }
 
-// Function to refresh overview data (placeholder)
+/**
+ * Refresh overview data on the index page
+ * Fetches and updates overview section data
+ */
 function refreshOverview() {
     window.Logger.info('Refreshing overview data...', { page: "index" });
     // Implement data fetching and UI update for overview section
 }
 
-// Function to export overview data (placeholder)
-function exportOverview() {
+/**
+ * Export overview data from the index page
+ * @param {string} format - Export format (csv, json, etc.)
+ */
+function exportOverview(format = 'csv') {
     if (typeof showNotification === 'function') {
         showNotification('info', 'ייצוא נתוני סקירה יהיה זמין בעתיד');
     } else {
@@ -54,7 +63,10 @@ function exportOverview() {
     }
 }
 
-// Function for quick actions (placeholder)
+/**
+ * Execute quick actions on the index page
+ * @param {string} actionType - Type of quick action to execute
+ */
 function quickAction(actionType) {
     if (typeof showNotification === 'function') {
         showNotification('info', `פעולה מהירה '${actionType}' תהיה זמינה בעתיד`);
@@ -66,7 +78,10 @@ function quickAction(actionType) {
 // toggleAllSections function removed - use global window.toggleAllSections directly
 // toggleSection function removed - use global window.toggleSection directly
 
-// Chart Management Functions
+/**
+ * Create trades status chart on the index page
+ * @returns {Promise<void>}
+ */
 async function createTradesStatusChart() {
     try {
         // window.Logger.info('📊 Creating trades status chart...', { page: "index" });
@@ -106,6 +121,10 @@ async function createTradesStatusChart() {
     }
 }
 
+/**
+ * Create performance chart on the index page
+ * @returns {Promise<void>}
+ */
 async function createPerformanceChart() {
     try {
         // window.Logger.info('📈 Creating performance chart...', { page: "index" });

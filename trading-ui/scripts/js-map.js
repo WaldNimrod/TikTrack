@@ -1494,7 +1494,7 @@ function initializeJsMapPage() {
  * Copy detailed log using global system
  * מעתיק לוג מפורט באמצעות המערכת הכללית
  */
-async function  {
+async function copyDetailedLog() {
     console.log('📋 Copying JS-Map detailed log...');
     
     try {

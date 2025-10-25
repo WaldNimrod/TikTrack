@@ -2009,7 +2009,7 @@ function toggleSection() {
 // toggleSection function removed - use toggleSection('main') instead
 
 // Note CRUD functions
-function openNoteDetails() {
+function openNoteDetailsWrapper() {
     if (typeof window.openNoteDetails === 'function') {
         window.openNoteDetails();
     } else {

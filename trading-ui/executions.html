@@ -28,6 +28,9 @@
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=05b6de6f_20251025_005449">
+    
+    <!-- Import User Data Modal Styles -->
+    <link rel="stylesheet" href="styles/import-user-data.css?v=05b6de6f_20251025_005449">
 </head>
 
 <body class="executions-page">
@@ -80,7 +83,7 @@
                         <div class="table-count" id="executionsCount">טוען...</div>
                         <div class="table-actions">
                             <button data-button-type="ADD" data-entity-type="execution" data-variant="full" data-onclick="openExecutionDetails()" data-text="הוסף ביצוע" id="addExecutionBtn" title="הוסף ביצוע חדש"></button>
-                            <button data-button-type="IMPORT" data-variant="full" data-onclick="openImportUserData()" data-text="📥 ייבוא נתוני משתמש" title="ייבוא ביצועים מקובץ CSV"></button>
+                            <button data-button-type="IMPORT" data-variant="full" data-onclick="openImportUserDataModal()" data-text="📥 ייבוא נתוני משתמש" title="ייבוא ביצועים מקובץ CSV"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
                     </div>
@@ -318,6 +321,304 @@
                         <button data-button-type="SAVE" data-onclick="updateExecution()" data-text="עדכן"></button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import User Data Modal -->
+    <div class="modal" id="import-user-data-modal" style="display: none;">
+        <div class="modal-content" style="width: 95%; max-width: 1200px; max-height: 90vh;">
+            <div class="modal-header">
+                <h3>📥 ייבוא נתוני משתמש</h3>
+                <button class="modal-close" onclick="closeImportUserDataModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <!-- Progress Steps -->
+                <div class="progress-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">בחירת קובץ</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">בחירת חשבון</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">ניתוח ראשוני</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">טיפול בבעיות</div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-label">תצוגה מקדימה</div>
+                    </div>
+                    <div class="step" data-step="6">
+                        <div class="step-number">6</div>
+                        <div class="step-label">אישור וייבוא</div>
+                    </div>
+                </div>
+
+                <!-- Step 1: File Selection -->
+                <div class="step-content active" id="import-step-1">
+                    <div class="step-header">
+                        <h4>1️⃣ בחירת קובץ</h4>
+                        <p>בחר קובץ CSV לייבוא או גרור אותו לכאן</p>
+                    </div>
+                    
+                    <div class="file-upload-area" id="import-file-upload-area">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">
+                            <p>גרור קובץ CSV לכאן או לחץ לבחירה</p>
+                            <p class="upload-hint">תומך בפורמטים: IBKR Activity Statement, Demo CSV</p>
+                        </div>
+                        <input type="file" id="import-file-input" accept=".csv,.txt" style="display: none;">
+                        <button class="btn btn-primary" onclick="document.getElementById('import-file-input').click()">
+                            בחר קובץ
+                        </button>
+                    </div>
+                    
+                    <div class="file-info" id="import-file-info" style="display: none;">
+                        <div class="file-details">
+                            <span class="file-name" id="import-file-name"></span>
+                            <span class="file-size" id="import-file-size"></span>
+                        </div>
+                        <button class="btn btn-secondary" onclick="clearImportFile()">הסר קובץ</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Account Selection -->
+                <div class="step-content" id="import-step-2">
+                    <div class="step-header">
+                        <h4>2️⃣ בחירת חשבון מסחר</h4>
+                        <p>בחר את החשבון שאליו ייובאו הנתונים</p>
+                    </div>
+                    
+                    <div class="account-selection">
+                        <label for="import-account-select">חשבון יעד:</label>
+                        <select id="import-account-select" class="form-select">
+                            <option value="">טוען חשבונות...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Step 3: Analysis -->
+                <div class="step-content" id="import-step-3">
+                    <div class="step-header">
+                        <h4>3️⃣ ניתוח ראשוני</h4>
+                        <p>מנתח את הקובץ ומזהה בעיות</p>
+                    </div>
+                    
+                    <div class="analysis-progress" id="import-analysis-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="import-progress-fill"></div>
+                        </div>
+                        <div class="progress-text" id="import-progress-text">מתחיל ניתוח...</div>
+                    </div>
+                    
+                    <div class="analysis-results" id="import-analysis-results" style="display: none;">
+                        <div class="results-summary">
+                            <div class="result-item success">
+                                <span class="result-icon">✅</span>
+                                <span class="result-count" id="import-valid-count">0</span>
+                                <span class="result-label">רשומות תקינות</span>
+                            </div>
+                            <div class="result-item warning">
+                                <span class="result-icon">⚠️</span>
+                                <span class="result-count" id="import-missing-tickers-count">0</span>
+                                <span class="result-label">טיקרים חסרים</span>
+                            </div>
+                            <div class="result-item duplicate">
+                                <span class="result-icon">🔄</span>
+                                <span class="result-count" id="import-duplicates-count">0</span>
+                                <span class="result-label">כפילויות</span>
+                            </div>
+                            <div class="result-item error">
+                                <span class="result-icon">❌</span>
+                                <span class="result-count" id="import-errors-count">0</span>
+                                <span class="result-label">שגיאות</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Problem Resolution -->
+                <div class="step-content" id="import-step-4">
+                    <div class="step-header">
+                        <h4>4️⃣ טיפול בבעיות</h4>
+                        <p>פתור בעיות לפני הייבוא</p>
+                    </div>
+                    
+                    <div class="problem-sections">
+                        <!-- Missing Tickers -->
+                        <div class="problem-section" id="import-missing-tickers-section" style="display: none;">
+                            <h5>⚠️ טיקרים חסרים במערכת</h5>
+                            <div class="missing-tickers-list" id="import-missing-tickers-list"></div>
+                            <button class="btn btn-primary" onclick="addMissingTickers()">
+                                הוסף טיקרים חסרים
+                            </button>
+                        </div>
+                        
+                        <!-- Duplicates -->
+                        <div class="problem-section" id="import-duplicates-section" style="display: none;">
+                            <h5>🔄 כפילויות זוהו</h5>
+                            <div class="duplicates-list" id="import-duplicates-list"></div>
+                            <button class="btn btn-secondary" onclick="reviewDuplicates()">
+                                סקור כפילויות
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Preview -->
+                <div class="step-content" id="import-step-5">
+                    <div class="step-header">
+                        <h4>5️⃣ תצוגה מקדימה</h4>
+                        <p>סקור את הנתונים לפני הייבוא</p>
+                    </div>
+                    
+                    <div class="preview-summary" id="import-preview-summary">
+                        <div class="summary-stats">
+                            <div class="stat-item">
+                                <span class="stat-number" id="import-preview-total">0</span>
+                                <span class="stat-label">סה"כ רשומות</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="import-preview-import">0</span>
+                                <span class="stat-label">ייכנסו למערכת</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="import-preview-skip">0</span>
+                                <span class="stat-label">ידולגו</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="showImportPreviewModal()">
+                        👁️ הצג תצוגה מקדימה מלאה
+                    </button>
+                </div>
+
+                <!-- Step 6: Confirmation -->
+                <div class="step-content" id="import-step-6">
+                    <div class="step-header">
+                        <h4>6️⃣ אישור וייבוא</h4>
+                        <p>אשר את הייבוא והתחל את התהליך</p>
+                    </div>
+                    
+                    <div class="final-summary" id="import-final-summary">
+                        <div class="summary-card">
+                            <h5>📊 סיכום ייבוא</h5>
+                            <div class="summary-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">קובץ:</span>
+                                    <span class="detail-value" id="import-final-filename"></span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">חשבון יעד:</span>
+                                    <span class="detail-value" id="import-final-account"></span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">רשומות שייכנסו:</span>
+                                    <span class="detail-value" id="import-final-import-count"></span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">רשומות שידולגו:</span>
+                                    <span class="detail-value" id="import-final-skip-count"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="confirmation-actions">
+                        <button class="btn btn-success" onclick="executeImport()">
+                            ✓ אשר ושמור למערכת
+                        </button>
+                        <button class="btn btn-danger" onclick="cancelImport()">
+                            ✗ ביטול
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="step-navigation">
+                    <button class="btn btn-secondary" id="import-prev-btn" onclick="previousImportStep()" style="display: none;">
+                        ← שלב קודם
+                    </button>
+                    <button class="btn btn-primary" id="import-next-btn" onclick="nextImportStep()" disabled>
+                        שלב הבא →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Preview Modal -->
+    <div class="modal" id="import-preview-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>תצוגה מקדימה - ייבוא נתוני משתמש</h3>
+                <button class="modal-close" onclick="closeImportPreviewModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-tabs">
+                    <button class="tab-btn active" onclick="showImportPreviewTab('import')">
+                        רשומות שייכנסו (<span id="import-import-tab-count">0</span>)
+                    </button>
+                    <button class="tab-btn" onclick="showImportPreviewTab('skip')">
+                        רשומות שידולגו (<span id="import-skip-tab-count">0</span>)
+                    </button>
+                </div>
+                
+                <div class="preview-tab-content">
+                    <div class="preview-tab active" id="import-preview-tab-import">
+                        <div class="preview-table-container">
+                            <table class="preview-table" id="import-preview-table-import">
+                                <thead>
+                                    <tr>
+                                        <th>טיקר</th>
+                                        <th>צד</th>
+                                        <th>כמות</th>
+                                        <th>מחיר</th>
+                                        <th>עמלה</th>
+                                        <th>תאריך</th>
+                                        <th>מזהה חיצוני</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="import-preview-tbody-import">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-tab" id="import-preview-tab-skip">
+                        <div class="preview-table-container">
+                            <table class="preview-table" id="import-preview-table-skip">
+                                <thead>
+                                    <tr>
+                                        <th>טיקר</th>
+                                        <th>צד</th>
+                                        <th>כמות</th>
+                                        <th>מחיר</th>
+                                        <th>עמלה</th>
+                                        <th>תאריך</th>
+                                        <th>סיבה</th>
+                                        <th>פרטים</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="import-preview-tbody-skip">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeImportPreviewModal()">
+                    סגור
+                </button>
             </div>
         </div>
     </div>

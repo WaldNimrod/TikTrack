@@ -2168,7 +2168,7 @@ window.filterAlertsLocally = filterAlertsLocally;
  * פונקציה נוספת שמפעילה פילטר ספציפי בנוסף לפילטר הראשי
  * @param {string} type - סוג האובייקט: 'all', 'account', 'trade', 'trade_plan', 'ticker'
  */
-function filterAlertsByRelatedObjectType(type) {
+function filterAlertsByRelatedObjectTypeWrapper(type) {
   // window.Logger.info('🔧 פילטר התראות לפי סוג אובייקט מקושר - סוג:', type, { page: "alerts" });
 
   // עדכון מצב הכפתורים
@@ -2568,7 +2568,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // Filter functions
-function filterAlertsByRelatedObjectType(type) {
+function filterAlertsByRelatedObjectTypeWrapper(type) {
     if (typeof window.filterAlertsByRelatedObjectType === 'function') {
         window.filterAlertsByRelatedObjectType(type);
     } else {
@@ -3055,3 +3055,148 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ===== CONDITION EVALUATION FUNCTIONS =====
+
+/**
+ * הערכת כל התנאים הפעילים במערכת
+ */
+async function evaluateAllConditions() {
+    try {
+        window.Logger.info('🔍 מתחיל הערכת כל התנאים...', { page: "alerts" });
+        
+        // הצגת אינדיקטור טעינה
+        showEvaluationLoading();
+        
+        // קריאה לשרת להערכת כל התנאים
+        const response = await fetch('/api/plan-conditions/evaluate-all', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        window.Logger.info('📊 תוצאות הערכת תנאים:', data, { page: "alerts" });
+        
+        // הצגת התוצאות
+        displayEvaluationResults(data);
+        
+        // עדכון סטטיסטיקות
+        updateEvaluationSummary(data);
+        
+        window.Logger.info('✅ הערכת תנאים הושלמה בהצלחה', { page: "alerts" });
+        
+    } catch (error) {
+        window.Logger.error('❌ שגיאה בהערכת תנאים:', error, { page: "alerts" });
+        showErrorNotification('שגיאה בהערכת תנאים: ' + error.message);
+    }
+}
+
+/**
+ * רענון תוצאות הערכת תנאים
+ */
+async function refreshConditionEvaluations() {
+    try {
+        window.Logger.info('🔄 מרענן תוצאות הערכת תנאים...', { page: "alerts" });
+        
+        // הצגת אינדיקטור טעינה
+        showEvaluationLoading();
+        
+        // קריאה לשרת לקבלת התראות חדשות
+        const response = await fetch('/api/alerts/');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        window.Logger.info('📊 התראות מעודכנות:', data, { page: "alerts" });
+        
+        // עדכון טבלת ההתראות
+        if (typeof window.updateAlertsTable === 'function') {
+            window.updateAlertsTable(data.data || data);
+        }
+        
+        // עדכון סטטיסטיקות
+        if (typeof window.updateAlertsSummary === 'function') {
+            window.updateAlertsSummary(data.data || data);
+        }
+        
+        window.Logger.info('✅ רענון הושלם בהצלחה', { page: "alerts" });
+        
+    } catch (error) {
+        window.Logger.error('❌ שגיאה ברענון:', error, { page: "alerts" });
+        showErrorNotification('שגיאה ברענון: ' + error.message);
+    }
+}
+
+/**
+ * הצגת אינדיקטור טעינה להערכת תנאים
+ */
+function showEvaluationLoading() {
+    const resultsDiv = document.getElementById('conditionEvaluationResults');
+    if (resultsDiv) {
+        resultsDiv.style.display = 'block';
+        resultsDiv.innerHTML = `
+            <div class="alert alert-info">
+                <h5>📊 הערכת תנאים</h5>
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm me-2" role="status">
+                        <span class="visually-hidden">טוען...</span>
+                    </div>
+                    <span>מעריך תנאים...</span>
+                </div>
+            </div>
+        `;
+    }
+}
+
+/**
+ * הצגת תוצאות הערכת תנאים
+ */
+function displayEvaluationResults(data) {
+    const resultsDiv = document.getElementById('conditionEvaluationResults');
+    if (resultsDiv) {
+        resultsDiv.style.display = 'block';
+        
+        const results = data.data || data;
+        const metCount = results.filter(r => r.met).length;
+        const notMetCount = results.length - metCount;
+        
+        resultsDiv.innerHTML = `
+            <div class="alert alert-info">
+                <h5>📊 תוצאות הערכת תנאים</h5>
+                <div id="evaluationSummary">
+                    <div>סה"כ תנאים: <strong>${results.length}</strong></div>
+                    <div>תנאים שהתקיימו: <strong class="text-success">${metCount}</strong></div>
+                    <div>תנאים שלא התקיימו: <strong class="text-danger">${notMetCount}</strong></div>
+                    <div>זמן הערכה: <strong>${new Date().toLocaleTimeString('he-IL')}</strong></div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+/**
+ * עדכון סטטיסטיקות הערכת תנאים
+ */
+function updateEvaluationSummary(data) {
+    const results = data.data || data;
+    const metCount = results.filter(r => r.met).length;
+    const notMetCount = results.length - metCount;
+    
+    // עדכון אלמנטים
+    const totalConditions = document.getElementById('totalConditions');
+    const metConditions = document.getElementById('metConditions');
+    const notMetConditions = document.getElementById('notMetConditions');
+    const evaluationTime = document.getElementById('evaluationTime');
+    
+    if (totalConditions) totalConditions.textContent = results.length;
+    if (metConditions) metConditions.textContent = metCount;
+    if (notMetConditions) notMetConditions.textContent = notMetCount;
+    if (evaluationTime) evaluationTime.textContent = new Date().toLocaleTimeString('he-IL');
+}

@@ -9,6 +9,11 @@
  * @author TikTrack Development Team
  */
 
+// Mock TextEncoder/TextDecoder for Node.js compatibility
+require('text-encoding');
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
 // Mock global objects
 global.window = {
     location: {

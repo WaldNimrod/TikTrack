@@ -1507,8 +1507,8 @@ async function copyDetailedLog() {
     }
 }
 
-// Export  to global scope
-window. = ;
+// Export functions to global scope
+window.copyDetailedLog = copyDetailedLog;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

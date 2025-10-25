@@ -1118,7 +1118,7 @@ const detailedLogGenerator = {
   /**
    * Copy detailed log to clipboard
    */
-  async  {
+  async copyDetailedLog() {
     try {
       const log = this.generateDetailedLog();
 

@@ -102,6 +102,8 @@ module.exports = {
         'window': {},
         'document': {},
         'navigator': {},
+        'TextEncoder': {},
+        'TextDecoder': {},
         'Logger': {},
         'UnifiedCacheManager': {},
         'showNotification': {},

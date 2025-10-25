@@ -24592,3 +24592,150 @@ NameError: name 'g' is not defined
 2025-10-25 04:49:45,541 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:49:45.541172', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/trade-plans/', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
 2025-10-25 04:49:45,541 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:49:45.541172', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/trade-plans/', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
 2025-10-25 04:49:45,541 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:49:45] "[33mGET /api/trade-plans/ HTTP/1.1[0m" 404 -
+2025-10-25 04:50:16,583 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:50:16] "GET /alerts.html HTTP/1.1" 200 -
+2025-10-25 04:50:30,793 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:50:30,793 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:50:30,793 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:50:30,793 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-25 04:50:30,794 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:50:30] "GET /api/executions/?_t=1761357030790 HTTP/1.1" 200 -
+2025-10-25 04:51:28,631 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:28] "GET /alerts.html HTTP/1.1" 200 -
+2025-10-25 04:51:30,783 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:51:30,784 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:51:30,784 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:51:30,784 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:51:30,784 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:30] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:51:30,789 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:51:30,789 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 119.9s)
+2025-10-25 04:51:30,789 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 119.9s)
+2025-10-25 04:51:30,789 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-25 04:51:30,789 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-25 04:51:30,793 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:51:30,793 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:51:30,794 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:30] "GET /api/executions/?_t=1761357090782 HTTP/1.1" 200 -
+2025-10-25 04:51:30,798 - cache - INFO - Cache MISS: services.ticker_service.get_all:ce47bb82d9903b84c8a63a9c230145b9
+2025-10-25 04:51:30,798 - services.trade_service - INFO - Loading trades with joinedload for account and ticker
+2025-10-25 04:51:30,798 - cache - INFO - Cache MISS: services.ticker_service.get_all:ce47bb82d9903b84c8a63a9c230145b9
+2025-10-25 04:51:30,801 - services.trade_service - INFO - Loaded 13 trades
+2025-10-25 04:51:30,801 - services.ticker_service - INFO - Found 19 tickers in database
+2025-10-25 04:51:30,801 - services.trade_service - INFO - First trade ID: 1
+2025-10-25 04:51:30,802 - services.trade_service - INFO - First trade trading_account_id: 1
+2025-10-25 04:51:30,803 - services.trade_service - INFO - First trade ticker_id: 1
+2025-10-25 04:51:30,803 - services.trade_service - INFO - First trade has account attribute: True
+2025-10-25 04:51:30,804 - services.trade_service - INFO - First trade account object: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-25 04:51:30,804 - services.trade_service - INFO - First trade has ticker attribute: True
+2025-10-25 04:51:30,804 - services.trade_service - INFO - First trade ticker object: <Ticker(symbol='AAPL', name='Apple Inc. - UPDATED', type='stock')>
+2025-10-25 04:51:30,804 - services.trade_service - INFO - First trade account name: חשבון מעודכן
+2025-10-25 04:51:30,805 - services.trade_service - INFO - First trade ticker symbol: AAPL
+2025-10-25 04:51:30,806 - services.position_calculator_service - INFO - Calculated positions for 13 trades
+2025-10-25 04:51:30,806 - models.trade - INFO - Trade 1: Checking trade_plan relationship...
+2025-10-25 04:51:30,806 - models.trade - INFO - Trade 1: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,806 - models.trade - INFO - Trade 1: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:51:30,806 - models.trade - INFO - Trade 1: trade_plan is not None, adding data...
+2025-10-25 04:51:30,806 - models.trade - INFO - Trade 1: Using loaded account name: חשבון מעודכן
+2025-10-25 04:51:30,806 - models.trade - INFO - Trade 1: Using loaded ticker symbol: AAPL
+2025-10-25 04:51:30,806 - models.trade - INFO - Trade 1 to_dict result: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-25 04:51:30,818 - models.trade - INFO - Trade 2: Checking trade_plan relationship...
+2025-10-25 04:51:30,818 - models.trade - INFO - Trade 2: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,819 - models.trade - INFO - Trade 2: self.trade_plan: <TradePlan(id=14, type='passive')>
+2025-10-25 04:51:30,819 - models.trade - INFO - Trade 2: trade_plan is not None, adding data...
+2025-10-25 04:51:30,819 - models.trade - INFO - Trade 2: Using loaded account name: חשבון טכנולוגיה
+2025-10-25 04:51:30,819 - models.trade - INFO - Trade 2: Using loaded ticker symbol: GOOGL
+2025-10-25 04:51:30,820 - models.trade - INFO - Trade 2 to_dict result: {'id': 2, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': 'טרייד מוצלח ב-Google', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-10 06:51:43', 'created_at': '2025-08-15 03:51:43', 'total_pl': 1500.0, 'trade_plan_created_at': '2025-08-30 03:36:52', 'trade_plan_planned_amount': 300.5, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:51:30,834 - models.trade - INFO - Trade 3: Checking trade_plan relationship...
+2025-10-25 04:51:30,834 - models.trade - INFO - Trade 3: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,834 - models.trade - INFO - Trade 3: self.trade_plan: <TradePlan(id=2, type='swing')>
+2025-10-25 04:51:30,834 - models.trade - INFO - Trade 3: trade_plan is not None, adding data...
+2025-10-25 04:51:30,834 - models.trade - INFO - Trade 3: Using loaded account name: חשבון ETF
+2025-10-25 04:51:30,834 - models.trade - INFO - Trade 3: Using loaded ticker symbol: SPY
+2025-10-25 04:51:30,835 - models.trade - INFO - Trade 3 to_dict result: {'id': 3, 'trading_account_id': 3, 'ticker_id': 9, 'trade_plan_id': 2, 'status': 'cancelled', 'investment_type': 'passive', 'side': 'Long', 'notes': 'השקעה ב-ETF', 'opened_at': '2025-08-15 03:51:43', 'closed_at': None, 'created_at': '2025-08-15 03:51:43', 'total_pl': 800.0, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 8000.0, 'trade_plan_status': 'open', 'account_name': 'חשבון ETF', 'ticker_symbol': 'SPY', 'cancelled_at': '2025-08-22 06:50:57', 'cancel_reason': 'בדיקת ביטול'}
+2025-10-25 04:51:30,839 - models.trade - INFO - Trade 4: Checking trade_plan relationship...
+2025-10-25 04:51:30,839 - models.trade - INFO - Trade 4: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,839 - models.trade - INFO - Trade 4: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:51:30,840 - models.trade - INFO - Trade 4: trade_plan is not None, adding data...
+2025-10-25 04:51:30,840 - models.trade - INFO - Trade 4: Using loaded account name: חשבון מעודכן
+2025-10-25 04:51:30,841 - models.trade - INFO - Trade 4: Using loaded ticker symbol: AAPL
+2025-10-25 04:51:30,841 - models.trade - INFO - Trade 4 to_dict result: {'id': 4, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-26 00:13:21', 'closed_at': None, 'created_at': '2025-08-26 00:13:21', 'total_pl': None, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:30:08', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-25 04:51:30,851 - models.trade - INFO - Trade 5: Checking trade_plan relationship...
+2025-10-25 04:51:30,851 - models.trade - INFO - Trade 5: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,851 - models.trade - INFO - Trade 5: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:51:30,851 - models.trade - INFO - Trade 5: trade_plan is not None, adding data...
+2025-10-25 04:51:30,852 - models.trade - INFO - Trade 5: Using loaded account name: חשבון ETF
+2025-10-25 04:51:30,852 - models.trade - INFO - Trade 5: Using loaded ticker symbol: AAPL
+2025-10-25 04:51:30,852 - models.trade - INFO - Trade 5 to_dict result: {'id': 5, 'trading_account_id': 3, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'גכעגעג', 'opened_at': '2025-08-30 22:02:00', 'closed_at': None, 'created_at': '2025-08-30 22:02:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון ETF', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:32:32', 'cancel_reason': 'test'}
+2025-10-25 04:51:30,863 - models.trade - INFO - Trade 6: Checking trade_plan relationship...
+2025-10-25 04:51:30,863 - models.trade - INFO - Trade 6: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,863 - models.trade - INFO - Trade 6: self.trade_plan: <TradePlan(id=1, type='passive')>
+2025-10-25 04:51:30,864 - models.trade - INFO - Trade 6: trade_plan is not None, adding data...
+2025-10-25 04:51:30,864 - models.trade - INFO - Trade 6: Using loaded account name: חשבון טכנולוגיה
+2025-10-25 04:51:30,864 - models.trade - INFO - Trade 6: Using loaded ticker symbol: GOOGL
+2025-10-25 04:51:30,864 - models.trade - INFO - Trade 6 to_dict result: {'id': 6, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': '', 'opened_at': '2025-08-31 16:57:00', 'closed_at': None, 'created_at': '2025-08-31 16:57:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 10250.0, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:51:30,881 - cache - INFO - Cache SET: services.ticker_service.get_all:ce47bb82d9903b84c8a63a9c230145b9 (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-25 04:51:30,880 - models.trade - INFO - Trade 7: Checking trade_plan relationship...
+2025-10-25 04:51:30,881 - cache - INFO - Cache SET: services.ticker_service.get_all:ce47bb82d9903b84c8a63a9c230145b9 (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-25 04:51:30,881 - models.trade - INFO - Trade 7: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,882 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:30] "GET /api/tickers/ HTTP/1.1" 200 -
+2025-10-25 04:51:30,882 - models.trade - INFO - Trade 7: self.trade_plan: <TradePlan(id=9, type='swing')>
+2025-10-25 04:51:30,882 - models.trade - INFO - Trade 7: trade_plan is not None, adding data...
+2025-10-25 04:51:30,882 - models.trade - INFO - Trade 7: Using loaded account name: חשבון טכנולוגיה
+2025-10-25 04:51:30,883 - models.trade - INFO - Trade 7: Using loaded ticker symbol: AMZN
+2025-10-25 04:51:30,883 - models.trade - INFO - Trade 7 to_dict result: {'id': 7, 'trading_account_id': 2, 'ticker_id': 6, 'trade_plan_id': 9, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-31 17:38:00', 'closed_at': None, 'created_at': '2025-08-31 17:38:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-06-16 06:52:13', 'trade_plan_planned_amount': 9275.0, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'AMZN', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:51:30,895 - models.trade - INFO - Trade 8: Checking trade_plan relationship...
+2025-10-25 04:51:30,895 - models.trade - INFO - Trade 8: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,895 - models.trade - INFO - Trade 8: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:51:30,895 - models.trade - INFO - Trade 8: trade_plan is not None, adding data...
+2025-10-25 04:51:30,895 - models.trade - INFO - Trade 8: Using loaded account name: חשבון מעודכן
+2025-10-25 04:51:30,896 - models.trade - INFO - Trade 8: Using loaded ticker symbol: AAPL
+2025-10-25 04:51:30,896 - models.trade - INFO - Trade 8 to_dict result: {'id': 8, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-01 23:51:48', 'closed_at': '2025-09-02 00:36:20', 'created_at': '2025-09-01 23:51:48', 'total_pl': None, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:51:30,904 - models.trade - INFO - Trade 9: Checking trade_plan relationship...
+2025-10-25 04:51:30,904 - models.trade - INFO - Trade 9: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,904 - models.trade - INFO - Trade 9: self.trade_plan: <TradePlan(id=14, type='passive')>
+2025-10-25 04:51:30,904 - models.trade - INFO - Trade 9: trade_plan is not None, adding data...
+2025-10-25 04:51:30,904 - models.trade - INFO - Trade 9: Using loaded account name: חשבון מעודכן
+2025-10-25 04:51:30,905 - models.trade - INFO - Trade 9: Using loaded ticker symbol: GOOGL
+2025-10-25 04:51:30,905 - models.trade - INFO - Trade 9 to_dict result: {'id': 9, 'trading_account_id': 1, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:41:51', 'closed_at': '2025-09-02 00:42:08', 'created_at': '2025-09-02 00:41:51', 'total_pl': None, 'trade_plan_created_at': '2025-08-30 03:36:52', 'trade_plan_planned_amount': 300.5, 'trade_plan_status': 'open', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:51:30,918 - models.trade - INFO - Trade 10: Checking trade_plan relationship...
+2025-10-25 04:51:30,918 - models.trade - INFO - Trade 10: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,918 - models.trade - INFO - Trade 10: self.trade_plan: <TradePlan(id=1, type='passive')>
+2025-10-25 04:51:30,918 - models.trade - INFO - Trade 10: trade_plan is not None, adding data...
+2025-10-25 04:51:30,919 - models.trade - INFO - Trade 10: Using loaded account name: חשבון מעודכן
+2025-10-25 04:51:30,919 - models.trade - INFO - Trade 10: Using loaded ticker symbol: TSLA
+2025-10-25 04:51:30,919 - models.trade - INFO - Trade 10 to_dict result: {'id': 10, 'trading_account_id': 1, 'ticker_id': 4, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:56:03', 'closed_at': None, 'created_at': '2025-09-02 00:56:03', 'total_pl': None, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 10250.0, 'trade_plan_status': 'open', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'TSLA', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:51:30,931 - models.trade - INFO - Trade 11: Checking trade_plan relationship...
+2025-10-25 04:51:30,931 - models.trade - INFO - Trade 11: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,931 - models.trade - INFO - Trade 11: self.trade_plan: None
+2025-10-25 04:51:30,931 - models.trade - INFO - Trade 11: trade_plan is None
+2025-10-25 04:51:30,931 - models.trade - INFO - Trade 11: Using loaded account name: חשבון מעודכן
+2025-10-25 04:51:30,931 - models.trade - INFO - Trade 11: Using loaded ticker symbol: AAPL
+2025-10-25 04:51:30,931 - models.trade - INFO - Trade 11 to_dict result: {'id': 11, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade', 'opened_at': '2025-10-06 21:05:06', 'closed_at': None, 'created_at': '2025-10-06 21:05:06', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:51:30,940 - models.trade - INFO - Trade 18: Checking trade_plan relationship...
+2025-10-25 04:51:30,940 - models.trade - INFO - Trade 18: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,940 - models.trade - INFO - Trade 18: self.trade_plan: None
+2025-10-25 04:51:30,940 - models.trade - INFO - Trade 18: trade_plan is None
+2025-10-25 04:51:30,940 - models.trade - INFO - Trade 18: Using loaded account name: חשבון מעודכן
+2025-10-25 04:51:30,941 - models.trade - INFO - Trade 18: Using loaded ticker symbol: AAPL
+2025-10-25 04:51:30,941 - models.trade - INFO - Trade 18 to_dict result: {'id': 18, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade for CRUD testing', 'opened_at': '2025-10-07 16:13:43', 'closed_at': None, 'created_at': '2025-10-07 16:13:43', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:51:30,950 - models.trade - INFO - Trade 19: Checking trade_plan relationship...
+2025-10-25 04:51:30,950 - models.trade - INFO - Trade 19: hasattr(self, 'trade_plan'): True
+2025-10-25 04:51:30,950 - models.trade - INFO - Trade 19: self.trade_plan: None
+2025-10-25 04:51:30,951 - models.trade - INFO - Trade 19: trade_plan is None
+2025-10-25 04:51:30,951 - models.trade - INFO - Trade 19: Using loaded account name: חשבון מעודכן
+2025-10-25 04:51:30,951 - models.trade - INFO - Trade 19: Using loaded ticker symbol: AAPL
+2025-10-25 04:51:30,951 - models.trade - INFO - Trade 19 to_dict result: {'id': 19, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-10-17 12:36:57', 'closed_at': None, 'created_at': '2025-10-17 12:36:57', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:51:30,964 - routes.api.trades - INFO - First trade data: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש', 'current_price': 262.82, 'daily_change': 1.2481701209646388, 'change_amount': 3.240000000000009, 'position': {'quantity': 825.0, 'average_price': 207.53677725118482, 'total_cost': 218951.3, 'total_fees': 25.76, 'side': 'long', 'last_updated': '2025-10-07 16:13:46.113000', 'total_bought': 1055.0, 'total_sold': 230.0}}
+2025-10-25 04:51:30,964 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:30] "GET /api/trades/ HTTP/1.1" 200 -
+2025-10-25 04:51:32,081 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:32] "GET /alerts.html HTTP/1.1" 200 -
+2025-10-25 04:51:36,757 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:51:36,757 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:51:36,757 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:51:36,757 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:51:36,757 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:36] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:51:36,960 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:36] "GET /scripts/alerts.js HTTP/1.1" 200 -
+2025-10-25 04:51:44,505 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:44] "GET /alerts.html HTTP/1.1" 200 -
+2025-10-25 04:51:48,577 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:48] "GET /scripts/alerts.js HTTP/1.1" 200 -
+2025-10-25 04:51:53,128 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:51:53] "GET /alerts.html HTTP/1.1" 200 -
+2025-10-25 04:51:59,347 - cache - INFO - Cache DELETE: services.system_settings_service.get_setting:ba2d4cef9d8b5c21c6c97616a0b9f233 (Was accessed 0 times)
+2025-10-25 04:51:59,347 - cache - INFO - Cache DELETE: services.system_settings_service.get_setting:ba2d4cef9d8b5c21c6c97616a0b9f233 (Was accessed 0 times)
+2025-10-25 04:51:59,347 - cache - INFO - Cache DELETE: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-25 04:51:59,347 - cache - INFO - Cache DELETE: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-25 04:51:59,347 - cache - INFO - Cache DELETE: services.ticker_service.get_all:cbb9c294e1b7f1a4a74178debb60f824 (Was accessed 0 times)
+2025-10-25 04:51:59,347 - cache - INFO - Cache DELETE: services.ticker_service.get_all:cbb9c294e1b7f1a4a74178debb60f824 (Was accessed 0 times)

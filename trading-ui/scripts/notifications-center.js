@@ -1606,7 +1606,7 @@ function testDetailsModal() {
   }
 }
 
-async function  {
+async function copyDetailedLog() {
   try {
     const detailedLog = await generateDetailedLog();
     if (detailedLog) {

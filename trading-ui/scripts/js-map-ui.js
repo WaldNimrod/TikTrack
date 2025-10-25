@@ -614,7 +614,7 @@ try {
 }
 
 // Add tab switching functionality
-function switchTab(tabName) {
+function switchFunctionsTab(tabName) {
     console.log('🔄 Switching to tab:', tabName);
     
     // Remove active class from all tabs
@@ -644,7 +644,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const tabName = this.getAttribute('data-tab');
-            switchTab(tabName);
+            switchFunctionsTab(tabName);
         });
     });
 });

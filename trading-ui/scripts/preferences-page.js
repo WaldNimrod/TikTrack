@@ -59,7 +59,7 @@ async function switchActiveProfile() {
         }
         
         window.Logger.info(`🔍 PROFILE DEBUG: Switching to profile: ${selectedProfileName}`, { page: "preferences-page" });
-        window.Logger.info(`🔍 CACHE DEBUG: Current cache state before switch:`, window.PreferencesCore?.cacheManager?.getAll?.(, { page: "preferences-page" }) || 'Cache not available');
+        window.Logger.info(`🔍 CACHE DEBUG: Current cache state before switch:`, window.PreferencesCore?.cacheManager?.getAll?.({ page: "preferences-page" }) || 'Cache not available');
         
         // 1. Get all profiles
         const profiles = await window.getUserProfiles();

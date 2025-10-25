@@ -1454,7 +1454,7 @@ class PageScriptsMatrixSystem {
         }
     }
 
-    async  {
+    async copyDetailedLog() {
         console.log('📋 Copying detailed log...');
         if (window.showNotification) {
             window.showNotification('יוצר לוג מפורט...', 'info');

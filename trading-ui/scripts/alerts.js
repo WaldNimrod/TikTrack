@@ -1557,6 +1557,9 @@ function editAlert(alertId) {
 
   // ניקוי ולידציה
   clearAlertValidation();
+  
+  // אתחול הממשק המתקדם לבניית תנאי
+  initializeAlertConditionBuilder(alert);
 
   // מילוי הטופס
   const editAlertId = document.getElementById('editAlertId');
@@ -3047,6 +3050,15 @@ document.addEventListener('DOMContentLoaded', function() {
             updateModalButtons('#add-manual-pane');
         });
     }
+    
+    // Initialize edit alert modal
+    const editAlertModal = document.getElementById('editAlertModal');
+    if (editAlertModal) {
+        editAlertModal.addEventListener('hidden.bs.modal', function() {
+            // Clean up condition builder when modal is closed
+            cleanupAlertConditionBuilder();
+        });
+    }
 });
 
 // ===== CONDITION EVALUATION FUNCTIONS =====
@@ -3192,4 +3204,88 @@ function updateEvaluationSummary(data) {
     if (metConditions) metConditions.textContent = metCount;
     if (notMetConditions) notMetConditions.textContent = notMetCount;
     if (evaluationTime) evaluationTime.textContent = new Date().toLocaleTimeString('he-IL');
+}
+
+// ===== ADVANCED CONDITION BUILDER FUNCTIONS =====
+
+/**
+ * אתחול הממשק המתקדם לבניית תנאי במודל העריכה
+ * @param {Object} alert - נתוני ההתראה לעריכה
+ */
+function initializeAlertConditionBuilder(alert) {
+    try {
+        window.Logger.info('🔧 Initializing alert condition builder for alert:', alert.id, { page: "alerts" });
+        
+        // בדיקה שהממשק המתקדם זמין
+        if (typeof ConditionBuilder === 'undefined') {
+            window.Logger.warn('⚠️ ConditionBuilder not available, using basic form', { page: "alerts" });
+            return false;
+        }
+        
+        const containerId = 'editAlertConditionBuilder';
+        const alertId = alert.id;
+        
+        // יצירת ConditionBuilder חדש
+        const conditionBuilder = new ConditionBuilder('alert', alertId, containerId);
+        
+        // שמירה בגלובל לנגישות
+        window.editAlertConditionBuilder = conditionBuilder;
+        
+        // טעינת תנאי קיים אם יש
+        if (alert.condition_attribute && alert.condition_operator && alert.condition_number) {
+            const existingCondition = {
+                method_id: getMethodIdFromCondition(alert.condition_attribute, alert.condition_operator),
+                parameters: {
+                    value: parseFloat(alert.condition_number),
+                    operator: alert.condition_operator,
+                    attribute: alert.condition_attribute
+                }
+            };
+            
+            // הוספת התנאי הקיים לממשק
+            conditionBuilder.addCondition(existingCondition);
+        }
+        
+        window.Logger.info('✅ Alert condition builder initialized successfully', { page: "alerts" });
+        return true;
+        
+    } catch (error) {
+        window.Logger.error('❌ Error initializing alert condition builder:', error, { page: "alerts" });
+        return false;
+    }
+}
+
+/**
+ * קבלת מזהה שיטה מתנאי קיים
+ * @param {string} attribute - מאפיין התנאי
+ * @param {string} operator - אופרטור התנאי
+ * @returns {number} מזהה השיטה
+ */
+function getMethodIdFromCondition(attribute, operator) {
+    // מיפוי מאפיינים לשיטות
+    const methodMapping = {
+        'price': 1, // Moving Averages
+        'volume': 2, // Volume Analysis
+        'ma': 1, // Moving Averages
+        'change': 3 // Support/Resistance
+    };
+    
+    return methodMapping[attribute] || 1; // ברירת מחדל: Moving Averages
+}
+
+/**
+ * ניקוי הממשק המתקדם
+ */
+function cleanupAlertConditionBuilder() {
+    try {
+        if (window.editAlertConditionBuilder) {
+            // ניקוי אם יש פונקציית cleanup
+            if (typeof window.editAlertConditionBuilder.cleanup === 'function') {
+                window.editAlertConditionBuilder.cleanup();
+            }
+            window.editAlertConditionBuilder = null;
+        }
+    } catch (error) {
+        window.Logger.error('❌ Error cleaning up alert condition builder:', error, { page: "alerts" });
+    }
 }

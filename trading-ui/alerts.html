@@ -403,7 +403,28 @@
                     </div>
                     <div class="modal-body">
                         <form id="editAlertForm">
+                            <!-- Advanced Condition Builder -->
                             <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <h6>עריכת תנאי התראה</h6>
+                                        <p class="text-muted">ערוך תנאי התראה באמצעות הממשק המתקדם</p>
+                                    </div>
+                                    
+                                    <!-- Condition Builder Container -->
+                                    <div id="editAlertConditionBuilder" class="condition-builder">
+                                        <div id="editAlertConditionsListContainer">
+                                            <!-- Conditions will be loaded here -->
+                                        </div>
+                                        <div id="editAlertParameterFormContainer">
+                                            <!-- Parameter form will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Basic Info (Hidden but kept for compatibility) -->
+                            <div class="row" style="display: none;">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="editAlertTicker" class="form-label">טיקר</label>
@@ -424,7 +445,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row" style="display: none;">
                                 <div class="col-md-8">
                                     <div class="mb-3">
                                         <label for="editConditionNumber" class="form-label">ערך התנאי</label>

@@ -58,6 +58,9 @@ class TradingAccount(BaseModel):
     # Each account can have multiple cash flows
     cash_flows = relationship("CashFlow", back_populates="account", cascade="all, delete-orphan")
     
+    # Each account can have multiple import sessions
+    import_sessions = relationship("ImportSession", back_populates="account", cascade="all, delete-orphan")
+    
     # Notes relationship removed - notes now use related_type and related_id
     
     def __repr__(self) -> str:

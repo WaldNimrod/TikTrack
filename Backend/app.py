@@ -226,6 +226,10 @@ app.register_blueprint(wal_bp)
 app.register_blueprint(system_settings_bp)
 app.register_blueprint(server_logs_bp)
 
+# Register User Data Import blueprint
+from routes.api.user_data_import import user_data_import_bp
+app.register_blueprint(user_data_import_bp)
+
 # Register External Data Integration blueprints - DISABLED due to import issues
 # External Data Integration blueprints
 app.register_blueprint(quotes_bp, name='quotes')

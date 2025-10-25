@@ -2382,91 +2382,21 @@ function addNewTrade() {
  * @param {Array} executions - מערך העסקעות
  */
 function updateExecutionsSummary(executions) {
-  // עדכון סיכום נתונים לעסקעות
-
-  // בדיקה אם האלמנטים קיימים בדף
-  const totalExecutionsElement = document.getElementById('totalExecutions');
-  const totalBuyExecutionsElement = document.getElementById('totalBuyExecutions');
-  const totalSellExecutionsElement = document.getElementById('totalSellExecutions');
-  const totalBuyAmountElement = document.getElementById('totalBuyAmount');
-  const totalSellAmountElement = document.getElementById('totalSellAmount');
-  const balanceAmountElement = document.getElementById('balanceAmount');
-
-  if (!totalExecutionsElement || !totalBuyExecutionsElement || !totalSellExecutionsElement ||
-        !totalBuyAmountElement || !totalSellAmountElement || !balanceAmountElement) {
-    // window.Logger.warn('⚠️ Executions summary elements not found - this is expected on trades page', { page: "executions" });
-    return;
-  }
-
-  if (!executions || executions.length === 0) {
-    // איפוס ערכים
-    totalExecutionsElement.textContent = '0';
-    totalBuyExecutionsElement.textContent = '0';
-    totalSellExecutionsElement.textContent = '0';
-    totalBuyAmountElement.textContent = '$0';
-    totalSellAmountElement.textContent = '$0';
-    balanceAmountElement.textContent = '$0';
-    return;
-  }
-
-  // חישוב סיכומים
-  const totalExecutions = executions.length;
-
-  // הפרדה בין קניות למכירות
-  const buyExecutions = executions.filter(exec => (exec.action || exec.type) === 'buy');
-  const sellExecutions = executions.filter(exec => (exec.action || exec.type) === 'sale');
-
-  const totalBuyExecutions = buyExecutions.length;
-  const totalSellExecutions = sellExecutions.length;
-
-  // חישוב סכומי קניות ומכירות
-  const totalBuyAmount = buyExecutions.reduce((sum, exec) => {
-    const quantity = parseInt(exec.quantity) || 0;
-    const price = parseFloat(exec.price) || 0;
-    return sum + quantity * price;
-  }, 0);
-
-  const totalSellAmount = sellExecutions.reduce((sum, exec) => {
-    const quantity = parseInt(exec.quantity) || 0;
-    const price = parseFloat(exec.price) || 0;
-    return sum + quantity * price;
-  }, 0);
-
-  // חישוב מאזן (מכירות - קניות)
-  const balance = totalSellAmount - totalBuyAmount;
-
-  // עדכון ה-DOM עם פורמט מספרים
-  totalExecutionsElement.textContent = window.formatNumberWithCommas ? window.formatNumberWithCommas(totalExecutions) : totalExecutions.toLocaleString('he-IL');
-  totalBuyExecutionsElement.textContent = window.formatNumberWithCommas ?
-    window.formatNumberWithCommas(totalBuyExecutions) :
-    totalBuyExecutions.toLocaleString('he-IL');
-  totalSellExecutionsElement.textContent = window.formatNumberWithCommas ?
-    window.formatNumberWithCommas(totalSellExecutions) :
-    totalSellExecutions.toLocaleString('he-IL');
-  totalBuyAmountElement.textContent = window.formatCurrencyWithCommas ?
-    window.formatCurrencyWithCommas(totalBuyAmount) :
-    `$${totalBuyAmount.toFixed(2)}`;
-  totalSellAmountElement.textContent = window.formatCurrencyWithCommas ?
-    window.formatCurrencyWithCommas(totalSellAmount) :
-    `$${totalSellAmount.toFixed(2)}`;
-
-  // שימוש בפונקציה הכללית לצביעה
-  const balanceElement = balanceAmountElement;
-
-  // קבלת צבעים מהמערכת הגלובלית
-  const colors = window.getTableColors();
-
-  // צביעה ידנית
-  balanceElement.textContent = `$${balance.toFixed(2)}`;
-  if (balance > 0) {
-    balanceElement.style.color = colors.positive;
-  } else if (balance < 0) {
-    balanceElement.style.color = colors.negative;
+  // עדכון סיכום נתונים לעסקעות - מערכת מאוחדת
+  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+    const config = window.INFO_SUMMARY_CONFIGS.executions;
+    window.InfoSummarySystem.calculateAndRender(executions, config);
   } else {
-    balanceElement.style.color = colors.secondary;
+    // מערכת סיכום נתונים לא זמינה
+    const summaryStatsElement = document.getElementById('summaryStats');
+    if (summaryStatsElement) {
+      summaryStatsElement.innerHTML = `
+        <div style="color: #dc3545; font-weight: bold;">
+          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+        </div>
+      `;
+    }
   }
-
-  // סיכום נתונים עודכן
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -3792,6 +3722,30 @@ async function generateDetailedLogForExecutions() {
             window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
         } else {
             alert('שגיאה בהעתקת הלוג: ' + error.message);
+        }
+    }
+}
+
+/**
+ * פתיחת עמוד ייבוא נתוני משתמש
+ * פותח את עמוד הייבוא בחלון חדש
+ */
+function openImportUserData() {
+    try {
+        window.Logger.info('📥 פותח עמוד ייבוא נתוני משתמש', { page: "executions" });
+        
+        // פתיחת עמוד הייבוא בחלון חדש
+        const importUrl = 'pages/import-user-data.html';
+        window.open(importUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+        
+    } catch (error) {
+        window.Logger.error('שגיאה בפתיחת עמוד הייבוא:', error, { page: "executions" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בפתיחת עמוד הייבוא', error.message);
+        } else if (typeof window.showNotification === 'function') {
+            window.showNotification('שגיאה בפתיחת עמוד הייבוא', 'error');
+        } else {
+            alert('שגיאה בפתיחת עמוד הייבוא: ' + error.message);
         }
     }
 }

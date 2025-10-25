@@ -1,4 +1,40 @@
 /**
+ * Function Index:
+ * ==============
+ * 
+ * TRADE PLAN MANAGEMENT:
+ * - executeTradePlan()
+ * - addTradePlan()
+ * - editTradePlan()
+ * - deleteTradePlan()
+ * - updateTradePlan()
+ * 
+ * FORM MANAGEMENT:
+ * - enableFormFields()
+ * - disableFormFields()
+ * - enableEditFieldsWrapper()
+ * - disableEditFields()
+ * 
+ * UI MANAGEMENT:
+ * - hideTickerInfo()
+ * - hideEditTickerInfo()
+ * - updateEditSharesFromAmount()
+ * - updateEditAmountFromShares()
+ * - addEditCondition()
+ * - addEditReason()
+ * - addEditImportantNote()
+ * 
+ * DATA FILTERING:
+ * - filterTradePlansLocally()
+ * 
+ * UTILITY FUNCTIONS:
+ * - restoreSortState()
+ * - setupModalConfigurations()
+ * 
+ * ==============
+ */
+
+/**
  * ========================================
  * Trade Plans Page - Trade Plans Page
  * ========================================
@@ -1633,20 +1669,21 @@ function filterTradePlansData(filters) {
  * @param {Array} trade_plans - מערך של תכנונים לעדכון
  */
 function updateTradePlansTable(trade_plans) {
-  // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
-  window.Logger.info(`🔄 updateTradePlansTable called with ${trade_plans ? trade_plans.length : 0} trade plans`, { page: "trade_plans" });
+  try {
+    // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
+    window.Logger.info(`🔄 updateTradePlansTable called with ${trade_plans ? trade_plans.length : 0} trade plans`, { page: "trade_plans" });
 
-  const tbody = document.querySelector('#trade_plansTable tbody');
-  window.Logger.info(`🔍 Looking for tbody:`, tbody, { page: "trade_plans" });
-  // Looking for table body
+    const tbody = document.querySelector('#trade_plansTable tbody');
+    window.Logger.info(`🔍 Looking for tbody:`, tbody, { page: "trade_plans" });
+    // Looking for table body
 
-  if (!tbody) {
-    handleElementNotFound('#trade_plansTable tbody', 'CRITICAL');
-    return;
-  }
+    if (!tbody) {
+      handleElementNotFound('#trade_plansTable tbody', 'CRITICAL');
+      return;
+    }
 
-  // Checking if there is data to display
-  window.Logger.info(`🔍 Checking data: trade_plans =`, trade_plans, `length =`, trade_plans?.length, { page: "trade_plans" });
+    // Checking if there is data to display
+    window.Logger.info(`🔍 Checking data: trade_plans =`, trade_plans, `length =`, trade_plans?.length, { page: "trade_plans" });
   window.Logger.info(`🔍 Condition check: !trade_plans =`, !trade_plans, `trade_plans.length === 0 =`, trade_plans?.length === 0, { page: "trade_plans" });
   if (!trade_plans || trade_plans.length === 0) {
     window.Logger.info(`❌ No data to display - entering error condition`, { page: "trade_plans" });
@@ -1952,26 +1989,34 @@ function updateTradePlansTable(trade_plans) {
     if (window.applyEntityColorsToHeaders) {
       window.applyEntityColorsToHeaders('trade_plan');
     }
+    
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון טבלת תכנוני טרייד:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון טבלת תכנוני טרייד', error.message);
+    }
+  }
 }
 
 /**
  * עדכון סטטיסטיקות סיכום
  */
 function updatePageSummaryStats() {
-  // Using filtered data if available, otherwise all data
-  const dataToUse = window.filteredTradePlansData || window.tradePlansData;
-  
-  // מערכת מאוחדת לסיכום נתונים
-  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
-    const config = window.INFO_SUMMARY_CONFIGS.trade_plans;
-    window.InfoSummarySystem.calculateAndRender(dataToUse, config);
+  try {
+    // Using filtered data if available, otherwise all data
+    const dataToUse = window.filteredTradePlansData || window.tradePlansData;
     
-    // עדכון מספר הרשומות בטבלה
-    const countElement = document.getElementById('designsCount');
-    if (countElement) {
-      countElement.textContent = `${dataToUse.length} רשומות`;
-    }
-  } else {
+    // מערכת מאוחדת לסיכום נתונים
+    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+      const config = window.INFO_SUMMARY_CONFIGS.trade_plans;
+      window.InfoSummarySystem.calculateAndRender(dataToUse, config);
+      
+      // עדכון מספר הרשומות בטבלה
+      const countElement = document.getElementById('designsCount');
+      if (countElement) {
+        countElement.textContent = `${dataToUse.length} רשומות`;
+      }
+    } else {
     // מערכת סיכום נתונים לא זמינה
     const summaryStatsElement = document.getElementById('summaryStats');
     if (summaryStatsElement) {
@@ -1980,6 +2025,13 @@ function updatePageSummaryStats() {
           ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
         </div>
       `;
+    }
+  }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון סטטיסטיקות סיכום:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון סטטיסטיקות סיכום', error.message);
     }
   }
 }
@@ -2555,15 +2607,23 @@ async function saveNewTradePlan() {
  * המרת שם שדה מהשרת ל-ID של השדה בטופס
  */
 function getFieldIdFromServerField(serverField) {
-  const fieldMapping = {
-    'ticker_id': 'ticker',
-    'investment_type': 'type',
-    'side': 'side',
-    'planned_amount': 'quantity',
-    'stop_price': 'price',
-    'target_price': 'notes',
-  };
-  return fieldMapping[serverField] || null;
+  try {
+    const fieldMapping = {
+      'ticker_id': 'ticker',
+      'investment_type': 'type',
+      'side': 'side',
+      'planned_amount': 'quantity',
+      'stop_price': 'price',
+      'target_price': 'notes',
+    };
+    return fieldMapping[serverField] || null;
+  } catch (error) {
+    window.Logger.error('שגיאה בקבלת מזהה שדה משדה שרת:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בקבלת מזהה שדה משדה שרת', error.message);
+    }
+    return null;
+  }
 }
 
 /**
@@ -3296,8 +3356,11 @@ function cleanupTradePlanConditions(mode) {
  * @returns {number|null} Plan ID or null
  */
 function getCurrentEditPlanId() {
-    // This should be implemented based on how the edit modal stores the current plan ID
-    // For now, return null - this should be updated based on the actual implementation
+    // Get plan ID from hidden input field in edit modal
+    const planIdInput = document.getElementById('editTradePlanId');
+    if (planIdInput && planIdInput.value) {
+        return parseInt(planIdInput.value, 10);
+    }
     return null;
 }
 

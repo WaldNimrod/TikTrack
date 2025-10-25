@@ -159,7 +159,7 @@ class ImportOrchestrator:
                 session.account_id
             )
             
-            # Prepare analysis results
+            # Prepare analysis results for API response (detailed)
             analysis_results = {
                 'total_records': session.total_records,
                 'parsed_records': len(raw_records),
@@ -175,8 +175,18 @@ class ImportOrchestrator:
                 'analysis_timestamp': datetime.now().isoformat()
             }
             
-            # Update session
-            session.add_summary_data(analysis_results)
+            # Save only essential summary data to database (not detailed results)
+            summary_data = {
+                'total_records': session.total_records,
+                'valid_records': len(validation_result['valid_records']),
+                'invalid_records': len(validation_result['invalid_records']),
+                'duplicate_records': len(duplicate_result['within_file_duplicates']) + 
+                                   len(duplicate_result['system_duplicates']),
+                'analysis_timestamp': datetime.now().isoformat()
+            }
+            
+            # Update session with minimal data
+            session.add_summary_data(summary_data)
             session.update_status('ready')
             self.db_session.commit()
             

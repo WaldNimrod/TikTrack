@@ -1242,8 +1242,15 @@ function addEditImportantNote() {
 }
 
 function addEditReminder() {
-  if (typeof window.showNotification === 'function') {
-    window.showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'info');
+  try {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'info');
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהוספת תזכורת בעריכה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת תזכורת בעריכה', error.message);
+    }
   }
 }
 
@@ -1251,50 +1258,64 @@ function addEditReminder() {
  * פתיחת מודל ביטול תכנון
  */
 function openCancelTradePlanModal(tradePlanId) {
+  try {
+    const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
+    if (!tradePlan) {
+      handleElementNotFound('trade plan', 'CRITICAL');
+      return;
+    }
 
-  const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
-  if (!tradePlan) {
-    handleElementNotFound('trade plan', 'CRITICAL');
-    return;
-  }
-
-  // הצגת פרטי התכנון במודל הביטול
-  document.getElementById('cancelTradePlanDetails').innerHTML = `
-        <strong>טיקר:</strong> ${tradePlan.ticker?.symbol || 'לא מוגדר'}<br>
-        <strong>סוג:</strong> ${tradePlan.investment_type || 'לא מוגדר'}<br>
-        <strong>צד:</strong> ${tradePlan.side || 'לא מוגדר'}<br>
-        <strong>סכום מתוכנן:</strong> $${tradePlan.planned_amount || '0.00'}
-    `;
+    // הצגת פרטי התכנון במודל הביטול
+    document.getElementById('cancelTradePlanDetails').innerHTML = `
+          <strong>טיקר:</strong> ${tradePlan.ticker?.symbol || 'לא מוגדר'}<br>
+          <strong>סוג:</strong> ${tradePlan.investment_type || 'לא מוגדר'}<br>
+          <strong>צד:</strong> ${tradePlan.side || 'לא מוגדר'}<br>
+          <strong>סכום מתוכנן:</strong> $${tradePlan.planned_amount || '0.00'}
+      `;
 
   document.getElementById('cancelTradePlanModal').setAttribute('data-trade-plan-id', tradePlanId);
 
   const modal = new bootstrap.Modal(document.getElementById('cancelTradePlanModal'));
   modal.show();
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בפתיחת מודל ביטול תכנון:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפתיחת מודל ביטול תכנון', error.message);
+    }
+  }
 }
 
 /**
  * פתיחת מודל מחיקת תכנון
  */
 function openDeleteTradePlanModal(tradePlanId) {
+  try {
+    const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
+    if (!tradePlan) {
+      handleElementNotFound('trade plan', 'CRITICAL');
+      return;
+    }
 
-  const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
-  if (!tradePlan) {
-    handleElementNotFound('trade plan', 'CRITICAL');
-    return;
-  }
-
-  // הצגת פרטי התכנון במודל המחיקה
-  document.getElementById('deleteTradePlanDetails').innerHTML = `
-        <strong>טיקר:</strong> ${tradePlan.ticker?.symbol || 'לא מוגדר'}<br>
-        <strong>סוג:</strong> ${tradePlan.investment_type || 'לא מוגדר'}<br>
-        <strong>צד:</strong> ${tradePlan.side || 'לא מוגדר'}<br>
-        <strong>סכום מתוכנן:</strong> $${tradePlan.planned_amount || '0.00'}
-    `;
+    // הצגת פרטי התכנון במודל המחיקה
+    document.getElementById('deleteTradePlanDetails').innerHTML = `
+          <strong>טיקר:</strong> ${tradePlan.ticker?.symbol || 'לא מוגדר'}<br>
+          <strong>סוג:</strong> ${tradePlan.investment_type || 'לא מוגדר'}<br>
+          <strong>צד:</strong> ${tradePlan.side || 'לא מוגדר'}<br>
+          <strong>סכום מתוכנן:</strong> $${tradePlan.planned_amount || '0.00'}
+      `;
 
   document.getElementById('deleteTradePlanModal').setAttribute('data-trade-plan-id', tradePlanId);
 
   const modal = new bootstrap.Modal(document.getElementById('deleteTradePlanModal'));
   modal.show();
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בפתיחת מודל מחיקת תכנון:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפתיחת מודל מחיקת תכנון', error.message);
+    }
+  }
 }
 
 /**
@@ -1518,7 +1539,14 @@ async function loadTradePlansData() {
  * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
  */
 function updateDesignsTable(trade_plans) {
-  return updateTradePlansTable(trade_plans);
+  try {
+    return updateTradePlansTable(trade_plans);
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון טבלת עיצובים:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון טבלת עיצובים', error.message);
+    }
+  }
 }
 
 
@@ -1526,12 +1554,13 @@ function updateDesignsTable(trade_plans) {
  * פילטור נתוני תכנונים
  */
 function filterTradePlansData(filters) {
-  // Use trade-plan-service for filtering
-  if (typeof window.tradePlanService?.filterTradePlans === 'function') {
-    const filteredData = window.tradePlanService.filterTradePlans(filters);
-    updateTradePlansTable(filteredData);
-    return;
-  }
+  try {
+    // Use trade-plan-service for filtering
+    if (typeof window.tradePlanService?.filterTradePlans === 'function') {
+      const filteredData = window.tradePlanService.filterTradePlans(filters);
+      updateTradePlansTable(filteredData);
+      return;
+    }
 
   // Fallback to local filtering
   if (!window.tradePlansData || !Array.isArray(window.tradePlansData)) {
@@ -1586,6 +1615,13 @@ function filterTradePlansData(filters) {
 
   // עדכון הטבלה
   updateTradePlansTable(filteredData);
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בפילטור נתוני תכנונים:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפילטור נתוני תכנונים', error.message);
+    }
+  }
 }
 
 /**

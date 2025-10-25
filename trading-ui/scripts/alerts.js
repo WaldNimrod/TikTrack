@@ -1264,17 +1264,18 @@ function populateRelatedObjects(relationTypeId) {
  * @param {number} relationTypeId - מזהה סוג השיוך
  */
 function populateEditRelatedObjects(relationTypeId) {
-  const selectElement = document.getElementById('editAlertRelatedObjectSelect');
-  if (!selectElement) {return;}
+  try {
+    const selectElement = document.getElementById('editAlertRelatedObjectSelect');
+    if (!selectElement) {return;}
 
-  // ניקוי הרשימה
-  selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+    // ניקוי הרשימה
+    selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
-  // מילוי לפי סוג השיוך
-  switch (relationTypeId) {
-  case 1: // חשבון
-    populateSelect('editAlertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון');
-    break;
+    // מילוי לפי סוג השיוך
+    switch (relationTypeId) {
+    case 1: // חשבון
+      populateSelect('editAlertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון');
+      break;
 
   case 2: // טרייד
     populateSelect('editAlertRelatedObjectSelect', window.tradesData || [], 'id', 'טרייד');
@@ -1288,6 +1289,13 @@ function populateEditRelatedObjects(relationTypeId) {
     populateSelect('editAlertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
     break;
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה במילוי אובייקטים קשורים בעריכה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במילוי אובייקטים קשורים בעריכה', error.message);
+    }
+  }
 }
 
 /**
@@ -1295,10 +1303,17 @@ function populateEditRelatedObjects(relationTypeId) {
  * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
  */
 function onEditRelationTypeChange(radioElement) {
-  // window.Logger.info('🔧 Edit relation type changed:', radioElement.value, { page: "alerts" });
+  try {
+    // window.Logger.info('🔧 Edit relation type changed:', radioElement.value, { page: "alerts" });
 
-  // מילוי רשימת האובייקטים לפי הסוג שנבחר
-  populateEditRelatedObjects(parseInt(radioElement.value));
+    // מילוי רשימת האובייקטים לפי הסוג שנבחר
+    populateEditRelatedObjects(parseInt(radioElement.value));
+  } catch (error) {
+    window.Logger.error('שגיאה בשינוי סוג שיוך בעריכה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בשינוי סוג שיוך בעריכה', error.message);
+    }
+  }
 }
 
 /**
@@ -1306,14 +1321,21 @@ function onEditRelationTypeChange(radioElement) {
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
 function onEditRelatedObjectChange(selectElement) {
-  // window.Logger.info('🔧 Edit related object changed:', selectElement.value, { page: "alerts" });
+  try {
+    // window.Logger.info('🔧 Edit related object changed:', selectElement.value, { page: "alerts" });
 
-  if (selectElement.value) {
-    // הפעלת שדות התנאי ישירות
-    enableEditConditionFields();
-  } else {
-    // השבתת שדות התנאי
-    disableEditConditionFields();
+    if (selectElement.value) {
+      // הפעלת שדות התנאי ישירות
+      enableEditConditionFields();
+    } else {
+      // השבתת שדות התנאי
+      disableEditConditionFields();
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בבחירת אובייקט בעריכה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בבחירת אובייקט בעריכה', error.message);
+    }
   }
 }
 
@@ -1321,20 +1343,21 @@ function onEditRelatedObjectChange(selectElement) {
  * הפעלת שדות התנאי במודל העריכה
  */
 function enableEditConditionFields() {
-  const conditionAttribute = document.getElementById('editConditionAttribute');
-  const conditionOperator = document.getElementById('editConditionOperator');
-  const conditionNumber = document.getElementById('editConditionNumber');
-  const alertMessage = document.getElementById('editAlertMessage');
+  try {
+    const conditionAttribute = document.getElementById('editConditionAttribute');
+    const conditionOperator = document.getElementById('editConditionOperator');
+    const conditionNumber = document.getElementById('editConditionNumber');
+    const alertMessage = document.getElementById('editAlertMessage');
 
-  if (conditionAttribute) {
-    conditionAttribute.disabled = false;
-    conditionAttribute.classList.remove('disabled-field');
-  }
-  if (conditionOperator) {
-    conditionOperator.disabled = false;
-    conditionOperator.classList.remove('disabled-field');
-  }
-  if (conditionNumber) {
+    if (conditionAttribute) {
+      conditionAttribute.disabled = false;
+      conditionAttribute.classList.remove('disabled-field');
+    }
+    if (conditionOperator) {
+      conditionOperator.disabled = false;
+      conditionOperator.classList.remove('disabled-field');
+    }
+    if (conditionNumber) {
     conditionNumber.disabled = false;
     conditionNumber.classList.remove('disabled-field');
   }
@@ -1342,26 +1365,34 @@ function enableEditConditionFields() {
     alertMessage.disabled = false;
     alertMessage.classList.remove('disabled-field');
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהפעלת שדות התנאי בעריכה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהפעלת שדות התנאי בעריכה', error.message);
+    }
+  }
 }
 
 /**
  * השבתת שדות התנאי במודל העריכה
  */
 function disableEditConditionFields() {
-  const conditionAttribute = document.getElementById('editConditionAttribute');
-  const conditionOperator = document.getElementById('editConditionOperator');
-  const conditionNumber = document.getElementById('editConditionNumber');
-  const alertMessage = document.getElementById('editAlertMessage');
+  try {
+    const conditionAttribute = document.getElementById('editConditionAttribute');
+    const conditionOperator = document.getElementById('editConditionOperator');
+    const conditionNumber = document.getElementById('editConditionNumber');
+    const alertMessage = document.getElementById('editAlertMessage');
 
-  if (conditionAttribute) {
-    conditionAttribute.disabled = true;
-    conditionAttribute.classList.add('disabled-field');
-    conditionAttribute.value = '';
-  }
-  if (conditionOperator) {
-    conditionOperator.disabled = true;
-    conditionOperator.classList.add('disabled-field');
-    conditionOperator.value = '';
+    if (conditionAttribute) {
+      conditionAttribute.disabled = true;
+      conditionAttribute.classList.add('disabled-field');
+      conditionAttribute.value = '';
+    }
+    if (conditionOperator) {
+      conditionOperator.disabled = true;
+      conditionOperator.classList.add('disabled-field');
+      conditionOperator.value = '';
   }
   if (conditionNumber) {
     conditionNumber.disabled = true;
@@ -1372,6 +1403,13 @@ function disableEditConditionFields() {
     alertMessage.disabled = true;
     alertMessage.classList.add('disabled-field');
     alertMessage.value = '';
+  }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהשבתת שדות התנאי בעריכה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהשבתת שדות התנאי בעריכה', error.message);
+    }
   }
 }
 
@@ -1385,20 +1423,28 @@ function disableEditConditionFields() {
  * @returns {boolean} true אם נתמך, false אם לא
  */
 function checkAlertVariable(selectElement) {
-  // window.Logger.info('🔍 === CHECK ALERT VARIABLE ===', { page: "alerts" });
-  // window.Logger.info('🔍 Element:', selectElement, { page: "alerts" });
-  // window.Logger.info('🔍 Selected value:', selectElement.value, { page: "alerts" });
+  try {
+    // window.Logger.info('🔍 === CHECK ALERT VARIABLE ===', { page: "alerts" });
+    // window.Logger.info('🔍 Element:', selectElement, { page: "alerts" });
+    // window.Logger.info('🔍 Selected value:', selectElement.value, { page: "alerts" });
 
-  // כרגע מאפשרים את כל התכונות
-  const selectedValue = selectElement.value;
+    // כרגע מאפשרים את כל התכונות
+    const selectedValue = selectElement.value;
 
-  if (!selectedValue) {
-    // window.Logger.info('❌ No variable selected', { page: "alerts" });
+    if (!selectedValue) {
+      // window.Logger.info('❌ No variable selected', { page: "alerts" });
+      return false;
+    }
+
+    // window.Logger.info('✅ Variable accepted:', selectedValue, { page: "alerts" });
+    return true;
+  } catch (error) {
+    window.Logger.error('שגיאה בבדיקת משתנה התראה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בבדיקת משתנה התראה', error.message);
+    }
     return false;
   }
-
-  // window.Logger.info('✅ Variable accepted:', selectedValue, { page: "alerts" });
-  return true;
 }
 
 /**
@@ -1411,12 +1457,13 @@ function checkAlertVariable(selectElement) {
  * @returns {boolean} true אם נתמך, false אם לא
  */
 function checkAlertOperator(selectElement) {
-  // window.Logger.info('🔍 === CHECK ALERT OPERATOR ===', { page: "alerts" });
-  // window.Logger.info('🔍 Element:', selectElement, { page: "alerts" });
-  // window.Logger.info('🔍 Selected value:', selectElement.value, { page: "alerts" });
+  try {
+    // window.Logger.info('🔍 === CHECK ALERT OPERATOR ===', { page: "alerts" });
+    // window.Logger.info('🔍 Element:', selectElement, { page: "alerts" });
+    // window.Logger.info('🔍 Selected value:', selectElement.value, { page: "alerts" });
 
-  // כרגע מאפשרים את כל האופרטורים
-  const selectedValue = selectElement.value;
+    // כרגע מאפשרים את כל האופרטורים
+    const selectedValue = selectElement.value;
 
   if (!selectedValue) {
     // window.Logger.info('❌ No operator selected', { page: "alerts" });
@@ -1425,6 +1472,14 @@ function checkAlertOperator(selectElement) {
 
   // window.Logger.info('✅ Operator accepted:', selectedValue, { page: "alerts" });
   return true;
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בבדיקת אופרטור התראה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בבדיקת אופרטור התראה', error.message);
+    }
+    return false;
+  }
 }
 
 /**
@@ -1439,7 +1494,15 @@ function checkAlertOperator(selectElement) {
  * @returns {string} מחרוזת התנאי
  */
 function buildAlertCondition(variable, operator, value) {
-  return `${variable} | ${operator} | ${value}`;
+  try {
+    return `${variable} | ${operator} | ${value}`;
+  } catch (error) {
+    window.Logger.error('שגיאה בבניית תנאי התראה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בבניית תנאי התראה', error.message);
+    }
+    return '';
+  }
 }
 
 /**
@@ -1451,16 +1514,24 @@ function buildAlertCondition(variable, operator, value) {
  * @returns {object} אובייקט עם variable, operator, value
  */
 function parseAlertCondition(condition) {
-  if (!condition || !condition.includes(' | ')) {
+  try {
+    if (!condition || !condition.includes(' | ')) {
+      return { variable: 'price', operator: 'moreThen', value: '' };
+    }
+
+    const parts = condition.split(' | ');
+    return {
+      variable: parts[0] || 'price',
+      operator: parts[1] || 'moreThen',
+      value: parts[2] || '',
+    };
+  } catch (error) {
+    window.Logger.error('שגיאה בפירוק תנאי התראה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפירוק תנאי התראה', error.message);
+    }
     return { variable: 'price', operator: 'moreThen', value: '' };
   }
-
-  const parts = condition.split(' | ');
-  return {
-    variable: parts[0] || 'price',
-    operator: parts[1] || 'moreThen',
-    value: parts[2] || '',
-  };
 }
 
 /**
@@ -1652,19 +1723,20 @@ async function saveAlert() {
  * @param {number} alertId - מזהה ההתראה לעריכה
  */
 function editAlert(alertId) {
-  const alert = (window.alertsData || alertsData).find(a => a.id === alertId);
-  if (!alert) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('התראה לא נמצאה', 'התראה לא נמצאה');
+  try {
+    const alert = (window.alertsData || alertsData).find(a => a.id === alertId);
+    if (!alert) {
+      if (window.showErrorNotification) {
+        window.showErrorNotification('התראה לא נמצאה', 'התראה לא נמצאה');
+      }
+      return;
     }
-    return;
-  }
 
-  // ניקוי ולידציה
-  clearAlertValidation();
-  
-  // אתחול הממשק המתקדם לבניית תנאי
-  initializeAlertConditionBuilder(alert);
+    // ניקוי ולידציה
+    clearAlertValidation();
+    
+    // אתחול הממשק המתקדם לבניית תנאי
+    initializeAlertConditionBuilder(alert);
 
   // מילוי הטופס
   const editAlertId = document.getElementById('editAlertId');
@@ -1778,6 +1850,13 @@ function editAlert(alertId) {
   } else {
     // window.Logger.error('Edit modal element not found', { page: "alerts" });
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעריכת התראה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעריכת התראה', error.message);
+    }
+  }
 }
 
 /**
@@ -1791,24 +1870,33 @@ function editAlert(alertId) {
  * @returns {string} מצב ההתראה בעברית (new, active, unread, read, cancelled)
  */
 function getAlertState(status, isTriggered) {
-  if (status === 'open' && isTriggered === 'false') {
-    return 'new';
-  }
-  if (status === 'open' && isTriggered !== 'false') {
-    return 'active'; // התראה פתוחה עם מצב הפעלה שונה
-  }
-  if (status === 'closed' && isTriggered === 'new') {
-    return 'unread';
-  }
-  if (status === 'closed' && isTriggered === 'true') {
-    return 'read';
-  }
-  if (status === 'cancelled' && isTriggered === 'false') {
-    return 'cancelled';
+  try {
+    if (status === 'open' && isTriggered === 'false') {
+      return 'new';
+    }
+    if (status === 'open' && isTriggered !== 'false') {
+      return 'active'; // התראה פתוחה עם מצב הפעלה שונה
+    }
+    if (status === 'closed' && isTriggered === 'new') {
+      return 'unread';
+    }
+    if (status === 'closed' && isTriggered === 'true') {
+      return 'read';
+    }
+    if (status === 'cancelled' && isTriggered === 'false') {
+      return 'cancelled';
   }
 
   // ברירת מחדל
   return 'new';
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בקבלת מצב התראה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בקבלת מצב התראה', error.message);
+    }
+    return 'new';
+  }
 }
 
 /**
@@ -1828,23 +1916,32 @@ function getAlertState(status, isTriggered) {
  * @returns {boolean} true אם השילוב תקין, false אחרת
  */
 function validateAlertStatusCombination(status, isTriggered) {
-  // כללים לפי הדוקומנטציה:
-  // 1. status='open' + is_triggered='false' - תקין
-  // 2. status='closed' + is_triggered='new' - תקין
-  // 3. status='closed' + is_triggered='true' - תקין
-  // 4. status='cancelled' + is_triggered='false' - תקין (תוקן!)
+  try {
+    // כללים לפי הדוקומנטציה:
+    // 1. status='open' + is_triggered='false' - תקין
+    // 2. status='closed' + is_triggered='new' - תקין
+    // 3. status='closed' + is_triggered='true' - תקין
+    // 4. status='cancelled' + is_triggered='false' - תקין (תוקן!)
 
-  if (status === 'open' && isTriggered === 'false') {
-    return true;
-  }
-  if (status === 'closed' && (isTriggered === 'new' || isTriggered === 'true')) {
-    return true;
-  }
-  if (status === 'cancelled' && isTriggered === 'false') {
-    return true;
+    if (status === 'open' && isTriggered === 'false') {
+      return true;
+    }
+    if (status === 'closed' && (isTriggered === 'new' || isTriggered === 'true')) {
+      return true;
+    }
+    if (status === 'cancelled' && isTriggered === 'false') {
+      return true;
   }
 
   return false;
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בוולידציה של שילוב סטטוס התראה:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בוולידציה של שילוב סטטוס התראה', error.message);
+    }
+    return false;
+  }
 }
 
 /**

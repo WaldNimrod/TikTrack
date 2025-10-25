@@ -173,13 +173,8 @@ def upload_file():
                     'message': analysis_result['error']
                 }), 500
             
-            # Save analysis results to session
-            session = db_session.query(ImportSession).filter(
-                ImportSession.id == result['session_id']
-            ).first()
-            if session:
-                session.add_summary_data(analysis_result['analysis_results'])
-                db_session.commit()
+            # Note: analyze_file already saves the results to session and commits
+            # No need to save again here
             
             return jsonify({
                 'status': 'success',

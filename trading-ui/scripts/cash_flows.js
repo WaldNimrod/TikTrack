@@ -171,19 +171,27 @@ let tradingAccountsData = [];
  * קבלת שם חשבון לפי ID
  */
 function getAccountNameById(accountId) {
-  // בדיקה אם יש cache של HeaderSystem
-  if (window.HeaderSystem && window.HeaderSystem.accountsCache) {
-    const account = window.HeaderSystem.accountsCache.find(acc => acc.id === accountId);
-    if (account) return account.name;
+  try {
+    // בדיקה אם יש cache של HeaderSystem
+    if (window.HeaderSystem && window.HeaderSystem.accountsCache) {
+      const account = window.HeaderSystem.accountsCache.find(acc => acc.id === accountId);
+      if (account) return account.name;
+    }
+    
+    // בדיקה אם יש נתונים גלובליים
+    if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
+      const account = window.trading_accountsData.find(acc => acc.id === accountId);
+      if (account) return account.name;
+    }
+    
+    return null;
+  } catch (error) {
+    window.Logger.error('שגיאה בקבלת שם חשבון לפי מזהה:', error, { page: "cash_flows" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בקבלת שם חשבון לפי מזהה', error.message);
+    }
+    return null;
   }
-  
-  // בדיקה אם יש נתונים גלובליים
-  if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
-    const account = window.trading_accountsData.find(acc => acc.id === accountId);
-    if (account) return account.name;
-  }
-  
-  return null;
 }
 
 /**
@@ -221,12 +229,13 @@ async function ensureTradingAccountsLoaded() {
  * פונקציה לפתיחה/סגירה של סקשן תזרימי מזומנים
  */
 function toggleCashFlowsSection() {
-  // toggleCashFlowsSection נקראה
+  try {
+    // toggleCashFlowsSection נקראה
 
-  const cashFlowsSection = document.querySelector('.cash-flows-section');
-  if (!cashFlowsSection) {
-    handleElementNotFound('toggleCashFlowsSection', 'סקשן תזרימי מזומנים לא נמצא');
-    return;
+    const cashFlowsSection = document.querySelector('.cash-flows-section');
+    if (!cashFlowsSection) {
+      handleElementNotFound('toggleCashFlowsSection', 'סקשן תזרימי מזומנים לא נמצא');
+      return;
   }
 
   const sectionBody = cashFlowsSection.querySelector('.section-body');
@@ -260,6 +269,13 @@ function toggleCashFlowsSection() {
   // שמירת המצב
   window.unifiedCacheManager?.save('cashFlowsSectionState', isVisible ? 'closed' : 'open');
   localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהחלפת סקציית תזרימי מזומנים:', error, { page: "cash_flows" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהחלפת סקציית תזרימי מזומנים', error.message);
+    }
+  }
 }
 
 // פונקציות לשחזור מצב הסגירה
@@ -366,16 +382,17 @@ async function loadCashFlows() {
  * ולידציה של טופס תזרים מזומנים
  */
 function validateCashFlowForm() {
-  return window.validateEntityForm('addCashFlowForm', [
-    { id: 'cashFlowType', name: 'סוג תזרים' },
-    { 
-      id: 'cashFlowAmount', 
-      name: 'סכום',
-      validation: (value) => {
-        const amount = parseFloat(value);
-        if (isNaN(amount)) return 'יש להזין סכום תקין';
-        if (amount === 0) return 'סכום לא יכול להיות 0';
-        if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
+  try {
+    return window.validateEntityForm('addCashFlowForm', [
+      { id: 'cashFlowType', name: 'סוג תזרים' },
+      { 
+        id: 'cashFlowAmount', 
+        name: 'סכום',
+        validation: (value) => {
+          const amount = parseFloat(value);
+          if (isNaN(amount)) return 'יש להזין סכום תקין';
+          if (amount === 0) return 'סכום לא יכול להיות 0';
+          if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
         return true;
       }
     },
@@ -398,6 +415,14 @@ function validateCashFlowForm() {
     { id: 'cashFlowCurrency', name: 'מטבע' },
     { id: 'cashFlowSource', name: 'מקור' }
   ]);
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בוולידציה של טופס תזרים מזומנים:', error, { page: "cash_flows" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בוולידציה של טופס תזרים מזומנים', error.message);
+    }
+    return false;
+  }
 }
 
 /**
@@ -411,19 +436,20 @@ function validateCashFlowForm() {
  * ולידציה של טופס עריכת תזרים מזומנים
  */
 function validateEditCashFlowForm() {
-  return window.validateEntityForm('editCashFlowForm', [
-    { id: 'editCashFlowType', name: 'סוג תזרים' },
-    { 
-      id: 'editCashFlowAmount', 
-      name: 'סכום',
-      validation: (value) => {
-        const amount = parseFloat(value);
-        if (isNaN(amount)) return 'יש להזין סכום תקין';
-        if (amount === 0) return 'סכום לא יכול להיות 0';
-        if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
-        return true;
-      }
-    },
+  try {
+    return window.validateEntityForm('editCashFlowForm', [
+      { id: 'editCashFlowType', name: 'סוג תזרים' },
+      { 
+        id: 'editCashFlowAmount', 
+        name: 'סכום',
+        validation: (value) => {
+          const amount = parseFloat(value);
+          if (isNaN(amount)) return 'יש להזין סכום תקין';
+          if (amount === 0) return 'סכום לא יכול להיות 0';
+          if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
+          return true;
+        }
+      },
     { 
       id: 'editCashFlowDate', 
       name: 'תאריך',
@@ -443,6 +469,14 @@ function validateEditCashFlowForm() {
     { id: 'editCashFlowCurrency', name: 'מטבע' },
     { id: 'editCashFlowSource', name: 'מקור' }
   ]);
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בוולידציה של טופס עריכת תזרים מזומנים:', error, { page: "cash_flows" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בוולידציה של טופס עריכת תזרים מזומנים', error.message);
+    }
+    return false;
+  }
 }
 
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
@@ -740,11 +774,12 @@ async function renderCashFlowsTable() {
  * עדכון סטטיסטיקות סיכום
  */
 function updatePageSummaryStats() {
-  if (!cashFlowsData) {
-    cashFlowsData = [];
-  }
+  try {
+    if (!cashFlowsData) {
+      cashFlowsData = [];
+    }
 
-  // מערכת מאוחדת לסיכום נתונים
+    // מערכת מאוחדת לסיכום נתונים
   if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
     const config = window.INFO_SUMMARY_CONFIGS.cash_flows;
     window.InfoSummarySystem.calculateAndRender(cashFlowsData, config);
@@ -759,6 +794,13 @@ function updatePageSummaryStats() {
       `;
     }
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון סטטיסטיקות סיכום:', error, { page: "cash_flows" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון סטטיסטיקות סיכום', error.message);
+    }
+  }
 }
 
 // פונקציות הועברו ל-translation-utils.js:
@@ -769,28 +811,37 @@ function updatePageSummaryStats() {
  * פורמט סכום
  */
 function formatAmount(amount) {
-  // שימוש במערכת הפורמט החדשה
-  if (window.formatCurrencyWithCommas) {
-    return window.formatCurrencyWithCommas(amount, 'USD');
-  }
+  try {
+    // שימוש במערכת הפורמט החדשה
+    if (window.formatCurrencyWithCommas) {
+      return window.formatCurrencyWithCommas(amount, 'USD');
+    }
 
-  // גיבוי למערכת הישנה
-  return new Intl.NumberFormat('he-IL', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
+    // גיבוי למערכת הישנה
+    return new Intl.NumberFormat('he-IL', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  } catch (error) {
+    window.Logger.error('שגיאה בעיצוב סכום:', error, { page: "cash_flows" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעיצוב סכום', error.message);
+    }
+    return amount.toString();
+  }
 }
 
 /**
  * קבלת סוג תזרים עם צבע
  */
 function getCashFlowTypeWithColor(type) {
-  const typeTranslation = window.translateCashFlowType ? window.translateCashFlowType(type) : type;
+  try {
+    const typeTranslation = window.translateCashFlowType ? window.translateCashFlowType(type) : type;
 
-  // שימוש במערכת הצבעים הדינמית - רק צבע טקסט ללא רקע
-  if (window.getTableColors) {
-    const colors = window.getTableColors();
-    let color = colors.secondary; // ברירת מחדל
+    // שימוש במערכת הצבעים הדינמית - רק צבע טקסט ללא רקע
+    if (window.getTableColors) {
+      const colors = window.getTableColors();
+      let color = colors.secondary; // ברירת מחדל
     
     switch (type) {
     case 'deposit':
@@ -832,6 +883,14 @@ function getCashFlowTypeWithColor(type) {
   }
 
   return `<span class="${cssClass}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;"><strong>${typeTranslation}</strong></span>`;
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בקבלת סוג תזרים עם צבע:', error, { page: "cash_flows" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בקבלת סוג תזרים עם צבע', error.message);
+    }
+    return type;
+  }
 }
 
 /**

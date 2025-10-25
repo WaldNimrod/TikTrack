@@ -40,7 +40,7 @@ class DemoConnector(BaseConnector):
         
         # Check for expected headers in the first line
         first_line = file_content.splitlines()[0]
-        expected_headers = ["symbol", "action", "date", "quantity", "price", "fee"]
+        expected_headers = ["Ticker", "Date", "Action", "Quantity", "Price", "Fee"]
         return all(header in first_line for header in expected_headers)
 
     def detect_format(self, file_content: str) -> bool:

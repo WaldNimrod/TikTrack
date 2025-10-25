@@ -56,43 +56,44 @@ def condition_evaluation_task():
         
         for result in evaluation_results:
             try:
-                if result.get('met', False):
+                condition_id = result.get('condition_id')
+                condition_type = result.get('condition_type', 'plan')
+                condition_met = result.get('met', False)
+                
+                if condition_met:
                     conditions_met += 1
-                    
-                    # Check if auto-generate alerts is enabled for this condition
-                    condition_id = result.get('condition_id')
-                    condition_type = result.get('condition_type', 'plan')
-                    
-                    # Get condition to check auto_generate_alerts setting
-                    auto_generate = True  # Default to True
-                    try:
-                        if condition_type == 'plan':
-                            from models.plan_condition import PlanCondition
-                            condition = db_session.query(PlanCondition).filter(PlanCondition.id == condition_id).first()
-                        else:
-                            from models.plan_condition import TradeCondition
-                            condition = db_session.query(TradeCondition).filter(TradeCondition.id == condition_id).first()
-                        
-                        if condition:
-                            auto_generate = condition.auto_generate_alerts
-                    except Exception as e:
-                        logger.warning(f"⚠️ Could not check auto_generate_alerts for condition {condition_id}: {str(e)}")
-                    
-                    # Create alert only if auto-generate is enabled
-                    if auto_generate:
-                        alert_result = create_alert_from_condition(
-                            alert_service, 
-                            result, 
-                            db_session
-                        )
-                        
-                        if alert_result.get('success', False):
-                            alerts_created += 1
-                            logger.info(f"✅ Alert created for condition {condition_id}: {alert_result.get('alert_id')}")
-                        else:
-                            logger.warning(f"⚠️ Failed to create alert for condition {condition_id}: {alert_result.get('error')}")
+                
+                # Check if auto-generate alerts is enabled for this condition
+                auto_generate = True  # Default to True
+                try:
+                    if condition_type == 'plan':
+                        from models.plan_condition import PlanCondition
+                        condition = db_session.query(PlanCondition).filter(PlanCondition.id == condition_id).first()
                     else:
-                        logger.info(f"ℹ️ Auto-generate alerts disabled for condition {condition_id}, skipping alert creation")
+                        from models.plan_condition import TradeCondition
+                        condition = db_session.query(TradeCondition).filter(TradeCondition.id == condition_id).first()
+                    
+                    if condition:
+                        auto_generate = condition.auto_generate_alerts
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not check auto_generate_alerts for condition {condition_id}: {str(e)}")
+                
+                # Process alert lifecycle
+                if auto_generate:
+                    alert_result = process_condition_alert_lifecycle(
+                        alert_service, 
+                        result, 
+                        db_session
+                    )
+                    
+                    if alert_result.get('success', False):
+                        if alert_result.get('action') == 'created':
+                            alerts_created += 1
+                        logger.info(f"✅ Alert processed for condition {condition_id}: {alert_result.get('message')}")
+                    else:
+                        logger.warning(f"⚠️ Failed to process alert for condition {condition_id}: {alert_result.get('error')}")
+                else:
+                    logger.info(f"ℹ️ Auto-generate alerts disabled for condition {condition_id}, skipping alert processing")
                 
             except Exception as e:
                 errors += 1
@@ -119,6 +120,143 @@ def condition_evaluation_task():
             'error': str(e),
             'duration_seconds': (datetime.now(timezone.utc) - task_start_time).total_seconds()
         }
+
+def process_condition_alert_lifecycle(alert_service, result: Dict[str, Any], db_session) -> Dict[str, Any]:
+    """
+    Process alert lifecycle for condition evaluation
+    
+    Args:
+        alert_service: AlertService instance
+        result: Evaluation result
+        db_session: Database session
+        
+    Returns:
+        Result dictionary with success status and details
+    """
+    try:
+        condition_id = result.get('condition_id')
+        condition_type = result.get('condition_type', 'plan')
+        condition_met = result.get('met', False)
+        
+        # Check if alert already exists for this condition
+        existing_alert = alert_service.get_alert_by_condition(
+            db_session, 
+            plan_condition_id=condition_id if condition_type == 'plan' else None,
+            trade_condition_id=condition_id if condition_type == 'trade' else None
+        )
+        
+        if not existing_alert:
+            # No existing alert - create one if condition is met
+            if condition_met:
+                alert_data = {
+                    'message': generate_alert_message(
+                        result.get('method_name', 'Unknown'),
+                        result.get('current_price', 0),
+                        result.get('details', {}),
+                        condition_type
+                    ),
+                    'related_id': condition_id,
+                    'related_type_id': 3 if condition_type == 'plan' else 2,  # trade_plan or trade
+                    'condition_attribute': 'price',
+                    'condition_operator': 'more_than',
+                    'condition_number': str(result.get('current_price', 0)),
+                    'status': 'open',
+                    'is_triggered': 'new',  # Immediately triggered
+                    'triggered_at': datetime.now(timezone.utc)
+                }
+                
+                alert = alert_service.create_or_update_alert_for_condition(
+                    db_session, condition_id, condition_type, alert_data
+                )
+                
+                return {
+                    'success': True,
+                    'action': 'created',
+                    'alert_id': alert.id,
+                    'message': f'Alert created and triggered for condition {condition_id}'
+                }
+            else:
+                # Condition not met, no alert needed yet
+                return {
+                    'success': True,
+                    'action': 'none',
+                    'message': f'Condition {condition_id} not met, no alert needed'
+                }
+        else:
+            # Alert exists - handle lifecycle
+            if condition_met:
+                # Condition is met
+                if existing_alert.is_triggered == 'false':
+                    # Alert was waiting - trigger it
+                    existing_alert.is_triggered = 'new'
+                    existing_alert.triggered_at = datetime.now(timezone.utc)
+                    db_session.commit()
+                    
+                    return {
+                        'success': True,
+                        'action': 'triggered',
+                        'alert_id': existing_alert.id,
+                        'message': f'Alert triggered for condition {condition_id}'
+                    }
+                elif existing_alert.is_triggered == 'true':
+                    # Alert was read - check cooldown and reactivate if needed
+                    cooldown_minutes = get_condition_alert_cooldown(db_session)
+                    if should_reactivate_alert(existing_alert, cooldown_minutes):
+                        alert_service.reactivate_alert(db_session, existing_alert.id)
+                        return {
+                            'success': True,
+                            'action': 'reactivated',
+                            'alert_id': existing_alert.id,
+                            'message': f'Alert reactivated for condition {condition_id}'
+                        }
+                    else:
+                        return {
+                            'success': True,
+                            'action': 'cooldown',
+                            'message': f'Alert for condition {condition_id} in cooldown period'
+                        }
+                elif existing_alert.is_triggered == 'new':
+                    # Alert already active - do nothing
+                    return {
+                        'success': True,
+                        'action': 'none',
+                        'message': f'Alert for condition {condition_id} already active'
+                    }
+            else:
+                # Condition not met - do nothing
+                return {
+                    'success': True,
+                    'action': 'none',
+                    'message': f'Condition {condition_id} not met, alert remains {existing_alert.is_triggered}'
+                }
+                
+    except Exception as e:
+        logger.error(f"Error processing alert lifecycle: {str(e)}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+def get_condition_alert_cooldown(db_session) -> int:
+    """Get cooldown minutes from preferences"""
+    try:
+        from services.preferences_service import PreferencesService
+        preferences_service = PreferencesService()
+        cooldown = preferences_service.get_preference_value(
+            db_session, 'condition_alert_cooldown_minutes', 60
+        )
+        return int(cooldown)
+    except Exception as e:
+        logger.warning(f"Could not get cooldown preference, using default: {e}")
+        return 60
+
+def should_reactivate_alert(alert, cooldown_minutes: int) -> bool:
+    """Check if alert should be reactivated based on cooldown"""
+    if not alert.triggered_at:
+        return True
+    
+    time_since_triggered = datetime.now(timezone.utc) - alert.triggered_at
+    return time_since_triggered.total_seconds() >= (cooldown_minutes * 60)
 
 def create_alert_from_condition(alert_service: AlertService, evaluation_result: Dict[str, Any], db_session: Session) -> Dict[str, Any]:
     """

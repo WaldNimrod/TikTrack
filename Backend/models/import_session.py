@@ -164,10 +164,17 @@ class ImportSession(BaseModel):
         Args:
             data: Dictionary containing summary information
         """
+        from sqlalchemy import inspect
+        from sqlalchemy.orm.attributes import flag_modified
+        
         if self.summary_data is None:
             self.summary_data = {}
         
+        # Update the dictionary
         self.summary_data.update(data)
+        
+        # Mark the column as modified so SQLAlchemy will update it
+        flag_modified(self, 'summary_data')
     
     def get_summary_data(self, key: str = None) -> Any:
         """

@@ -20,8 +20,14 @@ class Alert(BaseModel):
     condition_operator = Column(String(50), nullable=False, default='more_than')
     condition_number = Column(String(20), nullable=False, default='0')
     
+    # Condition linking fields (new)
+    plan_condition_id = Column(Integer, ForeignKey('plan_conditions.id'), nullable=True)
+    trade_condition_id = Column(Integer, ForeignKey('trade_conditions.id'), nullable=True)
+    
     # Relationships
     # ticker = relationship("Ticker", back_populates="alerts")  # Removed - not in database
+    plan_condition = relationship("PlanCondition", backref="alerts")
+    trade_condition = relationship("TradeCondition", backref="alerts")
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -104,7 +110,9 @@ class Alert(BaseModel):
             'condition_attribute': self.condition_attribute,
             'condition_operator': self.condition_operator,
             'condition_number': self.condition_number,
-            'condition_display_text': self.get_condition_display_text()
+            'condition_display_text': self.get_condition_display_text(),
+            'plan_condition_id': self.plan_condition_id,
+            'trade_condition_id': self.trade_condition_id
         }
         
         # Determine related_type based on related_type_id

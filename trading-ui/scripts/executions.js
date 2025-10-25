@@ -816,10 +816,17 @@ function validateExecutionType(input) {
  * ניקוי שגיאת שדה
  */
 function clearFieldError(input, errorElement) {
-  input.classList.remove('is-invalid');
-  if (errorElement) {
-    errorElement.textContent = '';
-    errorElement.style.display = 'none';
+  try {
+    input.classList.remove('is-invalid');
+    if (errorElement) {
+      errorElement.textContent = '';
+      errorElement.style.display = 'none';
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בניקוי שגיאת שדה:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בניקוי שגיאת שדה', error.message);
+    }
   }
 }
 
@@ -827,18 +834,19 @@ function clearFieldError(input, errorElement) {
  * ניקוי כל שגיאות הולידציה
  */
 function clearExecutionValidationErrors() {
-  const form = document.getElementById('addExecutionForm');
-  if (form) {
-    const inputs = form.querySelectorAll('.is-invalid');
-    inputs.forEach(input => {
-      input.classList.remove('is-invalid');
-      const errorElement = document.getElementById(input.id + 'Error');
-      if (errorElement) {
-        errorElement.textContent = '';
-        errorElement.style.display = 'none';
-      }
-    });
-  }
+  try {
+    const form = document.getElementById('addExecutionForm');
+    if (form) {
+      const inputs = form.querySelectorAll('.is-invalid');
+      inputs.forEach(input => {
+        input.classList.remove('is-invalid');
+        const errorElement = document.getElementById(input.id + 'Error');
+        if (errorElement) {
+          errorElement.textContent = '';
+          errorElement.style.display = 'none';
+        }
+      });
+    }
 
   const editForm = document.getElementById('editExecutionForm');
   if (editForm) {
@@ -852,20 +860,28 @@ function clearExecutionValidationErrors() {
       }
     });
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בניקוי שגיאות ולידציה:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בניקוי שגיאות ולידציה', error.message);
+    }
+  }
 }
 
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 function validateCompleteExecutionForm(mode) {
-  const prefix = mode === 'add' ? 'add' : 'edit';
-  let isValid = true;
-  const errors = [];
+  try {
+    const prefix = mode === 'add' ? 'add' : 'edit';
+    let isValid = true;
+    const errors = [];
 
-  // וולידציה של מזהה טרייד (trade_id - שדה חובה)
-  const tradeIdField = document.getElementById(`${prefix}ExecutionTradeId`);
-  if (!validateExecutionTradeId(tradeIdField)) {
-    isValid = false;
-    errors.push('בחירת טרייד או תכנון היא שדה חובה');
-  }
+    // וולידציה של מזהה טרייד (trade_id - שדה חובה)
+    const tradeIdField = document.getElementById(`${prefix}ExecutionTradeId`);
+    if (!validateExecutionTradeId(tradeIdField)) {
+      isValid = false;
+      errors.push('בחירת טרייד או תכנון היא שדה חובה');
+    }
 
   // וולידציה של סוג עסקה (action - שדה חובה)
   const typeField = document.getElementById(`${prefix}ExecutionType`);
@@ -969,6 +985,14 @@ function validateCompleteExecutionForm(mode) {
   }
 
   return isValid;
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בוולידציה מלאה של טופס:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בוולידציה מלאה של טופס', error.message);
+    }
+    return false;
+  }
 }
 
 
@@ -1395,20 +1419,21 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
  * הצגת הפריטים המקושרים
  */
 function displayLinkedItems(linkedItems) {
-  // הצגת פריטים מקושרים
-  // סוג הנתונים
-  // מפתחות
+  try {
+    // הצגת פריטים מקושרים
+    // סוג הנתונים
+    // מפתחות
 
-  const contentDiv = document.getElementById('linkedItemsContent');
-  let html = '';
+    const contentDiv = document.getElementById('linkedItemsContent');
+    let html = '';
 
-  // טריידים מקושרים
-  // בדיקת טריידים מקושרים
-  // האם קיים trades
-  // אורך trades
-  if (linkedItems.trades && linkedItems.trades.length > 0) {
-    // נמצאו טריידים מקושרים, יוצר HTML
-    html += `
+    // טריידים מקושרים
+    // בדיקת טריידים מקושרים
+    // האם קיים trades
+    // אורך trades
+    if (linkedItems.trades && linkedItems.trades.length > 0) {
+      // נמצאו טריידים מקושרים, יוצר HTML
+      html += `
             <div class="card mb-3">
                 <div class="card-header bg-warning text-dark">
                     <h6 class="mb-0">🔄 טריידים מקושרים (${linkedItems.trades.length})</h6>
@@ -1574,46 +1599,88 @@ function displayLinkedItems(linkedItems) {
   }
 
   contentDiv.innerHTML = html;
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהצגת פריטים מקושרים:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהצגת פריטים מקושרים', error.message);
+    }
+  }
 }
 
 /**
  * מעבר לניהול פריטים מקושרים
  */
 function goToLinkedItems() {
-  // סגירת המודל
-  const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsModal'));
-  modal.hide();
+  try {
+    // סגירת המודל
+    const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsModal'));
+    modal.hide();
 
-  // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
-  window.location.href = '/trade_plans'; // ברירת מחדל - דף תכנון
+    // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
+    window.location.href = '/trade_plans'; // ברירת מחדל - דף תכנון
+  } catch (error) {
+    window.Logger.error('שגיאה במעבר לפריטים מקושרים:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במעבר לפריטים מקושרים', error.message);
+    }
+  }
 }
 
 /**
  * מעבר לטרייד ספציפי
  */
 function goToTrade(tradeId) {
-  window.location.href = `/trade_plans#trade-${tradeId}`;
+  try {
+    window.location.href = `/trade_plans#trade-${tradeId}`;
+  } catch (error) {
+    window.Logger.error('שגיאה במעבר לטרייד:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במעבר לטרייד', error.message);
+    }
+  }
 }
 
 /**
  * מעבר לתכנון ספציפי
  */
 function goToPlan(planId) {
-  window.location.href = `/trade_plans#plan-${planId}`;
+  try {
+    window.location.href = `/trade_plans#plan-${planId}`;
+  } catch (error) {
+    window.Logger.error('שגיאה במעבר לתכנון:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במעבר לתכנון', error.message);
+    }
+  }
 }
 
 /**
  * מעבר להתראה ספציפית
  */
 function goToAlert(alertId) {
-  window.location.href = `/alerts#alert-${alertId}`;
+  try {
+    window.location.href = `/alerts#alert-${alertId}`;
+  } catch (error) {
+    window.Logger.error('שגיאה במעבר להתראה:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במעבר להתראה', error.message);
+    }
+  }
 }
 
 /**
  * מעבר להערה ספציפית
  */
 function goToNote(noteId) {
-  window.location.href = `/notes#note-${noteId}`;
+  try {
+    window.location.href = `/notes#note-${noteId}`;
+  } catch (error) {
+    window.Logger.error('שגיאה במעבר להערה:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במעבר להערה', error.message);
+    }
+  }
 }
 
 // ========================================
@@ -1841,20 +1908,21 @@ async function updateExecutionsTableMain(executions) {
 
 // פונקציה לבדיקה אם תאריך נמצא בטווח
 function isDateInRange(dateString, dateRange) {
-  // isDateInRange called
+  try {
+    // isDateInRange called
 
-  if (!dateString || !dateRange || dateRange === 'כל זמן') {
-    return true;
-  }
+    if (!dateString || !dateRange || dateRange === 'כל זמן') {
+      return true;
+    }
 
-  // חילוץ התאריך בלבד (ללא שעה)
-  let dateOnly = dateString;
-  if (dateString.includes(' ')) {
-    dateOnly = dateString.split(' ')[0];
-  }
+    // חילוץ התאריך בלבד (ללא שעה)
+    let dateOnly = dateString;
+    if (dateString.includes(' ')) {
+      dateOnly = dateString.split(' ')[0];
+    }
 
-  const date = new Date(dateOnly);
-  const today = new Date();
+    const date = new Date(dateOnly);
+    const today = new Date();
   today.setHours(23, 59, 59, 999); // סוף היום
 
   // Parsed date
@@ -1910,6 +1978,14 @@ function isDateInRange(dateString, dateRange) {
   default:
     return true;
   }
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בבדיקת תאריך בטווח:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בבדיקת תאריך בטווח', error.message);
+    }
+    return false;
+  }
 }
 
 // הגדרת הפונקציה כגלובלית
@@ -1917,20 +1993,21 @@ window.isDateInRange = isDateInRange;
 
 // פונקציית פילטור מקומי לעסקאות
 function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
-  // filterExecutionsLocally called
+  try {
+    // filterExecutionsLocally called
 
-  if (!executions || !Array.isArray(executions)) {
-    // // window.Logger.warn('⚠️ No executions data to filter', { page: "executions" });
-    return [];
-  }
+    if (!executions || !Array.isArray(executions)) {
+      // // window.Logger.warn('⚠️ No executions data to filter', { page: "executions" });
+      return [];
+    }
 
-  let filtered = executions;
+    let filtered = executions;
 
-  // פילטר לפי סטטוס
-  if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('הכול')) {
-    filtered = filtered.filter(execution => {
-      const status = execution.status || 'לא מוגדר';
-      return selectedStatuses.includes(status);
+    // פילטר לפי סטטוס
+    if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('הכול')) {
+      filtered = filtered.filter(execution => {
+        const status = execution.status || 'לא מוגדר';
+        return selectedStatuses.includes(status);
     });
   }
 
@@ -1994,6 +2071,15 @@ function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, se
 // הגדרת הפונקציה כגלובלית
 window.filterExecutionsLocally = filterExecutionsLocally;
 
+  } catch (error) {
+    window.Logger.error('שגיאה בפילטור מקומי של עסקעות:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפילטור מקומי של עסקעות', error.message);
+    }
+    return executions; // החזרת הנתונים המקוריים במקרה של שגיאה
+  }
+}
+
 // הגדרת הפונקציות כגלובליות
 window.openExecutionDetails = openExecutionDetails;
 window.editExecution = editExecution;
@@ -2021,8 +2107,15 @@ window.saveExecution = saveExecution;
  * עדכון ביצוע - פונקציה גלובלית
  */
 function updateExecution() {
+  try {
     // קריאה לפונקציה הראשית
     updateExecutionWrapper();
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון עסקה:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון עסקה', error.message);
+    }
+  }
 }
 
 window.updateExecution = updateExecution;
@@ -2070,12 +2163,19 @@ window.goToNote = goToNote;
  * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
-  // Restoring sort state for executions table
+  try {
+    // Restoring sort state for executions table
 
-  if (typeof window.restoreAnyTableSort === 'function') {
-    window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
-  } else {
-    handleFunctionNotFound('restoreAnyTableSort');
+    if (typeof window.restoreAnyTableSort === 'function') {
+      window.restoreAnyTableSort('executions', window.executionsData || [], updateExecutionsTableMain);
+    } else {
+      handleFunctionNotFound('restoreAnyTableSort');
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בשחזור מצב מיון:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בשחזור מצב מיון', error.message);
+    }
   }
 }
 
@@ -2128,22 +2228,30 @@ if (document.readyState === 'loading') {
  * הגדרת תצורות מודלים
  */
 function setupModalConfigurations() {
-  // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
-  const modals = [
-    'addExecutionModal',
-    'editExecutionModal',
-    'deleteExecutionModal',
-    'linkedItemsModal',
-  ];
+  try {
+    // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
+    const modals = [
+      'addExecutionModal',
+      'editExecutionModal',
+      'deleteExecutionModal',
+      'linkedItemsModal',
+    ];
 
-  modals.forEach(modalId => {
-    const modalElement = document.getElementById(modalId);
-    if (modalElement) {
-      // הגדרת backdrop ל-true (סגירה בלחיצה על הרקע)
-      modalElement.setAttribute('data-bs-backdrop', 'true');
-      modalElement.setAttribute('data-bs-keyboard', 'true');
+    modals.forEach(modalId => {
+      const modalElement = document.getElementById(modalId);
+      if (modalElement) {
+        // הגדרת backdrop ל-true (סגירה בלחיצה על הרקע)
+        modalElement.setAttribute('data-bs-backdrop', 'true');
+        modalElement.setAttribute('data-bs-keyboard', 'true');
     }
   });
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהגדרת קונפיגורציות מודל:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהגדרת קונפיגורציות מודל', error.message);
+    }
+  }
 }
 
 // ===== פונקציות לטעינת טיקרים וטריידים =====
@@ -2195,24 +2303,32 @@ async function loadTickersWithOpenOrClosedTradesAndPlans() {
  * @param {string} mode - 'add' או 'edit'
  */
 function enableAllFields(mode = 'add') {
-  const fields = [
-    'Type',
-    'Quantity',
-    'Price',
-    'Commission',
-    'Date',
-    'Notes',
-  ];
+  try {
+    const fields = [
+      'Type',
+      'Quantity',
+      'Price',
+      'Commission',
+      'Date',
+      'Notes',
+    ];
 
-  fields.forEach(field => {
-    const fieldId = mode === 'add' ? `addExecution${field}` : `editExecution${field}`;
-    const element = document.getElementById(fieldId);
-    if (element) {
-      element.disabled = false;
+    fields.forEach(field => {
+      const fieldId = mode === 'add' ? `addExecution${field}` : `editExecution${field}`;
+      const element = document.getElementById(fieldId);
+      if (element) {
+        element.disabled = false;
     }
   });
 
   // Enabled all fields for execution form
+  
+  } catch (error) {
+    window.Logger.error('שגיאה בהפעלת כל השדות:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהפעלת כל השדות', error.message);
+    }
+  }
 }
 
 /**
@@ -2431,13 +2547,20 @@ async function updateTradesOnTickerChange(mode = 'add') {
  * @param {string} symbol - סמל הטיקר
  */
 function goToTickerPage(_symbol) {
-  // מעבר לדף טיקר
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'מעבר לדף טיקר - בפיתוח');
-  } else {
-    // מעבר לדף טיקר - בפיתוח
+  try {
+    // מעבר לדף טיקר
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('מידע', 'מעבר לדף טיקר - בפיתוח');
+    } else {
+      // מעבר לדף טיקר - בפיתוח
+    }
+    // TODO: ניתוב לדף טיקר - ראה: CENTRAL_TASKS_TODO.md (משימה 1)
+  } catch (error) {
+    window.Logger.error('שגיאה במעבר לעמוד טיקר:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במעבר לעמוד טיקר', error.message);
+    }
   }
-  // TODO: ניתוב לדף טיקר - ראה: CENTRAL_TASKS_TODO.md (משימה 1)
 }
 
 
@@ -2445,11 +2568,18 @@ function goToTickerPage(_symbol) {
  * הצגת עזרה לבחירת טיקר
  */
 function showTickerHelp() {
-  // הצגת עזרה לבחירת טיקר
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר');
-  } else {
-    // בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר
+  try {
+    // הצגת עזרה לבחירת טיקר
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('מידע', 'בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר');
+    } else {
+      // בדוק אם יש לך תכנון או טרייד לטיקר שאתה מחפש. אם עדיין אין - הוסף טיקר
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהצגת עזרה לטיקר:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהצגת עזרה לטיקר', error.message);
+    }
   }
 }
 
@@ -2457,13 +2587,20 @@ function showTickerHelp() {
  * הוספת טיקר חדש
  */
 function addNewTicker() {
-  // הוספת טיקר חדש
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'הוספת טיקר - בפיתוח');
-  } else {
-    // הוספת טיקר - בפיתוח
+  try {
+    // הוספת טיקר חדש
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('מידע', 'הוספת טיקר - בפיתוח');
+    } else {
+      // הוספת טיקר - בפיתוח
+    }
+    // TODO: פתיחת מודל הוספת טיקר - ראה: CENTRAL_TASKS_TODO.md (משימה 2)
+  } catch (error) {
+    window.Logger.error('שגיאה בהוספת טיקר חדש:', error, { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת טיקר חדש', error.message);
+    }
   }
-  // TODO: פתיחת מודל הוספת טיקר - ראה: CENTRAL_TASKS_TODO.md (משימה 2)
 }
 
 /**

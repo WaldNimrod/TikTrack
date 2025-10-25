@@ -38,6 +38,17 @@ function initializeImportModal() {
     importAnalysisResults = null;
     importPreviewData = null;
     
+    // Load from cache if available
+    if (window.UnifiedCacheManager) {
+        const cachedSessionId = await window.UnifiedCacheManager.get('import_session_id');
+        const cachedAnalysisResults = await window.UnifiedCacheManager.get('import_analysis_results');
+        const cachedPreviewData = await window.UnifiedCacheManager.get('import_preview_data');
+        
+        if (cachedSessionId) importSessionId = cachedSessionId;
+        if (cachedAnalysisResults) importAnalysisResults = cachedAnalysisResults;
+        if (cachedPreviewData) importPreviewData = cachedPreviewData;
+    }
+    
     updateImportStepDisplay();
     updateImportStepNavigation();
     loadImportTradingAccounts();
@@ -54,6 +65,13 @@ function resetImportModal() {
     importSessionId = null;
     importAnalysisResults = null;
     importPreviewData = null;
+    
+    // Clear cache
+    if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.delete('import_session_id');
+        await window.UnifiedCacheManager.delete('import_analysis_results');
+        await window.UnifiedCacheManager.delete('import_preview_data');
+    }
     
     // Reset UI
     clearImportFile();
@@ -87,9 +105,10 @@ function setupImportEventListeners() {
         uploadArea.addEventListener('dragover', handleImportDragOver);
         uploadArea.addEventListener('dragleave', handleImportDragLeave);
         uploadArea.addEventListener('drop', handleImportFileDrop);
-        uploadArea.addEventListener('click', function() {
-            fileInput.click();
-        });
+        // Remove click event to prevent double triggering
+        // uploadArea.addEventListener('click', function() {
+        //     fileInput.click();
+        // });
     }
     
     // Account selection
@@ -355,13 +374,22 @@ async function processImportCurrentStep() {
             await generateImportPreview();
             break;
         case 4:
-            // Problem resolution - handled in UI
+            // Problem resolution - display problems
+            // Load analysis results from server
+            if (importSessionId) {
+                loadImportAnalysisResults();
+            }
             break;
         case 5:
-            // Preview - handled in UI
+            // Preview - display preview data
+            // Load preview data from server
+            if (importSessionId) {
+                loadImportPreviewData();
+            }
             break;
         case 6:
-            // Confirmation - handled in UI
+            // Confirmation - display final summary
+            displayImportFinalSummary();
             break;
     }
 }
@@ -394,6 +422,12 @@ async function analyzeImportFile() {
         if (data.status === 'success') {
             importSessionId = data.session_id;
             importAnalysisResults = data.analysis_results;
+            
+            // Save to cache for persistence across steps
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.set('import_session_id', importSessionId);
+                await window.UnifiedCacheManager.set('import_analysis_results', importAnalysisResults);
+            }
             
             // Update progress
             updateImportProgress(100, 'ניתוח הושלם');
@@ -430,6 +464,12 @@ async function generateImportPreview() {
         
         if (data.status === 'success') {
             importPreviewData = data.preview_data;
+            
+            // Save to cache for persistence across steps
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.set('import_preview_data', importPreviewData);
+            }
+            
             displayImportPreviewSummary(importPreviewData);
             showNotification('תצוגה מקדימה הוכנה', 'success');
         } else {
@@ -462,6 +502,144 @@ function displayImportAnalysisResults(results) {
     } else {
         document.getElementById('import-next-btn').disabled = true;
         document.getElementById('import-next-btn').style.display = 'none';
+    }
+}
+
+/**
+ * Add missing tickers functionality
+ */
+function addMissingTickers() {
+    // TODO: Implement missing tickers addition
+    console.log('Adding missing tickers...');
+    // For now, just show a message
+    alert('פונקציונליות הוספת טיקרים תהיה זמינה בקרוב');
+}
+
+/**
+ * Review duplicates functionality
+ */
+function reviewDuplicates() {
+    // TODO: Implement duplicates review
+    console.log('Reviewing duplicates...');
+    // For now, just show a message
+    alert('פונקציונליות סקירת כפילויות תהיה זמינה בקרוב');
+}
+
+/**
+ * Load analysis results from server for step 4
+ */
+async function loadImportAnalysisResults() {
+    if (!importSessionId) {
+        console.error('No session ID available');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/user-data-import/session/${importSessionId}`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            importAnalysisResults = data.analysis_results;
+            displayImportProblems(importAnalysisResults);
+        } else {
+            console.error('Failed to load analysis results:', data.message);
+            showNotification('שגיאה בטעינת נתוני הניתוח', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading analysis results:', error);
+        showNotification('שגיאה בטעינת נתוני הניתוח', 'error');
+    }
+}
+
+/**
+ * Load preview data from server for step 5
+ */
+async function loadImportPreviewData() {
+    if (!importSessionId) {
+        console.error('No session ID available');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/user-data-import/session/${importSessionId}/preview`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            importPreviewData = data.preview_data;
+            displayImportPreviewSummary(importPreviewData);
+        } else {
+            console.error('Failed to load preview data:', data.message);
+            showNotification('שגיאה בטעינת נתוני התצוגה המקדימה', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading preview data:', error);
+        showNotification('שגיאה בטעינת נתוני התצוגה המקדימה', 'error');
+    }
+}
+
+/**
+ * Display problems in step 4
+ */
+function displayImportProblems(results) {
+    console.log('Displaying problems with results:', results);
+    
+    // Show missing tickers section if there are missing tickers
+    const missingTickersSection = document.getElementById('import-missing-tickers-section');
+    const missingTickersList = document.getElementById('import-missing-tickers-list');
+    
+    // For now, show a placeholder since missing tickers logic is not implemented yet
+    if (false) { // TODO: Implement missing tickers detection
+        missingTickersSection.style.display = 'block';
+        missingTickersList.innerHTML = results.missing_tickers.map(ticker => 
+            `<div class="missing-ticker-item">${ticker}</div>`
+        ).join('');
+    } else {
+        missingTickersSection.style.display = 'none';
+    }
+    
+    // Show duplicates section if there are duplicates
+    const duplicatesSection = document.getElementById('import-duplicates-section');
+    const duplicatesList = document.getElementById('import-duplicates-list');
+    
+    if (results.duplicate_records && results.duplicate_records > 0) {
+        duplicatesSection.style.display = 'block';
+        duplicatesList.innerHTML = `<div class="duplicate-info">נמצאו ${results.duplicate_records} כפילויות</div>`;
+    } else {
+        duplicatesSection.style.display = 'none';
+    }
+    
+    // Show validation errors if there are any
+    const validationErrorsSection = document.getElementById('import-validation-errors-section');
+    const validationErrorsList = document.getElementById('import-validation-errors-list');
+    
+    if (results.validation_errors && results.validation_errors.length > 0) {
+        if (validationErrorsSection) {
+            validationErrorsSection.style.display = 'block';
+            validationErrorsList.innerHTML = results.validation_errors.map((error, index) => 
+                `<div class="validation-error-item">שגיאה ${index + 1}: ${error.errors.join(', ')}</div>`
+            ).join('');
+        }
+    } else {
+        if (validationErrorsSection) {
+            validationErrorsSection.style.display = 'none';
+        }
+    }
+    
+    // Show normalization errors if there are any
+    const normalizationErrorsSection = document.getElementById('import-normalization-errors-section');
+    const normalizationErrorsList = document.getElementById('import-normalization-errors-list');
+    
+    if (results.normalization_errors && results.normalization_errors.length > 0) {
+        if (normalizationErrorsSection) {
+            normalizationErrorsSection.style.display = 'block';
+            normalizationErrorsList.innerHTML = results.normalization_errors.map((error, index) => 
+                `<div class="normalization-error-item">שורה ${error.record_index + 1}: ${error.errors.join(', ')}</div>`
+            ).join('');
+        }
+    } else {
+        if (normalizationErrorsSection) {
+            normalizationErrorsSection.style.display = 'none';
+        }
     }
 }
 
@@ -522,6 +700,37 @@ function displayDetailedErrors(results) {
     
     errorContainer.innerHTML = errorHtml;
     errorContainer.style.display = errorHtml.includes('no-errors') ? 'none' : 'block';
+}
+
+/**
+ * Display final summary for step 6
+ */
+function displayImportFinalSummary() {
+    // Display file name
+    const filenameElement = document.getElementById('import-final-filename');
+    if (filenameElement && importSelectedFile) {
+        filenameElement.textContent = importSelectedFile.name;
+    }
+    
+    // Display account name
+    const accountElement = document.getElementById('import-final-account');
+    if (accountElement && importSelectedAccount) {
+        const accountSelect = document.getElementById('import-account-select');
+        const selectedOption = accountSelect.options[accountSelect.selectedIndex];
+        accountElement.textContent = selectedOption ? selectedOption.text : 'לא נבחר';
+    }
+    
+    // Display import count
+    const importCountElement = document.getElementById('import-final-import-count');
+    if (importCountElement && importPreviewData) {
+        importCountElement.textContent = importPreviewData.summary.records_to_import || 0;
+    }
+    
+    // Display skip count
+    const skipCountElement = document.getElementById('import-final-skip-count');
+    if (skipCountElement && importPreviewData) {
+        skipCountElement.textContent = importPreviewData.summary.records_to_skip || 0;
+    }
 }
 
 /**

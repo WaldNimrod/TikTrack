@@ -401,3 +401,128 @@ class AlertService:
         except Exception as e:
             logger.error(f"Error processing condition fields: {e}")
             raise
+    
+    @staticmethod
+    def get_alert_by_condition(db: Session, plan_condition_id: int = None, trade_condition_id: int = None) -> Optional[Alert]:
+        """מצא התראה לפי תנאי"""
+        try:
+            if plan_condition_id:
+                alert = db.query(Alert).filter(Alert.plan_condition_id == plan_condition_id).first()
+            elif trade_condition_id:
+                alert = db.query(Alert).filter(Alert.trade_condition_id == trade_condition_id).first()
+            else:
+                return None
+            
+            return alert
+        except Exception as e:
+            logger.error(f"Error finding alert by condition: {e}")
+            return None
+    
+    @staticmethod
+    def create_or_update_alert_for_condition(db: Session, condition_id: int, condition_type: str, alert_data: Dict) -> Alert:
+        """צור או עדכן התראה לתנאי"""
+        try:
+            # Check if alert already exists
+            if condition_type == 'plan':
+                existing_alert = db.query(Alert).filter(Alert.plan_condition_id == condition_id).first()
+            else:
+                existing_alert = db.query(Alert).filter(Alert.trade_condition_id == condition_id).first()
+            
+            if existing_alert:
+                # Update existing alert
+                for key, value in alert_data.items():
+                    if hasattr(existing_alert, key):
+                        setattr(existing_alert, key, value)
+                db.commit()
+                db.refresh(existing_alert)
+                logger.info(f"Updated existing alert {existing_alert.id} for condition {condition_id}")
+                return existing_alert
+            else:
+                # Create new alert
+                if condition_type == 'plan':
+                    alert_data['plan_condition_id'] = condition_id
+                else:
+                    alert_data['trade_condition_id'] = condition_id
+                
+                alert = Alert(**alert_data)
+                db.add(alert)
+                db.commit()
+                db.refresh(alert)
+                logger.info(f"Created new alert {alert.id} for condition {condition_id}")
+                return alert
+                
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error creating/updating alert for condition: {e}")
+            raise
+    
+    @staticmethod
+    def reactivate_alert(db: Session, alert_id: int) -> Alert:
+        """הפעל התראה מחדש (true -> new)"""
+        try:
+            alert = db.query(Alert).filter(Alert.id == alert_id).first()
+            if not alert:
+                raise ValueError(f"Alert {alert_id} not found")
+            
+            alert.is_triggered = 'new'
+            alert.triggered_at = datetime.now()
+            alert.status = 'open'  # Reopen if it was closed
+            
+            db.commit()
+            db.refresh(alert)
+            
+            logger.info(f"Alert {alert_id} reactivated")
+            return alert
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error reactivating alert {alert_id}: {e}")
+            raise
+    
+    @staticmethod
+    def cancel_condition_alerts(db: Session, plan_condition_id: int = None, trade_condition_id: int = None) -> int:
+        """בטל (status=closed) התראות של תנאי"""
+        try:
+            if plan_condition_id:
+                alerts = db.query(Alert).filter(Alert.plan_condition_id == plan_condition_id).all()
+            elif trade_condition_id:
+                alerts = db.query(Alert).filter(Alert.trade_condition_id == trade_condition_id).all()
+            else:
+                return 0
+            
+            count = 0
+            for alert in alerts:
+                alert.status = 'closed'
+                count += 1
+            
+            db.commit()
+            logger.info(f"Cancelled {count} alerts for condition")
+            return count
+            
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error cancelling condition alerts: {e}")
+            raise
+    
+    @staticmethod
+    def delete_condition_alerts(db: Session, plan_condition_id: int = None, trade_condition_id: int = None) -> int:
+        """מחק התראות של תנאי"""
+        try:
+            if plan_condition_id:
+                alerts = db.query(Alert).filter(Alert.plan_condition_id == plan_condition_id).all()
+            elif trade_condition_id:
+                alerts = db.query(Alert).filter(Alert.trade_condition_id == trade_condition_id).all()
+            else:
+                return 0
+            
+            count = len(alerts)
+            for alert in alerts:
+                db.delete(alert)
+            
+            db.commit()
+            logger.info(f"Deleted {count} alerts for condition")
+            return count
+            
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error deleting condition alerts: {e}")
+            raise

@@ -43,6 +43,32 @@ Validation → Duplicate Detection → Preview → User Confirmation →
 Import Execution → Database Storage
 ```
 
+### זרימת נתונים בין שלבים
+
+המערכת משתמשת ב-**Unified Cache Manager** ובמסד הנתונים לשמירת נתונים בין השלבים:
+
+1. **שלב 1-2**: העלאת קובץ ובחירת חשבון
+   - יצירת `ImportSession` בבסיס הנתונים
+   - שמירת `file_content` ו-`account_id` ב-session
+
+2. **שלב 3**: ניתוח קובץ
+   - קריאה ל-`/api/user-data-import/upload`
+   - השרת מחזיר `session_id` ו-`analysis_results`
+   - הנתונים נשמרים ב-`ImportSession.summary_data` (JSON)
+   - שמירה מקומית ב-Unified Cache Manager
+
+3. **שלב 4**: פתרון בעיות
+   - קריאה ל-`/api/user-data-import/session/{id}` לקבלת נתוני הניתוח
+   - הצגת בעיות (טיקרים חסרים, כפילויות)
+
+4. **שלב 5**: תצוגה מקדימה
+   - קריאה ל-`/api/user-data-import/session/{id}/preview`
+   - השרת מחזיר `preview_data` עם שתי טבלאות
+
+5. **שלב 6**: אישור סופי
+   - הצגת סיכום סופי
+   - קריאה ל-`/api/user-data-import/session/{id}/execute` לביצוע הייבוא
+
 ## מודלים
 
 ### ImportSession
@@ -218,6 +244,36 @@ GET /api/user-data-import/history?account_id={id}&limit={n}
 4. **טיפול בבעיות**: טיקרים חסרים, כפילויות
 5. **תצוגה מקדימה**: מודל עם שתי טבלאות
 6. **אישור וייבוא**: אישור סופי ושמירה
+
+### אינטגרציה עם Unified Cache Manager
+
+המערכת משתמשת ב-**Unified Cache Manager** לשמירת נתונים בין השלבים:
+
+#### מפתחות מטמון:
+- `import_session_id` - מזהה הסשן
+- `import_analysis_results` - תוצאות הניתוח
+- `import_preview_data` - נתוני התצוגה המקדימה
+
+#### API Operations:
+```javascript
+// שמירה למטמון
+await window.UnifiedCacheManager.set('import_session_id', sessionId);
+await window.UnifiedCacheManager.set('import_analysis_results', results);
+
+// טעינה מהמטמון
+const sessionId = await window.UnifiedCacheManager.get('import_session_id');
+const results = await window.UnifiedCacheManager.get('import_analysis_results');
+
+// מחיקה מהמטמון
+await window.UnifiedCacheManager.delete('import_session_id');
+await window.UnifiedCacheManager.delete('import_analysis_results');
+```
+
+#### שכבות מטמון:
+- **Memory Layer**: נתונים זמניים (<100KB)
+- **localStorage**: נתונים פשוטים (<1MB)
+- **IndexedDB**: נתונים מורכבים (>1MB)
+- **Backend Cache**: נתונים קריטיים עם TTL
 
 ### מודל אישור סופי
 

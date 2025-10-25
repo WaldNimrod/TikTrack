@@ -114,7 +114,8 @@ def create_plan_condition(plan_id):
                 condition_group=data.get('condition_group', 0),
                 parameters_json=parameters_json,
                 logical_operator=data.get('logical_operator', 'NONE'),
-                is_active=data.get('is_active', True)
+                is_active=data.get('is_active', True),
+                auto_generate_alerts=data.get('auto_generate_alerts', True)
             )
             
             db_session.add(condition)
@@ -232,6 +233,7 @@ def update_plan_condition(condition_id):
             condition.parameters_json = parameters_json
             condition.logical_operator = data.get('logical_operator', condition.logical_operator)
             condition.is_active = data.get('is_active', condition.is_active)
+            condition.auto_generate_alerts = data.get('auto_generate_alerts', condition.auto_generate_alerts)
             
             db_session.commit()
             
@@ -291,6 +293,16 @@ def delete_plan_condition(condition_id):
                     'error_code': 'CONDITION_INHERITED'
                 }), 400
             
+            # Check if user wants to delete associated alerts
+            delete_alerts = request.json.get('delete_alerts', False) if request.is_json else False
+            
+            # Delete associated alerts if requested
+            if delete_alerts:
+                from services.alert_service import AlertService
+                alert_service = AlertService(db_session)
+                deleted_count = alert_service.delete_condition_alerts(db_session, plan_condition_id=condition_id)
+                logger.info(f"Deleted {deleted_count} alerts for condition {condition_id}")
+            
             # Delete condition
             db_session.delete(condition)
             db_session.commit()
@@ -298,6 +310,7 @@ def delete_plan_condition(condition_id):
             return jsonify({
                 'status': 'success',
                 'message': 'Plan condition deleted successfully',
+                'alerts_deleted': deleted_count if delete_alerts else 0,
                 'timestamp': datetime.now().isoformat()
             }), 200
             
@@ -648,4 +661,124 @@ def get_evaluation_history(condition_id):
             'status': 'error',
             'message': f'Error getting evaluation history: {str(e)}',
             'error_code': 'HISTORY_ERROR'
+        }), 500
+
+@plan_conditions_bp.route('/<int:condition_id>/create-alert', methods=['POST'])
+def create_condition_alert(condition_id):
+    """Create alert manually for a condition"""
+    try:
+        db_session = next(get_db())
+        try:
+            condition = db_session.query(PlanCondition).filter(PlanCondition.id == condition_id).first()
+            if not condition:
+                return jsonify({'status': 'error', 'message': f'Plan condition with ID {condition_id} not found'}), 404
+            
+            # Check if alert already exists
+            from services.alert_service import AlertService
+            alert_service = AlertService(db_session)
+            existing_alert = alert_service.get_alert_by_condition(db_session, plan_condition_id=condition_id)
+            
+            if existing_alert:
+                return jsonify({
+                    'status': 'error', 
+                    'message': f'Alert already exists for condition {condition_id}',
+                    'alert_id': existing_alert.id
+                }), 400
+            
+            # Create alert data
+            alert_data = {
+                'message': f'Manual alert for condition {condition_id}',
+                'related_id': condition.trade_plan_id,
+                'related_type_id': 3,  # trade_plan
+                'condition_attribute': 'price',
+                'condition_operator': 'more_than',
+                'condition_number': '0',
+                'status': 'open',
+                'is_triggered': 'false'
+            }
+            
+            alert = alert_service.create_or_update_alert_for_condition(
+                db_session, condition_id, 'plan', alert_data
+            )
+            
+            return jsonify({
+                'status': 'success',
+                'data': alert.to_dict(),
+                'message': 'Alert created successfully'
+            }), 201
+            
+        except Exception as e:
+            raise e
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error creating alert for condition {condition_id}: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error creating alert: {str(e)}'
+        }), 500
+
+@plan_conditions_bp.route('/<int:condition_id>/alert', methods=['DELETE'])
+def delete_condition_alert(condition_id):
+    """Delete alert for a condition"""
+    try:
+        db_session = next(get_db())
+        try:
+            from services.alert_service import AlertService
+            alert_service = AlertService(db_session)
+            
+            deleted_count = alert_service.delete_condition_alerts(db_session, plan_condition_id=condition_id)
+            
+            return jsonify({
+                'status': 'success',
+                'deleted_count': deleted_count,
+                'message': f'Deleted {deleted_count} alerts for condition {condition_id}'
+            }), 200
+            
+        except Exception as e:
+            raise e
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error deleting alert for condition {condition_id}: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error deleting alert: {str(e)}'
+        }), 500
+
+@plan_conditions_bp.route('/<int:condition_id>/alert/toggle', methods=['POST'])
+def toggle_condition_alert(condition_id):
+    """Toggle alert creation for a condition"""
+    try:
+        db_session = next(get_db())
+        try:
+            condition = db_session.query(PlanCondition).filter(PlanCondition.id == condition_id).first()
+            if not condition:
+                return jsonify({'status': 'error', 'message': f'Plan condition with ID {condition_id} not found'}), 404
+            
+            # Toggle auto_generate_alerts
+            condition.auto_generate_alerts = not condition.auto_generate_alerts
+            db_session.commit()
+            
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'condition_id': condition_id,
+                    'auto_generate_alerts': condition.auto_generate_alerts
+                },
+                'message': f'Alert generation {"enabled" if condition.auto_generate_alerts else "disabled"} for condition {condition_id}'
+            }), 200
+            
+        except Exception as e:
+            raise e
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error toggling alert for condition {condition_id}: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Error toggling alert: {str(e)}'
         }), 500

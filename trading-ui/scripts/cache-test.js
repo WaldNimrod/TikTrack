@@ -1302,7 +1302,7 @@ function deleteCacheEntry(key) {
  * Copy detailed log for cache test page
  * העתקת לוג מפורט לעמוד בדיקת מטמון
  */
-async function  {
+async function copyDetailedLog() {
     const timestamp = new Date().toLocaleString('he-IL');
     const log = [];
 
@@ -1509,11 +1509,11 @@ async function  {
         log.push(`כפתור העתק לוג: ${visible} - ${disabled} - "${text}"`);
         
         // בדיקת פונקציה
-        const hasFunction = typeof  === 'function';
-        log.push(`פונקציית : ${hasFunction ? 'זמינה' : 'לא זמינה'}`);
+        const hasFunction = typeof copyDetailedLog === 'function';
+        log.push(`פונקציית copyDetailedLog: ${hasFunction ? 'זמינה' : 'לא זמינה'}`);
     } else {
         log.push('כפתור העתק לוג: לא נמצא');
-        log.push('פונקציית : לא זמינה');
+        log.push('פונקציית copyDetailedLog: לא זמינה');
     }
     log.push('');
 
@@ -2511,7 +2511,7 @@ async function syncWithServer() {
 /**
  * Copy detailed log to clipboard
  */
-async function  {
+async function copyDetailedLog() {
     try {
         const logData = {
             timestamp: new Date().toISOString(),

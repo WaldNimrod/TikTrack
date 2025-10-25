@@ -63,12 +63,18 @@ function resetImportModal() {
     
     updateImportStepDisplay();
     updateImportStepNavigation();
+    
+    // Don't re-setup event listeners - they're already set up
+    // setupImportEventListeners();
 }
 
 /**
  * Setup import event listeners
  */
 function setupImportEventListeners() {
+    // Remove existing listeners first to prevent duplicates
+    removeImportEventListeners();
+    
     // File input change
     const fileInput = document.getElementById('import-file-input');
     if (fileInput) {
@@ -94,12 +100,42 @@ function setupImportEventListeners() {
 }
 
 /**
+ * Remove import event listeners
+ */
+function removeImportEventListeners() {
+    // File input change
+    const fileInput = document.getElementById('import-file-input');
+    if (fileInput) {
+        fileInput.removeEventListener('change', handleImportFileSelect);
+    }
+    
+    // Drag and drop
+    const uploadArea = document.getElementById('import-file-upload-area');
+    if (uploadArea) {
+        uploadArea.removeEventListener('dragover', handleImportDragOver);
+        uploadArea.removeEventListener('dragleave', handleImportDragLeave);
+        uploadArea.removeEventListener('drop', handleImportFileDrop);
+        // Note: Can't remove anonymous function listeners easily
+    }
+    
+    // Account selection
+    const accountSelect = document.getElementById('import-account-select');
+    if (accountSelect) {
+        accountSelect.removeEventListener('change', handleImportAccountSelect);
+    }
+}
+
+/**
  * Handle file selection
  */
 function handleImportFileSelect(event) {
+    console.log('handleImportFileSelect called');
     const file = event.target.files[0];
+    console.log('Selected file:', file);
     if (file) {
         processImportSelectedFile(file);
+    } else {
+        console.log('No file selected');
     }
 }
 
@@ -136,6 +172,8 @@ function handleImportFileDrop(event) {
  * Process selected file
  */
 function processImportSelectedFile(file) {
+    console.log('processImportSelectedFile called with file:', file.name);
+    
     // Validate file type
     if (!file.name.toLowerCase().endsWith('.csv')) {
         showNotification('רק קבצי CSV נתמכים', 'error');
@@ -149,17 +187,21 @@ function processImportSelectedFile(file) {
     }
     
     importSelectedFile = file;
+    console.log('File stored in importSelectedFile');
     
     // Update UI
     document.getElementById('import-file-name').textContent = file.name;
     document.getElementById('import-file-size').textContent = formatFileSize(file.size);
     document.getElementById('import-file-info').style.display = 'block';
     document.getElementById('import-file-upload-area').style.display = 'none';
+    console.log('UI updated with file info');
     
     // Enable next step
     updateImportStepNavigation();
+    console.log('Step navigation updated');
     
     showNotification('קובץ נבחר בהצלחה', 'success');
+    console.log('processImportSelectedFile completed');
 }
 
 /**

@@ -1169,7 +1169,7 @@ async function initializeBackgroundTasks() {
     const copyLogBtn = document.getElementById('Btn');
     if (copyLogBtn) {
       copyLogBtn.addEventListener('click', () => {
-        detailedLogGenerator.;
+        detailedLogGenerator.copyDetailedLog();
       });
     }
 
@@ -1194,13 +1194,12 @@ async function initializeBackgroundTasks() {
 // } else {
 //   initializeBackgroundTasks();
 // }
-}
 
 // Global functions for onclick handlers - Background Tasks specific
 // Local  function for background-tasks page
-function  {
-  if (typeof detailedLogGenerator !== 'undefined' && detailedLogGenerator.) {
-    detailedLogGenerator.;
+function copyDetailedLogLocal() {
+  if (typeof detailedLogGenerator !== 'undefined' && detailedLogGenerator.copyDetailedLog) {
+    detailedLogGenerator.copyDetailedLog();
   } else {
     console.error('❌ detailedLogGenerator לא זמין');
     if (window.showErrorNotification) {

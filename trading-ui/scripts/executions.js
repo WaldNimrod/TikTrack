@@ -947,7 +947,7 @@ async function saveExecution() {
 /**
  * עדכון עסקה קיימת
  */
-async function updateExecution() {
+async function updateExecutionWrapper() {
 
 
   const id = document.getElementById('editExecutionId').value;
@@ -1907,6 +1907,15 @@ window.deleteExecution = deleteExecution;
 window.showEditExecutionModal = showEditExecutionModal;
 // window.showDeleteExecutionModal = showDeleteExecutionModal; // הוסר - שימוש במערכת הגלובלית
 window.saveExecution = saveExecution;
+
+/**
+ * עדכון ביצוע - פונקציה גלובלית
+ */
+function updateExecution() {
+    // קריאה לפונקציה הראשית
+    updateExecutionWrapper();
+}
+
 window.updateExecution = updateExecution;
 window.confirmDeleteExecution = confirmDeleteExecution;
 
@@ -3492,12 +3501,10 @@ function saveExecutionWrapper() {
     }
 }
 
-function updateExecution() {
-    if (typeof window.updateExecution === 'function') {
-        window.updateExecution();
-    } else {
-        window.Logger.warn('updateExecution function not found', { page: "executions" });
-    }
+function updateExecutionWrapper() {
+    // This is a wrapper function that calls the main updateExecutionWrapper
+    // The main function is defined earlier in the file
+    window.Logger.warn('updateExecutionWrapper called - this should not happen', { page: "executions" });
 }
 
 function confirmDeleteExecution() {

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/264</span>
+                <span class='fraction'>0/270</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/259</span>
+                <span class='fraction'>0/265</span>
             </div>
         
             
@@ -734,7 +734,16 @@
 <a name='L669'></a><a href='#L669'>669</a>
 <a name='L670'></a><a href='#L670'>670</a>
 <a name='L671'></a><a href='#L671'>671</a>
-<a name='L672'></a><a href='#L672'>672</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L672'></a><a href='#L672'>672</a>
+<a name='L673'></a><a href='#L673'>673</a>
+<a name='L674'></a><a href='#L674'>674</a>
+<a name='L675'></a><a href='#L675'>675</a>
+<a name='L676'></a><a href='#L676'>676</a>
+<a name='L677'></a><a href='#L677'>677</a>
+<a name='L678'></a><a href='#L678'>678</a>
+<a name='L679'></a><a href='#L679'>679</a>
+<a name='L680'></a><a href='#L680'>680</a>
+<a name='L681'></a><a href='#L681'>681</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -801,11 +810,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -865,12 +877,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -884,6 +898,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -891,10 +906,13 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1470,6 +1488,9 @@ function <span class="fstat-no" title="function not covered" >resetImportModal(<
     
 <span class="cstat-no" title="statement not covered" >    updateImportStepDisplay();</span>
 <span class="cstat-no" title="statement not covered" >    updateImportStepNavigation();</span>
+    
+    // Re-setup event listeners
+<span class="cstat-no" title="statement not covered" >    setupImportEventListeners();</span>
 }
 &nbsp;
 /**
@@ -1543,6 +1564,8 @@ function <span class="fstat-no" title="function not covered" >handleImportFileDr
  * Process selected file
  */
 function <span class="fstat-no" title="function not covered" >processImportSelectedFile(</span>file) {
+<span class="cstat-no" title="statement not covered" >    console.log('processImportSelectedFile called with file:', file.name);</span>
+    
     // Validate file type
 <span class="cstat-no" title="statement not covered" >    if (!file.name.toLowerCase().endsWith('.csv')) {</span>
 <span class="cstat-no" title="statement not covered" >        showNotification('רק קבצי CSV נתמכים', 'error');</span>
@@ -1556,17 +1579,21 @@ function <span class="fstat-no" title="function not covered" >processImportSelec
     }
     
 <span class="cstat-no" title="statement not covered" >    importSelectedFile = file;</span>
+<span class="cstat-no" title="statement not covered" >    console.log('File stored in importSelectedFile');</span>
     
     // Update UI
 <span class="cstat-no" title="statement not covered" >    document.getElementById('import-file-name').textContent = file.name;</span>
 <span class="cstat-no" title="statement not covered" >    document.getElementById('import-file-size').textContent = formatFileSize(file.size);</span>
 <span class="cstat-no" title="statement not covered" >    document.getElementById('import-file-info').style.display = 'block';</span>
 <span class="cstat-no" title="statement not covered" >    document.getElementById('import-file-upload-area').style.display = 'none';</span>
+<span class="cstat-no" title="statement not covered" >    console.log('UI updated with file info');</span>
     
     // Enable next step
 <span class="cstat-no" title="statement not covered" >    updateImportStepNavigation();</span>
+<span class="cstat-no" title="statement not covered" >    console.log('Step navigation updated');</span>
     
 <span class="cstat-no" title="statement not covered" >    showNotification('קובץ נבחר בהצלחה', 'success');</span>
+<span class="cstat-no" title="statement not covered" >    console.log('processImportSelectedFile completed');</span>
 }
 &nbsp;
 /**
@@ -2083,7 +2110,7 @@ function <span class="fstat-no" title="function not covered" >reviewDuplicates(<
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-25T01:51:22.109Z
+                at 2025-10-25T01:53:55.349Z
             </div>
         <script src="../prettify.js"></script>
         <script>

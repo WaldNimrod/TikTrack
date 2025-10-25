@@ -789,7 +789,7 @@ function generateDetailedLog() {
     log.push(`window.HeaderSystem: ${typeof window.HeaderSystem}`);
     log.push(`window.headerSystem: ${typeof window.headerSystem}`);
     log.push(`window.toggleSection: ${typeof window.toggleSection}`);
-    log.push(`window.: ${typeof window.}`);
+    log.push(`window.copyDetailedLog: ${typeof window.copyDetailedLog}`);
     
     // בדיקת צבעים דינמיים
     log.push('--- בדיקת צבעים דינמיים ---');

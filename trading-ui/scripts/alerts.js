@@ -2567,14 +2567,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Toggle functions
 
 
-// Filter functions
-function filterAlertsByRelatedObjectTypeWrapper(type) {
-    if (typeof window.filterAlertsByRelatedObjectType === 'function') {
-        window.filterAlertsByRelatedObjectType(type);
-    } else {
-        window.Logger.warn('filterAlertsByRelatedObjectType function not found', { page: "alerts" });
-    }
-}
+// Filter functions - removed duplicate
 
 // ===== GLOBAL EXPORTS =====
 // Detailed Log Functions for Alerts Page

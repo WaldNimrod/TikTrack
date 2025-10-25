@@ -597,7 +597,7 @@ function getInvestmentTypeColor(investmentType, intensity = 'medium') {
  * @param {string} investmentType - סוג ההשקעה
  * @returns {string} קוד הצבע
  */
-function getInvestmentTypeBackgroundColorWrapper2(investmentType) {
+function getInvestmentTypeBackgroundColorWrapper3(investmentType) {
   return getInvestmentTypeColor(investmentType, 'light');
 }
 
@@ -624,20 +624,9 @@ function getInvestmentTypeBorderColor(investmentType) {
 }
 
 /**
- * קבלת צבע רקע לסוג השקעה (תאימות לאחור)
+ * קבלת צבע רקע לסוג השקעה (תאימות לאחור) - removed duplicate
  * Get background color for investment type (backward compatibility)
- *
- * @param {string} investmentType - סוג ההשקעה
- * @returns {string} קוד הצבע
  */
-function getInvestmentTypeBackgroundColorWrapper2(investmentType) {
-  if (!investmentType) {
-    return 'rgba(108, 117, 125, 0.1)'; // אפור שקוף לנתונים חסרים
-  }
-
-  const entityType = getInvestmentTypeEntityType(investmentType);
-  return getEntityBackgroundColor(entityType);
-}
 
 /**
  * קבלת צבע טקסט לסוג השקעה (תאימות לאחור)

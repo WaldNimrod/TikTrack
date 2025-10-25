@@ -273,7 +273,7 @@ function disableFormFields() {
   });
 }
 
-function enableEditFields() {
+function enableEditFieldsWrapper() {
   const formFields = [
     'editType', 'editSide', 'editQuantity', 'editPrice', 'editNotes'
   ];
@@ -716,29 +716,8 @@ async function loadTickersForEditModal() {
 }
 
 /**
- * הפעלת השדות במודל העריכה
+ * הפעלת השדות במודל העריכה - removed duplicate
  */
-function enableEditFields() {
-  const fields = [
-    'editTradePlanInvestmentType',
-    'editTradePlanSide',
-    'editTradePlanStatus',
-    'editTradePlanPlannedAmount',
-    'editTradePlanShares',
-    'editTradePlanStopPrice',
-    'editTradePlanTargetPrice',
-    'editTradePlanEntryConditions',
-    'editTradePlanReasons',
-  ];
-
-  fields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.disabled = false;
-      field.classList.remove('disabled');
-    }
-  });
-}
 
 /**
  * עדכון מידע על הטיקר במודל העריכה

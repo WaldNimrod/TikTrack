@@ -383,7 +383,7 @@ class ServerMonitor {
   }
 
   // העתקת לוג מפורט
-   {
+  async copyDetailedLog() {
     try {
       console.log('📋 ServerMonitor - מעתיק לוג מפורט');
       
@@ -1187,7 +1187,6 @@ class ServerMonitor {
         </div>
       `;
     }
-    }
   }
 
   // הגדרת מאזינים ל-Cursor Tasks
@@ -1253,6 +1252,7 @@ class ServerMonitor {
     const changeModeBtn = document.getElementById('changeModeBtn');
     if (changeModeBtn) {
       changeModeBtn.addEventListener('click', () => this.showModeSelector());
+    }
   }
 
   // ========================================
@@ -1493,10 +1493,10 @@ window.serverMonitor = new ServerMonitor();
 // window.toggleSection export removed - using global version from ui-utils.js
 
 // הוספת פונקציות גלובליות
-// Local  function for server-monitor page
-async function  {
+// Local copyDetailedLog function for server-monitor page
+async function copyDetailedLogLocal() {
   if (window.serverMonitor) {
-    return window.serverMonitor.;
+    return window.serverMonitor.copyDetailedLog();
   } else {
     console.error('❌ serverMonitor instance לא קיים');
     if (window.showErrorNotification) {
@@ -2925,7 +2925,7 @@ function setupMonitoringEventListeners() {
   }
   
   if (copyLogBtn) {
-    copyLogBtn.addEventListener('click', window.);
+    copyLogBtn.addEventListener('click', window.copyDetailedLogLocal);
   }
 }
 

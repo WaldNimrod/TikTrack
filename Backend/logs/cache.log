@@ -21632,3 +21632,476 @@
 2025-10-25 04:28:58,747 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
 2025-10-25 04:28:58,747 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
 2025-10-25 04:28:58,748 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:28:58] "GET /api/executions/?_t=1761355738743 HTTP/1.1" 200 -
+2025-10-25 04:29:29,909 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:29:29,912 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:29:29,912 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 61.2s)
+2025-10-25 04:29:29,912 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:29:29,912 - cache - INFO - Cache EXPIRED: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Age: 61.2s)
+2025-10-25 04:29:29,913 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-25 04:29:29,913 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:29:29,913 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-25 04:29:29,913 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:29:29,915 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:29] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:29,919 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:29:29,919 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 26066 chars)
+2025-10-25 04:29:29,920 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:29] "GET /api/executions/?_t=1761355769906 HTTP/1.1" 200 -
+2025-10-25 04:29:34,635 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-25 04:29:34,636 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /executions HTTP/1.1" 200 -
+2025-10-25 04:29:34,650 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/master.css?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,663 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles/import-user-data.css?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,664 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/header-styles.css?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,666 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/global-favicon.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,667 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /images/icons/executions.svg HTTP/1.1" 200 -
+2025-10-25 04:29:34,669 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/notification-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,670 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/ui-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,671 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,671 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,674 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,676 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,677 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,677 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,678 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,678 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,679 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,680 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,681 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,681 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,682 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,683 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,684 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,685 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,687 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,687 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,688 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,688 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,689 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,691 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,692 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_actions-menu.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,692 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,694 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,696 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,696 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,698 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,698 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,698 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,700 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,702 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,702 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,704 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,704 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,704 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,704 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,704 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,707 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,708 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,709 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,710 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,711 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,712 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,714 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,714 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,715 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,715 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/main.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,715 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-25 04:29:34,718 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-25T04:29:34.716878', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:29:34,718 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/warning-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,721 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/error-handlers.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,723 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/unified-cache-manager.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,723 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-25T04:29:34.716878', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-25 04:29:34,724 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/logger-service.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,725 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_variables.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,726 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-25 04:29:34,726 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_colors-semantic.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,726 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,730 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_spacing.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,731 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_typography.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,733 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_rtl-logical.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,734 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/02-tools/_functions.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,734 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/01-settings/_breakpoints.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,734 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/02-tools/_mixins.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,734 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/03-generic/_reset.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,735 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/03-generic/_base.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,737 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/04-elements/_headings.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,738 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/04-elements/_links.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,739 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/04-elements/_forms-base.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,741 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/05-objects/_layout.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,741 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/04-elements/_buttons-base.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,743 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/05-objects/_grid.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,744 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,744 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_buttons-advanced.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,745 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_tables.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,745 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_cards.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,747 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_modals.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,747 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_notifications.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,749 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_forms-advanced.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,749 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_navigation.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,750 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_badges-status.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,751 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_page-headers.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,753 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_info-summary.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,754 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_entity-colors.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,754 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_constraints.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,754 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/06-components/_chart-management.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,755 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,756 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/07-trumps/chart-management.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,759 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/08-themes/_light.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,759 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /styles-new/09-utilities/_utilities.css HTTP/1.1" 200 -
+2025-10-25 04:29:34,760 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/cache-sync-manager.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,760 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/header-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,762 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/page-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,762 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/translation-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,762 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/button-icons.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,763 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/button-system-init.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,766 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/color-scheme-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,767 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/services/data-collection-service.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,768 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/services/field-renderer-service.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,770 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/services/select-populator-service.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,771 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/services/statistics-calculator.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,771 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/services/crud-response-handler.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,773 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/services/default-value-setter.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,774 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/pagination-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,776 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/modules/actions-menu-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,777 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/data-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,777 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/date-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,778 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/tables.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,780 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/preferences-core-new.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,781 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/preferences-colors.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,782 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/preferences-lazy-loader.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,783 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/preferences-validation.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,785 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/entity-details-api.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,785 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/preferences-ui.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,786 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/entity-details-renderer.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,786 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/entity-details-modal.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,787 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/init-system/package-manifest.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,788 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/page-initialization-configs.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,790 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/executions.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,790 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/unified-app-initializer.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,794 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/import-user-data.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,796 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/monitoring-functions.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,797 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/init-system-check.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,798 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/info-summary-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:34,799 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:34] "GET /scripts/info-summary-configs.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-25 04:29:35,022 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:29:35,024 - root - INFO - FRONTEND [INFO]: 🎨 Loading preferences-colors.js v1.0.0...
+2025-10-25 04:29:35,025 - root - INFO - FRONTEND [INFO]: ✅ preferences-validation.js loaded successfully
+2025-10-25 04:29:35,026 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:29:35,026 - root - INFO - FRONTEND [INFO]: 🎨 Loading preferences-colors.js v1.0.0...
+2025-10-25 04:29:35,026 - root - INFO - FRONTEND [INFO]: 🎨 Loading entity colors from preferences...
+2025-10-25 04:29:35,026 - root - INFO - FRONTEND [INFO]: ✅ preferences-validation.js loaded successfully
+2025-10-25 04:29:35,026 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:29:35,027 - root - INFO - FRONTEND [INFO]: ✅ preferences-colors.js loaded successfully
+2025-10-25 04:29:35,027 - root - INFO - FRONTEND [INFO]: 🎨 Loading entity colors from preferences...
+2025-10-25 04:29:35,027 - root - INFO - FRONTEND [INFO]: 📄 Loading preferences-ui.js v1.0.0...
+2025-10-25 04:29:35,027 - root - INFO - FRONTEND [INFO]: Entity Details Renderer system loaded and ready
+2025-10-25 04:29:35,027 - root - INFO - FRONTEND [INFO]: 🚀 Loading Header System v6.0.0...
+2025-10-25 04:29:35,028 - root - INFO - FRONTEND [INFO]: ✅ preferences-colors.js loaded successfully
+2025-10-25 04:29:35,029 - root - INFO - FRONTEND [INFO]: 🔍 Debug - window.ENTITY_COLORS:
+2025-10-25 04:29:35,030 - root - INFO - FRONTEND [INFO]: Entity Details Renderer system loaded and ready
+2025-10-25 04:29:35,029 - root - INFO - FRONTEND [INFO]: 📄 Loading preferences-ui.js v1.0.0...
+2025-10-25 04:29:35,030 - root - INFO - FRONTEND [INFO]: 🚀 Loading Header System v6.0.0...
+2025-10-25 04:29:35,030 - root - INFO - FRONTEND [INFO]: 📄 Loading preferences-lazy-loader.js v1.0.0...
+2025-10-25 04:29:35,030 - root - INFO - FRONTEND [INFO]: 🔍 Debug - window.ENTITY_COLORS:
+2025-10-25 04:29:35,030 - root - INFO - FRONTEND [INFO]: ✅ EntityDetailsRenderer initialized successfully with preferences support
+2025-10-25 04:29:35,030 - root - INFO - FRONTEND [INFO]: ✅ preferences-ui.js loaded successfully
+2025-10-25 04:29:35,031 - root - INFO - FRONTEND [INFO]: ✅ Header System v6.0.0 loaded successfully!
+2025-10-25 04:29:35,032 - root - INFO - FRONTEND [INFO]: 📄 Loading preferences-lazy-loader.js v1.0.0...
+2025-10-25 04:29:35,032 - root - INFO - FRONTEND [INFO]: Info Summary System initialized
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: 🔍 Debug - window.currentPreferences:
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: ✅ EntityDetailsRenderer initialized successfully with preferences support
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: ✅ preferences-ui.js loaded successfully
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: ✅ Header System v6.0.0 loaded successfully!
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: ✅ preferences-lazy-loader.js loaded successfully
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: Info Summary System initialized
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: 🔍 Debug - window.currentPreferences:
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: EntityDetailsModal initialized successfully
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: EntityDetailsAPI initialized successfully
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: 📄 Loading preferences-core.js v3.0.0...
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: ✅ preferences-lazy-loader.js loaded successfully
+2025-10-25 04:29:35,033 - root - INFO - FRONTEND [INFO]: 📄 Preferences core system initialized
+2025-10-25 04:29:35,034 - root - INFO - FRONTEND [INFO]: 🔍 Debug - window.userPreferences:
+2025-10-25 04:29:35,034 - root - INFO - FRONTEND [INFO]: EntityDetailsModal initialized successfully
+2025-10-25 04:29:35,034 - root - INFO - FRONTEND [INFO]: EntityDetailsAPI initialized successfully
+2025-10-25 04:29:35,035 - root - INFO - FRONTEND [INFO]: 📄 Loading preferences-core.js v3.0.0...
+2025-10-25 04:29:35,036 - root - INFO - FRONTEND [INFO]: 📄 Loading preferences-validation.js v1.0.0...
+2025-10-25 04:29:35,036 - root - INFO - FRONTEND [INFO]: 📄 Preferences core system initialized
+2025-10-25 04:29:35,036 - root - INFO - FRONTEND [INFO]: 🔍 Debug - window.userPreferences:
+2025-10-25 04:29:35,036 - root - INFO - FRONTEND [INFO]: Entity Details Modal system loaded and ready
+2025-10-25 04:29:35,036 - root - INFO - FRONTEND [INFO]: Entity Details API system loaded and ready
+2025-10-25 04:29:35,037 - root - INFO - FRONTEND [INFO]: ✅ preferences-core.js loaded successfully
+2025-10-25 04:29:35,037 - root - INFO - FRONTEND [INFO]: 📄 Loading preferences-validation.js v1.0.0...
+2025-10-25 04:29:35,037 - root - INFO - FRONTEND [INFO]: 🎨 Color preferences system initialized
+2025-10-25 04:29:35,037 - root - INFO - FRONTEND [INFO]: ✅ Loaded entity colors from global system
+2025-10-25 04:29:35,037 - root - INFO - FRONTEND [INFO]: Entity Details Modal system loaded and ready
+2025-10-25 04:29:35,037 - root - INFO - FRONTEND [INFO]: Entity Details API system loaded and ready
+2025-10-25 04:29:35,037 - root - INFO - FRONTEND [INFO]: ✅ preferences-core.js loaded successfully
+2025-10-25 04:29:35,037 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:35,038 - root - INFO - FRONTEND [INFO]: 🎨 Color preferences system initialized
+2025-10-25 04:29:35,038 - root - INFO - FRONTEND [INFO]: ✅ Loaded entity colors from global system
+2025-10-25 04:29:35,038 - root - INFO - FRONTEND [INFO]: 🔧 UnifiedAppInitializer created:
+2025-10-25 04:29:35,038 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:35,038 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:35,038 - root - INFO - FRONTEND [INFO]: 📄 Lazy loading system ready
+2025-10-25 04:29:35,039 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:35,040 - root - INFO - FRONTEND [INFO]: 📄 Preferences UI system initialized
+2025-10-25 04:29:35,040 - root - INFO - FRONTEND [INFO]: 🔧 UnifiedAppInitializer created:
+2025-10-25 04:29:35,041 - root - INFO - FRONTEND [INFO]: 📄 Lazy loading system ready
+2025-10-25 04:29:35,042 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-25 04:29:35,042 - root - INFO - FRONTEND [INFO]: 📄 Preferences UI system initialized
+2025-10-25 04:29:35,043 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:35,043 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-25 04:29:35,044 - cache - INFO - Cache MISS: services.ticker_service.get_all:ff3716050da055fd0f2563e68c0bcad1
+2025-10-25 04:29:35,043 - root - INFO - FRONTEND [INFO]: 📄 Preferences validation system ready
+2025-10-25 04:29:35,043 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-25 04:29:35,043 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:29:35,044 - root - INFO - FRONTEND [INFO]: 🎯 DOM Content Loaded - Starting Unified App Initialization
+2025-10-25 04:29:35,044 - cache - INFO - Cache MISS: services.ticker_service.get_all:ff3716050da055fd0f2563e68c0bcad1
+2025-10-25 04:29:35,045 - cache - INFO - Cache MISS: services.ticker_service.get_all:e50a7138326d4a82192afd2956948dd1
+2025-10-25 04:29:35,044 - root - INFO - FRONTEND [INFO]: 📄 Preferences validation system ready
+2025-10-25 04:29:35,044 - root - INFO - FRONTEND [INFO]: 🎯 DOM Content Loaded - Starting Unified App Initialization
+2025-10-25 04:29:35,045 - cache - INFO - Cache MISS: services.ticker_service.get_all:e50a7138326d4a82192afd2956948dd1
+2025-10-25 04:29:35,046 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:29:35,045 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:35,045 - root - INFO - FRONTEND [INFO]: 🔍 Current URL:
+2025-10-25 04:29:35,045 - services.ticker_service - INFO - Found 19 tickers in database
+2025-10-25 04:29:35,046 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:29:35,046 - root - INFO - FRONTEND [INFO]: 🔍 Current URL:
+2025-10-25 04:29:35,046 - services.ticker_service - INFO - Found 19 tickers in database
+2025-10-25 04:29:35,047 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-25 04:29:35,047 - root - INFO - FRONTEND [INFO]: 🔍 Current pathname:
+2025-10-25 04:29:35,048 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "GET /api/executions/?_t=1761355775031 HTTP/1.1" 200 -
+2025-10-25 04:29:35,049 - root - INFO - FRONTEND [INFO]: 🔍 Current pathname:
+2025-10-25 04:29:35,049 - root - INFO - FRONTEND [INFO]: ⚡ Executions page initialized via unified system
+2025-10-25 04:29:35,049 - root - INFO - FRONTEND [INFO]: ⚡ Executions page initialized via unified system
+2025-10-25 04:29:35,050 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:35,129 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-25 04:29:35,135 - services.trade_service - INFO - Loading trades with joinedload for account and ticker
+2025-10-25 04:29:35,141 - services.trade_service - INFO - Loaded 13 trades
+2025-10-25 04:29:35,141 - services.trade_service - INFO - First trade ID: 1
+2025-10-25 04:29:35,141 - services.trade_service - INFO - First trade trading_account_id: 1
+2025-10-25 04:29:35,142 - services.trade_service - INFO - First trade ticker_id: 1
+2025-10-25 04:29:35,142 - services.trade_service - INFO - First trade has account attribute: True
+2025-10-25 04:29:35,143 - services.trade_service - INFO - First trade account object: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-25 04:29:35,143 - services.trade_service - INFO - First trade has ticker attribute: True
+2025-10-25 04:29:35,143 - services.trade_service - INFO - First trade ticker object: <Ticker(symbol='AAPL', name='Apple Inc. - UPDATED', type='stock')>
+2025-10-25 04:29:35,143 - services.trade_service - INFO - First trade account name: חשבון מעודכן
+2025-10-25 04:29:35,144 - services.trade_service - INFO - First trade ticker symbol: AAPL
+2025-10-25 04:29:35,145 - services.position_calculator_service - INFO - Calculated positions for 13 trades
+2025-10-25 04:29:35,146 - models.trade - INFO - Trade 1: Checking trade_plan relationship...
+2025-10-25 04:29:35,146 - models.trade - INFO - Trade 1: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,146 - models.trade - INFO - Trade 1: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:29:35,147 - models.trade - INFO - Trade 1: trade_plan is not None, adding data...
+2025-10-25 04:29:35,147 - models.trade - INFO - Trade 1: Using loaded account name: חשבון מעודכן
+2025-10-25 04:29:35,147 - models.trade - INFO - Trade 1: Using loaded ticker symbol: AAPL
+2025-10-25 04:29:35,147 - models.trade - INFO - Trade 1 to_dict result: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-25 04:29:35,158 - models.trade - INFO - Trade 2: Checking trade_plan relationship...
+2025-10-25 04:29:35,158 - models.trade - INFO - Trade 2: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,158 - models.trade - INFO - Trade 2: self.trade_plan: <TradePlan(id=14, type='passive')>
+2025-10-25 04:29:35,158 - models.trade - INFO - Trade 2: trade_plan is not None, adding data...
+2025-10-25 04:29:35,158 - models.trade - INFO - Trade 2: Using loaded account name: חשבון טכנולוגיה
+2025-10-25 04:29:35,158 - models.trade - INFO - Trade 2: Using loaded ticker symbol: GOOGL
+2025-10-25 04:29:35,158 - models.trade - INFO - Trade 2 to_dict result: {'id': 2, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': 'טרייד מוצלח ב-Google', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-10 06:51:43', 'created_at': '2025-08-15 03:51:43', 'total_pl': 1500.0, 'trade_plan_created_at': '2025-08-30 03:36:52', 'trade_plan_planned_amount': 300.5, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:29:35,166 - cache - INFO - Cache SET: services.ticker_service.get_all:ff3716050da055fd0f2563e68c0bcad1 (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-25 04:29:35,166 - cache - INFO - Cache SET: services.ticker_service.get_all:ff3716050da055fd0f2563e68c0bcad1 (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-25 04:29:35,167 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "GET /api/tickers/ HTTP/1.1" 200 -
+2025-10-25 04:29:35,171 - cache - INFO - Cache SET: services.ticker_service.get_all:e50a7138326d4a82192afd2956948dd1 (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-25 04:29:35,171 - cache - INFO - Cache SET: services.ticker_service.get_all:e50a7138326d4a82192afd2956948dd1 (TTL: 30s, Dependencies: ['tickers'], Data size: 1206 chars)
+2025-10-25 04:29:35,172 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "GET /api/tickers/ HTTP/1.1" 200 -
+2025-10-25 04:29:35,173 - models.trade - INFO - Trade 3: Checking trade_plan relationship...
+2025-10-25 04:29:35,173 - models.trade - INFO - Trade 3: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,174 - models.trade - INFO - Trade 3: self.trade_plan: <TradePlan(id=2, type='swing')>
+2025-10-25 04:29:35,174 - models.trade - INFO - Trade 3: trade_plan is not None, adding data...
+2025-10-25 04:29:35,174 - models.trade - INFO - Trade 3: Using loaded account name: חשבון ETF
+2025-10-25 04:29:35,174 - models.trade - INFO - Trade 3: Using loaded ticker symbol: SPY
+2025-10-25 04:29:35,174 - models.trade - INFO - Trade 3 to_dict result: {'id': 3, 'trading_account_id': 3, 'ticker_id': 9, 'trade_plan_id': 2, 'status': 'cancelled', 'investment_type': 'passive', 'side': 'Long', 'notes': 'השקעה ב-ETF', 'opened_at': '2025-08-15 03:51:43', 'closed_at': None, 'created_at': '2025-08-15 03:51:43', 'total_pl': 800.0, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 8000.0, 'trade_plan_status': 'open', 'account_name': 'חשבון ETF', 'ticker_symbol': 'SPY', 'cancelled_at': '2025-08-22 06:50:57', 'cancel_reason': 'בדיקת ביטול'}
+2025-10-25 04:29:35,177 - models.trade - INFO - Trade 4: Checking trade_plan relationship...
+2025-10-25 04:29:35,177 - models.trade - INFO - Trade 4: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,177 - models.trade - INFO - Trade 4: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:29:35,177 - models.trade - INFO - Trade 4: trade_plan is not None, adding data...
+2025-10-25 04:29:35,177 - models.trade - INFO - Trade 4: Using loaded account name: חשבון מעודכן
+2025-10-25 04:29:35,177 - models.trade - INFO - Trade 4: Using loaded ticker symbol: AAPL
+2025-10-25 04:29:35,177 - models.trade - INFO - Trade 4 to_dict result: {'id': 4, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-26 00:13:21', 'closed_at': None, 'created_at': '2025-08-26 00:13:21', 'total_pl': None, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:30:08', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-25 04:29:35,186 - models.trade - INFO - Trade 5: Checking trade_plan relationship...
+2025-10-25 04:29:35,186 - models.trade - INFO - Trade 5: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,186 - models.trade - INFO - Trade 5: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:29:35,186 - models.trade - INFO - Trade 5: trade_plan is not None, adding data...
+2025-10-25 04:29:35,186 - models.trade - INFO - Trade 5: Using loaded account name: חשבון ETF
+2025-10-25 04:29:35,186 - models.trade - INFO - Trade 5: Using loaded ticker symbol: AAPL
+2025-10-25 04:29:35,186 - models.trade - INFO - Trade 5 to_dict result: {'id': 5, 'trading_account_id': 3, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'גכעגעג', 'opened_at': '2025-08-30 22:02:00', 'closed_at': None, 'created_at': '2025-08-30 22:02:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון ETF', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:32:32', 'cancel_reason': 'test'}
+2025-10-25 04:29:35,195 - models.trade - INFO - Trade 6: Checking trade_plan relationship...
+2025-10-25 04:29:35,195 - models.trade - INFO - Trade 6: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,195 - models.trade - INFO - Trade 6: self.trade_plan: <TradePlan(id=1, type='passive')>
+2025-10-25 04:29:35,195 - models.trade - INFO - Trade 6: trade_plan is not None, adding data...
+2025-10-25 04:29:35,195 - models.trade - INFO - Trade 6: Using loaded account name: חשבון טכנולוגיה
+2025-10-25 04:29:35,195 - models.trade - INFO - Trade 6: Using loaded ticker symbol: GOOGL
+2025-10-25 04:29:35,195 - models.trade - INFO - Trade 6 to_dict result: {'id': 6, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': '', 'opened_at': '2025-08-31 16:57:00', 'closed_at': None, 'created_at': '2025-08-31 16:57:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 10250.0, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:29:35,219 - models.trade - INFO - Trade 7: Checking trade_plan relationship...
+2025-10-25 04:29:35,219 - models.trade - INFO - Trade 7: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,219 - models.trade - INFO - Trade 7: self.trade_plan: <TradePlan(id=9, type='swing')>
+2025-10-25 04:29:35,219 - models.trade - INFO - Trade 7: trade_plan is not None, adding data...
+2025-10-25 04:29:35,220 - models.trade - INFO - Trade 7: Using loaded account name: חשבון טכנולוגיה
+2025-10-25 04:29:35,220 - models.trade - INFO - Trade 7: Using loaded ticker symbol: AMZN
+2025-10-25 04:29:35,220 - models.trade - INFO - Trade 7 to_dict result: {'id': 7, 'trading_account_id': 2, 'ticker_id': 6, 'trade_plan_id': 9, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-31 17:38:00', 'closed_at': None, 'created_at': '2025-08-31 17:38:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-06-16 06:52:13', 'trade_plan_planned_amount': 9275.0, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'AMZN', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:29:35,235 - models.trade - INFO - Trade 8: Checking trade_plan relationship...
+2025-10-25 04:29:35,235 - models.trade - INFO - Trade 8: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,235 - models.trade - INFO - Trade 8: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-25 04:29:35,236 - models.trade - INFO - Trade 8: trade_plan is not None, adding data...
+2025-10-25 04:29:35,236 - models.trade - INFO - Trade 8: Using loaded account name: חשבון מעודכן
+2025-10-25 04:29:35,236 - models.trade - INFO - Trade 8: Using loaded ticker symbol: AAPL
+2025-10-25 04:29:35,236 - models.trade - INFO - Trade 8 to_dict result: {'id': 8, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-01 23:51:48', 'closed_at': '2025-09-02 00:36:20', 'created_at': '2025-09-01 23:51:48', 'total_pl': None, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:29:35,244 - models.trade - INFO - Trade 9: Checking trade_plan relationship...
+2025-10-25 04:29:35,244 - models.trade - INFO - Trade 9: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,244 - models.trade - INFO - Trade 9: self.trade_plan: <TradePlan(id=14, type='passive')>
+2025-10-25 04:29:35,244 - models.trade - INFO - Trade 9: trade_plan is not None, adding data...
+2025-10-25 04:29:35,245 - models.trade - INFO - Trade 9: Using loaded account name: חשבון מעודכן
+2025-10-25 04:29:35,245 - models.trade - INFO - Trade 9: Using loaded ticker symbol: GOOGL
+2025-10-25 04:29:35,245 - models.trade - INFO - Trade 9 to_dict result: {'id': 9, 'trading_account_id': 1, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:41:51', 'closed_at': '2025-09-02 00:42:08', 'created_at': '2025-09-02 00:41:51', 'total_pl': None, 'trade_plan_created_at': '2025-08-30 03:36:52', 'trade_plan_planned_amount': 300.5, 'trade_plan_status': 'open', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:29:35,256 - models.trade - INFO - Trade 10: Checking trade_plan relationship...
+2025-10-25 04:29:35,257 - models.trade - INFO - Trade 10: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,257 - models.trade - INFO - Trade 10: self.trade_plan: <TradePlan(id=1, type='passive')>
+2025-10-25 04:29:35,257 - models.trade - INFO - Trade 10: trade_plan is not None, adding data...
+2025-10-25 04:29:35,257 - models.trade - INFO - Trade 10: Using loaded account name: חשבון מעודכן
+2025-10-25 04:29:35,257 - models.trade - INFO - Trade 10: Using loaded ticker symbol: TSLA
+2025-10-25 04:29:35,257 - models.trade - INFO - Trade 10 to_dict result: {'id': 10, 'trading_account_id': 1, 'ticker_id': 4, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:56:03', 'closed_at': None, 'created_at': '2025-09-02 00:56:03', 'total_pl': None, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 10250.0, 'trade_plan_status': 'open', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'TSLA', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:29:35,268 - models.trade - INFO - Trade 11: Checking trade_plan relationship...
+2025-10-25 04:29:35,268 - models.trade - INFO - Trade 11: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,268 - models.trade - INFO - Trade 11: self.trade_plan: None
+2025-10-25 04:29:35,268 - models.trade - INFO - Trade 11: trade_plan is None
+2025-10-25 04:29:35,268 - models.trade - INFO - Trade 11: Using loaded account name: חשבון מעודכן
+2025-10-25 04:29:35,268 - models.trade - INFO - Trade 11: Using loaded ticker symbol: AAPL
+2025-10-25 04:29:35,269 - models.trade - INFO - Trade 11 to_dict result: {'id': 11, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade', 'opened_at': '2025-10-06 21:05:06', 'closed_at': None, 'created_at': '2025-10-06 21:05:06', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:29:35,278 - models.trade - INFO - Trade 18: Checking trade_plan relationship...
+2025-10-25 04:29:35,278 - models.trade - INFO - Trade 18: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,278 - models.trade - INFO - Trade 18: self.trade_plan: None
+2025-10-25 04:29:35,278 - models.trade - INFO - Trade 18: trade_plan is None
+2025-10-25 04:29:35,278 - models.trade - INFO - Trade 18: Using loaded account name: חשבון מעודכן
+2025-10-25 04:29:35,278 - models.trade - INFO - Trade 18: Using loaded ticker symbol: AAPL
+2025-10-25 04:29:35,278 - models.trade - INFO - Trade 18 to_dict result: {'id': 18, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade for CRUD testing', 'opened_at': '2025-10-07 16:13:43', 'closed_at': None, 'created_at': '2025-10-07 16:13:43', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:29:35,290 - models.trade - INFO - Trade 19: Checking trade_plan relationship...
+2025-10-25 04:29:35,290 - models.trade - INFO - Trade 19: hasattr(self, 'trade_plan'): True
+2025-10-25 04:29:35,291 - models.trade - INFO - Trade 19: self.trade_plan: None
+2025-10-25 04:29:35,291 - models.trade - INFO - Trade 19: trade_plan is None
+2025-10-25 04:29:35,291 - models.trade - INFO - Trade 19: Using loaded account name: חשבון מעודכן
+2025-10-25 04:29:35,291 - models.trade - INFO - Trade 19: Using loaded ticker symbol: AAPL
+2025-10-25 04:29:35,291 - models.trade - INFO - Trade 19 to_dict result: {'id': 19, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-10-17 12:36:57', 'closed_at': None, 'created_at': '2025-10-17 12:36:57', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-25 04:29:35,300 - routes.api.trades - INFO - First trade data: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש', 'current_price': 262.82, 'daily_change': 1.2481701209646388, 'change_amount': 3.240000000000009, 'position': {'quantity': 825.0, 'average_price': 207.53677725118482, 'total_cost': 218951.3, 'total_fees': 25.76, 'side': 'long', 'last_updated': '2025-10-07 16:13:46.113000', 'total_bought': 1055.0, 'total_sold': 230.0}}
+2025-10-25 04:29:35,301 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:35] "GET /api/trades/ HTTP/1.1" 200 -
+2025-10-25 04:29:36,035 - root - INFO - FRONTEND [INFO]: Performance: Long task detected
+2025-10-25 04:29:36,035 - root - INFO - FRONTEND [INFO]: Performance: Long task detected
+2025-10-25 04:29:36,035 - root - INFO - FRONTEND [INFO]: ✅ Unified Cache Manager auto-initialized successfully
+2025-10-25 04:29:36,035 - root - INFO - FRONTEND [INFO]: ✅ Unified Cache Manager auto-initialized successfully
+2025-10-25 04:29:36,035 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:29:36,035 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:29:36,035 - root - INFO - FRONTEND [INFO]: 🚀 About to call initializeUnifiedApp...
+2025-10-25 04:29:36,036 - root - INFO - FRONTEND [INFO]: 🚀 About to call initializeUnifiedApp...
+2025-10-25 04:29:36,036 - root - INFO - FRONTEND [INFO]: 🔧 initializeUnifiedApp called
+2025-10-25 04:29:36,036 - root - INFO - FRONTEND [INFO]: 🔧 initializeUnifiedApp called
+2025-10-25 04:29:36,036 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:36,038 - root - INFO - FRONTEND [INFO]: 🔍 Page detection:
+2025-10-25 04:29:36,038 - root - INFO - FRONTEND [INFO]: 🔍 Page detection:
+2025-10-25 04:29:36,038 - root - INFO - FRONTEND [INFO]: 📋 Loaded page config for executions:
+2025-10-25 04:29:36,038 - root - INFO - FRONTEND [INFO]: 📋 Loaded page config for executions:
+2025-10-25 04:29:36,038 - root - INFO - FRONTEND [INFO]: 🎯 Stage 3: Executing initialization...
+2025-10-25 04:29:36,038 - root - INFO - FRONTEND [INFO]: 🎯 Stage 3: Executing initialization...
+2025-10-25 04:29:36,038 - root - INFO - FRONTEND [INFO]:   ✓ Base Package (14 סקריפטים, ~~150ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,038 - root - INFO - FRONTEND [INFO]:   ✓ Base Package (14 סקריפטים, ~~150ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,038 - root - INFO - FRONTEND [INFO]:   ✓ Services Package (7 סקריפטים, ~~80ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,038 - root - INFO - FRONTEND [INFO]:   ✓ Services Package (7 סקריפטים, ~~80ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,039 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:36,039 - root - INFO - FRONTEND [INFO]:   ✓ UI Advanced Package (3 סקריפטים, ~~50ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,040 - root - INFO - FRONTEND [INFO]:   ✓ UI Advanced Package (3 סקריפטים, ~~50ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,040 - root - INFO - FRONTEND [INFO]:   ✓ CRUD Operations Package (2 סקריפטים, ~~60ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,040 - root - INFO - FRONTEND [INFO]:   ✓ CRUD Operations Package (2 סקריפטים, ~~60ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,040 - root - INFO - FRONTEND [INFO]:   ✓ Preferences Package (6 סקריפטים, ~~80ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,040 - root - INFO - FRONTEND [INFO]:   ✓ Preferences Package (6 סקריפטים, ~~80ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,040 - root - INFO - FRONTEND [INFO]:   ✓ Entity Details Package (3 סקריפטים, ~~30ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,040 - root - INFO - FRONTEND [INFO]:   ✓ Entity Details Package (3 סקריפטים, ~~30ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,040 - root - INFO - FRONTEND [INFO]:   ✓ Info Summary Package (2 סקריפטים, ~~15ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,040 - root - INFO - FRONTEND [INFO]:   ✓ Info Summary Package (2 סקריפטים, ~~15ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,040 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:36,547 - root - INFO - FRONTEND [INFO]:   ✓ Initialization Package (3 סקריפטים, ~~30ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,550 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:29:36,551 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 2)
+2025-10-25 04:29:36,550 - root - INFO - FRONTEND [INFO]:   ✓ Initialization Package (3 סקריפטים, ~~30ms, { page: "unified-app-initializer" })
+2025-10-25 04:29:36,551 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "GET /images/icons/home.svg HTTP/1.1" 200 -
+2025-10-25 04:29:36,551 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "GET /images/logo.svg HTTP/1.1" 200 -
+2025-10-25 04:29:36,551 - root - INFO - FRONTEND [INFO]: 🚀 HeaderSystem.initialize called
+2025-10-25 04:29:36,551 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 2)
+2025-10-25 04:29:36,553 - root - INFO - FRONTEND [INFO]: 🚀 HeaderSystem.initialize called
+2025-10-25 04:29:36,553 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-25 04:29:36,553 - root - INFO - FRONTEND [INFO]: selectStatusOption:
+2025-10-25 04:29:36,554 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "GET /api/executions/?_t=1761355776547 HTTP/1.1" 200 -
+2025-10-25 04:29:36,554 - root - INFO - FRONTEND [INFO]: selectStatusOption:
+2025-10-25 04:29:36,555 - root - INFO - FRONTEND [INFO]: updateStatusFilterText:
+2025-10-25 04:29:36,555 - root - INFO - FRONTEND [INFO]: updateStatusFilterText:
+2025-10-25 04:29:36,556 - root - INFO - FRONTEND [INFO]: applyStatusFilter:
+2025-10-25 04:29:36,556 - root - INFO - FRONTEND [INFO]: applyStatusFilter:
+2025-10-25 04:29:36,556 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:36,585 - root - INFO - FRONTEND [INFO]: ✅ Actions Menu System ready
+2025-10-25 04:29:36,585 - root - INFO - FRONTEND [INFO]: ✅ Actions Menu System ready
+2025-10-25 04:29:36,585 - root - INFO - FRONTEND [INFO]: 🔧 Executing custom initializers:
+2025-10-25 04:29:36,585 - root - INFO - FRONTEND [INFO]: 🔧 Executing custom initializers:
+2025-10-25 04:29:36,586 - root - INFO - FRONTEND [INFO]: 🔧 Executing custom initializer 1/1:
+2025-10-25 04:29:36,586 - root - INFO - FRONTEND [INFO]: 🔧 Executing custom initializer 1/1:
+2025-10-25 04:29:36,586 - root - INFO - FRONTEND [INFO]: ⚡ Initializing Executions...
+2025-10-25 04:29:36,586 - root - INFO - FRONTEND [INFO]: ⚡ Initializing Executions...
+2025-10-25 04:29:36,586 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:29:36,586 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:29:36,587 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:36,607 - root - INFO - FRONTEND [INFO]: ✅ initializeUnifiedApp completed
+2025-10-25 04:29:36,608 - root - INFO - FRONTEND [INFO]:   ⏱️ זמן אתחול: 0ms
+2025-10-25 04:29:36,608 - root - INFO - FRONTEND [INFO]: ✅ initializeUnifiedApp completed
+2025-10-25 04:29:36,608 - root - INFO - FRONTEND [INFO]:   ⏱️ זמן אתחול: 0ms
+2025-10-25 04:29:36,608 - root - INFO - FRONTEND [INFO]: 🔧 Handling page-specific functions...
+2025-10-25 04:29:36,608 - root - INFO - FRONTEND [INFO]:   📦 חבילות: 8
+2025-10-25 04:29:36,608 - root - INFO - FRONTEND [INFO]: 🔧 Handling page-specific functions...
+2025-10-25 04:29:36,609 - root - INFO - FRONTEND [INFO]: 📄 Current page: executions
+2025-10-25 04:29:36,609 - root - INFO - FRONTEND [INFO]:   📦 חבילות: 8
+2025-10-25 04:29:36,609 - root - INFO - FRONTEND [INFO]: 📄 Current page: executions
+2025-10-25 04:29:36,609 - root - INFO - FRONTEND [INFO]:   ✅ מערכות זמינות: 6
+2025-10-25 04:29:36,609 - root - INFO - FRONTEND [INFO]: ✅ Page-specific functions handled successfully
+2025-10-25 04:29:36,609 - root - INFO - FRONTEND [INFO]:   ✅ מערכות זמינות: 6
+2025-10-25 04:29:36,610 - root - INFO - FRONTEND [INFO]: ✅ Page-specific functions handled successfully
+2025-10-25 04:29:36,610 - root - INFO - FRONTEND [INFO]: 🔔 showNotification called: "✅ Application initialized successfully", type: success, category: business, options:
+2025-10-25 04:29:36,610 - root - INFO - FRONTEND [INFO]: 🔍 CACHE DEBUG: Cache hit for notifications_business_enabled = true (key: preference_notifications_business_enabled_1_null, { page: "preferences-core-new" })
+2025-10-25 04:29:36,610 - root - INFO - FRONTEND [INFO]: 🔔 showNotification called: "✅ Application initialized successfully", type: success, category: business, options:
+2025-10-25 04:29:36,610 - root - INFO - FRONTEND [INFO]: 🔍 CACHE DEBUG: Cache hit for notifications_business_enabled = true (key: preference_notifications_business_enabled_1_null, { page: "preferences-core-new" })
+2025-10-25 04:29:36,610 - root - INFO - FRONTEND [INFO]: 🔍 Checking preference: notifications_business_enabled
+2025-10-25 04:29:36,610 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:36,610 - root - INFO - FRONTEND [INFO]: 🔍 Checking preference: notifications_business_enabled
+2025-10-25 04:29:36,611 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:29:36,647 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-25 04:29:36,647 - cache - INFO - Cache EXPIRED: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Age: 217.0s)
+2025-10-25 04:29:36,647 - cache - INFO - Cache EXPIRED: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Age: 217.0s)
+2025-10-25 04:29:36,647 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-25 04:29:36,647 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-25 04:29:36,648 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-25 04:29:36,648 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 2908 chars)
+2025-10-25 04:29:36,648 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:36] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-25 04:29:38,976 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-25 04:29:38,976 - cache - INFO - Cache HIT: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:29:38,976 - cache - INFO - Cache HIT: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-25 04:29:38,976 - routes.api.base_entity.trading_accounts - INFO - Cache hit for trading_accounts get_all
+2025-10-25 04:29:38,976 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:38] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-25 04:29:41,616 - root - INFO - FRONTEND [INFO]: 🔔 SUCCESS: business - ✅ Application initialized successfully
+2025-10-25 04:29:41,616 - root - INFO - FRONTEND [INFO]: 🔔 SUCCESS: business - ✅ Application initialized successfully
+2025-10-25 04:29:41,616 - root - INFO - FRONTEND [INFO]: 📥 פותח מודול ייבוא נתוני משתמש
+2025-10-25 04:29:41,616 - root - INFO - FRONTEND [INFO]: 📥 פותח מודול ייבוא נתוני משתמש
+2025-10-25 04:29:41,616 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:29:41] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:30:02,911 - root - INFO - FRONTEND [INFO]: 🔔 showNotification called: "קובץ נבחר בהצלחה", type: success, category: business, options:
+2025-10-25 04:30:02,912 - root - INFO - FRONTEND [INFO]: 🔔 showNotification called: "קובץ נבחר בהצלחה", type: success, category: business, options:
+2025-10-25 04:30:02,913 - root - INFO - FRONTEND [INFO]: 🔍 Checking preference: notifications_business_enabled
+2025-10-25 04:30:02,913 - root - INFO - FRONTEND [INFO]: 🔍 Checking preference: notifications_business_enabled
+2025-10-25 04:30:02,913 - root - INFO - FRONTEND [INFO]: 🔍 CACHE DEBUG: Cache hit for notifications_business_enabled = true (key: preference_notifications_business_enabled_1_null, { page: "preferences-core-new" })
+2025-10-25 04:30:02,913 - root - INFO - FRONTEND [INFO]: 🔍 CACHE DEBUG: Cache hit for notifications_business_enabled = true (key: preference_notifications_business_enabled_1_null, { page: "preferences-core-new" })
+2025-10-25 04:30:02,913 - root - INFO - FRONTEND [INFO]: 🔔 SUCCESS: מערכת - קובץ נבחר בהצלחה
+2025-10-25 04:30:02,913 - root - INFO - FRONTEND [INFO]: 🔔 SUCCESS: מערכת - קובץ נבחר בהצלחה
+2025-10-25 04:30:02,914 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:30:02] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-25 04:30:05,035 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-25 04:30:05,035 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 3)
+2025-10-25 04:30:05,035 - cache - INFO - Cache HIT: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Access count: 3)
+2025-10-25 04:30:05,035 - routes.api.base_entity.executions - INFO - Cache hit for executions get_all
+2025-10-25 04:30:05,036 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:30:05] "GET /api/executions/?_t=1761355805033 HTTP/1.1" 200 -
+2025-10-25 04:30:10,744 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:30:10,745 - root - INFO - FRONTEND [INFO]: 🔄 Auto-refreshing executions data...
+2025-10-25 04:30:10,746 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:30:10,746 - root - INFO - FRONTEND [INFO]: Info summary rendered for container 'summaryStats'
+2025-10-25 04:30:10,746 - werkzeug - INFO - 127.0.0.1 - - [25/Oct/2025 04:30:10] "POST /api/logs/batch HTTP/1.1" 200 -

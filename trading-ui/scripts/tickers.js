@@ -1535,82 +1535,20 @@ async function loadTickersData() {
  * עדכון סטטיסטיקות סיכום טיקרים
  */
 function updateTickersSummaryStats(tickers) {
-
-  try {
-    // בדיקה אם האלמנטים קיימים בדף הנוכחי
-    const totalTickersElement = document.getElementById('totalTickers');
-    const activeTickersElement = document.getElementById('activeTickers');
-    const averagePriceElement = document.getElementById('averagePrice');
-    const dailyChangeElement = document.getElementById('dailyChange');
-
-    // אם האלמנטים לא קיימים, הפונקציה לא רלוונטית לדף זה
-    if (!totalTickersElement || !activeTickersElement || !averagePriceElement || !dailyChangeElement) {
-      return;
+  // מערכת מאוחדת לסיכום נתונים
+  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+    const config = window.INFO_SUMMARY_CONFIGS.tickers;
+    window.InfoSummarySystem.calculateAndRender(tickers, config);
+  } else {
+    // מערכת סיכום נתונים לא זמינה
+    const summaryStatsElement = document.getElementById('summaryStats');
+    if (summaryStatsElement) {
+      summaryStatsElement.innerHTML = `
+        <div style="color: #dc3545; font-weight: bold;">
+          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+        </div>
+      `;
     }
-
-    if (!tickers || tickers.length === 0) {
-      // אם אין נתונים, אפס את כל השדות
-      totalTickersElement.textContent = '0';
-      activeTickersElement.textContent = '0';
-      averagePriceElement.textContent = '$0';
-      dailyChangeElement.textContent = '0%';
-      return;
-    }
-
-    // חישוב סטטיסטיקות
-    const totalTickers = tickers.length;
-    
-    // ספירת טיקרים פעילים (פתוחים)
-    const activeTickers = tickers.filter(ticker => ticker.status === 'open').length;
-    
-    // חישוב מחיר ממוצע
-    const validPrices = tickers
-      .map(ticker => ticker.current_price)
-      .filter(price => price && price !== 'N/A' && !isNaN(parseFloat(price)))
-      .map(price => parseFloat(price));
-    
-    const averagePrice = validPrices.length > 0 ? 
-      validPrices.reduce((sum, price) => sum + price, 0) / validPrices.length : 0;
-    
-    // חישוב שינוי יומי ממוצע
-    const validChanges = tickers
-      .map(ticker => ticker.change_percent)
-      .filter(change => change && change !== 'N/A' && !isNaN(parseFloat(change)))
-      .map(change => parseFloat(change));
-    
-    const averageChange = validChanges.length > 0 ? 
-      validChanges.reduce((sum, change) => sum + change, 0) / validChanges.length : 0;
-
-    // חישוב תאריכי עדכון נתונים חיצוניים
-    const validExternalDates = tickers
-      .map(ticker => ticker.yahoo_updated_at)
-      .filter(date => date)
-      .map(date => new Date(date))
-      .filter(date => !isNaN(date.getTime()));
-
-    let latestUpdate = 'אין נתונים';
-    let oldestUpdate = 'אין נתונים';
-
-    if (validExternalDates.length > 0) {
-      const latest = new Date(Math.max(...validExternalDates));
-      const oldest = new Date(Math.min(...validExternalDates));
-
-      const latestDuration = getTimeDuration(latest.toISOString());
-      const oldestDuration = getTimeDuration(oldest.toISOString());
-
-      latestUpdate = `${latest.toLocaleString('he-IL')} (${latestDuration})`;
-      oldestUpdate = `${oldest.toLocaleString('he-IL')} (${oldestDuration})`;
-    }
-
-    // עדכון השדות ב-HTML
-    totalTickersElement.textContent = totalTickers;
-    activeTickersElement.textContent = activeTickers;
-    averagePriceElement.textContent = `$${averagePrice.toFixed(2)}`;
-    dailyChangeElement.textContent = `${averageChange >= 0 ? '+' : ''}${averageChange.toFixed(2)}%`;
-
-
-  } catch (error) {
-    handleSystemError(error, 'עדכון סטטיסטיקות סיכום');
   }
 }
 

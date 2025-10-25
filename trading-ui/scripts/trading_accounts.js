@@ -532,42 +532,21 @@ function updateTradingAccountsTable(trading_accounts) {
  * @param {Array} trading_accounts - מערך החשבונות
  */
 function updateTradingAccountsSummary(trading_accounts) {
-  // בדיקה אם האלמנטים קיימים בדף
-  const totalAccountsElement = document.getElementById('totalAccounts');
-  const activeAccountsElement = document.getElementById('activeAccounts');
-  const openAccountsElement = document.getElementById('openAccounts');
-  const totalBalanceElement = document.getElementById('totalBalance');
-
-  if (!totalAccountsElement || !activeAccountsElement || !openAccountsElement || !totalBalanceElement) {
-    window.Logger.warn('⚠️ Trading accounts summary elements not found', { page: "trading_accounts" });
-    return;
+  // מערכת מאוחדת לסיכום נתונים
+  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+    const config = window.INFO_SUMMARY_CONFIGS.trading_accounts;
+    window.InfoSummarySystem.calculateAndRender(trading_accounts, config);
+  } else {
+    // מערכת סיכום נתונים לא זמינה
+    const summaryStatsElement = document.getElementById('summaryStats');
+    if (summaryStatsElement) {
+      summaryStatsElement.innerHTML = `
+        <div style="color: #dc3545; font-weight: bold;">
+          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+        </div>
+      `;
+    }
   }
-
-  if (!trading_accounts || trading_accounts.length === 0) {
-    // איפוס ערכים
-    totalAccountsElement.textContent = '0';
-    activeAccountsElement.textContent = '0';
-    openAccountsElement.textContent = '0';
-    totalBalanceElement.textContent = '$0';
-    return;
-  }
-
-  // חישוב סיכומים
-  const totalAccounts = trading_accounts.length;
-  const activeAccounts = trading_accounts.filter(tradingAccount => tradingAccount.status === 'open').length;
-  const openAccounts = trading_accounts.filter(tradingAccount => tradingAccount.status === 'open').length;
-  
-  // חישוב סה"כ יתרה
-  const totalBalance = trading_accounts.reduce((sum, tradingAccount) => {
-    const balance = parseFloat(tradingAccount.balance) || 0;
-    return sum + balance;
-  }, 0);
-
-  // עדכון ה-DOM
-  totalAccountsElement.textContent = totalAccounts;
-  activeAccountsElement.textContent = activeAccounts;
-  openAccountsElement.textContent = openAccounts;
-  totalBalanceElement.textContent = `$${totalBalance.toFixed(2)}`;
 }
 
 /**

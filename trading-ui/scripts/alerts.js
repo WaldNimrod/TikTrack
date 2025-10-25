@@ -676,30 +676,21 @@ function updateAlertsTable(alerts) {
  * עדכון סטטיסטיקות סיכום
  */
 function updatePageSummaryStats() {
-  // סטטיסטיקות לפי הדוקומנטציה של מערכת ההתראות
-  const totalAlerts = alertsData.length;
-  const openAlerts = alertsData.filter(alert =>
-    alert.status === 'open',
-  ).length; // התראות פעילות
-  const newAlerts = alertsData.filter(alert =>
-    alert.is_triggered === 'new',
-  ).length; // התראות חדשות (הופעלו ולא נקראו)
-  const todayAlerts = alertsData.filter(alert => {
-    const today = new Date().toDateString();
-    const alertDate = new Date(alert.created_at).toDateString();
-    return alertDate === today;
-  }).length;
-  const weekAlerts = alertsData.filter(alert => {
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    return new Date(alert.created_at) >= weekAgo;
-  }).length;
-
-  document.getElementById('totalAlerts').textContent = totalAlerts;
-  document.getElementById('activeAlerts').textContent = openAlerts;
-  document.getElementById('newAlerts').textContent = newAlerts;
-  document.getElementById('todayAlerts').textContent = todayAlerts;
-  document.getElementById('weekAlerts').textContent = weekAlerts;
+  // מערכת מאוחדת לסיכום נתונים
+  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+    const config = window.INFO_SUMMARY_CONFIGS.alerts;
+    window.InfoSummarySystem.calculateAndRender(alertsData, config);
+  } else {
+    // מערכת סיכום נתונים לא זמינה
+    const summaryStatsElement = document.getElementById('summaryStats');
+    if (summaryStatsElement) {
+      summaryStatsElement.innerHTML = `
+        <div style="color: #dc3545; font-weight: bold;">
+          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+        </div>
+      `;
+    }
+  }
 }
 
 

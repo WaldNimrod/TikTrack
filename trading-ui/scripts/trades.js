@@ -2487,68 +2487,21 @@ function updateTableStats() {
     }
   }
 
-  // חישוב סטטיסטיקות
-  const openTrades = tradesData.filter(trade => trade.status === 'open').length;
-  const closedTrades = tradesData.filter(trade => trade.status === 'closed').length;
-  const cancelledTrades = tradesData.filter(trade => trade.status === 'cancelled').length;
+  // מערכת סיכום נתונים מאוחדת - הקוד הישן הוסר
 
-  // חישוב P/L על בסיס נתוני פוזיציה
-  const totalPL = tradesData.reduce((sum, trade) => {
-    if (!trade.position || !trade.position.quantity) return sum;
-    
-    // נצטרך לטעון נתוני טיקר לחישוב P/L
-    // לעת עתה נחזיר 0 עד שנטען את הנתונים
-    return sum;
-  }, 0);
-  
-  const positivePL = tradesData.filter(trade => {
-    if (!trade.position || !trade.position.quantity) return false;
-    // נצטרך לטעון נתוני טיקר לחישוב P/L
-    return false;
-  }).length;
-  
-  const negativePL = tradesData.filter(trade => {
-    if (!trade.position || !trade.position.quantity) return false;
-    // נצטרך לטעון נתוני טיקר לחישוב P/L
-    return false;
-  }).length;
-
-  // עדכון סטטיסטיקות סיכום
-  const summaryStatsElement = document.getElementById('summaryStats');
-  if (summaryStatsElement) {
-    summaryStatsElement.innerHTML = `
-      <div class="stats-grid">
-        <div class="stat-item">
-          <span class="stat-label">פתוחים:</span>
-          <span class="stat-value">${openTrades}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">סגורים:</span>
-          <span class="stat-value">${closedTrades}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">מבוטלים:</span>
-          <span class="stat-value">${cancelledTrades}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">רווח כולל:</span>
-          <span class="stat-value">חישוב לפי פוזיציות</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">עם פוזיציות:</span>
-          <span class="stat-value">${tradesData.filter(trade => trade.position && trade.position.quantity !== 0).length}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">ללא פוזיציות:</span>
-          <span class="stat-value">${tradesData.filter(trade => !trade.position || trade.position.quantity === 0).length}</span>
-        </div>
-      </div>
-    `;
+  // עדכון סטטיסטיקות סיכום - מערכת מאוחדת
+  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+    const config = window.INFO_SUMMARY_CONFIGS.trades;
+    window.InfoSummarySystem.calculateAndRender(tradesData, config);
   } else {
-    if (typeof handleElementNotFound === 'function') {
-      handleElementNotFound('summaryStats', 'CRITICAL');
-    } else {
-      // window.Logger.error('summaryStats element not found', { page: "trades" });
+    // מערכת סיכום נתונים לא זמינה
+    const summaryStatsElement = document.getElementById('summaryStats');
+    if (summaryStatsElement) {
+      summaryStatsElement.innerHTML = `
+        <div style="color: #dc3545; font-weight: bold;">
+          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+        </div>
+      `;
     }
   }
 

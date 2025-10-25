@@ -744,19 +744,21 @@ function updatePageSummaryStats() {
     cashFlowsData = [];
   }
 
-  const totalCashFlows = cashFlowsData.length;
-  const totalDeposits = cashFlowsData
-    .filter(cf => cf.type === 'deposit')
-    .reduce((sum, cf) => sum + parseFloat(cf.amount || 0), 0);
-  const totalWithdrawals = cashFlowsData
-    .filter(cf => cf.type === 'withdrawal')
-    .reduce((sum, cf) => sum + parseFloat(cf.amount || 0), 0);
-  const currentBalance = totalDeposits - totalWithdrawals;
-
-  document.getElementById('totalCashFlows').textContent = totalCashFlows;
-  document.getElementById('totalDeposits').textContent = formatAmount(totalDeposits);
-  document.getElementById('totalWithdrawals').textContent = formatAmount(totalWithdrawals);
-  document.getElementById('currentBalance').textContent = formatAmount(currentBalance);
+  // מערכת מאוחדת לסיכום נתונים
+  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+    const config = window.INFO_SUMMARY_CONFIGS.cash_flows;
+    window.InfoSummarySystem.calculateAndRender(cashFlowsData, config);
+  } else {
+    // מערכת סיכום נתונים לא זמינה
+    const summaryStatsElement = document.getElementById('summaryStats');
+    if (summaryStatsElement) {
+      summaryStatsElement.innerHTML = `
+        <div style="color: #dc3545; font-weight: bold;">
+          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+        </div>
+      `;
+    }
+  }
 }
 
 // פונקציות הועברו ל-translation-utils.js:

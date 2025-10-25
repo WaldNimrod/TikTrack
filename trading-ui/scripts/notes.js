@@ -662,38 +662,20 @@ function updateNotesSummary(notes) {
     tableCountElement.textContent = `${notes.length} הערות`;
   }
 
-  // עדכון info-summary
-  const totalNotesElement = document.getElementById('totalNotes');
-  const activeNotesElement = document.getElementById('activeNotes');
-  const recentNotesElement = document.getElementById('recentNotes');
-  const totalLinksElement = document.getElementById('totalLinks');
-
-  if (totalNotesElement) {
-    totalNotesElement.textContent = notes.length;
-  }
-
-  if (activeNotesElement) {
-    // הערות פעילות = כל ההערות (כרגע)
-    activeNotesElement.textContent = notes.length;
-  }
-
-  if (recentNotesElement) {
-    // הערות חדשות = הערות מה-7 ימים האחרונים
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-    const recentNotes = notes.filter(note => {
-      const noteDate = new Date(note.created_at);
-      return noteDate >= oneWeekAgo;
-    });
-
-    recentNotesElement.textContent = recentNotes.length;
-  }
-
-  if (totalLinksElement) {
-    // סה"כ קישורים = הערות עם related_id
-    const linkedNotes = notes.filter(note => note.related_id && note.related_type_id);
-    totalLinksElement.textContent = linkedNotes.length;
+  // מערכת מאוחדת לסיכום נתונים
+  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+    const config = window.INFO_SUMMARY_CONFIGS.notes;
+    window.InfoSummarySystem.calculateAndRender(notes, config);
+  } else {
+    // מערכת סיכום נתונים לא זמינה
+    const summaryStatsElement = document.getElementById('summaryStats');
+    if (summaryStatsElement) {
+      summaryStatsElement.innerHTML = `
+        <div style="color: #dc3545; font-weight: bold;">
+          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+        </div>
+      `;
+    }
   }
 
 }

@@ -1081,15 +1081,44 @@ const PACKAGE_MANIFEST = {
     initTime: '~30ms'
   },
 
-  // 18. INIT PACKAGE - אתחול
+  // 18. INFO SUMMARY PACKAGE - מערכת סיכום נתונים מאוחדת
+  'info-summary': {
+    id: 'info-summary',
+    name: 'Info Summary Package',
+    description: 'מערכת סיכום נתונים מאוחדת לכל העמודים',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 18,
+    dependencies: ['base', 'services'],
+    scripts: [
+      {
+        file: 'info-summary-system.js',
+        globalCheck: 'window.InfoSummarySystem',
+        description: 'מערכת סיכום נתונים ליבה',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'info-summary-configs.js',
+        globalCheck: 'window.INFO_SUMMARY_CONFIGS',
+        description: 'תצורות עמודים לסיכום נתונים',
+        required: true,
+        loadOrder: 2
+      }
+    ],
+    estimatedSize: '~25KB',
+    initTime: '~15ms'
+  },
+
+  // 19. INIT PACKAGE - אתחול
   'init-system': {
     id: 'init-system',
     name: 'Initialization Package',
     description: 'מערכות אתחול וניטור',
     version: '2.0.0',
     critical: false,
-    loadOrder: 18,
-    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'filters', 'advanced-notifications', 'cash-flows', 'entity-details'],
+    loadOrder: 19,
+    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'filters', 'advanced-notifications', 'cash-flows', 'entity-details', 'info-summary'],
     scripts: [
       {
         file: 'init-system/package-manifest.js',

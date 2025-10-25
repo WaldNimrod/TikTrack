@@ -1,0 +1,164 @@
+{
+  "api_responses": {
+    "trades": {
+      "get": {
+        "success": {
+          "status": 200,
+          "data": [
+            {
+              "id": 1,
+              "symbol": "AAPL",
+              "side": "buy",
+              "quantity": 100,
+              "price": 150.00,
+              "status": "active"
+            }
+          ],
+          "total": 1,
+          "page": 1,
+          "limit": 10
+        },
+        "error": {
+          "status": 500,
+          "error": "Internal Server Error",
+          "message": "Failed to fetch trades"
+        }
+      },
+      "post": {
+        "success": {
+          "status": 201,
+          "data": {
+            "id": 2,
+            "symbol": "GOOGL",
+            "side": "sell",
+            "quantity": 50,
+            "price": 2800.00,
+            "status": "pending"
+          }
+        },
+        "validation_error": {
+          "status": 400,
+          "error": "Validation Error",
+          "message": "Invalid trade data",
+          "details": {
+            "symbol": "Symbol is required",
+            "quantity": "Quantity must be positive"
+          }
+        }
+      }
+    },
+    "cache": {
+      "clear": {
+        "success": {
+          "status": 200,
+          "message": "Cache cleared successfully",
+          "cleared_layers": ["memory", "localStorage", "indexedDB", "backend"]
+        },
+        "error": {
+          "status": 500,
+          "error": "Cache Clear Failed",
+          "message": "Failed to clear cache"
+        }
+      },
+      "stats": {
+        "success": {
+          "status": 200,
+          "data": {
+            "memory": {
+              "size": 1024,
+              "count": 10,
+              "hit_rate": 0.85
+            },
+            "localStorage": {
+              "size": 2048,
+              "count": 20,
+              "hit_rate": 0.90
+            },
+            "indexedDB": {
+              "size": 4096,
+              "count": 30,
+              "hit_rate": 0.95
+            },
+            "backend": {
+              "size": 8192,
+              "count": 40,
+              "hit_rate": 0.98
+            }
+          }
+        }
+      }
+    },
+    "logs": {
+      "send": {
+        "success": {
+          "status": 200,
+          "message": "Logs sent successfully",
+          "sent_count": 10
+        },
+        "error": {
+          "status": 500,
+          "error": "Log Send Failed",
+          "message": "Failed to send logs to server"
+        }
+      }
+    }
+  },
+  "dom_responses": {
+    "table_rendering": {
+      "success": {
+        "html": "<table class='data-table'><tr><td>Trade 1</td></tr></table>",
+        "row_count": 1,
+        "columns": ["id", "symbol", "price"]
+      }
+    },
+    "chart_rendering": {
+      "success": {
+        "canvas_id": "chart-1",
+        "chart_type": "line",
+        "data_points": 10
+      }
+    },
+    "button_rendering": {
+      "success": {
+        "html": "<button class='btn btn-edit'>Edit</button>",
+        "button_count": 1,
+        "classes": ["btn", "btn-edit"]
+      }
+    }
+  },
+  "error_scenarios": {
+    "network_errors": {
+      "timeout": {
+        "error": "Request timeout",
+        "code": "TIMEOUT",
+        "duration": 30000
+      },
+      "connection_failed": {
+        "error": "Connection failed",
+        "code": "CONNECTION_ERROR"
+      }
+    },
+    "validation_errors": {
+      "invalid_data": {
+        "error": "Invalid data format",
+        "code": "VALIDATION_ERROR",
+        "field": "symbol"
+      },
+      "missing_required": {
+        "error": "Missing required field",
+        "code": "REQUIRED_FIELD_MISSING",
+        "field": "quantity"
+      }
+    },
+    "system_errors": {
+      "cache_failure": {
+        "error": "Cache operation failed",
+        "code": "CACHE_ERROR"
+      },
+      "logger_failure": {
+        "error": "Logger service unavailable",
+        "code": "LOGGER_ERROR"
+      }
+    }
+  }
+}

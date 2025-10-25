@@ -1866,89 +1866,27 @@ function updateTradePlansTable(trade_plans) {
 function updatePageSummaryStats() {
   // Using filtered data if available, otherwise all data
   const dataToUse = window.filteredTradePlansData || window.tradePlansData;
-  const totalDesigns = dataToUse.length;
-  const openDesigns = dataToUse.filter(design => design.status === 'open').length;
-  const closedDesigns = dataToUse.filter(design => design.status === 'closed').length;
-  const cancelledDesigns = dataToUse.filter(design => design.status === 'cancelled').length;
-
-  // Calculating sums
-  let totalInvestment = 0;
-  let totalProfit = 0;
-
-  window.tradePlansData.forEach(design => {
-    // Safeguarding against invalid data
-    if (!design || typeof design !== 'object') {
-      if (typeof window.showNotification === 'function') {
-        window.showNotification('Invalid design data', 'warning');
-      }
-      return;
+  
+  // מערכת מאוחדת לסיכום נתונים
+  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+    const config = window.INFO_SUMMARY_CONFIGS.trade_plans;
+    window.InfoSummarySystem.calculateAndRender(dataToUse, config);
+    
+    // עדכון מספר הרשומות בטבלה
+    const countElement = document.getElementById('designsCount');
+    if (countElement) {
+      countElement.textContent = `${dataToUse.length} רשומות`;
     }
-
-    // Handling data from server (numbers) or strings
-    let amount = 0;
-    if (design.amount !== null && design.amount !== undefined) {
-      if (typeof design.amount === 'string') {
-        amount = parseFloat(design.amount.replace(/[$,]/g, '')) || 0;
-      } else {
-        amount = parseFloat(design.amount) || 0;
-      }
+  } else {
+    // מערכת סיכום נתונים לא זמינה
+    const summaryStatsElement = document.getElementById('summaryStats');
+    if (summaryStatsElement) {
+      summaryStatsElement.innerHTML = `
+        <div style="color: #dc3545; font-weight: bold;">
+          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+        </div>
+      `;
     }
-    totalInvestment += amount;
-
-    // Simple profit calculation (for example)
-    if (design.status === 'closed') {
-      let current = 0;
-      let target = 0;
-
-      if (design.current !== null && design.current !== undefined) {
-        if (typeof design.current === 'string') {
-          current = parseFloat(design.current.replace(/[$,]/g, '')) || 0;
-        } else {
-          current = parseFloat(design.current) || 0;
-        }
-      }
-
-      if (design.target !== null && design.target !== undefined) {
-        if (typeof design.target === 'string') {
-          target = parseFloat(design.target.replace(/[$,]/g, '')) || 0;
-        } else {
-          target = parseFloat(design.target) || 0;
-        }
-      }
-
-      if (current > target) {
-        totalProfit += amount * 0.1; // 10% profit for example
-      }
-    }
-  });
-
-  const avgInvestment = totalDesigns > 0 ? totalInvestment / totalDesigns : 0;
-
-  // עדכון אלמנטי הסיכום - בדיקה אם הם קיימים לפני הגישה
-  const totalDesignsElement = document.getElementById('totalDesigns');
-  if (totalDesignsElement) {
-    totalDesignsElement.textContent = totalDesigns;
-  }
-
-  const totalInvestmentElement = document.getElementById('totalInvestment');
-  if (totalInvestmentElement) {
-    totalInvestmentElement.textContent = formatCurrency(totalInvestment);
-  }
-
-  const avgInvestmentElement = document.getElementById('avgInvestment');
-  if (avgInvestmentElement) {
-    avgInvestmentElement.textContent = formatCurrency(avgInvestment);
-  }
-
-  const totalProfitElement = document.getElementById('totalProfit');
-  if (totalProfitElement) {
-    totalProfitElement.textContent = formatCurrency(totalProfit);
-  }
-
-  // עדכון מספר הרשומות בטבלה
-  const countElement = document.getElementById('designsCount');
-  if (countElement) {
-    countElement.textContent = `${totalDesigns} רשומות`;
   }
 }
 

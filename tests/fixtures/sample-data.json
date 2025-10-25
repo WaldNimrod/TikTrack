@@ -1,0 +1,99 @@
+{
+  "trades": [
+    {
+      "id": 1,
+      "symbol": "AAPL",
+      "side": "buy",
+      "quantity": 100,
+      "price": 150.00,
+      "status": "active",
+      "date": "2025-01-24T10:00:00Z",
+      "type": "stock"
+    },
+    {
+      "id": 2,
+      "symbol": "GOOGL",
+      "side": "sell",
+      "quantity": 50,
+      "price": 2800.00,
+      "status": "completed",
+      "date": "2025-01-24T11:00:00Z",
+      "type": "stock"
+    },
+    {
+      "id": 3,
+      "symbol": "TSLA",
+      "side": "buy",
+      "quantity": 25,
+      "price": 200.00,
+      "status": "pending",
+      "date": "2025-01-24T12:00:00Z",
+      "type": "stock"
+    }
+  ],
+  "accounts": [
+    {
+      "id": 1,
+      "name": "Main Trading Account",
+      "balance": 50000.00,
+      "currency": "USD",
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "name": "Demo Account",
+      "balance": 10000.00,
+      "currency": "USD",
+      "status": "active"
+    }
+  ],
+  "alerts": [
+    {
+      "id": 1,
+      "symbol": "AAPL",
+      "condition": "price_above",
+      "value": 160.00,
+      "status": "active",
+      "priority": "high"
+    },
+    {
+      "id": 2,
+      "symbol": "GOOGL",
+      "condition": "price_below",
+      "value": 2700.00,
+      "status": "inactive",
+      "priority": "medium"
+    }
+  ],
+  "preferences": {
+    "theme": "dark",
+    "language": "he",
+    "notifications": {
+      "email": true,
+      "browser": true,
+      "sound": false
+    },
+    "trading": {
+      "default_side": "buy",
+      "default_quantity": 100,
+      "auto_save": true
+    }
+  },
+  "cache_data": {
+    "user_preferences": {
+      "theme": "dark",
+      "language": "he"
+    },
+    "table_data": {
+      "trades": [
+        {"id": 1, "symbol": "AAPL", "price": 150.00}
+      ]
+    },
+    "chart_data": {
+      "performance": {
+        "labels": ["Jan", "Feb", "Mar"],
+        "datasets": [{"data": [10, 20, 30]}]
+      }
+    }
+  }
+}

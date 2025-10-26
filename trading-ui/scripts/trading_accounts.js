@@ -417,9 +417,6 @@ function loadDefaultTradingAccounts() {
 // הפונקציות הכלליות לפילטר חשבונות הועברו ל-grid-filters.js
 
 // פונקציה לקבלת חשבונות מסחר נטענים - הועברה ל-trading-account-service.js
-// function getTradingAccounts() {
-//   return window.trading_accountsData || [];
-// }
 
 // פונקציה לבדיקה אם חשבונות המסחר נטענו - הועברה ל-trading-account-service.js
 // function isTradingAccountsLoaded() {

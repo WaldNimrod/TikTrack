@@ -336,7 +336,7 @@ class ImportOrchestrator:
             Dict[str, Any]: Preview data
         """
         try:
-            logger.info(f"🔍 Starting generate_preview for session {session_id}")
+            logger.info(f"🔍 Starting generate_preview for session {session_id} - NEW CODE VERSION!")
             # Get session
             session = self.db_session.query(ImportSession).filter(
                 ImportSession.id == session_id
@@ -388,10 +388,19 @@ class ImportOrchestrator:
             )
             logger.info(f"📊 Clean: {len(duplicate_result['clean_records'])}, Duplicates: {len(duplicate_result['within_file_duplicates']) + len(duplicate_result['system_duplicates'])}")
             
-            # Prepare records for import (clean records only)
+            # Prepare records for import (clean records only, excluding missing tickers)
             clean_records = duplicate_result['clean_records']
+            missing_tickers = validation_result.get('missing_tickers', [])
             
-            # Prepare records to skip (duplicates and invalid)
+            # Filter out records with missing tickers from clean_records
+            original_clean_count = len(clean_records)
+            clean_records = [
+                record for record in clean_records 
+                if record['record'].get('symbol') not in missing_tickers
+            ]
+            logger.info(f"📊 Clean records: {original_clean_count} -> {len(clean_records)} (filtered out {original_clean_count - len(clean_records)} with missing tickers)")
+            
+            # Prepare records to skip (duplicates, invalid, and missing tickers)
             records_to_skip = []
             
             # Add invalid records
@@ -402,6 +411,17 @@ class ImportOrchestrator:
                     'reason': 'validation_error',
                     'errors': error_info['errors']
                 })
+            
+            # Add records with missing tickers
+            missing_tickers = validation_result.get('missing_tickers', [])
+            valid_records = validation_result['valid_records']
+            for record in valid_records:
+                if record.get('symbol') in missing_tickers:
+                    records_to_skip.append({
+                        'record': record,
+                        'reason': 'missing_ticker',
+                        'missing_ticker': record.get('symbol')
+                    })
             
             # Add duplicate records (main record + all matching records)
             within_file_duplicates = duplicate_result['within_file_duplicates']
@@ -449,6 +469,8 @@ class ImportOrchestrator:
             # Calculate total records
             total_records = len(raw_records)
             logger.info(f"📊 Total records: {total_records}")
+            logger.info(f"📊 Records to import: {len(clean_records)}")
+            logger.info(f"📊 Records to skip: {len(records_to_skip)}")
             
             # Generate preview data
             logger.info("🔄 Generating preview data...")

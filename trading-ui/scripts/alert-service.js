@@ -529,5 +529,6 @@ window.alertService = {
   updateAlertStatus,
   updateMultipleAlertsStatus,
   updateAlertsSummary,
+  validateAlertStatusCombination,
 };
 

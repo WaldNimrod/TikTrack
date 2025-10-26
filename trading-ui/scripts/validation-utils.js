@@ -8,16 +8,16 @@
  * 📖 דוקומנטציה מפורטת: documentation/frontend/VALIDATION_SYSTEM.md
  *
  * קובץ: trading-ui/scripts/validation-utils.js
- * גרסה: 2.2
- * עדכון אחרון: אוגוסט 31, 2025
+ * גרסה: 3.0
+ * עדכון אחרון: ינואר 12, 2025
  * מחבר: TikTrack Development Team
  *
- * תיקונים אחרונים (31 באוגוסט 2025):
- * - תיקון פונקציות showFieldError, showFieldSuccess, clearFieldError, clearFieldValidation
- * - תמיכה ב-ID מחרוזת או אלמנט DOM
- * - בדיקת קיום אלמנט לפני פעולה
- * - הוספת הודעות אזהרה לקונסול
- * - שיפור תאימות עם קובץ trade_plans.js
+ * תיקונים אחרונים (12 בינואר 2025):
+ * - הוספת validateDateRange() לוולידציה בין שדות תאריך
+ * - הוספת validateEntityForm() לעזרה בטפסי CRUD נפוצים
+ * - הוספת validateWithConfirmation() לוולידציה עם אישור משתמש
+ * - הרחבת המערכת לתמיכה בכל דפוסי הולידציה במערכת
+ * - סטנדרטיזציה מלאה של הולידציה בכל עמודי המשתמש
  */
 
 // ===== קבועים =====
@@ -571,6 +571,100 @@ function validateTickerSymbol(value) {
   return true;
 }
 
+// ===== פונקציות ולידציה מתקדמות =====
+
+/**
+ * ולידציה בין שדות תאריך (Cross-field validation)
+ * @param {string} startFieldId - מזהה שדה התאריך הראשון
+ * @param {string} endFieldId - מזהה שדה התאריך השני
+ * @param {string} errorMessage - הודעת שגיאה מותאמת אישית
+ * @returns {boolean} true אם תקין, false אם לא תקין
+ */
+function validateDateRange(startFieldId, endFieldId, errorMessage) {
+  const startField = document.getElementById(startFieldId);
+  const endField = document.getElementById(endFieldId);
+  
+  if (!startField || !endField) return true;
+  
+  const startValue = startField.value;
+  const endValue = endField.value;
+  
+  if (startValue && endValue) {
+    const startDate = new Date(startValue);
+    const endDate = new Date(endValue);
+    
+    if (endDate < startDate) {
+      showFieldError(endField, errorMessage || 'תאריך סיום לא יכול להיות לפני תאריך התחלה');
+      return false;
+    }
+    
+    clearFieldValidation(endField);
+  }
+  
+  return true;
+}
+
+/**
+ * ולידציה של טופס ישות עם כללים מקיפים
+ * עזרה לטפסי CRUD נפוצים
+ * @param {string} formId - מזהה הטופס
+ * @param {Array} fieldConfigs - מערך של {id, name, type, rules}
+ * @returns {Object} {isValid, errors, errorMessages}
+ */
+function validateEntityForm(formId, fieldConfigs) {
+  let isValid = true;
+  const errors = {};
+  const errorMessages = [];
+  
+  fieldConfigs.forEach(config => {
+    const field = document.getElementById(config.id);
+    if (!field) return;
+    
+    const result = validateField(field, config.rules || {required: true});
+    
+    if (result !== true) {
+      isValid = false;
+      errors[config.id] = result;
+      errorMessages.push(`${config.name}: ${result}`);
+    }
+  });
+  
+  return {isValid, errors, errorMessages};
+}
+
+/**
+ * ולידציה עם דיאלוג אישור
+ * ללוגיקת עסקים שדורשת אישור משתמש
+ * @param {string} title - כותרת הדיאלוג
+ * @param {string} message - הודעת הדיאלוג
+ * @param {Function} validationFn - פונקציית ולידציה להרצה
+ * @returns {Promise<boolean>} true אם אושר, false אם לא
+ */
+async function validateWithConfirmation(title, message, validationFn) {
+  const validationResult = await validationFn();
+  
+  if (!validationResult.isValid) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification(title, validationResult.message);
+    }
+    return false;
+  }
+  
+  // הצגת דיאלוג אישור
+  return new Promise((resolve) => {
+    if (window.showConfirmationDialog) {
+      window.showConfirmationDialog(
+        title,
+        message,
+        () => resolve(true),
+        () => resolve(false)
+      );
+    } else {
+      resolve(window.confirm(`${title}\n\n${message}`));
+    }
+  });
+}
+
 // ===== פונקציה ראשית =====
 
 /**
@@ -769,6 +863,11 @@ window.validateCurrencySymbol = validateCurrencySymbol;
 window.validateCurrencyRate = validateCurrencyRate;
 window.validateTickerSymbol = validateTickerSymbol;
 
+// ייצוא פונקציות ולידציה מתקדמות
+window.validateDateRange = validateDateRange;
+window.validateEntityForm = validateEntityForm;
+window.validateWithConfirmation = validateWithConfirmation;
+
 // ייצוא פונקציות אתחול
 window.initializeValidation = initializeValidation;
 window.clearValidation = clearValidation;
@@ -794,6 +893,9 @@ window.validationUtils = {
   validateCurrencySymbol,
   validateCurrencyRate,
   validateTickerSymbol,
+  validateDateRange,
+  validateEntityForm,
+  validateWithConfirmation,
   initializeValidation,
   clearValidation,
 };

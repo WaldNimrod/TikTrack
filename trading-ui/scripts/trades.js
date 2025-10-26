@@ -1456,65 +1456,40 @@ function enableTradeFormFields() {
  *
  * @returns {boolean} true אם הטופס תקין, false אם לא
  */
+/**
+ * ולידציה של טופס טרייד
+ * @deprecated השתמש ב-window.validateForm() או window.validateEntityForm() במקום
+ */
 function validateTradeForm() {
-  // הגדרת כללי הוולידציה לפי אילוצי בסיס הנתונים
-  const validationRules = {
-    'addTradeAccountId': { required: true, type: 'select' },
-    'addTradeTickerId': { required: true, type: 'select' },
-    'addTradeTradePlanId': { required: true, type: 'select' },
-    'addTradeStatus': {
-      required: false,
-      type: 'select',
-      enum: ['open', 'closed', 'cancelled'],
-    },
-    'addTradeType': {
-      required: false,
-      type: 'select',
-      enum: ['swing', 'investment', 'passive'],
-    },
-    'addTradeSide': {
-      required: false,
-      type: 'select',
-      enum: ['Long', 'Short'],
-    },
-    'addTradeOpenedAt': {
-      required: false,
-      type: 'datetime-local',
-      conditionalRequired: {
-        field: 'addTradeStatus',
-        value: 'open',
-        message: 'תאריך פתיחה הוא חובה עבור טריידים פתוחים',
-      },
-    },
-    'addTradeClosedAt': {
-      required: false,
-      type: 'datetime-local',
-      conditionalRequired: {
-        field: 'addTradeStatus',
-        value: 'closed',
-        message: 'תאריך סגירה הוא חובה עבור טריידים סגורים',
-      },
-      customValidation(value, formData) {
-        const openedAt = formData['addTradeOpenedAt'];
-        if (value && openedAt) {
-          const openedDate = new Date(openedAt);
-          const closedDate = new Date(value);
-          if (closedDate <= openedDate) {
-            return { isValid: false, message: 'תאריך סגירה חייב להיות אחרי תאריך פתיחה' };
-          }
-        }
-        return { isValid: true };
-      },
-    },
-  };
-
-  // שימוש בפונקציה הכללית לוולידציה
-  if (typeof window.validateForm === 'function') {
-    return window.validateForm('addTradeForm', validationRules);
-  } else {
-    // window.Logger.warn('⚠️ validateForm function not found - validation-utils.js not loaded, skipping validation', { page: "trades" });
-    return { isValid: true, errors: {}, errorMessages: [] };
+  const fieldConfigs = [
+    {id: 'addTradeAccountId', name: 'חשבון מסחר', rules: {required: true}},
+    {id: 'addTradeTickerId', name: 'טיקר', rules: {required: true}},
+    {id: 'addTradeTradePlanId', name: 'תוכנית טרייד', rules: {required: true}},
+    {id: 'addTradeStatus', name: 'סטטוס', rules: {required: false}},
+    {id: 'addTradeType', name: 'סוג טרייד', rules: {required: false}},
+    {id: 'addTradeSide', name: 'צד', rules: {required: false}},
+    {id: 'addTradeOpenedAt', name: 'תאריך פתיחה', rules: {required: false}},
+    {id: 'addTradeClosedAt', name: 'תאריך סגירה', rules: {required: false}}
+  ];
+  
+  const result = window.validateEntityForm('addTradeForm', fieldConfigs);
+  
+  // בדיקת ולידציה בין שדות תאריך
+  if (result.isValid) {
+    const dateValidation = window.validateDateRange('addTradeOpenedAt', 'addTradeClosedAt', 'תאריך סגירה חייב להיות אחרי תאריך פתיחה');
+    if (!dateValidation) {
+      result.isValid = false;
+      result.errorMessages.push('תאריך סגירה חייב להיות אחרי תאריך פתיחה');
+    }
   }
+  
+  if (!result.isValid && result.errorMessages.length > 0) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאות ולידציה', result.errorMessages.join('\n'));
+    }
+  }
+  
+  return result.isValid;
 }
 
 /**
@@ -1724,7 +1699,6 @@ async function saveNewTradeRecord() {
         closed_at: closedAtElement ? closedAtElement.value || null : null,
         notes: notesElement ? notesElement.value || null : null,
       };
-    })();
 
   // בדיקה אם איסוף הנתונים נכשל
   if (!formData) {
@@ -2459,31 +2433,10 @@ function setupDateValidation() {
 
 /**
  * בדיקת ולידציה של שדות תאריך
+ * @deprecated השתמש ב-window.validateDateRange() במקום
  */
 function validateDateFields() {
-  const openedAtField = document.getElementById('editTradeOpenedAt');
-  const closedAtField = document.getElementById('editTradeClosedAt');
-
-  if (!openedAtField || !closedAtField) {return;}
-
-  const openedAt = openedAtField.value;
-  const closedAt = closedAtField.value;
-
-  // הסרת הודעות שגיאה קודמות
-  clearDateValidationMessages();
-
-  if (openedAt && closedAt) {
-    const openedDate = new Date(openedAt);
-    const closedDate = new Date(closedAt);
-
-    if (closedDate < openedDate) {
-      showDateValidationError('תאריך סגירה לא יכול להיות לפני תאריך יצירה');
-      closedAtField.classList.add('is-invalid');
-    } else {
-      closedAtField.classList.remove('is-invalid');
-      closedAtField.classList.add('is-valid');
-    }
-  }
+  return window.validateDateRange('editTradeOpenedAt', 'editTradeClosedAt', 'תאריך סגירה לא יכול להיות לפני תאריך יצירה');
 }
 
 /**

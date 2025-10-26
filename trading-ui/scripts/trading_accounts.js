@@ -1043,56 +1043,29 @@ function createTradingAccountModal(mode, tradingAccount = null) {
  * @param {Object} tradingAccountData - נתוני החשבון המסחר
  * @returns {Object} - תוצאה עם isValid ו-message
  */
+/**
+ * ולידציה של נתוני חשבון מסחר
+ * @deprecated השתמש ב-window.validateEntityForm() במקום
+ */
 function validateTradingAccountData(tradingAccountData) {
-  // בדיקת שם החשבון
-  if (!tradingAccountData.name || tradingAccountData.name.trim() === '') {
-    return { isValid: false, message: 'שם החשבון הוא שדה חובה' };
-  }
-
-  const trimmedName = tradingAccountData.name.trim();
-
-  if (trimmedName.length < 3) {
-    return { isValid: false, message: 'שם החשבון חייב להכיל לפחות 3 תווים' };
-  }
-
-  if (trimmedName.length > 50) {
-    return { isValid: false, message: 'שם החשבון לא יכול לעלות על 50 תווים' };
-  }
-
-  // בדיקת תווים לא חוקיים
-  const invalidChars = /[<>"'&]/;
-  if (invalidChars.test(trimmedName)) {
-    return { isValid: false, message: 'שם החשבון מכיל תווים לא חוקיים' };
-  }
-
-  // בדיקת מטבע
-  if (!tradingAccountData.currency_id || tradingAccountData.currency_id === '') {
-    return { isValid: false, message: 'יש לבחור מטבע' };
-  }
-
-  // בדיקת סטטוס
-  if (tradingAccountData.status && !['open', 'closed'].includes(tradingAccountData.status)) {
-    return { isValid: false, message: 'סטטוס חשבון לא תקין - רק פתוח או סגור מותרים' };
-  }
-
-  // בדיקת יתרת מזומן
-  const cashBalance = tradingAccountData.cash_balance;
-  if (cashBalance !== null && cashBalance !== undefined && cashBalance !== '') {
-    const numBalance = parseFloat(cashBalance);
-    if (isNaN(numBalance)) {
-      return { isValid: false, message: 'יתרת מזומן חייבת להיות מספר תקין' };
-    }
-    if (numBalance < -1000000) {
-      return { isValid: false, message: 'יתרת מזומן נמוכה מדי (מינימום -1,000,000)' };
-    }
-    if (numBalance > 100000000) {
-      return { isValid: false, message: 'יתרת מזומן גבוהה מדי (מקסימום 100,000,000)' };
+  const fieldConfigs = [
+    {id: 'tradingAccountName', name: 'שם החשבון', rules: {required: true, minLength: 3, maxLength: 50}},
+    {id: 'tradingAccountCurrency', name: 'מטבע', rules: {required: true}},
+    {id: 'tradingAccountStatus', name: 'סטטוס', rules: {required: false}},
+    {id: 'tradingAccountCashBalance', name: 'יתרת מזומן', rules: {required: false, min: -1000000, max: 100000000}},
+    {id: 'tradingAccountTotalValue', name: 'ערך כולל', rules: {required: false, min: 0, max: 100000000}}
+  ];
+  
+  const result = window.validateEntityForm('tradingAccountForm', fieldConfigs);
+  
+  if (!result.isValid && result.errorMessages.length > 0) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאות ולידציה', result.errorMessages.join('\n'));
     }
   }
-
-  // בדיקת ערך כולל
-  const totalValue = tradingAccountData.total_value;
-  if (totalValue !== null && totalValue !== undefined && totalValue !== '') {
+  
+  return {isValid: result.isValid, message: result.errorMessages.join(', ')};
+}
     const numValue = parseFloat(totalValue);
     if (isNaN(numValue)) {
       return { isValid: false, message: 'ערך כולל חייב להיות מספר תקין' };

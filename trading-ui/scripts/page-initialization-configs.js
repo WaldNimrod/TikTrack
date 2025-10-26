@@ -756,31 +756,6 @@ const PAGE_CONFIGS = {
         ]
     },
     
-    'crud-testing-dashboard': {
-        name: 'CRUD Testing',
-        
-        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
-        packages: ['base', 'init-system'],
-        
-        requiredGlobals: [
-            'NotificationSystem',
-            'DataUtils'
-        ],
-        
-        requiresFilters: false,
-        requiresValidation: true,
-        requiresTables: true,
-        customInitializers: [
-            async (pageConfig) => {
-                window.Logger.info('🧪 Initializing CRUD Testing...', { page: "page-initialization-configs" });
-                
-                if (typeof window.initializeCRUDTesting === 'function') {
-                    await window.initializeCRUDTesting();
-                }
-            }
-        ]
-    },
-    
     'external-data-dashboard': {
         name: 'External Data',
         

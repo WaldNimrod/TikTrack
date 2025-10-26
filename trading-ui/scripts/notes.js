@@ -1184,36 +1184,27 @@ async function populateEditSelectByType(relationType, selectedId) {
  * @param {File} attachment - Attachment file
  * @returns {boolean} Whether the form is valid
  */
+/**
+ * ולידציה של טופס הערה
+ * @deprecated השתמש ב-window.validateEntityForm() במקום
+ */
 function validateNoteForm(content, relationType, relatedId, attachment) {
-  try {
-    let isValid = true;
-
-    // ניקוי שגיאות קודמות
-    clearNoteValidationErrors();
-
-  // וולידציה של תוכן
-  if (!content) {
-    window.showValidationWarning('contentError', 'תוכן הערה הוא שדה חובה');
-    isValid = false;
-  } else if (content.length < 1) {
-    window.showValidationWarning('contentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
-    isValid = false;
-  } else if (content.length > 10000) {
-    window.showValidationWarning('contentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
-    isValid = false;
-  } else {
-    // Content validation passed
+  const fieldConfigs = [
+    {id: 'noteContent', name: 'תוכן הערה', rules: {required: true, minLength: 1, maxLength: 10000}},
+    {id: 'noteRelationType', name: 'סוג קשר', rules: {required: true}},
+    {id: 'noteRelatedId', name: 'מזהה קשור', rules: {required: true}}
+  ];
+  
+  const result = window.validateEntityForm('noteForm', fieldConfigs);
+  
+  if (!result.isValid && result.errorMessages.length > 0) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאות ולידציה', result.errorMessages.join('\n'));
+    }
   }
-
-  // וולידציה של סוג קשר
-  if (!relationType) {
-    window.showValidationWarning('relationTypeError', 'יש לבחור סוג אובייקט לשיוך');
-    isValid = false;
-  }
-
-  // וולידציה של אובייקט קשור
-  if (!relatedId) {
-    window.showValidationWarning('relatedObjectError', 'יש לבחור אובייקט לשיוך');
+  
+  return result.isValid;
+}
     isValid = false;
   } else if (isNaN(parseInt(relatedId)) || parseInt(relatedId) <= 0) {
     window.showValidationWarning('relatedObjectError', 'מזהה אובייקט לא תקין');

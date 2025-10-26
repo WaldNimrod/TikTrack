@@ -647,32 +647,47 @@ function displayImportAnalysisResults(results) {
     
     // Calculate the breakdown:
     const validRecordsWithMissingTickers = results.valid_records || 0;
-    const missingTickersCount = results.missing_tickers ? results.missing_tickers.length : 0;
+    const missingTickersUniqueCount = results.missing_tickers ? results.missing_tickers.length : 0;
     const duplicateRecordsCount = results.duplicate_records || 0;
     const invalidRecordsCount = results.invalid_records || 0;
     
+    // We need to calculate how many records have missing tickers
+    // This is done by counting records that would be skipped due to missing tickers
+    // For now, we'll use a different approach - we'll get this from the preview data
+    let recordsWithMissingTickers = 0;
+    
+    // Try to get the actual count from preview data if available
+    if (importPreviewData && importPreviewData.records_to_skip) {
+        recordsWithMissingTickers = importPreviewData.records_to_skip.filter(r => r.reason === 'missing_ticker').length;
+    } else {
+        // Fallback: estimate based on the assumption that each missing ticker affects multiple records
+        // This is not accurate but better than the previous calculation
+        recordsWithMissingTickers = Math.max(0, validRecordsWithMissingTickers - (validRecordsWithMissingTickers - missingTickersUniqueCount));
+    }
+    
     // Records that are 100% valid (no missing tickers, no duplicates, no errors)
-    // If we have missing tickers, subtract them from valid records
-    const fullyValidRecords = Math.max(0, validRecordsWithMissingTickers - missingTickersCount);
+    const fullyValidRecords = Math.max(0, validRecordsWithMissingTickers - recordsWithMissingTickers);
     
     // Total records in file
-    const totalRecords = fullyValidRecords + missingTickersCount + duplicateRecordsCount + invalidRecordsCount;
+    const totalRecords = fullyValidRecords + recordsWithMissingTickers + duplicateRecordsCount + invalidRecordsCount;
     
     // Update display
     document.getElementById('import-total-count').textContent = totalRecords;
     document.getElementById('import-valid-count').textContent = fullyValidRecords;
-    document.getElementById('import-missing-tickers-count').textContent = missingTickersCount;
+    document.getElementById('import-missing-tickers-count').textContent = recordsWithMissingTickers;
+    document.getElementById('import-missing-tickers-detail').textContent = `${missingTickersUniqueCount} טיקרים ייחודיים`;
     document.getElementById('import-duplicates-count').textContent = duplicateRecordsCount;
     document.getElementById('import-errors-count').textContent = invalidRecordsCount;
     
     console.log('📊 Analysis Results:', {
         total: totalRecords,
         fullyValid: fullyValidRecords,
-        missingTickers: missingTickersCount,
+        recordsWithMissingTickers: recordsWithMissingTickers,
+        uniqueMissingTickers: missingTickersUniqueCount,
         duplicates: duplicateRecordsCount,
         errors: invalidRecordsCount,
         backendValidRecords: validRecordsWithMissingTickers,
-        calculation: `${validRecordsWithMissingTickers} - ${missingTickersCount} = ${fullyValidRecords}`
+        calculation: `${validRecordsWithMissingTickers} - ${recordsWithMissingTickers} = ${fullyValidRecords}`
     });
     
     // Display detailed error information

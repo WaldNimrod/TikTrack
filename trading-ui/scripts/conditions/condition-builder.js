@@ -22,17 +22,17 @@ class ConditionBuilder {
      */
     initializeTranslations() {
         this.translations = {
-            selectMethod: this.getTranslation('conditions.select_method'),
-            addCondition: this.getTranslation('conditions.add_condition'),
-            editCondition: this.getTranslation('conditions.edit_condition'),
-            deleteCondition: this.getTranslation('conditions.delete_condition'),
-            saveCondition: this.getTranslation('conditions.save_condition'),
-            cancel: this.getTranslation('conditions.cancel'),
-            loading: this.getTranslation('conditions.loading'),
-            error: this.getTranslation('conditions.error'),
-            success: this.getTranslation('conditions.success'),
-            warning: this.getTranslation('conditions.warning'),
-            info: this.getTranslation('conditions.info')
+            selectMethod: 'בחר שיטת מסחר',
+            addCondition: 'הוסף תנאי',
+            editCondition: 'ערוך תנאי',
+            deleteCondition: 'מחק תנאי',
+            saveCondition: 'שמור תנאי',
+            cancel: 'ביטול',
+            loading: 'טוען...',
+            error: 'שגיאה',
+            success: 'הצלחה',
+            warning: 'אזהרה',
+            info: 'מידע'
         };
     }
     
@@ -55,13 +55,76 @@ class ConditionBuilder {
      */
     async loadMethods() {
         try {
-            const response = await fetch('/api/trading-methods');
-            if (!response.ok) {
-                throw new Error('Failed to load methods');
-            }
-            
-            const data = await response.json();
-            this.methods = data.methods || [];
+            // Use static methods data instead of API call
+            this.methods = [
+                {
+                    id: 1,
+                    name: 'moving_average',
+                    display_name: 'ממוצעים נעים',
+                    category: 'technical',
+                    description: 'ניתוח ממוצעים נעים פשוטים ומורכבים',
+                    parameters: [
+                        { name: 'period', type: 'number', label: 'תקופה', min: 1, max: 200, default: 20 },
+                        { name: 'threshold', type: 'number', label: 'סף', min: 0.1, max: 10, default: 1.0 },
+                        { name: 'timeframe', type: 'select', label: 'מסגרת זמן', options: ['1m', '5m', '15m', '1h', '4h', '1d'], default: '1d' }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: 'volume_analysis',
+                    display_name: 'ניתוח נפח',
+                    category: 'technical',
+                    description: 'ניתוח נפח מסחר וזיהוי אנומליות',
+                    parameters: [
+                        { name: 'volume_threshold', type: 'number', label: 'סף נפח', min: 1, max: 1000, default: 2.0 },
+                        { name: 'comparison_period', type: 'number', label: 'תקופת השוואה', min: 5, max: 50, default: 20 }
+                    ]
+                },
+                {
+                    id: 3,
+                    name: 'support_resistance',
+                    display_name: 'תמיכה והתנגדות',
+                    category: 'technical',
+                    description: 'זיהוי רמות תמיכה והתנגדות',
+                    parameters: [
+                        { name: 'strength', type: 'select', label: 'חוזק', options: ['weak', 'medium', 'strong'], default: 'medium' },
+                        { name: 'tolerance', type: 'number', label: 'סובלנות', min: 0.1, max: 5.0, default: 1.0 }
+                    ]
+                },
+                {
+                    id: 4,
+                    name: 'trend_lines',
+                    display_name: 'קווי מגמה',
+                    category: 'technical',
+                    description: 'זיהוי קווי מגמה ושבירתם',
+                    parameters: [
+                        { name: 'min_touches', type: 'number', label: 'מינימום נגיעות', min: 2, max: 10, default: 3 },
+                        { name: 'angle_threshold', type: 'number', label: 'סף זווית', min: 5, max: 45, default: 15 }
+                    ]
+                },
+                {
+                    id: 5,
+                    name: 'technical_patterns',
+                    display_name: 'דפוסים טכניים',
+                    category: 'technical',
+                    description: 'זיהוי דפוסים טכניים קלאסיים',
+                    parameters: [
+                        { name: 'pattern_type', type: 'select', label: 'סוג דפוס', options: ['head_shoulders', 'double_top', 'double_bottom', 'triangle'], default: 'head_shoulders' },
+                        { name: 'confidence', type: 'number', label: 'רמת ביטחון', min: 0.5, max: 1.0, default: 0.8 }
+                    ]
+                },
+                {
+                    id: 6,
+                    name: 'fibonacci_levels',
+                    display_name: 'רמות פיבונאצ\'י',
+                    category: 'technical',
+                    description: 'ניתוח רמות פיבונאצ\'י לזיהוי נקודות כניסה ויציאה',
+                    parameters: [
+                        { name: 'levels', type: 'multiselect', label: 'רמות', options: ['23.6%', '38.2%', '50%', '61.8%', '78.6%'], default: ['38.2%', '61.8%'] },
+                        { name: 'swing_period', type: 'number', label: 'תקופת swing', min: 10, max: 100, default: 50 }
+                    ]
+                }
+            ];
             
             // Group methods by category
             this.methodsByCategory = this.groupMethodsByCategory(this.methods);
@@ -722,7 +785,16 @@ class ConditionBuilder {
      * Helper methods
      */
     getTranslation(key) {
-        return window.translations && window.translations[key] ? window.translations[key] : key;
+        // Use internal translations first
+        if (this.translations && this.translations[key]) {
+            return this.translations[key];
+        }
+        // Fallback to window translations
+        if (window.translations && window.translations[key]) {
+            return window.translations[key];
+        }
+        // Return key as fallback
+        return key;
     }
     
     showNotification(message, type = 'info') {

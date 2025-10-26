@@ -24,7 +24,7 @@
  * - BackgroundLoader: Background loading for non-critical
  */
 
-window.Logger.info('📄 Loading preferences-lazy-loader.js v1.0.0...', { page: "preferences-lazy-loader" });
+// window.Logger.info('📄 Loading preferences-lazy-loader.js v1.0.0...', { page: "preferences-lazy-loader" });
 
 // ============================================================================
 // PREFERENCE CLASSIFIER
@@ -135,11 +135,13 @@ class PreferenceClassifier {
             // LOW - Load in background or on demand
             low: [
                 // Console logs
+                'console_logs_initialization_enabled',
                 'console_logs_business_enabled',
-                'console_logs_development_enabled',
                 'console_logs_performance_enabled',
                 'console_logs_system_enabled',
-                'console_logs_ui_enabled',
+                'console_logs_ui_components_enabled',
+                'console_logs_cache_enabled',
+                'console_logs_notifications_enabled',
                 
                 // Advanced chart settings
                 'chartInteractive',
@@ -234,11 +236,11 @@ class LazyLoader {
      * @param {number} profileId - Profile ID
      */
     async initialize(userId = 1, profileId = 3) {
-        window.Logger.info('🚀 Initializing lazy loading system...', { page: "preferences-lazy-loader" });
+        // window.Logger.info('🚀 Initializing lazy loading system...', { page: "preferences-lazy-loader" });
         
         // Check if PreferencesCore is available
         if (!window.PreferencesCore) {
-            window.Logger.warn('⚠️ PreferencesCore not available, skipping lazy loading initialization', { page: "preferences-lazy-loader" });
+            // window.Logger.warn('⚠️ PreferencesCore not available, skipping lazy loading initialization', { page: "preferences-lazy-loader" });
             return;
         }
         
@@ -248,7 +250,7 @@ class LazyLoader {
         // Start background loading for high priority
         this.startBackgroundLoading(userId, profileId);
         
-        window.Logger.info('✅ Lazy loading system initialized', { page: "preferences-lazy-loader" });
+        // window.Logger.info('✅ Lazy loading system initialized', { page: "preferences-lazy-loader" });
     }
     
     /**
@@ -260,7 +262,7 @@ class LazyLoader {
         const criticalPrefs = this.classifier.getPreferencesByClassification('critical');
         this.loadingStats.critical.total = criticalPrefs.length;
         
-        window.Logger.info(`🔥 Loading ${criticalPrefs.length} critical preferences...`, { page: "preferences-lazy-loader" });
+        // window.Logger.info(`🔥 Loading ${criticalPrefs.length} critical preferences...`, { page: "preferences-lazy-loader" });
         
         try {
             // Load all preferences at once from API
@@ -286,10 +288,10 @@ class LazyLoader {
                 }
             }
             
-            window.Logger.info(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences`, { page: "preferences-lazy-loader" });
+            // window.Logger.info(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences`, { page: "preferences-lazy-loader" });
             
         } catch (error) {
-            window.Logger.error('❌ Error loading critical preferences:', error, { page: "preferences-lazy-loader" });
+            // window.Logger.error('❌ Error loading critical preferences:', error, { page: "preferences-lazy-loader" });
             // Fallback to individual loading
             const promises = criticalPrefs.map(async (prefName) => {
                 try {
@@ -298,7 +300,7 @@ class LazyLoader {
                     this.loadingStats.critical.loaded++;
                     return { name: prefName, value, success: true };
                 } catch (error) {
-                    window.Logger.warn(`⚠️ Failed to load critical preference ${prefName}:`, error, { page: "preferences-lazy-loader" });
+                    // window.Logger.warn(`⚠️ Failed to load critical preference ${prefName}:`, error, { page: "preferences-lazy-loader" });
                     return { name: prefName, value: null, success: false, error };
                 }
             });
@@ -306,7 +308,7 @@ class LazyLoader {
             const results = await Promise.all(promises);
             const successCount = results.filter(r => r.success).length;
             
-            window.Logger.info(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences (fallback, { page: "preferences-lazy-loader" })`);
+            // window.Logger.info(`✅ Loaded ${successCount}/${criticalPrefs.length} critical preferences (fallback, { page: "preferences-lazy-loader" })`);
         }
     }
     

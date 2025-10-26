@@ -253,11 +253,13 @@ async function loadPreferencesOverview() {
     ];
 
     const consoleLogs = [
+      { key: 'console_logs_initialization_enabled', title: 'לוגי אתחול מערכות', type: 'boolean' },
       { key: 'console_logs_system_enabled', title: 'לוגים מערכתיים', type: 'boolean' },
       { key: 'console_logs_business_enabled', title: 'לוגים עסקיים', type: 'boolean' },
-      { key: 'console_logs_ui_enabled', title: 'לוגים ממשק משתמש', type: 'boolean' },
-      { key: 'console_logs_development_enabled', title: 'לוגים פיתוח', type: 'boolean' },
-      { key: 'console_logs_performance_enabled', title: 'לוגים ביצועים', type: 'boolean' }
+      { key: 'console_logs_performance_enabled', title: 'לוגים ביצועים', type: 'boolean' },
+      { key: 'console_logs_ui_components_enabled', title: 'לוגי רכיבי ממשק', type: 'boolean' },
+      { key: 'console_logs_cache_enabled', title: 'לוגי מטמון', type: 'boolean' },
+      { key: 'console_logs_notifications_enabled', title: 'לוגי התראות', type: 'boolean' }
     ];
 
     let html = '<div class="preferences-list">';
@@ -2132,11 +2134,13 @@ async function loadPreferencesOverview() {
     ];
 
     const consoleLogs = [
+      { key: 'console_logs_initialization_enabled', title: 'לוגי אתחול מערכות', type: 'boolean' },
       { key: 'console_logs_system_enabled', title: 'לוגים מערכתיים', type: 'boolean' },
       { key: 'console_logs_business_enabled', title: 'לוגים עסקיים', type: 'boolean' },
-      { key: 'console_logs_ui_enabled', title: 'לוגים ממשק משתמש', type: 'boolean' },
-      { key: 'console_logs_development_enabled', title: 'לוגים פיתוח', type: 'boolean' },
-      { key: 'console_logs_performance_enabled', title: 'לוגים ביצועים', type: 'boolean' }
+      { key: 'console_logs_performance_enabled', title: 'לוגים ביצועים', type: 'boolean' },
+      { key: 'console_logs_ui_components_enabled', title: 'לוגי רכיבי ממשק', type: 'boolean' },
+      { key: 'console_logs_cache_enabled', title: 'לוגי מטמון', type: 'boolean' },
+      { key: 'console_logs_notifications_enabled', title: 'לוגי התראות', type: 'boolean' }
     ];
 
     let html = '<div class="preferences-list">';

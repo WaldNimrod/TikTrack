@@ -14,6 +14,8 @@ Last Updated: 2025-01-16
 from typing import List, Dict, Any, Optional, Tuple
 from datetime import datetime
 import logging
+import os
+import json
 from sqlalchemy.orm import Session
 
 from models.import_session import ImportSession
@@ -22,6 +24,7 @@ from models.ticker import Ticker
 from .normalization_service import NormalizationService
 from .validation_service import ValidationService
 from .duplicate_detection_service import DuplicateDetectionService
+from services.user_data_import.report_generator import ImportReportGenerator
 from connectors.user_data_import.ibkr_connector import IBKRConnector
 from connectors.user_data_import.demo_connector import DemoConnector
 
@@ -50,12 +53,87 @@ class ImportOrchestrator:
         self.normalization_service = NormalizationService()
         self.validation_service = ValidationService()
         self.duplicate_detection_service = DuplicateDetectionService(db_session)
+        self.report_generator = ImportReportGenerator()
         
         # Available connectors
         self.connectors = {
             'ibkr': IBKRConnector(),
             'demo': DemoConnector()
         }
+    
+    def create_live_report(self, session_id: int, user_id: int, 
+                          step: str, data: Dict[str, Any] = None) -> str:
+        """
+        Create or update a live import report.
+        
+        Args:
+            session_id: Import session ID
+            user_id: User ID
+            step: Current step name
+            data: Step-specific data
+            
+        Returns:
+            str: Path to the report file
+        """
+        try:
+            # Get or create report file
+            user_dir = self.report_generator.get_user_report_dir(user_id)
+            report_filename = f"import_live_report_{session_id}.json"
+            report_path = os.path.join(user_dir, report_filename)
+            
+            # Load existing report or create new one
+            if os.path.exists(report_path):
+                with open(report_path, 'r', encoding='utf-8') as f:
+                    report = json.load(f)
+            else:
+                report = {
+                    "session_info": {
+                        "session_id": session_id,
+                        "user_id": user_id,
+                        "created_at": datetime.now().isoformat(),
+                        "report_version": "1.0"
+                    },
+                    "steps": {},
+                    "summary": {
+                        "current_step": step,
+                        "total_steps": 6,
+                        "progress_percentage": 0
+                    }
+                }
+            
+            # Update current step
+            report["steps"][step] = {
+                "timestamp": datetime.now().isoformat(),
+                "data": data or {}
+            }
+            
+            # Update progress
+            step_number = self._get_step_number(step)
+            report["summary"]["current_step"] = step
+            report["summary"]["progress_percentage"] = (step_number / 6) * 100
+            
+            # Save updated report
+            with open(report_path, 'w', encoding='utf-8') as f:
+                json.dump(report, f, indent=2, ensure_ascii=False)
+            
+            logger.info(f"Updated live report for session {session_id}, step: {step}")
+            return report_path
+            
+        except Exception as e:
+            logger.error(f"Failed to create/update live report: {str(e)}")
+            raise
+    
+    def _get_step_number(self, step: str) -> int:
+        """Get step number for progress calculation."""
+        step_mapping = {
+            "file_upload": 1,
+            "account_selection": 2,
+            "analysis": 3,
+            "problem_resolution": 4,
+            "preview": 5,
+            "confirmation": 6
+        }
+        return step_mapping.get(step, 0)
     
     def create_import_session(self, account_id: int, file_name: str, 
                             file_content: str) -> Dict[str, Any]:
@@ -97,6 +175,19 @@ class ImportOrchestrator:
                 'connector_type': connector.get_provider_name().lower()
             })
             self.db_session.commit()
+            
+            # Create live report for this session
+            user_id = 1  # TODO: Get actual user ID from session/auth
+            self.create_live_report(
+                session_id=session.id,
+                user_id=user_id,
+                step="file_upload",
+                data={
+                    "file_name": file_name,
+                    "provider": connector.get_provider_name(),
+                    "connector_info": connector.get_connector_info()
+                }
+            )
             
             return {
                 'success': True,
@@ -182,13 +273,26 @@ class ImportOrchestrator:
                 'invalid_records': len(validation_result['invalid_records']),
                 'duplicate_records': len(duplicate_result['within_file_duplicates']) + 
                                    len(duplicate_result['system_duplicates']),
-                'analysis_timestamp': datetime.now().isoformat()
+                'analysis_timestamp': datetime.now().isoformat(),
+                # Add detailed data for step 4
+                'normalization_errors': normalization_result.get('errors', []),
+                'validation_errors': validation_result.get('errors', []),
+                'duplicate_details': duplicate_result
             }
             
             # Update session with minimal data
             session.add_summary_data(summary_data)
             session.update_status('ready')
             self.db_session.commit()
+            
+            # Update live report with analysis results
+            user_id = 1  # TODO: Get actual user ID from session/auth
+            self.create_live_report(
+                session_id=session.id,
+                user_id=user_id,
+                step="analysis",
+                data=analysis_results
+            )
             
             return {
                 'success': True,
@@ -215,28 +319,66 @@ class ImportOrchestrator:
             Dict[str, Any]: Preview data
         """
         try:
+            logger.info(f"🔍 Starting generate_preview for session {session_id}")
             # Get session
             session = self.db_session.query(ImportSession).filter(
                 ImportSession.id == session_id
             ).first()
             
             if not session:
+                logger.error(f"❌ Session {session_id} not found")
                 return {'success': False, 'error': 'Session not found'}
             
-            # Get analysis results
-            analysis_results = session.get_summary_data()
-            if not analysis_results:
-                return {'success': False, 'error': 'No analysis results found'}
+            logger.info(f"✅ Session {session_id} found, status: {session.status}")
+            
+            # Re-analyze the file to get current data (since we don't store detailed results)
+            file_content = session.get_summary_data('file_content')
+            connector_type = session.get_summary_data('connector_type')
+            logger.info(f"📁 File content length: {len(file_content) if file_content else 0}, connector: {connector_type}")
+            
+            connector = self.connectors.get(connector_type)
+            
+            if not connector:
+                logger.error(f"❌ Connector {connector_type} not found")
+                return {'success': False, 'error': 'Connector not found'}
+            
+            logger.info(f"✅ Connector {connector_type} found")
+            
+            # Parse and process the file again
+            logger.info(f"🔄 Parsing file: {session.file_name}")
+            raw_records = connector.parse_file(file_content, session.file_name)
+            logger.info(f"📊 Parsed {len(raw_records)} raw records")
+            
+            # Normalize records
+            logger.info("🔄 Normalizing records...")
+            normalization_result = self.normalization_service.normalize_records(
+                raw_records, connector
+            )
+            logger.info(f"📊 Normalized {len(normalization_result['normalized_records'])} records")
+            
+            # Validate records
+            logger.info("🔄 Validating records...")
+            validation_result = self.validation_service.validate_records(
+                normalization_result['normalized_records']
+            )
+            logger.info(f"📊 Valid: {len(validation_result['valid_records'])}, Invalid: {len(validation_result['invalid_records'])}")
+            
+            # Detect duplicates
+            logger.info("🔄 Detecting duplicates...")
+            duplicate_result = self.duplicate_detection_service.detect_duplicates(
+                validation_result['valid_records'],
+                session.account_id
+            )
+            logger.info(f"📊 Clean: {len(duplicate_result['clean_records'])}, Duplicates: {len(duplicate_result['within_file_duplicates']) + len(duplicate_result['system_duplicates'])}")
             
             # Prepare records for import (clean records only)
-            duplicate_details = analysis_results.get('duplicate_details', {})
-            clean_records = duplicate_details.get('clean_records', [])
+            clean_records = duplicate_result['clean_records']
             
             # Prepare records to skip (duplicates and invalid)
             records_to_skip = []
             
             # Add invalid records
-            validation_errors = analysis_results.get('validation_errors', [])
+            validation_errors = validation_result['validation_errors']
             for error_info in validation_errors:
                 records_to_skip.append({
                     'record': error_info['record'],
@@ -244,26 +386,55 @@ class ImportOrchestrator:
                     'errors': error_info['errors']
                 })
             
-            # Add duplicate records
-            within_file_duplicates = duplicate_details.get('within_file_duplicates', [])
+            # Add duplicate records (main record + all matching records)
+            within_file_duplicates = duplicate_result['within_file_duplicates']
             for duplicate in within_file_duplicates:
+                # Add main duplicate record
                 records_to_skip.append({
                     'record': duplicate['record'],
                     'reason': 'within_file_duplicate',
                     'confidence_score': duplicate.get('confidence_score', 0),
-                    'match_count': len(duplicate.get('within_file_matches', []))
+                    'match_count': len(duplicate.get('within_file_matches', [])),
+                    'details': duplicate  # Add full duplicate details
                 })
+                
+                # Add all matching records
+                for match in duplicate.get('within_file_matches', []):
+                    records_to_skip.append({
+                        'record': match['record'],
+                        'reason': 'within_file_duplicate_match',
+                        'confidence_score': match.get('confidence', 0),
+                        'match_count': 1,
+                        'details': match  # Add match details
+                    })
             
-            system_duplicates = duplicate_details.get('system_duplicates', [])
+            system_duplicates = duplicate_result['system_duplicates']
             for duplicate in system_duplicates:
+                # Add main duplicate record
                 records_to_skip.append({
                     'record': duplicate['record'],
                     'reason': 'system_duplicate',
                     'confidence_score': duplicate.get('confidence_score', 0),
-                    'match_count': len(duplicate.get('system_matches', []))
+                    'match_count': len(duplicate.get('system_matches', [])),
+                    'details': duplicate  # Add full duplicate details
                 })
+                
+                # Add all matching records
+                for match in duplicate.get('system_matches', []):
+                    records_to_skip.append({
+                        'record': match['record'],
+                        'reason': 'system_duplicate_match',
+                        'confidence_score': match.get('confidence', 0),
+                        'match_count': 1,
+                        'details': match  # Add match details
+                    })
+            
+            # Calculate total records
+            total_records = len(raw_records)
+            logger.info(f"📊 Total records: {total_records}")
             
             # Generate preview data
+            logger.info("🔄 Generating preview data...")
             preview_data = {
                 'records_to_import': [
                     {
@@ -286,21 +457,24 @@ class ImportOrchestrator:
                         'fee': record['record'].get('fee'),
                         'date': record['record'].get('date'),
                         'reason': record['reason'],
-                        'details': record.get('errors', []) if record['reason'] == 'validation_error' else None,
+                        'details': record.get('errors', []) if record['reason'] == 'validation_error' else record.get('details'),
                         'confidence_score': record.get('confidence_score', 0) if record['reason'].endswith('_duplicate') else None
                     }
                     for record in records_to_skip
                 ],
                 'summary': {
-                    'total_records': analysis_results.get('total_records', 0),
+                    'total_records': total_records,
                     'records_to_import': len(clean_records),
                     'records_to_skip': len(records_to_skip),
-                    'import_rate': (len(clean_records) / analysis_results.get('total_records', 1) * 100) if analysis_results.get('total_records', 0) > 0 else 0
+                    'import_rate': (len(clean_records) / total_records * 100) if total_records > 0 else 0
                 }
             }
             
             # Update session with preview data
+            logger.info("🔄 Updating session with preview data...")
             session.add_summary_data({'preview_data': preview_data})
+            
+            logger.info(f"✅ Preview generated successfully: {len(preview_data['records_to_import'])} to import, {len(preview_data['records_to_skip'])} to skip")
             
             return {
                 'success': True,
@@ -309,7 +483,10 @@ class ImportOrchestrator:
             }
             
         except Exception as e:
-            logger.error(f"Failed to generate preview: {str(e)}")
+            logger.error(f"❌ Failed to generate preview: {str(e)}")
+            logger.error(f"❌ Exception type: {type(e).__name__}")
+            import traceback
+            logger.error(f"❌ Traceback: {traceback.format_exc()}")
             return {
                 'success': False,
                 'error': str(e)
@@ -340,10 +517,12 @@ class ImportOrchestrator:
             # Update status to importing
             session.update_status('importing')
             
-            # Get preview data
-            preview_data = session.get_summary_data('preview_data')
-            if not preview_data:
-                return {'success': False, 'error': 'No preview data found'}
+            # Get preview data by regenerating it
+            preview_result = self.generate_preview(session_id)
+            if not preview_result['success']:
+                return {'success': False, 'error': 'Failed to generate preview data'}
+            
+            preview_data = preview_result['preview_data']
             
             # Import clean records
             records_to_import = preview_data.get('records_to_import', [])
@@ -373,6 +552,24 @@ class ImportOrchestrator:
             session.skipped_records = len(preview_data.get('records_to_skip', []))
             session.update_status('completed')
             
+            # Save original file to server
+            user_id = 1  # TODO: Get actual user ID from session/auth
+            file_content = session.get_summary_data('file_content')
+            file_name = session.file_name
+            
+            try:
+                saved_file_path = self.report_generator.save_import_file(
+                    user_id=user_id,
+                    session_id=session_id,
+                    file_content=file_content,
+                    file_name=file_name,
+                    status='completed'
+                )
+                logger.info(f"Saved import file: {saved_file_path}")
+            except Exception as e:
+                logger.error(f"Failed to save import file: {str(e)}")
+                # Don't fail the import if file saving fails
+            
             return {
                 'success': True,
                 'imported_count': imported_count,
@@ -384,6 +581,24 @@ class ImportOrchestrator:
         except Exception as e:
             logger.error(f"Failed to execute import: {str(e)}")
             session.update_status('failed')
+            
+            # Save original file even if import failed
+            try:
+                user_id = 1  # TODO: Get actual user ID from session/auth
+                file_content = session.get_summary_data('file_content')
+                file_name = session.file_name
+                
+                saved_file_path = self.report_generator.save_import_file(
+                    user_id=user_id,
+                    session_id=session_id,
+                    file_content=file_content,
+                    file_name=file_name,
+                    status='failed'
+                )
+                logger.info(f"Saved import file (failed): {saved_file_path}")
+            except Exception as save_error:
+                logger.error(f"Failed to save import file after error: {str(save_error)}")
+            
             return {
                 'success': False,
                 'error': str(e)

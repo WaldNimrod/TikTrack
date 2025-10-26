@@ -684,7 +684,7 @@ async function enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction
     
     return true;
   } catch (error) {
-    console.error(`❌ שגיאה ברענון טבלה אחרי ${operationName}:`, error);
+    if (window.Logger) { window.Logger.error(`❌ שגיאה ברענון טבלה אחרי ${operationName}:`, error, { page: "ui-utils" }); }
     return false;
   }
 }
@@ -736,7 +736,7 @@ async function handleApiResponseWithRefresh(response, options = {}) {
 
   } else if (response.status === 404) {
     // פריט לא קיים - טיפול ב-404
-    console.warn(`${itemName} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
+    if (window.Logger) { window.Logger.warn(`${itemName} כבר לא קיים בבסיס הנתונים, מרענן נתונים`, { page: "ui-utils" }); }
     
     if (typeof onNotFound === 'function') {
       await onNotFound();
@@ -754,7 +754,7 @@ async function handleApiResponseWithRefresh(response, options = {}) {
   } else {
     // שגיאה אחרת
     const errorResponse = await response.text();
-    console.error(`שגיאה ב${operationName}:`, errorResponse);
+    if (window.Logger) { window.Logger.error(`שגיאה ב${operationName}:`, errorResponse, { page: "ui-utils" }); }
     
     try {
       const errorData = JSON.parse(errorResponse);
@@ -827,7 +827,7 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
   if (loadData) {
     await enhancedTableRefresh(loadData, updateActive, operationName);
   } else {
-    console.warn('לא נמצאה פונקציית טעינת נתונים לעמוד הנוכחי');
+    if (window.Logger) { window.Logger.warn('לא נמצאה פונקציית טעינת נתונים לעמוד הנוכחי', { page: "ui-utils" }); }
     location.reload(); // fallback
   }
 }
@@ -854,45 +854,45 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
  * @param {string} sectionId - The ID of the section to toggle
  */
 window.toggleSection = function (sectionId) {
-  console.log(`🚀 ===== toggleSection CALLED =====`);
+  if (window.Logger) { window.Logger.debug(`🚀 ===== toggleSection CALLED =====`, { page: "ui-utils" }); }
   console.log(`📋 Function called at: ${new Date().toISOString()}`);
-  console.log(`📋 Section ID: "${sectionId}"`);
-  console.log(`📋 Function type: ${typeof window.toggleSection}`);
+  if (window.Logger) { window.Logger.debug(`📋 Section ID: "${sectionId}"`, { page: "ui-utils" }); }
+  if (window.Logger) { window.Logger.debug(`📋 Function type: ${typeof window.toggleSection}`, { page: "ui-utils" }); }
   
   try {
-    console.log(`🔧 toggleSection called with sectionId: "${sectionId}"`);
+    if (window.Logger) { window.Logger.debug(`🔧 toggleSection called with sectionId: "${sectionId}"`, { page: "ui-utils" }); }
     
     const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
     console.log(`🔍 Section found:`, section ? 'YES' : 'NO', section ? `(ID: ${section.id || 'no-id'}, data-section: ${section.getAttribute('data-section') || 'no-data-section'})` : '');
     
     const sectionBody = section ? section.querySelector('.section-body') : null;
-    console.log(`🔍 Section body found:`, sectionBody ? 'YES' : 'NO');
+    if (window.Logger) { window.Logger.debug(`🔍 Section body found:`, sectionBody ? 'YES' : 'NO', { page: "ui-utils" }); }
     
     const toggleBtn = section ? section.querySelector('button[onclick*="toggleSection"], button[data-onclick*="toggleSection"]') : null;
-    console.log(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO');
+    if (window.Logger) { window.Logger.debug(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO', { page: "ui-utils" }); }
     
     const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
-    console.log(`🔍 Icon found:`, icon ? 'YES' : 'NO');
+    if (window.Logger) { window.Logger.debug(`🔍 Icon found:`, icon ? 'YES' : 'NO', { page: "ui-utils" }); }
     
     if (sectionBody) {
       const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
-      console.log(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${sectionBody.style.display}"`);
+      if (window.Logger) { window.Logger.debug(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${sectionBody.style.display}"`, { page: "ui-utils" }); }
 
       if (isCollapsed) {
         sectionBody.classList.remove('collapsed');
         sectionBody.style.display = 'block';
-        console.log(`✅ Section "${sectionId}" EXPANDED`);
+        if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" EXPANDED`, { page: "ui-utils" }); }
       } else {
         sectionBody.classList.add('collapsed');
         sectionBody.style.display = 'none';
-        console.log(`✅ Section "${sectionId}" COLLAPSED`);
+        if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" COLLAPSED`, { page: "ui-utils" }); }
       }
 
       // Update icon
       if (icon) {
         const newIcon = sectionBody.style.display === 'none' ? '▼' : '▲';
         icon.textContent = newIcon;
-        console.log(`🎨 Icon updated to: "${newIcon}"`);
+        if (window.Logger) { window.Logger.debug(`🎨 Icon updated to: "${newIcon}"`, { page: "ui-utils" }); }
       }
 
       // Save state with page-specific key
@@ -900,18 +900,18 @@ window.toggleSection = function (sectionId) {
       const pageName = getCurrentPageName();
       const storageKey = `${pageName}_${sectionId}_SectionHidden`;
       localStorage.setItem(storageKey, isHidden.toString());
-      console.log(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`);
+      if (window.Logger) { window.Logger.debug(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`, { page: "ui-utils" }); }
       
     } else {
-      console.warn(`❌ Section ${sectionId} not found`);
+      if (window.Logger) { window.Logger.warn(`❌ Section ${sectionId} not found`, { page: "ui-utils" }); }
     }
     
-    console.log(`✅ ===== toggleSection COMPLETED SUCCESSFULLY =====`);
+    if (window.Logger) { window.Logger.debug(`✅ ===== toggleSection COMPLETED SUCCESSFULLY =====`, { page: "ui-utils" }); }
   } catch (error) {
-    console.error(`❌ ===== toggleSection ERROR =====`);
-    console.error(`❌ Error in toggleSection:`, error);
-    console.error(`❌ Error stack:`, error.stack);
-    console.error(`❌ ===== END ERROR =====`);
+    if (window.Logger) { window.Logger.error(`❌ ===== toggleSection ERROR =====`, { page: "ui-utils" }); }
+    if (window.Logger) { window.Logger.error(`❌ Error in toggleSection:`, error, { page: "ui-utils" }); }
+    if (window.Logger) { window.Logger.error(`❌ Error stack:`, error.stack, { page: "ui-utils" }); }
+    if (window.Logger) { window.Logger.error(`❌ ===== END ERROR =====`, { page: "ui-utils" }); }
   }
 };
 
@@ -924,15 +924,19 @@ window.toggleSection = function (sectionId) {
  * UPDATED: Now uses page-specific localStorage keys
  */
 window.restoreAllSectionStates = function () {
-  console.log(`🔧 restoreAllSectionStates called`);
+  if (window.Logger) {
+    window.Logger.debug('🔧 restoreAllSectionStates called', { page: 'ui-utils' });
+  }
   
   const sections = document.querySelectorAll('.content-section, .top-section');
-  // console.log(`🔍 Found ${sections.length} sections to restore`);
+  // if (window.Logger) { window.Logger.debug(`🔍 Found ${sections.length} sections to restore`, { page: "ui-utils" }); }
   
   let restoredCount = 0;
   
   const pageName = getCurrentPageName();
-  console.log(`🔧 restoreAllSectionStates called for page: "${pageName}"`);
+  if (window.Logger) {
+    window.Logger.debug(`🔧 restoreAllSectionStates called for page: "${pageName}"`, { page: 'ui-utils' });
+  }
   
   sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
@@ -941,13 +945,13 @@ window.restoreAllSectionStates = function () {
     const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : 
                   section.querySelector('.section-toggle-icon, .filter-icon');
 
-    console.log(`🔧 Processing section ${index + 1}/${sections.length}: ID="${sectionId}"`);
+    if (window.Logger) { window.Logger.debug(`🔧 Processing section ${index + 1}/${sections.length}: ID="${sectionId}"`, { page: "ui-utils" }); }
 
     if (sectionBody && sectionId) {
       // Check localStorage for saved state with page-specific key
       const storageKey = `${pageName}_${sectionId}_SectionHidden`;
       const isHidden = localStorage.getItem(storageKey) === 'true';
-      console.log(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isHidden}`);
+      if (window.Logger) { window.Logger.debug(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isHidden}`, { page: "ui-utils" }); }
 
       if (isHidden) {
         // Restore collapsed state
@@ -955,23 +959,23 @@ window.restoreAllSectionStates = function () {
         section.classList.add('collapsed');
         sectionBody.style.display = 'none';
         if (icon) { icon.textContent = '▼'; }
-        // console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
+        // if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" RESTORED to COLLAPSED`, { page: "ui-utils" }); }
       } else {
         // Restore expanded state (default)
         sectionBody.classList.remove('collapsed');
         section.classList.remove('collapsed');
         sectionBody.style.display = 'block';
         if (icon) { icon.textContent = '▲'; }
-        // console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
+        // if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" RESTORED to EXPANDED`, { page: "ui-utils" }); }
       }
       
       restoredCount++;
     } else {
-      console.log(`⚠️ No section body or ID found for section ${index + 1}`);
+      if (window.Logger) { window.Logger.debug(`⚠️ No section body or ID found for section ${index + 1}`, { page: "ui-utils" }); }
     }
   });
   
-  console.log(`✅ restoreAllSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
+  if (window.Logger) { window.Logger.debug(`✅ restoreAllSectionStates completed - restored ${restoredCount}/${sections.length} sections`, { page: "ui-utils" }); }
   return restoredCount;
 };
 
@@ -981,14 +985,14 @@ window.restoreAllSectionStates = function () {
  * UPDATED: Now uses page-specific localStorage keys consistently
  */
 window.restoreSectionStates = function () {
-  // console.log(`🔧 restoreSectionStates called`);
+  // if (window.Logger) { window.Logger.debug(`🔧 restoreSectionStates called`, { page: "ui-utils" }); }
   
   // Restore top section state with page-specific key
   const pageName = getCurrentPageName();
-  // console.log(`🔧 restoreSectionStates called for page: "${pageName}"`);
+  // if (window.Logger) { window.Logger.debug(`🔧 restoreSectionStates called for page: "${pageName}"`, { page: "ui-utils" }); }
   
   const topSectionHidden = localStorage.getItem(`${pageName}_top-section_collapsed`) === 'true';
-  // console.log(`💾 Retrieved top section state for page "${pageName}": collapsed=${topSectionHidden}`);
+  // if (window.Logger) { window.Logger.debug(`💾 Retrieved top section state for page "${pageName}": collapsed=${topSectionHidden}`, { page: "ui-utils" }); }
   
   const topSection = document.querySelector('.top-section .section-body, .top-section .section-content');
   const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleSection"]');
@@ -999,17 +1003,17 @@ window.restoreSectionStates = function () {
     topSection.classList.add('collapsed');
     topSection.style.display = 'none';
     if (topIcon) { topIcon.textContent = '▼'; }
-      // console.log(`✅ Top section RESTORED to COLLAPSED`);
+      // if (window.Logger) { window.Logger.debug(`✅ Top section RESTORED to COLLAPSED`, { page: "ui-utils" }); }
   } else if (topSection) {
     topSection.classList.remove('collapsed');
     topSection.style.display = 'block';
     if (topIcon) { topIcon.textContent = '▲'; }
-    // console.log(`✅ Top section RESTORED to EXPANDED`);
+    // if (window.Logger) { window.Logger.debug(`✅ Top section RESTORED to EXPANDED`, { page: "ui-utils" }); }
   }
 
   // Restore main section states
   const sections = document.querySelectorAll('.content-section');
-  // console.log(`🔍 Found ${sections.length} content sections to restore`);
+  // if (window.Logger) { window.Logger.debug(`🔍 Found ${sections.length} content sections to restore`, { page: "ui-utils" }); }
   
   let restoredCount = 0;
   
@@ -1017,7 +1021,7 @@ window.restoreSectionStates = function () {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     if (sectionId) {
       const sectionHidden = localStorage.getItem(`${pageName}_${sectionId}_SectionHidden`) === 'true';
-      // console.log(`💾 Retrieved state for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
+      // if (window.Logger) { window.Logger.debug(`💾 Retrieved state for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`, { page: "ui-utils" }); }
       
       const sectionBody = section.querySelector('.section-body, .section-content');
       const toggleBtn = section.querySelector('button[onclick*="toggleSection"], button[data-onclick*="toggleSection"]');
@@ -1029,20 +1033,20 @@ window.restoreSectionStates = function () {
         section.classList.add('collapsed');
         sectionBody.style.display = 'none';
         if (icon) { icon.textContent = '▼'; }
-        // console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
+        // if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" RESTORED to COLLAPSED`, { page: "ui-utils" }); }
         restoredCount++;
       } else if (sectionBody) {
         sectionBody.classList.remove('collapsed');
         section.classList.remove('collapsed');
         sectionBody.style.display = 'block';
         if (icon) { icon.textContent = '▲'; }
-        // console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
+        // if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" RESTORED to EXPANDED`, { page: "ui-utils" }); }
         restoredCount++;
       }
     }
   });
   
-  // console.log(`✅ restoreSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
+  // if (window.Logger) { window.Logger.debug(`✅ restoreSectionStates completed - restored ${restoredCount}/${sections.length} sections`, { page: "ui-utils" }); }
 };
 
 // ===== ACTION BUTTONS SYSTEM =====
@@ -1179,7 +1183,7 @@ window.generateActionButtons = generateActionButtons;
 function loadTableActionButtons(tableId, entityType, config = {}) {
   const table = document.getElementById(tableId);
   if (!table) {
-    console.error(`❌ Table ${tableId} not found`);
+    if (window.Logger) { window.Logger.error(`❌ Table ${tableId} not found`, { page: "ui-utils" }); }
     return;
   }
 
@@ -1188,7 +1192,7 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
   rows.forEach((row, index) => {
     const actionsCell = row.querySelector('.actions-cell');
     if (!actionsCell) {
-      console.warn(`⚠️ No actions cell found in row ${index}`);
+      if (window.Logger) { window.Logger.warn(`⚠️ No actions cell found in row ${index}`, { page: "ui-utils" }); }
       return;
     }
 
@@ -1271,7 +1275,7 @@ window.deleteTicker = deleteTicker;
 function toggleTopSection(sectionId = 'top-section') {
   const section = document.getElementById(sectionId);
   if (!section) {
-    console.warn(`⚠️ Section ${sectionId} not found`);
+    if (window.Logger) { window.Logger.warn(`⚠️ Section ${sectionId} not found`, { page: "ui-utils" }); }
     return;
   }
   
@@ -1294,7 +1298,7 @@ function toggleTopSection(sectionId = 'top-section') {
                      section.querySelector('.content');
   
   if (!sectionBody) {
-    console.warn(`⚠️ No content area found in section ${sectionId}`);
+    if (window.Logger) { window.Logger.warn(`⚠️ No content area found in section ${sectionId}`, { page: "ui-utils" }); }
     return;
   }
   
@@ -1309,21 +1313,21 @@ function toggleTopSection(sectionId = 'top-section') {
     section.classList.remove('collapsed');
     section.classList.add('expanded');
     if (toggleIcon) toggleIcon.textContent = '▼';
-    console.log(`📂 Expanded section: ${sectionId}`);
+    if (window.Logger) { window.Logger.debug(`📂 Expanded section: ${sectionId}`, { page: "ui-utils" }); }
   } else {
     // Collapse
     sectionBody.style.display = 'none';
     section.classList.add('collapsed');
     section.classList.remove('expanded');
     if (toggleIcon) toggleIcon.textContent = '▶';
-    console.log(`📁 Collapsed section: ${sectionId}`);
+    if (window.Logger) { window.Logger.debug(`📁 Collapsed section: ${sectionId}`, { page: "ui-utils" }); }
   }
   
   // Save state to localStorage with page-specific key
   const pageName = getCurrentPageName();
   const storageKey = `${pageName}_${sectionId}_collapsed`;
   localStorage.setItem(storageKey, (!isCollapsed).toString());
-  console.log(`💾 Top section state saved: ${storageKey} = "${!isCollapsed}"`);
+  if (window.Logger) { window.Logger.debug(`💾 Top section state saved: ${storageKey} = "${!isCollapsed}"`, { page: "ui-utils" }); }
 }
 
 // toggleSection function removed - use toggleSection('main') instead
@@ -1354,13 +1358,13 @@ function getCurrentPageName() {
  */
 window.debugSectionStates = function() {
   const pageName = getCurrentPageName();
-  console.log(`🔍 Debug Section States for page: "${pageName}"`);
-  console.log('=====================================');
+  if (window.Logger) { window.Logger.debug(`🔍 Debug Section States for page: "${pageName}"`, { page: "ui-utils" }); }
+  if (window.Logger) { window.Logger.debug('=====================================', { page: "ui-utils" }); }
   
   // Check top section
   const topSectionKey = `${pageName}_top-section_collapsed`;
   const topSectionState = localStorage.getItem(topSectionKey);
-  console.log(`📍 Top Section: ${topSectionKey} = "${topSectionState}"`);
+  if (window.Logger) { window.Logger.debug(`📍 Top Section: ${topSectionKey} = "${topSectionState}"`, { page: "ui-utils" }); }
   
   // Check all content sections
   const sections = document.querySelectorAll('.content-section');
@@ -1369,11 +1373,11 @@ window.debugSectionStates = function() {
     if (sectionId) {
       const sectionKey = `${pageName}_${sectionId}_SectionHidden`;
       const sectionState = localStorage.getItem(sectionKey);
-      console.log(`📍 Section ${index + 1}: ${sectionKey} = "${sectionState}"`);
+      if (window.Logger) { window.Logger.debug(`📍 Section ${index + 1}: ${sectionKey} = "${sectionState}"`, { page: "ui-utils" }); }
     }
   });
   
-  console.log('=====================================');
+  if (window.Logger) { window.Logger.debug('=====================================', { page: "ui-utils" }); }
 };
 
 /**
@@ -1392,11 +1396,11 @@ function toggleAllSections() {
   const allSections = [...contentSections, ...sectionContents];
   
   if (!allSections.length) {
-    console.warn('⚠️ No sections found to toggle');
+    if (window.Logger) { window.Logger.warn('⚠️ No sections found to toggle', { page: "ui-utils" }); }
     return;
   }
   
-  console.log(`🔍 Found ${allSections.length} sections to toggle`);
+  if (window.Logger) { window.Logger.debug(`🔍 Found ${allSections.length} sections to toggle`, { page: "ui-utils" }); }
   
   // Check if all sections are collapsed
   const allCollapsed = allSections.every(section => {
@@ -1407,8 +1411,8 @@ function toggleAllSections() {
     );
   });
   
-  console.log(`🔍 All sections are collapsed: ${allCollapsed}`);
-  console.log(`🎯 Action: ${allCollapsed ? 'EXPANDING all sections' : 'COLLAPSING all sections'}`);
+  if (window.Logger) { window.Logger.debug(`🔍 All sections are collapsed: ${allCollapsed}`, { page: "ui-utils" }); }
+  if (window.Logger) { window.Logger.debug(`🎯 Action: ${allCollapsed ? 'EXPANDING all sections' : 'COLLAPSING all sections'}`, { page: "ui-utils" }); }
   
   const pageName = getCurrentPageName();
   
@@ -1419,7 +1423,7 @@ function toggleAllSections() {
     const toggleBtn = section.querySelector('.filter-toggle-btn, [onclick*="toggle"]');
     const icon = section.querySelector('.section-toggle-icon, .filter-icon');
     
-    console.log(`🔧 Processing section ${index + 1}/${allSections.length}: ID="${sectionId}"`);
+    if (window.Logger) { window.Logger.debug(`🔧 Processing section ${index + 1}/${allSections.length}: ID="${sectionId}"`, { page: "ui-utils" }); }
     
     if (sectionBody) {
       if (allCollapsed) {
@@ -1428,28 +1432,28 @@ function toggleAllSections() {
         section.classList.remove('collapsed');
         section.classList.add('expanded');
         if (icon) icon.textContent = '▼';
-        console.log(`✅ Section "${sectionId}" EXPANDED`);
+        if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" EXPANDED`, { page: "ui-utils" }); }
       } else {
         // Collapse all
         sectionBody.style.display = 'none';
         section.classList.add('collapsed');
         section.classList.remove('expanded');
         if (icon) icon.textContent = '▶';
-        console.log(`✅ Section "${sectionId}" COLLAPSED`);
+        if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" COLLAPSED`, { page: "ui-utils" }); }
       }
       
       // Save state with page-specific key
       const isHidden = sectionBody.style.display === 'none';
       const storageKey = `${pageName}_${sectionId}_SectionHidden`;
       localStorage.setItem(storageKey, isHidden.toString());
-      console.log(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`);
+      if (window.Logger) { window.Logger.debug(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`, { page: "ui-utils" }); }
     } else {
-      console.log(`⚠️ No section body found for section "${sectionId}"`);
+      if (window.Logger) { window.Logger.debug(`⚠️ No section body found for section "${sectionId}"`, { page: "ui-utils" }); }
     }
   });
   
   console.log(`✅ toggleAllSections (generic) completed - processed ${allSections.length} sections`);
-  console.log(`📂 All sections ${allCollapsed ? 'expanded' : 'collapsed'}`);
+  if (window.Logger) { window.Logger.debug(`📂 All sections ${allCollapsed ? 'expanded' : 'collapsed'}`, { page: "ui-utils" }); }
 }
 
 /**
@@ -1458,13 +1462,13 @@ function toggleAllSections() {
  * UPDATED: Now uses page-specific localStorage keys
  */
 function loadSectionStates() {
-  // console.log(`🔧 loadSectionStates called`);
+  // if (window.Logger) { window.Logger.debug(`🔧 loadSectionStates called`, { page: "ui-utils" }); }
   
   const pageName = getCurrentPageName();
-  // console.log(`🔧 loadSectionStates called for page: "${pageName}"`);
+  // if (window.Logger) { window.Logger.debug(`🔧 loadSectionStates called for page: "${pageName}"`, { page: "ui-utils" }); }
   
   const sections = document.querySelectorAll('.content-section, .top-section');
-  // console.log(`🔍 Found ${sections.length} sections to load states for`);
+  // if (window.Logger) { window.Logger.debug(`🔍 Found ${sections.length} sections to load states for`, { page: "ui-utils" }); }
   
   let restoredCount = 0;
   
@@ -1473,7 +1477,7 @@ function loadSectionStates() {
     const storageKey = `${pageName}_${sectionId}_SectionHidden`;
     const isCollapsed = localStorage.getItem(storageKey) === 'true';
     
-    // console.log(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`);
+    // if (window.Logger) { window.Logger.debug(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`, { page: "ui-utils" }); }
     
     const sectionBody = section.querySelector('.section-body, .section-content');
     const toggleIcon = section.querySelector('.section-toggle-icon, .filter-icon');
@@ -1483,19 +1487,19 @@ function loadSectionStates() {
       section.classList.add('collapsed');
       section.classList.remove('expanded');
       if (toggleIcon) toggleIcon.textContent = '▶';
-        // console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
+        // if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" RESTORED to COLLAPSED`, { page: "ui-utils" }); }
       restoredCount++;
     } else if (sectionBody) {
       sectionBody.style.display = 'block';
       section.classList.remove('collapsed');
       section.classList.add('expanded');
       if (toggleIcon) toggleIcon.textContent = '▼';
-        // console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
+        // if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" RESTORED to EXPANDED`, { page: "ui-utils" }); }
       restoredCount++;
     }
   });
   
-  // console.log(`✅ loadSectionStates completed - restored ${restoredCount}/${sections.length} sections`);
+  // if (window.Logger) { window.Logger.debug(`✅ loadSectionStates completed - restored ${restoredCount}/${sections.length} sections`, { page: "ui-utils" }); }
 }
 
 // Export functions to global scope

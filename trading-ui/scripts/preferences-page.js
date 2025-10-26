@@ -10,6 +10,26 @@
 window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "preferences-page" })...');
 
 /**
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING:
+ * - loadAccountsForPreferences()
+ * 
+ * PREFERENCES MANAGEMENT:
+ * - savePreferences()
+ * - loadPreferences()
+ * - resetPreferences()
+ * 
+ * UI MANAGEMENT:
+ * - updateUI()
+ * - validateForm()
+ * 
+ * ==============
+ */
+
+// ===== DATA LOADING =====
+/**
  * Load accounts using global function
  */
 async function loadAccountsForPreferences() {

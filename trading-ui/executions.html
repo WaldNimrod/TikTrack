@@ -330,7 +330,12 @@
         <div class="modal-content" style="width: 95%; max-width: 1200px; max-height: 90vh;">
             <div class="modal-header">
                 <h3>📥 ייבוא נתוני משתמש</h3>
-                <button class="modal-close" onclick="closeImportUserDataModal()">&times;</button>
+                <div class="modal-header-actions" style="display: flex; align-items: center; gap: 10px;">
+                    <button class="btn btn-info btn-sm" id="import-download-report-btn" onclick="downloadImportReport()" style="display: none;">
+                        📄 הורד דוח
+                    </button>
+                    <button class="modal-close" onclick="closeImportUserDataModal()">&times;</button>
+                </div>
             </div>
             <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                 <!-- Progress Steps -->
@@ -470,9 +475,6 @@
                         <div class="problem-section" id="import-duplicates-section" style="display: none;">
                             <h5>🔄 כפילויות זוהו</h5>
                             <div class="duplicates-list" id="import-duplicates-list"></div>
-                            <button class="btn btn-secondary" onclick="reviewDuplicates()">
-                                סקור כפילויות
-                            </button>
                         </div>
                     </div>
                 </div>

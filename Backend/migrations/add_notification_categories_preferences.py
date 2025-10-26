@@ -99,38 +99,52 @@ def run_migration():
             },
             # Console log categories
             {
-                'preference_name': 'console_logs_development_enabled',
+                'preference_name': 'console_logs_initialization_enabled',
                 'data_type': 'boolean',
-                'default_value': 'true',
-                'description': 'Enable development console logs',
+                'default_value': 'false',
+                'description': 'Enable initialization console logs',
                 'group_id': group_id
             },
             {
                 'preference_name': 'console_logs_system_enabled',
                 'data_type': 'boolean',
-                'default_value': 'true',
+                'default_value': 'false',
                 'description': 'Enable system console logs',
                 'group_id': group_id
             },
             {
                 'preference_name': 'console_logs_business_enabled',
                 'data_type': 'boolean',
-                'default_value': 'true',
+                'default_value': 'false',
                 'description': 'Enable business console logs',
                 'group_id': group_id
             },
             {
                 'preference_name': 'console_logs_performance_enabled',
                 'data_type': 'boolean',
-                'default_value': 'true',
+                'default_value': 'false',
                 'description': 'Enable performance console logs',
                 'group_id': group_id
             },
             {
-                'preference_name': 'console_logs_ui_enabled',
+                'preference_name': 'console_logs_ui_components_enabled',
                 'data_type': 'boolean',
-                'default_value': 'true',
-                'description': 'Enable UI console logs',
+                'default_value': 'false',
+                'description': 'Enable UI components console logs',
+                'group_id': group_id
+            },
+            {
+                'preference_name': 'console_logs_cache_enabled',
+                'data_type': 'boolean',
+                'default_value': 'false',
+                'description': 'Enable cache console logs',
+                'group_id': group_id
+            },
+            {
+                'preference_name': 'console_logs_notifications_enabled',
+                'data_type': 'boolean',
+                'default_value': 'false',
+                'description': 'Enable notifications console logs',
                 'group_id': group_id
             }
         ]

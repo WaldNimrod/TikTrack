@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-10-26T17:08:43.702Z",
+  "summary": {
+    "totalFunctions": 156,
+    "totalDuplicates": 1,
+    "exactDuplicates": 0,
+    "nearDuplicates": 0,
+    "similarPatterns": 1
+  },
+  "duplicates": [
+    {
+      "func1": {
+        "name": "addEditBuySell",
+        "file": "trades.js",
+        "content": "function addEditBuySell() {\n  if (typeof window.showInfoNotification === 'function') {\n    window.showInfoNotification('מידע', 'פונקציונליות זו תהיה זמינה בקרוב');\n  }\n}"
+      },
+      "func2": {
+        "name": "addEditBuySell",
+        "file": "executions.js",
+        "content": "function addEditBuySell() {\n  if (typeof window.showInfoNotification === 'function') {\n    window.showInfoNotification('מידע', 'פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח');\n  } else {\n    // פונקציונליות הוספת קניה/מכירה נמצאת בפיתוח\n  }\n}"
+      },
+      "similarity": 0.7890625,
+      "type": "SIMILAR"
+    }
+  ]
+}

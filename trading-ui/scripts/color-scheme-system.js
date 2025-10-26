@@ -340,7 +340,9 @@ function generateNumericValueCSS() {
 // ===== COLOR SCHEME FUNCTIONS =====
 function applyColorScheme(schemeName = 'light', customColors = null) {
   try {
-    console.log(`🎨 Applying color scheme: ${schemeName}`);
+    if (window.Logger) {
+      window.Logger.info(`🎨 Applying color scheme: ${schemeName}`, { page: 'color-scheme' });
+    }
     
     // Remove existing scheme classes
     document.body.classList.remove('light-scheme', 'dark-scheme', 'custom-scheme');
@@ -365,7 +367,7 @@ function applyColorScheme(schemeName = 'light', customColors = null) {
         }
         break;
       default:
-        console.warn(`⚠️ Unknown color scheme: ${schemeName}`);
+        if (window.Logger) { window.Logger.warn(`⚠️ Unknown color scheme: ${schemeName}`, { page: "color-scheme" }); }
         applyLightScheme();
     }
     
@@ -378,7 +380,7 @@ function applyColorScheme(schemeName = 'light', customColors = null) {
     }));
     
   } catch (error) {
-    console.error('❌ Error applying color scheme:', error);
+    if (window.Logger) { window.Logger.error('❌ Error applying color scheme:', error, { page: "color-scheme" }); }
   }
 }
 
@@ -404,7 +406,7 @@ function applyDarkScheme() {
 
 function applyCustomScheme(customColors) {
   try {
-    console.log('🎨 Applying custom color scheme');
+    if (window.Logger) { window.Logger.info('🎨 Applying custom color scheme', { page: "color-scheme" }); }
     
     // Apply custom colors to CSS variables
     Object.entries(customColors).forEach(([key, value]) => {
@@ -412,7 +414,7 @@ function applyCustomScheme(customColors) {
     });
     
   } catch (error) {
-    console.error('❌ Error applying custom scheme:', error);
+    if (window.Logger) { window.Logger.error('❌ Error applying custom scheme:', error, { page: "color-scheme" }); }
   }
 }
 
@@ -461,7 +463,7 @@ async function loadDynamicColors() {
     
     return true;
   } catch (error) {
-    console.error('❌ Error loading dynamic colors:', error);
+    if (window.Logger) { window.Logger.error('❌ Error loading dynamic colors:', error, { page: "color-scheme" }); }
     return false;
   }
 }
@@ -488,17 +490,20 @@ async function setCurrentEntityColorFromPage() {
         document.documentElement.style.setProperty('--current-entity-color-light', lightColor);
         document.documentElement.style.setProperty('--current-entity-color-dark', darkColor);
         
-        console.log(`🎨 Set current entity color for ${entityType} (from ${pageClass}):`, {
-          primary: entityColor,
-          light: lightColor,
-          dark: darkColor
-        });
+        if (window.Logger) {
+          window.Logger.info(`🎨 Set current entity color for ${entityType} (from ${pageClass}):`, { 
+            page: 'color-scheme',
+            primary: entityColor,
+            light: lightColor,
+            dark: darkColor
+          });
+        }
       } else {
-        console.warn(`⚠️ No mapping found for page class: ${pageClass}`);
+        if (window.Logger) { window.Logger.warn(`⚠️ No mapping found for page class: ${pageClass}`, { page: "color-scheme" }); }
       }
     }
   } catch (error) {
-    console.error('❌ Error setting current entity color:', error);
+    if (window.Logger) { window.Logger.error('❌ Error setting current entity color:', error, { page: "color-scheme" }); }
   }
 }
 
@@ -528,7 +533,7 @@ const PAGE_TO_ENTITY_MAPPING = {
 async function getEntityColorFromPreferences(entityType, variant = 'primary') {
   try {
     if (!isValidEntityType(entityType)) {
-      console.warn(`⚠️ Invalid entity type: ${entityType}`);
+      if (window.Logger) { window.Logger.warn(`⚠️ Invalid entity type: ${entityType}`, { page: "color-scheme" }); }
       return;
     }
     
@@ -538,7 +543,7 @@ async function getEntityColorFromPreferences(entityType, variant = 'primary') {
       updateEntityColors(preferences);
     }
   } catch (error) {
-    console.error('❌ Error getting entity color from preferences:', error);
+    if (window.Logger) { window.Logger.error('❌ Error getting entity color from preferences:', error, { page: "color-scheme" }); }
   }
 }
 
@@ -550,7 +555,7 @@ async function getAllEntityColorVariantsFromPreferences(entityType) {
     }
     return {};
   } catch (error) {
-    console.error('❌ Error getting all entity color variants:', error);
+    if (window.Logger) { window.Logger.error('❌ Error getting all entity color variants:', error, { page: "color-scheme" }); }
     return {};
   }
 }
@@ -569,7 +574,7 @@ async function loadColorPreferences() {
       }
     };
   } catch (error) {
-    console.error('❌ Error loading color preferences:', error);
+    if (window.Logger) { window.Logger.error('❌ Error loading color preferences:', error, { page: "color-scheme" }); }
     return null;
   }
 }
@@ -580,7 +585,7 @@ function updateEntityColors(preferences) {
       Object.assign(ENTITY_COLORS, preferences.colorScheme.entities);
     }
   } catch (error) {
-    console.error('❌ Error updating entity colors:', error);
+    if (window.Logger) { window.Logger.error('❌ Error updating entity colors:', error, { page: "color-scheme" }); }
   }
 }
 
@@ -616,7 +621,7 @@ function updateCSSVariablesFromPreferences(preferences) {
       }
     }
   } catch (error) {
-    console.error('❌ Error updating CSS variables from preferences:', error);
+    if (window.Logger) { window.Logger.error('❌ Error updating CSS variables from preferences:', error, { page: "color-scheme" }); }
   }
 }
 
@@ -797,4 +802,4 @@ if (document.readyState === 'loading') {
 
 // Color Scheme System loaded successfully
 window.colorSchemeSystemReady = true;
-// console.log('✅ Color Scheme System ready');
+// if (window.Logger) { window.Logger.info('✅ Color Scheme System ready', { page: "color-scheme" }); }

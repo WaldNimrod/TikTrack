@@ -27,6 +27,7 @@ from .trade_plans import trade_plans_bp
 from .trades import trades_bp
 from .users import users_bp
 from .wal_management import wal_bp
+from .quality_check import bp as quality_check_bp
 
 # Base classes for unified API
 from .base_entity import BaseEntityAPI
@@ -68,6 +69,7 @@ __all__ = [
     'trades_bp',
     'users_bp',
     'wal_bp',
+    'quality_check_bp',
     
     # Base classes
     'BaseEntityAPI',

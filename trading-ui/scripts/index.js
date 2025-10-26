@@ -9,7 +9,33 @@
 
 window.Logger.info('🏠 Index page JavaScript loaded', { page: "index" });
 
-// Index page specific variables
+/**
+ * Function Index:
+ * ==============
+ * 
+ * TAB MANAGEMENT:
+ * - switchTableTab()
+ * 
+ * CHART MANAGEMENT:
+ * - initializeCharts()
+ * - updateCharts()
+ * - destroyCharts()
+ * 
+ * DATA LOADING:
+ * - loadDashboardData()
+ * - loadTradesData()
+ * - loadExecutionsData()
+ * - loadAccountsData()
+ * 
+ * UTILITY FUNCTIONS:
+ * - formatCurrency()
+ * - formatDate()
+ * - formatNumber()
+ * 
+ * ==============
+ */
+
+// ===== GLOBAL VARIABLES =====
 let homeCharts = {
     tradesStatusChart: null,
     performanceChart: null,
@@ -17,6 +43,7 @@ let homeCharts = {
     mixedChart: null
 };
 
+// ===== TAB MANAGEMENT =====
 /**
  * Switch between table tabs on the index page
  * @param {string} tabName - The name of the tab to switch to

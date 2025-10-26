@@ -1,3 +1,46 @@
+/**
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING:
+ * - loadTradingAccountsData()
+ * - updateTradingAccountsTable()
+ * - updatePageSummaryStats()
+ * 
+ * ACCOUNT MANAGEMENT:
+ * - addTradingAccount()
+ * - editTradingAccount()
+ * - deleteTradingAccount()
+ * - updateTradingAccount()
+ * 
+ * VALIDATION:
+ * - clearTradingAccountValidation()
+ * - validateTradingAccountForm()
+ * 
+ * UI MANAGEMENT:
+ * - showAddTradingAccountModal()
+ * - hideAddTradingAccountModal()
+ * - showEditTradingAccountModal()
+ * - hideEditTradingAccountModal()
+ * - updateRadioButtons()
+ * - populateSelect()
+ * - onRelationTypeChange()
+ * - onRelatedObjectChange()
+ * - enableConditionFields()
+ * - disableConditionFields()
+ * - populateRelatedObjects()
+ * 
+ * DATA FILTERING:
+ * - filterTradingAccountsLocally()
+ * 
+ * UTILITY FUNCTIONS:
+ * - getDemoTradingAccountsData()
+ * - restoreSortState()
+ * - setupModalConfigurations()
+ * 
+ * ==============
+ */
+
 /* ===== מערכת ניהול חשבונות מסחר ===== */
 window.Logger.info('📁 trading_accounts.js נטען - מתחיל אתחול', { page: "trading_accounts" });
 
@@ -2779,8 +2822,8 @@ window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "tra
 // ===== Sorting system - adapted for trading_accounts =====
 
 // Global variables for sorting
-let trading_accountsCurrentSortColumn = null;
-let trading_accountsCurrentSortDirection = 'asc';
+let tradingAccountsCurrentSortColumn = null;
+let tradingAccountsCurrentSortDirection = 'asc';
 
 /**
  * Function for sorting the table

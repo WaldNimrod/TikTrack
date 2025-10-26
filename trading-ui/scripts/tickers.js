@@ -1,3 +1,46 @@
+/**
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING:
+ * - loadTickersData()
+ * - updateTickersTable()
+ * - updatePageSummaryStats()
+ * 
+ * TICKER MANAGEMENT:
+ * - addTicker()
+ * - editTicker()
+ * - deleteTicker()
+ * - updateTicker()
+ * 
+ * VALIDATION:
+ * - clearTickerValidation()
+ * - validateTickerForm()
+ * 
+ * UI MANAGEMENT:
+ * - showAddTickerModal()
+ * - hideAddTickerModal()
+ * - showEditTickerModal()
+ * - hideEditTickerModal()
+ * - updateRadioButtons()
+ * - populateSelect()
+ * - onRelationTypeChange()
+ * - onRelatedObjectChange()
+ * - enableConditionFields()
+ * - disableConditionFields()
+ * - populateRelatedObjects()
+ * 
+ * DATA FILTERING:
+ * - filterTickersLocally()
+ * 
+ * UTILITY FUNCTIONS:
+ * - getDemoTickersData()
+ * - restoreSortState()
+ * - setupModalConfigurations()
+ * 
+ * ==============
+ */
+
 // ===== קובץ JavaScript לדף טיקרים =====
 
 /**

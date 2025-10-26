@@ -90,19 +90,19 @@ class CacheSyncManager {
      */
     async initialize() {
         try {
-            console.log('🔄 Initializing Cache Sync Manager...');
+            if (window.Logger) { window.Logger.info('🔄 Initializing Cache Sync Manager...', { page: "cache" }); }
             
             // בדיקת חיבור לשרת
             const isConnected = await this.checkServerConnection();
             if (!isConnected) {
-                console.warn('⚠️ Server not available, sync will be queued');
+                if (window.Logger) { window.Logger.warn('⚠️ Server not available, sync will be queued', { page: "cache" }); }
             }
             
             // התחלת עיבוד תור הסינכרון
             this.startQueueProcessing();
             
             this.initialized = true;
-            console.log('✅ Cache Sync Manager initialized successfully');
+            if (window.Logger) { window.Logger.info('✅ Cache Sync Manager initialized successfully', { page: "cache" }); }
             
             // הודעת הצלחה
             if (window.notificationSystem) {
@@ -114,7 +114,7 @@ class CacheSyncManager {
             
             return true;
         } catch (error) {
-            console.error('❌ Failed to initialize Cache Sync Manager:', error);
+            if (window.Logger) { window.Logger.error('❌ Failed to initialize Cache Sync Manager:', error, { page: "cache" }); }
             
             // הודעת שגיאה
             if (window.notificationSystem) {
@@ -137,7 +137,7 @@ class CacheSyncManager {
      */
     async syncToBackend(key, data, options = {}) {
         if (!this.initialized) {
-            console.warn('⚠️ Cache Sync Manager not initialized');
+            if (window.Logger) { window.Logger.warn('⚠️ Cache Sync Manager not initialized', { page: "cache" }); }
             return false;
         }
 
@@ -161,7 +161,7 @@ class CacheSyncManager {
             if (!success) {
                 // הוספה לתור אם הסינכרון נכשל
                 await this.addToQueue('syncToBackend', syncData);
-                console.log(`⚠️ Sync failed, added ${key} to queue`);
+                if (window.Logger) { window.Logger.info(`⚠️ Sync failed, added ${key} to queue`, { page: "cache" }); }
             }
             
             const responseTime = performance.now() - startTime;
@@ -177,7 +177,7 @@ class CacheSyncManager {
             return success;
             
         } catch (error) {
-            console.error(`❌ Error syncing ${key} to backend:`, error);
+            if (window.Logger) { window.Logger.error(`❌ Error syncing ${key} to backend:`, error, { page: "cache" }); }
             this.stats.failures.syncToBackend++;
             return false;
         }
@@ -191,7 +191,7 @@ class CacheSyncManager {
      */
     async syncFromBackend(key, options = {}) {
         if (!this.initialized) {
-            console.warn('⚠️ Cache Sync Manager not initialized');
+            if (window.Logger) { window.Logger.warn('⚠️ Cache Sync Manager not initialized', { page: "cache" }); }
             return null;
         }
 
@@ -206,7 +206,7 @@ class CacheSyncManager {
             if (data === null && options.retries !== false) {
                 // הוספה לתור אם הסינכרון נכשל
                 await this.addToQueue('syncFromBackend', { key, options });
-                console.log(`⚠️ Sync failed, added ${key} to queue`);
+                if (window.Logger) { window.Logger.info(`⚠️ Sync failed, added ${key} to queue`, { page: "cache" }); }
             }
             
             const responseTime = performance.now() - startTime;
@@ -222,7 +222,7 @@ class CacheSyncManager {
             return data;
             
         } catch (error) {
-            console.error(`❌ Error syncing ${key} from backend:`, error);
+            if (window.Logger) { window.Logger.error(`❌ Error syncing ${key} from backend:`, error, { page: "cache" }); }
             this.stats.failures.syncFromBackend++;
             return null;
         }
@@ -235,7 +235,7 @@ class CacheSyncManager {
      */
     async invalidateBackend(dependencies = []) {
         if (!this.initialized) {
-            console.warn('⚠️ Cache Sync Manager not initialized');
+            if (window.Logger) { window.Logger.warn('⚠️ Cache Sync Manager not initialized', { page: "cache" }); }
             return false;
         }
 
@@ -250,7 +250,7 @@ class CacheSyncManager {
             if (!success) {
                 // הוספה לתור אם הביטול נכשל
                 await this.addToQueue('invalidate', { dependencies });
-                console.log(`⚠️ Invalidation failed, added to queue`);
+                if (window.Logger) { window.Logger.info(`⚠️ Invalidation failed, added to queue`, { page: "cache" }); }
             }
             
             const responseTime = performance.now() - startTime;
@@ -266,7 +266,7 @@ class CacheSyncManager {
             return success;
             
         } catch (error) {
-            console.error('❌ Error invalidating backend cache:', error);
+            if (window.Logger) { window.Logger.error('❌ Error invalidating backend cache:', error, { page: "cache" }); }
             this.stats.failures.invalidate++;
             return false;
         }
@@ -280,7 +280,7 @@ class CacheSyncManager {
     async invalidateByAction(action) {
         const patterns = this.invalidationPatterns[action];
         if (!patterns) {
-            console.warn(`⚠️ No invalidation patterns found for action: ${action}`);
+            if (window.Logger) { window.Logger.warn(`⚠️ No invalidation patterns found for action: ${action}`, { page: "cache" }); }
             return false;
         }
         
@@ -335,7 +335,7 @@ class CacheSyncManager {
             return result.success === true;
             
         } catch (error) {
-            console.error('❌ Backend sync failed:', error);
+            if (window.Logger) { window.Logger.error('❌ Backend sync failed:', error, { page: "cache" }); }
             return false;
         }
     }
@@ -363,7 +363,7 @@ class CacheSyncManager {
             return result.success ? result.data : null;
             
         } catch (error) {
-            console.error('❌ Backend sync failed:', error);
+            if (window.Logger) { window.Logger.error('❌ Backend sync failed:', error, { page: "cache" }); }
             return null;
         }
     }
@@ -391,7 +391,7 @@ class CacheSyncManager {
             return result.success === true;
             
         } catch (error) {
-            console.error('❌ Backend invalidation failed:', error);
+            if (window.Logger) { window.Logger.error('❌ Backend invalidation failed:', error, { page: "cache" }); }
             return false;
         }
     }
@@ -404,7 +404,7 @@ class CacheSyncManager {
     async addToQueue(type, data) {
         // בדיקת גודל תור
         if (this.syncQueue.length >= this.maxQueueSize) {
-            console.warn('⚠️ Sync queue is full, removing oldest item');
+            if (window.Logger) { window.Logger.warn('⚠️ Sync queue is full, removing oldest item', { page: "cache" }); }
             this.syncQueue.shift();
         }
         
@@ -455,13 +455,13 @@ class CacheSyncManager {
                 
                 if (success) {
                     this.syncQueue.shift();
-                    console.log(`✅ Processed queued ${item.type}`);
+                    if (window.Logger) { window.Logger.info(`✅ Processed queued ${item.type}`, { page: "cache" }); }
                 } else {
                     item.attempts++;
                     if (item.attempts >= this.retryAttempts) {
                         this.syncQueue.shift();
                         this.stats.retries++;
-                        console.log(`❌ Failed to process queued ${item.type} after ${this.retryAttempts} attempts`);
+                        if (window.Logger) { window.Logger.info(`❌ Failed to process queued ${item.type} after ${this.retryAttempts} attempts`, { page: "cache" }); }
                     } else {
                         console.log(`⚠️ Retrying queued ${item.type} (attempt ${item.attempts + 1})`);
                         await this.delay(this.retryDelay * item.attempts);
@@ -469,7 +469,7 @@ class CacheSyncManager {
                 }
                 
             } catch (error) {
-                console.error(`❌ Error processing queue item:`, error);
+                if (window.Logger) { window.Logger.error(`❌ Error processing queue item:`, error, { page: "cache" }); }
                 item.attempts++;
                 if (item.attempts >= this.retryAttempts) {
                     this.syncQueue.shift();
@@ -500,7 +500,7 @@ class CacheSyncManager {
     clearQueue() {
         this.syncQueue = [];
         this.stats.queueSize = 0;
-        console.log('🧹 Sync queue cleared');
+        if (window.Logger) { window.Logger.info('🧹 Sync queue cleared', { page: "cache" }); }
     }
 
     /**
@@ -600,12 +600,12 @@ class CacheSyncManager {
      */
     async initialize() {
         if (this.initialized) {
-            // console.log('✅ CacheSyncManager already initialized');
+            // if (window.Logger) { window.Logger.info('✅ CacheSyncManager already initialized', { page: "cache" }); }
             return;
         }
 
         try {
-            // console.log('🔄 Initializing CacheSyncManager...');
+            // if (window.Logger) { window.Logger.info('🔄 Initializing CacheSyncManager...', { page: "cache" }); }
             
             // Initialize sync queue
             this.syncQueue = [];
@@ -615,10 +615,10 @@ class CacheSyncManager {
             this.startQueueProcessor();
             
             this.initialized = true;
-            // console.log('✅ CacheSyncManager initialized successfully');
+            // if (window.Logger) { window.Logger.info('✅ CacheSyncManager initialized successfully', { page: "cache" }); }
             
         } catch (error) {
-            console.error('❌ Failed to initialize CacheSyncManager:', error);
+            if (window.Logger) { window.Logger.error('❌ Failed to initialize CacheSyncManager:', error, { page: "cache" }); }
             throw error;
         }
     }
@@ -627,11 +627,12 @@ class CacheSyncManager {
      * Start processing sync queue
      */
     startQueueProcessor() {
-        setInterval(() => {
-            if (this.syncQueue.length > 0 && !this.isProcessing) {
-                this.processQueue();
-            }
-        }, 1000); // Check every second
+        // setInterval הושבת זמנית למניעת לופים
+        // setInterval(() => {
+        //     if (this.syncQueue.length > 0 && !this.isProcessing) {
+        //         this.processQueue();
+        //     }
+        // }, 1000); // Check every second
     }
 }
 
@@ -645,4 +646,6 @@ if (window.UnifiedInitializationSystem) {
     });
 }
 
-console.log('🔄 Cache Sync Manager loaded');
+if (window.Logger) {
+  window.Logger.info('🔄 Cache Sync Manager loaded', { page: 'cache' });
+}

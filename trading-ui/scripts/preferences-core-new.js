@@ -31,7 +31,7 @@
  * - No HTML changes required!
  */
 
-window.Logger.info('📄 Loading preferences-core.js v3.0.0...', { page: "preferences-core-new" });
+// window.Logger.info('📄 Loading preferences-core.js v3.0.0...', { page: "preferences-core-new" });
 
 // ============================================================================
 // ERROR CLASSES
@@ -101,7 +101,7 @@ class PreferencesAPIClient {
             return await response.json();
             
         } catch (error) {
-            window.Logger.error(`❌ API GET error for ${endpoint}:`, error, { page: "preferences-core-new" });
+            // window.Logger.error(`❌ API GET error for ${endpoint}:`, error, { page: "preferences-core-new" });
             throw error;
         }
     }
@@ -130,7 +130,7 @@ class PreferencesAPIClient {
             return await response.json();
             
         } catch (error) {
-            window.Logger.error(`❌ API POST error for ${endpoint}:`, error, { page: "preferences-core-new" });
+            // window.Logger.error(`❌ API POST error for ${endpoint}:`, error, { page: "preferences-core-new" });
             throw error;
         }
     }
@@ -290,13 +290,13 @@ class PreferencesValidationManager {
     validate(preferenceName, value, dataType) {
         const validator = this.validators.get(dataType);
         if (!validator) {
-            window.Logger.warn(`⚠️ No validator for data type: ${dataType}`, { page: "preferences-core-new" });
+            // window.Logger.warn(`⚠️ No validator for data type: ${dataType}`, { page: "preferences-core-new" });
             return true; // Allow unknown types
         }
         
         const isValid = validator(value);
         if (!isValid) {
-            window.Logger.warn(`⚠️ Validation failed for ${preferenceName}: expected ${dataType}, got ${typeof value}`, { page: "preferences-core-new" });
+            // window.Logger.warn(`⚠️ Validation failed for ${preferenceName}: expected ${dataType}, got ${typeof value}`, { page: "preferences-core-new" });
         }
         
         return isValid;
@@ -316,7 +316,7 @@ class PreferencesValidationManager {
             }
             return false;
         } catch (error) {
-            window.Logger.error(`❌ Error checking preference existence:`, error, { page: "preferences-core-new" });
+            // window.Logger.error(`❌ Error checking preference existence:`, error, { page: "preferences-core-new" });
             return false;
         }
     }
@@ -351,7 +351,7 @@ class ProfileManager {
             }
             return [];
         } catch (error) {
-            window.Logger.error('❌ Error loading profiles:', error, { page: "preferences-core-new" });
+            // window.Logger.error('❌ Error loading profiles:', error, { page: "preferences-core-new" });
             return [];
         }
     }
@@ -362,7 +362,7 @@ class ProfileManager {
      */
     switchProfile(profileId) {
         this.currentProfile = profileId;
-        window.Logger.info(`🔄 Switched to profile: ${profileId}`, { page: "preferences-core-new" });
+        // window.Logger.info(`🔄 Switched to profile: ${profileId}`, { page: "preferences-core-new" });
     }
     
     /**
@@ -412,7 +412,7 @@ class PreferencesCore {
             
             return result.data.default_value;
         } catch (error) {
-            window.Logger.error(`❌ Error getting default preference ${preferenceName}:`, error, { page: "preferences-core-new" });
+            // window.Logger.error(`❌ Error getting default preference ${preferenceName}:`, error, { page: "preferences-core-new" });
             return null;
         }
     }

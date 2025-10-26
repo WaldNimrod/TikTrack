@@ -1,3 +1,38 @@
+/**
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING:
+ * - loadAlertsData()
+ * - updateAlertsTable()
+ * - updatePageSummaryStats()
+ * 
+ * MODAL MANAGEMENT:
+ * - showAddAlertModal()
+ * - hideAddAlertModal()
+ * - showEditAlertModal()
+ * - hideEditAlertModal()
+ * 
+ * VALIDATION:
+ * - clearAlertValidation()
+ * - validateAlertForm()
+ * 
+ * UI MANAGEMENT:
+ * - updateRadioButtons()
+ * - populateSelect()
+ * - onRelationTypeChange()
+ * - onRelatedObjectChange()
+ * - enableConditionFields()
+ * - disableConditionFields()
+ * - populateRelatedObjects()
+ * 
+ * UTILITY FUNCTIONS:
+ * - getDemoAlertsData()
+ * - filterAlertsLocally()
+ * 
+ * ==============
+ */
+
 // alerts.js loaded successfully - removed debug log
 
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
@@ -472,6 +507,32 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
  *
  * @param {Array} alerts - מערך של התראות לעדכון
  */
+// פונקציה להצגת מקור התנאי
+function getConditionSourceDisplay(alert) {
+  try {
+    // בדיקה אם ההתראה מקושרת לתנאי
+    if (alert.plan_condition_id) {
+      // שימוש במערכת הקיימת - renderType עם 'plan' type
+      return window.renderType ? 
+        window.renderType('plan', null) :
+        `<span class="badge badge-success" title="תנאי תכנית מסחר">📋 תכנית ${alert.plan_condition_id}</span>`;
+    } else if (alert.trade_condition_id) {
+      // שימוש במערכת הקיימת - renderType עם 'trade' type  
+      return window.renderType ? 
+        window.renderType('trade', null) :
+        `<span class="badge badge-primary" title="תנאי טרייד">📈 טרייד ${alert.trade_condition_id}</span>`;
+    } else {
+      // שימוש במערכת הקיימת - renderStatus עם 'manual' status
+      return window.renderStatus ? 
+        window.renderStatus('manual', 'alert') :
+        `<span class="badge badge-secondary" title="התראה ידנית">✋ ידני</span>`;
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה ב-getConditionSourceDisplay:', error, { page: "alerts" });
+    return '<span class="text-muted">-</span>';
+  }
+}
+
 function updateAlertsTable(alerts) {
   try {
     const tbody = document.querySelector('#alertsTable tbody');
@@ -640,7 +701,9 @@ function updateAlertsTable(alerts) {
             ${window.renderBoolean ? window.renderBoolean(alert.is_triggered) : 
               `<span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span>`}
           </td>
-
+          <td class="text-center">
+            ${getConditionSourceDisplay(alert)}
+          </td>
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
@@ -2183,7 +2246,7 @@ async function updateAlert() {
 /**
  * מחיקת התראה
  */
-async function _deleteAlert(alertId) {
+async function deleteAlertInternal(alertId) {
   // שימוש במערכת הגלובלית למחיקה
   if (typeof window.showDeleteWarning === 'function') {
     window.showDeleteWarning('alerts', alertId, 'התראה', async () => {
@@ -2274,7 +2337,7 @@ function getStatusClass(status) {
  * @param {number} relatedType - מזהה סוג האובייקט (1=חשבון, 2=טרייד, 3=תכנון, 4=טיקר)
  * @returns {string} שם המחלקה CSS
  */
-function _getRelatedClass(relatedType) {
+function getRelatedClass(relatedType) {
   switch (relatedType) {
   case 4: return 'related-ticker'; // ticker
   case 2: return 'related-trade'; // trade

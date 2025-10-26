@@ -86,6 +86,29 @@ def update_trade_plan(plan_id: int):
     try:
         data = request.get_json()
         db: Session = next(get_db())
+        
+        # בדיקה אם המשתמש רוצה לסגור או לבטל את התכנית
+        new_status = data.get('status')
+        if new_status in ['closed', 'cancelled']:
+            # החזרת שאלה למשתמש
+            if new_status == 'closed':
+                return jsonify({
+                    "status": "question",
+                    "question": "האם לבטל גם התראות תנאים?",
+                    "question_type": "confirm_cancel_alerts",
+                    "message": "התכנית תיסגר. האם לבטל גם התראות תנאים?",
+                    "version": "1.0"
+                })
+            elif new_status == 'cancelled':
+                return jsonify({
+                    "status": "question",
+                    "question": "האם למחוק גם התראות תנאים?",
+                    "question_type": "confirm_delete_alerts",
+                    "message": "התכנית תבוטל. האם למחוק גם התראות תנאים?",
+                    "version": "1.0"
+                })
+        
+        # עדכון רגיל של התכנית
         plan = TradePlanService.update(db, plan_id, data)
         if plan:
             return jsonify({
@@ -101,6 +124,53 @@ def update_trade_plan(plan_id: int):
         }), 404
     except Exception as e:
         logger.error(f"Error updating trade plan {plan_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "1.0"
+        }), 400
+    finally:
+        db.close()
+
+@trade_plans_bp.route('/<int:plan_id>/confirm-status-change', methods=['POST'])
+def confirm_status_change(plan_id: int):
+    """Confirm status change with user response"""
+    try:
+        data = request.get_json()
+        db: Session = next(get_db())
+        
+        new_status = data.get('status')
+        user_response = data.get('user_response', False)
+        
+        # עדכון התכנית
+        plan = TradePlanService.update(db, plan_id, {'status': new_status})
+        
+        if plan and user_response:
+            # המשתמש בחר לבטל/למחוק התראות
+            if new_status == 'closed':
+                # ביטול התראות תנאים
+                from services.alert_service import AlertService
+                alert_service = AlertService(db)
+                cancelled_count = alert_service.cancel_condition_alerts(plan_condition_id=plan_id)
+                message = f"Trade plan closed and {cancelled_count} condition alerts cancelled"
+            elif new_status == 'cancelled':
+                # מחיקת התראות תנאים
+                from services.alert_service import AlertService
+                alert_service = AlertService(db)
+                deleted_count = alert_service.delete_condition_alerts(plan_condition_id=plan_id)
+                message = f"Trade plan cancelled and {deleted_count} condition alerts deleted"
+        else:
+            message = f"Trade plan {new_status} successfully"
+        
+        return jsonify({
+            "status": "success",
+            "data": plan.to_dict(),
+            "message": message,
+            "version": "1.0"
+        })
+        
+    except Exception as e:
+        logger.error(f"Error confirming status change for trade plan {plan_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},

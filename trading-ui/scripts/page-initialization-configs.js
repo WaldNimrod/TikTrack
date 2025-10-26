@@ -1570,7 +1570,34 @@ const ADDITIONAL_PAGE_CONFIGS = {
                 }
             }
         ]
-    }
+    },
+    
+    // Duplicate Detector
+    'duplicate-detector': {
+        name: 'Duplicate Detector',
+        packages: ['base', 'init-system'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'Logger',
+            'UnifiedCacheManager'
+        ],
+        description: 'Advanced duplicate code detection system',
+        lastModified: '2025-01-26',
+        pageType: 'development',
+        preloadAssets: [],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            function() {
+                if (window.Logger) {
+                    window.Logger.info('🔍 Initializing Duplicate Detector...', { page: "page-initialization-configs" });
+                }
+                // Duplicate detector specific initialization
+            }
+        ]
+    },
 };
 
 // ===== GLOBAL EXPORT =====

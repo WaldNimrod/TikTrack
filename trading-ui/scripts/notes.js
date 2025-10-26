@@ -1,3 +1,47 @@
+/**
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING:
+ * - loadNotesData()
+ * - updateNotesTable()
+ * - updatePageSummaryStats()
+ * 
+ * NOTE MANAGEMENT:
+ * - addNote()
+ * - editNote()
+ * - deleteNote()
+ * - updateNote()
+ * 
+ * VALIDATION:
+ * - clearNoteValidation()
+ * - validateNoteForm()
+ * 
+ * UI MANAGEMENT:
+ * - showAddNoteModal()
+ * - hideAddNoteModal()
+ * - showEditNoteModal()
+ * - hideEditNoteModal()
+ * - openNoteDetailsWrapper()
+ * - updateRadioButtons()
+ * - populateSelect()
+ * - onRelationTypeChange()
+ * - onRelatedObjectChange()
+ * - enableConditionFields()
+ * - disableConditionFields()
+ * - populateRelatedObjects()
+ * 
+ * DATA FILTERING:
+ * - filterNotesLocally()
+ * 
+ * UTILITY FUNCTIONS:
+ * - getDemoNotesData()
+ * - restoreSortState()
+ * - setupModalConfigurations()
+ * 
+ * ==============
+ */
+
 // ===== קובץ JavaScript פשוט לדף הערות =====
 
 // ייצוא מוקדם של הפונקציה למניעת שגיאות

@@ -14,7 +14,9 @@
  * @lastUpdated January 20, 2025
  */
 
-console.log('🔍 Loading Monitoring Functions...');
+if (window.Logger) {
+  window.Logger.info('🔍 Loading Monitoring Functions...', { page: 'monitoring' });
+}
 
 /**
  * Wait for page to be fully loaded
@@ -386,4 +388,6 @@ window.runDetailedPageScan = runDetailedPageScan;
 window.waitForPageFullyLoaded = waitForPageFullyLoaded;
 window.checkForMismatches = checkForMismatches;
 
-console.log('✅ Monitoring Functions loaded successfully');
+if (window.Logger) {
+  window.Logger.info('✅ Monitoring Functions loaded successfully', { page: 'monitoring' });
+}

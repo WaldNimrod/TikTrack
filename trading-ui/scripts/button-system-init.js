@@ -528,20 +528,28 @@ window.getButtonSystemStats = () => {
 // Initialize Button System function
 window.initializeButtonSystem = async () => {
     try {
-        console.log('🔘 Button System: Initializing...');
+        if (window.Logger) {
+            window.Logger.info('🔘 Button System: Initializing...', { page: 'button-system' });
+        }
         // The system is already initialized in constructor, just ensure buttons are processed
         window.advancedButtonSystem.initializeButtons();
-        console.log('🔘 Button System: Initialized successfully');
+        if (window.Logger) {
+            window.Logger.info('🔘 Button System: Initialized successfully', { page: 'button-system' });
+        }
         return true;
     } catch (error) {
-        console.error('🔘 Button System: Initialization failed:', error);
+        if (window.Logger) {
+            window.Logger.error('🔘 Button System: Initialization failed:', { page: 'button-system', error: error });
+        }
         return false;
     }
 };
 
 // DOM ready handler
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🔘 Button System Init: DOM loaded, system ready');
+    if (window.Logger) {
+        window.Logger.info('🔘 Button System Init: DOM loaded, system ready', { page: 'button-system' });
+    }
 });
 
 // Module export

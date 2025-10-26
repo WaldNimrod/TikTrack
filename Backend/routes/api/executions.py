@@ -34,7 +34,7 @@ base_api = BaseEntityAPI('executions', execution_service, 'executions')
 @api_endpoint(cache_ttl=30, dependencies=['executions'], rate_limit=60)
 @handle_database_session()
 def get_executions():
-    """Get all executions using base API"""
+    """Get all executions using base API with rate limiting"""
     db: Session = g.db
     response, status_code = base_api.get_all(db)
     return jsonify(response), status_code

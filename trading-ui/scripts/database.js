@@ -23,6 +23,36 @@
  * Note: Renamed from db_display.js as part of JavaScript architecture standardization
  */
 
+/**
+ * Function Index:
+ * ==============
+ * 
+ * PAGE INITIALIZATION:
+ * - initDatabaseDisplay()
+ * - setupEventListeners()
+ * 
+ * DATA LOADING:
+ * - loadTableData()
+ * - fetchTableData()
+ * 
+ * TABLE DISPLAY:
+ * - updateTableDisplay()
+ * - createTableBodyHTML()
+ * - formatCellValue()
+ * - applySortingFunctionality()
+ * 
+ * UTILITY FUNCTIONS:
+ * - showLoadingState()
+ * - updateTableInfo()
+ * - filterTableData()
+ * - formatDate()
+ * - formatNumber()
+ * - formatCurrency()
+ * - formatStatus()
+ * 
+ * ==============
+ */
+
 // ===== GLOBAL VARIABLES =====
 let currentTableType = 'accounts'; // Default table type
 const tableData = {};
@@ -33,41 +63,55 @@ const tableData = {};
  * Initialize the database display page
  */
 function initDatabaseDisplay() {
-  // console.log('🔄 Initializing database display page...');
+  try {
+    // console.log('🔄 Initializing database display page...');
 
-  // Load default table (accounts)
-  loadTableData('accounts');
+    // Load default table (accounts)
+    loadTableData('accounts');
 
-  // Set up event listeners
-  setupEventListeners();
+    // Set up event listeners
+    setupEventListeners();
 
-  // Initialize header system
-  if (window.headerSystem) {
-    window.headerSystem.init();
+    // Initialize header system
+    if (window.headerSystem) {
+      window.headerSystem.init();
+    }
+
+    // console.log('✅ Database display page initialized successfully');
+  } catch (error) {
+    window.Logger.error('שגיאה באתחול עמוד בסיס הנתונים:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה באתחול עמוד בסיס הנתונים', error.message);
+    }
   }
-
-  // console.log('✅ Database display page initialized successfully');
 }
 
 /**
  * Set up page event listeners
  */
 function setupEventListeners() {
-  // Table type selector
-  const tableTypeSelect = document.getElementById('tableTypeSelect');
-  if (tableTypeSelect) {
-    tableTypeSelect.addEventListener('change', function() {
-      const selectedType = this.value;
-      loadTableData(selectedType);
-    });
-  }
+  try {
+    // Table type selector
+    const tableTypeSelect = document.getElementById('tableTypeSelect');
+    if (tableTypeSelect) {
+      tableTypeSelect.addEventListener('change', function() {
+        const selectedType = this.value;
+        loadTableData(selectedType);
+      });
+    }
 
-  // Search functionality
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', function() {
-      filterTableData(this.value);
-    });
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        filterTableData(this.value);
+      });
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהגדרת אירועי עמוד בסיס הנתונים:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהגדרת אירועי עמוד בסיס הנתונים', error.message);
+    }
   }
 }
 
@@ -142,17 +186,18 @@ async function fetchTableData(tableType) {
  * @param {string} tableType - The table type
  */
 function updateTableDisplay(data, tableType) {
-  // Find the correct container for this table type
-  const containerId = `${tableType}Container`;
-  const tableContainer = document.getElementById(containerId);
+  try {
+    // Find the correct container for this table type
+    const containerId = `${tableType}Container`;
+    const tableContainer = document.getElementById(containerId);
 
-  if (!tableContainer) {
-    // console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
-    return;
-  }
+    if (!tableContainer) {
+      // console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
+      return;
+    }
 
-  // Find the table within the container
-  const table = tableContainer.querySelector('table');
+    // Find the table within the container
+    const table = tableContainer.querySelector('table');
   if (!table) {
     // console.error(`❌ Table not found in container ${containerId}`);
     return;
@@ -180,6 +225,12 @@ function updateTableDisplay(data, tableType) {
 
   // Apply sorting functionality
   applySortingFunctionality(tableType);
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון תצוגת טבלה:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון תצוגת טבלה', error.message);
+    }
+  }
 }
 
 
@@ -191,23 +242,31 @@ function updateTableDisplay(data, tableType) {
  * @returns {string} The table body HTML
  */
 function createTableBodyHTML(data, tableMapping, _tableType) {
-  let tbodyHTML = '';
+  try {
+    let tbodyHTML = '';
 
-  if (data.length === 0) {
-    tbodyHTML += `<tr><td colspan="${tableMapping.length}" class="text-center">אין נתונים</td></tr>`;
-  } else {
-    data.forEach(row => {
-      tbodyHTML += '<tr>';
-      tableMapping.forEach(fieldName => {
-        const value = row[fieldName] || '';
-        const formattedValue = formatCellValue(value, { field: fieldName });
-        tbodyHTML += `<td>${formattedValue}</td>`;
+    if (data.length === 0) {
+      tbodyHTML += `<tr><td colspan="${tableMapping.length}" class="text-center">אין נתונים</td></tr>`;
+    } else {
+      data.forEach(row => {
+        tbodyHTML += '<tr>';
+        tableMapping.forEach(fieldName => {
+          const value = row[fieldName] || '';
+          const formattedValue = formatCellValue(value, { field: fieldName });
+          tbodyHTML += `<td>${formattedValue}</td>`;
+        });
+        tbodyHTML += '</tr>';
       });
-      tbodyHTML += '</tr>';
-    });
-  }
+    }
 
-  return tbodyHTML;
+    return tbodyHTML;
+  } catch (error) {
+    window.Logger.error('שגיאה ביצירת HTML של טבלה:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה ביצירת HTML של טבלה', error.message);
+    }
+    return '<tr><td colspan="100%" class="text-center text-danger">שגיאה בטעינת הנתונים</td></tr>';
+  }
 }
 
 /**
@@ -217,22 +276,30 @@ function createTableBodyHTML(data, tableMapping, _tableType) {
  * @returns {string} The formatted value
  */
 function formatCellValue(value, column) {
-  if (value === null || value === undefined) {
-    return '';
-  }
+  try {
+    if (value === null || value === undefined) {
+      return '';
+    }
 
-  // Apply formatting based on column type
-  switch (column.type) {
-  case 'date':
-    return formatDate(value);
-  case 'number':
-    return formatNumber(value);
-  case 'currency':
-    return formatCurrency(value);
-  case 'status':
-    return formatStatus(value);
-  default:
-    return String(value);
+    // Apply formatting based on column type
+    switch (column.type) {
+    case 'date':
+      return formatDate(value);
+    case 'number':
+      return formatNumber(value);
+    case 'currency':
+      return formatCurrency(value);
+    case 'status':
+      return formatStatus(value);
+    default:
+      return String(value);
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בעיצוב ערך תא:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעיצוב ערך תא', error.message);
+    }
+    return String(value || '');
   }
 }
 
@@ -241,8 +308,15 @@ function formatCellValue(value, column) {
  * @param {string} tableType - The table type
  */
 function applySortingFunctionality(_tableType) {
-  // Sorting is handled by global sortTable function from main.js
-  // console.log(`🔀 Sorting functionality applied to ${tableType} table`);
+  try {
+    // Sorting is handled by global sortTable function from main.js
+    // console.log(`🔀 Sorting functionality applied to ${tableType} table`);
+  } catch (error) {
+    window.Logger.error('שגיאה בהחלת פונקציונליות מיון:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהחלת פונקציונליות מיון', error.message);
+    }
+  }
 }
 
 // ===== UTILITY FUNCTIONS =====
@@ -251,15 +325,22 @@ function applySortingFunctionality(_tableType) {
  * Show loading state
  */
 function showLoadingState() {
-  // Show loading state in the current table's tbody
-  if (currentTableType) {
-    const containerId = `${currentTableType}Container`;
-    const tableContainer = document.getElementById(containerId);
-    if (tableContainer) {
-      const tbody = tableContainer.querySelector('tbody');
-      if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center">טוען נתונים...</td></tr>';
+  try {
+    // Show loading state in the current table's tbody
+    if (currentTableType) {
+      const containerId = `${currentTableType}Container`;
+      const tableContainer = document.getElementById(containerId);
+      if (tableContainer) {
+        const tbody = tableContainer.querySelector('tbody');
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="10" class="text-center">טוען נתונים...</td></tr>';
+        }
       }
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהצגת מצב טעינה:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהצגת מצב טעינה', error.message);
     }
   }
 }
@@ -270,10 +351,17 @@ function showLoadingState() {
  * @param {number} recordCount - The number of records
  */
 function updateTableInfo(tableType, recordCount) {
-  // Update the count display in the section header
-  const countElement = document.getElementById(`${tableType}Count`);
-  if (countElement) {
-    countElement.textContent = `${recordCount} רשומות`;
+  try {
+    // Update the count display in the section header
+    const countElement = document.getElementById(`${tableType}Count`);
+    if (countElement) {
+      countElement.textContent = `${recordCount} רשומות`;
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון מידע טבלה:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון מידע טבלה', error.message);
+    }
   }
 }
 
@@ -282,16 +370,23 @@ function updateTableInfo(tableType, recordCount) {
  * @param {string} searchTerm - The search term
  */
 function filterTableData(searchTerm) {
-  if (!searchTerm || !tableData[currentTableType]) {
-    updateTableDisplay(tableData[currentTableType] || [], currentTableType);
-    return;
+  try {
+    if (!searchTerm || !tableData[currentTableType]) {
+      updateTableDisplay(tableData[currentTableType] || [], currentTableType);
+      return;
+    }
+
+    const filteredData = tableData[currentTableType].filter(row => Object.values(row).some(value =>
+      String(value).toLowerCase().includes(searchTerm.toLowerCase()),
+    ));
+
+    updateTableDisplay(filteredData, currentTableType);
+  } catch (error) {
+    window.Logger.error('שגיאה בפילטור נתוני טבלה:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפילטור נתוני טבלה', error.message);
+    }
   }
-
-  const filteredData = tableData[currentTableType].filter(row => Object.values(row).some(value =>
-    String(value).toLowerCase().includes(searchTerm.toLowerCase()),
-  ));
-
-  updateTableDisplay(filteredData, currentTableType);
 }
 
 /**
@@ -316,8 +411,16 @@ function formatDate(dateString) {
  * @returns {string} The formatted number
  */
 function formatNumber(number) {
-  if (number === null || number === undefined) {return '';}
-  return Number(number).toLocaleString('he-IL');
+  try {
+    if (number === null || number === undefined) {return '';}
+    return Number(number).toLocaleString('he-IL');
+  } catch (error) {
+    window.Logger.error('שגיאה בעיצוב מספר:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעיצוב מספר', error.message);
+    }
+    return String(number || '');
+  }
 }
 
 /**
@@ -326,11 +429,19 @@ function formatNumber(number) {
  * @returns {string} The formatted currency
  */
 function formatCurrency(amount) {
-  if (amount === null || amount === undefined) {return '';}
-  return new Intl.NumberFormat('he-IL', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
+  try {
+    if (amount === null || amount === undefined) {return '';}
+    return new Intl.NumberFormat('he-IL', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  } catch (error) {
+    window.Logger.error('שגיאה בעיצוב מטבע:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעיצוב מטבע', error.message);
+    }
+    return String(amount || '');
+  }
 }
 
 /**
@@ -339,17 +450,25 @@ function formatCurrency(amount) {
  * @returns {string} The formatted status
  */
 function formatStatus(status) {
-  if (!status) {return '';}
+  try {
+    if (!status) {return '';}
 
-  const statusMap = {
-    'active': 'פעיל',
-    'inactive': 'לא פעיל',
-    'pending': 'ממתין',
-    'completed': 'הושלם',
-    'cancelled': 'בוטל',
-  };
+    const statusMap = {
+      'active': 'פעיל',
+      'inactive': 'לא פעיל',
+      'pending': 'ממתין',
+      'completed': 'הושלם',
+      'cancelled': 'בוטל',
+    };
 
-  return statusMap[status] || status;
+    return statusMap[status] || status;
+  } catch (error) {
+    window.Logger.error('שגיאה בעיצוב סטטוס:', error, { page: "database" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעיצוב סטטוס', error.message);
+    }
+    return String(status || '');
+  }
 }
 
 // ===== מערכת טיפול בשגיאות =====

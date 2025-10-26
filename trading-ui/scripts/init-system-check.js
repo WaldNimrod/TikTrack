@@ -14,7 +14,9 @@
  * @lastUpdated January 20, 2025
  */
 
-console.log('🔍 Loading Init System Check...');
+if (window.Logger) {
+  window.Logger.info('🔍 Loading Init System Check...', { page: 'init-check' });
+}
 
 /**
  * Init System Check
@@ -33,7 +35,9 @@ class InitSystemCheck {
         this.addMonitoringButtonToHeader();
         
         this.isInitialized = true;
-        console.log('✅ Init System Check initialized');
+        if (window.Logger) {
+          window.Logger.info('✅ Init System Check initialized', { page: 'init-check' });
+        }
     }
 
     /**
@@ -44,7 +48,7 @@ class InitSystemCheck {
         setTimeout(() => {
             const navList = document.querySelector('.tiktrack-nav-list');
             if (!navList) {
-                console.warn('⚠️ Navigation list not found, retrying...');
+                if (window.Logger) { window.Logger.warn('⚠️ Navigation list not found, retrying...', { page: "init-check" }); }
                 setTimeout(() => this.addMonitoringButtonToHeader(), 500);
                 return;
             }
@@ -68,7 +72,7 @@ class InitSystemCheck {
             // הוספת הכפתור בסוף הרשימה
             navList.appendChild(monitoringButton);
 
-            console.log('✅ Monitoring check button added to header');
+            if (window.Logger) { window.Logger.info('✅ Monitoring check button added to header', { page: "init-check" }); }
         }, 2000); // הגדלנו את הזמן ל-2 שניות
     }
 
@@ -80,7 +84,7 @@ class InitSystemCheck {
             event.preventDefault();
         }
 
-        console.log('🔍 Starting page monitoring check...');
+        if (window.Logger) { window.Logger.info('🔍 Starting page monitoring check...', { page: "init-check" }); }
         
         // קבלת שם העמוד הנוכחי
         const currentPage = this.getCurrentPageName();
@@ -109,7 +113,7 @@ class InitSystemCheck {
             this.displayResults(scanResults, currentPage);
             
         } catch (error) {
-            console.error('Error running page monitoring check:', error);
+            if (window.Logger) { window.Logger.error('Error running page monitoring check:', error, { page: "init-check" }); }
             if (typeof showNotification === 'function') {
                 showNotification('שגיאה בבדיקת המערכת: ' + error.message, 'error');
             }
@@ -262,9 +266,9 @@ class InitSystemCheck {
             window.showDetailsModal(`🔍 תוצאות בדיקת מערכת - ${pageName}`, detailsHtml);
         } else if (typeof showNotification === 'function') {
             showNotification(`נמצאו ${totalIssues} בעיות במערכת`, 'error');
-            console.log('📋 Detailed results:', results);
+            if (window.Logger) { window.Logger.info('📋 Detailed results:', results, { page: "init-check" }); }
         } else {
-            console.log('📋 Monitoring check results:', results);
+            if (window.Logger) { window.Logger.info('📋 Monitoring check results:', results, { page: "init-check" }); }
         }
     }
 }

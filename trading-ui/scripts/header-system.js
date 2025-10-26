@@ -38,7 +38,10 @@
  * @lastUpdated January 15, 2025
  */
 
-window.Logger.info('🚀 Loading Header System v6.0.0...', { page: "header-system" });
+// Logger will be available after initialization
+if (window.Logger) {
+    window.Logger.info('🚀 Loading Header System v6.0.0...', { page: "header-system" });
+}
 
 /**
  * מערכת ראש דף מאוחדת עם פילטרים
@@ -165,6 +168,8 @@ class HeaderSystem {
                         
                         <!-- כלי פיתוח -->
                         <li><a class="tiktrack-dropdown-item" href="/init-system-management">🚀 ניהול מערכת אתחול</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/code-quality-dashboard">📊 איכות קוד</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/duplicate-detector">🔍 זיהוי כפילויות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 מנהל מערכת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">📄 מטריקס JS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/js-map">🗺️ מפת JS</a></li>
@@ -207,6 +212,13 @@ class HeaderSystem {
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px;"
                                title="נקה הכל + רענון עמוד">נקה הכל + רענון</a></li>
                       </ul>
+                    </li>
+
+                    <li class="tiktrack-nav-item">
+                      <a href="#" class="tiktrack-nav-link" onclick="runQuickQualityCheck(event)" 
+                         title="בדיקת איכות מהירה">
+                        <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">⚡</span>
+                      </a>
                     </li>
                   </ul>
                 </nav>

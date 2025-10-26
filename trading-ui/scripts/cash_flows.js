@@ -1,3 +1,46 @@
+/**
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING:
+ * - loadCashFlowsData()
+ * - updateCashFlowsTable()
+ * - updatePageSummaryStats()
+ * 
+ * CASH FLOW MANAGEMENT:
+ * - addCashFlow()
+ * - editCashFlow()
+ * - deleteCashFlow()
+ * - updateCashFlow()
+ * 
+ * VALIDATION:
+ * - clearCashFlowValidation()
+ * - validateCashFlowForm()
+ * 
+ * UI MANAGEMENT:
+ * - showAddCashFlowModal()
+ * - hideAddCashFlowModal()
+ * - showEditCashFlowModal()
+ * - hideEditCashFlowModal()
+ * - updateRadioButtons()
+ * - populateSelect()
+ * - onRelationTypeChange()
+ * - onRelatedObjectChange()
+ * - enableConditionFields()
+ * - disableConditionFields()
+ * - populateRelatedObjects()
+ * 
+ * DATA FILTERING:
+ * - filterCashFlowsLocally()
+ * 
+ * UTILITY FUNCTIONS:
+ * - getDemoCashFlowsData()
+ * - restoreSortState()
+ * - setupModalConfigurations()
+ * 
+ * ==============
+ */
+
 // ===== קובץ JavaScript לדף תזרימי מזומנים =====
 
 /**
@@ -997,13 +1040,13 @@ window.updateCashFlowsTable = updateCashFlowsTable;
 function startAutoRefresh() {
   window.Logger.info('Starting automatic cash flows update', { page: 'cash_flows' });
   
-  // עדכון נתונים כל 30 שניות
-  setInterval(async () => {
-    try {
-      window.Logger.info('Automatic cash flows data update', { page: 'cash_flows' });
-      await loadCashFlows();
-      
-      // עדכון סטטיסטיקות
+  // עדכון נתונים כל 30 שניות - הושבת זמנית למניעת לופים
+  // setInterval(async () => {
+  //   try {
+  //     window.Logger.info('Automatic cash flows data update', { page: 'cash_flows' });
+  //     await loadCashFlows();
+  //     
+  //     // עדכון סטטיסטיקות
       if (typeof updatePageSummaryStats === 'function') {
         updatePageSummaryStats();
       }
@@ -1316,7 +1359,7 @@ function initializeExternalIdFields() {
 }
 
 // עדכון פונקציית showAddCashFlowModal
-async function _showAddCashFlowModal() {
+async function showAddCashFlowModalInternal() {
   // איפוס הטופס
   document.getElementById('addCashFlowForm').reset();
 
@@ -1354,7 +1397,7 @@ async function _showAddCashFlowModal() {
 }
 
 // עדכון פונקציית showEditCashFlowModal
-async function _showEditCashFlowModal(id) {
+async function showEditCashFlowModalInternal(id) {
   const cashFlow = cashFlowsData.find(cf => cf.id === id);
   if (!cashFlow) {
     handleElementNotFound('showEditCashFlowModal', `תזרים מזומנים לא נמצא: ${id}`);

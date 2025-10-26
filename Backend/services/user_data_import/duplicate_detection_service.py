@@ -246,13 +246,20 @@ class DuplicateDetectionService:
             if abs(price1 - price2) <= self.price_tolerance:
                 score += 1
         
-        # Check date match (with tolerance)
+        # Check date match (with tolerance) - must be exact time for duplicates
         if (record1.get('date') and record2.get('date')):
             try:
                 date1 = datetime.fromisoformat(record1['date'].replace('Z', '+00:00'))
                 date2 = datetime.fromisoformat(record2['date'].replace('Z', '+00:00'))
-                if abs((date1 - date2).days) <= self.date_tolerance_days:
+                # For duplicates, we need exact time match (not just same day)
+                # Only allow same day if it's the exact same time
+                if date1 == date2:
                     score += 1
+                elif abs((date1 - date2).days) <= self.date_tolerance_days:
+                    # Same day but different time - check if it's within 1 hour
+                    time_diff = abs((date1 - date2).total_seconds())
+                    if time_diff <= 3600:  # 1 hour tolerance
+                        score += 1  # Same day, same hour
             except ValueError:
                 pass
         

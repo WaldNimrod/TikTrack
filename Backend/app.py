@@ -112,6 +112,7 @@ from routes.api import (
     currencies_bp,
     database_schema_bp,
     linked_items_bp,
+    quality_check_bp,
     entity_relation_types_bp,
     file_scanner_bp,
     cache_management_bp,
@@ -228,10 +229,15 @@ app.register_blueprint(css_management_bp)
 app.register_blueprint(wal_bp)
 app.register_blueprint(system_settings_bp)
 app.register_blueprint(server_logs_bp)
+app.register_blueprint(quality_check_bp, url_prefix='/api/quality-check')
 
 # Register User Data Import blueprint
 from routes.api.user_data_import import user_data_import_bp
 app.register_blueprint(user_data_import_bp)
+
+# Register User Data Import Reports blueprint
+from routes.api.user_data_import_reports import user_data_import_reports_bp
+app.register_blueprint(user_data_import_reports_bp, url_prefix='/api/user-data-import')
 
 # Register External Data Integration blueprints - DISABLED due to import issues
 # External Data Integration blueprints
@@ -262,11 +268,36 @@ def debug_log():
 # Logger batch endpoint for frontend logs
 @app.route('/api/logs/batch', methods=['POST'])
 def logs_batch():
-    """Batch logging endpoint for frontend logs"""
+    """Batch logging endpoint for frontend logs with rate limiting"""
     try:
+        # Simple rate limiting - allow max 10 requests per second
+        import time
+        current_time = time.time()
+        
+        # Check if we have rate limiting data
+        if not hasattr(app, 'rate_limit_data'):
+            app.rate_limit_data = {'requests': [], 'last_cleanup': current_time}
+        
+        # Clean old requests (older than 1 second)
+        app.rate_limit_data['requests'] = [
+            req_time for req_time in app.rate_limit_data['requests'] 
+            if current_time - req_time < 1.0
+        ]
+        
+        # Check rate limit (max 10 requests per second)
+        if len(app.rate_limit_data['requests']) >= 10:
+            return jsonify({"status": "rate_limited", "message": "Too many requests"}), 429
+        
+        # Add current request
+        app.rate_limit_data['requests'].append(current_time)
+        
         data = request.get_json()
         if data and 'logs' in data:
             logs = data['logs']
+            # Limit to max 50 logs per request
+            if len(logs) > 50:
+                logs = logs[:50]
+            
             for log in logs:
                 if isinstance(log, dict) and 'message' in log:
                     level = log.get('level', 'INFO')

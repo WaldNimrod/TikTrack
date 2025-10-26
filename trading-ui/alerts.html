@@ -151,15 +151,21 @@
                                                 הופעל <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th class="col-message">
+                                        <th class="col-condition-source text-center">
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTableData(5, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                תנאי <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-message">
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 הודעה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-created">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(7, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
                                                 נוצר ב: <span class="sort-icon">↕</span>
                                             </button>
                                         </th>

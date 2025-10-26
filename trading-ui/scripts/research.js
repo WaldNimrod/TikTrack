@@ -1,6 +1,31 @@
-// Research page functions
+// ===== RESEARCH PAGE FUNCTIONS =====
 
-// Initialize research page
+/**
+ * Function Index:
+ * ==============
+ * 
+ * PAGE INITIALIZATION:
+ * - initializeResearchPage()
+ * 
+ * DATA LOADING:
+ * - loadResearchData()
+ * 
+ * EVENT HANDLING:
+ * - setupResearchEventListeners()
+ * 
+ * RESEARCH TOOLS:
+ * - analyzeMarketTrends()
+ * - compareTickers()
+ * - technicalAnalysis()
+ * - getMarketOverview()
+ * - getVolatilityIndex()
+ * - getNewsFeed()
+ * - exportResearchData()
+ * 
+ * ==============
+ */
+
+// ===== PAGE INITIALIZATION =====
 /**
  * Initialize the research page
  * Loads data and sets up event listeners
@@ -22,7 +47,7 @@ function initializeResearchPage() {
     }
 }
 
-// Load research data
+// ===== DATA LOADING =====
 /**
  * Load research data from the server
  * Fetches market data, news, and analysis
@@ -43,7 +68,7 @@ function loadResearchData() {
     }
 }
 
-// Setup event listeners
+// ===== EVENT HANDLING =====
 /**
  * Set up event listeners for research page
  * Handles user interactions and form submissions
@@ -60,7 +85,7 @@ function setupResearchEventListeners() {
     }
 }
 
-// Research tool functions
+// ===== RESEARCH TOOLS =====
 /**
  * Analyze market trends
  * Performs technical analysis on market data

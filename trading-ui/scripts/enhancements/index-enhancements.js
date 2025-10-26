@@ -457,10 +457,10 @@ class IndexPageEnhancements {
      * Setup real-time updates
      */
     setupRealTimeUpdates() {
-        // Update data every 30 seconds
-        setInterval(() => {
-            this.debouncedDataUpdate();
-        }, 30000);
+        // Update data every 30 seconds - הושבת זמנית למניעת לופים
+        // setInterval(() => {
+        //     this.debouncedDataUpdate();
+        // }, 30000);
     }
     
     /**

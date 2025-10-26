@@ -123,13 +123,14 @@ class IBKRConnector(BaseConnector):
             csv_reader = csv.reader(StringIO(header_line))
             headers = [col.strip() for col in next(csv_reader)]
             
-            # Parse trade records starting from the line after header
-            for i in range(trades_start + 2, len(lines)):
+            # Parse trade records - only lines that start exactly with "Trades,Data"
+            for i in range(trades_start + 1, len(lines)):
                 line = lines[i].strip()
-                if not line or line.startswith('Trades,Total'):
-                    break
+                if not line:
+                    continue
                 
-                if line.startswith('Trades,Data,Order'):
+                # Only process lines that start exactly with "Trades,Data"
+                if line.startswith('Trades,Data'):
                     # Parse the trade record using CSV parser to handle quoted values
                     import csv
                     from io import StringIO

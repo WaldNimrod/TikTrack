@@ -1,4 +1,47 @@
 /**
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING:
+ * - loadTradesData()
+ * - updateTradesTable()
+ * - updatePageSummaryStats()
+ * 
+ * TRADE MANAGEMENT:
+ * - addTrade()
+ * - editTrade()
+ * - deleteTrade()
+ * - updateTrade()
+ * 
+ * VALIDATION:
+ * - clearTradeValidation()
+ * - validateTradeForm()
+ * 
+ * UI MANAGEMENT:
+ * - showAddTradeModal()
+ * - hideAddTradeModal()
+ * - showEditTradeModal()
+ * - hideEditTradeModal()
+ * - updateRadioButtons()
+ * - populateSelect()
+ * - onRelationTypeChange()
+ * - onRelatedObjectChange()
+ * - enableConditionFields()
+ * - disableConditionFields()
+ * - populateRelatedObjects()
+ * 
+ * DATA FILTERING:
+ * - filterTradesLocally()
+ * 
+ * UTILITY FUNCTIONS:
+ * - getDemoTradesData()
+ * - restoreSortState()
+ * - setupModalConfigurations()
+ * 
+ * ==============
+ */
+
+/**
  * Trades.js - TikTrack Frontend
  * =============================
  *

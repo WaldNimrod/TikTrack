@@ -1,3 +1,43 @@
+/**
+ * Function Index:
+ * ==============
+ * 
+ * EXECUTION MANAGEMENT:
+ * - addExecution()
+ * - editExecution()
+ * - deleteExecution()
+ * - updateExecution()
+ * 
+ * VALIDATION:
+ * - validateExecutionDate()
+ * - validateExecutionType()
+ * - clearFieldError()
+ * - clearExecutionValidationErrors()
+ * - validateCompleteExecutionForm()
+ * 
+ * UI MANAGEMENT:
+ * - displayLinkedItems()
+ * - goToLinkedItems()
+ * - goToTrade()
+ * - goToPlan()
+ * - goToAlert()
+ * - goToNote()
+ * - goToTickerPage()
+ * - showTickerHelp()
+ * - addNewTicker()
+ * 
+ * DATA FILTERING:
+ * - isDateInRange()
+ * - filterExecutionsLocally()
+ * 
+ * UTILITY FUNCTIONS:
+ * - restoreSortState()
+ * - setupModalConfigurations()
+ * - enableAllFields()
+ * 
+ * ==============
+ */
+
 // ===== קובץ JavaScript לדף עסקעות =====
 
 /**
@@ -2066,11 +2106,6 @@ function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, se
 
   // Filtered executions
   return filtered;
-}
-
-// הגדרת הפונקציה כגלובלית
-window.filterExecutionsLocally = filterExecutionsLocally;
-
   } catch (error) {
     window.Logger.error('שגיאה בפילטור מקומי של עסקעות:', error, { page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
@@ -2079,6 +2114,9 @@ window.filterExecutionsLocally = filterExecutionsLocally;
     return executions; // החזרת הנתונים המקוריים במקרה של שגיאה
   }
 }
+
+// הגדרת הפונקציה כגלובלית
+window.filterExecutionsLocally = filterExecutionsLocally;
 
 // הגדרת הפונקציות כגלובליות
 window.openExecutionDetails = openExecutionDetails;
@@ -2209,11 +2247,11 @@ window.initializeExecutionsPage = async function() {
   updateTickersList('add', false);
   updateTickersList('edit', false);
 
-  // עדכון אוטומטי כל 30 שניות
-  setInterval(() => {
-    window.Logger.info('🔄 Auto-refreshing executions data...', { page: "executions" });
-    loadExecutionsData();
-  }, 30000);
+  // עדכון אוטומטי כל 30 שניות - הושבת זמנית למניעת לופים
+  // setInterval(() => {
+  //   window.Logger.info('🔄 Auto-refreshing executions data...', { page: "executions" });
+  //   loadExecutionsData();
+  // }, 30000);
 };
 
 // Fallback for direct access (backward compatibility)

@@ -1,17 +1,37 @@
+// Fallback גלובלי למקרה ש-Logger לא נטען
+if (!window.Logger) {
+    window.Logger = {
+        info: () => {},
+        error: () => {},
+        warn: () => {},
+        debug: () => {},
+        critical: () => {}
+    };
+}
+
 /**
  * Logger Service - TikTrack
  * שירות לוגים מתקדם עם אינטגרציה לשרת
  * 
  * תכונות:
  * - רמות לוג שונות (DEBUG, INFO, WARN, ERROR, CRITICAL)
- * - שליחה לשרת עם batching
- * - שמירה מקומית ב-localStorage
- * - ניטור ביצועים
- * - טיפול בשגיאות מתקדם
+ * - שליחה לשרת עם batching (רק במצב DEBUG או שגיאות)
+ * - שמירה מקומית ב-localStorage (רק במצב DEBUG)
+ * - ניטור ביצועים (רק במצב DEBUG)
+ * - טיפול בשגיאות מתקדם עם הגנות
+ * - מניעת לופים אינסופיים
+ * - הגבלת גודל context
+ * - מניעת לוגים כפולים
+ * 
+ * מצב DEBUG:
+ * - נקבע לפי hostname (localhost/127.0.0.1) או URL parameters (debug=true, dev=true)
+ * - במצב DEBUG: כל הלוגים מוצגים, נשמרים ב-localStorage, נשלחים לשרת
+ * - במצב ייצור: רק שגיאות מוצגות ונשלחות לשרת
  * 
  * מחבר: TikTrack Development Team
  * תאריך יצירה: 24 אוקטובר 2025
- * גרסה: 2.0.0
+ * תאריך עדכון: 25 אוקטובר 2025
+ * גרסה: 2.1.0
  */
 
 class Logger {
@@ -22,6 +42,18 @@ class Logger {
         ERROR: 3,
         CRITICAL: 4
     };
+
+    // הגדרת מצב דיבג - נשמר פעם אחת
+    static _debugMode = null;
+    static get DEBUG_MODE() {
+        if (Logger._debugMode === null) {
+            Logger._debugMode = window.location.hostname === 'localhost' || 
+                                window.location.hostname === '127.0.0.1' ||
+                                window.location.search.includes('debug=true') ||
+                                window.location.search.includes('dev=true');
+        }
+        return Logger._debugMode;
+    }
 
     constructor() {
         this.initialized = false;
@@ -37,8 +69,46 @@ class Logger {
         this.performanceThreshold = 100; // ms
         this.longTaskThreshold = 50; // ms
         
+        // Debouncing and protection
+        this.isFlushing = false;
+        this.flushAttempts = 0;
+        this.maxFlushAttempts = 5;
+        
+        // הגנות נוספות
+        this.isLogging = false;
+        this.maxContextSize = 1000; // מקסימום 1KB ל-context
+        this.duplicateLogs = new Set(); // מניעת לוגים כפולים
+        
         this.init();
     }
+
+    /**
+     * מיפוי קטגוריות למערכות
+     * Maps page names to console log categories
+     */
+    static CATEGORY_MAPPING = {
+        'header-system': 'initialization',
+        'unified-app-initializer': 'initialization',
+        'button-system': 'ui_components',
+        'actions-menu': 'ui_components',
+        'notification-system': 'notifications',
+        'cache': 'cache',
+        'preferences': 'system',
+        'ui-utils': 'ui_components',
+        'color-scheme': 'ui_components',
+        'monitoring': 'system',
+        'init-check': 'initialization',
+        'cache-sync': 'cache',
+        'entity-details': 'system',
+        'trades': 'business',
+        'executions': 'business',
+        'alerts': 'business',
+        'accounts': 'business',
+        'tickers': 'business',
+        'trade-plans': 'business',
+        'cash-flows': 'business',
+        'notes': 'business'
+    };
 
     /**
      * אתחול מערכת הלוגים
@@ -149,70 +219,194 @@ class Logger {
     }
 
     /**
-     * פונקציית הלוג הראשית
+     * פונקציית הלוג הראשית עם הגנות
      */
-    log(level, message, context = {}) {
+    async log(level, message, context = {}) {
+        // הגנה מפני recursive calls
+        if (this.isLogging) {
+            return;
+        }
+
         if (level < this.currentLevel) {
             return;
         }
 
-        const logEntry = {
-            timestamp: new Date().toISOString(),
-            level: this.getLevelName(level),
-            message: message,
-            context: {
-                ...context,
-                page: window.location.pathname,
-                userAgent: navigator.userAgent,
-                sessionId: this.getSessionId(),
-                userId: this.getUserId()
+        // במצב DEBUG - מציגים כל הלוגים
+        if (Logger.DEBUG_MODE) {
+            // במצב DEBUG - מציגים הכל
+        } else {
+            // במצב ייצור - רק שגיאות קריטיות
+            if (level < Logger.LogLevel.ERROR) {
+                return;
             }
-        };
+        }
 
-        // Console output
-        this.outputToConsole(level, message, context);
+        // הגבלת גודל context
+        const contextString = JSON.stringify(context);
+        if (contextString.length > this.maxContextSize) {
+            context = {
+                ...context,
+                _truncated: true,
+                _originalSize: contextString.length
+            };
+        }
 
-        // Add to pending logs
-        this.pendingLogs.push(logEntry);
+        // מניעת לוגים כפולים (רק ל-ERROR ו-CRITICAL)
+        if (level >= Logger.LogLevel.ERROR) {
+            const logKey = `${level}-${message}-${JSON.stringify(context)}`;
+            if (this.duplicateLogs.has(logKey)) {
+                return; // לוג כפול - לא מטפלים
+            }
+            this.duplicateLogs.add(logKey);
+            
+            // ניקוי מערכת מניעת כפילויות כל 1000 לוגים
+            if (this.duplicateLogs.size > 1000) {
+                this.duplicateLogs.clear();
+            }
+        }
 
-        // Save to localStorage
-        this.savePendingLogs();
+        this.isLogging = true;
 
-        // Send to server if batch is ready
-        this.queueForServer(logEntry);
+        try {
+            const logEntry = {
+                timestamp: new Date().toISOString(),
+                level: this.getLevelName(level),
+                message: message,
+                context: {
+                    ...context,
+                    page: window.location.pathname,
+                    userAgent: navigator.userAgent,
+                    sessionId: this.getSessionId(),
+                    userId: this.getUserId()
+                }
+            };
+
+            // Console output
+            this.outputToConsole(level, message, context);
+
+            // Send to server if batch is ready (queueForServer יוסיף ל-pendingLogs)
+            this.queueForServer(logEntry);
+        } finally {
+            this.isLogging = false;
+        }
     }
 
     /**
      * שליחה לשרת
      */
-    async queueForServer(logEntry) {
+    queueForServer(logEntry) {
         this.pendingLogs.push(logEntry);
+
+        // Save to localStorage
+        this.savePendingLogs();
 
         // Send batch if full
         if (this.pendingLogs.length >= this.batchSize) {
-            await this.flushToServer();
+            this.flushToServer();
         }
 
-        // Set timeout for partial batch
+        // Set timeout for partial batch (longer delay to avoid 429)
         if (!this.flushTimeout) {
             this.flushTimeout = setTimeout(() => {
                 this.flushToServer();
-            }, this.batchTimeout);
+            }, this.batchTimeout * 2); // Double the timeout
         }
     }
 
     /**
-     * שליחת לוגים לשרת
+     * שליחת לוגים בקבוצות קטנות יותר
      */
-    async flushToServer() {
+    async flushToServerGradually() {
         if (this.pendingLogs.length === 0) {
             return;
         }
+
+        // Send in smaller batches to avoid 429 errors
+        const smallBatchSize = 10;
+        const batches = [];
+        
+        for (let i = 0; i < this.pendingLogs.length; i += smallBatchSize) {
+            batches.push(this.pendingLogs.slice(i, i + smallBatchSize));
+        }
+
+        for (const batch of batches) {
+            try {
+                const response = await fetch('/api/logs/batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        logs: batch
+                    })
+                });
+
+                if (!response.ok) {
+                    if (response.status === 429) {
+                        // Rate limited - wait before retrying
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        continue;
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                console.log(`✅ Sent ${batch.length} logs to server`);
+                
+                // Remove sent logs from pending
+                this.pendingLogs = this.pendingLogs.filter(log => !batch.includes(log));
+                
+            } catch (error) {
+                console.error('❌ Failed to send log batch:', error);
+                // Wait before trying next batch
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+
+        // Save remaining logs
+        this.savePendingLogs();
+    }
+
+    /**
+     * שליחת לוגים לשרת עם debouncing והגנות
+     */
+    async flushToServer() {
+        // הגנה מפני קריאות מרובות
+        if (this.isFlushing) {
+            return;
+        }
+
+        if (this.pendingLogs.length === 0) {
+            return;
+        }
+
+        // הגבלת מספר ניסיונות
+        if (this.flushAttempts >= this.maxFlushAttempts) {
+            console.warn('⚠️ Max flush attempts reached, clearing logs');
+            this.pendingLogs = [];
+            this.clearPendingLogs();
+            return;
+        }
+
+        // הגבלה: שולחים לשרת רק במצב דיבג או שגיאות קריטיות
+        const shouldSendToServer = Logger.DEBUG_MODE || 
+            this.pendingLogs.some(log => log.level >= Logger.LogLevel.ERROR);
+        
+        if (!shouldSendToServer) {
+            this.pendingLogs = []; // מנקים את הלוגים
+            return;
+        }
+
+        this.isFlushing = true;
+        this.flushAttempts++;
 
         const logsToSend = [...this.pendingLogs];
         this.pendingLogs = [];
 
         try {
+            // Timeout לשליחה
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 שניות timeout
+
             const response = await fetch('/api/logs/batch', {
                 method: 'POST',
                 headers: {
@@ -220,10 +414,20 @@ class Logger {
                 },
                 body: JSON.stringify({
                     logs: logsToSend
-                })
+                }),
+                signal: controller.signal
             });
 
+            clearTimeout(timeoutId);
+
             if (!response.ok) {
+                if (response.status === 429) {
+                    // Rate limited - put logs back and try later
+                    this.pendingLogs.unshift(...logsToSend);
+                    this.savePendingLogs();
+                    console.warn('⚠️ Rate limited, will retry later');
+                    return;
+                }
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
@@ -232,6 +436,7 @@ class Logger {
             
             // Clear localStorage after successful send
             this.clearPendingLogs();
+            this.flushAttempts = 0; // איפוס מונה הניסיונות
 
         } catch (error) {
             console.error('❌ Failed to send logs to server:', error);
@@ -239,6 +444,8 @@ class Logger {
             // Put logs back in pending queue
             this.pendingLogs.unshift(...logsToSend);
             this.savePendingLogs();
+        } finally {
+            this.isFlushing = false;
         }
 
         if (this.flushTimeout) {
@@ -248,22 +455,23 @@ class Logger {
     }
 
     /**
-     * התחלת עיבוד batch
+     * התחלת עיבוד batch - הוסר setInterval למניעת לופים אינסופיים
      */
     startBatchProcessing() {
-        // Process pending logs every 30 seconds
-        setInterval(() => {
-            if (this.pendingLogs.length > 0) {
-                this.flushToServer();
-            }
-        }, 30000);
+        // setInterval הוסר - עיבוד batch מתבצע רק על ידי flushTimeout
+        // זה מונע לופים אינסופיים ומשפר ביצועים
     }
 
     /**
-     * ניטור ביצועים
+     * ניטור ביצועים - רק במצב DEBUG
      */
     setupPerformanceMonitoring() {
-        // Monitor long tasks
+        // ניטור רק במצב DEBUG
+        if (!Logger.DEBUG_MODE) {
+            return;
+        }
+
+        // Monitor long tasks (רק במצב DEBUG)
         if ('PerformanceObserver' in window) {
             const observer = new PerformanceObserver(list => {
                 list.getEntries().forEach(entry => {
@@ -285,20 +493,40 @@ class Logger {
     }
 
     /**
-     * שמירת לוגים ב-localStorage
+     * שמירת לוגים ב-localStorage - זמנית: תמיד שומרים
      */
     savePendingLogs() {
+        // שמירה רק במצב DEBUG
+        if (!Logger.DEBUG_MODE) {
+            return;
+        }
+
         try {
-            localStorage.setItem('tiktrack_pending_logs', JSON.stringify(this.pendingLogs));
+            // הגבלת מספר לוגים מקסימלי
+            const maxLogs = 100;
+            let logsToSave = [...this.pendingLogs];
+            
+            if (logsToSave.length > maxLogs) {
+                // שומרים רק את הלוגים החדשים ביותר
+                logsToSave = logsToSave.slice(-maxLogs);
+                console.warn(`⚠️ Logs truncated to ${maxLogs} entries`);
+            }
+
+            localStorage.setItem('tiktrack_pending_logs', JSON.stringify(logsToSave));
         } catch (error) {
             console.warn('⚠️ Failed to save logs to localStorage:', error);
         }
     }
 
     /**
-     * טעינת לוגים מ-localStorage
+     * טעינת לוגים מ-localStorage - רק במצב DEBUG
      */
     loadPendingLogs() {
+        // טעינה רק במצב DEBUG
+        if (!Logger.DEBUG_MODE) {
+            return;
+        }
+
         try {
             const saved = localStorage.getItem('tiktrack_pending_logs');
             if (saved) {
@@ -322,9 +550,31 @@ class Logger {
     }
 
     /**
-     * פלט לקונסול
+     * בדוק אם צריך לוג לקונסול - זמנית: רק שגיאות
+     */
+    shouldLogToConsole(category) {
+        // במצב DEBUG - מציגים לוגים
+        if (Logger.DEBUG_MODE) {
+            return true;
+        }
+        
+        // במצב ייצור - רק שגיאות
+        return false;
+    }
+
+    /**
+     * פלט לקונסול - פישוט
      */
     outputToConsole(level, message, context) {
+        // Extract category from context.page
+        const page = context?.page || 'system';
+        const category = Logger.CATEGORY_MAPPING[page] || 'system';
+        
+        // בדיקה פשוטה אם צריך להדפיס לוג
+        if (!this.shouldLogToConsole(category)) {
+            return;
+        }
+        
         const timestamp = new Date().toLocaleTimeString();
         const levelName = this.getLevelName(level);
         
@@ -409,6 +659,17 @@ class Logger {
 
 // יצירת instance גלובלי
 window.Logger = new Logger();
+
+// Fallback למקרה ש-Logger לא זמין
+if (!window.Logger) {
+    window.Logger = {
+        info: () => {},
+        error: () => {},
+        warn: () => {},
+        debug: () => {},
+        critical: () => {}
+    };
+}
 
 // הוספה למערכת האתחול המאוחדת
 if (window.UnifiedInitializationSystem) {

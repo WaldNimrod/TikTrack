@@ -371,8 +371,7 @@
     margin-bottom: 15px;
 }
 
-.ticker-item,
-.duplicate-item {
+.ticker-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -381,6 +380,136 @@
     border-radius: 4px;
     margin-bottom: 5px;
     background: #f9f9f9;
+}
+
+/* Enhanced Duplicate Item Styles */
+.duplicate-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.duplicate-header {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.duplicate-confidence {
+    background: #26baac;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.duplicate-records {
+    padding: 15px;
+}
+
+.record-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.record-main,
+.record-matches {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 12px;
+    background: #fafafa;
+}
+
+.record-main h6,
+.record-matches h6 {
+    margin: 0 0 10px 0;
+    color: #26baac;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.record-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.record-field {
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.record-field strong {
+    color: #495057;
+    margin-left: 5px;
+}
+
+.record-match {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: white;
+}
+
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.match-confidence {
+    background: #fc5a06;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.no-matches {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 20px;
+}
+
+.duplicate-actions-item {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .record-comparison {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .record-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .duplicate-header {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
 }
 
 /* Preview Summary */

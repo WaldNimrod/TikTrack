@@ -1,0 +1,1643 @@
+{
+  "timestamp": "2025-10-26T17:11:25.668Z",
+  "summary": {
+    "totalFiles": 11,
+    "filesWithDuplicates": 8,
+    "totalDuplicates": 92,
+    "highSeverityDuplicates": 76,
+    "mediumSeverityDuplicates": 16,
+    "averageDuplicatesPerFile": "8.36"
+  },
+  "files": [
+    {
+      "file": "index.js",
+      "totalFunctions": 16,
+      "duplicates": [],
+      "duplicateCount": 0,
+      "severityBreakdown": {
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0
+      }
+    },
+    {
+      "file": "trades.js",
+      "totalFunctions": 61,
+      "duplicates": [
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "checkLinkedItemsBeforeDelete",
+            "startIndex": 78474,
+            "fullMatch": "function checkLinkedItemsBeforeDelete(tradeId) {"
+          },
+          "function2": {
+            "name": "checkLinkedItemsBeforeCancel",
+            "startIndex": 79864,
+            "fullMatch": "function checkLinkedItemsBeforeCancel(tradeId) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: checkLinkedItemsBeforeDelete vs checkLinkedItemsBeforeCancel (100.0% similar)"
+        },
+        {
+          "type": "HIGH_SIMILARITY",
+          "function1": {
+            "name": "addEditImportantNote",
+            "startIndex": 31159,
+            "fullMatch": "function addEditImportantNote() {"
+          },
+          "function2": {
+            "name": "addImportantNote",
+            "startIndex": 70109,
+            "fullMatch": "function addImportantNote() {"
+          },
+          "similarity": 0.8807339449541285,
+          "severity": "MEDIUM",
+          "reason": "HIGH_SIMILARITY: addEditImportantNote vs addImportantNote (88.1% similar)"
+        },
+        {
+          "type": "HIGH_SIMILARITY",
+          "function1": {
+            "name": "viewTickerDetails",
+            "startIndex": 21040,
+            "fullMatch": "function viewTickerDetails(tickerId) {"
+          },
+          "function2": {
+            "name": "viewAccountDetails",
+            "startIndex": 21426,
+            "fullMatch": "function viewAccountDetails(accountId) {"
+          },
+          "similarity": 0.845,
+          "severity": "MEDIUM",
+          "reason": "HIGH_SIMILARITY: viewTickerDetails vs viewAccountDetails (84.5% similar)"
+        },
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "addEditImportantNote",
+            "startIndex": 31159,
+            "fullMatch": "function addEditImportantNote() {"
+          },
+          "function2": {
+            "name": "addEditReminder",
+            "startIndex": 31344,
+            "fullMatch": "function addEditReminder() {"
+          },
+          "similarity": 0.7870370370370371,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: addEditImportantNote vs addEditReminder (78.7% similar)"
+        },
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "addEditReminder",
+            "startIndex": 31344,
+            "fullMatch": "function addEditReminder() {"
+          },
+          "function2": {
+            "name": "addImportantNote",
+            "startIndex": 70109,
+            "fullMatch": "function addImportantNote() {"
+          },
+          "similarity": 0.7798165137614679,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: addEditReminder vs addImportantNote (78.0% similar)"
+        }
+      ],
+      "duplicateCount": 5,
+      "severityBreakdown": {
+        "HIGH": 1,
+        "MEDIUM": 4,
+        "LOW": 0
+      }
+    },
+    {
+      "file": "executions.js",
+      "totalFunctions": 86,
+      "duplicates": [
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "updateExecutionWrapper",
+            "startIndex": 36184,
+            "fullMatch": "function updateExecutionWrapper() {"
+          },
+          "function2": {
+            "name": "updateExecutionWrapper",
+            "startIndex": 129004,
+            "fullMatch": "function updateExecutionWrapper() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: updateExecutionWrapper"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "confirmDeleteExecution",
+            "startIndex": 41379,
+            "fullMatch": "function confirmDeleteExecution(_id) {"
+          },
+          "function2": {
+            "name": "confirmDeleteExecution",
+            "startIndex": 129282,
+            "fullMatch": "function confirmDeleteExecution() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: confirmDeleteExecution"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "addNewTicker",
+            "startIndex": 90405,
+            "fullMatch": "function addNewTicker() {"
+          },
+          "function2": {
+            "name": "addNewTicker",
+            "startIndex": 130239,
+            "fullMatch": "function addNewTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: addNewTicker"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "addNewPlan",
+            "startIndex": 90990,
+            "fullMatch": "function addNewPlan() {"
+          },
+          "function2": {
+            "name": "addNewPlan",
+            "startIndex": 129813,
+            "fullMatch": "function addNewPlan() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: addNewPlan"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "addNewTrade",
+            "startIndex": 91305,
+            "fullMatch": "function addNewTrade() {"
+          },
+          "function2": {
+            "name": "addNewTrade",
+            "startIndex": 130024,
+            "fullMatch": "function addNewTrade() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: addNewTrade"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "enableExecutionFormFields",
+            "startIndex": 93226,
+            "fullMatch": "function enableExecutionFormFields() {"
+          },
+          "function2": {
+            "name": "disableExecutionFormFields",
+            "startIndex": 93633,
+            "fullMatch": "function disableExecutionFormFields() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: enableExecutionFormFields vs disableExecutionFormFields (100.0% similar)"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "goToLinkedTrade",
+            "startIndex": 99120,
+            "fullMatch": "function goToLinkedTrade(mode = 'edit') {"
+          },
+          "function2": {
+            "name": "goToLinkedTrade",
+            "startIndex": 129565,
+            "fullMatch": "function goToLinkedTrade(mode = 'edit') {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: goToLinkedTrade"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "saveExecutionWrapper",
+            "startIndex": 128774,
+            "fullMatch": "function saveExecutionWrapper() {"
+          },
+          "function2": {
+            "name": "confirmDeleteExecution",
+            "startIndex": 129282,
+            "fullMatch": "function confirmDeleteExecution() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: saveExecutionWrapper vs confirmDeleteExecution (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "saveExecutionWrapper",
+            "startIndex": 128774,
+            "fullMatch": "function saveExecutionWrapper() {"
+          },
+          "function2": {
+            "name": "addNewPlan",
+            "startIndex": 129813,
+            "fullMatch": "function addNewPlan() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: saveExecutionWrapper vs addNewPlan (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "saveExecutionWrapper",
+            "startIndex": 128774,
+            "fullMatch": "function saveExecutionWrapper() {"
+          },
+          "function2": {
+            "name": "addNewTrade",
+            "startIndex": 130024,
+            "fullMatch": "function addNewTrade() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: saveExecutionWrapper vs addNewTrade (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "saveExecutionWrapper",
+            "startIndex": 128774,
+            "fullMatch": "function saveExecutionWrapper() {"
+          },
+          "function2": {
+            "name": "addNewTicker",
+            "startIndex": 130239,
+            "fullMatch": "function addNewTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: saveExecutionWrapper vs addNewTicker (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "confirmDeleteExecution",
+            "startIndex": 129282,
+            "fullMatch": "function confirmDeleteExecution() {"
+          },
+          "function2": {
+            "name": "addNewPlan",
+            "startIndex": 129813,
+            "fullMatch": "function addNewPlan() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: confirmDeleteExecution vs addNewPlan (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "confirmDeleteExecution",
+            "startIndex": 129282,
+            "fullMatch": "function confirmDeleteExecution() {"
+          },
+          "function2": {
+            "name": "addNewTrade",
+            "startIndex": 130024,
+            "fullMatch": "function addNewTrade() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: confirmDeleteExecution vs addNewTrade (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "confirmDeleteExecution",
+            "startIndex": 129282,
+            "fullMatch": "function confirmDeleteExecution() {"
+          },
+          "function2": {
+            "name": "addNewTicker",
+            "startIndex": 130239,
+            "fullMatch": "function addNewTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: confirmDeleteExecution vs addNewTicker (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "addNewPlan",
+            "startIndex": 129813,
+            "fullMatch": "function addNewPlan() {"
+          },
+          "function2": {
+            "name": "addNewTrade",
+            "startIndex": 130024,
+            "fullMatch": "function addNewTrade() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: addNewPlan vs addNewTrade (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "addNewPlan",
+            "startIndex": 129813,
+            "fullMatch": "function addNewPlan() {"
+          },
+          "function2": {
+            "name": "addNewTicker",
+            "startIndex": 130239,
+            "fullMatch": "function addNewTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: addNewPlan vs addNewTicker (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "addNewTrade",
+            "startIndex": 130024,
+            "fullMatch": "function addNewTrade() {"
+          },
+          "function2": {
+            "name": "addNewTicker",
+            "startIndex": 130239,
+            "fullMatch": "function addNewTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: addNewTrade vs addNewTicker (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "validateExecutionQuantity",
+            "startIndex": 20996,
+            "fullMatch": "function validateExecutionQuantity(input) {"
+          },
+          "function2": {
+            "name": "validateExecutionPrice",
+            "startIndex": 21692,
+            "fullMatch": "function validateExecutionPrice(input) {"
+          },
+          "similarity": 0.9777777777777777,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: validateExecutionQuantity vs validateExecutionPrice (97.8% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "goToTrade",
+            "startIndex": 55217,
+            "fullMatch": "function goToTrade(tradeId) {"
+          },
+          "function2": {
+            "name": "goToPlan",
+            "startIndex": 55592,
+            "fullMatch": "function goToPlan(planId) {"
+          },
+          "similarity": 0.949748743718593,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: goToTrade vs goToPlan (95.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "goToTrade",
+            "startIndex": 55217,
+            "fullMatch": "function goToTrade(tradeId) {"
+          },
+          "function2": {
+            "name": "goToAlert",
+            "startIndex": 55964,
+            "fullMatch": "function goToAlert(alertId) {"
+          },
+          "similarity": 0.949748743718593,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: goToTrade vs goToAlert (95.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "goToPlan",
+            "startIndex": 55592,
+            "fullMatch": "function goToPlan(planId) {"
+          },
+          "function2": {
+            "name": "goToAlert",
+            "startIndex": 55964,
+            "fullMatch": "function goToAlert(alertId) {"
+          },
+          "similarity": 0.949748743718593,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: goToPlan vs goToAlert (95.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "addNewPlan",
+            "startIndex": 90990,
+            "fullMatch": "function addNewPlan() {"
+          },
+          "function2": {
+            "name": "addNewTrade",
+            "startIndex": 91305,
+            "fullMatch": "function addNewTrade() {"
+          },
+          "similarity": 0.9456521739130435,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: addNewPlan vs addNewTrade (94.6% similar)"
+        },
+        {
+          "type": "HIGH_SIMILARITY",
+          "function1": {
+            "name": "linkExistingExecution",
+            "startIndex": 102748,
+            "fullMatch": "function linkExistingExecution() {"
+          },
+          "function2": {
+            "name": "unlinkExecution",
+            "startIndex": 103029,
+            "fullMatch": "function unlinkExecution() {"
+          },
+          "similarity": 0.8761061946902655,
+          "severity": "MEDIUM",
+          "reason": "HIGH_SIMILARITY: linkExistingExecution vs unlinkExecution (87.6% similar)"
+        }
+      ],
+      "duplicateCount": 23,
+      "severityBreakdown": {
+        "HIGH": 22,
+        "MEDIUM": 1,
+        "LOW": 0
+      }
+    },
+    {
+      "file": "alerts.js",
+      "totalFunctions": 63,
+      "duplicates": [
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "disableConditionFields",
+            "startIndex": 43357,
+            "fullMatch": "function disableConditionFields() {"
+          },
+          "function2": {
+            "name": "disableEditConditionFields",
+            "startIndex": 49548,
+            "fullMatch": "function disableEditConditionFields() {"
+          },
+          "similarity": 0.7950819672131147,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: disableConditionFields vs disableEditConditionFields (79.5% similar)"
+        },
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "populateRelatedObjects",
+            "startIndex": 44660,
+            "fullMatch": "function populateRelatedObjects(relationTypeId) {"
+          },
+          "function2": {
+            "name": "populateEditRelatedObjects",
+            "startIndex": 45843,
+            "fullMatch": "function populateEditRelatedObjects(relationTypeId) {"
+          },
+          "similarity": 0.7831932773109244,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: populateRelatedObjects vs populateEditRelatedObjects (78.3% similar)"
+        },
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "enableConditionFields",
+            "startIndex": 42239,
+            "fullMatch": "function enableConditionFields() {"
+          },
+          "function2": {
+            "name": "enableEditConditionFields",
+            "startIndex": 48365,
+            "fullMatch": "function enableEditConditionFields() {"
+          },
+          "similarity": 0.7676579925650557,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: enableConditionFields vs enableEditConditionFields (76.8% similar)"
+        }
+      ],
+      "duplicateCount": 3,
+      "severityBreakdown": {
+        "HIGH": 0,
+        "MEDIUM": 3,
+        "LOW": 0
+      }
+    },
+    {
+      "file": "trade_plans.js",
+      "totalFunctions": 79,
+      "duplicates": [
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "displayTickerInfo",
+            "startIndex": 12734,
+            "fullMatch": "function displayTickerInfo(ticker) {"
+          },
+          "function2": {
+            "name": "displayEditTickerInfo",
+            "startIndex": 19376,
+            "fullMatch": "function displayEditTickerInfo(ticker) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: displayTickerInfo vs displayEditTickerInfo (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "setupPriceCalculation",
+            "startIndex": 119997,
+            "fullMatch": "function setupPriceCalculation() {"
+          },
+          "function2": {
+            "name": "setupEditPriceCalculation",
+            "startIndex": 124855,
+            "fullMatch": "function setupEditPriceCalculation() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: setupPriceCalculation vs setupEditPriceCalculation (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "openCancelTradePlanModal",
+            "startIndex": 46356,
+            "fullMatch": "function openCancelTradePlanModal(tradePlanId) {"
+          },
+          "function2": {
+            "name": "openDeleteTradePlanModal",
+            "startIndex": 47518,
+            "fullMatch": "function openDeleteTradePlanModal(tradePlanId) {"
+          },
+          "similarity": 0.9841269841269841,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: openCancelTradePlanModal vs openDeleteTradePlanModal (98.4% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "enableEditFieldsWrapper",
+            "startIndex": 10521,
+            "fullMatch": "function enableEditFieldsWrapper() {"
+          },
+          "function2": {
+            "name": "disableEditFields",
+            "startIndex": 11133,
+            "fullMatch": "function disableEditFields() {"
+          },
+          "similarity": 0.9825072886297376,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: enableEditFieldsWrapper vs disableEditFields (98.3% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "enableFormFields",
+            "startIndex": 9358,
+            "fullMatch": "function enableFormFields() {"
+          },
+          "function2": {
+            "name": "disableFormFields",
+            "startIndex": 9941,
+            "fullMatch": "function disableFormFields() {"
+          },
+          "similarity": 0.9824046920821115,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: enableFormFields vs disableFormFields (98.2% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "addEditCondition",
+            "startIndex": 44542,
+            "fullMatch": "function addEditCondition() {"
+          },
+          "function2": {
+            "name": "addEditReason",
+            "startIndex": 44978,
+            "fullMatch": "function addEditReason() {"
+          },
+          "similarity": 0.9708029197080292,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: addEditCondition vs addEditReason (97.1% similar)"
+        },
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "addEntryCondition",
+            "startIndex": 142467,
+            "fullMatch": "function addEntryCondition() {"
+          },
+          "function2": {
+            "name": "addReason",
+            "startIndex": 142673,
+            "fullMatch": "function addReason() {"
+          },
+          "similarity": 0.7904761904761904,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: addEntryCondition vs addReason (79.0% similar)"
+        },
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "addReminder",
+            "startIndex": 135009,
+            "fullMatch": "function addReminder() {"
+          },
+          "function2": {
+            "name": "addReason",
+            "startIndex": 142673,
+            "fullMatch": "function addReason() {"
+          },
+          "similarity": 0.7766990291262136,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: addReminder vs addReason (77.7% similar)"
+        },
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "addImportantNote",
+            "startIndex": 134775,
+            "fullMatch": "function addImportantNote() {"
+          },
+          "function2": {
+            "name": "addReminder",
+            "startIndex": 135009,
+            "fullMatch": "function addReminder() {"
+          },
+          "similarity": 0.7706422018348624,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: addImportantNote vs addReminder (77.1% similar)"
+        },
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "addReminder",
+            "startIndex": 135009,
+            "fullMatch": "function addReminder() {"
+          },
+          "function2": {
+            "name": "addEntryCondition",
+            "startIndex": 142467,
+            "fullMatch": "function addEntryCondition() {"
+          },
+          "similarity": 0.7619047619047619,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: addReminder vs addEntryCondition (76.2% similar)"
+        },
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "addImportantNote",
+            "startIndex": 134775,
+            "fullMatch": "function addImportantNote() {"
+          },
+          "function2": {
+            "name": "addReason",
+            "startIndex": 142673,
+            "fullMatch": "function addReason() {"
+          },
+          "similarity": 0.7614678899082569,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: addImportantNote vs addReason (76.1% similar)"
+        },
+        {
+          "type": "SIMILAR_CODE",
+          "function1": {
+            "name": "addImportantNote",
+            "startIndex": 134775,
+            "fullMatch": "function addImportantNote() {"
+          },
+          "function2": {
+            "name": "addEntryCondition",
+            "startIndex": 142467,
+            "fullMatch": "function addEntryCondition() {"
+          },
+          "similarity": 0.7339449541284404,
+          "severity": "MEDIUM",
+          "reason": "SIMILAR_CODE: addImportantNote vs addEntryCondition (73.4% similar)"
+        }
+      ],
+      "duplicateCount": 12,
+      "severityBreakdown": {
+        "HIGH": 6,
+        "MEDIUM": 6,
+        "LOW": 0
+      }
+    },
+    {
+      "file": "cash_flows.js",
+      "totalFunctions": 44,
+      "duplicates": [
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "validation",
+            "startIndex": 13500,
+            "fullMatch": "validation: (value) => {"
+          },
+          "function2": {
+            "name": "validation",
+            "startIndex": 13871,
+            "fullMatch": "validation: (value) => {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: validation"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "validation",
+            "startIndex": 13500,
+            "fullMatch": "validation: (value) => {"
+          },
+          "function2": {
+            "name": "validation",
+            "startIndex": 15252,
+            "fullMatch": "validation: (value) => {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: validation"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "validation",
+            "startIndex": 13500,
+            "fullMatch": "validation: (value) => {"
+          },
+          "function2": {
+            "name": "validation",
+            "startIndex": 15633,
+            "fullMatch": "validation: (value) => {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: validation"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "validation",
+            "startIndex": 13871,
+            "fullMatch": "validation: (value) => {"
+          },
+          "function2": {
+            "name": "validation",
+            "startIndex": 15252,
+            "fullMatch": "validation: (value) => {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: validation"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "validation",
+            "startIndex": 13871,
+            "fullMatch": "validation: (value) => {"
+          },
+          "function2": {
+            "name": "validation",
+            "startIndex": 15633,
+            "fullMatch": "validation: (value) => {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: validation"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "validation",
+            "startIndex": 15252,
+            "fullMatch": "validation: (value) => {"
+          },
+          "function2": {
+            "name": "validation",
+            "startIndex": 15633,
+            "fullMatch": "validation: (value) => {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: validation"
+        },
+        {
+          "type": "HIGH_SIMILARITY",
+          "function1": {
+            "name": "validateCashFlowForm",
+            "startIndex": 13281,
+            "fullMatch": "function validateCashFlowForm() {"
+          },
+          "function2": {
+            "name": "validateEditCashFlowForm",
+            "startIndex": 15020,
+            "fullMatch": "function validateEditCashFlowForm() {"
+          },
+          "similarity": 0.8551992225461613,
+          "severity": "MEDIUM",
+          "reason": "HIGH_SIMILARITY: validateCashFlowForm vs validateEditCashFlowForm (85.5% similar)"
+        }
+      ],
+      "duplicateCount": 7,
+      "severityBreakdown": {
+        "HIGH": 6,
+        "MEDIUM": 1,
+        "LOW": 0
+      }
+    },
+    {
+      "file": "research.js",
+      "totalFunctions": 12,
+      "duplicates": [],
+      "duplicateCount": 0,
+      "severityBreakdown": {
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0
+      }
+    },
+    {
+      "file": "notes.js",
+      "totalFunctions": 57,
+      "duplicates": [
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "editNote",
+            "startIndex": 10096,
+            "fullMatch": "function editNote(_id) {"
+          },
+          "function2": {
+            "name": "editNote",
+            "startIndex": 76620,
+            "fullMatch": "function editNote(id) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: editNote"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "deleteNote",
+            "startIndex": 10228,
+            "fullMatch": "function deleteNote(id) {"
+          },
+          "function2": {
+            "name": "deleteNote",
+            "startIndex": 76898,
+            "fullMatch": "function deleteNote(id) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: deleteNote"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "loadNotesData",
+            "startIndex": 13863,
+            "fullMatch": "function loadNotesData() {"
+          },
+          "function2": {
+            "name": "loadNotesData",
+            "startIndex": 77946,
+            "fullMatch": "function loadNotesData() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: loadNotesData"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "onNoteRelationTypeChange",
+            "startIndex": 37014,
+            "fullMatch": "function onNoteRelationTypeChange() {"
+          },
+          "function2": {
+            "name": "getFieldByErrorId",
+            "startIndex": 49626,
+            "fullMatch": "function getFieldByErrorId(errorId) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: onNoteRelationTypeChange vs getFieldByErrorId (100.0% similar)"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "formatText",
+            "startIndex": 59334,
+            "fullMatch": "function formatText(command, mode = 'add') {"
+          },
+          "function2": {
+            "name": "formatText",
+            "startIndex": 77641,
+            "fullMatch": "function formatText(format) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: formatText"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "toggleSection",
+            "startIndex": 75985,
+            "fullMatch": "function toggleSection() {"
+          },
+          "function2": {
+            "name": "openNoteDetailsWrapper",
+            "startIndex": 76387,
+            "fullMatch": "function openNoteDetailsWrapper() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: toggleSection vs openNoteDetailsWrapper (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "toggleSection",
+            "startIndex": 75985,
+            "fullMatch": "function toggleSection() {"
+          },
+          "function2": {
+            "name": "loadNotesData",
+            "startIndex": 77946,
+            "fullMatch": "function loadNotesData() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: toggleSection vs loadNotesData (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "openNoteDetailsWrapper",
+            "startIndex": 76387,
+            "fullMatch": "function openNoteDetailsWrapper() {"
+          },
+          "function2": {
+            "name": "loadNotesData",
+            "startIndex": 77946,
+            "fullMatch": "function loadNotesData() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: openNoteDetailsWrapper vs loadNotesData (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "editNote",
+            "startIndex": 76620,
+            "fullMatch": "function editNote(id) {"
+          },
+          "function2": {
+            "name": "deleteNote",
+            "startIndex": 76898,
+            "fullMatch": "function deleteNote(id) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: editNote vs deleteNote (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "editNote",
+            "startIndex": 76620,
+            "fullMatch": "function editNote(id) {"
+          },
+          "function2": {
+            "name": "filterNotesByRelatedObjectType",
+            "startIndex": 77219,
+            "fullMatch": "function filterNotesByRelatedObjectType(type) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: editNote vs filterNotesByRelatedObjectType (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "editNote",
+            "startIndex": 76620,
+            "fullMatch": "function editNote(id) {"
+          },
+          "function2": {
+            "name": "formatText",
+            "startIndex": 77641,
+            "fullMatch": "function formatText(format) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: editNote vs formatText (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "deleteNote",
+            "startIndex": 76898,
+            "fullMatch": "function deleteNote(id) {"
+          },
+          "function2": {
+            "name": "filterNotesByRelatedObjectType",
+            "startIndex": 77219,
+            "fullMatch": "function filterNotesByRelatedObjectType(type) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: deleteNote vs filterNotesByRelatedObjectType (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "deleteNote",
+            "startIndex": 76898,
+            "fullMatch": "function deleteNote(id) {"
+          },
+          "function2": {
+            "name": "formatText",
+            "startIndex": 77641,
+            "fullMatch": "function formatText(format) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: deleteNote vs formatText (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "filterNotesByRelatedObjectType",
+            "startIndex": 77219,
+            "fullMatch": "function filterNotesByRelatedObjectType(type) {"
+          },
+          "function2": {
+            "name": "formatText",
+            "startIndex": 77641,
+            "fullMatch": "function formatText(format) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: filterNotesByRelatedObjectType vs formatText (100.0% similar)"
+        }
+      ],
+      "duplicateCount": 14,
+      "severityBreakdown": {
+        "HIGH": 14,
+        "MEDIUM": 0,
+        "LOW": 0
+      }
+    },
+    {
+      "file": "preferences-page.js",
+      "totalFunctions": 5,
+      "duplicates": [],
+      "duplicateCount": 0,
+      "severityBreakdown": {
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0
+      }
+    },
+    {
+      "file": "tickers.js",
+      "totalFunctions": 54,
+      "duplicates": [
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "saveTicker",
+            "startIndex": 18792,
+            "fullMatch": "function saveTicker() {"
+          },
+          "function2": {
+            "name": "saveTicker",
+            "startIndex": 67807,
+            "fullMatch": "function saveTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: saveTicker"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "updateTicker",
+            "startIndex": 21129,
+            "fullMatch": "function updateTicker() {"
+          },
+          "function2": {
+            "name": "updateTicker",
+            "startIndex": 68015,
+            "fullMatch": "function updateTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: updateTicker"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "checkLinkedItemsAndCancelTicker",
+            "startIndex": 27923,
+            "fullMatch": "function checkLinkedItemsAndCancelTicker(tickerId) {"
+          },
+          "function2": {
+            "name": "checkLinkedItemsAndDeleteTicker",
+            "startIndex": 40667,
+            "fullMatch": "function checkLinkedItemsAndDeleteTicker(tickerId) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: checkLinkedItemsAndCancelTicker vs checkLinkedItemsAndDeleteTicker (100.0% similar)"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "confirmDeleteTicker",
+            "startIndex": 43886,
+            "fullMatch": "function confirmDeleteTicker(id) {"
+          },
+          "function2": {
+            "name": "confirmDeleteTicker",
+            "startIndex": 68231,
+            "fullMatch": "function confirmDeleteTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: confirmDeleteTicker"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "refreshYahooFinanceData",
+            "startIndex": 62479,
+            "fullMatch": "function refreshYahooFinanceData() {"
+          },
+          "function2": {
+            "name": "refreshYahooFinanceData",
+            "startIndex": 68502,
+            "fullMatch": "function refreshYahooFinanceData() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: refreshYahooFinanceData"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "toggleSection",
+            "startIndex": 67326,
+            "fullMatch": "function toggleSection() {"
+          },
+          "function2": {
+            "name": "saveTicker",
+            "startIndex": 67807,
+            "fullMatch": "function saveTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: toggleSection vs saveTicker (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "toggleSection",
+            "startIndex": 67326,
+            "fullMatch": "function toggleSection() {"
+          },
+          "function2": {
+            "name": "updateTicker",
+            "startIndex": 68015,
+            "fullMatch": "function updateTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: toggleSection vs updateTicker (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "toggleSection",
+            "startIndex": 67326,
+            "fullMatch": "function toggleSection() {"
+          },
+          "function2": {
+            "name": "confirmDeleteTicker",
+            "startIndex": 68231,
+            "fullMatch": "function confirmDeleteTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: toggleSection vs confirmDeleteTicker (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "toggleSection",
+            "startIndex": 67326,
+            "fullMatch": "function toggleSection() {"
+          },
+          "function2": {
+            "name": "refreshYahooFinanceData",
+            "startIndex": 68502,
+            "fullMatch": "function refreshYahooFinanceData() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: toggleSection vs refreshYahooFinanceData (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "saveTicker",
+            "startIndex": 67807,
+            "fullMatch": "function saveTicker() {"
+          },
+          "function2": {
+            "name": "updateTicker",
+            "startIndex": 68015,
+            "fullMatch": "function updateTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: saveTicker vs updateTicker (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "saveTicker",
+            "startIndex": 67807,
+            "fullMatch": "function saveTicker() {"
+          },
+          "function2": {
+            "name": "confirmDeleteTicker",
+            "startIndex": 68231,
+            "fullMatch": "function confirmDeleteTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: saveTicker vs confirmDeleteTicker (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "saveTicker",
+            "startIndex": 67807,
+            "fullMatch": "function saveTicker() {"
+          },
+          "function2": {
+            "name": "refreshYahooFinanceData",
+            "startIndex": 68502,
+            "fullMatch": "function refreshYahooFinanceData() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: saveTicker vs refreshYahooFinanceData (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "updateTicker",
+            "startIndex": 68015,
+            "fullMatch": "function updateTicker() {"
+          },
+          "function2": {
+            "name": "confirmDeleteTicker",
+            "startIndex": 68231,
+            "fullMatch": "function confirmDeleteTicker() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: updateTicker vs confirmDeleteTicker (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "updateTicker",
+            "startIndex": 68015,
+            "fullMatch": "function updateTicker() {"
+          },
+          "function2": {
+            "name": "refreshYahooFinanceData",
+            "startIndex": 68502,
+            "fullMatch": "function refreshYahooFinanceData() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: updateTicker vs refreshYahooFinanceData (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "confirmDeleteTicker",
+            "startIndex": 68231,
+            "fullMatch": "function confirmDeleteTicker() {"
+          },
+          "function2": {
+            "name": "refreshYahooFinanceData",
+            "startIndex": 68502,
+            "fullMatch": "function refreshYahooFinanceData() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: confirmDeleteTicker vs refreshYahooFinanceData (100.0% similar)"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "onSuccess",
+            "startIndex": 29204,
+            "fullMatch": "onSuccess: () => {"
+          },
+          "function2": {
+            "name": "onSuccess",
+            "startIndex": 39973,
+            "fullMatch": "onSuccess: () => {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: onSuccess"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "onSuccess",
+            "startIndex": 29204,
+            "fullMatch": "onSuccess: () => {"
+          },
+          "function2": {
+            "name": "onSuccess",
+            "startIndex": 41811,
+            "fullMatch": "onSuccess: () => {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: onSuccess"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "onSuccess",
+            "startIndex": 39973,
+            "fullMatch": "onSuccess: () => {"
+          },
+          "function2": {
+            "name": "onSuccess",
+            "startIndex": 41811,
+            "fullMatch": "onSuccess: () => {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: onSuccess"
+        }
+      ],
+      "duplicateCount": 18,
+      "severityBreakdown": {
+        "HIGH": 18,
+        "MEDIUM": 0,
+        "LOW": 0
+      }
+    },
+    {
+      "file": "trading_accounts.js",
+      "totalFunctions": 53,
+      "duplicates": [
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "getCurrencyDisplay",
+            "startIndex": 9385,
+            "fullMatch": "function getCurrencyDisplay(tradingAccount) {"
+          },
+          "function2": {
+            "name": "getTradingAccounts",
+            "startIndex": 15485,
+            "fullMatch": "function getTradingAccounts() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: getCurrencyDisplay vs getTradingAccounts (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "getCurrencyDisplay",
+            "startIndex": 9385,
+            "fullMatch": "function getCurrencyDisplay(tradingAccount) {"
+          },
+          "function2": {
+            "name": "isTradingAccountsLoaded",
+            "startIndex": 15652,
+            "fullMatch": "function isTradingAccountsLoaded() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: getCurrencyDisplay vs isTradingAccountsLoaded (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "getCurrencyDisplay",
+            "startIndex": 9385,
+            "fullMatch": "function getCurrencyDisplay(tradingAccount) {"
+          },
+          "function2": {
+            "name": "checkLinkedItems",
+            "startIndex": 59881,
+            "fullMatch": "function checkLinkedItems(tradingAccountId) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: getCurrencyDisplay vs checkLinkedItems (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "getTradingAccounts",
+            "startIndex": 15485,
+            "fullMatch": "function getTradingAccounts() {"
+          },
+          "function2": {
+            "name": "isTradingAccountsLoaded",
+            "startIndex": 15652,
+            "fullMatch": "function isTradingAccountsLoaded() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: getTradingAccounts vs isTradingAccountsLoaded (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "getTradingAccounts",
+            "startIndex": 15485,
+            "fullMatch": "function getTradingAccounts() {"
+          },
+          "function2": {
+            "name": "checkLinkedItems",
+            "startIndex": 59881,
+            "fullMatch": "function checkLinkedItems(tradingAccountId) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: getTradingAccounts vs checkLinkedItems (100.0% similar)"
+        },
+        {
+          "type": "EXACT_NAME_DUPLICATE",
+          "function1": {
+            "name": "getTradingAccounts",
+            "startIndex": 15485,
+            "fullMatch": "function getTradingAccounts() {"
+          },
+          "function2": {
+            "name": "getTradingAccounts",
+            "startIndex": 113518,
+            "fullMatch": "function getTradingAccounts() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "Exact function name duplicate: getTradingAccounts"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "isTradingAccountsLoaded",
+            "startIndex": 15652,
+            "fullMatch": "function isTradingAccountsLoaded() {"
+          },
+          "function2": {
+            "name": "checkLinkedItems",
+            "startIndex": 59881,
+            "fullMatch": "function checkLinkedItems(tradingAccountId) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: isTradingAccountsLoaded vs checkLinkedItems (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "updateTradingAccountFromModal",
+            "startIndex": 48233,
+            "fullMatch": "function updateTradingAccountFromModal() {"
+          },
+          "function2": {
+            "name": "setupSortableHeaders",
+            "startIndex": 70498,
+            "fullMatch": "function setupSortableHeaders() {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: updateTradingAccountFromModal vs setupSortableHeaders (100.0% similar)"
+        },
+        {
+          "type": "NEAR_DUPLICATE",
+          "function1": {
+            "name": "checkLinkedItemsAndCancelTradingAccount",
+            "startIndex": 85199,
+            "fullMatch": "function checkLinkedItemsAndCancelTradingAccount(tradingAccountId) {"
+          },
+          "function2": {
+            "name": "checkLinkedItemsAndDeleteTradingAccount",
+            "startIndex": 87745,
+            "fullMatch": "function checkLinkedItemsAndDeleteTradingAccount(tradingAccountId) {"
+          },
+          "similarity": 1,
+          "severity": "HIGH",
+          "reason": "NEAR_DUPLICATE: checkLinkedItemsAndCancelTradingAccount vs checkLinkedItemsAndDeleteTradingAccount (100.0% similar)"
+        },
+        {
+          "type": "HIGH_SIMILARITY",
+          "function1": {
+            "name": "showFormError",
+            "startIndex": 42191,
+            "fullMatch": "function showFormError(message) {"
+          },
+          "function2": {
+            "name": "showErrorMessage",
+            "startIndex": 59471,
+            "fullMatch": "function showErrorMessage(message) {"
+          },
+          "similarity": 0.8981481481481481,
+          "severity": "MEDIUM",
+          "reason": "HIGH_SIMILARITY: showFormError vs showErrorMessage (89.8% similar)"
+        }
+      ],
+      "duplicateCount": 10,
+      "severityBreakdown": {
+        "HIGH": 9,
+        "MEDIUM": 1,
+        "LOW": 0
+      }
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "issue": "Exact function name duplicates found",
+      "files": [
+        "trades.js",
+        "executions.js",
+        "trade_plans.js",
+        "cash_flows.js",
+        "notes.js",
+        "tickers.js",
+        "trading_accounts.js"
+      ],
+      "action": "Rename duplicate functions or consolidate functionality"
+    },
+    {
+      "priority": "MEDIUM",
+      "issue": "High similarity code blocks found",
+      "files": [
+        "trades.js",
+        "executions.js",
+        "alerts.js",
+        "trade_plans.js",
+        "cash_flows.js",
+        "trading_accounts.js"
+      ],
+      "action": "Review and refactor similar functions to reduce duplication"
+    }
+  ]
+}

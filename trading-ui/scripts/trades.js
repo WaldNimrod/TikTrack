@@ -1680,81 +1680,6 @@ async function saveNewTradeRecord() {
   await saveTradeData('add');
 }
 
-      // בדיקה שכל האלמנטים קיימים
-      if (!accountElement || !tickerElement || !tradePlanElement || !typeElement || !sideElement || !openedAtElement) {
-        if (typeof handleElementNotFound === 'function') {
-          handleElementNotFound('form elements', 'CRITICAL');
-        }
-        window.showErrorNotification('שגיאה בטופס', 'חלק מהשדות בטופס לא נמצאו. אנא סגור ופתח מחדש את המודל.');
-        return null;
-      }
-
-      return {
-        account_id: parseInt(accountElement.value),
-        ticker_id: parseInt(tickerElement.value),
-        trade_plan_id: parseInt(tradePlanElement.value),
-        investment_type: typeElement.value,
-        side: sideElement.value,
-        created_at: openedAtElement.value,
-        closed_at: closedAtElement ? closedAtElement.value || null : null,
-        notes: notesElement ? notesElement.value || null : null,
-      };
-
-  // בדיקה אם איסוף הנתונים נכשל
-  if (!formData) {
-    return;
-  }
-
-  // הוספת שדות נוספים
-  formData.status = 'open';
-
-  try {
-    const response = await fetch('/api/trades/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (response.ok) {
-      await response.json(); // newTrade not used
-      
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('trades', 'טרייד נשמר בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        window.showSuccessNotification('הצלחה', 'טרייד נשמר בהצלחה!', 4000, 'business');
-        // רענון הטבלה
-        loadTradesData();
-      }
-
-      // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
-      modal.hide();
-
-    } else {
-      const errorData = await response.json();
-      if (typeof handleSaveError === 'function') {
-        handleSaveError(new Error(`Status: ${response.status} - ${errorData.error?.message || errorData.message || 'שגיאה לא ידועה'}`), 'שמירת טרייד');
-      } else {
-        // window.Logger.error('Error saving trade:', errorData, { page: "trades" });
-      }
-
-      window.showErrorNotification('שגיאה', `שגיאה בשמירת טרייד: ${errorData.error?.message || errorData.message || 'שגיאה לא ידועה'}`);
-    }
-
-  } catch (error) {
-    if (typeof handleSaveError === 'function') {
-      handleSaveError(error, 'שמירת טרייד');
-    } else {
-      // window.Logger.error('Error saving trade:', error, { page: "trades" });
-    }
-    window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
-  }
-}
-
 /**
  * טעינת נתונים למודל
  *
@@ -3522,4 +3447,205 @@ async function generateDetailedLogForTrades() {
         }
     }
 }
+
+// ===== MODAL FUNCTIONS - NEW SYSTEM =====
+
+/**
+ * הצגת מודל הוספת טרייד
+ * Uses ModalManagerV2 for consistent modal experience
+ */
+function showAddTradeModal() {
+    window.Logger.debug('showAddTradeModal called', { page: 'trades' });
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showModal('tradesModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
+}
+
+/**
+ * הצגת מודל עריכת טרייד
+ * Uses ModalManagerV2 for consistent modal experience
+ */
+function showEditTradeModal(tradeId) {
+    window.Logger.debug('showEditTradeModal called', { tradeId, page: 'trades' });
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
+}
+
+/**
+ * שמירת טרייד
+ * Handles both add and edit modes
+ */
+async function saveTrade() {
+    window.Logger.debug('saveTrade called', { page: 'trades' });
+    
+    try {
+        // Collect form data
+        const form = document.getElementById('tradesModalForm');
+        if (!form) {
+            throw new Error('Trade form not found');
+        }
+        
+        const formData = new FormData(form);
+        const tradeData = {
+            ticker_id: formData.get('tradeTicker'),
+            account_id: formData.get('tradeAccount'),
+            name: formData.get('tradeName'),
+            type: formData.get('tradeType'),
+            quantity: parseInt(formData.get('tradeQuantity')),
+            entry_price: parseFloat(formData.get('tradeEntryPrice')),
+            exit_price: parseFloat(formData.get('tradeExitPrice')) || null,
+            stop_loss: parseFloat(formData.get('tradeStopLoss')) || null,
+            take_profit: parseFloat(formData.get('tradeTakeProfit')) || null,
+            entry_date: formData.get('tradeEntryDate'),
+            exit_date: formData.get('tradeExitDate') || null,
+            status: formData.get('tradeStatus'),
+            notes: formData.get('tradeNotes')
+        };
+        
+        // Calculate P&L if exit price is provided
+        if (tradeData.exit_price && tradeData.entry_price) {
+            const pnl = (tradeData.exit_price - tradeData.entry_price) * tradeData.quantity;
+            tradeData.pnl = pnl;
+        }
+        
+        // Validate data
+        if (!window.validateEntityForm) {
+            throw new Error('Validation system not available');
+        }
+        
+        const isValid = window.validateEntityForm('tradesModalForm', {
+            tradeTicker: { required: true },
+            tradeAccount: { required: true },
+            tradeName: { required: true, minLength: 2, maxLength: 100 },
+            tradeType: { required: true },
+            tradeQuantity: { required: true, min: 1 },
+            tradeEntryPrice: { required: true, min: 0.01 },
+            tradeExitPrice: { required: false, min: 0.01 },
+            tradeStopLoss: { required: false, min: 0.01 },
+            tradeTakeProfit: { required: false, min: 0.01 },
+            tradeEntryDate: { required: true },
+            tradeExitDate: { required: false },
+            tradeStatus: { required: true },
+            tradeNotes: { required: false, maxLength: 1000 }
+        });
+        
+        if (!isValid) {
+            window.Logger.warn('Trade validation failed', { page: 'trades' });
+            return;
+        }
+        
+        // Determine if this is add or edit
+        const isEdit = form.dataset.mode === 'edit';
+        const tradeId = form.dataset.tradeId;
+        
+        // Prepare API call
+        const url = isEdit ? `/api/trades/${tradeId}` : '/api/trades';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        // Send to API
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(tradeData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // Handle success
+        if (window.showNotification) {
+            const message = isEdit ? 'טרייד עודכן בהצלחה' : 'טרייד נוסף בהצלחה';
+            window.showNotification(message, 'success', 'business');
+        }
+        
+        // Close modal
+        if (window.ModalManagerV2) {
+            window.ModalManagerV2.hideModal('tradesModal');
+        }
+        
+        // Refresh data
+        if (window.loadTradesData) {
+            window.loadTradesData();
+        }
+        
+        window.Logger.info('Trade saved successfully', { tradeId: result.id, page: 'trades' });
+        
+    } catch (error) {
+        window.Logger.error('Error saving trade', { error: error.message, page: 'trades' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה בשמירת הטרייד', 'error', 'system');
+        }
+    }
+}
+
+/**
+ * מחיקת טרייד
+ * Includes linked items check
+ */
+async function deleteTrade(tradeId) {
+    window.Logger.debug('deleteTrade called', { tradeId, page: 'trades' });
+    
+    try {
+        // Check linked items first
+        if (window.checkLinkedItemsBeforeAction) {
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade', tradeId, 'delete');
+            if (hasLinkedItems) {
+                window.Logger.info('Trade has linked items, deletion cancelled', { tradeId, page: 'trades' });
+                return;
+            }
+        }
+        
+        // Confirm deletion
+        if (!confirm('האם אתה בטוח שברצונך למחוק את הטרייד?')) {
+            return;
+        }
+        
+        // Send delete request
+        const response = await fetch(`/api/trades/${tradeId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        // Handle success
+        if (window.showNotification) {
+            window.showNotification('טרייד נמחק בהצלחה', 'success', 'business');
+        }
+        
+        // Refresh data
+        if (window.loadTradesData) {
+            window.loadTradesData();
+        }
+        
+        window.Logger.info('Trade deleted successfully', { tradeId, page: 'trades' });
+        
+    } catch (error) {
+        window.Logger.error('Error deleting trade', { error: error.message, tradeId, page: 'trades' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה במחיקת הטרייד', 'error', 'system');
+        }
+    }
+}
+
+// Export functions to window for global access
+window.showAddTradeModal = showAddTradeModal;
+window.showEditTradeModal = showEditTradeModal;
+window.saveTrade = saveTrade;
+window.deleteTrade = deleteTrade;
 

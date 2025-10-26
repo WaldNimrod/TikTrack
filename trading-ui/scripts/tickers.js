@@ -2064,3 +2064,192 @@ function toggleTickersSection() {
     }
 }
 
+// ===== MODAL FUNCTIONS - NEW SYSTEM =====
+
+/**
+ * הצגת מודל הוספת טיקר
+ * Uses ModalManagerV2 for consistent modal experience
+ */
+function showAddTickerModal() {
+    window.Logger.debug('showAddTickerModal called', { page: 'tickers' });
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showModal('tickersModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
+}
+
+/**
+ * הצגת מודל עריכת טיקר
+ * Uses ModalManagerV2 for consistent modal experience
+ */
+function showEditTickerModal(tickerId) {
+    window.Logger.debug('showEditTickerModal called', { tickerId, page: 'tickers' });
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showEditModal('tickersModal', 'ticker', tickerId);
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
+}
+
+/**
+ * שמירת טיקר
+ * Handles both add and edit modes
+ */
+async function saveTicker() {
+    window.Logger.debug('saveTicker called', { page: 'tickers' });
+    
+    try {
+        // Collect form data
+        const form = document.getElementById('tickersModalForm');
+        if (!form) {
+            throw new Error('Ticker form not found');
+        }
+        
+        const formData = new FormData(form);
+        const tickerData = {
+            symbol: formData.get('tickerSymbol'),
+            name: formData.get('tickerName'),
+            type: formData.get('tickerType'),
+            exchange: formData.get('tickerExchange'),
+            currency: formData.get('tickerCurrency'),
+            status: formData.get('tickerStatus'),
+            notes: formData.get('tickerNotes')
+        };
+        
+        // Handle file upload if present
+        const logoFile = formData.get('tickerLogo');
+        if (logoFile && logoFile.size > 0) {
+            tickerData.logo = logoFile;
+        }
+        
+        // Validate data
+        if (!window.validateEntityForm) {
+            throw new Error('Validation system not available');
+        }
+        
+        const isValid = window.validateEntityForm('tickersModalForm', {
+            tickerSymbol: { required: true, minLength: 1, maxLength: 10 },
+            tickerName: { required: true, minLength: 2, maxLength: 100 },
+            tickerType: { required: true },
+            tickerExchange: { required: true },
+            tickerCurrency: { required: true },
+            tickerStatus: { required: true },
+            tickerNotes: { required: false, maxLength: 500 }
+        });
+        
+        if (!isValid) {
+            window.Logger.warn('Ticker validation failed', { page: 'tickers' });
+            return;
+        }
+        
+        // Determine if this is add or edit
+        const isEdit = form.dataset.mode === 'edit';
+        const tickerId = form.dataset.tickerId;
+        
+        // Prepare API call
+        const url = isEdit ? `/api/tickers/${tickerId}` : '/api/tickers';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        // Send to API
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(tickerData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // Handle success
+        if (window.showNotification) {
+            const message = isEdit ? 'טיקר עודכן בהצלחה' : 'טיקר נוסף בהצלחה';
+            window.showNotification(message, 'success', 'business');
+        }
+        
+        // Close modal
+        if (window.ModalManagerV2) {
+            window.ModalManagerV2.hideModal('tickersModal');
+        }
+        
+        // Refresh data
+        if (window.loadTickersData) {
+            window.loadTickersData();
+        }
+        
+        window.Logger.info('Ticker saved successfully', { tickerId: result.id, page: 'tickers' });
+        
+    } catch (error) {
+        window.Logger.error('Error saving ticker', { error: error.message, page: 'tickers' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה בשמירת הטיקר', 'error', 'system');
+        }
+    }
+}
+
+/**
+ * מחיקת טיקר
+ * Includes linked items check
+ */
+async function deleteTicker(tickerId) {
+    window.Logger.debug('deleteTicker called', { tickerId, page: 'tickers' });
+    
+    try {
+        // Check linked items first
+        if (window.checkLinkedItemsBeforeAction) {
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('ticker', tickerId, 'delete');
+            if (hasLinkedItems) {
+                window.Logger.info('Ticker has linked items, deletion cancelled', { tickerId, page: 'tickers' });
+                return;
+            }
+        }
+        
+        // Confirm deletion
+        if (!confirm('האם אתה בטוח שברצונך למחוק את הטיקר?')) {
+            return;
+        }
+        
+        // Send delete request
+        const response = await fetch(`/api/tickers/${tickerId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        // Handle success
+        if (window.showNotification) {
+            window.showNotification('טיקר נמחק בהצלחה', 'success', 'business');
+        }
+        
+        // Refresh data
+        if (window.loadTickersData) {
+            window.loadTickersData();
+        }
+        
+        window.Logger.info('Ticker deleted successfully', { tickerId, page: 'tickers' });
+        
+    } catch (error) {
+        window.Logger.error('Error deleting ticker', { error: error.message, tickerId, page: 'tickers' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה במחיקת הטיקר', 'error', 'system');
+        }
+    }
+}
+
+// Export functions to window for global access
+window.showAddTickerModal = showAddTickerModal;
+window.showEditTickerModal = showEditTickerModal;
+window.saveTicker = saveTicker;
+window.deleteTicker = deleteTicker;
+

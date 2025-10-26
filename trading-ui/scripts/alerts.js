@@ -3432,3 +3432,192 @@ function cleanupAlertConditionBuilder() {
         window.Logger.error('❌ Error cleaning up alert condition builder:', error, { page: "alerts" });
     }
 }
+
+// ===== MODAL FUNCTIONS - NEW SYSTEM =====
+
+/**
+ * הצגת מודל הוספת התראה
+ * Uses ModalManagerV2 for consistent modal experience
+ */
+function showAddAlertModal() {
+    window.Logger.debug('showAddAlertModal called', { page: 'alerts' });
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showModal('alertsModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
+}
+
+/**
+ * הצגת מודל עריכת התראה
+ * Uses ModalManagerV2 for consistent modal experience
+ */
+function showEditAlertModal(alertId) {
+    window.Logger.debug('showEditAlertModal called', { alertId, page: 'alerts' });
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showEditModal('alertsModal', 'alert', alertId);
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
+}
+
+/**
+ * שמירת התראה
+ * Handles both add and edit modes
+ */
+async function saveAlert() {
+    window.Logger.debug('saveAlert called', { page: 'alerts' });
+    
+    try {
+        // Collect form data
+        const form = document.getElementById('alertsModalForm');
+        if (!form) {
+            throw new Error('Alert form not found');
+        }
+        
+        const formData = new FormData(form);
+        const alertData = {
+            ticker_id: formData.get('alertTicker'),
+            name: formData.get('alertName'),
+            type: formData.get('alertType'),
+            value: parseFloat(formData.get('alertValue')),
+            condition: formData.get('alertCondition'),
+            expiry_date: formData.get('alertExpiry') || null,
+            status: formData.get('alertStatus'),
+            email_notification: formData.get('alertEmail') === 'on',
+            sms_notification: formData.get('alertSms') === 'on',
+            notes: formData.get('alertNotes')
+        };
+        
+        // Validate data
+        if (!window.validateEntityForm) {
+            throw new Error('Validation system not available');
+        }
+        
+        const isValid = window.validateEntityForm('alertsModalForm', {
+            alertTicker: { required: true },
+            alertName: { required: true, minLength: 2, maxLength: 100 },
+            alertType: { required: true },
+            alertValue: { required: true, min: 0 },
+            alertCondition: { required: true },
+            alertExpiry: { required: false },
+            alertStatus: { required: true },
+            alertEmail: { required: false },
+            alertSms: { required: false },
+            alertNotes: { required: false, maxLength: 500 }
+        });
+        
+        if (!isValid) {
+            window.Logger.warn('Alert validation failed', { page: 'alerts' });
+            return;
+        }
+        
+        // Determine if this is add or edit
+        const isEdit = form.dataset.mode === 'edit';
+        const alertId = form.dataset.alertId;
+        
+        // Prepare API call
+        const url = isEdit ? `/api/alerts/${alertId}` : '/api/alerts';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        // Send to API
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(alertData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // Handle success
+        if (window.showNotification) {
+            const message = isEdit ? 'התראה עודכנה בהצלחה' : 'התראה נוספה בהצלחה';
+            window.showNotification(message, 'success', 'business');
+        }
+        
+        // Close modal
+        if (window.ModalManagerV2) {
+            window.ModalManagerV2.hideModal('alertsModal');
+        }
+        
+        // Refresh data
+        if (window.loadAlertsData) {
+            window.loadAlertsData();
+        }
+        
+        window.Logger.info('Alert saved successfully', { alertId: result.id, page: 'alerts' });
+        
+    } catch (error) {
+        window.Logger.error('Error saving alert', { error: error.message, page: 'alerts' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה בשמירת ההתראה', 'error', 'system');
+        }
+    }
+}
+
+/**
+ * מחיקת התראה
+ * Includes linked items check
+ */
+async function deleteAlert(alertId) {
+    window.Logger.debug('deleteAlert called', { alertId, page: 'alerts' });
+    
+    try {
+        // Check linked items first
+        if (window.checkLinkedItemsBeforeAction) {
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('alert', alertId, 'delete');
+            if (hasLinkedItems) {
+                window.Logger.info('Alert has linked items, deletion cancelled', { alertId, page: 'alerts' });
+                return;
+            }
+        }
+        
+        // Confirm deletion
+        if (!confirm('האם אתה בטוח שברצונך למחוק את ההתראה?')) {
+            return;
+        }
+        
+        // Send delete request
+        const response = await fetch(`/api/alerts/${alertId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        // Handle success
+        if (window.showNotification) {
+            window.showNotification('התראה נמחקה בהצלחה', 'success', 'business');
+        }
+        
+        // Refresh data
+        if (window.loadAlertsData) {
+            window.loadAlertsData();
+        }
+        
+        window.Logger.info('Alert deleted successfully', { alertId, page: 'alerts' });
+        
+    } catch (error) {
+        window.Logger.error('Error deleting alert', { error: error.message, alertId, page: 'alerts' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה במחיקת ההתראה', 'error', 'system');
+        }
+    }
+}
+
+// Export functions to window for global access
+window.showAddAlertModal = showAddAlertModal;
+window.showEditAlertModal = showEditAlertModal;
+window.saveAlert = saveAlert;
+window.deleteAlert = deleteAlert;

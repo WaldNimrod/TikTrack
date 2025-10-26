@@ -140,7 +140,12 @@ let importReportPath = null;
 let importSelectedExistingRecords = [];
 
 /**
- * Load data from cache
+ * Load cached import data from Unified Cache Manager
+ * Attempts to restore previous import session state from cache
+ * 
+ * @function loadFromCache
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadFromCache() {
     if (window.UnifiedCacheManager) {
@@ -159,7 +164,12 @@ async function loadFromCache() {
 }
 
 /**
- * Clear cache data
+ * Clear all cached import data from Unified Cache Manager
+ * Removes all import-related data from cache layers
+ * 
+ * @function clearCache
+ * @async
+ * @returns {Promise<void>}
  */
 async function clearCache() {
     if (window.UnifiedCacheManager) {
@@ -174,7 +184,11 @@ async function clearCache() {
 }
 
 /**
- * Initialize import modal
+ * Initialize import modal and load cached data
+ * Sets up the modal state, loads cached data if available, and initializes UI elements
+ * 
+ * @function initializeImportModal
+ * @returns {void}
  */
 function initializeImportModal() {
     importCurrentStep = 1;
@@ -195,6 +209,10 @@ function initializeImportModal() {
 
 /**
  * Start a completely new import process
+ * Clears all global state, cache, and UI elements to begin fresh import
+ * 
+ * @function startNewImport
+ * @returns {void}
  */
 function startNewImport() {
     console.log('🔄 Starting new import process...');
@@ -318,7 +336,12 @@ function removeImportEventListeners() {
 }
 
 /**
- * Handle file selection
+ * Handle file selection from file input
+ * Processes selected file and updates UI with file information
+ * 
+ * @function handleImportFileSelect
+ * @param {Event} event - The change event from file input
+ * @returns {void}
  */
 function handleImportFileSelect(event) {
     console.log('handleImportFileSelect called');
@@ -361,7 +384,12 @@ function handleImportFileDrop(event) {
 }
 
 /**
- * Process selected file
+ * Process selected file and update UI
+ * Validates file type, stores file reference, and updates UI elements
+ * 
+ * @function processImportSelectedFile
+ * @param {File} file - The selected file object
+ * @returns {void}
  */
 function processImportSelectedFile(file) {
     console.log('processImportSelectedFile called with file:', file.name);
@@ -397,7 +425,11 @@ function processImportSelectedFile(file) {
 }
 
 /**
- * Clear selected file
+ * Clear selected file and reset file upload UI
+ * Removes file selection and resets file upload area to initial state
+ * 
+ * @function clearImportFile
+ * @returns {void}
  */
 function clearImportFile() {
     importSelectedFile = null;
@@ -408,7 +440,11 @@ function clearImportFile() {
 }
 
 /**
- * Clear selected account
+ * Clear selected account and reset account selection UI
+ * Removes account selection and resets account dropdown to initial state
+ * 
+ * @function clearImportAccount
+ * @returns {void}
  */
 function clearImportAccount() {
     importSelectedAccount = null;
@@ -417,7 +453,11 @@ function clearImportAccount() {
 }
 
 /**
- * Clear all step displays
+ * Clear all step displays and reset UI elements
+ * Hides all step content, clears lists, and resets counters to initial state
+ * 
+ * @function clearAllStepDisplays
+ * @returns {void}
  */
 function clearAllStepDisplays() {
     // Clear step 3 analysis results
@@ -507,7 +547,12 @@ function clearAllStepDisplays() {
 }
 
 /**
- * Handle account selection
+ * Handle account selection from dropdown
+ * Updates global state and triggers step navigation update
+ * 
+ * @function handleImportAccountSelect
+ * @param {Event} event - The change event from account select dropdown
+ * @returns {void}
  */
 function handleImportAccountSelect(event) {
     console.log('🔍 Account selected:', event.target.value);
@@ -581,7 +626,12 @@ async function loadImportTradingAccounts() {
 }
 
 /**
- * Next step
+ * Navigate to next step in import wizard
+ * Validates current step, processes it, and moves to next step
+ * 
+ * @function nextImportStep
+ * @async
+ * @returns {Promise<void>}
  */
 async function nextImportStep() {
     console.log(`🔄 STEP TRANSITION: Moving from step ${importCurrentStep} to step ${importCurrentStep + 1}`);
@@ -615,7 +665,11 @@ async function nextImportStep() {
 }
 
 /**
- * Previous step
+ * Navigate to previous step in import wizard
+ * Decrements current step and updates UI accordingly
+ * 
+ * @function previousImportStep
+ * @returns {void}
  */
 function previousImportStep() {
     if (importCurrentStep > 1) {
@@ -626,11 +680,11 @@ function previousImportStep() {
 }
 
 /**
- * Validate current step
+ * Validate current step before proceeding
+ * Performs step-specific validation checks
  * 
- * Note: This function is NOT part of the central validation system.
- * It performs specific checks for the import process before proceeding to the next step.
- * It validates file selection and account selection for the import workflow.
+ * @function validateImportCurrentStep
+ * @returns {boolean} True if validation passes, false otherwise
  */
 function validateImportCurrentStep() {
     switch (importCurrentStep) {
@@ -655,7 +709,12 @@ function validateImportCurrentStep() {
 }
 
 /**
- * Process current step
+ * Process current step based on step number
+ * Handles step-specific processing logic (analysis, preview generation, etc.)
+ * 
+ * @function processImportCurrentStep
+ * @async
+ * @returns {Promise<void>}
  */
 async function processImportCurrentStep() {
     console.log(`⚙️ PROCESSING STEP ${importCurrentStep}: Starting...`);
@@ -807,7 +866,18 @@ async function generateImportPreview() {
 }
 
 /**
- * Display analysis results
+ * Display analysis results in step 3
+ * Shows counts and statistics from file analysis
+ * 
+ * @function displayImportAnalysisResults
+ * @param {Object} results - Analysis results object
+ * @param {number} results.total_records - Total records in file
+ * @param {number} results.valid_records - Valid records count
+ * @param {number} results.invalid_records - Invalid records count
+ * @param {number} results.duplicate_records - Duplicate records count
+ * @param {number} results.existing_records - Existing records count
+ * @param {Array} results.missing_tickers - Array of missing ticker symbols
+ * @returns {void}
  */
 function displayImportAnalysisResults(results) {
     // The backend returns:
@@ -1876,7 +1946,11 @@ function cancelImport() {
 }
 
 /**
- * Update step display
+ * Update step display indicators and content visibility
+ * Shows/hides step content and updates step indicators based on current step
+ * 
+ * @function updateImportStepDisplay
+ * @returns {void}
  */
 function updateImportStepDisplay() {
     console.log(`🎨 UPDATE STEP DISPLAY: Updating display for step ${importCurrentStep}`);
@@ -1918,7 +1992,11 @@ function updateImportStepDisplay() {
 }
 
 /**
- * Update step navigation
+ * Update step navigation buttons state
+ * Enables/disables navigation buttons based on current step and validation
+ * 
+ * @function updateImportStepNavigation
+ * @returns {void}
  */
 function updateImportStepNavigation() {
     const prevBtn = document.getElementById('import-prev-btn');
@@ -1942,7 +2020,11 @@ function updateImportStepNavigation() {
 }
 
 /**
- * Check if can proceed to next step
+ * Check if user can proceed to next step
+ * Validates step-specific requirements for navigation
+ * 
+ * @function canProceedToNextImportStep
+ * @returns {boolean} True if can proceed, false otherwise
  */
 function canProceedToNextImportStep() {
     switch (importCurrentStep) {

@@ -1285,7 +1285,7 @@ class CRUDEnhancedTester {
             </td>
             <td>
                 ${result.needsDeepTesting ? 
-                    '<button class="btn btn-sm btn-warning" onclick="runDeepTesting(\'' + result.entity + '\')">בדיקה מפורטת</button>' :
+                    '<button class="btn btn-sm btn-warning" onclick="runDeepTestingForProblematic()">בדיקה מפורטת</button>' :
                     '<span class="text-muted">-</span>'
                 }
             </td>
@@ -1408,7 +1408,7 @@ class CRUDEnhancedTester {
             localStorage.setItem('lastCRUDTestReport', JSON.stringify(reportData));
             
             // שמירה ב-UnifiedCacheManager אם זמין
-            if (window.UnifiedCacheManager?.isInitialized()) {
+            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
                 await window.UnifiedCacheManager.save('crud_test_report_latest', reportData, {
                     layer: 'localStorage',
                     ttl: null // ללא תפוגה

@@ -2079,4 +2079,9 @@ window.testCacheClearingFunctions = function() {
     window.Logger.info('🧪 בדיקת פונקציות ניקוי מטמון הושלמה', { page: "header-system" });
 };
 
-window.Logger.info('✅ Header System v6.0.0 loaded successfully!', { page: "header-system" });
+// בדיקה שה-Logger זמין לפני השימוש
+if (window.Logger && window.Logger.info) {
+    window.Logger.info('✅ Header System v6.0.0 loaded successfully!', { page: "header-system" });
+} else {
+    console.log('✅ Header System v6.0.0 loaded successfully!');
+}

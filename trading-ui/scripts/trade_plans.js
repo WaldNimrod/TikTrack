@@ -4339,3 +4339,192 @@ function filterTradePlansByType(type) {
 
 // ייצוא הפונקציה לגלובל
 window.filterTradePlansByType = filterTradePlansByType;
+
+// ===== MODAL FUNCTIONS - NEW SYSTEM =====
+
+/**
+ * הצגת מודל הוספת תוכנית מסחר
+ * Uses ModalManagerV2 for consistent modal experience
+ */
+function showAddTradePlanModal() {
+    window.Logger.debug('showAddTradePlanModal called', { page: 'trade_plans' });
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showModal('tradePlansModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
+}
+
+/**
+ * הצגת מודל עריכת תוכנית מסחר
+ * Uses ModalManagerV2 for consistent modal experience
+ */
+function showEditTradePlanModal(tradePlanId) {
+    window.Logger.debug('showEditTradePlanModal called', { tradePlanId, page: 'trade_plans' });
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', tradePlanId);
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
+}
+
+/**
+ * שמירת תוכנית מסחר
+ * Handles both add and edit modes
+ */
+async function saveTradePlan() {
+    window.Logger.debug('saveTradePlan called', { page: 'trade_plans' });
+    
+    try {
+        // Collect form data
+        const form = document.getElementById('tradePlansModalForm');
+        if (!form) {
+            throw new Error('Trade Plan form not found');
+        }
+        
+        const formData = new FormData(form);
+        const tradePlanData = {
+            ticker_id: formData.get('tradePlanTicker'),
+            name: formData.get('tradePlanName'),
+            type: formData.get('tradePlanType'),
+            quantity: parseInt(formData.get('tradePlanQuantity')),
+            entry_price: parseFloat(formData.get('tradePlanEntryPrice')) || null,
+            stop_loss: parseFloat(formData.get('tradePlanStopLoss')) || null,
+            take_profit: parseFloat(formData.get('tradePlanTakeProfit')) || null,
+            entry_date: formData.get('tradePlanEntryDate') || null,
+            status: formData.get('tradePlanStatus'),
+            notes: formData.get('tradePlanNotes')
+        };
+        
+        // Validate data
+        if (!window.validateEntityForm) {
+            throw new Error('Validation system not available');
+        }
+        
+        const isValid = window.validateEntityForm('tradePlansModalForm', {
+            tradePlanTicker: { required: true },
+            tradePlanName: { required: true, minLength: 2, maxLength: 100 },
+            tradePlanType: { required: true },
+            tradePlanQuantity: { required: true, min: 1 },
+            tradePlanEntryPrice: { required: false, min: 0.01 },
+            tradePlanStopLoss: { required: false, min: 0.01 },
+            tradePlanTakeProfit: { required: false, min: 0.01 },
+            tradePlanEntryDate: { required: false },
+            tradePlanStatus: { required: true },
+            tradePlanNotes: { required: false, maxLength: 1000 }
+        });
+        
+        if (!isValid) {
+            window.Logger.warn('Trade Plan validation failed', { page: 'trade_plans' });
+            return;
+        }
+        
+        // Determine if this is add or edit
+        const isEdit = form.dataset.mode === 'edit';
+        const tradePlanId = form.dataset.tradePlanId;
+        
+        // Prepare API call
+        const url = isEdit ? `/api/trade_plans/${tradePlanId}` : '/api/trade_plans';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        // Send to API
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(tradePlanData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // Handle success
+        if (window.showNotification) {
+            const message = isEdit ? 'תוכנית מסחר עודכנה בהצלחה' : 'תוכנית מסחר נוספה בהצלחה';
+            window.showNotification(message, 'success', 'business');
+        }
+        
+        // Close modal
+        if (window.ModalManagerV2) {
+            window.ModalManagerV2.hideModal('tradePlansModal');
+        }
+        
+        // Refresh data
+        if (window.loadTradePlansData) {
+            window.loadTradePlansData();
+        }
+        
+        window.Logger.info('Trade Plan saved successfully', { tradePlanId: result.id, page: 'trade_plans' });
+        
+    } catch (error) {
+        window.Logger.error('Error saving trade plan', { error: error.message, page: 'trade_plans' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה בשמירת תוכנית המסחר', 'error', 'system');
+        }
+    }
+}
+
+/**
+ * מחיקת תוכנית מסחר
+ * Includes linked items check
+ */
+async function deleteTradePlan(tradePlanId) {
+    window.Logger.debug('deleteTradePlan called', { tradePlanId, page: 'trade_plans' });
+    
+    try {
+        // Check linked items first
+        if (window.checkLinkedItemsBeforeAction) {
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade_plan', tradePlanId, 'delete');
+            if (hasLinkedItems) {
+                window.Logger.info('Trade Plan has linked items, deletion cancelled', { tradePlanId, page: 'trade_plans' });
+                return;
+            }
+        }
+        
+        // Confirm deletion
+        if (!confirm('האם אתה בטוח שברצונך למחוק את תוכנית המסחר?')) {
+            return;
+        }
+        
+        // Send delete request
+        const response = await fetch(`/api/trade_plans/${tradePlanId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        // Handle success
+        if (window.showNotification) {
+            window.showNotification('תוכנית מסחר נמחקה בהצלחה', 'success', 'business');
+        }
+        
+        // Refresh data
+        if (window.loadTradePlansData) {
+            window.loadTradePlansData();
+        }
+        
+        window.Logger.info('Trade Plan deleted successfully', { tradePlanId, page: 'trade_plans' });
+        
+    } catch (error) {
+        window.Logger.error('Error deleting trade plan', { error: error.message, tradePlanId, page: 'trade_plans' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה במחיקת תוכנית המסחר', 'error', 'system');
+        }
+    }
+}
+
+// Export functions to window for global access
+window.showAddTradePlanModal = showAddTradePlanModal;
+window.showEditTradePlanModal = showEditTradePlanModal;
+window.saveTradePlan = saveTradePlan;
+window.deleteTradePlan = deleteTradePlan;

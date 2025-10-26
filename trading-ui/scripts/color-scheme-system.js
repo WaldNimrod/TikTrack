@@ -12,6 +12,12 @@
  */
 
 // ===== ENTITY TYPE DEFINITIONS =====
+// בדיקה שהקובץ לא נטען פעמיים
+if (window.VALID_ENTITY_TYPES) {
+    console.warn('⚠️ color-scheme-system.js כבר נטען - מדלג על טעינה חוזרת');
+    return;
+}
+
 const VALID_ENTITY_TYPES = [
   'trade', 'trade_plan', 'execution', 'account', 'cash_flow',
   'ticker', 'alert', 'note', 'constraint', 'design', 'research', 'preference'

@@ -99,6 +99,7 @@ if (!document.getElementById('import-ticker-button-styles')) {
 }
 
 // ===== IMPORT MODAL FUNCTIONS =====
+// Modal lifecycle and state management
 
 /**
  * Close import user data modal
@@ -146,6 +147,9 @@ let importAnalysisResults = null;
 let importPreviewData = null;
 let importReportPath = null;
 let importSelectedExistingRecords = [];
+
+// ===== CACHE MANAGEMENT FUNCTIONS =====
+// Unified Cache Manager integration for data persistence
 
 /**
  * Load cached import data from Unified Cache Manager
@@ -355,6 +359,9 @@ function removeImportEventListeners() {
     }
 }
 
+// ===== EVENT HANDLERS =====
+// File upload, drag & drop, and user interaction handlers
+
 /**
  * Handle file selection from file input
  * Processes selected file and updates UI with file information
@@ -471,6 +478,9 @@ function clearImportAccount() {
     document.getElementById('import-account-select').value = '';
     updateImportStepNavigation();
 }
+
+// ===== UTILITY FUNCTIONS =====
+// Helper functions for UI updates and data management
 
 /**
  * Clear all step displays and reset UI elements
@@ -650,6 +660,9 @@ async function loadImportTradingAccounts() {
     }
 }
 
+// ===== STEP NAVIGATION FUNCTIONS =====
+// Wizard step management and validation
+
 /**
  * Navigate to next step in import wizard
  * Validates current step, processes it, and moves to next step
@@ -800,6 +813,9 @@ async function processImportCurrentStep() {
     console.log(`✅ PROCESSING STEP ${importCurrentStep}: Completed`);
 }
 
+// ===== FILE ANALYSIS FUNCTIONS =====
+// File processing, analysis, and preview generation
+
 /**
  * Analyze uploaded file
  * Sends file to backend for analysis and stores results
@@ -899,6 +915,9 @@ async function generateImportPreview() {
         showNotification('שגיאה בהכנת תצוגה מקדימה', 'error');
     }
 }
+
+// ===== DATA DISPLAY FUNCTIONS =====
+// UI rendering and data visualization
 
 /**
  * Display analysis results in step 3
@@ -1071,6 +1090,9 @@ function showAddTickerModal(symbol) {
 function closeAddTickerModal() {
     document.getElementById('add-ticker-modal').style.display = 'none';
 }
+
+// ===== PROBLEM RESOLUTION FUNCTIONS =====
+// Missing tickers, duplicates, and existing records handling
 
 /**
  * Save missing ticker to database
@@ -1861,6 +1883,9 @@ function displayImportPreviewSummary(data) {
     });
 }
 
+// ===== MODAL MANAGEMENT FUNCTIONS =====
+// Preview modal and confirmation modal handling
+
 /**
  * Show preview modal with import data
  * Displays modal with records to import and skip
@@ -1999,6 +2024,9 @@ function closeConfirmationModal(confirmed) {
         window.confirmationModalResolve = null;
     }
 }
+
+// ===== IMPORT EXECUTION FUNCTIONS =====
+// Final import process and confirmation handling
 
 /**
  * Execute the final import process
@@ -2373,6 +2401,30 @@ async function downloadSessionFile(filename) {
         }
     } catch (error) {
         console.error('Download session file error:', error);
-        showNotification('שגיאה בהורדת הקובץ', 'error');
-    }
-}
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for HTML onclick attributes
+
+// Export modal functions
+window.openImportUserDataModal = openImportUserDataModal;
+window.closeImportUserDataModal = closeImportUserDataModal;
+
+// Export navigation functions
+window.nextImportStep = nextImportStep;
+window.previousImportStep = previousImportStep;
+
+// Export execution functions
+window.executeImport = executeImport;
+
+// Export utility functions
+window.startNewImport = startNewImport;
+
+// Export modal functions
+window.showImportPreviewModal = showImportPreviewModal;
+window.closeImportPreviewModal = closeImportPreviewModal;
+
+// Export ticker functions
+window.closeAddTickerModal = closeAddTickerModal;
+window.saveMissingTicker = saveMissingTicker;
+
+// Export existing records functions
+window.importExistingRecord = importExistingRecord;

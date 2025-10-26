@@ -2405,49 +2405,152 @@ async function showAddTradePlanModal() {
 /**
  * שמירת תכנון חדש
  */
-async function saveNewTradePlan() {
-  const form = document.getElementById('addTradePlanForm');
-  if (!form) {
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('Form element not found - skipping save operation', 'warning');
+/**
+ * שמירת נתוני תכנון (הוספה או עריכה)
+ * @param {string} mode - 'add' או 'edit'
+ */
+async function saveTradePlanData(mode) {
+  const isEdit = mode === 'edit';
+  
+  try {
+    if (isEdit) {
+      // שימוש ב-DataCollectionService לאיסוף נתונים
+      const tradePlanData = DataCollectionService.collectFormData({
+        id: { id: 'editTradePlanId', type: 'int' },
+        ticker_id: { id: 'editTicker', type: 'int' },
+        investment_type: { id: 'editType', type: 'text' },
+        side: { id: 'editSide', type: 'text' },
+        planned_amount: { id: 'editQuantity', type: 'number' },
+        stop_price: { id: 'editPrice', type: 'number' },
+        target_price: { id: 'editPrice', type: 'number' },
+        entry_conditions: { id: 'editNotes', type: 'text' },
+        reasons: { id: 'editNotes', type: 'text' }
+      });
+
+      const formData = {
+        ...tradePlanData,
+        status: 'open' // Default status
+      };
+
+      // בדיקה אם הסטטוס משתנה ל-'cancelled'
+      const originalTradePlan = window.tradePlansData.find(tp => tp.id === formData.id);
+      const isStatusChangingToCancelled = originalTradePlan &&
+                                             originalTradePlan.status !== 'cancelled' &&
+                                             formData.status === 'cancelled';
+
+      if (isStatusChangingToCancelled) {
+        // בדיקת פריטים מקושרים לפני הביטול
+        await checkLinkedItemsBeforeCancel(formData.id);
+        return; // לא ממשיכים עם העדכון אם יש פריטים מקושרים
+      }
+
+      // בדיקה אם הטיקר השתנה
+      const isTickerChanging = originalTradePlan &&
+                                  originalTradePlan.ticker_id !== formData.ticker_id;
+
+      if (isTickerChanging) {
+        // שינוי טיקר לא נתמך - הצגת הודעה ודחיית השינוי
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification(
+            'פיצ\'ר לא נתמך',
+            'שינוי טיקר לתכנון לא נתמך עדיין. השינוי נדחה.',
+            6000,
+            'system'
+          );
+        }
+        return;
+      }
+
+      // שליחה לשרת
+      const response = await fetch(`/api/trade_plans/${formData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        window.showSuccessNotification('תכנון עודכן בהצלחה!');
+        // סגירת המודל
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
+        if (modal) modal.hide();
+        // רענון הנתונים
+        await loadTradePlansData();
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+    } else {
+      const form = document.getElementById('addTradePlanForm');
+      if (!form) {
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('Form element not found - skipping save operation', 'warning');
+        }
+        return;
+      }
+
+      // בדיקת ולידציה
+      if (!validateTradePlanForm()) {
+        return;
+      }
+
+      // איסוף נתונים מהטופס
+      const formData = {
+        ticker_id: document.getElementById('ticker').value,
+        investment_type: document.getElementById('type').value,
+        side: document.getElementById('side').value,
+        planned_amount: document.getElementById('quantity').value,
+        stop_price: document.getElementById('price').value || null,
+        entry_conditions: document.getElementById('notes').value || null,
+        status: 'open'
+      };
+
+      // שליחה לשרת
+      const response = await fetch('/api/trade_plans/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        window.showSuccessNotification('תכנון נוסף בהצלחה!');
+        // סגירת המודל
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addTradePlanModal'));
+        if (modal) modal.hide();
+        // רענון הנתונים
+        await loadTradePlansData();
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
     }
-    return;
+    
+  } catch (error) {
+    const action = isEdit ? 'עדכון' : 'הוספת';
+    window.Logger.error(`שגיאה ב${action} תכנון:`, error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification(`שגיאה ב${action} תכנון`, error.message);
+    }
   }
+}
 
-  // ===== VALIDATION SYSTEM - Using Global Validation Utils =====
+/**
+ * שמירת תכנון בעריכה
+ * @deprecated Use saveTradePlanData('edit') instead
+ */
+async function saveEditTradePlan() {
+  await saveTradePlanData('edit');
+}
 
-  // Define validation rules
-  const validationRules = {
-    'ticker': {
-      required: true,
-      message: 'יש לבחור טיקר',
-    },
-    'type': {
-      required: true,
-      message: 'יש לבחור סוג השקעה',
-      customValidation: value => {
-        const validTypes = ['swing', 'investment', 'passive'];
-        if (!validTypes.includes(value)) {
-          return 'סוג השקעה לא תקין';
-        }
-        return true;
-      },
-    },
-    'side': {
-      required: true,
-      message: 'יש לבחור צד',
-      customValidation: value => {
-        const validSides = ['Long', 'Short'];
-        if (!validSides.includes(value)) {
-          return 'צד לא תקין';
-        }
-        return true;
-      },
-    },
-    'quantity': {
-      required: true,
-      message: 'יש להזין סכום מתוכנן',
-      min: 0.01,
+/**
+ * שמירת תכנון חדש
+ * @deprecated Use saveTradePlanData('add') instead
+ */
+async function saveNewTradePlan() {
+  await saveTradePlanData('add');
+}
       max: 999999999,
       customValidation: value => {
         const numValue = parseFloat(value);

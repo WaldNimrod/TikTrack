@@ -1,0 +1,891 @@
+/**
+ * ModalManagerV2 - TikTrack Modal System
+ * =====================================
+ * 
+ * מנהל מודלים מרכזי מתקדם עם תמיכה מלאה ב-CRUD operations
+ * ואינטגרציה עם כל המערכות הקיימות במערכת TikTrack
+ * 
+ * @version 2.0.0
+ * @created January 12, 2025
+ * @author TikTrack Development Team
+ * 
+ * תכונות:
+ * - יצירת מודלים דינמית מקונפיגורציה
+ * - אינטגרציה מלאה עם כל המערכות הקיימות
+ * - תמיכה ב-RTL מלא
+ * - עיצוב ITCSS
+ * - ביצועים אופטימליים
+ */
+
+class ModalManagerV2 {
+    /**
+     * Constructor - אתחול ModalManagerV2
+     * 
+     * @constructor
+     */
+    constructor() {
+        this.modals = new Map();
+        this.configurations = new Map();
+        this.activeModal = null;
+        this.isInitialized = false;
+        
+        this.init();
+    }
+
+    /**
+     * Initialize ModalManagerV2 - אתחול המערכת
+     * 
+     * @private
+     */
+    init() {
+        try {
+            this.setupEventListeners();
+            this.loadDefaultConfigurations();
+            this.isInitialized = true;
+            
+            // הוספה לאובייקט הגלובלי
+            window.ModalManagerV2 = this;
+            
+            console.log('ModalManagerV2 initialized successfully');
+        } catch (error) {
+            console.error('Error initializing ModalManagerV2:', error);
+        }
+    }
+
+    /**
+     * Setup event listeners - הגדרת מאזיני אירועים
+     * 
+     * @private
+     */
+    setupEventListeners() {
+        // מאזין לסגירת מודלים
+        document.addEventListener('hidden.bs.modal', (event) => {
+            this.handleModalHidden(event.target);
+        });
+        
+        // מאזין לפתיחת מודלים
+        document.addEventListener('shown.bs.modal', (event) => {
+            this.handleModalShown(event.target);
+        });
+        
+        // מאזין לשינוי העדפות משתמש
+        if (window.PreferencesSystem) {
+            window.PreferencesSystem.onPreferencesChanged(() => {
+                this.updateAllModalColors();
+            });
+        }
+    }
+
+    /**
+     * Load default configurations - טעינת קונפיגורציות ברירת מחדל
+     * 
+     * @private
+     */
+    loadDefaultConfigurations() {
+        // טעינת קונפיגורציות מקבצי config
+        const configFiles = [
+            'cash-flows-config.js',
+            'notes-config.js',
+            'trading-accounts-config.js',
+            'tickers-config.js',
+            'executions-config.js',
+            'alerts-config.js',
+            'trade-plans-config.js',
+            'trades-config.js'
+        ];
+        
+        configFiles.forEach(configFile => {
+            this.loadConfiguration(configFile);
+        });
+    }
+
+    /**
+     * Create CRUD modal from configuration - יצירת מודל CRUD מקונפיגורציה
+     * 
+     * @param {Object} config - קונפיגורציה של המודל
+     * @param {string} config.id - מזהה המודל
+     * @param {string} config.entityType - סוג הישות
+     * @param {Object} config.title - כותרות המודל
+     * @param {string} config.size - גודל המודל (sm, lg, xl)
+     * @param {string} config.headerType - סוג הכותרת (dynamic)
+     * @param {Array} config.fields - שדות המודל
+     * @param {Object} config.validation - כללי ולידציה
+     * @param {string} config.onSave - פונקציית שמירה
+     * @returns {HTMLElement} אלמנט המודל
+     */
+    createCRUDModal(config) {
+        try {
+            // בדיקת תקינות קונפיגורציה
+            this.validateConfiguration(config);
+            
+            // יצירת HTML המודל
+            const modalHTML = this.generateModalHTML(config);
+            
+            // הוספה לדף
+            const modalElement = this.insertModalIntoDOM(modalHTML);
+            
+            // אתחול כל המערכות
+            this.initializeModalSystems(modalElement, config);
+            
+            // שמירה במפה
+            this.modals.set(config.id, {
+                element: modalElement,
+                config: config,
+                isActive: false
+            });
+            
+            return modalElement;
+        } catch (error) {
+            console.error(`Error creating CRUD modal ${config.id}:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Generate modal HTML - יצירת HTML של המודל
+     * 
+     * @param {Object} config - קונפיגורציה של המודל
+     * @returns {string} HTML של המודל
+     * @private
+     */
+    generateModalHTML(config) {
+        const fieldsHTML = this.generateFieldsHTML(config.fields);
+        
+        return `
+            <div class="modal fade" id="${config.id}" tabindex="-1" 
+                 aria-labelledby="${config.id}Label" aria-hidden="true"
+                 data-bs-backdrop="true" data-bs-keyboard="true">
+                <div class="modal-dialog modal-${config.size || 'lg'}">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-dynamic" 
+                             style="background: linear-gradient(135deg, var(--entity-color-light), var(--entity-color-dark))">
+                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--entity-color-dark)">${config.title.add || 'הוספת ישות'}</h5>
+                            <button data-button-type="CLOSE" data-variant="icon-only" 
+                                    data-color="entity-dark" data-bs-dismiss="modal" 
+                                    aria-label="סגור"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="${config.id}Form">
+                                ${fieldsHTML}
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button data-button-type="CANCEL" data-color="warning" 
+                                    data-bs-dismiss="modal" data-text="ביטול"></button>
+                            <button data-button-type="SAVE" data-color="entity-dark" 
+                                    data-onclick="${config.onSave}" data-text="שמור"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Generate fields HTML - יצירת HTML של השדות
+     * 
+     * @param {Array} fields - רשימת שדות
+     * @returns {string} HTML של השדות
+     * @private
+     */
+    generateFieldsHTML(fields) {
+        if (!fields || !Array.isArray(fields)) {
+            return '';
+        }
+        
+        return fields.map(field => {
+            return this.renderField(field);
+        }).join('');
+    }
+
+    /**
+     * Render field - יצירת HTML של שדה
+     * 
+     * @param {Object} field - קונפיגורציה של השדה
+     * @returns {string} HTML של השדה
+     * @private
+     */
+    renderField(field) {
+        const requiredAttr = field.required ? 'required' : '';
+        const requiredStar = field.required ? '<span class="text-danger">*</span>' : '';
+        
+        switch (field.type) {
+            case 'text':
+                return `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="${field.id}" 
+                               name="${field.id}"
+                               ${requiredAttr}
+                               placeholder="${field.placeholder || ''}"
+                               value="${field.defaultValue || ''}">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
+            case 'number':
+                return `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <input type="number" 
+                               class="form-control" 
+                               id="${field.id}" 
+                               name="${field.id}"
+                               ${requiredAttr}
+                               ${field.min ? `min="${field.min}"` : ''}
+                               ${field.max ? `max="${field.max}"` : ''}
+                               ${field.step ? `step="${field.step}"` : ''}
+                               value="${field.defaultValue || ''}">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
+            case 'date':
+                return `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <input type="${field.dateTime ? 'datetime-local' : 'date'}" 
+                               class="form-control" 
+                               id="${field.id}" 
+                               name="${field.id}"
+                               ${requiredAttr}
+                               value="${field.defaultValue || ''}">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
+            case 'select':
+                let optionsHTML = '';
+                if (field.includeEmpty !== false) {
+                    const emptyText = field.emptyText || 'בחר...';
+                    optionsHTML += `<option value="">${emptyText}</option>`;
+                }
+                
+                if (field.options && Array.isArray(field.options)) {
+                    field.options.forEach(option => {
+                        const value = option.value || option.id || option;
+                        const label = option.label || option.name || option;
+                        const selected = field.defaultValue === value ? 'selected' : '';
+                        optionsHTML += `<option value="${value}" ${selected}>${label}</option>`;
+                    });
+                }
+                
+                return `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <select class="form-select" 
+                                id="${field.id}" 
+                                name="${field.id}"
+                                ${requiredAttr}>
+                            ${optionsHTML}
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
+            case 'textarea':
+                return `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <textarea class="form-control" 
+                                  id="${field.id}" 
+                                  name="${field.id}"
+                                  ${requiredAttr}
+                                  rows="${field.rows || 4}"
+                                  placeholder="${field.placeholder || ''}">${field.defaultValue || ''}</textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
+            default:
+                console.warn(`Unknown field type: ${field.type}`);
+                return '';
+        }
+    }
+
+    /**
+     * Show modal with mode and data - הצגת מודל עם מצב ונתונים
+     * 
+     * @param {string} modalId - מזהה המודל
+     * @param {string} mode - מצב המודל (add, edit, view)
+     * @param {Object} entityData - נתוני הישות (לעריכה/צפייה)
+     * @returns {Promise<void>}
+     */
+    async showModal(modalId, mode = 'add', entityData = null) {
+        try {
+            // בדיקה שהמודל קיים
+            if (!this.modals.has(modalId)) {
+                throw new Error(`Modal ${modalId} not found`);
+            }
+            
+            const modalInfo = this.modals.get(modalId);
+            const modalElement = modalInfo.element;
+            
+            // עדכון כותרת לפי מצב
+            this.updateModalTitle(modalElement, modalInfo.config, mode);
+            
+            // איפוס טופס
+            this.resetForm(modalElement);
+            
+            // מילוי נתונים אם במצב עריכה/צפייה
+            if (mode === 'edit' && entityData) {
+                await this.populateForm(modalElement, entityData);
+            }
+            
+            // הפעלת ולידציה
+            this.initializeValidation(modalElement, modalInfo.config);
+            
+            // הפעלת מערכת הכפתורים
+            this.initializeButtons(modalElement);
+            
+            // יישום צבעים
+            this.applyUserColors(modalElement, modalInfo.config.entityType);
+            
+            // מילוי selects
+            await this.populateSelects(modalElement, modalInfo.config);
+            
+            // הצגת המודל
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            
+            // עדכון מצב
+            modalInfo.isActive = true;
+            this.activeModal = modalId;
+            
+        } catch (error) {
+            console.error(`Error showing modal ${modalId}:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Show edit modal with entity data - הצגת מודל עריכה עם נתוני ישות
+     * 
+     * @param {string} modalId - מזהה המודל
+     * @param {string} entityType - סוג הישות
+     * @param {string|number} entityId - מזהה הישות
+     * @returns {Promise<void>}
+     */
+    async showEditModal(modalId, entityType, entityId) {
+        try {
+            // טעינת נתוני הישות
+            const entityData = await this.loadEntityData(entityType, entityId);
+            
+            if (!entityData) {
+                throw new Error(`Entity ${entityType} with ID ${entityId} not found`);
+            }
+            
+            // הצגת מודל במצב עריכה
+            await this.showModal(modalId, 'edit', entityData);
+            
+        } catch (error) {
+            console.error(`Error showing edit modal for ${entityType} ${entityId}:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Load entity data from API - טעינת נתוני ישות מ-API
+     * 
+     * @param {string} entityType - סוג הישות
+     * @param {string|number} entityId - מזהה הישות
+     * @returns {Promise<Object|null>} נתוני הישות
+     * @private
+     */
+    async loadEntityData(entityType, entityId) {
+        try {
+            const response = await fetch(`/api/${entityType}/${entityId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            return result.data || result;
+            
+        } catch (error) {
+            console.error(`Error loading entity data for ${entityType} ${entityId}:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Reset form - איפוס טופס
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {string} formId - מזהה הטופס (אופציונלי)
+     */
+    resetForm(modalElement, formId = null) {
+        const form = formId ? 
+            modalElement.querySelector(`#${formId}`) : 
+            modalElement.querySelector('form');
+        
+        if (!form) return;
+        
+        // איפוס כל השדות
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+                input.checked = false;
+            } else {
+                input.value = '';
+            }
+        });
+        
+        // ניקוי שגיאות ולידציה
+        this.clearValidationErrors(form);
+        
+        // מילוי ברירות מחדל מהעדפות
+        this.applyDefaultValues(form);
+    }
+
+    /**
+     * Populate form with data - מילוי טופס עם נתונים
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} data - נתונים למילוי
+     * @param {string} formId - מזהה הטופס (אופציונלי)
+     */
+    populateForm(modalElement, data, formId = null) {
+        const form = formId ? 
+            modalElement.querySelector(`#${formId}`) : 
+            modalElement.querySelector('form');
+        
+        if (!form || !data) return;
+        
+        // מילוי שדות רגילים
+        Object.entries(data).forEach(([key, value]) => {
+            const field = form.querySelector(`#${key}, [name="${key}"]`);
+            if (field) {
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    field.checked = Boolean(value);
+                } else {
+                    field.value = value || '';
+                }
+            }
+        });
+        
+        // מילוי selects מיוחדים
+        this.populateSpecialSelects(form, data);
+    }
+
+    /**
+     * Apply default values from preferences - יישום ברירות מחדל מהעדפות
+     * 
+     * @param {HTMLElement} form - אלמנט הטופס
+     * @private
+     */
+    applyDefaultValues(form) {
+        if (!window.PreferencesSystem) return;
+        
+        const preferences = window.PreferencesSystem.manager?.currentPreferences || {};
+        
+        // ברירת מחדל לחשבון מסחר
+        const accountField = form.querySelector('[id*="Account"], [name*="account"]');
+        if (accountField && preferences.defaultTradingAccount) {
+            accountField.value = preferences.defaultTradingAccount;
+        }
+        
+        // ברירת מחדל למטבע
+        const currencyField = form.querySelector('[id*="Currency"], [name*="currency"]');
+        if (currencyField && preferences.defaultCurrency) {
+            currencyField.value = preferences.defaultCurrency;
+        }
+        
+        // ברירת מחדל לתאריך - היום
+        const dateField = form.querySelector('input[type="date"], input[type="datetime-local"]');
+        if (dateField && !dateField.value) {
+            const today = new Date();
+            const dateValue = dateField.type === 'datetime-local' 
+                ? today.toISOString().slice(0, 16) 
+                : today.toISOString().slice(0, 10);
+            dateField.value = dateValue;
+        }
+    }
+
+    /**
+     * Initialize validation system - אתחול מערכת הולידציה
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @private
+     */
+    initializeValidation(modalElement, config) {
+        if (!window.initializeValidation || !config.validation) return;
+        
+        const form = modalElement.querySelector('form');
+        if (!form) return;
+        
+        // יצירת כללי ולידציה
+        const validationRules = {};
+        config.fields.forEach(field => {
+            if (field.validation) {
+                validationRules[field.id] = field.validation;
+            }
+        });
+        
+        // אתחול ולידציה
+        window.initializeValidation(form.id, validationRules);
+    }
+
+    /**
+     * Initialize button system - אתחול מערכת הכפתורים
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @private
+     */
+    initializeButtons(modalElement) {
+        if (!window.advancedButtonSystem) return;
+        
+        // עיבוד כל הכפתורים במודל
+        window.advancedButtonSystem.processButtons(modalElement);
+    }
+
+    /**
+     * Apply user colors - יישום צבעי משתמש
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {string} entityType - סוג הישות
+     * @private
+     */
+    applyUserColors(modalElement, entityType) {
+        if (!entityType || !window.getEntityColor) return;
+        
+        const header = modalElement.querySelector('.modal-header');
+        if (!header) return;
+        
+        // עדכון צבע כותרת - רקע בהיר
+        const entityColorLight = window.getEntityColor(entityType);
+        const entityColorDark = window.getEntityDarkColor(entityType);
+        
+        header.style.background = `linear-gradient(135deg, ${entityColorLight}, ${entityColorDark})`;
+        
+        // עדכון צבע כותרת הטקסט - כהה
+        const title = header.querySelector('.modal-title');
+        if (title) {
+            title.style.color = entityColorDark;
+        }
+        
+        // עדכון צבעי כפתורים
+        const closeButton = modalElement.querySelector('[data-button-type="CLOSE"]');
+        if (closeButton) {
+            closeButton.style.color = entityColorDark;
+            closeButton.style.borderColor = entityColorDark;
+        }
+        
+        const saveButton = modalElement.querySelector('[data-button-type="SAVE"]');
+        if (saveButton) {
+            saveButton.style.color = entityColorDark;
+            saveButton.style.borderColor = entityColorDark;
+        }
+        
+        const cancelButton = modalElement.querySelector('[data-button-type="CANCEL"]');
+        if (cancelButton) {
+            // כפתור ביטול - צבע אזהרה
+            cancelButton.style.color = 'var(--warning-color, #fc5a06)';
+            cancelButton.style.borderColor = 'var(--warning-color, #fc5a06)';
+        }
+    }
+
+    /**
+     * Populate selects - מילוי רשימות בחירה
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @private
+     */
+    async populateSelects(modalElement, config) {
+        if (!window.SelectPopulatorService) return;
+        
+        const selects = modalElement.querySelectorAll('select');
+        
+        for (const select of selects) {
+            const selectId = select.id;
+            
+            try {
+                // מילוי לפי סוג השדה
+                if (selectId.includes('Account') || selectId.includes('account')) {
+                    await window.SelectPopulatorService.populateAccountsSelect(selectId, {
+                        defaultFromPreferences: true
+                    });
+                } else if (selectId.includes('Ticker') || selectId.includes('ticker')) {
+                    await window.SelectPopulatorService.populateTickersSelect(selectId, {
+                        includeEmpty: true
+                    });
+                } else if (selectId.includes('Currency') || selectId.includes('currency')) {
+                    await window.SelectPopulatorService.populateCurrenciesSelect(selectId, {
+                        defaultFromPreferences: true
+                    });
+                } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
+                    await window.SelectPopulatorService.populateTradePlansSelect(selectId, {
+                        includeEmpty: true
+                    });
+                }
+            } catch (error) {
+                console.warn(`Error populating select ${selectId}:`, error);
+            }
+        }
+    }
+
+    /**
+     * Handle modal shown event - טיפול באירוע הצגת מודל
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @private
+     */
+    handleModalShown(modalElement) {
+        const modalId = modalElement.id;
+        
+        if (this.modals.has(modalId)) {
+            this.modals.get(modalId).isActive = true;
+            this.activeModal = modalId;
+        }
+        
+        // פוקוס על השדה הראשון
+        const firstInput = modalElement.querySelector('input:not([readonly]), select, textarea');
+        if (firstInput) {
+            setTimeout(() => firstInput.focus(), 100);
+        }
+    }
+
+    /**
+     * Handle modal hidden event - טיפול באירוע הסתרת מודל
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @private
+     */
+    handleModalHidden(modalElement) {
+        const modalId = modalElement.id;
+        
+        if (this.modals.has(modalId)) {
+            this.modals.get(modalId).isActive = false;
+        }
+        
+        if (this.activeModal === modalId) {
+            this.activeModal = null;
+        }
+        
+        // ניקוי שגיאות ולידציה
+        const form = modalElement.querySelector('form');
+        if (form) {
+            this.clearValidationErrors(form);
+        }
+    }
+
+    /**
+     * Clear validation errors - ניקוי שגיאות ולידציה
+     * 
+     * @param {HTMLElement} form - אלמנט הטופס
+     * @private
+     */
+    clearValidationErrors(form) {
+        const invalidFields = form.querySelectorAll('.is-invalid');
+        invalidFields.forEach(field => {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+        });
+        
+        const errorMessages = form.querySelectorAll('.invalid-feedback');
+        errorMessages.forEach(error => {
+            error.remove();
+        });
+    }
+
+    /**
+     * Validate configuration - ולידציה של קונפיגורציה
+     * 
+     * @param {Object} config - קונפיגורציה לבדיקה
+     * @throws {Error} אם הקונפיגורציה לא תקינה
+     * @private
+     */
+    validateConfiguration(config) {
+        if (!config.id) {
+            throw new Error('Modal ID is required');
+        }
+        
+        if (!config.entityType) {
+            throw new Error('Entity type is required');
+        }
+        
+        if (!config.fields || !Array.isArray(config.fields)) {
+            throw new Error('Fields array is required');
+        }
+        
+        if (!config.onSave) {
+            throw new Error('Save function is required');
+        }
+    }
+
+    /**
+     * Insert modal into DOM - הוספת מודל ל-DOM
+     * 
+     * @param {string} modalHTML - HTML של המודל
+     * @returns {HTMLElement} אלמנט המודל
+     * @private
+     */
+    insertModalIntoDOM(modalHTML) {
+        // יצירת אלמנט זמני
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = modalHTML;
+        
+        const modalElement = tempDiv.firstElementChild;
+        
+        // הוספה לדף
+        document.body.appendChild(modalElement);
+        
+        return modalElement;
+    }
+
+    /**
+     * Update modal title - עדכון כותרת המודל
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @param {string} mode - מצב המודל
+     * @private
+     */
+    updateModalTitle(modalElement, config, mode) {
+        const titleElement = modalElement.querySelector('.modal-title');
+        if (!titleElement) return;
+        
+        const title = config.title && config.title[mode] ? 
+            config.title[mode] : 
+            `${mode === 'add' ? 'הוספת' : mode === 'edit' ? 'עריכת' : 'צפייה ב'}${config.entityType}`;
+        
+        titleElement.textContent = title;
+    }
+
+    /**
+     * Update all modal colors - עדכון צבעי כל המודלים
+     * 
+     * @private
+     */
+    updateAllModalColors() {
+        this.modals.forEach((modalInfo, modalId) => {
+            if (modalInfo.isActive) {
+                this.applyUserColors(modalInfo.element, modalInfo.config.entityType);
+            }
+        });
+    }
+
+    /**
+     * Load configuration - טעינת קונפיגורציה
+     * 
+     * @param {string} configFile - שם קובץ הקונפיגורציה
+     * @private
+     */
+    loadConfiguration(configFile) {
+        // הטעינה תתבצע על ידי הוספת script tag
+        const script = document.createElement('script');
+        script.src = `scripts/modal-configs/${configFile}`;
+        script.async = true;
+        document.head.appendChild(script);
+    }
+
+    /**
+     * Initialize modal systems - אתחול מערכות המודל
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @private
+     */
+    initializeModalSystems(modalElement, config) {
+        // אתחול מערכת הכפתורים
+        this.initializeButtons(modalElement);
+        
+        // יישום צבעים
+        this.applyUserColors(modalElement, config.entityType);
+    }
+
+    /**
+     * Populate special selects - מילוי selects מיוחדים
+     * 
+     * @param {HTMLElement} form - אלמנט הטופס
+     * @param {Object} data - נתונים למילוי
+     * @private
+     */
+    populateSpecialSelects(form, data) {
+        // מילוי selects מיוחדים לפי הצורך
+        // לדוגמה: trade, tradePlan, etc.
+    }
+
+    /**
+     * Get modal info - קבלת מידע על מודל
+     * 
+     * @param {string} modalId - מזהה המודל
+     * @returns {Object|null} מידע על המודל
+     */
+    getModalInfo(modalId) {
+        return this.modals.get(modalId) || null;
+    }
+
+    /**
+     * Get active modal - קבלת המודל הפעיל
+     * 
+     * @returns {string|null} מזהה המודל הפעיל
+     */
+    getActiveModal() {
+        return this.activeModal;
+    }
+
+    /**
+     * Close active modal - סגירת המודל הפעיל
+     */
+    closeActiveModal() {
+        if (this.activeModal) {
+            const modalElement = document.getElementById(this.activeModal);
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        }
+    }
+
+    /**
+     * Destroy modal - השמדת מודל
+     * 
+     * @param {string} modalId - מזהה המודל
+     */
+    destroyModal(modalId) {
+        if (this.modals.has(modalId)) {
+            const modalInfo = this.modals.get(modalId);
+            
+            // הסרה מה-DOM
+            if (modalInfo.element && modalInfo.element.parentNode) {
+                modalInfo.element.parentNode.removeChild(modalInfo.element);
+            }
+            
+            // הסרה מהמפה
+            this.modals.delete(modalId);
+            
+            // עדכון מודל פעיל
+            if (this.activeModal === modalId) {
+                this.activeModal = null;
+            }
+        }
+    }
+}
+
+// אתחול אוטומטי כאשר הדף נטען
+document.addEventListener('DOMContentLoaded', () => {
+    if (!window.ModalManagerV2) {
+        new ModalManagerV2();
+    }
+});
+
+// ייצוא למרחב הגלובלי
+window.ModalManagerV2 = ModalManagerV2;

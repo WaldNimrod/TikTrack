@@ -1047,15 +1047,15 @@ function startAutoRefresh() {
   //     await loadCashFlows();
   //     
   //     // עדכון סטטיסטיקות
-      if (typeof updatePageSummaryStats === 'function') {
-        updatePageSummaryStats();
-      }
-      
-      window.Logger.info('Automatic update completed successfully', { page: 'cash_flows' });
-    } catch (error) {
-      window.Logger.error('Error in automatic update', error, { page: 'cash_flows' });
-    }
-  }, 30000); // 30 שניות
+  //     if (typeof updatePageSummaryStats === 'function') {
+  //       updatePageSummaryStats();
+  //     }
+  //     
+  //     window.Logger.info('Automatic update completed successfully', { page: 'cash_flows' });
+  //   } catch (error) {
+  //     window.Logger.error('Error in automatic update', error, { page: 'cash_flows' });
+  //   }
+  // }, 30000); // 30 שניות
   
   window.Logger.info('Automatic update activated - refresh every 30 seconds', { page: 'cash_flows' });
 }
@@ -1554,17 +1554,25 @@ async function updateCashFlow() {
 
 // הפונקציה הוסרה - קיימת כבר בשורה 909
 
-// פונקציות מודל חסרות
+// פונקציות מודל חדשות - מערכת ModalManagerV2
 function showAddCashFlowModal() {
     window.Logger.debug('showAddCashFlowModal called', { page: 'cash_flows' });
-    // קריאה לפונקציה האמיתית
-    _showAddCashFlowModal();
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showModal('cashFlowModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
 }
 
 function showEditCashFlowModal(cashFlowId) {
     window.Logger.debug('showEditCashFlowModal called', { cashFlowId, page: 'cash_flows' });
-    // קריאה לפונקציה האמיתית
-    _showEditCashFlowModal(cashFlowId);
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', cashFlowId);
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
 }
 
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====

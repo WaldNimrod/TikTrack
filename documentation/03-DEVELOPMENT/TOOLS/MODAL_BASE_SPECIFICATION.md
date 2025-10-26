@@ -25,10 +25,12 @@
   <div class="modal-dialog modal-{size}">
     <div class="modal-content">
       <!-- Header -->
-      <div class="modal-header modal-header-{type}">
-        <h5 class="modal-title" id="{modalId}Label">{title}</h5>
-        <button data-button-type="CLOSE" data-bs-dismiss="modal" 
-                data-text="סגור" aria-label="סגור"></button>
+      <div class="modal-header modal-header-dynamic" 
+           style="background: linear-gradient(135deg, var(--entity-color-light), var(--entity-color-dark))">
+        <h5 class="modal-title" id="{modalId}Label" style="color: var(--entity-color-dark)">{title}</h5>
+        <button data-button-type="CLOSE" data-variant="icon-only" 
+                data-color="entity-dark" data-bs-dismiss="modal" 
+                aria-label="סגור"></button>
       </div>
       
       <!-- Body -->
@@ -40,10 +42,10 @@
       
       <!-- Footer -->
       <div class="modal-footer">
-        <button data-button-type="CANCEL" data-bs-dismiss="modal" 
-                data-text="ביטול"></button>
-        <button data-button-type="SAVE" data-onclick="{saveFunction}" 
-                data-text="שמור"></button>
+        <button data-button-type="CANCEL" data-color="warning" 
+                data-bs-dismiss="modal" data-text="ביטול"></button>
+        <button data-button-type="SAVE" data-color="entity-dark" 
+                data-onclick="{saveFunction}" data-text="שמור"></button>
       </div>
     </div>
   </div>
@@ -53,11 +55,14 @@
 ### פרמטרים דינמיים:
 - `{modalId}` - מזהה ייחודי למודל
 - `{size}` - גודל מודל (sm, lg, xl)
-- `{type}` - סוג כותרת (colored, danger, success, info, warning)
 - `{title}` - כותרת המודל
 - `{formId}` - מזהה הטופס
-- `{dynamic-fields}` - שדות דינמיים
 - `{saveFunction}` - פונקציית שמירה
+- `{dynamic-fields}` - שדות דינמיים
+
+### משתני צבעים דינמיים:
+- `--entity-color-light` - צבע הישות בהיר (רקע כותרת)
+- `--entity-color-dark` - צבע הישות כהה (טקסט כותרת, כפתור סגור, כפתור שמור)
 
 ---
 

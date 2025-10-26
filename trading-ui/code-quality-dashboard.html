@@ -373,6 +373,82 @@
                     </div>
                 </div>
 
+                <!-- UI Content Section 5 Start-->
+                <div class="content-section" id="linter-testing-section">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="בדיקות לינטר" class="section-icon">
+                            בדיקות לינטר מקיפות
+                        </div>
+                        <div class="section-header-actions">
+                            <button data-button-type="PLAY" data-onclick="runComprehensiveTests()" data-text="הרץ בדיקות לינטר" title="הרץ בדיקות לינטר מקיפות">
+                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('linter-testing-section')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-code text-warning"></i>
+                                            תוצאות בדיקות לינטר
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="linterTestResults">
+                                            <div class="text-center text-muted">
+                                                לחץ על "הרץ בדיקות לינטר" כדי להתחיל בדיקות מקיפות
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-info-circle text-info"></i>
+                                            מידע על בדיקות לינטר
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text small">
+                                            בדיקות מקיפות למערכת הלינטר כולל:
+                                        </p>
+                                        <ul class="list-unstyled small">
+                                            <li><i class="fas fa-check text-success"></i> רכיבי מערכת</li>
+                                            <li><i class="fas fa-check text-success"></i> ביצועים</li>
+                                            <li><i class="fas fa-check text-success"></i> אבטחה</li>
+                                            <li><i class="fas fa-check text-success"></i> פונקציונליות</li>
+                                        </ul>
+                                        <div class="mt-3">
+                                            <h6 class="text-muted mb-2">סטטיסטיקות</h6>
+                                            <div id="linterTestStats">
+                                                <div class="stat-item">
+                                                    <span class="stat-label">סך בדיקות:</span>
+                                                    <span class="stat-value" id="totalLinterTests">0</span>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <span class="stat-label">עברו:</span>
+                                                    <span class="stat-value" id="passedLinterTests">0</span>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <span class="stat-label">נכשלו:</span>
+                                                    <span class="stat-value" id="failedLinterTests">0</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 5 End-->
+
             </div>
         </div>
     </div>
@@ -411,6 +487,9 @@
     
     <!-- Page-specific Scripts -->
     <script src="scripts/code-quality-dashboard.js?v=05b6de6f_20251025_005449"></script>
+    
+    <!-- Linter Testing System Script -->
+    <script src="scripts/linter-testing-system.js?v=05b6de6f_20251025_005449"></script>
     
     <!-- Quick Quality Check Script -->
     <script src="scripts/quick-quality-check.js?v=05b6de6f_20251025_005449"></script>

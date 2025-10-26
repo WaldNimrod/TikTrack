@@ -459,7 +459,7 @@ class ImportOrchestrator:
                 # Add all matching records
                 for match in duplicate.get('system_matches', []):
                     records_to_skip.append({
-                        'record': match['record'],
+                        'record': duplicate['record'],  # Use the original record from duplicate
                         'reason': 'system_duplicate_match',
                         'confidence_score': match.get('confidence', 0),
                         'match_count': 1,
@@ -571,6 +571,9 @@ class ImportOrchestrator:
             imported_count = 0
             import_errors = []
             
+            logger.info(f"🔍 DEBUG: records_to_import count: {len(records_to_import)}")
+            logger.info(f"🔍 DEBUG: preview_data keys: {list(preview_data.keys())}")
+            
             # Enrich records with ticker_ids
             logger.info(f"🔄 Enriching {len(records_to_import)} records with ticker_ids...")
             from services.ticker_service import TickerService
@@ -583,64 +586,59 @@ class ImportOrchestrator:
             from collections import defaultdict
             executions_by_ticker = defaultdict(list)
             
-            for record_data in enriched_records:
+            logger.info(f"🔍 DEBUG: Processing {len(enriched_records)} enriched records")
+            for i, record_data in enumerate(enriched_records):
                 ticker_id = record_data.get('ticker_id')
+                logger.info(f"🔍 DEBUG: Record {i}: ticker_id={ticker_id}, symbol={record_data.get('symbol')}")
                 if ticker_id:
                     executions_by_ticker[ticker_id].append(record_data)
                 else:
                     logger.warning(f"⚠️ Skipping record without ticker_id: {record_data.get('symbol')}")
             
             logger.info(f"📊 Grouped executions into {len(executions_by_ticker)} tickers")
+            logger.info(f"🔍 DEBUG: executions_by_ticker keys: {list(executions_by_ticker.keys())}")
             
-            # Create trades and executions
-            for ticker_id, executions in executions_by_ticker.items():
+            # Create executions only (no trades)
+            logger.info(f"🔍 DEBUG: Creating executions for {len(enriched_records)} records")
+            for i, execution_data in enumerate(enriched_records):
                 try:
-                    # Create or find trade for this ticker
-                    from models.trade import Trade
+                    logger.info(f"🔍 DEBUG: Creating execution {i}: ticker_id={execution_data.get('ticker_id')}, symbol={execution_data.get('symbol')}")
+                    
                     from models.execution import Execution
                     
-                    # Create a single trade for all executions of this ticker
-                    trade = Trade(
-                        ticker_id=ticker_id,
+                    # Convert date string to datetime object
+                    date_str = execution_data.get('date')
+                    if isinstance(date_str, str):
+                        from datetime import datetime as dt
+                        execution_date = dt.fromisoformat(date_str.replace('Z', '+00:00'))
+                    else:
+                        execution_date = date_str
+                    
+                    # Generate unique execution ID: filename + timestamp + original external_id
+                    import_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                    filename = session.file_name or 'unknown_file'
+                    unique_execution_id = f"{filename}_{import_timestamp}_{execution_data.get('external_id', 'exec')}"
+                    
+                    execution = Execution(
+                        ticker_id=execution_data.get('ticker_id'),
                         trading_account_id=session.account_id,
-                        status='active',
+                        action=execution_data.get('action'),
+                        quantity=execution_data.get('quantity'),
+                        price=execution_data.get('price'),
+                        fee=execution_data.get('fee', 0),
+                        date=execution_date,
+                        external_id=unique_execution_id,
+                        source='ibkr_import',  # Fixed source for IBKR imports
                         created_at=datetime.now()
                     )
-                    self.db_session.add(trade)
-                    self.db_session.flush()  # Get the trade ID
+                    self.db_session.add(execution)
+                    imported_count += 1
                     
-                    # Create executions for this trade
-                    for execution_data in executions:
-                        # Convert date string to datetime object
-                        date_str = execution_data.get('date')
-                        if isinstance(date_str, str):
-                            from datetime import datetime as dt
-                            execution_date = dt.fromisoformat(date_str.replace('Z', '+00:00'))
-                        else:
-                            execution_date = date_str
-                        
-                        execution = Execution(
-                            trade_id=trade.id,
-                            action=execution_data.get('action'),
-                            quantity=execution_data.get('quantity'),
-                            price=execution_data.get('price'),
-                            fee=execution_data.get('fee', 0),
-                            date=execution_date,
-                            external_id=execution_data.get('external_id'),
-                            created_at=datetime.now()
-                        )
-                        self.db_session.add(execution)
-                        imported_count += 1
-                    
-                    logger.info(f"✅ Created trade {trade.id} with {len(executions)} executions for ticker_id {ticker_id}")
+                    logger.info(f"✅ Created execution {i+1} for ticker_id {execution_data.get('ticker_id')}")
                     
                 except Exception as e:
-                    import_errors.append({
-                        'ticker_id': ticker_id,
-                        'executions_count': len(executions),
-                        'error': str(e)
-                    })
-                    logger.error(f"❌ Failed to create trade for ticker_id {ticker_id}: {str(e)}")
+                    logger.error(f"❌ Failed to create execution {i}: {str(e)}")
+                    import_errors.append(f"Failed to create execution {i}: {str(e)}")
             
             # Commit all changes
             self.db_session.commit()

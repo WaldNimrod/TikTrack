@@ -518,94 +518,111 @@ function restoreTickersSectionState() {
 // ========================================
 
 /**
+ * הצגת מודל טיקר (הוספה או עריכה)
+ * @param {string} mode - 'add' או 'edit'
+ * @param {number} [id] - מזהה הטיקר (נדרש רק בעריכה)
+ */
+async function showTickerModal(mode, id = null) {
+  const isEdit = mode === 'edit';
+  const modalId = isEdit ? 'editTickerModal' : 'addTickerModal';
+  const formId = isEdit ? 'editTickerForm' : 'addTickerForm';
+  const currencyId = isEdit ? 'editTickerCurrency' : 'addTickerCurrency';
+  
+  try {
+    if (isEdit) {
+      // מציאת הטיקר לפי ID
+      const ticker = tickersData.find(t => t.id === id);
+      if (!ticker) {
+        if (window.showErrorNotification) {
+          window.showErrorNotification('שגיאה', 'טיקר לא נמצא', 6000, 'system');
+        }
+        return;
+      }
+
+      // עדכון אפשרויות מטבע לפני מילוי הטופס
+      updateCurrencyOptions(ticker);
+    } else {
+      // טעינת מטבעות עם ברירת מחדל מהעדפות
+      await SelectPopulatorService.populateCurrenciesSelect(currencyId, {
+        includeEmpty: true,
+        emptyText: 'בחר מטבע',
+        defaultFromPreferences: true
+      });
+    }
+
+    // ניקוי הטופס
+    const form = document.getElementById(formId);
+    if (form) {
+      form.reset();
+    }
+
+    // ניקוי וולידציה
+    if (window.clearValidation) {
+      window.clearValidation(formId);
+    }
+
+    if (isEdit) {
+      // מילוי הטופס
+      const ticker = tickersData.find(t => t.id === id);
+      document.getElementById('editTickerId').value = ticker.id;
+      document.getElementById('editTickerSymbol').value = ticker.symbol;
+      document.getElementById('editTickerName').value = ticker.name;
+      document.getElementById('editTickerType').value = ticker.type;
+
+      // עדכון מטבע - תמיכה במערכת החדשה
+      const currencySelect = document.getElementById('editTickerCurrency');
+      if (currencySelect) {
+        if (ticker.currency_id) {
+          currencySelect.value = ticker.currency_id;
+        }
+      }
+
+      // עדכון סטטוס - המרה ל"לא מבוטל" או "מבוטל"
+      const statusSelect = document.getElementById('editTickerStatus');
+      if (statusSelect) {
+        if (ticker.status === 'cancelled') {
+          statusSelect.value = 'cancelled';
+        } else {
+          statusSelect.value = 'not_cancelled';
+        }
+      }
+
+      // עדכון הערות
+      const remarksField = document.getElementById('editTickerRemarks');
+      if (remarksField) {
+        remarksField.value = ticker.remarks || '';
+      }
+    }
+
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById(modalId), {
+      backdrop: true,
+      keyboard: true,
+    });
+    modal.show();
+
+  } catch (error) {
+    window.Logger.error(`שגיאה בהצגת מודל ${mode === 'edit' ? 'עריכת' : 'הוספת'} טיקר:`, error, { page: "tickers" });
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', `שגיאה בהצגת מודל ${mode === 'edit' ? 'עריכת' : 'הוספת'} טיקר`);
+    }
+  }
+}
+
+/**
  * הצגת מודל הוספת טיקר
+ * @deprecated Use showTickerModal('add') instead
  */
 async function showAddTickerModal() {
-  // הצגת מודל הוספת טיקר
-
-  // טעינת מטבעות עם ברירת מחדל מהעדפות
-  await SelectPopulatorService.populateCurrenciesSelect('addTickerCurrency', {
-    includeEmpty: true,
-    emptyText: 'בחר מטבע',
-    defaultFromPreferences: true
-  });
-
-  // ניקוי הטופס
-  document.getElementById('addTickerForm').reset();
-
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('addTickerForm');
-  }
-
-  // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('addTickerModal'), {
-    backdrop: true,
-    keyboard: true,
-  });
-  modal.show();
+  await showTickerModal('add');
 }
 
 /**
  * הצגת מודל עריכת טיקר
+ * @deprecated Use showTickerModal('edit', id) instead
  */
 function showEditTickerModal(id) {
-  // הצגת מודל עריכת טיקר
-
-  // מציאת הטיקר לפי ID
-  const ticker = tickersData.find(t => t.id === id);
-  if (!ticker) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'טיקר לא נמצא', 6000, 'system');
-    }
-    return;
-  }
-
-  // עדכון אפשרויות מטבע לפני מילוי הטופס
-  updateCurrencyOptions(ticker);
-
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('editTickerForm');
-  }
-
-  // מילוי הטופס
-  document.getElementById('editTickerId').value = ticker.id;
-  document.getElementById('editTickerSymbol').value = ticker.symbol;
-  document.getElementById('editTickerName').value = ticker.name;
-  document.getElementById('editTickerType').value = ticker.type;
-
-  // עדכון מטבע - תמיכה במערכת החדשה
-  const currencySelect = document.getElementById('editTickerCurrency');
-  if (currencySelect) {
-    if (ticker.currency_id) {
-      currencySelect.value = ticker.currency_id;
-    }
-  }
-
-  // עדכון סטטוס - המרה ל"לא מבוטל" או "מבוטל"
-  const statusSelect = document.getElementById('editTickerStatus');
-  if (statusSelect) {
-    if (ticker.status === 'cancelled') {
-      statusSelect.value = 'cancelled';
-    } else {
-      statusSelect.value = 'not_cancelled';
-    }
-  }
-
-  document.getElementById('editTickerRemarks').value = ticker.remarks || '';
-
-  // ניקוי שגיאות ולידציה
-  if (window.clearValidation) {
-    window.clearValidation('editTickerForm');
-  }
-
-  // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('editTickerModal'), {
-    backdrop: true,
-    keyboard: true,
-  });
-  modal.show();
+  showTickerModal('edit', id);
 }
 
 /**

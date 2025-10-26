@@ -1295,77 +1295,76 @@ function onRelatedObjectChange(selectElement) {
 
 
 /**
- * הפעלת שדות התנאי
+ * הפעלה/השבתה של שדות התנאי
+ * @param {boolean} enable - true להפעלה, false להשבתה
+ * @param {string} mode - 'add' או 'edit'
  */
-function enableConditionFields() {
-  try {
-    const conditionAttribute = document.getElementById('conditionAttribute');
-    const conditionOperator = document.getElementById('conditionOperator');
-    const conditionNumber = document.getElementById('conditionNumber');
-    const alertMessage = document.getElementById('alertMessage');
+function toggleConditionFields(enable, mode = 'add') {
+  const prefix = mode === 'edit' ? 'edit' : '';
+  const fields = [
+    'conditionAttribute',
+    'conditionOperator', 
+    'conditionNumber',
+    'alertMessage'
+  ];
 
-  if (conditionAttribute) {
-    conditionAttribute.disabled = false;
-    conditionAttribute.classList.remove('disabled-field');
-  }
-  if (conditionOperator) {
-    conditionOperator.disabled = false;
-    conditionOperator.classList.remove('disabled-field');
-  }
-  if (conditionNumber) {
-    conditionNumber.disabled = false;
-    conditionNumber.classList.remove('disabled-field');
-  }
-  if (alertMessage) {
-    alertMessage.disabled = false;
-    alertMessage.classList.remove('disabled-field');
-  }
-  
+  try {
+    fields.forEach(fieldName => {
+      const fieldId = prefix ? `${prefix}${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}` : fieldName;
+      const field = document.getElementById(fieldId);
+      
+      if (field) {
+        field.disabled = !enable;
+        
+        if (enable) {
+          field.classList.remove('disabled-field');
+        } else {
+          field.classList.add('disabled-field');
+          field.value = '';
+        }
+      }
+    });
+    
   } catch (error) {
-    window.Logger.error('שגיאה בהפעלת שדות התנאי:', error, { page: "alerts" });
+    const action = enable ? 'הפעלת' : 'השבתת';
+    const context = mode === 'edit' ? 'בעריכה' : '';
+    window.Logger.error(`שגיאה ב${action} שדות התנאי ${context}:`, error, { page: "alerts" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהפעלת שדות התנאי', error.message);
+      window.showErrorNotification(`שגיאה ב${action} שדות התנאי ${context}`, error.message);
     }
   }
 }
 
 /**
+ * הפעלת שדות התנאי
+ * @deprecated Use toggleConditionFields(true, 'add') instead
+ */
+function enableConditionFields() {
+  toggleConditionFields(true, 'add');
+}
+
+/**
  * השבתת שדות התנאי
+ * @deprecated Use toggleConditionFields(false, 'add') instead
  */
 function disableConditionFields() {
-  try {
-    const conditionAttribute = document.getElementById('conditionAttribute');
-    const conditionOperator = document.getElementById('conditionOperator');
-    const conditionNumber = document.getElementById('conditionNumber');
-    const alertMessage = document.getElementById('alertMessage');
+  toggleConditionFields(false, 'add');
+}
 
-  if (conditionAttribute) {
-    conditionAttribute.disabled = true;
-    conditionAttribute.classList.add('disabled-field');
-    conditionAttribute.value = '';
-  }
-  if (conditionOperator) {
-    conditionOperator.disabled = true;
-    conditionOperator.classList.add('disabled-field');
-    conditionOperator.value = '';
-  }
-  if (conditionNumber) {
-    conditionNumber.disabled = true;
-    conditionNumber.classList.add('disabled-field');
-    conditionNumber.value = '';
-  }
-  if (alertMessage) {
-    alertMessage.disabled = true;
-    alertMessage.classList.add('disabled-field');
-    alertMessage.value = '';
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בהשבתת שדות התנאי:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהשבתת שדות התנאי', error.message);
-    }
-  }
+/**
+ * הפעלת שדות התנאי במודל העריכה
+ * @deprecated Use toggleConditionFields(true, 'edit') instead
+ */
+function enableEditConditionFields() {
+  toggleConditionFields(true, 'edit');
+}
+
+/**
+ * השבתת שדות התנאי במודל העריכה
+ * @deprecated Use toggleConditionFields(false, 'edit') instead
+ */
+function disableEditConditionFields() {
+  toggleConditionFields(false, 'edit');
 }
 
 /**
@@ -1489,76 +1488,18 @@ function onEditRelatedObjectChange(selectElement) {
 
 /**
  * הפעלת שדות התנאי במודל העריכה
+ * @deprecated Use toggleConditionFields(true, 'edit') instead
  */
 function enableEditConditionFields() {
-  try {
-    const conditionAttribute = document.getElementById('editConditionAttribute');
-    const conditionOperator = document.getElementById('editConditionOperator');
-    const conditionNumber = document.getElementById('editConditionNumber');
-    const alertMessage = document.getElementById('editAlertMessage');
-
-    if (conditionAttribute) {
-      conditionAttribute.disabled = false;
-      conditionAttribute.classList.remove('disabled-field');
-    }
-    if (conditionOperator) {
-      conditionOperator.disabled = false;
-      conditionOperator.classList.remove('disabled-field');
-    }
-    if (conditionNumber) {
-    conditionNumber.disabled = false;
-    conditionNumber.classList.remove('disabled-field');
-  }
-  if (alertMessage) {
-    alertMessage.disabled = false;
-    alertMessage.classList.remove('disabled-field');
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בהפעלת שדות התנאי בעריכה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהפעלת שדות התנאי בעריכה', error.message);
-    }
-  }
+  toggleConditionFields(true, 'edit');
 }
 
 /**
  * השבתת שדות התנאי במודל העריכה
+ * @deprecated Use toggleConditionFields(false, 'edit') instead
  */
 function disableEditConditionFields() {
-  try {
-    const conditionAttribute = document.getElementById('editConditionAttribute');
-    const conditionOperator = document.getElementById('editConditionOperator');
-    const conditionNumber = document.getElementById('editConditionNumber');
-    const alertMessage = document.getElementById('editAlertMessage');
-
-    if (conditionAttribute) {
-      conditionAttribute.disabled = true;
-      conditionAttribute.classList.add('disabled-field');
-      conditionAttribute.value = '';
-    }
-    if (conditionOperator) {
-      conditionOperator.disabled = true;
-      conditionOperator.classList.add('disabled-field');
-      conditionOperator.value = '';
-  }
-  if (conditionNumber) {
-    conditionNumber.disabled = true;
-    conditionNumber.classList.add('disabled-field');
-    conditionNumber.value = '';
-  }
-  if (alertMessage) {
-    alertMessage.disabled = true;
-    alertMessage.classList.add('disabled-field');
-    alertMessage.value = '';
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בהשבתת שדות התנאי בעריכה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהשבתת שדות התנאי בעריכה', error.message);
-    }
-  }
+  toggleConditionFields(false, 'edit');
 }
 
 /**

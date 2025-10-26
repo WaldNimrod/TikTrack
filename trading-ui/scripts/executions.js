@@ -179,90 +179,71 @@ function deleteExecution(id) {
 // ========================================
 
 /**
- * ניקוי והשבתת שדות בטופס הוספת עסקה
+ * ניקוי והשבתת שדות בטופס עסקה (הוספה או עריכה)
+ * @param {string} formType - 'add' או 'edit'
  */
-function resetAddExecutionForm() {
+function resetExecutionForm(formType) {
   try {
+    const isEdit = formType === 'edit';
+    const formPrefix = isEdit ? 'editExecution' : 'execution';
+    const formId = `${formPrefix}Form`;
+    
     // ניקוי הטופס
-    const form = document.getElementById('addExecutionForm');
+    const form = document.getElementById(formId);
     if (form) {
       form.reset();
     }
     clearExecutionValidationErrors();
 
-  // השבתת כל השדות חוץ מטיקר
-  const fieldsToDisable = [
-    'executionTradeId',
-    'executionType',
-    'executionQuantity',
-    'executionPrice',
-    'executionCommission',
-    'executionDate',
-    'executionNotes',
-  ];
+    // השבתת כל השדות חוץ מטיקר
+    const fieldsToDisable = [
+      `${formPrefix}TradeId`,
+      `${formPrefix}Type`,
+      `${formPrefix}Quantity`,
+      `${formPrefix}Price`,
+      `${formPrefix}Commission`,
+      `${formPrefix}Date`,
+      `${formPrefix}Notes`,
+    ];
 
-  fieldsToDisable.forEach(fieldId => {
-    const element = document.getElementById(fieldId);
-    if (element) {
-      element.disabled = true;
+    fieldsToDisable.forEach(fieldId => {
+      const element = document.getElementById(fieldId);
+      if (element) {
+        element.disabled = true;
+      }
+    });
+
+    // הסתרת כפתור קישור לטרייד
+    const tradeLinkButton = document.getElementById(`${formPrefix}TradeLink`);
+    if (tradeLinkButton) {
+      tradeLinkButton.style.display = 'none';
     }
-  });
-
-  // הסתרת כפתור קישור לטרייד
-  const tradeLinkButton = document.getElementById('addExecutionTradeLink');
-  if (tradeLinkButton) {
-    tradeLinkButton.style.display = 'none';
-  }
 
   } catch (error) {
-    window.Logger.error('שגיאה באיפוס טופס הוספת ביצוע:', error, { page: "executions" });
+    const action = formType === 'edit' ? 'עריכת' : 'הוספת';
+    window.Logger.error(`שגיאה באיפוס טופס ${action} ביצוע:`, error, { page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה באיפוס טופס הוספת ביצוע', error.message);
+      window.showErrorNotification(`שגיאה באיפוס טופס ${action} ביצוע`, error.message);
     }
   }
+}
+
+/**
+ * ניקוי והשבתת שדות בטופס הוספת עסקה
+ * @deprecated Use resetExecutionForm('add') instead
+ */
+function resetAddExecutionForm() {
+  resetExecutionForm('add');
 }
 
 // showAddExecutionModal הועבר למערכת הכללית
 
 /**
  * ניקוי והשבתת שדות בטופס עריכת עסקה
+ * @deprecated Use resetExecutionForm('edit') instead
  */
 function resetEditExecutionForm() {
-  try {
-    // ניקוי הטופס
-    document.getElementById('editExecutionForm').reset();
-    clearExecutionValidationErrors();
-
-  // השבתת כל השדות חוץ מטיקר
-  const fieldsToDisable = [
-    'editExecutionTradeId',
-    'editExecutionType',
-    'editExecutionQuantity',
-    'editExecutionPrice',
-    'editExecutionCommission',
-    'editExecutionDate',
-    'editExecutionNotes',
-  ];
-
-  fieldsToDisable.forEach(fieldId => {
-    const element = document.getElementById(fieldId);
-    if (element) {
-      element.disabled = true;
-    }
-  });
-
-  // הסתרת כפתור קישור לטרייד
-  const tradeLinkButton = document.getElementById('editExecutionTradeLink');
-  if (tradeLinkButton) {
-    tradeLinkButton.style.display = 'none';
-  }
-
-  } catch (error) {
-    window.Logger.error('שגיאה באיפוס טופס עריכת ביצוע:', error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה באיפוס טופס עריכת ביצוע', error.message);
-    }
-  }
+  resetExecutionForm('edit');
 }
 
 /**
@@ -2707,9 +2688,10 @@ window.addNewPlan = addNewPlan;
 window.addNewTrade = addNewTrade;
 
 /**
- * הפעלת שדות הטופס אחרי בחירת טיקר
+ * הפעלה/השבתה של שדות הטופס
+ * @param {boolean} enable - true להפעלה, false להשבתה
  */
-function enableExecutionFormFields() {
+function toggleExecutionFormFields(enable) {
   const formFields = [
     'executionType', 'executionQuantity', 'executionPrice', 'executionDate', 'executionAccount', 'executionCommission'
   ];
@@ -2717,27 +2699,30 @@ function enableExecutionFormFields() {
   formFields.forEach(fieldId => {
     const field = document.getElementById(fieldId);
     if (field) {
-      field.disabled = false;
-      field.classList.remove('disabled');
+      field.disabled = !enable;
+      if (enable) {
+        field.classList.remove('disabled');
+      } else {
+        field.classList.add('disabled');
+      }
     }
   });
 }
 
 /**
+ * הפעלת שדות הטופס אחרי בחירת טיקר
+ * @deprecated Use toggleExecutionFormFields(true) instead
+ */
+function enableExecutionFormFields() {
+  toggleExecutionFormFields(true);
+}
+
+/**
  * השבתת שדות הטופס
+ * @deprecated Use toggleExecutionFormFields(false) instead
  */
 function disableExecutionFormFields() {
-  const formFields = [
-    'executionType', 'executionQuantity', 'executionPrice', 'executionDate', 'executionAccount', 'executionCommission'
-  ];
-  
-  formFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.disabled = true;
-      field.classList.add('disabled');
-    }
-  });
+  toggleExecutionFormFields(false);
 }
 
 /**
@@ -2842,50 +2827,70 @@ function hideExecutionTickerInfo() {
 }
 
 /**
- * חישוב ערכים מחושבים לטופס הוספה
+ * חישוב ערכים מחושבים לטופס עסקה (הוספה או עריכה)
+ * @param {string} formType - 'add' או 'edit'
  */
-function calculateAddExecutionValues() {
-  const quantity = parseFloat(document.getElementById('executionQuantity').value) || 0;
-  const price = parseFloat(document.getElementById('executionPrice').value) || 0;
-  const commission = parseFloat(document.getElementById('executionCommission').value) || 0;
-  const type = document.getElementById('executionType').value;
-
+function calculateExecutionValues(formType) {
+  const isEdit = formType === 'edit';
+  const prefix = isEdit ? 'editExecution' : 'execution';
+  
+  const quantity = parseFloat(document.getElementById(`${prefix}Quantity`).value) || 0;
+  const price = parseFloat(document.getElementById(`${prefix}Price`).value) || 0;
+  const commission = parseFloat(document.getElementById(`${prefix}Commission`).value) || 0;
+  
   let total = 0;
   let label = '';
-
-  if (type === 'buy') {
-    // בקנייה: סה"כ עלות = -(כמות * מחיר + עמלה) - שלילי כי זה כסף שיוצא
-    total = -(quantity * price + commission);
-    label = 'סה"כ עלות:';
-  } else if (type === 'sell') {
-    // במכירה: סה"כ מזומן = כמות * מחיר - עמלה - חיובי כי זה כסף שנכנס
-    total = quantity * price - commission;
-    label = 'סה"כ מזומן:';
-  } else {
-    // אם לא נבחר סוג, הצג סכום בסיסי
-    total = quantity * price;
+  
+  if (isEdit) {
+    // בטופס עריכה - לוגיקה פשוטה
+    total = quantity * price + commission;
     label = 'סה"כ:';
-  }
-
-  // עדכון התצוגה
-  const totalElement = document.getElementById('executionTotal');
-  if (totalElement) {
-    const sign = total >= 0 ? '' : '-';
-    totalElement.innerHTML = `<strong>${label}</strong> ${sign}$${Math.abs(total).toFixed(2)}`;
+    
+    const totalElement = document.getElementById(`${prefix}Total`);
+    if (totalElement) {
+      totalElement.textContent = `$${total.toFixed(2)}`;
+    }
+  } else {
+    // בטופס הוספה - לוגיקה מתקדמת עם buy/sell
+    const type = document.getElementById(`${prefix}Type`).value;
+    
+    if (type === 'buy') {
+      // בקנייה: סה"כ עלות = -(כמות * מחיר + עמלה) - שלילי כי זה כסף שיוצא
+      total = -(quantity * price + commission);
+      label = 'סה"כ עלות:';
+    } else if (type === 'sell') {
+      // במכירה: סה"כ מזומן = כמות * מחיר - עמלה - חיובי כי זה כסף שנכנס
+      total = quantity * price - commission;
+      label = 'סה"כ מזומן:';
+    } else {
+      // אם לא נבחר סוג, הצג סכום בסיסי
+      total = quantity * price;
+      label = 'סה"כ:';
+    }
+    
+    // עדכון התצוגה
+    const totalElement = document.getElementById(`${prefix}Total`);
+    if (totalElement) {
+      const sign = total >= 0 ? '' : '-';
+      totalElement.innerHTML = `<strong>${label}</strong> ${sign}$${Math.abs(total).toFixed(2)}`;
+    }
   }
 }
 
 /**
+ * חישוב ערכים מחושבים לטופס הוספה
+ * @deprecated Use calculateExecutionValues('add') instead
+ */
+function calculateAddExecutionValues() {
+  calculateExecutionValues('add');
+}
+
+/**
  * חישוב ערכים מחושבים לטופס עריכה
+ * @deprecated Use calculateExecutionValues('edit') instead
  */
 function calculateEditExecutionValues() {
-  const quantity = parseFloat(document.getElementById('editExecutionQuantity').value) || 0;
-  const price = parseFloat(document.getElementById('editExecutionPrice').value) || 0;
-  const commission = parseFloat(document.getElementById('editExecutionCommission').value) || 0;
-
-  const total = quantity * price + commission;
-
-  document.getElementById('editExecutionTotal').textContent = `$${total.toFixed(2)}`;
+  calculateExecutionValues('edit');
 }
 
 // הגדרת הפונקציות כגלובליות

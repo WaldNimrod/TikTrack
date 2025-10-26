@@ -12,7 +12,7 @@ class ConditionBuilder {
         this.conditions = [];
         this.methods = [];
         this.selectedMethod = null;
-        this.validator = new ConditionValidator();
+        this.validator = new ConditionsValidator();
         this.initializeTranslations();
         this.initializeComponent();
     }

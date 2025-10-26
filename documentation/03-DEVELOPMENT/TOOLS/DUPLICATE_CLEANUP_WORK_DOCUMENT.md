@@ -259,6 +259,12 @@
 - **trading_accounts.js**: `updateTradingAccountInAPI` vs `addTradingAccountToAPI`
 
 #### **🔄 דפוס 3: Cancel vs Delete - 5 עמודים**
+**הערה חשובה**: Cancel ו-Delete הם לא כפילות! אלו פעולות שונות לחלוטין:
+- **Cancel** = שינוי סטטוס (soft delete) - הרשומה נשארת במסד הנתונים עם סטטוס "בוטל"
+- **Delete** = מחיקה פיזית (hard delete) - הרשומה נמחקת לגמרי ממסד הנתונים
+
+**דפוס זה נכון ומוצדק** - יש צורך בשתי הפעולות השונות במערכת.
+
 - **tickers.js**: `cancelTicker` vs `deleteTicker`
 - **trades.js**: `cancelTradeRecord` vs `deleteTradeRecord`
 - **trade_plans.js**: `cancelTradePlan` vs `deleteTradePlan`

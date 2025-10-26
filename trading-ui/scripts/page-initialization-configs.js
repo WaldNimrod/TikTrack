@@ -1578,7 +1578,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     // CRUD Testing Dashboard
     'crud-testing-dashboard': {
         name: 'CRUD Testing Dashboard',
-        packages: ['base', 'init-system', 'crud'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'init-system'],
         requiredGlobals: [
             'NotificationSystem',
             'CRUDEnhancedTester',

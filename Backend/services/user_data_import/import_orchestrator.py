@@ -543,6 +543,8 @@ class ImportOrchestrator:
             Dict[str, Any]: Import execution results
         """
         try:
+            logger.info(f"🔍 Starting execute_import for session {session_id} - NEW CODE VERSION!")
+            
             # Get session
             session = self.db_session.query(ImportSession).filter(
                 ImportSession.id == session_id
@@ -609,13 +611,21 @@ class ImportOrchestrator:
                     
                     # Create executions for this trade
                     for execution_data in executions:
+                        # Convert date string to datetime object
+                        date_str = execution_data.get('date')
+                        if isinstance(date_str, str):
+                            from datetime import datetime as dt
+                            execution_date = dt.fromisoformat(date_str.replace('Z', '+00:00'))
+                        else:
+                            execution_date = date_str
+                        
                         execution = Execution(
                             trade_id=trade.id,
                             action=execution_data.get('action'),
                             quantity=execution_data.get('quantity'),
                             price=execution_data.get('price'),
                             fee=execution_data.get('fee', 0),
-                            execution_date=execution_data.get('date'),
+                            date=execution_date,
                             external_id=execution_data.get('external_id'),
                             created_at=datetime.now()
                         )

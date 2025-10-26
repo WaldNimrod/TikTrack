@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" class="crud-testing-page">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,194 +7,126 @@
     <title>דשבורד בדיקות CRUD - TikTrack</title>
     
     <!-- 
-    ===== CRUD TESTING DASHBOARD - CORRECTED ARCHITECTURE =====
+    ===== IMPORTANT DEVELOPMENT RULES =====
     
-    This page has been corrected to follow the proper architecture:
-    1. Complete ITCSS implementation
-    2. All base package systems included
-    3. Correct loading order
-    4. Scripts moved to body
+    CSS RULES:
+    - Only external CSS files are used, following the system's CSS architecture
+    - NO inline styles or styles within the page are allowed in this system
+    - All styling must be defined in external stylesheets according to ITCSS methodology
+    
+    JAVASCRIPT RULES:
+    - All functions are located in external files
+    - NO functions are allowed within the page
+    - All system functions use shared global functions located in dedicated files
+    - Page-specific functions should be centralized only in the page's dedicated script file
     
     ======================================
+    
+    CSS Loading Order - ראו: documentation/frontend/css/CSS_ARCHITECTURE.md
+    Bootstrap חייב להיטען לפני CSS שלנו כדי ש-CSS שלנו יוכל לדרוס אותו
     -->
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap CSS - חייב להיות קודם -->
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=05b6de6f_20251025_005449" rel="stylesheet">
-    
-    <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="styles-new/master.css?v=05b6de6f_20251025_005449">
-    
-    <!-- Header Styles - חייב להיות אחרי master.css -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=05b6de6f_20251025_005449">
-    
-    <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=05b6de6f_20251025_005449">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=05b6de6f_20251025_005449">
-    
-    <!-- CRUD Testing Dashboard Styles -->
-    <link rel="stylesheet" href="styles-new/06-components/_crud-testing-dashboard.css?v=05b6de6f_20251025_005449">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=05b6de6f_20251025_005449">    
+    <!-- FontAwesome Icons - Local -->
+    <link rel="stylesheet" href="images/fontawesome/css/all.min.css?v=05b6de6f_20251025_005449">
     
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=05b6de6f_20251025_005449"></script>
     
-    <!-- Logger Service - חייב להיות לפני header-system -->
-    <script src="scripts/logger-service.js?v=05b6de6f_20251025_005449"></script>
-    
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js?v=05b6de6f_20251025_005449"></script>
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js?v=05b6de6f_20251025_005449"></script>
 </head>
-<body class="crud-testing-page">
+
+<body>
     <div class="background-wrapper">
         <!-- Header System -->
         <div id="unified-header"></div>
-        
-        <!-- Page Content -->
+
+        <!-- Page body -->
         <div class="page-body">
-            <!-- תוכן ראשי -->
-            <div class="main-content">
-                <!-- אזור בדיקות CRUD - top-Section -->
+            <!-- Main content limited in width -->
+            <div class="main-content" data-section="crud-testing">
+                
+                <!-- UI Content Section Top Start-->
                 <div class="top-section" data-section="top">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/development.svg" alt="בדיקות CRUD" class="section-icon">
+                            <img src="images/icons/development.svg" alt="דשבורד בדיקות CRUD" class="section-icon">
                             דשבורד בדיקות CRUD
                         </div>
                         <div class="table-actions">
-                            <button data-button-type="COPY" data-variant="full" data-onclick="" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
-                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                            <button data-button-type="PLAY" data-onclick="runAllCRUDTests()" data-text="הרץ כל הבדיקות" title="הרץ את כל בדיקות CRUD">
+                            </button>
+                            <button data-button-type="REFRESH" data-onclick="refreshCRUDDashboard()" data-text="רענן" title="רענן את הדשבורד">
+                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
+                            </button>
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="info-summary" id="summaryStats">
-                            <div>סה"כ עמודים: <strong id="totalPages">12</strong></div>
-                            <div>עמודים נבדקו: <strong id="testedPages">0</strong></div>
-                            <div>עמודים תקינים: <strong id="passedPages">0</strong></div>
-                            <div>התקדמות: <strong id="progressPercent">0%</strong></div>
+                        <!-- תוכן CRUD יוכנס כאן על ידי הסקריפט -->
+                        <div class="text-center text-muted">
+                            לחץ על "הרץ כל הבדיקות" כדי להתחיל בדיקות CRUD
                         </div>
                     </div>
                 </div>
+                <!-- UI Content Section Top End -->  
 
-                <!-- UI Content Section 1 Start-->
-                <div class="content-section" id="section1">
-                    <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/development.svg" alt="כלי בדיקות" class="section-icon">
-                            כלי בדיקות CRUD
-                        </div>
-                        <div class="table-actions">
-                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section1')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <!-- הסבר על הכלים -->
-                        <div class="alert alert-info mb-4">
-                            <h5><i class="fas fa-info-circle"></i> איך להשתמש בכלי הבדיקות</h5>
-                            <p><strong>שלב 1:</strong> לחץ על הטאב של הישות שברצונך לבדוק</p>
-                            <p><strong>שלב 2:</strong> לחץ על כפתור "פתח עמוד" כדי לפתוח את העמוד הנבדק</p>
-                            <p><strong>שלב 3:</strong> השתמש בכלי הבדיקה האוטומטיים או בדוק ידנית</p>
-                            <p><strong>שלב 4:</strong> סמן את הבדיקות שביצעת וסיים עם "סיימתי בדיקה" או "יש בעיות"</p>
-                        </div>
-
-                        <!-- כלי בדיקה כלליים -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6><i class="fas fa-tools"></i> כלי בדיקה אוטומטיים</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <button class="btn btn-primary btn-sm mb-2" onclick="runAllBasicTests()">
-                                            <i class="fas fa-play"></i> בדיקות בסיסיות לכל העמודים
-                                        </button>
-                                        <br>
-                                        <button class="btn btn-success btn-sm mb-2" onclick="runAllCRUDTests()">
-                                            <i class="fas fa-database"></i> בדיקות CRUD לכל הישויות
-                                        </button>
-                                        <br>
-                                        <button class="btn btn-warning btn-sm" onclick="checkAllConnections()">
-                                            <i class="fas fa-network-wired"></i> בדיקת חיבורים לשרת
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6><i class="fas fa-chart-line"></i> דוחות וסטטיסטיקות</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <button class="btn btn-info btn-sm mb-2" onclick="generateTestReport()">
-                                            <i class="fas fa-file-alt"></i> יצירת דוח בדיקה
-                                        </button>
-                                        <br>
-                                        <button class="btn btn-secondary btn-sm mb-2" onclick="exportTestResults()">
-                                            <i class="fas fa-download"></i> ייצוא תוצאות
-                                        </button>
-                                        <br>
-                                        <button data-button-type="COPY" data-variant="full" data-onclick="" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
-                                        <br>
-                                        <button class="btn btn-dark btn-sm" onclick="resetAllTests()">
-                                            <i class="fas fa-undo"></i> איפוס כל הבדיקות
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- תצוגת תוצאות בדיקות -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6><i class="fas fa-chart-bar"></i> תוצאות בדיקות</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="testResultsContainer" class="d-none">
-                                            <h6>תוצאות בדיקה אחרונה:</h6>
-                                            <div id="testResultsContent"></div>
-                                        </div>
-                                        <div id="noResultsMessage" class="text-muted">
-                                            <i class="fas fa-info-circle"></i> עדיין לא בוצעו בדיקות. לחץ על אחד מכפתורי הבדיקה למעלה.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
+        
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 
-    <!-- Additional Scripts -->
+    <!-- ===== SCRIPT LOADING ORDER - GENERATED BY Package Manifest ===== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PackageManifest.getScriptsForPackages() -->
+    
+    <!-- BASE PACKAGE (Load Order: 1) -->
+    <script src="scripts/global-favicon.js?v=05b6de6f_20251025_005449"></script>
     <script src="scripts/notification-system.js?v=05b6de6f_20251025_005449"></script>
     <script src="scripts/ui-utils.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/warning-system.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/error-handlers.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/unified-cache-manager.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/cache-sync-manager.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/logger-service.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/header-system.js?v=05b6de6f_20251025_005449"></script>
     <script src="scripts/page-utils.js?v=05b6de6f_20251025_005449"></script>
     <script src="scripts/translation-utils.js?v=05b6de6f_20251025_005449"></script>
     <script src="scripts/button-icons.js?v=05b6de6f_20251025_005449"></script>
     <script src="scripts/button-system-init.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/color-scheme-system.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/unified-cache-manager.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/cache-sync-manager.js?v=05b6de6f_20251025_005449"></script>
     
-    <!-- CRUD Package Scripts -->
-    <script src="scripts/tables.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/data-utils.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/date-utils.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/modules/actions-menu-system.js?v=05b6de6f_20251025_005449"></script>
-    
-    <!-- CRUD Testing Scripts -->
-    <script src="scripts/crud-testing-enhanced.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/crud-utils.js?v=05b6de6f_20251025_005449"></script>
+    <!-- SERVICES PACKAGE (Load Order: 2) -->
+    <script src="scripts/services/data-collection-service.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/services/field-renderer-service.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/services/select-populator-service.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/services/statistics-calculator.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/services/default-value-setter.js?v=05b6de6f_20251025_005449"></script>
     <script src="scripts/services/crud-response-handler.js?v=05b6de6f_20251025_005449"></script>
     
-    <!-- Init System Check -->
-    <script src="scripts/init-system-check.js?v=05b6de6f_20251025_005449"></script>
+    <!-- UI-ADVANCED PACKAGE (Load Order: 3) -->
+    <script src="scripts/tables.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/pagination-system.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/modules/actions-menu-system.js?v=05b6de6f_20251025_005449"></script>
     
-    <!-- Monitoring Functions -->
-    <script src="scripts/monitoring-functions.js?v=05b6de6f_20251025_005449"></script>
+    <!-- CRUD PACKAGE (Load Order: 4) -->
+    <script src="scripts/date-utils.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/data-utils.js?v=05b6de6f_20251025_005449"></script>
+    
+    <!-- INIT-SYSTEM PACKAGE (Load Order: 19) -->
+    <script src="scripts/init-system/package-manifest.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/page-initialization-configs.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/unified-app-initializer.js?v=05b6de6f_20251025_005449"></script>
+    
+    <!-- Page-specific Script -->
+    <script src="scripts/crud-testing-enhanced.js?v=05b6de6f_20251025_005449"></script>
 </body>
 </html>

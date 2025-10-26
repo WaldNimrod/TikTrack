@@ -115,6 +115,18 @@
 
 ---
 
+## ✅ דפוסים פשוטים שהושלמו
+
+### **⚡ דפוס 1: Enable/Disable Fields - הושלם**
+- **trades.js** ✅ - `toggleTradeFormFields(enable)` - איחוד של `enableTradeFormFields` ו-`disableTradeFormFields`
+- **alerts.js** ✅ - `toggleConditionFields(enable, mode)` - איחוד של 4 פונקציות
+
+### **🔄 דפוס 2: Save Functions - הושלם**
+- **trades.js** ✅ - `saveTradeData(mode)` - איחוד של `saveEditTradeData` ו-`saveNewTradeRecord`
+- **alerts.js** ✅ - `saveAlertData(mode)` - איחוד של `updateAlert` ו-`createAlertFromCondition`
+- **trade_plans.js** ✅ - `saveTradePlanData(mode)` - איחוד של `saveEditTradePlan` ו-`saveNewTradePlan`
+- **trading_accounts.js** ✅ - `saveTradingAccountData(mode, tradingAccountData, tradingAccountId)` - איחוד של `addTradingAccountToAPI` ו-`updateTradingAccountInAPI`
+
 ## 🎯 נושאים נוספים שנותרו לטיפול
 
 ### 📝 דפוסים ספציפיים שזוהו

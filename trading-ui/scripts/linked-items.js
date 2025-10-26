@@ -81,23 +81,27 @@
  *    - createLinkedItemsList() - Create linked items list (3-column layout)
  *    - createBasicItemInfo() - Create concise item information
  *
- * 2. MODAL CREATION AND MANAGEMENT:
+ * 2. LINKED ITEMS CHECKING SYSTEM:
+ *    - checkLinkedItemsBeforeAction() - Check linked items before cancel/delete action
+ *    - checkLinkedItemsAndPerformAction() - Check linked items and perform action if safe
+ *
+ * 3. MODAL CREATION AND MANAGEMENT:
  *    - createModal() - Create modal structure with large X close button
  *    - getTickerSymbol() - Get ticker symbol from global data
  *
- * 3. ITEM TYPE MANAGEMENT:
+ * 4. ITEM TYPE MANAGEMENT:
  *    - getItemTypeIcon() - Get icon for item type
  *    - getItemTypeDisplayName() - Get display name for item type
  *    - getTypeBadgeClass() - Get badge color class for item type
  *    - getStatusBadge() - Get status badge HTML with color coding
  *
- * 4. ACTION BUTTONS:
+ * 5. ACTION BUTTONS:
  *    - viewItemDetails() - View item details
  *    - editItem() - Edit item
  *    - openItemPage() - Open item page
  *    - deleteItem() - Delete item
  *
- * 5. SPECIFIC ITEM TYPE HANDLERS:
+ * 6. SPECIFIC ITEM TYPE HANDLERS:
  *    - createTradeDetails() - Create trade details display
  *    - createAccountDetails() - Create account details display
  *    - createTickerDetails() - Create ticker details display
@@ -107,7 +111,7 @@
  *    - createTradePlanDetails() - Create trade plan details display
  *    - createExecutionDetails() - Create execution details display
  *
- * 6. UTILITY FUNCTIONS:
+ * 7. UTILITY FUNCTIONS:
  *    - exportLinkedItemsData() - Export linked items data
  *    - viewItemDetails() - View item details
  *    - editItem() - Edit item
@@ -121,11 +125,13 @@
  * - linked-items.css: Dedicated styling for the modal
  *
  * File: trading-ui/scripts/linked-items.js
- * Version: 3.0
- * Last Updated: August 26, 2025
+ * Version: 3.1
+ * Last Updated: January 12, 2025
  *
  * Global Exports:
  * - window.showLinkedItemsModal() - Display linked items modal
+ * - window.checkLinkedItemsBeforeAction() - Check linked items before action
+ * - window.checkLinkedItemsAndPerformAction() - Check and perform action if safe
  * - window.linkedItems - Module object with all functions
  *
  * USAGE:
@@ -140,6 +146,19 @@
  * View linked items with generic function:
  * ```javascript
  * viewLinkedItems(123, 'trade');
+ * ```
+ *
+ * Check linked items before cancel/delete:
+ * ```javascript
+ * const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade', 123, 'cancel');
+ * if (!hasLinkedItems) {
+ *   // Safe to proceed with action
+ * }
+ * ```
+ *
+ * Check linked items and perform action if safe:
+ * ```javascript
+ * await window.checkLinkedItemsAndPerformAction('trade', 123, 'cancel', performTradeCancellation);
  * ```
  *
  * Create modal content:
@@ -1770,6 +1789,71 @@ async function loadLinkedItemsData(itemType, itemId) {
 }
 
 
+// ===== LINKED ITEMS CHECKING SYSTEM =====
+/**
+ * Check linked items before performing cancel/delete action
+ * @param {string} itemType - Entity type (trade, ticker, trade_plan, account, etc.)
+ * @param {number} itemId - Entity ID
+ * @param {string} action - Action type ('cancel' or 'delete')
+ * @returns {Promise<boolean>} true if has linked items (blocks action), false if no linked items
+ */
+async function checkLinkedItemsBeforeAction(itemType, itemId, action = 'cancel') {
+  try {
+    const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
+    
+    if (!response.ok) {
+      return false; // On error, allow action to proceed
+    }
+
+    const linkedItemsData = await response.json();
+    const childEntities = linkedItemsData.child_entities || [];
+
+    if (childEntities.length > 0) {
+      // Store action context for rules explanation
+      window.currentAction = action;
+      
+      // Show modal in warningBlock mode
+      window.showLinkedItemsModal(linkedItemsData, itemType, itemId, 'warningBlock');
+      
+      // Clean up
+      delete window.currentAction;
+      
+      return true; // Has linked items - block action
+    }
+
+    return false; // No linked items - continue
+  } catch (error) {
+    window.Logger.error(`Error checking linked items for ${itemType} ${itemId}:`, error);
+    return false; // On error, allow action to proceed
+  }
+}
+
+/**
+ * Check linked items and perform action if no linked items exist
+ * @param {string} itemType - Entity type
+ * @param {number} itemId - Entity ID  
+ * @param {string} action - Action type ('cancel' or 'delete')
+ * @param {Function} actionFunction - Function to execute if no linked items
+ * @returns {Promise<void>}
+ */
+async function checkLinkedItemsAndPerformAction(itemType, itemId, action, actionFunction) {
+  try {
+    const hasLinkedItems = await checkLinkedItemsBeforeAction(itemType, itemId, action);
+    
+    if (!hasLinkedItems) {
+      // No linked items - perform the action
+      await actionFunction(itemId);
+    }
+    // If hasLinkedItems is true, modal is already shown and action is blocked
+    
+  } catch (error) {
+    window.Logger.error(`Error in checkLinkedItemsAndPerformAction:`, error);
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', error.message);
+    }
+  }
+}
+
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
 // Generic functions (for backward compatibility)
 window.viewLinkedItems = viewLinkedItems;
@@ -1778,6 +1862,10 @@ window.loadLinkedItemsData = loadLinkedItemsData;
 window.createLinkedItemsModalContent = createLinkedItemsModalContent;
 window.checkLinkedItems = checkLinkedItems;
 window.exportLinkedItemsData = exportLinkedItemsData;
+
+// New unified linked items checking functions
+window.checkLinkedItemsBeforeAction = checkLinkedItemsBeforeAction;
+window.checkLinkedItemsAndPerformAction = checkLinkedItemsAndPerformAction;
 window.createCSVFromLinkedItems = createCSVFromLinkedItems;
 window.downloadCSV = downloadCSV;
 window.createDetailedItemInfo = createDetailedItemInfo;
@@ -1822,6 +1910,10 @@ window.linkedItems = {
   getItemTypeDisplayName,
   getTypeBadgeClass,
   getStatusBadge,
+
+  // New unified linked items checking functions
+  checkLinkedItemsBeforeAction,
+  checkLinkedItemsAndPerformAction,
 
   viewItemDetails,
   editItem,

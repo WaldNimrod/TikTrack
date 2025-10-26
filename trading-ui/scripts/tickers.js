@@ -976,26 +976,10 @@ async function cancelTicker(id) {
 
 /**
  * בדיקת מקושרים וביצוע ביטול טיקר
+ * @deprecated Use window.checkLinkedItemsAndPerformAction('ticker', tickerId, 'cancel', performTickerCancellation) instead
  */
 async function checkLinkedItemsAndCancelTicker(tickerId) {
-  try {
-    // בדיקה אם יש פריטים מקושרים לפני ביטול
-    if (typeof window.checkLinkedItemsBeforeCancelTicker === 'function') {
-      const hasLinkedItems = await window.checkLinkedItemsBeforeCancelTicker(tickerId);
-      if (hasLinkedItems) {
-        return; // הפונקציה תטפל בהצגת המודול
-      }
-    }
-
-    // אין מקושרים - ביצוע הביטול
-    await performTickerCancellation(tickerId);
-
-  } catch (error) {
-    handleSystemError(error, 'בדיקת מקושרים');
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', error.message);
-    }
-  }
+  await window.checkLinkedItemsAndPerformAction('ticker', tickerId, 'cancel', performTickerCancellation);
 }
 
 /**
@@ -1089,82 +1073,18 @@ async function performTickerCancellation(tickerId) {
 
 /**
  * בדיקת פריטים מקושרים לפני מחיקת טיקר
+ * @deprecated Use window.checkLinkedItemsBeforeAction('ticker', tickerId, 'delete') instead
  */
 async function checkLinkedItemsBeforeDeleteTicker(tickerId) {
-  try {
-    const response = await fetch(`/api/linked-items/ticker/${tickerId}`);
-
-    if (!response.ok) {
-      // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
-      return false;
-    }
-
-    const linkedItemsData = await response.json();
-    const childEntities = linkedItemsData.child_entities || [];
-    // const parentEntities = linkedItemsData.parent_entities || []; // Not used
-
-    // בדיקה רק אם יש פריטים שמקושרים אל הטיקר (child entities)
-    // parent entities הם פריטים שהטיקר מקושר אליהם (חשבון) - לא רלוונטי למחיקה
-    if (childEntities.length > 0) {
-      // יש פריטים מקושרים - הצגת חלון מקושרים
-      if (typeof window.showLinkedItemsModal === 'function') {
-        // הוספת פרטי הטיקר לנתונים
-        linkedItemsData.tickerSymbol = getTickerSymbol(tickerId);
-        window.showLinkedItemsModal(linkedItemsData, 'ticker', tickerId, 'delete');
-        return true;
-      } else {
-        if (typeof window.showNotification === 'function') {
-          window.showNotification('יש פריטים מקושרים לטיקר זה', 'warning', 'אזהרה', 5000, 'business');
-        }
-        return true;
-      }
-    }
-
-    return false;
-  } catch (error) {
-    handleSystemError(error, 'בדיקת פריטים מקושרים');
-    return false;
-  }
+  return await window.checkLinkedItemsBeforeAction('ticker', tickerId, 'delete');
 }
 
 /**
  * בדיקת פריטים מקושרים לפני ביטול טיקר
+ * @deprecated Use window.checkLinkedItemsBeforeAction('ticker', tickerId, 'cancel') instead
  */
 async function checkLinkedItemsBeforeCancelTicker(tickerId) {
-  try {
-    const response = await fetch(`/api/linked-items/ticker/${tickerId}`);
-
-    if (!response.ok) {
-      // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול
-      return false;
-    }
-
-    const linkedItemsData = await response.json();
-    const childEntities = linkedItemsData.child_entities || [];
-    // const parentEntities = linkedItemsData.parent_entities || []; // Not used
-
-    // בדיקה רק אם יש פריטים שמקושרים אל הטיקר (child entities)
-    // parent entities הם פריטים שהטיקר מקושר אליהם (חשבון) - לא רלוונטי לביטול
-    if (childEntities.length > 0) {
-      // יש פריטים מקושרים - הצגת חלון מקושרים
-      if (typeof window.showLinkedItemsModal === 'function') {
-        // הוספת פרטי הטיקר לנתונים
-        linkedItemsData.tickerSymbol = getTickerSymbol(tickerId);
-        window.showLinkedItemsModal(linkedItemsData, 'ticker', tickerId);
-        return true;
-      } else {
-        if (typeof window.showNotification === 'function') {
-          window.showNotification('יש פריטים מקושרים לטיקר זה', 'warning', 'אזהרה', 5000, 'business');
-        }
-        return true;
-      }
-    }
-
-    return false;
-  } catch (error) {
-    handleSystemError(error, 'בדיקת פריטים מקושרים');
-    return false;
-  }
+  return await window.checkLinkedItemsBeforeAction('ticker', tickerId, 'cancel');
 }
 
 /**
@@ -1395,26 +1315,10 @@ async function reactivateTicker(tickerId) {
 
 /**
  * בדיקת מקושרים וביצוע מחיקת טיקר
+ * @deprecated Use window.checkLinkedItemsAndPerformAction('ticker', tickerId, 'delete', performTickerDeletion) instead
  */
 async function checkLinkedItemsAndDeleteTicker(tickerId) {
-  try {
-    // בדיקה אם יש פריטים מקושרים לפני מחיקה
-    if (typeof window.checkLinkedItemsBeforeDeleteTicker === 'function') {
-      const hasLinkedItems = await window.checkLinkedItemsBeforeDeleteTicker(tickerId);
-      if (hasLinkedItems) {
-        return; // הפונקציה תטפל בהצגת המודול
-      }
-    }
-
-    // אין מקושרים - ביצוע המחיקה
-    await performTickerDeletion(tickerId);
-
-  } catch (error) {
-    handleSystemError(error, 'בדיקת מקושרים');
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', error.message);
-    }
-  }
+  await window.checkLinkedItemsAndPerformAction('ticker', tickerId, 'delete', performTickerDeletion);
 }
 
 /**

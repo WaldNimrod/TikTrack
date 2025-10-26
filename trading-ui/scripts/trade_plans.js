@@ -1115,64 +1115,10 @@ async function saveEditTradePlan() {
 
 /**
  * בדיקת פריטים מקושרים לפני ביטול תכנון
+ * @deprecated Use window.checkLinkedItemsBeforeAction('trade_plan', tradePlanId, 'cancel') instead
  */
 async function checkLinkedItemsBeforeCancel(tradePlanId) {
-  try {
-    // בדיקת פריטים מקושרים דרך API הכללי
-    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/linked-items/trade_plan/${tradePlanId}`);
-
-    if (!response.ok) {
-      // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול
-      await cancelTradePlan(tradePlanId);
-      return;
-    }
-
-    const linkedItemsData = await response.json();
-    const childEntities = linkedItemsData.child_entities || [];
-    const parentEntities = linkedItemsData.parent_entities || [];
-    const allEntities = [...childEntities, ...parentEntities];
-
-    if (allEntities.length > 0) {
-      // יש פריטים מקושרים - הצגת חלון מקושרים
-      if (typeof window.showLinkedItemsModal === 'function') {
-        // הצגת המודל וחכייה לתשובה מהמשתמש
-        return new Promise(resolve => {
-          // שמירת ה-callback לביטול
-          window._linkedItemsWarningCallbacks = {
-            onConfirm: async () => {
-              await cancelTradePlan(tradePlanId);
-              resolve();
-            },
-            onCancel: () => {
-              resolve();
-            },
-          };
-
-          // הצגת המודל ב-warningBlock mode עם כל המידע הדרוש
-          window.showLinkedItemsModal(linkedItemsData, 'trade_plan', tradePlanId, 'warningBlock');
-        });
-      } else {
-        if (typeof window.showNotification === 'function') {
-          window.showNotification('לא ניתן לבטל תכנון זה - יש פריטים מקושרים אליו', 'error');
-        }
-        return;
-      }
-    } else {
-      // אין פריטים מקושרים - ביצוע הביטול
-      await cancelTradePlan(tradePlanId);
-    }
-
-  } catch (error) {
-    // window.Logger.error('❌ שגיאה בבדיקת פריטים מקושרים:', error, { page: "trade_plans" });
-    if (typeof window.handleSystemError === 'function') {
-      window.handleSystemError(error, 'בדיקת פריטים מקושרים');
-    } else if (typeof window.handleApiError === 'function') {
-      window.handleApiError(error, 'בדיקת פריטים מקושרים');
-    }
-    // במקרה של שגיאה - ממשיכים עם הביטול
-    await cancelTradePlan(tradePlanId);
-  }
+  return await window.checkLinkedItemsBeforeAction('trade_plan', tradePlanId, 'cancel');
 }
 
 /**

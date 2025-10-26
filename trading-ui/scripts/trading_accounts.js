@@ -2273,24 +2273,10 @@ async function restoreTradingAccount(tradingAccountId, tradingAccountName) {
 
 /**
  * בדיקת מקושרים וביצוע ביטול חשבון מסחר
+ * @deprecated Use window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'cancel', performTradingAccountCancellation) instead
  */
 async function checkLinkedItemsAndCancelTradingAccount(tradingAccountId) {
-  try {
-    // בדיקה אם יש פריטים מקושרים לפני ביטול
-    const hasLinkedItems = await checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId);
-    if (hasLinkedItems) {
-      return; // הפונקציה תטפל בהצגת המודול
-    }
-
-    // אין מקושרים - ביצוע הביטול
-    await performTradingAccountCancellation(tradingAccountId);
-
-  } catch (error) {
-    handleSystemError(error, 'בדיקת מקושרים');
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', error.message);
-    }
-  }
+  await window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'cancel', performTradingAccountCancellation);
 }
 
 /**
@@ -2352,24 +2338,10 @@ async function performTradingAccountCancellation(tradingAccountId) {
 
 /**
  * בדיקת מקושרים וביצוע מחיקת חשבון מסחר
+ * @deprecated Use window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'delete', performTradingAccountDeletion) instead
  */
 async function checkLinkedItemsAndDeleteTradingAccount(tradingAccountId) {
-  try {
-    // בדיקה אם יש פריטים מקושרים לפני מחיקה
-    const hasLinkedItems = await checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId);
-    if (hasLinkedItems) {
-      return; // הפונקציה תטפל בהצגת המודול
-    }
-
-    // אין מקושרים - ביצוע המחיקה
-    await performTradingAccountDeletion(tradingAccountId);
-
-  } catch (error) {
-    handleSystemError(error, 'בדיקת מקושרים');
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', error.message);
-    }
-  }
+  await window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'delete', performTradingAccountDeletion);
 }
 
 /**
@@ -2457,173 +2429,18 @@ async function performTradingAccountDeletion(tradingAccountId) {
 
 /**
  * בדיקת פריטים מקושרים לפני ביטול חשבון
+ * @deprecated Use window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'cancel') instead
  */
 async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
-  try {
-    // window.Logger.info('🔍 בדיקת פריטים מקושרים לחשבון:', tradingAccountId, { page: "trading_accounts" });
-
-    // בדיקה ישירה של טריידים פעילים (סטטוס 'open')
-    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${tradingAccountId}&status=open`);
-    if (tradesResponse.ok) {
-      const tradesData = await tradesResponse.json();
-      const openTrades = tradesData.data || tradesData || [];
-
-      // window.Logger.info('📊 טריידים פעילים:', openTrades.length, { page: "trading_accounts" });
-
-      if (openTrades.length > 0) {
-        // window.Logger.info('⚠️ יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה', { page: "trading_accounts" });
-
-        // יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה
-        if (typeof window.showLinkedItemsModal === 'function') {
-          // יצירת נתונים למודול המקושרים
-          const linkedItemsData = {
-            child_entities: openTrades.map(trade => ({
-              id: trade.id,
-              type: 'trade',
-              title: `טרייד ${trade.symbol || trade.id}`,
-              description: `טרייד פעיל - ${trade.side || 'לא מוגדר'} על ${trade.symbol || 'לא מוגדר'}`,
-              created_at: trade.created_at,
-              status: trade.status,
-            })),
-            parent_entities: [],
-            entity_id: tradingAccountId,
-            entity_type: 'account',
-            accountName: getTradingAccountName(tradingAccountId),
-          };
-
-          window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', tradingAccountId, 'warningBlock');
-        } else {
-          // window.Logger.info('❌ showLinkedItemsModal לא זמינה - הצגת אזהרה פשוטה', { page: "trading_accounts" });
-          if (typeof window.showWarningNotification === 'function') {
-            window.showWarningNotification(
-              'לא ניתן לבטל חשבון',
-              `יש ${openTrades.length} טריידים פעילים בחשבון זה. יש לסגור את כל הטריידים לפני ביטול החשבון.`,
-            );
-          }
-        }
-        return true; // יש פריטים פעילים - לא לבטל
-      }
-    }
-
-    // בדיקה של פריטים מקושרים אחרים (לא טריידים פעילים)
-    const response = await fetch(`/api/linked-items/account/${tradingAccountId}`);
-
-    if (!response.ok) {
-      // window.Logger.info('❌ לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול', { page: "trading_accounts" });
-      return false;
-    }
-
-    const linkedItemsData = await response.json();
-    // window.Logger.info('📊 נתוני מקושרים:', linkedItemsData, { page: "trading_accounts" });
-
-    const childEntities = linkedItemsData.child_entities || [];
-    // const parentEntities = linkedItemsData.parent_entities || []; // לא בשימוש
-
-    // window.Logger.info('👶 פריטים מקושרים (child, { page: "trading_accounts" }):', childEntities.length);
-    // window.Logger.info('👨‍👩‍👧‍👦 פריטים מקושרים (parent, { page: "trading_accounts" }):', parentEntities.length);
-
-    // בדיקה אם יש פריטים שמקושרים אל החשבון (child entities)
-    if (childEntities.length > 0) {
-      // window.Logger.info('⚠️ יש פריטים מקושרים - הצגת חלון מקושרים', { page: "trading_accounts" });
-      // יש פריטים מקושרים - הצגת חלון מקושרים
-      if (typeof window.showLinkedItemsModal === 'function') {
-        // הוספת פרטי החשבון לנתונים
-        linkedItemsData.accountName = getTradingAccountName(tradingAccountId);
-        window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', tradingAccountId, 'warningBlock');
-        return true;
-      } else {
-        // window.Logger.info('❌ showLinkedItemsModal לא זמינה', { page: "trading_accounts" });
-        if (typeof window.showNotification === 'function') {
-          window.showNotification('יש פריטים מקושרים לחשבון זה', 'warning', 'אזהרה', 5000, 'business');
-        }
-        return true;
-      }
-    }
-
-    // window.Logger.info('✅ אין פריטים מקושרים - אפשר לבטל', { page: "trading_accounts" });
-    return false;
-  } catch (error) {
-    // window.Logger.error('❌ שגיאה בבדיקת פריטים מקושרים:', error, { page: "trading_accounts" });
-    handleSystemError(error, 'בדיקת פריטים מקושרים');
-    return false;
-  }
+  return await window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'cancel');
 }
 
 /**
  * בדיקת פריטים מקושרים לפני מחיקת חשבון מסחר
+ * @deprecated Use window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'delete') instead
  */
 async function checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId) {
-  try {
-    // בדיקה ישירה של טריידים פעילים (סטטוס 'open')
-    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${tradingAccountId}&status=open`);
-    if (tradesResponse.ok) {
-      const tradesData = await tradesResponse.json();
-      const openTrades = tradesData.data || tradesData || [];
-
-      if (openTrades.length > 0) {
-        // יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה
-        if (typeof window.showLinkedItemsModal === 'function') {
-          // יצירת נתונים למודול המקושרים
-          const linkedItemsData = {
-            child_entities: openTrades.map(trade => ({
-              id: trade.id,
-              type: 'trade',
-              title: `טרייד ${trade.symbol || trade.id}`,
-              description: `טרייד פעיל - ${trade.side || 'לא מוגדר'} על ${trade.symbol || 'לא מוגדר'}`,
-              created_at: trade.created_at,
-              status: trade.status,
-            })),
-            parent_entities: [],
-            entity_id: tradingAccountId,
-            entity_type: 'account',
-            accountName: getTradingAccountName(tradingAccountId),
-          };
-
-          window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', tradingAccountId, 'warningBlock');
-        } else {
-          if (typeof window.showWarningNotification === 'function') {
-            window.showWarningNotification(
-              'לא ניתן למחוק חשבון',
-              `יש ${openTrades.length} טריידים פעילים בחשבון זה. יש לסגור את כל הטריידים לפני מחיקת החשבון.`,
-            );
-          }
-        }
-        return true; // יש פריטים פעילים - לא למחוק
-      }
-    }
-
-    // בדיקה של פריטים מקושרים אחרים (לא טריידים פעילים)
-    const response = await fetch(`/api/linked-items/account/${tradingAccountId}`);
-
-    if (!response.ok) {
-      // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
-      return false;
-    }
-
-    const linkedItemsData = await response.json();
-    const childEntities = linkedItemsData.child_entities || [];
-
-    // בדיקה רק אם יש פריטים שמקושרים אל החשבון (child entities)
-    if (childEntities.length > 0) {
-      // יש פריטים מקושרים - הצגת חלון מקושרים
-      if (typeof window.showLinkedItemsModal === 'function') {
-        // הוספת פרטי החשבון לנתונים
-        linkedItemsData.accountName = getTradingAccountName(tradingAccountId);
-        window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', tradingAccountId, 'warningBlock');
-        return true;
-      } else {
-        if (typeof window.showNotification === 'function') {
-          window.showNotification('יש פריטים מקושרים לחשבון זה', 'warning', 'אזהרה', 5000, 'business');
-        }
-        return true;
-      }
-    }
-
-    return false;
-  } catch (error) {
-    handleSystemError(error, 'בדיקת פריטים מקושרים');
-    return false;
-  }
+  return await window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'delete');
 }
 
 /**

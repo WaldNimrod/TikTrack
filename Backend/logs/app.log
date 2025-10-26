@@ -21267,3 +21267,24 @@
 2025-10-26 20:32:37,354 - werkzeug - INFO - 127.0.0.1 - - [26/Oct/2025 20:32:37] "POST /api/quality-check/jsdoc HTTP/1.1" 200 -
 2025-10-26 20:32:37,362 - routes.api.quality_check - ERROR - Error parsing naming output: invalid literal for int() with base 10: 'completed'
 2025-10-26 20:32:37,363 - werkzeug - INFO - 127.0.0.1 - - [26/Oct/2025 20:32:37] "POST /api/quality-check/naming HTTP/1.1" 200 -
+2025-10-26 20:33:37,283 - root - INFO - FRONTEND [INFO]: 🔔 showNotification called: "מריץ בדיקות איכות...", type: info, category: ui, options:
+2025-10-26 20:33:37,287 - root - INFO - FRONTEND [INFO]: 🔍 Checking preference: notifications_ui_enabled
+2025-10-26 20:33:37,287 - root - INFO - FRONTEND [WARN]: getPreference function not available, showing notification by default
+2025-10-26 20:33:37,292 - root - INFO - FRONTEND [INFO]: 🔔 INFO: מערכת - מריץ בדיקות איכות...
+2025-10-26 20:33:37,297 - root - INFO - FRONTEND [INFO]: 🔔 showNotification called: "הפעולה הושלמה בהצלחה", type: success, category: business, options:
+2025-10-26 20:33:37,297 - root - INFO - FRONTEND [INFO]: 🔍 Checking preference: notifications_business_enabled
+2025-10-26 20:33:37,297 - root - INFO - FRONTEND [WARN]: getPreference function not available, showing notification by default
+2025-10-26 20:33:37,298 - root - INFO - FRONTEND [INFO]: 🔔 SUCCESS: בדיקות איכות הושלמו - הפעולה הושלמה בהצלחה
+2025-10-26 20:33:37,298 - werkzeug - INFO - 127.0.0.1 - - [26/Oct/2025 20:33:37] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-26 20:36:45,299 - werkzeug - INFO - 127.0.0.1 - - [26/Oct/2025 20:36:45] "GET /crud-testing-dashboard.html HTTP/1.1" 200 -
+2025-10-26 20:37:37,261 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-26 20:37:37,267 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-26 20:37:37,272 - routes.api.quality_check - INFO - Running JSDoc Coverage Reporter
+2025-10-26 20:37:37,268 - routes.api.quality_check - INFO - Running Error Handling Coverage Monitor
+2025-10-26 20:37:37,272 - routes.api.quality_check - INFO - Running Naming Conventions Validator
+2025-10-26 20:37:37,279 - routes.api.quality_check - INFO - Running Function Index Validator
+2025-10-26 20:37:37,280 - werkzeug - INFO - 127.0.0.1 - - [26/Oct/2025 20:37:37] "POST /api/quality-check/function-index HTTP/1.1" 200 -
+2025-10-26 20:37:37,333 - werkzeug - INFO - 127.0.0.1 - - [26/Oct/2025 20:37:37] "POST /api/quality-check/jsdoc HTTP/1.1" 200 -
+2025-10-26 20:37:37,337 - werkzeug - INFO - 127.0.0.1 - - [26/Oct/2025 20:37:37] "POST /api/quality-check/error-handling HTTP/1.1" 200 -
+2025-10-26 20:37:37,341 - routes.api.quality_check - ERROR - Error parsing naming output: invalid literal for int() with base 10: 'completed'
+2025-10-26 20:37:37,341 - werkzeug - INFO - 127.0.0.1 - - [26/Oct/2025 20:37:37] "POST /api/quality-check/naming HTTP/1.1" 200 -

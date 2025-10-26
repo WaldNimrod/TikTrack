@@ -1598,6 +1598,59 @@ const ADDITIONAL_PAGE_CONFIGS = {
             }
         ]
     },
+    
+    // CRUD Testing Dashboard
+    'crud-testing-dashboard': {
+        name: 'CRUD Testing Dashboard',
+        packages: ['base', 'crud'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'CRUDEnhancedTester',
+            'window.runCRUDTests',
+            'window.runAPITests',
+            'window.runUITests'
+        ],
+        description: 'דשבורד בדיקות CRUD - בדיקות API ו-UI אוטומטיות',
+        lastModified: '2025-10-26',
+        pageType: 'development',
+        preloadAssets: ['crud-test-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                window.Logger.info('🧪 Initializing CRUD Testing Dashboard...', { page: "page-initialization-configs" });
+                
+                // Initialize CRUD Enhanced Tester
+                if (typeof window.CRUDEnhancedTester !== 'undefined') {
+                    window.crudTester = new window.CRUDEnhancedTester();
+                    window.Logger.info('✅ CRUD Enhanced Tester initialized', { page: "page-initialization-configs" });
+                }
+                
+                // Define global functions for CRUD testing
+                window.runCRUDTests = function() {
+                    if (window.crudTester) {
+                        window.crudTester.runAllTests();
+                    }
+                };
+                
+                window.runAPITests = function() {
+                    if (window.crudTester) {
+                        window.crudTester.runAPITests();
+                    }
+                };
+                
+                window.runUITests = function() {
+                    if (window.crudTester) {
+                        window.crudTester.runUITests();
+                    }
+                };
+                
+                window.Logger.info('✅ CRUD Testing Dashboard initialized successfully', { page: "page-initialization-configs" });
+            }
+        ]
+    }
 };
 
 // ===== GLOBAL EXPORT =====

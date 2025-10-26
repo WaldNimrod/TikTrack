@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" class="crud-testing-page">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,72 +7,35 @@
     <title>דשבורד בדיקות CRUD - TikTrack</title>
     
     <!-- 
-    ===== IMPORTANT DEVELOPMENT RULES =====
+    ===== CRUD TESTING DASHBOARD - CORRECTED ARCHITECTURE =====
     
-    CSS RULES:
-    - Only external CSS files are used, following the system's CSS architecture
-    - NO inline styles or styles within the page are allowed in this system
-    - All styling must be defined in external stylesheets according to ITCSS methodology
-    
-    JAVASCRIPT RULES:
-    - All functions are located in external files
-    - NO functions are allowed within the page
-    - All system functions use shared global functions located in dedicated files
-    - Page-specific functions should be centralized only in the page's dedicated script file
+    This page has been corrected to follow the proper architecture:
+    1. Complete ITCSS implementation
+    2. All base package systems included
+    3. Correct loading order
+    4. Scripts moved to body
     
     ======================================
     -->
     
-            <!-- ===== CSS Architecture - Unified CSS ===== -->
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap Framework -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=05b6de6f_20251025_005449" rel="stylesheet"><link rel="stylesheet" href="styles-new/master.css?v=05b6de6f_20251025_005449">
-    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=05b6de6f_20251025_005449">    
-    <!-- TikTrack CSS - Unified CSS (No @import) -->
-    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
-    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <!-- Bootstrap CSS - חייב להיות קודם -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=05b6de6f_20251025_005449" rel="stylesheet">
     
+    <!-- Header Styles - חייב להיות לפני master.css -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=05b6de6f_20251025_005449">
     
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=05b6de6f_20251025_005449">
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <!-- Bootstrap Icons -->
+    <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=05b6de6f_20251025_005449">
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=05b6de6f_20251025_005449">
     
-    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    
-    
     <!-- CRUD Testing Dashboard Styles -->
-    
-    
-    <!-- Error Handlers -->
-    
-    <!-- CRUD Testing Dashboard Styles - MOVED TO EXTERNAL CSS FILE -->
+    <link rel="stylesheet" href="styles-new/06-components/_crud-testing-dashboard.css?v=05b6de6f_20251025_005449">
     <!-- <style>
         .page-test-card {
             border: 1px solid #dee2e6;
@@ -225,30 +188,36 @@
     </style> -->
     <script src="scripts/global-favicon.js?v=05b6de6f_20251025_005449"></script>
 </head>
-<body>
+<body class="crud-testing-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
     <div class="background-wrapper">
-        <!-- Header System -->
-        <div id="unified-header"></div>
-
-        <!-- Page body -->
         <div class="page-body">
-            <!-- Main content limited in width -->
+            <!-- תוכן ראשי -->
             <div class="main-content">
-                <!-- UI Content Section Top Start-->
+                <!-- אזור בדיקות CRUD - top-Section -->
                 <div class="top-section" data-section="top">
                     <div class="section-header">
-                        <h1>🧪 דשבורד בדיקות CRUD</h1>
-                        <div class="header-actions">
-                            <button data-button-type="COPY" data-variant="full" data-onclick="" data-text="העתק לוג מפורט" title="העתק לוג מפורט עם כל הנתונים והסטטוס"></button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('top')" title="הצג/הסתר סקשן">
-                                ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-                                ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
-                            </button>
+                        <div class="table-title">
+                            <img src="images/icons/test.svg" alt="בדיקות CRUD" class="section-icon">
+                            דשבורד בדיקות CRUD
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="COPY" data-variant="full" data-onclick="" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
                         </div>
                     </div>
                     <div class="section-body">
+                        <div class="info-summary" id="summaryStats">
+                            <div>סה"כ עמודים: <strong id="totalPages">12</strong></div>
+                            <div>עמודים נבדקו: <strong id="testedPages">0</strong></div>
+                            <div>עמודים תקינים: <strong id="passedPages">0</strong></div>
+                            <div>התקדמות: <strong id="progressPercent">0%</strong></div>
+                        </div>
+                    </div>
+                </div>
                         <p><strong>נוצר:</strong> 06/09/2025 04:05</p>
                         
                         <div class="summary-stats" id="summaryStats">
@@ -1278,47 +1247,43 @@
     <!-- ===== BASE PACKAGE (loadOrder: 1) ===== -->
     <!-- מערכות ליבה חובה לכל עמוד -->
     <!-- Dependencies: none -->
-    <!-- Critical: YES | Version: 2.0.0 -->
-    <script src="scripts/global-favicon.js?v=05b6de6f_20251025_005449"></script> <!-- ניהול favicon -->
-    <script src="scripts/notification-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת התראות -->
-    <script src="scripts/ui-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לממשק משתמש -->
-    <script src="scripts/warning-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת אזהרות -->
-    <script src="scripts/error-handlers.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=05b6de6f_20251025_005449"></script>
+    
+    <!-- Base Package Scripts -->
+    <script src="scripts/global-favicon.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/notification-system.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/ui-utils.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/page-utils.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/translation-utils.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/button-icons.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/button-system-init.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/color-scheme-system.js?v=05b6de6f_20251025_005449"></script>
     <script src="scripts/unified-cache-manager.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/logger-service.js?v=05b6de6f_20251025_005449"></script> <!-- שירות לוגים מתקדם --> <!-- מנהל מטמון מאוחד -->
-    <script src="scripts/cache-sync-manager.js?v=05b6de6f_20251025_005449"></script> <!-- מנהל סנכרון מטמון -->
-    <script src="scripts/header-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת כותרת -->
-    <script src="scripts/page-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לעמודים -->
-    <script src="scripts/translation-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לתרגום -->
-    <script src="scripts/button-icons.js?v=05b6de6f_20251025_005449"></script> <!-- אייקונים לכפתורים -->
-    <script src="scripts/button-system-init.js?v=05b6de6f_20251025_005449"></script> <!-- אתחול מערכת כפתורים -->
-    <script src="scripts/color-scheme-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת צבעים דינמית -->
+    <script src="scripts/logger-service.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/cache-sync-manager.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/header-system.js?v=05b6de6f_20251025_005449"></script>
     
-    <!-- ===== INIT-SYSTEM PACKAGE (loadOrder: 2) ===== -->
-    <!-- מערכות אתחול וניטור -->
-    <!-- Dependencies: base -->
-    <!-- Critical: NO | Version: 2.0.0 -->
-    <script src="scripts/init-system/package-manifest.js?v=05b6de6f_20251025_005449"></script> <!-- מניפסט חבילות -->
-    <script src="scripts/page-initialization-configs.js?v=05b6de6f_20251025_005449"></script> <!-- קונפיגורציות עמודים -->
-    <script src="scripts/unified-app-initializer.js?v=05b6de6f_20251025_005449"></script> <!-- אתחול מאוחד -->
+    <!-- CRUD Package Scripts -->
+    <script src="scripts/tables.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/data-utils.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/date-utils.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/modules/actions-menu-system.js?v=05b6de6f_20251025_005449"></script>
     
-    <!-- Page-specific Scripts -->
-    <script src="scripts/crud-testing-dashboard.js?v=05b6de6f_20251025_005449"></script>
+    <!-- CRUD Testing Scripts -->
+    <script src="scripts/crud-testing-enhanced.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/crud-utils.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/services/crud-response-handler.js?v=05b6de6f_20251025_005449"></script>
     
-    <!-- 14. Init System Check (Available on all pages) -->
+    <!-- Init System Check -->
     <script src="scripts/init-system-check.js?v=05b6de6f_20251025_005449"></script>
     
-    <!-- 15. Monitoring Functions (Required for page checks) -->
+    <!-- Monitoring Functions -->
     <script src="scripts/monitoring-functions.js?v=05b6de6f_20251025_005449"></script>
     
-    <!-- Closing divs for main structure -->
-                </div> <!-- content-section -->
-            </div> <!-- main-content -->
-        </div> <!-- page-body -->
-    </div> <!-- background-wrapper -->
-    <!-- Local  function for crud-testing-dashboard page -->
-    <script>
-        // Make the local  function available globally for this page only
-    </script>
+    <!-- Notification Container -->
+    <div style="height: 3rem;"></div>
+    <div class="notification-container" id="notificationContainer"></div>
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 </body>
 </html>

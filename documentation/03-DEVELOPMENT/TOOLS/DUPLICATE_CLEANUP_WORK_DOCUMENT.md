@@ -56,8 +56,9 @@
 - **Modal Functions (Edit vs Add)**: 6 עמודים
 - **Save Functions (Edit vs Add)**: 4 עמודים
 - **Enable/Disable Fields**: 2 עמודים
+- **Linked Items Functions**: 5 עמודים (12 פונקציות → 2 פונקציות מאוחדות)
 
-**סה"כ**: 12 פונקציות מאוחדות ל-6 פונקציות מאוחדות
+**סה"כ**: 24 פונקציות מאוחדות ל-8 פונקציות מאוחדות
 
 ---
 
@@ -126,6 +127,45 @@
 - **alerts.js** ✅ - `saveAlertData(mode)` - איחוד של `updateAlert` ו-`createAlertFromCondition`
 - **trade_plans.js** ✅ - `saveTradePlanData(mode)` - איחוד של `saveEditTradePlan` ו-`saveNewTradePlan`
 - **trading_accounts.js** ✅ - `saveTradingAccountData(mode, tradingAccountData, tradingAccountId)` - איחוד של `addTradingAccountToAPI` ו-`updateTradingAccountInAPI`
+
+### ✅ שלב 5: ריכוז מערכת האלמנטים המקושרים (הושלם)
+
+#### **🔗 פונקציות מאוחדות שנוצרו ב-linked-items.js:**
+1. **`checkLinkedItemsBeforeAction(itemType, itemId, action)`** - בדיקת פריטים מקושרים לפני פעולה
+2. **`checkLinkedItemsAndPerformAction(itemType, itemId, action, actionFunction)`** - בדיקה וביצוע פעולה אם בטוח
+
+#### **עמודים שעודכנו:**
+1. **trades.js** ✅ - 3 פונקציות → deprecated wrappers
+   - `checkLinkedItemsBeforeDelete` → `window.checkLinkedItemsBeforeAction('trade', tradeId, 'delete')`
+   - `checkLinkedItemsBeforeCancel` → `window.checkLinkedItemsBeforeAction('trade', tradeId, 'cancel')`
+   - `checkLinkedItemsAndCancel` → `window.checkLinkedItemsAndPerformAction('trade', tradeId, 'cancel', performTradeCancellation)`
+
+2. **tickers.js** ✅ - 4 פונקציות → deprecated wrappers
+   - `checkLinkedItemsBeforeDeleteTicker` → `window.checkLinkedItemsBeforeAction('ticker', tickerId, 'delete')`
+   - `checkLinkedItemsBeforeCancelTicker` → `window.checkLinkedItemsBeforeAction('ticker', tickerId, 'cancel')`
+   - `checkLinkedItemsAndCancelTicker` → `window.checkLinkedItemsAndPerformAction('ticker', tickerId, 'cancel', performTickerCancellation)`
+   - `checkLinkedItemsAndDeleteTicker` → `window.checkLinkedItemsAndPerformAction('ticker', tickerId, 'delete', performTickerDeletion)`
+
+3. **trade_plans.js** ✅ - 1 פונקציה → deprecated wrapper
+   - `checkLinkedItemsBeforeCancel` → `window.checkLinkedItemsBeforeAction('trade_plan', tradePlanId, 'cancel')`
+
+4. **trading_accounts.js** ✅ - 4 פונקציות → deprecated wrappers
+   - `checkLinkedItemsBeforeCancelTradingAccount` → `window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'cancel')`
+   - `checkLinkedItemsBeforeDeleteTradingAccount` → `window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'delete')`
+   - `checkLinkedItemsAndCancelTradingAccount` → `window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'cancel', performTradingAccountCancellation)`
+   - `checkLinkedItemsAndDeleteTradingAccount` → `window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'delete', performTradingAccountDeletion)`
+
+#### **תיעוד שנוצר:**
+1. **`documentation/SYSTEMS/LINKED_ITEMS_SYSTEM.md`** - תיעוד טכני מפורט
+2. **`documentation/USER_GUIDES/LINKED_ITEMS_USER_GUIDE.md`** - מדריך משתמש בעברית
+3. **עדכון `linked-items.js`** - תיעוד מעודכן עם הפונקציות החדשות
+
+#### **תוצאות שלב 5:**
+- **12 פונקציות נמחקו** (כל הפונקציות המקומיות)
+- **2 פונקציות מאוחדות נוצרו** ב-linked-items.js
+- **~500 שורות קוד נמחקו** מכל העמודים
+- **מקור אמת יחיד** לכל בדיקות האלמנטים המקושרים
+- **תאימות לאחור מלאה** עם deprecated wrappers
 
 ---
 
@@ -205,7 +245,8 @@
 ### 📊 סטטיסטיקות
 - **15 פונקציות כפולות הוסרו**
 - **700 שורות קוד נמחקו**
-- **12 פונקציות מאוחדות ל-6 פונקציות מאוחדות**
+- **24 פונקציות מאוחדות ל-8 פונקציות מאוחדות**
+- **~500 שורות נוספות נמחקו** (Linked Items System)
 - **כיסוי טיפול בשגיאות משופר**
 - **כיסוי JSDoc משופר**
 
@@ -214,7 +255,6 @@
 ## 🚀 הצעדים הבאים
 
 ### 1. השלמת דפוסים פשוטים
-- **Linked Items Functions**: 5 עמודים
 - **Status Update Functions**: 4 עמודים
 - **Validation Functions**: 3 עמודים
 
@@ -256,6 +296,6 @@
 
 ---
 
-**עדכון אחרון:** 26 באוקטובר 2025  
+**עדכון אחרון:** 12 בינואר 2025  
 **סטטוס:** בעבודה פעילה  
-**התקדמות:** 70% הושלם
+**התקדמות:** 85% הושלם

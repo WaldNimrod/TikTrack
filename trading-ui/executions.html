@@ -426,10 +426,15 @@
                     
                     <div class="analysis-results" id="import-analysis-results" style="display: none;">
                         <div class="results-summary">
+                            <div class="result-item total">
+                                <span class="result-icon">📊</span>
+                                <span class="result-count" id="import-total-count">0</span>
+                                <span class="result-label">סה״כ רשומות בקובץ</span>
+                            </div>
                             <div class="result-item success">
                                 <span class="result-icon">✅</span>
                                 <span class="result-count" id="import-valid-count">0</span>
-                                <span class="result-label">רשומות תקינות</span>
+                                <span class="result-label">רשומות תקינות (100%)</span>
                             </div>
                             <div class="result-item warning">
                                 <span class="result-icon">⚠️</span>
@@ -467,9 +472,6 @@
                         <div class="problem-section" id="import-missing-tickers-section" style="display: none;">
                             <h5>⚠️ טיקרים חסרים במערכת</h5>
                             <div class="missing-tickers-list" id="import-missing-tickers-list"></div>
-                            <button class="btn btn-primary" onclick="addMissingTickers()">
-                                הוסף טיקרים חסרים
-                            </button>
                         </div>
                         
                         <!-- Duplicates -->
@@ -709,6 +711,9 @@
     
     <!-- Page-specific Scripts -->
     <script src="scripts/executions.js?v=05b6de6f_20251025_005449"></script>
+    
+    <!-- Ticker Service - Required for Import User Data functionality -->
+    <script src="scripts/ticker-service.js?v=05b6de6f_20251025_005449"></script>
     
     <!-- Import User Data Modal Scripts -->
     <script src="scripts/import-user-data.js?v=05b6de6f_20251025_005449"></script>

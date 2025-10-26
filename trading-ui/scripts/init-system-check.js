@@ -44,13 +44,27 @@ class InitSystemCheck {
      * הוספת כפתור בדיקה לראש הדף
      */
     addMonitoringButtonToHeader() {
-        // נחכה שהכותרת תיטען
-        setTimeout(() => {
+        // נחכה שהכותרת תיטען - עם הגבלת ניסיונות
+        let attempts = 0;
+        const maxAttempts = 10; // מקסימום 10 ניסיונות
+        
+        const tryAddButton = () => {
+            attempts++;
             const navList = document.querySelector('.tiktrack-nav-list');
+            
             if (!navList) {
-                if (window.Logger) { window.Logger.warn('⚠️ Navigation list not found, retrying...', { page: "init-check" }); }
-                setTimeout(() => this.addMonitoringButtonToHeader(), 500);
-                return;
+                if (attempts < maxAttempts) {
+                    if (window.Logger) { 
+                        window.Logger.warn(`⚠️ Navigation list not found, retrying... (${attempts}/${maxAttempts})`, { page: "init-check" }); 
+                    }
+                    setTimeout(() => tryAddButton(), 1000); // ניסיון כל שנייה
+                    return;
+                } else {
+                    if (window.Logger) { 
+                        window.Logger.warn('⚠️ Navigation list not found after max attempts, skipping button addition', { page: "init-check" }); 
+                    }
+                    return; // לא מנסים יותר
+                }
             }
 
             // בדיקה אם הכפתור כבר קיים
@@ -73,7 +87,10 @@ class InitSystemCheck {
             navList.appendChild(monitoringButton);
 
             if (window.Logger) { window.Logger.info('✅ Monitoring check button added to header', { page: "init-check" }); }
-        }, 2000); // הגדלנו את הזמן ל-2 שניות
+        };
+        
+        // התחלת הניסיונות
+        tryAddButton();
     }
 
     /**

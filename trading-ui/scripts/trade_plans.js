@@ -1152,8 +1152,11 @@ async function reactivateTradePlan(tradePlanId) {
 
     // עדכון סטטוס הטיקר
     if (tradePlan.ticker_id) {
-
-      if (typeof window.updateTickerActiveTradesStatus === 'function') {
+      // קריאה לשירות המאוחד
+      if (window.tickerService && window.tickerService.updateTickerActiveTradesStatus) {
+        await window.tickerService.updateTickerActiveTradesStatus(tradePlan.ticker_id);
+      } else if (typeof window.updateTickerActiveTradesStatus === 'function') {
+        // fallback לפונקציה המקורית אם השירות לא זמין
         await window.updateTickerActiveTradesStatus(tradePlan.ticker_id);
       } else {
         // window.Logger.warn('⚠️ updateTickerActiveTradesStatus function not available', { page: "trade_plans" });

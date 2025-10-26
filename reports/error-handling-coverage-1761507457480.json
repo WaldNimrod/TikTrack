@@ -1,0 +1,2189 @@
+{
+  "timestamp": "2025-10-26T19:37:37.466Z",
+  "pages": [
+    {
+      "file": "index.js",
+      "totalFunctions": 16,
+      "functionsWithCoverage": 10,
+      "functionsWithoutCoverage": 6,
+      "coveragePercentage": "62.50",
+      "functions": [
+        {
+          "name": "switchTableTab",
+          "hasTryCatch": false
+        },
+        {
+          "name": "refreshOverview",
+          "hasTryCatch": false
+        },
+        {
+          "name": "exportOverview",
+          "hasTryCatch": false
+        },
+        {
+          "name": "quickAction",
+          "hasTryCatch": false
+        },
+        {
+          "name": "createTradesStatusChart",
+          "hasTryCatch": true
+        },
+        {
+          "name": "createPerformanceChart",
+          "hasTryCatch": true
+        },
+        {
+          "name": "createAccountChart",
+          "hasTryCatch": true
+        },
+        {
+          "name": "createMixedChart",
+          "hasTryCatch": true
+        },
+        {
+          "name": "createMixedChartData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "refreshAllCharts",
+          "hasTryCatch": true
+        },
+        {
+          "name": "refreshChart",
+          "hasTryCatch": true
+        },
+        {
+          "name": "exportChart",
+          "hasTryCatch": true
+        },
+        {
+          "name": "exportAllCharts",
+          "hasTryCatch": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasTryCatch": true
+        },
+        {
+          "name": "debugZIndexStatus",
+          "hasTryCatch": false
+        },
+        {
+          "name": "copyDetailedLogLocal",
+          "hasTryCatch": true
+        }
+      ]
+    },
+    {
+      "file": "trades.js",
+      "totalFunctions": 65,
+      "functionsWithCoverage": 23,
+      "functionsWithoutCoverage": 42,
+      "coveragePercentage": "35.38",
+      "functions": [
+        {
+          "name": "formatDailyChange",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getInvestmentTypeColor",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTradesData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadTickerDataForTrades",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTradesTable",
+          "hasTryCatch": false
+        },
+        {
+          "name": "viewTickerDetails",
+          "hasTryCatch": false
+        },
+        {
+          "name": "viewAccountDetails",
+          "hasTryCatch": false
+        },
+        {
+          "name": "viewTradePlanDetails",
+          "hasTryCatch": false
+        },
+        {
+          "name": "editTradeRecord",
+          "hasTryCatch": false
+        },
+        {
+          "name": "cancelTradeRecord",
+          "hasTryCatch": true
+        },
+        {
+          "name": "checkLinkedItemsAndCancel",
+          "hasTryCatch": false
+        },
+        {
+          "name": "performTradeCancellation",
+          "hasTryCatch": true
+        },
+        {
+          "name": "deleteTradeRecord",
+          "hasTryCatch": true
+        },
+        {
+          "name": "performTradeDeletion",
+          "hasTryCatch": true
+        },
+        {
+          "name": "addEditImportantNote",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addEditReminder",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showTradeModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showEditTradeModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadEditTradeModalData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "saveEditTradeData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showAddTradeModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "toggleTradeFormFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "disableTradeFormFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "enableTradeFormFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "validateTradeForm",
+          "hasTryCatch": false
+        },
+        {
+          "name": "saveTradeData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "saveEditTradeData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "saveNewTradeRecord",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadModalData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTickerFromTradePlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTickersListForClosedTrades",
+          "hasTryCatch": false
+        },
+        {
+          "name": "onShowClosedTradesChange",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addImportantNote",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addReminder",
+          "hasTryCatch": false
+        },
+        {
+          "name": "validateTradeStatusChange",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getCurrentPosition",
+          "hasTryCatch": false
+        },
+        {
+          "name": "viewLinkedItemsForTrade",
+          "hasTryCatch": false
+        },
+        {
+          "name": "checkLinkedItemsBeforeDelete",
+          "hasTryCatch": false
+        },
+        {
+          "name": "checkLinkedItemsBeforeCancel",
+          "hasTryCatch": false
+        },
+        {
+          "name": "setupTradeModalListeners",
+          "hasTryCatch": false
+        },
+        {
+          "name": "initializeTradeConditionsSystem",
+          "hasTryCatch": true
+        },
+        {
+          "name": "setupDateValidation",
+          "hasTryCatch": false
+        },
+        {
+          "name": "validateDateFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showDateValidationError",
+          "hasTryCatch": false
+        },
+        {
+          "name": "clearDateValidationMessages",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addEditBuySell",
+          "hasTryCatch": false
+        },
+        {
+          "name": "refreshPositions",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTableStats",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTradePlanDates",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterTradesData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "setupSortEventListeners",
+          "hasTryCatch": false
+        },
+        {
+          "name": "validateTradePlanChange",
+          "hasTryCatch": false
+        },
+        {
+          "name": "validateTradeChanges",
+          "hasTryCatch": false
+        },
+        {
+          "name": "applyStatusFilterToTrades",
+          "hasTryCatch": false
+        },
+        {
+          "name": "validateTickerChange",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showTickerChangeConfirmation",
+          "hasTryCatch": false
+        },
+        {
+          "name": "validateTradePlanDate",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateEditTradeTickerFromPlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateEditTradePriceFromTicker",
+          "hasTryCatch": true
+        },
+        {
+          "name": "reactivateTrade",
+          "hasTryCatch": true
+        },
+        {
+          "name": "refreshTrades",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTrade",
+          "hasTryCatch": true
+        },
+        {
+          "name": "confirmDeleteTrade",
+          "hasTryCatch": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasTryCatch": true
+        },
+        {
+          "name": "generateDetailedLogForTrades",
+          "hasTryCatch": true
+        }
+      ]
+    },
+    {
+      "file": "executions.js",
+      "totalFunctions": 78,
+      "functionsWithCoverage": 48,
+      "functionsWithoutCoverage": 30,
+      "coveragePercentage": "61.54",
+      "functions": [
+        {
+          "name": "addExecution",
+          "hasTryCatch": true
+        },
+        {
+          "name": "openExecutionDetails",
+          "hasTryCatch": true
+        },
+        {
+          "name": "editExecution",
+          "hasTryCatch": true
+        },
+        {
+          "name": "deleteExecution",
+          "hasTryCatch": true
+        },
+        {
+          "name": "resetExecutionForm",
+          "hasTryCatch": true
+        },
+        {
+          "name": "resetAddExecutionForm",
+          "hasTryCatch": false
+        },
+        {
+          "name": "resetEditExecutionForm",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showEditExecutionModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateExecutionTradeId",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateExecutionQuantity",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateExecutionPrice",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateExecutionCommission",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateExecutionSource",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateExecutionNotes",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateExecutionExternalId",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateExecutionDate",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateExecutionType",
+          "hasTryCatch": true
+        },
+        {
+          "name": "clearFieldError",
+          "hasTryCatch": true
+        },
+        {
+          "name": "clearExecutionValidationErrors",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateCompleteExecutionForm",
+          "hasTryCatch": true
+        },
+        {
+          "name": "saveExecution",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateExecutionWrapper",
+          "hasTryCatch": true
+        },
+        {
+          "name": "confirmDeleteExecution",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showExecutionLinkedItemsModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadLinkedItemsDetails",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadLinkedItemsFromMultipleSources",
+          "hasTryCatch": true
+        },
+        {
+          "name": "displayLinkedItems",
+          "hasTryCatch": true
+        },
+        {
+          "name": "goToLinkedItems",
+          "hasTryCatch": true
+        },
+        {
+          "name": "goToTrade",
+          "hasTryCatch": true
+        },
+        {
+          "name": "goToPlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "goToAlert",
+          "hasTryCatch": true
+        },
+        {
+          "name": "goToNote",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadExecutionsData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateExecutionsTableMain",
+          "hasTryCatch": false
+        },
+        {
+          "name": "clearNewExecutionHighlights",
+          "hasTryCatch": false
+        },
+        {
+          "name": "isDateInRange",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterExecutionsLocally",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateExecution",
+          "hasTryCatch": true
+        },
+        {
+          "name": "restoreSortState",
+          "hasTryCatch": true
+        },
+        {
+          "name": "setupModalConfigurations",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadTickersWithOpenOrClosedTradesAndPlans",
+          "hasTryCatch": true
+        },
+        {
+          "name": "enableAllFields",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadActiveTradesForTicker",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTradesOnCheckboxChange",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTradesOnTickerChange",
+          "hasTryCatch": true
+        },
+        {
+          "name": "goToTickerPage",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showTickerHelp",
+          "hasTryCatch": true
+        },
+        {
+          "name": "addNewTicker",
+          "hasTryCatch": true
+        },
+        {
+          "name": "addNewPlan",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addNewTrade",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateExecutionsSummary",
+          "hasTryCatch": false
+        },
+        {
+          "name": "toggleExecutionFormFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "enableExecutionFormFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "disableExecutionFormFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadExecutionTickerInfo",
+          "hasTryCatch": true
+        },
+        {
+          "name": "displayExecutionTickerInfo",
+          "hasTryCatch": false
+        },
+        {
+          "name": "hideExecutionTickerInfo",
+          "hasTryCatch": false
+        },
+        {
+          "name": "calculateExecutionValues",
+          "hasTryCatch": false
+        },
+        {
+          "name": "calculateAddExecutionValues",
+          "hasTryCatch": false
+        },
+        {
+          "name": "calculateEditExecutionValues",
+          "hasTryCatch": false
+        },
+        {
+          "name": "goToLinkedTrade",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTradeExecutions",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateExecutionsTableForTradeModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addEditBuySell",
+          "hasTryCatch": false
+        },
+        {
+          "name": "linkExistingExecution",
+          "hasTryCatch": false
+        },
+        {
+          "name": "unlinkExecution",
+          "hasTryCatch": false
+        },
+        {
+          "name": "setupExecutionsFilterFunctions",
+          "hasTryCatch": false
+        },
+        {
+          "name": "applyAccountFilterWithTradesData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateExecutionsGlobalData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "toggleExternalIdField",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTickersSummaryData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTickersSummaryTable",
+          "hasTryCatch": false
+        },
+        {
+          "name": "refreshTickersSummary",
+          "hasTryCatch": false
+        },
+        {
+          "name": "viewTickerDetails",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addExecutionForTicker",
+          "hasTryCatch": false
+        },
+        {
+          "name": "toggleTickersSection",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateTickersList",
+          "hasTryCatch": true
+        },
+        {
+          "name": "toggleExecutionsSection",
+          "hasTryCatch": false
+        }
+      ]
+    },
+    {
+      "file": "alerts.js",
+      "totalFunctions": 66,
+      "functionsWithCoverage": 40,
+      "functionsWithoutCoverage": 26,
+      "coveragePercentage": "60.61",
+      "functions": [
+        {
+          "name": "getDemoAlertsData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadAlertsData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterAlertsLocally",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getConditionSourceDisplay",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateAlertsTable",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updatePageSummaryStats",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showAlertModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showAddAlertModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "clearAlertValidation",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadModalData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateRadioButtons",
+          "hasTryCatch": true
+        },
+        {
+          "name": "populateSelect",
+          "hasTryCatch": true
+        },
+        {
+          "name": "onRelationTypeChange",
+          "hasTryCatch": true
+        },
+        {
+          "name": "onRelatedObjectChange",
+          "hasTryCatch": true
+        },
+        {
+          "name": "toggleConditionFields",
+          "hasTryCatch": true
+        },
+        {
+          "name": "enableConditionFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "disableConditionFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "enableEditConditionFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "disableEditConditionFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "populateRelatedObjects",
+          "hasTryCatch": true
+        },
+        {
+          "name": "populateEditRelatedObjects",
+          "hasTryCatch": true
+        },
+        {
+          "name": "onEditRelationTypeChange",
+          "hasTryCatch": true
+        },
+        {
+          "name": "onEditRelatedObjectChange",
+          "hasTryCatch": true
+        },
+        {
+          "name": "enableEditConditionFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "disableEditConditionFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "checkAlertVariable",
+          "hasTryCatch": true
+        },
+        {
+          "name": "checkAlertOperator",
+          "hasTryCatch": true
+        },
+        {
+          "name": "buildAlertCondition",
+          "hasTryCatch": true
+        },
+        {
+          "name": "parseAlertCondition",
+          "hasTryCatch": true
+        },
+        {
+          "name": "saveAlert",
+          "hasTryCatch": true
+        },
+        {
+          "name": "editAlert",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getAlertState",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateAlertStatusCombination",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateStatusAndTriggered",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateAlert",
+          "hasTryCatch": false
+        },
+        {
+          "name": "deleteAlertInternal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "confirmDeleteAlert",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getStatusClass",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getRelatedClass",
+          "hasTryCatch": false
+        },
+        {
+          "name": "restoreAlertsSectionState",
+          "hasTryCatch": false
+        },
+        {
+          "name": "filterAlertsByRelatedObjectTypeWrapper",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadAlerts",
+          "hasTryCatch": false
+        },
+        {
+          "name": "reactivateAlert",
+          "hasTryCatch": true
+        },
+        {
+          "name": "checkAlertCondition",
+          "hasTryCatch": true
+        },
+        {
+          "name": "toggleAlert",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateAlertStatus",
+          "hasTryCatch": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateAlertsSummary",
+          "hasTryCatch": false
+        },
+        {
+          "name": "generateDetailedLogForAlerts",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadConditionsFromSource",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTradePlansForConditions",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadTradesForConditions",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadConditionsFromItem",
+          "hasTryCatch": true
+        },
+        {
+          "name": "displayAvailableConditions",
+          "hasTryCatch": false
+        },
+        {
+          "name": "selectConditionForAlert",
+          "hasTryCatch": false
+        },
+        {
+          "name": "createAlertFromCondition",
+          "hasTryCatch": true
+        },
+        {
+          "name": "initializeAlertModalTabs",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateModalButtons",
+          "hasTryCatch": false
+        },
+        {
+          "name": "evaluateAllConditions",
+          "hasTryCatch": true
+        },
+        {
+          "name": "refreshConditionEvaluations",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showEvaluationLoading",
+          "hasTryCatch": false
+        },
+        {
+          "name": "displayEvaluationResults",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateEvaluationSummary",
+          "hasTryCatch": false
+        },
+        {
+          "name": "initializeAlertConditionBuilder",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getMethodIdFromCondition",
+          "hasTryCatch": false
+        },
+        {
+          "name": "cleanupAlertConditionBuilder",
+          "hasTryCatch": true
+        }
+      ]
+    },
+    {
+      "file": "trade_plans.js",
+      "totalFunctions": 78,
+      "functionsWithCoverage": 40,
+      "functionsWithoutCoverage": 38,
+      "coveragePercentage": "51.28",
+      "functions": [
+        {
+          "name": "executeTradePlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "copyTradePlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "enableFormFields",
+          "hasTryCatch": true
+        },
+        {
+          "name": "disableFormFields",
+          "hasTryCatch": true
+        },
+        {
+          "name": "enableEditFieldsWrapper",
+          "hasTryCatch": true
+        },
+        {
+          "name": "disableEditFields",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadTickerInfo",
+          "hasTryCatch": true
+        },
+        {
+          "name": "displayTickerInfo",
+          "hasTryCatch": false
+        },
+        {
+          "name": "hideTickerInfo",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateFormFieldsWithTickerData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadEditTickerInfo",
+          "hasTryCatch": true
+        },
+        {
+          "name": "displayEditTickerInfo",
+          "hasTryCatch": false
+        },
+        {
+          "name": "hideEditTickerInfo",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateEditFormFieldsWithTickerData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "openEditTradePlanModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTickersForEditModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateEditTickerInfo",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateEditSharesFromAmount",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateEditAmountFromShares",
+          "hasTryCatch": true
+        },
+        {
+          "name": "saveEditTradePlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "checkLinkedItemsBeforeCancel",
+          "hasTryCatch": false
+        },
+        {
+          "name": "reactivateTradePlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "addEditCondition",
+          "hasTryCatch": true
+        },
+        {
+          "name": "addEditReason",
+          "hasTryCatch": true
+        },
+        {
+          "name": "addEditImportantNote",
+          "hasTryCatch": true
+        },
+        {
+          "name": "addEditReminder",
+          "hasTryCatch": true
+        },
+        {
+          "name": "openCancelTradePlanModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "openDeleteTradePlanModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "cancelTradePlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "confirmCancelTradePlan",
+          "hasTryCatch": false
+        },
+        {
+          "name": "confirmDeleteTradePlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "viewLinkedItemsForTradePlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadTradePlansData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateDesignsTable",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterTradePlansData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTradePlansTable",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updatePageSummaryStats",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showAddTradePlanModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "saveTradePlanData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "saveEditTradePlan",
+          "hasTryCatch": false
+        },
+        {
+          "name": "saveNewTradePlan",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getFieldIdFromServerField",
+          "hasTryCatch": true
+        },
+        {
+          "name": "editTradePlan",
+          "hasTryCatch": false
+        },
+        {
+          "name": "deleteTradePlan",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterDesignsData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "performLocalSort",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getPlanningColumnValue",
+          "hasTryCatch": false
+        },
+        {
+          "name": "isDateValue",
+          "hasTryCatch": false
+        },
+        {
+          "name": "restoreSortState",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getStatusClass",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getTypeClass",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadUserPreferences",
+          "hasTryCatch": false
+        },
+        {
+          "name": "createDateWithTimezone",
+          "hasTryCatch": false
+        },
+        {
+          "name": "translateDateRangeToDates",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateFilterDebugPanel",
+          "hasTryCatch": false
+        },
+        {
+          "name": "filterTradePlansLocally",
+          "hasTryCatch": false
+        },
+        {
+          "name": "initializeTradePlanConditionsSystem",
+          "hasTryCatch": true
+        },
+        {
+          "name": "setupTradePlanModalListeners",
+          "hasTryCatch": false
+        },
+        {
+          "name": "initializeTradePlanConditions",
+          "hasTryCatch": true
+        },
+        {
+          "name": "cleanupTradePlanConditions",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getCurrentEditPlanId",
+          "hasTryCatch": false
+        },
+        {
+          "name": "setupPriceCalculation",
+          "hasTryCatch": false
+        },
+        {
+          "name": "setupEditPriceCalculation",
+          "hasTryCatch": false
+        },
+        {
+          "name": "setupSortableHeadersLocal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "toggleSection",
+          "hasTryCatch": false
+        },
+        {
+          "name": "restorePlanningSectionState",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showTickerPage",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addImportantNote",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addReminder",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateTickerInfo",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateDefaultPrices",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateSharesFromAmount",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateAmountFromShares",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addEntryCondition",
+          "hasTryCatch": false
+        },
+        {
+          "name": "addReason",
+          "hasTryCatch": false
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasTryCatch": true
+        },
+        {
+          "name": "generateDetailedLogForTradePlans",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterTradePlansByType",
+          "hasTryCatch": false
+        }
+      ]
+    },
+    {
+      "file": "cash_flows.js",
+      "totalFunctions": 40,
+      "functionsWithCoverage": 24,
+      "functionsWithoutCoverage": 16,
+      "coveragePercentage": "60.00",
+      "functions": [
+        {
+          "name": "loadCashFlowsData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "calculateBalance",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getAccountNameById",
+          "hasTryCatch": true
+        },
+        {
+          "name": "ensureTradingAccountsLoaded",
+          "hasTryCatch": false
+        },
+        {
+          "name": "toggleCashFlowsSection",
+          "hasTryCatch": true
+        },
+        {
+          "name": "restoreCashFlowsSectionState",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadCashFlows",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateCashFlowForm",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateEditCashFlowForm",
+          "hasTryCatch": true
+        },
+        {
+          "name": "deleteCashFlow",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadAccountsForCashFlow",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadCurrenciesForCashFlow",
+          "hasTryCatch": true
+        },
+        {
+          "name": "renderCashFlowsTable",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updatePageSummaryStats",
+          "hasTryCatch": true
+        },
+        {
+          "name": "formatAmount",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getCashFlowTypeWithColor",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getCashFlowTypeText",
+          "hasTryCatch": false
+        },
+        {
+          "name": "formatCashFlowAmount",
+          "hasTryCatch": false
+        },
+        {
+          "name": "formatUsdRate",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showCashFlowDetails",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateCashFlowsTable",
+          "hasTryCatch": false
+        },
+        {
+          "name": "startAutoRefresh",
+          "hasTryCatch": true
+        },
+        {
+          "name": "applyDynamicColors",
+          "hasTryCatch": true
+        },
+        {
+          "name": "applyUserPreferences",
+          "hasTryCatch": true
+        },
+        {
+          "name": "initializeCashFlowsPage",
+          "hasTryCatch": true
+        },
+        {
+          "name": "confirmDeleteCashFlow",
+          "hasTryCatch": false
+        },
+        {
+          "name": "manageExternalIdField",
+          "hasTryCatch": false
+        },
+        {
+          "name": "setupSourceFieldListeners",
+          "hasTryCatch": false
+        },
+        {
+          "name": "initializeExternalIdFields",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showAddCashFlowModalInternal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showEditCashFlowModalInternal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "saveCashFlow",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateCashFlow",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showAddCashFlowModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showEditCashFlowModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "editCashFlow",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTradesForCashFlow",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadTradePlansForCashFlow",
+          "hasTryCatch": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasTryCatch": false
+        },
+        {
+          "name": "generateDetailedLogForCashFlows",
+          "hasTryCatch": true
+        }
+      ]
+    },
+    {
+      "file": "notes.js",
+      "totalFunctions": 47,
+      "functionsWithCoverage": 35,
+      "functionsWithoutCoverage": 12,
+      "coveragePercentage": "74.47",
+      "functions": [
+        {
+          "name": "addNote",
+          "hasTryCatch": true
+        },
+        {
+          "name": "uploadFile",
+          "hasTryCatch": true
+        },
+        {
+          "name": "downloadFile",
+          "hasTryCatch": true
+        },
+        {
+          "name": "viewLinkedItems",
+          "hasTryCatch": true
+        },
+        {
+          "name": "openNoteDetails",
+          "hasTryCatch": true
+        },
+        {
+          "name": "editNote",
+          "hasTryCatch": false
+        },
+        {
+          "name": "deleteNote",
+          "hasTryCatch": false
+        },
+        {
+          "name": "restoreNotesSectionState",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadNotesData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateNotesTable",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateNotesSummary",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateGridFromComponent",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showNoteModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showAddNoteModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showEditNoteModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadNoteData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadModalData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateRadioButtons",
+          "hasTryCatch": true
+        },
+        {
+          "name": "populateSelect",
+          "hasTryCatch": true
+        },
+        {
+          "name": "onNoteRelationTypeChange",
+          "hasTryCatch": false
+        },
+        {
+          "name": "populateEditSelectByType",
+          "hasTryCatch": false
+        },
+        {
+          "name": "validateNoteForm",
+          "hasTryCatch": true
+        },
+        {
+          "name": "validateEditNoteForm",
+          "hasTryCatch": true
+        },
+        {
+          "name": "saveNote",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateNoteFromModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "confirmDeleteNote",
+          "hasTryCatch": false
+        },
+        {
+          "name": "deleteNoteFromServer",
+          "hasTryCatch": true
+        },
+        {
+          "name": "clearNoteValidationErrors",
+          "hasTryCatch": true
+        },
+        {
+          "name": "setupNoteValidationEvents",
+          "hasTryCatch": true
+        },
+        {
+          "name": "clearSelectedFile",
+          "hasTryCatch": true
+        },
+        {
+          "name": "restoreSortState",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showTickerPage",
+          "hasTryCatch": true
+        },
+        {
+          "name": "formatText",
+          "hasTryCatch": true
+        },
+        {
+          "name": "clearFormatting",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getEditorContent",
+          "hasTryCatch": true
+        },
+        {
+          "name": "setEditorContent",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterNotesData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterNotesByType",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getTypeDisplayName",
+          "hasTryCatch": true
+        },
+        {
+          "name": "viewNote",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadNoteForViewing",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getNoteRelatedDisplay",
+          "hasTryCatch": true
+        },
+        {
+          "name": "editCurrentNote",
+          "hasTryCatch": true
+        },
+        {
+          "name": "displayCurrentAttachment",
+          "hasTryCatch": true
+        },
+        {
+          "name": "removeCurrentAttachment",
+          "hasTryCatch": true
+        },
+        {
+          "name": "replaceCurrentAttachment",
+          "hasTryCatch": false
+        },
+        {
+          "name": "toggleSection",
+          "hasTryCatch": false
+        }
+      ]
+    },
+    {
+      "file": "research.js",
+      "totalFunctions": 12,
+      "functionsWithCoverage": 12,
+      "functionsWithoutCoverage": 0,
+      "coveragePercentage": "100.00",
+      "functions": [
+        {
+          "name": "initializeResearchPage",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadResearchData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "setupResearchEventListeners",
+          "hasTryCatch": true
+        },
+        {
+          "name": "analyzeMarketTrends",
+          "hasTryCatch": true
+        },
+        {
+          "name": "compareTickers",
+          "hasTryCatch": true
+        },
+        {
+          "name": "technicalAnalysis",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getMarketOverview",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getVolatilityIndex",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getNewsFeed",
+          "hasTryCatch": true
+        },
+        {
+          "name": "exportResearchData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasTryCatch": true
+        },
+        {
+          "name": "generateDetailedLogForResearch",
+          "hasTryCatch": true
+        }
+      ]
+    },
+    {
+      "file": "tickers.js",
+      "totalFunctions": 46,
+      "functionsWithCoverage": 22,
+      "functionsWithoutCoverage": 24,
+      "coveragePercentage": "47.83",
+      "functions": [
+        {
+          "name": "editTicker",
+          "hasTryCatch": true
+        },
+        {
+          "name": "viewTickerDetails",
+          "hasTryCatch": true
+        },
+        {
+          "name": "refreshTickerData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadCurrenciesData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getCurrencySymbol",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getTimeDuration",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getTickerTypeStyle",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getTickerStatusStyle",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getTickerStatusLabel",
+          "hasTryCatch": false
+        },
+        {
+          "name": "generateTickerCurrencyOptions",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateCurrencyOptions",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateActiveTradesField",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTickerActiveTradesStatus",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateAllActiveTradesStatuses",
+          "hasTryCatch": true
+        },
+        {
+          "name": "restoreTickersSectionState",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showTickerModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showAddTickerModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showEditTickerModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "deleteTicker",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showDeleteTickerModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "saveTicker",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTicker",
+          "hasTryCatch": true
+        },
+        {
+          "name": "cancelTicker",
+          "hasTryCatch": true
+        },
+        {
+          "name": "checkLinkedItemsAndCancelTicker",
+          "hasTryCatch": false
+        },
+        {
+          "name": "performTickerCancellation",
+          "hasTryCatch": true
+        },
+        {
+          "name": "checkLinkedItemsBeforeDeleteTicker",
+          "hasTryCatch": false
+        },
+        {
+          "name": "checkLinkedItemsBeforeCancelTicker",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getTickerSymbol",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateAllTickerStatuses",
+          "hasTryCatch": true
+        },
+        {
+          "name": "performCancelTicker",
+          "hasTryCatch": true
+        },
+        {
+          "name": "reactivateTicker",
+          "hasTryCatch": true
+        },
+        {
+          "name": "checkLinkedItemsAndDeleteTicker",
+          "hasTryCatch": false
+        },
+        {
+          "name": "performTickerDeletion",
+          "hasTryCatch": true
+        },
+        {
+          "name": "confirmDeleteTicker",
+          "hasTryCatch": true
+        },
+        {
+          "name": "clearTickersCache",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTickersData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTickersSummaryStats",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateTickersTable",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadColorsAndApplyToHeaders",
+          "hasTryCatch": true
+        },
+        {
+          "name": "tryLoadData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "refreshYahooFinanceData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "refreshYahooFinanceDataSilently",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterTickersByType",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getTypeDisplayName",
+          "hasTryCatch": false
+        },
+        {
+          "name": "toggleSection",
+          "hasTryCatch": false
+        },
+        {
+          "name": "toggleTickersSection",
+          "hasTryCatch": false
+        }
+      ]
+    },
+    {
+      "file": "trading_accounts.js",
+      "totalFunctions": 48,
+      "functionsWithCoverage": 22,
+      "functionsWithoutCoverage": 26,
+      "coveragePercentage": "45.83",
+      "functions": [
+        {
+          "name": "loadCurrenciesFromServer",
+          "hasTryCatch": false
+        },
+        {
+          "name": "generateCurrencyOptions",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTradingAccountsFromServer",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadAllTradingAccountsFromServer",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadDefaultTradingAccounts",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTradingAccountsData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTradingAccountsTable",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateTradingAccountsSummary",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTradingAccounts",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTradingAccountFilterDisplayText",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showTradingAccountModal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showAddTradingAccountModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "createTradingAccountModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "validateTradingAccountData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showFormError",
+          "hasTryCatch": false
+        },
+        {
+          "name": "saveTradingAccount",
+          "hasTryCatch": true
+        },
+        {
+          "name": "addTradingAccountToAPI",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTradingAccountInAPI",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showEditTradingAccountModalById",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showEditTradingAccountModal",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTradingAccountsDataFromAPI",
+          "hasTryCatch": true
+        },
+        {
+          "name": "deleteTradingAccountFromAPI",
+          "hasTryCatch": true
+        },
+        {
+          "name": "cancelTradingAccount",
+          "hasTryCatch": true
+        },
+        {
+          "name": "deleteTradingAccount",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showSuccessMessage",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showErrorMessage",
+          "hasTryCatch": false
+        },
+        {
+          "name": "confirmDeleteTradingAccount",
+          "hasTryCatch": false
+        },
+        {
+          "name": "showOpenTradesWarning",
+          "hasTryCatch": false
+        },
+        {
+          "name": "loadTradingAccountsDataForTradingAccountsPage",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterTradingAccountsLocally",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateTradingAccountFilterMenu",
+          "hasTryCatch": false
+        },
+        {
+          "name": "restoreTradingAccountsSectionState",
+          "hasTryCatch": false
+        },
+        {
+          "name": "cancelTradingAccountWithLinkedItemsCheck",
+          "hasTryCatch": true
+        },
+        {
+          "name": "deleteTradingAccountWithLinkedItemsCheck",
+          "hasTryCatch": true
+        },
+        {
+          "name": "restoreTradingAccount",
+          "hasTryCatch": true
+        },
+        {
+          "name": "checkLinkedItemsAndCancelTradingAccount",
+          "hasTryCatch": false
+        },
+        {
+          "name": "performTradingAccountCancellation",
+          "hasTryCatch": true
+        },
+        {
+          "name": "checkLinkedItemsAndDeleteTradingAccount",
+          "hasTryCatch": false
+        },
+        {
+          "name": "performTradingAccountDeletion",
+          "hasTryCatch": true
+        },
+        {
+          "name": "checkLinkedItemsBeforeCancelTradingAccount",
+          "hasTryCatch": false
+        },
+        {
+          "name": "checkLinkedItemsBeforeDeleteTradingAccount",
+          "hasTryCatch": false
+        },
+        {
+          "name": "getTradingAccountName",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateTradingAccount",
+          "hasTryCatch": true
+        },
+        {
+          "name": "viewTradingAccountDetails",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showTradingAccountDetails",
+          "hasTryCatch": true
+        },
+        {
+          "name": "sortTable",
+          "hasTryCatch": false
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasTryCatch": true
+        },
+        {
+          "name": "getTradingAccounts",
+          "hasTryCatch": false
+        }
+      ]
+    },
+    {
+      "file": "database.js",
+      "totalFunctions": 16,
+      "functionsWithCoverage": 13,
+      "functionsWithoutCoverage": 3,
+      "coveragePercentage": "81.25",
+      "functions": [
+        {
+          "name": "initDatabaseDisplay",
+          "hasTryCatch": true
+        },
+        {
+          "name": "setupEventListeners",
+          "hasTryCatch": true
+        },
+        {
+          "name": "loadTableData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "fetchTableData",
+          "hasTryCatch": false
+        },
+        {
+          "name": "updateTableDisplay",
+          "hasTryCatch": true
+        },
+        {
+          "name": "createTableBodyHTML",
+          "hasTryCatch": true
+        },
+        {
+          "name": "formatCellValue",
+          "hasTryCatch": true
+        },
+        {
+          "name": "applySortingFunctionality",
+          "hasTryCatch": true
+        },
+        {
+          "name": "showLoadingState",
+          "hasTryCatch": true
+        },
+        {
+          "name": "updateTableInfo",
+          "hasTryCatch": true
+        },
+        {
+          "name": "filterTableData",
+          "hasTryCatch": true
+        },
+        {
+          "name": "formatDate",
+          "hasTryCatch": false
+        },
+        {
+          "name": "formatNumber",
+          "hasTryCatch": true
+        },
+        {
+          "name": "formatCurrency",
+          "hasTryCatch": true
+        },
+        {
+          "name": "formatStatus",
+          "hasTryCatch": true
+        },
+        {
+          "name": "addRecord",
+          "hasTryCatch": false
+        }
+      ]
+    },
+    {
+      "file": "preferences-page.js",
+      "totalFunctions": 5,
+      "functionsWithCoverage": 4,
+      "functionsWithoutCoverage": 1,
+      "coveragePercentage": "80.00",
+      "functions": [
+        {
+          "name": "loadAccountsForPreferences",
+          "hasTryCatch": true
+        },
+        {
+          "name": "switchActiveProfile",
+          "hasTryCatch": true
+        },
+        {
+          "name": "createNewProfile",
+          "hasTryCatch": true
+        },
+        {
+          "name": "copyDetailedLogLocal",
+          "hasTryCatch": true
+        },
+        {
+          "name": "initializePreferencesPage",
+          "hasTryCatch": false
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total": 517,
+    "withCoverage": 293,
+    "withoutCoverage": 224,
+    "coveragePercentage": "56.67"
+  },
+  "generatedAt": "2025-10-26T19:37:37.480Z",
+  "version": "1.0.0"
+}

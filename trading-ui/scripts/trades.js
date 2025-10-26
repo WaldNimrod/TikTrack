@@ -1901,9 +1901,37 @@ async function loadModalData() {
 
 /**
  * עדכון טיקר ומחיר לפי תוכנית טרייד נבחרת
+ * @deprecated Use window.tickerService.updateTickerFromTradePlan(tradePlanId) instead
  * @param {string} tradePlanId - מזהה תוכנית הטרייד
  */
 async function updateTickerFromTradePlan(tradePlanId) {
+  // קריאה לשירות המאוחד
+  if (window.tickerService && window.tickerService.updateTickerFromTradePlan) {
+    const tickerData = await window.tickerService.updateTickerFromTradePlan(tradePlanId);
+    
+    if (!tickerData) {
+      // ניקוי שדות אם לא נבחרה תוכנית
+      document.getElementById('addTradeTickerDisplay').textContent = 'לא נבחר';
+      document.getElementById('addTradeTickerId').value = '';
+      document.getElementById('addTradeCurrentPrice').textContent = '-';
+      document.getElementById('addTradeDailyChange').textContent = '-';
+      disableTradeFormFields();
+      return;
+    }
+    
+    // עדכון שדות הטיקר עם הנתונים מהשירות
+    document.getElementById('addTradeTickerDisplay').textContent = tickerData.tickerSymbol;
+    document.getElementById('addTradeTickerId').value = tickerData.tickerId;
+    
+    if (tickerData.price) {
+      document.getElementById('addTradeCurrentPrice').textContent = `$${parseFloat(tickerData.price).toFixed(2)}`;
+    }
+    
+    enableTradeFormFields();
+    return;
+  }
+  
+  // fallback לפונקציה המקורית אם השירות לא זמין
   if (!tradePlanId) {
     // ניקוי שדות אם לא נבחרה תוכנית
     document.getElementById('addTradeTickerDisplay').textContent = 'לא נבחר';
@@ -2007,16 +2035,23 @@ async function updateTickerFromTradePlan(tradePlanId) {
 /**
  * עדכון רשימת טיקרים לפי פילטר "הצג טריידים סגורים"
  * פונקציה זו מתעדכנת כשהמשתמש מסמן/מבטל את הפילטר
+ * @deprecated Use window.tickerService.updateTickersListForClosedTrades(showClosed) instead
  * @param {boolean} showClosed - האם להציג טריידים סגורים
  */
 function updateTickersListForClosedTrades(showClosed) {
-  // עדכון רשימת התוכניות במודל הוספת טרייד
-  if (showClosed) {
-    // טעינה מחדש של נתוני המודל כדי לכלול תוכניות סגורות
-    loadModalData();
+  // קריאה לשירות המאוחד
+  if (window.tickerService && window.tickerService.updateTickersListForClosedTrades) {
+    return window.tickerService.updateTickersListForClosedTrades(showClosed);
   } else {
-    // טעינה מחדש של נתוני המודל
-    loadModalData();
+    // fallback לפונקציה המקורית אם השירות לא זמין
+    // עדכון רשימת התוכניות במודל הוספת טרייד
+    if (showClosed) {
+      // טעינה מחדש של נתוני המודל כדי לכלול תוכניות סגורות
+      loadModalData();
+    } else {
+      // טעינה מחדש של נתוני המודל
+      loadModalData();
+    }
   }
 }
 

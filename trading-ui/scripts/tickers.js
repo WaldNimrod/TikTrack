@@ -441,51 +441,65 @@ async function updateActiveTradesField() {
 
 /**
  * עדכון אוטומטי של שדה active_trades לטיקר ספציפי
+ * @deprecated Use window.tickerService.updateTickerActiveTradesStatus(tickerId) instead
  */
 async function updateTickerActiveTradesStatus(tickerId) {
-  try {
-    const response = await fetch(`/api/tickers/${tickerId}/update-active-trades`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  // קריאה לשירות המאוחד
+  if (window.tickerService && window.tickerService.updateTickerActiveTradesStatus) {
+    return await window.tickerService.updateTickerActiveTradesStatus(tickerId);
+  } else {
+    // fallback לפונקציה המקורית אם השירות לא זמין
+    try {
+      const response = await fetch(`/api/tickers/${tickerId}/update-active-trades`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    if (response.ok) {
-      await response.json(); // result not used
+      if (response.ok) {
+        await response.json(); // result not used
 
-      // רענון הנתונים
-      await loadTickersData();
-    } else {
-      handleApiError('שגיאה בעדכון שדה active_trades לטיקר', response.status);
+        // רענון הנתונים
+        await loadTickersData();
+      } else {
+        handleApiError('שגיאה בעדכון שדה active_trades לטיקר', response.status);
+      }
+    } catch (error) {
+      handleSystemError(error, 'עדכון שדה active_trades לטיקר');
     }
-  } catch (error) {
-    handleSystemError(error, 'עדכון שדה active_trades לטיקר');
   }
 }
 
 /**
  * עדכון אוטומטי של כל שדות active_trades
+ * @deprecated Use window.tickerService.updateAllActiveTradesStatuses() instead
  */
 async function updateAllActiveTradesStatuses() {
-  try {
-    const response = await fetch('/api/tickers/update-all-active-trades', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  // קריאה לשירות המאוחד
+  if (window.tickerService && window.tickerService.updateAllActiveTradesStatuses) {
+    return await window.tickerService.updateAllActiveTradesStatuses();
+  } else {
+    // fallback לפונקציה המקורית אם השירות לא זמין
+    try {
+      const response = await fetch('/api/tickers/update-all-active-trades', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    if (response.ok) {
-      await response.json(); // result not used
+      if (response.ok) {
+        await response.json(); // result not used
 
-      // רענון הנתונים
-      await loadTickersData();
-    } else {
-      handleApiError('שגיאה בעדכון כל שדות active_trades', response.status);
+        // רענון הנתונים
+        await loadTickersData();
+      } else {
+        handleApiError('שגיאה בעדכון כל שדות active_trades', response.status);
+      }
+    } catch (error) {
+      handleSystemError(error, 'עדכון כל שדות active_trades');
     }
-  } catch (error) {
-    handleSystemError(error, 'עדכון כל שדות active_trades');
   }
 }
 
@@ -1103,39 +1117,44 @@ function getTickerSymbol(tickerId) {
 
 /**
  * עדכון כל הסטטוסים של טיקרים
+ * @deprecated Use window.tickerService.updateAllTickerStatuses() instead
  */
 async function updateAllTickerStatuses() {
+  // קריאה לשירות המאוחד
+  if (window.tickerService && window.tickerService.updateAllTickerStatuses) {
+    return await window.tickerService.updateAllTickerStatuses();
+  } else {
+    // fallback לפונקציה המקורית אם השירות לא זמין
+    try {
+      const response = await fetch('/api/tickers/update-all-statuses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
+      // השתמש במערכת הגלובלית החדשה
+      const handled = await window.handleApiResponseWithRefresh(response, {
+        loadDataFunction: window.loadTickersData,
+        updateActiveFieldsFunction: window.updateActiveTradesField,
+        operationName: 'עדכון',
+        itemName: 'סטטוסי כל הטיקרים',
+        successMessage: 'סטטוסים של כל הטיקרים עודכנו בהצלחה'
+      });
 
-  try {
-    const response = await fetch('/api/tickers/update-all-statuses', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+      if (!handled) {
+        const errorResponse = await response.text();
+        handleApiError('שגיאה בעדכון סטטוסים', errorResponse);
+        if (window.showErrorNotification) {
+          window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון סטטוסים של טיקרים');
+        }
+      }
 
-    // השתמש במערכת הגלובלית החדשה
-    const handled = await window.handleApiResponseWithRefresh(response, {
-      loadDataFunction: window.loadTickersData,
-      updateActiveFieldsFunction: window.updateActiveTradesField,
-      operationName: 'עדכון',
-      itemName: 'סטטוסי כל הטיקרים',
-      successMessage: 'סטטוסים של כל הטיקרים עודכנו בהצלחה'
-    });
-
-    if (!handled) {
-      const errorResponse = await response.text();
-      handleApiError('שגיאה בעדכון סטטוסים', errorResponse);
+    } catch (error) {
+      handleSystemError(error, 'עדכון סטטוסים');
       if (window.showErrorNotification) {
         window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון סטטוסים של טיקרים');
       }
-    }
-
-  } catch (error) {
-    handleSystemError(error, 'עדכון סטטוסים');
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון סטטוסים של טיקרים');
     }
   }
 }

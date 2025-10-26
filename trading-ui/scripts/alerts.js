@@ -2661,33 +2661,40 @@ function toggleAlert(alertId) {
 
 /**
  * עדכון סטטוס התראה
+ * @deprecated Use window.alertService.updateAlertStatus(alertId, status, isTriggered) instead
  * @param {number} alertId - מזהה ההתראה
  * @param {string} status - הסטטוס החדש
  */
 function updateAlertStatus(alertId, status) {
-  try {
-    fetch('/api/alerts/' + alertId + '/status', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ status: status })
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('שגיאה בעדכון סטטוס התראה');
-      }
-      return response.json();
-    })
-    .then(data => {
-      window.Logger.info('✅ סטטוס התראה עודכן:', data, { page: "alerts" });
-    })
-    .catch(error => {
+  // קריאה לשירות המאוחד
+  if (window.alertService && window.alertService.updateAlertStatus) {
+    return window.alertService.updateAlertStatus(alertId, status);
+  } else {
+    // fallback לפונקציה המקורית אם השירות לא זמין
+    try {
+      fetch('/api/alerts/' + alertId + '/status', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: status })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('שגיאה בעדכון סטטוס התראה');
+        }
+        return response.json();
+      })
+      .then(data => {
+        window.Logger.info('✅ סטטוס התראה עודכן:', data, { page: "alerts" });
+      })
+      .catch(error => {
+        window.Logger.error('שגיאה בעדכון סטטוס התראה:', error, { page: "alerts" });
+      });
+      
+    } catch (error) {
       window.Logger.error('שגיאה בעדכון סטטוס התראה:', error, { page: "alerts" });
-    });
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בעדכון סטטוס התראה:', error, { page: "alerts" });
+    }
   }
 }
 

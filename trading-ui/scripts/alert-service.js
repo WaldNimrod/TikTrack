@@ -384,6 +384,135 @@ async function deleteAlert(alertId) {
   }
 }
 
+// ===== ALERT STATUS UPDATE FUNCTIONS =====
+
+/**
+ * Update alert status via API
+ * ALERT SERVICE - Centralized function for updating alert status
+ *
+ * @param {number} alertId - Alert ID
+ * @param {string} status - New status ('open', 'closed', 'cancelled')
+ * @param {string} isTriggered - Triggered flag ('false', 'new', 'true')
+ * @returns {Promise<boolean>} true if successful, false otherwise
+ */
+async function updateAlertStatus(alertId, status, isTriggered = null) {
+  try {
+    const updateData = { status };
+    if (isTriggered !== null) {
+      updateData.is_triggered = isTriggered;
+    }
+
+    const response = await fetch(`/api/alerts/${alertId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      // עדכון הנתונים המקומיים אם קיימים
+      if (window.alertsData && Array.isArray(window.alertsData)) {
+        const alertIndex = window.alertsData.findIndex(alert => alert.id === alertId);
+        if (alertIndex !== -1) {
+          window.alertsData[alertIndex].status = status;
+          if (isTriggered !== null) {
+            window.alertsData[alertIndex].is_triggered = isTriggered;
+          }
+        }
+      }
+
+      // רענון הטבלה אם הפונקציה זמינה
+      if (typeof window.updateAlertsTable === 'function') {
+        window.updateAlertsTable(window.alertsData);
+      }
+
+      // עדכון סטטיסטיקות אם הפונקציה זמינה
+      if (typeof window.updateAlertsSummary === 'function') {
+        window.updateAlertsSummary(window.alertsData);
+      }
+
+      return true;
+    } else {
+      throw new Error(result.error || 'Unknown error');
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error('Error updating alert status:', error);
+    }
+    
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה בעדכון סטטוס התראה', error.message);
+    }
+    
+    return false;
+  }
+}
+
+/**
+ * Update multiple alerts status
+ * ALERT SERVICE - Centralized function for updating multiple alerts status
+ *
+ * @param {Array<number>} alertIds - Array of alert IDs
+ * @param {string} status - New status ('open', 'closed', 'cancelled')
+ * @param {string} isTriggered - Triggered flag ('false', 'new', 'true')
+ * @returns {Promise<number>} Number of successfully updated alerts
+ */
+async function updateMultipleAlertsStatus(alertIds, status, isTriggered = null) {
+  let successCount = 0;
+  
+  for (const alertId of alertIds) {
+    const success = await updateAlertStatus(alertId, status, isTriggered);
+    if (success) {
+      successCount++;
+    }
+  }
+  
+  return successCount;
+}
+
+/**
+ * Update alerts summary statistics
+ * ALERT SERVICE - Centralized function for updating alerts summary
+ *
+ * @param {Array} alertsData - Array of alerts data
+ * @returns {Object} Summary statistics
+ */
+function updateAlertsSummary(alertsData) {
+  if (!alertsData || !Array.isArray(alertsData)) {
+    return {
+      total: 0,
+      active: 0,
+      new: 0,
+      unread: 0,
+      read: 0,
+      cancelled: 0
+    };
+  }
+
+  const summary = {
+    total: alertsData.length,
+    active: 0,
+    new: 0,
+    unread: 0,
+    read: 0,
+    cancelled: 0
+  };
+
+  alertsData.forEach(alert => {
+    const state = getAlertState(alert.status, alert.is_triggered);
+    summary[state] = (summary[state] || 0) + 1;
+  });
+
+  return summary;
+}
+
 // Export the service module
 window.alertService = {
   getAlertState,
@@ -397,5 +526,8 @@ window.alertService = {
   parseAlertCondition,
   cancelAlert,
   deleteAlert,
+  updateAlertStatus,
+  updateMultipleAlertsStatus,
+  updateAlertsSummary,
 };
 

@@ -17,6 +17,56 @@
  * Last Updated: 2025-01-16
  */
 
+// Add CSS for ticker button states
+if (!document.getElementById('import-ticker-button-styles')) {
+    const style = document.createElement('style');
+    style.id = 'import-ticker-button-styles';
+    style.textContent = `
+        .missing-ticker-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 4px 0;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .missing-ticker-item .ticker-symbol {
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .missing-ticker-item button.btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+            cursor: not-allowed;
+        }
+        
+        .missing-ticker-item button.btn-success:hover {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .result-item.total {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .result-item.total .result-icon {
+            color: #2196f3;
+        }
+        
+        .result-item.total .result-count {
+            color: #1976d2;
+            font-weight: bold;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
 // ===== IMPORT MODAL FUNCTIONS =====
 
 /**
@@ -589,18 +639,49 @@ async function generateImportPreview() {
  * Display analysis results
  */
 function displayImportAnalysisResults(results) {
-    document.getElementById('import-valid-count').textContent = results.valid_records || 0;
-    document.getElementById('import-missing-tickers-count').textContent = results.missing_tickers ? results.missing_tickers.length : 0;
-    document.getElementById('import-duplicates-count').textContent = results.duplicate_records || 0;
-    document.getElementById('import-errors-count').textContent = results.invalid_records || 0;
+    // The backend returns:
+    // - valid_records: records that are technically valid (including those with missing tickers)
+    // - missing_tickers: list of ticker symbols that are missing
+    // - duplicate_records: count of duplicate records
+    // - invalid_records: records with other errors
+    
+    // Calculate the breakdown:
+    const validRecordsWithMissingTickers = results.valid_records || 0;
+    const missingTickersCount = results.missing_tickers ? results.missing_tickers.length : 0;
+    const duplicateRecordsCount = results.duplicate_records || 0;
+    const invalidRecordsCount = results.invalid_records || 0;
+    
+    // Records that are 100% valid (no missing tickers, no duplicates, no errors)
+    // If we have missing tickers, subtract them from valid records
+    const fullyValidRecords = Math.max(0, validRecordsWithMissingTickers - missingTickersCount);
+    
+    // Total records in file
+    const totalRecords = fullyValidRecords + missingTickersCount + duplicateRecordsCount + invalidRecordsCount;
+    
+    // Update display
+    document.getElementById('import-total-count').textContent = totalRecords;
+    document.getElementById('import-valid-count').textContent = fullyValidRecords;
+    document.getElementById('import-missing-tickers-count').textContent = missingTickersCount;
+    document.getElementById('import-duplicates-count').textContent = duplicateRecordsCount;
+    document.getElementById('import-errors-count').textContent = invalidRecordsCount;
+    
+    console.log('📊 Analysis Results:', {
+        total: totalRecords,
+        fullyValid: fullyValidRecords,
+        missingTickers: missingTickersCount,
+        duplicates: duplicateRecordsCount,
+        errors: invalidRecordsCount,
+        backendValidRecords: validRecordsWithMissingTickers,
+        calculation: `${validRecordsWithMissingTickers} - ${missingTickersCount} = ${fullyValidRecords}`
+    });
     
     // Display detailed error information
     displayDetailedErrors(results);
     
     document.getElementById('import-analysis-results').style.display = 'block';
     
-    // Enable next button if there are valid records
-    if (results.valid_records > 0) {
+    // Enable next button if there are any valid records (even with missing tickers)
+    if (validRecordsWithMissingTickers > 0) {
         document.getElementById('import-next-btn').disabled = false;
         document.getElementById('import-next-btn').style.display = 'inline-block';
     } else {
@@ -698,19 +779,128 @@ function closeAddTickerModal() {
  * Save missing ticker
  */
 async function saveMissingTicker() {
+    // Get the ticker symbol from the modal BEFORE calling saveTicker
+    const symbolInput = document.getElementById('tickerSymbol');
+    const tickerSymbol = symbolInput ? symbolInput.value.trim().toUpperCase() : null;
+    
+    console.log('🎯 Saving ticker:', tickerSymbol);
+    
     // Use existing saveTicker function from tickers.js
     if (window.saveTicker) {
-        await window.saveTicker();
-        closeAddTickerModal();
-        
-        // Refresh missing tickers list
-        if (importAnalysisResults) {
-            displayImportProblems(importAnalysisResults);
+        try {
+            await window.saveTicker();
+            closeAddTickerModal();
+            
+            if (tickerSymbol) {
+                console.log('✅ Ticker saved successfully, updating button for:', tickerSymbol);
+                
+                // Update the specific button for this ticker
+                updateTickerButtonStatus(tickerSymbol, 'handled');
+                
+                // Remove the ticker from the missing tickers list in memory
+                if (importAnalysisResults && importAnalysisResults.missing_tickers) {
+                    importAnalysisResults.missing_tickers = importAnalysisResults.missing_tickers.filter(t => t !== tickerSymbol);
+                    console.log('📝 Updated missing_tickers list:', importAnalysisResults.missing_tickers);
+                }
+                
+                // Show success notification
+                if (window.showNotification) {
+                    window.showNotification(`טיקר ${tickerSymbol} נוסף בהצלחה למערכת!`, 'success');
+                }
+                
+                // Update server about the new ticker so it can recalculate preview
+                await updateServerWithNewTicker(tickerSymbol);
+            }
+        } catch (error) {
+            console.error('❌ Error saving ticker:', error);
+            if (window.showNotification) {
+                window.showNotification('שגיאה בשמירת הטיקר', 'error');
+            }
         }
     } else {
         console.error('saveTicker function not available');
         alert('שגיאה: פונקציית שמירת הטיקר לא זמינה');
     }
+}
+
+/**
+ * Update server about new ticker so it can recalculate preview
+ */
+async function updateServerWithNewTicker(tickerSymbol) {
+    if (!importSessionId) {
+        console.error('No session ID available');
+        return;
+    }
+    
+    try {
+        console.log('🔄 Updating server with new ticker:', tickerSymbol);
+        
+        // Call API to update session with new ticker
+        const response = await fetch(`/api/user-data-import/session/${importSessionId}/update-ticker`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                ticker_symbol: tickerSymbol
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            console.log('✅ Server updated with new ticker');
+            
+            // Reload preview data to reflect the changes
+            await loadImportPreviewData();
+            
+            // Update the preview summary display
+            if (importPreviewData) {
+                displayImportPreviewSummary(importPreviewData);
+            }
+        } else {
+            console.error('❌ Failed to update server:', data.message);
+        }
+    } catch (error) {
+        console.error('❌ Error updating server:', error);
+    }
+}
+
+/**
+ * Update ticker button status
+ */
+function updateTickerButtonStatus(tickerSymbol, status) {
+    console.log('🔧 updateTickerButtonStatus called with:', tickerSymbol, status);
+    const button = document.querySelector(`button[data-ticker-symbol="${tickerSymbol}"]`);
+    console.log('🔍 Found button:', button);
+    
+    if (button) {
+        if (status === 'handled') {
+            button.textContent = 'טופל!';
+            button.className = 'btn btn-sm btn-success';
+            button.disabled = true;
+            button.onclick = null; // Remove click handler
+            console.log('✅ Button updated successfully');
+        }
+    } else {
+        console.error('❌ Button not found for ticker:', tickerSymbol);
+    }
+}
+
+/**
+ * Update all ticker buttons based on current status
+ */
+function updateAllTickerButtons() {
+    if (!importAnalysisResults || !importAnalysisResults.missing_tickers) {
+        return;
+    }
+    
+    importAnalysisResults.missing_tickers.forEach(tickerSymbol => {
+        const button = document.querySelector(`button[data-ticker-symbol="${tickerSymbol}"]`);
+        if (button && button.textContent === 'הוסף למערכת') {
+            // Button is still in "add" state, keep it as is
+        }
+    });
 }
 
 /**
@@ -827,11 +1017,15 @@ async function loadImportPreviewData() {
     }
     
     try {
+        console.log('🔄 Loading preview data for session:', importSessionId);
         const response = await fetch(`/api/user-data-import/session/${importSessionId}/preview`);
         const data = await response.json();
         
+        console.log('📊 Preview API response:', data);
+        
         if (data.status === 'success') {
             importPreviewData = data.preview_data;
+            console.log('📊 Preview data loaded:', importPreviewData);
             displayImportPreviewSummary(importPreviewData);
         } else {
             console.error('Failed to load preview data:', data.message);
@@ -859,7 +1053,9 @@ function displayImportProblems(results) {
         missingTickersList.innerHTML = results.missing_tickers.map(ticker => 
             `<div class="missing-ticker-item">
                 <span class="ticker-symbol">${ticker}</span>
-                <button class="btn btn-sm btn-primary" onclick="addMissingTicker('${ticker}')">
+                <button class="btn btn-sm btn-primary" 
+                        data-ticker-symbol="${ticker}" 
+                        onclick="addMissingTicker('${ticker}')">
                     הוסף למערכת
                 </button>
             </div>`
@@ -867,6 +1063,11 @@ function displayImportProblems(results) {
     } else {
         missingTickersSection.style.display = 'none';
     }
+    
+    // Update button states after rendering
+    setTimeout(() => {
+        updateAllTickerButtons();
+    }, 100);
     
     // Show duplicates section if there are duplicates
     const duplicatesSection = document.getElementById('import-duplicates-section');
@@ -1202,9 +1403,18 @@ function displayImportFinalSummary() {
  * Display preview summary
  */
 function displayImportPreviewSummary(data) {
+    console.log('📊 Preview Summary Data:', data);
+    console.log('📊 Summary:', data.summary);
+    
     document.getElementById('import-preview-total').textContent = data.summary.total_records || 0;
     document.getElementById('import-preview-import').textContent = data.summary.records_to_import || 0;
     document.getElementById('import-preview-skip').textContent = data.summary.records_to_skip || 0;
+    
+    console.log('📊 Updated preview display:', {
+        total: data.summary.total_records || 0,
+        import: data.summary.records_to_import || 0,
+        skip: data.summary.records_to_skip || 0
+    });
 }
 
 /**
@@ -1464,10 +1674,6 @@ function getReasonText(reason) {
 /**
  * Add missing tickers
  */
-function addMissingTickers() {
-    showNotification('פונקציונליות הוספת טיקרים תתווסף בעתיד', 'info');
-}
-
 /**
  * Review duplicates
  */

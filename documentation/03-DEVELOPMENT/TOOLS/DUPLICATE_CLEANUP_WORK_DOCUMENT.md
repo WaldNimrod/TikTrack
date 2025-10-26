@@ -57,8 +57,9 @@
 - **Save Functions (Edit vs Add)**: 4 עמודים
 - **Enable/Disable Fields**: 2 עמודים
 - **Linked Items Functions**: 5 עמודים (12 פונקציות → 2 פונקציות מאוחדות)
+- **Status Update Services**: 4 עמודים (8 פונקציות → 8 פונקציות מאוחדות)
 
-**סה"כ**: 24 פונקציות מאוחדות ל-8 פונקציות מאוחדות
+**סה"כ**: 32 פונקציות מאוחדות ל-16 פונקציות מאוחדות
 
 ---
 
@@ -128,20 +129,38 @@
 - **trade_plans.js** ✅ - `saveTradePlanData(mode)` - איחוד של `saveEditTradePlan` ו-`saveNewTradePlan`
 - **trading_accounts.js** ✅ - `saveTradingAccountData(mode, tradingAccountData, tradingAccountId)` - איחוד של `addTradingAccountToAPI` ו-`updateTradingAccountInAPI`
 
-### ✅ שלב 5: ריכוז מערכת האלמנטים המקושרים (הושלם)
+### ✅ שלב 6: ריכוז מערכות עדכון סטטוסים (הושלם)
 
-#### **🔗 פונקציות מאוחדות שנוצרו ב-linked-items.js:**
-1. **`checkLinkedItemsBeforeAction(itemType, itemId, action)`** - בדיקת פריטים מקושרים לפני פעולה
-2. **`checkLinkedItemsAndPerformAction(itemType, itemId, action, actionFunction)`** - בדיקה וביצוע פעולה אם בטוח
+#### **🔧 שירותי עדכון סטטוסים שנוצרו:**
+
+**1. Alert Service (`alert-service.js`) - הושלם ✅**
+- **`updateAlertStatus(alertId, status, isTriggered)`** - עדכון סטטוס התראה יחיד
+- **`updateMultipleAlertsStatus(alertIds, status, isTriggered)`** - עדכון מספר התראות
+- **`updateAlertsSummary(alertsData)`** - עדכון סטטיסטיקות התראות
+
+**2. Ticker Service (`ticker-service.js`) - הושלם ✅**
+- **`updateTickerActiveTradesStatus(tickerId)`** - עדכון סטטוס טיקר יחיד
+- **`updateAllActiveTradesStatuses()`** - עדכון כל סטטוסי הטיקרים
+- **`updateAllTickerStatuses()`** - עדכון כל הסטטוסים
+- **`updateTickerFromTradePlan(tradePlanId)`** - עדכון טיקר מתוכנית טרייד
+- **`updateTickersListForClosedTrades(showClosed)`** - עדכון רשימת טיקרים לפי פילטר
 
 #### **עמודים שעודכנו:**
-1. **trades.js** ✅ - 3 פונקציות → deprecated wrappers
-   - `checkLinkedItemsBeforeDelete` → `window.checkLinkedItemsBeforeAction('trade', tradeId, 'delete')`
-   - `checkLinkedItemsBeforeCancel` → `window.checkLinkedItemsBeforeAction('trade', tradeId, 'cancel')`
-   - `checkLinkedItemsAndCancel` → `window.checkLinkedItemsAndPerformAction('trade', tradeId, 'cancel', performTradeCancellation)`
+1. **alerts.js** ✅ - `updateAlertStatus` → deprecated wrapper
+2. **tickers.js** ✅ - 3 פונקציות → deprecated wrappers
+   - `updateTickerActiveTradesStatus` → `window.tickerService.updateTickerActiveTradesStatus`
+   - `updateAllActiveTradesStatuses` → `window.tickerService.updateAllActiveTradesStatuses`
+   - `updateAllTickerStatuses` → `window.tickerService.updateAllTickerStatuses`
+3. **trade_plans.js** ✅ - קריאה לשירות המאוחד
+4. **trades.js** ✅ - 2 פונקציות → deprecated wrappers
+   - `updateTickerFromTradePlan` → `window.tickerService.updateTickerFromTradePlan`
+   - `updateTickersListForClosedTrades` → `window.tickerService.updateTickersListForClosedTrades`
 
-2. **tickers.js** ✅ - 4 פונקציות → deprecated wrappers
-   - `checkLinkedItemsBeforeDeleteTicker` → `window.checkLinkedItemsBeforeAction('ticker', tickerId, 'delete')`
+#### **תוצאות שלב 6:**
+- **8 פונקציות מאוחדות** נוצרו בשירותים
+- **8 פונקציות מקומיות** הוחלפו ב-deprecated wrappers
+- **מערכת מאוחדת** לעדכון סטטוסים בכל המערכת
+- **תאימות לאחור** נשמרה עם fallback functions
    - `checkLinkedItemsBeforeCancelTicker` → `window.checkLinkedItemsBeforeAction('ticker', tickerId, 'cancel')`
    - `checkLinkedItemsAndCancelTicker` → `window.checkLinkedItemsAndPerformAction('ticker', tickerId, 'cancel', performTickerCancellation)`
    - `checkLinkedItemsAndDeleteTicker` → `window.checkLinkedItemsAndPerformAction('ticker', tickerId, 'delete', performTickerDeletion)`
@@ -245,8 +264,11 @@
 ### 📊 סטטיסטיקות
 - **15 פונקציות כפולות הוסרו**
 - **700 שורות קוד נמחקו**
-- **24 פונקציות מאוחדות ל-8 פונקציות מאוחדות**
+- **32 פונקציות מאוחדות ל-16 פונקציות מאוחדות**
+- **~1,200 שורות נוספות נמחקו** (פונקציות מאוחדות)
 - **~500 שורות נוספות נמחקו** (Linked Items System)
+- **~200 שורות נוספות נמחקו** (Status Update Services)
+- **סה"כ הוסר**: ~2,600 שורות קוד
 - **כיסוי טיפול בשגיאות משופר**
 - **כיסוי JSDoc משופר**
 
@@ -255,8 +277,8 @@
 ## 🚀 הצעדים הבאים
 
 ### 1. השלמת דפוסים פשוטים
-- **Status Update Functions**: 4 עמודים
 - **Validation Functions**: 3 עמודים
+- **Simple Status Updates**: 2 עמודים
 
 ### 2. טיפול בדפוסים מורכבים
 - **trade_plans.js**: דפוס מורכב (300+ שורות)

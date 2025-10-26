@@ -330,6 +330,59 @@ def get_preview(session_id: int):
             'message': f'Preview generation failed: {str(e)}'
         }), 500
 
+@user_data_import_bp.route('/session/<int:session_id>/update-ticker', methods=['POST'])
+def update_ticker(session_id: int):
+    """
+    Update session when a new ticker is added to the system.
+    This triggers a recalculation of the preview data.
+    
+    Args:
+        session_id: Import session ID
+        
+    Returns:
+        JSON response with updated preview data
+    """
+    try:
+        data = request.get_json()
+        ticker_symbol = data.get('ticker_symbol')
+        
+        if not ticker_symbol:
+            return jsonify({
+                'status': 'error',
+                'message': 'Ticker symbol is required'
+            }), 400
+        
+        db_session = next(get_db())
+        try:
+            orchestrator = ImportOrchestrator(db_session)
+            
+            # Regenerate preview data with the new ticker
+            result = orchestrator.generate_preview(session_id)
+            
+            if not result['success']:
+                return jsonify({
+                    'status': 'error',
+                    'message': result['error']
+                }), 400
+            
+            logger.info(f"✅ Preview recalculated for session {session_id} after adding ticker {ticker_symbol}")
+            
+            return jsonify({
+                'status': 'success',
+                'message': f'Ticker {ticker_symbol} added successfully',
+                'preview_data': result['preview_data']
+            }), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error updating ticker for session {session_id}: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to update ticker'
+        }), 500
+
 @user_data_import_bp.route('/session/<int:session_id>/execute', methods=['POST'])
 def execute_import(session_id: int):
     """

@@ -368,13 +368,14 @@ class ConditionBuilder {
      */
     async loadMethodParameters(methodId) {
         try {
-            const response = await fetch(`/api/trading-methods/${methodId}/parameters`);
-            if (!response.ok) {
-                throw new Error('Failed to load parameters');
+            // Find method in static data
+            const method = this.methods.find(m => m.id === methodId);
+            if (!method) {
+                throw new Error('Method not found');
             }
             
-            const data = await response.json();
-            this.methodParameters = data.parameters || [];
+            // Use parameters from static data
+            this.methodParameters = method.parameters || [];
             
             this.renderParameterFields();
         } catch (error) {

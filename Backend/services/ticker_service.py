@@ -240,6 +240,89 @@ class TickerService:
         return query.first() is not None
     
     @staticmethod
+    def get_symbols_to_ids_mapping(db: Session, symbols: List[str]) -> Dict[str, int]:
+        """
+        Get mapping of ticker symbols to their IDs
+        
+        Args:
+            db: Session - Database connection
+            symbols: List[str] - List of ticker symbols to map
+            
+        Returns:
+            Dict[str, int] - Mapping of symbol -> ticker_id
+            
+        Example:
+            >>> mapping = TickerService.get_symbols_to_ids_mapping(db, ["AAPL", "GOOGL", "MSFT"])
+            >>> print(mapping)  # {"AAPL": 1, "GOOGL": 2, "MSFT": 3}
+        """
+        if not symbols:
+            return {}
+        
+        # Convert to uppercase for consistency
+        symbols_upper = [symbol.upper() for symbol in symbols]
+        
+        # Query database for existing tickers
+        tickers = db.query(Ticker).filter(Ticker.symbol.in_(symbols_upper)).all()
+        
+        # Create mapping
+        mapping = {ticker.symbol: ticker.id for ticker in tickers}
+        
+        logger.info(f"📊 Created symbol->ID mapping for {len(mapping)}/{len(symbols)} symbols")
+        return mapping
+    
+    @staticmethod
+    def enrich_records_with_ticker_ids(db: Session, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Enrich records with ticker_id field based on symbol
+        
+        Args:
+            db: Session - Database connection
+            records: List[Dict[str, Any]] - Records with 'symbol' field
+            
+        Returns:
+            List[Dict[str, Any]] - Records enriched with 'ticker_id' field
+            
+        Example:
+            >>> records = [{"symbol": "AAPL", "action": "buy"}, {"symbol": "GOOGL", "action": "sell"}]
+            >>> enriched = TickerService.enrich_records_with_ticker_ids(db, records)
+            >>> print(enriched)  # [{"symbol": "AAPL", "action": "buy", "ticker_id": 1}, ...]
+        """
+        if not records:
+            return records
+        
+        # Get unique symbols from records
+        symbols = list(set([record.get('symbol') for record in records if record.get('symbol')]))
+        
+        if not symbols:
+            logger.warning("No symbols found in records")
+            return records
+        
+        # Get mapping
+        symbol_to_id = TickerService.get_symbols_to_ids_mapping(db, symbols)
+        
+        # Enrich records
+        enriched_records = []
+        missing_symbols = []
+        
+        for record in records:
+            enriched_record = record.copy()
+            symbol = record.get('symbol')
+            
+            if symbol and symbol.upper() in symbol_to_id:
+                enriched_record['ticker_id'] = symbol_to_id[symbol.upper()]
+                enriched_records.append(enriched_record)
+            else:
+                if symbol:
+                    missing_symbols.append(symbol)
+                logger.warning(f"⚠️ No ticker_id found for symbol: {symbol}")
+        
+        if missing_symbols:
+            logger.warning(f"⚠️ Missing ticker_ids for symbols: {missing_symbols}")
+        
+        logger.info(f"✅ Enriched {len(enriched_records)}/{len(records)} records with ticker_ids")
+        return enriched_records
+    
+    @staticmethod
     def create(db: Session, ticker_data: dict) -> Ticker:
         """
         Create new ticker with validation

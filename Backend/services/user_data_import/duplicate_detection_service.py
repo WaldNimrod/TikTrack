@@ -40,7 +40,7 @@ class DuplicateDetectionService:
             db_session: Database session for querying existing data
         """
         self.db_session = db_session
-        self.similarity_threshold = 3  # Minimum matching fields out of 5
+        self.similarity_threshold = 4  # Minimum matching fields out of 5 (including symbol)
         self.price_tolerance = 0.01    # Price difference tolerance
         self.date_tolerance_days = 1   # Date difference tolerance
     

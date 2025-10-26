@@ -12,6 +12,7 @@ Last Updated: 2025-01-16
 from typing import List, Dict, Any, Optional, Tuple
 from datetime import datetime
 import logging
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +27,9 @@ class ValidationService:
     - Format validation
     """
     
-    def __init__(self):
+    def __init__(self, db_session: Session = None):
         """Initialize the validation service"""
+        self.db_session = db_session
         self.validation_rules = {
             'symbol': self._validate_symbol,
             'action': self._validate_action,
@@ -76,10 +78,16 @@ class ValidationService:
                 })
                 logger.error(f"Failed to validate record {i}: {str(e)}")
         
+        # Check for missing tickers
+        logger.info(f"🔍 Starting missing tickers check for {len(valid_records)} valid records")
+        missing_tickers = self._check_missing_tickers(valid_records)
+        logger.info(f"📊 Missing tickers result: {missing_tickers}")
+        
         return {
             'valid_records': valid_records,
             'invalid_records': invalid_records,
             'validation_errors': validation_errors,
+            'missing_tickers': missing_tickers,
             'total_records': len(records),
             'valid_count': len(valid_records),
             'invalid_count': len(invalid_records),
@@ -336,3 +344,54 @@ class ValidationService:
                 violations.append("Invalid date format in records")
         
         return violations
+    
+    def _check_missing_tickers(self, records: List[Dict[str, Any]]) -> List[str]:
+        """
+        Check which tickers are missing from the database.
+        
+        Args:
+            records: List of valid records to check
+            
+        Returns:
+            List[str]: List of missing ticker symbols
+        """
+        logger.info(f"🔍 _check_missing_tickers called with {len(records)} records")
+        
+        if not self.db_session:
+            logger.warning("No database session provided - skipping ticker validation")
+            return []
+        
+        try:
+            # Get unique symbols from records
+            symbols = list(set([record.get('symbol') for record in records if record.get('symbol')]))
+            logger.info(f"📊 Found {len(symbols)} unique symbols: {symbols[:10]}...")
+            
+            if not symbols:
+                logger.info("No symbols found in records")
+                return []
+            
+            # Query existing tickers
+            try:
+                from models.ticker import Ticker
+                logger.info(f"🔍 Querying database for {len(symbols)} symbols")
+                existing_tickers = self.db_session.query(Ticker.symbol).filter(
+                    Ticker.symbol.in_(symbols)
+                ).all()
+                logger.info(f"📊 Found {len(existing_tickers)} existing tickers in DB")
+            except Exception as import_error:
+                logger.error(f"❌ Failed to import Ticker model: {str(import_error)}")
+                import traceback
+                logger.error(f"📋 Import traceback: {traceback.format_exc()}")
+                return []
+            
+            existing_symbols = {ticker.symbol for ticker in existing_tickers}
+            missing_symbols = [symbol for symbol in symbols if symbol not in existing_symbols]
+            
+            logger.info(f"✅ Found {len(missing_symbols)} missing tickers: {missing_symbols}")
+            return missing_symbols
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to check missing tickers: {str(e)}")
+            import traceback
+            logger.error(f"📋 Traceback: {traceback.format_exc()}")
+            return []

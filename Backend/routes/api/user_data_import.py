@@ -255,9 +255,31 @@ def get_session(session_id: int):
                     'message': 'Session not found'
                 }), 404
             
+            # Try to get summary_data from cache first
+            summary_data = None
+            try:
+                from services.advanced_cache_service import advanced_cache_service
+                cache_key = f"import_session_{session_id}_summary"
+                summary_data = advanced_cache_service.get(cache_key)
+                if summary_data:
+                    logger.info(f"✅ Retrieved summary_data from cache: {cache_key}")
+                else:
+                    logger.info(f"📋 No summary_data in cache: {cache_key}")
+            except Exception as e:
+                logger.error(f"❌ Failed to get from cache: {str(e)}")
+            
+            # If not in cache, get from database
+            if not summary_data and session.summary_data:
+                summary_data = session.summary_data
+                logger.info(f"📋 Retrieved summary_data from database")
+            
+            session_dict = session.to_dict()
+            if summary_data:
+                session_dict['summary_data'] = summary_data
+            
             return jsonify({
                 'status': 'success',
-                'session': session.to_dict()
+                'session': session_dict
             }), 200
             
         finally:

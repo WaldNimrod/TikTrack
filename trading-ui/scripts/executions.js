@@ -1773,6 +1773,20 @@ async function updateExecutionsTableMain(executions) {
     return;
   }
 
+  // זיהוי רשומות חדשות
+  const existingExecutionIds = new Set();
+  const existingRows = tbody.querySelectorAll('tr[data-execution-id]');
+  existingRows.forEach(row => {
+    const executionId = row.getAttribute('data-execution-id');
+    if (executionId) {
+      existingExecutionIds.add(parseInt(executionId));
+    }
+  });
+
+  const newExecutionIds = executions
+    .map(exec => exec.id)
+    .filter(id => !existingExecutionIds.has(id));
+
   if (executions.length === 0) {
     tbody.innerHTML = '<tr><td colspan="9" class="text-center">לא נמצאו עסקעות</td></tr>';
     return;
@@ -1865,7 +1879,7 @@ async function updateExecutionsTableMain(executions) {
     const accountName = trade ? trade.account_name : 'לא מוגדר';
 
     return `
-            <tr data-execution-id="${execution.id}">
+            <tr data-execution-id="${execution.id}" class="execution-row">
                                    <td class="ticker-cell">
                        <div style="display: flex; align-items: center; gap: 8px;">
                            <strong style="cursor: pointer; color: ${positiveColor};" 
@@ -1912,6 +1926,69 @@ async function updateExecutionsTableMain(executions) {
         `;
   }).join('');
 
+  // צביעת רשומות חדשות
+  if (newExecutionIds.length > 0) {
+    console.log(`🎨 Highlighting ${newExecutionIds.length} new executions`);
+    
+    // הוספת CSS animation אם לא קיים
+    if (!document.getElementById('new-execution-styles')) {
+      const style = document.createElement('style');
+      style.id = 'new-execution-styles';
+      style.textContent = `
+        .execution-row.newly-added {
+          background-color: rgba(40, 167, 69, 0.2) !important;
+          border-left: 4px solid #28a745 !important;
+          animation: fadeNewExecution 3s ease-out forwards;
+        }
+        
+        @keyframes fadeNewExecution {
+          0% {
+            background-color: rgba(40, 167, 69, 0.3);
+            border-left-color: #28a745;
+          }
+          50% {
+            background-color: rgba(40, 167, 69, 0.15);
+            border-left-color: #28a745;
+          }
+          100% {
+            background-color: transparent;
+            border-left-color: transparent;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    // הוספת class לרשומות החדשות
+    setTimeout(() => {
+      newExecutionIds.forEach(executionId => {
+        const row = tbody.querySelector(`tr[data-execution-id="${executionId}"]`);
+        if (row) {
+          row.classList.add('newly-added');
+          
+          // הסרת ה-class אחרי 3 דקות
+          setTimeout(() => {
+            row.classList.remove('newly-added');
+            // בדיקה אם יש עוד רשומות מודגשות
+            const remainingHighlighted = document.querySelectorAll('.execution-row.newly-added');
+            if (remainingHighlighted.length === 0) {
+              const clearBtn = document.getElementById('clearHighlightsBtn');
+              if (clearBtn) {
+                clearBtn.style.display = 'none';
+              }
+            }
+          }, 3 * 60 * 1000); // 3 דקות
+        }
+      });
+      
+      // הצגת כפתור הניקוי
+      const clearBtn = document.getElementById('clearHighlightsBtn');
+      if (clearBtn) {
+        clearBtn.style.display = 'inline-block';
+      }
+    }, 100); // קצת delay כדי שהטבלה תיטען
+  }
+
   // עדכון הספירה
   const countElement = document.querySelector('.table-count');
   if (countElement) {
@@ -1923,6 +2000,24 @@ async function updateExecutionsTableMain(executions) {
 
   // Table update completed successfully
   // === END UPDATE EXECUTIONS TABLE ===
+}
+
+/**
+ * ניקוי צביעת רשומות חדשות
+ */
+function clearNewExecutionHighlights() {
+  const highlightedRows = document.querySelectorAll('.execution-row.newly-added');
+  highlightedRows.forEach(row => {
+    row.classList.remove('newly-added');
+  });
+  
+  // הסתרת כפתור הניקוי
+  const clearBtn = document.getElementById('clearHighlightsBtn');
+  if (clearBtn) {
+    clearBtn.style.display = 'none';
+  }
+  
+  console.log(`🧹 Cleared highlights from ${highlightedRows.length} rows`);
 }
 
 // פונקציה formatDate מוגדרת בקובץ main.js

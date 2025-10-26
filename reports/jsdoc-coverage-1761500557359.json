@@ -1,0 +1,2121 @@
+{
+  "timestamp": "2025-10-26T17:42:37.352Z",
+  "pages": [
+    {
+      "file": "index.js",
+      "totalFunctions": 16,
+      "functionsWithJSDoc": 6,
+      "functionsWithoutJSDoc": 10,
+      "coveragePercentage": "37.50",
+      "functions": [
+        {
+          "name": "switchTableTab",
+          "hasJSDoc": true
+        },
+        {
+          "name": "refreshOverview",
+          "hasJSDoc": true
+        },
+        {
+          "name": "exportOverview",
+          "hasJSDoc": true
+        },
+        {
+          "name": "quickAction",
+          "hasJSDoc": true
+        },
+        {
+          "name": "createTradesStatusChart",
+          "hasJSDoc": true
+        },
+        {
+          "name": "createPerformanceChart",
+          "hasJSDoc": true
+        },
+        {
+          "name": "createAccountChart",
+          "hasJSDoc": false
+        },
+        {
+          "name": "createMixedChart",
+          "hasJSDoc": false
+        },
+        {
+          "name": "createMixedChartData",
+          "hasJSDoc": false
+        },
+        {
+          "name": "refreshAllCharts",
+          "hasJSDoc": false
+        },
+        {
+          "name": "refreshChart",
+          "hasJSDoc": false
+        },
+        {
+          "name": "exportChart",
+          "hasJSDoc": false
+        },
+        {
+          "name": "exportAllCharts",
+          "hasJSDoc": false
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasJSDoc": false
+        },
+        {
+          "name": "debugZIndexStatus",
+          "hasJSDoc": false
+        },
+        {
+          "name": "copyDetailedLogLocal",
+          "hasJSDoc": false
+        }
+      ]
+    },
+    {
+      "file": "trades.js",
+      "totalFunctions": 61,
+      "functionsWithJSDoc": 52,
+      "functionsWithoutJSDoc": 9,
+      "coveragePercentage": "85.25",
+      "functions": [
+        {
+          "name": "formatDailyChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getInvestmentTypeColor",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTradesData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTickerDataForTrades",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTradesTable",
+          "hasJSDoc": false
+        },
+        {
+          "name": "viewTickerDetails",
+          "hasJSDoc": false
+        },
+        {
+          "name": "viewAccountDetails",
+          "hasJSDoc": false
+        },
+        {
+          "name": "viewTradePlanDetails",
+          "hasJSDoc": false
+        },
+        {
+          "name": "editTradeRecord",
+          "hasJSDoc": false
+        },
+        {
+          "name": "cancelTradeRecord",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsAndCancel",
+          "hasJSDoc": true
+        },
+        {
+          "name": "performTradeCancellation",
+          "hasJSDoc": true
+        },
+        {
+          "name": "deleteTradeRecord",
+          "hasJSDoc": true
+        },
+        {
+          "name": "performTradeDeletion",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addEditImportantNote",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addEditReminder",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showEditTradeModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadEditTradeModalData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "saveEditTradeData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showAddTradeModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "disableTradeFormFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "enableTradeFormFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateTradeForm",
+          "hasJSDoc": true
+        },
+        {
+          "name": "saveNewTradeRecord",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadModalData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTickerFromTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTickersListForClosedTrades",
+          "hasJSDoc": true
+        },
+        {
+          "name": "onShowClosedTradesChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addImportantNote",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addReminder",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateTradeStatusChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getCurrentPosition",
+          "hasJSDoc": true
+        },
+        {
+          "name": "viewLinkedItemsForTrade",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsBeforeDelete",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsBeforeCancel",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setupTradeModalListeners",
+          "hasJSDoc": true
+        },
+        {
+          "name": "initializeTradeConditionsSystem",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setupDateValidation",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateDateFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showDateValidationError",
+          "hasJSDoc": true
+        },
+        {
+          "name": "clearDateValidationMessages",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addEditBuySell",
+          "hasJSDoc": true
+        },
+        {
+          "name": "refreshPositions",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTableStats",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTradePlanDates",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterTradesData",
+          "hasJSDoc": false
+        },
+        {
+          "name": "setupSortEventListeners",
+          "hasJSDoc": false
+        },
+        {
+          "name": "validateTradePlanChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateTradeChanges",
+          "hasJSDoc": true
+        },
+        {
+          "name": "applyStatusFilterToTrades",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateTickerChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showTickerChangeConfirmation",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateTradePlanDate",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateEditTradeTickerFromPlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateEditTradePriceFromTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "reactivateTrade",
+          "hasJSDoc": true
+        },
+        {
+          "name": "refreshTrades",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTrade",
+          "hasJSDoc": true
+        },
+        {
+          "name": "confirmDeleteTrade",
+          "hasJSDoc": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasJSDoc": false
+        },
+        {
+          "name": "generateDetailedLogForTrades",
+          "hasJSDoc": false
+        }
+      ]
+    },
+    {
+      "file": "executions.js",
+      "totalFunctions": 74,
+      "functionsWithJSDoc": 64,
+      "functionsWithoutJSDoc": 10,
+      "coveragePercentage": "86.49",
+      "functions": [
+        {
+          "name": "addExecution",
+          "hasJSDoc": true
+        },
+        {
+          "name": "openExecutionDetails",
+          "hasJSDoc": false
+        },
+        {
+          "name": "editExecution",
+          "hasJSDoc": false
+        },
+        {
+          "name": "deleteExecution",
+          "hasJSDoc": false
+        },
+        {
+          "name": "resetAddExecutionForm",
+          "hasJSDoc": true
+        },
+        {
+          "name": "resetEditExecutionForm",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showEditExecutionModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateExecutionTradeId",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateExecutionQuantity",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateExecutionPrice",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateExecutionCommission",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateExecutionSource",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateExecutionNotes",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateExecutionExternalId",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateExecutionDate",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateExecutionType",
+          "hasJSDoc": true
+        },
+        {
+          "name": "clearFieldError",
+          "hasJSDoc": true
+        },
+        {
+          "name": "clearExecutionValidationErrors",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateCompleteExecutionForm",
+          "hasJSDoc": false
+        },
+        {
+          "name": "saveExecution",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateExecutionWrapper",
+          "hasJSDoc": true
+        },
+        {
+          "name": "confirmDeleteExecution",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showExecutionLinkedItemsModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadLinkedItemsDetails",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadLinkedItemsFromMultipleSources",
+          "hasJSDoc": true
+        },
+        {
+          "name": "displayLinkedItems",
+          "hasJSDoc": true
+        },
+        {
+          "name": "goToLinkedItems",
+          "hasJSDoc": true
+        },
+        {
+          "name": "goToTrade",
+          "hasJSDoc": true
+        },
+        {
+          "name": "goToPlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "goToAlert",
+          "hasJSDoc": true
+        },
+        {
+          "name": "goToNote",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadExecutionsData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateExecutionsTableMain",
+          "hasJSDoc": true
+        },
+        {
+          "name": "isDateInRange",
+          "hasJSDoc": false
+        },
+        {
+          "name": "filterExecutionsLocally",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateExecution",
+          "hasJSDoc": true
+        },
+        {
+          "name": "restoreSortState",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setupModalConfigurations",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTickersWithOpenOrClosedTradesAndPlans",
+          "hasJSDoc": true
+        },
+        {
+          "name": "enableAllFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadActiveTradesForTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTradesOnCheckboxChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTradesOnTickerChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "goToTickerPage",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showTickerHelp",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addNewTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addNewPlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addNewTrade",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateExecutionsSummary",
+          "hasJSDoc": true
+        },
+        {
+          "name": "enableExecutionFormFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "disableExecutionFormFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadExecutionTickerInfo",
+          "hasJSDoc": true
+        },
+        {
+          "name": "displayExecutionTickerInfo",
+          "hasJSDoc": true
+        },
+        {
+          "name": "hideExecutionTickerInfo",
+          "hasJSDoc": true
+        },
+        {
+          "name": "calculateAddExecutionValues",
+          "hasJSDoc": true
+        },
+        {
+          "name": "calculateEditExecutionValues",
+          "hasJSDoc": true
+        },
+        {
+          "name": "goToLinkedTrade",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTradeExecutions",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateExecutionsTableForTradeModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addEditBuySell",
+          "hasJSDoc": true
+        },
+        {
+          "name": "linkExistingExecution",
+          "hasJSDoc": true
+        },
+        {
+          "name": "unlinkExecution",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setupExecutionsFilterFunctions",
+          "hasJSDoc": false
+        },
+        {
+          "name": "applyAccountFilterWithTradesData",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateExecutionsGlobalData",
+          "hasJSDoc": false
+        },
+        {
+          "name": "toggleExternalIdField",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTickersSummaryData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTickersSummaryTable",
+          "hasJSDoc": true
+        },
+        {
+          "name": "refreshTickersSummary",
+          "hasJSDoc": true
+        },
+        {
+          "name": "viewTickerDetails",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addExecutionForTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "toggleTickersSection",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTickersList",
+          "hasJSDoc": true
+        },
+        {
+          "name": "toggleExecutionsSection",
+          "hasJSDoc": false
+        }
+      ]
+    },
+    {
+      "file": "alerts.js",
+      "totalFunctions": 62,
+      "functionsWithJSDoc": 58,
+      "functionsWithoutJSDoc": 4,
+      "coveragePercentage": "93.55",
+      "functions": [
+        {
+          "name": "getDemoAlertsData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadAlertsData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterAlertsLocally",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getConditionSourceDisplay",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateAlertsTable",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updatePageSummaryStats",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showAddAlertModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "clearAlertValidation",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadModalData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateRadioButtons",
+          "hasJSDoc": true
+        },
+        {
+          "name": "populateSelect",
+          "hasJSDoc": true
+        },
+        {
+          "name": "onRelationTypeChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "onRelatedObjectChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "enableConditionFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "disableConditionFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "populateRelatedObjects",
+          "hasJSDoc": true
+        },
+        {
+          "name": "populateEditRelatedObjects",
+          "hasJSDoc": true
+        },
+        {
+          "name": "onEditRelationTypeChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "onEditRelatedObjectChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "enableEditConditionFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "disableEditConditionFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkAlertVariable",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkAlertOperator",
+          "hasJSDoc": true
+        },
+        {
+          "name": "buildAlertCondition",
+          "hasJSDoc": true
+        },
+        {
+          "name": "parseAlertCondition",
+          "hasJSDoc": true
+        },
+        {
+          "name": "saveAlert",
+          "hasJSDoc": true
+        },
+        {
+          "name": "editAlert",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getAlertState",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateAlertStatusCombination",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateStatusAndTriggered",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateAlert",
+          "hasJSDoc": true
+        },
+        {
+          "name": "deleteAlertInternal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "confirmDeleteAlert",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getStatusClass",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getRelatedClass",
+          "hasJSDoc": true
+        },
+        {
+          "name": "restoreAlertsSectionState",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterAlertsByRelatedObjectTypeWrapper",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadAlerts",
+          "hasJSDoc": false
+        },
+        {
+          "name": "reactivateAlert",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkAlertCondition",
+          "hasJSDoc": true
+        },
+        {
+          "name": "toggleAlert",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateAlertStatus",
+          "hasJSDoc": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateAlertsSummary",
+          "hasJSDoc": true
+        },
+        {
+          "name": "generateDetailedLogForAlerts",
+          "hasJSDoc": false
+        },
+        {
+          "name": "loadConditionsFromSource",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTradePlansForConditions",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTradesForConditions",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadConditionsFromItem",
+          "hasJSDoc": true
+        },
+        {
+          "name": "displayAvailableConditions",
+          "hasJSDoc": true
+        },
+        {
+          "name": "selectConditionForAlert",
+          "hasJSDoc": true
+        },
+        {
+          "name": "createAlertFromCondition",
+          "hasJSDoc": true
+        },
+        {
+          "name": "initializeAlertModalTabs",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateModalButtons",
+          "hasJSDoc": true
+        },
+        {
+          "name": "evaluateAllConditions",
+          "hasJSDoc": true
+        },
+        {
+          "name": "refreshConditionEvaluations",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showEvaluationLoading",
+          "hasJSDoc": true
+        },
+        {
+          "name": "displayEvaluationResults",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateEvaluationSummary",
+          "hasJSDoc": true
+        },
+        {
+          "name": "initializeAlertConditionBuilder",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getMethodIdFromCondition",
+          "hasJSDoc": true
+        },
+        {
+          "name": "cleanupAlertConditionBuilder",
+          "hasJSDoc": true
+        }
+      ]
+    },
+    {
+      "file": "trade_plans.js",
+      "totalFunctions": 76,
+      "functionsWithJSDoc": 59,
+      "functionsWithoutJSDoc": 17,
+      "coveragePercentage": "77.63",
+      "functions": [
+        {
+          "name": "executeTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "copyTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "enableFormFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "disableFormFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "enableEditFieldsWrapper",
+          "hasJSDoc": false
+        },
+        {
+          "name": "disableEditFields",
+          "hasJSDoc": false
+        },
+        {
+          "name": "loadTickerInfo",
+          "hasJSDoc": false
+        },
+        {
+          "name": "displayTickerInfo",
+          "hasJSDoc": false
+        },
+        {
+          "name": "hideTickerInfo",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateFormFieldsWithTickerData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadEditTickerInfo",
+          "hasJSDoc": false
+        },
+        {
+          "name": "displayEditTickerInfo",
+          "hasJSDoc": false
+        },
+        {
+          "name": "hideEditTickerInfo",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateEditFormFieldsWithTickerData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "openEditTradePlanModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTickersForEditModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateEditTickerInfo",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateEditSharesFromAmount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateEditAmountFromShares",
+          "hasJSDoc": true
+        },
+        {
+          "name": "saveEditTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsBeforeCancel",
+          "hasJSDoc": true
+        },
+        {
+          "name": "reactivateTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addEditCondition",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addEditReason",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addEditImportantNote",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addEditReminder",
+          "hasJSDoc": false
+        },
+        {
+          "name": "openCancelTradePlanModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "openDeleteTradePlanModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "cancelTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "confirmCancelTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "confirmDeleteTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "viewLinkedItemsForTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTradePlansData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateDesignsTable",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterTradePlansData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTradePlansTable",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updatePageSummaryStats",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showAddTradePlanModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "saveNewTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getFieldIdFromServerField",
+          "hasJSDoc": true
+        },
+        {
+          "name": "editTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "deleteTradePlan",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterDesignsData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "performLocalSort",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getPlanningColumnValue",
+          "hasJSDoc": true
+        },
+        {
+          "name": "isDateValue",
+          "hasJSDoc": true
+        },
+        {
+          "name": "restoreSortState",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getStatusClass",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getTypeClass",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadUserPreferences",
+          "hasJSDoc": true
+        },
+        {
+          "name": "createDateWithTimezone",
+          "hasJSDoc": true
+        },
+        {
+          "name": "translateDateRangeToDates",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateFilterDebugPanel",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterTradePlansLocally",
+          "hasJSDoc": true
+        },
+        {
+          "name": "initializeTradePlanConditionsSystem",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setupTradePlanModalListeners",
+          "hasJSDoc": true
+        },
+        {
+          "name": "initializeTradePlanConditions",
+          "hasJSDoc": true
+        },
+        {
+          "name": "cleanupTradePlanConditions",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getCurrentEditPlanId",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setupPriceCalculation",
+          "hasJSDoc": false
+        },
+        {
+          "name": "setupEditPriceCalculation",
+          "hasJSDoc": false
+        },
+        {
+          "name": "setupSortableHeadersLocal",
+          "hasJSDoc": false
+        },
+        {
+          "name": "toggleSection",
+          "hasJSDoc": false
+        },
+        {
+          "name": "restorePlanningSectionState",
+          "hasJSDoc": false
+        },
+        {
+          "name": "showTickerPage",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addImportantNote",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addReminder",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTickerInfo",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateDefaultPrices",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateSharesFromAmount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateAmountFromShares",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addEntryCondition",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addReason",
+          "hasJSDoc": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasJSDoc": false
+        },
+        {
+          "name": "generateDetailedLogForTradePlans",
+          "hasJSDoc": false
+        },
+        {
+          "name": "filterTradePlansByType",
+          "hasJSDoc": false
+        }
+      ]
+    },
+    {
+      "file": "cash_flows.js",
+      "totalFunctions": 40,
+      "functionsWithJSDoc": 31,
+      "functionsWithoutJSDoc": 9,
+      "coveragePercentage": "77.50",
+      "functions": [
+        {
+          "name": "loadCashFlowsData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "calculateBalance",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getAccountNameById",
+          "hasJSDoc": true
+        },
+        {
+          "name": "ensureTradingAccountsLoaded",
+          "hasJSDoc": true
+        },
+        {
+          "name": "toggleCashFlowsSection",
+          "hasJSDoc": true
+        },
+        {
+          "name": "restoreCashFlowsSectionState",
+          "hasJSDoc": false
+        },
+        {
+          "name": "loadCashFlows",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateCashFlowForm",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateEditCashFlowForm",
+          "hasJSDoc": true
+        },
+        {
+          "name": "deleteCashFlow",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadAccountsForCashFlow",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadCurrenciesForCashFlow",
+          "hasJSDoc": true
+        },
+        {
+          "name": "renderCashFlowsTable",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updatePageSummaryStats",
+          "hasJSDoc": true
+        },
+        {
+          "name": "formatAmount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getCashFlowTypeWithColor",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getCashFlowTypeText",
+          "hasJSDoc": true
+        },
+        {
+          "name": "formatCashFlowAmount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "formatUsdRate",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showCashFlowDetails",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateCashFlowsTable",
+          "hasJSDoc": true
+        },
+        {
+          "name": "startAutoRefresh",
+          "hasJSDoc": true
+        },
+        {
+          "name": "applyDynamicColors",
+          "hasJSDoc": true
+        },
+        {
+          "name": "applyUserPreferences",
+          "hasJSDoc": true
+        },
+        {
+          "name": "initializeCashFlowsPage",
+          "hasJSDoc": true
+        },
+        {
+          "name": "confirmDeleteCashFlow",
+          "hasJSDoc": false
+        },
+        {
+          "name": "manageExternalIdField",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setupSourceFieldListeners",
+          "hasJSDoc": true
+        },
+        {
+          "name": "initializeExternalIdFields",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showAddCashFlowModalInternal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showEditCashFlowModalInternal",
+          "hasJSDoc": false
+        },
+        {
+          "name": "saveCashFlow",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateCashFlow",
+          "hasJSDoc": false
+        },
+        {
+          "name": "showAddCashFlowModal",
+          "hasJSDoc": false
+        },
+        {
+          "name": "showEditCashFlowModal",
+          "hasJSDoc": false
+        },
+        {
+          "name": "editCashFlow",
+          "hasJSDoc": false
+        },
+        {
+          "name": "loadTradesForCashFlow",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTradePlansForCashFlow",
+          "hasJSDoc": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasJSDoc": true
+        },
+        {
+          "name": "generateDetailedLogForCashFlows",
+          "hasJSDoc": false
+        }
+      ]
+    },
+    {
+      "file": "notes.js",
+      "totalFunctions": 46,
+      "functionsWithJSDoc": 39,
+      "functionsWithoutJSDoc": 7,
+      "coveragePercentage": "84.78",
+      "functions": [
+        {
+          "name": "addNote",
+          "hasJSDoc": true
+        },
+        {
+          "name": "uploadFile",
+          "hasJSDoc": true
+        },
+        {
+          "name": "downloadFile",
+          "hasJSDoc": true
+        },
+        {
+          "name": "viewLinkedItems",
+          "hasJSDoc": true
+        },
+        {
+          "name": "openNoteDetails",
+          "hasJSDoc": true
+        },
+        {
+          "name": "editNote",
+          "hasJSDoc": true
+        },
+        {
+          "name": "deleteNote",
+          "hasJSDoc": true
+        },
+        {
+          "name": "restoreNotesSectionState",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadNotesData",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateNotesTable",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateNotesSummary",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateGridFromComponent",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showAddNoteModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showEditNoteModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadNoteData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadModalData",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateRadioButtons",
+          "hasJSDoc": true
+        },
+        {
+          "name": "populateSelect",
+          "hasJSDoc": true
+        },
+        {
+          "name": "onNoteRelationTypeChange",
+          "hasJSDoc": true
+        },
+        {
+          "name": "populateEditSelectByType",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateNoteForm",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateEditNoteForm",
+          "hasJSDoc": true
+        },
+        {
+          "name": "saveNote",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateNoteFromModal",
+          "hasJSDoc": false
+        },
+        {
+          "name": "confirmDeleteNote",
+          "hasJSDoc": false
+        },
+        {
+          "name": "deleteNoteFromServer",
+          "hasJSDoc": false
+        },
+        {
+          "name": "clearNoteValidationErrors",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setupNoteValidationEvents",
+          "hasJSDoc": true
+        },
+        {
+          "name": "clearSelectedFile",
+          "hasJSDoc": false
+        },
+        {
+          "name": "restoreSortState",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showTickerPage",
+          "hasJSDoc": true
+        },
+        {
+          "name": "formatText",
+          "hasJSDoc": true
+        },
+        {
+          "name": "clearFormatting",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getEditorContent",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setEditorContent",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterNotesData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterNotesByType",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getTypeDisplayName",
+          "hasJSDoc": true
+        },
+        {
+          "name": "viewNote",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadNoteForViewing",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getNoteRelatedDisplay",
+          "hasJSDoc": true
+        },
+        {
+          "name": "editCurrentNote",
+          "hasJSDoc": true
+        },
+        {
+          "name": "displayCurrentAttachment",
+          "hasJSDoc": true
+        },
+        {
+          "name": "removeCurrentAttachment",
+          "hasJSDoc": true
+        },
+        {
+          "name": "replaceCurrentAttachment",
+          "hasJSDoc": true
+        },
+        {
+          "name": "toggleSection",
+          "hasJSDoc": true
+        }
+      ]
+    },
+    {
+      "file": "research.js",
+      "totalFunctions": 12,
+      "functionsWithJSDoc": 11,
+      "functionsWithoutJSDoc": 1,
+      "coveragePercentage": "91.67",
+      "functions": [
+        {
+          "name": "initializeResearchPage",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadResearchData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setupResearchEventListeners",
+          "hasJSDoc": true
+        },
+        {
+          "name": "analyzeMarketTrends",
+          "hasJSDoc": true
+        },
+        {
+          "name": "compareTickers",
+          "hasJSDoc": true
+        },
+        {
+          "name": "technicalAnalysis",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getMarketOverview",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getVolatilityIndex",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getNewsFeed",
+          "hasJSDoc": true
+        },
+        {
+          "name": "exportResearchData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasJSDoc": true
+        },
+        {
+          "name": "generateDetailedLogForResearch",
+          "hasJSDoc": false
+        }
+      ]
+    },
+    {
+      "file": "tickers.js",
+      "totalFunctions": 45,
+      "functionsWithJSDoc": 40,
+      "functionsWithoutJSDoc": 5,
+      "coveragePercentage": "88.89",
+      "functions": [
+        {
+          "name": "editTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "viewTickerDetails",
+          "hasJSDoc": true
+        },
+        {
+          "name": "refreshTickerData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadCurrenciesData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getCurrencySymbol",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getTimeDuration",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getTickerTypeStyle",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getTickerStatusStyle",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getTickerStatusLabel",
+          "hasJSDoc": true
+        },
+        {
+          "name": "generateTickerCurrencyOptions",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateCurrencyOptions",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateActiveTradesField",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTickerActiveTradesStatus",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateAllActiveTradesStatuses",
+          "hasJSDoc": true
+        },
+        {
+          "name": "restoreTickersSectionState",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showAddTickerModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showEditTickerModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "deleteTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showDeleteTickerModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "saveTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "cancelTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsAndCancelTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "performTickerCancellation",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsBeforeDeleteTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsBeforeCancelTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getTickerSymbol",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateAllTickerStatuses",
+          "hasJSDoc": true
+        },
+        {
+          "name": "performCancelTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "reactivateTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsAndDeleteTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "performTickerDeletion",
+          "hasJSDoc": true
+        },
+        {
+          "name": "confirmDeleteTicker",
+          "hasJSDoc": true
+        },
+        {
+          "name": "clearTickersCache",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTickersData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTickersSummaryStats",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTickersTable",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadColorsAndApplyToHeaders",
+          "hasJSDoc": true
+        },
+        {
+          "name": "tryLoadData",
+          "hasJSDoc": false
+        },
+        {
+          "name": "refreshYahooFinanceData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "refreshYahooFinanceDataSilently",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterTickersByType",
+          "hasJSDoc": false
+        },
+        {
+          "name": "getTypeDisplayName",
+          "hasJSDoc": false
+        },
+        {
+          "name": "toggleSection",
+          "hasJSDoc": false
+        },
+        {
+          "name": "toggleTickersSection",
+          "hasJSDoc": false
+        }
+      ]
+    },
+    {
+      "file": "trading_accounts.js",
+      "totalFunctions": 47,
+      "functionsWithJSDoc": 36,
+      "functionsWithoutJSDoc": 11,
+      "coveragePercentage": "76.60",
+      "functions": [
+        {
+          "name": "loadCurrenciesFromServer",
+          "hasJSDoc": false
+        },
+        {
+          "name": "generateCurrencyOptions",
+          "hasJSDoc": false
+        },
+        {
+          "name": "loadTradingAccountsFromServer",
+          "hasJSDoc": false
+        },
+        {
+          "name": "loadAllTradingAccountsFromServer",
+          "hasJSDoc": false
+        },
+        {
+          "name": "loadDefaultTradingAccounts",
+          "hasJSDoc": false
+        },
+        {
+          "name": "loadTradingAccountsData",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateTradingAccountsTable",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTradingAccountsSummary",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTradingAccounts",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTradingAccountFilterDisplayText",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showAddTradingAccountModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "createTradingAccountModal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "validateTradingAccountData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showFormError",
+          "hasJSDoc": true
+        },
+        {
+          "name": "saveTradingAccount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addTradingAccountToAPI",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTradingAccountInAPI",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showEditTradingAccountModalById",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showEditTradingAccountModal",
+          "hasJSDoc": false
+        },
+        {
+          "name": "loadTradingAccountsDataFromAPI",
+          "hasJSDoc": true
+        },
+        {
+          "name": "deleteTradingAccountFromAPI",
+          "hasJSDoc": true
+        },
+        {
+          "name": "cancelTradingAccount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "deleteTradingAccount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showSuccessMessage",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showErrorMessage",
+          "hasJSDoc": true
+        },
+        {
+          "name": "confirmDeleteTradingAccount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showOpenTradesWarning",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTradingAccountsDataForTradingAccountsPage",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterTradingAccountsLocally",
+          "hasJSDoc": false
+        },
+        {
+          "name": "updateTradingAccountFilterMenu",
+          "hasJSDoc": false
+        },
+        {
+          "name": "restoreTradingAccountsSectionState",
+          "hasJSDoc": true
+        },
+        {
+          "name": "cancelTradingAccountWithLinkedItemsCheck",
+          "hasJSDoc": true
+        },
+        {
+          "name": "deleteTradingAccountWithLinkedItemsCheck",
+          "hasJSDoc": true
+        },
+        {
+          "name": "restoreTradingAccount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsAndCancelTradingAccount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "performTradingAccountCancellation",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsAndDeleteTradingAccount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "performTradingAccountDeletion",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsBeforeCancelTradingAccount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "checkLinkedItemsBeforeDeleteTradingAccount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "getTradingAccountName",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTradingAccount",
+          "hasJSDoc": true
+        },
+        {
+          "name": "viewTradingAccountDetails",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showTradingAccountDetails",
+          "hasJSDoc": true
+        },
+        {
+          "name": "sortTable",
+          "hasJSDoc": true
+        },
+        {
+          "name": "generateDetailedLog",
+          "hasJSDoc": false
+        },
+        {
+          "name": "getTradingAccounts",
+          "hasJSDoc": false
+        }
+      ]
+    },
+    {
+      "file": "database.js",
+      "totalFunctions": 16,
+      "functionsWithJSDoc": 16,
+      "functionsWithoutJSDoc": 0,
+      "coveragePercentage": "100.00",
+      "functions": [
+        {
+          "name": "initDatabaseDisplay",
+          "hasJSDoc": true
+        },
+        {
+          "name": "setupEventListeners",
+          "hasJSDoc": true
+        },
+        {
+          "name": "loadTableData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "fetchTableData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTableDisplay",
+          "hasJSDoc": true
+        },
+        {
+          "name": "createTableBodyHTML",
+          "hasJSDoc": true
+        },
+        {
+          "name": "formatCellValue",
+          "hasJSDoc": true
+        },
+        {
+          "name": "applySortingFunctionality",
+          "hasJSDoc": true
+        },
+        {
+          "name": "showLoadingState",
+          "hasJSDoc": true
+        },
+        {
+          "name": "updateTableInfo",
+          "hasJSDoc": true
+        },
+        {
+          "name": "filterTableData",
+          "hasJSDoc": true
+        },
+        {
+          "name": "formatDate",
+          "hasJSDoc": true
+        },
+        {
+          "name": "formatNumber",
+          "hasJSDoc": true
+        },
+        {
+          "name": "formatCurrency",
+          "hasJSDoc": true
+        },
+        {
+          "name": "formatStatus",
+          "hasJSDoc": true
+        },
+        {
+          "name": "addRecord",
+          "hasJSDoc": true
+        }
+      ]
+    },
+    {
+      "file": "preferences-page.js",
+      "totalFunctions": 5,
+      "functionsWithJSDoc": 5,
+      "functionsWithoutJSDoc": 0,
+      "coveragePercentage": "100.00",
+      "functions": [
+        {
+          "name": "loadAccountsForPreferences",
+          "hasJSDoc": true
+        },
+        {
+          "name": "switchActiveProfile",
+          "hasJSDoc": true
+        },
+        {
+          "name": "createNewProfile",
+          "hasJSDoc": true
+        },
+        {
+          "name": "copyDetailedLogLocal",
+          "hasJSDoc": true
+        },
+        {
+          "name": "initializePreferencesPage",
+          "hasJSDoc": true
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total": 500,
+    "withJSDoc": 417,
+    "withoutJSDoc": 83,
+    "coveragePercentage": "83.40"
+  },
+  "generatedAt": "2025-10-26T17:42:37.359Z",
+  "version": "1.0.0"
+}

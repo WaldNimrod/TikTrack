@@ -51,7 +51,7 @@ class ImportOrchestrator:
         """
         self.db_session = db_session
         self.normalization_service = NormalizationService()
-        self.validation_service = ValidationService()
+        self.validation_service = ValidationService(db_session)
         self.duplicate_detection_service = DuplicateDetectionService(db_session)
         self.report_generator = ImportReportGenerator()
         
@@ -240,9 +240,11 @@ class ImportOrchestrator:
             )
             
             # Validate records
+            logger.info(f"🔍 Starting validation for {len(normalization_result['normalized_records'])} records")
             validation_result = self.validation_service.validate_records(
                 normalization_result['normalized_records']
             )
+            logger.info(f"📊 Validation result: {validation_result.get('missing_tickers', 'NOT_FOUND')}")
             
             # Detect duplicates
             duplicate_result = self.duplicate_detection_service.detect_duplicates(
@@ -260,6 +262,7 @@ class ImportOrchestrator:
                 'clean_records': len(duplicate_result['clean_records']),
                 'duplicate_records': len(duplicate_result['within_file_duplicates']) + 
                                    len(duplicate_result['system_duplicates']),
+                'missing_tickers': validation_result['missing_tickers'],
                 'normalization_errors': normalization_result['errors'],
                 'validation_errors': validation_result['validation_errors'],
                 'duplicate_details': duplicate_result,
@@ -267,23 +270,37 @@ class ImportOrchestrator:
             }
             
             # Save only essential summary data to database (not detailed results)
+            missing_tickers_data = validation_result.get('missing_tickers', [])
+            logger.info(f"🔍 Missing tickers from validation_result: {missing_tickers_data}")
+            
             summary_data = {
                 'total_records': session.total_records,
                 'valid_records': len(validation_result['valid_records']),
                 'invalid_records': len(validation_result['invalid_records']),
                 'duplicate_records': len(duplicate_result['within_file_duplicates']) + 
                                    len(duplicate_result['system_duplicates']),
+                'missing_tickers': missing_tickers_data,
                 'analysis_timestamp': datetime.now().isoformat(),
                 # Add detailed data for step 4
                 'normalization_errors': normalization_result.get('errors', []),
                 'validation_errors': validation_result.get('errors', []),
                 'duplicate_details': duplicate_result
             }
+            logger.info(f"📊 Summary data before saving: missing_tickers={summary_data.get('missing_tickers')}")
             
             # Update session with minimal data
             session.add_summary_data(summary_data)
             session.update_status('ready')
             self.db_session.commit()
+            
+            # Save to advanced cache service
+            try:
+                from services.advanced_cache_service import advanced_cache_service
+                cache_key = f"import_session_{session_id}_summary"
+                advanced_cache_service.set(cache_key, summary_data, ttl=3600)  # 1 hour TTL
+                logger.info(f"✅ Saved summary_data to advanced_cache_service: {cache_key}")
+            except Exception as e:
+                logger.error(f"❌ Failed to save to advanced_cache_service: {str(e)}")
             
             # Update live report with analysis results
             user_id = 1  # TODO: Get actual user ID from session/auth
@@ -361,7 +378,7 @@ class ImportOrchestrator:
             validation_result = self.validation_service.validate_records(
                 normalization_result['normalized_records']
             )
-            logger.info(f"📊 Valid: {len(validation_result['valid_records'])}, Invalid: {len(validation_result['invalid_records'])}")
+            logger.info(f"📊 Valid: {len(validation_result['valid_records'])}, Invalid: {len(validation_result['invalid_records'])}, Missing tickers: {len(validation_result.get('missing_tickers', []))}")
             
             # Detect duplicates
             logger.info("🔄 Detecting duplicates...")
@@ -466,7 +483,8 @@ class ImportOrchestrator:
                     'total_records': total_records,
                     'records_to_import': len(clean_records),
                     'records_to_skip': len(records_to_skip),
-                    'import_rate': (len(clean_records) / total_records * 100) if total_records > 0 else 0
+                    'import_rate': (len(clean_records) / total_records * 100) if total_records > 0 else 0,
+                    'missing_tickers': validation_result.get('missing_tickers', [])
                 }
             }
             
@@ -529,23 +547,74 @@ class ImportOrchestrator:
             imported_count = 0
             import_errors = []
             
-            for record_data in records_to_import:
+            # Enrich records with ticker_ids
+            logger.info(f"🔄 Enriching {len(records_to_import)} records with ticker_ids...")
+            from services.ticker_service import TickerService
+            enriched_records = TickerService.enrich_records_with_ticker_ids(
+                self.db_session, records_to_import
+            )
+            logger.info(f"✅ Enriched {len(enriched_records)} records with ticker_ids")
+            
+            # Group executions by ticker_id for trade creation
+            from collections import defaultdict
+            executions_by_ticker = defaultdict(list)
+            
+            for record_data in enriched_records:
+                ticker_id = record_data.get('ticker_id')
+                if ticker_id:
+                    executions_by_ticker[ticker_id].append(record_data)
+                else:
+                    logger.warning(f"⚠️ Skipping record without ticker_id: {record_data.get('symbol')}")
+            
+            logger.info(f"📊 Grouped executions into {len(executions_by_ticker)} tickers")
+            
+            # Create trades and executions
+            for ticker_id, executions in executions_by_ticker.items():
                 try:
-                    # Create execution record
-                    # Note: This is a simplified version - in reality you'd need to:
-                    # 1. Find or create the appropriate trade
-                    # 2. Create the execution with proper relationships
-                    # 3. Handle ticker creation if needed
+                    # Create or find trade for this ticker
+                    from models.trade import Trade
+                    from models.execution import Execution
                     
-                    # For now, we'll just count successful imports
-                    imported_count += 1
+                    # Create a single trade for all executions of this ticker
+                    trade = Trade(
+                        ticker_id=ticker_id,
+                        account_id=session.account_id,
+                        status='active',
+                        created_at=datetime.now(),
+                        updated_at=datetime.now()
+                    )
+                    self.db_session.add(trade)
+                    self.db_session.flush()  # Get the trade ID
+                    
+                    # Create executions for this trade
+                    for execution_data in executions:
+                        execution = Execution(
+                            trade_id=trade.id,
+                            action=execution_data.get('action'),
+                            quantity=execution_data.get('quantity'),
+                            price=execution_data.get('price'),
+                            fee=execution_data.get('fee', 0),
+                            execution_date=execution_data.get('date'),
+                            external_id=execution_data.get('external_id'),
+                            created_at=datetime.now(),
+                            updated_at=datetime.now()
+                        )
+                        self.db_session.add(execution)
+                        imported_count += 1
+                    
+                    logger.info(f"✅ Created trade {trade.id} with {len(executions)} executions for ticker_id {ticker_id}")
                     
                 except Exception as e:
                     import_errors.append({
-                        'record': record_data,
+                        'ticker_id': ticker_id,
+                        'executions_count': len(executions),
                         'error': str(e)
                     })
-                    logger.error(f"Failed to import record: {str(e)}")
+                    logger.error(f"❌ Failed to create trade for ticker_id {ticker_id}: {str(e)}")
+            
+            # Commit all changes
+            self.db_session.commit()
+            logger.info(f"✅ Successfully imported {imported_count} executions")
             
             # Update session
             session.imported_records = imported_count

@@ -19,6 +19,35 @@
 
 // ===== IMPORT MODAL FUNCTIONS =====
 
+/**
+ * Close import user data modal
+ */
+function closeImportUserDataModal() {
+    console.log('Closing import user data modal...');
+    
+    // Hide modal
+    document.getElementById('import-user-data-modal').style.display = 'none';
+    
+    // Reset modal state
+    resetImportModal();
+}
+
+/**
+ * Open import user data modal
+ */
+function openImportUserDataModal() {
+    console.log('Opening import user data modal...');
+    
+    // Reset modal state
+    resetImportModal();
+    
+    // Show modal
+    document.getElementById('import-user-data-modal').style.display = 'block';
+    
+    // Initialize modal
+    initializeImportModal();
+}
+
 // Global state for import modal
 let importCurrentStep = 1;
 let importSelectedFile = null;
@@ -561,7 +590,7 @@ async function generateImportPreview() {
  */
 function displayImportAnalysisResults(results) {
     document.getElementById('import-valid-count').textContent = results.valid_records || 0;
-    document.getElementById('import-missing-tickers-count').textContent = 0; // TODO: Add missing tickers logic
+    document.getElementById('import-missing-tickers-count').textContent = results.missing_tickers ? results.missing_tickers.length : 0;
     document.getElementById('import-duplicates-count').textContent = results.duplicate_records || 0;
     document.getElementById('import-errors-count').textContent = results.invalid_records || 0;
     
@@ -581,14 +610,112 @@ function displayImportAnalysisResults(results) {
 }
 
 /**
+ * Add a missing ticker to the system
+ */
+async function addMissingTicker(symbol) {
+    console.log(`Adding missing ticker: ${symbol}`);
+    
+    // Open mini-modal for adding ticker
+    showAddTickerModal(symbol);
+}
+
+/**
+ * Show add ticker modal with pre-filled symbol
+ */
+function showAddTickerModal(symbol) {
+    // Create modal HTML if it doesn't exist
+    let modal = document.getElementById('add-ticker-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'add-ticker-modal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>הוסף טיקר חדש</h4>
+                    <button class="close-btn" onclick="closeAddTickerModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-ticker-form">
+                        <div class="form-group">
+                            <label for="addTickerSymbol">סמל הטיקר:</label>
+                            <input type="text" id="addTickerSymbol" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="addTickerName">שם הטיקר:</label>
+                            <input type="text" id="addTickerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="addTickerType">סוג הטיקר:</label>
+                            <select id="addTickerType" required>
+                                <option value="">בחר סוג</option>
+                                <option value="stock">מניה</option>
+                                <option value="etf">ETF</option>
+                                <option value="bond">אג"ח</option>
+                                <option value="crypto">קריפטו</option>
+                                <option value="commodity">סחורה</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="addTickerCurrency">מטבע:</label>
+                            <select id="addTickerCurrency" required>
+                                <option value="">בחר מטבע</option>
+                                <option value="1">USD</option>
+                                <option value="2">EUR</option>
+                                <option value="3">ILS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="addTickerRemarks">הערות:</label>
+                            <textarea id="addTickerRemarks" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeAddTickerModal()">ביטול</button>
+                    <button class="btn btn-primary" onclick="saveMissingTicker()">שמור טיקר</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    // Pre-fill symbol
+    document.getElementById('addTickerSymbol').value = symbol;
+    
+    // Show modal
+    modal.style.display = 'block';
+}
+
+/**
+ * Close add ticker modal
+ */
+function closeAddTickerModal() {
+    document.getElementById('add-ticker-modal').style.display = 'none';
+}
+
+/**
+ * Save missing ticker
+ */
+async function saveMissingTicker() {
+    // Use existing saveTicker function from tickers.js
+    if (window.saveTicker) {
+        await window.saveTicker();
+        closeAddTickerModal();
+        
+        // Refresh missing tickers list
+        if (importAnalysisResults) {
+            displayImportProblems(importAnalysisResults);
+        }
+    } else {
+        console.error('saveTicker function not available');
+        alert('שגיאה: פונקציית שמירת הטיקר לא זמינה');
+    }
+}
+
+/**
  * Add missing tickers functionality
  */
-function addMissingTickers() {
-    // TODO: Implement missing tickers addition
-    console.log('Adding missing tickers...');
-    // For now, just show a message
-    alert('פונקציונליות הוספת טיקרים תהיה זמינה בקרוב');
-}
 
 
 /**
@@ -623,6 +750,7 @@ async function loadImportAnalysisResults() {
                 valid_records: previewData.summary.records_to_import || 0,
                 invalid_records: invalidRecords.length,
                 duplicate_records: duplicateRecords.length,
+                missing_tickers: previewData.summary.missing_tickers || [],
                 normalization_errors: [],
                 validation_errors: [],
                 duplicate_details: {
@@ -725,11 +853,16 @@ function displayImportProblems(results) {
     const missingTickersSection = document.getElementById('import-missing-tickers-section');
     const missingTickersList = document.getElementById('import-missing-tickers-list');
     
-    // For now, show a placeholder since missing tickers logic is not implemented yet
-    if (false) { // TODO: Implement missing tickers detection
+    // Show missing tickers section if there are missing tickers
+    if (results.missing_tickers && results.missing_tickers.length > 0) {
         missingTickersSection.style.display = 'block';
         missingTickersList.innerHTML = results.missing_tickers.map(ticker => 
-            `<div class="missing-ticker-item">${ticker}</div>`
+            `<div class="missing-ticker-item">
+                <span class="ticker-symbol">${ticker}</span>
+                <button class="btn btn-sm btn-primary" onclick="addMissingTicker('${ticker}')">
+                    הוסף למערכת
+                </button>
+            </div>`
         ).join('');
     } else {
         missingTickersSection.style.display = 'none';
@@ -995,6 +1128,20 @@ function displayDetailedErrors(results) {
             errorHtml += error.errors.join(', ');
             errorHtml += `</div>`;
         });
+        errorHtml += '</div></div>';
+    }
+    
+    // Missing tickers
+    if (results.missing_tickers && results.missing_tickers.length > 0) {
+        errorHtml += '<div class="error-section">';
+        errorHtml += '<h4>טיקרים חסרים במערכת:</h4>';
+        errorHtml += '<div class="error-list">';
+        errorHtml += '<div class="error-item warning">';
+        errorHtml += `<strong>רשימת טיקרים:</strong> ${results.missing_tickers.join(', ')}`;
+        errorHtml += '</div>';
+        errorHtml += '<div class="error-item info">';
+        errorHtml += 'הטיקרים הללו לא קיימים במערכת. ניתן להוסיף אותם בשלב 4 או לדלג על הרשומות הרלוונטיות.';
+        errorHtml += '</div>';
         errorHtml += '</div></div>';
     }
     

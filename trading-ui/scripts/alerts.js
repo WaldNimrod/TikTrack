@@ -237,28 +237,32 @@ function getDemoAlertsData() {
         condition: 'מחיר יותר מ 150',
         condition_attribute: 'price',
         condition_operator: 'more_than',
-      condition_number: 150,
-      message: 'מחיר AAPL עלה מעל 150$',
-      created_at: '2025-01-09T10:00:00Z',
-      is_triggered: false
-    },
-    {
-      id: 2,
-      title: 'התראה על שינוי TSLA',
-      status: 'closed',
-      related_type_id: 4, // טיקר
-      related_id: 2, // מזהה טיקר TSLA
-      related_object_id: 2, // מזהה הטיקר הספציפי
-      ticker_id: 2, // מזהה הטיקר
-      condition: 'שינוי יותר מ 5%',
-      condition_attribute: 'change',
-      condition_operator: 'more_than',
-      condition_number: 5,
-      message: 'שינוי TSLA מעל 5%',
-      created_at: '2025-01-09T09:30:00Z',
-      is_triggered: true
-    }
-  ];
+        condition_number: 150,
+        message: 'מחיר AAPL עלה מעל 150$',
+        created_at: '2025-01-09T10:00:00Z',
+        is_triggered: false
+      },
+      {
+        id: 2,
+        title: 'התראה על שינוי TSLA',
+        status: 'closed',
+        related_type_id: 4, // טיקר
+        related_id: 2, // מזהה טיקר TSLA
+        related_object_id: 2, // מזהה הטיקר הספציפי
+        ticker_id: 2, // מזהה הטיקר
+        condition: 'שינוי יותר מ 5%',
+        condition_attribute: 'change',
+        condition_operator: 'more_than',
+        condition_number: 5,
+        message: 'שינוי TSLA מעל 5%',
+        created_at: '2025-01-09T09:30:00Z',
+        is_triggered: true
+      }
+    ];
+  } catch (error) {
+    window.Logger.error('שגיאה בקבלת נתוני דמו להתראות:', error, { page: "alerts" });
+    return [];
+  }
 }
 
 /**
@@ -327,7 +331,6 @@ async function loadAlertsData() {
     
 
     return alertsData;
-
   } catch (error) {
     window.Logger.error('שגיאה בטעינת התראות:', error, { page: "alerts" });
     // שימוש בנתוני דמו במקרה של שגיאה
@@ -345,14 +348,6 @@ async function loadAlertsData() {
     }
     
     return alertsData;
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בקבלת נתוני דמו להתראות:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בקבלת נתוני דמו להתראות', error.message);
-    }
-    return [];
   }
 }
 
@@ -977,33 +972,39 @@ function clearAlertValidation() {
       'alertMessage',
     ];
 
-  addFormFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.classList.remove('is-invalid');
-      field.style.borderColor = '';
-      field.style.boxShadow = '';
-    }
-  });
+    addFormFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.classList.remove('is-invalid');
+        field.style.borderColor = '';
+        field.style.boxShadow = '';
+      }
+    });
 
-  // ניקוי ולידציה למודל עריכה
-  const editFormFields = [
-    'editAlertRelationType',
-    'editAlertRelatedObjectSelect',
-    'editConditionAttribute',
-    'editConditionOperator',
-    'editConditionNumber',
-    'editAlertMessage',
-  ];
+    // ניקוי ולידציה למודל עריכה
+    const editFormFields = [
+      'editAlertRelationType',
+      'editAlertRelatedObjectSelect',
+      'editConditionAttribute',
+      'editConditionOperator',
+      'editConditionNumber',
+      'editAlertMessage',
+    ];
 
-  editFormFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.classList.remove('is-invalid');
-      field.style.borderColor = '';
-      field.style.boxShadow = '';
+    editFormFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.classList.remove('is-invalid');
+        field.style.borderColor = '';
+        field.style.boxShadow = '';
+      }
+    });
+  } catch (error) {
+    window.Logger.error('שגיאה בניקוי ולידציה של התראות:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בניקוי ולידציה של התראות', error.message);
     }
-  });
+  }
 }
 
 /**
@@ -1083,13 +1084,6 @@ async function loadModalData() {
       });
     } catch (fallbackError) {
       window.Logger.error('שגיאה ב-fallback:', fallbackError, { page: "alerts" });
-    }
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בניקוי ולידציה של התראות:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בניקוי ולידציה של התראות', error.message);
     }
   }
 }

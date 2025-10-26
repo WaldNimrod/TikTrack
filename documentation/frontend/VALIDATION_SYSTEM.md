@@ -1,7 +1,7 @@
 # מערכת ולידציה - TikTrack
 
 ## 📅 תאריך עדכון
-29 באוגוסט 2025
+12 בינואר 2025
 
 ## 🎯 מטרת הדוקומנטציה
 תיעוד מדויק של מערכת הולידציה, כולל פונקציות זמינות, קריטריונים לבדיקה, ודרך הקריאה הנכונה לכל פונקציה.
@@ -131,6 +131,85 @@ const isValid = window.validateField('currencyCode', value, {
     pattern: /^[A-Z]{3}$/
 });
 ```
+
+### **3. פונקציות ולידציה מתקדמות (גרסה 3.0)**
+
+#### **`window.validateDateRange(startFieldId, endFieldId, errorMessage)`**
+**תיאור**: ולידציה בין שדות תאריך
+**פרמטרים**:
+- `startFieldId` (string) - מזהה שדה התאריך הראשון
+- `endFieldId` (string) - מזהה שדה התאריך השני
+- `errorMessage` (string) - הודעת שגיאה מותאמת אישית
+
+**תכונות**:
+- בודק שהתאריך השני לא לפני הראשון
+- מציג הודעת שגיאה מותאמת
+- מחזיר true/false
+
+**דוגמה**:
+```javascript
+const isValid = window.validateDateRange('openedAt', 'closedAt', 'תאריך סגירה חייב להיות אחרי תאריך פתיחה');
+```
+
+#### **`window.validateEntityForm(formId, fieldConfigs)`**
+**תיאור**: ולידציה מקיפה לטפסי CRUD נפוצים
+**פרמטרים**:
+- `formId` (string) - מזהה הטופס
+- `fieldConfigs` (array) - מערך של קונפיגורציות שדות
+
+**תכונות**:
+- ולידציה מקיפה של כל השדות בטופס
+- מחזיר אובייקט עם תוצאות מפורטות
+- מציג הודעות שגיאה מפורטות
+
+**דוגמה**:
+```javascript
+const fieldConfigs = [
+  {id: 'name', name: 'שם', rules: {required: true, minLength: 2}},
+  {id: 'email', name: 'אימייל', rules: {required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/}},
+  {id: 'age', name: 'גיל', rules: {required: false, min: 0, max: 120}}
+];
+
+const result = window.validateEntityForm('userForm', fieldConfigs);
+if (!result.isValid) {
+  console.log('שגיאות:', result.errorMessages);
+}
+```
+
+#### **`window.validateWithConfirmation(title, message, validationFn)`**
+**תיאור**: ולידציה עם אישור משתמש
+**פרמטרים**:
+- `title` (string) - כותרת האישור
+- `message` (string) - הודעת האישור
+- `validationFn` (function) - פונקציית ולידציה
+
+**תכונות**:
+- מציג דיאלוג אישור למשתמש
+- מבצע ולידציה רק אחרי אישור
+- מחזיר תוצאות הולידציה
+
+**דוגמה**:
+```javascript
+const result = await window.validateWithConfirmation(
+  'אישור מחיקה',
+  'האם אתה בטוח שברצונך למחוק את הפריט?',
+  () => window.validateEntityForm('deleteForm', fieldConfigs)
+);
+```
+
+## 📋 מתי להשתמש בכל פונקציה
+
+| פונקציה | מתי להשתמש | דוגמה |
+|---------|------------|-------|
+| `window.validateField()` | ולידציה של שדה בודד | בדיקת שם, אימייל, מספר |
+| `window.validateDateRange()` | ולידציה בין שדות תאריך | תאריך פתיחה ≤ תאריך סגירה |
+| `window.validateEntityForm()` | ולידציה מקיפה של טופס | טפסי CRUD עם מספר שדות |
+| `window.validateWithConfirmation()` | ולידציה עם אישור משתמש | מחיקה, פעולות הרסניות |
+| `window.showValidationWarning()` | התראה מהירה | שגיאות בזמן אמת |
+| `window.showFieldError()` | סימון שדה ספציפי | שגיאות ולידציה |
+| `window.showFieldSuccess()` | סימון שדה מוצלח | אישור תקינות |
+| `window.clearFieldValidation()` | ניקוי שדה בודד | איפוס שדה |
+| `window.clearValidation()` | ניקוי כל הטופס | פתיחת מודל חדש |
 
 ## 🎨 עיצוב ולידציה
 

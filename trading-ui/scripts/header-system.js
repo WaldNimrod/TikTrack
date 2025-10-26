@@ -2080,4 +2080,3 @@ window.testCacheClearingFunctions = function() {
 };
 
 window.Logger.info('✅ Header System v6.0.0 loaded successfully!', { page: "header-system" });
-

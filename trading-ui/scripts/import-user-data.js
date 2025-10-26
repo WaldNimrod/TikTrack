@@ -102,6 +102,10 @@ if (!document.getElementById('import-ticker-button-styles')) {
 
 /**
  * Close import user data modal
+ * Hides the modal and cleans up state
+ * 
+ * @function closeImportUserDataModal
+ * @returns {void}
  */
 function closeImportUserDataModal() {
     console.log('Closing import user data modal...');
@@ -115,6 +119,10 @@ function closeImportUserDataModal() {
 
 /**
  * Open import user data modal
+ * Shows the modal and initializes the import process
+ * 
+ * @function openImportUserDataModal
+ * @returns {void}
  */
 function openImportUserDataModal() {
     console.log('Opening import user data modal...');
@@ -248,7 +256,11 @@ function startNewImport() {
 }
 
 /**
- * Reset import modal
+ * Reset import modal to initial state
+ * Clears all state variables and resets UI to step 1
+ * 
+ * @function resetImportModal
+ * @returns {void}
  */
 function resetImportModal() {
     importCurrentStep = 1;
@@ -278,7 +290,11 @@ function resetImportModal() {
 }
 
 /**
- * Setup import event listeners
+ * Setup event listeners for import modal
+ * Attaches event handlers for file upload, account selection, and navigation
+ * 
+ * @function setupImportEventListeners
+ * @returns {void}
  */
 function setupImportEventListeners() {
     // Remove existing listeners first to prevent duplicates
@@ -310,7 +326,11 @@ function setupImportEventListeners() {
 }
 
 /**
- * Remove import event listeners
+ * Remove event listeners from import modal
+ * Cleans up event handlers to prevent memory leaks
+ * 
+ * @function removeImportEventListeners
+ * @returns {void}
  */
 function removeImportEventListeners() {
     // File input change
@@ -561,7 +581,12 @@ function handleImportAccountSelect(event) {
 }
 
 /**
- * Load trading accounts
+ * Load trading accounts for import account selection
+ * Populates the account dropdown with available trading accounts
+ * 
+ * @function loadImportTradingAccounts
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadImportTradingAccounts() {
     try {
@@ -776,7 +801,12 @@ async function processImportCurrentStep() {
 }
 
 /**
- * Analyze file
+ * Analyze uploaded file
+ * Sends file to backend for analysis and stores results
+ * 
+ * @function analyzeImportFile
+ * @async
+ * @returns {Promise<void>}
  */
 async function analyzeImportFile() {
     if (!importSelectedFile || !importSelectedAccount) {
@@ -835,7 +865,12 @@ async function analyzeImportFile() {
 }
 
 /**
- * Generate preview
+ * Generate preview data for step 5
+ * Requests preview data from backend and displays it
+ * 
+ * @function generateImportPreview
+ * @async
+ * @returns {Promise<void>}
  */
 async function generateImportPreview() {
     if (!importSessionId) {
@@ -1028,13 +1063,22 @@ function showAddTickerModal(symbol) {
 
 /**
  * Close add ticker modal
+ * Hides the modal for adding missing tickers
+ * 
+ * @function closeAddTickerModal
+ * @returns {void}
  */
 function closeAddTickerModal() {
     document.getElementById('add-ticker-modal').style.display = 'none';
 }
 
 /**
- * Save missing ticker
+ * Save missing ticker to database
+ * Creates new ticker record and updates UI
+ * 
+ * @function saveMissingTicker
+ * @async
+ * @returns {Promise<void>}
  */
 async function saveMissingTicker() {
     // Get the ticker symbol from the modal BEFORE calling saveTicker
@@ -1147,6 +1191,10 @@ function updateTickerButtonStatus(tickerSymbol, status) {
 
 /**
  * Update all ticker buttons based on current status
+ * Refreshes button states for all missing tickers
+ * 
+ * @function updateAllTickerButtons
+ * @returns {void}
  */
 function updateAllTickerButtons() {
     if (!importAnalysisResults || !importAnalysisResults.missing_tickers) {
@@ -1168,6 +1216,11 @@ function updateAllTickerButtons() {
 
 /**
  * Load analysis results from server for step 4
+ * Fetches detailed analysis results including problems and existing records
+ * 
+ * @function loadImportAnalysisResults
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadImportAnalysisResults() {
     if (!importSessionId) {
@@ -1274,6 +1327,11 @@ async function loadImportAnalysisResults() {
 
 /**
  * Load preview data from server for step 5
+ * Fetches preview data including records to import and skip
+ * 
+ * @function loadImportPreviewData
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadImportPreviewData() {
     if (!importSessionId) {
@@ -1304,6 +1362,14 @@ async function loadImportPreviewData() {
 
 /**
  * Display problems in step 4
+ * Shows missing tickers, duplicates, and existing records with resolution options
+ * 
+ * @function displayImportProblems
+ * @param {Object} results - Problems data object
+ * @param {Array} results.missing_tickers - Array of missing ticker symbols
+ * @param {Array} results.duplicate_details - Duplicate records details
+ * @param {Array} results.existing_records - Existing records details
+ * @returns {void}
  */
 function displayImportProblems(results) {
     console.log('🔍 Displaying problems with results:', results);
@@ -1564,7 +1630,13 @@ function displayImportProblems(results) {
 }
 
 /**
- * Display existing records section
+ * Display existing records section in step 4
+ * Shows records that already exist in the system with "Import Anyway" buttons
+ * 
+ * @function displayExistingRecords
+ * @param {Object} results - Results object containing existing records
+ * @param {Array} results.existing_records - Array of existing record objects
+ * @returns {void}
  */
 function displayExistingRecords(results) {
     const existingSection = document.getElementById('import-existing-section');
@@ -1615,6 +1687,12 @@ function displayExistingRecords(results) {
 
 /**
  * Import existing record (user's choice to import despite existing)
+ * Sends request to backend to allow importing an existing record
+ * 
+ * @function importExistingRecord
+ * @param {number} recordIndex - Index of the record to import
+ * @async
+ * @returns {Promise<void>}
  */
 async function importExistingRecord(recordIndex) {
     try {
@@ -1723,6 +1801,10 @@ function displayDetailedErrors(results) {
 
 /**
  * Display final summary for step 6
+ * Shows import completion summary with file name and statistics
+ * 
+ * @function displayImportFinalSummary
+ * @returns {void}
  */
 function displayImportFinalSummary() {
     // Display file name
@@ -1753,7 +1835,16 @@ function displayImportFinalSummary() {
 }
 
 /**
- * Display preview summary
+ * Display preview summary for step 5
+ * Shows import statistics and record counts
+ * 
+ * @function displayImportPreviewSummary
+ * @param {Object} data - Preview data object
+ * @param {Object} data.summary - Summary statistics
+ * @param {number} data.summary.total_records - Total records count
+ * @param {number} data.summary.records_to_import - Records to import count
+ * @param {number} data.summary.records_to_skip - Records to skip count
+ * @returns {void}
  */
 function displayImportPreviewSummary(data) {
     console.log('📊 Preview Summary Data:', data);
@@ -1771,7 +1862,11 @@ function displayImportPreviewSummary(data) {
 }
 
 /**
- * Show preview modal
+ * Show preview modal with import data
+ * Displays modal with records to import and skip
+ * 
+ * @function showImportPreviewModal
+ * @returns {void}
  */
 function showImportPreviewModal() {
     if (!importPreviewData) {
@@ -1793,6 +1888,10 @@ function showImportPreviewModal() {
 
 /**
  * Close preview modal
+ * Hides the preview modal
+ * 
+ * @function closeImportPreviewModal
+ * @returns {void}
  */
 function closeImportPreviewModal() {
     document.getElementById('import-preview-modal').style.display = 'none';
@@ -1849,7 +1948,14 @@ function populateImportPreviewTable(type, records) {
 }
 
 /**
- * Show confirmation modal
+ * Show confirmation modal for user decisions
+ * Displays a custom modal for confirming actions like importing existing records
+ * 
+ * @function showConfirmationModal
+ * @param {string} title - Modal title
+ * @param {string} message - Modal message content
+ * @param {string} [type='warning'] - Modal type (warning, error, info)
+ * @returns {Promise<boolean>} Promise that resolves to true if confirmed, false if cancelled
  */
 function showConfirmationModal(title, message, type = 'warning') {
     return new Promise((resolve) => {
@@ -1876,7 +1982,12 @@ function showConfirmationModal(title, message, type = 'warning') {
 }
 
 /**
- * Close confirmation modal
+ * Close confirmation modal and resolve promise
+ * Removes modal from DOM and resolves the confirmation promise
+ * 
+ * @function closeConfirmationModal
+ * @param {boolean} confirmed - Whether user confirmed the action
+ * @returns {void}
  */
 function closeConfirmationModal(confirmed) {
     const overlay = document.getElementById('confirmationModalOverlay');
@@ -1890,7 +2001,12 @@ function closeConfirmationModal(confirmed) {
 }
 
 /**
- * Execute import
+ * Execute the final import process
+ * Sends request to backend to execute the import with confirmation for existing records
+ * 
+ * @function executeImport
+ * @async
+ * @returns {Promise<void>}
  */
 async function executeImport() {
     if (!importSessionId) {

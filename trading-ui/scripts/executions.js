@@ -633,82 +633,23 @@ function validateExecutionExternalId(input) {
 /**
  * ולידציה של תאריך (date)
  */
+/**
+ * ולידציה של תאריך (date)
+ * @deprecated השתמש ב-window.validateField() במקום
+ */
 function validateExecutionDate(input) {
-  try {
-    const date = input.value.trim();
-    const errorElement = document.getElementById(input.id + 'Error');
-
-    if (!date) {
-      if (window.showValidationWarning) {
-        window.showValidationWarning(input.id, 'תאריך עסקה הוא שדה חובה (לפי אילוץ NOT NULL)');
-      }
-      return false;
-    }
-
-    const dateObj = new Date(date);
-    if (isNaN(dateObj.getTime())) {
-      if (window.showValidationWarning) {
-        window.showValidationWarning(input.id, 'תאריך לא תקין');
-    }
-    return false;
-  }
-
-  const today = new Date();
-  const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-
-  if (dateObj > maxDate) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'תאריך לא יכול להיות יותר משנה קדימה');
-    }
-    return false;
-  }
-
-  const minDate = new Date(2000, 0, 1);
-  if (dateObj < minDate) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'תאריך לא יכול להיות לפני שנת 2000');
-    }
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בוולידציה של תאריך:', error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בוולידציה של תאריך', error.message);
-    }
-    return false;
-  }
+  return window.validateField(input, {required: true});
 }
 
 /**
  * ולידציה של סוג עסקה (action)
  */
+/**
+ * ולידציה של סוג עסקה (action)
+ * @deprecated השתמש ב-window.validateField() במקום
+ */
 function validateExecutionType(input) {
-  try {
-    const type = input.value.trim();
-    const errorElement = document.getElementById(input.id + 'Error');
-
-    if (!type) {
-      return false;
-    }
-
-    // בדיקה שהערך הוא אחד מהערכים המותרים בבסיס הנתונים (ENUM: buy, sale)
-    if (type !== 'buy' && type !== 'sale') {
-      return false;
-    }
-
-    clearFieldError(input, errorElement);
-    return true;
-  } catch (error) {
-    window.Logger.error('שגיאה בוולידציה של סוג עסקה:', error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בוולידציה של סוג עסקה', error.message);
-    }
-    return false;
-  }
+  return window.validateField(input, {required: true, enum: ['buy', 'sale']});
 }
 
 /**

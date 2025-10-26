@@ -1066,40 +1066,6 @@ function validateTradingAccountData(tradingAccountData) {
   
   return {isValid: result.isValid, message: result.errorMessages.join(', ')};
 }
-    const numValue = parseFloat(totalValue);
-    if (isNaN(numValue)) {
-      return { isValid: false, message: 'ערך כולל חייב להיות מספר תקין' };
-    }
-    if (numValue < -1000000) {
-      return { isValid: false, message: 'ערך כולל נמוך מדי (מינימום -1,000,000)' };
-    }
-    if (numValue > 100000000) {
-      return { isValid: false, message: 'ערך כולל גבוה מדי (מקסימום 100,000,000)' };
-    }
-  }
-
-  // בדיקת רווח/הפסד כולל
-  const totalPl = tradingAccountData.total_pl;
-  if (totalPl !== null && totalPl !== undefined && totalPl !== '') {
-    const numPl = parseFloat(totalPl);
-    if (isNaN(numPl)) {
-      return { isValid: false, message: 'רווח/הפסד כולל חייב להיות מספר תקין' };
-    }
-    if (numPl < -1000000) {
-      return { isValid: false, message: 'רווח/הפסד כולל נמוך מדי (מינימום -1,000,000)' };
-    }
-    if (numPl > 100000000) {
-      return { isValid: false, message: 'רווח/הפסד כולל גבוה מדי (מקסימום 100,000,000)' };
-    }
-  }
-
-  // בדיקת הערות
-  if (tradingAccountData.notes && tradingAccountData.notes.length > 1000) {
-    return { isValid: false, message: 'הערות ארוכות מדי (מקסימום 1,000 תווים)' };
-  }
-
-  return { isValid: true, message: '' };
-}
 
 /**
  * הצגת הודעת שגיאה בטופס

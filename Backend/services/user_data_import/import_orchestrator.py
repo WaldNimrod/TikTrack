@@ -600,10 +600,9 @@ class ImportOrchestrator:
                     # Create a single trade for all executions of this ticker
                     trade = Trade(
                         ticker_id=ticker_id,
-                        account_id=session.account_id,
+                        trading_account_id=session.account_id,
                         status='active',
-                        created_at=datetime.now(),
-                        updated_at=datetime.now()
+                        created_at=datetime.now()
                     )
                     self.db_session.add(trade)
                     self.db_session.flush()  # Get the trade ID
@@ -618,8 +617,7 @@ class ImportOrchestrator:
                             fee=execution_data.get('fee', 0),
                             execution_date=execution_data.get('date'),
                             external_id=execution_data.get('external_id'),
-                            created_at=datetime.now(),
-                            updated_at=datetime.now()
+                            created_at=datetime.now()
                         )
                         self.db_session.add(execution)
                         imported_count += 1

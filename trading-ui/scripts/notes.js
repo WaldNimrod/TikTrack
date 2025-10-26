@@ -1205,37 +1205,6 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
   
   return result.isValid;
 }
-    isValid = false;
-  } else if (isNaN(parseInt(relatedId)) || parseInt(relatedId) <= 0) {
-    window.showValidationWarning('relatedObjectError', 'מזהה אובייקט לא תקין');
-    isValid = false;
-  }
-
-  // וולידציה של קובץ מצורף (אם קיים)
-  if (attachment) {
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (attachment.size > maxSize) {
-      window.showValidationWarning('attachmentError', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
-      isValid = false;
-    }
-
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'application/pdf'];
-    if (!allowedTypes.includes(attachment.type)) {
-      window.showValidationWarning('attachmentError', 'סוג קובץ לא נתמך. מותרים: תמונות (JPG, PNG, GIF, BMP, WebP) ו-PDF בלבד');
-      isValid = false;
-    }
-  }
-
-  return isValid;
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בוולידציה של טופס הערה:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בוולידציה של טופס הערה', error.message);
-    }
-    return false;
-  }
-}
 
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 /**

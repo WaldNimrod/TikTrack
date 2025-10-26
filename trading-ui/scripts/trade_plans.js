@@ -2440,7 +2440,7 @@ async function saveTradePlanData(mode) {
       }
 
       // בדיקת ולידציה
-      if (!validateTradePlanForm()) {
+      if (!window.validateForm('addTradePlanForm')) {
         return;
       }
 

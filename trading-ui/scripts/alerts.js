@@ -1876,33 +1876,12 @@ function getAlertState(status, isTriggered) {
  * @param {string} isTriggered - מצב הפעלה
  * @returns {boolean} true אם השילוב תקין, false אחרת
  */
+/**
+ * ולידציה של שילוב סטטוס התראה
+ * @deprecated השתמש ב-window.alertService.validateAlertStatusCombination() במקום
+ */
 function validateAlertStatusCombination(status, isTriggered) {
-  try {
-    // כללים לפי הדוקומנטציה:
-    // 1. status='open' + is_triggered='false' - תקין
-    // 2. status='closed' + is_triggered='new' - תקין
-    // 3. status='closed' + is_triggered='true' - תקין
-    // 4. status='cancelled' + is_triggered='false' - תקין (תוקן!)
-
-    if (status === 'open' && isTriggered === 'false') {
-      return true;
-    }
-    if (status === 'closed' && (isTriggered === 'new' || isTriggered === 'true')) {
-      return true;
-    }
-    if (status === 'cancelled' && isTriggered === 'false') {
-      return true;
-  }
-
-  return false;
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בוולידציה של שילוב סטטוס התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בוולידציה של שילוב סטטוס התראה', error.message);
-    }
-    return false;
-  }
+  return window.alertService.validateAlertStatusCombination(status, isTriggered);
 }
 
 /**

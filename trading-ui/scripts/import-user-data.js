@@ -460,6 +460,10 @@ function previousImportStep() {
 
 /**
  * Validate current step
+ * 
+ * Note: This function is NOT part of the central validation system.
+ * It performs specific checks for the import process before proceeding to the next step.
+ * It validates file selection and account selection for the import workflow.
  */
 function validateImportCurrentStep() {
     switch (importCurrentStep) {

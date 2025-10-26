@@ -64,21 +64,22 @@
    - `showAddAlertModal` → `showAlertModal('add')`
    - `editAlert` → `showAlertModal('edit', alertId)`
 
+4. **trading_accounts.js** ✅ - איחוד דפוס Modal Functions
+   - `showTradingAccountModal(mode, tradingAccount)` - מאוחד מ-2 פונקציות
+   - `showAddTradingAccountModal` → `showTradingAccountModal('add')`
+   - `showEditTradingAccountModal` → `showTradingAccountModal('edit', tradingAccount)`
+
 #### **קבצים שנותרו לטיפול:**
-4. **trade_plans.js** ⚠️ - דפוס מורכב (פונקציה ארוכה מאוד - 300+ שורות)
+5. **trade_plans.js** ⚠️ - דפוס מורכב (פונקציה ארוכה מאוד - 300+ שורות)
    - `showAddTradePlanModal` - פונקציה מורכבת עם הרבה לוגיקה
    - `openEditTradePlanModal` - פונקציה מורכבת עם טעינת נתונים
    - **סטטוס:** דורש טיפול מיוחד עקב מורכבות
 
-5. **trading_accounts.js** ⏳ - דפוס פשוט (מועמד לאיחוד)
-   - `showAddTradingAccountModal` - פונקציה פשוטה
-   - `showEditTradingAccountModal` - פונקציה פשוטה
-
 #### **תוצאות שלב 4:**
-- **6 פונקציות נמחקו** (3 זוגות)
-- **3 פונקציות מאוחדות נוצרו**
+- **8 פונקציות נמחקו** (4 זוגות)
+- **4 פונקציות מאוחדות נוצרו**
 - **הפונקציות הישנות נשמרו כ-deprecated** לתאימות לאחור
-- **2 קבצים נותרו לטיפול** (1 מורכב, 1 פשוט)
+- **1 קובץ נותר לטיפול** (מורכב)
 
 ---
 
@@ -191,10 +192,10 @@
 
 ### ✅ הושלם
 - **15 כפילויות עם שמות זהים** נמחקו
-- **11 פונקציות מאוחדות** נוצרו
+- **15 פונקציות מאוחדות** נוצרו
 - **700+ שורות קוד** נמחקו
 - **3 דפוסים סמנטיים** אוחדו ב-executions.js
-- **1 דפוס Modal Functions** אוחד ב-tickers.js
+- **5 דפוסים Modal Functions** אוחדו ב-5 עמודים
 
 ### 🔍 זוהו לטיפול עתידי
 - **25+ דפוסים סמנטיים** בכל המערכת

@@ -2202,17 +2202,6 @@ async function showAddTradePlanModal() {
         }
       }, 100);
       
-      // Initialize conditions system
-      setTimeout(() => {
-        if (typeof window.initializeTradePlanConditions === 'function') {
-          window.Logger.info('🔧 showAddTradePlanModal: Initializing conditions system...', { page: "trade_plans" });
-          window.initializeTradePlanConditions('add');
-          window.Logger.info('✅ showAddTradePlanModal: Conditions system initialized', { page: "trade_plans" });
-        } else {
-          window.Logger.warn('⚠️ showAddTradePlanModal: initializeTradePlanConditions not available', { page: "trade_plans" });
-        }
-      }, 200);
-      
       // Check ticker input value after modal is shown
       setTimeout(() => {
         const tickerInputAfterModal = document.getElementById('ticker');

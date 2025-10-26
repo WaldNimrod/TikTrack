@@ -383,6 +383,52 @@ def update_ticker(session_id: int):
             'message': 'Failed to update ticker'
         }), 500
 
+@user_data_import_bp.route('/session/<int:session_id>/allow-existing', methods=['POST'])
+def allow_existing_record(session_id):
+    """Allow importing a record that exists in the system"""
+    try:
+        data = request.get_json()
+        record_index = data.get('record_index')
+        
+        # Get session
+        session = db.session.query(ImportSession).filter_by(id=session_id).first()
+        if not session:
+            return jsonify({'status': 'error', 'message': 'Session not found'}), 404
+        
+        # Load preview data
+        preview_data = session.preview_data
+        if not preview_data:
+            return jsonify({'status': 'error', 'message': 'No preview data'}), 400
+        
+        # Find the record in records_to_skip
+        record_to_move = None
+        new_skip_list = []
+        for skip_record in preview_data.get('records_to_skip', []):
+            if skip_record.get('record_index') == record_index and skip_record.get('reason') == 'existing_record':
+                record_to_move = skip_record['record']
+            else:
+                new_skip_list.append(skip_record)
+        
+        if record_to_move:
+            # Move to records_to_import
+            preview_data['records_to_import'].append({'record': record_to_move})
+            preview_data['records_to_skip'] = new_skip_list
+            
+            # Mark as "force import existing"
+            if 'force_import_existing' not in preview_data:
+                preview_data['force_import_existing'] = []
+            preview_data['force_import_existing'].append(record_index)
+            
+            # Save updated preview
+            session.preview_data = preview_data
+            db.session.commit()
+        
+        return jsonify({'status': 'success', 'preview_data': preview_data})
+        
+    except Exception as e:
+        logger.error(f"Error allowing existing record: {str(e)}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @user_data_import_bp.route('/session/<int:session_id>/execute', methods=['POST'])
 def execute_import(session_id: int):
     """

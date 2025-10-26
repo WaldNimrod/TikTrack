@@ -1476,7 +1476,7 @@ def run_button_tests():
     """הרצת בדיקות כפתורים"""
     try:
         # הפעלת הסקריפט
-        script_path = Path(__file__).parent.parent / 'test-crud-buttons.py'
+        script_path = Path(__file__).parent.parent / 'scripts' / 'button_system_tests.py'
         
         if not script_path.exists():
             return jsonify({
@@ -1489,8 +1489,34 @@ def run_button_tests():
             'python3', str(script_path)
         ], capture_output=True, text=True, cwd=script_path.parent)
         
+        # פרסור תוצאות
+        output_lines = result.stdout.split('\n')
+        total_tests = 0
+        passed_tests = 0
+        failed_tests = 0
+        
+        for line in output_lines:
+            if 'סה"כ בדיקות:' in line:
+                try:
+                    total_tests = int(line.split(':')[1].strip())
+                except:
+                    pass
+            elif 'עברו:' in line:
+                try:
+                    passed_tests = int(line.split(':')[1].strip())
+                except:
+                    pass
+            elif 'נכשלו:' in line:
+                try:
+                    failed_tests = int(line.split(':')[1].strip())
+                except:
+                    pass
+        
         return jsonify({
-            'status': 'success',
+            'success': True,
+            'testsRun': total_tests,
+            'passed': passed_tests,
+            'failed': failed_tests,
             'output': result.stdout,
             'error': result.stderr if result.stderr else None,
             'return_code': result.returncode,
@@ -1500,6 +1526,55 @@ def run_button_tests():
     except Exception as e:
         return jsonify({
             'error': f'שגיאה בהרצת בדיקות כפתורים: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+@app.route('/api/run-executions-crud-tests', methods=['POST'])
+def run_executions_crud_tests():
+    """הרצת בדיקות CRUD ל-Executions"""
+    try:
+        # הפעלת הסקריפט
+        script_path = Path(__file__).parent.parent / 'test_executions_crud.py'
+        
+        if not script_path.exists():
+            return jsonify({
+                'error': 'סקריפט בדיקות Executions CRUD לא נמצא',
+                'path': str(script_path)
+            }), 404
+        
+        # הרצת הסקריפט
+        result = subprocess.run([
+            'python3', str(script_path)
+        ], capture_output=True, text=True, cwd=script_path.parent)
+        
+        # פרסור תוצאות
+        output_lines = result.stdout.split('\n')
+        total_tests = 0
+        passed_tests = 0
+        failed_tests = 0
+        
+        for line in output_lines:
+            if 'TEST' in line and ':' in line:
+                total_tests += 1
+            elif '✅' in line or 'PASS' in line:
+                passed_tests += 1
+            elif '❌' in line or 'FAIL' in line:
+                failed_tests += 1
+        
+        return jsonify({
+            'success': True,
+            'testsRun': total_tests,
+            'passed': passed_tests,
+            'failed': failed_tests,
+            'output': result.stdout,
+            'error': result.stderr if result.stderr else None,
+            'return_code': result.returncode,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'שגיאה בהרצת בדיקות Executions CRUD: {str(e)}',
             'timestamp': datetime.now().isoformat()
         }), 500
 

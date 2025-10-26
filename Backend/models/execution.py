@@ -6,7 +6,9 @@ from typing import Dict, Any, Optional
 class Execution(BaseModel):
     __tablename__ = "executions"
     
-    trade_id = Column(Integer, ForeignKey('trades.id'), nullable=False)
+    ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
+    trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=True)
+    trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)  # Make nullable
     action = Column(String(20), nullable=False, default='buy')  # ENUM: buy, sale
     date = Column(DateTime, nullable=False)  # NOT NULL, must be >= trade.open_date
     quantity = Column(Float, nullable=False)  # RANGE: quantity > 0
@@ -17,6 +19,8 @@ class Execution(BaseModel):
     notes = Column(String(500), nullable=True)  # הערות על העסקה
     
     # Relationships
+    ticker = relationship("Ticker")
+    trading_account = relationship("TradingAccount")
     trade = relationship("Trade", back_populates="executions")
     
     def __repr__(self) -> str:

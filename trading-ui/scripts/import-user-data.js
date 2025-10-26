@@ -64,7 +64,38 @@ if (!document.getElementById('import-ticker-button-styles')) {
             font-weight: bold;
         }
     `;
-    document.head.appendChild(style);
+    // Add CSS for confirmation modal
+    const modalStyle = document.createElement('style');
+    modalStyle.textContent = `
+        .confirmation-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .confirmation-modal {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+    `;
+    document.head.appendChild(modalStyle);
 }
 
 // ===== IMPORT MODAL FUNCTIONS =====
@@ -106,6 +137,7 @@ let importSessionId = null;
 let importAnalysisResults = null;
 let importPreviewData = null;
 let importReportPath = null;
+let importSelectedExistingRecords = [];
 
 /**
  * Load data from cache
@@ -132,9 +164,9 @@ async function loadFromCache() {
 async function clearCache() {
     if (window.UnifiedCacheManager) {
         try {
-            await window.UnifiedCacheManager.delete('import_session_id');
-            await window.UnifiedCacheManager.delete('import_analysis_results');
-            await window.UnifiedCacheManager.delete('import_preview_data');
+            await window.UnifiedCacheManager.remove('import_session_id');
+            await window.UnifiedCacheManager.remove('import_analysis_results');
+            await window.UnifiedCacheManager.remove('import_preview_data');
         } catch (error) {
             console.warn('Failed to clear cache:', error);
         }
@@ -159,6 +191,38 @@ function initializeImportModal() {
     updateImportStepNavigation();
     loadImportTradingAccounts();
     setupImportEventListeners();
+}
+
+/**
+ * Start a completely new import process
+ */
+function startNewImport() {
+    console.log('🔄 Starting new import process...');
+    
+    // Clear all global state
+    importCurrentStep = 1;
+    importSelectedFile = null;
+    importSelectedAccount = null;
+    importSessionId = null;
+    importAnalysisResults = null;
+    importPreviewData = null;
+    importSelectedExistingRecords = [];
+    
+    // Clear cache
+    clearCache();
+    
+    // Reset UI
+    clearImportFile();
+    clearImportAccount();
+    
+    // Reset to step 1
+    updateImportStepDisplay();
+    updateImportStepNavigation();
+    
+    // Show notification
+    showNotification('ייבוא חדש התחיל - כל הנתונים נוקו. אנא בחר קובץ חדש לייבוא.', 'success');
+    
+    console.log('✅ New import process started successfully');
 }
 
 /**
@@ -336,6 +400,15 @@ function clearImportFile() {
     document.getElementById('import-file-input').value = '';
     document.getElementById('import-file-info').style.display = 'none';
     document.getElementById('import-file-upload-area').style.display = 'block';
+    updateImportStepNavigation();
+}
+
+/**
+ * Clear selected account
+ */
+function clearImportAccount() {
+    importSelectedAccount = null;
+    document.getElementById('import-account-select').value = '';
     updateImportStepNavigation();
 }
 
@@ -652,28 +725,29 @@ function displayImportAnalysisResults(results) {
     // Calculate the breakdown:
     const validRecordsWithMissingTickers = results.valid_records || 0;
     const missingTickersUniqueCount = results.missing_tickers ? results.missing_tickers.length : 0;
+    const existingRecordsCount = results.existing_records || 0;
     const duplicateRecordsCount = results.duplicate_records || 0;
     const invalidRecordsCount = results.invalid_records || 0;
     
+    document.getElementById('import-existing-count').textContent = existingRecordsCount;
+    
     // We need to calculate how many records have missing tickers
     // This is done by counting records that would be skipped due to missing tickers
-    // For now, we'll use a different approach - we'll get this from the preview data
     let recordsWithMissingTickers = 0;
     
     // Try to get the actual count from preview data if available
     if (importPreviewData && importPreviewData.records_to_skip) {
         recordsWithMissingTickers = importPreviewData.records_to_skip.filter(r => r.reason === 'missing_ticker').length;
     } else {
-        // Fallback: estimate based on the assumption that each missing ticker affects multiple records
-        // This is not accurate but better than the previous calculation
-        recordsWithMissingTickers = Math.max(0, validRecordsWithMissingTickers - (validRecordsWithMissingTickers - missingTickersUniqueCount));
+        // Fallback: use the missing tickers count as an estimate
+        recordsWithMissingTickers = missingTickersUniqueCount;
     }
     
-    // Records that are 100% valid (no missing tickers, no duplicates, no errors)
+    // Records that are 100% valid (no missing tickers, no duplicates, no errors, no existing records)
     const fullyValidRecords = Math.max(0, validRecordsWithMissingTickers - recordsWithMissingTickers);
     
     // Total records in file
-    const totalRecords = fullyValidRecords + recordsWithMissingTickers + duplicateRecordsCount + invalidRecordsCount;
+    const totalRecords = fullyValidRecords + recordsWithMissingTickers + duplicateRecordsCount + invalidRecordsCount + existingRecordsCount;
     
     // Update display
     document.getElementById('import-total-count').textContent = totalRecords;
@@ -683,16 +757,17 @@ function displayImportAnalysisResults(results) {
     document.getElementById('import-duplicates-count').textContent = duplicateRecordsCount;
     document.getElementById('import-errors-count').textContent = invalidRecordsCount;
     
-    console.log('📊 Analysis Results:', {
-        total: totalRecords,
-        fullyValid: fullyValidRecords,
-        recordsWithMissingTickers: recordsWithMissingTickers,
-        uniqueMissingTickers: missingTickersUniqueCount,
-        duplicates: duplicateRecordsCount,
-        errors: invalidRecordsCount,
-        backendValidRecords: validRecordsWithMissingTickers,
-        calculation: `${validRecordsWithMissingTickers} - ${recordsWithMissingTickers} = ${fullyValidRecords}`
-    });
+        console.log('📊 Analysis Results:', {
+            total: totalRecords,
+            fullyValid: fullyValidRecords,
+            recordsWithMissingTickers: recordsWithMissingTickers,
+            uniqueMissingTickers: missingTickersUniqueCount,
+            duplicates: duplicateRecordsCount,
+            existingRecords: existingRecordsCount,
+            errors: invalidRecordsCount,
+            backendValidRecords: validRecordsWithMissingTickers,
+            calculation: `${validRecordsWithMissingTickers} - ${recordsWithMissingTickers} = ${fullyValidRecords}`
+        });
     
     // Display detailed error information
     displayDetailedErrors(results);
@@ -946,7 +1021,7 @@ async function loadImportAnalysisResults() {
             
             // Count duplicates from records_to_skip
             const duplicateRecords = previewData.records_to_skip.filter(record => 
-                record.reason === 'within_file_duplicate' || record.reason === 'system_duplicate'
+                record.reason === 'within_file_duplicate' || record.reason === 'existing_record'
             );
             
             // Create analysis results from preview data
@@ -959,6 +1034,13 @@ async function loadImportAnalysisResults() {
                 valid_records: previewData.summary.records_to_import || 0,
                 invalid_records: invalidRecords.length,
                 duplicate_records: duplicateRecords.length,
+                existing_records: duplicateRecords.filter(record => 
+                    record.reason === 'existing_record'
+                ).map((record, index) => ({
+                    record_index: index,
+                    record: record,
+                    system_matches: record.details?.system_matches || []
+                })),
                 missing_tickers: previewData.summary.missing_tickers || [],
                 normalization_errors: [],
                 validation_errors: [],
@@ -987,8 +1069,8 @@ async function loadImportAnalysisResults() {
                         within_file_matches: record.details?.within_file_matches || [],
                         confidence_score: record.confidence_score || 60
                     })),
-                    system_duplicates: duplicateRecords.filter(record => 
-                        record.reason === 'system_duplicate'
+                    existing_records: duplicateRecords.filter(record => 
+                        record.reason === 'existing_record'
                     ).map((record, index) => ({
                         record_index: index,
                         // record is already the flat record itself, not nested
@@ -1312,6 +1394,94 @@ function displayImportProblems(results) {
             normalizationErrorsSection.style.display = 'none';
         }
     }
+    
+    // Show existing records section if there are existing records
+    displayExistingRecords(results);
+}
+
+/**
+ * Display existing records section
+ */
+function displayExistingRecords(results) {
+    const existingSection = document.getElementById('import-existing-section');
+    const existingList = document.getElementById('import-existing-list');
+    
+    if (!existingSection || !existingList) {
+        console.warn('Existing records section elements not found');
+        return;
+    }
+    
+    if (!results || !results.existing_records || results.existing_records.length === 0) {
+        existingSection.style.display = 'none';
+        return;
+    }
+    
+    existingSection.style.display = 'block';
+    
+    let html = '<div class="existing-records-container">';
+    
+    results.existing_records.forEach((item, index) => {
+        const record = item.record;
+        const matches = item.system_matches || [];
+        
+        html += `
+            <div class="existing-record-item" data-record-index="${item.record_index}">
+                <div class="record-info">
+                    <strong>${record.symbol}</strong> - 
+                    ${record.action === 'buy' ? 'קניה' : 'מכירה'} 
+                    ${record.quantity} @ $${record.price.toFixed(2)}
+                    <br>
+                    <small>תאריך: ${new Date(record.date).toLocaleDateString('he-IL')}</small>
+                </div>
+                <div class="record-matches">
+                    <small>נמצאו ${matches.length} התאמות במערכת</small>
+                </div>
+                <button class="btn btn-danger btn-sm" 
+                        onclick="importExistingRecord(${item.record_index})"
+                        id="existing-btn-${item.record_index}">
+                    ⚠️ ייבא בכל זאת
+                </button>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    existingList.innerHTML = html;
+}
+
+/**
+ * Import existing record (user's choice to import despite existing)
+ */
+async function importExistingRecord(recordIndex) {
+    try {
+        // Mark this record for import
+        if (!importSelectedExistingRecords) {
+            importSelectedExistingRecords = [];
+        }
+        importSelectedExistingRecords.push(recordIndex);
+        
+        // Update button
+        const btn = document.getElementById(`existing-btn-${recordIndex}`);
+        btn.textContent = '✅ יובא';
+        btn.className = 'btn btn-success btn-sm';
+        btn.disabled = true;
+        
+        // Send to backend
+        await fetch(`/api/user-data-import/session/${importSessionId}/allow-existing`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ record_index: recordIndex })
+        });
+        
+        // Reload preview
+        await loadImportPreviewData();
+        displayImportPreviewSummary();
+        
+        showNotification('הרשומה תיובא למרות שהיא קיימת במערכת', 'warning');
+    } catch (error) {
+        console.error('Error allowing existing record import:', error);
+        showNotification('שגיאה בעדכון סטטוס הרשומה', 'error');
+    }
 }
 
 /**
@@ -1515,6 +1685,47 @@ function populateImportPreviewTable(type, records) {
 }
 
 /**
+ * Show confirmation modal
+ */
+function showConfirmationModal(title, message, type = 'warning') {
+    return new Promise((resolve) => {
+        // Create modal HTML
+        const modalHtml = `
+            <div class="confirmation-modal-overlay" id="confirmationModalOverlay">
+                <div class="confirmation-modal">
+                    <h3>${title}</h3>
+                    <p>${message}</p>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeConfirmationModal(false)">ביטול</button>
+                        <button class="btn btn-danger" onclick="closeConfirmationModal(true)">אשר</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Append to body
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Store resolve function
+        window.confirmationModalResolve = resolve;
+    });
+}
+
+/**
+ * Close confirmation modal
+ */
+function closeConfirmationModal(confirmed) {
+    const overlay = document.getElementById('confirmationModalOverlay');
+    if (overlay) {
+        overlay.remove();
+    }
+    if (window.confirmationModalResolve) {
+        window.confirmationModalResolve(confirmed);
+        window.confirmationModalResolve = null;
+    }
+}
+
+/**
  * Execute import
  */
 async function executeImport() {
@@ -1524,6 +1735,20 @@ async function executeImport() {
     }
     
     try {
+        // Check if user is forcing import of existing records
+        if (importSelectedExistingRecords && importSelectedExistingRecords.length > 0) {
+            const confirmed = await showConfirmationModal(
+                'אישור ייבוא רשומות קיימות',
+                `אתה עומד לייבא ${importSelectedExistingRecords.length} רשומות שכבר קיימות במערכת. פעולה זו עלולה ליצור כפילויות. האם אתה בטוח?`,
+                'warning'
+            );
+            
+            if (!confirmed) {
+                showNotification('הייבוא בוטל', 'info');
+                return;
+            }
+        }
+        
         const response = await fetch(`/api/user-data-import/session/${importSessionId}/execute`, {
             method: 'POST'
         });

@@ -261,8 +261,9 @@ class ImportOrchestrator:
                 'invalid_records': len(validation_result['invalid_records']),
                 'clean_records': len(duplicate_result['clean_records']),
                 'duplicate_records': len(duplicate_result['within_file_duplicates']) + 
-                                   len(duplicate_result['system_duplicates']),
+                                   len(duplicate_result['existing_records']),
                 'missing_tickers': validation_result['missing_tickers'],
+                'existing_records': len(duplicate_result['existing_records']),
                 'normalization_errors': normalization_result['errors'],
                 'validation_errors': validation_result['validation_errors'],
                 'duplicate_details': duplicate_result,
@@ -278,7 +279,8 @@ class ImportOrchestrator:
                 'valid_records': len(validation_result['valid_records']),
                 'invalid_records': len(validation_result['invalid_records']),
                 'duplicate_records': len(duplicate_result['within_file_duplicates']) + 
-                                   len(duplicate_result['system_duplicates']),
+                                   len(duplicate_result['existing_records']),
+                'existing_records': len(duplicate_result['existing_records']),
                 'missing_tickers': missing_tickers_data,
                 'analysis_timestamp': datetime.now().isoformat(),
                 # Add detailed data for step 4
@@ -386,7 +388,7 @@ class ImportOrchestrator:
                 validation_result['valid_records'],
                 session.account_id
             )
-            logger.info(f"📊 Clean: {len(duplicate_result['clean_records'])}, Duplicates: {len(duplicate_result['within_file_duplicates']) + len(duplicate_result['system_duplicates'])}")
+            logger.info(f"📊 Clean: {len(duplicate_result['clean_records'])}, Duplicates: {len(duplicate_result['within_file_duplicates']) + len(duplicate_result['existing_records'])}")
             
             # Prepare records for import (clean records only, excluding missing tickers)
             clean_records = duplicate_result['clean_records']
@@ -445,26 +447,14 @@ class ImportOrchestrator:
                         'details': match  # Add match details
                     })
             
-            system_duplicates = duplicate_result['system_duplicates']
-            for duplicate in system_duplicates:
-                # Add main duplicate record
+            # Add records with existing matches
+            for existing in duplicate_result.get('existing_records', []):
                 records_to_skip.append({
-                    'record': duplicate['record'],
-                    'reason': 'system_duplicate',
-                    'confidence_score': duplicate.get('confidence_score', 0),
-                    'match_count': len(duplicate.get('system_matches', [])),
-                    'details': duplicate  # Add full duplicate details
+                    'record_index': existing['record_index'],
+                    'record': existing['record'],
+                    'reason': 'existing_record',
+                    'matches': existing.get('system_matches', [])
                 })
-                
-                # Add all matching records
-                for match in duplicate.get('system_matches', []):
-                    records_to_skip.append({
-                        'record': duplicate['record'],  # Use the original record from duplicate
-                        'reason': 'system_duplicate_match',
-                        'confidence_score': match.get('confidence', 0),
-                        'match_count': 1,
-                        'details': match  # Add match details
-                    })
             
             # Calculate total records
             total_records = len(raw_records)
@@ -506,7 +496,9 @@ class ImportOrchestrator:
                     'records_to_import': len(clean_records),
                     'records_to_skip': len(records_to_skip),
                     'import_rate': (len(clean_records) / total_records * 100) if total_records > 0 else 0,
-                    'missing_tickers': validation_result.get('missing_tickers', [])
+                    'missing_tickers': validation_result.get('missing_tickers', []),
+                    'duplicate_records': len(duplicate_result.get('within_file_duplicates', [])),
+                    'existing_records': len(duplicate_result.get('existing_records', []))
                 }
             }
             

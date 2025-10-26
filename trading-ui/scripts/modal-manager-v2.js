@@ -82,21 +82,8 @@ class ModalManagerV2 {
      * @private
      */
     loadDefaultConfigurations() {
-        // טעינת קונפיגורציות מקבצי config
-        const configFiles = [
-            'cash-flows-config.js',
-            'notes-config.js',
-            'trading-accounts-config.js',
-            'tickers-config.js',
-            'executions-config.js',
-            'alerts-config.js',
-            'trade-plans-config.js',
-            'trades-config.js'
-        ];
-        
-        configFiles.forEach(configFile => {
-            this.loadConfiguration(configFile);
-        });
+        // רק cash-flows-config נטען כרגע
+        // שאר הקבצים יטענו כשנצור אותם
     }
 
     /**
@@ -158,10 +145,9 @@ class ModalManagerV2 {
                 <div class="modal-dialog modal-${config.size || 'lg'}">
                     <div class="modal-content">
                         <div class="modal-header modal-header-dynamic" 
-                             style="background: linear-gradient(135deg, var(--entity-color-light), var(--entity-color-dark))">
-                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--entity-color-dark)">${config.title.add || 'הוספת ישות'}</h5>
-                            <button data-button-type="CLOSE" data-variant="icon-only" 
-                                    data-color="entity-dark" data-bs-dismiss="modal" 
+                             style="background: linear-gradient(135deg, var(--current-entity-color-light), var(--current-entity-color-dark))">
+                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark)">${config.title.add || 'הוספת ישות'}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" 
                                     aria-label="סגור"></button>
                         </div>
                         <div class="modal-body">
@@ -170,9 +156,9 @@ class ModalManagerV2 {
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button data-button-type="CANCEL" data-color="warning" 
+                            <button data-button-type="CANCEL" data-variant="normal" 
                                     data-bs-dismiss="modal" data-text="ביטול"></button>
-                            <button data-button-type="SAVE" data-color="entity-dark" 
+                            <button data-button-type="SAVE" data-variant="normal" 
                                     data-onclick="${config.onSave}" data-text="שמור"></button>
                         </div>
                     </div>
@@ -193,9 +179,25 @@ class ModalManagerV2 {
             return '';
         }
         
-        return fields.map(field => {
-            return this.renderField(field);
-        }).join('');
+        // ארגון השדות בעמודות - 2-3 עמודות לפי הדגשי העיצוב
+        const fieldsPerRow = 2; // 2 עמודות כמו שביקשת
+        const rows = [];
+        
+        for (let i = 0; i < fields.length; i += fieldsPerRow) {
+            const rowFields = fields.slice(i, i + fieldsPerRow);
+            const rowHTML = `
+                <div class="row">
+                    ${rowFields.map(field => `
+                        <div class="col-md-6">
+                            ${this.renderField(field)}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            rows.push(rowHTML);
+        }
+        
+        return rows.join('');
     }
 
     /**
@@ -208,6 +210,7 @@ class ModalManagerV2 {
     renderField(field) {
         const requiredAttr = field.required ? 'required' : '';
         const requiredStar = field.required ? '<span class="text-danger">*</span>' : '';
+        const disabledAttr = field.disabled ? 'disabled' : '';
         
         switch (field.type) {
             case 'text':
@@ -221,6 +224,7 @@ class ModalManagerV2 {
                                id="${field.id}" 
                                name="${field.id}"
                                ${requiredAttr}
+                               ${disabledAttr}
                                placeholder="${field.placeholder || ''}"
                                value="${field.defaultValue || ''}">
                         <div class="invalid-feedback"></div>
@@ -238,6 +242,7 @@ class ModalManagerV2 {
                                id="${field.id}" 
                                name="${field.id}"
                                ${requiredAttr}
+                               ${disabledAttr}
                                ${field.min ? `min="${field.min}"` : ''}
                                ${field.max ? `max="${field.max}"` : ''}
                                ${field.step ? `step="${field.step}"` : ''}
@@ -492,16 +497,18 @@ class ModalManagerV2 {
         
         const preferences = window.PreferencesSystem.manager?.currentPreferences || {};
         
-        // ברירת מחדל לחשבון מסחר
-        const accountField = form.querySelector('[id*="Account"], [name*="account"]');
+        // ברירת מחדל לחשבון מסחר - חיפוש מדויק יותר
+        const accountField = form.querySelector('[id*="Account"], [name*="account"], [id*="account"], [name*="Account"]');
         if (accountField && preferences.defaultTradingAccount) {
             accountField.value = preferences.defaultTradingAccount;
+            console.log('Applied default account:', preferences.defaultTradingAccount);
         }
         
-        // ברירת מחדל למטבע
-        const currencyField = form.querySelector('[id*="Currency"], [name*="currency"]');
+        // ברירת מחדל למטבע - חיפוש מדויק יותר
+        const currencyField = form.querySelector('[id*="Currency"], [name*="currency"], [id*="currency"], [name*="Currency"]');
         if (currencyField && preferences.defaultCurrency) {
             currencyField.value = preferences.defaultCurrency;
+            console.log('Applied default currency:', preferences.defaultCurrency);
         }
         
         // ברירת מחדל לתאריך - היום
@@ -512,6 +519,14 @@ class ModalManagerV2 {
                 ? today.toISOString().slice(0, 16) 
                 : today.toISOString().slice(0, 10);
             dateField.value = dateValue;
+            console.log('Applied default date:', dateValue);
+        }
+        
+        // ברירת מחדל למקור - ידני
+        const sourceField = form.querySelector('[id*="Source"], [name*="source"], [id*="source"], [name*="Source"]');
+        if (sourceField && !sourceField.value) {
+            sourceField.value = 'manual';
+            console.log('Applied default source: manual');
         }
     }
 
@@ -547,10 +562,8 @@ class ModalManagerV2 {
      * @private
      */
     initializeButtons(modalElement) {
-        if (!window.advancedButtonSystem) return;
-        
-        // עיבוד כל הכפתורים במודל
-        window.advancedButtonSystem.processButtons(modalElement);
+        // עיבוד כל הכפתורים במודל - מערכת הכפתורים תטפל בזה אוטומטית
+        // אין צורך לקרוא לפונקציה ספציפית
     }
 
     /**
@@ -561,41 +574,47 @@ class ModalManagerV2 {
      * @private
      */
     applyUserColors(modalElement, entityType) {
-        if (!entityType || !window.getEntityColor) return;
+        if (!entityType) return;
         
         const header = modalElement.querySelector('.modal-header');
         if (!header) return;
         
-        // עדכון צבע כותרת - רקע בהיר
-        const entityColorLight = window.getEntityColor(entityType);
-        const entityColorDark = window.getEntityDarkColor(entityType);
+        // קבלת צבע מהישות מהמערכת הדינמית
+        const entityColors = window.ENTITY_COLORS || {};
+        const entityColor = entityColors[entityType] || '#26baac';
+
+        // קבלת צבעי רקע וטקסט מהמערכת
+        const entityBackgroundColors = window.ENTITY_BACKGROUND_COLORS || {};
+        const entityTextColors = window.ENTITY_TEXT_COLORS || {};
         
-        header.style.background = `linear-gradient(135deg, ${entityColorLight}, ${entityColorDark})`;
-        
-        // עדכון צבע כותרת הטקסט - כהה
+        const backgroundColor = entityBackgroundColors[entityType] || 'rgba(38, 186, 172, 0.1)';
+        const textColor = entityTextColors[entityType] || '#1a9d7a';
+
+        // עדכון רקע הכותרת - וריאנט בהיר
+        header.style.background = backgroundColor;
+        header.style.borderBottom = `1px solid ${entityColor}`;
+
+        // עדכון צבע כותרת הטקסט - וריאנט כהה
         const title = header.querySelector('.modal-title');
         if (title) {
-            title.style.color = entityColorDark;
+            title.style.color = textColor;
         }
-        
-        // עדכון צבעי כפתורים
-        const closeButton = modalElement.querySelector('[data-button-type="CLOSE"]');
-        if (closeButton) {
-            closeButton.style.color = entityColorDark;
-            closeButton.style.borderColor = entityColorDark;
-        }
-        
+
+        // עדכון צבעי כפתורים - שימוש במערכת הכפתורים
         const saveButton = modalElement.querySelector('[data-button-type="SAVE"]');
         if (saveButton) {
-            saveButton.style.color = entityColorDark;
-            saveButton.style.borderColor = entityColorDark;
+            // כפתור שמור - צבע ישות כמו הכותרת
+            saveButton.style.backgroundColor = entityColor;
+            saveButton.style.color = 'white';
+            saveButton.style.borderColor = entityColor;
         }
-        
+
         const cancelButton = modalElement.querySelector('[data-button-type="CANCEL"]');
         if (cancelButton) {
             // כפתור ביטול - צבע אזהרה
-            cancelButton.style.color = 'var(--warning-color, #fc5a06)';
-            cancelButton.style.borderColor = 'var(--warning-color, #fc5a06)';
+            cancelButton.style.backgroundColor = '#ffc107';
+            cancelButton.style.color = '#000';
+            cancelButton.style.borderColor = '#ffc107';
         }
     }
 
@@ -886,6 +905,3 @@ document.addEventListener('DOMContentLoaded', () => {
         new ModalManagerV2();
     }
 });
-
-// ייצוא למרחב הגלובלי
-window.ModalManagerV2 = ModalManagerV2;

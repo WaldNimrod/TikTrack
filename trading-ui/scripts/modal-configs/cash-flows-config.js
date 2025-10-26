@@ -28,7 +28,8 @@ const cashFlowModalConfig = {
                 { value: 'deposit', label: 'הפקדה' },
                 { value: 'withdrawal', label: 'משיכה' },
                 { value: 'transfer', label: 'העברה' },
-                { value: 'fee', label: 'עמלה' }
+                { value: 'fee', label: 'עמלה' },
+                { value: 'dividend', label: 'דיבידנד' }
             ]
         },
         {
@@ -84,7 +85,8 @@ const cashFlowModalConfig = {
             id: 'cashFlowExternalId',
             label: 'מזהה חיצוני',
             placeholder: 'מזהה חיצוני (אופציונלי)',
-            defaultValue: '0'
+            defaultValue: '0',
+            disabled: true // מושבת כל עוד המקור הוא ידני
         },
         {
             type: 'select',

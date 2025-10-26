@@ -31,6 +31,20 @@
     
     <!-- Import User Data Modal Styles -->
     <link rel="stylesheet" href="styles/import-user-data.css?v=05b6de6f_20251025_005449">
+    
+    <!-- Additional styles for import modal -->
+    <style>
+        .step-actions {
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .step-actions .btn {
+            font-size: 0.875rem;
+            padding: 0.375rem 0.75rem;
+        }
+    </style>
 </head>
 
 <body class="executions-page">
@@ -372,6 +386,11 @@
                     <div class="step-header">
                         <h4>1️⃣ בחירת קובץ</h4>
                         <p>בחר קובץ CSV לייבוא או גרור אותו לכאן</p>
+                        <div class="step-actions">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="startNewImport()" title="התחל ייבוא חדש מאפס">
+                                <i class="bi bi-arrow-clockwise"></i> ייבוא חדש
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="file-upload-area" id="import-file-upload-area">
@@ -449,6 +468,11 @@
                                 <span class="result-count" id="import-duplicates-count">0</span>
                                 <span class="result-label">כפילויות</span>
                             </div>
+                            <div class="result-item info">
+                                <span class="result-icon">📋</span>
+                                <span class="result-count" id="import-existing-count">0</span>
+                                <span class="result-label">קיימות כבר במערכת</span>
+                            </div>
                             <div class="result-item error">
                                 <span class="result-icon">❌</span>
                                 <span class="result-count" id="import-errors-count">0</span>
@@ -481,6 +505,13 @@
                         <div class="problem-section" id="import-duplicates-section" style="display: none;">
                             <h5>🔄 כפילויות זוהו</h5>
                             <div class="duplicates-list" id="import-duplicates-list"></div>
+                        </div>
+                        
+                        <!-- Existing Records -->
+                        <div class="problem-section" id="import-existing-section" style="display: none;">
+                            <h5>📋 רשומות קיימות במערכת</h5>
+                            <p class="warning-text">רשומות אלו כבר קיימות במערכת. ייבוא כפול עלול ליצור נתונים שגויים.</p>
+                            <div class="existing-records-list" id="import-existing-list"></div>
                         </div>
                     </div>
                 </div>

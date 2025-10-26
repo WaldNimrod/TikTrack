@@ -16,8 +16,10 @@ from typing import List, Dict, Any, Optional, Tuple, Set
 from datetime import datetime, timedelta
 import logging
 from sqlalchemy.orm import Session
+from sqlalchemy import or_, and_
 from models.execution import Execution
 from models.ticker import Ticker
+from models.trade import Trade
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +42,7 @@ class DuplicateDetectionService:
             db_session: Database session for querying existing data
         """
         self.db_session = db_session
-        self.similarity_threshold = 4  # Minimum matching fields out of 5 (including symbol)
+        self.similarity_threshold = 5  # All 5 fields must match for existing record detection
         self.price_tolerance = 0.01    # Price difference tolerance
         self.date_tolerance_days = 1   # Date difference tolerance
     
@@ -58,7 +60,7 @@ class DuplicateDetectionService:
         """
         results = {
             'within_file_duplicates': [],
-            'system_duplicates': [],
+            'existing_records': [],
             'clean_records': [],
             'total_checked': len(records),
             'duplicate_count': 0,
@@ -80,30 +82,30 @@ class DuplicateDetectionService:
                 records, i, processed_indices
             )
             
-            # Check for system duplicates
-            system_matches = self._find_system_duplicates(
+            # Check for existing records
+            existing_matches = self._find_system_duplicates(
                 record, existing_executions
             )
             
-            if within_file_matches or system_matches:
+            if within_file_matches or existing_matches:
                 # This is a duplicate
                 duplicate_info = {
                     'record_index': i,
                     'record': record,
                     'within_file_matches': within_file_matches,
-                    'system_matches': system_matches,
+                    'system_matches': existing_matches,
                     'duplicate_type': self._classify_duplicate_type(
-                        within_file_matches, system_matches
+                        within_file_matches, existing_matches
                     ),
                     'confidence_score': self._calculate_confidence_score(
-                        record, within_file_matches, system_matches
+                        record, within_file_matches, existing_matches
                     )
                 }
                 
                 if within_file_matches:
                     results['within_file_duplicates'].append(duplicate_info)
-                if system_matches:
-                    results['system_duplicates'].append(duplicate_info)
+                if existing_matches:
+                    results['existing_records'].append(duplicate_info)
                 
                 # Mark all matching records as processed
                 processed_indices.add(i)
@@ -239,27 +241,21 @@ class DuplicateDetectionService:
             abs(float(record1['quantity']) - float(record2['quantity'])) < 0.001):
             score += 1
         
-        # Check price match (with tolerance)
+        # Check price match - integer part only
         if (record1.get('price') and record2.get('price')):
-            price1 = float(record1['price'])
-            price2 = float(record2['price'])
-            if abs(price1 - price2) <= self.price_tolerance:
+            price1 = int(float(record1['price']))
+            price2 = int(float(record2['price']))
+            if price1 == price2:
                 score += 1
         
-        # Check date match (with tolerance) - must be exact time for duplicates
+        # Check date match - same day only, ignore time
         if (record1.get('date') and record2.get('date')):
             try:
                 date1 = datetime.fromisoformat(record1['date'].replace('Z', '+00:00'))
                 date2 = datetime.fromisoformat(record2['date'].replace('Z', '+00:00'))
-                # For duplicates, we need exact time match (not just same day)
-                # Only allow same day if it's the exact same time
-                if date1 == date2:
+                # Compare only the date part, not time
+                if date1.date() == date2.date():
                     score += 1
-                elif abs((date1 - date2).days) <= self.date_tolerance_days:
-                    # Same day but different time - check if it's within 1 hour
-                    time_diff = abs((date1 - date2).total_seconds())
-                    if time_diff <= 3600:  # 1 hour tolerance
-                        score += 1  # Same day, same hour
             except ValueError:
                 pass
         
@@ -272,59 +268,76 @@ class DuplicateDetectionService:
     
     def _get_existing_executions(self, account_id: int) -> List[Dict[str, Any]]:
         """
-        Get existing executions for the account.
+        Get ALL existing executions in the system (ignore account filtering).
         
         Args:
-            account_id: Account ID to query
+            account_id: Account ID (ignored - we check against all executions)
             
         Returns:
-            List[Dict[str, Any]]: List of existing executions
+            List[Dict[str, Any]]: List of ALL existing executions
         """
         try:
-            # Query executions for this account
-            executions = self.db_session.query(Execution).join(
-                Execution.trade
-            ).filter(
-                Execution.trade.has(trading_account_id=account_id)
+            # Query ALL executions - ignore account filtering
+            # Use LEFT JOIN to include executions without trades
+            executions = self.db_session.query(Execution).outerjoin(
+                Trade, Execution.trade_id == Trade.id
             ).all()
             
-            return [execution.to_dict() for execution in executions]
+            # Convert to dict with ticker symbol
+            result = []
+            for execution in executions:
+                exec_dict = execution.to_dict()
+                # Add ticker symbol for comparison - get through trade
+                if execution.trade_id:
+                    # Get ticker through trade
+                    trade = self.db_session.query(Trade).filter(Trade.id == execution.trade_id).first()
+                    if trade and trade.ticker_id:
+                        ticker = self.db_session.query(Ticker).filter(Ticker.id == trade.ticker_id).first()
+                        if ticker:
+                            exec_dict['symbol'] = ticker.symbol
+                elif execution.ticker_id:
+                    # Direct ticker reference
+                    ticker = self.db_session.query(Ticker).filter(Ticker.id == execution.ticker_id).first()
+                    if ticker:
+                        exec_dict['symbol'] = ticker.symbol
+                result.append(exec_dict)
             
+            return result
         except Exception as e:
             logger.error(f"Failed to query existing executions: {str(e)}")
             return []
     
     def _classify_duplicate_type(self, within_file_matches: List[Dict[str, Any]], 
-                                system_matches: List[Dict[str, Any]]) -> str:
+                                existing_matches: List[Dict[str, Any]]) -> str:
         """
         Classify the type of duplicate.
         
         Args:
             within_file_matches: Within-file duplicate matches
-            system_matches: System duplicate matches
+            existing_matches: Existing records matches
             
         Returns:
             str: Duplicate type classification
         """
-        if within_file_matches and system_matches:
-            return 'both_within_and_system'
+        if within_file_matches and existing_matches:
+            return 'both_within_and_existing'
         elif within_file_matches:
             return 'within_file_only'
-        elif system_matches:
-            return 'system_only'
+        elif existing_matches:
+            return 'existing_only'
         else:
             return 'none'
     
     def _calculate_confidence_score(self, record: Dict[str, Any], 
                                  within_file_matches: List[Dict[str, Any]], 
-                                 system_matches: List[Dict[str, Any]]) -> float:
+                                 existing_matches: List[Dict[str, Any]]) -> float:
         """
         Calculate confidence score for duplicate detection.
         
         Args:
             record: Original record
             within_file_matches: Within-file matches
-            system_matches: System matches
+            existing_matches: Existing records matches
             
         Returns:
             float: Confidence score (0-100)
@@ -336,8 +349,8 @@ class DuplicateDetectionService:
             if match.get('confidence', 0) > max_confidence:
                 max_confidence = match['confidence']
         
-        # Check system matches
-        for match in system_matches:
+        # Check existing matches
+        for match in existing_matches:
             if match.get('confidence', 0) > max_confidence:
                 max_confidence = match['confidence']
         
@@ -354,7 +367,7 @@ class DuplicateDetectionService:
             Dict[str, Any]: Duplicate detection summary
         """
         within_file_count = len(results.get('within_file_duplicates', []))
-        system_count = len(results.get('system_duplicates', []))
+        existing_count = len(results.get('existing_records', []))
         clean_count = results.get('clean_count', 0)
         total_count = results.get('total_checked', 0)
         
@@ -362,7 +375,7 @@ class DuplicateDetectionService:
         confidence_scores = []
         for duplicate in results.get('within_file_duplicates', []):
             confidence_scores.append(duplicate.get('confidence_score', 0))
-        for duplicate in results.get('system_duplicates', []):
+        for duplicate in results.get('existing_records', []):
             confidence_scores.append(duplicate.get('confidence_score', 0))
         
         avg_confidence = sum(confidence_scores) / len(confidence_scores) if confidence_scores else 0
@@ -371,9 +384,9 @@ class DuplicateDetectionService:
             'total_records': total_count,
             'clean_records': clean_count,
             'within_file_duplicates': within_file_count,
-            'system_duplicates': system_count,
-            'total_duplicates': within_file_count + system_count,
-            'duplicate_rate': ((within_file_count + system_count) / total_count * 100) if total_count > 0 else 0,
+            'existing_records': existing_count,
+            'total_duplicates': within_file_count + existing_count,
+            'duplicate_rate': ((within_file_count + existing_count) / total_count * 100) if total_count > 0 else 0,
             'average_confidence': avg_confidence,
             'high_confidence_duplicates': len([c for c in confidence_scores if c >= 80]),
             'medium_confidence_duplicates': len([c for c in confidence_scores if 50 <= c < 80]),
@@ -408,10 +421,10 @@ class DuplicateDetectionService:
                 'matches': duplicate.get('within_file_matches', [])
             })
         
-        # Process system duplicates
-        for duplicate in results.get('system_duplicates', []):
+        # Process existing records
+        for duplicate in results.get('existing_records', []):
             details.append({
-                'type': 'system',
+                'type': 'existing',
                 'record_index': duplicate['record_index'],
                 'symbol': duplicate['record'].get('symbol'),
                 'action': duplicate['record'].get('action'),

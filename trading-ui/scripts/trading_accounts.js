@@ -2763,6 +2763,189 @@ window.sortTable = sortTable;
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 window.getTradingAccounts = getTradingAccounts;
 
+// ===== MODAL FUNCTIONS - NEW SYSTEM =====
+
+/**
+ * הצגת מודל הוספת חשבון מסחר
+ * Uses ModalManagerV2 for consistent modal experience
+ */
+function showAddTradingAccountModal() {
+    window.Logger.debug('showAddTradingAccountModal called', { page: 'trading_accounts' });
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showModal('tradingAccountsModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
+}
+
+/**
+ * הצגת מודל עריכת חשבון מסחר
+ * Uses ModalManagerV2 for consistent modal experience
+ */
+function showEditTradingAccountModal(accountId) {
+    window.Logger.debug('showEditTradingAccountModal called', { accountId, page: 'trading_accounts' });
+    
+    if (window.ModalManagerV2) {
+        window.ModalManagerV2.showEditModal('tradingAccountsModal', 'account', accountId);
+    } else {
+        console.error('ModalManagerV2 not available');
+    }
+}
+
+/**
+ * שמירת חשבון מסחר
+ * Handles both add and edit modes
+ */
+async function saveTradingAccount() {
+    window.Logger.debug('saveTradingAccount called', { page: 'trading_accounts' });
+    
+    try {
+        // Collect form data
+        const form = document.getElementById('tradingAccountsModalForm');
+        if (!form) {
+            throw new Error('Trading Account form not found');
+        }
+        
+        const formData = new FormData(form);
+        const accountData = {
+            name: formData.get('accountName'),
+            number: formData.get('accountNumber'),
+            type: formData.get('accountType'),
+            currency: formData.get('accountCurrency'),
+            balance: parseFloat(formData.get('accountBalance')) || 0,
+            status: formData.get('accountStatus'),
+            notes: formData.get('accountNotes')
+        };
+        
+        // Validate data
+        if (!window.validateEntityForm) {
+            throw new Error('Validation system not available');
+        }
+        
+        const isValid = window.validateEntityForm('tradingAccountsModalForm', {
+            accountName: { required: true, minLength: 2, maxLength: 100 },
+            accountNumber: { required: true, minLength: 3, maxLength: 50 },
+            accountType: { required: true },
+            accountCurrency: { required: true },
+            accountBalance: { required: false, min: 0 },
+            accountStatus: { required: true },
+            accountNotes: { required: false, maxLength: 500 }
+        });
+        
+        if (!isValid) {
+            window.Logger.warn('Trading Account validation failed', { page: 'trading_accounts' });
+            return;
+        }
+        
+        // Determine if this is add or edit
+        const isEdit = form.dataset.mode === 'edit';
+        const accountId = form.dataset.accountId;
+        
+        // Prepare API call
+        const url = isEdit ? `/api/trading_accounts/${accountId}` : '/api/trading_accounts';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        // Send to API
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(accountData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // Handle success
+        if (window.showNotification) {
+            const message = isEdit ? 'חשבון מסחר עודכן בהצלחה' : 'חשבון מסחר נוסף בהצלחה';
+            window.showNotification(message, 'success', 'business');
+        }
+        
+        // Close modal
+        if (window.ModalManagerV2) {
+            window.ModalManagerV2.hideModal('tradingAccountsModal');
+        }
+        
+        // Refresh data
+        if (window.loadTradingAccountsData) {
+            window.loadTradingAccountsData();
+        }
+        
+        window.Logger.info('Trading Account saved successfully', { accountId: result.id, page: 'trading_accounts' });
+        
+    } catch (error) {
+        window.Logger.error('Error saving trading account', { error: error.message, page: 'trading_accounts' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה בשמירת חשבון המסחר', 'error', 'system');
+        }
+    }
+}
+
+/**
+ * מחיקת חשבון מסחר
+ * Includes linked items check
+ */
+async function deleteTradingAccount(accountId) {
+    window.Logger.debug('deleteTradingAccount called', { accountId, page: 'trading_accounts' });
+    
+    try {
+        // Check linked items first
+        if (window.checkLinkedItemsBeforeAction) {
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('account', accountId, 'delete');
+            if (hasLinkedItems) {
+                window.Logger.info('Trading Account has linked items, deletion cancelled', { accountId, page: 'trading_accounts' });
+                return;
+            }
+        }
+        
+        // Confirm deletion
+        if (!confirm('האם אתה בטוח שברצונך למחוק את חשבון המסחר?')) {
+            return;
+        }
+        
+        // Send delete request
+        const response = await fetch(`/api/trading_accounts/${accountId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        // Handle success
+        if (window.showNotification) {
+            window.showNotification('חשבון מסחר נמחק בהצלחה', 'success', 'business');
+        }
+        
+        // Refresh data
+        if (window.loadTradingAccountsData) {
+            window.loadTradingAccountsData();
+        }
+        
+        window.Logger.info('Trading Account deleted successfully', { accountId, page: 'trading_accounts' });
+        
+    } catch (error) {
+        window.Logger.error('Error deleting trading account', { error: error.message, accountId, page: 'trading_accounts' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה במחיקת חשבון המסחר', 'error', 'system');
+        }
+    }
+}
+
+// Export functions to window for global access
+window.showAddTradingAccountModal = showAddTradingAccountModal;
+window.showEditTradingAccountModal = showEditTradingAccountModal;
+window.saveTradingAccount = saveTradingAccount;
+window.deleteTradingAccount = deleteTradingAccount;
+
 // סיום הקובץ
 window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "trading_accounts" });
 }

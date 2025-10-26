@@ -206,6 +206,7 @@ function startNewImport() {
     importSessionId = null;
     importAnalysisResults = null;
     importPreviewData = null;
+    importReportPath = null;
     importSelectedExistingRecords = [];
     
     // Clear cache
@@ -214,6 +215,9 @@ function startNewImport() {
     // Reset UI
     clearImportFile();
     clearImportAccount();
+    
+    // Clear all step displays
+    clearAllStepDisplays();
     
     // Reset to step 1
     updateImportStepDisplay();
@@ -410,6 +414,96 @@ function clearImportAccount() {
     importSelectedAccount = null;
     document.getElementById('import-account-select').value = '';
     updateImportStepNavigation();
+}
+
+/**
+ * Clear all step displays
+ */
+function clearAllStepDisplays() {
+    // Clear step 3 analysis results
+    const analysisResults = document.getElementById('import-analysis-results');
+    if (analysisResults) {
+        analysisResults.style.display = 'none';
+    }
+    
+    // Clear step 4 problems
+    const problemsSection = document.getElementById('import-problems-section');
+    if (problemsSection) {
+        problemsSection.style.display = 'none';
+    }
+    
+    // Clear step 5 preview summary
+    const previewSummary = document.getElementById('import-preview-summary');
+    if (previewSummary) {
+        previewSummary.style.display = 'none';
+    }
+    
+    // Clear step 6 final summary
+    const finalSummary = document.getElementById('import-final-summary');
+    if (finalSummary) {
+        finalSummary.style.display = 'none';
+    }
+    
+    // Clear all problem sections
+    const problemSections = [
+        'import-missing-tickers-section',
+        'import-duplicates-section', 
+        'import-existing-section',
+        'import-normalization-errors-section'
+    ];
+    
+    problemSections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.style.display = 'none';
+        }
+    });
+    
+    // Clear all lists
+    const listElements = [
+        'import-missing-tickers-list',
+        'import-duplicates-list',
+        'import-existing-list',
+        'import-normalization-errors-list'
+    ];
+    
+    listElements.forEach(listId => {
+        const list = document.getElementById(listId);
+        if (list) {
+            list.innerHTML = '';
+        }
+    });
+    
+    // Clear step 3 result cards
+    const resultCards = [
+        'import-total-count',
+        'import-valid-count', 
+        'import-invalid-count',
+        'import-duplicates-count',
+        'import-existing-count',
+        'import-missing-tickers-count'
+    ];
+    
+    resultCards.forEach(cardId => {
+        const card = document.getElementById(cardId);
+        if (card) {
+            card.textContent = '0';
+        }
+    });
+    
+    // Clear step 5 preview stats
+    const previewStats = [
+        'import-preview-total',
+        'import-preview-import', 
+        'import-preview-skip'
+    ];
+    
+    previewStats.forEach(statId => {
+        const stat = document.getElementById(statId);
+        if (stat) {
+            stat.textContent = '0';
+        }
+    });
 }
 
 /**

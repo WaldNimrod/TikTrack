@@ -858,70 +858,115 @@ function addEditReminder() {
 /**
  * פונקציה להצגת מודל עריכת טרייד
  */
-async function showEditTradeModal(trade) {
+/**
+ * הצגת מודל טרייד (הוספה או עריכה)
+ * @param {string} mode - 'add' או 'edit'
+ * @param {Object} [trade] - אובייקט הטרייד (נדרש רק בעריכה)
+ */
+async function showTradeModal(mode, trade = null) {
+  const isEdit = mode === 'edit';
+  const modalId = isEdit ? 'editTradeModal' : 'addTradeModal';
+  const formId = isEdit ? 'editTradeForm' : 'addTradeForm';
+  
+  try {
+    // ניקוי וולידציה
+    if (window.clearValidation) {
+      window.clearValidation(formId);
+    }
 
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('editTradeForm');
-  }
+    if (isEdit) {
+      // ניקוי סימונים
+      const tradePlanSelect = document.getElementById('editTradeTradePlanId');
+      if (tradePlanSelect) {
+        tradePlanSelect.removeAttribute('data-restored');
+        tradePlanSelect.removeAttribute('data-cleared');
+      }
 
-  // ניקוי סימונים
-  const tradePlanSelect = document.getElementById('editTradeTradePlanId');
-  if (tradePlanSelect) {
-    tradePlanSelect.removeAttribute('data-restored');
-    tradePlanSelect.removeAttribute('data-cleared');
-  }
+      // טעינת נתונים למודל עריכת טרייד
+      await loadEditTradeModalData(trade);
 
-  // טעינת נתונים למודל עריכת טרייד
-  await loadEditTradeModalData(trade);
-
-  // טעינת נתוני העסקאות
-  if (typeof window.loadTradeExecutions === 'function') {
-    try {
-      window.loadTradeExecutions(trade.id);
-    } catch {
-      if (typeof handleFunctionNotFound === 'function') {
-        handleFunctionNotFound('loadTradeExecutions');
+      // טעינת נתוני העסקאות
+      if (typeof window.loadTradeExecutions === 'function') {
+        try {
+          window.loadTradeExecutions(trade.id);
+        } catch {
+          if (typeof handleFunctionNotFound === 'function') {
+            handleFunctionNotFound('loadTradeExecutions');
+          }
+        }
       } else {
-        // window.Logger.warn('loadTradeExecutions function not found', { page: "trades" });
+        if (typeof handleFunctionNotFound === 'function') {
+          handleFunctionNotFound('loadTradeExecutions');
+        }
+      }
+
+      // שמירת הטרייד המקורי לבדיקות
+      window.currentEditTrade = trade;
+    } else {
+      // טעינת נתונים למודל
+      loadModalData();
+
+      // ניקוי הטופס
+      const form = document.getElementById('addTradeForm');
+      if (form) {
+        form.reset();
+      }
+
+      // ניטרול כל השדות חוץ מתוכנית טרייד
+      disableTradeFormFields();
+
+      // הגדרת תאריך נוכחי
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const hh = String(today.getHours()).padStart(2, '0');
+      const min = String(today.getMinutes()).padStart(2, '0');
+      const todayStr = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+
+      const dateInput = document.getElementById('addTradeOpenedAt');
+      if (dateInput) {
+        dateInput.value = todayStr;
       }
     }
-  } else {
-    if (typeof handleFunctionNotFound === 'function') {
-      handleFunctionNotFound('loadTradeExecutions');
+
+    // הצגת המודל
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      if (typeof bootstrap !== 'undefined') {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      } else {
+        if (typeof handleSystemError === 'function') {
+          handleSystemError(new Error('Bootstrap is not loaded'), 'מערכת מודלים');
+        }
+        // נסיון חלופי להצגת המודל
+        modalElement.style.display = 'block';
+        modalElement.classList.add('show');
+        document.body.classList.add('modal-open');
+      }
     } else {
-      // window.Logger.warn('loadTradeExecutions function not found', { page: "trades" });
+      if (typeof handleElementNotFound === 'function') {
+        handleElementNotFound(modalId, 'CRITICAL');
+      }
+    }
+    
+  } catch (error) {
+    const action = isEdit ? 'עריכת' : 'הוספת';
+    window.Logger.error(`שגיאה בהצגת מודל ${action} טרייד:`, error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification(`שגיאה בהצגת מודל ${action} טרייד`, error.message);
     }
   }
+}
 
-  // שמירת הטרייד המקורי לבדיקות
-  window.currentEditTrade = trade;
-
-  // הגדרת ולידציה של שדות תאריך - מושבת זמנית
-  // setTimeout(() => {
-  //   setupDateValidation();
-  // }, 100);
-
-  // שמירת הטרייד המקורי לבדיקות
-  window.currentEditTrade = trade;
-
-  // הגדרת ולידציה של שדות תאריך - מושבת זמנית
-  // setTimeout(() => {
-  //   setupDateValidation();
-  // }, 100);
-
-  // Show the modal
-  const modalElement = document.getElementById('editTradeModal');
-  if (modalElement) {
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
-  } else {
-    if (typeof handleElementNotFound === 'function') {
-      handleElementNotFound('editTradeModal', 'CRITICAL');
-    } else {
-      // window.Logger.error('editTradeModal element not found', { page: "trades" });
-    }
-  }
+/**
+ * פונקציה להצגת מודל עריכת טרייד
+ * @param {Object} trade - אובייקט הטרייד לעריכה
+ * @deprecated Use showTradeModal('edit', trade) instead
+ */
+async function showEditTradeModal(trade) {
+  await showTradeModal('edit', trade);
 }
 
 /**
@@ -1368,60 +1413,13 @@ async function saveEditTradeData() {
  * - loadModalData() - טעינת נתונים למודל
  * - Bootstrap Modal
  */
+/**
+ * Show add trade modal
+ * Opens the modal for adding a new trade
+ * @deprecated Use showTradeModal('add') instead
+ */
 function showAddTradeModal() {
-  // טעינת נתונים למודל
-  loadModalData();
-
-  // ניקוי הטופס
-  const form = document.getElementById('addTradeForm');
-  if (form) {
-    form.reset();
-  }
-
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('addTradeForm');
-  }
-
-  // ניטרול כל השדות חוץ מתוכנית טרייד
-  disableTradeFormFields();
-
-  // הגדרת תאריך נוכחי
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const hh = String(today.getHours()).padStart(2, '0');
-  const min = String(today.getMinutes()).padStart(2, '0');
-  const todayStr = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
-
-  const dateInput = document.getElementById('addTradeOpenedAt');
-  if (dateInput) {dateInput.value = todayStr;}
-
-  // הצגת המודל
-  const modalElement = document.getElementById('addTradeModal');
-  if (modalElement) {
-    if (typeof bootstrap !== 'undefined') {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    } else {
-      if (typeof handleSystemError === 'function') {
-        handleSystemError(new Error('Bootstrap is not loaded'), 'מערכת מודלים');
-      } else {
-        // window.Logger.error('Bootstrap is not loaded', { page: "trades" });
-      }
-      // נסיון חלופי להצגת המודל
-      modalElement.style.display = 'block';
-      modalElement.classList.add('show');
-      document.body.classList.add('modal-open');
-    }
-  } else {
-    if (typeof handleElementNotFound === 'function') {
-      handleElementNotFound('addTradeModal', 'CRITICAL');
-    } else {
-      // window.Logger.error('addTradeModal element not found', { page: "trades" });
-    }
-  }
+  showTradeModal('add');
 }
 
 /**

@@ -803,29 +803,28 @@ if (typeof loadCurrenciesFromServer === 'function') {
 // ===== פונקציות נוספות לניהול חשבונות =====
 
 /**
- * הצגת מודל הוספת חשבון
+ * הצגת מודל חשבון מסחר (הוספה או עריכה)
+ * @param {string} mode - 'add' או 'edit'
+ * @param {Object} [tradingAccount] - אובייקט החשבון המסחר (נדרש רק בעריכה)
  */
-function showAddTradingAccountModal() {
-  // בדיקה אם יש מודל קיים בדף
-  const modalElement = document.getElementById('tradingAccountModal');
-  if (modalElement) {
-    // איפוס הטופס
-    const form = document.getElementById('tradingAccountForm');
-    if (form) {
-      form.reset();
-    }
+function showTradingAccountModal(mode, tradingAccount = null) {
+  const isEdit = mode === 'edit';
+  
+  try {
+    if (isEdit) {
+      // בדיקה שהפרמטר תקין
+      if (!tradingAccount || typeof tradingAccount !== 'object') {
+        handleValidationError('showTradingAccountModal', 'פרמטר חשבון לא תקין');
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל העריכה');
+        } else {
+          handleSystemError(new Error('שגיאה בפתיחת מודל העריכה'), 'פתיחת מודל עריכה');
+        }
+        return;
+      }
 
-    // הצגת המודל
-    try {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    } catch (error) {
-      handleSystemError(error, 'הצגת מודל קיים');
-    }
-  } else {
-    // יצירת המודל דינמית
-    try {
-      const modal = createTradingAccountModal('add');
+      // יצירת המודל דינמית
+      const modal = createTradingAccountModal('edit', tradingAccount);
       document.body.appendChild(modal);
 
       // הצגת המודל
@@ -834,12 +833,49 @@ function showAddTradingAccountModal() {
 
       // אתחול וולידציה בפתיחת המודל
       if (window.initializeValidation) {
-        window.initializeValidation('tradingAccountForm');
+        window.initializeValidation('accountForm');
       }
-    } catch (error) {
-      handleSystemError(error, 'יצירת/הצגת מודל חדש');
+    } else {
+      // בדיקה אם יש מודל קיים בדף
+      const modalElement = document.getElementById('tradingAccountModal');
+      if (modalElement) {
+        // איפוס הטופס
+        const form = document.getElementById('tradingAccountForm');
+        if (form) {
+          form.reset();
+        }
+
+        // הצגת המודל
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      } else {
+        // יצירת המודל דינמית
+        const modal = createTradingAccountModal('add');
+        document.body.appendChild(modal);
+
+        // הצגת המודל
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+
+        // אתחול וולידציה בפתיחת המודל
+        if (window.initializeValidation) {
+          window.initializeValidation('tradingAccountForm');
+        }
+      }
     }
+    
+  } catch (error) {
+    const action = isEdit ? 'עריכת' : 'הוספת';
+    handleSystemError(error, `הצגת מודל ${action} חשבון מסחר`);
   }
+}
+
+/**
+ * הצגת מודל הוספת חשבון
+ * @deprecated Use showTradingAccountModal('add') instead
+ */
+function showAddTradingAccountModal() {
+  showTradingAccountModal('add');
 }
 
 /**
@@ -1271,31 +1307,13 @@ async function showEditTradingAccountModalById(tradingAccountId) {
   }
 }
 
+/**
+ * הצגת מודל עריכת חשבון מסחר
+ * @param {Object} tradingAccount - אובייקט החשבון המסחר לעריכה
+ * @deprecated Use showTradingAccountModal('edit', tradingAccount) instead
+ */
 function showEditTradingAccountModal(tradingAccount) {
-  // בדיקה שהפרמטר תקין
-  if (!account || typeof account !== 'object') {
-    handleValidationError('showEditAccountModal', 'פרמטר חשבון לא תקין');
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל העריכה');
-    } else {
-      handleSystemError(new Error('שגיאה בפתיחת מודל העריכה'), 'פתיחת מודל עריכה');
-    }
-    return;
-  }
-
-  // יצירת המודל דינמית
-  const modal = createTradingAccountModal('edit', tradingAccount);
-  document.body.appendChild(modal);
-
-  // הצגת המודל
-  const bootstrapModal = new bootstrap.Modal(modal);
-  bootstrapModal.show();
-
-  // אתחול וולידציה בפתיחת המודל
-  if (window.initializeValidation) {
-    window.initializeValidation('accountForm');
-  }
-
+  showTradingAccountModal('edit', tradingAccount);
 }
 
 

@@ -46,18 +46,39 @@
 - **3 פונקציות מאוחדות נוצרו**
 - **הפונקציות הישנות נשמרו כ-deprecated** לתאימות לאחור
 
-### ✅ שלב 3: איחוד דפוס Modal Functions ב-tickers.js
+### ✅ שלב 4: איחוד דפוס Modal Functions (הושלם חלקית)
 
-#### **דפוס שאוחד:**
-- **Modal Functions**: `showTickerModal(mode, id)` - מאוחד מ-2 פונקציות
-  - `showAddTickerModal` → `showTickerModal('add')`
-  - `showEditTickerModal` → `showTickerModal('edit', id)`
+#### **קבצים שהושלמו:**
+1. **notes.js** ✅ - איחוד דפוס Modal Functions
+   - `showNoteModal(mode, noteId)` - מאוחד מ-2 פונקציות
+   - `showAddNoteModal` → `showNoteModal('add')`
+   - `showEditNoteModal` → `showNoteModal('edit', noteId)`
 
-#### **תוצאות שלב 3:**
-- **2 פונקציות נמחקו**
-- **1 פונקציה מאוחדת נוצרה**
-- **תמיכה מלאה ב-add ו-edit modes**
-- **Error handling משופר**
+2. **trades.js** ✅ - איחוד דפוס Modal Functions
+   - `showTradeModal(mode, trade)` - מאוחד מ-2 פונקציות
+   - `showAddTradeModal` → `showTradeModal('add')`
+   - `showEditTradeModal` → `showTradeModal('edit', trade)`
+
+3. **alerts.js** ✅ - איחוד דפוס Modal Functions
+   - `showAlertModal(mode, alertId)` - מאוחד מ-2 פונקציות
+   - `showAddAlertModal` → `showAlertModal('add')`
+   - `editAlert` → `showAlertModal('edit', alertId)`
+
+#### **קבצים שנותרו לטיפול:**
+4. **trade_plans.js** ⚠️ - דפוס מורכב (פונקציה ארוכה מאוד - 300+ שורות)
+   - `showAddTradePlanModal` - פונקציה מורכבת עם הרבה לוגיקה
+   - `openEditTradePlanModal` - פונקציה מורכבת עם טעינת נתונים
+   - **סטטוס:** דורש טיפול מיוחד עקב מורכבות
+
+5. **trading_accounts.js** ⏳ - דפוס פשוט (מועמד לאיחוד)
+   - `showAddTradingAccountModal` - פונקציה פשוטה
+   - `showEditTradingAccountModal` - פונקציה פשוטה
+
+#### **תוצאות שלב 4:**
+- **6 פונקציות נמחקו** (3 זוגות)
+- **3 פונקציות מאוחדות נוצרו**
+- **הפונקציות הישנות נשמרו כ-deprecated** לתאימות לאחור
+- **2 קבצים נותרו לטיפול** (1 מורכב, 1 פשוט)
 
 ---
 

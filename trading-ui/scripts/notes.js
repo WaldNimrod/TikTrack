@@ -810,74 +810,84 @@ function updateGridFromComponent(
 
 // פונקציות מודלים
 /**
- * Show add note modal
- * Opens the modal for adding a new note
+ * הצגת מודל הערה (הוספה או עריכה)
+ * @param {string} mode - 'add' או 'edit'
+ * @param {number} [noteId] - מזהה ההערה (נדרש רק בעריכה)
  */
-function showAddNoteModal() {
-  try {
-    // איפוס הטופס
-    document.getElementById('addNoteForm').reset();
-
-  // ניקוי עורך הטקסט
-  setEditorContent('', 'add');
-
-  // ניקוי ולידציה
-  clearNoteValidationErrors();
-
-  // הסרת קלאסים של ולידציה
-  const fields = document.querySelectorAll('.is-valid, .is-invalid');
-  fields.forEach(field => {
-    field.classList.remove('is-valid', 'is-invalid');
-  });
-
-  // טעינת נתונים למודל
-  loadModalData();
-
-  // בחירת טיקר כברירת מחדל אחרי טעינת הנתונים
-  setTimeout(() => {
-    document.getElementById('noteRelationTicker').checked = true;
-    // טעינת אפשרויות לטיקר
-    const tickerRadio = document.getElementById('noteRelationTicker');
-    if (tickerRadio && window.modalTickers) {
-      populateSelect('noteRelatedObjectSelect', window.modalTickers, 'symbol', '');
-    }
-  }, 200);
-
-  // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('addNoteModal'));
-  modal.show();
+function showNoteModal(mode, noteId = null) {
+  const isEdit = mode === 'edit';
+  const modalId = isEdit ? 'editNoteModal' : 'addNoteModal';
   
+  try {
+    if (isEdit) {
+      // ניקוי דגלים
+      window.removeAttachmentFlag = false;
+      window.replaceAttachmentFlag = false;
+
+      // טעינת נתוני ההערה
+      loadNoteData(noteId);
+    } else {
+      // איפוס הטופס
+      const form = document.getElementById('addNoteForm');
+      if (form) {
+        form.reset();
+      }
+
+      // ניקוי עורך הטקסט
+      setEditorContent('', 'add');
+
+      // ניקוי ולידציה
+      clearNoteValidationErrors();
+
+      // הסרת קלאסים של ולידציה
+      const fields = document.querySelectorAll('.is-valid, .is-invalid');
+      fields.forEach(field => {
+        field.classList.remove('is-valid', 'is-invalid');
+      });
+
+      // טעינת נתונים למודל
+      loadModalData();
+
+      // בחירת טיקר כברירת מחדל אחרי טעינת הנתונים
+      setTimeout(() => {
+        document.getElementById('noteRelationTicker').checked = true;
+        // טעינת אפשרויות לטיקר
+        const tickerRadio = document.getElementById('noteRelationTicker');
+        if (tickerRadio && window.modalTickers) {
+          populateSelect('noteRelatedObjectSelect', window.modalTickers, 'symbol', '');
+        }
+      }, 200);
+    }
+
+    // הצגת המודל
+    const modal = new bootstrap.Modal(document.getElementById(modalId));
+    modal.show();
+    
   } catch (error) {
-    window.Logger.error('שגיאה בפתיחת מודל הוספת הערה:', error, { page: "notes" });
+    const action = isEdit ? 'עריכת' : 'הוספת';
+    window.Logger.error(`שגיאה בפתיחת מודל ${action} הערה:`, error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בפתיחת מודל הוספת הערה', error.message);
+      window.showErrorNotification(`שגיאה בפתיחת מודל ${action} הערה`, error.message);
     }
   }
 }
 
 /**
+ * Show add note modal
+ * Opens the modal for adding a new note
+ * @deprecated Use showNoteModal('add') instead
+ */
+function showAddNoteModal() {
+  showNoteModal('add');
+}
+
+/**
  * Show edit note modal
  * @param {number} noteId - The ID of the note to edit
+ * @deprecated Use showNoteModal('edit', noteId) instead
  */
 function showEditNoteModal(noteId) {
-  try {
-    // ניקוי דגלים
-    window.removeAttachmentFlag = false;
-    window.replaceAttachmentFlag = false;
-
-  // טעינת נתוני ההערה
-  loadNoteData(noteId);
-
-  // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('editNoteModal'));
-  modal.show();
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בפתיחת מודל עריכת הערה:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בפתיחת מודל עריכת הערה', error.message);
-    }
-  }
+  showNoteModal('edit', noteId);
 }
 
 async function loadNoteData(noteId) {

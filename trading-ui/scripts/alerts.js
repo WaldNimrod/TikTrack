@@ -792,89 +792,174 @@ function updatePageSummaryStats() {
 
 
 /**
+ * הצגת מודל התראה (הוספה או עריכה)
+ * @param {string} mode - 'add' או 'edit'
+ * @param {number} [alertId] - מזהה ההתראה (נדרש רק בעריכה)
+ */
+function showAlertModal(mode, alertId = null) {
+  const isEdit = mode === 'edit';
+  const modalId = isEdit ? 'editAlertModal' : 'addAlertModal';
+  const formId = isEdit ? 'editAlertForm' : 'addAlertForm';
+  
+  try {
+    if (isEdit) {
+      const alert = (window.alertsData || alertsData).find(a => a.id === alertId);
+      if (!alert) {
+        if (window.showErrorNotification) {
+          window.showErrorNotification('התראה לא נמצאה', 'התראה לא נמצאה');
+        }
+        return;
+      }
+
+      // ניקוי ולידציה
+      clearAlertValidation();
+      
+      // אתחול הממשק המתקדם לבניית תנאי
+      initializeAlertConditionBuilder(alert);
+
+      // מילוי הטופס
+      const editAlertId = document.getElementById('editAlertId');
+      const editAlertMessage = document.getElementById('editAlertMessage');
+      const editAlertStatus = document.getElementById('editAlertStatus');
+      const editAlertIsTriggered = document.getElementById('editAlertIsTriggered');
+      const editAlertState = document.getElementById('editAlertState');
+
+      if (editAlertId) {editAlertId.value = alert.id;}
+      if (editAlertMessage) {editAlertMessage.value = alert.message || '';}
+      if (editAlertStatus) {editAlertStatus.value = alert.status || 'open';}
+      if (editAlertIsTriggered) {editAlertIsTriggered.value = alert.is_triggered || 'false';}
+
+      // מילוי תנאי התראה
+      const editConditionAttribute = document.getElementById('editConditionAttribute');
+      const editConditionOperator = document.getElementById('editConditionOperator');
+      const editConditionNumber = document.getElementById('editConditionNumber');
+
+      if (editConditionAttribute) {editConditionAttribute.value = alert.condition_attribute || 'price';}
+      if (editConditionOperator) {editConditionOperator.value = alert.condition_operator || 'more_than';}
+      if (editConditionNumber) {editConditionNumber.value = alert.condition_number || '0';}
+
+      // קביעת המצב הנכון לפי status ו-is_triggered
+      const currentState = getAlertState(alert.status, alert.is_triggered);
+      if (editAlertState) {editAlertState.value = currentState;}
+
+      // טעינת נתונים למודל ואז מילוי השדות
+      loadModalData().then(() => {
+        // בחירת סוג הקשר
+        const relationType = alert.related_type_id;
+        const radioButton = document.querySelector(`input[name="editAlertRelationType"][value="${relationType}"]`);
+        if (radioButton) {
+          radioButton.checked = true;
+          // הפעלת אירוע change לטעינת האובייקטים
+          radioButton.dispatchEvent(new Event('change'));
+        }
+
+        // בחירת האובייקט המקושר
+        setTimeout(() => {
+          const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
+          if (relatedObjectSelect && alert.related_id) {
+            relatedObjectSelect.value = alert.related_id;
+            // הפעלת אירוע change להפעלת שדות נוספים
+            relatedObjectSelect.dispatchEvent(new Event('change'));
+          }
+        }, 200);
+
+        // הפעלת שדות התנאי
+        setTimeout(() => {
+          enableEditConditionFields();
+        }, 300);
+      });
+    } else {
+      // טעינת נתונים למודל
+      loadModalData();
+
+      // ניקוי הטופס
+      const form = document.getElementById('addAlertForm');
+      if (form) {
+        form.reset();
+      }
+
+      // ניקוי ולידציה
+      clearAlertValidation();
+    }
+
+    // הוספת event listeners לשדות התנאי
+    setTimeout(() => {
+      const conditionAttributeElement = document.getElementById(isEdit ? 'editConditionAttribute' : 'conditionAttribute');
+      if (conditionAttributeElement) {
+        conditionAttributeElement.addEventListener('change', function () {
+          checkAlertVariable(this);
+        });
+      }
+
+      const conditionOperatorElement = document.getElementById(isEdit ? 'editConditionOperator' : 'conditionOperator');
+      if (conditionOperatorElement) {
+        conditionOperatorElement.addEventListener('change', function () {
+          checkAlertOperator(this);
+        });
+      }
+    }, 100);
+
+    // הצגת המודל
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      // הגדרת z-index גבוה מאוד
+      modalElement.style.zIndex = isEdit ? '99999' : '999999';
+
+      // בדיקה אם Bootstrap זמין
+      if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(modalElement, {
+          backdrop: 'static',
+          keyboard: false,
+        });
+        modal.show();
+
+        // וידוא שהמודל מופיע מעל הכל
+        setTimeout(() => {
+          modalElement.style.zIndex = isEdit ? '99999' : '999999';
+          const dialog = modalElement.querySelector('.modal-dialog');
+          if (dialog) {
+            dialog.style.zIndex = isEdit ? '100000' : '1000000';
+          }
+          const content = modalElement.querySelector('.modal-content');
+          if (content) {
+            content.style.zIndex = isEdit ? '100001' : '1000001';
+          }
+        }, 100);
+      } else {
+        // אם Bootstrap לא זמין, נציג את המודל באופן ידני
+        modalElement.style.display = 'block';
+        modalElement.classList.add('show');
+        modalElement.style.zIndex = isEdit ? '99999' : '999999';
+        document.body.classList.add('modal-open');
+
+        // הוספת backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        backdrop.id = 'modalBackdrop';
+        backdrop.style.zIndex = isEdit ? '99998' : '999998';
+        document.body.appendChild(backdrop);
+      }
+    } else {
+      if (typeof handleElementNotFound === 'function') {
+        handleElementNotFound(modalId, 'CRITICAL');
+      }
+    }
+    
+  } catch (error) {
+    const action = isEdit ? 'עריכת' : 'הוספת';
+    window.Logger.error(`שגיאה בהצגת מודל ${action} התראה:`, error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification(`שגיאה בהצגת מודל ${action} התראה`, error.message);
+    }
+  }
+}
+
+/**
  * הצגת מודל הוספת התראה
+ * @deprecated Use showAlertModal('add') instead
  */
 function showAddAlertModal() {
-  try {
-    // טעינת נתונים למודל
-    loadModalData();
-
-    // ניקוי הטופס
-    const form = document.getElementById('addAlertForm');
-    if (form) {
-      form.reset();
-    }
-
-  // ניקוי ולידציה
-  clearAlertValidation();
-
-  // הוספת event listeners לשדות התנאי
-  setTimeout(() => {
-    const conditionAttributeElement = document.getElementById('conditionAttribute');
-    if (conditionAttributeElement) {
-      conditionAttributeElement.addEventListener('change', function () {
-        checkAlertVariable(this);
-      });
-    }
-
-    const conditionOperatorElement = document.getElementById('conditionOperator');
-    if (conditionOperatorElement) {
-      conditionOperatorElement.addEventListener('change', function () {
-        checkAlertOperator(this);
-      });
-    }
-  }, 100);
-
-  // הצגת המודל
-  const modalElement = document.getElementById('addAlertModal');
-  if (modalElement) {
-    // הגדרת z-index גבוה מאוד
-    modalElement.style.zIndex = '999999';
-
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-      const modal = new bootstrap.Modal(modalElement, {
-        backdrop: 'static',
-        keyboard: false,
-      });
-      modal.show();
-
-      // וידוא שהמודל מופיע מעל הכל
-      setTimeout(() => {
-        modalElement.style.zIndex = '999999';
-        const dialog = modalElement.querySelector('.modal-dialog');
-        if (dialog) {
-          dialog.style.zIndex = '1000000';
-        }
-        const content = modalElement.querySelector('.modal-content');
-        if (content) {
-          content.style.zIndex = '1000001';
-        }
-      }, 100);
-    } else {
-      // אם Bootstrap לא זמין, נציג את המודל באופן ידני
-      modalElement.style.display = 'block';
-      modalElement.classList.add('show');
-      modalElement.style.zIndex = '999999';
-      document.body.classList.add('modal-open');
-
-      // הוספת backdrop
-      const backdrop = document.createElement('div');
-      backdrop.className = 'modal-backdrop fade show';
-      backdrop.id = 'modalBackdrop';
-      backdrop.style.zIndex = '999998';
-      document.body.appendChild(backdrop);
-    }
-  } else {
-    // window.Logger.error('Modal element not found', { page: "alerts" });
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בהצגת מודל הוספת התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהצגת מודל הוספת התראה', error.message);
-    }
-  }
+  showAlertModal('add');
 }
 
 /**
@@ -1785,141 +1870,13 @@ async function saveAlert() {
  *
  * @param {number} alertId - מזהה ההתראה לעריכה
  */
+/**
+ * עריכת התראה
+ * @param {number} alertId - מזהה ההתראה לעריכה
+ * @deprecated Use showAlertModal('edit', alertId) instead
+ */
 function editAlert(alertId) {
-  try {
-    const alert = (window.alertsData || alertsData).find(a => a.id === alertId);
-    if (!alert) {
-      if (window.showErrorNotification) {
-        window.showErrorNotification('התראה לא נמצאה', 'התראה לא נמצאה');
-      }
-      return;
-    }
-
-    // ניקוי ולידציה
-    clearAlertValidation();
-    
-    // אתחול הממשק המתקדם לבניית תנאי
-    initializeAlertConditionBuilder(alert);
-
-  // מילוי הטופס
-  const editAlertId = document.getElementById('editAlertId');
-  const editAlertMessage = document.getElementById('editAlertMessage');
-  const editAlertStatus = document.getElementById('editAlertStatus');
-  const editAlertIsTriggered = document.getElementById('editAlertIsTriggered');
-  const editAlertState = document.getElementById('editAlertState');
-
-  if (editAlertId) {editAlertId.value = alert.id;}
-  if (editAlertMessage) {editAlertMessage.value = alert.message || '';}
-  if (editAlertStatus) {editAlertStatus.value = alert.status || 'open';}
-  if (editAlertIsTriggered) {editAlertIsTriggered.value = alert.is_triggered || 'false';}
-
-  // מילוי תנאי התראה
-  const editConditionAttribute = document.getElementById('editConditionAttribute');
-  const editConditionOperator = document.getElementById('editConditionOperator');
-  const editConditionNumber = document.getElementById('editConditionNumber');
-
-  if (editConditionAttribute) {editConditionAttribute.value = alert.condition_attribute || 'price';}
-  if (editConditionOperator) {editConditionOperator.value = alert.condition_operator || 'more_than';}
-  if (editConditionNumber) {editConditionNumber.value = alert.condition_number || '0';}
-
-  // קביעת המצב הנכון לפי status ו-is_triggered
-  const currentState = getAlertState(alert.status, alert.is_triggered);
-  if (editAlertState) {editAlertState.value = currentState;}
-
-  // טעינת נתונים למודל ואז מילוי השדות
-  loadModalData().then(() => {
-    // בחירת סוג הקשר
-    const relationType = alert.related_type_id;
-    const radioButton = document.querySelector(`input[name="editAlertRelationType"][value="${relationType}"]`);
-    if (radioButton) {
-      radioButton.checked = true;
-      // הפעלת אירוע change לטעינת האובייקטים
-      radioButton.dispatchEvent(new Event('change'));
-    }
-
-    // בחירת האובייקט המקושר
-    setTimeout(() => {
-      const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
-      if (relatedObjectSelect && alert.related_id) {
-        relatedObjectSelect.value = alert.related_id;
-        // הפעלת אירוע change להפעלת שדות נוספים
-        relatedObjectSelect.dispatchEvent(new Event('change'));
-      }
-    }, 200);
-
-    // הפעלת שדות התנאי
-    setTimeout(() => {
-      enableEditConditionFields();
-    }, 300);
-  });
-
-  // הוספת event listeners לשדות התנאי במודל העריכה
-  setTimeout(() => {
-    const editConditionAttributeElement = document.getElementById('editConditionAttribute');
-    if (editConditionAttributeElement) {
-      editConditionAttributeElement.addEventListener('change', function () {
-        checkAlertVariable(this);
-      });
-    }
-
-    const editConditionOperatorElement = document.getElementById('editConditionOperator');
-    if (editConditionOperatorElement) {
-      editConditionOperatorElement.addEventListener('change', function () {
-        checkAlertOperator(this);
-      });
-    }
-  }, 100);
-
-  // הצגת המודל
-  const modalElement = document.getElementById('editAlertModal');
-  if (modalElement) {
-    // הגדרת z-index גבוה מאוד
-    modalElement.style.zIndex = '99999';
-
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-      const modal = new bootstrap.Modal(modalElement, {
-        backdrop: 'static',
-        keyboard: false,
-      });
-      modal.show();
-
-      // וידוא שהמודל מופיע מעל הכל
-      setTimeout(() => {
-        modalElement.style.zIndex = '99999';
-        const dialog = modalElement.querySelector('.modal-dialog');
-        if (dialog) {
-          dialog.style.zIndex = '100000';
-        }
-        const content = modalElement.querySelector('.modal-content');
-        if (content) {
-          content.style.zIndex = '100001';
-        }
-      }, 100);
-    } else {
-      // אם Bootstrap לא זמין, נציג את המודל באופן ידני
-      modalElement.style.display = 'block';
-      modalElement.classList.add('show');
-      modalElement.style.zIndex = '99999';
-      document.body.classList.add('modal-open');
-
-      // הוספת backdrop
-      const backdrop = document.createElement('div');
-      backdrop.className = 'modal-backdrop fade show';
-      backdrop.id = 'modalBackdrop';
-      backdrop.style.zIndex = '99998';
-      document.body.appendChild(backdrop);
-    }
-  } else {
-    // window.Logger.error('Edit modal element not found', { page: "alerts" });
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בעריכת התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעריכת התראה', error.message);
-    }
-  }
+  showAlertModal('edit', alertId);
 }
 
 /**

@@ -1,48 +1,32 @@
 /**
- * Function Index:
- * ==============
+ * Executions Page - Comprehensive Function Index
+ * ==============================================
  * 
- * EXECUTION MANAGEMENT:
- * - addExecution()
- * - editExecution()
- * - deleteExecution()
- * - updateExecution()
+ * This file contains all functions for managing executions including:
+ * - CRUD operations for executions
+ * - Data loading and table management
+ * - Form validation and UI interactions
+ * - Modal handling and state management
+ * - Import functionality integration
+ * - Linked items management
+ * - Ticker and trade integration
  * 
- * VALIDATION:
- * - validateExecutionDate()
- * - validateExecutionType()
- * - clearFieldError()
- * - clearExecutionValidationErrors()
- * - validateCompleteExecutionForm()
- * 
- * UI MANAGEMENT:
- * - displayLinkedItems()
- * - goToLinkedItems()
- * - goToTrade()
- * - goToPlan()
- * - goToAlert()
- * - goToNote()
- * - goToTickerPage()
- * - showTickerHelp()
- * - addNewTicker()
- * 
- * DATA FILTERING:
- * - isDateInRange()
- * - filterExecutionsLocally()
- * 
- * UTILITY FUNCTIONS:
- * - restoreSortState()
- * - setupModalConfigurations()
- * - enableAllFields()
- * 
- * ==============
+ * Author: TikTrack Development Team
+ * Version: 2.0
+ * Last Updated: 2025-01-27
  */
 
 // ===== קובץ JavaScript לדף עסקעות =====
 
+// ===== EXECUTION MANAGEMENT FUNCTIONS =====
+// CRUD operations for executions
+
 /**
- * הוספת ביצוע חדש
- * פותח מודל להוספת ביצוע חדש
+ * Add new execution
+ * Opens modal for adding new execution
+ * 
+ * @function addExecution
+ * @returns {void}
  */
 function addExecution() {
   try {
@@ -1360,10 +1344,18 @@ function displayLinkedItems(linkedItems) {
   }
 }
 
+// ===== UI MANAGEMENT FUNCTIONS =====
+// UI interactions, linked items, and navigation
+
 /**
- * מעבר לניהול פריטים מקושרים
+ * Display linked items for execution
+ * Shows modal with related items
+ * 
+ * @function displayLinkedItems
+ * @param {number} executionId - ID of the execution
+ * @returns {void}
  */
-function goToLinkedItems() {
+function displayLinkedItems(executionId) {
   try {
     // סגירת המודל
     const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsModal'));
@@ -1441,8 +1433,16 @@ function goToNote(noteId) {
 
 // showNotification מיוצאת מקובץ ui-utils.js
 
+// ===== DATA LOADING FUNCTIONS =====
+// Data fetching, table updates, and statistics
+
 /**
- * טעינת נתוני עסקעות
+ * Load executions data from server
+ * Fetches all executions and updates the table display
+ * 
+ * @function loadExecutionsData
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadExecutionsData() {
   // loadExecutionsData called
@@ -2027,7 +2027,17 @@ function restoreSortState() {
 // הגדרת הפונקציה כגלובלית
 // window.sortTable export removed - using global version from tables.js
 
-// Initialize executions page - integrated with unified system
+// ===== INITIALIZATION FUNCTIONS =====
+// Page initialization and setup
+
+/**
+ * Initialize executions page
+ * Integrated with unified initialization system
+ * 
+ * @function initializeExecutionsPage
+ * @async
+ * @returns {Promise<void>}
+ */
 window.initializeExecutionsPage = async function() {
   window.Logger.info('⚡ Executions page initialized via unified system', { page: "executions" });
   
@@ -2101,8 +2111,16 @@ function setupModalConfigurations() {
 
 // ===== פונקציות לטעינת טיקרים וטריידים =====
 
+// ===== TICKER MANAGEMENT FUNCTIONS =====
+// Ticker loading, updating, and integration
+
 /**
- * טעינת טיקרים עם טריידים ותכנונים בסטטוס פתוח או סגור
+ * Load tickers with open or closed trades and plans
+ * Loads tickers that have active trading activity
+ * 
+ * @function loadTickersWithOpenOrClosedTradesAndPlans
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadTickersWithOpenOrClosedTradesAndPlans() {
   // Loading tickers with open or closed trades and plans
@@ -2409,8 +2427,15 @@ function goToTickerPage(_symbol) {
 }
 
 
+// ===== UTILITY FUNCTIONS =====
+// Helper functions for notifications and general utilities
+
 /**
- * הצגת עזרה לבחירת טיקר
+ * Show ticker help
+ * Displays help information for ticker selection
+ * 
+ * @function showTickerHelp
+ * @returns {void}
  */
 function showTickerHelp() {
   try {
@@ -2535,9 +2560,16 @@ function toggleExecutionFormFields(enable) {
   });
 }
 
+// ===== FORM MANAGEMENT FUNCTIONS =====
+// Form field enabling/disabling and validation
+
 /**
- * הפעלת שדות הטופס אחרי בחירת טיקר
+ * Enable execution form fields
+ * Activates form fields after ticker selection
  * @deprecated Use toggleExecutionFormFields(true) instead
+ * 
+ * @function enableExecutionFormFields
+ * @returns {void}
  */
 function enableExecutionFormFields() {
   toggleExecutionFormFields(true);
@@ -2866,10 +2898,63 @@ window.addEditBuySell = addEditBuySell;
 window.linkExistingExecution = linkExistingExecution;
 window.unlinkExecution = unlinkExecution;
 
-// הגדרת פונקציות פילטר כגלובליות
-window.filterExecutionsByAccount = window.filterExecutionsByAccount || function() {};
-window.searchExecutions = window.searchExecutions || function() {};
-window.resetExecutionsFilters = window.resetExecutionsFilters || function() {};
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for HTML onclick attributes
+
+// Export all necessary functions to global scope
+window.addExecution = addExecution;
+window.editExecution = editExecution;
+window.deleteExecution = deleteExecution;
+window.updateExecution = updateExecution;
+window.validateExecutionDate = validateExecutionDate;
+window.validateExecutionType = validateExecutionType;
+window.clearFieldError = clearFieldError;
+window.clearExecutionValidationErrors = clearExecutionValidationErrors;
+window.validateCompleteExecutionForm = validateCompleteExecutionForm;
+window.displayLinkedItems = displayLinkedItems;
+window.goToLinkedItems = goToLinkedItems;
+window.goToTrade = goToTrade;
+window.goToPlan = goToPlan;
+window.goToAlert = goToAlert;
+window.goToNote = goToNote;
+window.goToTickerPage = goToTickerPage;
+window.showTickerHelp = showTickerHelp;
+window.addNewTicker = addNewTicker;
+window.isDateInRange = isDateInRange;
+window.filterExecutionsLocally = filterExecutionsLocally;
+window.restoreSortState = restoreSortState;
+window.setupModalConfigurations = setupModalConfigurations;
+window.enableAllFields = enableAllFields;
+window.loadExecutionsData = loadExecutionsData;
+window.updateExecutionsTableMain = updateExecutionsTableMain;
+window.clearNewExecutionHighlights = clearNewExecutionHighlights;
+window.saveExecution = saveExecution;
+window.updateExecutionWrapper = updateExecutionWrapper;
+window.initializeExecutionsPage = window.initializeExecutionsPage;
+window.setupModalConfigurations = setupModalConfigurations;
+window.loadTickersWithOpenOrClosedTradesAndPlans = loadTickersWithOpenOrClosedTradesAndPlans;
+window.updateTickersList = updateTickersList;
+window.showTickerHelp = showTickerHelp;
+window.addNewTicker = addNewTicker;
+window.addNewPlan = addNewPlan;
+window.addNewTrade = addNewTrade;
+window.enableExecutionFormFields = enableExecutionFormFields;
+window.disableExecutionFormFields = disableExecutionFormFields;
+window.loadExecutionTickerInfo = loadExecutionTickerInfo;
+window.hideExecutionTickerInfo = hideExecutionTickerInfo;
+window.calculateAddExecutionValues = calculateAddExecutionValues;
+window.calculateEditExecutionValues = calculateEditExecutionValues;
+window.addEditBuySell = addEditBuySell;
+window.linkExistingExecution = linkExistingExecution;
+window.unlinkExecution = unlinkExecution;
+window.filterExecutionsByAccount = window.filterExecutionsByAccount;
+window.searchExecutions = window.searchExecutions;
+window.resetExecutionsFilters = window.resetExecutionsFilters;
+window.setupExecutionsFilterFunctions = setupExecutionsFilterFunctions;
+window.toggleExecutionsSection = toggleExecutionsSection;
+window.showAddExecutionModal = showAddExecutionModal;
+window.showEditExecutionModal = showEditExecutionModal;
+window.saveExecutionData = saveExecutionData;
 
 // פונקציה זו הוסרה - כפילות עם הפונקציה הראשונה
 
@@ -2974,7 +3059,16 @@ window.resetExecutionsFilters = window.resetExecutionsFilters || function() {};
 
 // ===== מערכת פילטרים לעמוד הביצועים =====
 
-// הגדרת פונקציות פילטר
+// ===== SORTING AND FILTERING FUNCTIONS =====
+// Table sorting, filtering, and state management
+
+/**
+ * Setup executions filter functions
+ * Configures filter system for executions table
+ * 
+ * @function setupExecutionsFilterFunctions
+ * @returns {void}
+ */
 function setupExecutionsFilterFunctions() {
   // Setting up executions filter functions
 
@@ -3612,10 +3706,14 @@ function toggleExecutionsSection() {
 // This file only contains the modal opening/closing functions
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
+// Modal management using ModalManagerV2
 
 /**
- * הצגת מודל הוספת ביצוע
+ * Show add execution modal
  * Uses ModalManagerV2 for consistent modal experience
+ * 
+ * @function showAddExecutionModal
+ * @returns {void}
  */
 function showAddExecutionModal() {
     window.Logger.debug('showAddExecutionModal called', { page: 'executions' });

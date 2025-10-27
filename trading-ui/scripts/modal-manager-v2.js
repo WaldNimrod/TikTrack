@@ -5,16 +5,84 @@
  * מנהל מודלים מרכזי מתקדם עם תמיכה מלאה ב-CRUD operations
  * ואינטגרציה עם כל המערכות הקיימות במערכת TikTrack
  * 
- * @version 2.0.0
- * @created January 12, 2025
- * @author TikTrack Development Team
+ * קובץ: trading-ui/scripts/modal-manager-v2.js
+ * גרסה: 2.1.0
+ * עדכון אחרון: 27 בינואר 2025
  * 
- * תכונות:
- * - יצירת מודלים דינמית מקונפיגורציה
+ * תכונות עיקריות:
+ * - יצירת מודלים דינמית מקונפיגורציה JSON
  * - אינטגרציה מלאה עם כל המערכות הקיימות
- * - תמיכה ב-RTL מלא
- * - עיצוב ITCSS
- * - ביצועים אופטימליים
+ * - תמיכה מלאה ב-RTL (Right-To-Left)
+ * - עיצוב ITCSS compliant - אפס inline styles
+ * - CSS Variables דינמיים לצבעים
+ * - ביצועים אופטימליים עם Map()
+ * 
+ * עדכונים אחרונים (27 בינואר 2025):
+ * - תיקון ITCSS compliance - הסרת כל inline styles
+ * - הוספת CSS variables support מלא
+ * - הוספת data-entity-type attributes
+ * - שיפור applyUserColors() לשימוש ב-CSS variables בלבד
+ * 
+ * תלויות:
+ * - Bootstrap 5.3.0 (לפונקציונליות מודלים)
+ * - window.ENTITY_COLORS (צבעי ישויות מהמערכת הדינמית)
+ * - window.ENTITY_BACKGROUND_COLORS (צבעי רקע)
+ * - window.ENTITY_TEXT_COLORS (צבעי טקסט)
+ * - window.validateEntityForm (מערכת ולידציה)
+ * - window.showNotification (מערכת התראות)
+ * - window.PreferencesSystem (ברירות מחדל)
+ * - window.SelectPopulatorService (אכלוס dropdowns)
+ * 
+ * דוקומנטציה מפורטת:
+ * - documentation/02-ARCHITECTURE/FRONTEND/MODAL_SYSTEM_V2.md
+ * - documentation/03-DEVELOPMENT/GUIDELINES/MODAL_MIGRATION_GUIDE.md
+ * - MODAL_SYSTEM_V2_WORK_DOCUMENT.md
+ * 
+ * ===== FUNCTION INDEX =====
+ * 
+ * Core Functions:
+ * - constructor()                    - אתחול המערכת
+ * - init()                           - הפעלת המערכת
+ * - setupEventListeners()            - הגדרת event listeners
+ * - loadDefaultConfigurations()      - טעינת קונפיגורציות ברירת מחדל
+ * 
+ * CRUD Operations:
+ * - createCRUDModal(config)          - יצירת מודל CRUD חדש
+ * - showModal(modalId, mode, data)   - הצגת מודל
+ * - showEditModal(modalId, type, id) - הצגת מודל עריכה
+ * - closeActiveModal()               - סגירת מודל פעיל
+ * - destroyModal(modalId)            - השמדת מודל
+ * 
+ * Modal Generation:
+ * - generateModalHTML(config)        - יצירת HTML של מודל
+ * - generateFieldsHTML(fields)       - יצירת HTML של שדות
+ * - renderField(field)               - רינדור שדה בודד
+ * 
+ * Form Management:
+ * - resetForm(modalElement)          - איפוס טופס
+ * - populateForm(modalElement, data) - מילוי טופס בנתונים
+ * - applyDefaultValues(form)         - יישום ברירות מחדל
+ * 
+ * Validation & Integration:
+ * - initializeValidation(element, config) - אתחול ולידציה
+ * - initializeButtons(modalElement)       - אתחול כפתורים
+ * - populateSelects(modalElement, config) - אכלוס רשימות בחירה
+ * 
+ * Styling & Colors:
+ * - applyUserColors(modalElement, entityType) - יישום צבעים דינמיים
+ * - updateAllModalColors()                     - עדכון כל הצבעים
+ * - updateModalTitle(element, config, mode)   - עדכון כותרת
+ * 
+ * Data Management:
+ * - loadEntityData(entityType, entityId)     - טעינת נתוני ישות
+ * - populateSpecialSelects(form, data)       - אכלוס selects מיוחדים
+ * 
+ * Utilities:
+ * - validateConfiguration(config)   - ולידציה של קונפיגורציה
+ * - clearValidationErrors(form)     - ניקוי שגיאות ולידציה
+ * - getModalInfo(modalId)           - קבלת מידע על מודל
+ * - loadConfiguration(configFile)   - טעינת קובץ קונפיגורציה
+ * - initializeModalSystems(element, config) - אתחול מערכות מודל
  */
 
 class ModalManagerV2 {
@@ -576,46 +644,22 @@ class ModalManagerV2 {
     applyUserColors(modalElement, entityType) {
         if (!entityType) return;
         
-        const header = modalElement.querySelector('.modal-header');
-        if (!header) return;
+        // הוספת data attribute למודל לזיהוי סוג הישות
+        modalElement.setAttribute('data-entity-type', entityType);
         
-        // קבלת צבע מהישות מהמערכת הדינמית
+        // קבלת צבעי הישות מהמערכת הדינמית
         const entityColors = window.ENTITY_COLORS || {};
-        const entityColor = entityColors[entityType] || '#26baac';
-
-        // קבלת צבעי רקע וטקסט מהמערכת
         const entityBackgroundColors = window.ENTITY_BACKGROUND_COLORS || {};
         const entityTextColors = window.ENTITY_TEXT_COLORS || {};
         
+        const entityColor = entityColors[entityType] || '#26baac';
         const backgroundColor = entityBackgroundColors[entityType] || 'rgba(38, 186, 172, 0.1)';
         const textColor = entityTextColors[entityType] || '#1a9d7a';
 
-        // עדכון רקע הכותרת - וריאנט בהיר
-        header.style.background = backgroundColor;
-        header.style.borderBottom = `1px solid ${entityColor}`;
-
-        // עדכון צבע כותרת הטקסט - וריאנט כהה
-        const title = header.querySelector('.modal-title');
-        if (title) {
-            title.style.color = textColor;
-        }
-
-        // עדכון צבעי כפתורים - שימוש במערכת הכפתורים
-        const saveButton = modalElement.querySelector('[data-button-type="SAVE"]');
-        if (saveButton) {
-            // כפתור שמור - צבע ישות כמו הכותרת
-            saveButton.style.backgroundColor = entityColor;
-            saveButton.style.color = 'white';
-            saveButton.style.borderColor = entityColor;
-        }
-
-        const cancelButton = modalElement.querySelector('[data-button-type="CANCEL"]');
-        if (cancelButton) {
-            // כפתור ביטול - צבע אזהרה
-            cancelButton.style.backgroundColor = '#ffc107';
-            cancelButton.style.color = '#000';
-            cancelButton.style.borderColor = '#ffc107';
-        }
+        // הזרקת משתני CSS דינמיים למודל (ITCSS compliant)
+        modalElement.style.setProperty('--modal-entity-color', entityColor);
+        modalElement.style.setProperty('--modal-entity-bg', backgroundColor);
+        modalElement.style.setProperty('--modal-entity-text', textColor);
     }
 
     /**

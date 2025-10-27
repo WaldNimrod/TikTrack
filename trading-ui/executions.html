@@ -29,8 +29,7 @@
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=05b6de6f_20251025_005449">
     
-    <!-- Import User Data Modal Styles -->
-    <link rel="stylesheet" href="styles/import-user-data.css?v=05b6de6f_20251025_005449">
+    <!-- Import User Data Modal Styles - Now using ITCSS -->
     
     <!-- Additional styles for import modal -->
     <style>
@@ -172,172 +171,7 @@
         <!-- Toast container for notifications -->
         <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 
-        <!-- Add Execution Modal -->
-        <div class="modal fade" id="addExecutionModal" tabindex="-1" aria-labelledby="addExecutionModalLabel" aria-hidden="true"
-            data-bs-backdrop="true" data-bs-keyboard="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
-                        <h5 class="modal-title" id="addExecutionModalLabel">הוספת עסקה חדשה</h5>
-                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="addExecutionForm">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="executionTicker" class="form-label">טיקר</label>
-                                        <select class="form-select" id="executionTicker" required>
-                                            <option value="">בחר טיקר</option>
-                                            <option value="AAPL">AAPL - Apple Inc.</option>
-                                            <option value="GOOGL">GOOGL - Alphabet Inc.</option>
-                                            <option value="MSFT">MSFT - Microsoft Corporation</option>
-                                            <option value="TSLA">TSLA - Tesla Inc.</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="executionType" class="form-label">סוג עסקה</label>
-                                        <select class="form-select" id="executionType" required>
-                                            <option value="">בחר סוג</option>
-                                            <option value="buy" class="text-success">קניה</option>
-                                            <option value="sell" class="text-danger">מכירה</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="executionQuantity" class="form-label">כמות</label>
-                                        <input type="number" class="form-control" id="executionQuantity" min="1" step="1" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="executionPrice" class="form-label">מחיר</label>
-                                        <input type="number" class="form-control" id="executionPrice" min="0" step="0.01" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="executionDate" class="form-label">תאריך עסקה</label>
-                                        <input type="datetime-local" class="form-control" id="executionDate" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="executionAccount" class="form-label">חשבון מסחר</label>
-                                        <select class="form-select" id="executionAccount" required>
-                                            <option value="">בחר חשבון</option>
-                                            <option value="demo">חשבון דמו</option>
-                                            <option value="live">חשבון חי</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="executionCommission" class="form-label">עמלה</label>
-                                        <input type="number" class="form-control" id="executionCommission" min="0" step="0.01" value="1.0">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">סה"כ</label>
-                                        <div class="form-control-plaintext bg-light p-2 rounded" id="executionTotal">
-                                            $0.00
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer d-flex justify-content-end">
-                        <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
-                        <button data-button-type="SAVE" data-onclick="addExecution()" data-text="שמור"></button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Edit Execution Modal -->
-        <div class="modal fade" id="editExecutionModal" tabindex="-1" aria-labelledby="editExecutionModalLabel" aria-hidden="true"
-            data-bs-backdrop="true" data-bs-keyboard="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header modal-header-colored d-flex justify-content-between align-items-center">
-                        <h5 class="modal-title" id="editExecutionModalLabel">עריכת עסקה</h5>
-                        <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editExecutionForm">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editExecutionTicker" class="form-label">טיקר</label>
-                                        <select class="form-select" id="editExecutionTicker" required>
-                                            <option value="AAPL">AAPL - Apple Inc.</option>
-                                            <option value="GOOGL">GOOGL - Alphabet Inc.</option>
-                                            <option value="MSFT">MSFT - Microsoft Corporation</option>
-                                            <option value="TSLA">TSLA - Tesla Inc.</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editExecutionType" class="form-label">סוג עסקה</label>
-                                        <select class="form-select" id="editExecutionType" required>
-                                            <option value="buy" class="text-success">קניה</option>
-                                            <option value="sell" class="text-danger">מכירה</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editExecutionQuantity" class="form-label">כמות</label>
-                                        <input type="number" class="form-control" id="editExecutionQuantity" min="1" step="1" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editExecutionPrice" class="form-label">מחיר</label>
-                                        <input type="number" class="form-control" id="editExecutionPrice" min="0" step="0.01" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editExecutionDate" class="form-label">תאריך עסקה</label>
-                                        <input type="datetime-local" class="form-control" id="editExecutionDate" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="editExecutionAccount" class="form-label">חשבון מסחר</label>
-                                        <select class="form-select" id="editExecutionAccount" required>
-                                            <option value="demo">חשבון דמו</option>
-                                            <option value="live">חשבון חי</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer d-flex justify-content-end">
-                        <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
-                        <button data-button-type="SAVE" data-onclick="updateExecution()" data-text="עדכן"></button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Import User Data Modal -->
@@ -768,5 +602,278 @@
     <script src="scripts/info-summary-configs.js?v=05b6de6f_20251025_005449"></script>
     
     <!-- Page-specific functions are now handled by the unified initialization system -->
+    
+    <!-- Import User Data Modal -->
+    <div class="modal" id="importUserDataModal" tabindex="-1" role="dialog" aria-labelledby="importUserDataModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importUserDataModalLabel">
+                        <i class="bi bi-cloud-upload"></i>
+                        ייבוא ביצועים (Executions)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Progress Steps Indicator -->
+                    <div class="import-steps-indicator">
+                        <div class="step" data-step="1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">העלאה</div>
+                        </div>
+                        <div class="step" data-step="2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">ניתוח</div>
+                        </div>
+                        <div class="step" data-step="3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">פתרון בעיות</div>
+                        </div>
+                        <div class="step" data-step="4">
+                            <div class="step-number">4</div>
+                            <div class="step-label">תצוגה מקדימה</div>
+                        </div>
+                        <div class="step" data-step="5">
+                            <div class="step-number">5</div>
+                            <div class="step-label">אישור</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1+2: Upload + Account Selection (COMBINED) -->
+                    <div class="import-step" id="step-upload" data-step="1">
+                        <div class="step-content">
+                            <div class="upload-section">
+                                <div class="file-drop-zone" id="dropZone">
+                                    <i class="bi bi-cloud-upload"></i>
+                                    <p>גרור קובץ CSV או לחץ לבחירה</p>
+                                    <input type="file" id="fileInput" accept=".csv" hidden>
+                                </div>
+                                <div class="file-info" id="fileInfo" style="display:none;">
+                                    <div class="file-details">
+                                        <span class="file-name" id="fileName"></span>
+                                        <span class="file-size" id="fileSize"></span>
+                                    </div>
+                                    <button data-button-type="SECONDARY" data-text="החלף קובץ" onclick="resetFile()"></button>
+                                </div>
+                            </div>
+                            
+                            <div class="account-section">
+                                <label>בחר חשבון מסחר:</label>
+                                <select id="accountSelect" class="form-select">
+                                    <option value="">בחר חשבון...</option>
+                                </select>
+                            </div>
+                            
+                            <div class="step-actions">
+                                <button data-button-type="PRIMARY" data-text="המשך לניתוח" 
+                                        onclick="analyzeFile()" id="analyzeBtn" disabled></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Analysis Results -->
+                    <div class="import-step" id="step-analysis" data-step="2" style="display:none;">
+                        <div class="step-content">
+                            <h3>תוצאות ניתוח</h3>
+                            <div class="analysis-cards">
+                                <div class="analysis-card total">
+                                    <div class="card-icon"><i class="bi bi-file-text"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="totalRecords">0</div>
+                                        <div class="card-label">סה"כ רשומות</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card valid">
+                                    <div class="card-icon"><i class="bi bi-check-circle"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="validRecords">0</div>
+                                        <div class="card-label">רשומות תקינות</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card invalid">
+                                    <div class="card-icon"><i class="bi bi-x-circle"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="invalidRecords">0</div>
+                                        <div class="card-label">רשומות לא תקינות</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card duplicates">
+                                    <div class="card-icon"><i class="bi bi-files"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="duplicateRecords">0</div>
+                                        <div class="card-label">רשומות כפולות</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card missing">
+                                    <div class="card-icon"><i class="bi bi-question-circle"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="missingTickers">0</div>
+                                        <div class="card-label">סמלים חסרים</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-actions">
+                                <button data-button-type="BACK" data-text="חזור" onclick="goToStep(1)"></button>
+                                <button data-button-type="PRIMARY" data-text="המשך לפתרון בעיות" 
+                                        onclick="goToStep(3)"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Problem Resolution -->
+                    <div class="import-step" id="step-problems" data-step="3" style="display:none;">
+                        <div class="step-content">
+                            <h3>פתרון בעיות</h3>
+                            
+                            <!-- Missing Tickers Section -->
+                            <div class="problem-section" id="missingTickersSection" style="display:none;">
+                                <h4><i class="bi bi-question-circle"></i> סמלים חסרים במערכת</h4>
+                                <p>הסמלים הבאים לא קיימים במערכת ויושמטו מהייבוא:</p>
+                                <div class="missing-tickers-list" id="missingTickersList"></div>
+                            </div>
+                            
+                            <!-- Duplicates Section -->
+                            <div class="problem-section" id="duplicatesSection" style="display:none;">
+                                <h4><i class="bi bi-files"></i> רשומות כפולות</h4>
+                                <p>נמצאו רשומות כפולות בקובץ או קיימות במערכת:</p>
+                                <div class="duplicates-list" id="duplicatesList"></div>
+                            </div>
+                            
+                            <!-- Existing Records Section -->
+                            <div class="problem-section" id="existingRecordsSection" style="display:none;">
+                                <h4><i class="bi bi-exclamation-triangle"></i> רשומות קיימות</h4>
+                                <p>רשומות אלו כבר קיימות במערכת ויושמטו מהייבוא:</p>
+                                <div class="existing-records-list" id="existingRecordsList"></div>
+                            </div>
+                            
+                            <div class="step-actions">
+                                <button data-button-type="BACK" data-text="חזור" onclick="goToStep(2)"></button>
+                                <button data-button-type="PRIMARY" data-text="המשך לתצוגה מקדימה" 
+                                        onclick="goToStep(4)"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Preview -->
+                    <div class="import-step" id="step-preview" data-step="4" style="display:none;">
+                        <div class="step-content">
+                            <h3>תצוגה מקדימה</h3>
+                            
+                            <div class="preview-summary">
+                                <div class="summary-item">
+                                    <span class="summary-label">רשומות לייבוא:</span>
+                                    <span class="summary-value" id="previewImportCount">0</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">רשומות להשמטה:</span>
+                                    <span class="summary-value" id="previewSkipCount">0</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">אחוז ייבוא:</span>
+                                    <span class="summary-value" id="previewImportRate">0%</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Records to Import -->
+                            <div class="preview-section">
+                                <h4><i class="bi bi-check-circle text-success"></i> רשומות לייבוא</h4>
+                                <div class="table-container">
+                                    <table class="import-table" id="importTable">
+                                        <thead>
+                                            <tr>
+                                                <th>סמל</th>
+                                                <th>פעולה</th>
+                                                <th>כמות</th>
+                                                <th>מחיר</th>
+                                                <th>עמלה</th>
+                                                <th>תאריך</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="importTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Records to Skip -->
+                            <div class="preview-section">
+                                <h4><i class="bi bi-x-circle text-danger"></i> רשומות להשמטה</h4>
+                                <div class="table-container">
+                                    <table class="import-table" id="skipTable">
+                                        <thead>
+                                            <tr>
+                                                <th>סמל</th>
+                                                <th>פעולה</th>
+                                                <th>כמות</th>
+                                                <th>מחיר</th>
+                                                <th>עמלה</th>
+                                                <th>תאריך</th>
+                                                <th>סיבה</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="skipTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="step-actions">
+                                <button data-button-type="BACK" data-text="חזור" onclick="goToStep(3)"></button>
+                                <button data-button-type="PRIMARY" data-text="המשך לאישור" 
+                                        onclick="goToStep(5)"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Final Confirmation -->
+                    <div class="import-step" id="step-confirm" data-step="5" style="display:none;">
+                        <div class="step-content">
+                            <h3>אישור סופי</h3>
+                            
+                            <div class="confirmation-summary">
+                                <div class="summary-card">
+                                    <h4>סיכום הייבוא</h4>
+                                    <div class="summary-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">קובץ:</span>
+                                            <span class="detail-value" id="confirmFileName"></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">חשבון:</span>
+                                            <span class="detail-value" id="confirmAccountName"></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">סה"כ רשומות:</span>
+                                            <span class="detail-value" id="confirmTotalRecords"></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">רשומות לייבוא:</span>
+                                            <span class="detail-value" id="confirmImportRecords"></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">רשומות להשמטה:</span>
+                                            <span class="detail-value" id="confirmSkipRecords"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-actions">
+                                <button data-button-type="CANCEL" data-text="ביטול" 
+                                        onclick="resetImport()"></button>
+                                <button data-button-type="BACK" data-text="חזור" 
+                                        onclick="goToStep(4)"></button>
+                                <button data-button-type="SAVE" data-text="ביצוע ייבוא" 
+                                        onclick="executeImport(false)"></button>
+                                <button data-button-type="DOWNLOAD" data-text="ביצוע ייבוא + הורדת דוח" 
+                                        onclick="executeImport(true)"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

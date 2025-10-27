@@ -17,37 +17,564 @@
  * Last Updated: 2025-01-16
  */
 
-// Add CSS for ticker button states
-if (!document.getElementById('import-ticker-button-styles')) {
-    const style = document.createElement('style');
-    style.id = 'import-ticker-button-styles';
-    style.textContent = `
-        .missing-ticker-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            margin: 4px 0;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            border: 1px solid #dee2e6;
+/**
+ * Import User Data JavaScript - Updated for ITCSS Architecture
+ * 
+ * This script handles the complete user data import process using:
+ * - Unified header system
+ * - Centralized button system
+ * - Dynamic color variables
+ * - Unified cache manager
+ * - Notification system
+ * 
+ * Author: TikTrack Development Team
+ * Version: 2.0 - ITCSS Integration
+ * Last Updated: 2025-01-27
+ */
+
+// Import State Management
+const ImportState = {
+    currentStep: 1,
+    sessionId: null,
+    file: null,
+    accountId: null,
+    analysisResults: null,
+    previewData: null,
+    
+    async saveToCache() {
+        try {
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.set('import_state', this);
+            }
+        } catch (error) {
+            console.warn('Failed to save import state to cache:', error);
+        }
+    },
+    
+    async loadFromCache() {
+        try {
+            if (window.UnifiedCacheManager) {
+                const cached = await window.UnifiedCacheManager.get('import_state');
+                if (cached) {
+                    Object.assign(this, cached);
+                    return true;
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load import state from cache:', error);
+        }
+        return false;
+    },
+    
+    clear() {
+        Object.assign(this, {
+            currentStep: 1,
+            sessionId: null,
+            file: null,
+            accountId: null,
+            analysisResults: null,
+            previewData: null
+        });
+    }
+};
+
+// DOM Elements
+let dropZone, fileInput, fileInfo, fileName, fileSize, accountSelect, analyzeBtn;
+
+// Initialize modal when it's shown
+function initializeImportModal() {
+    try {
+        // Get DOM elements
+        dropZone = document.getElementById('dropZone');
+        fileInput = document.getElementById('fileInput');
+        fileInfo = document.getElementById('fileInfo');
+        fileName = document.getElementById('fileName');
+        fileSize = document.getElementById('fileSize');
+        accountSelect = document.getElementById('accountSelect');
+        analyzeBtn = document.getElementById('analyzeBtn');
+        
+        // Load cached state
+        const hasCachedState = ImportState.loadFromCache();
+        if (hasCachedState && ImportState.sessionId) {
+            // Restore state
+            updateStepDisplay();
+            if (ImportState.file) {
+                showFileInfo(ImportState.file);
+            }
+            if (ImportState.accountId) {
+                accountSelect.value = ImportState.accountId;
+                updateAnalyzeButton();
+            }
         }
         
-        .missing-ticker-item .ticker-symbol {
-            font-weight: bold;
-            color: #495057;
+        // Setup event listeners
+        setupEventListeners();
+        
+        // Load accounts
+        loadAccounts();
+        
+        console.log('✅ Import modal initialized');
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize modal:', error);
+        showNotification('שגיאה באתחול המודול', 'error');
+    }
+}
+
+// Function to open the import modal
+function openImportUserDataModal() {
+    const modal = new bootstrap.Modal(document.getElementById('importUserDataModal'));
+    modal.show();
+    
+    // Initialize when modal is shown
+    document.getElementById('importUserDataModal').addEventListener('shown.bs.modal', function() {
+        initializeImportModal();
+    });
+}
+
+function setupEventListeners() {
+    // File drop zone
+    if (dropZone) {
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', handleDragOver);
+        dropZone.addEventListener('dragleave', handleDragLeave);
+        dropZone.addEventListener('drop', handleDrop);
+    }
+    
+    // File input
+    if (fileInput) {
+        fileInput.addEventListener('change', handleFileSelect);
+    }
+    
+    // Account selection
+    if (accountSelect) {
+        accountSelect.addEventListener('change', updateAnalyzeButton);
+    }
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+}
+
+function handleDragLeave(e) {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleFile(files[0]);
+    }
+}
+
+function handleFileSelect(e) {
+    const files = e.target.files;
+    if (files.length > 0) {
+        handleFile(files[0]);
+    }
+}
+
+function handleFile(file) {
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+        showNotification('אנא בחר קובץ CSV בלבד', 'error');
+        return;
+    }
+    
+    ImportState.file = file;
+    showFileInfo(file);
+    updateAnalyzeButton();
+    ImportState.saveToCache();
+}
+
+function showFileInfo(file) {
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    fileInfo.style.display = 'flex';
+    dropZone.style.display = 'none';
+}
+
+function resetFile() {
+    ImportState.file = null;
+    fileInput.value = '';
+    fileInfo.style.display = 'none';
+    dropZone.style.display = 'block';
+    updateAnalyzeButton();
+    ImportState.saveToCache();
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function updateAnalyzeButton() {
+    const hasFile = ImportState.file !== null;
+    const hasAccount = accountSelect.value !== '';
+    analyzeBtn.disabled = !(hasFile && hasAccount);
+}
+
+async function loadAccounts() {
+    try {
+        const response = await fetch('/api/accounts');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
         
-        .missing-ticker-item button.btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-            color: white;
-            cursor: not-allowed;
+        const data = await response.json();
+        if (data.success) {
+            accountSelect.innerHTML = '<option value="">בחר חשבון...</option>';
+            data.accounts.forEach(account => {
+                const option = document.createElement('option');
+                option.value = account.id;
+                option.textContent = account.name;
+                accountSelect.appendChild(option);
+            });
+        } else {
+            throw new Error(data.error || 'Failed to load accounts');
+        }
+    } catch (error) {
+        console.error('❌ Failed to load accounts:', error);
+        showNotification('שגיאה בטעינת החשבונות', 'error');
+    }
+}
+
+async function analyzeFile() {
+    if (!ImportState.file || !accountSelect.value) {
+        showNotification('אנא בחר קובץ וחשבון', 'error');
+        return;
+    }
+    
+    try {
+        ImportState.accountId = parseInt(accountSelect.value);
+        analyzeBtn.disabled = true;
+        analyzeBtn.textContent = 'מנתח...';
+        
+        // Upload file and create session
+        const formData = new FormData();
+        formData.append('file', ImportState.file);
+        formData.append('account_id', ImportState.accountId);
+        
+        const uploadResponse = await fetch('/api/user-data-import/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!uploadResponse.ok) {
+            throw new Error(`HTTP ${uploadResponse.status}`);
         }
         
-        .missing-ticker-item button.btn-success:hover {
-            background-color: #28a745;
-            border-color: #28a745;
+        const uploadData = await uploadResponse.json();
+        if (!uploadData.success) {
+            throw new Error(uploadData.error || 'Upload failed');
+        }
+        
+        ImportState.sessionId = uploadData.session_id;
+        
+        // Analyze file
+        const analyzeResponse = await fetch(`/api/user-data-import/session/${ImportState.sessionId}/analyze`, {
+            method: 'POST'
+        });
+        
+        if (!analyzeResponse.ok) {
+            throw new Error(`HTTP ${analyzeResponse.status}`);
+        }
+        
+        const analyzeData = await analyzeResponse.json();
+        if (!analyzeData.success) {
+            throw new Error(analyzeData.error || 'Analysis failed');
+        }
+        
+        ImportState.analysisResults = analyzeData.analysis_results;
+        displayAnalysisResults();
+        
+        goToStep(2);
+        ImportState.saveToCache();
+        
+    } catch (error) {
+        console.error('❌ Analysis failed:', error);
+        showNotification(`שגיאה בניתוח הקובץ: ${error.message}`, 'error');
+    } finally {
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = 'המשך לניתוח';
+    }
+}
+
+function displayAnalysisResults() {
+    if (!ImportState.analysisResults) return;
+    
+    const results = ImportState.analysisResults;
+    
+    document.getElementById('totalRecords').textContent = results.total_records || 0;
+    document.getElementById('validRecords').textContent = results.valid_records || 0;
+    document.getElementById('invalidRecords').textContent = results.invalid_records || 0;
+    document.getElementById('duplicateRecords').textContent = results.duplicate_records || 0;
+    document.getElementById('missingTickers').textContent = results.missing_tickers ? results.missing_tickers.length : 0;
+}
+
+function goToStep(stepNumber) {
+    ImportState.currentStep = stepNumber;
+    updateStepDisplay();
+    ImportState.saveToCache();
+    
+    // Load data for specific steps
+    if (stepNumber === 3) {
+        displayProblemResolution();
+    } else if (stepNumber === 4) {
+        generatePreview();
+    } else if (stepNumber === 5) {
+        displayConfirmation();
+    }
+}
+
+function updateStepDisplay() {
+    // Hide all steps
+    document.querySelectorAll('.import-step').forEach(step => {
+        step.style.display = 'none';
+    });
+    
+    // Show current step
+    const currentStepElement = document.querySelector(`[data-step="${ImportState.currentStep}"]`);
+    if (currentStepElement) {
+        currentStepElement.style.display = 'block';
+    }
+    
+    // Update step indicators
+    document.querySelectorAll('.step').forEach(step => {
+        const stepNumber = parseInt(step.dataset.step);
+        step.classList.remove('active', 'completed');
+        
+        if (stepNumber === ImportState.currentStep) {
+            step.classList.add('active');
+        } else if (stepNumber < ImportState.currentStep) {
+            step.classList.add('completed');
+        }
+    });
+}
+
+function displayProblemResolution() {
+    if (!ImportState.analysisResults) return;
+    
+    const results = ImportState.analysisResults;
+    
+    // Missing tickers
+    const missingTickersSection = document.getElementById('missingTickersSection');
+    const missingTickersList = document.getElementById('missingTickersList');
+    
+    if (results.missing_tickers && results.missing_tickers.length > 0) {
+        missingTickersList.innerHTML = '';
+        results.missing_tickers.forEach(ticker => {
+            const span = document.createElement('span');
+            span.className = 'missing-ticker';
+            span.textContent = ticker;
+            missingTickersList.appendChild(span);
+        });
+        missingTickersSection.style.display = 'block';
+    } else {
+        missingTickersSection.style.display = 'none';
+    }
+    
+    // Duplicates and existing records will be shown in preview
+}
+
+async function generatePreview() {
+    if (!ImportState.sessionId) return;
+    
+    try {
+        const response = await fetch(`/api/user-data-import/session/${ImportState.sessionId}/preview`, {
+            method: 'GET'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.error || 'Preview generation failed');
+        }
+        
+        ImportState.previewData = data.preview_data;
+        displayPreview();
+        
+    } catch (error) {
+        console.error('❌ Preview generation failed:', error);
+        showNotification(`שגיאה ביצירת התצוגה המקדימה: ${error.message}`, 'error');
+    }
+}
+
+function displayPreview() {
+    if (!ImportState.previewData) return;
+    
+    const preview = ImportState.previewData;
+    
+    // Update summary
+    document.getElementById('previewImportCount').textContent = preview.summary.records_to_import;
+    document.getElementById('previewSkipCount').textContent = preview.summary.records_to_skip;
+    document.getElementById('previewImportRate').textContent = `${preview.summary.import_rate.toFixed(1)}%`;
+    
+    // Display records to import
+    const importTableBody = document.getElementById('importTableBody');
+    importTableBody.innerHTML = '';
+    
+    preview.records_to_import.forEach(record => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${record.symbol || ''}</td>
+            <td>${record.action || ''}</td>
+            <td>${record.quantity || ''}</td>
+            <td>${record.price || ''}</td>
+            <td>${record.fee || ''}</td>
+            <td>${record.date || ''}</td>
+        `;
+        importTableBody.appendChild(row);
+    });
+    
+    // Display records to skip
+    const skipTableBody = document.getElementById('skipTableBody');
+    skipTableBody.innerHTML = '';
+    
+    preview.records_to_skip.forEach(record => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${record.symbol || ''}</td>
+            <td>${record.action || ''}</td>
+            <td>${record.quantity || ''}</td>
+            <td>${record.price || ''}</td>
+            <td>${record.fee || ''}</td>
+            <td>${record.date || ''}</td>
+            <td><span class="status-badge ${record.reason}">${getReasonText(record.reason)}</span></td>
+        `;
+        skipTableBody.appendChild(row);
+    });
+}
+
+function getReasonText(reason) {
+    const reasonTexts = {
+        'validation_error': 'שגיאת תקינות',
+        'missing_ticker': 'סמל חסר',
+        'within_file_duplicate': 'כפילות בקובץ',
+        'existing_record': 'רשומה קיימת'
+    };
+    return reasonTexts[reason] || reason;
+}
+
+function displayConfirmation() {
+    if (!ImportState.file || !ImportState.previewData) return;
+    
+    // Get account name
+    const accountName = accountSelect.options[accountSelect.selectedIndex].text;
+    
+    // Update confirmation details
+    document.getElementById('confirmFileName').textContent = ImportState.file.name;
+    document.getElementById('confirmAccountName').textContent = accountName;
+    document.getElementById('confirmTotalRecords').textContent = ImportState.analysisResults.total_records;
+    document.getElementById('confirmImportRecords').textContent = ImportState.previewData.summary.records_to_import;
+    document.getElementById('confirmSkipRecords').textContent = ImportState.previewData.summary.records_to_skip;
+}
+
+async function executeImport(downloadReport = false) {
+    if (!ImportState.sessionId) return;
+    
+    try {
+        const response = await fetch(`/api/user-data-import/session/${ImportState.sessionId}/execute`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                download_report: downloadReport
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.error || 'Import execution failed');
+        }
+        
+        showNotification('ייבוא הושלם בהצלחה!', 'success');
+        
+        if (downloadReport && data.report_url) {
+            // Download report
+            const link = document.createElement('a');
+            link.href = data.report_url;
+            link.download = `import_report_${ImportState.sessionId}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Close modal and reset
+        const modal = bootstrap.Modal.getInstance(document.getElementById('importUserDataModal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        // Reset import state
+        ImportState.clear();
+        ImportState.saveToCache();
+        
+        // Refresh the executions table
+        if (typeof refreshExecutionsTable === 'function') {
+            refreshExecutionsTable();
+        }
+        
+    } catch (error) {
+        console.error('❌ Import execution failed:', error);
+        showNotification(`שגיאה בביצוע הייבוא: ${error.message}`, 'error');
+    }
+}
+
+function resetImport() {
+    ImportState.clear();
+    ImportState.saveToCache();
+    
+    // Reset UI
+    resetFile();
+    accountSelect.value = '';
+    updateAnalyzeButton();
+    goToStep(1);
+    
+    // Clear all data displays
+    document.querySelectorAll('.analysis-card .card-number').forEach(el => {
+        el.textContent = '0';
+    });
+    
+    document.getElementById('importTableBody').innerHTML = '';
+    document.getElementById('skipTableBody').innerHTML = '';
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('importUserDataModal'));
+    if (modal) {
+        modal.hide();
+    }
+    
+    showNotification('ייבוא חדש הותחל', 'info');
+}
+
+function showHelp() {
+    showNotification('עזרה: בחר קובץ CSV וחשבון מסחר, ולאחר מכן עקוב אחר השלבים המוצגים', 'info');
+}
+
+// Utility function for notifications
+function showNotification(message, type = 'info') {
+    if (window.NotificationSystem) {
+        window.NotificationSystem.show(message, type);
+    } else {
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+}
         }
         
         .result-item.total {

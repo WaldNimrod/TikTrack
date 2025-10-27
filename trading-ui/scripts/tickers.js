@@ -1,51 +1,33 @@
 /**
- * Function Index:
- * ==============
+ * Tickers Page - Comprehensive Function Index
+ * ==========================================
  * 
- * DATA LOADING:
- * - loadTickersData()
- * - updateTickersTable()
- * - updatePageSummaryStats()
+ * This file contains all functions for managing tickers including:
+ * - CRUD operations for tickers
+ * - Data loading and table management
+ * - Form validation and UI interactions
+ * - Modal handling and state management
+ * - External data integration (Yahoo Finance)
+ * - Currency management
+ * - Status and activity tracking
  * 
- * TICKER MANAGEMENT:
- * - addTicker()
- * - editTicker()
- * - deleteTicker()
- * - updateTicker()
- * 
- * VALIDATION:
- * - clearTickerValidation()
- * - validateTickerForm()
- * 
- * UI MANAGEMENT:
- * - showAddTickerModal()
- * - hideAddTickerModal()
- * - showEditTickerModal()
- * - hideEditTickerModal()
- * - updateRadioButtons()
- * - populateSelect()
- * - onRelationTypeChange()
- * - onRelatedObjectChange()
- * - enableConditionFields()
- * - disableConditionFields()
- * - populateRelatedObjects()
- * 
- * DATA FILTERING:
- * - filterTickersLocally()
- * 
- * UTILITY FUNCTIONS:
- * - getDemoTickersData()
- * - restoreSortState()
- * - setupModalConfigurations()
- * 
- * ==============
+ * Author: TikTrack Development Team
+ * Version: 2.0
+ * Last Updated: 2025-01-27
  */
 
 // ===== קובץ JavaScript לדף טיקרים =====
 
+// ===== TICKER MANAGEMENT FUNCTIONS =====
+// CRUD operations for tickers
+
 /**
- * עריכת טיקר קיים
- * @param {number} tickerId - מזהה הטיקר
+ * Edit existing ticker
+ * Opens modal for editing ticker
+ * 
+ * @function editTicker
+ * @param {number} tickerId - ID of the ticker to edit
+ * @returns {void}
  */
 function editTicker(tickerId) {
   try {
@@ -245,8 +227,16 @@ const tickerTypeColors = {
   'other': { bg: '#fafafa', text: '#616161', label: 'אחר' },
 };
 
+// ===== CURRENCY MANAGEMENT FUNCTIONS =====
+// Currency data loading and management
+
 /**
- * טעינת נתוני מטבעות מהשרת
+ * Load currencies data from server
+ * Fetches all currencies for dropdowns
+ * 
+ * @function loadCurrenciesData
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadCurrenciesData() {
   try {
@@ -400,7 +390,17 @@ function updateCurrencyOptions(ticker = null) {
   }
 }
 
-// פונקציה לעדכון שדה active_trades לפי טריידים פתוחים
+// ===== STATUS MANAGEMENT FUNCTIONS =====
+// Status updates and activity tracking
+
+/**
+ * Update active trades field for tickers
+ * Updates active_trades field based on open trades
+ * 
+ * @function updateActiveTradesField
+ * @async
+ * @returns {Promise<void>}
+ */
 async function updateActiveTradesField() {
   // Updating active_trades field for tickers
 
@@ -503,7 +503,16 @@ async function updateAllActiveTradesStatuses() {
   }
 }
 
-// פונקציה לשחזור מצב הסגירה - שימוש בפונקציות הגלובליות
+// ===== UI STATE MANAGEMENT FUNCTIONS =====
+// Section state restoration and UI management
+
+/**
+ * Restore tickers section state
+ * Restores saved section states from localStorage
+ * 
+ * @function restoreTickersSectionState
+ * @returns {void}
+ */
 function restoreTickersSectionState() {
   // שחזור מצב הסקשן העליון
   if (typeof window.restoreAllSectionStates === 'function') {
@@ -623,9 +632,17 @@ async function showTickerModal(mode, id = null) {
   }
 }
 
+// ===== MODAL MANAGEMENT FUNCTIONS =====
+// Modal handling and form management
+
 /**
- * הצגת מודל הוספת טיקר
+ * Show add ticker modal
+ * Opens modal for adding new ticker
  * @deprecated Use showTickerModal('add') instead
+ * 
+ * @function showAddTickerModal
+ * @async
+ * @returns {Promise<void>}
  */
 async function showAddTickerModal() {
   await showTickerModal('add');
@@ -691,10 +708,16 @@ function showDeleteTickerModal(id) {
 // פונקציות שמירה ועדכון
 // ========================================
 
+// ===== SAVE AND UPDATE FUNCTIONS =====
+// Ticker saving, updating, and data management
+
 /**
- * שמירת טיקר חדש
- *
- * Note: updated_at field is NOT set during creation - it's reserved for future pricing system updates
+ * Save new ticker
+ * Collects form data and sends to server for creation
+ * 
+ * @function saveTicker
+ * @async
+ * @returns {Promise<void>}
  */
 async function saveTicker() {
 
@@ -1459,8 +1482,15 @@ async function confirmDeleteTicker(id) {
  */
 
 
+// ===== DATA MANAGEMENT FUNCTIONS =====
+// Data loading, caching, and table management
+
 /**
- * ניקוי מטמון הטיקרים
+ * Clear tickers cache
+ * Clears cached ticker data
+ * 
+ * @function clearTickersCache
+ * @returns {void}
  */
 function clearTickersCache() {
   window.tickersData = [];
@@ -1779,13 +1809,46 @@ window.updateCurrencyOptions = updateCurrencyOptions;
 // פונקציות ביטול טיקר - גלובליות
 window.cancelTicker = cancelTicker;
 window.checkLinkedItemsAndCancelTicker = checkLinkedItemsAndCancelTicker;
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for HTML onclick attributes
+
+// Export all necessary functions to global scope
+window.editTicker = editTicker;
+window.loadCurrenciesData = loadCurrenciesData;
+window.updateActiveTradesField = updateActiveTradesField;
+window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
+window.restoreTickersSectionState = restoreTickersSectionState;
+window.showAddTickerModal = showAddTickerModal;
+window.showEditTickerModal = showEditTickerModal;
+window.showTickerModal = showTickerModal;
+window.saveTicker = saveTicker;
+window.updateTicker = updateTicker;
+window.clearTickersCache = clearTickersCache;
+window.loadTickersData = loadTickersData;
+window.loadColorsAndApplyToHeaders = loadColorsAndApplyToHeaders;
+window.refreshYahooFinanceData = refreshYahooFinanceData;
+window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
+window.toggleSection = toggleSection;
+window.toggleTickersSection = toggleTickersSection;
+window.showAddTickerModal = showAddTickerModal;
+window.showEditTickerModal = showEditTickerModal;
+window.saveTickerData = saveTickerData;
 window.performTickerCancellation = performTickerCancellation;
 window.checkLinkedItemsBeforeCancelTicker = checkLinkedItemsBeforeCancelTicker;
 window.getTickerSymbol = getTickerSymbol;
 window.reactivateTicker = reactivateTicker;
+window.updateAllTickerStatuses = updateAllTickerStatuses;
+
+// ===== COLOR MANAGEMENT FUNCTIONS =====
+// Color loading and header styling
 
 /**
- * טעינת צבעים מההעדפות ויישום על הכותרות
+ * Load colors from preferences and apply to headers
+ * Loads color preferences and applies them to page headers
+ * 
+ * @function loadColorsAndApplyToHeaders
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadColorsAndApplyToHeaders() {
   try {
@@ -1895,9 +1958,16 @@ window.addEventListener('load', function () {
 
 // ===== Yahoo Finance Integration =====
 
+// ===== EXTERNAL DATA FUNCTIONS =====
+// External data integration and refresh
+
 /**
- * רענון נתוני מחירים חיצוניים לכל הטיקרים
- * משתמש בשירות האחיד שעובד עם כל הספקים
+ * Refresh Yahoo Finance data for all tickers
+ * Updates external price data for all tickers
+ * 
+ * @function refreshYahooFinanceData
+ * @async
+ * @returns {Promise<void>}
  */
 async function refreshYahooFinanceData() {
   try {
@@ -2047,7 +2117,16 @@ function getTypeDisplayName(type) {
 
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
 
-// Toggle functions
+// ===== UTILITY FUNCTIONS =====
+// Helper functions for UI interactions and general utilities
+
+/**
+ * Toggle section visibility
+ * Uses global toggleSection function
+ * 
+ * @function toggleSection
+ * @returns {void}
+ */
 function toggleSection() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection();
@@ -2065,10 +2144,14 @@ function toggleTickersSection() {
 }
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
+// Modal management using ModalManagerV2
 
 /**
- * הצגת מודל הוספת טיקר
+ * Show add ticker modal
  * Uses ModalManagerV2 for consistent modal experience
+ * 
+ * @function showAddTickerModal
+ * @returns {void}
  */
 function showAddTickerModal() {
     window.Logger.debug('showAddTickerModal called', { page: 'tickers' });

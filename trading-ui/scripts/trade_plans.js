@@ -1,37 +1,18 @@
 /**
- * Function Index:
- * ==============
+ * Trade Plans Page - Comprehensive Function Index
+ * ================================================
  * 
- * TRADE PLAN MANAGEMENT:
- * - executeTradePlan()
- * - addTradePlan()
- * - editTradePlan()
- * - deleteTradePlan()
- * - updateTradePlan()
+ * This file contains all functions for managing trade plans including:
+ * - CRUD operations for trade plans
+ * - Form management and validation
+ * - UI interactions and modal handling
+ * - Data filtering and sorting
+ * - Price calculations and ticker management
+ * - Conditions system integration
  * 
- * FORM MANAGEMENT:
- * - enableFormFields()
- * - disableFormFields()
- * - enableEditFieldsWrapper()
- * - disableEditFields()
- * 
- * UI MANAGEMENT:
- * - hideTickerInfo()
- * - hideEditTickerInfo()
- * - updateEditSharesFromAmount()
- * - updateEditAmountFromShares()
- * - addEditCondition()
- * - addEditReason()
- * - addEditImportantNote()
- * 
- * DATA FILTERING:
- * - filterTradePlansLocally()
- * 
- * UTILITY FUNCTIONS:
- * - restoreSortState()
- * - setupModalConfigurations()
- * 
- * ==============
+ * Author: TikTrack Development Team
+ * Version: 2.0
+ * Last Updated: 2025-01-27
  */
 
 /**
@@ -280,7 +261,16 @@ window.tradePlansLoaded = false;
 /**
  * פתיחת מודל הוספת תכנון חדש
  */
-// Helper functions for form field management
+// ===== FORM MANAGEMENT FUNCTIONS =====
+// Form field enabling/disabling and validation
+
+/**
+ * Enable form fields for trade plan creation
+ * Activates all form fields after ticker selection
+ * 
+ * @function enableFormFields
+ * @returns {void}
+ */
 function enableFormFields() {
   try {
     const formFields = [
@@ -431,6 +421,16 @@ async function displayTickerInfo(ticker) {
   }
 }
 
+// ===== UI MANAGEMENT FUNCTIONS =====
+// UI interactions, ticker info display, and form calculations
+
+/**
+ * Hide ticker information display
+ * Removes ticker info from add modal
+ * 
+ * @function hideTickerInfo
+ * @returns {void}
+ */
 function hideTickerInfo() {
   try {
     const tickerInfo = document.getElementById('tickerInfo');
@@ -976,8 +976,15 @@ async function updateEditTickerInfo() {
 }
 
 
+// ===== EDIT FORM FUNCTIONS =====
+// Edit modal form management and calculations
+
 /**
- * עדכון מספר מניות מסכום מתוכנן במודל העריכה
+ * Update shares from planned amount in edit modal
+ * Calculates number of shares based on planned amount and current price
+ * 
+ * @function updateEditSharesFromAmount
+ * @returns {void}
  */
 function updateEditSharesFromAmount() {
   try {
@@ -1184,8 +1191,15 @@ async function reactivateTradePlan(tradePlanId) {
 }
 
 
+// ===== EDIT MODAL HELPER FUNCTIONS =====
+// Helper functions for edit modal functionality
+
 /**
- * פונקציות עזר למודל העריכה
+ * Add condition to edit modal
+ * Placeholder for future condition functionality
+ * 
+ * @function addEditCondition
+ * @returns {void}
  */
 function addEditCondition() {
   try {
@@ -1947,8 +1961,15 @@ function updateTradePlansTable(trade_plans) {
   }
 }
 
+// ===== DATA MANAGEMENT FUNCTIONS =====
+// Data loading, filtering, and statistics
+
 /**
- * עדכון סטטיסטיקות סיכום
+ * Update page summary statistics
+ * Calculates and displays trade plan statistics
+ * 
+ * @function updatePageSummaryStats
+ * @returns {void}
  */
 function updatePageSummaryStats() {
   try {
@@ -2839,9 +2860,15 @@ function isDateValue(value) {
   return !isNaN(date.getTime());
 }
 
+// ===== SORTING AND FILTERING FUNCTIONS =====
+// Table sorting, filtering, and state management
+
 /**
- * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * Restore sort state for trade plans table
  * @deprecated Use window.restoreAnyTableSort from main.js instead
+ * 
+ * @function restoreSortState
+ * @returns {void}
  */
 function restoreSortState() {
   // Check if data is available
@@ -3300,9 +3327,15 @@ window.initializeTradePlanConditions = initializeTradePlanConditions;
 window.cleanupTradePlanConditions = cleanupTradePlanConditions;
 window.getCurrentEditPlanId = getCurrentEditPlanId;
 
+// ===== CONDITIONS SYSTEM FUNCTIONS =====
+// Conditions system integration and management
+
 /**
  * Initialize conditions system for trade plans
  * Integrated with unified initialization system
+ * 
+ * @function initializeTradePlanConditionsSystem
+ * @returns {void}
  */
 function initializeTradePlanConditionsSystem() {
     try {
@@ -3471,7 +3504,16 @@ window.initializeTradePlansPage = async function() {
 
 // updateGridFromComponent is already defined at the beginning of the file
 
-// Price calculation functions
+// ===== PRICE CALCULATION FUNCTIONS =====
+// Price calculations and percentage calculations
+
+/**
+ * Setup price calculation for add form
+ * Configures price and percentage calculation logic
+ * 
+ * @function setupPriceCalculation
+ * @returns {void}
+ */
 function setupPriceCalculation() {
   // Target price calculation - when price changes, update percentage
   const targetPriceInput = document.getElementById('targetPrice');
@@ -3760,7 +3802,16 @@ function setupSortableHeadersLocal() {
   });
 }
 
-// פונקציות לפתיחה/סגירה של סקשנים
+// ===== UI STATE MANAGEMENT FUNCTIONS =====
+// Section toggling, state restoration, and UI management
+
+/**
+ * Toggle section visibility
+ * Uses global toggleSection function
+ * 
+ * @function toggleSection
+ * @returns {void}
+ */
 function toggleSection() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection();
@@ -3862,8 +3913,15 @@ function showTickerPage(tickerId) {
   }
 }
 
+// ===== UTILITY FUNCTIONS =====
+// Helper functions for notifications and general utilities
+
 /**
- * הוספת הערה חשובה
+ * Add important note to trade plan
+ * Placeholder for future note functionality
+ * 
+ * @function addImportantNote
+ * @returns {void}
  */
 function addImportantNote() {
 
@@ -3885,11 +3943,14 @@ function addReminder() {
 }
 
 // ===== VALIDATION FUNCTIONS =====
-// All validation functions are now handled by the global validation system in validation-utils.js
-// No local validation functions needed - using window.showFieldError, window.clearValidationErrors, etc.
+// Form validation and ticker information updates
 
 /**
- * עדכון מידע טיקר
+ * Update ticker information display
+ * Shows current price and daily change for selected ticker
+ * 
+ * @function updateTickerInfo
+ * @returns {void}
  */
 function updateTickerInfo() {
   const tickerSelect = document.getElementById('ticker');
@@ -4337,14 +4398,54 @@ function filterTradePlansByType(type) {
   }
 }
 
-// ייצוא הפונקציה לגלובל
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for HTML onclick attributes
+
+// Export all necessary functions to global scope
+window.executeTradePlan = executeTradePlan;
+window.addTradePlan = addTradePlan;
+window.editTradePlan = editTradePlan;
+window.deleteTradePlan = deleteTradePlan;
+window.updateTradePlan = updateTradePlan;
+window.enableFormFields = enableFormFields;
+window.disableFormFields = disableFormFields;
+window.enableEditFieldsWrapper = enableEditFieldsWrapper;
+window.disableEditFields = disableEditFields;
+window.hideTickerInfo = hideTickerInfo;
+window.hideEditTickerInfo = hideEditTickerInfo;
+window.updateEditSharesFromAmount = updateEditSharesFromAmount;
+window.updateEditAmountFromShares = updateEditAmountFromShares;
+window.addEditCondition = addEditCondition;
+window.addEditReason = addEditReason;
+window.addEditImportantNote = addEditImportantNote;
+window.addEditReminder = addEditReminder;
+window.updatePageSummaryStats = updatePageSummaryStats;
+window.restoreSortState = restoreSortState;
+window.initializeTradePlanConditionsSystem = initializeTradePlanConditionsSystem;
+window.setupPriceCalculation = setupPriceCalculation;
+window.setupEditPriceCalculation = setupEditPriceCalculation;
+window.setupSortableHeadersLocal = setupSortableHeadersLocal;
+window.toggleSection = toggleSection;
+window.restorePlanningSectionState = restorePlanningSectionState;
+window.addImportantNote = addImportantNote;
+window.addReminder = addReminder;
+window.updateTickerInfo = updateTickerInfo;
+window.updateSharesFromAmount = updateSharesFromAmount;
+window.updateAmountFromShares = updateAmountFromShares;
+window.showAddTradePlanModal = showAddTradePlanModal;
+window.showEditTradePlanModal = showEditTradePlanModal;
+window.saveTradePlanData = saveTradePlanData;
 window.filterTradePlansByType = filterTradePlansByType;
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
+// Modal management using ModalManagerV2
 
 /**
- * הצגת מודל הוספת תוכנית מסחר
+ * Show add trade plan modal
  * Uses ModalManagerV2 for consistent modal experience
+ * 
+ * @function showAddTradePlanModal
+ * @returns {void}
  */
 function showAddTradePlanModal() {
     window.Logger.debug('showAddTradePlanModal called', { page: 'trade_plans' });

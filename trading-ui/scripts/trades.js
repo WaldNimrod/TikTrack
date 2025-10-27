@@ -1,44 +1,18 @@
 /**
- * Function Index:
- * ==============
+ * Trades Page - Comprehensive Function Index
+ * ==========================================
  * 
- * DATA LOADING:
- * - loadTradesData()
- * - updateTradesTable()
- * - updatePageSummaryStats()
+ * This file contains all functions for managing trades including:
+ * - CRUD operations for trades
+ * - Data loading and table management
+ * - Form validation and UI interactions
+ * - Modal handling and state management
+ * - Filtering and sorting functionality
+ * - Conditions system integration
  * 
- * TRADE MANAGEMENT:
- * - addTrade()
- * - editTrade()
- * - deleteTrade()
- * - updateTrade()
- * 
- * VALIDATION:
- * - clearTradeValidation()
- * - validateTradeForm()
- * 
- * UI MANAGEMENT:
- * - showAddTradeModal()
- * - hideAddTradeModal()
- * - showEditTradeModal()
- * - hideEditTradeModal()
- * - updateRadioButtons()
- * - populateSelect()
- * - onRelationTypeChange()
- * - onRelatedObjectChange()
- * - enableConditionFields()
- * - disableConditionFields()
- * - populateRelatedObjects()
- * 
- * DATA FILTERING:
- * - filterTradesLocally()
- * 
- * UTILITY FUNCTIONS:
- * - getDemoTradesData()
- * - restoreSortState()
- * - setupModalConfigurations()
- * 
- * ==============
+ * Author: TikTrack Development Team
+ * Version: 2.0
+ * Last Updated: 2025-01-27
  */
 
 /**
@@ -203,6 +177,17 @@ function getInvestmentTypeColor(investmentType) {
  * - עדכון הטבלה עם הנתונים החדשים
  * - תמיכה בפילטרים מקומיים
  *
+ * @returns {Promise<void>}
+ */
+// ===== DATA LOADING FUNCTIONS =====
+// Data fetching, table updates, and statistics
+
+/**
+ * Load trades data from server
+ * Fetches all trades and updates the table display
+ * 
+ * @function loadTradesData
+ * @async
  * @returns {Promise<void>}
  */
 async function loadTradesData() {
@@ -822,8 +807,15 @@ async function performTradeDeletion(tradeId) {
   }
 }
 
+// ===== EDIT MODAL HELPER FUNCTIONS =====
+// Helper functions for edit modal functionality
+
 /**
- * פונקציות עזר למודל העריכה
+ * Add important note to edit modal
+ * Placeholder for future note functionality
+ * 
+ * @function addEditImportantNote
+ * @returns {void}
  */
 function addEditImportantNote() {
   if (typeof window.showNotification === 'function') {
@@ -1441,9 +1433,16 @@ function disableTradeFormFields() {
   toggleTradeFormFields(false);
 }
 
+// ===== FORM MANAGEMENT FUNCTIONS =====
+// Form field enabling/disabling and validation
+
 /**
- * הפעלת שדות הטופס אחרי בחירת תוכנית
+ * Enable trade form fields
+ * Activates form fields after trade plan selection
  * @deprecated Use toggleTradeFormFields(true) instead
+ * 
+ * @function enableTradeFormFields
+ * @returns {void}
  */
 function enableTradeFormFields() {
   toggleTradeFormFields(true);
@@ -1680,21 +1679,15 @@ async function saveNewTradeRecord() {
   await saveTradeData('add');
 }
 
+// ===== DATA MANAGEMENT FUNCTIONS =====
+// Data loading, saving, and modal data management
+
 /**
- * טעינת נתונים למודל
- *
- * פונקציה זו טוענת את הנתונים הנדרשים למודל ההוספה
- *
- * תכונות:
- * - טעינת חשבונות מ-API
- * - טעינת תוכניות טרייד מ-API
- * - מילוי רשימות בחירה במודל
- * - טיפול בשגיאות
- *
- * נתונים נטענים:
- * - חשבונות: שם וסוג מטבע
- * - תוכניות טרייד: סמל טיקר וסוג השקעה
- *
+ * Load modal data for trades
+ * Loads accounts, trades, trade plans, and tickers for modal dropdowns
+ * 
+ * @function loadModalData
+ * @async
  * @returns {Promise<void>}
  */
 async function loadModalData() {
@@ -1977,8 +1970,15 @@ function onShowClosedTradesChange(_event) {
 // ייצוא הפונקציה לגלובל
 window.onShowClosedTradesChange = onShowClosedTradesChange;
 
+// ===== UTILITY FUNCTIONS =====
+// Helper functions for notifications and general utilities
+
 /**
- * הוספת הערה חשובה
+ * Add important note to trade
+ * Placeholder for future note functionality
+ * 
+ * @function addImportantNote
+ * @returns {void}
  */
 function addImportantNote() {
   // הצגת הודעה למשתמש
@@ -2132,7 +2132,17 @@ function getCurrentPosition(_tradeId) {
 // אתחול וולידציה
 // ========================================
 
-// Initialize trades page - integrated with unified system
+// ===== INITIALIZATION FUNCTIONS =====
+// Page initialization and setup
+
+/**
+ * Initialize trades page
+ * Integrated with unified initialization system
+ * 
+ * @function initializeTradesPage
+ * @async
+ * @returns {Promise<void>}
+ */
 window.initializeTradesPage = async function() {
   window.Logger.info('📊 Trades page initialized via unified system', { page: "trades" });
   
@@ -2336,8 +2346,15 @@ window.clearDateValidationMessages = clearDateValidationMessages; // ניקוי 
 // פונקציות סידור - משתמשות בפונקציות הגלובליות מ-tables.js
 // Sort functions - using global functions from tables.js
 
+// ===== VALIDATION FUNCTIONS =====
+// Form validation and date validation
+
 /**
- * ולידציה בזמן אמת של שדות תאריך
+ * Setup date validation for trade forms
+ * Configures date field validation logic
+ * 
+ * @function setupDateValidation
+ * @returns {void}
  */
 function setupDateValidation() {
   const openedAtField = document.getElementById('editTradeOpenedAt');
@@ -2556,10 +2573,63 @@ function filterTradesData(_selectedStatuses, _selectedTypes, _selectedAccounts, 
   updateTableStats();
 }
 
-// ייצוא פונקציה לפילטור נתונים
-window.filterTradesData = filterTradesData;
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for HTML onclick attributes
 
-// הוספת event listeners לכפתורי המיון - משתמש בפונקציות הגלובליות
+// Export all necessary functions to global scope
+window.loadTradesData = loadTradesData;
+window.updateTradesTable = updateTradesTable;
+window.updatePageSummaryStats = updatePageSummaryStats;
+window.addTrade = addTrade;
+window.editTrade = editTrade;
+window.deleteTrade = deleteTrade;
+window.updateTrade = updateTrade;
+window.clearTradeValidation = clearTradeValidation;
+window.validateTradeForm = validateTradeForm;
+window.showAddTradeModal = showAddTradeModal;
+window.hideAddTradeModal = hideAddTradeModal;
+window.showEditTradeModal = showEditTradeModal;
+window.hideEditTradeModal = hideEditTradeModal;
+window.updateRadioButtons = updateRadioButtons;
+window.populateSelect = populateSelect;
+window.onRelationTypeChange = onRelationTypeChange;
+window.onRelatedObjectChange = onRelatedObjectChange;
+window.enableConditionFields = enableConditionFields;
+window.disableConditionFields = disableConditionFields;
+window.populateRelatedObjects = populateRelatedObjects;
+window.filterTradesLocally = filterTradesLocally;
+window.getDemoTradesData = getDemoTradesData;
+window.restoreSortState = restoreSortState;
+window.setupModalConfigurations = setupModalConfigurations;
+window.addEditImportantNote = addEditImportantNote;
+window.addEditReminder = addEditReminder;
+window.enableTradeFormFields = enableTradeFormFields;
+window.disableTradeFormFields = disableTradeFormFields;
+window.loadModalData = loadModalData;
+window.initializeTradesPage = window.initializeTradesPage;
+window.setupDateValidation = setupDateValidation;
+window.validateDateFields = validateDateFields;
+window.clearDateValidationMessages = clearDateValidationMessages;
+window.addImportantNote = addImportantNote;
+window.addReminder = addReminder;
+window.setupSortEventListeners = setupSortEventListeners;
+window.filterTradesData = filterTradesData;
+window.onShowClosedTradesChange = onShowClosedTradesChange;
+window.refreshPositions = refreshPositions;
+window.updateTableStats = updateTableStats;
+window.loadTradePlanDates = loadTradePlanDates;
+window.addEditBuySell = addEditBuySell;
+
+// ===== SORTING AND FILTERING FUNCTIONS =====
+// Table sorting, filtering, and state management
+
+/**
+ * Setup sort event listeners for trades table
+ * Configures sortable headers for table columns
+ * 
+ * @function setupSortEventListeners
+ * @returns {void}
+ */
 function setupSortEventListeners() {
   const sortButtons = document.querySelectorAll('.sortable-header[data-sort-column]');
   sortButtons.forEach(button => {
@@ -3449,10 +3519,14 @@ async function generateDetailedLogForTrades() {
 }
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
+// Modal management using ModalManagerV2
 
 /**
- * הצגת מודל הוספת טרייד
+ * Show add trade modal
  * Uses ModalManagerV2 for consistent modal experience
+ * 
+ * @function showAddTradeModal
+ * @returns {void}
  */
 function showAddTradeModal() {
     window.Logger.debug('showAddTradeModal called', { page: 'trades' });

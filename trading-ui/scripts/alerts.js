@@ -1,36 +1,19 @@
 /**
- * Function Index:
- * ==============
+ * Alerts Page - Comprehensive Function Index
+ * ==========================================
  * 
- * DATA LOADING:
- * - loadAlertsData()
- * - updateAlertsTable()
- * - updatePageSummaryStats()
+ * This file contains all functions for managing alerts including:
+ * - CRUD operations for alerts
+ * - Data loading and table management
+ * - Form validation and UI interactions
+ * - Modal handling and state management
+ * - Conditions system integration
+ * - Advanced condition builder functionality
+ * - Condition evaluation and monitoring
  * 
- * MODAL MANAGEMENT:
- * - showAddAlertModal()
- * - hideAddAlertModal()
- * - showEditAlertModal()
- * - hideEditAlertModal()
- * 
- * VALIDATION:
- * - clearAlertValidation()
- * - validateAlertForm()
- * 
- * UI MANAGEMENT:
- * - updateRadioButtons()
- * - populateSelect()
- * - onRelationTypeChange()
- * - onRelatedObjectChange()
- * - enableConditionFields()
- * - disableConditionFields()
- * - populateRelatedObjects()
- * 
- * UTILITY FUNCTIONS:
- * - getDemoAlertsData()
- * - filterAlertsLocally()
- * 
- * ==============
+ * Author: TikTrack Development Team
+ * Version: 2.0
+ * Last Updated: 2025-01-27
  */
 
 // alerts.js loaded successfully - removed debug log
@@ -41,7 +24,17 @@ window.loadAlertsData = window.loadAlertsData || function() {
   window.Logger.info('⚠️ loadAlertsData placeholder called', { page: "alerts" });
 };
 
-// הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
+// ===== DATA LOADING FUNCTIONS =====
+// Data fetching, table updates, and statistics
+
+/**
+ * Load alerts data from server
+ * Fetches all alerts and updates the table display
+ * 
+ * @function loadAlertsData
+ * @async
+ * @returns {Promise<void>}
+ */
 window.loadAlertsData = async function() {
   window.Logger.info('🚀🚀🚀 loadAlertsData התחיל 🚀🚀🚀', { page: "alerts" });
 
@@ -1007,8 +1000,16 @@ function clearAlertValidation() {
   }
 }
 
+// ===== DATA MANAGEMENT FUNCTIONS =====
+// Data loading, saving, and modal data management
+
 /**
- * טעינת נתונים למודלים
+ * Load modal data for alerts
+ * Loads accounts, trades, trade plans, and tickers for modal dropdowns
+ * 
+ * @function loadModalData
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadModalData() {
   try {
@@ -1329,9 +1330,16 @@ function toggleConditionFields(enable, mode = 'add') {
   }
 }
 
+// ===== FORM MANAGEMENT FUNCTIONS =====
+// Form field enabling/disabling and validation
+
 /**
- * הפעלת שדות התנאי
+ * Enable condition fields for add modal
+ * Activates condition fields after relation type selection
  * @deprecated Use toggleConditionFields(true, 'add') instead
+ * 
+ * @function enableConditionFields
+ * @returns {void}
  */
 function enableConditionFields() {
   toggleConditionFields(true, 'add');
@@ -1617,12 +1625,16 @@ function parseAlertCondition(condition) {
   }
 }
 
+// ===== SAVE AND UPDATE FUNCTIONS =====
+// Alert saving, updating, and status management
+
 /**
- * שמירת התראה חדשה
- *
- * פונקציה זו אוספת נתונים מהטופס ושולחת אותם לשרת
- * כולל בדיקת תקינות וטיפול בשגיאות
- * משתמשת במערכת ההתראות הגלובלית להודעות
+ * Save new alert
+ * Collects form data and sends to server for creation
+ * 
+ * @function saveAlert
+ * @async
+ * @returns {Promise<void>}
  */
 async function saveAlert() {
   window.Logger.info('🔧 saveAlert function called', { page: "alerts" });
@@ -1878,18 +1890,15 @@ function validateAlertStatusCombination(status, isTriggered) {
   return window.alertService.validateAlertStatusCombination(status, isTriggered);
 }
 
+// ===== STATUS MANAGEMENT FUNCTIONS =====
+// Status updates and state management
+
 /**
- * עדכון status ו-is_triggered בהתאם למצב הנבחר
- *
- * פונקציה זו מעדכנת את השדות הנסתרים status ו-is_triggered
- * בהתאם למצב שנבחר ב-select של מצב ההתראה
- *
- * מצבים:
- * - new: status='open', is_triggered='false'
- * - active: status='open', is_triggered=שמירה על הערך הנוכחי
- * - unread: status='closed', is_triggered='new'
- * - read: status='closed', is_triggered='true'
- * - cancelled: status='cancelled', is_triggered='false'
+ * Update status and triggered state
+ * Updates hidden fields based on state selection
+ * 
+ * @function updateStatusAndTriggered
+ * @returns {void}
  */
 function updateStatusAndTriggered() {
   const stateSelect = document.getElementById('editAlertState');
@@ -2219,12 +2228,15 @@ function getRelatedClass(relatedType) {
 }
 
 
+// ===== UI STATE MANAGEMENT FUNCTIONS =====
+// Section state restoration and UI management
+
 /**
- * שחזור מצב הסקשנים
- *
- * פונקציה זו משחזרת את המצב השמור של הסקשנים (top-section ו-main-section)
- * כולל מצב פתוח/סגור ומיקום האייקונים
- * משתמשת ב-localStorage לשמירת המצב
+ * Restore alerts section state
+ * Restores saved section states from localStorage
+ * 
+ * @function restoreAlertsSectionState
+ * @returns {void}
  */
 function restoreAlertsSectionState() {
   // שימוש בפונקציה הגלובלית החדשה
@@ -2716,7 +2728,53 @@ document.addEventListener("DOMContentLoaded", () => {
 // Filter functions - removed duplicate
 
 // ===== GLOBAL EXPORTS =====
-// Detailed Log Functions for Alerts Page
+// Export functions to global scope for HTML onclick attributes
+
+// Export all necessary functions to global scope
+window.loadAlertsData = window.loadAlertsData;
+window.updateAlertsTable = updateAlertsTable;
+window.updatePageSummaryStats = updatePageSummaryStats;
+window.showAddAlertModal = showAddAlertModal;
+window.hideAddAlertModal = hideAddAlertModal;
+window.showEditAlertModal = showEditAlertModal;
+window.hideEditAlertModal = hideEditAlertModal;
+window.clearAlertValidation = clearAlertValidation;
+window.validateAlertForm = validateAlertForm;
+window.updateRadioButtons = updateRadioButtons;
+window.populateSelect = populateSelect;
+window.onRelationTypeChange = onRelationTypeChange;
+window.onRelatedObjectChange = onRelatedObjectChange;
+window.enableConditionFields = enableConditionFields;
+window.disableConditionFields = disableConditionFields;
+window.populateRelatedObjects = populateRelatedObjects;
+window.getDemoAlertsData = getDemoAlertsData;
+window.filterAlertsLocally = filterAlertsLocally;
+window.loadModalData = loadModalData;
+window.saveAlert = saveAlert;
+window.updateAlert = updateAlert;
+window.updateStatusAndTriggered = updateStatusAndTriggered;
+window.restoreAlertsSectionState = restoreAlertsSectionState;
+window.loadConditionsFromSource = loadConditionsFromSource;
+window.loadTradePlansForConditions = loadTradePlansForConditions;
+window.loadTradesForConditions = loadTradesForConditions;
+window.loadConditionsFromItem = loadConditionsFromItem;
+window.evaluateAllConditions = evaluateAllConditions;
+window.updateEvaluationStats = updateEvaluationStats;
+window.initializeAlertConditionBuilder = initializeAlertConditionBuilder;
+window.cleanupAlertConditionBuilder = cleanupAlertConditionBuilder;
+window.showAddAlertModal = showAddAlertModal;
+window.showEditAlertModal = showEditAlertModal;
+window.saveAlertData = saveAlertData;
+window.generateDetailedLog = generateDetailedLog;
+window.generateDetailedLogForAlerts = generateDetailedLogForAlerts;
+
+/**
+ * Generate detailed log for alerts page
+ * Creates comprehensive log data for debugging
+ * 
+ * @function generateDetailedLog
+ * @returns {string} JSON string of log data
+ */
 function generateDetailedLog() {
     try {
         const logData = {

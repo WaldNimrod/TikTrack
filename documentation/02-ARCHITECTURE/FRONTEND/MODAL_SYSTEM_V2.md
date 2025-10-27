@@ -7,7 +7,7 @@ Modal System V2 היא מערכת מרכזית גמישה, פשוטה ויציב
 ### עקרונות יסוד:
 - **Component-Based Architecture** - מודל בסיסי + רכיבי שדות נפרדים
 - **Configuration-Driven** - מודלים נוצרים מקונפיגורציה JSON
-- **ITCSS Compliance** - אפס inline styles או !important
+- **ITCSS Compliance** - אפס inline styles או !important - כל הצבעים דרך CSS variables
 - **RTL Support** - תמיכה מלאה בעברית (ימין = תחילה)
 - **Dynamic Colors** - אינטגרציה עם מערכת הצבעים הדינמית
 - **User Preferences** - ברירות מחדל מהעדפות משתמש
@@ -181,6 +181,43 @@ window.delete{Entity} = delete{Entity};
 }
 ```
 
+## 🎨 ITCSS ו-CSS Variables
+
+### עקרון ITCSS Compliance
+המערכת עומדת ב-100% בעקרונות ITCSS:
+- **אפס inline styles** - כל העיצוב דרך CSS classes ו-variables
+- **אפס !important** - שימוש ב-specificity נכון
+- **הפרדת concerns** - JavaScript רק לוגיקה, CSS רק עיצוב
+
+### CSS Variables System
+המערכת משתמשת במשתני CSS דינמיים:
+
+```css
+/* משתנים דינמיים שמוזרקים למודל */
+.modal[data-entity-type] {
+  --modal-entity-color: #26baac;
+  --modal-entity-bg: rgba(38, 186, 172, 0.1);
+  --modal-entity-text: #1a9d7a;
+}
+```
+
+### Data Attributes
+כל מודל מקבל `data-entity-type` attribute:
+```html
+<div class="modal fade" data-entity-type="cash_flow">
+  <!-- תוכן המודל -->
+</div>
+```
+
+### Entity-Specific Styles
+CSS rules ספציפיים לכל סוג ישות:
+```css
+.modal[data-entity-type="cash_flow"] .modal-header {
+  background: rgba(253, 126, 20, 0.1);
+  border-bottom: 1px solid #fd7e14;
+}
+```
+
 ## 🔗 אינטגרציה עם מערכות קיימות
 
 ### Button System
@@ -191,9 +228,9 @@ window.delete{Entity} = delete{Entity};
 
 ### Color System
 המערכת משתמשת במשתני CSS דינמיים:
-- `--current-entity-color` - צבע ישות נוכחי
-- `--current-entity-color-light` - צבע בהיר
-- `--current-entity-color-dark` - צבע כהה
+- `--modal-entity-color` - צבע ישות נוכחי
+- `--modal-entity-bg` - צבע רקע בהיר
+- `--modal-entity-text` - צבע טקסט כהה
 
 ### Validation System
 המערכת משתמשת במערכת הולידציה הקיימת:
@@ -223,15 +260,20 @@ window.delete{Entity} = delete{Entity};
 
 ## 📊 סטטיסטיקות נוכחיות
 
-### עמודים שהומרו (3/8):
+### עמודים שהומרו (8/8 - 100%):
 - ✅ **cash_flows** - 8 שדות, מורכב
 - ✅ **notes** - 4 שדות, פשוט
 - ✅ **trading_accounts** - 7 שדות, בינוני
+- ✅ **tickers** - 8 שדות, בינוני
+- ✅ **executions** - 10 שדות, מורכב
+- ✅ **alerts** - 10 שדות, מורכב
+- ✅ **trade_plans** - 10 שדות, מורכב
+- ✅ **trades** - 13 שדות, מורכב
 
 ### קוד שנמחק:
-- ~800 שורות HTML כפולות
-- ~600 שורות JavaScript כפולות
-- **סה"כ**: ~1400 שורות קוד
+- ~2500+ שורות HTML כפולות
+- ~1500+ שורות JavaScript כפולות
+- **סה"כ**: ~4000+ שורות קוד
 
 ### קוד חדש:
 - ~400 שורות ModalManagerV2
@@ -239,7 +281,7 @@ window.delete{Entity} = delete{Entity};
 - ~150 שורות Modal Configs
 - **סה"כ**: ~750 שורות קוד מאוחד
 
-### שיפור נטו: 46% פחות קוד, 100% יותר maintainable
+### שיפור נטו: 81% פחות קוד, 100% יותר maintainable
 
 ## 🔧 Best Practices
 

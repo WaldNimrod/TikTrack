@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.Logger.info('🎨 צבע טרייד:', tradeColor, { page: "alerts" });
   window.Logger.info('🎨 צבע טיקר:', tickerColor, { page: "alerts" });
   window.Logger.info('🎨 צבע תוכנית:', tradePlanColor, { page: "alerts" });
-  window.Logger.info('🎨 צבע חשבון:', accountColor, { page: "alerts" });
+  window.Logger.info('🎨 צבע חשבון מסחר:', accountColor, { page: "alerts" });
 });
 
 
@@ -784,170 +784,6 @@ function updatePageSummaryStats() {
  * @param {string} mode - 'add' או 'edit'
  * @param {number} [alertId] - מזהה ההתראה (נדרש רק בעריכה)
  */
-function showAlertModal(mode, alertId = null) {
-  const isEdit = mode === 'edit';
-  const modalId = isEdit ? 'editAlertModal' : 'addAlertModal';
-  const formId = isEdit ? 'editAlertForm' : 'addAlertForm';
-  
-  try {
-    if (isEdit) {
-      const alert = (window.alertsData || alertsData).find(a => a.id === alertId);
-      if (!alert) {
-        if (window.showErrorNotification) {
-          window.showErrorNotification('התראה לא נמצאה', 'התראה לא נמצאה');
-        }
-        return;
-      }
-
-      // ניקוי ולידציה
-      clearAlertValidation();
-      
-      // אתחול הממשק המתקדם לבניית תנאי
-      initializeAlertConditionBuilder(alert);
-
-      // מילוי הטופס
-      const editAlertId = document.getElementById('editAlertId');
-      const editAlertMessage = document.getElementById('editAlertMessage');
-      const editAlertStatus = document.getElementById('editAlertStatus');
-      const editAlertIsTriggered = document.getElementById('editAlertIsTriggered');
-      const editAlertState = document.getElementById('editAlertState');
-
-      if (editAlertId) {editAlertId.value = alert.id;}
-      if (editAlertMessage) {editAlertMessage.value = alert.message || '';}
-      if (editAlertStatus) {editAlertStatus.value = alert.status || 'open';}
-      if (editAlertIsTriggered) {editAlertIsTriggered.value = alert.is_triggered || 'false';}
-
-      // מילוי תנאי התראה
-      const editConditionAttribute = document.getElementById('editConditionAttribute');
-      const editConditionOperator = document.getElementById('editConditionOperator');
-      const editConditionNumber = document.getElementById('editConditionNumber');
-
-      if (editConditionAttribute) {editConditionAttribute.value = alert.condition_attribute || 'price';}
-      if (editConditionOperator) {editConditionOperator.value = alert.condition_operator || 'more_than';}
-      if (editConditionNumber) {editConditionNumber.value = alert.condition_number || '0';}
-
-      // קביעת המצב הנכון לפי status ו-is_triggered
-      const currentState = getAlertState(alert.status, alert.is_triggered);
-      if (editAlertState) {editAlertState.value = currentState;}
-
-      // טעינת נתונים למודל ואז מילוי השדות
-      loadModalData().then(() => {
-        // בחירת סוג הקשר
-        const relationType = alert.related_type_id;
-        const radioButton = document.querySelector(`input[name="editAlertRelationType"][value="${relationType}"]`);
-        if (radioButton) {
-          radioButton.checked = true;
-          // הפעלת אירוע change לטעינת האובייקטים
-          radioButton.dispatchEvent(new Event('change'));
-        }
-
-        // בחירת האובייקט המקושר
-        setTimeout(() => {
-          const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
-          if (relatedObjectSelect && alert.related_id) {
-            relatedObjectSelect.value = alert.related_id;
-            // הפעלת אירוע change להפעלת שדות נוספים
-            relatedObjectSelect.dispatchEvent(new Event('change'));
-          }
-        }, 200);
-
-        // הפעלת שדות התנאי
-        setTimeout(() => {
-          enableEditConditionFields();
-        }, 300);
-      });
-    } else {
-      // טעינת נתונים למודל
-      loadModalData();
-
-      // ניקוי הטופס
-      const form = document.getElementById('addAlertForm');
-      if (form) {
-        form.reset();
-      }
-
-      // ניקוי ולידציה
-      clearAlertValidation();
-    }
-
-    // הוספת event listeners לשדות התנאי
-    setTimeout(() => {
-      const conditionAttributeElement = document.getElementById(isEdit ? 'editConditionAttribute' : 'conditionAttribute');
-      if (conditionAttributeElement) {
-        conditionAttributeElement.addEventListener('change', function () {
-          checkAlertVariable(this);
-        });
-      }
-
-      const conditionOperatorElement = document.getElementById(isEdit ? 'editConditionOperator' : 'conditionOperator');
-      if (conditionOperatorElement) {
-        conditionOperatorElement.addEventListener('change', function () {
-          checkAlertOperator(this);
-        });
-      }
-    }, 100);
-
-    // הצגת המודל
-    const modalElement = document.getElementById(modalId);
-    if (modalElement) {
-      // הגדרת z-index גבוה מאוד
-      modalElement.style.zIndex = isEdit ? '99999' : '999999';
-
-      // בדיקה אם Bootstrap זמין
-      if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(modalElement, {
-          backdrop: 'static',
-          keyboard: false,
-        });
-        modal.show();
-
-        // וידוא שהמודל מופיע מעל הכל
-        setTimeout(() => {
-          modalElement.style.zIndex = isEdit ? '99999' : '999999';
-          const dialog = modalElement.querySelector('.modal-dialog');
-          if (dialog) {
-            dialog.style.zIndex = isEdit ? '100000' : '1000000';
-          }
-          const content = modalElement.querySelector('.modal-content');
-          if (content) {
-            content.style.zIndex = isEdit ? '100001' : '1000001';
-          }
-        }, 100);
-      } else {
-        // אם Bootstrap לא זמין, נציג את המודל באופן ידני
-        modalElement.style.display = 'block';
-        modalElement.classList.add('show');
-        modalElement.style.zIndex = isEdit ? '99999' : '999999';
-        document.body.classList.add('modal-open');
-
-        // הוספת backdrop
-        const backdrop = document.createElement('div');
-        backdrop.className = 'modal-backdrop fade show';
-        backdrop.id = 'modalBackdrop';
-        backdrop.style.zIndex = isEdit ? '99998' : '999998';
-        document.body.appendChild(backdrop);
-      }
-    } else {
-      if (typeof handleElementNotFound === 'function') {
-        handleElementNotFound(modalId, 'CRITICAL');
-      }
-    }
-    
-  } catch (error) {
-    const action = isEdit ? 'עריכת' : 'הוספת';
-    window.Logger.error(`שגיאה בהצגת מודל ${action} התראה:`, error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification(`שגיאה בהצגת מודל ${action} התראה`, error.message);
-    }
-  }
-}
-
-/**
- * הצגת מודל הוספת התראה
- * @deprecated Use showAlertModal('add') instead
- */
-function showAddAlertModal() {
-  showAlertModal('add');
 }
 
 /**
@@ -1100,13 +936,13 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
 
   if (accountRadio) {
     accountRadio.addEventListener('change', () => {
-      populateSelect('alertRelatedObjectSelect', accounts, 'name', 'חשבון');
+      populateSelect('alertRelatedObjectSelect', accounts, 'name', 'חשבון מסחר');
     });
   }
 
   if (editAccountRadio) {
     editAccountRadio.addEventListener('change', () => {
-      populateSelect('editAlertRelatedObjectSelect', accounts, 'name', 'חשבון');
+      populateSelect('editAlertRelatedObjectSelect', accounts, 'name', 'חשבון מסחר');
     });
   }
 
@@ -1198,8 +1034,8 @@ function populateSelect(selectId, data, field, prefix = '') {
     // יצירת טקסט מותאם לכל סוג אובייקט
     let displayText = '';
 
-    if (prefix === 'חשבון') {
-      // עבור חשבון: שם החשבון + מטבע
+    if (prefix === 'חשבון מסחר') {
+      // עבור חשבון מסחר: שם החשבון מסחר + מטבע
       const name = item.name || item.account_name || 'לא מוגדר';
       const currency = item.currency || 'ILS';
       displayText = `${name} (${currency})`;
@@ -1383,8 +1219,8 @@ function populateRelatedObjects(relationTypeId) {
 
   // מילוי לפי סוג השיוך
   switch (relationTypeId) {
-  case 1: // חשבון
-    populateSelect('alertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון');
+  case 1: // חשבון מסחר
+    populateSelect('alertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון מסחר');
     break;
 
   case 2: // טרייד
@@ -1422,8 +1258,8 @@ function populateEditRelatedObjects(relationTypeId) {
 
     // מילוי לפי סוג השיוך
     switch (relationTypeId) {
-    case 1: // חשבון
-      populateSelect('editAlertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון');
+    case 1: // חשבון מסחר
+      populateSelect('editAlertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון מסחר');
       break;
 
   case 2: // טרייד
@@ -2214,7 +2050,7 @@ function getStatusClass(status) {
  * פונקציה זו מחזירה את שם המחלקה CSS המתאימה לסוג האובייקט המקושר
  * משמשת לעיצוב התאים בטבלה
  *
- * @param {number} relatedType - מזהה סוג האובייקט (1=חשבון, 2=טרייד, 3=תכנון, 4=טיקר)
+ * @param {number} relatedType - מזהה סוג האובייקט (1=חשבון מסחר, 2=טרייד, 3=תכנון, 4=טיקר)
  * @returns {string} שם המחלקה CSS
  */
 function getRelatedClass(relatedType) {

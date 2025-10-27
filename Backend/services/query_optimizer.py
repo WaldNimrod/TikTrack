@@ -54,8 +54,7 @@ class QueryOptimizer:
         """
         return db.query(Ticker).options(
             joinedload(Ticker.trades),
-            joinedload(Ticker.trade_plans),
-            joinedload(Ticker.alerts)
+            joinedload(Ticker.trade_plans)
         ).all()
     
     @staticmethod
@@ -74,7 +73,6 @@ class QueryOptimizer:
         return db.query(Ticker).options(
             joinedload(Ticker.trades).joinedload(Trade.executions),
             joinedload(Ticker.trade_plans),
-            joinedload(Ticker.alerts),
             joinedload(Ticker.currency)
         ).filter(Ticker.id == ticker_id).first()
     

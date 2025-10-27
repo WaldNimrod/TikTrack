@@ -1,23 +1,24 @@
 /**
- * Data Utils - TikTrack Frontend
- * ==============================
- *
- * Shared data utilities for all pages
- *
- * Features:
- * - Currency loading and management
- * - Account data utilities
- * - Common data fetching functions
- *
- * @author TikTrack Development Team
- * @version 1.9.9
- * @lastUpdated August 26, 2025
+ * Data Utils - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains shared data utilities for all pages including currency management,
+ * API utilities, data validation, and price calculation functions.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/DATA_UTILITIES_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.9.9
+ * Last Updated: 2025-01-27
  */
 
-// ===== Utility Functions =====
+// ===== UTILITY FUNCTIONS =====
 
 /**
  * בדיקה אם ערך הוא מספרי
+ * Check if value is numeric
+ * @function isNumeric
  * @param {*} value - הערך לבדיקה
  * @returns {boolean} true אם הערך הוא מספרי
  */
@@ -31,10 +32,12 @@ function isNumeric(value) {
 // ייצוא פונקציה גלובלית
 window.isNumeric = isNumeric;
 
-// ===== Currency Management =====
+// ===== CURRENCY MANAGEMENT FUNCTIONS =====
 
 /**
  * Load currencies from server
+ * @function loadCurrenciesFromServer
+ * @async
  * @returns {Promise<Array>} Array of currencies
  */
 async function loadCurrenciesFromServer() {
@@ -84,6 +87,7 @@ async function loadCurrenciesFromServer() {
 
 /**
  * Get currency display symbol
+ * @function getCurrencyDisplay
  * @param {Object} account - Account object
  * @returns {string} Currency symbol
  */
@@ -125,6 +129,7 @@ function getCurrencyDisplay(account) {
 
 /**
  * Generate currency options for forms
+ * @function generateCurrencyOptions
  * @param {Object} account - Account object for selection
  * @returns {string} HTML options string
  */
@@ -148,10 +153,11 @@ function generateCurrencyOptions(account = null) {
   }).join('');
 }
 
-// ===== API Utilities =====
+// ===== API UTILITIES FUNCTIONS =====
 
 /**
  * Make API call with error handling
+ * @function apiCall
  * @param {string} url - API endpoint
  * @param {Object} options - Fetch options
  * @returns {Promise<Object>} API response
@@ -181,6 +187,7 @@ async function apiCall(url, options = {}) {
 
 /**
  * Load data from API with retry logic
+ * @function loadDataFromAPI
  * @param {string} endpoint - API endpoint
  * @param {number} maxRetries - Maximum retry attempts
  * @returns {Promise<Array>} Data array
@@ -212,10 +219,11 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
   }
 }
 
-// ===== Data Validation =====
+// ===== DATA VALIDATION FUNCTIONS =====
 
 /**
  * Validate data structure
+ * @function validateDataStructure
  * @param {Array} data - Data array to validate
  * @param {string} type - Data type for logging
  * @returns {boolean} Is valid
@@ -231,6 +239,7 @@ function validateDataStructure(data, _type = 'data') {
 
 /**
  * Filter data by search term
+ * @function filterDataBySearch
  * @param {Array} data - Data array
  * @param {string} searchTerm - Search term
  * @param {Array} searchFields - Fields to search in
@@ -252,11 +261,15 @@ function filterDataBySearch(data, searchTerm, searchFields = []) {
   }));
 }
 
-// ===== Validation Functions =====
+// ===== VALIDATION FUNCTIONS =====
 
 /**
  * אימות שדה חובה
  * Validate required field
+ * @function validateRequired
+ * @param {string} value - הערך לבדיקה
+ * @param {string} fieldName - שם השדה
+ * @returns {boolean} האם תקין
  */
 function validateRequired(value, fieldName) {
   if (!value || value.trim() === '') {
@@ -273,6 +286,12 @@ function validateRequired(value, fieldName) {
 /**
  * אימות מספר
  * Validate number
+ * @function validateNumber
+ * @param {string|number} value - הערך לבדיקה
+ * @param {string} fieldName - שם השדה
+ * @param {number} min - ערך מינימלי
+ * @param {number} max - ערך מקסימלי
+ * @returns {boolean} האם תקין
  */
 function validateNumber(value, fieldName, min = null, max = null) {
   const num = parseFloat(value);
@@ -309,6 +328,10 @@ function validateNumber(value, fieldName, min = null, max = null) {
 /**
  * אימות תאריך
  * Validate date
+ * @function validateDate
+ * @param {string} value - הערך לבדיקה
+ * @param {string} fieldName - שם השדה
+ * @returns {boolean} האם תקין
  */
 function validateDate(value, fieldName) {
   const date = new Date(value);
@@ -323,10 +346,11 @@ function validateDate(value, fieldName) {
   return true;
 }
 
-// ===== Price Calculation Functions =====
+// ===== PRICE CALCULATION FUNCTIONS =====
 
 /**
  * Calculate default stop and target prices
+ * @function calculateDefaultPrices
  * @param {number} currentPrice - Current price
  * @param {object} options - Additional options
  * @returns {object} Stop and target prices
@@ -348,6 +372,7 @@ function calculateDefaultPrices(currentPrice, options = {}) {
 
 /**
  * Convert amount to shares
+ * @function convertAmountToShares
  * @param {number} amount - Amount to invest
  * @param {number} price - Current price per share
  * @param {boolean} allowFractionalShares - Whether to allow fractional shares
@@ -384,6 +409,7 @@ function convertAmountToShares(amount, price, allowFractionalShares = null) {
 
 /**
  * Convert shares to amount
+ * @function convertSharesToAmount
  * @param {number} shares - Number of shares
  * @param {number} price - Current price per share
  * @returns {number} Total amount
@@ -398,9 +424,12 @@ function convertSharesToAmount(shares, price) {
   return parseFloat(amount.toFixed(2));
 }
 
+// ===== PREFERENCE FUNCTIONS =====
+
 /**
  * Get user preference
  * ✨ עודכן לתמיכה במערכת העדפות!
+ * @function getUserPreference
  * @param {string} key - Preference key
  * @param {*} defaultValue - Default value
  * @returns {*} User preference value
@@ -429,9 +458,7 @@ async function getUserPreference(key, defaultValue = null) {
   }
 }
 
-// ===== Export Functions =====
-
-// Make functions globally available
+// ===== GLOBAL EXPORTS =====
 window.loadCurrenciesFromServer = loadCurrenciesFromServer;
 window.getCurrencyDisplay = getCurrencyDisplay;
 window.generateCurrencyOptions = generateCurrencyOptions;

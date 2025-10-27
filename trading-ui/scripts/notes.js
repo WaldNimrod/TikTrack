@@ -660,7 +660,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     } else if (note.related_type_id) {
       // Fallback למערכת הישנה
       switch (note.related_type_id) {
-      case 1: typeForFilter = 'חשבון'; break;
+      case 1: typeForFilter = 'חשבון מסחר'; break;
       case 2: typeForFilter = 'טרייד'; break;
       case 3: typeForFilter = 'תוכנית'; break;
       case 4: typeForFilter = 'טיקר'; break;
@@ -673,7 +673,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     if (note.related_type_id === 1) {
       // עבור חשבונות - הצג רק אייקון קישור
       symbolLink = `<a href='#' onclick='viewLinkedItemsForNote(${note.id})' ` +
-        'class=\'symbol-link\' title=\'עבור לדף החשבון\'>🔗</a>';
+        'class=\'symbol-link\' title=\'עבור לדף החשבון מסחר\'>🔗</a>';
     } else if (symbolDisplay && symbolDisplay !== '-' && symbolDisplay !== '') {
       // עבור טיקרים, טריידים ותוכניות - הצג אייקון קישור + סימבול
       symbolLink = `<a href='#' onclick='showTickerPage("${symbolDisplay}")' ` +
@@ -814,190 +814,6 @@ function updateGridFromComponent(
  * @param {string} mode - 'add' או 'edit'
  * @param {number} [noteId] - מזהה ההערה (נדרש רק בעריכה)
  */
-function showNoteModal(mode, noteId = null) {
-  const isEdit = mode === 'edit';
-  const modalId = isEdit ? 'editNoteModal' : 'addNoteModal';
-  
-  try {
-    if (isEdit) {
-      // ניקוי דגלים
-      window.removeAttachmentFlag = false;
-      window.replaceAttachmentFlag = false;
-
-      // טעינת נתוני ההערה
-      loadNoteData(noteId);
-    } else {
-      // איפוס הטופס
-      const form = document.getElementById('addNoteForm');
-      if (form) {
-        form.reset();
-      }
-
-      // ניקוי עורך הטקסט
-      setEditorContent('', 'add');
-
-      // ניקוי ולידציה
-      clearNoteValidationErrors();
-
-      // הסרת קלאסים של ולידציה
-      const fields = document.querySelectorAll('.is-valid, .is-invalid');
-      fields.forEach(field => {
-        field.classList.remove('is-valid', 'is-invalid');
-      });
-
-      // טעינת נתונים למודל
-      loadModalData();
-
-      // בחירת טיקר כברירת מחדל אחרי טעינת הנתונים
-      setTimeout(() => {
-        document.getElementById('noteRelationTicker').checked = true;
-        // טעינת אפשרויות לטיקר
-        const tickerRadio = document.getElementById('noteRelationTicker');
-        if (tickerRadio && window.modalTickers) {
-          populateSelect('noteRelatedObjectSelect', window.modalTickers, 'symbol', '');
-        }
-      }, 200);
-    }
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById(modalId));
-    modal.show();
-    
-  } catch (error) {
-    const action = isEdit ? 'עריכת' : 'הוספת';
-    window.Logger.error(`שגיאה בפתיחת מודל ${action} הערה:`, error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification(`שגיאה בפתיחת מודל ${action} הערה`, error.message);
-    }
-  }
-}
-
-/**
- * Show add note modal
- * Opens the modal for adding a new note
- * @deprecated Use showNoteModal('add') instead
- */
-function showAddNoteModal() {
-  showNoteModal('add');
-}
-
-/**
- * Show edit note modal
- * @param {number} noteId - The ID of the note to edit
- * @deprecated Use showNoteModal('edit', noteId) instead
- */
-function showEditNoteModal(noteId) {
-  showNoteModal('edit', noteId);
-}
-
-async function loadNoteData(noteId) {
-  try {
-    const response = await fetch(`/api/notes/${noteId}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const responseData = await response.json();
-    // חילוץ הנתונים מהמבנה הנכון
-    const note = responseData.data || responseData;
-    // מילוי הטופס
-    document.getElementById('editNoteId').value = note.id;
-    setEditorContent(note.content || '', 'edit');
-
-    // הצגת קובץ מצורף נוכחי
-    displayCurrentAttachment(note.attachment);
-
-    // בחירת סוג הקשר
-    const relationType = note.related_type_id;
-    if (relationType) {
-      // בחירת הרדיו באטון הנכון
-      const radioButton = document.querySelector(`input[name="editNoteRelationType"][value="${relationType}"]`);
-      if (radioButton) {
-        radioButton.checked = true;
-        // טעינת נתונים למודל אם עוד לא נטענו
-        if (typeof window.loadModalData === 'function') {
-          await window.loadModalData();
-        }
-
-        // מילוי הרשימה הנכונה לפי סוג הקשר
-        await populateEditSelectByType(relationType, note.related_id);
-      } else {
-        handleElementNotFound('populateEditSelectByType', `לא נמצא רדיו באטון עבור ערך: ${relationType}`);
-      }
-    } else {
-      // window.Logger.warn('⚠️ אין סוג קשר מוגדר', { page: "notes" });
-    }
-
-  } catch {
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני הערה');
-    }
-  }
-}
-
-async function loadModalData() {
-  try {
-    // טעינת נתונים במקביל
-    const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
-    ]);
-
-    const accounts = Array.isArray(accountsResponse.data) ? accountsResponse.data : [];
-    const trades = Array.isArray(tradesResponse.data) ? tradesResponse.data : [];
-    const tradePlans = Array.isArray(tradePlansResponse.data) ? tradePlansResponse.data : [];
-    const tickers = Array.isArray(tickersResponse.data) ? tickersResponse.data : [];
-
-    // עדכון רדיו באטונים
-    updateRadioButtons(accounts, trades, tradePlans, tickers);
-
-    // הגדרת נתונים ראשוניים (ברירת מחדל לטיקר)
-    await SelectPopulatorService.populateTickersSelect('noteRelatedObjectSelect', {
-      includeEmpty: true,
-      emptyText: 'בחר טיקר',
-      defaultFromPreferences: true,
-      filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
-    });
-    
-    await SelectPopulatorService.populateTickersSelect('editNoteRelatedObjectSelect', {
-      includeEmpty: true,
-      emptyText: 'בחר טיקר',
-      defaultFromPreferences: true,
-      filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
-    });
-
-  } catch {
-    // המשך עם מערכים ריקים
-    updateRadioButtons([], [], [], []);
-  }
-}
-
-/**
- * עדכון רדיו באטונים
- */
-function updateRadioButtons(accounts, trades, tradePlans, tickers) {
-  try {
-    // עדכון רדיו באטון לחשבונות
-    const accountRadio = document.getElementById('noteRelationAccount');
-  const editAccountRadio = document.getElementById('editNoteRelationAccount');
-
-  if (accountRadio) {
-    accountRadio.addEventListener('change', () => {
-      populateSelect('noteRelatedObjectSelect', accounts, 'name', 'חשבון');
-    });
-  }
-
-  if (editAccountRadio) {
-    editAccountRadio.addEventListener('change', () => {
-      populateSelect('editNoteRelatedObjectSelect', accounts, 'name', 'חשבון');
-    });
-  }
-
-  // עדכון רדיו באטון לטריידים
-  const tradeRadio = document.getElementById('noteRelationTrade');
-  const editTradeRadio = document.getElementById('editNoteRelationTrade');
 
   if (tradeRadio) {
     tradeRadio.addEventListener('change', () => {
@@ -1072,8 +888,8 @@ function populateSelect(selectId, data, field, prefix = '') {
     // יצירת טקסט מותאם לכל סוג אובייקט
     let displayText = '';
 
-    if (prefix === 'חשבון') {
-      // עבור חשבון: שם החשבון + מטבע
+    if (prefix === 'חשבון מסחר') {
+      // עבור חשבון מסחר: שם החשבון מסחר + מטבע
       const name = item.name || item.account_name || 'לא מוגדר';
       const currency = item.currency || 'ILS';
       displayText = `${name} (${currency})`;
@@ -1123,12 +939,12 @@ async function populateEditSelectByType(relationType, selectedId) {
     let placeholder = '';
 
     switch (parseInt(relationType)) {
-    case 1: { // חשבון
+    case 1: { // חשבון מסחר
       const accountsResponse = await fetch('/api/accounts/');
       const accountsData = await accountsResponse.json();
       data = Array.isArray(accountsData.data) ? accountsData.data : [];
       displayField = 'name';
-      placeholder = 'חשבון';
+      placeholder = 'חשבון מסחר';
       break;
     }
     case 2: { // טרייד
@@ -2190,7 +2006,7 @@ function getNoteRelatedDisplay(note) {
 
   // Fallback למערכת הישנה
   switch (note.related_type_id) {
-  case 1: return `🏦 חשבון ${note.related_id}`;
+  case 1: return `🏦 חשבון מסחר ${note.related_id}`;
   case 2: return `📈 טרייד ${note.related_id}`;
   case 3: return `📋 תוכנית ${note.related_id}`;
   case 4: return `📊 טיקר ${note.related_id}`;

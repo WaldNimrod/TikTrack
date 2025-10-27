@@ -767,3 +767,182 @@ class ImportOrchestrator:
                 'success': False,
                 'error': str(e)
             }
+    
+    def accept_duplicate(self, session_id: int, record_index: int, duplicate_type: str) -> Dict[str, Any]:
+        """
+        Accept a duplicate record for import (move from skip to import list)
+        
+        Args:
+            session_id: Import session ID
+            record_index: Index of the duplicate record
+            duplicate_type: Type of duplicate ('within_file' or 'existing_record')
+            
+        Returns:
+            Dict with success status
+        """
+        try:
+            # Get session
+            session = self.session_manager.get_session(session_id)
+            if not session:
+                return {'success': False, 'error': 'Session not found'}
+            
+            # Get current preview data
+            preview_data = self.processor.get_cached_results(session_id, 'preview')
+            if not preview_data:
+                return {'success': False, 'error': 'No preview data found'}
+            
+            # Find the record in records_to_skip
+            record_to_move = None
+            new_skip_list = []
+            
+            for skip_record in preview_data.get('records_to_skip', []):
+                if (skip_record.get('record_index') == record_index and 
+                    skip_record.get('reason') == duplicate_type):
+                    record_to_move = skip_record
+                else:
+                    new_skip_list.append(skip_record)
+            
+            if not record_to_move:
+                return {'success': False, 'error': 'Record not found in skip list'}
+            
+            # Move to records_to_import
+            import_record = {
+                'symbol': record_to_move.get('symbol'),
+                'action': record_to_move.get('action'),
+                'quantity': record_to_move.get('quantity'),
+                'price': record_to_move.get('price'),
+                'fee': record_to_move.get('fee'),
+                'date': record_to_move.get('date'),
+                'external_id': record_to_move.get('external_id')
+            }
+            
+            preview_data['records_to_import'].append(import_record)
+            preview_data['records_to_skip'] = new_skip_list
+            
+            # Update summary
+            preview_data['summary']['records_to_import'] = len(preview_data['records_to_import'])
+            preview_data['summary']['records_to_skip'] = len(preview_data['records_to_skip'])
+            preview_data['summary']['import_rate'] = (
+                len(preview_data['records_to_import']) / 
+                preview_data['summary']['total_records'] * 100
+            ) if preview_data['summary']['total_records'] > 0 else 0
+            
+            # Cache updated preview data
+            self.processor.cache_results(session_id, 'preview', preview_data, ttl=3600)
+            
+            logger.info(f"✅ Accepted duplicate record {record_index} for session {session_id}")
+            return {'success': True}
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to accept duplicate for session {session_id}: {str(e)}")
+            return {'success': False, 'error': str(e)}
+    
+    def reject_duplicate(self, session_id: int, record_index: int, duplicate_type: str) -> Dict[str, Any]:
+        """
+        Reject a duplicate record (keep in skip list)
+        
+        Args:
+            session_id: Import session ID
+            record_index: Index of the duplicate record
+            duplicate_type: Type of duplicate ('within_file' or 'existing_record')
+            
+        Returns:
+            Dict with success status
+        """
+        try:
+            # Get session
+            session = self.session_manager.get_session(session_id)
+            if not session:
+                return {'success': False, 'error': 'Session not found'}
+            
+            # Get current preview data
+            preview_data = self.processor.get_cached_results(session_id, 'preview')
+            if not preview_data:
+                return {'success': False, 'error': 'No preview data found'}
+            
+            # Find the record in records_to_skip and mark as rejected
+            for skip_record in preview_data.get('records_to_skip', []):
+                if (skip_record.get('record_index') == record_index and 
+                    skip_record.get('reason') == duplicate_type):
+                    skip_record['rejected'] = True
+                    skip_record['rejected_at'] = datetime.utcnow().isoformat()
+                    break
+            
+            # Cache updated preview data
+            self.processor.cache_results(session_id, 'preview', preview_data, ttl=3600)
+            
+            logger.info(f"✅ Rejected duplicate record {record_index} for session {session_id}")
+            return {'success': True}
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to reject duplicate for session {session_id}: {str(e)}")
+            return {'success': False, 'error': str(e)}
+    
+    def allow_existing_record(self, session_id: int, record_index: int) -> Dict[str, Any]:
+        """
+        Allow importing an existing record (move from skip to import list)
+        
+        Args:
+            session_id: Import session ID
+            record_index: Index of the existing record
+            
+        Returns:
+            Dict with success status
+        """
+        try:
+            # Get session
+            session = self.session_manager.get_session(session_id)
+            if not session:
+                return {'success': False, 'error': 'Session not found'}
+            
+            # Get current preview data
+            preview_data = self.processor.get_cached_results(session_id, 'preview')
+            if not preview_data:
+                return {'success': False, 'error': 'No preview data found'}
+            
+            # Find the record in records_to_skip
+            record_to_move = None
+            new_skip_list = []
+            
+            for skip_record in preview_data.get('records_to_skip', []):
+                if (skip_record.get('record_index') == record_index and 
+                    skip_record.get('reason') == 'existing_record'):
+                    record_to_move = skip_record
+                else:
+                    new_skip_list.append(skip_record)
+            
+            if not record_to_move:
+                return {'success': False, 'error': 'Record not found in skip list'}
+            
+            # Move to records_to_import
+            import_record = {
+                'symbol': record_to_move.get('symbol'),
+                'action': record_to_move.get('action'),
+                'quantity': record_to_move.get('quantity'),
+                'price': record_to_move.get('price'),
+                'fee': record_to_move.get('fee'),
+                'date': record_to_move.get('date'),
+                'external_id': record_to_move.get('external_id'),
+                'force_import_existing': True
+            }
+            
+            preview_data['records_to_import'].append(import_record)
+            preview_data['records_to_skip'] = new_skip_list
+            
+            # Update summary
+            preview_data['summary']['records_to_import'] = len(preview_data['records_to_import'])
+            preview_data['summary']['records_to_skip'] = len(preview_data['records_to_skip'])
+            preview_data['summary']['import_rate'] = (
+                len(preview_data['records_to_import']) / 
+                preview_data['summary']['total_records'] * 100
+            ) if preview_data['summary']['total_records'] > 0 else 0
+            
+            # Cache updated preview data
+            self.processor.cache_results(session_id, 'preview', preview_data, ttl=3600)
+            
+            logger.info(f"✅ Allowed existing record {record_index} for session {session_id}")
+            return {'success': True}
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to allow existing record for session {session_id}: {str(e)}")
+            return {'success': False, 'error': str(e)}

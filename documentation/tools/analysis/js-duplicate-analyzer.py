@@ -12,11 +12,38 @@ def analyze_js_duplicates():
     """ניתוח כפילויות JavaScript מתקדם"""
     print("🔍 מנתח כפילויות JavaScript...")
     
-    # קבצי JavaScript לבדיקה
-    js_files = [
-        "trading-ui/scripts/header-system.js",
-        "trading-ui/test-header-only.html"
-    ]
+    # סריקה מקיפה של כל קבצי JavaScript
+    js_files = []
+    
+    # קבצי scripts עיקריים
+    scripts_dir = "trading-ui/scripts/"
+    if os.path.exists(scripts_dir):
+        for file in os.listdir(scripts_dir):
+            if file.endswith('.js'):
+                js_files.append(os.path.join(scripts_dir, file))
+    
+    # קבצי modules
+    modules_dir = "trading-ui/scripts/modules/"
+    if os.path.exists(modules_dir):
+        for file in os.listdir(modules_dir):
+            if file.endswith('.js'):
+                js_files.append(os.path.join(modules_dir, file))
+    
+    # קבצי services
+    services_dir = "trading-ui/scripts/services/"
+    if os.path.exists(services_dir):
+        for file in os.listdir(services_dir):
+            if file.endswith('.js'):
+                js_files.append(os.path.join(services_dir, file))
+    
+    # קבצי modal-configs
+    configs_dir = "trading-ui/scripts/modal-configs/"
+    if os.path.exists(configs_dir):
+        for file in os.listdir(configs_dir):
+            if file.endswith('.js'):
+                js_files.append(os.path.join(configs_dir, file))
+    
+    print(f"📁 נמצאו {len(js_files)} קבצי JavaScript לסריקה")
     
     results = {
         'duplicate_functions': defaultdict(list),

@@ -1,14 +1,16 @@
 /**
- * UI Utilities JavaScript
- *
- * פונקציות UI משותפות באמת - רק מה שמשמש הרבה עמודים
- *
- * File: trading-ui/scripts/ui-utils.js
+ * UI Utils - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains shared UI utility functions used across multiple pages including
+ * price calculations, section toggles, form utilities, and common UI operations.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/UI_UTILITIES_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
  * Version: 1.2
- * Last Updated: January 15, 2025
- *
- * Added: Price calculation functions for trade plans, trades, and tickers
- * Added: Section toggle functions for opening/closing sections
+ * Last Updated: 2025-01-27
  */
 
 // ===== PRICE CALCULATION FUNCTIONS =====
@@ -16,6 +18,7 @@
 
 /**
  * Calculate stop price based on percentage
+ * @function calculateStopPrice
  * @param {number} currentPrice - Current price of the ticker
  * @param {number} stopPercentage - Stop percentage (e.g., 0.1 for 10%)
  * @param {string} side - Trade side ('Long' or 'Short')

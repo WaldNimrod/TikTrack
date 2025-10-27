@@ -1,3 +1,18 @@
+/**
+ * Ticker Service - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the ticker service for TikTrack.
+ * Provides advanced ticker management functions with caching and filtering.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/TICKER_SERVICE_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
+ */
+
 // ===== שירות טיקרים כללי =====
 /*
  * Ticker Service - Global Ticker Management
@@ -28,12 +43,22 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 דקות
 /**
  * בדיקה אם ה-cache עדכני
  */
+/**
+ * Check if cache is valid
+ * @function isCacheValid
+ * @returns {boolean} Whether cache is valid
+ */
 function isCacheValid() {
   return lastCacheUpdate && Date.now() - lastCacheUpdate < CACHE_DURATION;
 }
 
 /**
  * ניקוי ה-cache
+ */
+/**
+ * Clear ticker cache
+ * @function clearCache
+ * @returns {void}
  */
 function clearCache() {
   tickersCache = null;
@@ -46,6 +71,12 @@ function clearCache() {
 /**
  * קבלת כל הטיקרים מהשרת
  * @returns {Promise<Array>} מערך של טיקרים
+ */
+/**
+ * Get all tickers from server
+ * @function getTickers
+ * @async
+ * @returns {Promise<Array>} Array of tickers
  */
 async function getTickers() {
   try {
@@ -69,6 +100,12 @@ async function getTickers() {
  * קבלת טריידים מהשרת
  * @returns {Promise<Array>} מערך של טריידים
  */
+/**
+ * Get all trades from server
+ * @function getTrades
+ * @async
+ * @returns {Promise<Array>} Array of trades
+ */
 async function getTrades() {
   try {
     const response = await fetch('/api/trades/');
@@ -91,6 +128,12 @@ async function getTrades() {
  * קבלת תכנונים מהשרת (אופציונלי)
  * @returns {Promise<Array>} מערך של תכנונים
  */
+/**
+ * Get all trade plans from server
+ * @function getTradePlans
+ * @async
+ * @returns {Promise<Array>} Array of trade plans
+ */
 async function getTradePlans() {
   try {
     const response = await fetch('/api/trade_plans/');
@@ -111,6 +154,12 @@ async function getTradePlans() {
 
 /**
  * טעינת נתונים ל-cache
+ */
+/**
+ * Load cache data
+ * @function loadCache
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadCache() {
   if (isCacheValid()) {
@@ -143,6 +192,13 @@ async function loadCache() {
  * @param {boolean} options.useCache - האם להשתמש ב-cache
  * @returns {Promise<Array>} מערך של טיקרים עם טריידים
  */
+/**
+ * Get tickers with trades
+ * @function getTickersWithTrades
+ * @async
+ * @param {Object} options - Options for filtering
+ * @returns {Promise<Array>} Array of tickers with trades
+ */
 async function getTickersWithTrades(options = {}) {
   const { tradeStatuses = ['active', 'closed', 'open', 'cancelled'], useCache = true } = options;
 
@@ -170,6 +226,13 @@ async function getTickersWithTrades(options = {}) {
  * @param {Array} options.planStatuses - סטטוסי תכנונים
  * @param {boolean} options.useCache - האם להשתמש ב-cache
  * @returns {Promise<Array>} מערך של טיקרים עם תכנונים
+ */
+/**
+ * Get tickers with trade plans
+ * @function getTickersWithPlans
+ * @async
+ * @param {Object} options - Options for filtering
+ * @returns {Promise<Array>} Array of tickers with trade plans
  */
 async function getTickersWithPlans(options = {}) {
   const { planStatuses = [], useCache = true } = options;
@@ -204,6 +267,13 @@ async function getTickersWithPlans(options = {}) {
  * @param {Array} options.planStatuses - סטטוסי תכנונים
  * @param {boolean} options.useCache - האם להשתמש ב-cache
  * @returns {Promise<Array>} מערך של טיקרים רלוונטיים
+ */
+/**
+ * Get relevant tickers
+ * @function getRelevantTickers
+ * @async
+ * @param {Object} options - Options for filtering
+ * @returns {Promise<Array>} Array of relevant tickers
  */
 async function getRelevantTickers(options = {}) {
   const {
@@ -250,6 +320,13 @@ async function getRelevantTickers(options = {}) {
  * @param {boolean} options.useCache - האם להשתמש ב-cache
  * @returns {Promise<Array>} מערך של טיקרים עם טריידים ותכנונים פתוחים/סגורים
  */
+/**
+ * Get tickers with open or closed trades and plans
+ * @function getTickersWithOpenOrClosedTradesAndPlans
+ * @async
+ * @param {Object} options - Options for filtering
+ * @returns {Promise<Array>} Array of tickers with trades and plans
+ */
 async function getTickersWithOpenOrClosedTradesAndPlans(options = {}) {
   const { useCache = true } = options;
 
@@ -293,6 +370,14 @@ async function getTickersWithOpenOrClosedTradesAndPlans(options = {}) {
  * @param {boolean} useCache - האם להשתמש ב-cache
  * @returns {Promise<Array>} מערך של טיקרים
  */
+/**
+ * Get tickers by type
+ * @function getTickersByType
+ * @async
+ * @param {Array} types - Ticker types
+ * @param {boolean} useCache - Whether to use cache
+ * @returns {Promise<Array>} Array of tickers by type
+ */
 async function getTickersByType(types = [], useCache = true) {
   if (useCache) {
     await loadCache();
@@ -319,6 +404,14 @@ async function getTickersByType(types = [], useCache = true) {
  * @param {boolean} activeOnly - האם להציג רק טיקרים פעילים
  * @param {boolean} useCache - האם להשתמש ב-cache
  * @returns {Promise<Array>} מערך של טיקרים
+ */
+/**
+ * Get tickers by activity
+ * @function getTickersByActivity
+ * @async
+ * @param {boolean} activeOnly - Whether to get only active tickers
+ * @param {boolean} useCache - Whether to use cache
+ * @returns {Promise<Array>} Array of tickers by activity
  */
 async function getTickersByActivity(activeOnly = true, useCache = true) {
   if (useCache) {
@@ -349,6 +442,14 @@ async function getTickersByActivity(activeOnly = true, useCache = true) {
  * @param {Array} tickers - מערך של טיקרים
  * @param {string} placeholder - טקסט ברירת מחדל
  */
+/**
+ * Update ticker select dropdown
+ * @function updateTickerSelect
+ * @param {string} selectId - Select element ID
+ * @param {Array} tickers - Array of tickers
+ * @param {string} placeholder - Placeholder text
+ * @returns {void}
+ */
 function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...') {
   const select = document.getElementById(selectId);
   if (!select) {
@@ -370,6 +471,12 @@ function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...
 /**
  * טעינת טיקרים עבור מודל תכנון טרייד
  * מספק טיקרים פעילים (פתוח או סגור) לעדכון שדות select
+ * @returns {Promise<void>}
+ */
+/**
+ * Load tickers for trade plan
+ * @function loadTickersForTradePlan
+ * @async
  * @returns {Promise<void>}
  */
 async function loadTickersForTradePlan() {
@@ -419,7 +526,29 @@ async function loadTickersForTradePlan() {
 }
 
 // הגדרת הפונקציות כגלובליות
-window.tickerService = {
+// ===== GLOBAL EXPORTS =====
+window.isCacheValid = isCacheValid;
+window.clearCache = clearCache;
+window.getTickers = getTickers;
+window.getTrades = getTrades;
+window.getTradePlans = getTradePlans;
+window.loadCache = loadCache;
+window.getTickersWithTrades = getTickersWithTrades;
+window.getTickersWithPlans = getTickersWithPlans;
+window.getRelevantTickers = getRelevantTickers;
+window.getTickersWithOpenOrClosedTradesAndPlans = getTickersWithOpenOrClosedTradesAndPlans;
+window.getTickersByType = getTickersByType;
+window.getTickersByActivity = getTickersByActivity;
+window.updateTickerSelect = updateTickerSelect;
+window.loadTickersForTradePlan = loadTickersForTradePlan;
+window.saveTicker = saveTicker;
+window.updateTicker = updateTicker;
+window.deleteTicker = deleteTicker;
+window.updateTickerActiveTradesStatus = updateTickerActiveTradesStatus;
+window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
+window.updateAllTickerStatuses = updateAllTickerStatuses;
+window.updateTickerFromTradePlan = updateTickerFromTradePlan;
+window.updateTickersListForClosedTrades = updateTickersListForClosedTrades;
   getTickers,
   getTrades,
   getTradePlans,
@@ -449,6 +578,12 @@ window.tickerService = {
  * שמירת טיקר חדש
  * 
  * Note: updated_at field is NOT set during creation - it's reserved for future pricing system updates
+ */
+/**
+ * Save ticker
+ * @function saveTicker
+ * @async
+ * @returns {Promise<void>}
  */
 async function saveTicker() {
   // איסוף נתונים מהטופס באמצעות DataCollectionService
@@ -544,6 +679,12 @@ async function saveTicker() {
 /**
  * עדכון טיקר קיים
  */
+/**
+ * Update ticker
+ * @function updateTicker
+ * @async
+ * @returns {Promise<void>}
+ */
 async function updateTicker() {
   // שימוש ב-DataCollectionService לאיסוף נתונים
   const tickerData = DataCollectionService.collectFormData({
@@ -603,6 +744,12 @@ async function updateTicker() {
 /**
  * מחיקת טיקר
  */
+/**
+ * Delete ticker
+ * @function deleteTicker
+ * @async
+ * @returns {Promise<void>}
+ */
 async function deleteTicker() {
   try {
     const response = await fetch(`/api/tickers/${window.currentTickerId}`, {
@@ -630,6 +777,13 @@ async function deleteTicker() {
  *
  * @param {number} tickerId - Ticker ID
  * @returns {Promise<boolean>} true if successful, false otherwise
+ */
+/**
+ * Update ticker active trades status
+ * @function updateTickerActiveTradesStatus
+ * @async
+ * @param {number} tickerId - Ticker ID
+ * @returns {Promise<void>}
  */
 async function updateTickerActiveTradesStatus(tickerId) {
   try {
@@ -683,6 +837,12 @@ async function updateTickerActiveTradesStatus(tickerId) {
  * TICKER SERVICE - Centralized function for updating all tickers active trades status
  *
  * @returns {Promise<number>} Number of successfully updated tickers
+ */
+/**
+ * Update all active trades statuses
+ * @function updateAllActiveTradesStatuses
+ * @async
+ * @returns {Promise<void>}
  */
 async function updateAllActiveTradesStatuses() {
   try {
@@ -738,6 +898,12 @@ async function updateAllActiveTradesStatuses() {
  * TICKER SERVICE - Centralized function for updating all ticker statuses
  *
  * @returns {Promise<number>} Number of successfully updated tickers
+ */
+/**
+ * Update all ticker statuses
+ * @function updateAllTickerStatuses
+ * @async
+ * @returns {Promise<void>}
  */
 async function updateAllTickerStatuses() {
   try {
@@ -795,6 +961,13 @@ async function updateAllTickerStatuses() {
  * @param {string} tradePlanId - Trade plan ID
  * @returns {Promise<Object|null>} Updated ticker data or null if error
  */
+/**
+ * Update ticker from trade plan
+ * @function updateTickerFromTradePlan
+ * @async
+ * @param {number} tradePlanId - Trade plan ID
+ * @returns {Promise<void>}
+ */
 async function updateTickerFromTradePlan(tradePlanId) {
   if (!tradePlanId) {
     return null;
@@ -836,6 +1009,13 @@ async function updateTickerFromTradePlan(tradePlanId) {
  * Update tickers list for closed trades filter
  * TICKER SERVICE - Centralized function for updating tickers list based on closed trades filter
  *
+ * @param {boolean} showClosed - Whether to show closed trades
+ * @returns {Promise<void>}
+ */
+/**
+ * Update tickers list for closed trades
+ * @function updateTickersListForClosedTrades
+ * @async
  * @param {boolean} showClosed - Whether to show closed trades
  * @returns {Promise<void>}
  */

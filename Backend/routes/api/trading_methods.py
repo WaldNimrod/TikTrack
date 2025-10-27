@@ -368,7 +368,7 @@ def delete_trading_method(method_id):
             
             # Check if method is in use
             from models.plan_condition import PlanCondition
-            from models.plan_condition import TradeCondition
+            from models.trade_condition import TradeCondition
             
             plan_conditions_count = db_session.query(PlanCondition).filter(
                 PlanCondition.method_id == method_id

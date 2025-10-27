@@ -10,16 +10,6 @@
     outline-offset: 2px;
 }
 
-.debug-highlight-stacking-context {
-    outline: 3px solid orange ;
-    outline-offset: 2px;
-}
-
-.debug-highlight-higher-zindex {
-    outline: 3px solid blue ;
-    outline-offset: 2px;
-}
-
 /* Debug popup overlay */
 .debug-popup-overlay {
     position: fixed;

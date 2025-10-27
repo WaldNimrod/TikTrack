@@ -8,8 +8,8 @@ class Alert(BaseModel):
     __tablename__ = "alerts"
     
     # Fields that exist in the database
-    # trading_account_id = Column(Integer, nullable=True)  # Removed - not in database
-    # ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)  # Removed - not in database
+    account_id = Column(Integer, nullable=True)
+    ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
     message = Column(String(500), nullable=True)
     triggered_at = Column(DateTime, nullable=True)
     status = Column(String(20), default='open', nullable=True)
@@ -20,14 +20,14 @@ class Alert(BaseModel):
     condition_operator = Column(String(50), nullable=False, default='more_than')
     condition_number = Column(String(20), nullable=False, default='0')
     
-    # Condition linking fields (new)
+    # New condition linking fields
     plan_condition_id = Column(Integer, ForeignKey('plan_conditions.id'), nullable=True)
     trade_condition_id = Column(Integer, ForeignKey('trade_conditions.id'), nullable=True)
     
     # Relationships
     # ticker = relationship("Ticker", back_populates="alerts")  # Removed - not in database
-    plan_condition = relationship("PlanCondition", backref="alerts")
-    trade_condition = relationship("TradeCondition", backref="alerts")
+    plan_condition = relationship("PlanCondition", foreign_keys=[plan_condition_id], back_populates="alerts")
+    trade_condition = relationship("TradeCondition", foreign_keys=[trade_condition_id], back_populates="alerts")
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

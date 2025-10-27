@@ -222,7 +222,7 @@ class TradesAdapter {
 
     /**
      * Format account data for charts
-     * עבד נתוני חשבון לגרפים
+     * עבד נתוני חשבון מסחר לגרפים
      * @param {Object} summary - Summary data
      * @returns {Object} Account chart data
      */

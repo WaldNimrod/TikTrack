@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 
 import json
 from models.alert import Alert
-from models.plan_condition import PlanCondition, TradeCondition, ConditionAlertMapping
+from models.plan_condition import PlanCondition, ConditionAlertMapping
+from models.trade_condition import TradeCondition
 from models.trade_plan import TradePlan
 from models.trade import Trade
 from models.trading_method import TradingMethod

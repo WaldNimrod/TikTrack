@@ -233,71 +233,6 @@ function resetEditExecutionForm() {
 /**
  * הצגת מודל עריכת עסקה
  */
-async function showEditExecutionModal(id) {
-  window.Logger.info('🔍 [EDIT MODAL] פתיחת מודל עריכה עבור עסקה ID:', id, { page: "executions" });
-  window.Logger.info('🔍 [EDIT MODAL] נתוני עסקעות במטמון:', executionsData.length, 'עסקעות', { page: "executions" });
-  window.Logger.info('🔍 [EDIT MODAL] נתוני עסקעות במטמון:', executionsData.map(e => `${e.id}(trade:${e.trade_id}, { page: "executions" })`));
-
-  // מציאת העסקה לפי ID
-  const execution = executionsData.find(e => e.id === id);
-  if (!execution) {
-    window.Logger.info('❌ [EDIT MODAL] עסקה לא נמצאה במטמון:', id, { page: "executions" });
-    handleElementNotFound('execution', 'CRITICAL');
-    return;
-  }
-  
-  window.Logger.info('✅ [EDIT MODAL] עסקה נמצאה:', execution, { page: "executions" });
-
-  // מילוי שדה ה-ID לפני כל השאר
-  document.getElementById('editExecutionId').value = execution.id;
-  window.Logger.info('✅ [EDIT MODAL] שדה ID מולא:', execution.id, { page: "executions" });
-
-  // טעינת טיקרים לפי הצ'קבוקס
-  const showClosedTrades = document.getElementById('editExecutionShowClosedTrades')?.checked || false;
-  await updateTickersList('edit', showClosedTrades);
-
-  // טעינת פרטי הטרייד/תכנון המקושר
-  let linkedObject = null;
-  let tickerId = null;
-  let actionValue = null;
-  let executionDate = null;
-
-  try {
-    // בדיקה אם יש טרייד מקושר
-    if (execution.trade_id) {
-      window.Logger.info('🔍 [EDIT MODAL] מחפש טרייד מקושר ID:', execution.trade_id, { page: "executions" });
-      const tradesResponse = await fetch('/api/trades/');
-      const responseData = await tradesResponse.json();
-      const trades = responseData.data || responseData || [];
-      
-      window.Logger.info('🔍 [EDIT MODAL] טריידים נטענו מהשרת:', trades.length, 'טריידים', { page: "executions" });
-      window.Logger.info('🔍 [EDIT MODAL] טריידים מהשרת:', trades.map(t => `${t.id}(ticker:${t.ticker_id},status:${t.status}, { page: "executions" })`));
-
-      const trade = trades.find(t => t.id === execution.trade_id);
-      if (trade) {
-        window.Logger.info('✅ [EDIT MODAL] טרייד מקושר נמצא:', trade, { page: "executions" });
-        linkedObject = { type: 'trade', data: trade };
-        tickerId = trade.ticker_id;
-      } else {
-        window.Logger.info('❌ [EDIT MODAL] טרייד מקושר לא נמצא:', execution.trade_id, { page: "executions" });
-      }
-    }
-
-    // אם לא נמצא טרייד, נבדוק תכנונים
-    if (!linkedObject) {
-      try {
-        const plansResponse = await fetch('/api/trade_plans/');
-        if (plansResponse.ok) {
-          const plansData = await plansResponse.json();
-          const plans = plansData.data || plansData || [];
-
-          const plan = plans.find(p => p.id === execution.trade_id);
-          if (plan) {
-            linkedObject = { type: 'plan', data: plan };
-            tickerId = plan.ticker_id;
-
-          }
-        }
       } catch {
         // לא ניתן לטעון תכנונים
       }
@@ -1179,7 +1114,7 @@ function displayLinkedItems(linkedItems) {
                     <ul>
                         ${linkedItems.trades.map(trade => `
                             <li>
-                                טרייד #${trade.id} - חשבון: ${trade.account_name || 'לא זמין'} - סטטוס: ${trade.status}
+                                טרייד #${trade.id} - חשבון מסחר: ${trade.account_name || 'לא זמין'} - סטטוס: ${trade.status}
                                 <button class="btn btn-sm ms-2" onclick="goToTrade(${trade.id})">
                                     עבור לטרייד
                                 </button>
@@ -1606,7 +1541,7 @@ async function updateExecutionsTableMain(executions) {
       (execution.action || execution.type) === 'sale' ? 'מכירה' :
         execution.action || execution.type;
 
-    // מציאת שם החשבון מהטרייד
+    // מציאת שם החשבון מסחר מהטרייד
     const accountName = trade ? trade.account_name : 'לא מוגדר';
 
     return `
@@ -1626,7 +1561,7 @@ async function updateExecutionsTableMain(executions) {
                 </td>
                 <td data-account="${accountName}" style="cursor: pointer;" 
                   onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
-                  title="פתח פרטי חשבון">${accountName}</td>
+                  title="פתח פרטי חשבון מסחר">${accountName}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td class="pl-cell">$0</td>
@@ -1867,7 +1802,7 @@ function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, se
     });
   }
 
-  // פילטר לפי חשבון
+  // פילטר לפי חשבון מסחר
   if (selectedAccounts && selectedAccounts.length > 0 && !selectedAccounts.includes('הכול')) {
     filtered = filtered.filter(execution => {
       const account = execution.account_name || 'לא מוגדר';
@@ -3083,7 +3018,7 @@ function setupExecutionsFilterFunctions() {
     };
   }
 
-  // פונקציה לפילטר חשבון
+  // פונקציה לפילטר חשבון מסחר
   window.filterExecutionsByAccount = function(accountNames) {
     // Filtering executions by account names
 
@@ -3113,7 +3048,7 @@ function setupExecutionsFilterFunctions() {
           applyAccountFilterWithTradesData(namesArray);
         })
         .catch(error => {
-          handleApiError(error, 'טריידים לפילטר חשבון');
+          handleApiError(error, 'טריידים לפילטר חשבון מסחר');
           // Fallback - הצגת כל הביצועים
           filteredExecutions = [...allExecutions];
           updateExecutionsTableMain(filteredExecutions);
@@ -3122,7 +3057,7 @@ function setupExecutionsFilterFunctions() {
     }
   };
 
-  // פונקציה עזר לפילטר חשבון עם נתוני טריידים
+  // פונקציה עזר לפילטר חשבון מסחר עם נתוני טריידים
   function applyAccountFilterWithTradesData(namesArray) {
     const tradesMap = {};
 

@@ -318,6 +318,14 @@ try:
 except Exception as e:
     logger.error(f"❌ Failed to register condition evaluation task: {e}")
 
+# Register import sessions cleanup task
+try:
+    from services.import_sessions_cleanup_task import register_import_sessions_cleanup_task
+    register_import_sessions_cleanup_task(background_task_manager)
+    logger.info("✅ Import sessions cleanup task registered successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to register import sessions cleanup task: {e}")
+
 # Start background task scheduler automatically
 try:
     logger.info("🚀 Starting background task scheduler...")

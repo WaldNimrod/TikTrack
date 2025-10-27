@@ -1,88 +1,17 @@
 /**
- * ModalManagerV2 - TikTrack Modal System
- * =====================================
+ * Modal Manager V2 - Comprehensive Function Index
+ * ==========================================
  * 
- * מנהל מודלים מרכזי מתקדם עם תמיכה מלאה ב-CRUD operations
- * ואינטגרציה עם כל המערכות הקיימות במערכת TikTrack
+ * This file contains the central modal management system with full CRUD operations support
+ * and integration with all existing TikTrack systems.
  * 
- * קובץ: trading-ui/scripts/modal-manager-v2.js
- * גרסה: 2.1.0
- * עדכון אחרון: 27 בינואר 2025
- * 
- * תכונות עיקריות:
- * - יצירת מודלים דינמית מקונפיגורציה JSON
- * - אינטגרציה מלאה עם כל המערכות הקיימות
- * - תמיכה מלאה ב-RTL (Right-To-Left)
- * - עיצוב ITCSS compliant - אפס inline styles
- * - CSS Variables דינמיים לצבעים
- * - ביצועים אופטימליים עם Map()
- * 
- * עדכונים אחרונים (27 בינואר 2025):
- * - תיקון ITCSS compliance - הסרת כל inline styles
- * - הוספת CSS variables support מלא
- * - הוספת data-entity-type attributes
- * - שיפור applyUserColors() לשימוש ב-CSS variables בלבד
- * 
- * תלויות:
- * - Bootstrap 5.3.0 (לפונקציונליות מודלים)
- * - window.ENTITY_COLORS (צבעי ישויות מהמערכת הדינמית)
- * - window.ENTITY_BACKGROUND_COLORS (צבעי רקע)
- * - window.ENTITY_TEXT_COLORS (צבעי טקסט)
- * - window.validateEntityForm (מערכת ולידציה)
- * - window.showNotification (מערכת התראות)
- * - window.PreferencesSystem (ברירות מחדל)
- * - window.SelectPopulatorService (אכלוס dropdowns)
- * 
- * דוקומנטציה מפורטת:
+ * Related Documentation:
  * - documentation/02-ARCHITECTURE/FRONTEND/MODAL_SYSTEM_V2.md
- * - documentation/03-DEVELOPMENT/GUIDELINES/MODAL_MIGRATION_GUIDE.md
- * - MODAL_SYSTEM_V2_WORK_DOCUMENT.md
+ * - documentation/02-ARCHITECTURE/FRONTEND/MODAL_MANAGEMENT_SYSTEM.md
  * 
- * ===== FUNCTION INDEX =====
- * 
- * Core Functions:
- * - constructor()                    - אתחול המערכת
- * - init()                           - הפעלת המערכת
- * - setupEventListeners()            - הגדרת event listeners
- * - loadDefaultConfigurations()      - טעינת קונפיגורציות ברירת מחדל
- * 
- * CRUD Operations:
- * - createCRUDModal(config)          - יצירת מודל CRUD חדש
- * - showModal(modalId, mode, data)   - הצגת מודל
- * - showEditModal(modalId, type, id) - הצגת מודל עריכה
- * - closeActiveModal()               - סגירת מודל פעיל
- * - destroyModal(modalId)            - השמדת מודל
- * 
- * Modal Generation:
- * - generateModalHTML(config)        - יצירת HTML של מודל
- * - generateFieldsHTML(fields)       - יצירת HTML של שדות
- * - renderField(field)               - רינדור שדה בודד
- * 
- * Form Management:
- * - resetForm(modalElement)          - איפוס טופס
- * - populateForm(modalElement, data) - מילוי טופס בנתונים
- * - applyDefaultValues(form)         - יישום ברירות מחדל
- * 
- * Validation & Integration:
- * - initializeValidation(element, config) - אתחול ולידציה
- * - initializeButtons(modalElement)       - אתחול כפתורים
- * - populateSelects(modalElement, config) - אכלוס רשימות בחירה
- * 
- * Styling & Colors:
- * - applyUserColors(modalElement, entityType) - יישום צבעים דינמיים
- * - updateAllModalColors()                     - עדכון כל הצבעים
- * - updateModalTitle(element, config, mode)   - עדכון כותרת
- * 
- * Data Management:
- * - loadEntityData(entityType, entityId)     - טעינת נתוני ישות
- * - populateSpecialSelects(form, data)       - אכלוס selects מיוחדים
- * 
- * Utilities:
- * - validateConfiguration(config)   - ולידציה של קונפיגורציה
- * - clearValidationErrors(form)     - ניקוי שגיאות ולידציה
- * - getModalInfo(modalId)           - קבלת מידע על מודל
- * - loadConfiguration(configFile)   - טעינת קובץ קונפיגורציה
- * - initializeModalSystems(element, config) - אתחול מערכות מודל
+ * Author: TikTrack Development Team
+ * Version: 2.1.0
+ * Last Updated: 2025-01-27
  */
 
 class ModalManagerV2 {
@@ -565,7 +494,7 @@ class ModalManagerV2 {
         
         const preferences = window.PreferencesSystem.manager?.currentPreferences || {};
         
-        // ברירת מחדל לחשבון מסחר - חיפוש מדויק יותר
+        // ברירת מחדל לחשבון מסחר מסחר - חיפוש מדויק יותר
         const accountField = form.querySelector('[id*="Account"], [name*="account"], [id*="account"], [name*="Account"]');
         if (accountField && preferences.defaultTradingAccount) {
             accountField.value = preferences.defaultTradingAccount;

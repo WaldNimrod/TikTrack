@@ -509,3 +509,4 @@ window.delete{Entity} = delete{Entity};
 **גרסה**: 2.0.0  
 **עדכון אחרון**: 27 בינואר 2025  
 **מפתח**: TikTrack Development Team
+

@@ -383,6 +383,179 @@ def update_ticker(session_id: int):
             'message': 'Failed to update ticker'
         }), 500
 
+@user_data_import_bp.route('/session/<int:session_id>/accept-duplicate', methods=['POST'])
+def accept_duplicate(session_id):
+    """
+    Accept a duplicate record for import (move from skip to import list)
+    
+    Payload:
+        {
+            "record_index": int,
+            "duplicate_type": "within_file" | "existing_record"
+        }
+    
+    Returns:
+        JSON response with success status
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No data provided'
+            }), 400
+        
+        record_index = data.get('record_index')
+        duplicate_type = data.get('duplicate_type')
+        
+        if record_index is None or not duplicate_type:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required fields: record_index, duplicate_type'
+            }), 400
+        
+        # Get database session
+        db_session = next(get_db())
+        try:
+            # Create import orchestrator
+            orchestrator = ImportOrchestrator(db_session)
+            
+            # Accept the duplicate
+            result = orchestrator.accept_duplicate(
+                session_id=session_id,
+                record_index=record_index,
+                duplicate_type=duplicate_type
+            )
+            
+            if result['success']:
+                return jsonify({
+                    'success': True,
+                    'message': 'Duplicate accepted for import'
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': result['error']
+                }), 400
+                
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Accept duplicate failed: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Accept duplicate failed: {str(e)}'
+        }), 500
+
+
+@user_data_import_bp.route('/session/<int:session_id>/reject-duplicate', methods=['POST'])
+def reject_duplicate(session_id):
+    """
+    Reject a duplicate record (keep in skip list)
+    
+    Payload:
+        {
+            "record_index": int,
+            "duplicate_type": "within_file" | "existing_record"
+        }
+    
+    Returns:
+        JSON response with success status
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No data provided'
+            }), 400
+        
+        record_index = data.get('record_index')
+        duplicate_type = data.get('duplicate_type')
+        
+        if record_index is None or not duplicate_type:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required fields: record_index, duplicate_type'
+            }), 400
+        
+        # Get database session
+        db_session = next(get_db())
+        try:
+            # Create import orchestrator
+            orchestrator = ImportOrchestrator(db_session)
+            
+            # Reject the duplicate (keep in skip list)
+            result = orchestrator.reject_duplicate(
+                session_id=session_id,
+                record_index=record_index,
+                duplicate_type=duplicate_type
+            )
+            
+            if result['success']:
+                return jsonify({
+                    'success': True,
+                    'message': 'Duplicate rejected'
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': result['error']
+                }), 400
+                
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Reject duplicate failed: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Reject duplicate failed: {str(e)}'
+        }), 500
+
+
+@user_data_import_bp.route('/session/<int:session_id>/refresh-preview', methods=['POST'])
+def refresh_preview(session_id):
+    """
+    Refresh preview data after user actions (ticker added, duplicate accepted, etc.)
+    
+    Returns:
+        JSON response with updated preview data
+    """
+    try:
+        # Get database session
+        db_session = next(get_db())
+        try:
+            # Create import orchestrator
+            orchestrator = ImportOrchestrator(db_session)
+            
+            # Generate fresh preview
+            result = orchestrator.generate_preview(session_id)
+            
+            if result['success']:
+                return jsonify({
+                    'success': True,
+                    'preview_data': result['preview_data'],
+                    'summary_stats': result['summary_stats']
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': result['error']
+                }), 400
+                
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Refresh preview failed: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Refresh preview failed: {str(e)}'
+        }), 500
+
+
 @user_data_import_bp.route('/session/<int:session_id>/allow-existing', methods=['POST'])
 def allow_existing_record(session_id):
     """Allow importing a record that exists in the system"""

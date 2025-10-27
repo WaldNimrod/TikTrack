@@ -391,23 +391,32 @@ function displayProblemResolution() {
  * Shows missing tickers, within-file duplicates, and existing records as interactive cards
  * 
  * @function displayProblemResolutionDetailed
+ * @param {Object} options - Configuration options
+ * @param {boolean} options.showMissingTickers - Whether to show missing tickers
+ * @param {boolean} options.showDuplicates - Whether to show duplicates
+ * @param {boolean} options.showExistingRecords - Whether to show existing records
  * @returns {void}
  */
-function displayProblemResolutionDetailed() {
+function displayProblemResolutionDetailed(options = {}) {
     if (!ImportState.analysisResults) return;
     
     const results = ImportState.analysisResults;
+    const {
+        showMissingTickers = true,
+        showDuplicates = true,
+        showExistingRecords = true
+    } = options;
     
     // Clear existing content
     clearProblemSections();
     
     // Display missing tickers
-    if (results.missing_tickers && results.missing_tickers.length > 0) {
+    if (showMissingTickers && results.missing_tickers && results.missing_tickers.length > 0) {
         displayMissingTickersDetailed(results.missing_tickers);
     }
     
     // Display duplicates (will be populated from preview data)
-    if (ImportState.previewData) {
+    if (showDuplicates && ImportState.previewData) {
         displayDuplicatesDetailed(ImportState.previewData);
     }
     

@@ -129,7 +129,7 @@ class SelectPopulatorService {
                 valueField: 'id',
                 textField: 'name',
                 includeEmpty: options.includeEmpty !== false,
-                emptyText: options.emptyText || 'בחר חשבון...',
+                emptyText: options.emptyText || 'בחר חשבון מסחר...',
                 defaultValue: defaultValue,
                 defaultText: options.defaultText
             });
@@ -441,7 +441,7 @@ function populateSelect(selectId, data, field, prefix = '') {
     option.value = item.id;
     
     let displayText = '';
-    if (prefix === 'חשבון') {
+    if (prefix === 'חשבון מסחר') {
       const name = item.name || item.account_name || 'לא מוגדר';
       const currency = item.currency || 'ILS';
       displayText = `${name} (${currency})`;
@@ -470,7 +470,7 @@ function populateSelect(selectId, data, field, prefix = '') {
 
 /**
  * סינון טיקרים לפי סוג השיוך
- * @param {number} relationType - סוג השיוך (1=חשבון, 2=טרייד, 3=תכנון, 4=טיקר)
+ * @param {number} relationType - סוג השיוך (1=חשבון מסחר, 2=טרייד, 3=תכנון, 4=טיקר)
  * @returns {Array} מערך טיקרים מסוננים
  */
 function getFilteredTickers(relationType) {
@@ -525,13 +525,13 @@ function populateRelatedObjects(relationTypeId, selectedTicker = null, selectEle
 
   // מילוי לפי סוג השיוך עם סינון לפי טיקר
   switch (relationTypeId) {
-  case 1: // חשבון - רק חשבונות פתוחים
+  case 1: // חשבון מסחר - רק חשבונות פתוחים
     let accountsData = (window.accountsData || []).filter(account => 
       account.status === 'open' || account.status === 'active' || account.is_active === true
     );
-    // מיון א-ב לפי שם החשבון
+    // מיון א-ב לפי שם החשבון מסחר
     accountsData.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'he'));
-    populateSelect(selectElementId, accountsData, 'name', 'חשבון');
+    populateSelect(selectElementId, accountsData, 'name', 'חשבון מסחר');
     break;
 
   case 2: // טרייד - רק טריידים פתוחים וסגורים
@@ -631,7 +631,7 @@ function handleRelationTypeChange(selectElement, config) {
         relatedObjectSelect.required = true;
       }
     } else if (relationType === 1) {
-      // עבור חשבון - הטיקר לא פעיל
+      // עבור חשבון מסחר - הטיקר לא פעיל
       tickerSelect.disabled = true;
       tickerSelect.classList.add('disabled-field');
       tickerSelect.required = false;
@@ -659,7 +659,7 @@ function handleRelationTypeChange(selectElement, config) {
     }
   }
   
-  // 3. אלמנט לקישור - פעיל עבור חשבון(1)/תוכנית(3)/טרייד(2), לא פעיל עבור טיקר(4)
+  // 3. אלמנט לקישור - פעיל עבור חשבון מסחר(1)/תוכנית(3)/טרייד(2), לא פעיל עבור טיקר(4)
   if (relationType && relationType !== 4) {
     const selectedTicker = tickerSelect ? tickerSelect.value : null;
     populateRelatedObjects(relationType, selectedTicker, config.relatedSelectId);

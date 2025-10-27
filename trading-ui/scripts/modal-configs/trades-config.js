@@ -29,10 +29,10 @@ const tradesModalConfig = {
         {
             type: 'select',
             id: 'tradeAccount',
-            label: 'חשבון מסחר',
+            label: 'חשבון מסחר מסחר',
             required: true,
             options: [], // יטען דינמית מ-API
-            placeholder: 'בחר חשבון...'
+            placeholder: 'בחר חשבון מסחר...'
         },
         {
             type: 'text',

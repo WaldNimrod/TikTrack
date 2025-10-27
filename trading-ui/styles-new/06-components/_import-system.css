@@ -319,6 +319,176 @@
     margin-bottom: var(--spacing-md);
 }
 
+/* Problem Cards - Detailed View */
+.problem-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.problem-card {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.problem-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.problem-card-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.problem-card-header i {
+    font-size: var(--font-size-lg);
+}
+
+.problem-card.missing-ticker .problem-card-header {
+    background: var(--warning-background);
+    color: var(--warning-color);
+}
+
+.problem-card.within-file-duplicate .problem-card-header {
+    background: var(--info-background);
+    color: var(--info-color);
+}
+
+.problem-card.existing-record .problem-card-header {
+    background: var(--secondary-background);
+    color: var(--secondary-color);
+}
+
+.problem-card-body {
+    padding: var(--spacing-md);
+}
+
+.problem-card-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+}
+
+.problem-card-detail {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--font-size-sm);
+}
+
+.problem-card-detail-label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.problem-card-detail-value {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.problem-card-confidence {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+}
+
+.confidence-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--light-color);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.confidence-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.confidence-high .confidence-fill {
+    background: var(--success-color);
+}
+
+.confidence-medium .confidence-fill {
+    background: var(--warning-color);
+}
+
+.confidence-low .confidence-fill {
+    background: var(--danger-color);
+}
+
+.confidence-text {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    min-width: 40px;
+}
+
+.problem-card-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    justify-content: flex-end;
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+}
+
+.problem-card-actions button {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-width: 60px;
+}
+
+/* Missing Ticker Specific Styles */
+.missing-ticker-card {
+    border-left: 4px solid var(--warning-color);
+}
+
+.missing-ticker-info {
+    background: var(--warning-background);
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--warning-color);
+}
+
+/* Duplicate Specific Styles */
+.duplicate-card {
+    border-left: 4px solid var(--info-color);
+}
+
+.duplicate-matches {
+    background: var(--info-background);
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--info-color);
+}
+
+/* Existing Record Specific Styles */
+.existing-record-card {
+    border-left: 4px solid var(--secondary-color);
+}
+
+.existing-record-info {
+    background: var(--secondary-background);
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--secondary-color);
+}
+
+/* Legacy Lists (for backward compatibility) */
 .missing-tickers-list,
 .duplicates-list,
 .existing-records-list {

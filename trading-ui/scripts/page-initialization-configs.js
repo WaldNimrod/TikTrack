@@ -1,4 +1,19 @@
 /**
+ * Page Initialization Configs - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains page initialization configurations for TikTrack.
+ * Defines which scripts and packages are loaded for each page.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/PAGE_INITIALIZATION_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
+ */
+
+/**
  * Page Initialization Configurations - TikTrack
  * =============================================
  *

@@ -101,7 +101,7 @@ class TradesAdapter {
         // Count trades by account
         const accountCounts = {};
         rawData.data.forEach(trade => {
-            const accountName = trade.account_name || `חשבון ${trade.account_id}`;
+            const accountName = trade.account_name || `חשבון מסחר ${trade.account_id}`;
             accountCounts[accountName] = (accountCounts[accountName] || 0) + 1;
         });
 
@@ -116,7 +116,7 @@ class TradesAdapter {
         return {
             labels: labels,
             datasets: [{
-                label: 'מספר טריידים לפי חשבון',
+                label: 'מספר טריידים לפי חשבון מסחר',
                 data: data,
                 backgroundColor: [
                     colorPalette[0] || '#007bff', // primary

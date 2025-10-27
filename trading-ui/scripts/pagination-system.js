@@ -1,18 +1,16 @@
 /**
- * Pagination System - General Purpose
- * ===================================
+ * Pagination System - Comprehensive Function Index
+ * ==========================================
  * 
- * מערכת pagination כללית לשימוש בכל הטבלאות במערכת
+ * This file contains the general purpose pagination system for all tables in TikTrack.
+ * Includes user preferences support, unified UI, optimal performance, and large table support.
  * 
- * תכונות:
- * - תמיכה בהעדפות משתמש
- * - ממשק משתמש אחיד
- * - ביצועים מיטביים
- * - תמיכה בטבלאות גדולות
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/PAGINATION_SYSTEM.md
  * 
- * @version 1.0.0
- * @lastUpdated January 2025
- * @author TikTrack Development Team
+ * Author: TikTrack Development Team
+ * Version: 1.0.0
+ * Last Updated: 2025-01-27
  */
 
 // ===== GLOBAL PAGINATION SYSTEM =====

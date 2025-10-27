@@ -50,7 +50,7 @@ const cashFlowModalConfig = {
         {
             type: 'select',
             id: 'cashFlowAccount',
-            label: 'חשבון מסחר',
+            label: 'חשבון מסחר מסחר',
             required: true,
             defaultFromPreferences: true // ברירת מחדל מהעדפות
         },

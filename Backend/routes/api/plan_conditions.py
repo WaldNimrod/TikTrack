@@ -281,7 +281,7 @@ def delete_plan_condition(condition_id):
                 }), 404
             
             # Check if condition is inherited by trade conditions
-            from models.plan_condition import TradeCondition
+            from models.trade_condition import TradeCondition
             inherited_count = db_session.query(TradeCondition).filter(
                 TradeCondition.inherited_from_plan_condition_id == condition_id
             ).count()

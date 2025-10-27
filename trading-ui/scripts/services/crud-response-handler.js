@@ -558,7 +558,7 @@ class CRUDResponseHandler {
                 'טרייד': 'trades',
                 'ביצוע': 'executions',
                 'טיקר': 'tickers',
-                'חשבון מסחר': 'trading_accounts',
+                'חשבון מסחר מסחר': 'trading_accounts',
                 'תזרים מזומנים': 'cash_flows',
                 'תוכנית מסחר': 'trade_plans'
             };

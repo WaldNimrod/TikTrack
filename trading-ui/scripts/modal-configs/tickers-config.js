@@ -169,3 +169,4 @@ if (window.ModalManagerV2) {
 
 // ייצוא לקונסול (לצורך debug)
 window.tickersModalConfig = tickersModalConfig;
+

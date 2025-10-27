@@ -35,7 +35,7 @@ class ImportSession(BaseModel):
     __table_args__ = {'extend_existing': True}
     
     # Database columns - matching import session requirements
-    account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False, 
+    account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False, 
                        comment="Trading account ID for the import")
     provider = Column(String(50), nullable=False, 
                      comment="Data provider: ibkr, demo, etc.")

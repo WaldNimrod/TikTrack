@@ -235,9 +235,9 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
   } else if (itemType === 'trade_plan') {
     modalTitle = 'פריטים מקושרים לתוכנית השקעה';
   } else if (itemType === 'account') {
-    // עבור חשבון - הוספת שם החשבון
-    const accountName = data.accountName || `חשבון ${itemId}`;
-    modalTitle = `פריטים מקושרים לחשבון ${accountName}`;
+    // עבור חשבון מסחר - הוספת שם החשבון מסחר
+    const accountName = data.accountName || `חשבון מסחר ${itemId}`;
+    modalTitle = `פריטים מקושרים לחשבון מסחר ${accountName}`;
   } else {
     modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
   }
@@ -274,7 +274,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
 
   switch (itemType) {
   case 'account':
-    itemName = data.accountName || `חשבון ${itemId}`;
+    itemName = data.accountName || `חשבון מסחר ${itemId}`;
     break;
   case 'trade':
     itemName = data.tradeSymbol || `טרייד ${itemId}`;
@@ -656,7 +656,7 @@ function getRulesExplanation(itemType, data) {
     explanation += `<br>• ${executions.length} ביצוע(ים)`;
   }
   if (accounts.length > 0) {
-    explanation += `<br>• ${accounts.length} חשבון(ות)`;
+    explanation += `<br>• ${accounts.length} חשבון מסחר(ות)`;
   }
 
   explanation += '<br><br><strong>כללי ביטול:</strong><br>';
@@ -767,7 +767,7 @@ function getRulesExplanation(itemType, data) {
     const linkedNotes = childEntities.filter(entity => entity.type === 'note');
     const linkedAlerts = childEntities.filter(entity => entity.type === 'alert');
 
-    explanation = 'לא ניתן למחוק חשבון זה כי יש:';
+    explanation = 'לא ניתן למחוק חשבון מסחר זה כי יש:';
     if (linkedTrades.length > 0) {
       const openTrades = linkedTrades.filter(t => t.status === 'open');
       const closedTrades = linkedTrades.filter(t => t.status === 'closed');
@@ -893,7 +893,7 @@ function getItemTypeIcon(type) {
   // ברירת מחדל אם הפונקציה הגלובלית לא זמינה
   const icons = {
     'trade': '<img src="/images/icons/trades.svg" alt="טרייד" class="linked-item-icon-img" width="48" height="48">',
-    'account': '<img src="/images/icons/accounts.svg" alt="חשבון" class="linked-item-icon-img" width="48" height="48">',
+    'account': '<img src="/images/icons/accounts.svg" alt="חשבון מסחר" class="linked-item-icon-img" width="48" height="48">',
     'ticker': '<img src="/images/icons/tickers.svg" alt="טיקר" class="linked-item-icon-img" width="48" height="48">',
     'alert': '<img src="/images/icons/alerts.svg" alt="התראה" class="linked-item-icon-img" width="48" height="48">',
     'cash_flow': '<img src="/images/icons/cash_flows.svg" alt="תזרים מזומנים" class="linked-item-icon-img" width="48" height="48">',
@@ -915,7 +915,7 @@ function getItemTypeIcon(type) {
 function getItemTypeDisplayName(type) {
   const names = {
     'trade': 'טרייד',
-    'account': 'חשבון',
+    'account': 'חשבון מסחר',
     'ticker': 'טיקר',
     'alert': 'התראה',
     'cash_flow': 'תזרים מזומנים',
@@ -1589,7 +1589,7 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
   }
 
   switch (item.related_type_id) {
-    case 1: { // חשבון
+    case 1: { // חשבון מסחר
       const account = accounts.find(a => a.id === item.related_id);
       if (account) {
         const name = account.name || account.account_name || 'לא מוגדר';
@@ -1603,7 +1603,7 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
           relatedDisplay = `${name} (${currency})`;
         }
       } else {
-        relatedDisplay = `חשבון ${item.related_id}`;
+        relatedDisplay = `חשבון מסחר ${item.related_id}`;
       }
       relatedIcon = '🏦';
       relatedClass = 'related-account entity-account-badge';
@@ -1713,7 +1713,7 @@ function getRelatedObjectTypeName(typeId) {
  */
 function getRelatedObjectTypeNameHebrew(typeId) {
   const typeNames = {
-    1: 'חשבון',
+    1: 'חשבון מסחר',
     2: 'טרייד',
     3: 'תוכנית',
     4: 'טיקר'
@@ -1739,7 +1739,7 @@ function getRelatedObjectSymbol(item, dataSources = {}) {
   }
 
   switch (item.related_type_id) {
-    case 1: // חשבון - ריק
+    case 1: // חשבון מסחר - ריק
       return '-';
     case 2: // טרייד
       const trade = trades.find(t => t.id === item.related_id);

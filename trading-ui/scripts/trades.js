@@ -472,7 +472,7 @@ async function updateTradesTable(trades) {
         window.Logger.info('🔍 trades.js RESULT:', result, { page: "trades" });
         return result;
       })() : `<span class="text-danger">❌ FieldRendererService לא זמין</span>`) : '-'}</td>
-      <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
+      <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון מסחר לא ידוע'}</a></strong></td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : ''}</td>
       <td class="actions-cell">
@@ -524,12 +524,12 @@ function viewTickerDetails(tickerId) {
 }
 
 function viewAccountDetails(accountId) {
-  // צפייה בפרטי חשבון באמצעות מודל פרטי ישות
+  // צפייה בפרטי חשבון מסחר באמצעות מודל פרטי ישות
   if (typeof window.showEntityDetails === 'function') {
     window.showEntityDetails('account', accountId, { mode: 'view' });
   } else {
     if (typeof window.showInfoNotification === 'function') {
-      window.showInfoNotification('מידע', 'פונקציונליות צפייה בפרטי חשבון תהיה זמינה בקרוב');
+      window.showInfoNotification('מידע', 'פונקציונליות צפייה בפרטי חשבון מסחר תהיה זמינה בקרוב');
     }
   }
 }
@@ -832,172 +832,6 @@ function addEditReminder() {
 /**
  * פונקציה להצגת מודל עריכת טרייד
  */
-/**
- * הצגת מודל טרייד (הוספה או עריכה)
- * @param {string} mode - 'add' או 'edit'
- * @param {Object} [trade] - אובייקט הטרייד (נדרש רק בעריכה)
- */
-async function showTradeModal(mode, trade = null) {
-  const isEdit = mode === 'edit';
-  const modalId = isEdit ? 'editTradeModal' : 'addTradeModal';
-  const formId = isEdit ? 'editTradeForm' : 'addTradeForm';
-  
-  try {
-    // ניקוי וולידציה
-    if (window.clearValidation) {
-      window.clearValidation(formId);
-    }
-
-    if (isEdit) {
-      // ניקוי סימונים
-      const tradePlanSelect = document.getElementById('editTradeTradePlanId');
-      if (tradePlanSelect) {
-        tradePlanSelect.removeAttribute('data-restored');
-        tradePlanSelect.removeAttribute('data-cleared');
-      }
-
-      // טעינת נתונים למודל עריכת טרייד
-      await loadEditTradeModalData(trade);
-
-      // טעינת נתוני העסקאות
-      if (typeof window.loadTradeExecutions === 'function') {
-        try {
-          window.loadTradeExecutions(trade.id);
-        } catch {
-          if (typeof handleFunctionNotFound === 'function') {
-            handleFunctionNotFound('loadTradeExecutions');
-          }
-        }
-      } else {
-        if (typeof handleFunctionNotFound === 'function') {
-          handleFunctionNotFound('loadTradeExecutions');
-        }
-      }
-
-      // שמירת הטרייד המקורי לבדיקות
-      window.currentEditTrade = trade;
-    } else {
-      // טעינת נתונים למודל
-      loadModalData();
-
-      // ניקוי הטופס
-      const form = document.getElementById('addTradeForm');
-      if (form) {
-        form.reset();
-      }
-
-      // ניטרול כל השדות חוץ מתוכנית טרייד
-      disableTradeFormFields();
-
-      // הגדרת תאריך נוכחי
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      const hh = String(today.getHours()).padStart(2, '0');
-      const min = String(today.getMinutes()).padStart(2, '0');
-      const todayStr = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
-
-      const dateInput = document.getElementById('addTradeOpenedAt');
-      if (dateInput) {
-        dateInput.value = todayStr;
-      }
-    }
-
-    // הצגת המודל
-    const modalElement = document.getElementById(modalId);
-    if (modalElement) {
-      if (typeof bootstrap !== 'undefined') {
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-      } else {
-        if (typeof handleSystemError === 'function') {
-          handleSystemError(new Error('Bootstrap is not loaded'), 'מערכת מודלים');
-        }
-        // נסיון חלופי להצגת המודל
-        modalElement.style.display = 'block';
-        modalElement.classList.add('show');
-        document.body.classList.add('modal-open');
-      }
-    } else {
-      if (typeof handleElementNotFound === 'function') {
-        handleElementNotFound(modalId, 'CRITICAL');
-      }
-    }
-    
-  } catch (error) {
-    const action = isEdit ? 'עריכת' : 'הוספת';
-    window.Logger.error(`שגיאה בהצגת מודל ${action} טרייד:`, error, { page: "trades" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification(`שגיאה בהצגת מודל ${action} טרייד`, error.message);
-    }
-  }
-}
-
-/**
- * פונקציה להצגת מודל עריכת טרייד
- * @param {Object} trade - אובייקט הטרייד לעריכה
- * @deprecated Use showTradeModal('edit', trade) instead
- */
-async function showEditTradeModal(trade) {
-  await showTradeModal('edit', trade);
-}
-
-/**
- * טעינת נתונים למודל עריכת טרייד
- */
-async function loadEditTradeModalData(trade) {
-  try {
-    // טעינת חשבונות, תוכניות טרייד וטיקרים
-    const [accountsResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/accounts/'),
-      fetch('/api/trade_plans/'),
-      fetch('/api/tickers/'),
-    ]);
-
-    if (!accountsResponse.ok || !tradePlansResponse.ok || !tickersResponse.ok) {
-      throw new Error('שגיאה בטעינת נתונים');
-    }
-
-    const accounts = await accountsResponse.json();
-    const tradePlans = await tradePlansResponse.json();
-    const tickers = await tickersResponse.json();
-
-    // מילוי רשימת חשבונות עם SelectPopulatorService
-    if (window.SelectPopulatorService) {
-      await window.SelectPopulatorService.populateAccountsSelect('editTradeAccountId', {
-      includeEmpty: true,
-      emptyText: 'בחר חשבון',
-        filter: (account) => account.status === 'open'
-      });
-    } else {
-      // Fallback למערכת הישנה
-      const accountSelect = document.getElementById('editTradeAccountId');
-      if (accountSelect) {
-        accountSelect.innerHTML = '<option value="">בחר חשבון</option>';
-        const openAccounts = accounts.data.filter(account => account.status === 'open');
-        openAccounts.forEach(account => {
-          const option = document.createElement('option');
-          option.value = account.id;
-          option.textContent = `${account.name} (${account.currency})`;
-          accountSelect.appendChild(option);
-        });
-      }
-    }
-
-    // מילוי רשימת טיקרים עם SelectPopulatorService
-    if (window.SelectPopulatorService) {
-      await window.SelectPopulatorService.populateTickersSelect('editTradeTickerId', {
-      includeEmpty: true,
-      emptyText: 'בחר טיקר',
-        filter: (ticker) => ticker.status === 'open'
-      });
-    } else {
-      // Fallback למערכת הישנה
-      const tickerSelect = document.getElementById('editTradeTickerId');
-      if (tickerSelect) {
-        tickerSelect.innerHTML = '<option value="">בחר טיקר</option>';
-        const activeTickers = tickers.data.filter(ticker => ticker.status === 'open');
         activeTickers.forEach(ticker => {
           const option = document.createElement('option');
           option.value = ticker.id;
@@ -1389,13 +1223,6 @@ async function saveEditTradeData() {
  */
 /**
  * Show add trade modal
- * Opens the modal for adding a new trade
- * @deprecated Use showTradeModal('add') instead
- */
-function showAddTradeModal() {
-  showTradeModal('add');
-}
-
 /**
  * הפעלה/השבתה של שדות הטופס
  * @param {boolean} enable - true להפעלה, false להשבתה
@@ -1461,7 +1288,7 @@ function enableTradeFormFields() {
  */
 function validateTradeForm() {
   const fieldConfigs = [
-    {id: 'addTradeAccountId', name: 'חשבון מסחר', rules: {required: true}},
+    {id: 'addTradeAccountId', name: 'חשבון מסחר מסחר', rules: {required: true}},
     {id: 'addTradeTickerId', name: 'טיקר', rules: {required: true}},
     {id: 'addTradeTradePlanId', name: 'תוכנית טרייד', rules: {required: true}},
     {id: 'addTradeStatus', name: 'סטטוס', rules: {required: false}},
@@ -1505,7 +1332,7 @@ function validateTradeForm() {
  * - סגירת המודל ורענון הטבלה
  *
  * מבנה הנתונים הנשלח:
- * - account_id: מזהה החשבון
+ * - account_id: מזהה החשבון מסחר
  * - ticker_id: מזהה הטיקר (אופציונלי)
  * - trade_plan_id: מזהה תוכנית טרייד (אופציונלי)
  * - type: סוג הטרייד (swing, investment, passive)
@@ -1558,12 +1385,6 @@ async function saveTradeData(mode) {
         };
 
       // עדכון הטיקר לפי התוכנית הנבחרת
-      if (formData.trade_plan_id) {
-        const tradePlanSelect = document.getElementById('editTradeTradePlanId');
-        const selectedOption = tradePlanSelect.options[tradePlanSelect.selectedIndex];
-
-        if (selectedOption) {
-          const planTickerId = selectedOption.getAttribute('data-ticker-id');
           const planTickerSymbol = selectedOption.getAttribute('data-ticker-symbol');
 
           if (planTickerId && planTickerSymbol) {
@@ -1704,7 +1525,7 @@ async function loadModalData() {
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
     const accountSelect = document.getElementById('addTradeAccountId');
     if (accountSelect) {
-      accountSelect.innerHTML = '<option value="">בחר חשבון</option>';
+      accountSelect.innerHTML = '<option value="">בחר חשבון מסחר</option>';
       const openAccounts = accounts.data.filter(account => account.status === 'open');
       openAccounts.forEach(account => {
         const option = document.createElement('option');
@@ -2218,7 +2039,7 @@ window.updateTradesTable = updateTradesTable;              // עדכון טבל�
 
 // פונקציות פעולות:
 window.viewTickerDetails = viewTickerDetails;              // צפייה בפרטי טיקר
-window.viewAccountDetails = viewAccountDetails;              // צפייה בפרטי חשבון
+window.viewAccountDetails = viewAccountDetails;              // צפייה בפרטי חשבון מסחר
 window.viewTradePlanDetails = viewTradePlanDetails;        // צפייה בפרטי תוכנית טרייד
 window.viewLinkedItemsForTrade = viewLinkedItemsForTrade;  // צפייה בפריטים מקושרים לטרייד
 window.editTradeRecord = editTradeRecord;                  // עריכת טרייד
@@ -3291,7 +3112,7 @@ function confirmDeleteTrade(tradeId) {
     
     // יצירת הודעת אישור
     const confirmMessage = `האם אתה בטוח שברצונך למחוק את הטרייד?\n\n` +
-      `חשבון: ${trade.account_name || 'לא ידוע'}\n` +
+      `חשבון מסחר: ${trade.account_name || 'לא ידוע'}\n` +
       `טיקר: ${trade.ticker_symbol || 'לא ידוע'}\n` +
       `סכום: ${trade.amount || 'לא ידוע'}`;
     

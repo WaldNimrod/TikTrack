@@ -1,0 +1,28 @@
+{
+  "general_systems_analysis": {
+    "total_window_references": 1123,
+    "notification_system_usage": {
+      "window.showNotification": 829,
+      "description": "שימוש נרחב במערכת התראות"
+    },
+    "modal_system_usage": {
+      "window.ModalManagerV2": 64,
+      "description": "שימוש במערכת מודלים V2"
+    },
+    "header_system_usage": {
+      "window.headerSystem": 27,
+      "description": "שימוש במערכת כותרת"
+    },
+    "potential_duplicates": {
+      "notification_calls": "829 קריאות למערכת התראות - ייתכן שיש כפילויות",
+      "modal_calls": "64 קריאות למערכת מודלים - נראה תקין",
+      "header_calls": "27 קריאות למערכת כותרת - נראה תקין"
+    },
+    "dependencies_analysis": {
+      "high_dependency": "notification-system (829 uses)",
+      "medium_dependency": "modal-manager-v2 (64 uses)",
+      "low_dependency": "header-system (27 uses)"
+    }
+  }
+}
+

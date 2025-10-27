@@ -29,7 +29,7 @@ CACHE_ENABLED = not CACHE_DISABLED
 # Database settings
 DATABASE_URL = f"sqlite:///{DB_PATH}"
 
-# Checks
-if not UI_DIR.exists():
+# Checks (skip in testing mode)
+if not os.getenv('TESTING') and not UI_DIR.exists():
     raise FileNotFoundError(f"UI directory not found at: {UI_DIR}")
 

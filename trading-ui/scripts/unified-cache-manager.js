@@ -1,4 +1,19 @@
 /**
+ * Unified Cache Manager - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the unified cache management system with 4 layers:
+ * Memory, localStorage, IndexedDB, and Backend Cache.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_CACHE_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
+ */
+
+/**
  * ========================================
  * Unified Cache Manager - TikTrack
  * ========================================
@@ -1519,6 +1534,13 @@ if (window.UnifiedInitializationSystem) {
  * @param {Object} options - Options for clearing
  * @returns {Promise<Object>} Result with success status and details
  */
+/**
+ * Clear all cache layers
+ * @function clearAllCache
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
     try {
         window.Logger.info('🔄 Starting complete cache clearing process...', { page: "unified-cache-manager" });
@@ -1762,6 +1784,13 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
  * @param {Object} options - Options for clearing
  * @returns {Promise<Object>} Result with success status
  */
+/**
+ * Clear all cache quickly with auto-refresh
+ * @function clearAllCacheQuick
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) {
     try {
         window.Logger.info('🧹 Quick cache clearing for development...', { page: "unified-cache-manager" });
@@ -1813,6 +1842,13 @@ UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) 
  * Detailed cache clearing with comprehensive feedback
  * @param {Object} options - Options for clearing
  * @returns {Promise<Object>} Result with success status and detailed feedback
+ */
+/**
+ * Clear all cache with detailed logging
+ * @function clearAllCacheDetailed
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
  */
 UnifiedCacheManager.prototype.clearAllCacheDetailed = async function(options = {}) {
     try {
@@ -1878,6 +1914,13 @@ UnifiedCacheManager.prototype.clearAllCacheDetailed = async function(options = {
  * @param {Object} options - Options for the process
  * @returns {Promise<Object>} Complete verification report
  */
+/**
+ * Verify cache system functionality
+ * @function verifyCacheSystem
+ * @async
+ * @param {Object} options - Options for verification
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.verifyCacheSystem = async function(options = {}) {
     try {
         window.Logger.info('🔍 Starting complete cache verification process...', { page: "unified-cache-manager" });
@@ -1940,6 +1983,12 @@ UnifiedCacheManager.prototype.verifyCacheSystem = async function(options = {}) {
 /**
  * Scan all cache layers and return detailed information
  * @returns {Promise<Object>} Detailed scan results
+ */
+/**
+ * Scan all cache layers
+ * @function scanAllCacheLayers
+ * @async
+ * @returns {Promise<Object>} Scan results
  */
 UnifiedCacheManager.prototype.scanAllCacheLayers = async function() {
     const scanResults = {
@@ -2140,6 +2189,12 @@ UnifiedCacheManager.prototype.scanAllCacheLayers = async function() {
  * @param {Object} scanResults - Results from scanAllCacheLayers
  * @returns {number} Total key count
  */
+/**
+ * Count total keys in scan results
+ * @function countTotalKeys
+ * @param {Object} scanResults - Scan results object
+ * @returns {number} Total key count
+ */
 UnifiedCacheManager.prototype.countTotalKeys = function(scanResults) {
     return scanResults.memory.count +
            scanResults.localStorage.count +
@@ -2151,6 +2206,12 @@ UnifiedCacheManager.prototype.countTotalKeys = function(scanResults) {
 
 /**
  * Verify cache system functionality by testing read/write operations
+ * @returns {Promise<Object>} Verification results
+ */
+/**
+ * Verify cache functionality by testing read/write operations
+ * @function verifyCacheFunctionality
+ * @async
  * @returns {Promise<Object>} Verification results
  */
 UnifiedCacheManager.prototype.verifyCacheFunctionality = async function() {
@@ -2275,6 +2336,12 @@ UnifiedCacheManager.prototype.verifyCacheFunctionality = async function() {
  * Refresh data from backend database for all systems
  * @returns {Promise<Object>} Refresh results
  */
+/**
+ * Refresh data from backend
+ * @function refreshDataFromBackend
+ * @async
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
     const refreshResults = {
         success: true,
@@ -2355,6 +2422,12 @@ UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
 /**
  * Refresh trading data from backend
  */
+/**
+ * Refresh trading data
+ * @function refreshTradingData
+ * @async
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.refreshTradingData = async function() {
     try {
         // Clear trading-related cache keys
@@ -2383,6 +2456,12 @@ UnifiedCacheManager.prototype.refreshTradingData = async function() {
 
 /**
  * Refresh market data from backend
+ */
+/**
+ * Refresh market data
+ * @function refreshMarketData
+ * @async
+ * @returns {Promise<void>}
  */
 UnifiedCacheManager.prototype.refreshMarketData = async function() {
     try {
@@ -2415,6 +2494,12 @@ UnifiedCacheManager.prototype.refreshMarketData = async function() {
  * @param {string} key - Cache key
  * @returns {object} Policy configuration
  */
+/**
+ * Get key policy for cache layer decision
+ * @function getKeyPolicy
+ * @param {string} key - Cache key
+ * @returns {Object} Key policy
+ */
 UnifiedCacheManager.prototype.getKeyPolicy = function(key) {
     // Exact match
     if (this.defaultPolicies[key]) {
@@ -2437,6 +2522,12 @@ UnifiedCacheManager.prototype.getKeyPolicy = function(key) {
 
 /**
  * Refresh user preferences from backend
+ */
+/**
+ * Refresh user preferences
+ * @function refreshUserPreferences
+ * @async
+ * @returns {Promise<void>}
  */
 UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
     try {
@@ -2472,6 +2563,12 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
 /**
  * Refresh UI state from backend
  */
+/**
+ * Refresh UI state
+ * @function refreshUIState
+ * @async
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.refreshUIState = async function() {
     try {
         // Clear UI state cache
@@ -2499,6 +2596,12 @@ UnifiedCacheManager.prototype.refreshUIState = async function() {
 /**
  * Refresh notifications from backend
  */
+/**
+ * Refresh notifications
+ * @function refreshNotifications
+ * @async
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.refreshNotifications = async function() {
     try {
         // Clear notifications cache
@@ -2525,6 +2628,13 @@ UnifiedCacheManager.prototype.refreshNotifications = async function() {
 // ===== GLOBAL FUNCTION EXPORTS =====
 
 // Export functions to global scope for backward compatibility
+/**
+ * Clear all unified cache (global wrapper)
+ * @function clearAllUnifiedCache
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
+ */
 window.clearAllUnifiedCache = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.clearAllCacheDetailed(options);
@@ -2534,6 +2644,13 @@ window.clearAllUnifiedCache = async function(options = {}) {
     }
 };
 
+/**
+ * Clear all unified cache quickly (global wrapper)
+ * @function clearAllUnifiedCacheQuick
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
+ */
 window.clearAllUnifiedCacheQuick = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.clearAllCacheQuick(options);
@@ -2544,6 +2661,13 @@ window.clearAllUnifiedCacheQuick = async function(options = {}) {
 };
 
 // Alias for compatibility with existing code
+/**
+ * Clear all cache (global wrapper)
+ * @function clearAllCache
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
+ */
 window.clearAllCache = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.clearAllCacheDetailed(options);
@@ -2553,6 +2677,13 @@ window.clearAllCache = async function(options = {}) {
     }
 };
 
+/**
+ * Verify cache system (global wrapper)
+ * @function verifyCacheSystem
+ * @async
+ * @param {Object} options - Options for verification
+ * @returns {Promise<void>}
+ */
 window.verifyCacheSystem = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.verifyCacheSystem(options);
@@ -2568,6 +2699,13 @@ window.verifyCacheSystem = async function(options = {}) {
 /**
  * ניקוי מהיר לצרכי פיתוח - כפתור ראשי
  * Uses existing clearAllCacheQuick() method
+ */
+/**
+ * Clear cache quickly (global wrapper)
+ * @function clearCacheQuick
+ * @async
+ * @param {Event} event - Event object
+ * @returns {Promise<void>}
  */
 window.clearCacheQuick = async function(event) {
     if (event) {
@@ -2592,6 +2730,14 @@ window.clearCacheQuick = async function(event) {
  * Uses existing clearAllCache() method with layer filter
  * @param {string} layer - שם השכבה (memory, localStorage, indexedDB, backend)
  */
+/**
+ * Clear specific cache layer (global wrapper)
+ * @function clearCacheLayer
+ * @async
+ * @param {string} layer - Cache layer to clear
+ * @param {Event} event - Event object
+ * @returns {Promise<void>}
+ */
 window.clearCacheLayer = async function(layer, event) {
     if (event) {
         event.preventDefault();
@@ -2614,6 +2760,13 @@ window.clearCacheLayer = async function(layer, event) {
  * ניקוי כל שכבות המטמון (ללא רענון) - תפריט משנה
  * Uses existing clearAllCacheDetailed() method
  */
+/**
+ * Clear all cache advanced (global wrapper)
+ * @function clearAllCacheAdvanced
+ * @async
+ * @param {Event} event - Event object
+ * @returns {Promise<void>}
+ */
 window.clearAllCacheAdvanced = async function(event) {
     if (event) {
         event.preventDefault();
@@ -2635,6 +2788,13 @@ window.clearAllCacheAdvanced = async function(event) {
 /**
  * ניקוי מלא + רענון עמוד - תפריט משנה
  * Uses existing clearAllCacheDetailed() method + page reload
+ */
+/**
+ * Clear cache full (global wrapper)
+ * @function clearCacheFull
+ * @async
+ * @param {Event} event - Event object
+ * @returns {Promise<void>}
  */
 window.clearCacheFull = async function(event) {
     if (event) {
@@ -2664,6 +2824,14 @@ window.clearCacheFull = async function(event) {
  * ניקוי מטמון לפני פעולות CRUD - פונקציה שמוזכרת במקומות רבים
  * @param {string} entity - שם הישות (trades, alerts, trading_accounts, etc.)
  * @param {string} operation - סוג הפעולה (add, edit, delete, cancel)
+ */
+/**
+ * Clear cache before CRUD operation (global wrapper)
+ * @function clearCacheBeforeCRUD
+ * @async
+ * @param {string} entity - Entity name
+ * @param {string} operation - CRUD operation
+ * @returns {Promise<void>}
  */
 window.clearCacheBeforeCRUD = async function(entity, operation) {
     window.Logger.info(`🧹 ניקוי מטמון לפני ${operation} של ${entity}...`, { page: "unified-cache-manager" });
@@ -2701,6 +2869,12 @@ window.clearCacheBeforeCRUD = async function(entity, operation) {
 })();
 
 // Export additional functions to window for easy access
+/**
+ * Invalidate cache by dependency (global wrapper)
+ * @function invalidateByDependency
+ * @param {string} changedKey - Changed key
+ * @returns {Promise<number>} Number of invalidated keys
+ */
 window.invalidateByDependency = function(changedKey) {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { changedKey, page: 'unified-cache-manager' });
@@ -2709,6 +2883,12 @@ window.invalidateByDependency = function(changedKey) {
     return window.unifiedCacheManager.invalidateByDependency(changedKey);
 };
 
+/**
+ * Invalidate cache by pattern (global wrapper)
+ * @function invalidateCache
+ * @param {string} pattern - Cache pattern
+ * @returns {Promise<number>} Number of invalidated keys
+ */
 window.invalidateCache = function(pattern) {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { pattern, page: 'unified-cache-manager' });
@@ -2717,6 +2897,12 @@ window.invalidateCache = function(pattern) {
     return window.unifiedCacheManager.invalidate(pattern);
 };
 
+/**
+ * Get multiple cache values (global wrapper)
+ * @function getMultipleCache
+ * @param {Array<string>} keys - Cache keys
+ * @returns {Promise<Object>} Cache values
+ */
 window.getMultipleCache = function(keys) {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { count: keys.length, page: 'unified-cache-manager' });
@@ -2725,6 +2911,13 @@ window.getMultipleCache = function(keys) {
     return window.unifiedCacheManager.getMultiple(keys);
 };
 
+/**
+ * Set multiple cache values (global wrapper)
+ * @function setMultipleCache
+ * @param {Object} data - Data to cache
+ * @param {string} ttl - Time to live
+ * @returns {Promise<void>}
+ */
 window.setMultipleCache = function(data, ttl = 'medium') {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { count: Object.keys(data).length, page: 'unified-cache-manager' });
@@ -2733,6 +2926,12 @@ window.setMultipleCache = function(data, ttl = 'medium') {
     return window.unifiedCacheManager.setMultiple(data, ttl);
 };
 
+/**
+ * Check if cache has key (global wrapper)
+ * @function hasCache
+ * @param {string} key - Cache key
+ * @returns {Promise<boolean>} Whether key exists
+ */
 window.hasCache = function(key) {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { key, page: 'unified-cache-manager' });
@@ -2741,6 +2940,11 @@ window.hasCache = function(key) {
     return window.unifiedCacheManager.has(key);
 };
 
+/**
+ * Get cache statistics (global wrapper)
+ * @function getCacheStats
+ * @returns {Promise<Object>} Cache statistics
+ */
 window.getCacheStats = function() {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { page: 'unified-cache-manager' });

@@ -11,7 +11,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, desc
 
 from models.trading_method import TradingMethod, MethodParameter
-from models.plan_condition import PlanCondition, TradeCondition
+from models.plan_condition import PlanCondition
+from models.trade_condition import TradeCondition
 from models.external_data import MarketDataQuote
 from models.ticker import Ticker
 from models.trade_plan import TradePlan

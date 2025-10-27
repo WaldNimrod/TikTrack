@@ -211,7 +211,7 @@ let cashFlowsData = window.cashFlowsData;
 let tradingAccountsData = [];
 
 /**
- * קבלת שם חשבון לפי ID
+ * קבלת שם חשבון מסחר לפי ID
  */
 function getAccountNameById(accountId) {
   try {
@@ -229,9 +229,9 @@ function getAccountNameById(accountId) {
     
     return null;
   } catch (error) {
-    window.Logger.error('שגיאה בקבלת שם חשבון לפי מזהה:', error, { page: "cash_flows" });
+    window.Logger.error('שגיאה בקבלת שם חשבון מסחר לפי מזהה:', error, { page: "cash_flows" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בקבלת שם חשבון לפי מזהה', error.message);
+      window.showErrorNotification('שגיאה בקבלת שם חשבון מסחר לפי מזהה', error.message);
     }
     return null;
   }
@@ -454,7 +454,7 @@ function validateCashFlowForm() {
         return true;
       }
     },
-    { id: 'cashFlowAccount', name: 'חשבון מסחר' },
+    { id: 'cashFlowAccount', name: 'חשבון מסחר מסחר' },
     { id: 'cashFlowCurrency', name: 'מטבע' },
     { id: 'cashFlowSource', name: 'מקור' }
   ]);
@@ -508,7 +508,7 @@ function validateEditCashFlowForm() {
         return true;
       }
     },
-    { id: 'editCashFlowAccount', name: 'חשבון מסחר' },
+    { id: 'editCashFlowAccount', name: 'חשבון מסחר מסחר' },
     { id: 'editCashFlowCurrency', name: 'מטבע' },
     { id: 'editCashFlowSource', name: 'מקור' }
   ]);
@@ -544,7 +544,7 @@ async function deleteCashFlow(id) {
     // הצגת חלון אישור מפורט
     const confirmMessage = `האם אתה בטוח שברצונך למחוק את תזרים המזומנים הבא?
 
-חשבון: ${getAccountNameById(cashFlow.trading_account_id) || 'לא מוגדר'}
+חשבון מסחר: ${getAccountNameById(cashFlow.trading_account_id) || 'לא מוגדר'}
 סוג: ${getCashFlowTypeText(cashFlow.type)}
 סכום: ${cashFlow.amount} ${cashFlow.currency_symbol || ''}
 תאריך: ${formatDate(cashFlow.date)}
@@ -600,7 +600,7 @@ async function deleteCashFlow(id) {
 const addCashFlowValidationRules = {
   cashFlowAccount: {
     required: true,
-    message: 'נדרש לבחור חשבון',
+    message: 'נדרש לבחור חשבון מסחר',
   },
   cashFlowType: {
     required: true,
@@ -633,7 +633,7 @@ const addCashFlowValidationRules = {
 const editCashFlowValidationRules = {
   editCashFlowAccount: {
     required: true,
-    message: 'נדרש לבחור חשבון',
+    message: 'נדרש לבחור חשבון מסחר',
   },
   editCashFlowType: {
     required: true,
@@ -681,7 +681,7 @@ async function loadAccountsForCashFlow(selectId, useDefaultFromPreferences = fal
     // שימוש ב-SelectPopulatorService
     await SelectPopulatorService.populateAccountsSelect(selectId, {
       includeEmpty: true,
-      emptyText: 'בחר חשבון...',
+      emptyText: 'בחר חשבון מסחר...',
       defaultFromPreferences: useDefaultFromPreferences,
       filterFn: (account) => account.status === 'open'
     });
@@ -745,8 +745,8 @@ async function renderCashFlowsTable() {
 
   cashFlowsData.forEach(cashFlow => {
     const row = document.createElement('tr');
-    // קבלת שם החשבון - קודם ננסה מהשרת, אחר כך fallback
-    const accountName = cashFlow.account_name || getAccountNameById(cashFlow.trading_account_id) || `חשבון ${cashFlow.trading_account_id}`;
+    // קבלת שם החשבון מסחר - קודם ננסה מהשרת, אחר כך fallback
+    const accountName = cashFlow.account_name || getAccountNameById(cashFlow.trading_account_id) || `חשבון מסחר ${cashFlow.trading_account_id}`;
 
     // הצגת רק סמל המטבע
     const currencyDisplay = cashFlow.currency_symbol || '$';
@@ -916,7 +916,7 @@ function getCashFlowTypeWithColor(type) {
     cssClass = 'numeric-value-negative'; // משיכה - אדום
     break;
   case 'dividend':
-    cssClass = 'entity-account-badge'; // דיבידנד - צבע חשבון
+    cssClass = 'entity-account-badge'; // דיבידנד - צבע חשבון מסחר
     break;
   case 'fee':
     cssClass = 'numeric-value-zero'; // עמלה - אפור
@@ -1261,7 +1261,7 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
  * @param {number} columnIndex - אינדקס העמודה לסידור
  *
  * דוגמאות שימוש:
- * sortTable(0); // סידור לפי עמודת חשבון
+ * sortTable(0); // סידור לפי עמודת חשבון מסחר
  * sortTable(2); // סידור לפי עמודת סכום
  * sortTable(4); // סידור לפי עמודת תאריך
  *
@@ -1359,195 +1359,6 @@ function initializeExternalIdFields() {
 }
 
 // עדכון פונקציית showAddCashFlowModal
-async function showAddCashFlowModalInternal() {
-  // איפוס הטופס
-  document.getElementById('addCashFlowForm').reset();
-
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('addCashFlowForm');
-  }
-
-  // הגדרת תאריך ברירת מחדל להיום
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('cashFlowDate').value = today;
-
-  // הגדרת מקור ברירת מחדל ל"ידני"
-  document.getElementById('cashFlowSource').value = 'manual';
-
-  try {
-    // טעינת רשימת החשבונות והמטבעות
-    await loadAccountsForCashFlow('cashFlowAccount', true);
-    await loadCurrenciesForCashFlow('cashFlowCurrency', true);
-    // טעינת רשימת הטריידים והתוכניות
-    await loadTradesForCashFlow('cashFlowTrade');
-    await loadTradePlansForCashFlow('cashFlowTradePlan');
-    // אתחול שדה מזהה חיצוני
-    initializeExternalIdFields();
-
-    // הוספת event listeners לשדות מקור
-    setupSourceFieldListeners();
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('addCashFlowModal'));
-    modal.show();
-  } catch (error) {
-    handleApiError(error, 'טעינת נתונים להוספה');
-  }
-}
-
-// עדכון פונקציית showEditCashFlowModal
-async function showEditCashFlowModalInternal(id) {
-  const cashFlow = cashFlowsData.find(cf => cf.id === id);
-  if (!cashFlow) {
-    handleElementNotFound('showEditCashFlowModal', `תזרים מזומנים לא נמצא: ${id}`);
-    return;
-  }
-
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('editCashFlowForm');
-  }
-
-  try {
-    // טעינת רשימת החשבונות והמטבעות קודם
-    await loadAccountsForCashFlow('editCashFlowAccount', false);
-    await loadCurrenciesForCashFlow('editCashFlowCurrency', false);
-    // טעינת רשימת הטריידים והתוכניות
-    await loadTradesForCashFlow('editCashFlowTrade');
-    await loadTradePlansForCashFlow('editCashFlowTradePlan');
-    // מילוי הטופס אחרי שהרשימות נטענו
-    const editTypeField = document.getElementById('editCashFlowType');
-    document.getElementById('editCashFlowId').value = cashFlow.id;
-    document.getElementById('editCashFlowAccount').value = cashFlow.trading_account_id;
-
-    if (editTypeField) {
-      editTypeField.value = cashFlow.type;
-    } else {
-      handleElementNotFound('showEditCashFlowModal', 'לא נמצא אלמנט editCashFlowType');
-    }
-    document.getElementById('editCashFlowAmount').value = cashFlow.amount;
-    document.getElementById('editCashFlowCurrency').value = cashFlow.currency_id || '';
-    // המרת תאריך לפורמט datetime-local
-    const dateValue = cashFlow.date ? new Date(cashFlow.date).toISOString().slice(0, 16) : '';
-    document.getElementById('editCashFlowDate').value = dateValue;
-    document.getElementById('editCashFlowDescription').value = cashFlow.description || '';
-
-    const editSourceField = document.getElementById('editCashFlowSource');
-    editSourceField.value = cashFlow.source || 'manual';
-    document.getElementById('editCashFlowExternalId').value = cashFlow.external_id || '0';
-
-    // מילוי שדות הקישור
-    document.getElementById('editCashFlowTrade').value = cashFlow.trade_id || '';
-    document.getElementById('editCashFlowTradePlan').value = cashFlow.trade_plan_id || '';
-
-    // אתחול שדה מזהה חיצוני
-    initializeExternalIdFields();
-
-    // הוספת event listeners לשדות מקור
-    setupSourceFieldListeners();
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('editCashFlowModal'));
-    modal.show();
-  } catch (error) {
-    handleApiError(error, 'טעינת נתונים לעריכה');
-  }
-}
-
-// עדכון פונקציית saveCashFlow
-async function saveCashFlow() {
-  try {
-    // שימוש ב-DataCollectionService לאיסוף נתונים
-    const cashFlowData = DataCollectionService.collectFormData({
-      account_id: { id: 'cashFlowAccount', type: 'int' },
-      type: { id: 'cashFlowType', type: 'text' },
-      amount: { id: 'cashFlowAmount', type: 'number' },
-      currency_id: { id: 'cashFlowCurrency', type: 'int' },
-      date: { id: 'cashFlowDate', type: 'date' },
-      description: { id: 'cashFlowDescription', type: 'text' },
-      source: { id: 'cashFlowSource', type: 'text' },
-      external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' },
-      trade_id: { id: 'cashFlowTrade', type: 'int', default: null },
-      trade_plan_id: { id: 'cashFlowTradePlan', type: 'int', default: null }
-    });
-
-    const formData = {
-      ...cashFlowData,
-      usd_rate: 1.000000
-    };
-
-    // בדיקת תקינות מקיפה
-    if (!validateCashFlowForm()) {
-      return;
-    }
-
-    const response = await fetch('/api/cash_flows/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: 'addCashFlowModal',
-      successMessage: 'תזרים המזומנים נשמר בהצלחה!',
-      apiUrl: '/api/cash_flows/',
-      entityName: 'תזרים מזומנים'
-    });
-
-  } catch (error) {
-    CRUDResponseHandler.handleError(error, 'שמירת תזרים מזומנים');
-  }
-}
-
-// עדכון פונקציית updateCashFlow
-async function updateCashFlow() {
-  try {
-    // שימוש ב-DataCollectionService לאיסוף נתונים
-    const cashFlowData = DataCollectionService.collectFormData({
-      id: { id: 'editCashFlowId', type: 'int' },
-      account_id: { id: 'editCashFlowAccount', type: 'int' },
-      type: { id: 'editCashFlowType', type: 'text' },
-      amount: { id: 'editCashFlowAmount', type: 'number' },
-      currency_id: { id: 'editCashFlowCurrency', type: 'int' },
-      date: { id: 'editCashFlowDate', type: 'date' },
-      description: { id: 'editCashFlowDescription', type: 'text' },
-      source: { id: 'editCashFlowSource', type: 'text' },
-      external_id: { id: 'editCashFlowExternalId', type: 'text', default: '0' },
-      trade_id: { id: 'editCashFlowTrade', type: 'int', default: null },
-      trade_plan_id: { id: 'editCashFlowTradePlan', type: 'int', default: null }
-    });
-
-    const formData = {
-      ...cashFlowData,
-      usd_rate: 1.000000
-    };
-
-    // בדיקת תקינות מקיפה
-    if (!validateEditCashFlowForm()) {
-      return;
-    }
-
-    const response = await fetch(`/api/cash_flows/${formData.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleUpdateResponse(response, {
-      modalId: 'editCashFlowModal',
-      successMessage: 'תזרים המזומנים נעדכן בהצלחה!',
-      apiUrl: '/api/cash_flows/',
-      entityName: 'תזרים מזומנים'
-    });
-
-  } catch (error) {
     CRUDResponseHandler.handleError(error, 'עדכון תזרים מזומנים');
   }
 }

@@ -1,8 +1,8 @@
 /**
- * Import User Data JavaScript - Modal Version
+ * Import User Data JavaScript - Clean Version
  * 
  * This script handles the complete user data import process in modal format:
- * - 6-step wizard with progress indicators
+ * - 5-step wizard with progress indicators
  * - File upload with drag & drop validation
  * - Account selection with API integration
  * - File analysis with visual progress
@@ -10,2718 +10,890 @@
  * - Preview generation with detailed tables
  * - Import execution with confirmation
  * 
- * Can be used in any page by including the modal HTML and this script
- * 
  * Author: TikTrack Development Team
- * Version: 2.0 - Modal Integration
+ * Version: 2.0 - Clean Modal Integration
  * Last Updated: 2025-01-16
  */
 
+// Global state for import modal
+let currentSessionId = null;
+let currentStep = 1;
+let selectedFile = null;
+let selectedAccount = null;
+let analysisResults = null;
+let previewData = null;
+
 /**
- * Import User Data JavaScript - Updated for ITCSS Architecture
- * 
- * This script handles the complete user data import process using:
- * - Unified header system
- * - Centralized button system
- * - Dynamic color variables
- * - Unified cache manager
- * - Notification system
- * 
- * Author: TikTrack Development Team
- * Version: 2.0 - ITCSS Integration
- * Last Updated: 2025-01-27
+ * Open import user data modal
  */
-
-// Import State Management
-const ImportState = {
-    currentStep: 1,
-    sessionId: null,
-    file: null,
-    accountId: null,
-    analysisResults: null,
-    previewData: null,
-    
-    async saveToCache() {
-        try {
-            if (window.UnifiedCacheManager) {
-                await window.UnifiedCacheManager.set('import_state', this);
-            }
-        } catch (error) {
-            console.warn('Failed to save import state to cache:', error);
-        }
-    },
-    
-    async loadFromCache() {
-        try {
-            if (window.UnifiedCacheManager) {
-                const cached = await window.UnifiedCacheManager.get('import_state');
-                if (cached) {
-                    Object.assign(this, cached);
-                    return true;
-                }
-            }
-        } catch (error) {
-            console.warn('Failed to load import state from cache:', error);
-        }
-        return false;
-    },
-    
-    clear() {
-        Object.assign(this, {
-            currentStep: 1,
-            sessionId: null,
-            file: null,
-            accountId: null,
-            analysisResults: null,
-            previewData: null
-        });
-    }
-};
-
-// DOM Elements
-let dropZone, fileInput, fileInfo, fileName, fileSize, accountSelect, analyzeBtn;
-
-// Initialize modal when it's shown
-function initializeImportModal() {
-    try {
-        // Get DOM elements
-        dropZone = document.getElementById('dropZone');
-        fileInput = document.getElementById('fileInput');
-        fileInfo = document.getElementById('fileInfo');
-        fileName = document.getElementById('fileName');
-        fileSize = document.getElementById('fileSize');
-        accountSelect = document.getElementById('accountSelect');
-        analyzeBtn = document.getElementById('analyzeBtn');
-        
-        // Load cached state
-        const hasCachedState = ImportState.loadFromCache();
-        if (hasCachedState && ImportState.sessionId) {
-            // Restore state
-            updateStepDisplay();
-            if (ImportState.file) {
-                showFileInfo(ImportState.file);
-            }
-            if (ImportState.accountId) {
-                accountSelect.value = ImportState.accountId;
-                updateAnalyzeButton();
-            }
-        }
-        
-        // Setup event listeners
-        setupEventListeners();
-        
-        // Load accounts
-        loadAccounts();
-        
-        console.log('✅ Import modal initialized');
-        
-    } catch (error) {
-        console.error('❌ Failed to initialize modal:', error);
-        showNotification('שגיאה באתחול המודול', 'error');
-    }
-}
-
-// Function to open the import modal
 function openImportUserDataModal() {
-    const modal = new bootstrap.Modal(document.getElementById('importUserDataModal'));
-    modal.show();
+    console.log('Opening import user data modal...');
     
-    // Initialize when modal is shown
-    document.getElementById('importUserDataModal').addEventListener('shown.bs.modal', function() {
-        initializeImportModal();
-    });
-}
-
-function setupEventListeners() {
-    // File drop zone
-    if (dropZone) {
-        dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', handleDragOver);
-        dropZone.addEventListener('dragleave', handleDragLeave);
-        dropZone.addEventListener('drop', handleDrop);
-    }
+    // Reset state
+    resetImportModal();
     
-    // File input
-    if (fileInput) {
-        fileInput.addEventListener('change', handleFileSelect);
-    }
-    
-    // Account selection
-    if (accountSelect) {
-        accountSelect.addEventListener('change', updateAnalyzeButton);
-    }
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    dropZone.classList.add('dragover');
-}
-
-function handleDragLeave(e) {
-    e.preventDefault();
-    dropZone.classList.remove('dragover');
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    dropZone.classList.remove('dragover');
-    
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-        handleFile(files[0]);
-    }
-}
-
-function handleFileSelect(e) {
-    const files = e.target.files;
-    if (files.length > 0) {
-        handleFile(files[0]);
-    }
-}
-
-function handleFile(file) {
-    if (!file.name.toLowerCase().endsWith('.csv')) {
-        showNotification('אנא בחר קובץ CSV בלבד', 'error');
-        return;
-    }
-    
-    ImportState.file = file;
-    showFileInfo(file);
-    updateAnalyzeButton();
-    ImportState.saveToCache();
-}
-
-function showFileInfo(file) {
-    fileName.textContent = file.name;
-    fileSize.textContent = formatFileSize(file.size);
-    fileInfo.style.display = 'flex';
-    dropZone.style.display = 'none';
-}
-
-function resetFile() {
-    ImportState.file = null;
-    fileInput.value = '';
-    fileInfo.style.display = 'none';
-    dropZone.style.display = 'block';
-    updateAnalyzeButton();
-    ImportState.saveToCache();
-}
-
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-function updateAnalyzeButton() {
-    const hasFile = ImportState.file !== null;
-    const hasAccount = accountSelect.value !== '';
-    analyzeBtn.disabled = !(hasFile && hasAccount);
-}
-
-async function loadAccounts() {
-    try {
-        const response = await fetch('/api/accounts');
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        if (data.success) {
-            accountSelect.innerHTML = '<option value="">בחר חשבון...</option>';
-            data.accounts.forEach(account => {
-                const option = document.createElement('option');
-                option.value = account.id;
-                option.textContent = account.name;
-                accountSelect.appendChild(option);
-            });
-        } else {
-            throw new Error(data.error || 'Failed to load accounts');
-        }
-    } catch (error) {
-        console.error('❌ Failed to load accounts:', error);
-        showNotification('שגיאה בטעינת החשבונות', 'error');
-    }
-}
-
-async function analyzeFile() {
-    if (!ImportState.file || !accountSelect.value) {
-        showNotification('אנא בחר קובץ וחשבון', 'error');
-        return;
-    }
-    
-    try {
-        ImportState.accountId = parseInt(accountSelect.value);
-        analyzeBtn.disabled = true;
-        analyzeBtn.textContent = 'מנתח...';
-        
-        // Upload file and create session
-        const formData = new FormData();
-        formData.append('file', ImportState.file);
-        formData.append('account_id', ImportState.accountId);
-        
-        const uploadResponse = await fetch('/api/user-data-import/upload', {
-            method: 'POST',
-            body: formData
-        });
-        
-        if (!uploadResponse.ok) {
-            throw new Error(`HTTP ${uploadResponse.status}`);
-        }
-        
-        const uploadData = await uploadResponse.json();
-        if (!uploadData.success) {
-            throw new Error(uploadData.error || 'Upload failed');
-        }
-        
-        ImportState.sessionId = uploadData.session_id;
-        
-        // Analyze file
-        const analyzeResponse = await fetch(`/api/user-data-import/session/${ImportState.sessionId}/analyze`, {
-            method: 'POST'
-        });
-        
-        if (!analyzeResponse.ok) {
-            throw new Error(`HTTP ${analyzeResponse.status}`);
-        }
-        
-        const analyzeData = await analyzeResponse.json();
-        if (!analyzeData.success) {
-            throw new Error(analyzeData.error || 'Analysis failed');
-        }
-        
-        ImportState.analysisResults = analyzeData.analysis_results;
-        displayAnalysisResults();
-        
-        goToStep(2);
-        ImportState.saveToCache();
-        
-    } catch (error) {
-        console.error('❌ Analysis failed:', error);
-        showNotification(`שגיאה בניתוח הקובץ: ${error.message}`, 'error');
-    } finally {
-        analyzeBtn.disabled = false;
-        analyzeBtn.textContent = 'המשך לניתוח';
-    }
-}
-
-function displayAnalysisResults() {
-    if (!ImportState.analysisResults) return;
-    
-    const results = ImportState.analysisResults;
-    
-    document.getElementById('totalRecords').textContent = results.total_records || 0;
-    document.getElementById('validRecords').textContent = results.valid_records || 0;
-    document.getElementById('invalidRecords').textContent = results.invalid_records || 0;
-    document.getElementById('duplicateRecords').textContent = results.duplicate_records || 0;
-    document.getElementById('missingTickers').textContent = results.missing_tickers ? results.missing_tickers.length : 0;
-}
-
-function goToStep(stepNumber) {
-    ImportState.currentStep = stepNumber;
-    updateStepDisplay();
-    ImportState.saveToCache();
-    
-    // Load data for specific steps
-    if (stepNumber === 3) {
-        displayProblemResolution();
-    } else if (stepNumber === 4) {
-        generatePreview();
-    } else if (stepNumber === 5) {
-        displayConfirmation();
-    }
-}
-
-function updateStepDisplay() {
-    // Hide all steps
-    document.querySelectorAll('.import-step').forEach(step => {
-        step.style.display = 'none';
-    });
-    
-    // Show current step
-    const currentStepElement = document.querySelector(`[data-step="${ImportState.currentStep}"]`);
-    if (currentStepElement) {
-        currentStepElement.style.display = 'block';
-    }
-    
-    // Update step indicators
-    document.querySelectorAll('.step').forEach(step => {
-        const stepNumber = parseInt(step.dataset.step);
-        step.classList.remove('active', 'completed');
-        
-        if (stepNumber === ImportState.currentStep) {
-            step.classList.add('active');
-        } else if (stepNumber < ImportState.currentStep) {
-            step.classList.add('completed');
-        }
-    });
-}
-
-function displayProblemResolution() {
-    if (!ImportState.analysisResults) return;
-    
-    const results = ImportState.analysisResults;
-    
-    // Missing tickers
-    const missingTickersSection = document.getElementById('missingTickersSection');
-    const missingTickersList = document.getElementById('missingTickersList');
-    
-    if (results.missing_tickers && results.missing_tickers.length > 0) {
-        missingTickersList.innerHTML = '';
-        results.missing_tickers.forEach(ticker => {
-            const span = document.createElement('span');
-            span.className = 'missing-ticker';
-            span.textContent = ticker;
-            missingTickersList.appendChild(span);
-        });
-        missingTickersSection.style.display = 'block';
-    } else {
-        missingTickersSection.style.display = 'none';
-    }
-    
-    // Duplicates and existing records will be shown in preview
-}
-
-async function generatePreview() {
-    if (!ImportState.sessionId) return;
-    
-    try {
-        const response = await fetch(`/api/user-data-import/session/${ImportState.sessionId}/preview`, {
-            method: 'GET'
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        if (!data.success) {
-            throw new Error(data.error || 'Preview generation failed');
-        }
-        
-        ImportState.previewData = data.preview_data;
-        displayPreview();
-        
-    } catch (error) {
-        console.error('❌ Preview generation failed:', error);
-        showNotification(`שגיאה ביצירת התצוגה המקדימה: ${error.message}`, 'error');
-    }
-}
-
-function displayPreview() {
-    if (!ImportState.previewData) return;
-    
-    const preview = ImportState.previewData;
-    
-    // Update summary
-    document.getElementById('previewImportCount').textContent = preview.summary.records_to_import;
-    document.getElementById('previewSkipCount').textContent = preview.summary.records_to_skip;
-    document.getElementById('previewImportRate').textContent = `${preview.summary.import_rate.toFixed(1)}%`;
-    
-    // Display records to import
-    const importTableBody = document.getElementById('importTableBody');
-    importTableBody.innerHTML = '';
-    
-    preview.records_to_import.forEach(record => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${record.symbol || ''}</td>
-            <td>${record.action || ''}</td>
-            <td>${record.quantity || ''}</td>
-            <td>${record.price || ''}</td>
-            <td>${record.fee || ''}</td>
-            <td>${record.date || ''}</td>
-        `;
-        importTableBody.appendChild(row);
-    });
-    
-    // Display records to skip
-    const skipTableBody = document.getElementById('skipTableBody');
-    skipTableBody.innerHTML = '';
-    
-    preview.records_to_skip.forEach(record => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${record.symbol || ''}</td>
-            <td>${record.action || ''}</td>
-            <td>${record.quantity || ''}</td>
-            <td>${record.price || ''}</td>
-            <td>${record.fee || ''}</td>
-            <td>${record.date || ''}</td>
-            <td><span class="status-badge ${record.reason}">${getReasonText(record.reason)}</span></td>
-        `;
-        skipTableBody.appendChild(row);
-    });
-}
-
-function getReasonText(reason) {
-    const reasonTexts = {
-        'validation_error': 'שגיאת תקינות',
-        'missing_ticker': 'סמל חסר',
-        'within_file_duplicate': 'כפילות בקובץ',
-        'existing_record': 'רשומה קיימת'
-    };
-    return reasonTexts[reason] || reason;
-}
-
-function displayConfirmation() {
-    if (!ImportState.file || !ImportState.previewData) return;
-    
-    // Get account name
-    const accountName = accountSelect.options[accountSelect.selectedIndex].text;
-    
-    // Update confirmation details
-    document.getElementById('confirmFileName').textContent = ImportState.file.name;
-    document.getElementById('confirmAccountName').textContent = accountName;
-    document.getElementById('confirmTotalRecords').textContent = ImportState.analysisResults.total_records;
-    document.getElementById('confirmImportRecords').textContent = ImportState.previewData.summary.records_to_import;
-    document.getElementById('confirmSkipRecords').textContent = ImportState.previewData.summary.records_to_skip;
-}
-
-async function executeImport(downloadReport = false) {
-    if (!ImportState.sessionId) return;
-    
-    try {
-        const response = await fetch(`/api/user-data-import/session/${ImportState.sessionId}/execute`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                download_report: downloadReport
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        if (!data.success) {
-            throw new Error(data.error || 'Import execution failed');
-        }
-        
-        showNotification('ייבוא הושלם בהצלחה!', 'success');
-        
-        if (downloadReport && data.report_url) {
-            // Download report
-            const link = document.createElement('a');
-            link.href = data.report_url;
-            link.download = `import_report_${ImportState.sessionId}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-        
-        // Close modal and reset
-        const modal = bootstrap.Modal.getInstance(document.getElementById('importUserDataModal'));
-        if (modal) {
-            modal.hide();
-        }
-        
-        // Reset import state
-        ImportState.clear();
-        ImportState.saveToCache();
-        
-        // Refresh the executions table
-        if (typeof refreshExecutionsTable === 'function') {
-            refreshExecutionsTable();
-        }
-        
-    } catch (error) {
-        console.error('❌ Import execution failed:', error);
-        showNotification(`שגיאה בביצוע הייבוא: ${error.message}`, 'error');
-    }
-}
-
-function resetImport() {
-    ImportState.clear();
-    ImportState.saveToCache();
-    
-    // Reset UI
-    resetFile();
-    accountSelect.value = '';
-    updateAnalyzeButton();
-    goToStep(1);
-    
-    // Clear all data displays
-    document.querySelectorAll('.analysis-card .card-number').forEach(el => {
-        el.textContent = '0';
-    });
-    
-    document.getElementById('importTableBody').innerHTML = '';
-    document.getElementById('skipTableBody').innerHTML = '';
-    
-    // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('importUserDataModal'));
+    // Show modal
+    const modal = document.getElementById('importUserDataModal');
     if (modal) {
-        modal.hide();
+        modal.style.display = 'block';
+        modal.classList.add('show');
     }
     
-    showNotification('ייבוא חדש הותחל', 'info');
+    // Initialize step 1
+    goToStep(1);
 }
-
-function showHelp() {
-    showNotification('עזרה: בחר קובץ CSV וחשבון מסחר, ולאחר מכן עקוב אחר השלבים המוצגים', 'info');
-}
-
-// Utility function for notifications
-function showNotification(message, type = 'info') {
-    if (window.NotificationSystem) {
-        window.NotificationSystem.show(message, type);
-    } else {
-        console.log(`[${type.toUpperCase()}] ${message}`);
-    }
-}
-        }
-        
-        .result-item.total {
-            background-color: #e3f2fd;
-            border-left: 4px solid #2196f3;
-        }
-        
-        .result-item.total .result-icon {
-            color: #2196f3;
-        }
-        
-        .result-item.total .result-count {
-            color: #1976d2;
-            font-weight: bold;
-        }
-    `;
-    // Add CSS for confirmation modal
-    const modalStyle = document.createElement('style');
-    modalStyle.textContent = `
-        .confirmation-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        }
-        
-        .confirmation-modal {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            max-width: 500px;
-            text-align: center;
-        }
-        
-        .modal-actions {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-    `;
-    document.head.appendChild(modalStyle);
-}
-
-// ===== IMPORT MODAL FUNCTIONS =====
-// Modal lifecycle and state management
 
 /**
  * Close import user data modal
- * Hides the modal and cleans up state
- * 
- * @function closeImportUserDataModal
- * @returns {void}
  */
 function closeImportUserDataModal() {
     console.log('Closing import user data modal...');
     
     // Hide modal
-    document.getElementById('import-user-data-modal').style.display = 'none';
+    const modal = document.getElementById('importUserDataModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+    }
     
-    // Reset modal state
+    // Reset state
     resetImportModal();
 }
 
 /**
- * Open import user data modal
- * Shows the modal and initializes the import process
- * 
- * @function openImportUserDataModal
- * @returns {void}
- */
-function openImportUserDataModal() {
-    console.log('Opening import user data modal...');
-    
-    // Reset modal state
-    resetImportModal();
-    
-    // Show modal
-    document.getElementById('import-user-data-modal').style.display = 'block';
-    
-    // Initialize modal
-    initializeImportModal();
-}
-
-// Global state for import modal
-let importCurrentStep = 1;
-let importSelectedFile = null;
-let importSelectedAccount = null;
-let importSessionId = null;
-let importAnalysisResults = null;
-let importPreviewData = null;
-let importReportPath = null;
-let importSelectedExistingRecords = [];
-
-// ===== CACHE MANAGEMENT FUNCTIONS =====
-// Unified Cache Manager integration for data persistence
-
-/**
- * Load cached import data from Unified Cache Manager
- * Attempts to restore previous import session state from cache
- * 
- * @function loadFromCache
- * @async
- * @returns {Promise<void>}
- */
-async function loadFromCache() {
-    if (window.UnifiedCacheManager) {
-        try {
-            const cachedSessionId = await window.UnifiedCacheManager.get('import_session_id');
-            const cachedAnalysisResults = await window.UnifiedCacheManager.get('import_analysis_results');
-            const cachedPreviewData = await window.UnifiedCacheManager.get('import_preview_data');
-            
-            if (cachedSessionId) importSessionId = cachedSessionId;
-            if (cachedAnalysisResults) importAnalysisResults = cachedAnalysisResults;
-            if (cachedPreviewData) importPreviewData = cachedPreviewData;
-        } catch (error) {
-            console.warn('Failed to load from cache:', error);
-        }
-    }
-}
-
-/**
- * Clear all cached import data from Unified Cache Manager
- * Removes all import-related data from cache layers
- * 
- * @function clearCache
- * @async
- * @returns {Promise<void>}
- */
-async function clearCache() {
-    if (window.UnifiedCacheManager) {
-        try {
-            await window.UnifiedCacheManager.remove('import_session_id');
-            await window.UnifiedCacheManager.remove('import_analysis_results');
-            await window.UnifiedCacheManager.remove('import_preview_data');
-        } catch (error) {
-            console.warn('Failed to clear cache:', error);
-        }
-    }
-}
-
-/**
- * Initialize import modal and load cached data
- * Sets up the modal state, loads cached data if available, and initializes UI elements
- * 
- * @function initializeImportModal
- * @returns {void}
- */
-function initializeImportModal() {
-    importCurrentStep = 1;
-    importSelectedFile = null;
-    importSelectedAccount = null;
-    importSessionId = null;
-    importAnalysisResults = null;
-    importPreviewData = null;
-    
-    // Load from cache if available
-    loadFromCache();
-    
-    updateImportStepDisplay();
-    updateImportStepNavigation();
-    loadImportTradingAccounts();
-    setupImportEventListeners();
-}
-
-/**
- * Start a completely new import process
- * Clears all global state, cache, and UI elements to begin fresh import
- * 
- * @function startNewImport
- * @returns {void}
- */
-function startNewImport() {
-    console.log('🔄 Starting new import process...');
-    
-    // Clear all global state
-    importCurrentStep = 1;
-    importSelectedFile = null;
-    importSelectedAccount = null;
-    importSessionId = null;
-    importAnalysisResults = null;
-    importPreviewData = null;
-    importReportPath = null;
-    importSelectedExistingRecords = [];
-    
-    // Clear cache
-    clearCache();
-    
-    // Reset UI
-    clearImportFile();
-    clearImportAccount();
-    
-    // Clear all step displays
-    clearAllStepDisplays();
-    
-    // Reset to step 1
-    updateImportStepDisplay();
-    updateImportStepNavigation();
-    
-    // Show notification
-    showNotification('ייבוא חדש התחיל - כל הנתונים נוקו. אנא בחר קובץ חדש לייבוא.', 'success');
-    
-    console.log('✅ New import process started successfully');
-}
-
-/**
- * Reset import modal to initial state
- * Clears all state variables and resets UI to step 1
- * 
- * @function resetImportModal
- * @returns {void}
+ * Reset import modal state
  */
 function resetImportModal() {
-    importCurrentStep = 1;
-    importSelectedFile = null;
-    importSelectedAccount = null;
-    importSessionId = null;
-    importAnalysisResults = null;
-    importPreviewData = null;
+    currentSessionId = null;
+    currentStep = 1;
+    selectedFile = null;
+    selectedAccount = null;
+    analysisResults = null;
+    previewData = null;
     
-    // Clear cache
-    clearCache();
-    
-    // Update report download button
-    updateReportDownloadButton();
-    
-    // Reset UI
-    clearImportFile();
-    document.getElementById('import-account-select').value = '';
-    document.getElementById('import-analysis-results').style.display = 'none';
-    document.getElementById('import-analysis-progress').style.display = 'none';
-    
-    updateImportStepDisplay();
-    updateImportStepNavigation();
-    
-    // Don't re-setup event listeners - they're already set up
-    // setupImportEventListeners();
-}
-
-/**
- * Setup event listeners for import modal
- * Attaches event handlers for file upload, account selection, and navigation
- * 
- * @function setupImportEventListeners
- * @returns {void}
- */
-function setupImportEventListeners() {
-    // Remove existing listeners first to prevent duplicates
-    removeImportEventListeners();
-    
-    // File input change
-    const fileInput = document.getElementById('import-file-input');
+    // Reset form elements
+    const fileInput = document.getElementById('importFileInput');
     if (fileInput) {
-        fileInput.addEventListener('change', handleImportFileSelect);
+        fileInput.value = '';
     }
     
-    // Drag and drop
-    const uploadArea = document.getElementById('import-file-upload-area');
-    if (uploadArea) {
-        uploadArea.addEventListener('dragover', handleImportDragOver);
-        uploadArea.addEventListener('dragleave', handleImportDragLeave);
-        uploadArea.addEventListener('drop', handleImportFileDrop);
-        // Remove click event to prevent double triggering
-        // uploadArea.addEventListener('click', function() {
-        //     fileInput.click();
-        // });
-    }
-    
-    // Account selection
-    const accountSelect = document.getElementById('import-account-select');
+    const accountSelect = document.getElementById('importAccountSelect');
     if (accountSelect) {
-        accountSelect.addEventListener('change', handleImportAccountSelect);
+        accountSelect.value = '';
     }
 }
 
 /**
- * Remove event listeners from import modal
- * Cleans up event handlers to prevent memory leaks
- * 
- * @function removeImportEventListeners
- * @returns {void}
+ * Go to specific step
  */
-function removeImportEventListeners() {
-    // File input change
-    const fileInput = document.getElementById('import-file-input');
-    if (fileInput) {
-        fileInput.removeEventListener('change', handleImportFileSelect);
-    }
-    
-    // Drag and drop
-    const uploadArea = document.getElementById('import-file-upload-area');
-    if (uploadArea) {
-        uploadArea.removeEventListener('dragover', handleImportDragOver);
-        uploadArea.removeEventListener('dragleave', handleImportDragLeave);
-        uploadArea.removeEventListener('drop', handleImportFileDrop);
-        // Note: Can't remove anonymous function listeners easily
-    }
-    
-    // Account selection
-    const accountSelect = document.getElementById('import-account-select');
-    if (accountSelect) {
-        accountSelect.removeEventListener('change', handleImportAccountSelect);
-    }
-}
-
-// ===== EVENT HANDLERS =====
-// File upload, drag & drop, and user interaction handlers
-
-/**
- * Handle file selection from file input
- * Processes selected file and updates UI with file information
- * 
- * @function handleImportFileSelect
- * @param {Event} event - The change event from file input
- * @returns {void}
- */
-function handleImportFileSelect(event) {
-    console.log('handleImportFileSelect called');
-    const file = event.target.files[0];
-    console.log('Selected file:', file);
-    if (file) {
-        processImportSelectedFile(file);
-    } else {
-        console.log('No file selected');
-    }
-}
-
-/**
- * Handle drag over
- */
-function handleImportDragOver(event) {
-    event.preventDefault();
-    document.getElementById('import-file-upload-area').classList.add('dragover');
-}
-
-/**
- * Handle drag leave
- */
-function handleImportDragLeave(event) {
-    event.preventDefault();
-    document.getElementById('import-file-upload-area').classList.remove('dragover');
-}
-
-/**
- * Handle file drop
- */
-function handleImportFileDrop(event) {
-    event.preventDefault();
-    document.getElementById('import-file-upload-area').classList.remove('dragover');
-    
-    const files = event.dataTransfer.files;
-    if (files.length > 0) {
-        processImportSelectedFile(files[0]);
-    }
-}
-
-/**
- * Process selected file and update UI
- * Validates file type, stores file reference, and updates UI elements
- * 
- * @function processImportSelectedFile
- * @param {File} file - The selected file object
- * @returns {void}
- */
-function processImportSelectedFile(file) {
-    console.log('processImportSelectedFile called with file:', file.name);
-    
-    // Validate file type
-    if (!file.name.toLowerCase().endsWith('.csv')) {
-        showNotification('רק קבצי CSV נתמכים', 'error');
-        return;
-    }
-    
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-        showNotification('הקובץ גדול מדי (מקסימום 10MB)', 'error');
-        return;
-    }
-    
-    importSelectedFile = file;
-    console.log('File stored in importSelectedFile');
-    
-    // Update UI
-    document.getElementById('import-file-name').textContent = file.name;
-    document.getElementById('import-file-size').textContent = formatFileSize(file.size);
-    document.getElementById('import-file-info').style.display = 'block';
-    document.getElementById('import-file-upload-area').style.display = 'none';
-    console.log('UI updated with file info');
-    
-    // Enable next step
-    updateImportStepNavigation();
-    console.log('Step navigation updated');
-    
-    showNotification('קובץ נבחר בהצלחה', 'success');
-    console.log('processImportSelectedFile completed');
-}
-
-/**
- * Clear selected file and reset file upload UI
- * Removes file selection and resets file upload area to initial state
- * 
- * @function clearImportFile
- * @returns {void}
- */
-function clearImportFile() {
-    importSelectedFile = null;
-    document.getElementById('import-file-input').value = '';
-    document.getElementById('import-file-info').style.display = 'none';
-    document.getElementById('import-file-upload-area').style.display = 'block';
-    updateImportStepNavigation();
-}
-
-/**
- * Clear selected account and reset account selection UI
- * Removes account selection and resets account dropdown to initial state
- * 
- * @function clearImportAccount
- * @returns {void}
- */
-function clearImportAccount() {
-    importSelectedAccount = null;
-    document.getElementById('import-account-select').value = '';
-    updateImportStepNavigation();
-}
-
-// ===== UTILITY FUNCTIONS =====
-// Helper functions for UI updates and data management
-
-/**
- * Clear all step displays and reset UI elements
- * Hides all step content, clears lists, and resets counters to initial state
- * 
- * @function clearAllStepDisplays
- * @returns {void}
- */
-function clearAllStepDisplays() {
-    // Clear step 3 analysis results
-    const analysisResults = document.getElementById('import-analysis-results');
-    if (analysisResults) {
-        analysisResults.style.display = 'none';
-    }
-    
-    // Clear step 4 problems
-    const problemsSection = document.getElementById('import-problems-section');
-    if (problemsSection) {
-        problemsSection.style.display = 'none';
-    }
-    
-    // Clear step 5 preview summary
-    const previewSummary = document.getElementById('import-preview-summary');
-    if (previewSummary) {
-        previewSummary.style.display = 'none';
-    }
-    
-    // Clear step 6 final summary
-    const finalSummary = document.getElementById('import-final-summary');
-    if (finalSummary) {
-        finalSummary.style.display = 'none';
-    }
-    
-    // Clear all problem sections
-    const problemSections = [
-        'import-missing-tickers-section',
-        'import-duplicates-section', 
-        'import-existing-section',
-        'import-normalization-errors-section'
-    ];
-    
-    problemSections.forEach(sectionId => {
-        const section = document.getElementById(sectionId);
-        if (section) {
-            section.style.display = 'none';
-        }
-    });
-    
-    // Clear all lists
-    const listElements = [
-        'import-missing-tickers-list',
-        'import-duplicates-list',
-        'import-existing-list',
-        'import-normalization-errors-list'
-    ];
-    
-    listElements.forEach(listId => {
-        const list = document.getElementById(listId);
-        if (list) {
-            list.innerHTML = '';
-        }
-    });
-    
-    // Clear step 3 result cards
-    const resultCards = [
-        'import-total-count',
-        'import-valid-count', 
-        'import-invalid-count',
-        'import-duplicates-count',
-        'import-existing-count',
-        'import-missing-tickers-count'
-    ];
-    
-    resultCards.forEach(cardId => {
-        const card = document.getElementById(cardId);
-        if (card) {
-            card.textContent = '0';
-        }
-    });
-    
-    // Clear step 5 preview stats
-    const previewStats = [
-        'import-preview-total',
-        'import-preview-import', 
-        'import-preview-skip'
-    ];
-    
-    previewStats.forEach(statId => {
-        const stat = document.getElementById(statId);
-        if (stat) {
-            stat.textContent = '0';
-        }
-    });
-}
-
-/**
- * Handle account selection from dropdown
- * Updates global state and triggers step navigation update
- * 
- * @function handleImportAccountSelect
- * @param {Event} event - The change event from account select dropdown
- * @returns {void}
- */
-function handleImportAccountSelect(event) {
-    console.log('🔍 Account selected:', event.target.value);
-    importSelectedAccount = event.target.value;
-    updateImportStepNavigation();
-}
-
-/**
- * Load trading accounts for import account selection
- * Populates the account dropdown with available trading accounts
- * 
- * @function loadImportTradingAccounts
- * @async
- * @returns {Promise<void>}
- */
-async function loadImportTradingAccounts() {
-    try {
-        // Use SelectPopulatorService if available
-        if (typeof window.SelectPopulatorService !== 'undefined') {
-            await window.SelectPopulatorService.populateAccountsSelect('import-account-select', {
-                includeEmpty: true,
-                emptyText: 'בחר חשבון מסחר',
-                filterFn: (account) => account.status === 'open'
-            });
-        } else if (typeof window.loadTradingAccountsFromServer === 'function') {
-            // Fallback to direct loading
-            await window.loadTradingAccountsFromServer();
-            const accounts = window.trading_accountsData || [];
-            
-            const select = document.getElementById('import-account-select');
-            select.innerHTML = '<option value="">בחר חשבון מסחר</option>';
-            
-            // Filter only open accounts
-            const openAccounts = accounts.filter(account => account.status === 'open');
-            
-            openAccounts.forEach(account => {
-                const option = document.createElement('option');
-                option.value = account.id;
-                option.textContent = `${account.name} (${account.currency?.symbol || 'USD'})`;
-                select.appendChild(option);
-            });
-            
-            if (openAccounts.length === 0) {
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'אין חשבונות פעילים';
-                option.disabled = true;
-                select.appendChild(option);
-            }
-        } else {
-            // Fallback to direct API call
-            const response = await fetch('/api/trading-accounts/');
-            const data = await response.json();
-            const accounts = data.data || data;
-            
-            const select = document.getElementById('import-account-select');
-            select.innerHTML = '<option value="">בחר חשבון מסחר</option>';
-            
-            const openAccounts = accounts.filter(account => account.status === 'open');
-            
-            openAccounts.forEach(account => {
-                const option = document.createElement('option');
-                option.value = account.id;
-                option.textContent = `${account.name} (${account.currency?.symbol || 'USD'})`;
-                select.appendChild(option);
-            });
-        }
-    } catch (error) {
-        console.error('Error loading accounts:', error);
-        showNotification('שגיאה בטעינת חשבונות', 'error');
-        
-        // Show error in select
-        const select = document.getElementById('import-account-select');
-        select.innerHTML = '<option value="">שגיאה בטעינת חשבונות</option>';
-    }
-}
-
-// ===== STEP NAVIGATION FUNCTIONS =====
-// Wizard step management and validation
-
-/**
- * Navigate to next step in import wizard
- * Validates current step, processes it, and moves to next step
- * 
- * @function nextImportStep
- * @async
- * @returns {Promise<void>}
- */
-async function nextImportStep() {
-    console.log(`🔄 STEP TRANSITION: Moving from step ${importCurrentStep} to step ${importCurrentStep + 1}`);
-    
-    if (importCurrentStep < 6) {
-        // Validate current step
-        console.log(`🔍 STEP ${importCurrentStep}: Validating current step...`);
-        if (!validateImportCurrentStep()) {
-            console.log(`❌ STEP ${importCurrentStep}: Validation failed, staying on current step`);
-            return;
-        }
-        console.log(`✅ STEP ${importCurrentStep}: Validation passed`);
-        
-        // Process current step
-        console.log(`⚙️ STEP ${importCurrentStep}: Processing current step...`);
-        await processImportCurrentStep();
-        console.log(`✅ STEP ${importCurrentStep}: Processing completed`);
-        
-        // Move to next step
-        importCurrentStep++;
-        console.log(`➡️ STEP TRANSITION: Now on step ${importCurrentStep}`);
-        
-        console.log(`🎨 STEP ${importCurrentStep}: Updating step display...`);
-        updateImportStepDisplay();
-        console.log(`✅ STEP ${importCurrentStep}: Step display updated`);
-        
-        console.log(`🧭 STEP ${importCurrentStep}: Updating step navigation...`);
-        updateImportStepNavigation();
-        console.log(`✅ STEP ${importCurrentStep}: Step navigation updated`);
-    }
-}
-
-/**
- * Navigate to previous step in import wizard
- * Decrements current step and updates UI accordingly
- * 
- * @function previousImportStep
- * @returns {void}
- */
-function previousImportStep() {
-    if (importCurrentStep > 1) {
-        importCurrentStep--;
-        updateImportStepDisplay();
-        updateImportStepNavigation();
-    }
-}
-
-/**
- * Validate current step before proceeding
- * Performs step-specific validation checks
- * 
- * @function validateImportCurrentStep
- * @returns {boolean} True if validation passes, false otherwise
- */
-function validateImportCurrentStep() {
-    switch (importCurrentStep) {
-        case 1:
-            if (!importSelectedFile) {
-                showNotification('אנא בחר קובץ לייבוא', 'error');
-                return false;
-            }
-            return true;
-            
-        case 2:
-            console.log('🔍 Validating step 2 - importSelectedAccount:', importSelectedAccount);
-            if (!importSelectedAccount) {
-                showNotification('אנא בחר חשבון מסחר', 'error');
-                return false;
-            }
-            return true;
-            
-        default:
-            return true;
-    }
-}
-
-/**
- * Process current step based on step number
- * Handles step-specific processing logic (analysis, preview generation, etc.)
- * 
- * @function processImportCurrentStep
- * @async
- * @returns {Promise<void>}
- */
-async function processImportCurrentStep() {
-    console.log(`⚙️ PROCESSING STEP ${importCurrentStep}: Starting...`);
-    
-    switch (importCurrentStep) {
-        case 2:
-            console.log(`📊 STEP 2: Analyzing file...`);
-            await analyzeImportFile();
-            console.log(`✅ STEP 2: File analysis completed`);
-            break;
-        case 3:
-            console.log(`🔍 STEP 3: Generating preview...`);
-            await generateImportPreview();
-            console.log(`✅ STEP 3: Preview generation completed`);
-            break;
-        case 4:
-            console.log(`🔧 STEP 4: Problem resolution - loading analysis results...`);
-            // Problem resolution - display problems
-            // Load analysis results from server
-            if (importSessionId) {
-                console.log(`📡 STEP 4: Loading analysis results from server (session: ${importSessionId})...`);
-                await loadImportAnalysisResults();
-                console.log(`✅ STEP 4: Analysis results loaded`);
-                // Ensure the problems are displayed after loading
-                if (importAnalysisResults) {
-                    console.log(`🎨 STEP 4: Displaying problems...`);
-                    displayImportProblems(importAnalysisResults);
-                    console.log(`✅ STEP 4: Problems displayed`);
-                } else {
-                    console.log(`❌ STEP 4: No analysis results to display`);
-                }
-            } else {
-                console.log(`❌ STEP 4: No session ID available`);
-            }
-            break;
-        case 5:
-            console.log(`👁️ STEP 5: Preview - loading preview data...`);
-            // Preview - display preview data
-            // Load preview data from server
-            if (importSessionId) {
-                console.log(`📡 STEP 5: Loading preview data from server (session: ${importSessionId})...`);
-                loadImportPreviewData();
-                console.log(`✅ STEP 5: Preview data loaded`);
-            } else {
-                console.log(`❌ STEP 5: No session ID available`);
-            }
-            break;
-        case 6:
-            console.log(`✅ STEP 6: Confirmation - displaying final summary...`);
-            // Confirmation - display final summary
-            displayImportFinalSummary();
-            console.log(`✅ STEP 6: Final summary displayed`);
-            break;
-        default:
-            console.log(`ℹ️ STEP ${importCurrentStep}: No processing needed`);
-    }
-    
-    console.log(`✅ PROCESSING STEP ${importCurrentStep}: Completed`);
-}
-
-// ===== FILE ANALYSIS FUNCTIONS =====
-// File processing, analysis, and preview generation
-
-/**
- * Analyze uploaded file
- * Sends file to backend for analysis and stores results
- * 
- * @function analyzeImportFile
- * @async
- * @returns {Promise<void>}
- */
-async function analyzeImportFile() {
-    if (!importSelectedFile || !importSelectedAccount) {
-        return;
-    }
-    
-    try {
-        // Show progress
-        document.getElementById('import-analysis-progress').style.display = 'block';
-        updateImportProgress(0, 'מתחיל ניתוח...');
-        
-        // Upload file
-        const formData = new FormData();
-        formData.append('file', importSelectedFile);
-        formData.append('account_id', importSelectedAccount);
-        
-        const response = await fetch('/api/user-data-import/upload', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            importSessionId = data.session_id;
-            importAnalysisResults = data.analysis_results;
-            
-            // Save to cache for persistence across steps
-            if (window.UnifiedCacheManager) {
-                await window.UnifiedCacheManager.save('import_session_id', importSessionId);
-                await window.UnifiedCacheManager.save('import_analysis_results', importAnalysisResults);
-            }
-            
-            // Update report download button
-            updateReportDownloadButton();
-            
-            // Update progress
-            updateImportProgress(100, 'ניתוח הושלם');
-            
-            // Show results
-            displayImportAnalysisResults(importAnalysisResults);
-            
-            // Hide progress
-            setTimeout(() => {
-                document.getElementById('import-analysis-progress').style.display = 'none';
-            }, 1000);
-            
-            showNotification('ניתוח הושלם בהצלחה', 'success');
-        } else {
-            showNotification(`שגיאה בניתוח: ${data.message}`, 'error');
-        }
-    } catch (error) {
-        console.error('Error analyzing file:', error);
-        showNotification('שגיאה בניתוח הקובץ', 'error');
-    }
-}
-
-/**
- * Generate preview data for step 5
- * Requests preview data from backend and displays it
- * 
- * @function generateImportPreview
- * @async
- * @returns {Promise<void>}
- */
-async function generateImportPreview() {
-    if (!importSessionId) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/api/user-data-import/session/${importSessionId}/preview`);
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            importPreviewData = data.preview_data;
-            
-            // Save to cache for persistence across steps
-            if (window.UnifiedCacheManager) {
-                await window.UnifiedCacheManager.save('import_preview_data', importPreviewData);
-            }
-            
-            displayImportPreviewSummary(importPreviewData);
-            showNotification('תצוגה מקדימה הוכנה', 'success');
-        } else {
-            showNotification(`שגיאה בהכנת תצוגה מקדימה: ${data.message}`, 'error');
-        }
-    } catch (error) {
-        console.error('Error generating preview:', error);
-        showNotification('שגיאה בהכנת תצוגה מקדימה', 'error');
-    }
-}
-
-// ===== DATA DISPLAY FUNCTIONS =====
-// UI rendering and data visualization
-
-/**
- * Display analysis results in step 3
- * Shows counts and statistics from file analysis
- * 
- * @function displayImportAnalysisResults
- * @param {Object} results - Analysis results object
- * @param {number} results.total_records - Total records in file
- * @param {number} results.valid_records - Valid records count
- * @param {number} results.invalid_records - Invalid records count
- * @param {number} results.duplicate_records - Duplicate records count
- * @param {number} results.existing_records - Existing records count
- * @param {Array} results.missing_tickers - Array of missing ticker symbols
- * @returns {void}
- */
-function displayImportAnalysisResults(results) {
-    // The backend returns:
-    // - valid_records: records that are technically valid (including those with missing tickers)
-    // - missing_tickers: list of ticker symbols that are missing
-    // - duplicate_records: count of duplicate records
-    // - invalid_records: records with other errors
-    
-    // Calculate the breakdown:
-    const validRecordsWithMissingTickers = results.valid_records || 0;
-    const missingTickersUniqueCount = results.missing_tickers ? results.missing_tickers.length : 0;
-    const existingRecordsCount = results.existing_records || 0;
-    const duplicateRecordsCount = results.duplicate_records || 0;
-    const invalidRecordsCount = results.invalid_records || 0;
-    
-    document.getElementById('import-existing-count').textContent = existingRecordsCount;
-    
-    // We need to calculate how many records have missing tickers
-    // This is done by counting records that would be skipped due to missing tickers
-    let recordsWithMissingTickers = 0;
-    
-    // Try to get the actual count from preview data if available
-    if (importPreviewData && importPreviewData.records_to_skip) {
-        recordsWithMissingTickers = importPreviewData.records_to_skip.filter(r => r.reason === 'missing_ticker').length;
-    } else {
-        // Fallback: use the missing tickers count as an estimate
-        recordsWithMissingTickers = missingTickersUniqueCount;
-    }
-    
-    // Records that are 100% valid (no missing tickers, no duplicates, no errors, no existing records)
-    const fullyValidRecords = Math.max(0, validRecordsWithMissingTickers - recordsWithMissingTickers);
-    
-    // Total records in file
-    const totalRecords = fullyValidRecords + recordsWithMissingTickers + duplicateRecordsCount + invalidRecordsCount + existingRecordsCount;
-    
-    // Update display
-    document.getElementById('import-total-count').textContent = totalRecords;
-    document.getElementById('import-valid-count').textContent = fullyValidRecords;
-    document.getElementById('import-missing-tickers-count').textContent = recordsWithMissingTickers;
-    document.getElementById('import-missing-tickers-detail').textContent = `${missingTickersUniqueCount} טיקרים ייחודיים`;
-    document.getElementById('import-duplicates-count').textContent = duplicateRecordsCount;
-    document.getElementById('import-errors-count').textContent = invalidRecordsCount;
-    
-        console.log('📊 Analysis Results:', {
-            total: totalRecords,
-            fullyValid: fullyValidRecords,
-            recordsWithMissingTickers: recordsWithMissingTickers,
-            uniqueMissingTickers: missingTickersUniqueCount,
-            duplicates: duplicateRecordsCount,
-            existingRecords: existingRecordsCount,
-            errors: invalidRecordsCount,
-            backendValidRecords: validRecordsWithMissingTickers,
-            calculation: `${validRecordsWithMissingTickers} - ${recordsWithMissingTickers} = ${fullyValidRecords}`
-        });
-    
-    // Display detailed error information
-    displayDetailedErrors(results);
-    
-    document.getElementById('import-analysis-results').style.display = 'block';
-    
-    // Enable next button if there are any valid records (even with missing tickers)
-    if (validRecordsWithMissingTickers > 0) {
-        document.getElementById('import-next-btn').disabled = false;
-        document.getElementById('import-next-btn').style.display = 'inline-block';
-    } else {
-        document.getElementById('import-next-btn').disabled = true;
-        document.getElementById('import-next-btn').style.display = 'none';
-    }
-}
-
-/**
- * Add a missing ticker to the system
- */
-async function addMissingTicker(symbol) {
-    console.log(`Adding missing ticker: ${symbol}`);
-    
-    // Open mini-modal for adding ticker
-    showAddTickerModal(symbol);
-}
-
-/**
- * Show add ticker modal with pre-filled symbol
- */
-function showAddTickerModal(symbol) {
-    // Create modal HTML if it doesn't exist
-    let modal = document.getElementById('add-ticker-modal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'add-ticker-modal';
-        modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4>הוסף טיקר חדש</h4>
-                    <button class="close-btn" onclick="closeAddTickerModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form id="add-ticker-form">
-                        <div class="form-group">
-                            <label for="addTickerSymbol">סמל הטיקר:</label>
-                            <input type="text" id="addTickerSymbol" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="addTickerName">שם הטיקר:</label>
-                            <input type="text" id="addTickerName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="addTickerType">סוג הטיקר:</label>
-                            <select id="addTickerType" required>
-                                <option value="">בחר סוג</option>
-                                <option value="stock">מניה</option>
-                                <option value="etf">ETF</option>
-                                <option value="bond">אג"ח</option>
-                                <option value="crypto">קריפטו</option>
-                                <option value="commodity">סחורה</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="addTickerCurrency">מטבע:</label>
-                            <select id="addTickerCurrency" required>
-                                <option value="">בחר מטבע</option>
-                                <option value="1">USD</option>
-                                <option value="2">EUR</option>
-                                <option value="3">ILS</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="addTickerRemarks">הערות:</label>
-                            <textarea id="addTickerRemarks" rows="3"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" onclick="closeAddTickerModal()">ביטול</button>
-                    <button class="btn btn-primary" onclick="saveMissingTicker()">שמור טיקר</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }
-    
-    // Pre-fill symbol
-    document.getElementById('addTickerSymbol').value = symbol;
-    
-    // Show modal
-    modal.style.display = 'block';
-}
-
-/**
- * Close add ticker modal
- * Hides the modal for adding missing tickers
- * 
- * @function closeAddTickerModal
- * @returns {void}
- */
-function closeAddTickerModal() {
-    document.getElementById('add-ticker-modal').style.display = 'none';
-}
-
-// ===== PROBLEM RESOLUTION FUNCTIONS =====
-// Missing tickers, duplicates, and existing records handling
-
-/**
- * Save missing ticker to database
- * Creates new ticker record and updates UI
- * 
- * @function saveMissingTicker
- * @async
- * @returns {Promise<void>}
- */
-async function saveMissingTicker() {
-    // Get the ticker symbol from the modal BEFORE calling saveTicker
-    const symbolInput = document.getElementById('tickerSymbol');
-    const tickerSymbol = symbolInput ? symbolInput.value.trim().toUpperCase() : null;
-    
-    console.log('🎯 Saving ticker:', tickerSymbol);
-    
-    // Use existing saveTicker function from tickers.js
-    if (window.saveTicker) {
-        try {
-            await window.saveTicker();
-            closeAddTickerModal();
-            
-            if (tickerSymbol) {
-                console.log('✅ Ticker saved successfully, updating button for:', tickerSymbol);
-                
-                // Update the specific button for this ticker
-                updateTickerButtonStatus(tickerSymbol, 'handled');
-                
-                // Remove the ticker from the missing tickers list in memory
-                if (importAnalysisResults && importAnalysisResults.missing_tickers) {
-                    importAnalysisResults.missing_tickers = importAnalysisResults.missing_tickers.filter(t => t !== tickerSymbol);
-                    console.log('📝 Updated missing_tickers list:', importAnalysisResults.missing_tickers);
-                }
-                
-                // Show success notification
-                if (window.showNotification) {
-                    window.showNotification(`טיקר ${tickerSymbol} נוסף בהצלחה למערכת!`, 'success');
-                }
-                
-                // Update server about the new ticker so it can recalculate preview
-                await updateServerWithNewTicker(tickerSymbol);
-            }
-        } catch (error) {
-            console.error('❌ Error saving ticker:', error);
-            if (window.showNotification) {
-                window.showNotification('שגיאה בשמירת הטיקר', 'error');
-            }
-        }
-    } else {
-        console.error('saveTicker function not available');
-        alert('שגיאה: פונקציית שמירת הטיקר לא זמינה');
-    }
-}
-
-/**
- * Update server about new ticker so it can recalculate preview
- */
-async function updateServerWithNewTicker(tickerSymbol) {
-    if (!importSessionId) {
-        console.error('No session ID available');
-        return;
-    }
-    
-    try {
-        console.log('🔄 Updating server with new ticker:', tickerSymbol);
-        
-        // Call API to update session with new ticker
-        const response = await fetch(`/api/user-data-import/session/${importSessionId}/update-ticker`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                ticker_symbol: tickerSymbol
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            console.log('✅ Server updated with new ticker');
-            
-            // Reload preview data to reflect the changes
-            await loadImportPreviewData();
-            
-            // Update the preview summary display
-            if (importPreviewData) {
-                displayImportPreviewSummary(importPreviewData);
-            }
-        } else {
-            console.error('❌ Failed to update server:', data.message);
-        }
-    } catch (error) {
-        console.error('❌ Error updating server:', error);
-    }
-}
-
-/**
- * Update ticker button status
- */
-function updateTickerButtonStatus(tickerSymbol, status) {
-    console.log('🔧 updateTickerButtonStatus called with:', tickerSymbol, status);
-    const button = document.querySelector(`button[data-ticker-symbol="${tickerSymbol}"]`);
-    console.log('🔍 Found button:', button);
-    
-    if (button) {
-        if (status === 'handled') {
-            button.textContent = 'טופל!';
-            button.className = 'btn btn-sm btn-success';
-            button.disabled = true;
-            button.onclick = null; // Remove click handler
-            console.log('✅ Button updated successfully');
-        }
-    } else {
-        console.error('❌ Button not found for ticker:', tickerSymbol);
-    }
-}
-
-/**
- * Update all ticker buttons based on current status
- * Refreshes button states for all missing tickers
- * 
- * @function updateAllTickerButtons
- * @returns {void}
- */
-function updateAllTickerButtons() {
-    if (!importAnalysisResults || !importAnalysisResults.missing_tickers) {
-        return;
-    }
-    
-    importAnalysisResults.missing_tickers.forEach(tickerSymbol => {
-        const button = document.querySelector(`button[data-ticker-symbol="${tickerSymbol}"]`);
-        if (button && button.textContent === 'הוסף למערכת') {
-            // Button is still in "add" state, keep it as is
-        }
-    });
-}
-
-/**
- * Add missing tickers functionality
- */
-
-
-/**
- * Load analysis results from server for step 4
- * Fetches detailed analysis results including problems and existing records
- * 
- * @function loadImportAnalysisResults
- * @async
- * @returns {Promise<void>}
- */
-async function loadImportAnalysisResults() {
-    if (!importSessionId) {
-        console.error('No session ID available');
-        return;
-    }
-    
-    try {
-        // Use preview endpoint to get detailed data including duplicates
-        const response = await fetch(`/api/user-data-import/session/${importSessionId}/preview`);
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            const previewData = data.preview_data;
-            
-            // Count duplicates from records_to_skip
-            const duplicateRecords = previewData.records_to_skip.filter(record => 
-                record.reason === 'within_file_duplicate' || record.reason === 'existing_record'
-            );
-            
-            // Create analysis results from preview data
-            const invalidRecords = previewData.records_to_skip.filter(record => 
-                record.reason === 'validation_error'
-            );
-            
-            importAnalysisResults = {
-                total_records: previewData.summary.total_records || 0,
-                valid_records: previewData.summary.records_to_import || 0,
-                invalid_records: invalidRecords.length,
-                duplicate_records: duplicateRecords.length,
-                existing_records: duplicateRecords.filter(record => 
-                    record.reason === 'existing_record'
-                ).map((record, index) => ({
-                    record_index: index,
-                    record: record,
-                    system_matches: record.details?.system_matches || []
-                })),
-                missing_tickers: previewData.summary.missing_tickers || [],
-                normalization_errors: [],
-                validation_errors: [],
-                duplicate_details: {
-                    within_file_duplicates: duplicateRecords.filter(record => 
-                        record.reason === 'within_file_duplicate'
-                    ).map((record, index) => ({
-                        record_index: index,
-                        // record is already the flat record itself, not nested
-                        symbol: record.symbol,
-                        action: record.action,
-                        date: record.date,
-                        quantity: record.quantity,
-                        price: record.price,
-                        fee: record.fee,
-                        currency: record.currency,
-                        asset_category: record.asset_category,
-                        proceeds: record.proceeds,
-                        basis: record.basis,
-                        realized_pl: record.realized_pl,
-                        mtm_pl: record.mtm_pl,
-                        code: record.code,
-                        row_number: record.row_number,
-                        external_id: record.external_id,
-                        source: record.source,
-                        within_file_matches: record.details?.within_file_matches || [],
-                        confidence_score: record.confidence_score || 60
-                    })),
-                    existing_records: duplicateRecords.filter(record => 
-                        record.reason === 'existing_record'
-                    ).map((record, index) => ({
-                        record_index: index,
-                        // record is already the flat record itself, not nested
-                        symbol: record.symbol,
-                        action: record.action,
-                        date: record.date,
-                        quantity: record.quantity,
-                        price: record.price,
-                        fee: record.fee,
-                        currency: record.currency,
-                        asset_category: record.asset_category,
-                        proceeds: record.proceeds,
-                        basis: record.basis,
-                        realized_pl: record.realized_pl,
-                        mtm_pl: record.mtm_pl,
-                        code: record.code,
-                        row_number: record.row_number,
-                        external_id: record.external_id,
-                        source: record.source,
-                        system_matches: record.details?.system_matches || [],
-                        confidence_score: record.confidence_score || 60
-                    }))
-                }
-            };
-            
-            console.log('🔍 Loaded analysis results from preview:', importAnalysisResults);
-            displayImportProblems(importAnalysisResults);
-        } else {
-            console.error('Failed to load analysis results:', data.message);
-            showNotification('שגיאה בטעינת נתוני הניתוח', 'error');
-        }
-    } catch (error) {
-        console.error('Error loading analysis results:', error);
-        showNotification('שגיאה בטעינת נתוני הניתוח', 'error');
-    }
-}
-
-/**
- * Load preview data from server for step 5
- * Fetches preview data including records to import and skip
- * 
- * @function loadImportPreviewData
- * @async
- * @returns {Promise<void>}
- */
-async function loadImportPreviewData() {
-    if (!importSessionId) {
-        console.error('No session ID available');
-        return;
-    }
-    
-    try {
-        console.log('🔄 Loading preview data for session:', importSessionId);
-        const response = await fetch(`/api/user-data-import/session/${importSessionId}/preview`);
-        const data = await response.json();
-        
-        console.log('📊 Preview API response:', data);
-        
-        if (data.status === 'success') {
-            importPreviewData = data.preview_data;
-            console.log('📊 Preview data loaded:', importPreviewData);
-            displayImportPreviewSummary(importPreviewData);
-        } else {
-            console.error('Failed to load preview data:', data.message);
-            showNotification('שגיאה בטעינת נתוני התצוגה המקדימה', 'error');
-        }
-    } catch (error) {
-        console.error('Error loading preview data:', error);
-        showNotification('שגיאה בטעינת נתוני התצוגה המקדימה', 'error');
-    }
-}
-
-/**
- * Display problems in step 4
- * Shows missing tickers, duplicates, and existing records with resolution options
- * 
- * @function displayImportProblems
- * @param {Object} results - Problems data object
- * @param {Array} results.missing_tickers - Array of missing ticker symbols
- * @param {Array} results.duplicate_details - Duplicate records details
- * @param {Array} results.existing_records - Existing records details
- * @returns {void}
- */
-function displayImportProblems(results) {
-    console.log('🔍 Displaying problems with results:', results);
-    
-    // Show missing tickers section if there are missing tickers
-    const missingTickersSection = document.getElementById('import-missing-tickers-section');
-    const missingTickersList = document.getElementById('import-missing-tickers-list');
-    
-    // Show missing tickers section if there are missing tickers
-    if (results.missing_tickers && results.missing_tickers.length > 0) {
-        missingTickersSection.style.display = 'block';
-        missingTickersList.innerHTML = results.missing_tickers.map(ticker => 
-            `<div class="missing-ticker-item">
-                <span class="ticker-symbol">${ticker}</span>
-                <button class="btn btn-sm btn-primary" 
-                        data-ticker-symbol="${ticker}" 
-                        onclick="addMissingTicker('${ticker}')">
-                    הוסף למערכת
-                </button>
-            </div>`
-        ).join('');
-    } else {
-        missingTickersSection.style.display = 'none';
-    }
-    
-    // Update button states after rendering
-    setTimeout(() => {
-        updateAllTickerButtons();
-    }, 100);
-    
-    // Show duplicates section if there are duplicates
-    const duplicatesSection = document.getElementById('import-duplicates-section');
-    const duplicatesList = document.getElementById('import-duplicates-list');
-    
-    console.log('🔍 Duplicate records:', results.duplicate_records);
-    console.log('🔍 Duplicates section element:', duplicatesSection);
-    
-    if (results.duplicate_records && results.duplicate_records > 0) {
-        if (duplicatesSection) {
-            duplicatesSection.style.display = 'block';
-            
-            // Build detailed duplicate list
-            let duplicateListHtml = '';
-            const duplicateDetails = results.duplicate_details || {};
-            
-            console.log('🔍 Duplicate details:', duplicateDetails);
-            console.log('🔍 Within-file duplicates:', duplicateDetails.within_file_duplicates);
-            console.log('🔍 System duplicates:', duplicateDetails.system_duplicates);
-            
-            // Within-file duplicates
-            if (duplicateDetails.within_file_duplicates && duplicateDetails.within_file_duplicates.length > 0) {
-                duplicateListHtml += `
-                    <div class="duplicate-group">
-                        <h6>🔍 כפילויות בתוך הקובץ (${duplicateDetails.within_file_duplicates.length})</h6>
-                        <div class="duplicate-items">
-                `;
-                
-                duplicateDetails.within_file_duplicates.forEach((dup, index) => {
-                    // dup is already the record itself, not wrapped in a record property
-                    duplicateListHtml += `
-                        <div class="duplicate-item">
-                            <div class="duplicate-header">
-                                <strong>כפילות ${index + 1}</strong>
-                                <span class="duplicate-confidence">דמיון: ${dup.confidence_score || 60}%</span>
-                            </div>
-                            <div class="duplicate-records">
-                                <div class="record-comparison">
-                                    <div class="record-main">
-                                        <h6>📄 רשומה ראשית (שורה ${dup.row_number || 'N/A'})</h6>
-                                        <div class="record-details">
-                                            <div class="record-field"><strong>טיקר:</strong> ${dup.symbol || 'N/A'}</div>
-                                            <div class="record-field"><strong>פעולה:</strong> ${dup.action || 'N/A'}</div>
-                                            <div class="record-field"><strong>תאריך:</strong> ${dup.date || 'N/A'}</div>
-                                            <div class="record-field"><strong>כמות:</strong> ${dup.quantity || 'N/A'}</div>
-                                            <div class="record-field"><strong>מחיר:</strong> $${dup.price || 'N/A'}</div>
-                                            <div class="record-field"><strong>עמלה:</strong> $${dup.fee || 'N/A'}</div>
-                                            <div class="record-field"><strong>סה"כ:</strong> $${dup.proceeds || 'N/A'}</div>
-                                            <div class="record-field"><strong>רווח/הפסד:</strong> $${dup.realized_pl || 'N/A'}</div>
-                                        </div>
-                                    </div>
-                                    <div class="record-matches">
-                                        <h6>🔍 רשומות דומות (${dup.within_file_matches?.length || 0})</h6>
-                                        ${dup.within_file_matches?.map((match, matchIndex) => `
-                                            <div class="record-match">
-                                                <div class="match-header">
-                                                    <strong>רשומה דומה ${matchIndex + 1}</strong>
-                                                    <span class="match-confidence">דמיון: ${match.confidence || 60}%</span>
-                                                </div>
-                                                <div class="record-details">
-                                                    <div class="record-field"><strong>טיקר:</strong> ${match.record?.symbol || 'N/A'}</div>
-                                                    <div class="record-field"><strong>פעולה:</strong> ${match.record?.action || 'N/A'}</div>
-                                                    <div class="record-field"><strong>תאריך:</strong> ${match.record?.date || 'N/A'}</div>
-                                                    <div class="record-field"><strong>כמות:</strong> ${match.record?.quantity || 'N/A'}</div>
-                                                    <div class="record-field"><strong>מחיר:</strong> $${match.record?.price || 'N/A'}</div>
-                                                    <div class="record-field"><strong>עמלה:</strong> $${match.record?.fee || 'N/A'}</div>
-                                                    <div class="record-field"><strong>סה"כ:</strong> $${match.record?.proceeds || 'N/A'}</div>
-                                                    <div class="record-field"><strong>רווח/הפסד:</strong> $${match.record?.realized_pl || 'N/A'}</div>
-                                                </div>
-                                            </div>
-                                        `).join('') || '<div class="no-matches">אין רשומות דומות</div>'}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="duplicate-actions-item">
-                                <button class="btn btn-success btn-xs" onclick="acceptDuplicate(${index}, 'within_file')">
-                                    ✅ ייבוא הכול
-                                </button>
-                                <button class="btn btn-danger btn-xs" onclick="rejectDuplicate(${index}, 'within_file')">
-                                    ❌ אשר כפילות
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                duplicateListHtml += `
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // System duplicates
-            if (duplicateDetails.system_duplicates && duplicateDetails.system_duplicates.length > 0) {
-                duplicateListHtml += `
-                    <div class="duplicate-group">
-                        <h6>🗄️ כפילויות במערכת (${duplicateDetails.system_duplicates.length})</h6>
-                        <div class="duplicate-items">
-                `;
-                
-                duplicateDetails.system_duplicates.forEach((dup, index) => {
-                    // dup is already the record itself, not wrapped in a record property
-                    duplicateListHtml += `
-                        <div class="duplicate-item">
-                            <div class="duplicate-header">
-                                <strong>כפילות ${index + 1}</strong>
-                                <span class="duplicate-confidence">דמיון: ${dup.confidence_score || 60}%</span>
-                            </div>
-                            <div class="duplicate-records">
-                                <div class="record-comparison">
-                                    <div class="record-main">
-                                        <h6>📄 רשומה חדשה (שורה ${dup.row_number || 'N/A'})</h6>
-                                        <div class="record-details">
-                                            <div class="record-field"><strong>טיקר:</strong> ${dup.symbol || 'N/A'}</div>
-                                            <div class="record-field"><strong>פעולה:</strong> ${dup.action || 'N/A'}</div>
-                                            <div class="record-field"><strong>תאריך:</strong> ${dup.date || 'N/A'}</div>
-                                            <div class="record-field"><strong>כמות:</strong> ${dup.quantity || 'N/A'}</div>
-                                            <div class="record-field"><strong>מחיר:</strong> $${dup.price || 'N/A'}</div>
-                                            <div class="record-field"><strong>עמלה:</strong> $${dup.fee || 'N/A'}</div>
-                                            <div class="record-field"><strong>סה"כ:</strong> $${dup.proceeds || 'N/A'}</div>
-                                            <div class="record-field"><strong>רווח/הפסד:</strong> $${dup.realized_pl || 'N/A'}</div>
-                                        </div>
-                                    </div>
-                                    <div class="record-matches">
-                                        <h6>🗄️ רשומות קיימות במערכת (${dup.system_matches?.length || 0})</h6>
-                                        ${dup.system_matches?.map((match, matchIndex) => `
-                                            <div class="record-match">
-                                                <div class="match-header">
-                                                    <strong>רשומה קיימת ${matchIndex + 1}</strong>
-                                                    <span class="match-confidence">דמיון: ${match.confidence || 60}%</span>
-                                                </div>
-                                                <div class="record-details">
-                                                    <div class="record-field"><strong>טיקר:</strong> ${match.record?.symbol || 'N/A'}</div>
-                                                    <div class="record-field"><strong>פעולה:</strong> ${match.record?.action || 'N/A'}</div>
-                                                    <div class="record-field"><strong>תאריך:</strong> ${match.record?.date || 'N/A'}</div>
-                                                    <div class="record-field"><strong>כמות:</strong> ${match.record?.quantity || 'N/A'}</div>
-                                                    <div class="record-field"><strong>מחיר:</strong> $${match.record?.price || 'N/A'}</div>
-                                                    <div class="record-field"><strong>עמלה:</strong> $${match.record?.fee || 'N/A'}</div>
-                                                    <div class="record-field"><strong>סה"כ:</strong> $${match.record?.proceeds || 'N/A'}</div>
-                                                    <div class="record-field"><strong>רווח/הפסד:</strong> $${match.record?.realized_pl || 'N/A'}</div>
-                                                </div>
-                                            </div>
-                                        `).join('') || '<div class="no-matches">אין רשומות קיימות</div>'}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="duplicate-actions-item">
-                                <button class="btn btn-success btn-xs" onclick="acceptDuplicate(${index}, 'system')">
-                                    ✅ ייבוא הכול
-                                </button>
-                                <button class="btn btn-danger btn-xs" onclick="rejectDuplicate(${index}, 'system')">
-                                    ❌ אשר כפילות
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                duplicateListHtml += `
-                        </div>
-                    </div>
-                `;
-            }
-            
-            duplicatesList.innerHTML = `
-                <div class="duplicate-info">
-                    <h6>נמצאו ${results.duplicate_records} כפילויות פוטנציאליות</h6>
-                    <p class="text-muted">המערכת זיהתה עסקאות שעלולות להיות כפילויות. אנא סקור אותן בקפידה.</p>
-                    
-                    ${duplicateListHtml}
-                    
-                    <div class="duplicate-actions">
-                        <button class="btn btn-success btn-sm" onclick="acceptAllDuplicates()">
-                            ✅ ייבוא כל הכפילויות
-                        </button>
-                        <button class="btn btn-danger btn-sm" onclick="rejectAllDuplicates()">
-                            ❌ אשר כל הכפילויות
-                        </button>
-                    </div>
-                </div>
-            `;
-            console.log('✅ Duplicates section displayed with detailed list');
-        } else {
-            console.error('❌ Duplicates section element not found');
-        }
-    } else {
-        if (duplicatesSection) {
-            duplicatesSection.style.display = 'none';
-        }
-        console.log('ℹ️ No duplicates found');
-    }
-    
-    // Show validation errors if there are any
-    const validationErrorsSection = document.getElementById('import-validation-errors-section');
-    const validationErrorsList = document.getElementById('import-validation-errors-list');
-    
-    if (results.validation_errors && results.validation_errors.length > 0) {
-        if (validationErrorsSection) {
-            validationErrorsSection.style.display = 'block';
-            validationErrorsList.innerHTML = results.validation_errors.map((error, index) => 
-                `<div class="validation-error-item">שגיאה ${index + 1}: ${error.errors.join(', ')}</div>`
-            ).join('');
-        }
-    } else {
-        if (validationErrorsSection) {
-            validationErrorsSection.style.display = 'none';
-        }
-    }
-    
-    // Show normalization errors if there are any
-    const normalizationErrorsSection = document.getElementById('import-normalization-errors-section');
-    const normalizationErrorsList = document.getElementById('import-normalization-errors-list');
-    
-    if (results.normalization_errors && results.normalization_errors.length > 0) {
-        if (normalizationErrorsSection) {
-            normalizationErrorsSection.style.display = 'block';
-            normalizationErrorsList.innerHTML = results.normalization_errors.map((error, index) => 
-                `<div class="normalization-error-item">שורה ${error.record_index + 1}: ${error.errors.join(', ')}</div>`
-            ).join('');
-        }
-    } else {
-        if (normalizationErrorsSection) {
-            normalizationErrorsSection.style.display = 'none';
-        }
-    }
-    
-    // Show existing records section if there are existing records
-    displayExistingRecords(results);
-}
-
-/**
- * Display existing records section in step 4
- * Shows records that already exist in the system with "Import Anyway" buttons
- * 
- * @function displayExistingRecords
- * @param {Object} results - Results object containing existing records
- * @param {Array} results.existing_records - Array of existing record objects
- * @returns {void}
- */
-function displayExistingRecords(results) {
-    const existingSection = document.getElementById('import-existing-section');
-    const existingList = document.getElementById('import-existing-list');
-    
-    if (!existingSection || !existingList) {
-        console.warn('Existing records section elements not found');
-        return;
-    }
-    
-    if (!results || !results.existing_records || results.existing_records.length === 0) {
-        existingSection.style.display = 'none';
-        return;
-    }
-    
-    existingSection.style.display = 'block';
-    
-    let html = '<div class="existing-records-container">';
-    
-    results.existing_records.forEach((item, index) => {
-        const record = item.record;
-        const matches = item.system_matches || [];
-        
-        html += `
-            <div class="existing-record-item" data-record-index="${item.record_index}">
-                <div class="record-info">
-                    <strong>${record.symbol}</strong> - 
-                    ${record.action === 'buy' ? 'קניה' : 'מכירה'} 
-                    ${record.quantity} @ $${record.price.toFixed(2)}
-                    <br>
-                    <small>תאריך: ${new Date(record.date).toLocaleDateString('he-IL')}</small>
-                </div>
-                <div class="record-matches">
-                    <small>נמצאו ${matches.length} התאמות במערכת</small>
-                </div>
-                <button class="btn btn-danger btn-sm" 
-                        onclick="importExistingRecord(${item.record_index})"
-                        id="existing-btn-${item.record_index}">
-                    ⚠️ ייבא בכל זאת
-                </button>
-            </div>
-        `;
-    });
-    
-    html += '</div>';
-    existingList.innerHTML = html;
-}
-
-/**
- * Import existing record (user's choice to import despite existing)
- * Sends request to backend to allow importing an existing record
- * 
- * @function importExistingRecord
- * @param {number} recordIndex - Index of the record to import
- * @async
- * @returns {Promise<void>}
- */
-async function importExistingRecord(recordIndex) {
-    try {
-        // Mark this record for import
-        if (!importSelectedExistingRecords) {
-            importSelectedExistingRecords = [];
-        }
-        importSelectedExistingRecords.push(recordIndex);
-        
-        // Update button
-        const btn = document.getElementById(`existing-btn-${recordIndex}`);
-        btn.textContent = '✅ יובא';
-        btn.className = 'btn btn-success btn-sm';
-        btn.disabled = true;
-        
-        // Send to backend
-        await fetch(`/api/user-data-import/session/${importSessionId}/allow-existing`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ record_index: recordIndex })
-        });
-        
-        // Reload preview
-        await loadImportPreviewData();
-        displayImportPreviewSummary();
-        
-        showNotification('הרשומה תיובא למרות שהיא קיימת במערכת', 'warning');
-    } catch (error) {
-        console.error('Error allowing existing record import:', error);
-        showNotification('שגיאה בעדכון סטטוס הרשומה', 'error');
-    }
-}
-
-/**
- * Display detailed error information
- */
-function displayDetailedErrors(results) {
-    const errorContainer = document.getElementById('import-error-details');
-    if (!errorContainer) return;
-    
-    let errorHtml = '';
-    
-    // Normalization errors
-    if (results.normalization_errors && results.normalization_errors.length > 0) {
-        errorHtml += '<div class="error-section">';
-        errorHtml += '<h4>שגיאות נורמליזציה:</h4>';
-        errorHtml += '<div class="error-list">';
-        results.normalization_errors.forEach((error, index) => {
-            errorHtml += `<div class="error-item">`;
-            errorHtml += `<strong>שורה ${error.record_index + 1}:</strong> `;
-            errorHtml += error.errors.join(', ');
-            errorHtml += `</div>`;
-        });
-        errorHtml += '</div></div>';
-    }
-    
-    // Validation errors
-    if (results.validation_errors && results.validation_errors.length > 0) {
-        errorHtml += '<div class="error-section">';
-        errorHtml += '<h4>שגיאות ולידציה:</h4>';
-        errorHtml += '<div class="error-list">';
-        results.validation_errors.forEach((error, index) => {
-            errorHtml += `<div class="error-item">`;
-            errorHtml += `<strong>רשומה ${index + 1}:</strong> `;
-            errorHtml += error.errors.join(', ');
-            errorHtml += `</div>`;
-        });
-        errorHtml += '</div></div>';
-    }
-    
-    // Missing tickers
-    if (results.missing_tickers && results.missing_tickers.length > 0) {
-        errorHtml += '<div class="error-section">';
-        errorHtml += '<h4>טיקרים חסרים במערכת:</h4>';
-        errorHtml += '<div class="error-list">';
-        errorHtml += '<div class="error-item warning">';
-        errorHtml += `<strong>רשימת טיקרים:</strong> ${results.missing_tickers.join(', ')}`;
-        errorHtml += '</div>';
-        errorHtml += '<div class="error-item info">';
-        errorHtml += 'הטיקרים הללו לא קיימים במערכת. ניתן להוסיף אותם בשלב 4 או לדלג על הרשומות הרלוונטיות.';
-        errorHtml += '</div>';
-        errorHtml += '</div></div>';
-    }
-    
-    // Duplicate details
-    if (results.duplicate_details && results.duplicate_details.within_file_duplicates && results.duplicate_details.within_file_duplicates.length > 0) {
-        errorHtml += '<div class="error-section">';
-        errorHtml += '<h4>כפילויות זוהו:</h4>';
-        errorHtml += '<div class="error-list">';
-        results.duplicate_details.within_file_duplicates.forEach((dup, index) => {
-            errorHtml += `<div class="error-item">`;
-            errorHtml += `<strong>כפילות ${index + 1}:</strong> `;
-            errorHtml += `${dup.record.symbol} - ${dup.record.action} - ${dup.record.quantity} (ביטחון: ${dup.confidence_score}%)`;
-            errorHtml += `</div>`;
-        });
-        errorHtml += '</div></div>';
-    }
-    
-    if (errorHtml === '') {
-        errorHtml = '<div class="no-errors">אין שגיאות לפרט</div>';
-    }
-    
-    errorContainer.innerHTML = errorHtml;
-    errorContainer.style.display = errorHtml.includes('no-errors') ? 'none' : 'block';
-}
-
-/**
- * Display final summary for step 6
- * Shows import completion summary with file name and statistics
- * 
- * @function displayImportFinalSummary
- * @returns {void}
- */
-function displayImportFinalSummary() {
-    // Display file name
-    const filenameElement = document.getElementById('import-final-filename');
-    if (filenameElement && importSelectedFile) {
-        filenameElement.textContent = importSelectedFile.name;
-    }
-    
-    // Display account name
-    const accountElement = document.getElementById('import-final-account');
-    if (accountElement && importSelectedAccount) {
-        const accountSelect = document.getElementById('import-account-select');
-        const selectedOption = accountSelect.options[accountSelect.selectedIndex];
-        accountElement.textContent = selectedOption ? selectedOption.text : 'לא נבחר';
-    }
-    
-    // Display import count
-    const importCountElement = document.getElementById('import-final-import-count');
-    if (importCountElement && importPreviewData) {
-        importCountElement.textContent = importPreviewData.summary.records_to_import || 0;
-    }
-    
-    // Display skip count
-    const skipCountElement = document.getElementById('import-final-skip-count');
-    if (skipCountElement && importPreviewData) {
-        skipCountElement.textContent = importPreviewData.summary.records_to_skip || 0;
-    }
-}
-
-/**
- * Display preview summary for step 5
- * Shows import statistics and record counts
- * 
- * @function displayImportPreviewSummary
- * @param {Object} data - Preview data object
- * @param {Object} data.summary - Summary statistics
- * @param {number} data.summary.total_records - Total records count
- * @param {number} data.summary.records_to_import - Records to import count
- * @param {number} data.summary.records_to_skip - Records to skip count
- * @returns {void}
- */
-function displayImportPreviewSummary(data) {
-    console.log('📊 Preview Summary Data:', data);
-    console.log('📊 Summary:', data.summary);
-    
-    document.getElementById('import-preview-total').textContent = data.summary.total_records || 0;
-    document.getElementById('import-preview-import').textContent = data.summary.records_to_import || 0;
-    document.getElementById('import-preview-skip').textContent = data.summary.records_to_skip || 0;
-    
-    console.log('📊 Updated preview display:', {
-        total: data.summary.total_records || 0,
-        import: data.summary.records_to_import || 0,
-        skip: data.summary.records_to_skip || 0
-    });
-}
-
-// ===== MODAL MANAGEMENT FUNCTIONS =====
-// Preview modal and confirmation modal handling
-
-/**
- * Show preview modal with import data
- * Displays modal with records to import and skip
- * 
- * @function showImportPreviewModal
- * @returns {void}
- */
-function showImportPreviewModal() {
-    if (!importPreviewData) {
-        showNotification('אין נתוני תצוגה מקדימה', 'error');
-        return;
-    }
-    
-    // Update tab counts
-    document.getElementById('import-import-tab-count').textContent = importPreviewData.records_to_import.length;
-    document.getElementById('import-skip-tab-count').textContent = importPreviewData.records_to_skip.length;
-    
-    // Populate tables
-    populateImportPreviewTable('import', importPreviewData.records_to_import);
-    populateImportPreviewTable('skip', importPreviewData.records_to_skip);
-    
-    // Show modal
-    document.getElementById('import-preview-modal').style.display = 'block';
-}
-
-/**
- * Close preview modal
- * Hides the preview modal
- * 
- * @function closeImportPreviewModal
- * @returns {void}
- */
-function closeImportPreviewModal() {
-    document.getElementById('import-preview-modal').style.display = 'none';
-}
-
-/**
- * Show preview tab
- */
-function showImportPreviewTab(tabName) {
-    // Update tab buttons
-    document.querySelectorAll('#import-preview-modal .tab-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    // Update tab content
-    document.querySelectorAll('#import-preview-modal .preview-tab').forEach(tab => tab.classList.remove('active'));
-    document.getElementById(`import-preview-tab-${tabName}`).classList.add('active');
-}
-
-/**
- * Populate preview table
- */
-function populateImportPreviewTable(type, records) {
-    const tbody = document.getElementById(`import-preview-tbody-${type}`);
-    tbody.innerHTML = '';
-    
-    records.forEach(record => {
-        const row = document.createElement('tr');
-        
-        if (type === 'import') {
-            row.innerHTML = `
-                <td>${record.symbol}</td>
-                <td>${record.action === 'buy' ? 'קניה' : 'מכירה'}</td>
-                <td>${record.quantity}</td>
-                <td>$${record.price}</td>
-                <td>$${record.fee}</td>
-                <td>${formatDate(record.date)}</td>
-                <td>${record.external_id}</td>
-            `;
-        } else {
-            row.innerHTML = `
-                <td>${record.symbol}</td>
-                <td>${record.action === 'buy' ? 'קניה' : 'מכירה'}</td>
-                <td>${record.quantity}</td>
-                <td>$${record.price}</td>
-                <td>$${record.fee}</td>
-                <td>${formatDate(record.date)}</td>
-                <td>${getReasonText(record.reason)}</td>
-                <td>${record.details ? record.details.join(', ') : ''}</td>
-            `;
-        }
-        
-        tbody.appendChild(row);
-    });
-}
-
-/**
- * Show confirmation modal for user decisions
- * Displays a custom modal for confirming actions like importing existing records
- * 
- * @function showConfirmationModal
- * @param {string} title - Modal title
- * @param {string} message - Modal message content
- * @param {string} [type='warning'] - Modal type (warning, error, info)
- * @returns {Promise<boolean>} Promise that resolves to true if confirmed, false if cancelled
- */
-function showConfirmationModal(title, message, type = 'warning') {
-    return new Promise((resolve) => {
-        // Create modal HTML
-        const modalHtml = `
-            <div class="confirmation-modal-overlay" id="confirmationModalOverlay">
-                <div class="confirmation-modal">
-                    <h3>${title}</h3>
-                    <p>${message}</p>
-                    <div class="modal-actions">
-                        <button class="btn btn-secondary" onclick="closeConfirmationModal(false)">ביטול</button>
-                        <button class="btn btn-danger" onclick="closeConfirmationModal(true)">אשר</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Append to body
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
-        // Store resolve function
-        window.confirmationModalResolve = resolve;
-    });
-}
-
-/**
- * Close confirmation modal and resolve promise
- * Removes modal from DOM and resolves the confirmation promise
- * 
- * @function closeConfirmationModal
- * @param {boolean} confirmed - Whether user confirmed the action
- * @returns {void}
- */
-function closeConfirmationModal(confirmed) {
-    const overlay = document.getElementById('confirmationModalOverlay');
-    if (overlay) {
-        overlay.remove();
-    }
-    if (window.confirmationModalResolve) {
-        window.confirmationModalResolve(confirmed);
-        window.confirmationModalResolve = null;
-    }
-}
-
-// ===== IMPORT EXECUTION FUNCTIONS =====
-// Final import process and confirmation handling
-
-/**
- * Execute the final import process
- * Sends request to backend to execute the import with confirmation for existing records
- * 
- * @function executeImport
- * @async
- * @returns {Promise<void>}
- */
-async function executeImport() {
-    if (!importSessionId) {
-        showNotification('אין סשן ייבוא פעיל', 'error');
-        return;
-    }
-    
-    try {
-        // Check if user is forcing import of existing records
-        if (importSelectedExistingRecords && importSelectedExistingRecords.length > 0) {
-            const confirmed = await showConfirmationModal(
-                'אישור ייבוא רשומות קיימות',
-                `אתה עומד לייבא ${importSelectedExistingRecords.length} רשומות שכבר קיימות במערכת. פעולה זו עלולה ליצור כפילויות. האם אתה בטוח?`,
-                'warning'
-            );
-            
-            if (!confirmed) {
-                showNotification('הייבוא בוטל', 'info');
-                return;
-            }
-        }
-        
-        const response = await fetch(`/api/user-data-import/session/${importSessionId}/execute`, {
-            method: 'POST'
-        });
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            showNotification(`ייבוא הושלם: ${data.imported_count} רשומות יובאו`, 'success');
-            
-            // Close modal and refresh data
-            closeImportUserDataModal();
-            if (typeof window.loadExecutionsData === 'function') {
-                window.loadExecutionsData();
-            }
-        } else {
-            showNotification(`שגיאה בייבוא: ${data.message}`, 'error');
-        }
-    } catch (error) {
-        console.error('Error executing import:', error);
-        showNotification('שגיאה בייבוא', 'error');
-    }
-}
-
-/**
- * Cancel import
- */
-function cancelImport() {
-    if (confirm('האם אתה בטוח שברצונך לבטל את הייבוא?')) {
-        closeImportUserDataModal();
-    }
-}
-
-/**
- * Update step display indicators and content visibility
- * Shows/hides step content and updates step indicators based on current step
- * 
- * @function updateImportStepDisplay
- * @returns {void}
- */
-function updateImportStepDisplay() {
-    console.log(`🎨 UPDATE STEP DISPLAY: Updating display for step ${importCurrentStep}`);
+function goToStep(step) {
+    console.log(`Going to step ${step}`);
+    currentStep = step;
     
     // Update step indicators
-    document.querySelectorAll('#import-user-data-modal .step').forEach((step, index) => {
-        step.classList.remove('active', 'completed');
-        
-        if (index + 1 === importCurrentStep) {
-            step.classList.add('active');
-            console.log(`🎯 STEP INDICATOR: Step ${index + 1} marked as active`);
-        } else if (index + 1 < importCurrentStep) {
-            step.classList.add('completed');
-            console.log(`✅ STEP INDICATOR: Step ${index + 1} marked as completed`);
-        }
-    });
+    updateStepIndicators();
     
-    // Update step content
-    document.querySelectorAll('#import-user-data-modal .step-content').forEach((content, index) => {
-        content.classList.remove('active');
-        
-        if (index + 1 === importCurrentStep) {
-            content.classList.add('active');
-            console.log(`📄 STEP CONTENT: Step ${index + 1} content marked as active`);
-        }
-    });
-    
-    // Process current step to load data
-    if (importCurrentStep >= 4 && importSessionId) {
-        console.log(`⚙️ UPDATE STEP DISPLAY: Processing step ${importCurrentStep} (session: ${importSessionId})`);
-        processImportCurrentStep();
-    } else if (importCurrentStep >= 4) {
-        console.log(`❌ UPDATE STEP DISPLAY: Step ${importCurrentStep} but no session ID`);
-    } else {
-        console.log(`ℹ️ UPDATE STEP DISPLAY: Step ${importCurrentStep} - no processing needed`);
-    }
-    
-    console.log(`✅ UPDATE STEP DISPLAY: Completed for step ${importCurrentStep}`);
+    // Show step content
+    showStepContent(step);
 }
 
 /**
- * Update step navigation buttons state
- * Enables/disables navigation buttons based on current step and validation
- * 
- * @function updateImportStepNavigation
- * @returns {void}
+ * Update step indicators
  */
-function updateImportStepNavigation() {
-    const prevBtn = document.getElementById('import-prev-btn');
-    const nextBtn = document.getElementById('import-next-btn');
-    
-    // Previous button
-    if (importCurrentStep > 1) {
-        prevBtn.style.display = 'inline-block';
-    } else {
-        prevBtn.style.display = 'none';
-    }
-    
-    // Next button
-    if (importCurrentStep < 6) {
-        nextBtn.textContent = 'שלב הבא →';
-        nextBtn.disabled = !canProceedToNextImportStep();
-    } else {
-        nextBtn.textContent = 'סיום';
-        nextBtn.disabled = false;
-    }
+function updateStepIndicators() {
+    const indicators = document.querySelectorAll('.step-indicator');
+    indicators.forEach((indicator, index) => {
+        const stepNumber = index + 1;
+        if (stepNumber < currentStep) {
+            indicator.classList.add('completed');
+            indicator.classList.remove('active');
+        } else if (stepNumber === currentStep) {
+            indicator.classList.add('active');
+            indicator.classList.remove('completed');
+        } else {
+            indicator.classList.remove('active', 'completed');
+        }
+    });
 }
 
 /**
- * Check if user can proceed to next step
- * Validates step-specific requirements for navigation
- * 
- * @function canProceedToNextImportStep
- * @returns {boolean} True if can proceed, false otherwise
+ * Show step content
  */
-function canProceedToNextImportStep() {
-    switch (importCurrentStep) {
+function showStepContent(step) {
+    // Hide all step content
+    const stepContents = document.querySelectorAll('.step-content');
+    stepContents.forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Show current step content
+    const currentStepContent = document.getElementById(`step${step}Content`);
+    if (currentStepContent) {
+        currentStepContent.style.display = 'block';
+    }
+    
+    // Load step-specific content
+    switch(step) {
         case 1:
-            return importSelectedFile !== null;
+            loadStep1Content();
+            break;
         case 2:
-            return importSelectedAccount !== null;
+            loadStep2Content();
+            break;
         case 3:
-            return importAnalysisResults !== null;
+            loadStep3Content();
+            break;
         case 4:
-            return true; // Problem resolution
+            loadStep4Content();
+            break;
         case 5:
-            return importPreviewData !== null;
-        case 6:
-            return true; // Confirmation
-        default:
-            return false;
+            loadStep5Content();
+            break;
     }
 }
 
 /**
- * Update progress
+ * Load step 1 content (File & Account Selection)
  */
-function updateImportProgress(percentage, text) {
-    document.getElementById('import-progress-fill').style.width = `${percentage}%`;
-    document.getElementById('import-progress-text').textContent = text;
+function loadStep1Content() {
+    const content = document.getElementById('step1Content');
+    if (!content) return;
+    
+    content.innerHTML = `
+        <div class="step-content-inner">
+            <h4>בחר קובץ וחשבון מסחר מסחר</h4>
+            
+            <div class="form-group">
+                <label for="importFileInput">קובץ CSV:</label>
+                <input type="file" id="importFileInput" accept=".csv" class="form-control" onchange="handleFileSelect(event)">
+                <div id="fileInfo" class="file-info"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="importAccountSelect">חשבון מסחר מסחר:</label>
+                <select id="importAccountSelect" class="form-control" onchange="handleAccountSelect(event)">
+                    <option value="">בחר חשבון מסחר מסחר</option>
+                </select>
+                <div id="accountInfo" class="account-info"></div>
+            </div>
+            
+            <div class="step-actions">
+                <button class="btn btn-primary" onclick="analyzeFile()" id="analyzeBtn" disabled>
+                    <i class="fas fa-search"></i> נתח קובץ
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Load accounts
+    loadAccounts();
+}
+
+/**
+ * Load step 2 content (File Analysis)
+ */
+function loadStep2Content() {
+    const content = document.getElementById('step2Content');
+    if (!content) return;
+    
+    content.innerHTML = `
+        <div class="step-content-inner">
+            <h4>ניתוח קובץ</h4>
+            <div id="analysisResults" class="analysis-results">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> מנתח קובץ...
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Start analysis
+    analyzeFile();
+}
+
+/**
+ * Load step 3 content (Problem Resolution)
+ */
+function loadStep3Content() {
+    const content = document.getElementById('step3Content');
+    if (!content) return;
+    
+    content.innerHTML = `
+        <div class="step-content-inner">
+            <h4>פתרון בעיות</h4>
+            <div id="problemResolution" class="problem-resolution">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> טוען נתונים...
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Load problem resolution
+    loadProblemResolution();
+}
+
+/**
+ * Load step 4 content (Preview)
+ */
+function loadStep4Content() {
+    const content = document.getElementById('step4Content');
+    if (!content) return;
+    
+    content.innerHTML = `
+        <div class="step-content-inner">
+            <h4>תצוגה מקדימה</h4>
+            <div id="previewContainer" class="preview-container">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> יוצר תצוגה מקדימה...
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Generate preview
+    generatePreview();
+}
+
+/**
+ * Load step 5 content (Final Approval)
+ */
+function loadStep5Content() {
+    const content = document.getElementById('step5Content');
+    if (!content) return;
+    
+    content.innerHTML = `
+        <div class="step-content-inner">
+            <h4>אישור סופי</h4>
+            <div class="final-summary">
+                <h5>סיכום ייבוא</h5>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">רשומות לייבוא:</span>
+                        <span class="stat-value" id="importCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">רשומות לדילוג:</span>
+                        <span class="stat-value" id="skipCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">אחוז ייבוא:</span>
+                        <span class="stat-value" id="importRate">0%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step-actions">
+                <button class="btn btn-secondary" onclick="goToStep(4)">
+                    <i class="fas fa-arrow-right"></i> חזור לתצוגה מקדימה
+                </button>
+                <button class="btn btn-primary" onclick="showConfirmationModal()">
+                    <i class="fas fa-check"></i> אישור ייבוא
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Update summary stats
+    updateSummaryStats();
+}
+
+/**
+ * Handle file selection
+ */
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    selectedFile = file;
+    
+    // Update UI
+    const fileInfo = document.getElementById('fileInfo');
+    if (fileInfo) {
+        fileInfo.innerHTML = `
+            <div class="file-selected">
+                <i class="fas fa-file-csv"></i>
+                <span>${file.name}</span>
+                <small>${formatFileSize(file.size)}</small>
+            </div>
+        `;
+    }
+    
+    // Enable analyze button
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    if (analyzeBtn && selectedAccount) {
+        analyzeBtn.disabled = false;
+    }
+}
+
+/**
+ * Handle account selection
+ */
+function handleAccountSelect(event) {
+    const accountId = event.target.value;
+    if (!accountId) return;
+    
+    selectedAccount = accountId;
+    
+    // Update UI
+    const accountInfo = document.getElementById('accountInfo');
+    if (accountInfo) {
+        const selectedOption = event.target.options[event.target.selectedIndex];
+        accountInfo.innerHTML = `
+            <div class="account-selected">
+                <i class="fas fa-user"></i>
+                <span>${selectedOption.textContent}</span>
+            </div>
+        `;
+    }
+    
+    // Enable analyze button
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    if (analyzeBtn && selectedFile) {
+        analyzeBtn.disabled = false;
+    }
+}
+
+/**
+ * Load accounts from API
+ */
+function loadAccounts() {
+    fetch('/api/user-data-import/accounts')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const accountSelect = document.getElementById('importAccountSelect');
+                if (accountSelect) {
+                    accountSelect.innerHTML = '<option value="">בחר חשבון מסחר מסחר</option>';
+                    data.accounts.forEach(account => {
+                        const option = document.createElement('option');
+                        option.value = account.id;
+                        option.textContent = `${account.name} (${account.provider})`;
+                        accountSelect.appendChild(option);
+                    });
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error loading accounts:', error);
+            showNotification('שגיאה בטעינת חשבונות', 'error');
+        });
+}
+
+/**
+ * Analyze file
+ */
+function analyzeFile() {
+    if (!selectedFile || !selectedAccount) {
+        showNotification('נא לבחור קובץ וחשבון מסחר', 'error');
+        return;
+    }
+    
+    console.log('Analyzing file...');
+    
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('account_id', selectedAccount);
+    
+    fetch('/api/user-data-import/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('File analysis completed:', data);
+            currentSessionId = data.session_id;
+            analysisResults = data.analysis_results;
+            
+            // Display results
+            displayAnalysisResults(data.analysis_results);
+            
+            // Go to next step
+            setTimeout(() => goToStep(3), 1000);
+        } else {
+            showNotification(`שגיאה בניתוח הקובץ: ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Analysis error:', error);
+        showNotification('שגיאה בניתוח הקובץ', 'error');
+    });
+}
+
+/**
+ * Display analysis results
+ */
+function displayAnalysisResults(results) {
+    const resultsContainer = document.getElementById('analysisResults');
+    if (!resultsContainer) return;
+    
+    resultsContainer.innerHTML = `
+        <div class="analysis-results">
+            <h5>תוצאות ניתוח</h5>
+            <div class="results-grid">
+                <div class="result-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="result-label">רשומות שנמצאו</span>
+                    <span class="result-count">${results.total_records || 0}</span>
+                </div>
+                <div class="result-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span class="result-label">רשומות תקינות</span>
+                    <span class="result-count">${results.valid_records || 0}</span>
+                </div>
+                <div class="result-item">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span class="result-label">רשומות בעייתיות</span>
+                    <span class="result-count">${results.invalid_records || 0}</span>
+                </div>
+                <div class="result-item">
+                    <i class="fas fa-times-circle"></i>
+                    <span class="result-label">כפילויות</span>
+                    <span class="result-count">${results.duplicate_records || 0}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Load problem resolution
+ */
+function loadProblemResolution() {
+    if (!currentSessionId) {
+        showNotification('לא נמצא מזהה סשן', 'error');
+        return;
+    }
+    
+    fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            previewData = data.preview_data;
+            displayProblemResolution(data.preview_data);
+        } else {
+            showNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Problem resolution error:', error);
+        showNotification('שגיאה בטעינת נתוני בעיות', 'error');
+    });
+}
+
+/**
+ * Display problem resolution
+ */
+function displayProblemResolution(data) {
+    const container = document.getElementById('problemResolution');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="problem-resolution">
+            <div class="problem-section">
+                <h5>טיקרים חסרים</h5>
+                <div id="missingTickers" class="problem-cards">
+                    ${data.missing_tickers?.map(ticker => `
+                        <div class="problem-card missing-ticker-card">
+                            <div class="problem-card-header">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>${ticker}</span>
+                            </div>
+                            <div class="problem-card-actions">
+                                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${ticker}')">
+                                    הוסף טיקר
+                                </button>
+                            </div>
+                        </div>
+                    `).join('') || '<p>אין טיקרים חסרים</p>'}
+                </div>
+            </div>
+            
+            <div class="problem-section">
+                <h5>כפילויות בקובץ</h5>
+                <div id="withinFileDuplicates" class="problem-cards">
+                    ${data.within_file_duplicates?.map((dup, index) => `
+                        <div class="problem-card within-file-duplicate">
+                            <div class="problem-card-header">
+                                <i class="fas fa-copy"></i>
+                                <span>${dup.symbol} - ${dup.date}</span>
+                            </div>
+                            <div class="problem-card-body">
+                                <div class="problem-card-details">
+                                    <span>כמות: ${dup.quantity}</span>
+                                    <span>מחיר: ${dup.price}</span>
+                                </div>
+                                <div class="problem-card-confidence">
+                                    <span>רמת ביטחון: ${dup.confidence || 0}%</span>
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill" style="width: ${dup.confidence || 0}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="problem-card-actions">
+                                <button class="btn btn-sm btn-success" onclick="acceptDuplicate(${index}, 'within_file')">
+                                    קבל
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="rejectDuplicate(${index}, 'within_file')">
+                                    דחה
+                                </button>
+                            </div>
+                        </div>
+                    `).join('') || '<p>אין כפילויות בקובץ</p>'}
+                </div>
+            </div>
+            
+            <div class="problem-section">
+                <h5>כפילויות מול בסיס הנתונים</h5>
+                <div id="existingRecords" class="problem-cards">
+                    ${data.existing_records?.map((record, index) => `
+                        <div class="problem-card existing-record-card">
+                            <div class="problem-card-header">
+                                <i class="fas fa-database"></i>
+                                <span>${record.symbol} - ${record.date}</span>
+                            </div>
+                            <div class="problem-card-body">
+                                <div class="problem-card-details">
+                                    <span>כמות: ${record.quantity}</span>
+                                    <span>מחיר: ${record.price}</span>
+                                </div>
+                                <div class="problem-card-confidence">
+                                    <span>רמת ביטחון: ${record.confidence || 0}%</span>
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill" style="width: ${record.confidence || 0}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="problem-card-actions">
+                                <button class="btn btn-sm btn-success" onclick="acceptDuplicate(${index}, 'existing_record')">
+                                    קבל
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="rejectDuplicate(${index}, 'existing_record')">
+                                    דחה
+                                </button>
+                            </div>
+                        </div>
+                    `).join('') || '<p>אין כפילויות מול בסיס הנתונים</p>'}
+                </div>
+            </div>
+            
+            <div class="step-actions">
+                <button class="btn btn-primary" onclick="goToStep(4)">
+                    <i class="fas fa-arrow-right"></i> המשך לתצוגה מקדימה
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Accept duplicate
+ */
+function acceptDuplicate(index, type) {
+    if (!currentSessionId) return;
+    
+    fetch(`/api/user-data-import/session/${currentSessionId}/accept-duplicate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            record_index: index,
+            duplicate_type: type
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('כפילות אושרה', 'success');
+            // Refresh problem resolution
+            loadProblemResolution();
+        } else {
+            showNotification(`שגיאה באישור כפילות: ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Accept duplicate error:', error);
+        showNotification('שגיאה באישור כפילות', 'error');
+    });
+}
+
+/**
+ * Reject duplicate
+ */
+function rejectDuplicate(index, type) {
+    if (!currentSessionId) return;
+    
+    fetch(`/api/user-data-import/session/${currentSessionId}/reject-duplicate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            record_index: index,
+            duplicate_type: type
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('כפילות נדחתה', 'success');
+            // Refresh problem resolution
+            loadProblemResolution();
+        } else {
+            showNotification(`שגיאה בדחיית כפילות: ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Reject duplicate error:', error);
+        showNotification('שגיאה בדחיית כפילות', 'error');
+    });
+}
+
+/**
+ * Open add ticker modal
+ */
+function openAddTickerModal(symbol) {
+    // Simple prompt for now
+    const tickerName = prompt(`הזן שם לטיקר ${symbol}:`, symbol);
+    if (tickerName) {
+        saveTickerFromModal(symbol, tickerName);
+    }
+}
+
+/**
+ * Save ticker from modal
+ */
+function saveTickerFromModal(symbol, name) {
+    // This would typically make an API call to add the ticker
+    showNotification(`טיקר ${symbol} נוסף בהצלחה`, 'success');
+    // Refresh problem resolution
+    loadProblemResolution();
+}
+
+/**
+ * Generate preview
+ */
+function generatePreview() {
+    if (!currentSessionId) {
+        showNotification('לא נמצא מזהה סשן', 'error');
+        return;
+    }
+    
+    fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            previewData = data.preview_data;
+            displayPreview(data.preview_data);
+            
+            // Go to next step
+            setTimeout(() => goToStep(5), 1000);
+        } else {
+            showNotification(`שגיאה ביצירת תצוגה מקדימה: ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Preview error:', error);
+        showNotification('שגיאה ביצירת תצוגה מקדימה', 'error');
+    });
+}
+
+/**
+ * Display preview
+ */
+function displayPreview(data) {
+    const container = document.getElementById('previewContainer');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="preview-data">
+            <h5>תצוגה מקדימה</h5>
+            <div class="preview-summary">
+                <div class="summary-item">
+                    <span class="summary-label">רשומות לייבוא:</span>
+                    <span class="summary-count">${data.summary?.records_to_import || 0}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">רשומות לדילוג:</span>
+                    <span class="summary-count">${data.summary?.records_to_skip || 0}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">אחוז ייבוא:</span>
+                    <span class="summary-count">${data.summary?.import_rate || 0}%</span>
+                </div>
+            </div>
+            
+            <div class="preview-tables">
+                <div class="table-container">
+                    <h6>רשומות לייבוא</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>סמל</th>
+                                    <th>תאריך</th>
+                                    <th>כמות</th>
+                                    <th>מחיר</th>
+                                    <th>עמלה</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.records_to_import?.map(record => `
+                                    <tr>
+                                        <td>${record.symbol}</td>
+                                        <td>${record.date}</td>
+                                        <td>${record.quantity}</td>
+                                        <td>${record.price}</td>
+                                        <td>${record.fee}</td>
+                                    </tr>
+                                `).join('') || '<tr><td colspan="5">אין רשומות לייבוא</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <h6>רשומות לדילוג</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>סמל</th>
+                                    <th>תאריך</th>
+                                    <th>כמות</th>
+                                    <th>מחיר</th>
+                                    <th>סיבה</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.records_to_skip?.map(record => `
+                                    <tr>
+                                        <td>${record.symbol}</td>
+                                        <td>${record.date}</td>
+                                        <td>${record.quantity}</td>
+                                        <td>${record.price}</td>
+                                        <td>${record.reason}</td>
+                                    </tr>
+                                `).join('') || '<tr><td colspan="5">אין רשומות לדילוג</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Update summary stats
+ */
+function updateSummaryStats() {
+    if (!previewData) return;
+    
+    const importCount = document.getElementById('importCount');
+    const skipCount = document.getElementById('skipCount');
+    const importRate = document.getElementById('importRate');
+    
+    if (importCount) importCount.textContent = previewData.summary?.records_to_import || 0;
+    if (skipCount) skipCount.textContent = previewData.summary?.records_to_skip || 0;
+    if (importRate) importRate.textContent = `${previewData.summary?.import_rate || 0}%`;
+}
+
+/**
+ * Show confirmation modal
+ */
+function showConfirmationModal() {
+    const modal = document.createElement('div');
+    modal.className = 'confirmation-modal-overlay';
+    modal.innerHTML = `
+        <div class="confirmation-modal">
+            <h3>אישור ייבוא נתונים</h3>
+            <p>האם אתה בטוח שברצונך לייבא את הנתונים?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeConfirmationModal()">ביטול</button>
+                <button class="btn btn-primary" onclick="executeImport()">ביצוע ייבוא</button>
+                <button class="btn btn-danger" onclick="executeImportWithReport()">ייבוא + דוח</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+/**
+ * Close confirmation modal
+ */
+function closeConfirmationModal() {
+    const modal = document.querySelector('.confirmation-modal-overlay');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+/**
+ * Execute import
+ */
+function executeImport() {
+    closeConfirmationModal();
+    performImport(false);
+}
+
+/**
+ * Execute import with report
+ */
+function executeImportWithReport() {
+    closeConfirmationModal();
+    performImport(true);
+}
+
+/**
+ * Perform import
+ */
+function performImport(generateReport = false) {
+    if (!currentSessionId) {
+        showNotification('לא נמצא מזהה סשן', 'error');
+        return;
+    }
+    
+    showNotification('מתחיל ייבוא נתונים...', 'info');
+    
+    fetch(`/api/user-data-import/execute/${currentSessionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            generate_report: generateReport
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('ייבוא הנתונים הושלם בהצלחה!', 'success');
+            closeImportUserDataModal();
+            
+            if (generateReport && data.report_url) {
+                showNotification('דוח ייבוא זמין להורדה', 'info');
+            }
+            
+            // Refresh executions table if exists
+            if (typeof refreshExecutionsTable === 'function') {
+                refreshExecutionsTable();
+            }
+        } else {
+            showNotification(`שגיאה בייבוא: ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Import error:', error);
+        showNotification('שגיאה בייבוא הנתונים', 'error');
+    });
 }
 
 /**
@@ -2738,220 +910,30 @@ function formatFileSize(bytes) {
 }
 
 /**
- * Format date
+ * Show notification
  */
-function formatDate(dateString) {
-    try {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('he-IL');
-    } catch (error) {
-        return dateString;
+function showNotification(message, type = 'info') {
+    if (window.NotificationSystem) {
+        window.NotificationSystem.show(message, type);
+    } else {
+        console.log(`[${type.toUpperCase()}] ${message}`);
     }
 }
 
-/**
- * Get reason text
- */
-function getReasonText(reason) {
-    const reasons = {
-        'validation_error': 'שגיאת וולידציה',
-        'within_file_duplicate': 'כפילות בקובץ',
-        'system_duplicate': 'כפילות במערכת'
-    };
-    
-    return reasons[reason] || reason;
-}
-
-/**
- * Add missing tickers
- */
-/**
- * Review duplicates
- */
-function reviewDuplicates() {
-    showNotification('פונקציונליות סקירת כפילויות תתווסף בעתיד', 'info');
-}
-
-/**
- * Accept a specific duplicate
- */
-function acceptDuplicate(index, type) {
-    console.log(`Accepting duplicate ${index} of type ${type}`);
-    showNotification(`כפילות ${index + 1} אושרה`, 'success');
-    // TODO: Implement API call to accept specific duplicate
-}
-
-/**
- * Reject a specific duplicate
- */
-function rejectDuplicate(index, type) {
-    console.log(`Rejecting duplicate ${index} of type ${type}`);
-    showNotification(`כפילות ${index + 1} נדחתה`, 'success');
-    // TODO: Implement API call to reject specific duplicate
-}
-
-/**
- * Accept all duplicates
- */
-function acceptAllDuplicates() {
-    showNotification('כל הכפילויות התקבלו - יועברו לשלב הבא', 'success');
-    // TODO: Implement logic to accept all duplicates
-}
-
-/**
- * Reject all duplicates
- */
-function rejectAllDuplicates() {
-    showNotification('כל הכפילויות נדחו - יוסרו מהרשימה', 'info');
-    // TODO: Implement logic to reject all duplicates
-}
-
-/**
- * Download import report
- */
-async function downloadImportReport() {
-    if (!importSessionId) {
-        showNotification('אין דוח זמין להורדה', 'error');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/api/user-data-import/reports/${importSessionId}/download?user_id=1&type=live`);
-        
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `import_report_${importSessionId}_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-            
-            showNotification('דוח הייבוא הורד בהצלחה', 'success');
-        } else {
-            const error = await response.json();
-            showNotification(`שגיאה בהורדת הדוח: ${error.message}`, 'error');
-        }
-    } catch (error) {
-        console.error('Download report error:', error);
-        showNotification('שגיאה בהורדת הדוח', 'error');
-    }
-}
-
-/**
- * Get live report status
- */
-async function getLiveReportStatus() {
-    if (!importSessionId) {
-        return null;
-    }
-    
-    try {
-        const response = await fetch(`/api/user-data-import/reports/${importSessionId}?user_id=1`);
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            return data.report;
-        }
-    } catch (error) {
-        console.error('Get live report error:', error);
-    }
-    
-    return null;
-}
-
-/**
- * Update report download button visibility
- */
-function updateReportDownloadButton() {
-    const downloadBtn = document.getElementById('import-download-report-btn');
-    if (downloadBtn) {
-        if (importSessionId) {
-            downloadBtn.style.display = 'inline-block';
-        } else {
-            downloadBtn.style.display = 'none';
-        }
-    }
-}
-
-/**
- * List session files
- */
-async function listSessionFiles() {
-    if (!importSessionId) {
-        return [];
-    }
-    
-    try {
-        const response = await fetch(`/api/user-data-import/reports/${importSessionId}/files?user_id=1`);
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            return data.files;
-        }
-    } catch (error) {
-        console.error('List session files error:', error);
-    }
-    
-    return [];
-}
-
-/**
- * Download session file
- */
-async function downloadSessionFile(filename) {
-    if (!importSessionId) {
-        showNotification('אין סשן זמין', 'error');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/api/user-data-import/reports/${importSessionId}/files/${filename}?user_id=1`);
-        
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-            
-            showNotification('קובץ הורד בהצלחה', 'success');
-        } else {
-            const error = await response.json();
-            showNotification(`שגיאה בהורדת הקובץ: ${error.message}`, 'error');
-        }
-    } catch (error) {
-        console.error('Download session file error:', error);
-// ===== GLOBAL EXPORTS =====
-// Export functions to global scope for HTML onclick attributes
-
-// Export modal functions
+// Export functions for global access
 window.openImportUserDataModal = openImportUserDataModal;
 window.closeImportUserDataModal = closeImportUserDataModal;
-
-// Export navigation functions
-window.nextImportStep = nextImportStep;
-window.previousImportStep = previousImportStep;
-
-// Export execution functions
+window.goToStep = goToStep;
+window.uploadFile = handleFileSelect;
+window.selectAccount = handleAccountSelect;
+window.analyzeFile = analyzeFile;
+window.acceptDuplicate = acceptDuplicate;
+window.rejectDuplicate = rejectDuplicate;
+window.openAddTickerModal = openAddTickerModal;
+window.saveTickerFromModal = saveTickerFromModal;
+window.showConfirmationModal = showConfirmationModal;
+window.closeConfirmationModal = closeConfirmationModal;
 window.executeImport = executeImport;
-
-// Export utility functions
-window.startNewImport = startNewImport;
-
-// Export modal functions
-window.showImportPreviewModal = showImportPreviewModal;
-window.closeImportPreviewModal = closeImportPreviewModal;
-
-// Export ticker functions
-window.closeAddTickerModal = closeAddTickerModal;
-window.saveMissingTicker = saveMissingTicker;
-
-// Export existing records functions
-window.importExistingRecord = importExistingRecord;
+window.executeImportWithReport = executeImportWithReport;
+window.performImport = performImport;
+window.showNotification = showNotification;

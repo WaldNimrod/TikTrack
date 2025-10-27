@@ -1,26 +1,19 @@
-// ===== VALIDATION UTILS - מערכת ולידציה גלובלית =====
-/*
- * Validation Utils - TikTrack
- * ===========================
- *
- * מערכת ולידציה גלובלית עם תמיכה בוולידציה בזמן אמת ובזמן שליחה
- *
- * 📖 דוקומנטציה מפורטת: documentation/frontend/VALIDATION_SYSTEM.md
- *
- * קובץ: trading-ui/scripts/validation-utils.js
- * גרסה: 3.0
- * עדכון אחרון: ינואר 12, 2025
- * מחבר: TikTrack Development Team
- *
- * תיקונים אחרונים (12 בינואר 2025):
- * - הוספת validateDateRange() לוולידציה בין שדות תאריך
- * - הוספת validateEntityForm() לעזרה בטפסי CRUD נפוצים
- * - הוספת validateWithConfirmation() לוולידציה עם אישור משתמש
- * - הרחבת המערכת לתמיכה בכל דפוסי הולידציה במערכת
- * - סטנדרטיזציה מלאה של הולידציה בכל עמודי המשתמש
+/**
+ * Validation Utils - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains a comprehensive validation system with real-time and submission validation support.
+ * Includes field validation, form validation, custom validation rules, and advanced validation features.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/VALIDATION_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 3.0
+ * Last Updated: 2025-01-27
  */
 
-// ===== קבועים =====
+// ===== CONSTANTS =====
 
 // כללי ולידציה ברירת מחדל
 const DEFAULT_VALIDATION_RULES = {
@@ -55,10 +48,14 @@ const DEFAULT_VALIDATION_RULES = {
   },
 };
 
-// ===== פונקציות עזר =====
+// ===== HELPER FUNCTIONS =====
 
 /**
  * קבלת תווית השדה
+ * Get field label
+ * @function getFieldLabel
+ * @param {HTMLElement} field - השדה
+ * @returns {string} תווית השדה
  */
 function getFieldLabel(field) {
   // ניסיון למצוא label לפי for
@@ -85,6 +82,10 @@ function getFieldLabel(field) {
 
 /**
  * בדיקה אם תאריך תקין
+ * Check if date is valid
+ * @function isValidDate
+ * @param {string} dateString - מחרוזת תאריך
+ * @returns {boolean} האם התאריך תקין
  */
 function isValidDate(dateString) {
   const date = new Date(dateString);
@@ -93,6 +94,10 @@ function isValidDate(dateString) {
 
 /**
  * בדיקה אם אימייל תקין
+ * Check if email is valid
+ * @function isValidEmail
+ * @param {string} email - כתובת אימייל
+ * @returns {boolean} האם האימייל תקין
  */
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -100,15 +105,24 @@ function isValidEmail(email) {
 
 /**
  * בדיקה אם מספר טלפון תקין
+ * Check if phone number is valid
+ * @function isValidPhone
+ * @param {string} phone - מספר טלפון
+ * @returns {boolean} האם הטלפון תקין
  */
 function isValidPhone(phone) {
   return /^[\d\s\-+()]+$/.test(phone);
 }
 
-// ===== פונקציות ויזואליות =====
+// ===== VISUAL FUNCTIONS =====
 
 /**
  * הצגת שגיאה בשדה
+ * Show field error
+ * @function showFieldError
+ * @param {HTMLElement|string} input - השדה או מזהה השדה
+ * @param {string} message - הודעת השגיאה
+ * @returns {void}
  */
 function showFieldError(input, message) {
   // אם input הוא מחרוזת (ID), נקבל את האלמנט
@@ -834,9 +848,7 @@ function clearValidation(formId) {
 
 }
 
-// ===== ייצוא פונקציות =====
-
-// ייצוא פונקציות עזר
+// ===== GLOBAL EXPORTS =====
 window.isValidDate = isValidDate;
 window.isValidEmail = isValidEmail;
 window.isValidPhone = isValidPhone;

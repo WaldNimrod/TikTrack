@@ -1,34 +1,17 @@
 /**
- * Notification System - TikTrack
- * =============================
- *
- * מערכת התראות מרכזית לפרויקט TikTrack
- *
- * קובץ זה מכיל שלושה מערכות עיקריות:
- * 1. ALERTS SYSTEM - התראות עסקיות לתנאי שוק
- * 2. NOTIFICATION SYSTEM - הודעות מערכת למשוב משתמש
- * 3. LINKED ITEMS SYSTEM - הצגה וניהול פריטים מקושרים
- *
- * קובץ: trading-ui/scripts/notification-system.js
- * גרסה: 3.1
- * עדכון אחרון: 31 באוגוסט 2025
- *
- * תיקונים אחרונים (31 באוגוסט 2025):
- * - שיפור תמיכה בעמוד תכנונים
- * - תיקון הודעות הצלחה ושגיאה
- * - שיפור מערכת אישור מחיקה
- * - תמיכה במערכת ביטול תכנונים
- *
- * תלויות:
- * - linked-items.js (לפונקציות הצגת מודלים)
- * - Bootstrap 5.3.0 (לפונקציונליות מודלים)
- *
- * דוקומנטציה מפורטת: documentation/frontend/NOTIFICATION_SYSTEM.md
+ * Notification System - Comprehensive Function Index
+ * ==========================================
  * 
- * עדכון: ינואר 2025 - הוספת מצבי עבודה למערכת התראות
- * - 4 מצבי עבודה: DEBUG, DEVELOPMENT, WORK, SILENT
- * - זיהוי אוטומטי של רמות חשיבות
- * - תמיכה בפעולות משתמש
+ * This file contains the central notification system for TikTrack including alerts system,
+ * notification system, and linked items system with 4 working modes.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/NOTIFICATION_SYSTEM.md
+ * - documentation/02-ARCHITECTURE/FRONTEND/NOTIFICATION_SYSTEM_README.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 3.1
+ * Last Updated: 2025-01-27
  */
 
 // ===== NOTIFICATION MODES SYSTEM =====
@@ -1184,18 +1167,6 @@ function fallbackCopyToClipboard(text) {
 // ===== LEGACY SUPPORT =====
 // These functions provide backward compatibility
 
-/**
- * Legacy support function for old notification calls
- * NOTIFICATION SYSTEM - Handles old notification format for backward compatibility
- *
- * @param {string} message - Message (can be title + message)
- * @param {string} type - Notification type
- * @param {number} duration - Display duration
- */
-function showNotificationLegacy(message, type = 'info', duration = 4000) {
-  // Direct console log to avoid recursion
-  window.Logger.info(`🔔 ${type.toUpperCase()}: ${message}`, { page: "notification-system" });
-}
 
 // ===== GLOBAL NOTIFICATION HISTORY SYSTEM =====
 /**

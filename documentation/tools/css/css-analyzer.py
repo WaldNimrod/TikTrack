@@ -12,7 +12,7 @@ def analyze_css_file(css_file):
     
     if not os.path.exists(css_file):
         print(f"❌ File not found: {css_file}")
-        return
+        return None
     
     with open(css_file, 'r', encoding='utf-8') as f:
         content = f.read()
@@ -64,6 +64,16 @@ def analyze_css_file(css_file):
         print(f"\n👻 POTENTIALLY UNUSED SELECTORS ({len(unused)}):")
         for selector in unused[:10]:
             print(f"  {selector}")
+    
+    return {
+        'selectors_count': len(selectors),
+        'duplicates': dict(duplicates),
+        'conflicts': conflicts,
+        'redundant': redundant,
+        'important': important_count,
+        'high_specificity': high_specificity,
+        'unused': unused
+    }
 
 def find_all_selectors(content):
     """מוצא את כל ה-selectors בקובץ CSS"""
@@ -186,9 +196,94 @@ def find_unused_selectors(content):
     
     return unused
 
+def check_inline_styles_in_html(results):
+    """בודק inline styles בקבצי HTML"""
+    print("\n🔍 Checking for inline styles in HTML files...")
+    
+    html_files = []
+    html_dir = "trading-ui/"
+    if os.path.exists(html_dir):
+        for file in os.listdir(html_dir):
+            if file.endswith('.html'):
+                html_files.append(os.path.join(html_dir, file))
+    
+    inline_styles_found = []
+    for html_file in html_files:
+        try:
+            with open(html_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # חיפוש inline styles
+            style_matches = re.findall(r'style\s*=\s*["\'][^"\']*["\']', content)
+            if style_matches:
+                inline_styles_found.append({
+                    'file': html_file,
+                    'count': len(style_matches),
+                    'examples': style_matches[:3]  # רק 3 דוגמאות
+                })
+        except Exception as e:
+            print(f"⚠️ Error reading {html_file}: {e}")
+    
+    results['inline_styles_in_html'] = inline_styles_found
+    if inline_styles_found:
+        print(f"⚠️ Found inline styles in {len(inline_styles_found)} HTML files")
+    else:
+        print("✅ No inline styles found in HTML files")
+
 if __name__ == "__main__":
-    css_file = "trading-ui/styles-new/unified.css"
     print("🔍 CSS Analyzer - מוצא כפילויות ובעיות")
     print("=" * 60)
-    analyze_css_file(css_file)
-    print("\n✅ Analysis complete!")
+    
+    # סריקה מקיפה של כל קבצי CSS
+    css_files = []
+    
+    # קבצי styles-new
+    styles_dir = "trading-ui/styles-new/"
+    if os.path.exists(styles_dir):
+        for file in os.listdir(styles_dir):
+            if file.endswith('.css'):
+                css_files.append(os.path.join(styles_dir, file))
+    
+    # קבצי styles נוספים
+    styles_old_dir = "trading-ui/styles/"
+    if os.path.exists(styles_old_dir):
+        for file in os.listdir(styles_old_dir):
+            if file.endswith('.css'):
+                css_files.append(os.path.join(styles_old_dir, file))
+    
+    print(f"📁 נמצאו {len(css_files)} קבצי CSS לסריקה")
+    
+    all_results = {
+        'files_analyzed': [],
+        'total_selectors': 0,
+        'duplicate_selectors': {},
+        'css_conflicts': [],
+        'redundant_properties': [],
+        'important_declarations': [],
+        'inline_styles_in_html': []
+    }
+    
+    for css_file in css_files:
+        print(f"\n📄 Analyzing: {css_file}")
+        result = analyze_css_file(css_file)
+        if result:
+            all_results['files_analyzed'].append(css_file)
+            all_results['total_selectors'] += result.get('selectors_count', 0)
+            all_results['duplicate_selectors'].update(result.get('duplicates', {}))
+            all_results['css_conflicts'].extend(result.get('conflicts', []))
+            all_results['redundant_properties'].extend(result.get('redundant', []))
+            all_results['important_declarations'].append({
+                'file': css_file,
+                'count': result.get('important', 0)
+            })
+    
+    # בדיקת inline styles בקבצי HTML
+    check_inline_styles_in_html(all_results)
+    
+    # שמירת תוצאות
+    import json
+    with open('css-issues-phase1.json', 'w', encoding='utf-8') as f:
+        json.dump(all_results, f, indent=2, ensure_ascii=False)
+    
+    print(f"\n✅ Analysis complete!")
+    print(f"📊 Results saved to: css-issues-phase1.json")

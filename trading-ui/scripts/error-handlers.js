@@ -1,26 +1,27 @@
-// ===== קובץ JavaScript לטיפול בשגיאות =====
-/*
- * Error-Handlers.js - Error Handling Utilities
- * ===========================================
- *
+/**
+ * Error Handlers - Comprehensive Function Index
+ * ==========================================
+ * 
  * This file contains utility functions for handling errors throughout the TikTrack application.
- * It provides centralized error handling and logging functionality.
- *
- * Dependencies:
- * - notification-system.js (for user notifications)
- *
- * File: trading-ui/scripts/error-handlers.js
+ * Provides centralized error handling and logging functionality.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/ERROR_HANDLING_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
  * Version: 1.0
- * Last Updated: August 31, 2025
+ * Last Updated: 2025-01-27
  */
 
 // ===== פונקציות טיפול בשגיאות =====
 
 /**
- * טיפול בשגיאות API
- * @param {Error} error - השגיאה
- * @param {string} context - הקונטקסט של השגיאה
- * @param {string} userMessage - הודעה למשתמש
+ * Handle API errors
+ * @function handleApiError
+ * @param {Error} error - The error object
+ * @param {string} context - Error context
+ * @param {string|null} userMessage - User message
+ * @returns {void}
  */
 function handleApiError(error, context = 'API_CALL', userMessage = null) {
   // לוג מפורט למפתחים
@@ -37,9 +38,11 @@ function handleApiError(error, context = 'API_CALL', userMessage = null) {
 }
 
 /**
- * טיפול באלמנטים שלא נמצאו
- * @param {string} elementId - מזהה האלמנט
- * @param {string} fallback - פעולה חלופית
+ * Handle element not found errors
+ * @function handleElementNotFound
+ * @param {string} elementId - Element ID
+ * @param {string} fallback - Fallback action
+ * @returns {void}
  */
 function handleElementNotFound(elementId, fallback = 'ELEMENT_NOT_FOUND') {
   // console.warn(`🔧 Element not found: ${elementId} - ${fallback}`);
@@ -69,9 +72,11 @@ function handleFunctionNotFound(functionName, fallback = 'FUNCTION_NOT_FOUND') {
 }
 
 /**
- * טיפול בשגיאות ולידציה
- * @param {string} field - שם השדה
- * @param {string} message - הודעת השגיאה
+ * Handle validation errors
+ * @function handleValidationError
+ * @param {string} field - Field name
+ * @param {string} message - Error message
+ * @returns {void}
  */
 function handleValidationError(field, message) {
   // console.warn(`🔧 Validation error in ${field}: ${message}`);

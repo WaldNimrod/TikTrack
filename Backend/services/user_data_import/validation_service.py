@@ -14,6 +14,13 @@ from datetime import datetime
 import logging
 from sqlalchemy.orm import Session
 
+# Import models
+try:
+    from models.ticker import Ticker
+except ImportError:
+    logger.warning("Failed to import Ticker model - ticker validation will be limited")
+    Ticker = None
+
 logger = logging.getLogger(__name__)
 
 class ValidationService:
@@ -371,18 +378,27 @@ class ValidationService:
                 return []
             
             # Query existing tickers
-            try:
-                from models.ticker import Ticker
-                logger.info(f"🔍 Querying database for {len(symbols)} symbols")
-                existing_tickers = self.db_session.query(Ticker.symbol).filter(
-                    Ticker.symbol.in_(symbols)
-                ).all()
-                logger.info(f"📊 Found {len(existing_tickers)} existing tickers in DB")
-            except Exception as import_error:
-                logger.error(f"❌ Failed to import Ticker model: {str(import_error)}")
-                import traceback
-                logger.error(f"📋 Import traceback: {traceback.format_exc()}")
+            if not Ticker:
+                logger.warning("Ticker model not available - skipping ticker validation")
                 return []
+            
+            # Load ticker cache if not loaded
+            if not hasattr(self, 'ticker_cache') or self.ticker_cache is None:
+                self._load_ticker_cache()
+            
+            # Use cache if available
+            if hasattr(self, 'ticker_cache') and self.ticker_cache:
+                logger.info(f"🔍 Using ticker cache for {len(symbols)} symbols")
+                existing_symbols = set(self.ticker_cache.keys())
+                missing_symbols = [symbol for symbol in symbols if symbol not in existing_symbols]
+                logger.info(f"✅ Found {len(missing_symbols)} missing tickers: {missing_symbols}")
+                return missing_symbols
+            
+            logger.info(f"🔍 Querying database for {len(symbols)} symbols")
+            existing_tickers = self.db_session.query(Ticker.symbol).filter(
+                Ticker.symbol.in_(symbols)
+            ).all()
+            logger.info(f"📊 Found {len(existing_tickers)} existing tickers in DB")
             
             existing_symbols = {ticker.symbol for ticker in existing_tickers}
             missing_symbols = [symbol for symbol in symbols if symbol not in existing_symbols]

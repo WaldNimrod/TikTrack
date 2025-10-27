@@ -1558,14 +1558,39 @@ window.runDeepTestingForProblematic = async function() {
 
     const results = [];
     let failures = 0;
+    
+    // בדיקה מפורטת לכל עמוד בעייתי
     for (const r of problematicPages) {
         try {
-            const deep = await window.runDeepUITesting(r.entity);
-            results.push({ entity: r.entity, success: !!deep?.success, details: deep });
-            if (!deep?.success) failures++;
+            console.log(`🔍 Running deep test for ${r.entity}...`);
+            
+            // בדיקה מפורטת - נריץ בדיקה נוספת לעמוד הבעייתי
+            const deepResult = await window.crudEnhancedTester.runSingleEntityTest(r.entity);
+            
+            results.push({ 
+                entity: r.entity, 
+                success: deepResult.score >= 80, 
+                score: deepResult.score,
+                details: deepResult,
+                issues: deepResult.issues || [],
+                recommendations: deepResult.recommendations || []
+            });
+            
+            if (deepResult.score < 80) {
+                failures++;
+                console.log(`❌ ${r.entity} still problematic: ${deepResult.score}/100`);
+            } else {
+                console.log(`✅ ${r.entity} fixed: ${deepResult.score}/100`);
+            }
         } catch (e) {
             failures++;
-            results.push({ entity: r.entity, success: false, error: e?.message || 'unknown' });
+            console.error(`❌ Deep test failed for ${r.entity}:`, e);
+            results.push({ 
+                entity: r.entity, 
+                success: false, 
+                error: e?.message || 'unknown',
+                score: 0
+            });
         }
     }
 
@@ -1576,16 +1601,109 @@ window.runDeepTestingForProblematic = async function() {
         localStorage.setItem('lastCRUDTestReport', JSON.stringify(prev));
     } catch (e) {}
 
+    // הצגת תוצאות בדיקות מפורטות
+    console.log(`📊 Deep testing completed: ${failures} failures out of ${problematicPages.length} pages`);
+    
     if (failures === 0) {
-        if (window.showFinalSuccessNotification) {
-            window.showFinalSuccessNotification('בדיקות מפורטות הסתיימו', 'כל העמודים הבעייתיים עברו את הבדיקות המפורטות בהצלחה.', 6000, 'system');
-        } else if (window.showSuccessNotification) {
-            window.showSuccessNotification('בדיקות מפורטות הסתיימו', 'כל העמודים הבעייתיים עברו בהצלחה.', 5000);
+        if (window.showSuccessNotification) {
+            window.showSuccessNotification('בדיקות מפורטות הסתיימו', 'כל העמודים הבעייתיים עברו בהצלחה!', 5000);
         }
     } else {
         if (window.showErrorNotification) {
-            window.showErrorNotification('נמצאו בעיות בבדיקות מפורטות', `ב-${failures} עמודים עדיין קיימות בעיות. פתח דוח סופי לצפייה בפרטים.`, 8000);
+            window.showErrorNotification('נמצאו בעיות בבדיקות מפורטות', `ב-${failures} עמודים עדיין קיימות בעיות. ראה דוח מפורט למטה.`, 8000);
         }
+    }
+    
+    // הצגת דוח מפורט של הבדיקות המפורטות
+    const deepReportCard = document.getElementById('deepTestingResults');
+    if (deepReportCard) {
+        deepReportCard.style.display = 'block';
+        
+        // יצירת תוכן הדוח המפורט
+        let reportContent = `
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-search text-info"></i>
+                    תוצאות בדיקות מפורטות
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h4 class="text-primary mb-0">${problematicPages.length}</h4>
+                            <small class="text-muted">עמודים נבדקו</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h4 class="text-success mb-0">${problematicPages.length - failures}</h4>
+                            <small class="text-muted">תוקנו</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h4 class="text-danger mb-0">${failures}</h4>
+                            <small class="text-muted">עדיין בעייתיים</small>
+                        </div>
+                    </div>
+                </div>
+        `;
+        
+        // הוספת פרטים לכל עמוד
+        results.forEach(result => {
+            const statusClass = result.success ? 'success' : 'danger';
+            const statusIcon = result.success ? '✅' : '❌';
+            const statusText = result.success ? 'תוקן' : 'עדיין בעייתי';
+            
+            reportContent += `
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="text-${statusClass}">
+                            ${statusIcon} ${result.entity} (${result.score}/100) - ${statusText}
+                        </h6>
+                    </div>
+                    <div class="card-body">
+            `;
+            
+            if (result.error) {
+                reportContent += `<p class="text-danger"><strong>שגיאה:</strong> ${result.error}</p>`;
+            }
+            
+            if (result.issues && result.issues.length > 0) {
+                reportContent += `
+                    <p><strong>בעיות שנמצאו:</strong></p>
+                    <ul>
+                        ${result.issues.map(issue => `<li>${issue}</li>`).join('')}
+                    </ul>
+                `;
+            }
+            
+            if (result.recommendations && result.recommendations.length > 0) {
+                reportContent += `
+                    <p><strong>המלצות תיקון:</strong></p>
+                    <ul>
+                        ${result.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                `;
+            }
+            
+            reportContent += `
+                    </div>
+                </div>
+            `;
+        });
+        
+        reportContent += `
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary" onclick="copyReportToClipboard()">
+                        <i class="fas fa-copy"></i> העתק דוח
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        deepReportCard.innerHTML = reportContent;
     }
 };
 

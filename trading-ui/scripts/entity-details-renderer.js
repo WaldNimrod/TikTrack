@@ -728,7 +728,7 @@ class EntityDetailsRenderer {
                 investmentType: 'swing'
             },
             'account': { 
-                text: 'חשבון', 
+                text: 'חשבון מסחר', 
                 icon: 'fas fa-university',
                 investmentType: 'investment'
             },
@@ -805,7 +805,7 @@ class EntityDetailsRenderer {
             'trade': ['טרייד:', 'Trade:', 'trade:'],
             'trade_plan': ['תכנון:', 'תכנית:', 'Plan:', 'plan:'],
             'alert': ['התראה:', 'Alert:', 'alert:'],
-            'account': ['חשבון:', 'Account:', 'account:'],
+            'account': ['חשבון מסחר:', 'Account:', 'account:'],
             'ticker': ['טיקר:', 'Ticker:', 'ticker:'],
             'execution': ['ביצוע:', 'Execution:', 'execution:'],
             'cash_flow': ['תזרים:', 'Cash Flow:', 'cash_flow:'],
@@ -940,7 +940,7 @@ class EntityDetailsRenderer {
             ],
             account: [
                 { key: 'id', label: 'מזהה', type: 'number' },
-                { key: 'name', label: 'שם חשבון', type: 'text' },
+                { key: 'name', label: 'שם חשבון מסחר', type: 'text' },
                 { key: 'type', label: 'סוג', type: 'text' },
                 { key: 'status', label: 'סטטוס', type: 'status' },
                 { key: 'currency', label: 'מטבע', type: 'text' },
@@ -1119,7 +1119,7 @@ class EntityDetailsRenderer {
     getEntityDisplayName(entityType) {
         const names = {
             ticker: 'טיקר', trade: 'טרייד', trade_plan: 'תכנית',
-            execution: 'ביצוע', account: 'חשבון', alert: 'התראה'
+            execution: 'ביצוע', account: 'חשבון מסחר', alert: 'התראה'
         };
         return names[entityType] || entityType;
     }
@@ -1164,7 +1164,7 @@ class EntityDetailsRenderer {
     renderAccount(accountData, options = {}) {
         window.Logger.info(`🎨 Rendering account data:`, accountData, { page: "entity-details-renderer" });
         
-        // קבלת צבע החשבון מההעדפות
+        // קבלת צבע החשבון מסחר מההעדפות
         const accountColor = this.entityColors.account || '#28a745';
         
         return `
@@ -1513,7 +1513,7 @@ class EntityDetailsRenderer {
      * Render cash flow linked items - רנדור פריטים מקושרים לתזרים מזומנים
      */
     renderCashFlowLinkedItems(cashFlowData) {
-        // הוספת החשבון המקושר כפריט מקושר ראשון
+        // הוספת החשבון מסחר המקושר כפריט מקושר ראשון
         const accountItem = cashFlowData.trading_account_id ? `
             <div class="col-md-6">
                 <div class="card linked-item-card">
@@ -1523,8 +1523,8 @@ class EntityDetailsRenderer {
                                 <i class="fas fa-building"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <h6 class="card-title mb-1">${cashFlowData.account_name || `חשבון ${cashFlowData.trading_account_id}`}</h6>
-                                <p class="card-text text-muted small mb-0">חשבון מסחר #${cashFlowData.trading_account_id}</p>
+                                <h6 class="card-title mb-1">${cashFlowData.account_name || `חשבון מסחר ${cashFlowData.trading_account_id}`}</h6>
+                                <p class="card-text text-muted small mb-0">חשבון מסחר מסחר #${cashFlowData.trading_account_id}</p>
                             </div>
                             <div class="linked-item-actions">
                                 <button class="btn btn-sm btn-outline-primary" 
@@ -1567,7 +1567,7 @@ class EntityDetailsRenderer {
             'trade': 'טרייד',
             'trade_plan': 'תכנון',
             'execution': 'ביצוע',
-            'account': 'חשבון',
+            'account': 'חשבון מסחר',
             'alert': 'התראה',
             'cash_flow': 'תזרים',
             'note': 'הערה'

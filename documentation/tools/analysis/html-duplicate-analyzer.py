@@ -12,12 +12,17 @@ def analyze_html_duplicates():
     """ניתוח כפילויות HTML מתקדם"""
     print("🔍 מנתח כפילויות HTML...")
     
-    # קבצי HTML לבדיקה
-    html_files = [
-        "trading-ui/test-header-only.html",
-        "trading-ui/index.html",
-        "trading-ui/css-management.html"
-    ]
+    # סריקה מקיפה של כל קבצי HTML
+    html_files = []
+    
+    # קבצי HTML עיקריים
+    html_dir = "trading-ui/"
+    if os.path.exists(html_dir):
+        for file in os.listdir(html_dir):
+            if file.endswith('.html'):
+                html_files.append(os.path.join(html_dir, file))
+    
+    print(f"📁 נמצאו {len(html_files)} קבצי HTML לסריקה")
     
     results = {
         'duplicate_scripts': defaultdict(list),

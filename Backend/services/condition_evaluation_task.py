@@ -70,7 +70,7 @@ def condition_evaluation_task():
                         from models.plan_condition import PlanCondition
                         condition = db_session.query(PlanCondition).filter(PlanCondition.id == condition_id).first()
                     else:
-                        from models.plan_condition import TradeCondition
+                        from models.trade_condition import TradeCondition
                         condition = db_session.query(TradeCondition).filter(TradeCondition.id == condition_id).first()
                     
                     if condition:

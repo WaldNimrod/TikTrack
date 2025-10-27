@@ -1,3 +1,18 @@
+/**
+ * Account Service - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the account service for TikTrack.
+ * Provides advanced account management functions with caching and status filtering.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/ACCOUNT_SERVICE_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
+ */
+
 // ===== שירות חשבונות כללי =====
 /*
  * Account Service - Global Account Management
@@ -10,8 +25,8 @@
  * - getAccounts() - קבלת כל החשבונות
  * - getActiveAccounts() - חשבונות פעילים
  * - getAccountsByStatus() - חשבונות לפי סטטוס
- * - cancelAccount() - ביטול חשבון
- * - reactivateAccount() - הפעלה מחדש של חשבון
+ * - cancelAccount() - ביטול חשבון מסחר
+ * - reactivateAccount() - הפעלה מחדש של חשבון מסחר
  *
  * File: trading-ui/scripts/account-service.js
  * Version: 1.0
@@ -28,6 +43,11 @@ let accountsLastCacheUpdate = null;
 /**
  * ניקוי ה-cache
  */
+/**
+ * Clear accounts cache
+ * @function clearCache
+ * @returns {void}
+ */
 function clearCache() {
   accountsCache = null;
   accountsLastCacheUpdate = null;
@@ -36,6 +56,12 @@ function clearCache() {
 /**
  * קבלת כל החשבונות מהשרת
  * @returns {Promise<Array>} מערך של חשבונות
+ */
+/**
+ * Get all accounts from server
+ * @function getAccounts
+ * @async
+ * @returns {Promise<Array>} Array of accounts
  */
 async function getAccounts() {
   try {
@@ -58,6 +84,12 @@ async function getAccounts() {
  * קבלת חשבונות פעילים (לא מבוטלים)
  * @returns {Promise<Array>} מערך של חשבונות פעילים
  */
+/**
+ * Get active accounts only
+ * @function getActiveAccounts
+ * @async
+ * @returns {Promise<Array>} Array of active accounts
+ */
 async function getActiveAccounts() {
   const accounts = await getAccounts();
   return accounts.filter(account => account.status !== 'cancelled');
@@ -68,18 +100,32 @@ async function getActiveAccounts() {
  * @param {string} status - הסטטוס הרצוי
  * @returns {Promise<Array>} מערך של חשבונות
  */
+/**
+ * Get accounts by status
+ * @function getAccountsByStatus
+ * @async
+ * @param {string} status - Account status
+ * @returns {Promise<Array>} Array of accounts with specified status
+ */
 async function getAccountsByStatus(status) {
   const accounts = await getAccounts();
   return accounts.filter(account => account.status === status);
 }
 
 /**
- * ביטול חשבון - גרסה פשוטה
- * @param {number} accountId - מזהה החשבון
+ * ביטול חשבון מסחר - גרסה פשוטה
+ * @param {number} accountId - מזהה החשבון מסחר
  * @returns {Promise<boolean>} האם הביטול הצליח
  */
+/**
+ * Cancel account
+ * @function cancelAccount
+ * @async
+ * @param {number} accountId - Account ID
+ * @returns {Promise<boolean>} Success status
+ */
 async function cancelAccount(accountId) {
-  // ביטול חשבון
+  // ביטול חשבון מסחר
 
   const response = await fetch(`/api/accounts/${accountId}`, {
     method: 'PUT',
@@ -89,7 +135,7 @@ async function cancelAccount(accountId) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error?.message || 'שגיאה בביטול החשבון');
+    throw new Error(errorData.error?.message || 'שגיאה בביטול החשבון מסחר');
   }
 
   // ניקוי ה-cache
@@ -99,12 +145,19 @@ async function cancelAccount(accountId) {
 }
 
 /**
- * הפעלה מחדש של חשבון מבוטל - גרסה פשוטה
- * @param {number} accountId - מזהה החשבון
+ * הפעלה מחדש של חשבון מסחר מבוטל - גרסה פשוטה
+ * @param {number} accountId - מזהה החשבון מסחר
  * @returns {Promise<boolean>} האם ההפעלה מחדש הצליחה
  */
+/**
+ * Reactivate account
+ * @function reactivateAccount
+ * @async
+ * @param {number} accountId - Account ID
+ * @returns {Promise<boolean>} Success status
+ */
 async function reactivateAccount(accountId) {
-  // הפעלה מחדש של חשבון
+  // הפעלה מחדש של חשבון מסחר
 
   const response = await fetch(`/api/accounts/${accountId}`, {
     method: 'PUT',
@@ -114,7 +167,7 @@ async function reactivateAccount(accountId) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error?.message || 'שגיאה בהפעלה מחדש של החשבון');
+    throw new Error(errorData.error?.message || 'שגיאה בהפעלה מחדש של החשבון מסחר');
   }
 
   // ניקוי ה-cache
@@ -124,9 +177,16 @@ async function reactivateAccount(accountId) {
 }
 
 /**
- * קבלת חשבון לפי מזהה
- * @param {number} accountId - מזהה החשבון
- * @returns {Promise<Object|null>} החשבון או null אם לא נמצא
+ * קבלת חשבון מסחר לפי מזהה
+ * @param {number} accountId - מזהה החשבון מסחר
+ * @returns {Promise<Object|null>} החשבון מסחר או null אם לא נמצא
+ */
+/**
+ * Get account by ID
+ * @function getAccountById
+ * @async
+ * @param {number} accountId - Account ID
+ * @returns {Promise<Object|null>} Account object or null
  */
 async function getAccountById(accountId) {
   try {
@@ -158,10 +218,22 @@ window.clearAccountsCache = clearCache;
  * פונקציה לבדיקה אם החשבונות נטענו
  * @returns {boolean} האם החשבונות נטענו
  */
+/**
+ * Check if accounts are loaded
+ * @function isAccountsLoaded
+ * @returns {boolean} Whether accounts are loaded
+ */
 function isAccountsLoaded() {
   return accountsCache !== null && accountsLastCacheUpdate !== null;
 }
 
-// ייצוא הפונקציה הנוספת
+// ===== GLOBAL EXPORTS =====
+window.clearCache = clearCache;
+window.getAccounts = getAccounts;
+window.getActiveAccounts = getActiveAccounts;
+window.getAccountsByStatus = getAccountsByStatus;
+window.cancelAccount = cancelAccount;
+window.reactivateAccount = reactivateAccount;
+window.getAccountById = getAccountById;
 window.isAccountsLoaded = isAccountsLoaded;
 

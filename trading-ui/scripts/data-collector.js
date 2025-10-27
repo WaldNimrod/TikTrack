@@ -1,27 +1,26 @@
 /**
- * ========================================
- * Data Collector Module - Linter Realtime Monitor
- * ========================================
+ * Data Collector - Comprehensive Function Index
+ * ==========================================
  * 
- * מודול איסוף נתונים למערכת ניטור Linter
- * כולל ניהול סטטיסטיקות ונתוני קבצים
+ * This file contains data collection utilities for the Linter Realtime Monitor system.
+ * Includes initial data loading, statistics updates, file management, and storage calculations.
  * 
- * תכונות:
- * - טעינת נתונים ראשונית
- * - עדכון סטטיסטיקות
- * - ניהול נתוני קבצים
- * - חישוב גודל אחסון
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/LINTER_REALTIME_MONITOR.md
  * 
- * ========================================
- * 
- * מחבר: TikTrack Development Team
- * תאריך עדכון אחרון: 2025
- * ========================================
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
+
+// ===== DATA LOADING FUNCTIONS =====
 
 /**
  * טעינת נתונים ראשונית
- * Load initial data
+ * Load initial data from IndexedDB
+ * @function loadInitialData
+ * @async
+ * @returns {Promise<void>}
  */
 async function loadInitialData() {
     try {
@@ -79,7 +78,10 @@ async function loadInitialData() {
 
 /**
  * עדכון תצוגת סטטיסטיקות
- * Update statistics display
+ * Update statistics display from IndexedDB
+ * @function updateStatisticsDisplay
+ * @async
+ * @returns {Promise<void>}
  */
 async function updateStatisticsDisplay() {
     try {
@@ -165,9 +167,14 @@ async function updateStatisticsDisplay() {
     }
 }
 
+// ===== FILE MANAGEMENT FUNCTIONS =====
+
 /**
  * Get file type from filename
  * קבלת סוג קובץ משם הקובץ
+ * @function getFileType
+ * @param {string} fileName - שם הקובץ
+ * @returns {string} סוג הקובץ (js, html, css, python, other)
  */
 function getFileType(fileName) {
     const extension = fileName.split('.').pop().toLowerCase();
@@ -195,6 +202,9 @@ function getFileType(fileName) {
 /**
  * עדכון סטטיסטיקות סוגי קבצים
  * Update file type statistics
+ * @function updateFileTypeStatistics
+ * @param {Array} issues - מערך של בעיות (errors/warnings)
+ * @returns {void}
  */
 function updateFileTypeStatistics(issues) {
     console.log('🔄 updateFileTypeStatistics called with issues:', issues ? issues.length : 0);
@@ -322,9 +332,13 @@ function updateFileTypeStatistics(issues) {
     console.log('📊 updateFileTypeStatistics completed');
 }
 
+// ===== STORAGE FUNCTIONS =====
+
 /**
  * חישוב גודל אחסון
  * Calculate storage size
+ * @function calculateStorageSize
+ * @returns {string} גודל אחסון בפורמט קריא
  */
 function calculateStorageSize() {
     try {
@@ -368,7 +382,7 @@ function calculateStorageSize() {
     }
 }
 
-// Export functions to global scope
+// ===== GLOBAL EXPORTS =====
 window.loadInitialData = loadInitialData;
 window.updateStatisticsDisplay = updateStatisticsDisplay;
 window.updateFileTypeStatistics = updateFileTypeStatistics;

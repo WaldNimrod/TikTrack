@@ -8,7 +8,8 @@ import logging
 from typing import Dict, Tuple, Any, List
 from sqlalchemy.orm import Session
 from models.trading_method import TradingMethod, MethodParameter
-from models.plan_condition import PlanCondition, TradeCondition
+from models.plan_condition import PlanCondition
+from models.trade_condition import TradeCondition
 from services.constraint_service import ConstraintService
 from services.validation_service import ValidationService
 

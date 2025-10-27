@@ -116,7 +116,7 @@
   border-color: var(--entity-execution-border);
 }
 
-/* חשבון - Account */
+/* חשבון מסחר - Trading Account */
 .entity-account {
   color: var(--entity-account-color);
   background-color: color-mix(in srgb, var(--entity-account-color) 10%, transparent);

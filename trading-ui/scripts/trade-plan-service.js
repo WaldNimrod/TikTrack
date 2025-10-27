@@ -1,4 +1,19 @@
 /**
+ * Trade Plan Service - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the trade plan service for TikTrack.
+ * Provides centralized access to trade plans data and utilities.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/TRADE_PLAN_SERVICE_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
+ */
+
+/**
  * ========================================
  * Trade Plan Service - Global Service File
  * ========================================
@@ -33,6 +48,12 @@ let isDataLoaded = false;
 
 /**
  * טעינת נתוני תכניות מסחר מהשרת
+ */
+/**
+ * Load trade plans data from server
+ * @function loadTradePlansData
+ * @async
+ * @returns {Promise<Array>} Array of trade plans
  */
 async function loadTradePlansData() {
   try {
@@ -84,6 +105,11 @@ async function loadTradePlansData() {
 /**
  * קבלת נתוני תכניות מסחר
  */
+/**
+ * Get trade plans data
+ * @function getTradePlans
+ * @returns {Array} Array of trade plans
+ */
 function getTradePlans() {
   return tradePlansData;
 }
@@ -91,12 +117,23 @@ function getTradePlans() {
 /**
  * בדיקה אם הנתונים נטענו
  */
+/**
+ * Check if trade plans data is loaded
+ * @function isTradePlansLoaded
+ * @returns {boolean} Whether data is loaded
+ */
 function isTradePlansLoaded() {
   return isDataLoaded;
 }
 
 /**
  * עיצוב סטטוס תכנון להצגה
+ */
+/**
+ * Format trade plan status for display
+ * @function formatTradePlanStatus
+ * @param {string} status - Trade plan status
+ * @returns {string} Formatted status
  */
 function formatTradePlanStatus(status) {
   const statusMap = {
@@ -111,6 +148,12 @@ function formatTradePlanStatus(status) {
 /**
  * המרת סטטוס מתצוגה לערך
  */
+/**
+ * Parse trade plan status from display
+ * @function parseTradePlanStatus
+ * @param {string} displayStatus - Display status
+ * @returns {string} Parsed status
+ */
 function parseTradePlanStatus(displayStatus) {
   const reverseStatusMap = {
     'פתוח': 'open',
@@ -124,12 +167,24 @@ function parseTradePlanStatus(displayStatus) {
 /**
  * קבלת תכנון לפי ID
  */
+/**
+ * Get trade plan by ID
+ * @function getTradePlanById
+ * @param {number} id - Trade plan ID
+ * @returns {Object|null} Trade plan object or null
+ */
 function getTradePlanById(id) {
   return tradePlansData.find(plan => plan.id === id);
 }
 
 /**
  * קבלת תכנונים לפי סטטוס
+ */
+/**
+ * Get trade plans by status
+ * @function getTradePlansByStatus
+ * @param {string} status - Trade plan status
+ * @returns {Array} Array of trade plans
  */
 function getTradePlansByStatus(status) {
   return tradePlansData.filter(plan => plan.status === status);
@@ -138,12 +193,24 @@ function getTradePlansByStatus(status) {
 /**
  * קבלת תכנונים לפי סוג השקעה
  */
+/**
+ * Get trade plans by investment type
+ * @function getTradePlansByInvestmentType
+ * @param {string} investmentType - Investment type
+ * @returns {Array} Array of trade plans
+ */
 function getTradePlansByInvestmentType(investmentType) {
   return tradePlansData.filter(plan => plan.investment_type === investmentType);
 }
 
 /**
  * קבלת תכנונים לפי חשבון
+ */
+/**
+ * Get trade plans by account
+ * @function getTradePlansByAccount
+ * @param {number} accountId - Account ID
+ * @returns {Array} Array of trade plans
  */
 function getTradePlansByAccount(accountId) {
   return tradePlansData.filter(plan => plan.account_id === accountId);
@@ -152,12 +219,24 @@ function getTradePlansByAccount(accountId) {
 /**
  * קבלת תכנונים לפי טיקר
  */
+/**
+ * Get trade plans by ticker
+ * @function getTradePlansByTicker
+ * @param {number} tickerId - Ticker ID
+ * @returns {Array} Array of trade plans
+ */
 function getTradePlansByTicker(tickerId) {
   return tradePlansData.filter(plan => plan.ticker_id === tickerId);
 }
 
 /**
  * חיפוש תכנונים לפי טקסט
+ */
+/**
+ * Search trade plans by text
+ * @function searchTradePlans
+ * @param {string} searchTerm - Search term
+ * @returns {Array} Array of matching trade plans
  */
 function searchTradePlans(searchTerm) {
   if (!searchTerm || searchTerm.trim() === '') {
@@ -175,6 +254,12 @@ function searchTradePlans(searchTerm) {
 
 /**
  * פילטור תכנונים לפי מספר קריטריונים
+ */
+/**
+ * Filter trade plans by criteria
+ * @function filterTradePlans
+ * @param {Object} filters - Filter criteria
+ * @returns {Array} Array of filtered trade plans
  */
 function filterTradePlans(filters = {}) {
   let filteredData = [...tradePlansData];
@@ -221,6 +306,11 @@ function filterTradePlans(filters = {}) {
 
 /**
  * נתוני דמו לתכניות מסחר
+ */
+/**
+ * Get demo trade plans data
+ * @function getDemoTradePlansData
+ * @returns {Array} Array of demo trade plans
  */
 function getDemoTradePlansData() {
   return [
@@ -283,6 +373,14 @@ window.isTradePlansLoaded = isTradePlansLoaded;
 window.loadTradePlansData = loadTradePlansData;
 window.formatTradePlanStatus = formatTradePlanStatus;
 window.parseTradePlanStatus = parseTradePlanStatus;
+window.getTradePlanById = getTradePlanById;
+window.getTradePlansByStatus = getTradePlansByStatus;
+window.getTradePlansByInvestmentType = getTradePlansByInvestmentType;
+window.getTradePlansByAccount = getTradePlansByAccount;
+window.getTradePlansByTicker = getTradePlansByTicker;
+window.searchTradePlans = searchTradePlans;
+window.filterTradePlans = filterTradePlans;
+window.getDemoTradePlansData = getDemoTradePlansData;
 
 // Data access for backward compatibility
 Object.defineProperty(window, 'tradePlansData', {

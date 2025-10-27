@@ -1,110 +1,16 @@
 /**
- * Tables.js - TikTrack Table Management System
- * ============================================
- *
- * REFACTORING HISTORY:
- * ===================
- *
- * This file was created during the main.js modular split (Phase 6 - August 24, 2025)
- * by combining table-sorting.js and table-grid.js into a single comprehensive module.
- *
- * UNIFIED CACHE INTEGRATION (January 26, 2025):
- * =============================================
- * - Integrated with UnifiedCacheManager for table data caching
- * - Added table state management with unified cache
- * - Improved performance with smart caching strategies
- *
- * ORIGINAL STATE:
- * - Table functions scattered across main.js (2153 lines)
- * - Duplicate sorting logic in multiple files
- * - Inconsistent table management across pages
- * - Difficult to maintain table-specific functionality
- *
- * REFACTORING BENEFITS:
- * - Centralized table management system
- * - Consistent sorting behavior across all tables
- * - Improved maintainability and debugging
- * - Clear separation of concerns
- *
- * SORTING FIXES (August 24, 2025):
- * ================================
- *
- * ISSUE: Multiple table files had incorrect function calls causing:
- * - RangeError: Maximum call stack size exceeded (infinite recursion)
- * - Sorting not working on various pages
- * - Inconsistent sorting behavior across tables
- *
- * FIXES APPLIED:
- * - Fixed trade_plans.js: Changed window.sortTable to window.sortTableData
- * - Fixed notes.js: Changed window.sortTable to window.sortTableData
- * - Fixed alerts.js: Changed window.sortTable to window.sortTableData
- * - Fixed tickers.js: Changed window.sortTable to window.sortTableData
- * - Fixed cash_flows.js: Changed window.sortTable to window.sortTableData
- * - Fixed executions.js: Changed window.sortTable to window.sortTableData
- * - Fixed accounts.js: Corrected window.sortTableData parameters
- *
- * CORRECT FUNCTION SIGNATURE:
- * window.sortTableData(columnIndex, data, tableType, updateFunction)
- *
- * CONTENTS:
- * =========
- *
- * 1. GLOBAL SORTING SYSTEM:
- *    - sortTableData() - Main sorting function for all tables
- *    - sortAnyTable() - Universal table sorter
- *    - sortTable() - Legacy compatibility wrapper
- *    - isDateValue() - Date validation helper
- *
- * 2. UNIFIED CACHE INTEGRATION:
- *    - loadTableDataFromCache() - Load table data from unified cache
- *    - saveTableDataToCache() - Save table data to unified cache
- *    - saveTableState() - Save table UI state to cache
- *    - loadTableState() - Load table UI state from cache
- *
- * 2. SORT STATE MANAGEMENT:
- *    - saveSortState() - Save current sort configuration
- *    - getSortState() - Retrieve saved sort state
- *    - restoreAnyTableSort() - Restore previous sort state
- *    - updateSortIcons() - Update UI sort indicators
- *
- * 3. GRID CORE FUNCTIONS:
- *    - getDefaultColumnDefs() - Default column definitions
- *    - External filter management
- *    - Grid initialization helpers
- *
- * 4. TABLE UTILITIES:
- *    - closeModal() - Modal management (table-related)
- *    - Column value extraction
- *    - Table type validation
- *
- * DEPENDENCIES:
- * ============
- * - table-mappings.js: Column mappings and value extraction
- * - translation-utils.js: Text translations
- * - ui-utils.js: UI interaction helpers
- *
- * USAGE:
- * ======
- *
- * Basic table sorting:
- * ```javascript
- * sortTableData(0, tableData, 'trades', updateTradesTable);
- * ```
- *
- * Restore previous sort:
- * ```javascript
- * restoreAnyTableSort('accounts', accountsData, updateAccountsTable);
- * ```
- *
- * Get default columns:
- * ```javascript
- * const columns = getDefaultColumnDefs();
- * ```
- *
- * @version 1.1
- * @lastUpdated August 24, 2025
- * @refactoringPhase 6 - Modular Architecture
- * @sortingFixes August 24, 2025 - Fixed infinite recursion in all table files
+ * Tables - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the centralized table management system with sorting, caching,
+ * state management, and performance optimization for all TikTrack tables.
+ * 
+ * Related Documentation:
+ * - documentation/03-API_REFERENCE/table-system.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 // ===== GLOBAL SORTING SYSTEM =====

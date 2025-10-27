@@ -44,7 +44,7 @@
 
 #unified-header .header-container {
     margin: 0 auto;
-    padding: var(--spacing-md, 16px) 10px;
+    padding: var(--spacing-md, 16px) 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -174,7 +174,7 @@
     }
     
     .filters-container {
-        max-width: var(--container-lg, 1200px);
+        max-width: var(--container-xl, 1400px);
         padding: 0 20px;
     }
 }

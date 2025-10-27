@@ -171,3 +171,4 @@ if (window.ModalManagerV2) {
 
 // ייצוא לקונסול (לצורך debug)
 window.tradePlansModalConfig = tradePlansModalConfig;
+

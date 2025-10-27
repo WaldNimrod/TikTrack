@@ -57,16 +57,20 @@ Import Execution → Database Storage
    - הנתונים נשמרים ב-`ImportSession.summary_data` (JSON)
    - שמירה מקומית ב-Unified Cache Manager
 
-3. **שלב 4**: פתרון בעיות
+3. **שלב 3**: פתרון בעיות (מפורט)
    - קריאה ל-`/api/user-data-import/session/{id}` לקבלת נתוני הניתוח
-   - הצגת בעיות (טיקרים חסרים, כפילויות, רשומות קיימות במערכת)
-   - **ממשק "ייבוא בכל זאת"** לרשומות קיימות במערכת (עדכון 2025-10-27)
+   - הצגת בעיות בממשק אינטראקטיבי מפורט:
+     - **טיקרים חסרים**: כרטיסים עם כפתור "הוסף טיקר"
+     - **כפילויות בקובץ**: כרטיסים עם כפתורי "קבל"/"דחה"
+     - **רשומות קיימות**: כרטיסים עם כפתורי "קבל"/"דחה"
+   - כל כרטיס מציג פרטים מלאים: סמל, פעולה, כמות, מחיר, תאריך, עמלה
+   - confidence scores לכפילויות עם אינדיקטור ויזואלי
 
-4. **שלב 5**: תצוגה מקדימה
+4. **שלב 4**: תצוגה מקדימה
    - קריאה ל-`/api/user-data-import/session/{id}/preview`
    - השרת מחזיר `preview_data` עם שתי טבלאות
 
-5. **שלב 6**: אישור סופי
+5. **שלב 5**: אישור סופי
    - הצגת סיכום סופי
    - קריאה ל-`/api/user-data-import/session/{id}/execute` לביצוע הייבוא
 
@@ -231,6 +235,59 @@ GET /api/user-data-import/session/{id}/preview
 
 ```http
 POST /api/user-data-import/session/{id}/execute
+```
+
+### API Endpoints חדשים - טיפול בבעיות
+
+#### קבלת/דחיית כפילויות
+```http
+POST /api/user-data-import/session/{session_id}/accept-duplicate
+POST /api/user-data-import/session/{session_id}/reject-duplicate
+```
+
+**Payload:**
+```json
+{
+    "record_index": 5,
+    "duplicate_type": "within_file" | "existing_record"
+}
+```
+
+**Response:**
+```json
+{
+    "success": true,
+    "message": "Duplicate accepted for import"
+}
+```
+
+#### רענון תצוגה מקדימה
+```http
+POST /api/user-data-import/session/{session_id}/refresh-preview
+```
+
+**Response:**
+```json
+{
+    "success": true,
+    "preview_data": { ... },
+    "summary_stats": { ... }
+}
+```
+
+#### הוספת טיקר חדש
+```http
+POST /api/tickers
+```
+
+**Payload:**
+```json
+{
+    "symbol": "AAPL",
+    "name": "Apple Inc.",
+    "exchange": "NASDAQ",
+    "is_active": true
+}
 ```
 
 ### אישור ייבוא רשומה קיימת

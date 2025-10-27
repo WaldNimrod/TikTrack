@@ -1,4 +1,19 @@
 /**
+ * Alert Service - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the alert service for TikTrack.
+ * Provides alert state management, validation, and utility operations.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/ALERT_SERVICE_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
+ */
+
+/**
  * Alert Service
  *
  * This file contains general alert-related functions that can be used across the application.
@@ -17,6 +32,13 @@
  * @param {string} status - Alert status from database ('open', 'closed', 'cancelled')
  * @param {string} isTriggered - Triggered flag from database ('false', 'new', 'true')
  * @returns {string} Display state: 'new', 'active', 'unread', 'read', 'cancelled'
+ */
+/**
+ * Get alert state based on status and triggered flag
+ * @function getAlertState
+ * @param {string} status - Alert status from database
+ * @param {string} isTriggered - Triggered flag from database
+ * @returns {string} Display state
  */
 function getAlertState(status, isTriggered) {
   if (status === 'open' && isTriggered === 'false') {
@@ -47,6 +69,13 @@ function getAlertState(status, isTriggered) {
  * @param {string} isTriggered - Triggered flag
  * @returns {boolean} true if combination is valid, false otherwise
  */
+/**
+ * Validate alert status combination
+ * @function validateAlertStatusCombination
+ * @param {string} status - Alert status
+ * @param {string} isTriggered - Triggered flag
+ * @returns {boolean} Whether combination is valid
+ */
 function validateAlertStatusCombination(status, isTriggered) {
   // כללים לפי הדוקומנטציה:
   // 1. status='open' + is_triggered='false' - תקין
@@ -75,6 +104,13 @@ function validateAlertStatusCombination(status, isTriggered) {
  * @param {string} isTriggered - Triggered flag
  * @returns {string} Hebrew display text
  */
+/**
+ * Get alert status display text
+ * @function getAlertStatusDisplay
+ * @param {string} status - Alert status
+ * @param {string} isTriggered - Triggered flag
+ * @returns {string} Display text
+ */
 function getAlertStatusDisplay(status, isTriggered) {
   const state = getAlertState(status, isTriggered);
 
@@ -96,6 +132,13 @@ function getAlertStatusDisplay(status, isTriggered) {
  * @param {string} status - Alert status
  * @param {string} isTriggered - Triggered flag
  * @returns {string} CSS class name
+ */
+/**
+ * Get alert status CSS class
+ * @function getAlertStatusClass
+ * @param {string} status - Alert status
+ * @param {string} isTriggered - Triggered flag
+ * @returns {string} CSS class
  */
 function getAlertStatusClass(status, isTriggered) {
   const state = getAlertState(status, isTriggered);
@@ -121,6 +164,13 @@ function getAlertStatusClass(status, isTriggered) {
  * @param {string} isTriggered - Triggered flag
  * @returns {boolean} true if alert is active
  */
+/**
+ * Check if alert is active
+ * @function isAlertActive
+ * @param {string} status - Alert status
+ * @param {string} isTriggered - Triggered flag
+ * @returns {boolean} Whether alert is active
+ */
 function isAlertActive(status, _isTriggered) {
   return status === 'open';
 }
@@ -131,6 +181,12 @@ function isAlertActive(status, _isTriggered) {
  *
  * @param {string} isTriggered - Triggered flag
  * @returns {boolean} true if alert is triggered
+ */
+/**
+ * Check if alert is triggered
+ * @function isAlertTriggered
+ * @param {string} isTriggered - Triggered flag
+ * @returns {boolean} Whether alert is triggered
  */
 function isAlertTriggered(isTriggered) {
   return isTriggered === 'true' || isTriggered === 'new';
@@ -143,11 +199,31 @@ function isAlertTriggered(isTriggered) {
  * @param {string} status - Alert status
  * @returns {boolean} true if alert can be cancelled
  */
+/**
+ * Check if alert can be cancelled
+ * @function canAlertBeCancelled
+ * @param {string} status - Alert status
+ * @returns {boolean} Whether alert can be cancelled
+ */
 function canAlertBeCancelled(status) {
   return status === 'open';
 }
 
-// ===== EXPORT TO GLOBAL SCOPE =====
+// ===== GLOBAL EXPORTS =====
+window.getAlertState = getAlertState;
+window.validateAlertStatusCombination = validateAlertStatusCombination;
+window.getAlertStatusDisplay = getAlertStatusDisplay;
+window.getAlertStatusClass = getAlertStatusClass;
+window.isAlertActive = isAlertActive;
+window.isAlertTriggered = isAlertTriggered;
+window.canAlertBeCancelled = canAlertBeCancelled;
+window.formatAlertCondition = formatAlertCondition;
+window.parseAlertCondition = parseAlertCondition;
+window.cancelAlert = cancelAlert;
+window.deleteAlert = deleteAlert;
+window.updateAlertStatus = updateAlertStatus;
+window.updateMultipleAlertsStatus = updateMultipleAlertsStatus;
+window.updateAlertsSummary = updateAlertsSummary;
 
 // Export all functions to global scope
 window.getAlertState = getAlertState;
@@ -168,6 +244,12 @@ window.deleteAlert = deleteAlert;
  * פונקציה לתרגום תנאי התראה לעברית
  * @param {string} condition - תנאי ההתראה בפורמט: variable|operator|value
  * @returns {string} - התנאי מתורגם לעברית
+ */
+/**
+ * Format alert condition for display
+ * @function formatAlertCondition
+ * @param {string} condition - Alert condition
+ * @returns {string} Formatted condition
  */
 function formatAlertCondition(condition) {
   if (!condition) {return '-';}
@@ -232,6 +314,12 @@ function formatAlertCondition(condition) {
  * @param {string} condition - תנאי ההתראה בפורמט: variable|operator|value
  * @returns {object} - אובייקט עם המשתנה, האופרטור והערך
  */
+/**
+ * Parse alert condition
+ * @function parseAlertCondition
+ * @param {string} condition - Alert condition
+ * @returns {Object} Parsed condition object
+ */
 function parseAlertCondition(condition) {
   if (!condition) {return { variable: '', operator: '', value: '' };}
 
@@ -262,6 +350,13 @@ function parseAlertCondition(condition) {
 /**
  * ביטול התראה - שינוי סטטוס למבוטל
  * @param {number} alertId - מזהה ההתראה
+ */
+/**
+ * Cancel alert
+ * @function cancelAlert
+ * @async
+ * @param {number} alertId - Alert ID
+ * @returns {Promise<boolean>} Success status
  */
 async function cancelAlert(alertId) {
   try {
@@ -320,6 +415,13 @@ async function cancelAlert(alertId) {
 /**
  * מחיקת התראה - גרסה פשוטה לשימוש כללי
  * @param {number} alertId - מזהה ההתראה
+ */
+/**
+ * Delete alert
+ * @function deleteAlert
+ * @async
+ * @param {number} alertId - Alert ID
+ * @returns {Promise<boolean>} Success status
  */
 async function deleteAlert(alertId) {
   try {
@@ -395,6 +497,15 @@ async function deleteAlert(alertId) {
  * @param {string} isTriggered - Triggered flag ('false', 'new', 'true')
  * @returns {Promise<boolean>} true if successful, false otherwise
  */
+/**
+ * Update alert status
+ * @function updateAlertStatus
+ * @async
+ * @param {number} alertId - Alert ID
+ * @param {string} status - New status
+ * @param {string} isTriggered - Triggered flag
+ * @returns {Promise<boolean>} Success status
+ */
 async function updateAlertStatus(alertId, status, isTriggered = null) {
   try {
     const updateData = { status };
@@ -464,6 +575,15 @@ async function updateAlertStatus(alertId, status, isTriggered = null) {
  * @param {string} isTriggered - Triggered flag ('false', 'new', 'true')
  * @returns {Promise<number>} Number of successfully updated alerts
  */
+/**
+ * Update multiple alerts status
+ * @function updateMultipleAlertsStatus
+ * @async
+ * @param {Array} alertIds - Array of alert IDs
+ * @param {string} status - New status
+ * @param {string} isTriggered - Triggered flag
+ * @returns {Promise<boolean>} Success status
+ */
 async function updateMultipleAlertsStatus(alertIds, status, isTriggered = null) {
   let successCount = 0;
   
@@ -483,6 +603,12 @@ async function updateMultipleAlertsStatus(alertIds, status, isTriggered = null) 
  *
  * @param {Array} alertsData - Array of alerts data
  * @returns {Object} Summary statistics
+ */
+/**
+ * Update alerts summary
+ * @function updateAlertsSummary
+ * @param {Array} alertsData - Alerts data
+ * @returns {void}
  */
 function updateAlertsSummary(alertsData) {
   if (!alertsData || !Array.isArray(alertsData)) {

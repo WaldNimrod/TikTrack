@@ -68,7 +68,7 @@ class DuplicateDetectionService:
         }
         
         # Get existing executions for this account
-        existing_executions = self._get_existing_executions(account_id)
+        existing_executions = self._get_existing_executions(account_id, records)
         
         # Track processed records to avoid double-checking
         processed_indices = set()
@@ -266,46 +266,101 @@ class DuplicateDetectionService:
         
         return score
     
-    def _get_existing_executions(self, account_id: int) -> List[Dict[str, Any]]:
+    def _get_existing_executions(self, account_id: int, records: List[Dict] = None) -> List[Dict[str, Any]]:
         """
-        Get ALL existing executions in the system (ignore account filtering).
+        Get existing executions filtered by date range and symbols
         
         Args:
             account_id: Account ID (ignored - we check against all executions)
+            records: List of records to check against (for filtering)
             
         Returns:
-            List[Dict[str, Any]]: List of ALL existing executions
+            List[Dict[str, Any]]: List of existing executions with symbol information
         """
         try:
-            # Query ALL executions - ignore account filtering
-            # Use LEFT JOIN to include executions without trades
-            executions = self.db_session.query(Execution).outerjoin(
-                Trade, Execution.trade_id == Trade.id
-            ).all()
+            # If no records provided, get all executions (legacy behavior)
+            if not records:
+                logger.info("No records provided, querying all executions")
+                executions = self.db_session.query(Execution).outerjoin(
+                    Trade, Execution.trade_id == Trade.id
+                ).all()
+            else:
+                # Extract date range and symbols from records for filtering
+                symbols = list(set([r.get('symbol') for r in records if r.get('symbol')]))
+                dates = [r.get('date') for r in records if r.get('date')]
+                
+                if not symbols or not dates:
+                    logger.info("No symbols or dates found in records")
+                    return []
+                
+                # Parse dates and get range
+                parsed_dates = []
+                for date_str in dates:
+                    try:
+                        if isinstance(date_str, str):
+                            # Handle different date formats
+                            if 'T' in date_str:
+                                parsed_date = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+                            else:
+                                parsed_date = datetime.strptime(date_str, '%Y-%m-%d')
+                        else:
+                            parsed_date = date_str
+                        parsed_dates.append(parsed_date)
+                    except (ValueError, TypeError) as e:
+                        logger.warning(f"Failed to parse date {date_str}: {e}")
+                        continue
+                
+                if not parsed_dates:
+                    logger.warning("No valid dates found in records")
+                    return []
+                
+                min_date = min(parsed_dates) - timedelta(days=1)
+                max_date = max(parsed_dates) + timedelta(days=1)
+                
+                logger.info(f"Querying executions for symbols {symbols} between {min_date} and {max_date}")
+                
+                # Query executions in date range for these symbols
+                executions = self.db_session.query(Execution)\
+                    .outerjoin(Trade, Execution.trade_id == Trade.id)\
+                    .outerjoin(Ticker, Trade.ticker_id == Ticker.id)\
+                    .filter(
+                        Ticker.symbol.in_(symbols),
+                        Execution.date >= min_date,
+                        Execution.date <= max_date
+                    ).all()
             
-            # Convert to dict with ticker symbol
+            logger.info(f"Found {len(executions)} existing executions")
+            
+            # Convert to dict with symbol
             result = []
             for execution in executions:
-                exec_dict = execution.to_dict()
-                # Add ticker symbol for comparison - get through trade
-                if execution.trade_id:
-                    # Get ticker through trade
-                    trade = self.db_session.query(Trade).filter(Trade.id == execution.trade_id).first()
-                    if trade and trade.ticker_id:
-                        ticker = self.db_session.query(Ticker).filter(Ticker.id == trade.ticker_id).first()
+                try:
+                    exec_dict = execution.to_dict()
+                    
+                    # Add ticker symbol for comparison
+                    if execution.trade_id:
+                        # Get ticker through trade
+                        trade = self.db_session.query(Trade).filter(Trade.id == execution.trade_id).first()
+                        if trade and trade.ticker_id:
+                            ticker = self.db_session.query(Ticker).filter(Ticker.id == trade.ticker_id).first()
+                            if ticker:
+                                exec_dict['symbol'] = ticker.symbol
+                    elif execution.ticker_id:
+                        # Direct ticker reference
+                        ticker = self.db_session.query(Ticker).filter(Ticker.id == execution.ticker_id).first()
                         if ticker:
                             exec_dict['symbol'] = ticker.symbol
-                elif execution.ticker_id:
-                    # Direct ticker reference
-                    ticker = self.db_session.query(Ticker).filter(Ticker.id == execution.ticker_id).first()
-                    if ticker:
-                        exec_dict['symbol'] = ticker.symbol
-                result.append(exec_dict)
+                    
+                    result.append(exec_dict)
+                except Exception as e:
+                    logger.warning(f"Failed to process execution {execution.id}: {e}")
+                    continue
             
             return result
+            
         except Exception as e:
             logger.error(f"Failed to query existing executions: {str(e)}")
-            return []
+            return []  # Return empty list, not None
     
     def _classify_duplicate_type(self, within_file_matches: List[Dict[str, Any]], 
                                 existing_matches: List[Dict[str, Any]]) -> str:

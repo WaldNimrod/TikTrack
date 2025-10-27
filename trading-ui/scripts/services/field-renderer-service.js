@@ -446,7 +446,7 @@ class FieldRendererService {
     static _getEntityHebrewLabel(type) {
         const map = {
             'trade': 'טרייד',
-            'account': 'חשבון',
+            'account': 'חשבון מסחר',
             'ticker': 'טיקר',
             'alert': 'התראה',
             'cash_flow': 'תזרים מזומנים',

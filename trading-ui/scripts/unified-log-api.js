@@ -1,4 +1,19 @@
 /**
+ * Unified Log API - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the unified log API system for TikTrack.
+ * Provides a simple interface for displaying and managing logs across the application.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_LOG_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
+ */
+
+/**
  * Unified Log API - TikTrack
  * ==========================
  *
@@ -54,6 +69,12 @@ class UnifiedLogAPI {
     /**
      * Initialize the API
      */
+    /**
+     * Initialize the Unified Log API
+     * @function initialize
+     * @async
+     * @returns {Promise<void>}
+     */
     async initialize() {
         if (this.initialized) {
             console.log('✅ UnifiedLogAPI already initialized');
@@ -89,6 +110,15 @@ class UnifiedLogAPI {
 
     /**
      * Show a single log
+     */
+    /**
+     * Show log in container
+     * @function showLog
+     * @async
+     * @param {string} logType - Type of log to show
+     * @param {string} containerId - Container ID
+     * @param {Object} options - Display options
+     * @returns {Promise<void>}
      */
     async showLog(logType, containerId, options = {}) {
         try {
@@ -126,6 +156,14 @@ class UnifiedLogAPI {
 
     /**
      * Show multiple logs
+     */
+    /**
+     * Show multiple logs
+     * @function showMultipleLogs
+     * @async
+     * @param {Array} logConfigs - Array of log configurations
+     * @param {Object} globalOptions - Global options
+     * @returns {Promise<void>}
      */
     async showMultipleLogs(logConfigs, globalOptions = {}) {
         try {
@@ -183,6 +221,13 @@ class UnifiedLogAPI {
     /**
      * Refresh a specific log
      */
+    /**
+     * Refresh specific log
+     * @function refreshLog
+     * @async
+     * @param {string} containerId - Container ID
+     * @returns {Promise<void>}
+     */
     async refreshLog(containerId) {
         const display = this.activeDisplays.get(containerId);
         if (display) {
@@ -195,6 +240,12 @@ class UnifiedLogAPI {
 
     /**
      * Refresh all logs
+     */
+    /**
+     * Refresh all active logs
+     * @function refreshAllLogs
+     * @async
+     * @returns {Promise<void>}
      */
     async refreshAllLogs() {
         const refreshPromises = [];
@@ -209,6 +260,15 @@ class UnifiedLogAPI {
 
     /**
      * Export log data
+     */
+    /**
+     * Export log data
+     * @function exportLog
+     * @async
+     * @param {string} logType - Type of log to export
+     * @param {string} format - Export format (csv, json, txt)
+     * @param {Object} options - Export options
+     * @returns {Promise<void>}
      */
     async exportLog(logType, format = 'csv', options = {}) {
         try {
@@ -238,6 +298,14 @@ class UnifiedLogAPI {
 
     /**
      * Get log data without displaying
+     */
+    /**
+     * Get log data
+     * @function getLogData
+     * @async
+     * @param {string} logType - Type of log
+     * @param {Object} options - Options
+     * @returns {Promise<Array>} Log data
      */
     async getLogData(logType, options = {}) {
         try {

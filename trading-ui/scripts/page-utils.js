@@ -1,4 +1,19 @@
 /**
+ * Page Utils - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains page management utilities for TikTrack.
+ * Includes page initialization, state management, navigation, and debug utilities.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/PAGE_UTILITIES_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
+ */
+
+/**
  * Page Utils - TikTrack Page Management Utilities
  * ===============================================
  *
@@ -86,6 +101,12 @@
  *
  * @param {string} pageName - Name of the page to initialize filters for
  */
+/**
+ * Initialize page filters
+ * @function initializePageFilters
+ * @param {string} pageName - Page name
+ * @returns {void}
+ */
 function initializePageFilters(pageName) {
   // Initializing filters for page
 
@@ -113,6 +134,12 @@ function initializePageFilters(pageName) {
  * previous sort state if available.
  *
  * @param {string} pageName - Name of the page
+ */
+/**
+ * Setup sortable headers
+ * @function setupSortableHeaders
+ * @param {string} pageName - Page name
+ * @returns {void}
  */
 function setupSortableHeaders(pageName) {
   // Setting up sortable headers for page
@@ -150,6 +177,13 @@ function setupSortableHeaders(pageName) {
  * @param {string} pageName - Name of the page
  * @param {Array} data - Current table data
  */
+/**
+ * Update table statistics
+ * @function updateTableStats
+ * @param {string} pageName - Page name
+ * @param {Array} data - Table data
+ * @returns {void}
+ */
 function updateTableStats(pageName, data = null) {
   // Updating table stats for page
 
@@ -179,6 +213,12 @@ function updateTableStats(pageName, data = null) {
  *
  * @param {string} pageName - Name of the page to debug
  */
+/**
+ * Debug saved filters
+ * @function debugSavedFilters
+ * @param {string} pageName - Page name
+ * @returns {void}
+ */
 function debugSavedFilters(pageName) {
   // Debugging saved filters for page
 
@@ -197,6 +237,11 @@ function debugSavedFilters(pageName) {
  *
  * Special function for restoring the designs section collapse state
  * Used specifically on the designs/trade plans page
+ */
+/**
+ * Restore designs section state
+ * @function restoreDesignsSectionState
+ * @returns {void}
  */
 function restoreDesignsSectionState() {
   // Restoring designs section state
@@ -227,6 +272,12 @@ function restoreDesignsSectionState() {
  * functionality including filters, sorting, statistics, and state management.
  *
  * @param {string} pageName - Name of the page to initialize
+ */
+/**
+ * Initialize page
+ * @function initializePage
+ * @param {string} pageName - Page name
+ * @returns {void}
  */
 function initializePage(pageName) {
   // Initializing page
@@ -275,6 +326,13 @@ function initializePage(pageName) {
  * @param {string} pageName - Name of the page
  * @param {Object} state - State object to save
  */
+/**
+ * Save page state
+ * @function savePageState
+ * @param {string} pageName - Page name
+ * @param {Object} state - Page state
+ * @returns {void}
+ */
 function savePageState(pageName, state) {
   try {
     const key = `pageState_${pageName}`;
@@ -299,6 +357,12 @@ function savePageState(pageName, state) {
  *
  * @param {string} pageName - Name of the page
  * @returns {Object|null} Saved state object or null if not found
+ */
+/**
+ * Load page state
+ * @function loadPageState
+ * @param {string} pageName - Page name
+ * @returns {Object|null} Saved page state
  */
 function loadPageState(pageName) {
   try {
@@ -325,6 +389,12 @@ function loadPageState(pageName) {
  *
  * @param {string} pageName - Name of the page
  */
+/**
+ * Clear page state
+ * @function clearPageState
+ * @param {string} pageName - Page name
+ * @returns {void}
+ */
 function clearPageState(pageName) {
   try {
     const key = `pageState_${pageName}`;
@@ -342,6 +412,12 @@ function clearPageState(pageName) {
  *
  * @param {string} pageName - Name of the page to check
  * @returns {boolean} True if page is available
+ */
+/**
+ * Check if page is available
+ * @function isPageAvailable
+ * @param {string} pageName - Page name
+ * @returns {boolean} Whether page is available
  */
 function isPageAvailable(pageName) {
   const availablePages = [
@@ -361,6 +437,12 @@ function isPageAvailable(pageName) {
  *
  * @param {string} pageName - Name of the page
  * @returns {Object} Page information object
+ */
+/**
+ * Get page information
+ * @function getPageInfo
+ * @param {string} pageName - Page name
+ * @returns {Object} Page information
  */
 function getPageInfo(pageName) {
   const pageInfo = {
@@ -392,6 +474,13 @@ function getPageInfo(pageName) {
  * @param {Object} options - Navigation options
  * @param {boolean} options.preserveState - Whether to preserve current state
  * @param {Object} options.state - State to pass to the new page
+ */
+/**
+ * Navigate to page
+ * @function navigateToPage
+ * @param {string} pageName - Page name
+ * @param {Object} options - Navigation options
+ * @returns {void}
  */
 function navigateToPage(pageName, options = {}) {
   // Navigating to page
@@ -426,6 +515,11 @@ function navigateToPage(pageName, options = {}) {
  *
  * @returns {string} Current page name
  */
+/**
+ * Get current page name
+ * @function getCurrentPageName
+ * @returns {string} Current page name
+ */
 function getCurrentPageName() {
   const path = window.location.pathname;
 
@@ -451,6 +545,12 @@ function getCurrentPageName() {
  * @param {string} pageName - Name of the page to check
  * @returns {boolean} True if current page matches
  */
+/**
+ * Check if current page matches
+ * @function isCurrentPage
+ * @param {string} pageName - Page name
+ * @returns {boolean} Whether current page matches
+ */
 function isCurrentPage(pageName) {
   return getCurrentPageName() === pageName;
 }
@@ -461,6 +561,12 @@ function isCurrentPage(pageName) {
  *
  * @param {Object} filters - Filter object to apply
  */
+/**
+ * Apply saved filters
+ * @function applySavedFilters
+ * @param {Object} filters - Saved filters
+ * @returns {void}
+ */
 function applySavedFilters(_filters) {
   // Implementation for applying saved filters
   // Applying saved filters
@@ -470,6 +576,12 @@ function applySavedFilters(_filters) {
  * Setup filter event handlers
  *
  * @param {string} pageName - Name of the page
+ */
+/**
+ * Setup filter event handlers
+ * @function setupFilterEventHandlers
+ * @param {string} pageName - Page name
+ * @returns {void}
  */
 function setupFilterEventHandlers(_pageName) {
   // Implementation for setting up filter event handlers
@@ -482,6 +594,13 @@ function setupFilterEventHandlers(_pageName) {
  * @param {string} pageName - Name of the page
  * @param {number} columnIndex - Index of the column
  */
+/**
+ * Handle header sort
+ * @function handleHeaderSort
+ * @param {string} pageName - Page name
+ * @param {number} columnIndex - Column index
+ * @returns {void}
+ */
 function handleHeaderSort(_pageName, _columnIndex) {
   // Implementation for handling header sort
   // Handling header sort for page
@@ -493,6 +612,13 @@ function handleHeaderSort(_pageName, _columnIndex) {
  * @param {string} pageName - Name of the page
  * @param {Object} sortState - Sort state to restore
  */
+/**
+ * Restore sort state
+ * @function restoreSortState
+ * @param {string} pageName - Page name
+ * @param {Object} sortState - Sort state
+ * @returns {void}
+ */
 function restoreSortState(_pageName, _sortState) {
   // Implementation for restoring sort state
   // Restoring sort state for page
@@ -502,6 +628,12 @@ function restoreSortState(_pageName, _sortState) {
  * Get current table data
  *
  * @param {string} pageName - Name of the page
+ * @returns {Array} Current table data
+ */
+/**
+ * Get current table data
+ * @function getCurrentTableData
+ * @param {string} pageName - Page name
  * @returns {Array} Current table data
  */
 function getCurrentTableData(_pageName) {
@@ -516,6 +648,13 @@ function getCurrentTableData(_pageName) {
  * @param {Array} data - Table data
  * @param {string} pageName - Name of the page
  * @returns {Object} Calculated statistics
+ */
+/**
+ * Calculate table statistics
+ * @function calculateTableStats
+ * @param {Array} data - Table data
+ * @param {string} pageName - Page name
+ * @returns {Object} Table statistics
  */
 function calculateTableStats(data, _pageName) {
   // Implementation for calculating table statistics
@@ -533,6 +672,13 @@ function calculateTableStats(data, _pageName) {
  * @param {string} pageName - Name of the page
  * @param {Object} stats - Statistics to display
  */
+/**
+ * Update stats display
+ * @function updateStatsDisplay
+ * @param {string} pageName - Page name
+ * @param {Object} stats - Statistics
+ * @returns {void}
+ */
 function updateStatsDisplay(_pageName, _stats) {
   // Implementation for updating statistics display
   // Updating stats display for page
@@ -541,6 +687,11 @@ function updateStatsDisplay(_pageName, _stats) {
 /**
  * Get current page state
  *
+ * @returns {Object} Current page state
+ */
+/**
+ * Get current page state
+ * @function getCurrentPageState
  * @returns {Object} Current page state
  */
 function getCurrentPageState() {
@@ -557,6 +708,11 @@ function getCurrentPageState() {
 /**
  * Initialize trades page
  */
+/**
+ * Initialize trades page
+ * @function initializeTradesPage
+ * @returns {void}
+ */
 function initializeTradesPage() {
   // Initializing trades page
   // Trades-specific initialization
@@ -565,6 +721,11 @@ function initializeTradesPage() {
 /**
  * Initialize accounts page
  */
+/**
+ * Initialize accounts page
+ * @function initializeAccountsPage
+ * @returns {void}
+ */
 function initializeAccountsPage() {
   // Initializing accounts page
   // Accounts-specific initialization
@@ -572,6 +733,11 @@ function initializeAccountsPage() {
 
 /**
  * Initialize alerts page
+ */
+/**
+ * Initialize alerts page
+ * @function initializeAlertsPage
+ * @returns {void}
  */
 function initializeAlertsPage() {
   // Initializing alerts page

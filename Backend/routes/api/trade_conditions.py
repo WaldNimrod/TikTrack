@@ -9,7 +9,7 @@ import logging
 import json
 from typing import Dict, Any
 
-from models.plan_condition import TradeCondition
+from models.trade_condition import TradeCondition
 from models.trade import Trade
 from models.plan_condition import PlanCondition
 from services.conditions_validation_service import ConditionsValidationService

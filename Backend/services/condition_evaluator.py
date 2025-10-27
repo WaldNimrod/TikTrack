@@ -28,7 +28,8 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from models.plan_condition import PlanCondition, TradeCondition
+from models.plan_condition import PlanCondition
+from models.trade_condition import TradeCondition
 from models.external_data import MarketDataQuote
 from models.trading_method import TradingMethod
 from models.ticker import Ticker

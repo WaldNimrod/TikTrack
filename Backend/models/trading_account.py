@@ -30,7 +30,7 @@ class TradingAccount(BaseModel):
     in the backend architecture documentation.
     """
     
-    __tablename__ = "trading_accounts"
+    __tablename__ = "accounts"
     __table_args__ = {'extend_existing': True}
     
     # Database columns - matching actual database schema

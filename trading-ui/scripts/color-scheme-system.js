@@ -12,13 +12,15 @@
  */
 
 // ===== ENTITY TYPE DEFINITIONS =====
-// בדיקה שהקובץ לא נטען פעמיים
-if (window.VALID_ENTITY_TYPES) {
-    console.warn('⚠️ color-scheme-system.js כבר נטען - מדלג על טעינה חוזרת');
-    return;
-}
+// עטיפת כל הקובץ בפונקציה כדי למנוע טעינה כפולה
+(function() {
+    // בדיקה שהקובץ לא נטען פעמיים
+    if (window.VALID_ENTITY_TYPES) {
+        console.warn('⚠️ color-scheme-system.js כבר נטען - מדלג על טעינה חוזרת');
+        return;
+    }
 
-const VALID_ENTITY_TYPES = [
+    const VALID_ENTITY_TYPES = [
   'trade', 'trade_plan', 'execution', 'account', 'cash_flow',
   'ticker', 'alert', 'note', 'constraint', 'design', 'research', 'preference'
 ];
@@ -809,3 +811,5 @@ if (document.readyState === 'loading') {
 // Color Scheme System loaded successfully
 window.colorSchemeSystemReady = true;
 // if (window.Logger) { window.Logger.info('✅ Color Scheme System ready', { page: "color-scheme" }); }
+
+})(); // סיום הפונקציה המעטפת

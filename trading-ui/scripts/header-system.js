@@ -295,12 +295,12 @@ class HeaderSystem {
               </div>
             </div>
 
-            <!-- פילטר חשבון -->
+            <!-- פילטר חשבון מסחר -->
             <div class="filter-group account-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle account-filter-toggle" id="accountFilterToggle" 
                         onclick="toggleAccountFilterMenu()">
-                  <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון</span>
+                  <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון מסחר</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="filter-menu" id="accountFilterMenu">
@@ -1011,7 +1011,7 @@ class HeaderSystem {
             accountItem.onclick = () => selectAccountOption(account.name);
             accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
             accountMenu.appendChild(accountItem);
-            // window.Logger.info('🔧 הוספתי חשבון:', account.name, { page: "header-system" });
+            // window.Logger.info('🔧 הוספתי חשבון מסחר:', account.name, { page: "header-system" });
           });
           
           // window.Logger.info(`✅ Loaded ${openAccounts.length} open trading accounts for filter`, { page: "header-system" });
@@ -1045,7 +1045,7 @@ class HeaderSystem {
           HeaderSystem.updateFilterUI('type', window.filterSystem.currentFilters.type);
         }
         
-        // עדכון UI של פילטר החשבון
+        // עדכון UI של פילטר החשבון מסחר
         if (window.filterSystem.currentFilters.account && window.filterSystem.currentFilters.account.length > 0) {
           // window.Logger.info('🔧 Updating account filter UI with:', window.filterSystem.currentFilters.account, { page: "header-system" });
           HeaderSystem.updateFilterUI('account', window.filterSystem.currentFilters.account);
@@ -1217,7 +1217,7 @@ class HeaderSystem {
               // אם אין שדה סוג - תמיד הצג (לא מסנן)
             }
             
-            // פילטר חשבון
+            // פילטר חשבון מסחר
             if (this.currentFilters.account.length > 0 && !this.currentFilters.account.includes('הכול')) {
               const accountCell = row.querySelector('td[data-account]');
               if (accountCell) {
@@ -1598,7 +1598,7 @@ window.updateAccountFilterText = function() {
 
   if (accountElement) {
     if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
-      accountElement.textContent = 'כל חשבון';
+      accountElement.textContent = 'כל חשבון מסחר';
     } else if (selectedItems.length === 1) {
       accountElement.textContent = selectedItems[0].getAttribute('data-value');
     } else {
@@ -1736,7 +1736,7 @@ window.updateFilterUI = function(filters) {
     }
   });
   
-  // עדכון פילטר חשבון
+  // עדכון פילטר חשבון מסחר
   const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
   accountItems.forEach(item => {
     item.classList.remove('selected');
@@ -2083,5 +2083,4 @@ window.testCacheClearingFunctions = function() {
 if (window.Logger && window.Logger.info) {
     window.Logger.info('✅ Header System v6.0.0 loaded successfully!', { page: "header-system" });
 } else {
-    console.log('✅ Header System v6.0.0 loaded successfully!');
 }

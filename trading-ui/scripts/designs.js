@@ -9,7 +9,6 @@
  * @lastUpdated January 2025
  */
 
-console.log('🎨 Designs page script loaded');
 
 /**
  * Toggle all sections visibility
@@ -112,4 +111,3 @@ function generateDetailedLog() {
 // window. export removed - using global version from system-management.js
 // window.generateDetailedLog export removed - local function only
 
-console.log('✅ Designs page script ready');

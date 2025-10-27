@@ -42,7 +42,6 @@ async function waitForPageFullyLoaded() {
  * Enhanced monitoring with real-time error detection
  */
 async function checkForMismatches(pageName, pageConfig) {
-    console.log(`🔍 checkForMismatches: Starting enhanced monitoring for page ${pageName}`);
     
     // Real-time error detection
     const errorLog = [];
@@ -65,7 +64,6 @@ async function checkForMismatches(pageName, pageConfig) {
         .map(script => script.src.split('?')[0])
         .filter(src => src && !src.includes('bootstrap') && !src.includes('font-awesome'));
     
-    console.log(`🔍 checkForMismatches: Found ${loadedScripts.length} loaded scripts:`, loadedScripts);
     
     // Check for scripts not defined in manifest
     const manifestScripts = [];
@@ -153,7 +151,6 @@ async function checkForMismatches(pageName, pageConfig) {
         });
     }
     
-    console.log(`🔍 checkForMismatches: Required scripts:`, requiredScripts);
     
     const mismatches = [];
     const duplicates = [];
@@ -326,7 +323,6 @@ async function checkForMismatches(pageName, pageConfig) {
         }
     });
     
-    console.log(`🔍 checkForMismatches: Found ${mismatches.length} mismatches`);
     
     return {
         mismatches: mismatches.length,
@@ -340,13 +336,10 @@ async function checkForMismatches(pageName, pageConfig) {
  * Run detailed page scan
  */
 async function runDetailedPageScan(pageName, pageConfig) {
-    console.log(`🔍 runDetailedPageScan: Starting for page ${pageName}`);
     
     // Check if we're on the correct page
     const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
     if (currentPage !== pageName) {
-        console.log(`🔍 runDetailedPageScan: Not on target page. Current: ${currentPage}, Target: ${pageName}`);
-        console.log(`🔍 runDetailedPageScan: Skipping detailed scan - need to be on the actual page`);
 
         // Return empty results since we can't scan a different page
         return {
@@ -365,7 +358,6 @@ async function runDetailedPageScan(pageName, pageConfig) {
 
     // Wait for page to be fully loaded
     await waitForPageFullyLoaded();
-    console.log(`🔍 runDetailedPageScan: Page ${pageName} fully loaded, proceeding with scan...`);
 
     // Run mismatch check
     const mismatchResults = await checkForMismatches(pageName, pageConfig);
@@ -379,7 +371,6 @@ async function runDetailedPageScan(pageName, pageConfig) {
         mismatchDetails: mismatchResults.mismatchDetails
     };
     
-    console.log(`🔍 runDetailedPageScan: Completed for page ${pageName}`, results);
     return results;
 }
 

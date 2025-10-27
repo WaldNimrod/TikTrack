@@ -1,51 +1,19 @@
-// ===== מיפוי עמודות לכל הטבלאות באתר =====
-// Table Column Mappings for All Tables
-//
-// This file centralizes all table column mappings for the entire application.
-// All sorting and data display functions use these mappings to ensure consistency.
-//
-// File: trading-ui/scripts/table-mappings.js
-// Dependencies: None (standalone utility file)
-// Dependents: main.js, all page-specific scripts
-//
-// TABLE STRUCTURE FIXES (August 24, 2025):
-// =======================================
-//
-// ISSUE: Table headers and data columns were inconsistent across pages
-// - Trades table had 10 columns in HTML but 11 columns in data
-// - Column order mismatch between HTML headers and JavaScript data rendering
-// - Sorting failed due to incorrect column mappings
-//
-// FIXES APPLIED:
-// - Updated trades table mapping to include 11 columns (added account_name)
-// - Fixed column order to match HTML headers exactly
-// - Updated getColumnValue function to handle new field names
-// - Corrected colspan attributes in HTML tables
-//
-// TRADES TABLE STRUCTURE (11 columns):
-// - account_name (0) - חשבון
-// - ticker_symbol (1) - טיקר
-// - trade_plan_id (2) - תוכנית
-// - status (3) - סטטוס
-// - investment_type (4) - סוג
-// - side (5) - צד
-// - created_at (6) - נוצר ב
-// - closed_at (7) - נסגר ב
-// - total_pl (8) - רווח/הפסד
-// - notes (9) - הערות
-// - actions (10) - פעולות
-//
-// @version 1.1
-// @lastUpdated August 24, 2025
-// @tableStructureFixes August 24, 2025 - Fixed column mappings and table structure
-
 /**
- * מיפוי עמודות לכל הטבלאות באתר
- * כל טבלה מוגדרת עם מערך של שמות השדות לפי סדר העמודות
- *
- * Column mappings for all tables in the application.
- * Each table is defined with an array of field names in column order.
+ * Table Mappings - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains centralized table column mappings for all tables in TikTrack.
+ * All sorting and data display functions use these mappings to ensure consistency.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/TABLE_MAPPING_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.1
+ * Last Updated: 2025-01-27
  */
+
+// ===== TABLE COLUMN MAPPINGS =====
 const TABLE_COLUMN_MAPPINGS = {
   // טבלת תכנונים (Trade Plans) - Database Display Page Structure
   'trade_plans': [
@@ -206,7 +174,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'closed_at',       // 5 - נסגר ב
     'total_pl',        // 6 - רווח/הפסד כולל
     'notes',           // 7 - הערות
-    'account_name',     // 8 - שם חשבון
+    'account_name',     // 8 - שם חשבון מסחר
   ],
 
   'executions_legacy': [
@@ -267,7 +235,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'stop_price',      // 5 - מחיר עצירה
     'target_price',    // 6 - מחיר יעד
     'reasons',         // 7 - סיבות
-    'account_name',    // 8 - שם חשבון
+    'account_name',    // 8 - שם חשבון מסחר
     'ticker_symbol',    // 9 - סמל טיקר
   ],
 
@@ -307,7 +275,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'ticker',          // 0 - טיקר
     'status',          // 1 - סטטוס
     'investment_type', // 2 - סוג השקעה
-    'account',         // 3 - חשבון
+    'account',         // 3 - חשבון מסחר
     'date',            // 4 - תאריך
     'quantity',        // 5 - כמות
     'price',           // 6 - מחיר
@@ -318,7 +286,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'name',            // 0 - שם
     'status',          // 1 - סטטוס
     'investment_type', // 2 - סוג השקעה
-    'account',         // 3 - חשבון
+    'account',         // 3 - חשבון מסחר
     'date',            // 4 - תאריך
     'amount',           // 5 - סכום
   ],

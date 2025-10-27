@@ -184,7 +184,7 @@ class EntityDetailsModal {
                     trade: 'טרייד', 
                     trade_plan: 'תכנית השקעה',
                     execution: 'ביצוע עסקה',
-                    account: 'חשבון',
+                    account: 'חשבון מסחר',
                     alert: 'התראה',
                     cash_flow: 'תזרים מזומנים',
                     note: 'הערה'

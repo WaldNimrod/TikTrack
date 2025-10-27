@@ -64,7 +64,6 @@ const tableData = {};
  */
 function initDatabaseDisplay() {
   try {
-    // console.log('🔄 Initializing database display page...');
 
     // Load default table (accounts)
     loadTableData('accounts');
@@ -77,7 +76,6 @@ function initDatabaseDisplay() {
       window.headerSystem.init();
     }
 
-    // console.log('✅ Database display page initialized successfully');
   } catch (error) {
     window.Logger.error('שגיאה באתחול עמוד בסיס הנתונים:', error, { page: "database" });
     if (typeof window.showErrorNotification === 'function') {
@@ -123,7 +121,6 @@ function setupEventListeners() {
  */
 async function loadTableData(tableType) {
   try {
-    // console.log(`📊 Loading data for table type: ${tableType}`);
 
     // Update current table type
     currentTableType = tableType;
@@ -144,7 +141,6 @@ async function loadTableData(tableType) {
     updateTableInfo(tableType, data.length);
 
 
-    // console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
 
   } catch (error) {
     // console.error(`❌ Error loading data for ${tableType}:`, error);
@@ -310,7 +306,6 @@ function formatCellValue(value, column) {
 function applySortingFunctionality(_tableType) {
   try {
     // Sorting is handled by global sortTable function from main.js
-    // console.log(`🔀 Sorting functionality applied to ${tableType} table`);
   } catch (error) {
     window.Logger.error('שגיאה בהחלת פונקציונליות מיון:', error, { page: "database" });
     if (typeof window.showErrorNotification === 'function') {
@@ -516,9 +511,7 @@ window.addRecord = addRecord;
 
 // Initialize when DOM is loaded
 // document.addEventListener('DOMContentLoaded', function() {
-//   // console.log('➕ Database display page DOM loaded');
 //   initDatabaseDisplay();
 // });
 
-// console.log('✅ DB Display script loaded successfully');
 

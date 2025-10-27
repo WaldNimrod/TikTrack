@@ -1,4 +1,19 @@
 /**
+ * External Data Service - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the external data service for TikTrack.
+ * Provides unified interface for fetching market data from external providers.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/EXTERNAL_DATA_SERVICE_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
+ */
+
+/**
  * External Data Service - Unified interface for all external data providers
  * ========================================================================
  *
@@ -103,6 +118,14 @@ class ExternalDataService {
   /**
      * Make HTTP request with retry logic
      */
+  /**
+   * Make HTTP request with retry logic
+   * @function makeRequest
+   * @async
+   * @param {string} url - Request URL
+   * @param {Object} options - Request options
+   * @returns {Promise<Object>} Response data
+   */
   async makeRequest(url, options = {}) {
     let lastError = null;
 
@@ -147,6 +170,14 @@ class ExternalDataService {
      * @param {Object} options - Additional options
      * @returns {Promise<Object>} Normalized quote data
      */
+  /**
+   * Get quote for single symbol
+   * @function getQuote
+   * @async
+   * @param {string} symbol - Stock symbol
+   * @param {Object} options - Request options
+   * @returns {Promise<Object>} Quote data
+   */
   async getQuote(symbol, options = {}) {
     try {
       this.log(`Fetching quote for ${symbol}`);
@@ -208,6 +239,14 @@ class ExternalDataService {
      * @param {Object} options - Additional options
      * @returns {Promise<Array>} Array of normalized quote data
      */
+  /**
+   * Get multiple quotes
+   * @function getQuotes
+   * @async
+   * @param {Array} symbols - Array of stock symbols
+   * @param {Object} options - Request options
+   * @returns {Promise<Array>} Array of quote data
+   */
   async getQuotes(symbols, options = {}) {
     try {
       if (!Array.isArray(symbols) || symbols.length === 0) {
@@ -303,8 +342,14 @@ class ExternalDataService {
   }
 
   /**
-     * Get quotes in smaller batches for large requests
-     */
+   * Get batched quotes
+   * @function getBatchedQuotes
+   * @async
+   * @param {Array} symbols - Array of stock symbols
+   * @param {number} batchSize - Batch size
+   * @param {Object} options - Request options
+   * @returns {Promise<Array>} Array of quote data
+   */
   async getBatchedQuotes(symbols, batchSize, options = {}) {
     const batches = [];
     for (let i = 0; i < symbols.length; i += batchSize) {
@@ -331,10 +376,11 @@ class ExternalDataService {
   }
 
   /**
-     * Get system status and provider information
-     *
-     * @returns {Promise<Object>} System status data
-     */
+   * Get system status
+   * @function getSystemStatus
+   * @async
+   * @returns {Promise<Object>} System status data
+   */
   async getSystemStatus() {
     try {
       this.log('Fetching system status');
@@ -500,12 +546,13 @@ class ExternalDataService {
   }
 
   /**
-     * Refresh external data for active tickers with notifications
-     *
-     * @param {Array} tickersData - Array of ticker objects
-     * @param {string} buttonId - ID of refresh button (optional)
-     * @returns {Promise<Object>} Updated data object
-     */
+   * Refresh tickers data
+   * @function refreshTickersData
+   * @async
+   * @param {Array} tickersData - Array of ticker data
+   * @param {string|null} buttonId - Button ID for UI updates
+   * @returns {Promise<void>}
+   */
   async refreshTickersData(tickersData, buttonId = null) {
     const refreshBtn = buttonId ? document.getElementById(buttonId) : null;
 
@@ -575,11 +622,12 @@ class ExternalDataService {
   }
 
   /**
-     * Refresh external data for active tickers silently (no notifications)
-     *
-     * @param {Array} tickersData - Array of ticker objects
-     * @returns {Promise<Object>} Updated data object or null
-     */
+   * Refresh tickers data silently
+   * @function refreshTickersDataSilently
+   * @async
+   * @param {Array} tickersData - Array of ticker data
+   * @returns {Promise<Object>} Updated data object
+   */
   async refreshTickersDataSilently(tickersData) {
     try {
       // Get all symbols (including cancelled ones)

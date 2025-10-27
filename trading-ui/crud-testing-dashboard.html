@@ -153,10 +153,10 @@
                                         </div>
                         <div class="table-actions">
                             <button data-button-type="PLAY" data-onclick="runSmartTestAllEntities()" data-text="הרץ בדיקות API" title="הרץ בדיקות API מהירות">
-                                            </button>
+                                </button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('crud-api-tests')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
-                                            </button>
-                                        </div>
+                                </button>
+                    </div>
                     </div>
                     <div class="section-body">
                         <!-- כפתורי בדיקה פשוטים -->
@@ -168,7 +168,7 @@
                                             <i class="fas fa-cogs text-primary"></i>
                                             בקרת בדיקות API
                                         </h6>
-                            </div>
+                </div>
                                     <div class="card-body">
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                             <button class="btn btn-primary btn-lg" onclick="runSmartTestAllEntities()">
@@ -190,9 +190,9 @@
                             </div>
                             </div>
                             </div>
-                            </div>
-                            </div>
-                            </div>
+                        </div>
+                    </div>
+                    </div>
                 <!-- UI Content Section 1 End-->   
 
                 <!-- UI Content Section 2 Start-->
@@ -201,14 +201,14 @@
                         <div class="table-title">
                             <img src="images/icons/development.svg" alt="תוצאות בדיקות" class="section-icon">
                             תוצאות בדיקות מפורטות
-                            </div>
+                    </div>
                         <div class="table-actions">
                             <button data-button-type="REFRESH" data-onclick="refreshTestResults()" data-text="רענן תוצאות" title="רענן תוצאות בדיקות">
                                             </button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('crud-test-results')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
                                             </button>
                                         </div>
-                                        </div>
+                    </div>
                     <div class="section-body">
                         <!-- תוצאות בדיקות מפורטות -->
                         <div class="row">
@@ -220,17 +220,17 @@
                                             <i class="fas fa-chart-bar text-success"></i>
                                             תוצאות בדיקות API
                                         </h6>
-                                                </div>
+                            </div>
                                     <div class="card-body">
                                         <!-- פס התקדמות -->
-                                        <div class="progress mb-3" style="height: 20px;">
-                                            <div class="progress-bar" id="apiProgressBar" role="progressbar" style="width: 0%">
+                                        <div class="progress mb-3" >
+                                            <div class="progress-bar" id="apiProgressBar" role="progressbar" >
                                                 <span id="apiProgressText">0%</span>
-                                            </div>
-                                        </div>
-                                        
+                            </div>
+                            </div>
+
                                         <!-- טבלת תוצאות מפורטת -->
-                                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                        <div class="table-responsive" >
                                             <table class="table table-sm table-hover" id="testResultsTable">
                                                 <thead class="table-dark sticky-top">
                                                     <tr>
@@ -249,35 +249,50 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                        </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
                             </div>
 
                         <!-- דוח מפורט -->
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                <div class="card" id="finalReportCard" style="display: none;">
+                                <div class="card" id="finalReportCard" >
                                     <div class="card-header">
                                         <h6 class="mb-0">
                                             <i class="fas fa-file-alt text-info"></i>
                                             דוח סופי
                                         </h6>
-                                        </div>
+                        </div>
                                     <div class="card-body">
                                         <div id="detailedReport">
                                             <div class="text-center text-muted">
                                                 <i class="fas fa-chart-line fa-2x mb-2"></i>
                                                 <p>התחל בדיקות כדי לראות דוח מפורט</p>
+                    </div>
+                    </div>
+                                        </div>
+                    </div>
+                    
+                                        <!-- תוצאות בדיקות מפורטות -->
+                                        <div class="card" id="deepTestingResults" >
+                                            <div class="card-header">
+                                                <h6 class="mb-0">
+                                                    <i class="fas fa-search text-info"></i>
+                                                    תוצאות בדיקות מפורטות
+                                                </h6>
+                    </div>
+                                            <div class="card-body">
+                                                <div class="text-center text-muted">
+                                                    לחץ על "בדיקה מפורטת" כדי לראות תוצאות מפורטות
+                </div>
+                                </div>
+                            </div>
+                                        </div>
                                         </div>
                                     </div>
                                         </div>
-                                        </div>
-                                                </div>
-                                                </div>
-                                                </div>
-                                                </div>
                 <!-- UI Content Section 2 End-->
 
                 <!-- UI Content Section 3 Start-->
@@ -290,8 +305,8 @@
                         <div class="table-actions">
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('additional-tests')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
                                             </button>
-                                        </div>
-                                        </div>
+                                                </div>
+                                                </div>
                     <div class="section-body">
                         <!-- בדיקות נוספות -->
                         <div class="row">
@@ -317,10 +332,10 @@
                                                 <i class="fas fa-play"></i> הרץ בדיקות כפתורים
                                             </button>
                                         </div>
-                                        </div>
-                                            </div>
-                                        </div>
-                                        
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- בדיקות CRUD Executions -->
                             <div class="col-md-6">
                                 <div class="card">
@@ -348,7 +363,7 @@
                                                 </div>
                                                 </div>
                                                 </div>
-                                            </div>
+                                                </div>
                 <!-- UI Content Section 3 End-->
 
                                     </div>
@@ -464,6 +479,8 @@
                     window.showErrorNotification('שגיאה בבדיקות כפתורים', 'לא ניתן להריץ את הבדיקות כרגע');
                 }
             });
+        };
+        
         // פונקציה לבדיקות Executions CRUD
         window.runExecutionsCRUDTests = function() {
             // הרצת בדיקות Executions CRUD דרך API
@@ -492,3 +509,104 @@
                 }
             });
         };
+        
+        // פונקציה פשוטה להעתקת דוח
+        window.copyReportToClipboard = async function() {
+            try {
+                const report = JSON.parse(localStorage.getItem('lastCRUDTestReport') || '{}');
+                
+                if (!report.summary) {
+                    if (window.showErrorNotification) {
+                        window.showErrorNotification('אין דוח זמין', 'אנא הרץ בדיקות תחילה ואז נסה שוב.', 5000);
+                    }
+                    return;
+                }
+                
+                // יצירת דוח טקסט פשוט
+                const text = `דוח בדיקות CRUD - TikTrack
+================================
+
+נוצר: ${new Date(report.summary.timestamp).toLocaleString('he-IL')}
+
+סיכום כללי:
+- ציון כללי: ${report.summary.overallScore}/100
+- עמודים תקינים: ${report.summary.passedEntities}/${report.summary.totalEntities}
+- עמודים בעייתיים: ${report.summary.problematicEntities}
+- זמן בדיקות: ${report.summary.totalTestTime} שניות
+
+${report.problematicPages.length > 0 ? `
+עמודים בעייתיים:
+${report.problematicPages.map(page => `
+${page.displayName} (${page.score}/100):
+בעיות: ${page.issues.join(', ')}
+`).join('')}
+` : ''}
+
+תוצאות מפורטות:
+${report.allResults.map(result => 
+    `${result.displayName}: ${result.score}/100 (${result.responseTime}ms) - ${result.score >= 80 ? 'תקין' : 'בעייתי'}`
+).join('\n')}
+
+---
+דוח נוצר אוטומטי - ${new Date().toLocaleString('he-IL')}`;
+                
+                // העתקה ללוח
+                await navigator.clipboard.writeText(text);
+                
+                if (window.showSuccessNotification) {
+                    window.showSuccessNotification('הועתק בהצלחה', 'הדוח הועתק ללוח', 2000);
+                }
+                
+            } catch (error) {
+                console.error('Failed to copy to clipboard:', error);
+                
+                // Fallback: create textarea and copy
+                const report = JSON.parse(localStorage.getItem('lastCRUDTestReport') || '{}');
+                if (report.summary) {
+                    const text = `דוח בדיקות CRUD - TikTrack
+================================
+
+נוצר: ${new Date(report.summary.timestamp).toLocaleString('he-IL')}
+
+סיכום כללי:
+- ציון כללי: ${report.summary.overallScore}/100
+- עמודים תקינים: ${report.summary.passedEntities}/${report.summary.totalEntities}
+- עמודים בעייתיים: ${report.summary.problematicEntities}
+- זמן בדיקות: ${report.summary.totalTestTime} שניות
+
+${report.problematicPages.length > 0 ? `
+עמודים בעייתיים:
+${report.problematicPages.map(page => `
+${page.displayName} (${page.score}/100):
+בעיות: ${page.issues.join(', ')}
+`).join('')}
+` : ''}
+
+תוצאות מפורטות:
+${report.allResults.map(result => 
+    `${result.displayName}: ${result.score}/100 (${result.responseTime}ms) - ${result.score >= 80 ? 'תקין' : 'בעייתי'}`
+).join('\n')}
+
+---
+דוח נוצר אוטומטי - ${new Date().toLocaleString('he-IL')}`;
+                    
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    if (window.showSuccessNotification) {
+                        window.showSuccessNotification('הועתק בהצלחה', 'הדוח הועתק ללוח (fallback)', 2000);
+                    }
+                } else {
+                    if (window.showErrorNotification) {
+                        window.showErrorNotification('שגיאה בהעתקה', 'לא ניתן להעתיק את הדוח', 3000);
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+</html>

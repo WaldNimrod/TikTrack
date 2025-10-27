@@ -6,17 +6,17 @@
 
 /* Debug highlights for problematic elements */
 .debug-highlight-overflow-hidden {
-    outline: 3px solid red !important;
+    outline: 3px solid red ;
     outline-offset: 2px;
 }
 
 .debug-highlight-stacking-context {
-    outline: 3px solid orange !important;
+    outline: 3px solid orange ;
     outline-offset: 2px;
 }
 
 .debug-highlight-higher-zindex {
-    outline: 3px solid blue !important;
+    outline: 3px solid blue ;
     outline-offset: 2px;
 }
 
@@ -45,12 +45,12 @@
 
 /* Test mode styles */
 .debug-test-mode .actions-menu-popup {
-    position: fixed !important;
-    z-index: 9999 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    border: 2px solid red !important;
+    position: fixed ;
+    z-index: 9999 ;
+    opacity: 1 ;
+    visibility: visible ;
+    pointer-events: auto ;
+    border: 2px solid red ;
 }
 
 .debug-test-mode .actions-menu-popup::after {

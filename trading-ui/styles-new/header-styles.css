@@ -84,7 +84,7 @@
 }
 
 #unified-header .header-top {
-    margin: 0 !important;
+    margin: 0 ;
     padding: 0;
     display: flex;
     justify-content: center;
@@ -537,15 +537,15 @@
 }
 
 .clear-btn {
-    display: flex !important;
+    display: flex ;
     align-items: center;
     justify-content: center;
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    min-height: 28px !important;
-    max-width: 28px !important;
-    max-height: 28px !important;
+    width: 28px ;
+    height: 28px ;
+    min-width: 28px ;
+    min-height: 28px ;
+    max-width: 28px ;
+    max-height: 28px ;
     background: white;
     border: 1px solid #fb5a05;
     border-radius: 4px;
@@ -554,9 +554,9 @@
     transition: all 0.2s ease;
     font-size: 14px;
     font-weight: normal;
-    padding: 0 !important;
+    padding: 0 ;
     margin: 0;
-    flex-shrink: 0 !important;
+    flex-shrink: 0 ;
     box-sizing: border-box;
 }
 
@@ -649,13 +649,13 @@
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
-    display: flex !important;
+    display: flex ;
     align-items: center;
     justify-content: center;
     padding: 0;
     margin: 0;
-    visibility: visible !important;
-    opacity: 1 !important;
+    visibility: visible ;
+    opacity: 1 ;
     position: relative;
     z-index: 952;
 }

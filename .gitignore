@@ -42,3 +42,4 @@ logs/*.log.*
 
 # Archive directories (keep local but don't backup)
 archive/
+reports/advanced-duplicates-*.json

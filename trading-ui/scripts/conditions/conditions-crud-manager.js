@@ -1,18 +1,22 @@
 /**
- * Conditions CRUD Manager - TikTrack
- * ===================================
- *
- * מערכת CRUD ספציפית למערכת התנאים
- * משתמש במערכת ה-CRUD הכללית crud-testing-dashboard.js
- *
- * @author TikTrack Development Team
- * @version 1.0.0
- * @lastUpdated October 19, 2025
+ * Conditions CRUD Manager - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the conditions CRUD manager for TikTrack including:
+ * - Condition creation, reading, updating, and deletion
+ * - Data validation and preparation
+ * - Cache management
+ * - Error handling and notifications
+ * - API integration
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 /**
- * Conditions CRUD Manager
- * מנהל CRUD ספציפי לתנאים
+ * Conditions CRUD Manager class
+ * @class ConditionsCRUDManager
  */
 class ConditionsCRUDManager {
     constructor() {
@@ -25,7 +29,11 @@ class ConditionsCRUDManager {
     
     /**
      * Create new condition
-     * יצירת תנאי חדש
+     * @function createCondition
+     * @async
+     * @param {number} tradePlanId - Trade plan ID
+     * @param {Object} conditionData - Condition data
+     * @returns {Promise<Object>} Created condition
      */
     async createCondition(tradePlanId, conditionData) {
         try {
@@ -71,8 +79,12 @@ class ConditionsCRUDManager {
     }
     
     /**
-     * Read conditions for trade plan
-     * קריאת תנאים לתכנית מסחר
+     * Read conditions
+     * @function readConditions
+     * @async
+     * @param {number} tradePlanId - Trade plan ID
+     * @param {boolean} useCache - Whether to use cache
+     * @returns {Promise<Array>} Conditions array
      */
     async readConditions(tradePlanId, useCache = true) {
         try {
@@ -121,7 +133,11 @@ class ConditionsCRUDManager {
     
     /**
      * Update condition
-     * עדכון תנאי
+     * @function updateCondition
+     * @async
+     * @param {number} conditionId - Condition ID
+     * @param {Object} conditionData - Condition data
+     * @returns {Promise<Object>} Updated condition
      */
     async updateCondition(conditionId, conditionData) {
         try {
@@ -168,7 +184,10 @@ class ConditionsCRUDManager {
     
     /**
      * Delete condition
-     * מחיקת תנאי
+     * @function deleteCondition
+     * @async
+     * @param {number} conditionId - Condition ID
+     * @returns {Promise<boolean>} Success status
      */
     async deleteCondition(conditionId) {
         try {
@@ -211,7 +230,10 @@ class ConditionsCRUDManager {
     
     /**
      * Get trading methods
-     * קבלת שיטות מסחר
+     * @function getTradingMethods
+     * @async
+     * @param {boolean} useCache - Whether to use cache
+     * @returns {Promise<Array>} Trading methods array
      */
     async getTradingMethods(useCache = true) {
         try {
@@ -260,7 +282,11 @@ class ConditionsCRUDManager {
     
     /**
      * Create alert from condition
-     * יצירת התראה מתנאי
+     * @function createAlertFromCondition
+     * @async
+     * @param {number} conditionId - Condition ID
+     * @param {Object} alertData - Alert data
+     * @returns {Promise<Object>} Created alert
      */
     async createAlertFromCondition(conditionId, alertData = {}) {
         try {
@@ -311,7 +337,10 @@ class ConditionsCRUDManager {
     
     /**
      * Get condition by ID
-     * קבלת תנאי לפי מזהה
+     * @function getConditionById
+     * @async
+     * @param {number} conditionId - Condition ID
+     * @returns {Promise<Object|null>} Condition object or null
      */
     async getConditionById(conditionId) {
         try {
@@ -333,8 +362,10 @@ class ConditionsCRUDManager {
     }
     
     /**
-     * Prepare condition data for API
-     * הכנת נתוני תנאי ל-API
+     * Prepare condition data
+     * @function prepareConditionData
+     * @param {Object} conditionData - Raw condition data
+     * @returns {Object} Prepared condition data
      */
     prepareConditionData(conditionData) {
         const prepared = { ...conditionData };
@@ -359,7 +390,12 @@ class ConditionsCRUDManager {
     
     /**
      * Make API call
-     * ביצוע קריאת API
+     * @function makeApiCall
+     * @async
+     * @param {string} endpoint - API endpoint
+     * @param {string} method - HTTP method
+     * @param {Object|null} data - Request data
+     * @returns {Promise<Object>} API response
      */
     async makeApiCall(endpoint, method = 'GET', data = null) {
         try {
@@ -397,7 +433,9 @@ class ConditionsCRUDManager {
     
     /**
      * Confirm deletion
-     * אישור מחיקה
+     * @function confirmDeletion
+     * @async
+     * @returns {Promise<boolean>} Confirmation result
      */
     async confirmDeletion() {
         return new Promise((resolve) => {
@@ -412,7 +450,10 @@ class ConditionsCRUDManager {
     
     /**
      * Show notification
-     * הצגת התראה
+     * @function showNotification
+     * @param {string} message - Message key
+     * @param {string} type - Notification type
+     * @returns {void}
      */
     showNotification(message, type = 'info') {
         if (window.showNotification && typeof window.showNotification === 'function') {
@@ -426,7 +467,9 @@ class ConditionsCRUDManager {
     
     /**
      * Clear cache
-     * ניקוי מטמון
+     * @function clearCache
+     * @param {string|null} pattern - Cache pattern
+     * @returns {void}
      */
     clearCache(pattern = null) {
         if (pattern) {
@@ -442,7 +485,8 @@ class ConditionsCRUDManager {
     
     /**
      * Get cache statistics
-     * קבלת סטטיסטיקות מטמון
+     * @function getCacheStats
+     * @returns {Object} Cache statistics
      */
     getCacheStats() {
         return {
@@ -455,7 +499,8 @@ class ConditionsCRUDManager {
     
     /**
      * Get oldest cache entry
-     * קבלת ערך מטמון ישן ביותר
+     * @function getOldestCacheEntry
+     * @returns {Object|null} Oldest cache entry
      */
     getOldestCacheEntry() {
         let oldest = null;
@@ -473,7 +518,8 @@ class ConditionsCRUDManager {
     
     /**
      * Get newest cache entry
-     * קבלת ערך מטמון חדש ביותר
+     * @function getNewestCacheEntry
+     * @returns {Object|null} Newest cache entry
      */
     getNewestCacheEntry() {
         let newest = null;
@@ -489,6 +535,9 @@ class ConditionsCRUDManager {
         return newest;
     }
 }
+
+// ===== GLOBAL EXPORTS =====
+window.ConditionsCRUDManager = ConditionsCRUDManager;
 
 // Create global instance
 window.conditionsCRUDManager = new ConditionsCRUDManager();

@@ -154,15 +154,25 @@ const executionsModalConfig = {
 };
 
 // יצירת המודל אם ModalManagerV2 זמין
-if (window.ModalManagerV2) {
-    try {
-        window.ModalManagerV2.createCRUDModal(executionsModalConfig);
-        console.log('✅ Executions modal created successfully');
-    } catch (error) {
-        console.error('❌ Error creating Executions modal:', error);
+function createExecutionsModal() {
+    if (window.ModalManagerV2) {
+        try {
+            window.ModalManagerV2.createCRUDModal(executionsModalConfig);
+            console.log('✅ Executions modal created successfully');
+        } catch (error) {
+            console.error('❌ Error creating Executions modal:', error);
+        }
+    } else {
+        console.warn('⚠️ ModalManagerV2 not available for Executions modal');
     }
-} else {
-    console.warn('⚠️ ModalManagerV2 not available for Executions modal');
+}
+
+// נסה ליצור את המודל מיד
+createExecutionsModal();
+
+// אם ModalManagerV2 לא זמין, נסה שוב אחרי זמן קצר
+if (!window.ModalManagerV2) {
+    setTimeout(createExecutionsModal, 100);
 }
 
 // ייצוא לקונסול (לצורך debug)

@@ -1,17 +1,23 @@
 /**
- * Linter Data Adapter - TikTrack Chart System
- * מתאם נתוני Linter - מערכת גרפים TikTrack
+ * Linter Data Adapter - Comprehensive Function Index
+ * ==========================================
  * 
- * @version 1.0.0
- * @lastUpdated December 2024
- * @author TikTrack Development Team
+ * This file contains the linter data adapter for TikTrack charts including:
+ * - Linter data retrieval and caching
+ * - Data transformation for charts
+ * - Error handling and fallbacks
+ * - Performance optimization
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 console.log('🔍 Linter Data Adapter initialized');
 
 /**
- * Linter Data Adapter
- * מתאם נתוני Linter
+ * Linter Data Adapter class
+ * @class LinterAdapter
  */
 class LinterAdapter {
     constructor(config = {}) {
@@ -22,7 +28,8 @@ class LinterAdapter {
 
     /**
      * Get linter data
-     * קבל נתוני Linter
+     * @function getData
+     * @async
      * @param {Object} params - Query parameters
      * @returns {Promise<Object>} Linter data
      */
@@ -56,9 +63,9 @@ class LinterAdapter {
 
     /**
      * Format data for charts
-     * עיצוב נתונים עבור גרפים
+     * @function formatData
      * @param {Object} rawData - Raw data
-     * @returns {Object} Formatted chart data
+     * @returns {Object} Formatted data
      */
     formatData(rawData) {
         const colors = window.getChartColor ? {
@@ -109,8 +116,8 @@ class LinterAdapter {
     }
 
     /**
-     * Generate mock data for testing
-     * צור נתוני דמה לבדיקה
+     * Generate mock data
+     * @function generateMockData
      * @param {Object} params - Parameters
      * @returns {Object} Mock data
      */
@@ -143,7 +150,8 @@ class LinterAdapter {
 
     /**
      * Clear cache
-     * נקה מטמון
+     * @function clearCache
+     * @returns {void}
      */
     clearCache() {
         this.cache.clear();
@@ -152,7 +160,7 @@ class LinterAdapter {
 
     /**
      * Get cache status
-     * קבל סטטוס מטמון
+     * @function getCacheStatus
      * @returns {Object} Cache status
      */
     getCacheStatus() {
@@ -162,6 +170,9 @@ class LinterAdapter {
         };
     }
 }
+
+// ===== GLOBAL EXPORTS =====
+window.LinterAdapter = LinterAdapter;
 
 // Create global instance
 window.LinterAdapter = new LinterAdapter();

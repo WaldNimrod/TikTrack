@@ -1,17 +1,24 @@
 /**
- * Chart Loader - TikTrack Chart Loader
- * טוען גרפים - טוען גרפים TikTrack
+ * Chart Loader - Comprehensive Function Index
+ * ==========================================
  * 
- * @version 1.0.0
- * @lastUpdated December 2024
- * @author TikTrack Development Team
+ * This file contains the chart loader system for TikTrack including:
+ * - Chart.js loading and initialization
+ * - Version management
+ * - Loading state tracking
+ * - Error handling and fallbacks
+ * - Performance optimization
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 console.log('📊 Chart Loader initialized');
 
 /**
  * Chart Loader Class
- * מחלקת טוען גרפים
+ * @class ChartLoader
  */
 class ChartLoader {
     constructor() {
@@ -22,7 +29,8 @@ class ChartLoader {
 
     /**
      * Load Chart.js
-     * טען Chart.js
+     * @function load
+     * @async
      * @returns {Promise<boolean>} Load success
      */
     async load() {
@@ -40,7 +48,8 @@ class ChartLoader {
 
     /**
      * Internal load method
-     * שיטת טעינה פנימית
+     * @function _loadChartJs
+     * @async
      * @returns {Promise<boolean>} Load success
      */
     async _loadChartJs() {
@@ -131,8 +140,8 @@ class ChartLoader {
 
     /**
      * Check if Chart.js is loaded
-     * בדוק אם Chart.js נטען
-     * @returns {boolean} Load status
+     * @function isChartJsLoaded
+     * @returns {boolean} Whether Chart.js is loaded
      */
     isChartJsLoaded() {
         return typeof Chart !== 'undefined';
@@ -140,8 +149,8 @@ class ChartLoader {
 
     /**
      * Get Chart.js version
-     * קבל גרסת Chart.js
-     * @returns {string} Version
+     * @function getVersion
+     * @returns {string} Chart.js version
      */
     getVersion() {
         if (this.isChartJsLoaded()) {
@@ -152,8 +161,8 @@ class ChartLoader {
 
     /**
      * Get loader status
-     * קבל סטטוס טוען
-     * @returns {Object} Status
+     * @function getStatus
+     * @returns {Object} Loader status
      */
     getStatus() {
         return {
@@ -164,6 +173,9 @@ class ChartLoader {
         };
     }
 }
+
+// ===== GLOBAL EXPORTS =====
+window.ChartLoader = ChartLoader;
 
 // Create global instance
 window.ChartLoader = new ChartLoader();

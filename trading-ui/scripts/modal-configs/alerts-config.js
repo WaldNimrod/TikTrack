@@ -172,3 +172,4 @@ if (window.ModalManagerV2) {
 // ייצוא לקונסול (לצורך debug)
 window.alertsModalConfig = alertsModalConfig;
 
+

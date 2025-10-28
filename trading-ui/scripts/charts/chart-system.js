@@ -1,17 +1,24 @@
 /**
- * Chart System - TikTrack Chart System
- * מערכת גרפים - מערכת גרפים TikTrack
+ * Chart System - Comprehensive Function Index
+ * ==========================================
  * 
- * @version 1.0.0
- * @lastUpdated December 2024
- * @author TikTrack Development Team
+ * This file contains the main chart system for TikTrack including:
+ * - Chart initialization and management
+ * - Data adapter registration
+ * - Chart lifecycle management
+ * - Performance optimization
+ * - Theme integration
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 console.log('📊 Chart System initialized');
 
 /**
- * Main Chart System
- * מערכת גרפים ראשית
+ * Main Chart System class
+ * @class ChartSystem
  */
 class ChartSystem {
     constructor() {
@@ -23,7 +30,9 @@ class ChartSystem {
 
     /**
      * Initialize chart system
-     * אתחל מערכת גרפים
+     * @function init
+     * @async
+     * @returns {Promise<void>}
      */
     async init() {
         try {
@@ -48,9 +57,10 @@ class ChartSystem {
 
     /**
      * Register data adapter
-     * רשום מתאם נתונים
+     * @function registerAdapter
      * @param {string} name - Adapter name
-     * @param {Object} adapter - Adapter instance
+     * @param {Object} adapter - Adapter object
+     * @returns {void}
      */
     registerAdapter(name, adapter) {
         this.adapters.set(name, adapter);
@@ -59,9 +69,9 @@ class ChartSystem {
 
     /**
      * Get data adapter
-     * קבל מתאם נתונים
+     * @function getAdapter
      * @param {string} name - Adapter name
-     * @returns {Object} Adapter instance
+     * @returns {Object|null} Adapter object
      */
     getAdapter(name) {
         return this.adapters.get(name);
@@ -69,9 +79,10 @@ class ChartSystem {
 
     /**
      * Create new chart
-     * צור גרף חדש
+     * @function create
+     * @async
      * @param {Object} config - Chart configuration
-     * @returns {Promise<Object>} Chart instance
+     * @returns {Promise<Object|null>} Chart instance
      */
     async create(config) {
         if (!this.isInitialized) {
@@ -145,9 +156,11 @@ class ChartSystem {
 
     /**
      * Update chart data
-     * עדכן נתוני גרף
+     * @function update
+     * @async
      * @param {string} chartId - Chart ID
      * @param {Object} newData - New data
+     * @returns {Promise<void>}
      */
     async update(chartId, newData) {
         const chartEntry = this.charts.get(chartId);
@@ -173,8 +186,9 @@ class ChartSystem {
 
     /**
      * Destroy chart
-     * השמד גרף
+     * @function destroy
      * @param {string} chartId - Chart ID
+     * @returns {void}
      */
     destroy(chartId) {
         const chartEntry = this.charts.get(chartId);
@@ -189,7 +203,8 @@ class ChartSystem {
 
     /**
      * Destroy all charts
-     * השמד את כל הגרפים
+     * @function destroyAll
+     * @returns {void}
      */
     destroyAll() {
         this.charts.forEach((_, chartId) => this.destroy(chartId));
@@ -198,9 +213,9 @@ class ChartSystem {
 
     /**
      * Get chart instance
-     * קבל מופע גרף
+     * @function getChart
      * @param {string} chartId - Chart ID
-     * @returns {Object} Chart instance
+     * @returns {Object|null} Chart instance
      */
     getChart(chartId) {
         const chartEntry = this.charts.get(chartId);
@@ -209,8 +224,8 @@ class ChartSystem {
 
     /**
      * Get all charts
-     * קבל את כל הגרפים
-     * @returns {Array} Array of chart instances
+     * @function getAllCharts
+     * @returns {Array} All chart instances
      */
     getAllCharts() {
         return Array.from(this.charts.values()).map(entry => entry.instance);
@@ -218,9 +233,9 @@ class ChartSystem {
 
     /**
      * Get chart info
-     * קבל מידע על גרף
+     * @function getChartInfo
      * @param {string} chartId - Chart ID
-     * @returns {Object} Chart information
+     * @returns {Object|null} Chart info
      */
     getChartInfo(chartId) {
         const chartEntry = this.charts.get(chartId);
@@ -240,8 +255,8 @@ class ChartSystem {
 
     /**
      * Get all charts info
-     * קבל מידע על כל הגרפים
-     * @returns {Array} Array of chart information
+     * @function getAllChartsInfo
+     * @returns {Array} All charts info
      */
     getAllChartsInfo() {
         return Array.from(this.charts.keys()).map(chartId => this.getChartInfo(chartId));
@@ -249,7 +264,8 @@ class ChartSystem {
 
     /**
      * Apply theme to all charts
-     * החל נושא על כל הגרפים
+     * @function applyThemeToAllCharts
+     * @returns {void}
      */
     applyThemeToAllCharts() {
         if (!window.ChartTheme) {
@@ -277,8 +293,9 @@ class ChartSystem {
 
     /**
      * Set theme
-     * הגדר נושא
+     * @function setTheme
      * @param {string} themeName - Theme name
+     * @returns {void}
      */
     setTheme(themeName) {
         if (window.ChartTheme) {
@@ -290,10 +307,11 @@ class ChartSystem {
     }
 
     /**
-     * Export chart (future feature)
-     * ייצא גרף (תכונה עתידית)
+     * Export chart
+     * @function export
      * @param {string} chartId - Chart ID
      * @param {string} format - Export format
+     * @returns {string|null} Export data
      */
     export(chartId, format = 'PNG') {
         console.log(`📤 Export chart '${chartId}' to ${format} - Future feature`);
@@ -305,7 +323,7 @@ class ChartSystem {
 
     /**
      * Get system status
-     * קבל סטטוס מערכת
+     * @function getStatus
      * @returns {Object} System status
      */
     getStatus() {
@@ -318,6 +336,9 @@ class ChartSystem {
         };
     }
 }
+
+// ===== GLOBAL EXPORTS =====
+window.ChartSystem = ChartSystem;
 
 // Create global instance
 window.ChartSystem = new ChartSystem();

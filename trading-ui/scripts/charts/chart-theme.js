@@ -1,17 +1,24 @@
 /**
- * Chart Theme System - TikTrack Chart System
- * מערכת נושאי גרפים - מערכת גרפים TikTrack
+ * Chart Theme System - Comprehensive Function Index
+ * ==========================================
  * 
- * @version 1.0.0
- * @lastUpdated December 2024
- * @author TikTrack Development Team
+ * This file contains the chart theme system for TikTrack including:
+ * - Theme management and registration
+ * - Dynamic color integration
+ * - Theme switching and application
+ * - Color preference integration
+ * - Performance optimization
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 console.log('🎨 Chart Theme System initialized');
 
 /**
- * Chart Theme Manager
- * מנהל נושאי גרפים
+ * Chart Theme Manager class
+ * @class ChartTheme
  */
 class ChartTheme {
     constructor() {
@@ -23,7 +30,8 @@ class ChartTheme {
 
     /**
      * Initialize theme system
-     * אתחל מערכת נושאים
+     * @function init
+     * @returns {void}
      */
     init() {
         this.loadDefaultThemes();
@@ -41,7 +49,8 @@ class ChartTheme {
 
     /**
      * Load default themes
-     * טען נושאים ברירת מחדל
+     * @function loadDefaultThemes
+     * @returns {void}
      */
     loadDefaultThemes() {
         // Default theme
@@ -83,10 +92,11 @@ class ChartTheme {
     }
 
     /**
-     * Register a new theme
-     * רשום נושא חדש
+     * Register theme
+     * @function registerTheme
      * @param {string} name - Theme name
      * @param {Object} config - Theme configuration
+     * @returns {void}
      */
     registerTheme(name, config) {
         this.themes.set(name, config);
@@ -94,10 +104,10 @@ class ChartTheme {
     }
 
     /**
-     * Get theme configuration
-     * קבל תצורת נושא
-     * @param {string} name - Theme name (optional)
-     * @returns {Object} Theme configuration
+     * Get theme
+     * @function getTheme
+     * @param {string|null} name - Theme name
+     * @returns {Object|null} Theme configuration
      */
     getTheme(name = null) {
         const themeName = name || this.currentTheme;
@@ -112,9 +122,10 @@ class ChartTheme {
     }
 
     /**
-     * Set current theme
-     * הגדר נושא נוכחי
+     * Set theme
+     * @function setTheme
      * @param {string} name - Theme name
+     * @returns {void}
      */
     setTheme(name) {
         if (!this.themes.has(name)) {
@@ -133,8 +144,9 @@ class ChartTheme {
     }
 
     /**
-     * Integrate with existing color system
-     * אינטגרציה עם מערכת הצבעים הקיימת
+     * Integrate with color system
+     * @function integrateWithColorSystem
+     * @returns {void}
      */
     integrateWithColorSystem() {
         if (window.getColorPreferences) {
@@ -148,8 +160,8 @@ class ChartTheme {
 
     /**
      * Get chart colors
-     * קבל צבעי גרפים
-     * @returns {Object} Color configuration
+     * @function getChartColors
+     * @returns {Object} Chart colors
      */
     getChartColors() {
         if (this.dynamicColors) {
@@ -217,8 +229,8 @@ class ChartTheme {
     }
 
     /**
-     * Get color by name
-     * קבל צבע לפי שם
+     * Get color
+     * @function getColor
      * @param {string} colorName - Color name
      * @returns {string} Color value
      */
@@ -228,9 +240,9 @@ class ChartTheme {
     }
 
     /**
-     * Get chart color palette (6-8 core colors for charts)
-     * קבל פלטת צבעים לגרפים (6-8 צבעים מרכזיים)
-     * @returns {Array} Array of color values
+     * Get chart color palette
+     * @function getChartColorPalette
+     * @returns {Array} Color palette
      */
     getChartColorPalette() {
         const colors = this.getChartColors();
@@ -264,9 +276,9 @@ class ChartTheme {
 
     /**
      * Get color with opacity
-     * קבל צבע עם שקיפות
+     * @function getColorWithOpacity
      * @param {string} colorName - Color name
-     * @param {number} opacity - Opacity (0-1)
+     * @param {number} opacity - Opacity value
      * @returns {string} Color with opacity
      */
     getColorWithOpacity(colorName, opacity = 0.1) {
@@ -285,10 +297,10 @@ class ChartTheme {
     /* getDarkerColor function removed - only light mode supported */
 
     /**
-     * Get lighter variant of color
-     * קבל גרסה בהירה יותר של הצבע
+     * Get lighter color
+     * @function getLighterColor
      * @param {string} colorName - Color name
-     * @param {number} amount - Lightening amount (0-1)
+     * @param {number} amount - Lightness amount
      * @returns {string} Lighter color
      */
     getLighterColor(colorName, amount = 0.2) {
@@ -304,10 +316,10 @@ class ChartTheme {
     }
 
     /**
-     * Get theme options for Chart.js
-     * קבל אפשרויות נושא עבור Chart.js
-     * @param {string} themeName - Theme name (optional)
-     * @returns {Object} Chart.js theme options
+     * Get chart options
+     * @function getChartOptions
+     * @param {string|null} themeName - Theme name
+     * @returns {Object} Chart options
      */
     getChartOptions(themeName = null) {
         const theme = this.getTheme(themeName);
@@ -383,7 +395,8 @@ class ChartTheme {
 
     /**
      * Update dynamic colors
-     * עדכן צבעים דינמיים
+     * @function updateDynamicColors
+     * @returns {void}
      */
     updateDynamicColors() {
         if (window.getColorPreferences) {
@@ -396,8 +409,9 @@ class ChartTheme {
     }
     
     /**
-     * Update existing charts with new colors
-     * עדכן גרפים קיימים עם צבעים חדשים
+     * Update existing charts
+     * @function updateExistingCharts
+     * @returns {void}
      */
     updateExistingCharts() {
         if (window.ChartSystem) {
@@ -449,13 +463,16 @@ class ChartTheme {
 
     /**
      * Get available themes
-     * קבל נושאים זמינים
-     * @returns {Array} Available theme names
+     * @function getAvailableThemes
+     * @returns {Array} Available themes
      */
     getAvailableThemes() {
         return Array.from(this.themes.keys());
     }
 }
+
+// ===== GLOBAL EXPORTS =====
+window.ChartTheme = ChartTheme;
 
 // Create global instance
 window.ChartTheme = new ChartTheme();

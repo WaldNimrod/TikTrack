@@ -1,9 +1,23 @@
 /**
- * Condition Builder - Main Component
- * Builds conditions with methods and parameters
- * Uses Translation System for all UI text
+ * Condition Builder - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the condition builder system for TikTrack including:
+ * - Condition building and management
+ * - Method selection and parameter configuration
+ * - Translation system integration
+ * - Validation and error handling
+ * - UI rendering and event handling
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
+/**
+ * Condition Builder class
+ * @class ConditionBuilder
+ */
 class ConditionBuilder {
     constructor(entityType, entityId, containerId) {
         this.entityType = entityType; // 'plan' or 'trade'
@@ -19,6 +33,8 @@ class ConditionBuilder {
     
     /**
      * Initialize translations for the component
+     * @function initializeTranslations
+     * @returns {void}
      */
     initializeTranslations() {
         this.translations = {
@@ -38,6 +54,9 @@ class ConditionBuilder {
     
     /**
      * Initialize the component
+     * @function initializeComponent
+     * @async
+     * @returns {Promise<void>}
      */
     async initializeComponent() {
         try {
@@ -51,7 +70,10 @@ class ConditionBuilder {
     }
     
     /**
-     * Load trading methods from server
+     * Load available methods
+     * @function loadMethods
+     * @async
+     * @returns {Promise<void>}
      */
     async loadMethods() {
         try {
@@ -136,6 +158,9 @@ class ConditionBuilder {
     
     /**
      * Group methods by category
+     * @function groupMethodsByCategory
+     * @param {Array} methods - Methods array
+     * @returns {Object} Grouped methods
      */
     groupMethodsByCategory(methods) {
         const grouped = {};
@@ -150,6 +175,8 @@ class ConditionBuilder {
     
     /**
      * Render the component
+     * @function render
+     * @returns {void}
      */
     render() {
         const container = document.getElementById(this.containerId);
@@ -192,6 +219,8 @@ class ConditionBuilder {
     
     /**
      * Render method selector
+     * @function renderMethodSelector
+     * @returns {string} HTML string
      */
     renderMethodSelector() {
         let html = '';
@@ -220,6 +249,8 @@ class ConditionBuilder {
     
     /**
      * Render parameter form
+     * @function renderParameterForm
+     * @returns {string} HTML string
      */
     renderParameterForm() {
         if (!this.selectedMethod) {
@@ -248,6 +279,8 @@ class ConditionBuilder {
     
     /**
      * Render conditions list
+     * @function renderConditionsList
+     * @returns {string} HTML string
      */
     renderConditionsList() {
         if (this.conditions.length === 0) {
@@ -276,6 +309,9 @@ class ConditionBuilder {
     
     /**
      * Format parameters for display
+     * @function formatParameters
+     * @param {Object} parameters - Parameters object
+     * @returns {string} Formatted parameters string
      */
     formatParameters(parameters) {
         if (!parameters) return '';
@@ -290,6 +326,8 @@ class ConditionBuilder {
     
     /**
      * Attach event listeners
+     * @function attachEventListeners
+     * @returns {void}
      */
     attachEventListeners() {
         // Method selection
@@ -336,7 +374,11 @@ class ConditionBuilder {
     }
     
     /**
-     * Select method and load parameters
+     * Select method
+     * @function selectMethod
+     * @async
+     * @param {number} methodId - Method ID
+     * @returns {Promise<void>}
      */
     async selectMethod(methodId) {
         try {
@@ -365,6 +407,10 @@ class ConditionBuilder {
     
     /**
      * Load method parameters
+     * @function loadMethodParameters
+     * @async
+     * @param {number} methodId - Method ID
+     * @returns {Promise<void>}
      */
     async loadMethodParameters(methodId) {
         try {
@@ -386,6 +432,8 @@ class ConditionBuilder {
     
     /**
      * Render parameter fields
+     * @function renderParameterFields
+     * @returns {void}
      */
     renderParameterFields() {
         const container = document.getElementById('parameterFields');
@@ -400,7 +448,10 @@ class ConditionBuilder {
     }
     
     /**
-     * Render individual parameter field
+     * Render parameter field
+     * @function renderParameterField
+     * @param {Object} param - Parameter object
+     * @returns {string} HTML string
      */
     renderParameterField(param) {
         const fieldId = `param_${param.parameter_key}`;
@@ -533,6 +584,9 @@ class ConditionBuilder {
     
     /**
      * Add condition
+     * @function addCondition
+     * @async
+     * @returns {Promise<void>}
      */
     async addCondition() {
         try {
@@ -574,6 +628,9 @@ class ConditionBuilder {
     
     /**
      * Edit condition
+     * @function editCondition
+     * @param {number} index - Condition index
+     * @returns {void}
      */
     editCondition(index) {
         const condition = this.conditions[index];
@@ -594,6 +651,9 @@ class ConditionBuilder {
     
     /**
      * Delete condition
+     * @function deleteCondition
+     * @param {number} index - Condition index
+     * @returns {void}
      */
     deleteCondition(index) {
         if (confirm('האם אתה בטוח שברצונך למחוק תנאי זה?')) {
@@ -606,6 +666,8 @@ class ConditionBuilder {
     
     /**
      * Cancel parameter form
+     * @function cancelParameterForm
+     * @returns {void}
      */
     cancelParameterForm() {
         document.getElementById('parameterFormContainer').style.display = 'none';
@@ -618,6 +680,8 @@ class ConditionBuilder {
     
     /**
      * Gather form data
+     * @function gatherFormData
+     * @returns {Object} Form data
      */
     gatherFormData() {
         const formData = {
@@ -659,7 +723,10 @@ class ConditionBuilder {
     }
     
     /**
-     * Populate parameter form with existing values
+     * Populate parameter form
+     * @function populateParameterForm
+     * @param {Object} parameters - Parameters object
+     * @returns {void}
      */
     populateParameterForm(parameters) {
         try {
@@ -681,7 +748,10 @@ class ConditionBuilder {
     }
     
     /**
-     * Save conditions to server
+     * Save conditions
+     * @function saveConditions
+     * @async
+     * @returns {Promise<void>}
      */
     async saveConditions() {
         try {
@@ -719,6 +789,9 @@ class ConditionBuilder {
     
     /**
      * Test conditions
+     * @function testConditions
+     * @async
+     * @returns {Promise<void>}
      */
     async testConditions() {
         try {
@@ -757,6 +830,9 @@ class ConditionBuilder {
     
     /**
      * Load existing conditions
+     * @function loadExistingConditions
+     * @async
+     * @returns {Promise<void>}
      */
     async loadExistingConditions() {
         try {
@@ -783,7 +859,10 @@ class ConditionBuilder {
     }
     
     /**
-     * Helper methods
+     * Get translation
+     * @function getTranslation
+     * @param {string} key - Translation key
+     * @returns {string} Translated text
      */
     getTranslation(key) {
         // Use internal translations first
@@ -798,6 +877,13 @@ class ConditionBuilder {
         return key;
     }
     
+    /**
+     * Show notification
+     * @function showNotification
+     * @param {string} message - Message key
+     * @param {string} type - Notification type
+     * @returns {void}
+     */
     showNotification(message, type = 'info') {
         if (window.showNotification) {
             window.showNotification(message, type);
@@ -811,5 +897,5 @@ class ConditionBuilder {
     }
 }
 
-// Export for use in other modules
+// ===== GLOBAL EXPORTS =====
 window.ConditionBuilder = ConditionBuilder;

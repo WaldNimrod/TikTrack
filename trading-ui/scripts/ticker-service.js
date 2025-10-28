@@ -549,28 +549,6 @@ window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
 window.updateAllTickerStatuses = updateAllTickerStatuses;
 window.updateTickerFromTradePlan = updateTickerFromTradePlan;
 window.updateTickersListForClosedTrades = updateTickersListForClosedTrades;
-  getTickers,
-  getTrades,
-  getTradePlans,
-  getTickersWithTrades,
-  getTickersWithPlans,
-  getRelevantTickers,
-  getTickersWithOpenOrClosedTradesAndPlans,
-  getTickersByType,
-  getTickersByActivity,
-  updateTickerSelect,
-  loadTickersForTradePlan,
-  clearCache,
-  loadCache,
-  saveTicker,
-  updateTicker,
-  deleteTicker,
-  updateTickerActiveTradesStatus,
-  updateAllActiveTradesStatuses,
-  updateAllTickerStatuses,
-  updateTickerFromTradePlan,
-  updateTickersListForClosedTrades
-};
 
 // ===== CRUD OPERATIONS =====
 

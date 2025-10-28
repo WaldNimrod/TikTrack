@@ -1,18 +1,21 @@
 /**
- * Conditions Initializer - TikTrack
- * ==================================
- *
- * מערכת אתחול מאוחדת למערכת התנאים
- * משתמש במערכת האתחול הכללית unified-app-initializer.js
- *
- * @author TikTrack Development Team
- * @version 1.0.0
- * @lastUpdated October 19, 2025
+ * Conditions Initializer - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the conditions system initializer for TikTrack including:
+ * - System initialization and dependency management
+ * - Component loading and setup
+ * - Error handling and validation
+ * - Integration with unified app initializer
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 /**
- * Conditions System Initializer
- * מאתחל מערכת התנאים
+ * Conditions System Initializer class
+ * @class ConditionsInitializer
  */
 class ConditionsInitializer {
     constructor() {
@@ -33,7 +36,9 @@ class ConditionsInitializer {
     
     /**
      * Initialize conditions system
-     * אתחול מערכת התנאים
+     * @function initialize
+     * @async
+     * @returns {Promise<boolean>} Initialization success
      */
     async initialize() {
         if (this.isInitialized) {
@@ -69,7 +74,9 @@ class ConditionsInitializer {
     
     /**
      * Check dependencies
-     * בדיקת תלויות
+     * @function checkDependencies
+     * @async
+     * @returns {Promise<void>}
      */
     async checkDependencies() {
         console.log('🔍 Checking Conditions System dependencies...');
@@ -92,6 +99,12 @@ class ConditionsInitializer {
     /**
      * Check if script is loaded
      * בדיקה אם סקריפט נטען
+     */
+    /**
+     * Check if script is loaded
+     * @function isScriptLoaded
+     * @param {string} scriptName - Script name
+     * @returns {boolean} Whether script is loaded
      */
     isScriptLoaded(scriptName) {
         const scripts = document.querySelectorAll('script[src]');

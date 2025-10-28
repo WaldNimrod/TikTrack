@@ -1,18 +1,22 @@
 /**
- * Conditions Form Generator - TikTrack
- * =====================================
- *
- * מערכת יצירת טפסים דינמית למערכת התנאים
- * משתמש במערכת ה-condition-builder.js הקיימת
- *
- * @author TikTrack Development Team
- * @version 1.0.0
- * @lastUpdated October 19, 2025
+ * Conditions Form Generator - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the conditions form generator for TikTrack including:
+ * - Dynamic form generation for conditions
+ * - Form validation and event handling
+ * - Trading methods integration
+ * - Parameter management
+ * - UI rendering and interaction
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 /**
- * Conditions Form Generator
- * מחולל טפסים דינמי לתנאים
+ * Conditions Form Generator class
+ * @class ConditionsFormGenerator
  */
 class ConditionsFormGenerator {
     constructor() {
@@ -25,7 +29,10 @@ class ConditionsFormGenerator {
     
     /**
      * Generate condition form
-     * יצירת טופס תנאי
+     * @function generateConditionForm
+     * @param {string} containerId - Container ID
+     * @param {Object} options - Form options
+     * @returns {void}
      */
     generateConditionForm(containerId, options = {}) {
         const container = document.getElementById(containerId);
@@ -46,7 +53,9 @@ class ConditionsFormGenerator {
     
     /**
      * Build form HTML
-     * בניית HTML של הטופס
+     * @function buildFormHTML
+     * @param {Object} options - Form options
+     * @returns {string} Form HTML
      */
     buildFormHTML(options = {}) {
         const isEdit = options.isEdit || false;
@@ -129,7 +138,9 @@ class ConditionsFormGenerator {
     
     /**
      * Setup form event listeners
-     * הגדרת מאזיני אירועים לטופס
+     * @function setupFormEventListeners
+     * @param {string} containerId - Container ID
+     * @returns {void}
      */
     setupFormEventListeners(containerId) {
         const container = document.getElementById(containerId);

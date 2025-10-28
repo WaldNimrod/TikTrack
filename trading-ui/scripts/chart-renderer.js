@@ -197,6 +197,10 @@ class ChartRenderer {
 window.ChartRenderer = new ChartRenderer();
 
 // Auto-initialize when DOM is ready
+// ===== GLOBAL EXPORTS =====
+window.ChartRenderer = ChartRenderer;
+
+// Initialize Chart Renderer
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         window.ChartRenderer.init();

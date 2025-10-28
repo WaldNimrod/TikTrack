@@ -7,7 +7,7 @@
     "trading-ui/styles/import-user-data.css",
     "trading-ui/styles/debug-actions-menu.css"
   ],
-  "total_selectors": 258,
+  "total_selectors": 256,
   "duplicate_selectors": {
     "#unified-header .header-container": 3,
     "#unified-header .logo-text": 2,
@@ -70,9 +70,9 @@
     ".search-clear-btn - font-size: ['1.2rem', '0.8rem']",
     ".search-clear-btn - padding: ['0', '0.25rem']",
     ".search-clear-btn:hover - color: ['#ff9500', '#333']",
-    "#unified-header .header-container - padding: ['var(--spacing-md, 16px) 10px', 'var(--spacing-lg, 24px) 20px', 'var(--spacing-sm, 8px) 15px']",
+    "#unified-header .header-container - padding: ['var(--spacing-md, 16px) 20px', 'var(--spacing-lg, 24px) 20px', 'var(--spacing-sm, 8px) 15px']",
     "#unified-header .logo-text - font-size: ['1rem', '0.9375rem']",
-    ".filters-container - max-width: ['var(--container-lg, 1200px)', '100%']",
+    ".filters-container - max-width: ['var(--container-xl, 1400px)', '100%']",
     ".filters-container - padding: ['0 20px', '0 15px']",
     ".step - flex-direction: ['column', 'row']",
     ".step-number - margin-bottom: ['10px', '0']",
@@ -102,7 +102,7 @@
     },
     {
       "file": "trading-ui/styles-new/header-styles.css",
-      "count": 13
+      "count": 0
     },
     {
       "file": "trading-ui/styles/import-user-data.css",
@@ -110,7 +110,7 @@
     },
     {
       "file": "trading-ui/styles/debug-actions-menu.css",
-      "count": 9
+      "count": 0
     }
   ],
   "inline_styles_in_html": [
@@ -139,13 +139,6 @@
       ]
     },
     {
-      "file": "trading-ui/chart-management.html",
-      "count": 1,
-      "examples": [
-        "style=\"max-width: 100%; height: auto;\""
-      ]
-    },
-    {
       "file": "trading-ui/smart-init-testing.html",
       "count": 1,
       "examples": [
@@ -166,15 +159,6 @@
       "count": 1,
       "examples": [
         "style=\"height: 3rem;\""
-      ]
-    },
-    {
-      "file": "trading-ui/db_display.html",
-      "count": 6,
-      "examples": [
-        "style=\"border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;\"",
-        "style=\"border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;\"",
-        "style=\"border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;\""
       ]
     },
     {
@@ -246,33 +230,10 @@
       ]
     },
     {
-      "file": "trading-ui/conditions-test.html",
-      "count": 1,
-      "examples": [
-        "style=\"display: none;\""
-      ]
-    },
-    {
-      "file": "trading-ui/cash_flows.html",
-      "count": 7,
-      "examples": [
-        "style=\"border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;\"",
-        "style=\"border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;\"",
-        "style=\"border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;\""
-      ]
-    },
-    {
       "file": "trading-ui/index-smart.html",
       "count": 1,
       "examples": [
         "style=\"height: 3rem;\""
-      ]
-    },
-    {
-      "file": "trading-ui/alerts.html",
-      "count": 1,
-      "examples": [
-        "style=\"display: none;\""
       ]
     },
     {
@@ -289,15 +250,6 @@
         "style=\"display: none;\"",
         "style=\"display:none;\"",
         "style=\"display:none;\""
-      ]
-    },
-    {
-      "file": "trading-ui/crud-testing-dashboard.html",
-      "count": 5,
-      "examples": [
-        "style=\"height: 20px;\"",
-        "style=\"width: 0%\"",
-        "style=\"max-height: 400px; overflow-y: auto;\""
       ]
     }
   ]

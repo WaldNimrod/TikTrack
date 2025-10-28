@@ -1,14 +1,25 @@
 /**
- * Chart Export System - TikTrack Chart System
- * מערכת ייצוא גרפים - מערכת גרפים TikTrack
+ * Chart Export System - Comprehensive Function Index
+ * ==========================================
  * 
- * @version 1.0.0
- * @lastUpdated December 2024
- * @author TikTrack Development Team
+ * This file contains the chart export system for TikTrack including:
+ * - Chart export functionality
+ * - Multiple format support (PNG, JPG, PDF, SVG)
+ * - Quality and resolution options
+ * - Batch export capabilities
+ * - Export queue management
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 console.log('📤 Chart Export System initialized');
 
+/**
+ * Chart Export System class
+ * @class ChartExportSystem
+ */
 class ChartExportSystem {
     constructor() {
         this.supportedFormats = ['png', 'jpg', 'pdf', 'svg'];
@@ -19,7 +30,11 @@ class ChartExportSystem {
 
     /**
      * Export a single chart
-     * ייצוא גרף בודד
+     * @function exportChart
+     * @async
+     * @param {string} chartId - Chart ID
+     * @param {Object} options - Export options
+     * @returns {Promise<string>} Export data URL
      */
     async exportChart(chartId, options = {}) {
         try {
@@ -103,7 +118,11 @@ class ChartExportSystem {
 
     /**
      * Export multiple charts
-     * ייצוא מספר גרפים
+     * @function exportMultipleCharts
+     * @async
+     * @param {Array<string>} chartIds - Chart IDs
+     * @param {Object} options - Export options
+     * @returns {Promise<Array>} Export results
      */
     async exportMultipleCharts(chartIds, options = {}) {
         try {
@@ -149,8 +168,11 @@ class ChartExportSystem {
     }
 
     /**
-     * Export all active charts
-     * ייצוא כל הגרפים הפעילים
+     * Export all charts
+     * @function exportAllCharts
+     * @async
+     * @param {Object} options - Export options
+     * @returns {Promise<Array>} Export results
      */
     async exportAllCharts(options = {}) {
         try {
@@ -191,7 +213,8 @@ class ChartExportSystem {
 
     /**
      * Get export status
-     * קבלת סטטוס ייצוא
+     * @function getExportStatus
+     * @returns {Object} Export status
      */
     getExportStatus() {
         return {
@@ -203,8 +226,11 @@ class ChartExportSystem {
     }
 
     /**
-     * Simulate export process (future implementation)
-     * סימולציה של תהליך ייצוא (יישום עתידי)
+     * Simulate export
+     * @function simulateExport
+     * @async
+     * @param {Object} options - Export options
+     * @returns {Promise<string>} Simulated export data
      */
     async simulateExport(options) {
         return new Promise((resolve) => {
@@ -218,7 +244,8 @@ class ChartExportSystem {
 
     /**
      * Get supported formats
-     * קבלת פורמטים נתמכים
+     * @function getSupportedFormats
+     * @returns {Array} Supported formats
      */
     getSupportedFormats() {
         return this.supportedFormats;
@@ -226,7 +253,8 @@ class ChartExportSystem {
 
     /**
      * Get quality levels
-     * קבלת רמות איכות
+     * @function getQualityLevels
+     * @returns {Array} Quality levels
      */
     getQualityLevels() {
         return this.qualityLevels;
@@ -234,7 +262,9 @@ class ChartExportSystem {
 
     /**
      * Validate export options
-     * אימות אפשרויות ייצוא
+     * @function validateOptions
+     * @param {Object} options - Export options
+     * @returns {Object} Validated options
      */
     validateOptions(options) {
         const errors = [];
@@ -261,6 +291,9 @@ class ChartExportSystem {
         };
     }
 }
+
+// ===== GLOBAL EXPORTS =====
+window.ChartExportSystem = ChartExportSystem;
 
 // Create global instance
 window.ChartExportSystem = new ChartExportSystem();

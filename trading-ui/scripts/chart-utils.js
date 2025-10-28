@@ -1,17 +1,24 @@
 /**
- * Chart Utils - TikTrack Chart Utilities
- * כלי גרפים - כלי גרפים TikTrack
+ * Chart Utils - Comprehensive Function Index
+ * ==========================================
  * 
- * @version 1.0.0
- * @lastUpdated December 2024
- * @author TikTrack Development Team
+ * This file contains chart utility functions for TikTrack including:
+ * - Color management and generation
+ * - Chart configuration helpers
+ * - Data formatting utilities
+ * - Chart styling and themes
+ * - Performance optimization helpers
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 console.log('📊 Chart Utils loaded');
 
 /**
- * Chart Utilities
- * כלי גרפים
+ * Chart Utilities class
+ * @class ChartUtils
  */
 class ChartUtils {
     constructor() {
@@ -29,7 +36,7 @@ class ChartUtils {
 
     /**
      * Generate random color
-     * צור צבע אקראי
+     * @function getRandomColor
      * @returns {string} Random color
      */
     getRandomColor() {
@@ -39,7 +46,7 @@ class ChartUtils {
 
     /**
      * Get color by index
-     * קבל צבע לפי אינדקס
+     * @function getColorByIndex
      * @param {number} index - Color index
      * @returns {string} Color value
      */
@@ -49,10 +56,10 @@ class ChartUtils {
 
     /**
      * Format data for charts
-     * עבד נתונים לגרפים
-     * @param {Array} data - Raw data
+     * @function formatDataForChart
+     * @param {Array} data - Data array
      * @param {string} type - Chart type
-     * @returns {Object} Formatted chart data
+     * @returns {Object} Formatted data
      */
     formatDataForChart(data, type = 'line') {
         if (!Array.isArray(data)) {
@@ -79,7 +86,7 @@ class ChartUtils {
 
     /**
      * Create chart configuration
-     * צור תצורת גרף
+     * @function createChartConfig
      * @param {string} type - Chart type
      * @param {Object} data - Chart data
      * @param {Object} options - Additional options
@@ -110,5 +117,8 @@ class ChartUtils {
 
 // Create global instance
 window.ChartUtils = new ChartUtils();
+
+// ===== GLOBAL EXPORTS =====
+window.ChartUtils = ChartUtils;
 
 console.log('✅ Chart Utils ready');

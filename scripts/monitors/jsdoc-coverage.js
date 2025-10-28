@@ -37,6 +37,33 @@ const CONFIG = {
 };
 
 /**
+ * Check if file exists and return full path
+ */
+function checkFileExists(fileName) {
+    const fullPath = path.join(CONFIG.scriptsDir, fileName);
+    const absolutePath = path.resolve(fullPath);
+    
+    if (fs.existsSync(absolutePath)) {
+        return absolutePath;
+    }
+    
+    // Try alternative paths
+    const alternativePaths = [
+        path.join(process.cwd(), 'trading-ui', 'scripts', fileName),
+        path.join(process.cwd(), '..', 'trading-ui', 'scripts', fileName),
+        path.join(__dirname, '..', '..', 'trading-ui', 'scripts', fileName)
+    ];
+    
+    for (const altPath of alternativePaths) {
+        if (fs.existsSync(altPath)) {
+            return altPath;
+        }
+    }
+    
+    return null;
+}
+
+/**
  * Main execution function
  */
 async function main() {
@@ -56,14 +83,14 @@ async function main() {
 
         // Process each core page
         for (const page of CONFIG.corePages) {
-            const pagePath = path.join(CONFIG.scriptsDir, page);
+            const pagePath = checkFileExists(page);
             
-            if (!fs.existsSync(pagePath)) {
-                console.log(`⚠️  File not found: ${page}`);
+            if (!pagePath) {
+                console.log(`⚠️  File not found: ${page} (searched in multiple locations)`);
                 continue;
             }
 
-            console.log(`📄 Analyzing: ${page}`);
+            console.log(`📄 Analyzing: ${page} (${pagePath})`);
             const pageResult = await analyzePage(pagePath, page);
             results.pages.push(pageResult);
             results.summary.total += pageResult.totalFunctions;
@@ -145,7 +172,20 @@ function checkFunctionForJSDoc(content, func) {
     const jsdocPattern = /\/\*\*[\s\S]*?\*\//;
     const match = beforeFunction.match(jsdocPattern);
     
-    return match !== null;
+    if (!match) {
+        return false;
+    }
+    
+    // Check for advanced JSDoc tags
+    const jsdocContent = match[0];
+    const hasDescription = jsdocContent.includes('@description') || 
+                          (jsdocContent.includes('*') && !jsdocContent.includes('@param') && !jsdocContent.includes('@returns'));
+    const hasParams = jsdocContent.includes('@param');
+    const hasReturns = jsdocContent.includes('@returns') || jsdocContent.includes('@return');
+    const hasThrows = jsdocContent.includes('@throws');
+    
+    // Consider it documented if it has at least description or any advanced tags
+    return hasDescription || hasParams || hasReturns || hasThrows;
 }
 
 /**

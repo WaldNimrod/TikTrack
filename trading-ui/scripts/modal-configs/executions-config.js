@@ -167,13 +167,18 @@ function createExecutionsModal() {
     }
 }
 
-// נסה ליצור את המודל מיד
-createExecutionsModal();
-
-// אם ModalManagerV2 לא זמין, נסה שוב אחרי זמן קצר
-if (!window.ModalManagerV2) {
-    setTimeout(createExecutionsModal, 100);
-}
+// נסה ליצור את המודל אחרי שהדף נטען
+document.addEventListener('DOMContentLoaded', () => {
+    // המתן קצת כדי שכל הסקריפטים יטענו
+    setTimeout(() => {
+        createExecutionsModal();
+        
+        // אם ModalManagerV2 עדיין לא זמין, נסה שוב
+        if (!window.ModalManagerV2) {
+            setTimeout(createExecutionsModal, 500);
+        }
+    }, 200);
+});
 
 // ייצוא לקונסול (לצורך debug)
 window.executionsModalConfig = executionsModalConfig;

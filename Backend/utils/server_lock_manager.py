@@ -70,6 +70,8 @@ class ServerLockManager:
                 sock.close()
                 if result == 0:
                     self.logger.warning("Port 8080 appears to be in use, but cannot identify the process")
+                    # Try to find and kill Python processes that might be TikTrack
+                    return self.find_python_processes_on_port()
                 return processes
             
             for conn in connections:
@@ -88,6 +90,40 @@ class ServerLockManager:
             # Continue execution - this is not a critical error
             
         self.logger.info(f"Found {len(processes)} processes on port 8080")
+        return processes
+    
+    def find_python_processes_on_port(self) -> List[Dict]:
+        """
+        Fallback method to find Python processes that might be TikTrack servers
+        when we can't access network connections due to permissions
+        
+        Returns:
+            List of process dictionaries
+        """
+        self.logger.info("Searching for Python processes that might be TikTrack servers...")
+        
+        processes = []
+        
+        try:
+            for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+                try:
+                    # Check if it's a Python process
+                    if proc.info['name'] and 'python' in proc.info['name'].lower():
+                        cmdline = ' '.join(proc.info['cmdline']) if proc.info['cmdline'] else ''
+                        
+                        # Check if it looks like a TikTrack server
+                        if any(keyword in cmdline.lower() for keyword in self.server_keywords):
+                            process_info = self.get_process_details(proc.info['pid'])
+                            if process_info:
+                                processes.append(process_info)
+                                
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    continue
+                    
+        except Exception as e:
+            self.logger.warning(f"Error searching for Python processes: {e}")
+            
+        self.logger.info(f"Found {len(processes)} potential TikTrack Python processes")
         return processes
     
     def is_tiktrack_server(self, pid: int) -> bool:
@@ -211,6 +247,49 @@ class ServerLockManager:
         
         sys.exit(1)
     
+    def kill_existing_processes(self, processes: List[Dict]) -> bool:
+        """
+        Attempt to kill existing TikTrack server processes
+        
+        Args:
+            processes: List of processes to kill
+            
+        Returns:
+            True if all processes were killed successfully, False otherwise
+        """
+        self.logger.info(f"Attempting to kill {len(processes)} existing processes...")
+        
+        killed_count = 0
+        for proc in processes:
+            try:
+                self.logger.info(f"Killing process {proc['pid']}: {proc['cmdline']}")
+                process = psutil.Process(proc['pid'])
+                process.terminate()
+                
+                # Wait for process to terminate
+                try:
+                    process.wait(timeout=5)
+                    killed_count += 1
+                    self.logger.info(f"Successfully killed process {proc['pid']}")
+                except psutil.TimeoutExpired:
+                    # Force kill if graceful termination failed
+                    self.logger.warning(f"Process {proc['pid']} didn't terminate gracefully, force killing...")
+                    process.kill()
+                    process.wait(timeout=2)
+                    killed_count += 1
+                    self.logger.info(f"Force killed process {proc['pid']}")
+                    
+            except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+                self.logger.warning(f"Could not kill process {proc['pid']}: {e}")
+                continue
+        
+        if killed_count == len(processes):
+            self.logger.info(f"Successfully killed all {killed_count} processes")
+            return True
+        else:
+            self.logger.warning(f"Only killed {killed_count} out of {len(processes)} processes")
+            return False
+
     def check_and_prevent_conflicts(self) -> bool:
         """
         Main function to check for conflicts and prevent multiple instances
@@ -228,8 +307,15 @@ class ServerLockManager:
         
         if tiktrack_processes:
             self.logger.warning(f"Found {len(tiktrack_processes)} existing TikTrack server processes")
-            self.show_error_and_exit(tiktrack_processes)
-            return False
+            
+            # Try to kill existing processes
+            if self.kill_existing_processes(tiktrack_processes):
+                self.logger.info("All existing processes killed successfully")
+                return True
+            else:
+                self.logger.error("Failed to kill some existing processes")
+                self.show_error_and_exit(tiktrack_processes)
+                return False
         
         self.logger.info("No conflicts found - server can start safely")
         return True
@@ -247,8 +333,12 @@ def main():
             print("❌ Conflicts found")
             sys.exit(1)
     else:
-        # Interactive mode
-        manager.check_and_prevent_conflicts()
+        # Interactive mode - this will kill processes if found
+        if manager.check_and_prevent_conflicts():
+            print("✅ No conflicts found - server can start")
+        else:
+            print("❌ Conflicts found - server startup blocked")
+            sys.exit(1)
 
 if __name__ == "__main__":
     main()

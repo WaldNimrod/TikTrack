@@ -1,18 +1,22 @@
 /**
- * Conditions Validator - TikTrack
- * ===============================
- *
- * מערכת validation ספציפית למערכת התנאים
- * משתמש במערכת ה-validation הכללית constraints.js
- *
- * @author TikTrack Development Team
- * @version 1.0.0
- * @lastUpdated October 19, 2025
+ * Conditions Validator - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the conditions validation system for TikTrack including:
+ * - Method validation rules
+ * - Parameter validation
+ * - Form validation
+ * - Error handling and reporting
+ * - Integration with constraints system
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 /**
- * Conditions Validator
- * ולידטור תנאים
+ * Conditions Validator class
+ * @class ConditionsValidator
  */
 class ConditionsValidator {
     constructor() {
@@ -116,8 +120,10 @@ class ConditionsValidator {
     }
     
     /**
-     * Validate condition data
-     * ולידציה של נתוני תנאי
+     * Validate condition
+     * @function validateCondition
+     * @param {Object} conditionData - Condition data
+     * @returns {Object} Validation result
      */
     validateCondition(conditionData) {
         const errors = [];
@@ -180,7 +186,10 @@ class ConditionsValidator {
     
     /**
      * Validate method parameters
-     * ולידציה של פרמטרי שיטה
+     * @function validateMethodParameters
+     * @param {number} methodId - Method ID
+     * @param {string} parametersJson - Parameters JSON string
+     * @returns {Object} Validation result
      */
     validateMethodParameters(methodId, parametersJson) {
         const errors = [];
@@ -255,7 +264,11 @@ class ConditionsValidator {
     
     /**
      * Validate parameter type
-     * ולידציה של סוג פרמטר
+     * @function validateParameterType
+     * @param {string} paramName - Parameter name
+     * @param {*} paramValue - Parameter value
+     * @param {string} expectedType - Expected type
+     * @returns {boolean} Whether type is valid
      */
     validateParameterType(paramName, paramValue, expectedType) {
         let actualType = typeof paramValue;
@@ -280,7 +293,11 @@ class ConditionsValidator {
     
     /**
      * Validate parameter range
-     * ולידציה של טווח פרמטר
+     * @function validateParameterRange
+     * @param {string} paramName - Parameter name
+     * @param {*} paramValue - Parameter value
+     * @param {Object} rangeRules - Range rules
+     * @returns {boolean} Whether range is valid
      */
     validateParameterRange(paramName, paramValue, rangeRules) {
         if (rangeRules.min !== undefined && paramValue < rangeRules.min) {
@@ -302,7 +319,9 @@ class ConditionsValidator {
     
     /**
      * Validate logical operator
-     * ולידציה של אופרטור לוגי
+     * @function validateLogicalOperator
+     * @param {string} operator - Logical operator
+     * @returns {boolean} Whether operator is valid
      */
     validateLogicalOperator(operator) {
         const errors = [];
@@ -316,7 +335,9 @@ class ConditionsValidator {
     
     /**
      * Validate condition group
-     * ולידציה של קבוצת תנאי
+     * @function validateConditionGroup
+     * @param {number} group - Condition group
+     * @returns {boolean} Whether group is valid
      */
     validateConditionGroup(group) {
         const errors = [];
@@ -332,8 +353,10 @@ class ConditionsValidator {
     }
     
     /**
-     * Validate is_active
-     * ולידציה של סטטוס פעיל
+     * Validate is active
+     * @function validateIsActive
+     * @param {boolean} isActive - Is active flag
+     * @returns {boolean} Whether is active is valid
      */
     validateIsActive(isActive) {
         const errors = [];
@@ -346,8 +369,10 @@ class ConditionsValidator {
     }
     
     /**
-     * Get method key from method ID
-     * קבלת מפתח שיטה ממזהה שיטה
+     * Get method key from ID
+     * @function getMethodKeyFromId
+     * @param {number} methodId - Method ID
+     * @returns {string|null} Method key
      */
     getMethodKeyFromId(methodId) {
         // This would typically come from the trading methods API
@@ -365,8 +390,10 @@ class ConditionsValidator {
     }
     
     /**
-     * Validate condition for creation
-     * ולידציה של תנאי ליצירה
+     * Validate for creation
+     * @function validateForCreation
+     * @param {Object} conditionData - Condition data
+     * @returns {Object} Validation result
      */
     validateForCreation(conditionData) {
         const validation = this.validateCondition(conditionData);
@@ -381,8 +408,10 @@ class ConditionsValidator {
     }
     
     /**
-     * Validate condition for update
-     * ולידציה של תנאי לעדכון
+     * Validate for update
+     * @function validateForUpdate
+     * @param {Object} conditionData - Condition data
+     * @returns {Object} Validation result
      */
     validateForUpdate(conditionData) {
         const validation = this.validateCondition(conditionData);

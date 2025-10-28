@@ -1,19 +1,26 @@
 /**
- * Comprehensive Cache Clearing Test Suite
- * ========================================
+ * Comprehensive Cache Clearing Test Suite - Comprehensive Function Index
+ * ==========================================
  * 
- * בדיקה מקיפה של כל 4 רמות הניקוי
- * דוגם מפתחות מכל ענף/קטגוריה ובודק שנמחקו
+ * This file contains the comprehensive cache clearing test suite for TikTrack including:
+ * - Cache clearing test for all 4 levels
+ * - Key sampling and verification
+ * - Performance testing
+ * - Error handling and reporting
+ * - Test result analysis
  * 
- * @author TikTrack Development Team
- * @version 1.0.0
- * @date 11 אוקטובר 2025
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 console.log('🧪 Comprehensive Cache Clearing Test Suite loaded');
 
 /**
  * Main test function - tests all 4 levels comprehensively
+ * @function runComprehensiveCacheClearingTest
+ * @async
+ * @returns {Promise<void>}
  */
 window.runComprehensiveCacheClearingTest = async function() {
     console.log('\n' + '='.repeat(80));
@@ -153,9 +160,10 @@ window.runComprehensiveCacheClearingTest = async function() {
 };
 
 /**
- * Test Light Level (25% coverage)
- * Should clear: Memory + Services
- * Should NOT clear: localStorage, IndexedDB, Orphans
+ * Test light level cache clearing
+ * @function testLevel_Light
+ * @async
+ * @returns {Promise<Object>} Test results
  */
 async function testLevel_Light() {
     console.log('\n🟢 ========== TESTING LIGHT LEVEL ==========');
@@ -289,9 +297,10 @@ async function testLevel_Light() {
 }
 
 /**
- * Test Medium Level (60% coverage)
- * Should clear: Memory + Services + UnifiedCM (4 layers)
- * Should NOT clear: Orphans
+ * Test medium level cache clearing
+ * @function testLevel_Medium
+ * @async
+ * @returns {Promise<Object>} Test results
  */
 async function testLevel_Medium() {
     console.log('\n🔵 ========== TESTING MEDIUM LEVEL ==========');
@@ -439,9 +448,10 @@ async function testLevel_Medium() {
 }
 
 /**
- * Test Full Level (100% coverage)
- * Should clear: Everything including Orphans
- * Should NOT clear: non-prefix localStorage (unless orphan list)
+ * Test full level cache clearing
+ * @function testLevel_Full
+ * @async
+ * @returns {Promise<Object>} Test results
  */
 async function testLevel_Full() {
     console.log('\n🟠 ========== TESTING FULL LEVEL ==========');
@@ -622,9 +632,10 @@ async function testLevel_Full() {
 }
 
 /**
- * Test Nuclear Level (150%+ coverage)
- * Should clear: EVERYTHING
- * ⚠️ DESTRUCTIVE - Manual execution only!
+ * Test nuclear level cache clearing
+ * @function testLevel_Nuclear
+ * @async
+ * @returns {Promise<Object>} Test results
  */
 async function testLevel_Nuclear() {
     console.log('\n☢️ ========== TESTING NUCLEAR LEVEL ==========');

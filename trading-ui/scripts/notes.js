@@ -1,3 +1,75 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 45
+ * 
+ * PAGE INITIALIZATION (1)
+ * - setupNoteValidationEvents() - setupNoteValidationEvents function
+ * 
+ * DATA LOADING (7)
+ * - uploadFile() - * Add new note
+ * - downloadFile() - downloadFile function
+ * - loadNotesData() - loadNotesData function
+ * - getEditorContent() - * ניקוי עיצוב בעורך
+ * - getTypeDisplayName() - getTypeDisplayName function
+ * - loadNoteForViewing() - * View a note
+ * - getNoteRelatedDisplay() - getNoteRelatedDisplay function
+ * 
+ * DATA MANIPULATION (13)
+ * - addNote() - addNote function
+ * - deleteNote() - * Open note details modal
+ * - updateNotesTable() - updateNotesTable function
+ * - updateNotesSummary() - updateNotesSummary function
+ * - updateGridFromComponent() - updateGridFromComponent function
+ * - saveNote() - saveNote function
+ * - updateNoteFromModal() - updateNoteFromModal function
+ * - confirmDeleteNote() - confirmDeleteNote function
+ * - deleteNoteFromServer() - deleteNoteFromServer function
+ * - removeCurrentAttachment() - removeCurrentAttachment function
+ * - showAddNoteModal() - * Replace current attachment
+ * - saveNote() - * הצגת מודל הוספת הערה
+ * - deleteNote() - deleteNote function
+ * 
+ * EVENT HANDLING (5)
+ * - restoreNotesSectionState() - restoreNotesSectionState function
+ * - onNoteRelationTypeChange() - onNoteRelationTypeChange function
+ * - clearNoteValidationErrors() - clearNoteValidationErrors function
+ * - setEditorContent() - * קבלת תוכן מעורך הטקסט
+ * - toggleSection() - * Replace current attachment
+ * 
+ * UI UPDATES (3)
+ * - showTickerPage() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * - displayCurrentAttachment() - * Edit current note
+ * - showEditNoteModal() - * Toggle section using global function
+ * 
+ * VALIDATION (2)
+ * - validateNoteForm() - validateNoteForm function
+ * - validateEditNoteForm() - * ולידציה של טופס הערה
+ * 
+ * UTILITIES (2)
+ * - formatText() - * פונקציה להצגת דף טיקר (כרגע הודעת "בפיתוח")
+ * - clearFormatting() - clearFormatting function
+ * 
+ * OTHER (12)
+ * - viewLinkedItems() - viewLinkedItems function
+ * - openNoteDetails() - openNoteDetails function
+ * - editNote() - * Open note details modal
+ * - populateSelect() - * Update grid from component filters
+ * - populateEditSelectByType() - * Handle note relation type change
+ * - clearSelectedFile() - clearSelectedFile function
+ * - restoreSortState() - restoreSortState function
+ * - filterNotesData() - filterNotesData function
+ * - filterNotesByType() - filterNotesByType function
+ * - viewNote() - * Get display name for type
+ * - editCurrentNote() - editCurrentNote function
+ * - replaceCurrentAttachment() - replaceCurrentAttachment function
+ * 
+ * ==========================================
+ */
 /**
  * Notes Page - Comprehensive Function Index
  * ==========================================
@@ -847,14 +919,6 @@ function updateGridFromComponent(
       populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
     });
   }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בעדכון רדיו באטונים:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעדכון רדיו באטונים', error.message);
-    }
-  }
-}
 
 /**
  * מילוי select עם נתונים

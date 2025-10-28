@@ -371,9 +371,10 @@ const PAGE_CONFIGS = {
         // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'entity-services': שירותי ישויות (טיקרים, חשבונות)
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -381,7 +382,10 @@ const PAGE_CONFIGS = {
             'DataUtils',
             'window.Logger',
             'window.CacheSyncManager',
-            'window.loadExecutionsData'
+            'window.loadExecutionsData',
+            'window.SelectPopulatorService',
+            'window.tickerService',
+            'window.openImportUserDataModal'
         ],
         
         // ← NEW: מטאדאטה

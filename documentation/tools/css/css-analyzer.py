@@ -65,6 +65,20 @@ def analyze_css_file(css_file):
         for selector in unused[:10]:
             print(f"  {selector}")
     
+    # 8. מוצא CSS variables
+    css_vars = find_css_variables(content)
+    if css_vars:
+        print(f"\n🎨 CSS VARIABLES ({len(css_vars)}):")
+        for var in css_vars[:10]:
+            print(f"  {var}")
+    
+    # 9. מוצא media queries
+    media_queries = find_media_queries(content)
+    if media_queries:
+        print(f"\n📱 MEDIA QUERIES ({len(media_queries)}):")
+        for query in media_queries[:5]:
+            print(f"  {query}")
+    
     return {
         'selectors_count': len(selectors),
         'duplicates': dict(duplicates),
@@ -72,21 +86,27 @@ def analyze_css_file(css_file):
         'redundant': redundant,
         'important': important_count,
         'high_specificity': high_specificity,
-        'unused': unused
+        'unused': unused,
+        'css_variables': css_vars,
+        'media_queries': media_queries
     }
 
 def find_all_selectors(content):
     """מוצא את כל ה-selectors בקובץ CSS"""
     selectors = []
     
-    # מוצא כל ה-CSS rules
+    # מוצא כל ה-CSS rules - שיפור regex
     css_rules = re.findall(r'([^{}]+)\s*\{[^{}]*\}', content, re.MULTILINE | re.DOTALL)
     
     for rule in css_rules:
         # מנקה את ה-selector
         selector = rule.strip()
-        if selector and not selector.startswith('/*'):
-            selectors.append(selector)
+        if selector and not selector.startswith('/*') and not selector.startswith('@'):
+            # מנקה הערות בתוך selector
+            selector = re.sub(r'/\*.*?\*/', '', selector, flags=re.DOTALL)
+            selector = selector.strip()
+            if selector:
+                selectors.append(selector)
     
     return selectors
 
@@ -196,6 +216,35 @@ def find_unused_selectors(content):
     
     return unused
 
+def find_css_variables(content):
+    """מוצא CSS variables בקובץ"""
+    variables = []
+    
+    # מוצא הגדרות CSS variables
+    var_definitions = re.findall(r'--[a-zA-Z0-9-]+:\s*[^;]+;', content)
+    for var in var_definitions:
+        variables.append(f"Defined: {var.strip()}")
+    
+    # מוצא שימוש ב-CSS variables
+    var_usage = re.findall(r'var\(--[a-zA-Z0-9-]+\)', content)
+    for var in var_usage:
+        variables.append(f"Used: {var}")
+    
+    return variables
+
+def find_media_queries(content):
+    """מוצא media queries בקובץ"""
+    media_queries = []
+    
+    # מוצא media queries
+    media_pattern = r'@media\s+([^{]+)\s*\{'
+    matches = re.findall(media_pattern, content, re.MULTILINE | re.DOTALL)
+    
+    for match in matches:
+        media_queries.append(match.strip())
+    
+    return media_queries
+
 def check_inline_styles_in_html(results):
     """בודק inline styles בקבצי HTML"""
     print("\n🔍 Checking for inline styles in HTML files...")
@@ -213,13 +262,23 @@ def check_inline_styles_in_html(results):
             with open(html_file, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            # חיפוש inline styles
-            style_matches = re.findall(r'style\s*=\s*["\'][^"\']*["\']', content)
+            # חיפוש inline styles - שיפור regex
+            style_matches = re.findall(r'style\s*=\s*["\']([^"\']*)["\']', content)
             if style_matches:
+                # מנתח כל inline style
+                analyzed_styles = []
+                for style in style_matches:
+                    # מחלץ properties מ-inline style
+                    properties = re.findall(r'([^:;]+):\s*([^;]+)', style)
+                    analyzed_styles.append({
+                        'raw': style,
+                        'properties': properties
+                    })
+                
                 inline_styles_found.append({
                     'file': html_file,
                     'count': len(style_matches),
-                    'examples': style_matches[:3]  # רק 3 דוגמאות
+                    'analyzed': analyzed_styles[:3]  # רק 3 דוגמאות
                 })
         except Exception as e:
             print(f"⚠️ Error reading {html_file}: {e}")
@@ -227,6 +286,8 @@ def check_inline_styles_in_html(results):
     results['inline_styles_in_html'] = inline_styles_found
     if inline_styles_found:
         print(f"⚠️ Found inline styles in {len(inline_styles_found)} HTML files")
+        for item in inline_styles_found[:5]:  # הצג רק 5 קבצים
+            print(f"  📄 {item['file']}: {item['count']} inline styles")
     else:
         print("✅ No inline styles found in HTML files")
 

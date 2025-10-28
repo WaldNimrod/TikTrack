@@ -249,12 +249,13 @@ class ModalManagerV2 {
                 `;
                 
             case 'date':
+            case 'datetime-local':
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
                             ${field.label} ${requiredStar}
                         </label>
-                        <input type="${field.dateTime ? 'datetime-local' : 'date'}" 
+                        <input type="${field.type === 'datetime-local' ? 'datetime-local' : (field.dateTime ? 'datetime-local' : 'date')}" 
                                class="form-control" 
                                id="${field.id}" 
                                name="${field.id}"

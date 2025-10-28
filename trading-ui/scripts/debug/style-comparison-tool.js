@@ -1,22 +1,24 @@
 /**
- * ========================================
- * Style Comparison Tool - TikTrack
- * ========================================
+ * Style Comparison Tool - Comprehensive Function Index
+ * ==========================================
  * 
- * כלי בדיקה מקיף להשוואת עיצובים בין עמודים
- * להריץ בקונסולת הדפדפן בכל עמוד
+ * This file contains the style comparison tool for TikTrack including:
+ * - Page style analysis and comparison
+ * - Inline style detection
+ * - CSS class analysis
+ * - Style consistency checking
+ * - Debugging and reporting tools
  * 
- * שימוש:
- * 1. פתח עמוד (trade_plans או trades)
- * 2. פתח Console (F12)
- * 3. העתק והדבק את הקוד הזה
- * 4. הרץ: analyzePageStyles()
- * 
- * תאריך: 12 אוקטובר 2025
- * גרסה: 1.0.0
- * ========================================
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
+/**
+ * Analyze page styles
+ * @function analyzePageStyles
+ * @returns {void}
+ */
 function analyzePageStyles() {
     console.clear();
     console.log('%c════════════════════════════════════════', 'color: #26baac; font-weight: bold; font-size: 16px;');
@@ -287,6 +289,13 @@ function analyzePageStyles() {
 }
 
 // ===== פונקציה להשוואת שני עמודים =====
+/**
+ * Compare pages
+ * @function comparePages
+ * @param {Object} page1Data - First page data
+ * @param {Object} page2Data - Second page data
+ * @returns {void}
+ */
 function comparePages(page1Data, page2Data) {
     console.clear();
     console.log('%c════════════════════════════════════════', 'color: #26baac; font-weight: bold; font-size: 18px;');
@@ -332,6 +341,12 @@ function comparePages(page1Data, page2Data) {
 }
 
 // ===== פונקציה לבדיקת Badge ספציפי =====
+/**
+ * Inspect badge
+ * @function inspectBadge
+ * @param {string} selector - Badge selector
+ * @returns {void}
+ */
 function inspectBadge(selector) {
     console.clear();
     console.log('%c🔍 בדיקת Badge מפורטת', 'color: #26baac; font-weight: bold; font-size: 16px;');
@@ -388,6 +403,13 @@ function inspectBadge(selector) {
 }
 
 // ===== פונקציה להשוואת Computed Styles =====
+/**
+ * Compare badge styles
+ * @function compareBadgeStyles
+ * @param {string} selector1 - First badge selector
+ * @param {string} selector2 - Second badge selector
+ * @returns {void}
+ */
 function compareBadgeStyles(selector1, selector2) {
     console.clear();
     console.log('%c⚖️ השוואת Badges', 'color: #26baac; font-weight: bold; font-size: 16px;');

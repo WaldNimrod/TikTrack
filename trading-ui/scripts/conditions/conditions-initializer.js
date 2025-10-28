@@ -98,10 +98,6 @@ class ConditionsInitializer {
     
     /**
      * Check if script is loaded
-     * בדיקה אם סקריפט נטען
-     */
-    /**
-     * Check if script is loaded
      * @function isScriptLoaded
      * @param {string} scriptName - Script name
      * @returns {boolean} Whether script is loaded
@@ -118,7 +114,9 @@ class ConditionsInitializer {
     
     /**
      * Initialize components
-     * אתחול רכיבים
+     * @function initializeComponents
+     * @async
+     * @returns {Promise<void>}
      */
     async initializeComponents() {
         console.log('🔧 Initializing Conditions System components...');
@@ -158,7 +156,8 @@ class ConditionsInitializer {
     
     /**
      * Setup global access
-     * הגדרת גישה גלובלית
+     * @function setupGlobalAccess
+     * @returns {void}
      */
     setupGlobalAccess() {
         console.log('🌐 Setting up global access...');
@@ -205,8 +204,9 @@ class ConditionsInitializer {
     }
     
     /**
-     * Register with unified initialization system
-     * רישום במערכת האתחול המאוחדת
+     * Register with unified system
+     * @function registerWithUnifiedSystem
+     * @returns {void}
      */
     registerWithUnifiedSystem() {
         console.log('📋 Registering with Unified Initialization System...');
@@ -228,7 +228,8 @@ class ConditionsInitializer {
     
     /**
      * Get system status
-     * קבלת סטטוס מערכת
+     * @function getStatus
+     * @returns {Object} System status
      */
     getStatus() {
         return {
@@ -246,7 +247,9 @@ class ConditionsInitializer {
     
     /**
      * Get component
-     * קבלת רכיב
+     * @function getComponent
+     * @param {string} componentName - Component name
+     * @returns {Object|null} Component instance
      */
     getComponent(componentName) {
         if (!this.isInitialized) {
@@ -259,7 +262,8 @@ class ConditionsInitializer {
     
     /**
      * Reset system
-     * איפוס מערכת
+     * @function reset
+     * @returns {void}
      */
     reset() {
         console.log('🔄 Resetting Conditions System...');
@@ -282,7 +286,8 @@ class ConditionsInitializer {
     
     /**
      * Health check
-     * בדיקת בריאות
+     * @function healthCheck
+     * @returns {Object} Health status
      */
     healthCheck() {
         const status = this.getStatus();

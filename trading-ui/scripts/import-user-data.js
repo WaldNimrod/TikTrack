@@ -127,9 +127,26 @@ function showStepContent(step) {
     });
     
     // Show current step content
-    const currentStepContent = document.getElementById(`step${step}Content`);
+    let currentStepContent;
+    if (step === 1) {
+        currentStepContent = document.getElementById('step-upload');
+    } else if (step === 2) {
+        currentStepContent = document.getElementById('step-account');
+    } else if (step === 3) {
+        currentStepContent = document.getElementById('step-problems');
+    } else if (step === 4) {
+        currentStepContent = document.getElementById('step-preview');
+    } else if (step === 5) {
+        currentStepContent = document.getElementById('step-confirm');
+    }
+    
     if (currentStepContent) {
         currentStepContent.style.display = 'block';
+        // Show the step-content div inside
+        const stepContent = currentStepContent.querySelector('.step-content');
+        if (stepContent) {
+            stepContent.style.display = 'block';
+        }
     }
     
     // Load step-specific content
@@ -156,37 +173,70 @@ function showStepContent(step) {
  * Load step 1 content (File & Account Selection)
  */
 function loadStep1Content() {
-    const content = document.getElementById('step1Content');
-    if (!content) return;
-    
-    content.innerHTML = `
-        <div class="step-content-inner">
-            <h4>בחר קובץ וחשבון מסחר מסחר</h4>
-            
-            <div class="form-group">
-                <label for="importFileInput">קובץ CSV:</label>
-                <input type="file" id="importFileInput" accept=".csv" class="form-control" onchange="handleFileSelect(event)">
-                <div id="fileInfo" class="file-info"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="importAccountSelect">חשבון מסחר מסחר:</label>
-                <select id="importAccountSelect" class="form-control" onchange="handleAccountSelect(event)">
-                    <option value="">בחר חשבון מסחר מסחר</option>
-                </select>
-                <div id="accountInfo" class="account-info"></div>
-            </div>
-            
-            <div class="step-actions">
-                <button class="btn btn-primary" onclick="analyzeFile()" id="analyzeBtn" disabled>
-                    <i class="fas fa-search"></i> נתח קובץ
-                </button>
-            </div>
-        </div>
-    `;
-    
-    // Load accounts
+    // The HTML content is already in the DOM, just need to load accounts
     loadAccounts();
+    
+    // Add event listeners
+    setupStep1EventListeners();
+}
+
+/**
+ * Setup event listeners for step 1
+ */
+function setupStep1EventListeners() {
+    // File input
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+        fileInput.addEventListener('change', handleFileSelect);
+    }
+    
+    // Drop zone
+    const dropZone = document.getElementById('dropZone');
+    if (dropZone) {
+        dropZone.addEventListener('click', () => fileInput?.click());
+        dropZone.addEventListener('dragover', handleDragOver);
+        dropZone.addEventListener('drop', handleFileDrop);
+    }
+    
+    // Account select
+    const accountSelect = document.getElementById('accountSelect');
+    if (accountSelect) {
+        accountSelect.addEventListener('change', handleAccountSelect);
+    }
+    
+    // Continue button
+    const continueBtn = document.querySelector('[data-button-type="PRIMARY"]');
+    if (continueBtn) {
+        continueBtn.addEventListener('click', analyzeFile);
+    }
+}
+
+/**
+ * Handle drag over event
+ */
+function handleDragOver(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.classList.add('drag-over');
+}
+
+/**
+ * Handle file drop event
+ */
+function handleFileDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.classList.remove('drag-over');
+    
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+        const file = files[0];
+        if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+            handleFileSelect({ target: { files: [file] } });
+        } else {
+            showNotification('אנא בחר קובץ CSV בלבד', 'error');
+        }
+    }
 }
 
 /**
@@ -305,25 +355,90 @@ function handleFileSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
     
+    console.log('File selected:', file.name, file.size);
     selectedFile = file;
     
-    // Update UI
+    // Update UI using existing HTML structure
     const fileInfo = document.getElementById('fileInfo');
-    if (fileInfo) {
-        fileInfo.innerHTML = `
-            <div class="file-selected">
-                <i class="fas fa-file-csv"></i>
-                <span>${file.name}</span>
-                <small>${formatFileSize(file.size)}</small>
-            </div>
-        `;
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    
+    if (fileInfo && fileName && fileSize) {
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.style.display = 'block';
+        
+        // Hide drop zone
+        const dropZone = document.getElementById('dropZone');
+        if (dropZone) {
+            dropZone.style.display = 'none';
+        }
+        
+        console.log('File info updated in UI');
+    } else {
+        console.error('File info elements not found:', { fileInfo, fileName, fileSize });
     }
     
-    // Enable analyze button
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    if (analyzeBtn && selectedAccount) {
-        analyzeBtn.disabled = false;
+    // Enable analyze button if account is also selected
+    updateAnalyzeButton();
+}
+
+/**
+ * Update analyze button state
+ */
+function updateAnalyzeButton() {
+    const continueBtn = document.querySelector('[data-button-type="PRIMARY"]');
+    if (continueBtn) {
+        if (selectedFile && selectedAccount) {
+            continueBtn.disabled = false;
+            console.log('Analyze button enabled');
+        } else {
+            continueBtn.disabled = true;
+            console.log('Analyze button disabled - missing:', { 
+                file: !!selectedFile, 
+                account: !!selectedAccount 
+            });
+        }
     }
+}
+
+/**
+ * Format file size
+ */
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+/**
+ * Reset file selection
+ */
+function resetFile() {
+    console.log('Resetting file selection');
+    selectedFile = null;
+    
+    // Reset file input
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+        fileInput.value = '';
+    }
+    
+    // Hide file info and show drop zone
+    const fileInfo = document.getElementById('fileInfo');
+    const dropZone = document.getElementById('dropZone');
+    
+    if (fileInfo) {
+        fileInfo.style.display = 'none';
+    }
+    if (dropZone) {
+        dropZone.style.display = 'block';
+    }
+    
+    // Update analyze button
+    updateAnalyzeButton();
 }
 
 /**
@@ -331,9 +446,16 @@ function handleFileSelect(event) {
  */
 function handleAccountSelect(event) {
     const accountId = event.target.value;
-    if (!accountId) return;
+    console.log('Account selected:', accountId);
     
-    selectedAccount = accountId;
+    if (!accountId) {
+        selectedAccount = null;
+    } else {
+        selectedAccount = accountId;
+    }
+    
+    // Update analyze button
+    updateAnalyzeButton();
     
     // Update UI
     const accountInfo = document.getElementById('accountInfo');
@@ -358,26 +480,37 @@ function handleAccountSelect(event) {
  * Load accounts from API
  */
 function loadAccounts() {
-    fetch('/api/user-data-import/accounts')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const accountSelect = document.getElementById('importAccountSelect');
+    // Use the existing SelectPopulatorService
+    if (window.SelectPopulatorService) {
+        window.SelectPopulatorService.populateAccountsSelect('accountSelect', {
+            includeEmpty: true,
+            emptyText: 'בחר חשבון מסחר...',
+            filterFn: (account) => account.status === 'open'
+        });
+    } else {
+        // Fallback to direct API call
+        fetch('/api/trading-accounts/')
+            .then(response => response.json())
+            .then(data => {
+                const accounts = data.data || data || [];
+                const openAccounts = accounts.filter(account => account.status === 'open');
+                
+                const accountSelect = document.getElementById('accountSelect');
                 if (accountSelect) {
-                    accountSelect.innerHTML = '<option value="">בחר חשבון מסחר מסחר</option>';
-                    data.accounts.forEach(account => {
+                    accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
+                    openAccounts.forEach(account => {
                         const option = document.createElement('option');
                         option.value = account.id;
-                        option.textContent = `${account.name} (${account.provider})`;
+                        option.textContent = account.name;
                         accountSelect.appendChild(option);
                     });
                 }
-            }
-        })
-        .catch(error => {
-            console.error('Error loading accounts:', error);
-            showNotification('שגיאה בטעינת חשבונות', 'error');
-    });
+            })
+            .catch(error => {
+                console.error('Error loading accounts:', error);
+                showNotification('שגיאה בטעינת חשבונות', 'error');
+            });
+    }
 }
 
 /**
@@ -393,7 +526,7 @@ function analyzeFile() {
     
     const formData = new FormData();
     formData.append('file', selectedFile);
-    formData.append('account_id', selectedAccount);
+    formData.append('trading_account_id', selectedAccount);
     
     fetch('/api/user-data-import/upload', {
         method: 'POST',
@@ -425,36 +558,22 @@ function analyzeFile() {
  * Display analysis results
  */
 function displayAnalysisResults(results) {
-    const resultsContainer = document.getElementById('analysisResults');
-    if (!resultsContainer) return;
+    console.log('Displaying analysis results:', results);
     
-    resultsContainer.innerHTML = `
-        <div class="analysis-results">
-            <h5>תוצאות ניתוח</h5>
-            <div class="results-grid">
-                <div class="result-item">
-                    <i class="fas fa-file-alt"></i>
-                    <span class="result-label">רשומות שנמצאו</span>
-                    <span class="result-count">${results.total_records || 0}</span>
-                </div>
-                <div class="result-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span class="result-label">רשומות תקינות</span>
-                    <span class="result-count">${results.valid_records || 0}</span>
-                </div>
-                <div class="result-item">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span class="result-label">רשומות בעייתיות</span>
-                    <span class="result-count">${results.invalid_records || 0}</span>
-                </div>
-                <div class="result-item">
-                    <i class="fas fa-times-circle"></i>
-                    <span class="result-label">כפילויות</span>
-                    <span class="result-count">${results.duplicate_records || 0}</span>
-                </div>
-            </div>
-        </div>
-    `;
+    // Update the analysis cards
+    const totalRecords = document.getElementById('totalRecords');
+    const validRecords = document.getElementById('validRecords');
+    const invalidRecords = document.getElementById('invalidRecords');
+    const duplicateRecords = document.getElementById('duplicateRecords');
+    const missingTickers = document.getElementById('missingTickers');
+    
+    if (totalRecords) totalRecords.textContent = results.total_records || 0;
+    if (validRecords) validRecords.textContent = results.valid_records || 0;
+    if (invalidRecords) invalidRecords.textContent = results.invalid_records || 0;
+    if (duplicateRecords) duplicateRecords.textContent = results.duplicate_records || 0;
+    if (missingTickers) missingTickers.textContent = results.missing_tickers ? results.missing_tickers.length : 0;
+    
+    console.log('Analysis results displayed successfully');
 }
 
 /**
@@ -1208,3 +1327,4 @@ window.executeImport = executeImport;
 window.executeImportWithReport = executeImportWithReport;
 window.performImport = performImport;
 window.showNotification = showNotification;
+window.resetFile = resetFile;

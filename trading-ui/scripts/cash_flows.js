@@ -1,3 +1,66 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 36
+ * 
+ * PAGE INITIALIZATION (3)
+ * - initializeCashFlowsPage() - initializeCashFlowsPage function
+ * - setupSourceFieldListeners() - setupSourceFieldListeners function
+ * - initializeExternalIdFields() - * Setup source field listeners
+ * 
+ * DATA LOADING (10)
+ * - loadCashFlowsData() - loadCashFlowsData function
+ * - getAccountNameById() - getAccountNameById function
+ * - ensureTradingAccountsLoaded() - ensureTradingAccountsLoaded function
+ * - loadCashFlows() - loadCashFlows function
+ * - loadAccountsForCashFlow() - loadAccountsForCashFlow function
+ * - loadCurrenciesForCashFlow() - loadCurrenciesForCashFlow function
+ * - getCashFlowTypeWithColor() - * Format amount
+ * - getCashFlowTypeText() - getCashFlowTypeText function
+ * - loadTradesForCashFlow() - * Show edit cash flow modal
+ * - loadTradePlansForCashFlow() - loadTradePlansForCashFlow function
+ * 
+ * DATA MANIPULATION (5)
+ * - deleteCashFlow() - deleteCashFlow function
+ * - updatePageSummaryStats() - updatePageSummaryStats function
+ * - updateCashFlowsTable() - * Format USD rate
+ * - confirmDeleteCashFlow() - confirmDeleteCashFlow function
+ * - showAddCashFlowModal() - * הצגת שגיאה לשדה בודד
+ * 
+ * EVENT HANDLING (2)
+ * - toggleCashFlowsSection() - * טעינת נתוני חשבונות מסחר אם הם לא נטענו
+ * - restoreCashFlowsSectionState() - restoreCashFlowsSectionState function
+ * 
+ * UI UPDATES (3)
+ * - renderCashFlowsTable() - * טעינת רשימת מטבעות למודולי cash flow
+ * - showCashFlowDetails() - * Format USD rate
+ * - showEditCashFlowModal() - * Initialize external ID fields
+ * 
+ * VALIDATION (2)
+ * - validateCashFlowForm() - validateCashFlowForm function
+ * - validateEditCashFlowForm() - validateEditCashFlowForm function
+ * 
+ * UTILITIES (3)
+ * - formatAmount() - formatAmount function
+ * - formatCashFlowAmount() - * Get cash flow type text
+ * - formatUsdRate() - formatUsdRate function
+ * 
+ * OTHER (8)
+ * - calculateBalance() - calculateBalance function
+ * - startAutoRefresh() - * Update cash flows table
+ * - applyDynamicColors() - * Start auto refresh
+ * - applyUserPreferences() - applyUserPreferences function
+ * - manageExternalIdField() - * Confirm delete cash flow
+ * - editCashFlow() - * Show add cash flow modal
+ * - generateDetailedLog() - generateDetailedLog function
+ * - generateDetailedLogForCashFlows() - generateDetailedLogForCashFlows function
+ * 
+ * ==========================================
+ */
 /**
  * Cash Flows Page - Comprehensive Function Index
  * ==========================================
@@ -1531,7 +1594,6 @@ window.showEditCashFlowModal = showEditCashFlowModal;
 window.editCashFlow = editCashFlow;
 window.loadCashFlowsData = loadCashFlowsData;
 window.updateCashFlowsTable = updateCashFlowsTable;
-window.saveCashFlow = saveCashFlow;
 window.updateCashFlow = updateCashFlow;
 
 // window.showLinkedItemsWarning = showLinkedItemsWarning; // הוסר - הוחלף ב-showLinkedItemsModal

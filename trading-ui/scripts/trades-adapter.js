@@ -368,10 +368,12 @@ window.TradesAdapter = TradesAdapter;
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        window.TradesAdapter.init();
+        const adapter = new window.TradesAdapter();
+        adapter.init();
     });
 } else {
-    window.TradesAdapter.init();
+    const adapter = new window.TradesAdapter();
+    adapter.init();
 }
 
 console.log('✅ Trades Adapter ready');

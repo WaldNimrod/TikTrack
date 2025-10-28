@@ -1,3 +1,109 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 83
+ * 
+ * PAGE INITIALIZATION (2)
+ * - setupModalConfigurations() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * - setupExecutionsFilterFunctions() - setupExecutionsFilterFunctions function
+ * 
+ * DATA LOADING (8)
+ * - loadLinkedItemsDetails() - loadLinkedItemsDetails function
+ * - loadLinkedItemsFromMultipleSources() - * טעינת פרטי הפריטים המקושרים
+ * - loadExecutionsData() - * מעבר להתראה ספציפית
+ * - loadTickersWithOpenOrClosedTradesAndPlans() - * הגדרת תצורות מודלים
+ * - loadActiveTradesForTicker() - * הפעלה/השבתה של שדה מזהה חיצוני לפי בחירת מקור
+ * - loadExecutionTickerInfo() - * Enable execution form fields
+ * - loadTradeExecutions() - * מעבר לטרייד המקושר
+ * - loadTickersSummaryData() - loadTickersSummaryData function
+ * 
+ * DATA MANIPULATION (24)
+ * - addExecution() - addExecution function
+ * - deleteExecution() - deleteExecution function
+ * - resetAddExecutionForm() - resetAddExecutionForm function
+ * - saveExecution() - saveExecution function
+ * - updateExecutionWrapper() - updateExecutionWrapper function
+ * - confirmDeleteExecution() - confirmDeleteExecution function
+ * - updateExecutionsTableMain() - updateExecutionsTableMain function
+ * - updateExecution() - updateExecution function
+ * - updateTradesOnCheckboxChange() - updateTradesOnCheckboxChange function
+ * - updateTradesOnTickerChange() - updateTradesOnTickerChange function
+ * - addNewTicker() - * Show ticker help
+ * - addNewPlan() - * הוספת טיקר חדש
+ * - addNewTrade() - * הוספת טיקר חדש
+ * - updateExecutionsSummary() - * הוספת תכנון חדש
+ * - calculateAddExecutionValues() - calculateAddExecutionValues function
+ * - updateExecutionsTableForTradeModal() - * טעינת עסקאות לטרייד
+ * - addEditBuySell() - addEditBuySell function
+ * - updateExecutionsGlobalData() - updateExecutionsGlobalData function
+ * - updateTickersSummaryTable() - updateTickersSummaryTable function
+ * - addExecutionForTicker() - * צפייה בפרטי טיקר
+ * - updateTickersList() - * הצגה/הסתרה של סקשן הטיקרים
+ * - showAddExecutionModal() - showAddExecutionModal function
+ * - saveExecution() - * Show add execution modal
+ * - deleteExecution() - deleteExecution function
+ * 
+ * EVENT HANDLING (33)
+ * - openExecutionDetails() - openExecutionDetails function
+ * - editExecution() - editExecution function
+ * - resetExecutionForm() - resetExecutionForm function
+ * - resetEditExecutionForm() - * ניקוי והשבתת שדות בטופס הוספת עסקה
+ * - showEditExecutionModal() - * ניקוי והשבתת שדות בטופס הוספת עסקה
+ * - fillEditExecutionForm() - * ניקוי והשבתת שדות בטופס הוספת עסקה
+ * - validateExecutionTradeId() - validateExecutionTradeId function
+ * - validateExecutionQuantity() - validateExecutionQuantity function
+ * - validateExecutionPrice() - * ולידציה של כמות
+ * - validateExecutionCommission() - * ולידציה של כמות
+ * - validateExecutionSource() - * ולידציה של כמות
+ * - validateExecutionNotes() - * ולידציה של כמות
+ * - validateExecutionExternalId() - * ולידציה של כמות
+ * - validateExecutionDate() - * ולידציה של עמלה (fee)
+ * - validateExecutionType() - * ולידציה של מקור (source)
+ * - clearExecutionValidationErrors() - * ולידציה של סוג עסקה (action)
+ * - validateCompleteExecutionForm() - validateCompleteExecutionForm function
+ * - showExecutionLinkedItemsModal() - showExecutionLinkedItemsModal function
+ * - goToNote() - * מעבר לתכנון ספציפי
+ * - clearNewExecutionHighlights() - clearNewExecutionHighlights function
+ * - filterExecutionsLocally() - filterExecutionsLocally function
+ * - toggleExecutionFormFields() - toggleExecutionFormFields function
+ * - enableExecutionFormFields() - * הפעלה/השבתה של שדות הטופס
+ * - disableExecutionFormFields() - * הפעלה/השבתה של שדות הטופס
+ * - displayExecutionTickerInfo() - displayExecutionTickerInfo function
+ * - hideExecutionTickerInfo() - hideExecutionTickerInfo function
+ * - calculateExecutionValues() - * הסתרת מידע על הטיקר
+ * - calculateEditExecutionValues() - * חישוב ערכים מחושבים לטופס הוספה
+ * - linkExistingExecution() - * הוספת קניה/מכירה במודל עריכת טרייד
+ * - unlinkExecution() - * הוספת קניה/מכירה במודל עריכת טרייד
+ * - toggleTickersSection() - * הוספת עסקה לטיקר
+ * - toggleExecutionsSection() - toggleExecutionsSection function
+ * - showEditExecutionModal() - * Show add execution modal
+ * 
+ * UI UPDATES (3)
+ * - displayLinkedItems() - displayLinkedItems function
+ * - displayLinkedItems() - displayLinkedItems function
+ * - showTickerHelp() - * מעבר לדף טיקר (בפיתוח)
+ * 
+ * OTHER (13)
+ * - clearFieldError() - * ולידציה של הערות (notes)
+ * - goToTrade() - * Display linked items for execution
+ * - goToPlan() - * מעבר לטרייד ספציפי
+ * - goToAlert() - * מעבר לטרייד ספציפי
+ * - isDateInRange() - * ניקוי צביעת רשומות חדשות
+ * - restoreSortState() - restoreSortState function
+ * - enableAllFields() - enableAllFields function
+ * - goToTickerPage() - * עדכון טריידים כאשר הטיקר משתנה
+ * - goToLinkedTrade() - * חישוב ערכים מחושבים לטופס הוספה
+ * - applyAccountFilterWithTradesData() - applyAccountFilterWithTradesData function
+ * - toggleExternalIdField() - toggleExternalIdField function
+ * - refreshTickersSummary() - refreshTickersSummary function
+ * - viewTickerDetails() - * רענון רשימת טיקרים
+ * 
+ * ==========================================
+ */
 /**
  * Executions Page - Comprehensive Function Index
  * ==============================================
@@ -2895,7 +3001,6 @@ window.setupExecutionsFilterFunctions = setupExecutionsFilterFunctions;
 window.toggleExecutionsSection = toggleExecutionsSection;
 window.showAddExecutionModal = showAddExecutionModal;
 window.showEditExecutionModal = showEditExecutionModal;
-window.saveExecutionData = saveExecutionData;
 
 // פונקציה זו הוסרה - כפילות עם הפונקציה הראשונה
 

@@ -1,3 +1,27 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 5
+ * 
+ * PAGE INITIALIZATION (1)
+ * - initializePreferencesPage() - initializePreferencesPage function
+ * 
+ * DATA LOADING (1)
+ * - loadAccountsForPreferences() - loadAccountsForPreferences function
+ * 
+ * DATA MANIPULATION (1)
+ * - createNewProfile() - createNewProfile function
+ * 
+ * OTHER (2)
+ * - switchActiveProfile() - switchActiveProfile function
+ * - copyDetailedLogLocal() - copyDetailedLogLocal function
+ * 
+ * ==========================================
+ */
 /**
  * Preferences Page Script - Clean Version
  * Handles page-specific functionality for preferences.html

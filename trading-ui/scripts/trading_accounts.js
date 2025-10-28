@@ -1,3 +1,63 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 37
+ * 
+ * DATA LOADING (6)
+ * - loadDefaultTradingAccounts() - loadDefaultTradingAccounts function
+ * - loadTradingAccountsData() - * Load default trading accounts
+ * - loadTradingAccounts() - * Update trading accounts summary
+ * - loadTradingAccountsDataForTradingAccountsPage() - loadTradingAccountsDataForTradingAccountsPage function
+ * - getTradingAccountName() - * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר
+ * - getTradingAccounts() - getTradingAccounts function
+ * 
+ * DATA MANIPULATION (14)
+ * - updateTradingAccountsTable() - updateTradingAccountsTable function
+ * - updateTradingAccountsSummary() - updateTradingAccountsSummary function
+ * - updateTradingAccountFilterDisplayText() - updateTradingAccountFilterDisplayText function
+ * - deleteTradingAccountFromAPI() - deleteTradingAccountFromAPI function
+ * - deleteTradingAccount() - deleteTradingAccount function
+ * - confirmDeleteTradingAccount() - * Show success message
+ * - updateTradingAccountFilterMenu() - updateTradingAccountFilterMenu function
+ * - deleteTradingAccountWithLinkedItemsCheck() - deleteTradingAccountWithLinkedItemsCheck function
+ * - checkLinkedItemsAndDeleteTradingAccount() - checkLinkedItemsAndDeleteTradingAccount function
+ * - checkLinkedItemsBeforeDeleteTradingAccount() - * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר
+ * - updateTradingAccount() - * בדיקת פריטים מקושרים לפני מחיקת חשבון מסחר מסחר
+ * - showAddTradingAccountModal() - showAddTradingAccountModal function
+ * - saveTradingAccount() - * Show add trading account modal
+ * - deleteTradingAccount() - deleteTradingAccount function
+ * 
+ * EVENT HANDLING (3)
+ * - restoreTradingAccountsSectionState() - restoreTradingAccountsSectionState function
+ * - performTradingAccountCancellation() - * בדיקת מקושרים וביצוע ביטול חשבון מסחר מסחר
+ * - performTradingAccountDeletion() - * בדיקת מקושרים וביצוע מחיקת חשבון מסחר מסחר
+ * 
+ * UI UPDATES (5)
+ * - showSuccessMessage() - showSuccessMessage function
+ * - showErrorMessage() - * Show success message
+ * - showOpenTradesWarning() - * Show error message
+ * - showTradingAccountDetails() - showTradingAccountDetails function
+ * - showEditTradingAccountModal() - * Show add trading account modal
+ * 
+ * VALIDATION (3)
+ * - cancelTradingAccountWithLinkedItemsCheck() - cancelTradingAccountWithLinkedItemsCheck function
+ * - checkLinkedItemsAndCancelTradingAccount() - checkLinkedItemsAndCancelTradingAccount function
+ * - checkLinkedItemsBeforeCancelTradingAccount() - checkLinkedItemsBeforeCancelTradingAccount function
+ * 
+ * OTHER (6)
+ * - cancelTradingAccount() - * הצגת מודל חשבון מסחר מסחר (הוספה או עריכה)
+ * - filterTradingAccountsLocally() - filterTradingAccountsLocally function
+ * - restoreTradingAccount() - restoreTradingAccount function
+ * - viewTradingAccountDetails() - viewTradingAccountDetails function
+ * - sortTable() - sortTable function
+ * - generateDetailedLog() - * Sort table
+ * 
+ * ==========================================
+ */
 /**
  * Trading Accounts Page - Comprehensive Function Index
  * ==========================================

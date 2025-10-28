@@ -1,18 +1,23 @@
 /**
- * Conditions Translations - TikTrack
- * ==================================
- *
- * מערכת תרגום ספציפית למערכת התנאים
- * משתמש במערכת התרגום הכללית translation-utils.js
- *
- * @author TikTrack Development Team
- * @version 1.0.0
- * @lastUpdated October 19, 2025
+ * Conditions Translations - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the conditions translation system for TikTrack including:
+ * - Trading methods translations
+ * - Method categories translations
+ * - Parameters translations
+ * - Logical operators translations
+ * - UI text translations
+ * - Error messages translations
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 /**
- * Conditions Translation Manager
- * מנהל תרגום ספציפי לתנאים
+ * Conditions Translation Manager class
+ * @class ConditionsTranslations
  */
 class ConditionsTranslations {
     constructor() {
@@ -110,8 +115,11 @@ class ConditionsTranslations {
     }
     
     /**
-     * Get translation for key
-     * קבלת תרגום למפתח
+     * Get translation
+     * @function get
+     * @param {string} key - Translation key
+     * @param {string|null} defaultValue - Default value
+     * @returns {string} Translated text
      */
     get(key, defaultValue = null) {
         const keys = key.split('.');
@@ -129,64 +137,80 @@ class ConditionsTranslations {
     }
     
     /**
-     * Get method name translation
-     * קבלת תרגום שם שיטה
+     * Get method name
+     * @function getMethodName
+     * @param {string} methodKey - Method key
+     * @returns {string} Method name
      */
     getMethodName(methodKey) {
         return this.get(`methods.${methodKey}`, methodKey);
     }
     
     /**
-     * Get category name translation
-     * קבלת תרגום שם קטגוריה
+     * Get category name
+     * @function getCategoryName
+     * @param {string} categoryKey - Category key
+     * @returns {string} Category name
      */
     getCategoryName(categoryKey) {
         return this.get(`categories.${categoryKey}`, categoryKey);
     }
     
     /**
-     * Get parameter name translation
-     * קבלת תרגום שם פרמטר
+     * Get parameter name
+     * @function getParameterName
+     * @param {string} parameterKey - Parameter key
+     * @returns {string} Parameter name
      */
     getParameterName(parameterKey) {
         return this.get(`parameters.${parameterKey}`, parameterKey);
     }
     
     /**
-     * Get operator translation
-     * קבלת תרגום אופרטור
+     * Get operator
+     * @function getOperator
+     * @param {string} operatorKey - Operator key
+     * @returns {string} Operator text
      */
     getOperator(operatorKey) {
         return this.get(`operators.${operatorKey}`, operatorKey);
     }
     
     /**
-     * Get status translation
-     * קבלת תרגום סטטוס
+     * Get status
+     * @function getStatus
+     * @param {string} statusKey - Status key
+     * @returns {string} Status text
      */
     getStatus(statusKey) {
         return this.get(`status.${statusKey}`, statusKey);
     }
     
     /**
-     * Get action translation
-     * קבלת תרגום פעולה
+     * Get action
+     * @function getAction
+     * @param {string} actionKey - Action key
+     * @returns {string} Action text
      */
     getAction(actionKey) {
         return this.get(`actions.${actionKey}`, actionKey);
     }
     
     /**
-     * Get message translation
-     * קבלת תרגום הודעה
+     * Get message
+     * @function getMessage
+     * @param {string} messageKey - Message key
+     * @returns {string} Message text
      */
     getMessage(messageKey) {
         return this.get(`messages.${messageKey}`, messageKey);
     }
     
     /**
-     * Get form label translation
-     * קבלת תרגום תווית טופס
+     * Get form label
+     * @function getFormLabel
+     * @param {string} labelKey - Label key
+     * @returns {string} Label text
      */
     getFormLabel(labelKey) {
         return this.get(`form.${labelKey}`, labelKey);
@@ -194,7 +218,9 @@ class ConditionsTranslations {
     
     /**
      * Translate condition object
-     * תרגום אובייקט תנאי
+     * @function translateCondition
+     * @param {Object} condition - Condition object
+     * @returns {Object} Translated condition
      */
     translateCondition(condition) {
         if (!condition) return null;
@@ -210,7 +236,9 @@ class ConditionsTranslations {
     
     /**
      * Translate method object
-     * תרגום אובייקט שיטה
+     * @function translateMethod
+     * @param {Object} method - Method object
+     * @returns {Object} Translated method
      */
     translateMethod(method) {
         if (!method) return null;
@@ -224,7 +252,9 @@ class ConditionsTranslations {
     
     /**
      * Translate parameters object
-     * תרגום אובייקט פרמטרים
+     * @function translateParameters
+     * @param {Object} parameters - Parameters object
+     * @returns {Object} Translated parameters
      */
     translateParameters(parameters) {
         if (!parameters) return {};

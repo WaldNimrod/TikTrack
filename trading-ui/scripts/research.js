@@ -1,3 +1,32 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 12
+ * 
+ * PAGE INITIALIZATION (2)
+ * - initializeResearchPage() - initializeResearchPage function
+ * - setupResearchEventListeners() - * Load research data from server
+ * 
+ * DATA LOADING (4)
+ * - loadResearchData() - * Initialize the research page
+ * - getMarketOverview() - * Perform technical analysis
+ * - getVolatilityIndex() - * Get market overview
+ * - getNewsFeed() - * Get volatility index
+ * 
+ * OTHER (6)
+ * - analyzeMarketTrends() - * Setup research event listeners
+ * - compareTickers() - * Analyze market trends
+ * - technicalAnalysis() - * Compare tickers
+ * - exportResearchData() - * Get news feed
+ * - generateDetailedLog() - * Export research data
+ * - generateDetailedLogForResearch() - generateDetailedLogForResearch function
+ * 
+ * ==========================================
+ */
 /**
  * Research Page - Comprehensive Function Index
  * ==========================================
@@ -336,6 +365,14 @@ async function generateDetailedLogForResearch() {
             }
         }
     } catch (err) {
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בהעתקת לוג', err.message);
+        } else {
+            alert('שגיאה בהעתקת לוג: ' + err.message);
+        }
+    }
+}
+
 // ===== GLOBAL EXPORTS =====
 window.initializeResearchPage = initializeResearchPage;
 window.loadResearchData = loadResearchData;

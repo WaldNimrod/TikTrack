@@ -73,9 +73,30 @@ def analyze_js_duplicates():
             'dom_content_loaded': content.count('DOMContentLoaded')
         }
         
-        # חיפוש כפילויות functions
-        functions = re.findall(r'function\s+(\w+)', content)
-        function_counts = Counter(functions)
+        # חיפוש כפילויות functions - שיפור regex
+        # מנקה JSDoc comments ו-Function Index לפני ניתוח
+        content_clean = re.sub(r'/\*\*[\s\S]*?\*/', '', content)
+        content_clean = re.sub(r'//.*$', '', content_clean, flags=re.MULTILINE)
+        # מנקה Function Index
+        content_clean = re.sub(r'/\*[\s\S]*?FUNCTION INDEX[\s\S]*?\*/', '', content_clean)
+        content_clean = re.sub(r'/\*[\s\S]*?Function Index:[\s\S]*?\*/', '', content_clean)
+        
+        # מוצא function declarations רגילות (לא async)
+        functions = re.findall(r'(?<!async\s)function\s+(\w+)', content_clean)
+        # מוצא arrow functions
+        arrow_functions = re.findall(r'(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?\([^)]*\)\s*=>', content_clean)
+        # מוצא async functions
+        async_functions = re.findall(r'async\s+function\s+(\w+)', content_clean)
+        # מוצא class methods (רק methods אמיתיים, לא statements או function calls)
+        class_methods = re.findall(r'(\w+)\s*\([^)]*\)\s*\{', content_clean)
+        # מסנן keywords, statements ו-function calls
+        keywords = {'if', 'for', 'while', 'switch', 'catch', 'try', 'else', 'return', 'throw', 'break', 'continue'}
+        # מסנן function calls (לא methods)
+        function_calls = re.findall(r'(\w+)\s*\([^)]*\)\s*;', content_clean)
+        class_methods = [method for method in class_methods if method not in keywords and method not in function_calls]
+        
+        all_functions = functions + arrow_functions + async_functions + class_methods
+        function_counts = Counter(all_functions)
         
         for func, count in function_counts.items():
             if count > 1:
@@ -84,9 +105,27 @@ def analyze_js_duplicates():
                     'count': count
                 })
         
-        # חיפוש כפילויות variables
+        # חיפוש כפילויות variables - שיפור regex
+        # מוצא let/const/var declarations
         variables = re.findall(r'(let|const|var)\s+(\w+)', content)
-        variable_counts = Counter([var[1] for var in variables])
+        # מוצא destructuring assignments
+        destructuring = re.findall(r'(?:let|const|var)\s+\{([^}]+)\}', content)
+        # מוצא function parameters
+        function_params = re.findall(r'function\s+\w+\s*\(([^)]*)\)', content)
+        # מוצא arrow function parameters
+        arrow_params = re.findall(r'(?:const|let|var)\s+\w+\s*=\s*(?:async\s+)?\(([^)]*)\)\s*=>', content)
+        
+        all_variables = [var[1] for var in variables]
+        # מוסיף destructuring variables
+        for dest in destructuring:
+            dest_vars = re.findall(r'(\w+)', dest)
+            all_variables.extend(dest_vars)
+        # מוסיף function parameters
+        for params in function_params + arrow_params:
+            param_vars = re.findall(r'(\w+)', params)
+            all_variables.extend(param_vars)
+        
+        variable_counts = Counter(all_variables)
         
         for var, count in variable_counts.items():
             if count > 1:
@@ -95,9 +134,18 @@ def analyze_js_duplicates():
                     'count': count
                 })
         
-        # חיפוש כפילויות event listeners
+        # חיפוש כפילויות event listeners - שיפור regex
+        # מוצא addEventListener calls
         event_listeners = re.findall(r'addEventListener\s*\(\s*[\'"]([^\'"]+)[\'"]', content)
-        event_counts = Counter(event_listeners)
+        # מוצא jQuery event handlers
+        jquery_events = re.findall(r'\.on\s*\(\s*[\'"]([^\'"]+)[\'"]', content)
+        # מוצא inline event handlers
+        inline_events = re.findall(r'on(\w+)\s*=', content)
+        # מוצא DOMContentLoaded events
+        dom_events = re.findall(r'DOMContentLoaded', content)
+        
+        all_events = event_listeners + jquery_events + inline_events + dom_events
+        event_counts = Counter(all_events)
         
         for event, count in event_counts.items():
             if count > 1:

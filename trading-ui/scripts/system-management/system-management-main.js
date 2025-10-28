@@ -1,15 +1,23 @@
 /**
- * System Management Main Orchestrator - TikTrack
- * ============================================
+ * System Management Main Orchestrator - Comprehensive Function Index
+ * ==========================================
  * 
- * Main orchestrator for system management page
- * Manages all sections and coordinates their initialization
+ * This file contains the system management main orchestrator for TikTrack including:
+ * - Section management and coordination
+ * - Initialization and configuration
+ * - Auto-refresh and monitoring
+ * - Error handling and reporting
+ * - Performance optimization
  * 
- * @version 1.0.0
- * @lastUpdated October 19, 2025
- * @author TikTrack Development Team
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
+/**
+ * System Management Main Orchestrator class
+ * @class SystemManagementMain
+ */
 class SystemManagementMain {
   constructor() {
     this.sections = new Map();
@@ -20,7 +28,8 @@ class SystemManagementMain {
 
   /**
    * Get default section configurations
-   * קבלת הגדרות ברירת מחדל לסקשנים
+   * @function getDefaultSectionConfigs
+   * @returns {Object} Section configurations
    */
   getDefaultSectionConfigs() {
     return {
@@ -83,8 +92,10 @@ class SystemManagementMain {
   }
 
   /**
-   * Initialize the system management page
-   * אתחול עמוד ניהול המערכת
+   * Initialize system management
+   * @function init
+   * @async
+   * @returns {Promise<void>}
    */
   async init() {
     if (this.isInitialized) {
@@ -129,7 +140,9 @@ class SystemManagementMain {
 
   /**
    * Initialize sections by priority
-   * אתחול סקשנים לפי עדיפות
+   * @function initializeSectionsByPriority
+   * @async
+   * @returns {Promise<void>}
    */
   async initializeSectionsByPriority() {
     const sectionIds = Object.keys(this.sectionConfigs);
@@ -157,8 +170,11 @@ class SystemManagementMain {
   }
 
   /**
-   * Initialize a single section
-   * אתחול סקשן בודד
+   * Initialize section
+   * @function initializeSection
+   * @async
+   * @param {string} sectionId - Section ID
+   * @returns {Promise<void>}
    */
   async initializeSection(sectionId) {
     console.log(`🔧 Initializing section: ${sectionId}`);
@@ -199,8 +215,10 @@ class SystemManagementMain {
   }
 
   /**
-   * Get section class name from section ID
-   * קבלת שם מחלקת הסקשן ממזהה הסקשן
+   * Get section class name
+   * @function getSectionClassName
+   * @param {string} sectionId - Section ID
+   * @returns {string} Section class name
    */
   getSectionClassName(sectionId) {
     // Convert sm-dashboard to SMDashboardSection
@@ -214,7 +232,8 @@ class SystemManagementMain {
 
   /**
    * Setup global event listeners
-   * הגדרת מאזינים גלובליים
+   * @function setupGlobalEventListeners
+   * @returns {void}
    */
   setupGlobalEventListeners() {
     // Global refresh button
@@ -251,8 +270,9 @@ class SystemManagementMain {
   }
 
   /**
-   * Setup global refresh functionality
-   * הגדרת פונקציונליות רענון גלובלית
+   * Setup global refresh
+   * @function setupGlobalRefresh
+   * @returns {void}
    */
   setupGlobalRefresh() {
     // Add refresh button to header if not exists
@@ -269,7 +289,8 @@ class SystemManagementMain {
 
   /**
    * Setup section toggles
-   * הגדרת החלפת סקשנים
+   * @function setupSectionToggles
+   * @returns {void}
    */
   setupSectionToggles() {
     // Add toggle all button to header if not exists
@@ -286,7 +307,9 @@ class SystemManagementMain {
 
   /**
    * Refresh all sections
-   * רענון כל הסקשנים
+   * @function refreshAllSections
+   * @async
+   * @returns {Promise<void>}
    */
   async refreshAllSections() {
     console.log('🔄 Refreshing all sections...');
@@ -306,8 +329,9 @@ class SystemManagementMain {
   }
 
   /**
-   * Toggle all sections visibility
-   * החלפת נראות כל הסקשנים
+   * Toggle all sections
+   * @function toggleAllSections
+   * @returns {void}
    */
   toggleAllSections() {
     const toggleBtn = document.getElementById('global-toggle-btn');
@@ -334,8 +358,9 @@ class SystemManagementMain {
   }
 
   /**
-   * Pause auto-refresh for all sections
-   * השהיית רענון אוטומטי לכל הסקשנים
+   * Pause auto refresh
+   * @function pauseAutoRefresh
+   * @returns {void}
    */
   pauseAutoRefresh() {
     console.log('⏸️ Pausing auto-refresh for all sections');
@@ -347,8 +372,9 @@ class SystemManagementMain {
   }
 
   /**
-   * Resume auto-refresh for all sections
-   * חידוש רענון אוטומטי לכל הסקשנים
+   * Resume auto refresh
+   * @function resumeAutoRefresh
+   * @returns {void}
    */
   resumeAutoRefresh() {
     console.log('▶️ Resuming auto-refresh for all sections');
@@ -359,7 +385,8 @@ class SystemManagementMain {
 
   /**
    * Show global loading state
-   * הצגת מצב טעינה גלובלי
+   * @function showGlobalLoadingState
+   * @returns {void}
    */
   showGlobalLoadingState() {
     const mainContent = document.querySelector('.main-content');
@@ -380,7 +407,8 @@ class SystemManagementMain {
 
   /**
    * Hide global loading state
-   * הסתרת מצב טעינה גלובלי
+   * @function hideGlobalLoadingState
+   * @returns {void}
    */
   hideGlobalLoadingState() {
     const overlay = document.getElementById('global-loading-overlay');
@@ -391,7 +419,9 @@ class SystemManagementMain {
 
   /**
    * Show global error
-   * הצגת שגיאה גלובלית
+   * @function showGlobalError
+   * @param {Error} error - Error object
+   * @returns {void}
    */
   showGlobalError(error) {
     const mainContent = document.querySelector('.main-content');
@@ -415,8 +445,9 @@ class SystemManagementMain {
   }
 
   /**
-   * Get system management status
-   * קבלת סטטוס ניהול המערכת
+   * Get system status
+   * @function getStatus
+   * @returns {Object} System status
    */
   getStatus() {
     const sectionStatuses = {};
@@ -434,8 +465,9 @@ class SystemManagementMain {
   }
 
   /**
-   * Cleanup resources
-   * ניקוי משאבים
+   * Cleanup system management
+   * @function cleanup
+   * @returns {void}
    */
   cleanup() {
     console.log('🧹 Cleaning up System Management...');

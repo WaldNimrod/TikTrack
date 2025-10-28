@@ -1,3 +1,42 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 16
+ * 
+ * PAGE INITIALIZATION (2)
+ * - initDatabaseDisplay() - initDatabaseDisplay function
+ * - setupEventListeners() - * Initialize the database display page
+ * 
+ * DATA LOADING (3)
+ * - loadTableData() - * Set up page event listeners
+ * - fetchTableData() - * Load data for a specific table type
+ * - showLoadingState() - * Apply sorting functionality to table
+ * 
+ * DATA MANIPULATION (4)
+ * - updateTableDisplay() - * Fetch table data from server
+ * - createTableBodyHTML() - createTableBodyHTML function
+ * - updateTableInfo() - * Show loading state
+ * - addRecord() - * Format status value
+ * 
+ * EVENT HANDLING (1)
+ * - applySortingFunctionality() - * Format cell value based on column configuration
+ * 
+ * UTILITIES (5)
+ * - formatCellValue() - formatCellValue function
+ * - formatDate() - * Filter table data
+ * - formatNumber() - * Format date value
+ * - formatCurrency() - * Format date value
+ * - formatStatus() - * Format currency value
+ * 
+ * OTHER (1)
+ * - filterTableData() - * Update table information display
+ * 
+ * ==========================================
+ */
 /**
  * ========================================
  * Database Management - Database Display Page Management

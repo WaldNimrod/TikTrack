@@ -21,15 +21,14 @@
  * @async
  * @returns {Promise<void>}
  */
-async function initializeUnifiedApp() {
-    /*
-     * Example configuration:
-     *             globalCheck: 'window.MyNewScript', // IMPORTANT: Global for identification
-     *             description: 'My new script',
-     *             required: true
-     *         }
-     *     ]
-     */
+/*
+ * Example configuration:
+ *             globalCheck: 'window.MyNewScript', // IMPORTANT: Global for identification
+ *             description: 'My new script',
+ *             required: true
+ *         }
+ *     ]
+ */
     
     // STEP 3: Update Page Configuration
     // ---------------------------------
@@ -1343,7 +1342,6 @@ class UnifiedAppInitializer {
 }
 
 // ===== GLOBAL EXPORTS =====
-window.initializeUnifiedApp = initializeUnifiedApp;
 window.handlePageSpecificFunctions = handlePageSpecificFunctions;
 
 window.UnifiedAppInitializer = UnifiedAppInitializer;

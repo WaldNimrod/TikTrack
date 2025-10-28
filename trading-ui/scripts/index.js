@@ -1,3 +1,36 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 16
+ * 
+ * DATA MANIPULATION (5)
+ * - createTradesStatusChart() - * Export overview data from the index page
+ * - createPerformanceChart() - createPerformanceChart function
+ * - createAccountChart() - createAccountChart function
+ * - createMixedChart() - createMixedChart function
+ * - createMixedChartData() - createMixedChartData function
+ * 
+ * EVENT HANDLING (1)
+ * - quickAction() - * Refresh overview data on the index page
+ * 
+ * OTHER (10)
+ * - switchTableTab() - switchTableTab function
+ * - refreshOverview() - * Switch between table tabs on the index page
+ * - exportOverview() - * Switch between table tabs on the index page
+ * - refreshAllCharts() - refreshAllCharts function
+ * - refreshChart() - refreshChart function
+ * - exportChart() - exportChart function
+ * - exportAllCharts() - exportAllCharts function
+ * - generateDetailedLog() - generateDetailedLog function
+ * - debugZIndexStatus() - debugZIndexStatus function
+ * - copyDetailedLogLocal() - copyDetailedLogLocal function
+ * 
+ * ==========================================
+ */
 /**
  * Index Page JavaScript - TikTrack
  * עמוד הבית - JavaScript

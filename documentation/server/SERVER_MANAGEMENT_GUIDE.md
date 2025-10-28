@@ -19,9 +19,9 @@
 
 ---
 
-## 🚀 **How to Start the Server (הדרך הנכונה)**
+## 🚀 **How to Start the Server (הדרך היחידה)**
 
-### **הפעלה רגילה:**
+### **הפעלה רגילה (הדרך היחידה):**
 ```bash
 ./start_server.sh
 ```
@@ -35,6 +35,23 @@
 ```bash
 ./start_server.sh --force
 ```
+
+## 📁 **קבצי השרת הפעילים (רק אלה)**
+
+### **קבצים עיקריים:**
+- **`Backend/app.py`** - קובץ השרת הראשי (היחיד הפעיל)
+- **`start_server.sh`** - סקריפט הפעלה (הדרך היחידה להפעיל)
+- **`Backend/utils/server_lock_manager.py`** - ניהול תהליכים
+
+### **קבצי API:**
+- **`Backend/routes/api/server_management.py`** - API ניהול שרת
+- **`Backend/routes/api/server_logs.py`** - API לוגים
+
+### **קבצים שהוסרו:**
+- **❌ הוסר** - כל סקריפטי השרת הישנים הועברו לארכיון
+- **❌ הוסר** - dev_server.py, dev_server_optimized.py
+- **❌ הוסר** - restart-bg.sh, run-background.sh
+- **❌ הוסר** - trading-ui/server.py
 
 ### **מה קורה כשמריצים את הסקריפט:**
 1. **בדיקת Python** - וידוא ש-Python3 זמין

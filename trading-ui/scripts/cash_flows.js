@@ -1,53 +1,29 @@
 /**
- * Function Index:
- * ==============
+ * Cash Flows Page - Comprehensive Function Index
+ * ==========================================
  * 
- * DATA LOADING:
- * - loadCashFlowsData()
- * - updateCashFlowsTable()
- * - updatePageSummaryStats()
+ * This file contains all functions for managing cash flows including:
+ * - CRUD operations for cash flows
+ * - Data loading and table management
+ * - Form validation and UI interactions
+ * - Modal handling and state management
+ * - Filtering and sorting functionality
+ * - Related objects integration
  * 
- * CASH FLOW MANAGEMENT:
- * - addCashFlow()
- * - editCashFlow()
- * - deleteCashFlow()
- * - updateCashFlow()
- * 
- * VALIDATION:
- * - clearCashFlowValidation()
- * - validateCashFlowForm()
- * 
- * UI MANAGEMENT:
- * - showAddCashFlowModal()
- * - hideAddCashFlowModal()
- * - showEditCashFlowModal()
- * - hideEditCashFlowModal()
- * - updateRadioButtons()
- * - populateSelect()
- * - onRelationTypeChange()
- * - onRelatedObjectChange()
- * - enableConditionFields()
- * - disableConditionFields()
- * - populateRelatedObjects()
- * 
- * DATA FILTERING:
- * - filterCashFlowsLocally()
- * 
- * UTILITY FUNCTIONS:
- * - getDemoCashFlowsData()
- * - restoreSortState()
- * - setupModalConfigurations()
- * 
- * ==============
+ * Author: TikTrack Development Team
+ * Version: 2.0
+ * Last Updated: 2025-01-27
  */
 
 // ===== קובץ JavaScript לדף תזרימי מזומנים =====
 
 /**
- * טעינת נתוני תזרימי מזומנים
- * טוען את כל נתוני התזרימים מהשרת
+ * Load cash flows data from server
+ * @function loadCashFlowsData
+ * @async
+ * @returns {Promise<void>}
  */
-function loadCashFlowsData() {
+async function loadCashFlowsData() {
   try {
     window.Logger.info('Loading cash flows data', { page: 'cash_flows' });
     
@@ -112,8 +88,9 @@ function loadCashFlowsData() {
 }
 
 /**
- * חישוב יתרה
- * מחשב את היתרה הנוכחית על בסיס תזרימי המזומנים
+ * Calculate balance
+ * @function calculateBalance
+ * @returns {void}
  */
 function calculateBalance() {
   try {
@@ -211,7 +188,10 @@ let cashFlowsData = window.cashFlowsData;
 let tradingAccountsData = [];
 
 /**
- * קבלת שם חשבון מסחר לפי ID
+ * Get account name by ID
+ * @function getAccountNameById
+ * @param {string} accountId - Account ID
+ * @returns {string} Account name
  */
 function getAccountNameById(accountId) {
   try {
@@ -269,7 +249,9 @@ async function ensureTradingAccountsLoaded() {
  */
 
 /**
- * פונקציה לפתיחה/סגירה של סקשן תזרימי מזומנים
+ * Toggle cash flows section
+ * @function toggleCashFlowsSection
+ * @returns {void}
  */
 function toggleCashFlowsSection() {
   try {
@@ -422,7 +404,9 @@ async function loadCashFlows() {
 }
 
 /**
- * ולידציה של טופס תזרים מזומנים
+ * Validate cash flow form
+ * @function validateCashFlowForm
+ * @returns {boolean} Is valid
  */
 function validateCashFlowForm() {
   try {
@@ -476,7 +460,9 @@ function validateCashFlowForm() {
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
 /**
- * ולידציה של טופס עריכת תזרים מזומנים
+ * Validate edit cash flow form
+ * @function validateEditCashFlowForm
+ * @returns {boolean} Is valid
  */
 function validateEditCashFlowForm() {
   try {
@@ -814,7 +800,9 @@ async function renderCashFlowsTable() {
 }
 
 /**
- * עדכון סטטיסטיקות סיכום
+ * Update page summary statistics
+ * @function updatePageSummaryStats
+ * @returns {void}
  */
 function updatePageSummaryStats() {
   try {
@@ -851,7 +839,10 @@ function updatePageSummaryStats() {
 // getSourceDisplayName -> translateCashFlowSource
 
 /**
- * פורמט סכום
+ * Format amount
+ * @function formatAmount
+ * @param {number} amount - Amount to format
+ * @returns {string} Formatted amount
  */
 function formatAmount(amount) {
   try {
@@ -875,7 +866,10 @@ function formatAmount(amount) {
 }
 
 /**
- * קבלת סוג תזרים עם צבע
+ * Get cash flow type with color
+ * @function getCashFlowTypeWithColor
+ * @param {string} type - Cash flow type
+ * @returns {string} HTML with color
  */
 function getCashFlowTypeWithColor(type) {
   try {
@@ -937,14 +931,20 @@ function getCashFlowTypeWithColor(type) {
 }
 
 /**
- * קבלת סוג תזרים כטקסט בלבד (ללא HTML)
+ * Get cash flow type text
+ * @function getCashFlowTypeText
+ * @param {string} type - Cash flow type
+ * @returns {string} Type text
  */
 function getCashFlowTypeText(type) {
   return window.translateCashFlowType ? window.translateCashFlowType(type) : type;
 }
 
 /**
- * עיצוב סכום עם יישור נכון וצביעה
+ * Format cash flow amount
+ * @function formatCashFlowAmount
+ * @param {number} amount - Amount to format
+ * @returns {string} Formatted amount
  */
 function formatCashFlowAmount(amount) {
   if (!amount && amount !== 0) {return '-';}
@@ -969,7 +969,10 @@ function formatCashFlowAmount(amount) {
 }
 
 /**
- * עיצוב שער דולר עם 2 ספרות אחרי הנקודה
+ * Format USD rate
+ * @function formatUsdRate
+ * @param {number} rate - Rate to format
+ * @returns {string} Formatted rate
  */
 function formatUsdRate(rate) {
   if (!rate) {return '1.00';}
@@ -982,8 +985,10 @@ function formatUsdRate(rate) {
 // ========================================
 
 /**
- * הצגת פרטי תזרים מזומנים
- * @param {number} cashFlowId - מזהה התזרים
+ * Show cash flow details
+ * @function showCashFlowDetails
+ * @param {string} cashFlowId - Cash flow ID
+ * @returns {void}
  */
 function showCashFlowDetails(cashFlowId) {
   // שימוש במערכת הפרטים הגלובלית
@@ -1004,8 +1009,10 @@ function showCashFlowDetails(cashFlowId) {
 // showLinkedItemsModal - using global function from linked-items.js
 
 /**
- * עדכון טבלת תזרימי מזומנים
- * @param {Array} cashFlows - מערך של תזרימי מזומנים
+ * Update cash flows table
+ * @function updateCashFlowsTable
+ * @param {Array} cashFlows - Cash flows array
+ * @returns {void}
  */
 function updateCashFlowsTable(cashFlows) {
 
@@ -1035,7 +1042,9 @@ window.updateCashFlowsTable = updateCashFlowsTable;
 // הפונקציה הכפולה נמחקה
 
 /**
- * עדכון אוטומטי של נתוני תזרימי מזומנים
+ * Start auto refresh
+ * @function startAutoRefresh
+ * @returns {void}
  */
 function startAutoRefresh() {
   window.Logger.info('Starting automatic cash flows update', { page: 'cash_flows' });
@@ -1134,7 +1143,10 @@ async function applyDynamicColors() {
 }
 
 /**
- * החלת העדפות משתמש על העמוד
+ * Apply user preferences
+ * @function applyUserPreferences
+ * @param {Object} preferences - User preferences
+ * @returns {void}
  */
 function applyUserPreferences(preferences) {
   try {
@@ -1247,6 +1259,12 @@ window.saveCashFlow = saveCashFlow;
 window.updateCashFlow = updateCashFlow;
 
 // יצירת alias לפונקציית המחיקה לשמירה על תאימות
+/**
+ * Confirm delete cash flow
+ * @function confirmDeleteCashFlow
+ * @param {string} id - Cash flow ID
+ * @returns {void}
+ */
 function confirmDeleteCashFlow(id) {
   return deleteCashFlow(id);
 }
@@ -1282,9 +1300,11 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
 // ========================================
 
 /**
- * ניהול שדה מזהה חיצוני בהתאם למקור
- * @param {string} source - מקור התזרים
- * @param {string} modalType - סוג המודל ('add' או 'edit')
+ * Manage external ID field
+ * @function manageExternalIdField
+ * @param {string} source - Source type
+ * @param {string} modalType - Modal type
+ * @returns {void}
  */
 function manageExternalIdField(source, modalType) {
   const fieldId = modalType === 'edit' ? 'editCashFlowExternalId' : 'cashFlowExternalId';
@@ -1313,7 +1333,9 @@ function manageExternalIdField(source, modalType) {
 }
 
 /**
- * הוספת event listeners לשדות מקור ווולידציה מיידית
+ * Setup source field listeners
+ * @function setupSourceFieldListeners
+ * @returns {void}
  */
 function setupSourceFieldListeners() {
   // למודל הוספה
@@ -1342,7 +1364,9 @@ function setupSourceFieldListeners() {
 // Function removed - not used anywhere
 
 /**
- * אתחול שדות מזהה חיצוני במודלים
+ * Initialize external ID fields
+ * @function initializeExternalIdFields
+ * @returns {void}
  */
 function initializeExternalIdFields() {
   // אתחול במודל הוספה
@@ -1358,14 +1382,12 @@ function initializeExternalIdFields() {
   }
 }
 
-// עדכון פונקציית showAddCashFlowModal
-    CRUDResponseHandler.handleError(error, 'עדכון תזרים מזומנים');
-  }
-}
-
-// הפונקציה הוסרה - קיימת כבר בשורה 909
-
 // פונקציות מודל חדשות - מערכת ModalManagerV2
+/**
+ * Show add cash flow modal
+ * @function showAddCashFlowModal
+ * @returns {void}
+ */
 function showAddCashFlowModal() {
     window.Logger.debug('showAddCashFlowModal called', { page: 'cash_flows' });
     
@@ -1376,6 +1398,12 @@ function showAddCashFlowModal() {
     }
 }
 
+/**
+ * Show edit cash flow modal
+ * @function showEditCashFlowModal
+ * @param {string} cashFlowId - Cash flow ID
+ * @returns {void}
+ */
 function showEditCashFlowModal(cashFlowId) {
     window.Logger.debug('showEditCashFlowModal called', { cashFlowId, page: 'cash_flows' });
     
@@ -1391,6 +1419,12 @@ function showEditCashFlowModal(cashFlowId) {
 // Toggle functions
 
 // Cash Flow CRUD functions
+/**
+ * Edit cash flow
+ * @function editCashFlow
+ * @param {string} id - Cash flow ID
+ * @returns {void}
+ */
 function editCashFlow(id) {
     if (typeof window.editCashFlow === 'function') {
         window.editCashFlow(id);
@@ -1504,7 +1538,9 @@ window.updateCashFlow = updateCashFlow;
 // window.checkLinkedItemsForCashFlow = checkLinkedItemsForCashFlow; // הוסר - לא נחוץ יותר
 
 /**
- * Generate detailed log for Cash Flows
+ * Generate detailed log
+ * @function generateDetailedLog
+ * @returns {void}
  */
 function generateDetailedLog() {
     const timestamp = new Date().toLocaleString('he-IL');
@@ -1755,25 +1791,31 @@ async function generateDetailedLogForCashFlows() {
 // ===== מערכת טיפול בשגיאות =====
 // השתמש במערכת הכללית error-handlers.js
 
-// ===== ייצוא פונקציות לגלובל scope =====
-// הוספת פונקציות חשובות ל-window object כדי שיהיו זמינות גלובלית
-
-// פונקציות עיקריות
+// ===== GLOBAL EXPORTS =====
 window.loadCashFlowsData = loadCashFlowsData;
 window.calculateBalance = calculateBalance;
+window.getAccountNameById = getAccountNameById;
 window.toggleCashFlowsSection = toggleCashFlowsSection;
-window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
-
-window.loadCashFlows = loadCashFlows;
-
-// פונקציות טופס
 window.validateCashFlowForm = validateCashFlowForm;
 window.validateEditCashFlowForm = validateEditCashFlowForm;
-
-// פונקציות CRUD
-window.deleteCashFlow = deleteCashFlow;
-window.saveCashFlow = saveCashFlow;
-window.updateCashFlow = updateCashFlow;
+window.updatePageSummaryStats = updatePageSummaryStats;
+window.formatAmount = formatAmount;
+window.getCashFlowTypeWithColor = getCashFlowTypeWithColor;
+window.getCashFlowTypeText = getCashFlowTypeText;
+window.formatCashFlowAmount = formatCashFlowAmount;
+window.formatUsdRate = formatUsdRate;
+window.showCashFlowDetails = showCashFlowDetails;
+window.updateCashFlowsTable = updateCashFlowsTable;
+window.startAutoRefresh = startAutoRefresh;
+window.applyUserPreferences = applyUserPreferences;
+window.confirmDeleteCashFlow = confirmDeleteCashFlow;
+window.manageExternalIdField = manageExternalIdField;
+window.setupSourceFieldListeners = setupSourceFieldListeners;
+window.initializeExternalIdFields = initializeExternalIdFields;
+window.showAddCashFlowModal = showAddCashFlowModal;
+window.showEditCashFlowModal = showEditCashFlowModal;
+window.editCashFlow = editCashFlow;
+window.generateDetailedLog = generateDetailedLog;
 window.editCashFlow = editCashFlow;
 
 // פונקציות טעינה

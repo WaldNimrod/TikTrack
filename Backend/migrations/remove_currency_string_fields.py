@@ -62,7 +62,7 @@ def migrate():
         cursor.execute("""
             CREATE TABLE cash_flows_new (
                 id INTEGER NOT NULL,
-                account_id INTEGER NOT NULL,
+                trading_account_id INTEGER NOT NULL,
                 type VARCHAR(50) NOT NULL,
                 amount FLOAT NOT NULL,
                 date DATE,
@@ -73,7 +73,7 @@ def migrate():
                 external_id VARCHAR(100) DEFAULT '0',
                 created_at DATETIME DEFAULT (CURRENT_TIMESTAMP),
                 PRIMARY KEY (id),
-                FOREIGN KEY (account_id) REFERENCES accounts (id),
+                FOREIGN KEY (trading_account_id) REFERENCES accounts (id),
                 FOREIGN KEY (currency_id) REFERENCES currencies(id)
             )
         """)
@@ -101,11 +101,11 @@ def migrate():
         # Copy cash_flows data (converting currency to currency_id)
         cursor.execute("""
             INSERT INTO cash_flows_new (
-                id, account_id, type, amount, date, description,
+                id, trading_account_id, type, amount, date, description,
                 currency_id, usd_rate, source, external_id, created_at
             )
             SELECT 
-                cf.id, cf.account_id, cf.type, cf.amount, cf.date, cf.description,
+                cf.id, cf.trading_account_id, cf.type, cf.amount, cf.date, cf.description,
                 CASE 
                     WHEN cf.currency = 'USD' THEN 1
                     WHEN cf.currency = 'EUR' THEN 2

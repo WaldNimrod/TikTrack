@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 trading_accounts_bp = Blueprint('trading_accounts', __name__, url_prefix='/api/trading-accounts')
 
 # Initialize base API
-base_api = BaseEntityAPI('accounts', TradingAccountService, 'accounts')
+base_api = BaseEntityAPI('trading_accounts', TradingAccountService, 'trading_accounts')
 
 @trading_accounts_bp.route('/', methods=['GET'])
 @api_endpoint(cache_ttl=60, rate_limit=60)

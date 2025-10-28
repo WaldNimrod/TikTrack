@@ -248,11 +248,11 @@ def create_notes_migration():
         attachment,
         created_at,
         CASE 
-            WHEN account_id IS NOT NULL THEN 1
+            WHEN trading_account_id IS NOT NULL THEN 1
             WHEN trade_id IS NOT NULL THEN 2
             WHEN trade_plan_id IS NOT NULL THEN 3
         END as related_type_id,
-        COALESCE(account_id, trade_id, trade_plan_id) as related_id
+        COALESCE(trading_account_id, trade_id, trade_plan_id) as related_id
     FROM notes;
     
     -- Delete old table
@@ -269,19 +269,19 @@ def create_notes_migration():
         content VARCHAR(1000) NOT NULL,
         attachment VARCHAR(500),
         created_at DATETIME DEFAULT (CURRENT_TIMESTAMP),
-        account_id INTEGER,
+        trading_account_id INTEGER,
         trade_id INTEGER,
         trade_plan_id INTEGER
     );
     
     -- Copy data back
-    INSERT INTO notes_old (id, content, attachment, created_at, account_id, trade_id, trade_plan_id)
+    INSERT INTO notes_old (id, content, attachment, created_at, trading_account_id, trade_id, trade_plan_id)
     SELECT 
         id,
         content,
         attachment,
         created_at,
-        CASE WHEN related_type_id = 1 THEN related_id ELSE NULL END as account_id,
+        CASE WHEN related_type_id = 1 THEN related_id ELSE NULL END as trading_account_id,
         CASE WHEN related_type_id = 2 THEN related_id ELSE NULL END as trade_id,
         CASE WHEN related_type_id = 3 THEN related_id ELSE NULL END as trade_plan_id
     FROM notes;

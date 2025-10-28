@@ -67,22 +67,22 @@ def update_accounts_currency_table():
             accounts_to_update = result.fetchall()
             
             updated_count = 0
-            for account_id, currency_str in accounts_to_update:
+            for trading_account_id, currency_str in accounts_to_update:
                 currency_str = currency_str.upper() if currency_str else 'USD'
                 
                 if currency_str in currency_mapping:
                     currency_id = currency_mapping[currency_str]
                     connection.execute(
-                        text("UPDATE accounts SET currency_id = :currency_id WHERE id = :account_id"),
-                        {"currency_id": currency_id, "account_id": account_id}
+                        text("UPDATE accounts SET currency_id = :currency_id WHERE id = :trading_account_id"),
+                        {"currency_id": currency_id, "trading_account_id": trading_account_id}
                     )
                     updated_count += 1
                 else:
                     # If currency doesn't exist, use USD as default
                     default_currency_id = currency_mapping.get('USD', 1)
                     connection.execute(
-                        text("UPDATE accounts SET currency_id = :currency_id WHERE id = :account_id"),
-                        {"currency_id": default_currency_id, "account_id": account_id}
+                        text("UPDATE accounts SET currency_id = :currency_id WHERE id = :trading_account_id"),
+                        {"currency_id": default_currency_id, "trading_account_id": trading_account_id}
                     )
                     updated_count += 1
             

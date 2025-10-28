@@ -1,21 +1,30 @@
-/** לכן בבק
- * Constraint Manager - JavaScript for managing database constraints
- * Date: August 23, 2025
- * Description: Frontend JavaScript for the constraints management interface
- *
- * Dependencies:
- * - main.js (global utilities)
- * - translation-utils.js (translation functions)
- *
- * File: trading-ui/scripts/constraint-manager.js
+/**
+ * Constraint Manager - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the constraint management system for TikTrack.
+ * Provides database constraint management interface with CRUD operations.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/CONSTRAINT_MANAGEMENT_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
  * Version: 2.2
- * Last Updated: August 23, 2025
+ * Last Updated: 2025-01-27
  */
 
 // Global constraint manager instance
 let constraintManager;
 
+/**
+ * Constraint Manager Class
+ * @class ConstraintManager
+ */
 class ConstraintManager {
+  /**
+   * Constructor - Initialize ConstraintManager
+   * @constructor
+   */
   constructor() {
     this.apiBase = 'http://localhost:8080/api/constraints';
     this.currentConstraint = null;
@@ -25,6 +34,12 @@ class ConstraintManager {
     this.init();
   }
 
+  /**
+   * Initialize constraint manager
+   * @function init
+   * @async
+   * @returns {Promise<void>}
+   */
   async init() {
     try {
       await this.loadStats();
@@ -37,6 +52,12 @@ class ConstraintManager {
     }
   }
 
+  /**
+   * Load constraint statistics
+   * @function loadStats
+   * @async
+   * @returns {Promise<void>}
+   */
   async loadStats() {
     try {
       const response = await fetch(`${this.apiBase}/health`);
@@ -57,6 +78,12 @@ class ConstraintManager {
     }
   }
 
+  /**
+   * Load database tables
+   * @function loadTables
+   * @async
+   * @returns {Promise<void>}
+   */
   async loadTables() {
     try {
       const response = await fetch(`${this.apiBase}/tables`);
@@ -71,6 +98,13 @@ class ConstraintManager {
     }
   }
 
+  /**
+   * Load constraints with optional table filter
+   * @function loadConstraints
+   * @async
+   * @param {string} tableFilter - Table filter
+   * @returns {Promise<void>}
+   */
   async loadConstraints(tableFilter = '') {
     try {
       const url = tableFilter ? `${this.apiBase}/?table=${tableFilter}` : this.apiBase;
@@ -97,6 +131,11 @@ class ConstraintManager {
 
 
 
+  /**
+   * Update statistics display
+   * @function updateStats
+   * @returns {void}
+   */
   updateStats() {
     document.getElementById('total-constraints').textContent = this.constraints.length;
     document.getElementById('total-tables').textContent = new Set(this.constraints.map(c => c.table_name)).size;
@@ -107,6 +146,11 @@ class ConstraintManager {
     document.getElementById('total-enums').textContent = enumCount;
   }
 
+  /**
+   * Populate table filter dropdown
+   * @function populateTableFilter
+   * @returns {void}
+   */
   populateTableFilter() {
     const select = document.getElementById('table-filter');
     select.innerHTML = '<option value="">כל הטבלאות</option>';
@@ -119,6 +163,11 @@ class ConstraintManager {
     });
   }
 
+  /**
+   * Render constraints list
+   * @function renderConstraintsList
+   * @returns {void}
+   */
   renderConstraintsList() {
     const container = document.getElementById('constraints-list-container');
 
@@ -131,6 +180,12 @@ class ConstraintManager {
     container.innerHTML = html;
   }
 
+  /**
+   * Render filtered constraints
+   * @function renderFilteredConstraints
+   * @param {Array} filteredConstraints - Filtered constraints array
+   * @returns {void}
+   */
   renderFilteredConstraints(filteredConstraints) {
     const container = document.getElementById('constraints-list-container');
 
@@ -143,6 +198,12 @@ class ConstraintManager {
     container.innerHTML = html;
   }
 
+  /**
+   * Render single constraint item
+   * @function renderConstraintItem
+   * @param {Object} constraint - Constraint object
+   * @returns {string} HTML string
+   */
   renderConstraintItem(constraint) {
     const badgeClass = this.getBadgeClass(constraint.constraint_type);
     const badgeText = this.getBadgeText(constraint.constraint_type);
@@ -201,6 +262,12 @@ class ConstraintManager {
     return texts[constraintType] || constraintType;
   }
 
+  /**
+   * Select constraint by ID
+   * @function selectConstraint
+   * @param {string} constraintId - Constraint ID
+   * @returns {void}
+   */
   selectConstraint(constraintId) {
     // Remove active class from all items
     document.querySelectorAll('.constraint-item').forEach(item => {
@@ -227,6 +294,11 @@ class ConstraintManager {
     }
   }
 
+  /**
+   * Render constraint editor
+   * @function renderConstraintEditor
+   * @returns {void}
+   */
   renderConstraintEditor() {
     const container = document.getElementById('editor-container');
     const constraint = this.currentConstraint;
@@ -281,6 +353,13 @@ class ConstraintManager {
         `;
   }
 
+  /**
+   * Delete constraint by ID
+   * @function deleteConstraint
+   * @async
+   * @param {string} constraintId - Constraint ID
+   * @returns {Promise<void>}
+   */
   async deleteConstraint(constraintId) {
     if (typeof window.showConfirmationDialog === 'function') {
       const confirmed = await new Promise(resolve => {
@@ -337,6 +416,11 @@ class ConstraintManager {
   }
 
 
+  /**
+   * Setup event listeners
+   * @function setupEventListeners
+   * @returns {void}
+   */
   setupEventListeners() {
     // Table filter
     const tableFilter = document.getElementById('table-filter');
@@ -371,6 +455,11 @@ class ConstraintManager {
     }
   }
 
+  /**
+   * Handle add constraint form submission
+   * @function handleAddConstraint
+   * @returns {void}
+   */
   handleAddConstraint() {
     const formData = {
       table_name: document.getElementById('table-name').value,
@@ -426,6 +515,11 @@ class ConstraintManager {
     }, 5000);
   }
 
+  /**
+   * Handle modal add constraint form submission
+   * @function handleModalAddConstraint
+   * @returns {void}
+   */
   handleModalAddConstraint() {
     const formData = {
       table_name: document.getElementById('modal-table-name').value,
@@ -476,6 +570,13 @@ class ConstraintManager {
     }
   }
 
+  /**
+   * Add new constraint
+   * @function addConstraint
+   * @async
+   * @param {FormData} formData - Form data
+   * @returns {Promise<void>}
+   */
   async addConstraint(formData) {
     try {
       const response = await fetch(this.apiBase, {
@@ -629,12 +730,13 @@ window.handleModalAddConstraint = function () {
   }
 };
 
-// Global function for loading constraints data (for compatibility with main.js)
-window.loadConstraintsData = function () {
-  if (constraintManager) {
-    constraintManager.loadConstraints();
-  } else {
-    // Constraint manager not initialized
-  }
-};
+// ===== GLOBAL EXPORTS =====
+window.constraintManager = constraintManager;
+window.showAddConstraintModal = showAddConstraintModal;
+window.selectConstraint = selectConstraint;
+window.addNewConstraint = addNewConstraint;
+window.handleModalAddConstraint = handleModalAddConstraint;
+window.deleteConstraint = deleteConstraint;
+window.removeEnumValue = removeEnumValue;
+window.loadConstraintsData = loadConstraintsData;
 

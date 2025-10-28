@@ -1,44 +1,18 @@
 /**
- * Function Index:
- * ==============
+ * Trading Accounts Page - Comprehensive Function Index
+ * ==========================================
  * 
- * DATA LOADING:
- * - loadTradingAccountsData()
- * - updateTradingAccountsTable()
- * - updatePageSummaryStats()
+ * This file contains all functions for managing trading accounts including:
+ * - CRUD operations for trading accounts
+ * - Data loading and table management
+ * - Form validation and UI interactions
+ * - Modal handling and state management
+ * - Filtering and sorting functionality
+ * - Related objects integration
  * 
- * ACCOUNT MANAGEMENT:
- * - addTradingAccount()
- * - editTradingAccount()
- * - deleteTradingAccount()
- * - updateTradingAccount()
- * 
- * VALIDATION:
- * - clearTradingAccountValidation()
- * - validateTradingAccountForm()
- * 
- * UI MANAGEMENT:
- * - showAddTradingAccountModal()
- * - hideAddTradingAccountModal()
- * - showEditTradingAccountModal()
- * - hideEditTradingAccountModal()
- * - updateRadioButtons()
- * - populateSelect()
- * - onRelationTypeChange()
- * - onRelatedObjectChange()
- * - enableConditionFields()
- * - disableConditionFields()
- * - populateRelatedObjects()
- * 
- * DATA FILTERING:
- * - filterTradingAccountsLocally()
- * 
- * UTILITY FUNCTIONS:
- * - getDemoTradingAccountsData()
- * - restoreSortState()
- * - setupModalConfigurations()
- * 
- * ==============
+ * Author: TikTrack Development Team
+ * Version: 2.0
+ * Last Updated: 2025-01-27
  */
 
 /* ===== מערכת ניהול חשבונות מסחר ===== */
@@ -404,7 +378,11 @@ async function loadAllTradingAccountsFromServer() {
   }
 }
 
-// פונקציה לטעינת חשבונות ברירת מחדל
+/**
+ * Load default trading accounts
+ * @function loadDefaultTradingAccounts
+ * @returns {void}
+ */
 function loadDefaultTradingAccounts() {
   // Loading default trading_accounts - no dummy data
   window.trading_accountsData = [];
@@ -457,13 +435,10 @@ async function loadTradingAccountsData() {
 }
 
 /**
- * עדכון טבלת חשבונות בדף database.html
- * הפונקציה מעדכנת את הטבלה עם נתוני החשבונות
- *
- * @param {Array} trading_accounts - מערך של חשבונות
- *
- * @example
- * updateTradingAccountsTable(trading_accounts);
+ * Update trading accounts table
+ * @function updateTradingAccountsTable
+ * @param {Array} trading_accounts - Trading accounts array
+ * @returns {void}
  */
 function updateTradingAccountsTable(trading_accounts) {
   window.Logger.info('🚀🚀🚀 updateTradingAccountsTable התחיל עם', trading_accounts ? trading_accounts.length : 0, 'חשבונות 🚀🚀🚀', { page: "trading_accounts" });
@@ -568,8 +543,10 @@ function updateTradingAccountsTable(trading_accounts) {
 }
 
 /**
- * עדכון סיכום נתונים לחשבונות מסחר
- * @param {Array} trading_accounts - מערך החשבונות
+ * Update trading accounts summary
+ * @function updateTradingAccountsSummary
+ * @param {Array} trading_accounts - Trading accounts array
+ * @returns {void}
  */
 function updateTradingAccountsSummary(trading_accounts) {
   // מערכת מאוחדת לסיכום נתונים
@@ -629,7 +606,11 @@ async function loadTradingAccounts() {
  * @param {Array} trading_accounts - מערך של חשבונות
  */
 
-// פונקציה לעדכון טקסט פילטר החשבונות
+/**
+ * Update trading account filter display text
+ * @function updateTradingAccountFilterDisplayText
+ * @returns {void}
+ */
 function updateTradingAccountFilterDisplayText() {
   const appHeader = document.querySelector('app-header');
   if (!appHeader || !appHeader.shadowRoot) {
@@ -1085,8 +1066,10 @@ async function deleteTradingAccount(tradingAccountId, tradingAccountName) {
 // הפונקציה הועברה למטה - גרסה מפורטת יותר
 
 /**
- * הצגת הודעת הצלחה
- * @param {string} message - הודעת ההצלחה
+ * Show success message
+ * @function showSuccessMessage
+ * @param {string} message - Success message
+ * @returns {void}
  */
 function showSuccessMessage(message) {
   if (typeof window.showSuccessNotification === 'function') {
@@ -1095,8 +1078,10 @@ function showSuccessMessage(message) {
 }
 
 /**
- * הצגת הודעת שגיאה
- * @param {string} message - הודעת השגיאה
+ * Show error message
+ * @function showErrorMessage
+ * @param {string} message - Error message
+ * @returns {void}
  */
 function showErrorMessage(message) {
   if (typeof window.showErrorNotification === 'function') {
@@ -1108,6 +1093,13 @@ function showErrorMessage(message) {
 
 // פונקציות עזר - הועברו ל-ui-utils.js
 
+/**
+ * Confirm delete trading account
+ * @function confirmDeleteTradingAccount
+ * @param {string} tradingAccountId - Trading account ID
+ * @param {string} tradingAccountName - Trading account name
+ * @returns {void}
+ */
 function confirmDeleteTradingAccount(tradingAccountId, tradingAccountName) {
   deleteTradingAccount(tradingAccountId, tradingAccountName);
 }
@@ -1117,6 +1109,13 @@ function confirmDeleteTradingAccount(tradingAccountId, tradingAccountName) {
 //   return Promise.resolve({ hasLinkedItems: false, items: [] });
 // }
 
+/**
+ * Show open trades warning
+ * @function showOpenTradesWarning
+ * @param {string} tradingAccountId - Trading account ID
+ * @param {string} tradingAccountName - Trading account name
+ * @returns {void}
+ */
 function showOpenTradesWarning(tradingAccountId, tradingAccountName) {
   if (typeof window.showWarningNotification === 'function') {
     window.showWarningNotification('אזהרה', `יש עסקאות פתוחות בחשבון מסחר "${accountName}". לא ניתן למחוק חשבון מסחר עם עסקאות פעילות.`);
@@ -1322,6 +1321,16 @@ async function loadTradingAccountsDataForTradingAccountsPage() {
 // function setupSortableHeaders() { ... }
 
 // פונקציה לפילטור מקומי של חשבונות - ספציפית לחשבונות
+/**
+ * Filter trading accounts locally
+ * @function filterTradingAccountsLocally
+ * @param {Array} trading_accounts - Trading accounts array
+ * @param {Array} selectedStatuses - Selected statuses
+ * @param {Array} selectedTypes - Selected types
+ * @param {Object} selectedDateRange - Selected date range
+ * @param {string} searchTerm - Search term
+ * @returns {Array} Filtered trading accounts
+ */
 function filterTradingAccountsLocally(trading_accounts, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
   let filteredAccounts = [...trading_accounts];
 
@@ -1409,6 +1418,12 @@ function filterTradingAccountsLocally(trading_accounts, selectedStatuses, select
 // פונקציה גלובלית לעדכון הטבלה - הועברה ל-header-system.js
 
 // פונקציה לעדכון תפריט פילטר החשבונות
+/**
+ * Update trading account filter menu
+ * @function updateTradingAccountFilterMenu
+ * @param {Array} trading_accounts - Trading accounts array
+ * @returns {void}
+ */
 function updateTradingAccountFilterMenu(trading_accounts) {
   // חיפוש התפריט בתוך האפ-הדר (Shadow DOM)
   const appHeader = document.querySelector('app-header');
@@ -1892,7 +1907,10 @@ async function checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId) {
 }
 
 /**
- * קבלת שם החשבון מסחר לפי ID
+ * Get trading account name
+ * @function getTradingAccountName
+ * @param {string} tradingAccountId - Trading account ID
+ * @returns {string} Trading account name
  */
 function getTradingAccountName(tradingAccountId) {
   // נסה למצוא בחשבונות שכבר נטענו
@@ -1906,9 +1924,11 @@ function getTradingAccountName(tradingAccountId) {
 }
 
 /**
- * עדכון חשבון מסחר קיים
- * @param {number} tradingAccountId - מזהה החשבון מסחר המסחר
- * @param {Object} tradingAccountData - נתוני החשבון מסחר המסחר החדשים
+ * Update trading account
+ * @function updateTradingAccount
+ * @param {string} tradingAccountId - Trading account ID
+ * @param {Object} tradingAccountData - Trading account data
+ * @returns {void}
  */
 function updateTradingAccount(tradingAccountId, tradingAccountData) {
   try {
@@ -1966,9 +1986,10 @@ function updateTradingAccount(tradingAccountId, tradingAccountData) {
 }
 
 /**
- * צפייה בפרטי חשבון מסחר
- * מציג חלון עם פרטים מפורטים של החשבון מסחר
- * @param {number} tradingAccountId - מזהה החשבון מסחר המסחר
+ * View trading account details
+ * @function viewTradingAccountDetails
+ * @param {string} tradingAccountId - Trading account ID
+ * @returns {void}
  */
 function viewTradingAccountDetails(tradingAccountId) {
   try {
@@ -2026,8 +2047,10 @@ function viewTradingAccountDetails(tradingAccountId) {
 }
 
 /**
- * הצגת פרטי חשבון מסחר באמצעות מודול פרטי ישות
- * @param {number} tradingAccountId - מזהה החשבון מסחר המסחר
+ * Show trading account details
+ * @function showTradingAccountDetails
+ * @param {string} tradingAccountId - Trading account ID
+ * @returns {void}
  */
 function showTradingAccountDetails(tradingAccountId) {
   try {
@@ -2120,6 +2143,12 @@ let tradingAccountsCurrentSortDirection = 'asc';
  * 
  * @since 2.0
  */
+/**
+ * Sort table
+ * @function sortTable
+ * @param {number} columnIndex - Column index
+ * @returns {void}
+ */
 function sortTable(columnIndex) {
   window.Logger.info(`🔄 מיון טבלת חשבונות לפי עמודה ${columnIndex}`, { page: "trading_accounts" });
 
@@ -2142,6 +2171,11 @@ function sortTable(columnIndex) {
 }
 
 // Detailed Log Functions for Accounts Page
+/**
+ * Generate detailed log
+ * @function generateDetailedLog
+ * @returns {void}
+ */
 function generateDetailedLog() {
     try {
         const logData = {
@@ -2245,6 +2279,11 @@ function generateDetailedLog() {
 //  function removed - no longer needed
 
 // פונקציה לטעינת חשבונות לפילטר (נדרשת על ידי header-system.js)
+/**
+ * Get trading accounts
+ * @function getTradingAccounts
+ * @returns {Array} Trading accounts array
+ */
 function getTradingAccounts() {
     return new Promise((resolve, reject) => {
         if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
@@ -2275,8 +2314,9 @@ window.getTradingAccounts = getTradingAccounts;
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
 
 /**
- * הצגת מודל הוספת חשבון מסחר מסחר
- * Uses ModalManagerV2 for consistent modal experience
+ * Show add trading account modal
+ * @function showAddTradingAccountModal
+ * @returns {void}
  */
 function showAddTradingAccountModal() {
     window.Logger.debug('showAddTradingAccountModal called', { page: 'trading_accounts' });
@@ -2289,8 +2329,10 @@ function showAddTradingAccountModal() {
 }
 
 /**
- * הצגת מודל עריכת חשבון מסחר מסחר
- * Uses ModalManagerV2 for consistent modal experience
+ * Show edit trading account modal
+ * @function showEditTradingAccountModal
+ * @param {string} accountId - Account ID
+ * @returns {void}
  */
 function showEditTradingAccountModal(accountId) {
     window.Logger.debug('showEditTradingAccountModal called', { accountId, page: 'trading_accounts' });
@@ -2449,7 +2491,24 @@ async function deleteTradingAccount(accountId) {
     }
 }
 
-// Export functions to window for global access
+// ===== GLOBAL EXPORTS =====
+window.loadDefaultTradingAccounts = loadDefaultTradingAccounts;
+window.updateTradingAccountsTable = updateTradingAccountsTable;
+window.updateTradingAccountsSummary = updateTradingAccountsSummary;
+window.updateTradingAccountFilterDisplayText = updateTradingAccountFilterDisplayText;
+window.showSuccessMessage = showSuccessMessage;
+window.showErrorMessage = showErrorMessage;
+window.confirmDeleteTradingAccount = confirmDeleteTradingAccount;
+window.showOpenTradesWarning = showOpenTradesWarning;
+window.filterTradingAccountsLocally = filterTradingAccountsLocally;
+window.updateTradingAccountFilterMenu = updateTradingAccountFilterMenu;
+window.getTradingAccountName = getTradingAccountName;
+window.updateTradingAccount = updateTradingAccount;
+window.viewTradingAccountDetails = viewTradingAccountDetails;
+window.showTradingAccountDetails = showTradingAccountDetails;
+window.sortTable = sortTable;
+window.generateDetailedLog = generateDetailedLog;
+window.getTradingAccounts = getTradingAccounts;
 window.showAddTradingAccountModal = showAddTradingAccountModal;
 window.showEditTradingAccountModal = showEditTradingAccountModal;
 window.saveTradingAccount = saveTradingAccount;

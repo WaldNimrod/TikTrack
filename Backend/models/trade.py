@@ -27,7 +27,7 @@ class Trade(BaseModel):
     notes = Column(String(500), nullable=True)
     
     # Relationships
-    account = relationship("TradingAccount", back_populates="trades")
+    account = relationship("TradingAccount", foreign_keys=[trading_account_id], back_populates="trades")
     ticker = relationship("Ticker")
     trade_plan = relationship("TradePlan", back_populates="trades")
     executions = relationship("Execution", back_populates="trade")

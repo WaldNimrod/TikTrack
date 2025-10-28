@@ -31,9 +31,9 @@ class TradePlanService:
         ).filter(TradePlan.id == plan_id).first()
     
     @staticmethod
-    def get_by_account(db: Session, account_id: int) -> List[TradePlan]:
+    def get_by_account(db: Session, trading_account_id: int) -> List[TradePlan]:
         """Get trade plans by account"""
-        return db.query(TradePlan).filter(TradePlan.trading_account_id == account_id).all()
+        return db.query(TradePlan).filter(TradePlan.trading_trading_account_id == trading_account_id).all()
     
     @staticmethod
     def get_by_ticker(db: Session, ticker_id: int) -> List[TradePlan]:
@@ -183,11 +183,11 @@ class TradePlanService:
         return None
     
     @staticmethod
-    def get_plan_summary(db: Session, account_id: Optional[int] = None) -> Dict[str, Any]:
+    def get_plan_summary(db: Session, trading_account_id: Optional[int] = None) -> Dict[str, Any]:
         """Get trade plan summary"""
         query = db.query(TradePlan)
-        if account_id:
-            query = query.filter(TradePlan.trading_account_id == account_id)
+        if trading_account_id:
+            query = query.filter(TradePlan.trading_trading_account_id == trading_account_id)
         
         plans = query.all()
         
@@ -220,8 +220,8 @@ class TradePlanService:
         """Get plans with custom conditions"""
         query = db.query(TradePlan)
         
-        if 'account_id' in conditions:
-            query = query.filter(TradePlan.trading_account_id == conditions['account_id'])
+        if 'trading_account_id' in conditions:
+            query = query.filter(TradePlan.trading_trading_account_id == conditions['trading_account_id'])
         
         if 'ticker_id' in conditions:
             query = query.filter(TradePlan.ticker_id == conditions['ticker_id'])

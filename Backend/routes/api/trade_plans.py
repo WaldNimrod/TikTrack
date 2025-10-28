@@ -35,12 +35,12 @@ def get_trade_plan(plan_id: int):
     response, status_code = base_api.get_by_id(db, plan_id)
     return jsonify(response), status_code
 
-@trade_plans_bp.route('/account/<int:account_id>', methods=['GET'])
-def get_trade_plans_by_account(account_id: int):
+@trade_plans_bp.route('/account/<int:trading_account_id>', methods=['GET'])
+def get_trade_plans_by_account(trading_account_id: int):
     """Get trade plans by account"""
     try:
         db: Session = next(get_db())
-        plans = TradePlanService.get_by_account(db, account_id)
+        plans = TradePlanService.get_by_account(db, trading_account_id)
         return jsonify({
             "status": "success",
             "data": [plan.to_dict() for plan in plans],
@@ -48,7 +48,7 @@ def get_trade_plans_by_account(account_id: int):
             "version": "1.0"
         })
     except Exception as e:
-        logger.error(f"Error getting trade plans for account {account_id}: {str(e)}")
+        logger.error(f"Error getting trade plans for account {trading_account_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה בטעינת תכנונים לחשבון"},
@@ -243,9 +243,9 @@ def activate_trade_plan(plan_id: int):
 def get_trade_plan_summary():
     """Get trade plan summary"""
     try:
-        account_id = request.args.get('account_id', type=int)
+        trading_account_id = request.args.get('trading_account_id', type=int)
         db: Session = next(get_db())
-        summary = TradePlanService.get_plan_summary(db, account_id)
+        summary = TradePlanService.get_plan_summary(db, trading_account_id)
         return jsonify({
             "status": "success",
             "data": summary,

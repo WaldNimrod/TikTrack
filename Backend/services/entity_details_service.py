@@ -74,9 +74,9 @@ class EntityDetailsService:
     ENTITY_FIELDS = {
         'ticker': ['id', 'symbol', 'name', 'type', 'status', 'sector', 'currency_id', 
                   'remarks', 'created_at', 'updated_at', 'deleted_at'],
-        'trade': ['id', 'symbol', 'account_id', 'ticker_id', 'quantity', 'entry_price',
+        'trade': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'quantity', 'entry_price',
                  'exit_price', 'trade_type', 'status', 'profit_loss', 'created_at', 'updated_at'],
-        'trade_plan': ['id', 'symbol', 'account_id', 'ticker_id', 'target_price', 'stop_loss',
+        'trade_plan': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'target_price', 'stop_loss',
                       'strategy', 'risk_level', 'status', 'plan_type', 'created_at', 'updated_at'],
         'execution': ['id', 'trade_id', 'symbol', 'execution_type', 'quantity', 'price',
                      'commission', 'execution_date', 'status', 'created_at'],
@@ -84,7 +84,7 @@ class EntityDetailsService:
                    'currency_id', 'status', 'remarks', 'created_at', 'updated_at'],
         'alert': ['id', 'title', 'ticker_id', 'alert_type', 'condition', 'target_value',
                  'is_active', 'status', 'triggered_at', 'created_at', 'updated_at'],
-        'cash_flow': ['id', 'account_id', 'flow_type', 'amount', 'flow_date', 'category',
+        'cash_flow': ['id', 'trading_account_id', 'flow_type', 'amount', 'flow_date', 'category',
                      'description', 'status', 'created_at', 'updated_at'],
         'note': ['id', 'title', 'content', 'category', 'importance', 'linked_object_type',
                 'linked_object_id', 'created_at', 'updated_at']
@@ -462,13 +462,13 @@ class EntityDetailsService:
         return linked_items
     
     @staticmethod
-    def _get_account_linked_items(db: Session, account_id: int) -> List[Dict[str, Any]]:
+    def _get_account_linked_items(db: Session, trading_account_id: int) -> List[Dict[str, Any]]:
         """Get linked items for account"""
         linked_items = []
         
         try:
             # Get related trades
-            trades = db.query(Trade).filter(Trade.trading_account_id == account_id).all()
+            trades = db.query(Trade).filter(Trade.trading_trading_account_id == trading_account_id).all()
             for trade in trades:
                 linked_items.append({
                     'id': trade.id,
@@ -479,7 +479,7 @@ class EntityDetailsService:
                 })
             
             # Get related trade plans
-            trade_plans = db.query(TradePlan).filter(TradePlan.trading_account_id == account_id).all()
+            trade_plans = db.query(TradePlan).filter(TradePlan.trading_trading_account_id == trading_account_id).all()
             for plan in trade_plans:
                 linked_items.append({
                     'id': plan.id,
@@ -490,7 +490,7 @@ class EntityDetailsService:
                 })
             
             # Get related cash flows
-            cash_flows = db.query(CashFlow).filter(CashFlow.trading_account_id == account_id).all()
+            cash_flows = db.query(CashFlow).filter(CashFlow.trading_trading_account_id == trading_account_id).all()
             for flow in cash_flows:
                 linked_items.append({
                     'id': flow.id,

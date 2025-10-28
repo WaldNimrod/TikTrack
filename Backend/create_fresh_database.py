@@ -132,7 +132,7 @@ class DatabaseRecreator:
         cursor.execute("""
             CREATE TABLE trade_plans (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                account_id INTEGER NOT NULL,
+                trading_account_id INTEGER NOT NULL,
                 ticker_id INTEGER NOT NULL,
                 investment_type VARCHAR(20),
                 planned_amount FLOAT,
@@ -155,7 +155,7 @@ class DatabaseRecreator:
         cursor.execute("""
             CREATE TABLE trades (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                account_id INTEGER NOT NULL,
+                trading_account_id INTEGER NOT NULL,
                 ticker_id INTEGER NOT NULL,
                 trade_plan_id INTEGER NOT NULL,
                 status VARCHAR(20) DEFAULT 'open',
@@ -193,7 +193,7 @@ class DatabaseRecreator:
         cursor.execute("""
             CREATE TABLE cash_flows (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                account_id INTEGER NOT NULL,
+                trading_account_id INTEGER NOT NULL,
                 type VARCHAR(50),
                 amount FLOAT NOT NULL,
                 date DATE NOT NULL,
@@ -203,7 +203,7 @@ class DatabaseRecreator:
                 usd_rate DECIMAL(10,6) DEFAULT 1.000000,
                 source VARCHAR(20) DEFAULT 'manual',
                 external_id VARCHAR(100),
-                FOREIGN KEY (account_id) REFERENCES accounts (id),
+                FOREIGN KEY (trading_account_id) REFERENCES accounts (id),
                 FOREIGN KEY (currency_id) REFERENCES currencies (id)
             )
         """)
@@ -212,7 +212,7 @@ class DatabaseRecreator:
         cursor.execute("""
             CREATE TABLE alerts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                account_id INTEGER,
+                trading_account_id INTEGER,
                 ticker_id INTEGER,
                 message TEXT,
                 triggered_at NUMERIC,
@@ -363,7 +363,7 @@ class DatabaseRecreator:
             (2, 3, 'passive', 500.00, 'Index investment', 120.00, 130.00, 'Diversification', 'Long', 'open')
         ]
         cursor.executemany(
-            "INSERT INTO trade_plans (account_id, ticker_id, investment_type, planned_amount, entry_conditions, stop_price, target_price, reasons, side, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO trade_plans (trading_account_id, ticker_id, investment_type, planned_amount, entry_conditions, stop_price, target_price, reasons, side, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             trade_plans
         )
         
@@ -374,7 +374,7 @@ class DatabaseRecreator:
             (2, 3, 3, 'closed', 'passive', datetime.now() - timedelta(days=15), datetime.now() - timedelta(days=1), None, None, 25.00, 'GOOGL completed', 'Long')
         ]
         cursor.executemany(
-            "INSERT INTO trades (account_id, ticker_id, trade_plan_id, status, investment_type, opened_at, closed_at, cancelled_at, cancel_reason, total_pl, notes, side) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO trades (trading_account_id, ticker_id, trade_plan_id, status, investment_type, opened_at, closed_at, cancelled_at, cancel_reason, total_pl, notes, side) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             trades
         )
         
@@ -398,7 +398,7 @@ class DatabaseRecreator:
             (1, 'fee', -10.00, datetime.now() - timedelta(days=1), 'Trading fee', 1, 1.000000, 'manual')
         ]
         cursor.executemany(
-            "INSERT INTO cash_flows (account_id, type, amount, date, description, currency_id, usd_rate, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO cash_flows (trading_account_id, type, amount, date, description, currency_id, usd_rate, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             cash_flows
         )
         
@@ -409,7 +409,7 @@ class DatabaseRecreator:
             (2, 3, 'GOOGL volume alert', None, int(datetime.now().timestamp()), 'closed', 'true', 1, 3, 'volume', '>', 1000000)
         ]
         cursor.executemany(
-            "INSERT INTO alerts (account_id, ticker_id, message, triggered_at, created_at, status, is_triggered, related_type_id, related_id, condition_attribute, condition_operator, condition_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO alerts (trading_account_id, ticker_id, message, triggered_at, created_at, status, is_triggered, related_type_id, related_id, condition_attribute, condition_operator, condition_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             alerts
         )
         
@@ -430,7 +430,7 @@ class DatabaseRecreator:
             ('trades', 'investment_type', 'ENUM', 'valid_investment_type', 'valid_investment_type', 1),
             ('trades', 'status', 'ENUM', 'valid_trade_status', 'valid_trade_status', 1),
             ('trades', 'side', 'ENUM', 'valid_trade_side', 'valid_trade_side', 1),
-            ('trades', 'account_id', 'NOT_NULL', 'account_required', 'account_required', 1),
+            ('trades', 'trading_account_id', 'NOT_NULL', 'account_required', 'account_required', 1),
             ('trades', 'ticker_id', 'NOT_NULL', 'ticker_required', 'ticker_required', 1),
             ('trade_plans', 'investment_type', 'ENUM', 'valid_plan_investment_type', 'valid_plan_investment_type', 1),
             ('trade_plans', 'side', 'ENUM', 'valid_plan_side', 'valid_plan_side', 1),
@@ -449,7 +449,7 @@ class DatabaseRecreator:
             ('executions', 'trade_id', 'NOT_NULL', 'execution_trade_required', 'execution_trade_required', 1),
             ('executions', 'action', 'ENUM', 'valid_execution_action', 'valid_execution_action', 1),
             ('executions', 'date', 'NOT_NULL', 'execution_date_required', 'execution_date_required', 1),
-            ('cash_flows', 'account_id', 'NOT_NULL', 'cash_flow_account_required', 'cash_flow_account_required', 1),
+            ('cash_flows', 'trading_account_id', 'NOT_NULL', 'cash_flow_account_required', 'cash_flow_account_required', 1),
             ('cash_flows', 'type', 'ENUM', 'valid_cash_flow_type', 'valid_cash_flow_type', 1),
             ('cash_flows', 'amount', 'NOT_NULL', 'cash_flow_amount_required', 'cash_flow_amount_required', 1),
             ('cash_flows', 'date', 'NOT_NULL', 'cash_flow_date_required', 'cash_flow_date_required', 1),

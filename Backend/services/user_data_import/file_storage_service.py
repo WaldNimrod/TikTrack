@@ -148,12 +148,22 @@ class FileStorageService:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
+            # Get metadata
+            metadata = self.get_file_metadata(session_id, user_id)
+            
             logger.debug(f"Retrieved file for session {session_id}: {len(content)} characters")
-            return content
+            return {
+                'success': True,
+                'content': content,
+                'filename': metadata.get('original_filename', 'original.csv') if metadata else 'original.csv'
+            }
             
         except Exception as e:
             logger.error(f"❌ Failed to get file for session {session_id}: {str(e)}")
-            return None
+            return {
+                'success': False,
+                'error': str(e)
+            }
     
     def get_file_metadata(self, session_id: int, user_id: int = 1) -> Optional[Dict[str, Any]]:
         """
@@ -217,11 +227,17 @@ class FileStorageService:
                 logger.warning(f"Directory not empty, could not remove: {session_dir}")
             
             logger.info(f"✅ Deleted {files_deleted} files for session {session_id}")
-            return True
+            return {
+                'success': True,
+                'message': f'Deleted {files_deleted} files successfully'
+            }
             
         except Exception as e:
             logger.error(f"❌ Failed to delete files for session {session_id}: {str(e)}")
-            return False
+            return {
+                'success': False,
+                'error': str(e)
+            }
     
     def verify_file_integrity(self, session_id: int, user_id: int = 1) -> Dict[str, Any]:
         """

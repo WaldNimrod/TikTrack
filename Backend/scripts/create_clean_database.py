@@ -140,7 +140,7 @@ def create_tables(cursor):
     # Trade Plans table
     cursor.execute("""
         CREATE TABLE trade_plans (
-            account_id INTEGER NOT NULL,
+            trading_account_id INTEGER NOT NULL,
             ticker_id INTEGER NOT NULL,
             investment_type VARCHAR(20),
             planned_amount FLOAT,
@@ -158,14 +158,14 @@ def create_tables(cursor):
             target_percentage FLOAT DEFAULT 2000, 
             current_price FLOAT DEFAULT 0,
             FOREIGN KEY (ticker_id) REFERENCES tickers(id),
-            FOREIGN KEY (account_id) REFERENCES accounts(id)
+            FOREIGN KEY (trading_account_id) REFERENCES accounts(id)
         )
     """)
     
     # Trades table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS trades (
-            account_id INTEGER NOT NULL, 
+            trading_account_id INTEGER NOT NULL, 
             ticker_id INTEGER NOT NULL, 
             trade_plan_id INTEGER, 
             status VARCHAR(20), 
@@ -204,7 +204,7 @@ def create_tables(cursor):
     # Cash Flows table
     cursor.execute("""
         CREATE TABLE cash_flows (
-            account_id INTEGER NOT NULL, 
+            trading_account_id INTEGER NOT NULL, 
             type VARCHAR(50) NOT NULL, 
             amount FLOAT NOT NULL, 
             date DATE, 
@@ -216,7 +216,7 @@ def create_tables(cursor):
             source VARCHAR(20) DEFAULT 'manual', 
             external_id VARCHAR(100) DEFAULT '0', 
             PRIMARY KEY (id), 
-            FOREIGN KEY(account_id) REFERENCES accounts (id)
+            FOREIGN KEY(trading_account_id) REFERENCES accounts (id)
         )
     """)
     
@@ -224,7 +224,7 @@ def create_tables(cursor):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS alerts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            account_id INT,
+            trading_account_id INT,
             ticker_id INT,
             message TEXT,
             triggered_at NUM,

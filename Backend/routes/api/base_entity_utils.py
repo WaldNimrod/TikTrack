@@ -281,7 +281,7 @@ class BaseEntityUtils:
         
         # Common filter parameters
         filter_params = [
-            'status', 'type', 'account_id', 'user_id', 'date_from', 'date_to',
+            'status', 'type', 'trading_account_id', 'user_id', 'date_from', 'date_to',
             'search', 'sort_by', 'sort_order', 'limit', 'offset'
         ]
         
@@ -290,7 +290,7 @@ class BaseEntityUtils:
                 value = request_args[param]
                 
                 # Convert string numbers to integers
-                if param in ['account_id', 'user_id', 'limit', 'offset'] and isinstance(value, str):
+                if param in ['trading_account_id', 'user_id', 'limit', 'offset'] and isinstance(value, str):
                     try:
                         value = int(value)
                     except ValueError:

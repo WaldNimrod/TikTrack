@@ -110,7 +110,7 @@ function updateStepIndicators() {
         } else if (stepNumber === currentStep) {
             indicator.classList.add('active');
             indicator.classList.remove('completed');
-        } else {
+    } else {
             indicator.classList.remove('active', 'completed');
         }
     });
@@ -271,17 +271,17 @@ function loadStep5Content() {
                     <div class="stat-item">
                         <span class="stat-label">רשומות לייבוא:</span>
                         <span class="stat-value" id="importCount">0</span>
-                    </div>
+                </div>
                     <div class="stat-item">
                         <span class="stat-label">רשומות לדילוג:</span>
                         <span class="stat-value" id="skipCount">0</span>
-                    </div>
+                        </div>
                     <div class="stat-item">
                         <span class="stat-label">אחוז ייבוא:</span>
                         <span class="stat-value" id="importRate">0%</span>
-                    </div>
-                </div>
-            </div>
+                        </div>
+                        </div>
+                        </div>
             
             <div class="step-actions">
                 <button class="btn btn-secondary" onclick="goToStep(4)">
@@ -290,9 +290,9 @@ function loadStep5Content() {
                 <button class="btn btn-primary" onclick="showConfirmationModal()">
                     <i class="fas fa-check"></i> אישור ייבוא
                 </button>
+                </div>
             </div>
-        </div>
-    `;
+        `;
     
     // Update summary stats
     updateSummaryStats();
@@ -377,7 +377,7 @@ function loadAccounts() {
         .catch(error => {
             console.error('Error loading accounts:', error);
             showNotification('שגיאה בטעינת חשבונות', 'error');
-        });
+    });
 }
 
 /**
@@ -473,7 +473,7 @@ function loadProblemResolution() {
     .then(data => {
         if (data.success) {
             previewData = data.preview_data;
-            displayProblemResolution(data.preview_data);
+            displayProblemResolutionDetailed(data.preview_data);
         } else {
             showNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
         }
@@ -505,12 +505,12 @@ function displayProblemResolution(data) {
                             <div class="problem-card-actions">
                                 <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${ticker}')">
                                     הוסף טיקר
-                                </button>
+                </button>
                             </div>
-                        </div>
+                                        </div>
                     `).join('') || '<p>אין טיקרים חסרים</p>'}
-                </div>
-            </div>
+                                    </div>
+                                                </div>
             
             <div class="problem-section">
                 <h5>כפילויות בקובץ</h5>
@@ -520,12 +520,12 @@ function displayProblemResolution(data) {
                             <div class="problem-card-header">
                                 <i class="fas fa-copy"></i>
                                 <span>${dup.symbol} - ${dup.date}</span>
-                            </div>
+                                                </div>
                             <div class="problem-card-body">
                                 <div class="problem-card-details">
                                     <span>כמות: ${dup.quantity}</span>
                                     <span>מחיר: ${dup.price}</span>
-                                </div>
+                                            </div>
                                 <div class="problem-card-confidence">
                                     <span>רמת ביטחון: ${dup.confidence || 0}%</span>
                                     <div class="confidence-bar">
@@ -543,8 +543,8 @@ function displayProblemResolution(data) {
                             </div>
                         </div>
                     `).join('') || '<p>אין כפילויות בקובץ</p>'}
-                </div>
-            </div>
+                        </div>
+                    </div>
             
             <div class="problem-section">
                 <h5>כפילויות מול בסיס הנתונים</h5>
@@ -559,14 +559,14 @@ function displayProblemResolution(data) {
                                 <div class="problem-card-details">
                                     <span>כמות: ${record.quantity}</span>
                                     <span>מחיר: ${record.price}</span>
-                                </div>
+                                        </div>
                                 <div class="problem-card-confidence">
                                     <span>רמת ביטחון: ${record.confidence || 0}%</span>
                                     <div class="confidence-bar">
                                         <div class="confidence-fill" style="width: ${record.confidence || 0}%"></div>
                                     </div>
-                                </div>
-                            </div>
+                                                </div>
+                                                </div>
                             <div class="problem-card-actions">
                                 <button class="btn btn-sm btn-success" onclick="acceptDuplicate(${index}, 'existing_record')">
                                     קבל
@@ -577,16 +577,16 @@ function displayProblemResolution(data) {
                             </div>
                         </div>
                     `).join('') || '<p>אין כפילויות מול בסיס הנתונים</p>'}
-                </div>
-            </div>
+                        </div>
+                    </div>
             
             <div class="step-actions">
                 <button class="btn btn-primary" onclick="goToStep(4)">
                     <i class="fas fa-arrow-right"></i> המשך לתצוגה מקדימה
-                </button>
-            </div>
-        </div>
-    `;
+                        </button>
+                    </div>
+                </div>
+            `;
 }
 
 /**
@@ -609,8 +609,8 @@ function acceptDuplicate(index, type) {
     .then(data => {
         if (data.success) {
             showNotification('כפילות אושרה', 'success');
-            // Refresh problem resolution
-            loadProblemResolution();
+            // Refresh preview data
+            refreshPreviewData();
         } else {
             showNotification(`שגיאה באישור כפילות: ${data.error}`, 'error');
         }
@@ -628,7 +628,7 @@ function rejectDuplicate(index, type) {
     if (!currentSessionId) return;
     
     fetch(`/api/user-data-import/session/${currentSessionId}/reject-duplicate`, {
-        method: 'POST',
+            method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
@@ -641,8 +641,8 @@ function rejectDuplicate(index, type) {
     .then(data => {
         if (data.success) {
             showNotification('כפילות נדחתה', 'success');
-            // Refresh problem resolution
-            loadProblemResolution();
+            // Refresh preview data
+            refreshPreviewData();
         } else {
             showNotification(`שגיאה בדחיית כפילות: ${data.error}`, 'error');
         }
@@ -657,10 +657,21 @@ function rejectDuplicate(index, type) {
  * Open add ticker modal
  */
 function openAddTickerModal(symbol) {
-    // Simple prompt for now
-    const tickerName = prompt(`הזן שם לטיקר ${symbol}:`, symbol);
-    if (tickerName) {
-        saveTickerFromModal(symbol, tickerName);
+    const modal = document.getElementById('addTickerModal');
+    const symbolInput = document.getElementById('tickerSymbol');
+    const nameInput = document.getElementById('tickerName');
+    
+    if (modal && symbolInput && nameInput) {
+        symbolInput.value = symbol;
+        nameInput.value = symbol; // Default name to symbol
+        modal.style.display = 'block';
+        modal.classList.add('show');
+    } else {
+        // Fallback to prompt
+        const tickerName = prompt(`הזן שם לטיקר ${symbol}:`, symbol);
+        if (tickerName) {
+            saveTickerFromModal(symbol, tickerName);
+        }
     }
 }
 
@@ -668,10 +679,52 @@ function openAddTickerModal(symbol) {
  * Save ticker from modal
  */
 function saveTickerFromModal(symbol, name) {
-    // This would typically make an API call to add the ticker
-    showNotification(`טיקר ${symbol} נוסף בהצלחה`, 'success');
-    // Refresh problem resolution
-    loadProblemResolution();
+    if (!symbol) {
+        symbol = document.getElementById('tickerSymbol')?.value;
+    }
+    if (!name) {
+        name = document.getElementById('tickerName')?.value;
+    }
+    
+    if (!symbol || !name) {
+        showNotification('נא למלא את כל השדות', 'error');
+        return;
+    }
+    
+    // Close modal
+    const modal = document.getElementById('addTickerModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+    }
+    
+    // Make API call to add ticker
+    fetch('/api/tickers', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            symbol: symbol,
+            name: name,
+            type: document.getElementById('tickerType')?.value || 'stock',
+            currency: document.getElementById('tickerCurrency')?.value || 'USD'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(`טיקר ${symbol} נוסף בהצלחה`, 'success');
+            // Refresh preview data
+            refreshPreviewData();
+        } else {
+            showNotification(`שגיאה בהוספת טיקר: ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Add ticker error:', error);
+        showNotification('שגיאה בהוספת טיקר', 'error');
+    });
 }
 
 /**
@@ -746,9 +799,9 @@ function displayPreview(data) {
                             <tbody>
                                 ${data.records_to_import?.map(record => `
                                     <tr>
-                                        <td>${record.symbol}</td>
+                <td>${record.symbol}</td>
                                         <td>${record.date}</td>
-                                        <td>${record.quantity}</td>
+                <td>${record.quantity}</td>
                                         <td>${record.price}</td>
                                         <td>${record.fee}</td>
                                     </tr>
@@ -774,9 +827,9 @@ function displayPreview(data) {
                             <tbody>
                                 ${data.records_to_skip?.map(record => `
                                     <tr>
-                                        <td>${record.symbol}</td>
+                <td>${record.symbol}</td>
                                         <td>${record.date}</td>
-                                        <td>${record.quantity}</td>
+                <td>${record.quantity}</td>
                                         <td>${record.price}</td>
                                         <td>${record.reason}</td>
                                     </tr>
@@ -812,17 +865,17 @@ function showConfirmationModal() {
     const modal = document.createElement('div');
     modal.className = 'confirmation-modal-overlay';
     modal.innerHTML = `
-        <div class="confirmation-modal">
+                <div class="confirmation-modal">
             <h3>אישור ייבוא נתונים</h3>
             <p>האם אתה בטוח שברצונך לייבא את הנתונים?</p>
-            <div class="modal-actions">
+                    <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeConfirmationModal()">ביטול</button>
                 <button class="btn btn-primary" onclick="executeImport()">ביצוע ייבוא</button>
                 <button class="btn btn-danger" onclick="executeImportWithReport()">ייבוא + דוח</button>
+                </div>
             </div>
-        </div>
-    `;
-    
+        `;
+        
     document.body.appendChild(modal);
 }
 
@@ -886,7 +939,7 @@ function performImport(generateReport = false) {
             if (typeof refreshExecutionsTable === 'function') {
                 refreshExecutionsTable();
             }
-        } else {
+    } else {
             showNotification(`שגיאה בייבוא: ${data.error}`, 'error');
         }
     })
@@ -918,6 +971,224 @@ function showNotification(message, type = 'info') {
     } else {
         console.log(`[${type.toUpperCase()}] ${message}`);
     }
+}
+
+/**
+ * Display problem resolution with detailed cards
+ */
+function displayProblemResolutionDetailed(data) {
+    console.log('Displaying detailed problem resolution:', data);
+    
+    // Clear existing content
+    clearProblemSections();
+    
+    // Display missing tickers
+    if (data.summary?.missing_tickers && data.summary.missing_tickers.length > 0) {
+        displayMissingTickers(data.summary.missing_tickers);
+    }
+    
+    // Display within-file duplicates
+    if (data.records_to_skip) {
+        const withinFileDuplicates = data.records_to_skip.filter(record => 
+            record.reason === 'within_file_duplicate' || record.reason === 'within_file_duplicate_match'
+        );
+        if (withinFileDuplicates.length > 0) {
+            displayWithinFileDuplicates(withinFileDuplicates);
+        }
+    }
+    
+    // Display existing records
+    if (data.records_to_skip) {
+        const existingRecords = data.records_to_skip.filter(record => 
+            record.reason === 'existing_record'
+        );
+        if (existingRecords.length > 0) {
+            displayExistingRecords(existingRecords);
+        }
+    }
+}
+
+/**
+ * Clear all problem sections
+ */
+function clearProblemSections() {
+    const sections = [
+        'missingTickersSection',
+        'withinFileDuplicatesSection', 
+        'existingRecordsSection'
+    ];
+    
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.style.display = 'none';
+        }
+    });
+}
+
+/**
+ * Display missing tickers
+ */
+function displayMissingTickers(missingTickers) {
+    const section = document.getElementById('missingTickersSection');
+    const container = document.getElementById('missingTickersContainer');
+    
+    if (!section || !container) return;
+    
+    section.style.display = 'block';
+    
+    container.innerHTML = missingTickers.map(ticker => 
+        renderMissingTickerCard(ticker)
+    ).join('');
+}
+
+/**
+ * Display within-file duplicates
+ */
+function displayWithinFileDuplicates(duplicates) {
+    const section = document.getElementById('withinFileDuplicatesSection');
+    const container = document.getElementById('withinFileDuplicatesContainer');
+    
+    if (!section || !container) return;
+    
+    section.style.display = 'block';
+    
+    container.innerHTML = duplicates.map((duplicate, index) => 
+        renderDuplicateCard(duplicate, 'within_file', index)
+    ).join('');
+}
+
+/**
+ * Display existing records
+ */
+function displayExistingRecords(existingRecords) {
+    const section = document.getElementById('existingRecordsSection');
+    const container = document.getElementById('existingRecordsContainer');
+    
+    if (!section || !container) return;
+    
+    section.style.display = 'block';
+    
+    container.innerHTML = existingRecords.map((record, index) => 
+        renderDuplicateCard(record, 'existing_record', index)
+    ).join('');
+}
+
+/**
+ * Render missing ticker card
+ */
+function renderMissingTickerCard(ticker) {
+    return `
+        <div class="problem-card missing-ticker-card">
+            <div class="problem-card-header">
+                <i class="bi bi-exclamation-circle"></i>
+                <span>${ticker}</span>
+            </div>
+            <div class="problem-card-body">
+                <div class="missing-ticker-info">
+                    <i class="bi bi-info-circle"></i>
+                    הטיקר ${ticker} לא קיים במערכת
+                </div>
+            </div>
+            <div class="problem-card-actions">
+                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${ticker}')">
+                    <i class="bi bi-plus-circle"></i>
+                    הוסף טיקר
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Render duplicate/existing record card
+ */
+function renderDuplicateCard(duplicate, type, index) {
+    const confidence = duplicate.confidence_score || 0;
+    const confidenceClass = getConfidenceClass(confidence);
+    
+    return `
+        <div class="problem-card ${type === 'within_file' ? 'within-file-duplicate' : 'existing-record-card'}">
+            <div class="problem-card-header">
+                <i class="bi ${type === 'within_file' ? 'bi-files' : 'bi-exclamation-triangle'}"></i>
+                <span>${duplicate.symbol || 'לא ידוע'}</span>
+            </div>
+            <div class="problem-card-body">
+                <div class="problem-card-details">
+                    <div class="problem-card-detail">
+                        <span class="problem-card-detail-label">פעולה:</span>
+                        <span class="problem-card-detail-value">${duplicate.action || 'לא ידוע'}</span>
+                    </div>
+                    <div class="problem-card-detail">
+                        <span class="problem-card-detail-label">כמות:</span>
+                        <span class="problem-card-detail-value">${duplicate.quantity || 'לא ידוע'}</span>
+                    </div>
+                    <div class="problem-card-detail">
+                        <span class="problem-card-detail-label">מחיר:</span>
+                        <span class="problem-card-detail-value">${duplicate.price || 'לא ידוע'}</span>
+                    </div>
+                    <div class="problem-card-detail">
+                        <span class="problem-card-detail-label">תאריך:</span>
+                        <span class="problem-card-detail-value">${duplicate.date || 'לא ידוע'}</span>
+                    </div>
+                </div>
+                <div class="problem-card-confidence ${confidenceClass}">
+                    <span class="confidence-text">רמת ביטחון: ${confidence}%</span>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${confidence}%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="problem-card-actions">
+                <button class="btn btn-sm btn-success" onclick="acceptDuplicate(${index}, '${type}')">
+                    <i class="bi bi-check-circle"></i>
+                    קבל
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="rejectDuplicate(${index}, '${type}')">
+                    <i class="bi bi-x-circle"></i>
+                    דחה
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Get confidence class based on score
+ */
+function getConfidenceClass(confidence) {
+    if (confidence >= 80) return 'confidence-high';
+    if (confidence >= 50) return 'confidence-medium';
+    return 'confidence-low';
+}
+
+/**
+ * Refresh preview data after user actions
+ */
+function refreshPreviewData() {
+    if (!currentSessionId) return;
+    
+    fetch(`/api/user-data-import/session/${currentSessionId}/refresh-preview`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            previewData = data.preview_data;
+            // Refresh the current step display
+            if (currentStep === 3) {
+                displayProblemResolutionDetailed(data.preview_data);
+            } else if (currentStep === 4) {
+                displayPreview(data.preview_data);
+            }
+        } else {
+            showNotification(`שגיאה ברענון התצוגה: ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Refresh preview error:', error);
+        showNotification('שגיאה ברענון התצוגה', 'error');
+    });
 }
 
 // Export functions for global access

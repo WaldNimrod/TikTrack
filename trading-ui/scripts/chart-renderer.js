@@ -1,17 +1,24 @@
 /**
- * Chart Renderer - TikTrack Chart Renderer
- * מרנדר גרפים - מרנדר גרפים TikTrack
+ * Chart Renderer - Comprehensive Function Index
+ * ==========================================
  * 
- * @version 1.0.0
- * @lastUpdated December 2024
- * @author TikTrack Development Team
+ * This file contains the chart rendering system for TikTrack including:
+ * - Chart initialization and management
+ * - Chart.js integration and configuration
+ * - Data visualization and rendering
+ * - Chart lifecycle management
+ * - Performance optimization
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
  */
 
 console.log('📊 Chart Renderer loaded');
 
 /**
- * Chart Renderer
- * מרנדר גרפים
+ * Chart Renderer class
+ * @class ChartRenderer
  */
 class ChartRenderer {
     constructor() {
@@ -21,7 +28,9 @@ class ChartRenderer {
 
     /**
      * Initialize renderer
-     * אתחל מרנדר
+     * @function init
+     * @async
+     * @returns {Promise<void>}
      */
     async init() {
         try {
@@ -40,7 +49,9 @@ class ChartRenderer {
 
     /**
      * Wait for Chart.js to be available
-     * המתן עד ש-Chart.js יהיה זמין
+     * @function waitForChartJs
+     * @async
+     * @returns {Promise<void>}
      */
     async waitForChartJs() {
         let attempts = 0;
@@ -58,10 +69,10 @@ class ChartRenderer {
 
     /**
      * Render chart
-     * רנדר גרף
-     * @param {string} canvasId - Canvas element ID
+     * @function render
+     * @param {string} canvasId - Canvas ID
      * @param {Object} config - Chart configuration
-     * @returns {Object} Chart instance
+     * @returns {Object|null} Chart instance
      */
     render(canvasId, config) {
         if (!this.isInitialized) {
@@ -99,10 +110,11 @@ class ChartRenderer {
     }
 
     /**
-     * Update chart data
-     * עדכן נתוני גרף
-     * @param {string} canvasId - Canvas element ID
+     * Update chart
+     * @function update
+     * @param {string} canvasId - Canvas ID
      * @param {Object} newData - New data
+     * @returns {void}
      */
     update(canvasId, newData) {
         const chart = this.charts.get(canvasId);
@@ -122,8 +134,9 @@ class ChartRenderer {
 
     /**
      * Destroy chart
-     * השמד גרף
-     * @param {string} canvasId - Canvas element ID
+     * @function destroy
+     * @param {string} canvasId - Canvas ID
+     * @returns {void}
      */
     destroy(canvasId) {
         const chart = this.charts.get(canvasId);
@@ -136,7 +149,8 @@ class ChartRenderer {
 
     /**
      * Destroy all charts
-     * השמד את כל הגרפים
+     * @function destroyAll
+     * @returns {void}
      */
     destroyAll() {
         this.charts.forEach((chart, canvasId) => {
@@ -148,9 +162,9 @@ class ChartRenderer {
 
     /**
      * Get chart instance
-     * קבל מופע גרף
-     * @param {string} canvasId - Canvas element ID
-     * @returns {Object} Chart instance
+     * @function getChart
+     * @param {string} canvasId - Canvas ID
+     * @returns {Object|null} Chart instance
      */
     getChart(canvasId) {
         return this.charts.get(canvasId);
@@ -158,8 +172,8 @@ class ChartRenderer {
 
     /**
      * Get all charts
-     * קבל את כל הגרפים
-     * @returns {Array} Array of chart instances
+     * @function getAllCharts
+     * @returns {Map} All charts
      */
     getAllCharts() {
         return Array.from(this.charts.values());
@@ -167,8 +181,8 @@ class ChartRenderer {
 
     /**
      * Get renderer status
-     * קבל סטטוס מרנדר
-     * @returns {Object} Status
+     * @function getStatus
+     * @returns {Object} Status object
      */
     getStatus() {
         return {

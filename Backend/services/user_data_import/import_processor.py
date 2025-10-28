@@ -114,7 +114,7 @@ class ImportProcessor:
             return False
     
     def process_file(self, session_id: int, file_content: str, 
-                    connector, account_id: int) -> Dict[str, Any]:
+                    connector, trading_account_id: int) -> Dict[str, Any]:
         """
         Process file through the complete pipeline.
         
@@ -122,7 +122,7 @@ class ImportProcessor:
             session_id: Import session ID
             file_content: File content as string
             connector: Connector instance
-            account_id: Trading account ID
+            trading_account_id: Trading account ID
             
         Returns:
             Dict with processing results
@@ -167,7 +167,7 @@ class ImportProcessor:
             # Step 4: Detect duplicates
             duplicate_results = self._process_step(
                 session_id, 'duplicates',
-                lambda: self._detect_duplicates(valid_records, account_id)
+                lambda: self._detect_duplicates(valid_records, trading_account_id)
             )
             
             if not duplicate_results['success']:
@@ -293,10 +293,10 @@ class ImportProcessor:
         except Exception as e:
             raise Exception(f"Record validation failed: {str(e)}")
     
-    def _detect_duplicates(self, valid_records: List[Dict[str, Any]], account_id: int) -> Dict[str, Any]:
+    def _detect_duplicates(self, valid_records: List[Dict[str, Any]], trading_account_id: int) -> Dict[str, Any]:
         """Detect duplicates in valid records"""
         try:
-            result = self.duplicate_service.detect_duplicates(valid_records, account_id)
+            result = self.duplicate_service.detect_duplicates(valid_records, trading_account_id)
             return {
                 'clean_records': result['clean_records'],
                 'within_file_duplicates': result['within_file_duplicates'],

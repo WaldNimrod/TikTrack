@@ -29,7 +29,7 @@ def migrate():
         cursor.execute("""
             CREATE TABLE alerts_new (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                account_id INTEGER,
+                trading_account_id INTEGER,
                 ticker_id INTEGER,
                 message TEXT,
                 triggered_at DATETIME,
@@ -48,12 +48,12 @@ def migrate():
         # Copy data from old table to new table
         cursor.execute("""
             INSERT INTO alerts_new (
-                id, account_id, ticker_id, message, triggered_at, created_at,
+                id, trading_account_id, ticker_id, message, triggered_at, created_at,
                 status, is_triggered, related_type_id, related_id,
                 condition_attribute, condition_operator, condition_number
             )
             SELECT 
-                id, account_id, ticker_id, message, 
+                id, trading_account_id, ticker_id, message, 
                 CASE 
                     WHEN triggered_at IS NOT NULL THEN datetime(triggered_at, 'unixepoch')
                     ELSE NULL 

@@ -1,0 +1,115 @@
+{
+  "timestamp": "2025-10-27T19:48:52.017398",
+  "total_files": 8,
+  "files_analyzed": 8,
+  "excellent_files": 8,
+  "good_files": 0,
+  "needs_improvement_files": 0,
+  "poor_files": 0,
+  "detailed_results": {
+    "trades.html": {
+      "modal_v2_usage": 11,
+      "add_functions": 22,
+      "edit_functions": 29,
+      "delete_functions": 10,
+      "api_calls": 22,
+      "error_handling": 56,
+      "console_logs": 3,
+      "jsdoc_functions": 1,
+      "score": 100,
+      "status": "excellent"
+    },
+    "trading_accounts.html": {
+      "modal_v2_usage": 10,
+      "add_functions": 9,
+      "edit_functions": 17,
+      "delete_functions": 12,
+      "api_calls": 17,
+      "error_handling": 50,
+      "console_logs": 3,
+      "jsdoc_functions": 1,
+      "score": 100,
+      "status": "excellent"
+    },
+    "alerts.html": {
+      "modal_v2_usage": 10,
+      "add_functions": 17,
+      "edit_functions": 17,
+      "delete_functions": 6,
+      "api_calls": 24,
+      "error_handling": 96,
+      "console_logs": 3,
+      "jsdoc_functions": 1,
+      "score": 100,
+      "status": "excellent"
+    },
+    "tickers.html": {
+      "modal_v2_usage": 11,
+      "add_functions": 15,
+      "edit_functions": 14,
+      "delete_functions": 6,
+      "api_calls": 21,
+      "error_handling": 59,
+      "console_logs": 0,
+      "jsdoc_functions": 1,
+      "score": 100,
+      "status": "excellent"
+    },
+    "executions.html": {
+      "modal_v2_usage": 11,
+      "add_functions": 31,
+      "edit_functions": 21,
+      "delete_functions": 7,
+      "api_calls": 22,
+      "error_handling": 106,
+      "console_logs": 2,
+      "jsdoc_functions": 1,
+      "score": 100,
+      "status": "excellent"
+    },
+    "cash_flows.html": {
+      "modal_v2_usage": 7,
+      "add_functions": 9,
+      "edit_functions": 14,
+      "delete_functions": 2,
+      "api_calls": 5,
+      "error_handling": 41,
+      "console_logs": 0,
+      "jsdoc_functions": 1,
+      "score": 100,
+      "status": "excellent"
+    },
+    "trade_plans.html": {
+      "modal_v2_usage": 11,
+      "add_functions": 43,
+      "edit_functions": 48,
+      "delete_functions": 4,
+      "api_calls": 16,
+      "error_handling": 102,
+      "console_logs": 3,
+      "jsdoc_functions": 1,
+      "score": 100,
+      "status": "excellent"
+    },
+    "notes.html": {
+      "modal_v2_usage": 10,
+      "add_functions": 17,
+      "edit_functions": 19,
+      "delete_functions": 7,
+      "api_calls": 15,
+      "error_handling": 75,
+      "console_logs": 0,
+      "jsdoc_functions": 1,
+      "score": 100,
+      "status": "excellent"
+    }
+  },
+  "summary": {
+    "average_score": 100.0,
+    "excellent_percentage": 100.0,
+    "good_percentage": 0.0,
+    "needs_improvement_percentage": 0.0,
+    "poor_percentage": 0.0,
+    "overall_status": "excellent"
+  }
+}

@@ -233,11 +233,19 @@ function resetEditExecutionForm() {
 /**
  * הצגת מודל עריכת עסקה
  */
-      } catch {
-        // לא ניתן לטעון תכנונים
-      }
-    }
+function showEditExecutionModal(executionId) {
+  try {
+    // לא ניתן לטעון תכנונים
+  } catch {
+    // לא ניתן לטעון תכנונים
+  }
+}
 
+/**
+ * מילוי טופס עריכת עסקה
+ */
+async function fillEditExecutionForm(execution, linkedObject, tickerId) {
+  try {
     // עדכון שדה הטיקר
     if (tickerId) {
       window.Logger.info('🔍 [EDIT MODAL] מעדכן שדה טיקר ל-ID:', tickerId, { page: "executions" });

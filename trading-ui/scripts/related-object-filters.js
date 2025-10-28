@@ -1,35 +1,27 @@
 /**
- * ========================================
- * מערכת פילטרים לפי סוג אובייקט מקושר - מערכת כללית
- * ========================================
- *
- * מערכת פילטרים מרכזית לסינון פריטים לפי סוג האובייקט המקושר
- * תומכת בכל היישויות עם שדה `related_type_id` וכפתורי פילטור עם `data-type`
+ * Related Object Filters - Comprehensive Function Index
+ * ==========================================
  * 
- * 🎯 מטרה: פילטור אחיד לפי סוג אובייקט מקושר בכל העמודים
- * 📍 בשימוש: alerts.html, notes.html, וכל עמוד אחר שזקוק לסינון
- * 🔗 קשור למערכת: linked-items.js (מערכת האובייקטים המקושרים)
- *
- * כללים לשימוש:
- * 1. בעמוד HTML: הוסף כפתורי פילטור עם `data-type` attribute
- * 2. בקוד JS: קרא ל-`createRelatedObjectFilter(entityName, dataVar, updateFunction, itemName)`
- * 3. הפילטרים יתאתחלו אוטומטית ויצרו פונקציות גלובליות
- *
- * File: trading-ui/scripts/related-object-filters.js
+ * This file contains a centralized filtering system for filtering items by related object type.
+ * Supports all entities with `related_type_id` field and filter buttons with `data-type` attribute.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/RELATED_OBJECT_FILTERS_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
  * Version: 2.0
- * Last Updated: October 15, 2025
- *
- * מחבר: TikTrack Development Team
- * ========================================
+ * Last Updated: 2025-01-27
  */
 
 /**
- * פילטר לפי סוג אובייקט מקושר - פונקציה גלובלית
- * @param {string} type - סוג האובייקט: 'all', 'account', 'trade', 'trade_plan', 'ticker'
- * @param {Array} data - מערך הנתונים לפילטור
- * @param {Function} updateFunction - פונקציה לעדכון הטבלה
- * @param {string} countSelector - סלקטור לאלמנט ספירת רשומות
- * @param {string} itemName - שם הפריטים (למשל: "התראות", "הודעות")
+ * Filter by related object type
+ * @function filterByRelatedObjectType
+ * @param {string} type - Object type: 'all', 'account', 'trade', 'trade_plan', 'ticker'
+ * @param {Array} data - Data array to filter
+ * @param {Function} updateFunction - Function to update table
+ * @param {string} countSelector - Selector for count element
+ * @param {string} itemName - Item name (e.g., "alerts", "notes")
+ * @returns {void}
  */
 function filterByRelatedObjectType(type, data, updateFunction, countSelector, itemName) {
   // פילטר לפי סוג אובייקט מקושר - סוג: ${type}, כמות נתונים: ${data.length}
@@ -88,8 +80,10 @@ function filterByRelatedObjectType(type, data, updateFunction, countSelector, it
 }
 
 /**
- * פילטר התראות לפי סוג אובייקט מקושר
- * @param {string} type - סוג האובייקט
+ * Filter alerts by related object type
+ * @function filterAlertsByRelatedObjectType
+ * @param {string} type - Object type to filter by
+ * @returns {void}
  */
 function filterAlertsByRelatedObjectType(type) {
   if (typeof window.alertsData === 'undefined') {
@@ -107,8 +101,10 @@ function filterAlertsByRelatedObjectType(type) {
 }
 
 /**
- * פילטר הערות לפי סוג אובייקט מקושר
- * @param {string} type - סוג האובייקט
+ * Filter notes by related object type
+ * @function filterNotesByRelatedObjectType
+ * @param {string} type - Object type to filter by
+ * @returns {void}
  */
 function filterNotesByRelatedObjectType(type) {
   if (typeof window.notesData === 'undefined') {
@@ -126,12 +122,14 @@ function filterNotesByRelatedObjectType(type) {
 }
 
 /**
- * יצירת מערכת פילטרים לכל יישות - פונקציה כללית
- * @param {string} entityName - שם היישות (לדוגמה: 'alerts', 'notes')
- * @param {string} dataVarName - שם משתנה הנתונים הגלובלי (לדוגמה: 'alertsData')
- * @param {string} updateFunctionName - שם פונקציית עדכון הטבלה (לדוגמה: 'updateAlertsTable')
- * @param {string} itemName - שם הפריטים בעברית (לדוגמה: 'התראות', 'הערות')
- * @param {string} countSelector - סלקטור לאלמנט ספירה (אופציונלי)
+ * Create related object filter
+ * @function createRelatedObjectFilter
+ * @param {string} entityName - Entity name
+ * @param {string} dataVarName - Data variable name
+ * @param {string} updateFunctionName - Update function name
+ * @param {string} itemName - Item name
+ * @param {string} countSelector - Count selector
+ * @returns {void}
  */
 function createRelatedObjectFilter(entityName, dataVarName, updateFunctionName, itemName, countSelector = '.table-count') {
   // יצירת שם פונקציה לפי התקן
@@ -158,8 +156,9 @@ function createRelatedObjectFilter(entityName, dataVarName, updateFunctionName, 
 }
 
 /**
- * אתחול אוטומטי של פילטרים לכל היישויות הבסיסיות
- * פונקציה זו מופעלת אוטומטית כאשר הקובץ נטען
+ * Initialize related object filters
+ * @function initializeRelatedObjectFilters
+ * @returns {void}
  */
 function initializeRelatedObjectFilters() {
   // הגדרת תצורות הפילטרים לכל יישות
@@ -192,11 +191,7 @@ function initializeRelatedObjectFilters() {
   console.log('🚀 מערכת הפילטרים לפי סוג אובייקט מקושר אותחלה');
 }
 
-// אתחול דרך UnifiedAppInitializer - כלל 43
-// DOMContentLoaded listener הוסר לטובת מערכת האתחול המאוחדת
-window.initializeRelatedObjectFilters = initializeRelatedObjectFilters;
-
-// ייצוא הפונקציות לגלובל
+// ===== GLOBAL EXPORTS =====
 window.filterByRelatedObjectType = filterByRelatedObjectType;
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
 window.filterNotesByRelatedObjectType = filterNotesByRelatedObjectType;

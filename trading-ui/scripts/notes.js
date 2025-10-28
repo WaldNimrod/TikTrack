@@ -1,45 +1,18 @@
 /**
- * Function Index:
- * ==============
+ * Notes Page - Comprehensive Function Index
+ * ==========================================
  * 
- * DATA LOADING:
- * - loadNotesData()
- * - updateNotesTable()
- * - updatePageSummaryStats()
+ * This file contains all functions for managing notes including:
+ * - CRUD operations for notes
+ * - Data loading and table management
+ * - Form validation and UI interactions
+ * - Modal handling and state management
+ * - Filtering and sorting functionality
+ * - Related objects integration
  * 
- * NOTE MANAGEMENT:
- * - addNote()
- * - editNote()
- * - deleteNote()
- * - updateNote()
- * 
- * VALIDATION:
- * - clearNoteValidation()
- * - validateNoteForm()
- * 
- * UI MANAGEMENT:
- * - showAddNoteModal()
- * - hideAddNoteModal()
- * - showEditNoteModal()
- * - hideEditNoteModal()
- * - openNoteDetailsWrapper()
- * - updateRadioButtons()
- * - populateSelect()
- * - onRelationTypeChange()
- * - onRelatedObjectChange()
- * - enableConditionFields()
- * - disableConditionFields()
- * - populateRelatedObjects()
- * 
- * DATA FILTERING:
- * - filterNotesLocally()
- * 
- * UTILITY FUNCTIONS:
- * - getDemoNotesData()
- * - restoreSortState()
- * - setupModalConfigurations()
- * 
- * ==============
+ * Author: TikTrack Development Team
+ * Version: 2.0
+ * Last Updated: 2025-01-27
  */
 
 // ===== קובץ JavaScript פשוט לדף הערות =====
@@ -108,8 +81,9 @@ window.loadNotesData = async function() {
 };
 
 /**
- * Add a new note to the system
- * Opens the add note modal for user input
+ * Add new note
+ * @function addNote
+ * @returns {void}
  */
 function addNote() {
   try {
@@ -129,9 +103,10 @@ function addNote() {
 }
 
 /**
- * העלאת קובץ
- * מעלה קובץ להערה
- * @param {number} noteId - מזהה ההערה
+ * Upload file for note
+ * @function uploadFile
+ * @param {string} noteId - Note ID
+ * @returns {void}
  */
 function uploadFile(noteId) {
   try {
@@ -196,9 +171,11 @@ function uploadFile(noteId) {
 }
 
 /**
- * Download a file associated with a note
- * @param {number} noteId - The ID of the note
- * @param {string} fileName - The name of the file to download
+ * Download file from note
+ * @function downloadFile
+ * @param {string} noteId - Note ID
+ * @param {string} fileName - File name
+ * @returns {void}
  */
 function downloadFile(noteId, fileName) {
   try {
@@ -236,9 +213,10 @@ function downloadFile(noteId, fileName) {
 }
 
 /**
- * צפייה בפריטים מקושרים
- * מציג פריטים המקושרים להערה
- * @param {number} noteId - מזהה ההערה
+ * View linked items for note
+ * @function viewLinkedItems
+ * @param {string} noteId - Note ID
+ * @returns {void}
  */
 function viewLinkedItems(noteId) {
   try {
@@ -318,16 +296,20 @@ function openNoteDetails(_id) {
 }
 
 /**
- * Edit a note
- * @param {number} _id - The ID of the note to edit
+ * Edit note
+ * @function editNote
+ * @param {string} _id - Note ID
+ * @returns {void}
  */
 function editNote(_id) {
   showEditNoteModal(_id);
 }
 
 /**
- * Delete a note
- * @param {number} id - The ID of the note to delete
+ * Delete note
+ * @function deleteNote
+ * @param {string} id - Note ID
+ * @returns {void}
  */
 function deleteNote(id) {
   // שימוש במערכת הגלובלית למחיקה
@@ -440,6 +422,12 @@ window.deleteNote = deleteNote;
 window.restoreNotesSectionState = restoreNotesSectionState;
 
 // פונקציה לטעינת נתונים
+/**
+ * Load notes data from server
+ * @function loadNotesData
+ * @async
+ * @returns {Promise<void>}
+ */
 async function loadNotesData() {
   window.Logger.info('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀', { page: "notes" });
 
@@ -554,14 +542,15 @@ async function loadNotesData() {
   }
 }
 
-// פונקציה לעדכון הטבלה
 /**
- * Update the notes table with new data
- * @param {Array} notes - Array of notes to display
- * @param {Array} accounts - Array of accounts for linking
- * @param {Array} trades - Array of trades for linking
- * @param {Array} tradePlans - Array of trade plans for linking
- * @param {Array} tickers - Array of tickers for linking
+ * Update notes table display
+ * @function updateNotesTable
+ * @param {Array} notes - Notes array
+ * @param {Array} accounts - Accounts array
+ * @param {Array} trades - Trades array
+ * @param {Array} tradePlans - Trade plans array
+ * @param {Array} tickers - Tickers array
+ * @returns {void}
  */
 function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], tickers = []) {
   try {
@@ -2347,9 +2336,17 @@ async function deleteNote(noteId) {
     }
 }
 
-// Export functions to window for global access
+// ===== GLOBAL EXPORTS =====
+window.loadNotesData = loadNotesData;
+window.addNote = addNote;
+window.editNote = editNote;
+window.deleteNote = deleteNote;
+window.uploadFile = uploadFile;
+window.downloadFile = downloadFile;
+window.viewLinkedItems = viewLinkedItems;
+window.updateNotesTable = updateNotesTable;
 window.showAddNoteModal = showAddNoteModal;
 window.showEditNoteModal = showEditNoteModal;
 window.saveNote = saveNote;
-window.deleteNote = deleteNote;
+window.restoreNotesSectionState = restoreNotesSectionState;
 

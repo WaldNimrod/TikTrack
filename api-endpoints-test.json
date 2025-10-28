@@ -1,0 +1,71 @@
+{
+  "timestamp": "2025-10-27T19:49:11.419678",
+  "base_url": "http://localhost:8080",
+  "total_endpoints": 8,
+  "endpoints_tested": 8,
+  "endpoints_working": 0,
+  "endpoints_failed": 8,
+  "detailed_results": {
+    "trades": {
+      "endpoint": "/api/trades",
+      "status_code": 500,
+      "response_time": 0.001901,
+      "content_length": 83,
+      "status": "error"
+    },
+    "trading_accounts": {
+      "endpoint": "/api/trading_accounts",
+      "status_code": 404,
+      "response_time": 0.001322,
+      "content_length": 217,
+      "status": "error"
+    },
+    "alerts": {
+      "endpoint": "/api/alerts",
+      "status_code": 500,
+      "response_time": 0.00198,
+      "content_length": 847,
+      "status": "error"
+    },
+    "tickers": {
+      "endpoint": "/api/tickers",
+      "status_code": 500,
+      "response_time": 0.001268,
+      "content_length": 84,
+      "status": "error"
+    },
+    "executions": {
+      "endpoint": "/api/executions",
+      "status_code": 500,
+      "response_time": 0.001427,
+      "content_length": 829,
+      "status": "error"
+    },
+    "cash_flows": {
+      "endpoint": "/api/cash_flows",
+      "status_code": 500,
+      "response_time": 0.001483,
+      "content_length": 1718,
+      "status": "error"
+    },
+    "trade_plans": {
+      "endpoint": "/api/trade_plans",
+      "status_code": 500,
+      "response_time": 0.001566,
+      "content_length": 2248,
+      "status": "error"
+    },
+    "notes": {
+      "endpoint": "/api/notes",
+      "status_code": 500,
+      "response_time": 0.001398,
+      "content_length": 236,
+      "status": "error"
+    }
+  },
+  "summary": {
+    "success_rate": 0.0,
+    "all_endpoints_working": false,
+    "average_response_time": 0
+  }
+}

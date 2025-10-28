@@ -135,13 +135,13 @@ class ImportOrchestrator:
         }
         return step_mapping.get(step, 0)
     
-    def create_import_session(self, account_id: int, file_name: str, 
+    def create_import_session(self, trading_account_id: int, file_name: str, 
                             file_content: str) -> Dict[str, Any]:
         """
         Create a new import session and detect file format.
         
         Args:
-            account_id: Trading account ID
+            trading_account_id: Trading account ID
             file_name: Original file name
             file_content: File content as string
             
@@ -160,7 +160,7 @@ class ImportOrchestrator:
             
             # Create import session
             session = ImportSession(
-                account_id=account_id,
+                trading_account_id=trading_account_id,
                 provider=connector.get_provider_name(),
                 file_name=file_name,
                 status='analyzing'
@@ -249,7 +249,7 @@ class ImportOrchestrator:
             # Detect duplicates
             duplicate_result = self.duplicate_detection_service.detect_duplicates(
                 validation_result['valid_records'],
-                session.account_id
+                session.trading_account_id
             )
             
             # Prepare analysis results for API response (detailed)
@@ -386,7 +386,7 @@ class ImportOrchestrator:
             logger.info("🔄 Detecting duplicates...")
             duplicate_result = self.duplicate_detection_service.detect_duplicates(
                 validation_result['valid_records'],
-                session.account_id
+                session.trading_account_id
             )
             logger.info(f"📊 Clean: {len(duplicate_result['clean_records'])}, Duplicates: {len(duplicate_result['within_file_duplicates']) + len(duplicate_result['existing_records'])}")
             
@@ -613,7 +613,7 @@ class ImportOrchestrator:
                     
                     execution = Execution(
                         ticker_id=execution_data.get('ticker_id'),
-                        trading_account_id=session.account_id,
+                        trading_account_id=session.trading_account_id,
                         action=execution_data.get('action'),
                         quantity=execution_data.get('quantity'),
                         price=execution_data.get('price'),
@@ -740,12 +740,12 @@ class ImportOrchestrator:
         
         return None
     
-    def get_import_history(self, account_id: int, limit: int = 10) -> Dict[str, Any]:
+    def get_import_history(self, trading_account_id: int, limit: int = 10) -> Dict[str, Any]:
         """
         Get import history for an account.
         
         Args:
-            account_id: Trading account ID
+            trading_account_id: Trading account ID
             limit: Maximum number of records to return
             
         Returns:
@@ -753,7 +753,7 @@ class ImportOrchestrator:
         """
         try:
             sessions = self.db_session.query(ImportSession).filter(
-                ImportSession.account_id == account_id
+                ImportSession.trading_account_id == trading_account_id
             ).order_by(ImportSession.created_at.desc()).limit(limit).all()
             
             return {

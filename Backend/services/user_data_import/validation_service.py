@@ -411,3 +411,26 @@ class ValidationService:
             import traceback
             logger.error(f"📋 Traceback: {traceback.format_exc()}")
             return []
+    
+    def _load_ticker_cache(self):
+        """
+        Load ticker cache from database.
+        
+        This method loads all tickers into memory for faster validation.
+        """
+        try:
+            if not self.db_session or not Ticker:
+                logger.warning("Cannot load ticker cache - no database session or Ticker model")
+                self.ticker_cache = None
+                return
+            
+            logger.info("🔄 Loading ticker cache from database...")
+            tickers = self.db_session.query(Ticker).all()
+            
+            # Create cache as dict with symbol as key
+            self.ticker_cache = {ticker.symbol: ticker for ticker in tickers}
+            logger.info(f"✅ Loaded {len(self.ticker_cache)} tickers into cache")
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to load ticker cache: {str(e)}")
+            self.ticker_cache = None

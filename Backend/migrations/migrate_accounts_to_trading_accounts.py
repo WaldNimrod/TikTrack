@@ -92,7 +92,7 @@ def migrate_accounts_to_trading_accounts():
         cursor.execute("""
             CREATE TABLE trades_new (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                trading_account_id INTEGER NOT NULL,
+                trading_trading_account_id INTEGER NOT NULL,
                 ticker_id INTEGER NOT NULL,
                 trade_plan_id INTEGER,
                 status VARCHAR(20),
@@ -105,7 +105,7 @@ def migrate_accounts_to_trading_accounts():
                 notes VARCHAR(500),
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 side VARCHAR(10) DEFAULT 'Long',
-                FOREIGN KEY (trading_account_id) REFERENCES trading_accounts(id),
+                FOREIGN KEY (trading_trading_account_id) REFERENCES trading_accounts(id),
                 FOREIGN KEY (ticker_id) REFERENCES tickers(id),
                 FOREIGN KEY (trade_plan_id) REFERENCES trade_plans(id)
             )
@@ -113,12 +113,12 @@ def migrate_accounts_to_trading_accounts():
         
         cursor.execute("""
             INSERT INTO trades_new (
-                id, trading_account_id, ticker_id, trade_plan_id, status, 
+                id, trading_trading_account_id, ticker_id, trade_plan_id, status, 
                 investment_type, opened_at, closed_at, cancelled_at, 
                 cancel_reason, total_pl, notes, created_at, side
             ) 
             SELECT 
-                id, account_id, ticker_id, trade_plan_id, status, 
+                id, trading_account_id, ticker_id, trade_plan_id, status, 
                 investment_type, opened_at, closed_at, cancelled_at, 
                 cancel_reason, total_pl, notes, created_at, side
             FROM trades
@@ -132,7 +132,7 @@ def migrate_accounts_to_trading_accounts():
         cursor.execute("""
             CREATE TABLE trade_plans_new (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                trading_account_id INTEGER NOT NULL,
+                trading_trading_account_id INTEGER NOT NULL,
                 ticker_id INTEGER NOT NULL,
                 investment_type VARCHAR(20),
                 planned_amount FLOAT,
@@ -148,20 +148,20 @@ def migrate_accounts_to_trading_accounts():
                 stop_percentage FLOAT DEFAULT 0.1,
                 target_percentage FLOAT DEFAULT 2000,
                 current_price FLOAT DEFAULT 0,
-                FOREIGN KEY (trading_account_id) REFERENCES trading_accounts(id),
+                FOREIGN KEY (trading_trading_account_id) REFERENCES trading_accounts(id),
                 FOREIGN KEY (ticker_id) REFERENCES tickers(id)
             )
         """)
         
         cursor.execute("""
             INSERT INTO trade_plans_new (
-                id, trading_account_id, ticker_id, investment_type, 
+                id, trading_trading_account_id, ticker_id, investment_type, 
                 planned_amount, entry_conditions, stop_price, target_price, 
                 reasons, cancelled_at, cancel_reason, created_at, side, 
                 status, stop_percentage, target_percentage, current_price
             ) 
             SELECT 
-                id, account_id, ticker_id, investment_type, 
+                id, trading_account_id, ticker_id, investment_type, 
                 planned_amount, entry_conditions, stop_price, target_price, 
                 reasons, cancelled_at, cancel_reason, created_at, side, 
                 status, stop_percentage, target_percentage, current_price
@@ -176,7 +176,7 @@ def migrate_accounts_to_trading_accounts():
         cursor.execute("""
             CREATE TABLE cash_flows_new (
                 id INTEGER NOT NULL,
-                trading_account_id INTEGER NOT NULL,
+                trading_trading_account_id INTEGER NOT NULL,
                 type VARCHAR(50) NOT NULL,
                 amount FLOAT NOT NULL,
                 date DATE,
@@ -187,18 +187,18 @@ def migrate_accounts_to_trading_accounts():
                 source VARCHAR(20) DEFAULT 'manual',
                 external_id VARCHAR(100) DEFAULT '0',
                 PRIMARY KEY (id),
-                FOREIGN KEY (trading_account_id) REFERENCES trading_accounts(id),
+                FOREIGN KEY (trading_trading_account_id) REFERENCES trading_accounts(id),
                 FOREIGN KEY (currency_id) REFERENCES currencies(id)
             )
         """)
         
         cursor.execute("""
             INSERT INTO cash_flows_new (
-                id, trading_account_id, type, amount, date, description, 
+                id, trading_trading_account_id, type, amount, date, description, 
                 created_at, currency_id, usd_rate, source, external_id
             ) 
             SELECT 
-                id, account_id, type, amount, date, description, 
+                id, trading_account_id, type, amount, date, description, 
                 created_at, currency_id, usd_rate, source, external_id
             FROM cash_flows
         """)
@@ -231,20 +231,20 @@ def migrate_accounts_to_trading_accounts():
         cursor.execute("SELECT COUNT(*) FROM trading_accounts")
         trading_accounts_count = cursor.fetchone()[0]
         
-        cursor.execute("SELECT COUNT(*) FROM trades WHERE trading_account_id IS NOT NULL")
+        cursor.execute("SELECT COUNT(*) FROM trades WHERE trading_trading_account_id IS NOT NULL")
         trades_count = cursor.fetchone()[0]
         
-        cursor.execute("SELECT COUNT(*) FROM trade_plans WHERE trading_account_id IS NOT NULL")
+        cursor.execute("SELECT COUNT(*) FROM trade_plans WHERE trading_trading_account_id IS NOT NULL")
         trade_plans_count = cursor.fetchone()[0]
         
-        cursor.execute("SELECT COUNT(*) FROM cash_flows WHERE trading_account_id IS NOT NULL")
+        cursor.execute("SELECT COUNT(*) FROM cash_flows WHERE trading_trading_account_id IS NOT NULL")
         cash_flows_count = cursor.fetchone()[0]
         
         logger.info(f"Migration verification:")
         logger.info(f"  - Trading accounts: {trading_accounts_count}")
-        logger.info(f"  - Trades with trading_account_id: {trades_count}")
-        logger.info(f"  - Trade plans with trading_account_id: {trade_plans_count}")
-        logger.info(f"  - Cash flows with trading_account_id: {cash_flows_count}")
+        logger.info(f"  - Trades with trading_trading_account_id: {trades_count}")
+        logger.info(f"  - Trade plans with trading_trading_account_id: {trade_plans_count}")
+        logger.info(f"  - Cash flows with trading_trading_account_id: {cash_flows_count}")
         
         return True
         

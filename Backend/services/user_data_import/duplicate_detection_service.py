@@ -47,13 +47,13 @@ class DuplicateDetectionService:
         self.date_tolerance_days = 1   # Date difference tolerance
     
     def detect_duplicates(self, records: List[Dict[str, Any]], 
-                         account_id: int) -> Dict[str, Any]:
+                         trading_trading_account_id: int) -> Dict[str, Any]:
         """
         Detect duplicates in a list of records.
         
         Args:
             records: List of normalized records to check
-            account_id: Account ID for system duplicate checking
+            trading_trading_account_id: Account ID for system duplicate checking
             
         Returns:
             Dict[str, Any]: Duplicate detection results
@@ -68,7 +68,7 @@ class DuplicateDetectionService:
         }
         
         # Get existing executions for this account
-        existing_executions = self._get_existing_executions(account_id, records)
+        existing_executions = self._get_existing_executions(trading_trading_account_id, records)
         
         # Track processed records to avoid double-checking
         processed_indices = set()
@@ -251,12 +251,24 @@ class DuplicateDetectionService:
         # Check date match - same day only, ignore time
         if (record1.get('date') and record2.get('date')):
             try:
-                date1 = datetime.fromisoformat(record1['date'].replace('Z', '+00:00'))
-                date2 = datetime.fromisoformat(record2['date'].replace('Z', '+00:00'))
-                # Compare only the date part, not time
-                if date1.date() == date2.date():
+                # Handle both date objects and date strings
+                if hasattr(record1['date'], 'date'):
+                    date1 = record1['date'].date()
+                elif isinstance(record1['date'], str):
+                    date1 = datetime.fromisoformat(record1['date'].replace('Z', '+00:00')).date()
+                else:
+                    date1 = record1['date']
+                
+                if hasattr(record2['date'], 'date'):
+                    date2 = record2['date'].date()
+                elif isinstance(record2['date'], str):
+                    date2 = datetime.fromisoformat(record2['date'].replace('Z', '+00:00')).date()
+                else:
+                    date2 = record2['date']
+                
+                if date1 == date2:
                     score += 1
-            except ValueError:
+            except (ValueError, TypeError, AttributeError):
                 pass
         
         # Check action match
@@ -266,12 +278,12 @@ class DuplicateDetectionService:
         
         return score
     
-    def _get_existing_executions(self, account_id: int, records: List[Dict] = None) -> List[Dict[str, Any]]:
+    def _get_existing_executions(self, trading_trading_account_id: int, records: List[Dict] = None) -> List[Dict[str, Any]]:
         """
         Get existing executions filtered by date range and symbols
         
         Args:
-            account_id: Account ID (ignored - we check against all executions)
+            trading_trading_account_id: Account ID (ignored - we check against all executions)
             records: List of records to check against (for filtering)
             
         Returns:

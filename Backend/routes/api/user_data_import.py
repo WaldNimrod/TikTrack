@@ -47,12 +47,12 @@ def upload_and_preview():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
-    account_id = request.form.get('account_id')
-    if not account_id:
+    trading_account_id = request.form.get('trading_account_id')
+    if not trading_account_id:
         return jsonify({"error": "Missing trading account ID"}), 400
     
     try:
-        account_id = int(account_id)
+        trading_account_id = int(trading_account_id)
     except ValueError:
         return jsonify({"error": "Invalid trading account ID"}), 400
 
@@ -70,7 +70,7 @@ def upload_and_preview():
         orchestrator = ImportOrchestrator(db_session)
         
         # Create import session first
-        session_data = orchestrator.create_import_session(account_id, file_name, file_content)
+        session_data = orchestrator.create_import_session(trading_account_id, file_name, file_content)
         session_id = session_data['session_id']
         
         # Analyze the file
@@ -102,7 +102,7 @@ def upload_file():
     
     Expected form data:
     - file: CSV file to import
-    - account_id: Trading account ID (optional, defaults to first account)
+    - trading_account_id: Trading account ID (optional, defaults to first account)
     
     Returns:
         JSON response with session ID and analysis results
@@ -129,8 +129,8 @@ def upload_file():
             }), 400
         
         # Get account ID
-        account_id = request.form.get('account_id', type=int)
-        if not account_id:
+        trading_account_id = request.form.get('trading_account_id', type=int)
+        if not trading_account_id:
             # Default to first account
             db_session = next(get_db())
             try:
@@ -140,7 +140,7 @@ def upload_file():
                         'status': 'error',
                         'message': 'No trading accounts found'
                     }), 400
-                account_id = account.id
+                trading_account_id = account.id
             finally:
                 db_session.close()
         
@@ -153,7 +153,7 @@ def upload_file():
         try:
             orchestrator = ImportOrchestrator(db_session)
             result = orchestrator.create_import_session(
-                account_id=account_id,
+                trading_account_id=trading_account_id,
                 file_name=file.filename,
                 file_content=file_content
             )
@@ -687,26 +687,26 @@ def get_import_history():
     Get import history for an account.
     
     Query parameters:
-    - account_id: Trading account ID (optional)
+    - trading_account_id: Trading account ID (optional)
     - limit: Maximum number of records (default: 10)
     
     Returns:
         JSON response with import history
     """
     try:
-        account_id = request.args.get('account_id', type=int)
+        trading_account_id = request.args.get('trading_account_id', type=int)
         limit = request.args.get('limit', 10, type=int)
         
-        if not account_id:
+        if not trading_account_id:
             return jsonify({
                 'status': 'error',
-                'message': 'account_id parameter is required'
+                'message': 'trading_account_id parameter is required'
             }), 400
         
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result = orchestrator.get_import_history(account_id, limit)
+            result = orchestrator.get_import_history(trading_account_id, limit)
             
             if not result['success']:
                 return jsonify({

@@ -5,7 +5,7 @@ Migration to update alerts table structure
 
 This migration updates the alerts table to use a flexible association system:
 - Adds related_type_id and related_id fields
-- Removes account_id and ticker_id fields
+- Removes trading_account_id and ticker_id fields
 - Transfers existing data to the new system
 - Adds 'ticker' association type to note_relation_types table
 
@@ -60,8 +60,8 @@ def update_alerts_structure():
         # Transfer alerts associated with accounts
         cursor.execute("""
             UPDATE alerts 
-            SET related_type_id = ?, related_id = account_id 
-            WHERE account_id IS NOT NULL
+            SET related_type_id = ?, related_id = trading_account_id 
+            WHERE trading_account_id IS NOT NULL
         """, (relation_types.get('account', 1),))
         account_alerts_updated = cursor.rowcount
         

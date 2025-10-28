@@ -35,8 +35,8 @@ class ImportSession(BaseModel):
     __table_args__ = {'extend_existing': True}
     
     # Database columns - matching import session requirements
-    account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False, 
-                       comment="Trading account ID for the import")
+    trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False, 
+                               comment="Trading account ID for the import")
     provider = Column(String(50), nullable=False, 
                      comment="Data provider: ibkr, demo, etc.")
     file_name = Column(String(255), nullable=False, 
@@ -55,7 +55,7 @@ class ImportSession(BaseModel):
                          comment="When import was completed")
     
     # Relationships
-    account = relationship("TradingAccount", back_populates="import_sessions")
+    trading_account = relationship("TradingAccount", foreign_keys=[trading_account_id], back_populates="import_sessions")
     
     def __repr__(self) -> str:
         """String representation of the ImportSession object."""
@@ -70,7 +70,7 @@ class ImportSession(BaseModel):
         """
         return {
             'id': self.id,
-            'account_id': self.account_id,
+            'trading_account_id': self.trading_account_id,
             'provider': self.provider,
             'file_name': self.file_name,
             'total_records': self.total_records,

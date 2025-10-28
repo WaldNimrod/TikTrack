@@ -29,17 +29,17 @@ def get_trades():
     db: Session = g.db
     
     # Get filtering parameters
-    account_id = request.args.get('account_id', type=int)
+    trading_account_id = request.args.get('trading_account_id', type=int)
     status = request.args.get('status')
     
     try:
         # If there are filtering parameters, use appropriate function
-        if account_id and status:
-            logger.info(f"Filtering trades by account_id={account_id} and status={status}")
-            trades = TradeService.get_by_account_and_status(db, account_id, status)
-            logger.info(f"Found {len(trades)} trades for account {account_id} with status {status}")
-        elif account_id:
-            trades = TradeService.get_by_account(db, account_id)
+        if trading_account_id and status:
+            logger.info(f"Filtering trades by trading_account_id={trading_account_id} and status={status}")
+            trades = TradeService.get_by_account_and_status(db, trading_account_id, status)
+            logger.info(f"Found {len(trades)} trades for account {trading_account_id} with status {status}")
+        elif trading_account_id:
+            trades = TradeService.get_by_account(db, trading_account_id)
         elif status:
             trades = TradeService.get_by_status(db, status)
         else:
@@ -107,12 +107,12 @@ def get_trade(trade_id: int):
     response, status_code = base_api.get_by_id(db, trade_id)
     return jsonify(response), status_code
 
-@trades_bp.route('/account/<int:account_id>', methods=['GET'])
-def get_trades_by_account(account_id: int):
+@trades_bp.route('/account/<int:trading_account_id>', methods=['GET'])
+def get_trades_by_account(trading_account_id: int):
     """Get trades by account"""
     try:
         db: Session = next(get_db())
-        trades = TradeService.get_by_account(db, account_id)
+        trades = TradeService.get_by_account(db, trading_account_id)
         return jsonify({
             "status": "success",
             "data": [trade.to_dict() for trade in trades],
@@ -120,7 +120,7 @@ def get_trades_by_account(account_id: int):
             "version": "1.0"
         })
     except Exception as e:
-        logger.error(f"Error getting trades for account {account_id}: {str(e)}")
+        logger.error(f"Error getting trades for account {trading_account_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve account trades"},
@@ -196,7 +196,7 @@ def update_trade(trade_id: int):
                 # Return basic trade data without relationships
                 basic_data = {
                     "id": trade.id,
-                    "trading_account_id": trade.trading_account_id,
+                    "trading_trading_account_id": trade.trading_trading_account_id,
                     "ticker_id": trade.ticker_id,
                     "trade_plan_id": trade.trade_plan_id,
                     "status": trade.status,
@@ -328,9 +328,9 @@ def delete_trade(trade_id: int):
 def get_trade_summary():
     """Get trade summary"""
     try:
-        account_id = request.args.get('account_id', type=int)
+        trading_account_id = request.args.get('trading_account_id', type=int)
         db: Session = next(get_db())
-        summary = TradeService.get_trade_summary(db, account_id)
+        summary = TradeService.get_trade_summary(db, trading_account_id)
         return jsonify({
             "status": "success",
             "data": summary,

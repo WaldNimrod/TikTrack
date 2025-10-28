@@ -96,7 +96,7 @@ def rename_type_column():
         cursor.execute("""
             INSERT INTO trades_new 
             SELECT 
-                account_id, ticker_id, trade_plan_id, status, 
+                trading_account_id, ticker_id, trade_plan_id, status, 
                 type as investment_type, opened_at, closed_at, cancelled_at, 
                 cancel_reason, total_pl, notes, id, created_at, side
             FROM trades

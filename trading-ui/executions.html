@@ -296,23 +296,29 @@
                             
                             <!-- Missing Tickers Section -->
                             <div class="problem-section" id="missingTickersSection" style="display:none;">
-                                <h4><i class="bi bi-question-circle"></i> סמלים חסרים במערכת</h4>
-                                <p>הסמלים הבאים לא קיימים במערכת ויושמטו מהייבוא:</p>
-                                <div class="missing-tickers-list" id="missingTickersList"></div>
+                                <h4><i class="bi bi-exclamation-circle"></i> סמלים חסרים</h4>
+                                <p>הסמלים הבאים לא קיימים במערכת. ניתן להוסיף אותם או לדלג על הרשומות:</p>
+                                <div class="problem-card-container" id="missingTickersContainer">
+                                    <!-- Missing ticker cards will be populated here -->
+                                </div>
                             </div>
                             
-                            <!-- Duplicates Section -->
-                            <div class="problem-section" id="duplicatesSection" style="display:none;">
-                                <h4><i class="bi bi-files"></i> רשומות כפולות</h4>
-                                <p>נמצאו רשומות כפולות בקובץ או קיימות במערכת:</p>
-                                <div class="duplicates-list" id="duplicatesList"></div>
+                            <!-- Within-File Duplicates Section -->
+                            <div class="problem-section" id="withinFileDuplicatesSection" style="display:none;">
+                                <h4><i class="bi bi-files"></i> כפילויות בקובץ</h4>
+                                <p>נמצאו רשומות כפולות בתוך הקובץ. ניתן לבחור איזה רשומה לייבא:</p>
+                                <div class="problem-card-container" id="withinFileDuplicatesContainer">
+                                    <!-- Within-file duplicate cards will be populated here -->
+                                </div>
                             </div>
                             
                             <!-- Existing Records Section -->
                             <div class="problem-section" id="existingRecordsSection" style="display:none;">
-                                <h4><i class="bi bi-exclamation-triangle"></i> רשומות קיימות</h4>
-                                <p>רשומות אלו כבר קיימות במערכת ויושמטו מהייבוא:</p>
-                                <div class="existing-records-list" id="existingRecordsList"></div>
+                                <h4><i class="bi bi-exclamation-triangle"></i> רשומות קיימות במערכת</h4>
+                                <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג:</p>
+                                <div class="problem-card-container" id="existingRecordsContainer">
+                                    <!-- Existing record cards will be populated here -->
+                                </div>
                             </div>
                             
                             <div class="step-actions">
@@ -551,4 +557,53 @@
     <script src="scripts/info-summary-configs.js?v=05b6de6f_20251025_005449"></script>
     
     <!-- Page-specific functions are now handled by the unified initialization system -->
+    
+    <!-- Add Ticker Modal -->
+    <div class="modal" id="addTickerModal" tabindex="-1" role="dialog" aria-labelledby="addTickerModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTickerModalLabel">
+                        <i class="bi bi-plus-circle"></i>
+                        הוספת טיקר חדש
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTickerForm">
+                        <div class="mb-3">
+                            <label for="tickerSymbol" class="form-label">סמל הטיקר</label>
+                            <input type="text" class="form-control" id="tickerSymbol" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tickerName" class="form-label">שם הטיקר</label>
+                            <input type="text" class="form-control" id="tickerName" placeholder="הזן שם הטיקר">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tickerType" class="form-label">סוג הטיקר</label>
+                            <select class="form-select" id="tickerType">
+                                <option value="stock">מניה</option>
+                                <option value="etf">קרן נסחרת</option>
+                                <option value="bond">אג"ח</option>
+                                <option value="option">אופציה</option>
+                                <option value="future">חוזה עתידי</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tickerCurrency" class="form-label">מטבע</label>
+                            <select class="form-select" id="tickerCurrency">
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="ILS">ILS</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTickerFromModal()">שמור טיקר</button>
+                </div>
+            </div>
+        </div>
+    </div>
     

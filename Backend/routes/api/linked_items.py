@@ -404,7 +404,7 @@ def get_trade_child_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     return children
 
 # TradingAccount child entities
-def get_account_child_entities(cursor, account_id: int) -> List[Dict[str, Any]]:
+def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str, Any]]:
     """Get child entities for an account"""
     children = []
     
@@ -415,8 +415,8 @@ def get_account_child_entities(cursor, account_id: int) -> List[Dict[str, Any]]:
                created_at, status
         FROM trades t
         JOIN tickers tk ON t.ticker_id = tk.id
-        WHERE t.trading_account_id = ?
-    """, (account_id,))
+        WHERE t.trading_trading_account_id = ?
+    """, (trading_account_id,))
     
     for row in cursor.fetchall():
         children.append({
@@ -434,8 +434,8 @@ def get_account_child_entities(cursor, account_id: int) -> List[Dict[str, Any]]:
                CONCAT(type, ': ', amount, ' ', currency) as description,
                date, 'active' as status
         FROM cash_flows 
-        WHERE account_id = ?
-    """, (account_id,))
+        WHERE trading_account_id = ?
+    """, (trading_account_id,))
     
     for row in cursor.fetchall():
         children.append({
@@ -454,7 +454,7 @@ def get_account_child_entities(cursor, account_id: int) -> List[Dict[str, Any]]:
                n.created_at, 'active' as status
         FROM notes n
         WHERE n.related_type_id = 1 AND n.related_id = ?
-    """, (account_id,))
+    """, (trading_account_id,))
     
     for row in cursor.fetchall():
         children.append({
@@ -563,7 +563,7 @@ def get_trade_parent_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
                a.name as description,
                a.created_at, a.status
         FROM trades t
-        JOIN trading_accounts a ON t.trading_account_id = a.id
+        JOIN trading_accounts a ON t.trading_trading_account_id = a.id
         WHERE t.id = ?
     """, (trade_id,))
     

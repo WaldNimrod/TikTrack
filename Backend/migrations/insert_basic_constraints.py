@@ -85,12 +85,12 @@ def insert_trades_constraints():
                 VALUES (?, ?, ?, ?)
             """, (constraint_id, value, display_name, sort_order))
         
-        # 4. account_id NOT NULL constraint
+        # 4. trading_account_id NOT NULL constraint
         cursor.execute("""
             INSERT INTO constraints (table_name, column_name, constraint_type, constraint_name, constraint_definition)
             VALUES (?, ?, ?, ?, ?)
-        """, ('trades', 'account_id', 'NOT_NULL', 'account_required', 
-              'account_id IS NOT NULL'))
+        """, ('trades', 'trading_account_id', 'NOT_NULL', 'account_required', 
+              'trading_account_id IS NOT NULL'))
         
         # 5. ticker_id NOT NULL constraint
         cursor.execute("""

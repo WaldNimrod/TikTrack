@@ -41,14 +41,14 @@ class ImportSessionManager:
         """
         self.db_session = db_session
     
-    def create_session(self, account_id: int, file_name: str, 
+    def create_session(self, trading_trading_account_id: int, file_name: str, 
                       provider: str, file_size: int = None, 
                       file_hash: str = None) -> Dict[str, Any]:
         """
         Create a new import session.
         
         Args:
-            account_id: Trading account ID
+            trading_account_id: Trading account ID
             file_name: Original file name
             provider: Provider name (e.g., 'IBKR', 'Demo')
             file_size: File size in bytes (optional)
@@ -60,18 +60,18 @@ class ImportSessionManager:
         try:
             # Validate account exists
             account = self.db_session.query(TradingAccount).filter(
-                TradingAccount.id == account_id
+                TradingAccount.id == trading_account_id
             ).first()
             
             if not account:
                 return {
                     'success': False,
-                    'error': f'Trading account {account_id} not found'
+                    'error': f'Trading account {trading_account_id} not found'
                 }
             
             # Create new session
             session = ImportSession(
-                account_id=account_id,
+                trading_account_id=trading_account_id,
                 provider=provider,
                 file_name=file_name,
                 file_size=file_size,
@@ -83,7 +83,7 @@ class ImportSessionManager:
             self.db_session.add(session)
             self.db_session.commit()
             
-            logger.info(f"✅ Created import session {session.id} for account {account_id}")
+            logger.info(f"✅ Created import session {session.id} for account {trading_account_id}")
             
             return {
                 'success': True,
@@ -239,7 +239,7 @@ class ImportSessionManager:
             # Build summary
             summary = {
                 'session_id': session.id,
-                'account_id': session.account_id,
+                'trading_account_id': session.trading_account_id,
                 'provider': session.provider,
                 'file_name': session.file_name,
                 'file_size': session.file_size,
@@ -259,12 +259,12 @@ class ImportSessionManager:
             logger.error(f"❌ Failed to get session summary {session_id}: {str(e)}")
             return None
     
-    def get_sessions_by_account(self, account_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_sessions_by_account(self, trading_account_id: int, limit: int = 10) -> List[Dict[str, Any]]:
         """
         Get sessions for a specific account.
         
         Args:
-            account_id: Trading account ID
+            trading_account_id: Trading account ID
             limit: Maximum number of sessions to return
             
         Returns:
@@ -272,13 +272,13 @@ class ImportSessionManager:
         """
         try:
             sessions = self.db_session.query(ImportSession).filter(
-                ImportSession.account_id == account_id
+                ImportSession.trading_account_id == trading_account_id
             ).order_by(desc(ImportSession.created_at)).limit(limit).all()
             
             return [session.to_dict() for session in sessions]
             
         except Exception as e:
-            logger.error(f"❌ Failed to get sessions for account {account_id}: {str(e)}")
+            logger.error(f"❌ Failed to get sessions for account {trading_account_id}: {str(e)}")
             return []
     
     def get_sessions_by_status(self, status: str, limit: int = 50) -> List[Dict[str, Any]]:

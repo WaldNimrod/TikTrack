@@ -25,7 +25,7 @@ def upgrade():
     # Create import_sessions table
     op.create_table('import_sessions',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('account_id', sa.Integer(), nullable=False),
+        sa.Column('trading_account_id', sa.Integer(), nullable=False),
         sa.Column('provider', sa.String(length=50), nullable=False),
         sa.Column('file_name', sa.String(length=255), nullable=False),
         sa.Column('total_records', sa.Integer(), nullable=False, default=0),
@@ -35,12 +35,12 @@ def upgrade():
         sa.Column('summary_data', sa.JSON(), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.Column('completed_at', sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(['account_id'], ['trading_accounts.id'], ),
+        sa.ForeignKeyConstraint(['trading_account_id'], ['trading_accounts.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
     
     # Add indexes for better performance
-    op.create_index('ix_import_sessions_account_id', 'import_sessions', ['account_id'])
+    op.create_index('ix_import_sessions_trading_account_id', 'import_sessions', ['trading_account_id'])
     op.create_index('ix_import_sessions_status', 'import_sessions', ['status'])
     op.create_index('ix_import_sessions_provider', 'import_sessions', ['provider'])
     op.create_index('ix_import_sessions_created_at', 'import_sessions', ['created_at'])
@@ -52,7 +52,7 @@ def downgrade():
     op.drop_index('ix_import_sessions_created_at', table_name='import_sessions')
     op.drop_index('ix_import_sessions_provider', table_name='import_sessions')
     op.drop_index('ix_import_sessions_status', table_name='import_sessions')
-    op.drop_index('ix_import_sessions_account_id', table_name='import_sessions')
+    op.drop_index('ix_import_sessions_trading_account_id', table_name='import_sessions')
     
     # Drop table
     op.drop_table('import_sessions')

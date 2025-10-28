@@ -30,6 +30,19 @@ This is a fundamental rule that ALL future chats must follow. Any documentation 
 - **ALWAYS CHECK**: for running processes before starting
 - **IF PORT OCCUPIED**: Look for existing processes first
 
+### Active Server Files (ONLY These):
+- **`Backend/app.py`** - Main server file (ONLY active server)
+- **`start_server.sh`** - Startup script (ONLY way to start)
+- **`Backend/utils/server_lock_manager.py`** - Process management
+- **`Backend/routes/api/server_management.py`** - Server management API
+- **`Backend/routes/api/server_logs.py`** - Server logs API
+
+### Removed Files (DO NOT USE):
+- **❌ REMOVED**: dev_server.py, dev_server_optimized.py
+- **❌ REMOVED**: restart-bg.sh, run-background.sh
+- **❌ REMOVED**: trading-ui/server.py
+- **All old server scripts moved to archive/**
+
 ### Process Management:
 - The system automatically detects and prevents multiple server instances
 - If you see "port already in use" error, check for existing processes

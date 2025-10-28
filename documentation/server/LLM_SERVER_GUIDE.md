@@ -10,7 +10,7 @@
 
 ## 🚀 **Quick Start Commands**
 
-### **Start Server (Recommended)**
+### **Start Server (ONLY Method)**
 ```bash
 ./start_server.sh
 ```
@@ -24,6 +24,23 @@
 ```bash
 ./start_server.sh --force
 ```
+
+## 📁 **Active Server Files (ONLY These)**
+
+### **Main Server Files:**
+- **`Backend/app.py`** - Main server file (ONLY active server)
+- **`start_server.sh`** - Startup script (ONLY way to start server)
+- **`Backend/utils/server_lock_manager.py`** - Process management
+
+### **API Management Files:**
+- **`Backend/routes/api/server_management.py`** - Server management API
+- **`Backend/routes/api/server_logs.py`** - Server logs API
+
+### **All Other Server Files:**
+- **❌ REMOVED** - All old server scripts moved to archive
+- **❌ REMOVED** - dev_server.py, dev_server_optimized.py
+- **❌ REMOVED** - restart-bg.sh, run-background.sh
+- **❌ REMOVED** - trading-ui/server.py
 
 ---
 

@@ -1,34 +1,24 @@
-// ===== RESEARCH PAGE FUNCTIONS =====
-
 /**
- * Function Index:
- * ==============
+ * Research Page - Comprehensive Function Index
+ * ==========================================
  * 
- * PAGE INITIALIZATION:
- * - initializeResearchPage()
+ * This file contains all functions for the research page including:
+ * - Page initialization and data loading
+ * - Event handling and UI interactions
+ * - Research tools and analysis functions
+ * - Market data processing and visualization
+ * - Export and reporting functionality
  * 
- * DATA LOADING:
- * - loadResearchData()
- * 
- * EVENT HANDLING:
- * - setupResearchEventListeners()
- * 
- * RESEARCH TOOLS:
- * - analyzeMarketTrends()
- * - compareTickers()
- * - technicalAnalysis()
- * - getMarketOverview()
- * - getVolatilityIndex()
- * - getNewsFeed()
- * - exportResearchData()
- * 
- * ==============
+ * Author: TikTrack Development Team
+ * Version: 2.0
+ * Last Updated: 2025-01-27
  */
 
 // ===== PAGE INITIALIZATION =====
 /**
  * Initialize the research page
- * Loads data and sets up event listeners
+ * @function initializeResearchPage
+ * @returns {void}
  */
 function initializeResearchPage() {
     try {
@@ -49,8 +39,9 @@ function initializeResearchPage() {
 
 // ===== DATA LOADING =====
 /**
- * Load research data from the server
- * Fetches market data, news, and analysis
+ * Load research data from server
+ * @function loadResearchData
+ * @returns {void}
  */
 function loadResearchData() {
     try {
@@ -70,8 +61,9 @@ function loadResearchData() {
 
 // ===== EVENT HANDLING =====
 /**
- * Set up event listeners for research page
- * Handles user interactions and form submissions
+ * Setup research event listeners
+ * @function setupResearchEventListeners
+ * @returns {void}
  */
 function setupResearchEventListeners() {
     try {
@@ -88,7 +80,8 @@ function setupResearchEventListeners() {
 // ===== RESEARCH TOOLS =====
 /**
  * Analyze market trends
- * Performs technical analysis on market data
+ * @function analyzeMarketTrends
+ * @returns {void}
  */
 function analyzeMarketTrends() {
     try {
@@ -107,7 +100,8 @@ function analyzeMarketTrends() {
 
 /**
  * Compare tickers
- * Compares performance of different tickers
+ * @function compareTickers
+ * @returns {void}
  */
 function compareTickers() {
     try {
@@ -126,7 +120,8 @@ function compareTickers() {
 
 /**
  * Perform technical analysis
- * Analyzes technical indicators and patterns
+ * @function technicalAnalysis
+ * @returns {void}
  */
 function technicalAnalysis() {
     try {
@@ -145,7 +140,8 @@ function technicalAnalysis() {
 
 /**
  * Get market overview
- * Retrieves and displays market summary data
+ * @function getMarketOverview
+ * @returns {void}
  */
 function getMarketOverview() {
     try {
@@ -164,7 +160,8 @@ function getMarketOverview() {
 
 /**
  * Get volatility index
- * Calculates and displays market volatility metrics
+ * @function getVolatilityIndex
+ * @returns {void}
  */
 function getVolatilityIndex() {
     try {
@@ -183,7 +180,8 @@ function getVolatilityIndex() {
 
 /**
  * Get news feed
- * Retrieves and displays relevant market news
+ * @function getNewsFeed
+ * @returns {void}
  */
 function getNewsFeed() {
     try {
@@ -202,7 +200,8 @@ function getNewsFeed() {
 
 /**
  * Export research data
- * Exports research data in various formats
+ * @function exportResearchData
+ * @returns {void}
  */
 function exportResearchData() {
     try {
@@ -219,10 +218,10 @@ function exportResearchData() {
     }
 }
 
-// Detailed Log Functions for Research Page
 /**
  * Generate detailed log
- * Creates a comprehensive log of research activities
+ * @function generateDetailedLog
+ * @returns {void}
  */
 function generateDetailedLog() {
     try {
@@ -337,11 +336,16 @@ async function generateDetailedLogForResearch() {
             }
         }
     } catch (err) {
-        window.Logger.error('שגיאה בהעתקה:', err, { page: "research" });
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה בהעתקת הלוג');
-        } else {
-            alert('שגיאה בהעתקת הלוג');
-        }
-    }
-}
+// ===== GLOBAL EXPORTS =====
+window.initializeResearchPage = initializeResearchPage;
+window.loadResearchData = loadResearchData;
+window.setupResearchEventListeners = setupResearchEventListeners;
+window.analyzeMarketTrends = analyzeMarketTrends;
+window.compareTickers = compareTickers;
+window.technicalAnalysis = technicalAnalysis;
+window.getMarketOverview = getMarketOverview;
+window.getVolatilityIndex = getVolatilityIndex;
+window.getNewsFeed = getNewsFeed;
+window.exportResearchData = exportResearchData;
+window.generateDetailedLog = generateDetailedLog;
+window.generateDetailedLogForResearch = generateDetailedLogForResearch;

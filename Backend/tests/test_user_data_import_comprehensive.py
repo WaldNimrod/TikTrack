@@ -92,7 +92,7 @@ class TestUserDataImportSystem(unittest.TestCase):
         # Create some existing executions for duplicate testing
         existing_execution = Execution(
             ticker_id=1,  # AAPL
-            trading_account_id=cls.test_account.id,
+            trading_trading_account_id=cls.test_account.id,
             side="buy",
             quantity=100,
             price=150.25,
@@ -119,7 +119,7 @@ class TestUserDataImportSystem(unittest.TestCase):
         """Test ImportSession model functionality"""
         # Create session
         session = ImportSession(
-            account_id=self.test_account.id,
+            trading_account_id=self.test_account.id,
             provider="ibkr",
             file_name="test_file.csv",
             total_records=100,
@@ -407,7 +407,7 @@ Trades,Total,Stocks,1,100,100,15025,1.50,15026.50,0,0"""
         
         # Test create session
         result = orchestrator.create_import_session(
-            account_id=self.test_account.id,
+            trading_account_id=self.test_account.id,
             file_name="test_import.csv",
             file_content=file_content
         )
@@ -439,7 +439,7 @@ Trades,Total,Stocks,1,100,100,15025,1.50,15026.50,0,0"""
         response = self.client.post('/api/user-data-import/upload', 
                                    data={
                                        'file': (io.BytesIO(test_file_content.encode()), 'test.csv'),
-                                       'account_id': str(self.test_account.id)
+                                       'trading_account_id': str(self.test_account.id)
                                    },
                                    content_type='multipart/form-data')
         
@@ -453,7 +453,7 @@ Trades,Total,Stocks,1,100,100,15025,1.50,15026.50,0,0"""
         """Test session retrieval endpoint"""
         # Create a test session
         session = ImportSession(
-            account_id=self.test_account.id,
+            trading_account_id=self.test_account.id,
             provider="ibkr",
             file_name="test.csv",
             status="ready"
@@ -474,7 +474,7 @@ Trades,Total,Stocks,1,100,100,15025,1.50,15026.50,0,0"""
         """Test preview endpoint"""
         # Create a test session with analysis data
         session = ImportSession(
-            account_id=self.test_account.id,
+            trading_account_id=self.test_account.id,
             provider="ibkr",
             file_name="test.csv",
             status="ready"
@@ -512,7 +512,7 @@ Trades,Total,Stocks,1,100,100,15025,1.50,15026.50,0,0"""
         
         # Create session
         result = orchestrator.create_import_session(
-            account_id=self.test_account.id,
+            trading_account_id=self.test_account.id,
             file_name="test_import.csv",
             file_content=file_content
         )

@@ -94,7 +94,7 @@ MSFT,2025-01-03,75,300.00"""
         
         # Step 1: Create import session
         result = orchestrator.create_import_session(
-            account_id=self.test_account.id,
+            trading_account_id=self.test_account.id,
             file_name="test_import.csv",
             file_content=test_csv_content
         )
@@ -116,7 +116,7 @@ MSFT,2025-01-03,75,300.00"""
         
         # Verify data was imported
         executions = self.db_session.query(Execution).filter(
-            Execution.account_id == self.test_account.id
+            Execution.trading_account_id == self.test_account.id
         ).all()
         
         self.assertEqual(len(executions), 3)  # Should have 3 executions
@@ -128,7 +128,7 @@ MSFT,2025-01-03,75,300.00"""
         # Create existing execution
         existing_ticker = self.db_session.query(Ticker).filter(Ticker.symbol == 'AAPL').first()
         existing_execution = Execution(
-            account_id=self.test_account.id,
+            trading_account_id=self.test_account.id,
             ticker_id=existing_ticker.id,
             date=date(2025, 1, 1),
             quantity=100,
@@ -147,7 +147,7 @@ TSLA,2025-01-02,50,200.00"""
         
         # Create session and analyze
         result = orchestrator.create_import_session(
-            account_id=self.test_account.id,
+            trading_account_id=self.test_account.id,
             file_name="test_duplicate.csv",
             file_content=test_csv_content
         )
@@ -173,7 +173,7 @@ AAPL,2025-01-02,50,200.00"""
         
         # Create session and analyze
         result = orchestrator.create_import_session(
-            account_id=self.test_account.id,
+            trading_account_id=self.test_account.id,
             file_name="test_missing.csv",
             file_content=test_csv_content
         )
@@ -276,7 +276,7 @@ class TestAPIIntegration(unittest.TestCase):
         # Test upload
         response = self.client.post('/api/user-data-import/upload', 
                                   data={'file': (io.BytesIO(test_csv_content.encode()), 'test.csv'),
-                                        'account_id': 1},
+                                        'trading_account_id': 1},
                                   content_type='multipart/form-data')
         
         self.assertEqual(response.status_code, 200)
@@ -291,7 +291,7 @@ class TestAPIIntegration(unittest.TestCase):
         
         upload_response = self.client.post('/api/user-data-import/upload',
                                          data={'file': (io.BytesIO(test_csv_content.encode()), 'test.csv'),
-                                               'account_id': 1},
+                                               'trading_account_id': 1},
                                          content_type='multipart/form-data')
         
         session_id = upload_response.get_json()['session_id']
@@ -311,7 +311,7 @@ class TestAPIIntegration(unittest.TestCase):
         
         upload_response = self.client.post('/api/user-data-import/upload',
                                          data={'file': (io.BytesIO(test_csv_content.encode()), 'test.csv'),
-                                               'account_id': 1},
+                                               'trading_account_id': 1},
                                          content_type='multipart/form-data')
         
         session_id = upload_response.get_json()['session_id']

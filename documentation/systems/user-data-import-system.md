@@ -58,13 +58,15 @@ Import Execution → Database Storage
    - שמירה מקומית ב-Unified Cache Manager
 
 3. **שלב 3**: פתרון בעיות (מפורט)
-   - קריאה ל-`/api/user-data-import/session/{id}` לקבלת נתוני הניתוח
+   - קריאה ל-`/api/user-data-import/session/{id}/preview` לקבלת נתוני הניתוח
    - הצגת בעיות בממשק אינטראקטיבי מפורט:
      - **טיקרים חסרים**: כרטיסים עם כפתור "הוסף טיקר"
      - **כפילויות בקובץ**: כרטיסים עם כפתורי "קבל"/"דחה"
      - **רשומות קיימות**: כרטיסים עם כפתורי "קבל"/"דחה"
    - כל כרטיס מציג פרטים מלאים: סמל, פעולה, כמות, מחיר, תאריך, עמלה
    - confidence scores לכפילויות עם אינדיקטור ויזואלי
+   - ממשק להוספת טיקרים חדשים עם מודל Bootstrap
+   - רענון אוטומטי של התצוגה לאחר פעולות המשתמש
 
 4. **שלב 4**: תצוגה מקדימה
    - קריאה ל-`/api/user-data-import/session/{id}/preview`
@@ -206,6 +208,110 @@ class BaseImportConnector(ABC):
 2. **ניתוח קובץ**: `analyze_file()`
 3. **הכנת תצוגה מקדימה**: `generate_preview()`
 4. **ביצוע ייבוא**: `execute_import()`
+
+## ממשק משתמש - שלב 3: פתרון בעיות
+
+### מבנה HTML
+
+שלב 3 כולל 3 סעיפים נפרדים:
+
+```html
+<!-- Missing Tickers Section -->
+<div class="problem-section" id="missingTickersSection">
+    <h4><i class="bi bi-exclamation-circle"></i> סמלים חסרים</h4>
+    <div class="problem-card-container" id="missingTickersContainer">
+        <!-- Missing ticker cards will be populated here -->
+    </div>
+</div>
+
+<!-- Within-File Duplicates Section -->
+<div class="problem-section" id="withinFileDuplicatesSection">
+    <h4><i class="bi bi-files"></i> כפילויות בקובץ</h4>
+    <div class="problem-card-container" id="withinFileDuplicatesContainer">
+        <!-- Within-file duplicate cards will be populated here -->
+    </div>
+</div>
+
+<!-- Existing Records Section -->
+<div class="problem-section" id="existingRecordsSection">
+    <h4><i class="bi bi-exclamation-triangle"></i> רשומות קיימות במערכת</h4>
+    <div class="problem-card-container" id="existingRecordsContainer">
+        <!-- Existing record cards will be populated here -->
+    </div>
+</div>
+```
+
+### כרטיסי בעיות
+
+כל כרטיס בעיה כולל:
+
+1. **Header**: אייקון + סמל הטיקר
+2. **Body**: פרטי הרשומה (פעולה, כמות, מחיר, תאריך)
+3. **Confidence Bar**: אינדיקטור ויזואלי לרמת הביטחון
+4. **Actions**: כפתורי פעולה (קבל/דחה, הוסף טיקר)
+
+### מודל הוספת טיקר
+
+```html
+<div class="modal" id="addTickerModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">הוספת טיקר חדש</h5>
+            </div>
+            <div class="modal-body">
+                <form id="addTickerForm">
+                    <div class="mb-3">
+                        <label for="tickerSymbol">סמל הטיקר</label>
+                        <input type="text" id="tickerSymbol" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tickerName">שם הטיקר</label>
+                        <input type="text" id="tickerName" placeholder="הזן שם הטיקר">
+                    </div>
+                    <div class="mb-3">
+                        <label for="tickerType">סוג הטיקר</label>
+                        <select id="tickerType">
+                            <option value="stock">מניה</option>
+                            <option value="etf">קרן נסחרת</option>
+                            <option value="bond">אג"ח</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="saveTickerFromModal()">שמור טיקר</button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+### פונקציות JavaScript
+
+#### `displayProblemResolutionDetailed(data)`
+מציג את כל הבעיות בממשק מפורט עם כרטיסים אינטראקטיביים.
+
+#### `renderMissingTickerCard(ticker)`
+יוצר כרטיס לטיקר חסר עם כפתור "הוסף טיקר".
+
+#### `renderDuplicateCard(duplicate, type, index)`
+יוצר כרטיס לכפילות/רשומה קיימת עם כפתורי "קבל"/"דחה".
+
+#### `acceptDuplicate(index, type)`
+מקבל כפילות ומעדכן את התצוגה.
+
+#### `rejectDuplicate(index, type)`
+דוחה כפילות ומעדכן את התצוגה.
+
+#### `openAddTickerModal(symbol)`
+פותח מודל להוספת טיקר חדש.
+
+#### `saveTickerFromModal(symbol, name)`
+שומר טיקר חדש ומעדכן את התצוגה.
+
+#### `refreshPreviewData()`
+מרענן את התצוגה לאחר פעולות המשתמש.
 
 ## API Endpoints
 

@@ -90,9 +90,11 @@ function handleValidationError(field, message) {
 }
 
 /**
- * טיפול בשגיאות טעינת נתונים
- * @param {Error} error - השגיאה
- * @param {string} dataType - סוג הנתונים
+ * Handle data load errors
+ * @function handleDataLoadError
+ * @param {Error} error - The error object
+ * @param {string} dataType - Type of data being loaded
+ * @returns {void}
  */
 function handleDataLoadError(error, dataType) {
   // console.warn(`🔧 Data load error for ${dataType}:`, error);
@@ -105,9 +107,11 @@ function handleDataLoadError(error, dataType) {
 }
 
 /**
- * טיפול בשגיאות שמירה
- * @param {Error} error - השגיאה
- * @param {string} operation - סוג הפעולה
+ * Handle save errors
+ * @function handleSaveError
+ * @param {Error} error - The error object
+ * @param {string} operation - Operation being performed
+ * @returns {void}
  */
 function handleSaveError(error, operation) {
   // console.warn(`🔧 Save error for ${operation}:`, error);
@@ -120,9 +124,11 @@ function handleSaveError(error, operation) {
 }
 
 /**
- * טיפול בשגיאות מחיקה
- * @param {Error} error - השגיאה
- * @param {string} itemType - סוג הפריט
+ * Handle delete errors
+ * @function handleDeleteError
+ * @param {Error} error - The error object
+ * @param {string} itemType - Type of item being deleted
+ * @returns {void}
  */
 function handleDeleteError(error, itemType) {
   // console.warn(`🔧 Delete error for ${itemType}:`, error);
@@ -135,9 +141,11 @@ function handleDeleteError(error, itemType) {
 }
 
 /**
- * טיפול בשגיאות מערכת
- * @param {Error} error - השגיאה
- * @param {string} system - שם המערכת
+ * Handle system errors
+ * @function handleSystemError
+ * @param {Error} error - The error object
+ * @param {string} system - System name
+ * @returns {void}
  */
 function handleSystemError(error, system) {
   // console.warn(`🔧 System error in ${system}:`, error);
@@ -149,12 +157,9 @@ function handleSystemError(error, system) {
   }
 }
 
-// ===== ייצוא פונקציות גלובליות =====
-
-// ייצוא פונקציות לטיפול בשגיאות
+// ===== GLOBAL EXPORTS =====
 window.handleApiError = handleApiError;
 window.handleElementNotFound = handleElementNotFound;
-window.handleFunctionNotFound = handleFunctionNotFound;
 window.handleValidationError = handleValidationError;
 window.handleDataLoadError = handleDataLoadError;
 window.handleSaveError = handleSaveError;

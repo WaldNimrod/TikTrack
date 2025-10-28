@@ -569,7 +569,7 @@ window.updateTickersListForClosedTrades = updateTickersListForClosedTrades;
   updateAllActiveTradesStatuses,
   updateAllTickerStatuses,
   updateTickerFromTradePlan,
-  updateTickersListForClosedTrades,
+  updateTickersListForClosedTrades
 };
 
 // ===== CRUD OPERATIONS =====

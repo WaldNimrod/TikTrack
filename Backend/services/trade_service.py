@@ -49,9 +49,9 @@ class TradeService:
         ).filter(Trade.id == trade_id).first()
     
     @staticmethod
-    def get_by_account(db: Session, account_id: int) -> List[Trade]:
+    def get_by_account(db: Session, trading_account_id: int) -> List[Trade]:
         """Get trades by account"""
-        return db.query(Trade).filter(Trade.trading_account_id == account_id).all()
+        return db.query(Trade).filter(Trade.trading_account_id == trading_account_id).all()
     
     @staticmethod
     def get_by_ticker(db: Session, ticker_id: int) -> List[Trade]:
@@ -69,20 +69,20 @@ class TradeService:
         return db.query(Trade).filter(Trade.status == status).all()
     
     @staticmethod
-    def get_by_account_and_status(db: Session, account_id: int, status: str) -> List[Trade]:
+    def get_by_account_and_status(db: Session, trading_account_id: int, status: str) -> List[Trade]:
         """Get trades by account and status"""
         import logging
         logger = logging.getLogger(__name__)
         
-        logger.info(f"Getting trades for account_id={account_id} and status={status}")
+        logger.info(f"Getting trades for trading_account_id={trading_account_id} and status={status}")
         
         # Check all trades in system
         all_trades = db.query(Trade).all()
         logger.info(f"Total trades in system: {len(all_trades)}")
         
         # Check trades by account
-        account_trades = db.query(Trade).filter(Trade.trading_account_id == account_id).all()
-        logger.info(f"Trades for account {account_id}: {len(account_trades)}")
+        account_trades = db.query(Trade).filter(Trade.trading_account_id == trading_account_id).all()
+        logger.info(f"Trades for account {trading_account_id}: {len(account_trades)}")
         
         # Check trades by status
         status_trades = db.query(Trade).filter(Trade.status == status).all()
@@ -90,11 +90,11 @@ class TradeService:
         
         # Combined filtering
         filtered_trades = db.query(Trade).filter(
-            Trade.trading_account_id == account_id,
+            Trade.trading_account_id == trading_account_id,
             Trade.status == status
         ).all()
         
-        logger.info(f"Filtered trades for account {account_id} with status {status}: {len(filtered_trades)}")
+        logger.info(f"Filtered trades for account {trading_account_id} with status {status}: {len(filtered_trades)}")
         
         return filtered_trades
     
@@ -278,11 +278,11 @@ class TradeService:
         return False
     
     @staticmethod
-    def get_trade_summary(db: Session, account_id: Optional[int] = None) -> Dict[str, Any]:
+    def get_trade_summary(db: Session, trading_account_id: Optional[int] = None) -> Dict[str, Any]:
         """Get trade summary"""
         query = db.query(Trade)
-        if account_id:
-            query = query.filter(Trade.trading_account_id == account_id)
+        if trading_account_id:
+            query = query.filter(Trade.trading_account_id == trading_account_id)
         
         trades = query.all()
         

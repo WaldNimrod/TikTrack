@@ -1,52 +1,134 @@
 # TikTrack Server Restart System Guide
 # ====================================
 
-## 🎯 Overview
+## 🎯 **CURRENT STATUS: Unified Server Management System**
 
-The TikTrack server restart system consists of three main components designed to handle different restart scenarios with varying levels of complexity and thoroughness.
+### **New System Architecture (October 2025):**
+- **Main Startup Script**: `start_server.sh` - Unified entry point with process conflict detection
+- **Process Manager**: `Backend/utils/server_lock_manager.py` - Automatic conflict detection and prevention
+- **Legacy Scripts**: Archived to `archive/server-scripts-old-*/` - No longer in use
 
-**Current System Architecture (September 2025):**
-- **Main Script**: `restart` - Unified entry point with cache mode control
-- **Quick Script**: `restart_server_quick.sh` - Fast restart for development
-- **Complete Script**: `restart_server_complete.sh` - Comprehensive restart for production
+### **Key Changes:**
+1. **Process Conflict Detection** - Automatically prevents multiple server instances
+2. **Unified Startup** - Single script handles all server operations
+3. **Detailed Error Messages** - Clear guidance when conflicts are detected
+4. **Foreground Development Mode** - Live logs for development
+5. **Comprehensive Logging** - Integration with existing logging system
 
-## 🎯 **CURRENT STATUS: Problem Identified and Solved**
+---
 
-### **Problem Analysis**
-The original `restart` command was hanging and not returning control to the user, halting the development process. After extensive debugging and analysis, the root cause was identified:
+## 🚀 **Current Recommended Usage**
 
-**Root Cause**: The server takes approximately **80 seconds** to fully initialize due to:
-- SocketIO initialization with multiple concurrent connections
-- Background tasks startup (6 automatic tasks)
-- Database initialization with complex schema
-- External data services integration
-- Real-time notifications system
+### **Start Server (Primary Method):**
+```bash
+./start_server.sh
+```
 
-**Hanging Issue**: Scripts were waiting for the server to be fully ready, but the server's complex startup process caused scripts to hang indefinitely.
+### **Check for Conflicts:**
+```bash
+./start_server.sh --check-only
+```
 
-### **Terminal Communication Issue Discovered**
-After extensive testing, a critical discovery was made:
+### **Force Start (Not Recommended):**
+```bash
+./start_server.sh --force
+```
 
-**The Real Problem**: The issue was not with the script logic or server startup, but with **terminal communication**:
-- **Cursor Terminal**: Uses pseudo-terminal (`TERM=dumb`, `not a tty`) - causes output buffering issues
-- **macOS Terminal**: Uses real terminal (`TERM=xterm-256color`, `/dev/ttys008`) - works perfectly
+---
 
-**Terminal Comparison**:
-| Feature | Cursor Terminal | macOS Terminal |
-|---------|----------------|----------------|
-| TERM | `dumb` ❌ | `xterm-256color` ✅ |
-| TTY | `not a tty` ❌ | `/dev/ttys008` ✅ |
-| COLUMNS | `0` ❌ | `80` ✅ |
-| LINES | `0` ❌ | `24` ✅ |
-| Control Return | ❌ | ✅ |
-| Output Display | ❌ | ✅ |
+## 📋 **What Was Archived**
 
-### **Solution Implemented**
-A comprehensive solution was implemented:
+The following scripts have been moved to `archive/server-scripts-old-*/`:
+- `Backend/dev_server.py` - Old development server
+- `Backend/dev_server_optimized.py` - Optimized development server  
+- `restart-bg.sh` - Background restart script
+- `run-background.sh` - Background run script
+- `trading-ui/server.py` - Old server script
 
-1. **Script Enhancement**: Improved the `restart` script with better terminal compatibility
-2. **Terminal Scripts**: Created dedicated scripts for macOS Terminal usage
-3. **Documentation**: Complete setup guide for proper terminal usage
+**Reason for Archive:** These scripts were causing multiple server processes to run simultaneously on port 8080, leading to conflicts and development issues.
+
+---
+
+## ⚠️ **Multiple Processes Issue - SOLVED**
+
+### **The Problem (Before):**
+- Multiple server scripts could run simultaneously
+- Processes would "stick" in background
+- Confusion about which server was running
+- Performance issues and data refresh problems
+
+### **The Solution (Now):**
+- **Automatic Detection**: System detects existing TikTrack processes
+- **Conflict Prevention**: Blocks startup if conflicts found
+- **Clear Error Messages**: Detailed information about conflicting processes
+- **Resolution Guidance**: Step-by-step instructions to resolve conflicts
+
+### **Example Error Message:**
+```
+🚫 ERROR: TikTrack Server Already Running
+================================================================================
+
+Found existing TikTrack server process(es):
+
+Process #1:
+  PID: 93432
+  Command: python3 app.py
+  Running Time: 2h 15m
+  Status: sleeping
+
+To resolve this issue:
+1. Stop the existing server:
+   kill 93432
+
+2. Or use Ctrl+C in the terminal where the server is running
+
+3. Then run the startup script again:
+   ./start_server.sh
+```
+
+---
+
+## 🔧 **Technical Details**
+
+### **Process Detection Logic:**
+1. **Port Scanning**: Checks for processes listening on port 8080
+2. **Process Identification**: Identifies TikTrack servers by command line keywords
+3. **Conflict Resolution**: Provides detailed information and resolution steps
+4. **Safe Startup**: Only starts if no conflicts detected
+
+### **Integration Points:**
+- **Logging System**: Uses existing `Backend/config/logging.py`
+- **Error Handling**: Comprehensive error messages with user guidance
+- **Signal Handling**: Graceful shutdown with Ctrl+C
+- **File Validation**: Checks for required files before startup
+
+---
+
+## 📚 **Related Documentation**
+
+- **Main Guide**: `documentation/server/SERVER_MANAGEMENT_GUIDE.md`
+- **LLM Guide**: `documentation/server/LLM_SERVER_GUIDE.md`
+- **Cursor Rules**: `.cursorrules` (Server Management Rules section)
+- **Archive Info**: `archive/server-scripts-old-*/ARCHIVE_INFO.md`
+
+---
+
+## 🎯 **Migration Notes**
+
+### **For Developers:**
+- **Old Way**: `python3 Backend/app.py` ❌
+- **New Way**: `./start_server.sh` ✅
+
+### **For AI Assistants:**
+- Always use `./start_server.sh` to start the server
+- Never run Python directly
+- Check for conflicts first with `--check-only`
+- Read error messages carefully - they contain specific guidance
+
+### **For CI/CD Systems:**
+- Use `./start_server.sh --check-only` to verify no conflicts
+- Use `./start_server.sh` for normal startup
+- Monitor logs in `Backend/logs/` for detailed information
 
 **Key Insight**: The server can start in background and become available gradually, so scripts don't need to wait for full initialization. The main issue was terminal communication, not script logic.
 

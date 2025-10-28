@@ -20,3 +20,24 @@ This is a fundamental rule that ALL future chats must follow. Any documentation 
 - Main Index: `documentation/INDEX.md`
 - Pages List: `documentation/PAGES_LIST.md`
 - Working Rules: `documentation/DOCUMENTATION_WORKING_RULES.md`
+
+## Server Management Rules - CRITICAL
+**השתמש רק ב-`./start_server.sh` להפעלת השרת - אין להפעיל את השרת ישירות**
+
+### Server Startup Rules:
+- **ONLY USE**: `./start_server.sh` to start the server
+- **NEVER RUN**: `python3 Backend/app.py` directly
+- **ALWAYS CHECK**: for running processes before starting
+- **IF PORT OCCUPIED**: Look for existing processes first
+
+### Process Management:
+- The system automatically detects and prevents multiple server instances
+- If you see "port already in use" error, check for existing processes
+- Use `./start_server.sh --check-only` to check for conflicts
+- Server runs in foreground mode for development (shows live logs)
+
+### Troubleshooting:
+- If server won't start: Check `./start_server.sh --check-only`
+- If multiple processes: Kill existing with `kill [PID]`
+- Always use Ctrl+C to stop server gracefully
+- Check logs in `Backend/logs/` for detailed information

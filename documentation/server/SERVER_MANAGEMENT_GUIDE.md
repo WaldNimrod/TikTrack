@@ -2,19 +2,87 @@
 # =================================
 # מדריך מפורט לניהול שרת TikTrack
 
-**גרסה:** 2.0  
-**תאריך עדכון:** דצמבר 2024  
+**גרסה:** 3.0  
+**תאריך עדכון:** אוקטובר 2025  
 **מפתח:** TikTrack Development Team
 
 ---
 
 ## 📋 **סקירה כללית**
 
-מערכת TikTrack כוללת מערכת ניהול שרת מתקדמת המשלבת:
-- **Cursor Tasks Integration** - ניהול דרך IDE
-- **Web Dashboards** - ממשקי ניהול מבוססי דפדפן
-- **API Endpoints** - ניהול דרך API calls
-- **Real-time Monitoring** - ניטור בזמן אמת
+מערכת TikTrack כוללת מערכת ניהול שרת מאוחדת עם מניעת הרצה מקבילה:
+- **Unified Startup Script** - הפעלה מאוחדת עם בדיקת תהליכים
+- **Process Conflict Detection** - מניעת הרצה מקבילה אוטומטית
+- **Detailed Error Messages** - הודעות שגיאה מפורטות עם הדרכה
+- **Foreground Development Mode** - לוגים חיים לפיתוח
+- **Comprehensive Logging** - מערכת לוגים מתקדמת
+
+---
+
+## 🚀 **How to Start the Server (הדרך הנכונה)**
+
+### **הפעלה רגילה:**
+```bash
+./start_server.sh
+```
+
+### **בדיקת תהליכים בלבד:**
+```bash
+./start_server.sh --check-only
+```
+
+### **הפעלה כפויה (לא מומלץ):**
+```bash
+./start_server.sh --force
+```
+
+### **מה קורה כשמריצים את הסקריפט:**
+1. **בדיקת Python** - וידוא ש-Python3 זמין
+2. **בדיקת קבצים** - וידוא שכל הקבצים הנדרשים קיימים
+3. **בדיקת תהליכים** - זיהוי תהליכי TikTrack קיימים על פורט 8080
+4. **הפעלת השרת** - הפעלה ב-foreground עם לוגים חיים
+5. **טיפול בעצירה** - עצירה מסודרת עם Ctrl+C
+
+---
+
+## ⚠️ **Multiple Processes Issue (בעיית תהליכים מקבילים)**
+
+### **הבעיה:**
+לפני המערכת החדשה, היה אפשר להפעיל מספר תהליכי שרת במקביל על אותו פורט 8080, מה שגרם ל:
+- תהליכים "תקועים" ברקע
+- בלבול לגבי איזה שרת רץ
+- בעיות ביצועים
+- קושי בפיתוח ורענון נתונים
+
+### **הפתרון:**
+המערכת החדשה כוללת:
+- **זיהוי אוטומטי** של תהליכי TikTrack קיימים
+- **הודעות שגיאה מפורטות** עם פרטי התהליך הקיים
+- **הדרכה ברורה** איך לפתור את הבעיה
+- **מניעת הרצה מקבילה** לחלוטין
+
+### **דוגמה לשגיאה:**
+```
+🚫 ERROR: TikTrack Server Already Running
+================================================================================
+
+Found existing TikTrack server process(es):
+
+Process #1:
+  PID: 93432
+  Command: /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python app.py
+  Running Time: 2h 15m
+  Status: sleeping
+
+To resolve this issue:
+1. Stop the existing server:
+   kill 93432
+
+2. Or use Ctrl+C in the terminal where the server is running
+
+3. Then run the startup script again:
+   ./start_server.sh
+```
 
 ---
 

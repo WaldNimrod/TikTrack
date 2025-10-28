@@ -876,49 +876,9 @@ function updateGridFromComponent(
  * @param {number} [noteId] - מזהה ההערה (נדרש רק בעריכה)
  */
 
-  if (tradeRadio) {
-    tradeRadio.addEventListener('change', () => {
-      populateSelect('noteRelatedObjectSelect', trades, 'id', 'טרייד');
-    });
-  }
+// REMOVED: Orphaned code - tradeRadio and editTradeRadio not defined
 
-  if (editTradeRadio) {
-    editTradeRadio.addEventListener('change', () => {
-      populateSelect('editNoteRelatedObjectSelect', trades, 'id', 'טרייד');
-    });
-  }
-
-  // עדכון רדיו באטון לתכנונים
-  const planRadio = document.getElementById('noteRelationTradePlan');
-  const editPlanRadio = document.getElementById('editNoteRelationTradePlan');
-
-  if (planRadio) {
-    planRadio.addEventListener('change', () => {
-      populateSelect('noteRelatedObjectSelect', tradePlans, 'id', 'תכנון');
-    });
-  }
-
-  if (editPlanRadio) {
-    editPlanRadio.addEventListener('change', () => {
-      populateSelect('editNoteRelatedObjectSelect', tradePlans, 'id', 'תכנון');
-    });
-  }
-
-  // עדכון רדיו באטון לטיקרים
-  const tickerRadio = document.getElementById('noteRelationTicker');
-  const editTickerRadio = document.getElementById('editNoteRelationTicker');
-
-  if (tickerRadio) {
-    tickerRadio.addEventListener('change', () => {
-      populateSelect('noteRelatedObjectSelect', tickers, 'symbol', '');
-    });
-  }
-
-  if (editTickerRadio) {
-    editTickerRadio.addEventListener('change', () => {
-      populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
-    });
-  }
+// REMOVED: Orphaned code - radio button event listeners not in function
 
 /**
  * מילוי select עם נתונים
@@ -2257,154 +2217,24 @@ function showEditNoteModal(noteId) {
  * שמירת הערה
  * Handles both add and edit modes
  */
-async function saveNote() {
-    window.Logger.debug('saveNote called', { page: 'notes' });
-    
-    try {
-        // Collect form data
-        const form = document.getElementById('notesModalForm');
-        if (!form) {
-            throw new Error('Notes form not found');
-        }
-        
-        const formData = new FormData(form);
-        const noteData = {
-            title: formData.get('noteTitle'),
-            content: formData.get('noteContent'),
-            category: formData.get('noteCategory'),
-            priority: formData.get('notePriority')
-        };
-        
-        // Validate data
-        if (!window.validateEntityForm) {
-            throw new Error('Validation system not available');
-        }
-        
-        const isValid = window.validateEntityForm('notesModalForm', {
-            noteTitle: { required: true, minLength: 3, maxLength: 100 },
-            noteContent: { required: true, minLength: 10, maxLength: 2000 },
-            noteCategory: { required: false },
-            notePriority: { required: false }
-        });
-        
-        if (!isValid) {
-            window.Logger.warn('Note validation failed', { page: 'notes' });
-            return;
-        }
-        
-        // Determine if this is add or edit
-        const isEdit = form.dataset.mode === 'edit';
-        const noteId = form.dataset.noteId;
-        
-        // Prepare API call
-        const url = isEdit ? `/api/notes/${noteId}` : '/api/notes';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        // Send to API
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(noteData)
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        
-        // Handle success
-        if (window.showNotification) {
-            const message = isEdit ? 'הערה עודכנה בהצלחה' : 'הערה נוספה בהצלחה';
-            window.showNotification(message, 'success', 'business');
-        }
-        
-        // Close modal
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.hideModal('notesModal');
-        }
-        
-        // Refresh data
-        if (window.loadNotesData) {
-            window.loadNotesData();
-        }
-        
-        window.Logger.info('Note saved successfully', { noteId: result.id, page: 'notes' });
-        
-    } catch (error) {
-        window.Logger.error('Error saving note', { error: error.message, page: 'notes' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה בשמירת ההערה', 'error', 'system');
-        }
-    }
-}
+// REMOVED: Duplicate saveNote function - using ModalManagerV2 automatic CRUD handling
 
 /**
  * מחיקת הערה
  * Includes linked items check
  */
-async function deleteNote(noteId) {
-    window.Logger.debug('deleteNote called', { noteId, page: 'notes' });
-    
-    try {
-        // Check linked items first
-        if (window.checkLinkedItemsBeforeAction) {
-            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('note', noteId, 'delete');
-            if (hasLinkedItems) {
-                window.Logger.info('Note has linked items, deletion cancelled', { noteId, page: 'notes' });
-                return;
-            }
-        }
-        
-        // Confirm deletion
-        if (!confirm('האם אתה בטוח שברצונך למחוק את ההערה?')) {
-            return;
-        }
-        
-        // Send delete request
-        const response = await fetch(`/api/notes/${noteId}`, {
-            method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        // Handle success
-        if (window.showNotification) {
-            window.showNotification('הערה נמחקה בהצלחה', 'success', 'business');
-        }
-        
-        // Refresh data
-        if (window.loadNotesData) {
-            window.loadNotesData();
-        }
-        
-        window.Logger.info('Note deleted successfully', { noteId, page: 'notes' });
-        
-    } catch (error) {
-        window.Logger.error('Error deleting note', { error: error.message, noteId, page: 'notes' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה במחיקת ההערה', 'error', 'system');
-        }
-    }
-}
+// REMOVED: Duplicate deleteNote function - using confirmDeleteNote instead
 
 // ===== GLOBAL EXPORTS =====
 window.loadNotesData = loadNotesData;
 window.addNote = addNote;
 window.editNote = editNote;
-window.deleteNote = deleteNote;
+// Note: deleteNote and saveNote removed - using ModalManagerV2 and confirmDeleteNote instead
 window.uploadFile = uploadFile;
 window.downloadFile = downloadFile;
 window.viewLinkedItems = viewLinkedItems;
 window.updateNotesTable = updateNotesTable;
 window.showAddNoteModal = showAddNoteModal;
 window.showEditNoteModal = showEditNoteModal;
-window.saveNote = saveNote;
 window.restoreNotesSectionState = restoreNotesSectionState;
 

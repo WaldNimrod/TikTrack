@@ -60,7 +60,7 @@ const cashFlowModalConfig = {
             label: 'תאריך תזרים',
             required: true,
             dateTime: true,
-            defaultValue: (() => {
+            defaultValue: function() {
                 // Generate current date in YYYY-MM-DDTHH:MM format
                 const now = new Date();
                 const year = now.getFullYear();
@@ -69,7 +69,7 @@ const cashFlowModalConfig = {
                 const hours = String(now.getHours()).padStart(2, '0');
                 const minutes = String(now.getMinutes()).padStart(2, '0');
                 return `${year}-${month}-${day}T${hours}:${minutes}`;
-            })()
+            }
         },
         {
             type: 'text',

@@ -436,18 +436,18 @@ class PreferencesCore {
             });
             
             if (cached !== null) {
-                window.Logger.info(`🔍 CACHE DEBUG: Cache hit for ${preferenceName} = ${cached} (key: ${cacheKey}, { page: "preferences-core-new" })`);
+                window.Logger.debug(`🔍 CACHE DEBUG: Cache hit for ${preferenceName} = ${cached} (key: ${cacheKey}, { page: "preferences-core-new" })`);
                 return cached;
             }
         }
         
-        window.Logger.info(`🔍 CACHE DEBUG: Cache miss for ${preferenceName} (key: ${cacheKey}, { page: "preferences-core-new" }) - loading from API`);
+        window.Logger.debug(`🔍 CACHE DEBUG: Cache miss for ${preferenceName} (key: ${cacheKey}, { page: "preferences-core-new" }) - loading from API`);
         
         // Check lazy loading if enabled
         if (useLazyLoading && window.LazyLoader) {
             const isLoaded = window.LazyLoader.isLoaded(preferenceName);
             if (!isLoaded) {
-                window.Logger.info(`🎯 Loading ${preferenceName} on demand via lazy loader`, { page: "preferences-core-new" });
+                window.Logger.debug(`🎯 Loading ${preferenceName} on demand via lazy loader`, { page: "preferences-core-new" });
                 // Load all preferences at once from API
                 try {
                     const response = await fetch(`/api/preferences/user?user_id=${userId || this.currentUserId}&profile_id=${profileId || this.currentProfileId}`);

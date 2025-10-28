@@ -1314,10 +1314,50 @@ async function initializeCashFlowsPage() {
 
 // ===== CRUD FUNCTIONS =====
 
+// REMOVED: saveCashFlow function - using ModalManagerV2 automatic CRUD handling
+// The ModalManagerV2 system automatically handles save operations based on modal configuration
+
 /**
- * שמירת תזרים מזומנים
- * Handles both add and edit modes
+ * עדכון תזרים מזומנים
+ * @function updateCashFlow
+ * @param {string} id - Cash flow ID
+ * @returns {Promise<void>}
+ */
+async function updateCashFlow(id) {
+    window.Logger.debug('updateCashFlow called', { id, page: 'cash_flows' });
+    
+    try {
+        // Find cash flow data
+        const cashFlow = cashFlowsData.find(cf => cf.id === id);
+        if (!cashFlow) {
+            throw new Error('Cash flow not found');
+        }
+        
+        // Show edit modal with data
+        if (window.ModalManagerV2) {
+            window.ModalManagerV2.showEditModal('cashFlowModal', cashFlow);
+        } else {
+            throw new Error('ModalManagerV2 not available');
+        }
+        
+    } catch (error) {
+        window.Logger.error('Error updating cash flow', { error: error.message, page: 'cash_flows' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה בעדכון תזרים המזומנים', 'error', 'system');
+        }
+    }
+}
+
+// ייצוא פונקציות גלובליות
+window.toggleCashFlowsSection = toggleCashFlowsSection;
+window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
+// ===== MODAL FUNCTIONS - NEW SYSTEM =====
+
+/**
+ * Save cash flow - required by ModalManagerV2
  * @function saveCashFlow
+ * @async
  * @returns {Promise<void>}
  */
 async function saveCashFlow() {
@@ -1332,10 +1372,10 @@ async function saveCashFlow() {
         
         const formData = new FormData(form);
         const cashFlowData = {
-            type: formData.get('cashFlowType'),
             amount: parseFloat(formData.get('cashFlowAmount')),
+            type: formData.get('cashFlowType'),
             currency_id: formData.get('cashFlowCurrency'),
-            trading_account_id: formData.get('cashFlowAccount'),
+            account_id: formData.get('cashFlowAccount'),
             date: formData.get('cashFlowDate'),
             description: formData.get('cashFlowDescription'),
             source: formData.get('cashFlowSource'),
@@ -1350,8 +1390,8 @@ async function saveCashFlow() {
         }
         
         const isValid = window.validateEntityForm('cashFlowModalForm', {
-            cashFlowType: { required: true },
             cashFlowAmount: { required: true, min: 0.01 },
+            cashFlowType: { required: true },
             cashFlowCurrency: { required: true },
             cashFlowAccount: { required: true },
             cashFlowDate: { required: true },
@@ -1389,7 +1429,7 @@ async function saveCashFlow() {
         
         // Handle success
         if (window.showNotification) {
-            const message = isEdit ? 'תזרים מזומנים עודכן בהצלחה' : 'תזרים מזומנים נוסף בהצלחה';
+            const message = isEdit ? 'תזרים מזומן עודכן בהצלחה' : 'תזרים מזומן נוסף בהצלחה';
             window.showNotification(message, 'success', 'business');
         }
         
@@ -1409,46 +1449,12 @@ async function saveCashFlow() {
         window.Logger.error('Error saving cash flow', { error: error.message, page: 'cash_flows' });
         
         if (window.showNotification) {
-            window.showNotification('שגיאה בשמירת תזרים המזומנים', 'error', 'system');
+            window.showNotification('שגיאה בשמירת תזרים המזומן', 'error', 'system');
         }
     }
 }
 
-/**
- * עדכון תזרים מזומנים
- * @function updateCashFlow
- * @param {string} id - Cash flow ID
- * @returns {Promise<void>}
- */
-async function updateCashFlow(id) {
-    window.Logger.debug('updateCashFlow called', { id, page: 'cash_flows' });
-    
-    try {
-        // Find cash flow data
-        const cashFlow = cashFlowsData.find(cf => cf.id === id);
-        if (!cashFlow) {
-            throw new Error('Cash flow not found');
-        }
-        
-        // Show edit modal with data
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.showEditModal('cashFlowModal', cashFlow);
-        } else {
-            throw new Error('ModalManagerV2 not available');
-        }
-        
-    } catch (error) {
-        window.Logger.error('Error updating cash flow', { error: error.message, page: 'cash_flows' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה בעדכון תזרים המזומנים', 'error', 'system');
-        }
-    }
-}
-
-// ייצוא פונקציות גלובליות
-window.toggleCashFlowsSection = toggleCashFlowsSection;
-window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
+// Export save function for ModalManagerV2
 window.saveCashFlow = saveCashFlow;
 window.updateCashFlow = updateCashFlow;
 

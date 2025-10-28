@@ -346,7 +346,7 @@ class UnifiedCacheManager {
             
             // אם לא נמצא, נסה fallback
             if (options.fallback) {
-                window.Logger.info(`⚠️ Key ${key} not found, using fallback`, { page: "unified-cache-manager" });
+                window.Logger.debug(`⚠️ Key ${key} not found, using fallback`, { page: "unified-cache-manager" });
                 const fallbackData = await options.fallback();
                 
                 // שמור את הנתונים מהשירות למטמון
@@ -360,7 +360,7 @@ class UnifiedCacheManager {
             const responseTime = performance.now() - startTime;
             this.updatePerformanceStats(responseTime, false);
             
-            window.Logger.info(`❌ Key ${key} not found in any layer`, { page: "unified-cache-manager" });
+            window.Logger.debug(`❌ Key ${key} not found in any layer`, { page: "unified-cache-manager" });
             return null;
             
         } catch (error) {
@@ -524,7 +524,7 @@ class UnifiedCacheManager {
             if (removed) {
                 window.Logger.info(`✅ Removed ${key} from cache`, { page: "unified-cache-manager" });
             } else {
-                window.Logger.info(`⚠️ Key ${key} not found for removal`, { page: "unified-cache-manager" });
+                window.Logger.debug(`⚠️ Key ${key} not found for removal`, { page: "unified-cache-manager" });
             }
             
             return removed;

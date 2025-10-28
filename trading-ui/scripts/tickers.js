@@ -97,28 +97,7 @@
  * @param {number} tickerId - ID of the ticker to edit
  * @returns {void}
  */
-function editTicker(tickerId) {
-  try {
-    window.Logger.info('✏️ עורך טיקר:', tickerId, { page: "tickers" });
-    
-    // חיפוש הטיקר בנתונים
-    const ticker = window.tickersData.find(t => t.id === tickerId);
-    if (!ticker) {
-      throw new Error('טיקר לא נמצא');
-    }
-    
-    // פתיחת מודל עריכה עם נתוני הטיקר
-    showAddTickerModal(ticker);
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בעריכת טיקר:', error, { page: "tickers" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעריכת טיקר', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בעריכת טיקר');
-    }
-  }
-}
+// REMOVED: editTicker function - using showAddTickerModal directly
 
 /**
  * צפייה בפרטי טיקר
@@ -1474,7 +1453,7 @@ function clearTickersCache() {
   try {
     window.tickersData = [];
     tickersData = [];
-    window.Logger.info('🗑️ מטמון הטיקרים נוקה', { page: "tickers" });
+    window.Logger.debug('🗑️ מטמון הטיקרים נוקה', { page: "tickers" });
   } catch (error) {
     console.error('clearTickersCache failed:', error);
   }
@@ -1600,7 +1579,7 @@ function updateTickersTable(tickers) {
       
       // לוגים לדיבוג
       if (ticker.symbol === 'AAPL') {
-        window.Logger.info(`🔍 Debug AAPL:`, {
+        window.Logger.debug(`🔍 Debug AAPL:`, {
           current_price: ticker.current_price,
           change_percent: ticker.change_percent,
           volume: ticker.volume,
@@ -1664,26 +1643,26 @@ function updateTickersTable(tickers) {
                     <td class="actions-cell">
                         ${window.createActionsMenu ? window.createActionsMenu([
                           { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
-                          { type: 'LINK', onclick: `viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
-                          { type: 'EDIT', onclick: `editTicker(${ticker.id})`, title: 'ערוך' },
-                          { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${ticker.status === 'cancelled' ? 'reactivate' : 'cancel'}Ticker(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' }
+                          { type: 'LINK', onclick: `window.viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
+                          { type: 'EDIT', onclick: `showEditTickerModal(${ticker.id})`, title: 'ערוך' },
+                          { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' }
                         ]) : `
                         <div class="btn-group btn-group-sm" role="group">
                             <button data-button-type="VIEW" data-variant="small" 
                                     data-onclick="window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })" 
                                     data-text="" title="צפה בפרטי טיקר"></button>
                             <button data-button-type="LINK" data-variant="small" 
-                                    data-onclick="viewLinkedItemsForTicker(${ticker.id})" 
+                                    data-onclick="window.viewLinkedItemsForTicker(${ticker.id})" 
                                     data-text="" title="פריטים מקושרים"></button>
                             <button data-button-type="EDIT" data-variant="small" 
-                                    data-onclick="editTicker(${ticker.id})" 
+                                    data-onclick="showEditTickerModal(${ticker.id})" 
                                     data-text="" title="ערוך"></button>
                             ${ticker.status === 'cancelled' ?
     `<button data-button-type="REACTIVATE" data-variant="small" 
-             data-onclick="window.reactivateTicker(${ticker.id})" 
+             data-onclick="reactivateTicker(${ticker.id})" 
              data-text="" title="הפעל מחדש טיקר"></button>` :
     `<button data-button-type="CANCEL" data-variant="small" 
-             data-onclick="window.cancelTicker(${ticker.id})" 
+             data-onclick="performTickerCancellation(${ticker.id})" 
              data-text="" title="בטל טיקר"></button>`
                             }
                         </div>
@@ -1707,7 +1686,7 @@ function updateTickersTable(tickers) {
       countElement.textContent = `${tickers.length} טיקרים`;
     }
     
-    window.Logger.info(`📊 טבלת טיקרים עודכנה עם ${tickers.length} פריטים`, { page: "tickers" });
+    window.Logger.debug(`📊 טבלת טיקרים עודכנה עם ${tickers.length} פריטים`, { page: "tickers" });
 
     // סידור ברירת מחדל לפי העמודה הראשונה (סמל) - רק אם אין סידור קיים
     if (typeof window.applyDefaultSort === 'function') {
@@ -1743,7 +1722,7 @@ window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
 // פונקציות מודלים
 window.showAddTickerModal = showAddTickerModal;
 window.showEditTickerModal = showEditTickerModal;
-window.showDeleteTickerModal = showDeleteTickerModal;
+// Note: showDeleteTickerModal removed - not needed (using confirmDeleteTicker directly)
 window.saveTicker = saveTicker;
 window.updateTicker = updateTicker;
 window.confirmDeleteTicker = confirmDeleteTicker;
@@ -1804,11 +1783,7 @@ window.loadCurrenciesData = loadCurrenciesData;
 window.updateActiveTradesField = updateActiveTradesField;
 window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
 window.restoreTickersSectionState = restoreTickersSectionState;
-window.showAddTickerModal = showAddTickerModal;
-window.showEditTickerModal = showEditTickerModal;
-window.showTickerModal = showTickerModal;
-window.saveTicker = saveTicker;
-window.updateTicker = updateTicker;
+// Note: saveTicker already exported above
 window.clearTickersCache = clearTickersCache;
 window.loadTickersData = loadTickersData;
 window.loadColorsAndApplyToHeaders = loadColorsAndApplyToHeaders;
@@ -1818,7 +1793,7 @@ window.toggleSection = toggleSection;
 window.toggleTickersSection = toggleTickersSection;
 window.showAddTickerModal = showAddTickerModal;
 window.showEditTickerModal = showEditTickerModal;
-window.saveTickerData = saveTickerData;
+// Note: saveTickerData removed - not needed (using saveTicker directly)
 window.performTickerCancellation = performTickerCancellation;
 window.checkLinkedItemsBeforeCancelTicker = checkLinkedItemsBeforeCancelTicker;
 window.getTickerSymbol = getTickerSymbol;
@@ -2180,158 +2155,16 @@ function showEditTickerModal(tickerId) {
  * שמירת טיקר
  * Handles both add and edit modes
  */
-async function saveTicker() {
-    window.Logger.debug('saveTicker called', { page: 'tickers' });
-    
-    try {
-        // Collect form data
-        const form = document.getElementById('tickersModalForm');
-        if (!form) {
-            throw new Error('Ticker form not found');
-        }
-        
-        const formData = new FormData(form);
-        const tickerData = {
-            symbol: formData.get('tickerSymbol'),
-            name: formData.get('tickerName'),
-            type: formData.get('tickerType'),
-            exchange: formData.get('tickerExchange'),
-            currency: formData.get('tickerCurrency'),
-            status: formData.get('tickerStatus'),
-            notes: formData.get('tickerNotes')
-        };
-        
-        // Handle file upload if present
-        const logoFile = formData.get('tickerLogo');
-        if (logoFile && logoFile.size > 0) {
-            tickerData.logo = logoFile;
-        }
-        
-        // Validate data
-        if (!window.validateEntityForm) {
-            throw new Error('Validation system not available');
-        }
-        
-        const isValid = window.validateEntityForm('tickersModalForm', {
-            tickerSymbol: { required: true, minLength: 1, maxLength: 10 },
-            tickerName: { required: true, minLength: 2, maxLength: 100 },
-            tickerType: { required: true },
-            tickerExchange: { required: true },
-            tickerCurrency: { required: true },
-            tickerStatus: { required: true },
-            tickerNotes: { required: false, maxLength: 500 }
-        });
-        
-        if (!isValid) {
-            window.Logger.warn('Ticker validation failed', { page: 'tickers' });
-            return;
-        }
-        
-        // Determine if this is add or edit
-        const isEdit = form.dataset.mode === 'edit';
-        const tickerId = form.dataset.tickerId;
-        
-        // Prepare API call
-        const url = isEdit ? `/api/tickers/${tickerId}` : '/api/tickers';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        // Send to API
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(tickerData)
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        
-        // Handle success
-        if (window.showNotification) {
-            const message = isEdit ? 'טיקר עודכן בהצלחה' : 'טיקר נוסף בהצלחה';
-            window.showNotification(message, 'success', 'business');
-        }
-        
-        // Close modal
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.hideModal('tickersModal');
-        }
-        
-        // Refresh data
-        if (window.loadTickersData) {
-            window.loadTickersData();
-        }
-        
-        window.Logger.info('Ticker saved successfully', { tickerId: result.id, page: 'tickers' });
-        
-    } catch (error) {
-        window.Logger.error('Error saving ticker', { error: error.message, page: 'tickers' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה בשמירת הטיקר', 'error', 'system');
-        }
-    }
-}
+// REMOVED: Duplicate saveTicker function - using ModalManagerV2 automatic CRUD handling
 
 /**
  * מחיקת טיקר
  * Includes linked items check
  */
-async function deleteTicker(tickerId) {
-    window.Logger.debug('deleteTicker called', { tickerId, page: 'tickers' });
-    
-    try {
-        // Check linked items first
-        if (window.checkLinkedItemsBeforeAction) {
-            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('ticker', tickerId, 'delete');
-            if (hasLinkedItems) {
-                window.Logger.info('Ticker has linked items, deletion cancelled', { tickerId, page: 'tickers' });
-                return;
-            }
-        }
-        
-        // Confirm deletion
-        if (!confirm('האם אתה בטוח שברצונך למחוק את הטיקר?')) {
-            return;
-        }
-        
-        // Send delete request
-        const response = await fetch(`/api/tickers/${tickerId}`, {
-            method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        // Handle success
-        if (window.showNotification) {
-            window.showNotification('טיקר נמחק בהצלחה', 'success', 'business');
-        }
-        
-        // Refresh data
-        if (window.loadTickersData) {
-            window.loadTickersData();
-        }
-        
-        window.Logger.info('Ticker deleted successfully', { tickerId, page: 'tickers' });
-        
-    } catch (error) {
-        window.Logger.error('Error deleting ticker', { error: error.message, tickerId, page: 'tickers' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה במחיקת הטיקר', 'error', 'system');
-        }
-    }
-}
+// REMOVED: Duplicate deleteTicker function - using confirmDeleteTicker instead
 
 // Export functions to window for global access
 window.showAddTickerModal = showAddTickerModal;
 window.showEditTickerModal = showEditTickerModal;
-window.saveTicker = saveTicker;
-window.deleteTicker = deleteTicker;
+// Note: saveTicker and deleteTicker removed - using ModalManagerV2 and confirmDeleteTicker instead
 

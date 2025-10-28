@@ -408,6 +408,12 @@ const PAGE_CONFIGS = {
                 if (typeof window.loadExecutionsData === 'function') {
                     await window.loadExecutionsData();
                 }
+                
+                // Initialize import modal
+                if (typeof window.initializeImportUserDataModal === 'function') {
+                    window.Logger.info('📥 Initializing Import User Data Modal...', { page: "page-initialization-configs" });
+                    window.initializeImportUserDataModal();
+                }
             }
         ]
     },

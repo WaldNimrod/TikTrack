@@ -582,6 +582,11 @@ async function updateTradesTable(trades) {
 
 // פונקציות נוספות
 
+/**
+ * View ticker details for a specific ticker ID
+ * @param {number} tickerId - The ticker ID to view details for
+ * @returns {void}
+ */
 function viewTickerDetails(tickerId) {
   try {
   // צפייה בפרטי טיקר באמצעות מודל פרטי ישות
@@ -600,6 +605,11 @@ function viewTickerDetails(tickerId) {
   }
 }
 
+/**
+ * View account details for a specific account ID
+ * @param {number} accountId - The account ID to view details for
+ * @returns {void}
+ */
 function viewAccountDetails(accountId) {
   try {
     // צפייה בפרטי חשבון מסחר באמצעות מודל פרטי ישות
@@ -618,6 +628,11 @@ function viewAccountDetails(accountId) {
   }
 }
 
+/**
+ * View trade plan details for a specific trade plan ID
+ * @param {number} tradePlanId - The trade plan ID to view details for
+ * @returns {void}
+ */
 function viewTradePlanDetails(tradePlanId) {
   try {
   // צפייה בפרטי תוכנית טרייד באמצעות מודל פרטי ישות
@@ -636,6 +651,11 @@ function viewTradePlanDetails(tradePlanId) {
   }
 }
 
+/**
+ * Edit trade record for a specific trade ID
+ * @param {number} tradeId - The trade ID to edit
+ * @returns {void}
+ */
 function editTradeRecord(tradeId) {
   try {
   // עריכת טרייד
@@ -935,6 +955,10 @@ function addEditImportantNote() {
   }
 }
 
+/**
+ * Add edit reminder functionality (placeholder)
+ * @returns {void}
+ */
 function addEditReminder() {
   try {
         if (typeof window.showNotification === 'function') {
@@ -1722,6 +1746,10 @@ function confirmDeleteTrade(tradeId) {
 }
 
 // Detailed Log Functions for Trades Page
+/**
+ * Generate detailed log for trades page
+ * @returns {string} JSON string of detailed log data
+ */
 function generateDetailedLog() {
     try {
         const logData = {

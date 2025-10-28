@@ -290,6 +290,10 @@ function enableFormFields() {
   }
 }
 
+/**
+ * Disable form fields for trade plan creation
+ * @returns {void}
+ */
 function disableFormFields() {
   try {
     const formFields = [
@@ -311,6 +315,10 @@ function disableFormFields() {
   }
 }
 
+/**
+ * Enable edit form fields wrapper
+ * @returns {void}
+ */
 function enableEditFieldsWrapper() {
   try {
     const formFields = [
@@ -332,6 +340,10 @@ function enableEditFieldsWrapper() {
   }
 }
 
+/**
+ * Disable edit form fields
+ * @returns {void}
+ */
 function disableEditFields() {
   try {
     const formFields = [
@@ -589,6 +601,10 @@ async function displayEditTickerInfo(ticker) {
   }
 }
 
+/**
+ * Hide edit ticker information section
+ * @returns {void}
+ */
 function hideEditTickerInfo() {
   try {
     const tickerInfo = document.getElementById('editTickerInfo');
@@ -1110,6 +1126,10 @@ function addEditCondition() {
   }
 }
 
+/**
+ * Add edit reason functionality (placeholder)
+ * @returns {void}
+ */
 function addEditReason() {
   try {
     if (typeof window.showNotification === 'function') {
@@ -1123,6 +1143,10 @@ function addEditReason() {
   }
 }
 
+/**
+ * Add edit important note functionality (placeholder)
+ * @returns {void}
+ */
 function addEditImportantNote() {
   try {
     if (typeof window.showNotification === 'function') {
@@ -1136,6 +1160,10 @@ function addEditImportantNote() {
   }
 }
 
+/**
+ * Add edit reminder functionality (placeholder)
+ * @returns {void}
+ */
 function addEditReminder() {
   try {
     if (typeof window.showNotification === 'function') {
@@ -2384,7 +2412,4 @@ async function deleteTradePlan(tradePlanId) {
 }
 
 // Export functions to window for global access
-window.showAddTradePlanModal = showAddTradePlanModal;
-window.showEditTradePlanModal = showEditTradePlanModal;
-window.saveTradePlan = saveTradePlan;
-window.deleteTradePlan = deleteTradePlan;
+// Note: saveTradePlan already exported above

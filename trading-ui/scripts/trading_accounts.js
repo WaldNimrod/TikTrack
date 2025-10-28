@@ -2504,10 +2504,7 @@ window.showTradingAccountDetails = showTradingAccountDetails;
 window.sortTable = sortTable;
 window.generateDetailedLog = generateDetailedLog;
 window.getTradingAccounts = getTradingAccounts;
-window.showAddTradingAccountModal = showAddTradingAccountModal;
-window.showEditTradingAccountModal = showEditTradingAccountModal;
-window.saveTradingAccount = saveTradingAccount;
-window.deleteTradingAccount = deleteTradingAccount;
+// Note: saveTradingAccount already exported above
 
 // סיום הקובץ
 window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "trading_accounts" });

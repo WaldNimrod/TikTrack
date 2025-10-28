@@ -49,18 +49,20 @@ class Logger {
         if (Logger._debugMode === null) {
             Logger._debugMode = window.location.hostname === 'localhost' || 
                                 window.location.hostname === '127.0.0.1' ||
+                                window.location.hostname === '0.0.0.0' ||
                                 window.location.search.includes('debug=true') ||
-                                window.location.search.includes('dev=true');
+                                window.location.search.includes('dev=true') ||
+                                window.location.port === '8080'; // Development server port
         }
         return Logger._debugMode;
     }
 
     constructor() {
         this.initialized = false;
-        this.currentLevel = Logger.LogLevel.INFO;
+        this.currentLevel = Logger.LogLevel.WARN; // הפחתת רעש - רק WARN ומעלה
         this.pendingLogs = [];
-        this.batchSize = 10;
-        this.batchTimeout = 5000; // 5 seconds
+        this.batchSize = 50; // הגדלת batch size להפחתת בקשות
+        this.batchTimeout = 10000; // 10 seconds - הפחתת תדירות
         this.flushTimeout = null;
         this.maxRetries = 3;
         this.retryDelay = 1000;

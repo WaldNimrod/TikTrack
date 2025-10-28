@@ -347,7 +347,7 @@ class LazyLoader {
         const highPrefs = this.classifier.getPreferencesByClassification('high');
         this.loadingStats.high.total = highPrefs.length;
         
-        window.Logger.info(`⚡ Loading ${highPrefs.length} high priority preferences...`, { page: "preferences-lazy-loader" });
+        window.Logger.debug(`⚡ Loading ${highPrefs.length} high priority preferences...`, { page: "preferences-lazy-loader" });
         
         // Load in batches to avoid overwhelming the server
         const batchSize = 5;
@@ -369,7 +369,7 @@ class LazyLoader {
             await new Promise(resolve => setTimeout(resolve, 50));
         }
         
-        window.Logger.info(`✅ Loaded ${this.loadingStats.high.loaded}/${highPrefs.length} high priority preferences`, { page: "preferences-lazy-loader" });
+        window.Logger.debug(`✅ Loaded ${this.loadingStats.high.loaded}/${highPrefs.length} high priority preferences`, { page: "preferences-lazy-loader" });
     }
     
     /**
@@ -381,7 +381,7 @@ class LazyLoader {
         const mediumPrefs = this.classifier.getPreferencesByClassification('medium');
         this.loadingStats.medium.total = mediumPrefs.length;
         
-        window.Logger.info(`📊 Loading ${mediumPrefs.length} medium priority preferences...`, { page: "preferences-lazy-loader" });
+        window.Logger.debug(`📊 Loading ${mediumPrefs.length} medium priority preferences...`, { page: "preferences-lazy-loader" });
         
         // Load in smaller batches
         const batchSize = 3;
@@ -403,7 +403,7 @@ class LazyLoader {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
         
-        window.Logger.info(`✅ Loaded ${this.loadingStats.medium.loaded}/${mediumPrefs.length} medium priority preferences`, { page: "preferences-lazy-loader" });
+        window.Logger.debug(`✅ Loaded ${this.loadingStats.medium.loaded}/${mediumPrefs.length} medium priority preferences`, { page: "preferences-lazy-loader" });
     }
     
     /**
@@ -415,7 +415,7 @@ class LazyLoader {
         const lowPrefs = this.classifier.getPreferencesByClassification('low');
         this.loadingStats.low.total = lowPrefs.length;
         
-        window.Logger.info(`🐌 Loading ${lowPrefs.length} low priority preferences in background...`, { page: "preferences-lazy-loader" });
+        window.Logger.debug(`🐌 Loading ${lowPrefs.length} low priority preferences in background...`, { page: "preferences-lazy-loader" });
         
         // Load one by one with longer delays
         for (const prefName of lowPrefs) {
@@ -431,7 +431,7 @@ class LazyLoader {
             await new Promise(resolve => setTimeout(resolve, 200));
         }
         
-        window.Logger.info(`✅ Loaded ${this.loadingStats.low.loaded}/${lowPrefs.length} low priority preferences`, { page: "preferences-lazy-loader" });
+        window.Logger.debug(`✅ Loaded ${this.loadingStats.low.loaded}/${lowPrefs.length} low priority preferences`, { page: "preferences-lazy-loader" });
     }
     
     /**
@@ -479,10 +479,10 @@ class LazyLoader {
      * @returns {Promise<any>} Preference value
      */
     async loadOnDemand(preferenceName, userId = 1, profileId = 3) {
-        window.Logger.info(`🎯 Loading preference on demand: ${preferenceName}`, { page: "preferences-lazy-loader" });
+        window.Logger.debug(`🎯 Loading preference on demand: ${preferenceName}`, { page: "preferences-lazy-loader" });
         
         const classification = this.classifier.classify(preferenceName);
-        window.Logger.info(`📊 Classification: ${classification}`, { page: "preferences-lazy-loader" });
+        window.Logger.debug(`📊 Classification: ${classification}`, { page: "preferences-lazy-loader" });
         
         return await this.loadSinglePreference(preferenceName, userId, profileId);
     }

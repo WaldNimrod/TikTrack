@@ -25,10 +25,23 @@ let analysisResults = null;
 let previewData = null;
 
 /**
+ * Initialize import user data modal - called by unified system
+ */
+window.initializeImportUserDataModal = function() {
+    window.Logger.info('[Import Modal] Initializing import modal', { page: 'import-user-data' });
+    
+    // Setup event listeners once
+    setupImportModalEventListeners();
+    
+    // Load accounts
+    loadAccounts();
+};
+
+/**
  * Open import user data modal
  */
-function openImportUserDataModal() {
-    console.log('Opening import user data modal...');
+async function openImportUserDataModal() {
+    window.Logger.info('[Import Modal] Opening import modal', { page: 'import-user-data' });
     
     // Reset state
     resetImportModal();
@@ -39,6 +52,12 @@ function openImportUserDataModal() {
         modal.style.display = 'block';
         modal.classList.add('show');
         modal.setAttribute('aria-hidden', 'false');
+        
+        // Setup event listeners now that modal is visible
+        setupImportModalEventListeners();
+        
+        // Load accounts
+        await loadAccounts();
     }
     
     // Initialize step 1
@@ -49,7 +68,7 @@ function openImportUserDataModal() {
  * Close import user data modal
  */
 function closeImportUserDataModal() {
-    console.log('Closing import user data modal...');
+    window.Logger.info('[Import Modal] Closing import modal', { page: 'import-user-data' });
     
     // Hide modal
     const modal = document.getElementById('importUserDataModal');
@@ -102,6 +121,12 @@ function resetImportModal() {
         dropZone.style.display = 'block';
     }
     
+    // Reset event listener flags
+    const elementsWithListeners = document.querySelectorAll('[data-listeners-setup]');
+    elementsWithListeners.forEach(element => {
+        element.removeAttribute('data-listeners-setup');
+    });
+    
     // Reset analyze button
     updateAnalyzeButton();
 }
@@ -110,7 +135,7 @@ function resetImportModal() {
  * Go to specific step
  */
 function goToStep(step) {
-    console.log(`Going to step ${step}`);
+    window.Logger.info('[Import Modal] Navigating to step', { step, page: 'import-user-data' });
     currentStep = step;
     
     // Update step indicators
@@ -184,25 +209,6 @@ function showStepContent(step) {
             stepContent.style.display = 'block';
         }
     }
-    
-    // Load step-specific content
-    switch(step) {
-        case 1:
-            loadStep1Content();
-            break;
-        case 2:
-            loadStep2Content();
-            break;
-        case 3:
-            loadStep3Content();
-            break;
-        case 4:
-            loadStep4Content();
-            break;
-        case 5:
-            loadStep5Content();
-            break;
-    }
 }
 
 /**
@@ -210,18 +216,28 @@ function showStepContent(step) {
  */
 function loadStep1Content() {
     // The HTML content is already in the DOM, just need to load accounts
-    setupStep1EventListeners();
+    // Event listeners are already set up during initialization
     loadAccounts();
 }
 
 /**
- * Setup event listeners for step 1
+ * Setup event listeners for import modal - called once during initialization
  */
-function setupStep1EventListeners() {
+function setupImportModalEventListeners() {
+    window.Logger.debug('[Import Modal] Setting up import modal event listeners', { page: 'import-user-data' });
+    
+    // Check if already set up
+    const modal = document.getElementById('importUserDataModal');
+    if (modal && modal.hasAttribute('data-listeners-setup')) {
+        window.Logger.debug('[Import Modal] Event listeners already set up', { page: 'import-user-data' });
+        return;
+    }
+    
     // File input
     const fileInput = document.getElementById('fileInput');
     if (fileInput) {
         fileInput.addEventListener('change', handleFileSelect);
+        window.Logger.debug('[Import Modal] File input event listener added', { page: 'import-user-data' });
     }
     
     // Drop zone
@@ -230,25 +246,43 @@ function setupStep1EventListeners() {
         dropZone.addEventListener('click', () => fileInput?.click());
         dropZone.addEventListener('dragover', handleDragOver);
         dropZone.addEventListener('drop', handleFileDrop);
+        window.Logger.debug('[Import Modal] Drop zone event listeners added', { page: 'import-user-data' });
     }
     
     // Account select
     const accountSelect = document.getElementById('accountSelect');
+    window.Logger.debug('[Import Modal] Account select element found', { 
+        exists: !!accountSelect, 
+        id: accountSelect?.id,
+        page: 'import-user-data' 
+    });
     if (accountSelect) {
         accountSelect.addEventListener('change', handleAccountSelect);
+        window.Logger.info('[Import Modal] Account select event listener added successfully', { page: 'import-user-data' });
+    } else {
+        window.Logger.error('[Import Modal] Account select element not found!', { page: 'import-user-data' });
     }
     
     // Connector select
     const connectorSelect = document.getElementById('connectorSelect');
     if (connectorSelect) {
         connectorSelect.addEventListener('change', handleConnectorSelect);
+        window.Logger.debug('[Import Modal] Connector select event listener added', { page: 'import-user-data' });
     }
     
     // Continue button
     const continueBtn = document.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
         continueBtn.addEventListener('click', analyzeFile);
+        window.Logger.debug('[Import Modal] Continue button event listener added', { page: 'import-user-data' });
     }
+    
+    // Mark as set up
+    if (modal) {
+        modal.setAttribute('data-listeners-setup', 'true');
+    }
+    
+    window.Logger.info('[Import Modal] All event listeners set up successfully', { page: 'import-user-data' });
 }
 
 /**
@@ -314,7 +348,7 @@ function loadConfirmationData() {
  */
 function displayPreviewData(data) {
     // TODO: Implement preview data display
-    console.log('Displaying preview data:', data);
+    window.Logger.debug('[Import Modal] Displaying preview data', { data, page: 'import-user-data' });
 }
 
 /**
@@ -322,7 +356,7 @@ function displayPreviewData(data) {
  */
 function displayConfirmationData(analysisResults, previewData) {
     // TODO: Implement confirmation data display
-    console.log('Displaying confirmation data:', { analysisResults, previewData });
+    window.Logger.debug('[Import Modal] Displaying confirmation data', { analysisResults, previewData, page: 'import-user-data' });
 }
 
 /**
@@ -335,7 +369,7 @@ function loadProblemResolution() {
     }
     
     fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
-        method: 'POST'
+        method: 'GET'
     })
     .then(response => response.json())
     .then(data => {
@@ -347,7 +381,7 @@ function loadProblemResolution() {
         }
     })
     .catch(error => {
-        console.error('Problem resolution error:', error);
+        window.Logger.error('Problem resolution error:', error);
         showNotification('שגיאה בטעינת נתוני בעיות', 'error');
     });
 }
@@ -466,7 +500,7 @@ function handleFileSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
     
-    console.log('File selected:', file.name, file.size);
+    window.Logger.info('[Import Modal] File selected', { fileName: file.name, fileSize: file.size, page: 'import-user-data' });
     selectedFile = file;
     
     // Update UI using existing HTML structure
@@ -485,9 +519,9 @@ function handleFileSelect(event) {
             dropZone.style.display = 'none';
         }
         
-        console.log('File info updated in UI');
+        window.Logger.debug('[Import Modal] File info updated in UI', { page: 'import-user-data' });
         } else {
-        console.error('File info elements not found:', { fileInfo, fileName, fileSize });
+        window.Logger.error('File info elements not found:', { fileInfo, fileName, fileSize });
     }
     
     // Enable analyze button if account is also selected
@@ -500,15 +534,38 @@ function handleFileSelect(event) {
 function updateAnalyzeButton() {
     const continueBtn = document.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
-        if (selectedFile && selectedAccount && selectedConnector) {
+        // Check if all required fields are filled
+        const allFieldsFilled = selectedFile && selectedAccount && selectedConnector;
+        
+        // Additional validation - check actual DOM values
+        const connectorSelect = document.getElementById('connectorSelect');
+        const accountSelect = document.getElementById('accountSelect');
+        
+        const connectorValue = connectorSelect?.value;
+        const accountValue = accountSelect?.value;
+        
+        window.Logger.debug('[Import Modal] Button state check', { 
+            selectedFile: !!selectedFile,
+            selectedAccount: !!selectedAccount,
+            selectedConnector: !!selectedConnector,
+            connectorValue: connectorValue,
+            accountValue: accountValue,
+            allFieldsFilled,
+            page: 'import-user-data'
+        });
+        
+        if (allFieldsFilled) {
             continueBtn.disabled = false;
-            console.log('Analyze button enabled');
+            window.Logger.info('[Import Modal] Analyze button enabled', { page: 'import-user-data' });
         } else {
             continueBtn.disabled = true;
-            console.log('Analyze button disabled - missing:', { 
+            window.Logger.warn('[Import Modal] Analyze button disabled - missing requirements', { 
                 file: !!selectedFile, 
                 account: !!selectedAccount,
-                connector: !!selectedConnector
+                connector: !!selectedConnector,
+                connectorValue: connectorValue,
+                accountValue: accountValue,
+                page: 'import-user-data'
             });
         }
     }
@@ -529,7 +586,7 @@ function formatFileSize(bytes) {
  * Reset file selection
  */
 function resetFile() {
-    console.log('Resetting file selection');
+    window.Logger.debug('[Import Modal] Resetting file selection', { page: 'import-user-data' });
     selectedFile = null;
     
     // Reset file input
@@ -557,8 +614,15 @@ function resetFile() {
  * Handle account selection
  */
 function handleAccountSelect(event) {
+    window.Logger.info('[Import Modal] handleAccountSelect called', { 
+        event: event.type, 
+        target: event.target?.id,
+        value: event.target?.value,
+        page: 'import-user-data' 
+    });
+    
     const accountId = event.target.value;
-    console.log('Account selected:', accountId);
+    window.Logger.info('[Import Modal] Account selected', { accountId, page: 'import-user-data' });
     
     if (!accountId) {
         selectedAccount = null;
@@ -593,57 +657,191 @@ function handleAccountSelect(event) {
  */
 function handleConnectorSelect(event) {
     selectedConnector = event.target.value;
-    console.log('Connector selected:', selectedConnector);
+    window.Logger.info('[Import Modal] Connector selected', { connector: selectedConnector, page: 'import-user-data' });
+    
+    // Validate connector selection using central validation system
+    validateConnectorSelection();
     updateAnalyzeButton();
+}
+
+/**
+ * Validate connector selection using central validation system
+ */
+function validateConnectorSelection() {
+    const connectorSelect = document.getElementById('connectorSelect');
+    if (!connectorSelect) return;
+    
+    // Use central validation system
+    const validationResult = window.validateSelectField(connectorSelect, {
+        required: true,
+        customValidation: (value) => {
+            if (!value || value === '') {
+                return 'חובה לבחור ספק נתונים';
+            }
+            return true;
+        }
+    });
+    
+    if (validationResult === true) {
+        window.Logger.debug('[Import Modal] Connector validation passed', { connector: selectedConnector, page: 'import-user-data' });
+        } else {
+        window.Logger.warn('[Import Modal] Connector validation failed', { error: validationResult, page: 'import-user-data' });
+    }
+}
+
+/**
+ * Validate all required fields before proceeding
+ */
+function validateAllRequiredFields() {
+    let isValid = true;
+    
+    // Validate connector selection using central validation system
+    const connectorSelect = document.getElementById('connectorSelect');
+    if (connectorSelect) {
+        const connectorValidation = window.validateSelectField(connectorSelect, {
+            required: true,
+            customValidation: (value) => {
+                if (!value || value === '') {
+                    return 'חובה לבחור ספק נתונים';
+                }
+                return true;
+            }
+        });
+        
+        if (connectorValidation !== true) {
+            isValid = false;
+            window.Logger.warn('[Import Modal] Connector validation failed', { error: connectorValidation, page: 'import-user-data' });
+            showNotification('שגיאה', connectorValidation, 'error');
+        }
+    }
+    
+    // Validate file selection
+    if (!selectedFile) {
+        isValid = false;
+        window.Logger.warn('[Import Modal] No file selected', { page: 'import-user-data' });
+        showNotification('שגיאה', 'חובה לבחור קובץ', 'error');
+    }
+    
+    // Validate account selection using central validation system
+    const accountSelect = document.getElementById('accountSelect');
+    if (accountSelect) {
+        const accountValidation = window.validateSelectField(accountSelect, {
+            required: true,
+            customValidation: (value) => {
+                if (!value || value === '') {
+                    return 'חובה לבחור חשבון מסחר';
+                }
+                return true;
+            }
+        });
+        
+        if (accountValidation !== true) {
+            isValid = false;
+            window.Logger.warn('[Import Modal] Account validation failed', { error: accountValidation, page: 'import-user-data' });
+            showNotification('שגיאה', accountValidation, 'error');
+        }
+    } else {
+        isValid = false;
+        window.Logger.error('[Import Modal] Account select element not found for validation', { page: 'import-user-data' });
+        showNotification('שגיאה', 'שדה חשבון מסחר לא נמצא', 'error');
+    }
+    
+    // Additional validation - check if selectedAccount variable is set
+    if (!selectedAccount) {
+        isValid = false;
+        window.Logger.warn('[Import Modal] selectedAccount variable not set', { 
+            selectedAccount, 
+            accountSelectValue: accountSelect?.value,
+            page: 'import-user-data' 
+        });
+        showNotification('שגיאה', 'חובה לבחור חשבון מסחר', 'error');
+    }
+    
+    return isValid;
 }
 
 /**
  * Load accounts from API
  */
-function loadAccounts() {
+async function loadAccounts() {
+    window.Logger.debug('[Import Modal] Loading accounts', { page: 'import-user-data' });
+    
     // Use the existing SelectPopulatorService
     if (window.SelectPopulatorService) {
-        window.SelectPopulatorService.populateAccountsSelect('accountSelect', {
-            includeEmpty: true,
-            emptyText: 'בחר חשבון מסחר...',
-            filterFn: (account) => account.status === 'open'
-        });
-    } else {
-        // Fallback to direct API call
-        fetch('/api/trading-accounts/')
-            .then(response => response.json())
-            .then(data => {
-                const accounts = data.data || data || [];
-                const openAccounts = accounts.filter(account => account.status === 'open');
-                
-                const accountSelect = document.getElementById('accountSelect');
-                if (accountSelect) {
-                    accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
-                    openAccounts.forEach(account => {
-                        const option = document.createElement('option');
-                        option.value = account.id;
-                        option.textContent = account.name;
-                        accountSelect.appendChild(option);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error loading accounts:', error);
-                showNotification('שגיאה בטעינת חשבונות', 'error');
+        window.Logger.debug('[Import Modal] Using SelectPopulatorService', { page: 'import-user-data' });
+        try {
+            await window.SelectPopulatorService.populateAccountsSelect('accountSelect', {
+                includeEmpty: true,
+                emptyText: 'בחר חשבון מסחר...',
+                filterFn: (account) => account.status === 'open'
             });
+            window.Logger.info('[Import Modal] Accounts loaded successfully', { page: 'import-user-data' });
+        } catch (error) {
+            window.Logger.error('[Import Modal] Error loading accounts with SelectPopulatorService', { error: error.message, page: 'import-user-data' });
+            // Fallback to direct API call
+            await loadAccountsFallback();
+        }
+    } else {
+        window.Logger.warn('[Import Modal] SelectPopulatorService not available, using fallback', { page: 'import-user-data' });
+        // Fallback to direct API call
+        await loadAccountsFallback();
     }
+}
+
+/**
+ * Fallback method to load accounts directly
+ */
+function loadAccountsFallback() {
+    window.Logger.debug('[Import Modal] Loading accounts via fallback method', { page: 'import-user-data' });
+    
+    fetch('/api/trading-accounts/')
+        .then(response => response.json())
+        .then(data => {
+            const accounts = data.data || data || [];
+            const openAccounts = accounts.filter(account => account.status === 'open');
+            
+            const accountSelect = document.getElementById('accountSelect');
+            if (accountSelect) {
+                accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
+                openAccounts.forEach(account => {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = account.name;
+                    accountSelect.appendChild(option);
+                });
+                window.Logger.info('[Import Modal] Accounts loaded via fallback', { count: openAccounts.length, page: 'import-user-data' });
+            }
+        })
+        .catch(error => {
+            window.Logger.error('[Import Modal] Error loading accounts via fallback', { error: error.message, page: 'import-user-data' });
+            showNotification('שגיאה בטעינת חשבונות', 'error');
+        });
 }
 
 /**
  * Analyze file
  */
 function analyzeFile() {
-    if (!selectedFile || !selectedAccount || !selectedConnector) {
-        showNotification('נא לבחור קובץ, חשבון מסחר וספק נתונים', 'error');
+    // Validate all required fields using central validation system
+    if (!validateAllRequiredFields()) {
+        window.Logger.warn('[Import Modal] Cannot proceed - validation failed', { page: 'import-user-data' });
         return;
     }
     
-    console.log('Analyzing file...');
+    window.Logger.info('[Import Modal] Starting file analysis', { sessionId: currentSessionId, page: 'import-user-data' });
+    
+    // Additional debug - check actual values
+    const connectorSelect = document.getElementById('connectorSelect');
+    const accountSelect = document.getElementById('accountSelect');
+    
+    window.Logger.info('[Import Modal] Analysis starting with values', {
+        selectedFile: selectedFile?.name,
+        selectedAccount: selectedAccount,
+        selectedConnector: selectedConnector,
+        connectorValue: connectorSelect?.value,
+        accountValue: accountSelect?.value,
+        page: 'import-user-data'
+    });
     
     const formData = new FormData();
     formData.append('file', selectedFile);
@@ -657,7 +855,7 @@ function analyzeFile() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            console.log('File analysis completed:', data);
+            window.Logger.info('[Import Modal] File analysis completed', { data, page: 'import-user-data' });
             currentSessionId = data.session_id;
             analysisResults = data.analysis_results;
             
@@ -666,12 +864,12 @@ function analyzeFile() {
             
             // Go to next step
             setTimeout(() => goToStep(3), 1000);
-        } else {
+    } else {
             showNotification(`שגיאה בניתוח הקובץ: ${data.error}`, 'error');
         }
     })
     .catch(error => {
-        console.error('Analysis error:', error);
+        window.Logger.error('Analysis error:', error);
         showNotification('שגיאה בניתוח הקובץ', 'error');
     });
 }
@@ -680,22 +878,35 @@ function analyzeFile() {
  * Display analysis results
  */
 function displayAnalysisResults(results) {
-    console.log('Displaying analysis results:', results);
+    window.Logger.debug('[Import Modal] Displaying analysis results', { results, page: 'import-user-data' });
     
-    // Update the analysis cards
-    const totalRecords = document.getElementById('totalRecords');
-    const validRecords = document.getElementById('validRecords');
-    const invalidRecords = document.getElementById('invalidRecords');
-    const duplicateRecords = document.getElementById('duplicateRecords');
-    const missingTickers = document.getElementById('missingTickers');
-    
-    if (totalRecords) totalRecords.textContent = results.total_records || 0;
-    if (validRecords) validRecords.textContent = results.valid_records || 0;
-    if (invalidRecords) invalidRecords.textContent = results.invalid_records || 0;
-    if (duplicateRecords) duplicateRecords.textContent = results.duplicate_records || 0;
-    if (missingTickers) missingTickers.textContent = results.missing_tickers ? results.missing_tickers.length : 0;
-    
-    console.log('Analysis results displayed successfully');
+    try {
+        // Update the analysis cards
+        const totalRecords = document.getElementById('totalRecords');
+        const validRecords = document.getElementById('validRecords');
+        const invalidRecords = document.getElementById('invalidRecords');
+        const duplicateRecords = document.getElementById('duplicateRecords');
+        const missingTickers = document.getElementById('missingTickers');
+        
+        window.Logger.debug('[Import Modal] Found elements', { 
+            totalRecords: !!totalRecords, 
+            validRecords: !!validRecords, 
+            invalidRecords: !!invalidRecords, 
+            duplicateRecords: !!duplicateRecords, 
+            missingTickers: !!missingTickers,
+            page: 'import-user-data' 
+        });
+        
+        if (totalRecords) totalRecords.textContent = results.total_records || 0;
+        if (validRecords) validRecords.textContent = results.valid_records || 0;
+        if (invalidRecords) invalidRecords.textContent = results.invalid_records || 0;
+        if (duplicateRecords) duplicateRecords.textContent = results.duplicate_records || 0;
+        if (missingTickers) missingTickers.textContent = results.missing_tickers ? results.missing_tickers.length : 0;
+        
+        window.Logger.info('[Import Modal] Analysis results displayed successfully', { page: 'import-user-data' });
+    } catch (error) {
+        window.Logger.error('[Import Modal] Error displaying analysis results', { error: error.message, stack: error.stack, page: 'import-user-data' });
+    }
 }
 
 /**
@@ -708,19 +919,19 @@ function loadProblemResolution() {
     }
     
     fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
-        method: 'POST'
+        method: 'GET'
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             previewData = data.preview_data;
             displayProblemResolutionDetailed(data.preview_data);
-        } else {
+    } else {
             showNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
         }
     })
     .catch(error => {
-        console.error('Problem resolution error:', error);
+        window.Logger.error('Problem resolution error:', error);
         showNotification('שגיאה בטעינת נתוני בעיות', 'error');
     });
 }
@@ -750,7 +961,7 @@ function loadConfirmationData() {
  */
 function displayPreviewData(data) {
     // TODO: Implement preview data display
-    console.log('Displaying preview data:', data);
+    window.Logger.debug('[Import Modal] Displaying preview data', { data, page: 'import-user-data' });
 }
 
 /**
@@ -758,7 +969,7 @@ function displayPreviewData(data) {
  */
 function displayConfirmationData(analysisResults, previewData) {
     // TODO: Implement confirmation data display
-    console.log('Displaying confirmation data:', { analysisResults, previewData });
+    window.Logger.debug('[Import Modal] Displaying confirmation data', { analysisResults, previewData, page: 'import-user-data' });
 }
 
 /**
@@ -893,7 +1104,7 @@ function acceptDuplicate(index, type) {
         }
     })
     .catch(error => {
-        console.error('Accept duplicate error:', error);
+        window.Logger.error('Accept duplicate error:', error);
         showNotification('שגיאה באישור כפילות', 'error');
     });
 }
@@ -925,7 +1136,7 @@ function rejectDuplicate(index, type) {
         }
     })
     .catch(error => {
-        console.error('Reject duplicate error:', error);
+        window.Logger.error('Reject duplicate error:', error);
         showNotification('שגיאה בדחיית כפילות', 'error');
     });
 }
@@ -1001,7 +1212,7 @@ function saveTickerFromModal(symbol, name) {
         }
     })
     .catch(error => {
-        console.error('Add ticker error:', error);
+        window.Logger.error('Add ticker error:', error);
         showNotification('שגיאה בהוספת טיקר', 'error');
     });
 }
@@ -1016,7 +1227,7 @@ function generatePreview() {
     }
     
     fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
-        method: 'POST'
+        method: 'GET'
     })
     .then(response => response.json())
     .then(data => {
@@ -1031,7 +1242,7 @@ function generatePreview() {
         }
     })
     .catch(error => {
-        console.error('Preview error:', error);
+        window.Logger.error('Preview error:', error);
         showNotification('שגיאה ביצירת תצוגה מקדימה', 'error');
     });
 }
@@ -1223,7 +1434,7 @@ function performImport(generateReport = false) {
         }
     })
     .catch(error => {
-        console.error('Import error:', error);
+        window.Logger.error('Import error:', error);
         showNotification('שגיאה בייבוא הנתונים', 'error');
     });
 }
@@ -1248,7 +1459,7 @@ function showNotification(message, type = 'info') {
     if (window.NotificationSystem) {
         window.NotificationSystem.show(message, type);
     } else {
-        console.log(`[${type.toUpperCase()}] ${message}`);
+        window.Logger.info(`[Import Modal] ${message}`, { type, page: 'import-user-data' });
     }
 }
 
@@ -1256,7 +1467,7 @@ function showNotification(message, type = 'info') {
  * Display problem resolution with detailed cards
  */
 function displayProblemResolutionDetailed(data) {
-    console.log('Displaying detailed problem resolution:', data);
+    window.Logger.debug('[Import Modal] Displaying detailed problem resolution', { data, page: 'import-user-data' });
     
     // Clear existing content
     clearProblemSections();
@@ -1465,7 +1676,7 @@ function refreshPreviewData() {
         }
     })
     .catch(error => {
-        console.error('Refresh preview error:', error);
+        window.Logger.error('Refresh preview error:', error);
         showNotification('שגיאה ברענון התצוגה', 'error');
     });
 }

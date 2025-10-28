@@ -88,12 +88,12 @@ const tickersModalConfig = {
             defaultValue: 'USD'
         },
         {
-            type: 'file',
+            type: 'text',
             id: 'tickerLogo',
-            label: 'לוגו החברה',
+            label: 'לוגו החברה (URL)',
             required: false,
-            accept: 'image/*',
-            description: 'העלה תמונת לוגו של החברה (PNG, JPG, SVG)'
+            placeholder: 'https://example.com/logo.png',
+            description: 'קישור לתמונת לוגו של החברה'
         },
         {
             type: 'select',
@@ -156,16 +156,25 @@ const tickersModalConfig = {
 };
 
 // יצירת המודל אם ModalManagerV2 זמין
-if (window.ModalManagerV2) {
-    try {
-        window.ModalManagerV2.createCRUDModal(tickersModalConfig);
-        console.log('✅ Tickers modal created successfully');
-    } catch (error) {
-        console.error('❌ Error creating Tickers modal:', error);
+// יצירת המודל - מחכה ל-DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.ModalManagerV2) {
+        try {
+            window.ModalManagerV2.createCRUDModal(tickersModalConfig);
+            if (window.Logger) {
+                window.Logger.debug('Tickers modal created successfully', { page: 'tickers' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error creating Tickers modal', { error: error.message, page: 'tickers' });
+            }
+        }
+    } else {
+        if (window.Logger) {
+            window.Logger.warn('ModalManagerV2 not available for Tickers modal', { page: 'tickers' });
+        }
     }
-} else {
-    console.warn('⚠️ ModalManagerV2 not available for Tickers modal');
-}
+});
 
 // ייצוא לקונסול (לצורך debug)
 window.tickersModalConfig = tickersModalConfig;

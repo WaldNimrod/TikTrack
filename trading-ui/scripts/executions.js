@@ -2979,9 +2979,7 @@ window.setupModalConfigurations = setupModalConfigurations;
 window.enableAllFields = enableAllFields;
 window.loadExecutionsData = loadExecutionsData;
 window.updateExecutionsTableMain = updateExecutionsTableMain;
-window.clearNewExecutionHighlights = clearNewExecutionHighlights;
-window.saveExecution = saveExecution;
-window.updateExecutionWrapper = updateExecutionWrapper;
+// Note: saveExecution already exported above
 window.initializeExecutionsPage = window.initializeExecutionsPage;
 window.setupModalConfigurations = setupModalConfigurations;
 window.loadTickersWithOpenOrClosedTradesAndPlans = loadTickersWithOpenOrClosedTradesAndPlans;
@@ -3987,7 +3985,4 @@ async function deleteExecution(executionId) {
 }
 
 // Export functions to window for global access
-window.showAddExecutionModal = showAddExecutionModal;
-window.showEditExecutionModal = showEditExecutionModal;
-window.saveExecution = saveExecution;
-window.deleteExecution = deleteExecution;
+// Note: saveExecution already exported above

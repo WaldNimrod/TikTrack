@@ -474,7 +474,7 @@ const PACKAGE_MANIFEST = {
     scripts: [
       {
         file: 'validation-utils.js',
-        globalCheck: 'window.validateRequired',
+        globalCheck: 'window.validateSelectField',
         description: 'כלי ולידציה',
         required: true
       }

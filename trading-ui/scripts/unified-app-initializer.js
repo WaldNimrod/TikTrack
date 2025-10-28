@@ -698,6 +698,15 @@ class UnifiedAppInitializer {
         if (config.requiresTables && this.availableSystems.has('tables')) {
             window.setupSortableHeaders();
         }
+        
+        // Initialize page-specific custom initializers
+        if (config.customInitializers && Array.isArray(config.customInitializers)) {
+            for (const initializer of config.customInitializers) {
+                if (typeof initializer === 'function') {
+                    await initializer(config);
+                }
+            }
+        }
     }
 
     /**

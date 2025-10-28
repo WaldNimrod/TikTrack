@@ -893,7 +893,7 @@ function getItemTypeIcon(type) {
   // ברירת מחדל אם הפונקציה הגלובלית לא זמינה
   const icons = {
     'trade': '<img src="/images/icons/trades.svg" alt="טרייד" class="linked-item-icon-img" width="48" height="48">',
-    'account': '<img src="/images/icons/accounts.svg" alt="חשבון מסחר" class="linked-item-icon-img" width="48" height="48">',
+    'account': '<img src="/images/icons/trading_accounts.svg" alt="חשבון מסחר" class="linked-item-icon-img" width="48" height="48">',
     'ticker': '<img src="/images/icons/tickers.svg" alt="טיקר" class="linked-item-icon-img" width="48" height="48">',
     'alert': '<img src="/images/icons/alerts.svg" alt="התראה" class="linked-item-icon-img" width="48" height="48">',
     'cash_flow': '<img src="/images/icons/cash_flows.svg" alt="תזרים מזומנים" class="linked-item-icon-img" width="48" height="48">',

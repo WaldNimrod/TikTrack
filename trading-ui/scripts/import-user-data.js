@@ -37,6 +37,7 @@ function openImportUserDataModal() {
     if (modal) {
         modal.style.display = 'block';
         modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
     }
     
     // Initialize step 1
@@ -54,6 +55,7 @@ function closeImportUserDataModal() {
     if (modal) {
         modal.style.display = 'none';
         modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
     }
     
     // Reset state
@@ -785,6 +787,7 @@ function openAddTickerModal(symbol) {
         nameInput.value = symbol; // Default name to symbol
         modal.style.display = 'block';
         modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
     } else {
         // Fallback to prompt
         const tickerName = prompt(`הזן שם לטיקר ${symbol}:`, symbol);
@@ -815,6 +818,7 @@ function saveTickerFromModal(symbol, name) {
     if (modal) {
         modal.style.display = 'none';
         modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
     }
     
     // Make API call to add ticker

@@ -44,53 +44,45 @@ class InitSystemCheck {
      * הוספת כפתור בדיקה לראש הדף
      */
     addMonitoringButtonToHeader() {
-        // נחכה שהכותרת תיטען - עם הגבלת ניסיונות
-        let attempts = 0;
-        const maxAttempts = 10; // מקסימום 10 ניסיונות
-        
-        const tryAddButton = () => {
-            attempts++;
+        // נחכה שהרשימה תהיה קיימת
+        const waitForNavList = () => {
             const navList = document.querySelector('.tiktrack-nav-list');
-            
-            if (!navList) {
-                if (attempts < maxAttempts) {
-                    if (window.Logger) { 
-                        window.Logger.warn(`⚠️ Navigation list not found, retrying... (${attempts}/${maxAttempts})`, { page: "init-check" }); 
-                    }
-                    setTimeout(() => tryAddButton(), 1000); // ניסיון כל שנייה
-                    return;
-                } else {
-                    if (window.Logger) { 
-                        window.Logger.warn('⚠️ Navigation list not found after max attempts, skipping button addition', { page: "init-check" }); 
-                    }
-                    return; // לא מנסים יותר
-                }
+            if (navList) {
+                this.addButtonToNavList(navList);
+            } else {
+                setTimeout(waitForNavList, 100);
             }
-
-            // בדיקה אם הכפתור כבר קיים
-            if (document.getElementById('initSystemCheckBtn')) {
-                return;
-            }
-
-            // יצירת כפתור הבדיקה
-            const monitoringButton = document.createElement('li');
-            monitoringButton.className = 'tiktrack-nav-item';
-            monitoringButton.innerHTML = `
-                <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
-                   onclick="initSystemCheck.runPageCheck(event)" 
-                   title="בדיקת מערכת איתחול">
-                    <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
-                </a>
-            `;
-
-            // הוספת הכפתור בסוף הרשימה
-            navList.appendChild(monitoringButton);
-
-            if (window.Logger) { window.Logger.info('✅ Monitoring check button added to header', { page: "init-check" }); }
         };
         
-        // התחלת הניסיונות
-        tryAddButton();
+        waitForNavList();
+    }
+
+    /**
+     * הוספת כפתור לרשימת הניווט
+     */
+    addButtonToNavList(navList) {
+        // בדיקה אם הכפתור כבר קיים
+        if (document.getElementById('initSystemCheckBtn')) {
+            return;
+        }
+
+        // יצירת כפתור הבדיקה
+        const monitoringButton = document.createElement('li');
+        monitoringButton.className = 'tiktrack-nav-item';
+        monitoringButton.innerHTML = `
+            <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
+               onclick="initSystemCheck.runPageCheck(event)" 
+               title="בדיקת מערכת איתחול">
+                <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
+            </a>
+        `;
+
+        // הוספת הכפתור בסוף הרשימה
+        navList.appendChild(monitoringButton);
+
+        if (window.Logger) { 
+            window.Logger.info('✅ Monitoring check button added to header', { page: "init-check" }); 
+        }
     }
 
     /**
@@ -346,13 +338,31 @@ window.copyMonitoringResults = copyMonitoringResults;
 // יצירת instance גלובלי
 const initSystemCheck = new InitSystemCheck();
 
-// אתחול אוטומטי כשהדף נטען
+// אתחול אוטומטי כשהדף נטען - נחכה שהרשימה תהיה קיימת
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        initSystemCheck.init();
+        // נחכה שהרשימה תהיה קיימת
+        const waitForNavList = () => {
+            const navList = document.querySelector('.tiktrack-nav-list');
+            if (navList) {
+                initSystemCheck.init();
+            } else {
+                setTimeout(waitForNavList, 100);
+            }
+        };
+        waitForNavList();
     });
 } else {
-    initSystemCheck.init();
+    // נחכה שהרשימה תהיה קיימת
+    const waitForNavList = () => {
+        const navList = document.querySelector('.tiktrack-nav-list');
+        if (navList) {
+            initSystemCheck.init();
+        } else {
+            setTimeout(waitForNavList, 100);
+        }
+    };
+    waitForNavList();
 }
 
 // ייצוא גלובלי

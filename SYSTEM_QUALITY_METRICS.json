@@ -1,0 +1,196 @@
+{
+  "scan_timestamp": "2025-01-28T21:19:55.000Z",
+  "scan_version": "1.0",
+  "overall_health_score": 78,
+  "total_files_scanned": 140,
+  "scan_duration_minutes": 45,
+  
+  "issues_by_severity": {
+    "critical": 35,
+    "high": 194,
+    "medium": 1167,
+    "low": 2230
+  },
+  
+  "issues_by_category": {
+    "javascript_duplicates": 3626,
+    "css_conflicts": 32,
+    "html_duplicates": 251,
+    "documentation_gaps": 51,
+    "error_handling_gaps": 165,
+    "console_log_statements": 1247,
+    "inline_styles": 17,
+    "unused_css": 3
+  },
+  
+  "issues_by_system": {
+    "scripts_modules": {
+      "total_files": 13,
+      "total_functions": 254,
+      "duplicate_functions": 81,
+      "console_log_statements": 322,
+      "average_score": 75
+    },
+    "scripts_services": {
+      "total_files": 7,
+      "total_functions": 6,
+      "duplicate_functions": 25,
+      "console_log_statements": 12,
+      "average_score": 90
+    },
+    "scripts_core": {
+      "total_files": 50,
+      "total_functions": 488,
+      "duplicate_functions": 3520,
+      "console_log_statements": 913,
+      "average_score": 72
+    },
+    "pages_main": {
+      "total_files": 13,
+      "total_functions": 440,
+      "duplicate_functions": 0,
+      "console_log_statements": 0,
+      "average_score": 82
+    }
+  },
+  
+  "quality_metrics": {
+    "javascript": {
+      "total_functions": 488,
+      "duplicate_functions": 3626,
+      "console_log_statements": 1247,
+      "dead_code": 0,
+      "syntax_errors": 0,
+      "jsdoc_coverage_percentage": 88.41,
+      "error_handling_coverage_percentage": 62.50
+    },
+    "css": {
+      "total_selectors": 256,
+      "duplicate_selectors": 38,
+      "important_declarations": 13,
+      "inline_styles_files": 17,
+      "css_conflicts": 32,
+      "unused_selectors": 3
+    },
+    "html": {
+      "total_pages": 51,
+      "duplicate_scripts": 27,
+      "duplicate_ids": 5,
+      "duplicate_classes": 219,
+      "inline_styles_files": 17,
+      "embedded_javascript": 0
+    }
+  },
+  
+  "page_scores": {
+    "index.js": 50,
+    "trades.js": 85,
+    "executions.js": 70,
+    "alerts.js": 85,
+    "trade_plans.js": 80,
+    "cash_flows.js": 85,
+    "notes.js": 85,
+    "research.js": 95,
+    "tickers.js": 70,
+    "trading_accounts.js": 65,
+    "database.js": 95,
+    "preferences-page.js": 90
+  },
+  
+  "system_scores": {
+    "scripts_modules": 75,
+    "scripts_services": 90,
+    "scripts_core": 72,
+    "pages_main": 82,
+    "css_system": 85,
+    "html_system": 80
+  },
+  
+  "trend_data": {
+    "previous_scan_date": "2025-01-26T00:00:00.000Z",
+    "previous_health_score": 66,
+    "improvement_points": 12,
+    "critical_issues_change": -60,
+    "code_duplication_change": 15,
+    "documentation_improvement": 5,
+    "error_handling_improvement": 8
+  },
+  
+  "critical_duplicates": [
+    {
+      "function_name": "updatePageSummaryStats",
+      "files": ["alerts.js", "cash_flows.js", "trade_plans.js"],
+      "similarity_percentage": 98.6,
+      "priority": "critical"
+    },
+    {
+      "function_name": "generateDetailedLog",
+      "files": ["alerts.js", "trading_accounts.js"],
+      "similarity_percentage": 95.5,
+      "priority": "critical"
+    },
+    {
+      "function_name": "catch",
+      "files": ["alerts.js", "notes.js", "trades.js", "tickers.js", "executions.js"],
+      "similarity_percentage": 99.7,
+      "priority": "critical"
+    }
+  ],
+  
+  "files_with_most_issues": [
+    {
+      "file": "js-map.js",
+      "console_log_count": 126,
+      "duplicate_functions": 43,
+      "jsdoc_coverage": 0,
+      "priority": "critical"
+    },
+    {
+      "file": "init-system-management.js",
+      "console_log_count": 85,
+      "duplicate_functions": 57,
+      "jsdoc_coverage": 0,
+      "priority": "critical"
+    },
+    {
+      "file": "core-systems.js",
+      "console_log_count": 187,
+      "duplicate_functions": 46,
+      "jsdoc_coverage": 0,
+      "priority": "high"
+    },
+    {
+      "file": "import-user-data-old.js",
+      "console_log_count": 79,
+      "duplicate_functions": 157,
+      "jsdoc_coverage": 0,
+      "priority": "high"
+    }
+  ],
+  
+  "recommendations": {
+    "immediate_actions": [
+      "Unify 35 exact duplicate functions",
+      "Remove 1247 console.log statements",
+      "Add error handling to 165 functions"
+    ],
+    "short_term_improvements": [
+      "Fix 32 CSS conflicts",
+      "Remove inline styles from 17 HTML files",
+      "Improve JSDoc coverage for 51 functions"
+    ],
+    "long_term_enhancements": [
+      "Refactor architecture for 20+ files",
+      "Optimize 5 heavy files",
+      "Reduce dependencies between 30+ files"
+    ]
+  },
+  
+  "success_criteria": {
+    "target_health_score": 95,
+    "target_duplication_score": 90,
+    "target_error_handling_score": 90,
+    "target_documentation_score": 95,
+    "target_css_score": 95
+  }
+}

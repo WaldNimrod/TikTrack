@@ -148,17 +148,23 @@ class ImportOrchestrator:
         Returns:
             Dict[str, Any]: Session creation results
         """
+        logger.info(f"🔧 Creating import session for account {trading_account_id}, file: {file_name}")
         try:
             # Detect file format and select connector
+            logger.info("🔍 Detecting file format and connector...")
             connector = self._detect_connector(file_content)
             if not connector:
+                logger.error(f"❌ Unsupported file format. Supported formats: {list(self.connectors.keys())}")
                 return {
                     'success': False,
                     'error': 'Unsupported file format',
                     'supported_formats': list(self.connectors.keys())
                 }
             
+            logger.info(f"✅ Connector detected: {connector.get_provider_name()}")
+            
             # Create import session
+            logger.info("📝 Creating database session...")
             session = ImportSession(
                 trading_account_id=trading_account_id,
                 provider=connector.get_provider_name(),
@@ -168,13 +174,16 @@ class ImportOrchestrator:
             
             self.db_session.add(session)
             self.db_session.commit()
+            logger.info(f"✅ Import session created in database: {session.id}")
             
             # Store file content for processing
+            logger.info("💾 Storing file content and connector info...")
             session.add_summary_data({
                 'file_content': file_content,
                 'connector_type': connector.get_provider_name().lower()
             })
             self.db_session.commit()
+            logger.info("✅ File content stored successfully")
             
             # Create live report for this session
             user_id = 1  # TODO: Get actual user ID from session/auth
@@ -213,6 +222,7 @@ class ImportOrchestrator:
         Returns:
             Dict[str, Any]: Analysis results
         """
+        logger.info(f"🔍 Starting file analysis for session {session_id}")
         try:
             # Get session
             session = self.db_session.query(ImportSession).filter(
@@ -220,24 +230,36 @@ class ImportOrchestrator:
             ).first()
             
             if not session:
+                logger.error(f"❌ Session {session_id} not found")
                 return {'success': False, 'error': 'Session not found'}
+            
+            logger.info(f"✅ Session found: {session.id}, status: {session.status}")
             
             # Get file content and connector
             file_content = session.get_summary_data('file_content')
             connector_type = session.get_summary_data('connector_type')
+            logger.info(f"📄 File content length: {len(file_content) if file_content else 0}, connector: {connector_type}")
+            
             connector = self.connectors.get(connector_type)
             
             if not connector:
+                logger.error(f"❌ Connector {connector_type} not found")
                 return {'success': False, 'error': 'Connector not found'}
             
+            logger.info(f"✅ Connector found: {connector.get_provider_name()}")
+            
             # Parse file
+            logger.info("📊 Parsing file...")
             raw_records = connector.parse_file(file_content, session.file_name)
             session.total_records = len(raw_records)
+            logger.info(f"✅ File parsed: {len(raw_records)} records found")
             
             # Normalize records
+            logger.info("🔄 Normalizing records...")
             normalization_result = self.normalization_service.normalize_records(
                 raw_records, connector
             )
+            logger.info(f"✅ Normalization completed: {len(normalization_result['normalized_records'])} records")
             
             # Validate records
             logger.info(f"🔍 Starting validation for {len(normalization_result['normalized_records'])} records")
@@ -247,10 +269,12 @@ class ImportOrchestrator:
             logger.info(f"📊 Validation result: {validation_result.get('missing_tickers', 'NOT_FOUND')}")
             
             # Detect duplicates
+            logger.info("🔍 Detecting duplicates...")
             duplicate_result = self.duplicate_detection_service.detect_duplicates(
                 validation_result['valid_records'],
                 session.trading_account_id
             )
+            logger.info(f"✅ Duplicate detection completed: {len(duplicate_result['clean_records'])} clean records")
             
             # Prepare analysis results for API response (detailed)
             analysis_results = {
@@ -313,6 +337,8 @@ class ImportOrchestrator:
                 data=analysis_results
             )
             
+            logger.info(f"🎉 Analysis completed successfully. Results: {analysis_results}")
+            
             return {
                 'success': True,
                 'analysis_results': analysis_results,
@@ -320,8 +346,9 @@ class ImportOrchestrator:
             }
             
         except Exception as e:
-            logger.error(f"Failed to analyze file: {str(e)}")
-            session.update_status('failed')
+            logger.error(f"💥 Failed to analyze file: {str(e)}", exc_info=True)
+            if 'session' in locals():
+                session.update_status('failed')
             return {
                 'success': False,
                 'error': str(e)

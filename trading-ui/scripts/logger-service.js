@@ -671,6 +671,87 @@ if (!window.Logger) {
     };
 }
 
+// ===== DETAILED LOG GENERATION FUNCTIONS =====
+// These functions are used across multiple pages for detailed logging
+
+/**
+ * Generate detailed log for any page - Unified function
+ * Creates comprehensive log data including performance, memory, and page-specific stats
+ * 
+ * @function generateDetailedLog
+ * @param {string} pageName - Name of the page (alerts, trading_accounts, etc.)
+ * @param {Object} pageSpecificStats - Page-specific statistics object
+ * @returns {string} JSON string of log data
+ */
+function generateDetailedLog(pageName, pageSpecificStats = {}) {
+    try {
+        const logData = {
+            timestamp: new Date().toISOString(),
+            page: pageName,
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            performance: {
+                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
+            },
+            memory: window.performance.memory ? {
+                used: window.performance.memory.usedJSHeapSize,
+                total: window.performance.memory.totalJSHeapSize,
+                limit: window.performance.memory.jsHeapSizeLimit
+            } : null,
+            pageStats: pageSpecificStats,
+            sections: {
+                topSection: {
+                    visible: !document.getElementById('topSection')?.classList.contains('d-none'),
+                    summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא'
+                },
+                section1: {
+                    visible: !document.getElementById('section1')?.classList.contains('d-none'),
+                    tableRows: document.querySelectorAll('table tbody tr').length,
+                    tableData: document.querySelector('table')?.textContent?.substring(0, 300) || 'לא נמצא'
+                }
+            },
+            tableData: {
+                totalRows: document.querySelectorAll('table tbody tr').length,
+                headers: Array.from(document.querySelectorAll('table thead th')).map(th => th.textContent?.trim()),
+                sortableColumns: document.querySelectorAll('.sortable-header').length,
+                hasData: document.querySelectorAll('table tbody tr').length > 0
+            },
+            filters: {
+                allButton: document.querySelector('button[data-type="all"]') ? 'זמין' : 'לא זמין',
+                activeFilter: document.querySelector('.btn.active')?.textContent || 'לא נמצא'
+            },
+            modals: {
+                addModal: document.querySelector('[id*="add"][id*="Modal"]') ? 'זמין' : 'לא זמין',
+                editModal: document.querySelector('[id*="edit"][id*="Modal"]') ? 'זמין' : 'לא זמין',
+                deleteModal: document.querySelector('[id*="delete"][id*="Modal"]') ? 'זמין' : 'לא זמין'
+            },
+            functions: {
+                showAddModal: typeof window[`showAdd${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Modal`] === 'function' ? 'זמין' : 'לא זמין',
+                editFunction: typeof window[`edit${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`] === 'function' ? 'זמין' : 'לא זמין',
+                deleteFunction: typeof window[`delete${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`] === 'function' ? 'זמין' : 'לא זמין',
+                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין'
+            },
+            errors: window.Logger ? window.Logger.getErrors() : [],
+            warnings: window.Logger ? window.Logger.getWarnings() : []
+        };
+
+        return JSON.stringify(logData, null, 2);
+    } catch (error) {
+        console.error('Error generating detailed log:', error);
+        return JSON.stringify({
+            timestamp: new Date().toISOString(),
+            page: pageName,
+            error: error.message,
+            stack: error.stack
+        }, null, 2);
+    }
+}
+
 // הוספה למערכת האתחול המאוחדת
 if (window.UnifiedInitializationSystem) {
     window.UnifiedInitializationSystem.addCoreSystem('Logger', () => {

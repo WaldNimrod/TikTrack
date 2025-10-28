@@ -1734,38 +1734,8 @@ function updateTradePlansTable(trade_plans) {
  * @returns {void}
  */
 function updatePageSummaryStats() {
-  try {
-    // Using filtered data if available, otherwise all data
-    const dataToUse = window.filteredTradePlansData || window.tradePlansData;
-    
-    // מערכת מאוחדת לסיכום נתונים
-    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
-      const config = window.INFO_SUMMARY_CONFIGS.trade_plans;
-      window.InfoSummarySystem.calculateAndRender(dataToUse, config);
-      
-      // עדכון מספר הרשומות בטבלה
-      const countElement = document.getElementById('designsCount');
-      if (countElement) {
-        countElement.textContent = `${dataToUse.length} רשומות`;
-      }
-    } else {
-    // מערכת סיכום נתונים לא זמינה
-    const summaryStatsElement = document.getElementById('summaryStats');
-    if (summaryStatsElement) {
-      summaryStatsElement.innerHTML = `
-        <div style="color: #dc3545; font-weight: bold;">
-          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-        </div>
-      `;
-    }
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בעדכון סטטיסטיקות סיכום:', error, { page: "trade_plans" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעדכון סטטיסטיקות סיכום', error.message);
-    }
-  }
+  // Use unified function from ui-utils.js
+  window.updatePageSummaryStats('trade_plans', window.tradePlansData, 'designsCount');
 }
 
 /**

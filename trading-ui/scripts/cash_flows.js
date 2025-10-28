@@ -868,33 +868,8 @@ async function renderCashFlowsTable() {
  * @returns {void}
  */
 function updatePageSummaryStats() {
-  try {
-    if (!cashFlowsData) {
-      cashFlowsData = [];
-    }
-
-    // מערכת מאוחדת לסיכום נתונים
-  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
-    const config = window.INFO_SUMMARY_CONFIGS.cash_flows;
-    window.InfoSummarySystem.calculateAndRender(cashFlowsData, config);
-  } else {
-    // מערכת סיכום נתונים לא זמינה
-    const summaryStatsElement = document.getElementById('summaryStats');
-    if (summaryStatsElement) {
-      summaryStatsElement.innerHTML = `
-        <div style="color: #dc3545; font-weight: bold;">
-          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-        </div>
-      `;
-    }
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בעדכון סטטיסטיקות סיכום:', error, { page: "cash_flows" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעדכון סטטיסטיקות סיכום', error.message);
-    }
-  }
+  // Use unified function from ui-utils.js
+  window.updatePageSummaryStats('cash_flows', cashFlowsData);
 }
 
 // פונקציות הועברו ל-translation-utils.js:

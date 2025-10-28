@@ -844,29 +844,8 @@ function updateAlertsTable(alerts) {
  * עדכון סטטיסטיקות סיכום
  */
 function updatePageSummaryStats() {
-  try {
-    // מערכת מאוחדת לסיכום נתונים
-    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
-      const config = window.INFO_SUMMARY_CONFIGS.alerts;
-      window.InfoSummarySystem.calculateAndRender(alertsData, config);
-  } else {
-    // מערכת סיכום נתונים לא זמינה
-    const summaryStatsElement = document.getElementById('summaryStats');
-    if (summaryStatsElement) {
-      summaryStatsElement.innerHTML = `
-        <div style="color: #dc3545; font-weight: bold;">
-          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-        </div>
-      `;
-    }
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בעדכון סטטיסטיקות סיכום:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעדכון סטטיסטיקות סיכום', error.message);
-    }
-  }
+  // Use unified function from ui-utils.js
+  window.updatePageSummaryStats('alerts', alertsData);
 }
 
 
@@ -2696,112 +2675,20 @@ window.generateDetailedLogForAlerts = generateDetailedLogForAlerts;
 
 /**
  * Generate detailed log for alerts page
- * Creates comprehensive log data for debugging
- * 
  * @function generateDetailedLog
  * @returns {string} JSON string of log data
  */
 function generateDetailedLog() {
-    try {
-        const logData = {
-            timestamp: new Date().toISOString(),
-            page: 'alerts',
-            url: window.location.href,
-            userAgent: navigator.userAgent,
-            viewport: {
-                width: window.innerWidth,
-                height: window.innerHeight
-            },
-            performance: {
-                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
-                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
-            },
-            memory: window.performance.memory ? {
-                used: window.performance.memory.usedJSHeapSize,
-                total: window.performance.memory.totalJSHeapSize,
-                limit: window.performance.memory.jsHeapSizeLimit
-            } : null,
-            alertsStats: {
-                totalAlerts: document.getElementById('totalAlerts')?.textContent || 'לא נמצא',
-                activeAlerts: document.getElementById('activeAlerts')?.textContent || 'לא נמצא',
-                newAlerts: document.getElementById('newAlerts')?.textContent || 'לא נמצא',
-                todayAlerts: document.getElementById('todayAlerts')?.textContent || 'לא נמצא',
-                weekAlerts: document.getElementById('weekAlerts')?.textContent || 'לא נמצא'
-            },
-            sections: {
-                topSection: {
-                    title: 'התראות - סקירה כללית',
-                    visible: !document.getElementById('topSection')?.classList.contains('d-none'),
-                    alertsCount: document.querySelectorAll('.alert-card').length,
-                    summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא',
-                    colorDemoVisible: !document.getElementById('alertsColorDemo')?.style.display === 'none'
-                },
-                section1: {
-                    title: 'ניהול התראות',
-                    visible: !document.getElementById('section1')?.classList.contains('d-none'),
-                    tableRows: document.querySelectorAll('#alertsTable tbody tr').length,
-                    tableData: document.querySelector('#alertsContainer')?.textContent?.substring(0, 300) || 'לא נמצא'
-                }
-            },
-            tableData: {
-                totalRows: document.querySelectorAll('#alertsTable tbody tr').length,
-                headers: Array.from(document.querySelectorAll('#alertsTable thead th')).map(th => th.textContent?.trim()),
-                sortableColumns: document.querySelectorAll('.sortable-header').length,
-                hasData: document.querySelectorAll('#alertsTable tbody tr').length > 0
-            },
-            filters: {
-                allButton: document.querySelector('button[data-type="all"]') ? 'זמין' : 'לא זמין',
-                accountButton: document.querySelector('button[data-type="account"]') ? 'זמין' : 'לא זמין',
-                tradeButton: document.querySelector('button[data-type="trade"]') ? 'זמין' : 'לא זמין',
-                tradePlanButton: document.querySelector('button[data-type="trade_plan"]') ? 'זמין' : 'לא זמין',
-                tickerButton: document.querySelector('button[data-type="ticker"]') ? 'זמין' : 'לא זמין',
-                activeFilter: document.querySelector('.btn.active')?.textContent || 'לא נמצא'
-            },
-            modals: {
-                addModal: document.getElementById('addAlertModal') ? 'זמין' : 'לא זמין',
-                editModal: document.getElementById('editAlertModal') ? 'זמין' : 'לא זמין',
-                deleteModal: document.getElementById('deleteAlertModal') ? 'זמין' : 'לא זמין'
-            },
-            functions: {
-                showAddAlertModal: typeof window.showAddAlertModal === 'function' ? 'זמין' : 'לא זמין',
-                editAlert: typeof window.editAlert === 'function' ? 'זמין' : 'לא זמין',
-                deleteAlert: typeof window.deleteAlert === 'function' ? 'זמין' : 'לא זמין',
-                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
-                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
-                filterAlertsByRelatedObjectType: typeof window.filterAlertsByRelatedObjectType === 'function' ? 'זמין' : 'לא זמין',
-                sortTableData: typeof window.sortTableData === 'function' ? 'זמין' : 'לא זמין'
-            },
-            console: {
-                errors: [],
-                warnings: [],
-                logs: []
-            }
-        };
-
-        // Capture console messages
-        const originalError = console.error;
-        const originalWarn = console.warn;
-        const originalLog = console.log;
-
-        console.error = function(...args) {
-            logData.console.errors.push(args.join(' '));
-            originalError.apply(console, args);
-        };
-
-        console.warn = function(...args) {
-            logData.console.warnings.push(args.join(' '));
-            originalWarn.apply(console, args);
-        };
-
-        console.log = function(...args) {
-            logData.console.logs.push(args.join(' '));
-            originalLog.apply(console, args);
-        };
-
-        return JSON.stringify(logData, null, 2);
-    } catch (error) {
-        return `Error generating log: ${error.message}`;
-    }
+    const alertsStats = {
+        totalAlerts: document.getElementById('totalAlerts')?.textContent || 'לא נמצא',
+        activeAlerts: document.getElementById('activeAlerts')?.textContent || 'לא נמצא',
+        newAlerts: document.getElementById('newAlerts')?.textContent || 'לא נמצא',
+        todayAlerts: document.getElementById('todayAlerts')?.textContent || 'לא נמצא',
+        weekAlerts: document.getElementById('weekAlerts')?.textContent || 'לא נמצא'
+    };
+    
+    // Use unified function from logger-service.js
+    return window.generateDetailedLog('alerts', alertsStats);
 }
 
 

@@ -70,7 +70,7 @@ const executionsModalConfig = {
             id: 'executionDate',
             label: 'תאריך ושעה',
             required: true,
-            defaultValue: 'today'
+            defaultValue: new Date().toISOString().slice(0, 16)
         },
         {
             type: 'number',

@@ -1505,6 +1505,60 @@ function loadSectionStates() {
   // if (window.Logger) { window.Logger.debug(`✅ loadSectionStates completed - restored ${restoredCount}/${sections.length} sections`, { page: "ui-utils" }); }
 }
 
+// ===== PAGE SUMMARY STATISTICS FUNCTIONS =====
+// These functions are used across multiple pages for summary statistics
+
+/**
+ * Update page summary statistics - Unified function
+ * Calculates and displays page-specific statistics using InfoSummarySystem
+ * 
+ * @function updatePageSummaryStats
+ * @param {string} pageName - Name of the page (alerts, cash_flows, trade_plans, etc.)
+ * @param {Array} data - Data array to calculate statistics from
+ * @param {string} [countElementId] - Optional element ID to update record count
+ * @returns {void}
+ */
+function updatePageSummaryStats(pageName, data, countElementId = null) {
+  try {
+    // Using filtered data if available, otherwise provided data
+    const dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
+    
+    // מערכת מאוחדת לסיכום נתונים
+    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+      const config = window.INFO_SUMMARY_CONFIGS[pageName];
+      if (config) {
+        window.InfoSummarySystem.calculateAndRender(dataToUse, config);
+        
+        // עדכון מספר הרשומות בטבלה (אם סופק ID)
+        if (countElementId) {
+          const countElement = document.getElementById(countElementId);
+          if (countElement) {
+            countElement.textContent = `${dataToUse.length} רשומות`;
+          }
+        }
+      } else {
+        console.warn(`No summary config found for page: ${pageName}`);
+      }
+    } else {
+      // מערכת סיכום נתונים לא זמינה
+      const summaryStatsElement = document.getElementById('summaryStats');
+      if (summaryStatsElement) {
+        summaryStatsElement.innerHTML = `
+          <div style="color: #dc3545; font-weight: bold;">
+            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+          </div>
+        `;
+      }
+    }
+    
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון סטטיסטיקות סיכום:', error, { page: pageName });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון סטטיסטיקות סיכום', error.message);
+    }
+  }
+}
+
 // Export functions to global scope
 // toggleSection removed - use toggleSection('top') instead
 // window.toggleSection export removed - using global version from ui-utils.js

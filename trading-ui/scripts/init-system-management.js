@@ -10,7 +10,7 @@ let pageTemplateGenerator = null;
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🔧 Initializing Init System Management page...');
+    // console.log('🔧 Initializing Init System Management page...');
     
     try {
         // Initialize tools
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Load advanced monitoring
         await loadAdvancedMonitoring();
         
-        console.log('✅ Init System Management page initialized');
+        // console.log('✅ Init System Management page initialized');
     } catch (error) {
         console.error('❌ Failed to initialize Init System Management page:', error);
         showNotification('שגיאה באתחול עמוד ניהול מערכת', 'error');
@@ -1082,7 +1082,7 @@ function showNotification(message, type = 'info') {
     if (typeof window.NotificationSystem !== 'undefined' && window.NotificationSystem.showNotification) {
         window.NotificationSystem.showNotification(message, type);
     } else {
-        console.log(`${type.toUpperCase()}: ${message}`);
+        // console.log(`${type.toUpperCase()}: ${message}`);
     }
 }
 
@@ -1092,7 +1092,7 @@ function showNotification(message, type = 'info') {
  * Load advanced monitoring data
  */
 async function loadAdvancedMonitoring() {
-    console.log('🔍 Loading advanced monitoring...');
+    // console.log('🔍 Loading advanced monitoring...');
     
     try {
         await Promise.all([
@@ -1102,7 +1102,7 @@ async function loadAdvancedMonitoring() {
             loadValidationTests()
         ]);
         
-        console.log('✅ Advanced monitoring loaded');
+        // console.log('✅ Advanced monitoring loaded');
     } catch (error) {
         console.error('❌ Failed to load advanced monitoring:', error);
         showNotification('שגיאה בטעינת ניטור מתקדם', 'error');
@@ -1470,7 +1470,7 @@ function displayTestResults(container, title, tests) {
  * Run advanced monitoring
  */
 async function runAdvancedMonitoring() {
-    console.log('🔍 Running advanced monitoring...');
+    // console.log('🔍 Running advanced monitoring...');
     
     try {
         await loadAdvancedMonitoring();
@@ -1533,11 +1533,11 @@ ${JSON.stringify(logData.tests, null, 2)}
  * Run Comprehensive Tests on All Pages
  */
 async function runComprehensiveTests() {
-    console.log('🔍 runComprehensiveTests: Starting comprehensive tests for all pages...');
+    // console.log('🔍 runComprehensiveTests: Starting comprehensive tests for all pages...');
     
     // Get all page configs
     const allPages = Object.keys(window.PAGE_CONFIGS || {});
-    console.log('🔍 runComprehensiveTests: Found pages:', allPages);
+    // console.log('🔍 runComprehensiveTests: Found pages:', allPages);
     const results = [];
     
     // Summary counters
@@ -1547,7 +1547,7 @@ async function runComprehensiveTests() {
     
     // Test each page
     for (const pageName of allPages) {
-        console.log(`🔍 runComprehensiveTests: Testing page ${pageName}...`);
+            // console.log(`🔍 runComprehensiveTests: Testing page ${pageName}...`);
         const pageConfig = window.PAGE_CONFIGS[pageName];
         if (!pageConfig) {
             console.log(`❌ runComprehensiveTests: No config found for page ${pageName}`);

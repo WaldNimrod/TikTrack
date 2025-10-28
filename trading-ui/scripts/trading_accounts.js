@@ -82,6 +82,7 @@ window.Logger.info('📁 trading_accounts.js נטען - מתחיל אתחול', 
 if (typeof window.getCurrencyDisplay !== 'function') {
   window.Logger.warn('⚠️ getCurrencyDisplay not available, using fallback', { page: "trading_accounts" });
   window.getCurrencyDisplay = function(account) {
+    try {
     if (account.currency_symbol) {
       switch (account.currency_symbol) {
         case 'USD': return '$';
@@ -92,6 +93,10 @@ if (typeof window.getCurrencyDisplay !== 'function') {
       }
     }
     return '$'; // ברירת מחדל
+    } catch (error) {
+      console.error('getCurrencyDisplay failed:', error);
+      return '$'; // ברירת מחדל במקרה של שגיאה
+    }
   };
 }
 
@@ -444,11 +449,17 @@ async function loadAllTradingAccountsFromServer() {
  * @returns {void}
  */
 function loadDefaultTradingAccounts() {
+  try {
   // Loading default trading_accounts - no dummy data
   window.trading_accountsData = [];
   window.trading_accountsLoaded = true;
   if (typeof window.updateTradingAccountFilterMenu === 'function') {
     window.updateTradingAccountFilterMenu(window.trading_accountsData);
+    }
+  } catch (error) {
+    console.error('loadDefaultTradingAccounts failed:', error);
+    window.trading_accountsData = [];
+    window.trading_accountsLoaded = true;
   }
 }
 
@@ -672,6 +683,7 @@ async function loadTradingAccounts() {
  * @returns {void}
  */
 function updateTradingAccountFilterDisplayText() {
+  try {
   const appHeader = document.querySelector('app-header');
   if (!appHeader || !appHeader.shadowRoot) {
     return;
@@ -701,6 +713,9 @@ function updateTradingAccountFilterDisplayText() {
     selectedText.textContent = selectedTradingAccounts[0];
   } else {
     selectedText.textContent = `${selectedTradingAccounts.length} נבחרו`;
+    }
+  } catch (error) {
+    console.error('updateTradingAccountFilterDisplayText failed:', error);
   }
 }
 
@@ -719,35 +734,42 @@ window.loadTradingAccounts = loadTradingAccounts;
 
 // פונקציה גלובלית לעדכון ידני של תפריט החשבונות
 window.refreshTradingAccountFilterMenu = function () {
-  if (window.trading_accountsData && window.trading_accountsData.length > 0) {
-    if (typeof window.updateTradingAccountFilterMenu === 'function') {
-      window.updateTradingAccountFilterMenu(window.trading_accountsData);
+  try {
+    if (window.trading_accountsData && window.trading_accountsData.length > 0) {
+      if (typeof window.updateTradingAccountFilterMenu === 'function') {
+        window.updateTradingAccountFilterMenu(window.trading_accountsData);
+      }
+    } else {
+      loadTradingAccountsFromServer();
     }
-  } else {
-    loadTradingAccountsFromServer();
+  } catch (error) {
+    console.error('refreshTradingAccountFilterMenu failed:', error);
   }
 };
 
 // פונקציה לבדיקת מצב החשבונות
 window.checkTradingAccountsStatus = function () {
-
-  const appHeader = document.querySelector('app-header');
-  if (appHeader) {
-    const tradingAccountMenu = appHeader.shadowRoot.getElementById('tradingAccountFilterMenu');
-    if (tradingAccountMenu) {
-      const items = tradingAccountMenu.querySelectorAll('.trading-account-filter-item');
-      // TradingAccount menu items count
-      items.forEach(() => {
-        // const accountName = item.getAttribute('data-account'); // Not used
-        // Item details
-      });
+  try {
+    const appHeader = document.querySelector('app-header');
+    if (appHeader) {
+      const tradingAccountMenu = appHeader.shadowRoot.getElementById('tradingAccountFilterMenu');
+      if (tradingAccountMenu) {
+        const items = tradingAccountMenu.querySelectorAll('.trading-account-filter-item');
+        // TradingAccount menu items count
+        items.forEach(() => {
+          // const accountName = item.getAttribute('data-account'); // Not used
+          // Item details
+        });
+      } else {
+        // TradingAccount menu not found in shadow DOM
+      }
     } else {
-      // TradingAccount menu not found in shadow DOM
+      // App header not found
     }
-  } else {
-    // App header not found
+    // END TRADING ACCOUNTS STATUS CHECK
+  } catch (error) {
+    console.error('checkTradingAccountsStatus failed:', error);
   }
-  // END TRADING ACCOUNTS STATUS CHECK
 };
 
 // פונקציה זמנית לעדכון תפריט החשבונות
@@ -2232,108 +2254,21 @@ function sortTable(columnIndex) {
 
 // Detailed Log Functions for Accounts Page
 /**
- * Generate detailed log
+ * Generate detailed log for trading accounts page
  * @function generateDetailedLog
- * @returns {void}
+ * @returns {string} JSON string of log data
  */
 function generateDetailedLog() {
-    try {
-        const logData = {
-            timestamp: new Date().toISOString(),
-            page: 'trading_accounts',
-            url: window.location.href,
-            userAgent: navigator.userAgent,
-            viewport: {
-                width: window.innerWidth,
-                height: window.innerHeight
-            },
-            performance: {
-                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
-                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
-            },
-            memory: window.performance.memory ? {
-                used: window.performance.memory.usedJSHeapSize,
-                total: window.performance.memory.totalJSHeapSize,
-                limit: window.performance.memory.jsHeapSizeLimit
-            } : null,
-            trading_accountsStats: {
+    const tradingAccountsStats = {
                 totalAccounts: document.getElementById('totalAccounts')?.textContent || 'לא נמצא',
                 activeAccounts: document.getElementById('activeAccounts')?.textContent || 'לא נמצא',
                 totalValue: document.getElementById('totalValue')?.textContent || 'לא נמצא',
                 totalProfit: document.getElementById('totalProfit')?.textContent || 'לא נמצא',
                 newAlertsCount: document.getElementById('newAlertsCount')?.textContent || 'לא נמצא'
-            },
-            sections: {
-                topSection: {
-                    title: 'חשבונות',
-                    visible: !document.querySelector('.top-section')?.classList.contains('d-none'),
-                    alertsCount: document.querySelectorAll('.alert-card').length,
-                    summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא',
-                    colorDemoVisible: !document.getElementById('trading_accountsColorDemo')?.classList.contains('d-none')
-                },
-                contentSection: {
-                    title: 'החשבונות שלי',
-                    visible: !document.querySelector('.content-section')?.classList.contains('d-none'),
-                    tableRows: document.querySelectorAll('#accountsTable tbody tr').length,
-                    tableData: document.querySelector('#trading_accountsContainer')?.textContent?.substring(0, 300) || 'לא נמצא'
-                }
-            },
-            tableData: {
-                totalRows: document.querySelectorAll('#accountsTable tbody tr').length,
-                headers: Array.from(document.querySelectorAll('#accountsTable thead th')).map(th => th.textContent?.trim()),
-                sortableColumns: document.querySelectorAll('.sortable-header').length,
-                hasData: document.querySelectorAll('#accountsTable tbody tr').length > 0
-            },
-            modals: {
-                addModal: document.getElementById('addTradingAccountModal') ? 'זמין' : 'לא זמין',
-                editModal: document.getElementById('editTradingAccountModal') ? 'זמין' : 'לא זמין',
-                deleteModal: document.getElementById('deleteTradingAccountModal') ? 'זמין' : 'לא זמין'
-            },
-            functions: {
-                showAddTradingAccountModal: typeof window.showAddTradingAccountModal === 'function' ? 'זמין' : 'לא זמין',
-                deleteTradingAccount: typeof window.deleteTradingAccount === 'function' ? 'זמין' : 'לא זמין',
-                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
-                loadTradingAccountsFromServer: typeof window.loadTradingAccountsFromServer === 'function' ? 'זמין' : 'לא זמין',
-                updateTradingAccountsTable: typeof window.updateTradingAccountsTable === 'function' ? 'זמין' : 'לא זמין',
-                sortTable: typeof window.sortTable === 'function' ? 'זמין' : 'לא זמין'
-            },
-            dataStatus: {
-                trading_accountsLoaded: window.trading_accountsLoaded || false,
-                currenciesLoaded: window.currenciesLoaded || false,
-                trading_accountsDataLength: window.trading_accountsData ? window.trading_accountsData.length : 0,
-                currenciesDataLength: window.currenciesData ? window.currenciesData.length : 0
-            },
-            console: {
-                errors: [],
-                warnings: [],
-                logs: []
-            }
-        };
-
-        // Capture console messages
-        const originalError = console.error;
-        const originalWarn = console.warn;
-        const originalLog = console.log;
-
-        console.error = function(...args) {
-            logData.console.errors.push(args.join(' '));
-            originalError.apply(console, args);
-        };
-
-        console.warn = function(...args) {
-            logData.console.warnings.push(args.join(' '));
-            originalWarn.apply(console, args);
-        };
-
-        console.log = function(...args) {
-            logData.console.logs.push(args.join(' '));
-            originalLog.apply(console, args);
-        };
-
-        return JSON.stringify(logData, null, 2);
-    } catch (error) {
-        return `Error generating log: ${error.message}`;
-    }
+    };
+    
+    // Use unified function from logger-service.js
+    return window.generateDetailedLog('trading_accounts', tradingAccountsStats);
 }
 
 //  function removed - no longer needed

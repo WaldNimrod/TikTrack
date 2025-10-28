@@ -20,6 +20,7 @@ let currentSessionId = null;
 let currentStep = 1;
 let selectedFile = null;
 let selectedAccount = null;
+let selectedConnector = null;
 let analysisResults = null;
 let previewData = null;
 
@@ -176,10 +177,8 @@ function showStepContent(step) {
  */
 function loadStep1Content() {
     // The HTML content is already in the DOM, just need to load accounts
-    loadAccounts();
-    
-    // Add event listeners
     setupStep1EventListeners();
+    loadAccounts();
 }
 
 /**
@@ -391,14 +390,15 @@ function handleFileSelect(event) {
 function updateAnalyzeButton() {
     const continueBtn = document.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
-        if (selectedFile && selectedAccount) {
+        if (selectedFile && selectedAccount && selectedConnector) {
             continueBtn.disabled = false;
             console.log('Analyze button enabled');
         } else {
             continueBtn.disabled = true;
             console.log('Analyze button disabled - missing:', { 
                 file: !!selectedFile, 
-                account: !!selectedAccount 
+                account: !!selectedAccount,
+                connector: !!selectedConnector
             });
         }
     }
@@ -476,6 +476,15 @@ function handleAccountSelect(event) {
     if (analyzeBtn && selectedFile) {
         analyzeBtn.disabled = false;
     }
+}
+
+/**
+ * Handle connector selection
+ */
+function handleConnectorSelect(event) {
+    selectedConnector = event.target.value;
+    console.log('Connector selected:', selectedConnector);
+    updateAnalyzeButton();
 }
 
 /**

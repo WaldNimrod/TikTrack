@@ -210,6 +210,16 @@
                     <!-- Step 1+2: Upload + Account Selection (COMBINED) -->
                     <div class="import-step" id="step-upload" data-step="1">
                         <div class="step-content">
+                            <div class="connector-section">
+                                <label>בחר ספק נתונים:</label>
+                                <select id="connectorSelect" class="form-select">
+                                    <option value="">בחר ספק נתונים...</option>
+                                    <option value="ibkr">Interactive Brokers (IBKR)</option>
+                                    <option value="demo">Demo Data</option>
+                                </select>
+                                <small class="form-text text-muted">בחר את הספק שממנו יובאו הנתונים</small>
+                            </div>
+                            
                             <div class="upload-section">
                                 <div class="file-drop-zone" id="dropZone">
                                     <i class="bi bi-cloud-upload"></i>
@@ -226,7 +236,7 @@
                             </div>
                             
                             <div class="account-section">
-                                <label>בחר חשבון מסחר מסחר:</label>
+                                <label>בחר חשבון מסחר:</label>
                                 <select id="accountSelect" class="form-select">
                                     <option value="">בחר חשבון מסחר...</option>
                                 </select>

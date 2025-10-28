@@ -107,90 +107,117 @@ def upload_file():
     Returns:
         JSON response with session ID and analysis results
     """
+    logger.info("🚀 Starting file upload process")
     try:
         # Check if file is present
         if 'file' not in request.files:
+            logger.warning("❌ No file provided in request")
             return jsonify({
-                'status': 'error',
-                'message': 'No file provided'
+                'success': False,
+                'error': 'No file provided'
             }), 400
         
         file = request.files['file']
         if file.filename == '':
+            logger.warning("❌ No file selected")
             return jsonify({
-                'status': 'error',
-                'message': 'No file selected'
+                'success': False,
+                'error': 'No file selected'
             }), 400
         
+        logger.info(f"📁 File received: {file.filename}")
+        
         if not allowed_file(file.filename):
+            logger.warning(f"❌ Invalid file type: {file.filename}")
             return jsonify({
-                'status': 'error',
-                'message': 'Invalid file type. Only CSV files are allowed'
+                'success': False,
+                'error': 'Invalid file type. Only CSV files are allowed'
             }), 400
         
         # Get account ID
         trading_account_id = request.form.get('trading_account_id', type=int)
+        logger.info(f"🏦 Trading account ID from request: {trading_account_id}")
+        
         if not trading_account_id:
+            logger.info("🔍 No trading account provided, using default")
             # Default to first account
             db_session = next(get_db())
             try:
                 account = db_session.query(TradingAccount).first()
                 if not account:
+                    logger.error("❌ No trading accounts found in database")
                     return jsonify({
-                        'status': 'error',
-                        'message': 'No trading accounts found'
+                        'success': False,
+                        'error': 'No trading accounts found'
                     }), 400
                 trading_account_id = account.id
+                logger.info(f"✅ Using default trading account: {trading_account_id}")
             finally:
                 db_session.close()
         
         # Read file content
         file_content = file.read().decode('utf-8')
         secure_filename(file.filename)
+        logger.info(f"📄 File content read successfully, length: {len(file_content)} characters")
         
         # Create import session
+        logger.info("🔧 Creating import session...")
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
+            logger.info("✅ ImportOrchestrator created successfully")
+            
             result = orchestrator.create_import_session(
                 trading_account_id=trading_account_id,
                 file_name=file.filename,
                 file_content=file_content
             )
+            logger.info(f"📊 Session creation result: {result}")
             
             if not result['success']:
+                logger.error(f"❌ Session creation failed: {result['error']}")
                 return jsonify({
-                    'status': 'error',
-                    'message': result['error']
+                    'success': False,
+                    'error': result['error']
                 }), 400
             
+            logger.info(f"✅ Import session created successfully: {result['session_id']}")
+            
             # Analyze file
+            logger.info("🔍 Starting file analysis...")
             analysis_result = orchestrator.analyze_file(result['session_id'])
+            logger.info(f"📊 Analysis result: {analysis_result}")
             
             if not analysis_result['success']:
+                logger.error(f"❌ File analysis failed: {analysis_result['error']}")
                 return jsonify({
-                    'status': 'error',
-                    'message': analysis_result['error']
+                    'success': False,
+                    'error': analysis_result['error']
                 }), 500
+            
+            logger.info("✅ File analysis completed successfully")
             
             # Note: analyze_file already saves the results to session and commits
             # No need to save again here
             
-            return jsonify({
-                'status': 'success',
+            response_data = {
+                'success': True,
                 'session_id': result['session_id'],
                 'provider': result['provider'],
                 'analysis_results': analysis_result['analysis_results']
-            }), 200
+            }
+            logger.info(f"🎉 Returning success response: {response_data}")
+            
+            return jsonify(response_data), 200
             
         finally:
             db_session.close()
         
     except Exception as e:
-        logger.error(f"File upload failed: {str(e)}")
+        logger.error(f"💥 File upload failed with exception: {str(e)}", exc_info=True)
         return jsonify({
-            'status': 'error',
-            'message': f'File upload failed: {str(e)}'
+            'success': False,
+            'error': f'File upload failed: {str(e)}'
         }), 500
 
 @user_data_import_bp.route('/session/<int:session_id>/analyze', methods=['GET'])

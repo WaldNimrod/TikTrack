@@ -2118,20 +2118,7 @@ function getTypeDisplayName(type) {
 // ===== UTILITY FUNCTIONS =====
 // Helper functions for UI interactions and general utilities
 
-/**
- * Toggle section visibility
- * Uses global toggleSection function
- * 
- * @function toggleSection
- * @returns {void}
- */
-function toggleSection() {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection();
-    } else {
-        window.Logger.warn('toggleSection function not found', { page: "tickers" });
-    }
-}
+// toggleSection function removed - using global version from ui-basic.js
 
 function toggleTickersSection() {
     if (typeof window.toggleSection === 'function') {

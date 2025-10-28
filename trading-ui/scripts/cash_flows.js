@@ -868,8 +868,31 @@ async function renderCashFlowsTable() {
  * @returns {void}
  */
 function updatePageSummaryStats() {
-  // Use unified function from ui-utils.js
-  window.updatePageSummaryStats('cash_flows', cashFlowsData);
+  // Simple local implementation - no dependency on global function
+  try {
+    // Update record count if element exists
+    const countElement = document.getElementById('cashFlowsCount');
+    if (countElement && cashFlowsData) {
+      countElement.textContent = cashFlowsData.length;
+    }
+    
+    // Update summary stats if element exists
+    const summaryElement = document.getElementById('cashFlowsSummary');
+    if (summaryElement && cashFlowsData) {
+      const totalAmount = cashFlowsData.reduce((sum, cf) => sum + (cf.amount || 0), 0);
+      summaryElement.textContent = `סה"כ: ${cashFlowsData.length} תזרימים, ${totalAmount.toFixed(2)} ₪`;
+    }
+    
+    window.Logger.debug('Page summary stats updated locally', { 
+      count: cashFlowsData?.length || 0, 
+      page: 'cash_flows' 
+    });
+  } catch (error) {
+    window.Logger.warn('Error updating page summary stats', { 
+      error: error.message, 
+      page: 'cash_flows' 
+    });
+  }
 }
 
 // פונקציות הועברו ל-translation-utils.js:
@@ -1289,8 +1312,141 @@ async function initializeCashFlowsPage() {
 //   initializeCashFlowsPage();
 // });
 
+// ===== CRUD FUNCTIONS =====
+
+/**
+ * שמירת תזרים מזומנים
+ * Handles both add and edit modes
+ * @function saveCashFlow
+ * @returns {Promise<void>}
+ */
+async function saveCashFlow() {
+    window.Logger.debug('saveCashFlow called', { page: 'cash_flows' });
+    
+    try {
+        // Collect form data
+        const form = document.getElementById('cashFlowModalForm');
+        if (!form) {
+            throw new Error('Cash flow form not found');
+        }
+        
+        const formData = new FormData(form);
+        const cashFlowData = {
+            type: formData.get('cashFlowType'),
+            amount: parseFloat(formData.get('cashFlowAmount')),
+            currency_id: formData.get('cashFlowCurrency'),
+            trading_account_id: formData.get('cashFlowAccount'),
+            date: formData.get('cashFlowDate'),
+            description: formData.get('cashFlowDescription'),
+            source: formData.get('cashFlowSource'),
+            external_id: formData.get('cashFlowExternalId') || '0',
+            trade_id: formData.get('cashFlowTrade') || null,
+            trade_plan_id: formData.get('cashFlowTradePlan') || null
+        };
+        
+        // Validate data
+        if (!window.validateEntityForm) {
+            throw new Error('Validation system not available');
+        }
+        
+        const isValid = window.validateEntityForm('cashFlowModalForm', {
+            cashFlowType: { required: true },
+            cashFlowAmount: { required: true, min: 0.01 },
+            cashFlowCurrency: { required: true },
+            cashFlowAccount: { required: true },
+            cashFlowDate: { required: true },
+            cashFlowSource: { required: true }
+        });
+        
+        if (!isValid) {
+            window.Logger.warn('Cash flow validation failed', { page: 'cash_flows' });
+            return;
+        }
+        
+        // Determine if this is add or edit
+        const isEdit = form.dataset.mode === 'edit';
+        const cashFlowId = form.dataset.cashFlowId;
+        
+        // Prepare API call
+        const url = isEdit ? `/api/cash_flows/${cashFlowId}` : '/api/cash_flows';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        // Send to API
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(cashFlowData)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // Handle success
+        if (window.showNotification) {
+            const message = isEdit ? 'תזרים מזומנים עודכן בהצלחה' : 'תזרים מזומנים נוסף בהצלחה';
+            window.showNotification(message, 'success', 'business');
+        }
+        
+        // Close modal
+        if (window.ModalManagerV2) {
+            window.ModalManagerV2.hideModal('cashFlowModal');
+        }
+        
+        // Refresh data
+        if (window.loadCashFlowsData) {
+            window.loadCashFlowsData();
+        }
+        
+        window.Logger.info('Cash flow saved successfully', { cashFlowId: result.id, page: 'cash_flows' });
+        
+    } catch (error) {
+        window.Logger.error('Error saving cash flow', { error: error.message, page: 'cash_flows' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה בשמירת תזרים המזומנים', 'error', 'system');
+        }
+    }
+}
+
+/**
+ * עדכון תזרים מזומנים
+ * @function updateCashFlow
+ * @param {string} id - Cash flow ID
+ * @returns {Promise<void>}
+ */
+async function updateCashFlow(id) {
+    window.Logger.debug('updateCashFlow called', { id, page: 'cash_flows' });
+    
+    try {
+        // Find cash flow data
+        const cashFlow = cashFlowsData.find(cf => cf.id === id);
+        if (!cashFlow) {
+            throw new Error('Cash flow not found');
+        }
+        
+        // Show edit modal with data
+        if (window.ModalManagerV2) {
+            window.ModalManagerV2.showEditModal('cashFlowModal', cashFlow);
+        } else {
+            throw new Error('ModalManagerV2 not available');
+        }
+        
+    } catch (error) {
+        window.Logger.error('Error updating cash flow', { error: error.message, page: 'cash_flows' });
+        
+        if (window.showNotification) {
+            window.showNotification('שגיאה בעדכון תזרים המזומנים', 'error', 'system');
+        }
+    }
+}
+
 // ייצוא פונקציות גלובליות
-// פונקציות לא בשימוש - הוסרו
 window.toggleCashFlowsSection = toggleCashFlowsSection;
 window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
 window.saveCashFlow = saveCashFlow;

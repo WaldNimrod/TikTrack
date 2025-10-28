@@ -2219,13 +2219,7 @@ function replaceCurrentAttachment() {
  * Toggle section using global function
  * Uses global toggleSection function if available
  */
-function toggleSection() {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection();
-    } else {
-        window.Logger.warn('toggleSection function not found', { page: "notes" });
-    }
-}
+// toggleSection function removed - using global version from ui-basic.js
 
 // toggleSection function removed - use toggleSection('main') instead
 

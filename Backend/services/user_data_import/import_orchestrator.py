@@ -136,32 +136,45 @@ class ImportOrchestrator:
         return step_mapping.get(step, 0)
     
     def create_import_session(self, trading_account_id: int, file_name: str, 
-                            file_content: str) -> Dict[str, Any]:
+                            file_content: str, connector_type: str) -> Dict[str, Any]:
         """
-        Create a new import session and detect file format.
+        Create a new import session with specified connector.
         
         Args:
             trading_account_id: Trading account ID
             file_name: Original file name
             file_content: File content as string
+            connector_type: Type of connector to use ('ibkr', 'demo', etc.)
             
         Returns:
             Dict[str, Any]: Session creation results
         """
-        logger.info(f"🔧 Creating import session for account {trading_account_id}, file: {file_name}")
+        logger.info(f"🔧 Creating import session for account {trading_account_id}, file: {file_name}, connector: {connector_type}")
         try:
-            # Detect file format and select connector
-            logger.info("🔍 Detecting file format and connector...")
-            connector = self._detect_connector(file_content)
+            # Get connector by type
+            connector = self.connectors.get(connector_type)
             if not connector:
-                logger.error(f"❌ Unsupported file format. Supported formats: {list(self.connectors.keys())}")
+                logger.error(f"❌ Unsupported connector type: {connector_type}. Supported: {list(self.connectors.keys())}")
                 return {
                     'success': False,
-                    'error': 'Unsupported file format',
+                    'error': f'Unsupported connector type: {connector_type}',
                     'supported_formats': list(self.connectors.keys())
                 }
             
-            logger.info(f"✅ Connector detected: {connector.get_provider_name()}")
+            logger.info(f"✅ Connector found: {connector.get_provider_name()}")
+            
+            # Validate file format with selected connector
+            logger.info("🔍 Validating file format with selected connector...")
+            if not connector.identify_file(file_content, file_name):
+                logger.error(f"❌ File format does not match connector {connector_type}")
+                return {
+                    'success': False,
+                    'error': f'File format does not match selected connector ({connector_type}). Please check your file format or select a different connector.',
+                    'connector_type': connector_type,
+                    'expected_format': connector.get_connector_info().get('format_description', 'Unknown format')
+                }
+            
+            logger.info("✅ File format validated successfully")
             
             # Create import session
             logger.info("📝 Creating database session...")
@@ -180,7 +193,7 @@ class ImportOrchestrator:
             logger.info("💾 Storing file content and connector info...")
             session.add_summary_data({
                 'file_content': file_content,
-                'connector_type': connector.get_provider_name().lower()
+                'connector_type': connector_type
             })
             self.db_session.commit()
             logger.info("✅ File content stored successfully")

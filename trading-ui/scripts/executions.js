@@ -1708,7 +1708,12 @@ async function updateExecutionsTableMain(executions) {
 
   // צביעת רשומות חדשות
   if (newExecutionIds.length > 0) {
-    console.log(`🎨 Highlighting ${newExecutionIds.length} new executions`);
+    if (window.Logger) {
+      window.Logger.debug(`Highlighting ${newExecutionIds.length} new executions`, { 
+        count: newExecutionIds.length, 
+        page: 'executions' 
+      });
+    }
     
     // הוספת CSS animation אם לא קיים
     if (!document.getElementById('new-execution-styles')) {

@@ -46,7 +46,7 @@ class InitSystemCheck {
     addMonitoringButtonToHeader() {
         // נחכה שהרשימה תהיה קיימת
         const waitForNavList = () => {
-            const navList = document.querySelector('.tiktrack-nav-list');
+            const navList = document.querySelector('.tiktrack-nav-list') || document.querySelector('#unified-header');
             if (navList) {
                 this.addButtonToNavList(navList);
             } else {

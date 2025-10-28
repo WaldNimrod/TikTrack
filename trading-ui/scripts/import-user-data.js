@@ -71,19 +71,39 @@ function resetImportModal() {
     currentStep = 1;
     selectedFile = null;
     selectedAccount = null;
+    selectedConnector = null;
     analysisResults = null;
     previewData = null;
     
     // Reset form elements
-    const fileInput = document.getElementById('importFileInput');
+    const fileInput = document.getElementById('fileInput');
     if (fileInput) {
         fileInput.value = '';
     }
     
-    const accountSelect = document.getElementById('importAccountSelect');
+    const accountSelect = document.getElementById('accountSelect');
     if (accountSelect) {
         accountSelect.value = '';
     }
+    
+    const connectorSelect = document.getElementById('connectorSelect');
+    if (connectorSelect) {
+        connectorSelect.value = '';
+    }
+    
+    // Reset UI elements
+    const fileInfo = document.getElementById('fileInfo');
+    if (fileInfo) {
+        fileInfo.style.display = 'none';
+    }
+    
+    const dropZone = document.getElementById('dropZone');
+    if (dropZone) {
+        dropZone.style.display = 'block';
+    }
+    
+    // Reset analyze button
+    updateAnalyzeButton();
 }
 
 /**
@@ -98,6 +118,19 @@ function goToStep(step) {
     
     // Show step content
     showStepContent(step);
+    
+    // Load step-specific content
+    if (step === 1) {
+        loadStep1Content();
+    } else if (step === 2) {
+        loadStep2Content();
+    } else if (step === 3) {
+        loadProblemResolution();
+    } else if (step === 4) {
+        loadPreviewData();
+    } else if (step === 5) {
+        loadConfirmationData();
+    }
 }
 
 /**
@@ -134,7 +167,7 @@ function showStepContent(step) {
     if (step === 1) {
         currentStepContent = document.getElementById('step-upload');
     } else if (step === 2) {
-        currentStepContent = document.getElementById('step-account');
+        currentStepContent = document.getElementById('step-analysis');
     } else if (step === 3) {
         currentStepContent = document.getElementById('step-problems');
     } else if (step === 4) {
@@ -205,6 +238,12 @@ function setupStep1EventListeners() {
         accountSelect.addEventListener('change', handleAccountSelect);
     }
     
+    // Connector select
+    const connectorSelect = document.getElementById('connectorSelect');
+    if (connectorSelect) {
+        connectorSelect.addEventListener('change', handleConnectorSelect);
+    }
+    
     // Continue button
     const continueBtn = document.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
@@ -244,67 +283,138 @@ function handleFileDrop(event) {
  * Load step 2 content (File Analysis)
  */
 function loadStep2Content() {
-    const content = document.getElementById('step2Content');
-    if (!content) return;
-    
-    content.innerHTML = `
-        <div class="step-content-inner">
-            <h4>ניתוח קובץ</h4>
-            <div id="analysisResults" class="analysis-results">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i> מנתח קובץ...
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Start analysis
-    analyzeFile();
+    // The HTML content is already in the DOM, just need to display analysis results
+    if (analysisResults) {
+        displayAnalysisResults(analysisResults);
+    }
 }
 
 /**
- * Load step 3 content (Problem Resolution)
+ * Load preview data (Step 4)
  */
-function loadStep3Content() {
-    const content = document.getElementById('step3Content');
-    if (!content) return;
-    
-    content.innerHTML = `
-        <div class="step-content-inner">
-            <h4>פתרון בעיות</h4>
-            <div id="problemResolution" class="problem-resolution">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i> טוען נתונים...
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Load problem resolution
-    loadProblemResolution();
+function loadPreviewData() {
+    // The HTML content is already in the DOM, just need to display preview data
+    if (previewData) {
+        displayPreviewData(previewData);
+    }
 }
 
 /**
- * Load step 4 content (Preview)
+ * Load confirmation data (Step 5)
  */
-function loadStep4Content() {
-    const content = document.getElementById('step4Content');
-    if (!content) return;
+function loadConfirmationData() {
+    // The HTML content is already in the DOM, just need to display confirmation data
+    if (analysisResults && previewData) {
+        displayConfirmationData(analysisResults, previewData);
+    }
+}
+
+/**
+ * Display preview data
+ */
+function displayPreviewData(data) {
+    // TODO: Implement preview data display
+    console.log('Displaying preview data:', data);
+}
+
+/**
+ * Display confirmation data
+ */
+function displayConfirmationData(analysisResults, previewData) {
+    // TODO: Implement confirmation data display
+    console.log('Displaying confirmation data:', { analysisResults, previewData });
+}
+
+/**
+ * Load problem resolution
+ */
+function loadProblemResolution() {
+    if (!currentSessionId) {
+        showNotification('לא נמצא מזהה סשן', 'error');
+        return;
+    }
     
-    content.innerHTML = `
-        <div class="step-content-inner">
-            <h4>תצוגה מקדימה</h4>
-            <div id="previewContainer" class="preview-container">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i> יוצר תצוגה מקדימה...
+    fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            previewData = data.preview_data;
+            displayProblemResolutionDetailed(data.preview_data);
+        } else {
+            showNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Problem resolution error:', error);
+        showNotification('שגיאה בטעינת נתוני בעיות', 'error');
+    });
+}
+
+/**
+ * Display problem resolution
+ */
+function displayProblemResolution(data) {
+    const container = document.getElementById('problemResolution');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="problem-summary">
+            <h4>סיכום בעיות</h4>
+            <div class="problem-stats">
+                <div class="stat-item">
+                    <span class="stat-label">רשומות עם בעיות:</span>
+                    <span class="stat-value">${data.problematic_records || 0}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">רשומות נקיות:</span>
+                    <span class="stat-value">${data.clean_records || 0}</span>
                 </div>
             </div>
         </div>
     `;
-    
-    // Generate preview
-    generatePreview();
 }
+
+/**
+ * Display problem resolution detailed
+ */
+function displayProblemResolutionDetailed(data) {
+    // Clear previous content
+    clearProblemSections();
+    
+    // Display missing tickers
+    if (data.missing_tickers && data.missing_tickers.length > 0) {
+        displayMissingTickers(data.missing_tickers);
+    }
+    
+    // Display within-file duplicates
+    if (data.within_file_duplicates && data.within_file_duplicates.length > 0) {
+        displayWithinFileDuplicates(data.within_file_duplicates);
+    }
+    
+    // Display existing records
+    if (data.existing_records && data.existing_records.length > 0) {
+        displayExistingRecords(data.existing_records);
+    }
+}
+
+/**
+ * Clear problem sections
+ */
+function clearProblemSections() {
+    const missingTickersSection = document.getElementById('missingTickersSection');
+    const withinFileDuplicatesSection = document.getElementById('withinFileDuplicatesSection');
+    const existingRecordsSection = document.getElementById('existingRecordsSection');
+    
+    if (missingTickersSection) missingTickersSection.innerHTML = '';
+    if (withinFileDuplicatesSection) withinFileDuplicatesSection.innerHTML = '';
+    if (existingRecordsSection) existingRecordsSection.innerHTML = '';
+}
+
+/**
+ * Display missing tickers
+ */
 
 /**
  * Load step 5 content (Final Approval)
@@ -376,7 +486,7 @@ function handleFileSelect(event) {
         }
         
         console.log('File info updated in UI');
-    } else {
+        } else {
         console.error('File info elements not found:', { fileInfo, fileName, fileSize });
     }
     
@@ -528,8 +638,8 @@ function loadAccounts() {
  * Analyze file
  */
 function analyzeFile() {
-    if (!selectedFile || !selectedAccount) {
-        showNotification('נא לבחור קובץ וחשבון מסחר', 'error');
+    if (!selectedFile || !selectedAccount || !selectedConnector) {
+        showNotification('נא לבחור קובץ, חשבון מסחר וספק נתונים', 'error');
         return;
     }
     
@@ -538,9 +648,10 @@ function analyzeFile() {
     const formData = new FormData();
     formData.append('file', selectedFile);
     formData.append('trading_account_id', selectedAccount);
+    formData.append('connector_type', selectedConnector);
     
     fetch('/api/user-data-import/upload', {
-        method: 'POST',
+            method: 'POST',
         body: formData
     })
     .then(response => response.json())
@@ -612,6 +723,42 @@ function loadProblemResolution() {
         console.error('Problem resolution error:', error);
         showNotification('שגיאה בטעינת נתוני בעיות', 'error');
     });
+}
+
+/**
+ * Load preview data (Step 4)
+ */
+function loadPreviewData() {
+    // The HTML content is already in the DOM, just need to display preview data
+    if (previewData) {
+        displayPreviewData(previewData);
+    }
+}
+
+/**
+ * Load confirmation data (Step 5)
+ */
+function loadConfirmationData() {
+    // The HTML content is already in the DOM, just need to display confirmation data
+    if (analysisResults && previewData) {
+        displayConfirmationData(analysisResults, previewData);
+    }
+}
+
+/**
+ * Display preview data
+ */
+function displayPreviewData(data) {
+    // TODO: Implement preview data display
+    console.log('Displaying preview data:', data);
+}
+
+/**
+ * Display confirmation data
+ */
+function displayConfirmationData(analysisResults, previewData) {
+    // TODO: Implement confirmation data display
+    console.log('Displaying confirmation data:', { analysisResults, previewData });
 }
 
 /**

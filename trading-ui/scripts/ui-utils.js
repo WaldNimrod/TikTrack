@@ -1567,6 +1567,7 @@ window.toggleSectionGlobal = window.toggleSection;
 window.toggleAllSectionsGlobal = window.toggleAllSections;
 window.toggleTopSection = toggleTopSection;
 window.loadSectionStates = loadSectionStates;
+window.updatePageSummaryStats = updatePageSummaryStats;
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // Load section states when DOM is ready

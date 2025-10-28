@@ -155,6 +155,17 @@ def upload_file():
             finally:
                 db_session.close()
         
+        # Get connector type
+        connector_type = request.form.get('connector_type')
+        logger.info(f"🔌 Connector type from request: {connector_type}")
+        
+        if not connector_type:
+            logger.error("❌ No connector type provided")
+            return jsonify({
+                'success': False,
+                'error': 'Connector type is required'
+            }), 400
+        
         # Read file content
         file_content = file.read().decode('utf-8')
         secure_filename(file.filename)
@@ -170,7 +181,8 @@ def upload_file():
             result = orchestrator.create_import_session(
                 trading_account_id=trading_account_id,
                 file_name=file.filename,
-                file_content=file_content
+                file_content=file_content,
+                connector_type=connector_type
             )
             logger.info(f"📊 Session creation result: {result}")
             

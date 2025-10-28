@@ -1787,307 +1787,17 @@ function clearValidationErrors(formId) {
 
 // ===== פונקציות ולידציה =====
 
-/**
- * ולידציה של שדה טקסט
- */
-function validateTextField(input, rules = {}) {
-  const value = input.value.trim();
-  const mergedRules = { ...DEFAULT_VALIDATION_RULES.text, ...rules };
+// validateTextField function removed - using version from validation-utils.js
 
-  // בדיקת שדה חובה
-  if (mergedRules.required && value.length === 0) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} הוא שדה חובה`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
+// validateNumberField function removed - using version from validation-utils.js
 
-  // אם השדה ריק ולא חובה - תקין
-  if (value.length === 0) {
-    clearFieldValidation(input);
-    return true;
-  }
+// validateEmailField function removed - using version from validation-utils.js
 
-  // בדיקת אורך מינימלי
-  if (value.length < mergedRules.minLength) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} - מינימום ${mergedRules.minLength} תווים נדרשים`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
+// validateDateField function removed - using version from validation-utils.js
 
-  // בדיקת אורך מקסימלי
-  if (value.length > mergedRules.maxLength) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} - מקסימום ${mergedRules.maxLength} תווים מותרים`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
+// validateSelectField function removed - using version from validation-utils.js
 
-  // בדיקת תבנית
-  if (!mergedRules.pattern.test(value)) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} - ערך לא תקין`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
-
-  // בדיקה מותאמת אישית
-  if (mergedRules.customValidation) {
-    const customResult = mergedRules.customValidation(value, input);
-    if (customResult !== true) {
-      const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - ${customResult}`;
-      showFieldError(input, errorMsg);
-      return errorMsg;
-    }
-  }
-
-  // אם הכל תקין
-  showFieldSuccess(input);
-  return true;
-}
-
-/**
- * ולידציה של שדה מספר
- */
-function validateNumberField(input, rules = {}) {
-  const value = input.value.trim();
-  const mergedRules = { ...DEFAULT_VALIDATION_RULES.number, ...rules };
-
-  // בדיקת שדה חובה
-  if (mergedRules.required && value.length === 0) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} הוא שדה חובה`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
-
-  // אם השדה ריק ולא חובה - תקין
-  if (value.length === 0) {
-    clearFieldValidation(input);
-    return true;
-  }
-
-  // בדיקה שהערך הוא מספר
-  const numValue = parseFloat(value);
-  if (isNaN(numValue)) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} - ערך מספרי לא תקין`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
-
-  // בדיקת ערך מינימלי
-  if (mergedRules.min !== null && numValue < mergedRules.min) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} - ערך מינימלי: ${mergedRules.min}`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
-
-  // בדיקת ערך מקסימלי
-  if (mergedRules.max !== null && numValue > mergedRules.max) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} - ערך מקסימלי: ${mergedRules.max}`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
-
-  // בדיקה מותאמת אישית
-  if (mergedRules.customValidation) {
-    const customResult = mergedRules.customValidation(numValue, input);
-    if (customResult !== true) {
-      const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - ${customResult}`;
-      showFieldError(input, errorMsg);
-      return errorMsg;
-    }
-  }
-
-  // אם הכל תקין
-  showFieldSuccess(input);
-  return true;
-}
-
-/**
- * ולידציה של שדה אימייל
- */
-function validateEmailField(input, rules = {}) {
-  const value = input.value.trim();
-  const mergedRules = { ...DEFAULT_VALIDATION_RULES.email, ...rules };
-
-  // בדיקת שדה חובה
-  if (mergedRules.required && value.length === 0) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} הוא שדה חובה`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
-
-  // אם השדה ריק ולא חובה - תקין
-  if (value.length === 0) {
-    clearFieldValidation(input);
-    return true;
-  }
-
-  // בדיקת תבנית אימייל
-  if (!mergedRules.pattern.test(value)) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} - כתובת אימייל לא תקינה`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
-
-  // בדיקה מותאמת אישית
-  if (mergedRules.customValidation) {
-    const customResult = mergedRules.customValidation(value, input);
-    if (customResult !== true) {
-      const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - ${customResult}`;
-      showFieldError(input, errorMsg);
-      return errorMsg;
-    }
-  }
-
-  // אם הכל תקין
-  showFieldSuccess(input);
-  return true;
-}
-
-/**
- * ולידציה של שדה תאריך
- */
-function validateDateField(input, rules = {}) {
-  const value = input.value.trim();
-  const mergedRules = { ...DEFAULT_VALIDATION_RULES.date, ...rules };
-
-  // בדיקת שדה חובה
-  if (mergedRules.required && value.length === 0) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} הוא שדה חובה`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
-
-  // אם השדה ריק ולא חובה - תקין
-  if (value.length === 0) {
-    clearFieldValidation(input);
-    return true;
-  }
-
-  // בדיקה שהערך הוא תאריך תקין
-  const dateValue = new Date(value);
-  if (isNaN(dateValue.getTime())) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} - תאריך לא תקין`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
-
-  // בדיקת תאריך מינימלי
-  if (mergedRules.minDate) {
-    const minDate = new Date(mergedRules.minDate);
-    if (dateValue < minDate) {
-      const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - תאריך מינימלי: ${minDate.toLocaleDateString('he-IL')}`;
-      showFieldError(input, errorMsg);
-      return errorMsg;
-    }
-  }
-
-  // בדיקת תאריך מקסימלי
-  if (mergedRules.maxDate) {
-    const maxDate = new Date(mergedRules.maxDate);
-    if (dateValue > maxDate) {
-      const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - תאריך מקסימלי: ${maxDate.toLocaleDateString('he-IL')}`;
-      showFieldError(input, errorMsg);
-      return errorMsg;
-    }
-  }
-
-  // בדיקה מותאמת אישית
-  if (mergedRules.customValidation) {
-    const customResult = mergedRules.customValidation(value, input);
-    if (customResult !== true) {
-      const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - ${customResult}`;
-      showFieldError(input, errorMsg);
-      return errorMsg;
-    }
-  }
-
-  // אם הכל תקין
-  showFieldSuccess(input);
-  return true;
-}
-
-/**
- * ולידציה של שדה סלקט
- */
-function validateSelectField(input, rules = {}) {
-  const value = input.value;
-  const mergedRules = { ...DEFAULT_VALIDATION_RULES.select, ...rules };
-
-  // בדיקת שדה חובה
-  if (mergedRules.required && (!value || value === '')) {
-    const fieldLabel = getFieldLabel(input);
-    const errorMsg = `${fieldLabel} הוא שדה חובה`;
-    showFieldError(input, errorMsg);
-    return errorMsg;
-  }
-
-  // אם השדה ריק ולא חובה - תקין
-  if (!value || value === '') {
-    clearFieldValidation(input);
-    return true;
-  }
-
-  // בדיקה מותאמת אישית
-  if (mergedRules.customValidation) {
-    const customResult = mergedRules.customValidation(value, input);
-    if (customResult !== true) {
-      const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - ${customResult}`;
-      showFieldError(input, errorMsg);
-      return errorMsg;
-    }
-  }
-
-  // אם הכל תקין
-  showFieldSuccess(input);
-  return true;
-}
-
-/**
- * ולידציה כללית של שדה
- */
-function validateField(input, rules = {}) {
-  switch (input.type) {
-  case 'text':
-  case 'password':
-  case 'email':
-  case 'tel':
-  case 'url':
-    return validateTextField(input, rules);
-
-  case 'number':
-    return validateNumberField(input, rules);
-
-  case 'date':
-    return validateDateField(input, rules);
-
-  default:
-    if (input.tagName === 'SELECT') {
-      return validateSelectField(input, rules);
-    } else if (input.tagName === 'TEXTAREA') {
-      return validateTextField(input, rules);
-    } else {
-      return validateTextField(input, rules);
-    }
-  }
-}
+// validateField function removed - using version from validation-utils.js
 
 /**
  * הגדרת ולידציה לשדה
@@ -2111,121 +1821,18 @@ function setupFieldValidation(input, rules = {}) {
 
 // ===== פונקציות ולידציה מותאמות =====
 
-/**
- * ולידציה של סמל מטבע
- */
-function validateCurrencySymbol(value) {
-  if (!value || value.length === 0) {return 'סמל מטבע הוא חובה';}
-  if (value.length !== 3) {return 'סמל מטבע חייב להיות 3 תווים';}
-  if (!/^[A-Z]{3}$/.test(value)) {return 'סמל מטבע חייב להיות 3 אותיות גדולות';}
-  return true;
-}
+// validateCurrencySymbol function removed - using version from validation-utils.js
 
-/**
- * ולידציה של שער מטבע
- */
-function validateCurrencyRate(value) {
-  const numValue = parseFloat(value);
-  if (isNaN(numValue)) {return 'שער מטבע חייב להיות מספר';}
-  if (numValue <= 0) {return 'שער מטבע חייב להיות חיובי';}
-  if (numValue > 1000000) {return 'שער מטבע לא יכול להיות יותר מ-1,000,000';}
-  return true;
-}
+// validateCurrencyRate function removed - using version from validation-utils.js
 
-/**
- * ולידציה של סמל טיקר
- */
-function validateTickerSymbol(value) {
-  if (!value || value.length === 0) {return 'סמל טיקר הוא חובה';}
-  if (value.length > 10) {return 'סמל טיקר לא יכול להיות יותר מ-10 תווים';}
-  if (!/^[A-Z0-9.]+$/.test(value)) {return 'סמל טיקר יכול להכיל רק אותיות גדולות, מספרים ונקודות';}
-  return true;
-}
+// validateTickerSymbol function removed - using version from validation-utils.js
 
 // ===== פונקציה ראשית =====
 
 /**
  * ולידציה של טופס
  */
-function validateForm(formId, validationRules = {}) {
-  const form = document.getElementById(formId);
-  if (!form) {
-    // Form not found
-    return { isValid: false, errors: { form: 'טופס לא נמצא' } };
-  }
-
-  let isValid = true;
-  const errors = {};
-  const errorMessages = [];
-
-  // בדיקת שדות חובה
-  const requiredFields = form.querySelectorAll('[required]');
-  requiredFields.forEach(field => {
-    if (!field.value || field.value.trim() === '') {
-      const fieldLabel = getFieldLabel(field);
-      const errorMsg = `${fieldLabel} הוא שדה חובה`;
-      showFieldError(field, errorMsg);
-      isValid = false;
-      errors[field.name || field.id] = errorMsg;
-      errorMessages.push(errorMsg);
-    }
-  });
-
-  // בדיקת שדות תאריך
-  const dateFields = form.querySelectorAll('input[type="date"], input[type="datetime-local"]');
-  dateFields.forEach(field => {
-    if (field.value && !isValidDate(field.value)) {
-      const fieldLabel = getFieldLabel(field);
-      const errorMsg = `${fieldLabel} - תאריך לא תקין`;
-      showFieldError(field, errorMsg);
-      isValid = false;
-      errors[field.name || field.id] = errorMsg;
-      errorMessages.push(errorMsg);
-    }
-  });
-
-  // בדיקת שדות מספר
-  const numberFields = form.querySelectorAll('input[type="number"]');
-  numberFields.forEach(field => {
-    if (field.value && isNaN(parseFloat(field.value))) {
-      const fieldLabel = getFieldLabel(field);
-      const errorMsg = `${fieldLabel} - ערך מספרי לא תקין`;
-      showFieldError(field, errorMsg);
-      isValid = false;
-      errors[field.name || field.id] = errorMsg;
-      errorMessages.push(errorMsg);
-    }
-  });
-
-  // בדיקת ולידציה מותאמת אישית
-  Object.keys(validationRules).forEach(fieldName => {
-    const field = form.querySelector(`[name="${fieldName}"], [id="${fieldName}"]`);
-    if (field) {
-      const fieldRules = validationRules[fieldName];
-      const fieldValid = validateField(field, fieldRules);
-      if (!fieldValid) {
-        const fieldLabel = getFieldLabel(field);
-        const errorMsg = `${fieldLabel} - ${fieldValid}`;
-        showFieldError(field, errorMsg);
-        isValid = false;
-        errors[fieldName] = errorMsg;
-        errorMessages.push(errorMsg);
-      }
-    }
-  });
-
-  if (!isValid) {
-    // הצגת הודעת שגיאה פשוטה (כפי שמוגדר באפיון) + סימון שדות כבר בוצע למעלה
-    const firstError = errorMessages[0] || 'שגיאה בטופס';
-    if (typeof window.showSimpleErrorNotification === 'function') {
-      window.showSimpleErrorNotification('שגיאת ולידציה', firstError);
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification(firstError, 'error', 'שגיאת ולידציה', 4000, 'ui');
-    }
-  }
-
-  return { isValid, errors, errorMessages };
-}
+// validateForm function removed - using version from validation-utils.js
 
 // ===== פונקציות אתחול =====
 
@@ -2361,78 +1968,12 @@ window.clearValidation = clearValidation;
  *   { id: 'cashFlowAmount', name: 'סכום', validation: (value) => parseFloat(value) !== 0 || 'סכום לא יכול להיות 0' }
  * ]);
  */
-function validateEntityForm(formId, requiredFields = []) {
-  // ניקוי ולידציה קודמת
-  if (typeof window.clearValidation === 'function') {
-    window.clearValidation(formId);
-  }
+// validateEntityForm function removed - using version from validation-utils.js
 
-  let isValid = true;
-  const errors = [];
-
-  // בדיקת כל שדה חובה
-  requiredFields.forEach(fieldConfig => {
-    const field = document.getElementById(fieldConfig.id);
-    
-    if (!field) {
-      console.warn(`⚠️ שדה ${fieldConfig.id} לא נמצא בטופס`);
-      return;
-    }
-
-    const value = field.value;
-    let hasError = false;
-    let errorMessage = '';
-
-    // בדיקה אם השדה ריק
-    if (!value || value.trim() === '') {
-      hasError = true;
-      errorMessage = `יש לבחור ${fieldConfig.name}`;
-    }
-    // בדיקת ולידציה מותאמת אישית
-    else if (fieldConfig.validation) {
-      const validationResult = fieldConfig.validation(value, field);
-      if (validationResult !== true) {
-        hasError = true;
-        errorMessage = validationResult;
-      }
-    }
-
-    // סימון שדה בעייתי
-    if (hasError) {
-      if (typeof window.showFieldError === 'function') {
-        window.showFieldError(fieldConfig.id, errorMessage);
-      }
-      errors.push(fieldConfig.name);
-      isValid = false;
-    } else {
-      // סימון שדה תקין
-      if (typeof window.showFieldSuccess === 'function') {
-        window.showFieldSuccess(fieldConfig.id);
-      }
-    }
-  });
-
-  // הצגת הודעת שגיאה קצרה ומרוכזת
-  if (!isValid && errors.length > 0) {
-    const errorMsg = errors.length === 1 
-      ? `שדה חובה חסר: ${errors[0]}` 
-      : `שדות חובה חסרים: ${errors.join(', ')}`;
-    
-    // שימוש ב-showSimpleErrorNotification למניעת מודל מפורט
-    if (typeof window.showSimpleErrorNotification === 'function') {
-      window.showSimpleErrorNotification('שגיאת ולידציה', errorMsg);
-    } else if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאת ולידציה', errorMsg);
-    }
-  }
-
-  return isValid;
-}
-
-// ייצוא המודול
+// ייצוא המודול - פונקציות ולידציה הוסרו (בשימוש מ-validation-utils.js)
 window.validationUtils = {
-  validateForm,
-  validateEntityForm,
+  // פונקציות ולידציה הועברו ל-validation-utils.js
+  // validateForm, validateEntityForm, validateField, etc. - בשימוש מ-validation-utils.js
   showFieldError,
   showFieldSuccess,
   clearFieldError,
@@ -2442,19 +1983,8 @@ window.validationUtils = {
   isValidEmail,
   isValidPhone,
   setupFieldValidation,
-  validateField,
-  validateTextField,
-  validateNumberField,
-  validateEmailField,
-  validateDateField,
-  validateSelectField,
-  validateCurrencySymbol,
-  validateCurrencyRate,
-  validateTickerSymbol,
   initializeValidation,
   clearValidation,
 };
 
-// ייצוא הפונקציה החדשה
-window.validateEntityForm = validateEntityForm;
 

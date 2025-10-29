@@ -485,7 +485,7 @@ class PreferencesUI {
             this.loadingManager.startLoading(loaderId, 'טוען העדפות...');
             
             // Load active profile if not provided
-            if (!profileId && profileId !== 0) {
+            if (profileId === null || profileId === undefined) {
                 profileId = await this.loadActiveProfile();
             }
             

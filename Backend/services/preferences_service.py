@@ -1045,6 +1045,34 @@ class PreferencesService:
         except Exception as e:
             logger.error(f"Error activating profile {profile_id} for user {user_id}: {e}")
             return False
+    
+    def check_preference_type_exists(self, preference_name: str) -> bool:
+        """
+        בדיקת קיום סוג העדפה במסד הנתונים
+        
+        Args:
+            preference_name: שם סוג ההעדפה
+        
+        Returns:
+            True אם הסוג קיים, False אחרת
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT COUNT(*) FROM preference_types 
+                WHERE preference_name = ? AND is_active = 1
+            ''', (preference_name,))
+            
+            count = cursor.fetchone()[0]
+            conn.close()
+            
+            return count > 0
+            
+        except Exception as e:
+            logger.error(f"Error checking preference type existence for {preference_name}: {e}")
+            return False
 
 
 # יצירת מופע גלובלי

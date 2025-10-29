@@ -672,6 +672,11 @@ function restoreTickersSectionState() {
  * @returns {Promise<void>}
  */
 async function saveTicker() {
+  
+  // ניקוי מטמון לפני פעולת CRUD
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('tickers', 'add');
+  }
 
   // איסוף נתונים מהטופס באמצעות DataCollectionService
   const tickerData = DataCollectionService.collectFormData({

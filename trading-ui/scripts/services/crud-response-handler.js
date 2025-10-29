@@ -26,7 +26,7 @@ class CRUDResponseHandler {
      * טיפול בתגובת שמירה (POST)
      * 
      * @param {Response} response - תגובת fetch
-     * @param {Object} options - אופציות: { modalId, successMessage, reloadFn, entityName }
+     * @param {Object} options - אופציות: { modalId, successMessage, reloadFn, entityName, requiresHardReload }
      * @returns {Promise<Object|null>} - נתוני התגובה או null במקרה של שגיאה
      * 
      * @example
@@ -117,7 +117,7 @@ class CRUDResponseHandler {
      * טיפול בתגובת עדכון (PUT)
      * 
      * @param {Response} response - תגובת fetch
-     * @param {Object} options - אופציות: { modalId, successMessage, reloadFn, entityName }
+     * @param {Object} options - אופציות: { modalId, successMessage, reloadFn, entityName, requiresHardReload }
      * @returns {Promise<Object|null>} - נתוני התגובה או null במקרה של שגיאה
      * 
      * @example
@@ -519,12 +519,35 @@ class CRUDResponseHandler {
     /**
      * מערכת רענון טבלאות אוטומטית
      * מטפלת בניקוי מטמון ורענון אוטומטי לפי תלויות
+     * 
+     * @param {Object} options - אופציות רענון
+     * @param {Function} [options.reloadFn] - פונקציית רענון מותאמת אישית
+     * @param {string} [options.entityType] - סוג ישות (trades, alerts, etc.)
+     * @param {boolean} [options.requiresHardReload] - דורש hard reload (להעדפות)
      */
     static async handleTableRefresh(options = {}) {
         try {
             // אם יש reloadFn מותאם אישית - להשתמש בו
             if (options.reloadFn && typeof options.reloadFn === 'function') {
                 await options.reloadFn();
+                return;
+            }
+
+            // אם דורש hard reload (להעדפות) - השתמש ב-clearCacheQuick
+            if (options.requiresHardReload) {
+                console.log('🔄 CRUDResponseHandler: requiresHardReload detected, calling clearCacheQuick...');
+                if (typeof window.clearCacheQuick === 'function') {
+                    console.log('✅ CRUDResponseHandler: clearCacheQuick function found, executing...');
+                    await window.clearCacheQuick();
+                    console.log('✅ CRUDResponseHandler: Hard reload executed via clearCacheQuick');
+                } else {
+                    console.warn('⚠️ CRUDResponseHandler: clearCacheQuick not available - falling back to regular refresh');
+                    // Fallback to regular refresh
+                    const entityType = this.detectEntityType(options);
+                    if (entityType) {
+                        await this.refreshEntityTables(entityType);
+                    }
+                }
                 return;
             }
 
@@ -573,10 +596,20 @@ class CRUDResponseHandler {
      */
     static async refreshEntityTables(entityType) {
         try {
-            // ניקוי מטמון עבור הישות
-            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                await window.UnifiedCacheManager.remove(entityType);
-                console.log(`🔄 נוקה מטמון עבור ${entityType}`);
+            // ניקוי מטמון עבור הישות - שימוש נכון ב-UnifiedCacheManager
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                // ניקוי ממוקד לפי entity type
+                const keys = await window.UnifiedCacheManager.getAllKeys();
+                const entityKeys = keys.filter(k => 
+                    k.startsWith(`${entityType}_`) || 
+                    k.startsWith(`all_${entityType}`) ||
+                    k.includes(entityType)
+                );
+                
+                for (const key of entityKeys) {
+                    await window.UnifiedCacheManager.remove(key);
+                }
+                console.log(`🔄 נוקה מטמון עבור ${entityType} (${entityKeys.length} מפתחות)`);
             }
 
             // איפוס דגלי טעינה קיימים אם יש גישה אליהם

@@ -7,9 +7,9 @@
   },
   "steps": {
     "file_upload": {
-      "timestamp": "2025-10-29T00:12:13.155073",
+      "timestamp": "2025-10-29T21:16:47.389516",
       "data": {
-        "file_name": "U16011759_202509_202509.csv",
+        "file_name": "ibkr_sample.csv",
         "provider": "IBKR",
         "connector_info": {
           "provider_name": "IBKR",
@@ -21,7 +21,7 @@
       }
     },
     "analysis": {
-      "timestamp": "2025-10-29T00:12:13.168042",
+      "timestamp": "2025-10-29T21:16:47.398830",
       "data": {
         "total_records": 56,
         "parsed_records": 56,
@@ -31,26 +31,27 @@
         "clean_records": 54,
         "duplicate_records": 1,
         "missing_tickers": [
-          "ALAB",
-          "IREN",
-          "SOUN",
-          "NNE",
-          "OKLO",
-          "OPEN",
-          "MSTR",
-          "CVNA",
-          "PANW",
-          "COIN",
-          "PONY",
-          "AAL",
-          "BAC",
-          "HOOD",
-          "AFRM",
           "ANET",
+          "IREN",
           "MARA",
-          "BULL",
-          "AVGO"
+          "BAC",
+          "AAL",
+          "COIN",
+          "AVGO",
+          "NNE",
+          "SOUN",
+          "ALAB",
+          "CVNA",
+          "HOOD",
+          "OPEN",
+          "AFRM",
+          "OKLO",
+          "PONY",
+          "MSTR",
+          "PANW",
+          "BULL"
         ],
+        "missing_ticker_records": 51,
         "existing_records": 0,
         "normalization_errors": [],
         "validation_errors": [],
@@ -1248,7 +1249,7 @@
           "duplicate_count": 1,
           "clean_count": 54
         },
-        "analysis_timestamp": "2025-10-29T00:12:13.161760"
+        "analysis_timestamp": "2025-10-29T21:16:47.397243"
       }
     }
   },

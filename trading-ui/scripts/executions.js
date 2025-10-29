@@ -834,7 +834,11 @@ function validateCompleteExecutionForm(mode) {
  * שמירת עסקה חדשה
  */
 async function saveExecution() {
-
+  
+  // ניקוי מטמון לפני פעולת CRUD
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('executions', 'add');
+  }
 
   // איסוף נתונים מהטופס באמצעות DataCollectionService
   const executionData = DataCollectionService.collectFormData({

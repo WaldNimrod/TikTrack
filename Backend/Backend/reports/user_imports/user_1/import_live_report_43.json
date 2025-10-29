@@ -7,9 +7,9 @@
   },
   "steps": {
     "file_upload": {
-      "timestamp": "2025-10-29T03:26:18.246646",
+      "timestamp": "2025-10-29T21:56:07.036216",
       "data": {
-        "file_name": "U16011759_202509_202509.csv",
+        "file_name": "ibkr_sample.csv",
         "provider": "IBKR",
         "connector_info": {
           "provider_name": "IBKR",
@@ -21,94 +21,366 @@
       }
     },
     "analysis": {
-      "timestamp": "2025-10-29T03:26:18.253383",
+      "timestamp": "2025-10-29T21:56:07.118240",
       "data": {
         "total_records": 56,
         "parsed_records": 56,
         "normalized_records": 56,
         "valid_records": 56,
         "invalid_records": 0,
-        "clean_records": 54,
-        "duplicate_records": 1,
+        "clean_records": 51,
+        "duplicate_records": 5,
         "missing_tickers": [
-          "SOUN",
-          "HOOD",
           "COIN",
-          "CVNA",
-          "MSTR",
-          "BULL",
-          "ALAB",
-          "MARA",
-          "IREN",
-          "ANET",
-          "AFRM",
           "AVGO",
-          "AAL",
-          "PONY",
-          "OPEN",
+          "SOUN",
+          "MARA",
+          "BAC",
           "NNE",
-          "PANW",
           "OKLO",
-          "BAC"
+          "OPEN",
+          "AAL",
+          "BULL",
+          "AFRM",
+          "ANET",
+          "MSTR",
+          "PANW",
+          "IREN",
+          "PONY",
+          "ALAB",
+          "CVNA",
+          "HOOD"
         ],
         "missing_ticker_records": 51,
-        "existing_records": 0,
+        "existing_records": 5,
         "normalization_errors": [],
         "validation_errors": [],
         "duplicate_details": {
-          "within_file_duplicates": [
+          "within_file_duplicates": [],
+          "existing_records": [
             {
-              "record_index": 24,
+              "record_index": 8,
               "record": {
-                "symbol": "MARA",
+                "symbol": "AMZN",
                 "action": "sell",
-                "date": "2025-09-25T09:30:55",
-                "quantity": 200.0,
-                "price": 16.935,
-                "fee": 1.0376,
+                "date": "2025-09-23T09:31:23",
+                "quantity": 30.0,
+                "price": 225.504333333,
+                "fee": 1.00564,
                 "currency": "USD",
                 "asset_category": "Stocks",
-                "proceeds": 3387.0,
-                "basis": -3721.0044,
-                "realized_pl": -335.042,
-                "mtm_pl": 173.0,
-                "code": "C;LI",
-                "row_number": 296,
-                "external_id": "2025-09-25_MARA_sell_200_0_16_93",
+                "proceeds": 6765.13,
+                "basis": -6658.450985,
+                "realized_pl": 105.673375,
+                "mtm_pl": 143.83,
+                "code": "C;LI;P",
+                "row_number": 271,
+                "external_id": "2025-09-23_AMZN_sell_30_0_225_50",
                 "source": "ibkr_import"
               },
-              "within_file_matches": [
+              "within_file_matches": [],
+              "system_matches": [
                 {
-                  "record_index": 25,
-                  "record": {
-                    "symbol": "MARA",
+                  "execution_id": 1,
+                  "execution": {
+                    "ticker_id": 6,
+                    "trading_account_id": 5,
+                    "trade_id": null,
                     "action": "sell",
-                    "date": "2025-09-25T13:15:29",
-                    "quantity": 200.0,
-                    "price": 16.46,
-                    "fee": 1.0376,
-                    "currency": "USD",
-                    "asset_category": "Stocks",
-                    "proceeds": 3292.0,
-                    "basis": -3439.0044,
-                    "realized_pl": -148.042,
-                    "mtm_pl": 78.0,
-                    "code": "C;LI;P",
-                    "row_number": 297,
-                    "external_id": "2025-09-25_MARA_sell_200_0_16_46",
-                    "source": "ibkr_import"
+                    "date": "2025-09-23 09:31:23",
+                    "quantity": 30.0,
+                    "price": 225.504333333,
+                    "fee": 1.00564,
+                    "source": "ibkr_import",
+                    "external_id": "U16011759_202509_202509.csv_20251029_203208_2025-09-23_AMZN_sell_30_0_225_50",
+                    "notes": null,
+                    "realized_pl": 105.673375,
+                    "mtm_pl": 143.83,
+                    "id": 1,
+                    "created_at": "2025-10-29 20:32:08",
+                    "symbol": "AMZN"
+                  },
+                  "match_type": "field_similarity",
+                  "confidence": 100.0,
+                  "similarity_score": 5
+                },
+                {
+                  "execution_id": 18,
+                  "execution": {
+                    "ticker_id": 6,
+                    "trading_account_id": 5,
+                    "trade_id": null,
+                    "action": "sell",
+                    "date": "2025-09-23 09:31:23",
+                    "quantity": 30.0,
+                    "price": 225.504333333,
+                    "fee": 1.00564,
+                    "source": "ibkr_import",
+                    "external_id": "ibkr_sample.csv_20251029_205944_2025-09-23_AMZN_sell_30_0_225_50",
+                    "notes": null,
+                    "realized_pl": 105.673375,
+                    "mtm_pl": 143.83,
+                    "id": 18,
+                    "created_at": "2025-10-29 20:59:44",
+                    "symbol": "AMZN"
                   },
                   "match_type": "field_similarity",
                   "confidence": 100.0,
                   "similarity_score": 5
                 }
               ],
-              "system_matches": [],
-              "duplicate_type": "within_file_only",
+              "duplicate_type": "existing_only",
+              "confidence_score": 100.0
+            },
+            {
+              "record_index": 9,
+              "record": {
+                "symbol": "AMZN",
+                "action": "buy",
+                "date": "2025-09-29T11:24:45",
+                "quantity": 10.0,
+                "price": 220.7,
+                "fee": 1.00022,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -2207.0,
+                "basis": 2208.00022,
+                "realized_pl": 0.0,
+                "mtm_pl": 14.7,
+                "code": "O",
+                "row_number": 272,
+                "external_id": "2025-09-29_AMZN_buy_10_0_220_70",
+                "source": "ibkr_import"
+              },
+              "within_file_matches": [],
+              "system_matches": [
+                {
+                  "execution_id": 2,
+                  "execution": {
+                    "ticker_id": 6,
+                    "trading_account_id": 5,
+                    "trade_id": null,
+                    "action": "buy",
+                    "date": "2025-09-29 11:24:45",
+                    "quantity": 10.0,
+                    "price": 220.7,
+                    "fee": 1.00022,
+                    "source": "ibkr_import",
+                    "external_id": "U16011759_202509_202509.csv_20251029_203208_2025-09-29_AMZN_buy_10_0_220_70",
+                    "notes": null,
+                    "realized_pl": 0,
+                    "mtm_pl": 14.7,
+                    "id": 2,
+                    "created_at": "2025-10-29 20:32:08",
+                    "symbol": "AMZN"
+                  },
+                  "match_type": "field_similarity",
+                  "confidence": 100.0,
+                  "similarity_score": 5
+                },
+                {
+                  "execution_id": 19,
+                  "execution": {
+                    "ticker_id": 6,
+                    "trading_account_id": 5,
+                    "trade_id": null,
+                    "action": "buy",
+                    "date": "2025-09-29 11:24:45",
+                    "quantity": 10.0,
+                    "price": 220.7,
+                    "fee": 1.00022,
+                    "source": "ibkr_import",
+                    "external_id": "ibkr_sample.csv_20251029_205944_2025-09-29_AMZN_buy_10_0_220_70",
+                    "notes": null,
+                    "realized_pl": 0,
+                    "mtm_pl": 14.7,
+                    "id": 19,
+                    "created_at": "2025-10-29 20:59:44",
+                    "symbol": "AMZN"
+                  },
+                  "match_type": "field_similarity",
+                  "confidence": 100.0,
+                  "similarity_score": 5
+                }
+              ],
+              "duplicate_type": "existing_only",
+              "confidence_score": 100.0
+            },
+            {
+              "record_index": 27,
+              "record": {
+                "symbol": "MSFT",
+                "action": "sell",
+                "date": "2025-09-05T11:01:42",
+                "quantity": 10.0,
+                "price": 495.01,
+                "fee": 1.00193,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 4950.1,
+                "basis": -4279.15035,
+                "realized_pl": 669.94772,
+                "mtm_pl": 0.1,
+                "code": "C;LI",
+                "row_number": 300,
+                "external_id": "2025-09-05_MSFT_sell_10_0_495_01",
+                "source": "ibkr_import"
+              },
+              "within_file_matches": [],
+              "system_matches": [
+                {
+                  "execution_id": 3,
+                  "execution": {
+                    "ticker_id": 3,
+                    "trading_account_id": 5,
+                    "trade_id": null,
+                    "action": "sell",
+                    "date": "2025-09-05 11:01:42",
+                    "quantity": 10.0,
+                    "price": 495.01,
+                    "fee": 1.00193,
+                    "source": "ibkr_import",
+                    "external_id": "U16011759_202509_202509.csv_20251029_203208_2025-09-05_MSFT_sell_10_0_495_01",
+                    "notes": null,
+                    "realized_pl": 669.94772,
+                    "mtm_pl": 0.1,
+                    "id": 3,
+                    "created_at": "2025-10-29 20:32:08",
+                    "symbol": "MSFT"
+                  },
+                  "match_type": "field_similarity",
+                  "confidence": 100.0,
+                  "similarity_score": 5
+                },
+                {
+                  "execution_id": 20,
+                  "execution": {
+                    "ticker_id": 3,
+                    "trading_account_id": 5,
+                    "trade_id": null,
+                    "action": "sell",
+                    "date": "2025-09-05 11:01:42",
+                    "quantity": 10.0,
+                    "price": 495.01,
+                    "fee": 1.00193,
+                    "source": "ibkr_import",
+                    "external_id": "ibkr_sample.csv_20251029_205944_2025-09-05_MSFT_sell_10_0_495_01",
+                    "notes": null,
+                    "realized_pl": 669.94772,
+                    "mtm_pl": 0.1,
+                    "id": 20,
+                    "created_at": "2025-10-29 20:59:44",
+                    "symbol": "MSFT"
+                  },
+                  "match_type": "field_similarity",
+                  "confidence": 100.0,
+                  "similarity_score": 5
+                }
+              ],
+              "duplicate_type": "existing_only",
+              "confidence_score": 100.0
+            },
+            {
+              "record_index": 28,
+              "record": {
+                "symbol": "MSFT",
+                "action": "buy",
+                "date": "2025-09-16T09:46:53",
+                "quantity": 10.0,
+                "price": 512.97,
+                "fee": 1.00022,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -5129.7,
+                "basis": 5130.70022,
+                "realized_pl": 0.0,
+                "mtm_pl": -39.3,
+                "code": "O",
+                "row_number": 301,
+                "external_id": "2025-09-16_MSFT_buy_10_0_512_97",
+                "source": "ibkr_import"
+              },
+              "within_file_matches": [],
+              "system_matches": [
+                {
+                  "execution_id": 4,
+                  "execution": {
+                    "ticker_id": 3,
+                    "trading_account_id": 5,
+                    "trade_id": null,
+                    "action": "buy",
+                    "date": "2025-09-16 09:46:53",
+                    "quantity": 10.0,
+                    "price": 512.97,
+                    "fee": 1.00022,
+                    "source": "ibkr_import",
+                    "external_id": "U16011759_202509_202509.csv_20251029_203208_2025-09-16_MSFT_buy_10_0_512_97",
+                    "notes": null,
+                    "realized_pl": 0,
+                    "mtm_pl": -39.3,
+                    "id": 4,
+                    "created_at": "2025-10-29 20:32:08",
+                    "symbol": "MSFT"
+                  },
+                  "match_type": "field_similarity",
+                  "confidence": 100.0,
+                  "similarity_score": 5
+                }
+              ],
+              "duplicate_type": "existing_only",
+              "confidence_score": 100.0
+            },
+            {
+              "record_index": 38,
+              "record": {
+                "symbol": "NVDA",
+                "action": "sell",
+                "date": "2025-09-02T11:40:22",
+                "quantity": 25.0,
+                "price": 167.88,
+                "fee": 1.004825,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 4197.0,
+                "basis": -2948.350875,
+                "realized_pl": 1247.6443,
+                "mtm_pl": -72.5,
+                "code": "C;LI",
+                "row_number": 314,
+                "external_id": "2025-09-02_NVDA_sell_25_0_167_88",
+                "source": "ibkr_import"
+              },
+              "within_file_matches": [],
+              "system_matches": [
+                {
+                  "execution_id": 5,
+                  "execution": {
+                    "ticker_id": 5,
+                    "trading_account_id": 5,
+                    "trade_id": null,
+                    "action": "sell",
+                    "date": "2025-09-02 11:40:22",
+                    "quantity": 25.0,
+                    "price": 167.88,
+                    "fee": 1.004825,
+                    "source": "ibkr_import",
+                    "external_id": "U16011759_202509_202509.csv_20251029_203208_2025-09-02_NVDA_sell_25_0_167_88",
+                    "notes": null,
+                    "realized_pl": 1247.6443,
+                    "mtm_pl": -72.5,
+                    "id": 5,
+                    "created_at": "2025-10-29 20:32:08",
+                    "symbol": "NVDA"
+                  },
+                  "match_type": "field_similarity",
+                  "confidence": 100.0,
+                  "similarity_score": 5
+                }
+              ],
+              "duplicate_type": "existing_only",
               "confidence_score": 100.0
             }
           ],
-          "existing_records": [],
           "clean_records": [
             {
               "record_index": 0,
@@ -275,48 +547,6 @@
                 "code": "O",
                 "row_number": 269,
                 "external_id": "2025-09-25_ALAB_buy_30_0_196_00",
-                "source": "ibkr_import"
-              }
-            },
-            {
-              "record_index": 8,
-              "record": {
-                "symbol": "AMZN",
-                "action": "sell",
-                "date": "2025-09-23T09:31:23",
-                "quantity": 30.0,
-                "price": 225.504333333,
-                "fee": 1.00564,
-                "currency": "USD",
-                "asset_category": "Stocks",
-                "proceeds": 6765.13,
-                "basis": -6658.450985,
-                "realized_pl": 105.673375,
-                "mtm_pl": 143.83,
-                "code": "C;LI;P",
-                "row_number": 271,
-                "external_id": "2025-09-23_AMZN_sell_30_0_225_50",
-                "source": "ibkr_import"
-              }
-            },
-            {
-              "record_index": 9,
-              "record": {
-                "symbol": "AMZN",
-                "action": "buy",
-                "date": "2025-09-29T11:24:45",
-                "quantity": 10.0,
-                "price": 220.7,
-                "fee": 1.00022,
-                "currency": "USD",
-                "asset_category": "Stocks",
-                "proceeds": -2207.0,
-                "basis": 2208.00022,
-                "realized_pl": 0.0,
-                "mtm_pl": 14.7,
-                "code": "O",
-                "row_number": 272,
-                "external_id": "2025-09-29_AMZN_buy_10_0_220_70",
                 "source": "ibkr_import"
               }
             },
@@ -615,6 +845,48 @@
               }
             },
             {
+              "record_index": 24,
+              "record": {
+                "symbol": "MARA",
+                "action": "sell",
+                "date": "2025-09-25T09:30:55",
+                "quantity": 200.0,
+                "price": 16.935,
+                "fee": 1.0376,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 3387.0,
+                "basis": -3721.0044,
+                "realized_pl": -335.042,
+                "mtm_pl": 173.0,
+                "code": "C;LI",
+                "row_number": 296,
+                "external_id": "2025-09-25_MARA_sell_200_0_16_93",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 25,
+              "record": {
+                "symbol": "MARA",
+                "action": "sell",
+                "date": "2025-09-25T13:15:29",
+                "quantity": 200.0,
+                "price": 16.46,
+                "fee": 1.0376,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 3292.0,
+                "basis": -3439.0044,
+                "realized_pl": -148.042,
+                "mtm_pl": 78.0,
+                "code": "C;LI;P",
+                "row_number": 297,
+                "external_id": "2025-09-25_MARA_sell_200_0_16_46",
+                "source": "ibkr_import"
+              }
+            },
+            {
               "record_index": 26,
               "record": {
                 "symbol": "MARA",
@@ -632,48 +904,6 @@
                 "code": "O",
                 "row_number": 298,
                 "external_id": "2025-09-30_MARA_buy_200_0_18_20",
-                "source": "ibkr_import"
-              }
-            },
-            {
-              "record_index": 27,
-              "record": {
-                "symbol": "MSFT",
-                "action": "sell",
-                "date": "2025-09-05T11:01:42",
-                "quantity": 10.0,
-                "price": 495.01,
-                "fee": 1.00193,
-                "currency": "USD",
-                "asset_category": "Stocks",
-                "proceeds": 4950.1,
-                "basis": -4279.15035,
-                "realized_pl": 669.94772,
-                "mtm_pl": 0.1,
-                "code": "C;LI",
-                "row_number": 300,
-                "external_id": "2025-09-05_MSFT_sell_10_0_495_01",
-                "source": "ibkr_import"
-              }
-            },
-            {
-              "record_index": 28,
-              "record": {
-                "symbol": "MSFT",
-                "action": "buy",
-                "date": "2025-09-16T09:46:53",
-                "quantity": 10.0,
-                "price": 512.97,
-                "fee": 1.00022,
-                "currency": "USD",
-                "asset_category": "Stocks",
-                "proceeds": -5129.7,
-                "basis": 5130.70022,
-                "realized_pl": 0.0,
-                "mtm_pl": -39.3,
-                "code": "O",
-                "row_number": 301,
-                "external_id": "2025-09-16_MSFT_buy_10_0_512_97",
                 "source": "ibkr_import"
               }
             },
@@ -863,27 +1093,6 @@
                 "code": "O;P",
                 "row_number": 312,
                 "external_id": "2025-09-30_NNE_buy_150_0_38_65",
-                "source": "ibkr_import"
-              }
-            },
-            {
-              "record_index": 38,
-              "record": {
-                "symbol": "NVDA",
-                "action": "sell",
-                "date": "2025-09-02T11:40:22",
-                "quantity": 25.0,
-                "price": 167.88,
-                "fee": 1.004825,
-                "currency": "USD",
-                "asset_category": "Stocks",
-                "proceeds": 4197.0,
-                "basis": -2948.350875,
-                "realized_pl": 1247.6443,
-                "mtm_pl": -72.5,
-                "code": "C;LI",
-                "row_number": 314,
-                "external_id": "2025-09-02_NVDA_sell_25_0_167_88",
                 "source": "ibkr_import"
               }
             },
@@ -1246,10 +1455,10 @@
             }
           ],
           "total_checked": 56,
-          "duplicate_count": 1,
-          "clean_count": 54
+          "duplicate_count": 5,
+          "clean_count": 51
         },
-        "analysis_timestamp": "2025-10-29T03:26:18.251870"
+        "analysis_timestamp": "2025-10-29T21:56:07.105000"
       }
     }
   },

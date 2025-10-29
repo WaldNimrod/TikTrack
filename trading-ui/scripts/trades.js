@@ -802,16 +802,10 @@ async function performTradeCancellation(tradeId) {
       throw new Error(errorData.error?.message || 'שגיאה בביטול הטרייד');
     }
 
-    // שימוש במערכת הריענון המרכזית
-    if (window.centralRefresh) {
-      await window.centralRefresh.showSuccessAndRefresh('trades', 'טרייד בוטל בהצלחה!');
-    } else {
-      // Fallback למערכת הישנה
-      // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה!', 4000, 'business');
-      // רענון הטבלה
-      await loadTradesData();
-    }
+    // הצלחה
+    window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה!', 4000, 'business');
+    // רענון הטבלה
+    await loadTradesData();
 
   } catch (error) {
     if (typeof handleSaveError === 'function') {
@@ -911,16 +905,10 @@ async function performTradeDeletion(tradeId) {
       throw new Error(errorData.error?.message || 'שגיאה במחיקת הטרייד');
     }
 
-    // שימוש במערכת הריענון המרכזית
-    if (window.centralRefresh) {
-      await window.centralRefresh.showSuccessAndRefresh('trades', 'טרייד נמחק בהצלחה!');
-    } else {
-      // Fallback למערכת הישנה
-      // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה!', 4000, 'business');
-      // רענון הטבלה
-      await loadTradesData();
-    }
+    // הצלחה
+    window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה!', 4000, 'business');
+    // רענון הטבלה
+    await loadTradesData();
 
   } catch (error) {
     if (typeof handleDeleteError === 'function') {
@@ -1585,17 +1573,11 @@ async function reactivateTrade(tradeId) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    // שימוש במערכת הריענון המרכזית
-    if (window.centralRefresh) {
-      await window.centralRefresh.showSuccessAndRefresh('trades', 'טרייד הופעל מחדש בהצלחה!');
-    } else {
-      // Fallback למערכת הישנה
-      // הצגת הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!', '', 4000, 'business');
-      } else if (typeof window.showNotification === 'function') {
-        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!', '', 4000, 'business');
-      }
+    // הצגת הודעת הצלחה
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!', '', 4000, 'business');
+    } else if (typeof window.showNotification === 'function') {
+      window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!', '', 4000, 'business');
     }
 
     // רענון הטבלה
@@ -2018,6 +2000,11 @@ async function saveTrade() {
     window.Logger.debug('saveTrade called', { page: 'trades' });
     
     try {
+        // ניקוי מטמון לפני פעולת CRUD
+        if (window.clearCacheBeforeCRUD) {
+            window.clearCacheBeforeCRUD('trades', 'add');
+        }
+        
         // Collect form data
         const form = document.getElementById('tradesModalForm');
         if (!form) {

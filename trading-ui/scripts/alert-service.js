@@ -379,12 +379,7 @@ async function cancelAlert(alertId) {
     const result = await response.json();
 
     if (response.ok) {
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה בוטלה בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        // התראה בוטלה בהצלחה
+      // התראה בוטלה בהצלחה
         if (window.showSuccessNotification) {
           window.showSuccessNotification('הצלחה', 'התראה בוטלה בהצלחה!');
         }
@@ -437,12 +432,7 @@ async function deleteAlert(alertId) {
     const result = await response.json();
 
     if (response.ok && result.status === 'success') {
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה נמחקה בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        // התראה נמחקה בהצלחה
+      // התראה נמחקה בהצלחה
         if (window.showSuccessNotification) {
           window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
         }

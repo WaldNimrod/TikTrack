@@ -1106,6 +1106,12 @@ function validateEditNoteForm(content, relationType, relatedId, attachment) {
 
 // פונקציות שמירה ומחיקה
 async function saveNote() {
+  
+  // ניקוי מטמון לפני פעולת CRUD
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('notes', 'add');
+  }
+  
   // שימוש ב-DataCollectionService לאיסוף נתונים
   const noteData = DataCollectionService.collectFormData({
     content: { id: 'addNoteContent', type: 'text', isTextContent: true },

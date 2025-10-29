@@ -2266,46 +2266,68 @@ async function saveTradePlan() {
     window.Logger.debug('saveTradePlan called', { page: 'trade_plans' });
     
     try {
-        // Collect form data
+        // ניקוי מטמון לפני פעולת CRUD
+        if (window.clearCacheBeforeCRUD) {
+            window.clearCacheBeforeCRUD('trade_plans', 'add');
+        }
+        
+        // Collect form data using DataCollectionService
         const form = document.getElementById('tradePlansModalForm');
         if (!form) {
             throw new Error('Trade Plan form not found');
         }
         
-        const formData = new FormData(form);
-        const tradePlanData = {
-            ticker_id: formData.get('tradePlanTicker'),
-            name: formData.get('tradePlanName'),
-            type: formData.get('tradePlanType'),
-            quantity: parseInt(formData.get('tradePlanQuantity')),
-            entry_price: parseFloat(formData.get('tradePlanEntryPrice')) || null,
-            stop_loss: parseFloat(formData.get('tradePlanStopLoss')) || null,
-            take_profit: parseFloat(formData.get('tradePlanTakeProfit')) || null,
-            entry_date: formData.get('tradePlanEntryDate') || null,
-            status: formData.get('tradePlanStatus'),
-            notes: formData.get('tradePlanNotes')
-        };
-        
-        // Validate data
-        if (!window.validateEntityForm) {
-            throw new Error('Validation system not available');
-        }
-        
-        const isValid = window.validateEntityForm('tradePlansModalForm', {
-            tradePlanTicker: { required: true },
-            tradePlanName: { required: true, minLength: 2, maxLength: 100 },
-            tradePlanType: { required: true },
-            tradePlanQuantity: { required: true, min: 1 },
-            tradePlanEntryPrice: { required: false, min: 0.01 },
-            tradePlanStopLoss: { required: false, min: 0.01 },
-            tradePlanTakeProfit: { required: false, min: 0.01 },
-            tradePlanEntryDate: { required: false },
-            tradePlanStatus: { required: true },
-            tradePlanNotes: { required: false, maxLength: 1000 }
+        const tradePlanData = DataCollectionService.collectFormData({
+            ticker_id: { id: 'tradePlanTicker', type: 'int' },
+            name: { id: 'tradePlanName', type: 'text' },
+            type: { id: 'tradePlanType', type: 'text' },
+            quantity: { id: 'tradePlanQuantity', type: 'int' },
+            entry_price: { id: 'tradePlanEntryPrice', type: 'float', default: null },
+            stop_loss: { id: 'tradePlanStopLoss', type: 'float', default: null },
+            take_profit: { id: 'tradePlanTakeProfit', type: 'float', default: null },
+            entry_date: { id: 'tradePlanEntryDate', type: 'dateOnly', default: null },
+            status: { id: 'tradePlanStatus', type: 'text' },
+            notes: { id: 'tradePlanNotes', type: 'text', default: null }
         });
         
-        if (!isValid) {
-            window.Logger.warn('Trade Plan validation failed', { page: 'trade_plans' });
+        // ולידציה מפורטת
+        let hasErrors = false;
+        if (!tradePlanData.ticker_id) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('tradePlanTicker', 'טיקר הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!tradePlanData.name || tradePlanData.name.trim() === '') {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('tradePlanName', 'שם התוכנית הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!tradePlanData.type) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('tradePlanType', 'סוג השקעה הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!tradePlanData.quantity || tradePlanData.quantity <= 0) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('tradePlanQuantity', 'כמות חייבת להיות גדולה מ-0');
+            }
+            hasErrors = true;
+        }
+        
+        if (!tradePlanData.status) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('tradePlanStatus', 'סטטוס הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (hasErrors) {
             return;
         }
         
@@ -2326,36 +2348,23 @@ async function saveTradePlan() {
             body: JSON.stringify(tradePlanData)
         });
         
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
+        // Use CRUDResponseHandler for consistent response handling
+        if (isEdit) {
+            await CRUDResponseHandler.handleUpdateResponse(response, {
+                modalId: 'tradePlansModal',
+                successMessage: 'תוכנית מסחר עודכנה בהצלחה',
+                entityName: 'תוכנית מסחר'
+            });
+        } else {
+            await CRUDResponseHandler.handleSaveResponse(response, {
+                modalId: 'tradePlansModal',
+                successMessage: 'תוכנית מסחר נוספה בהצלחה',
+                entityName: 'תוכנית מסחר'
+            });
         }
-        
-        const result = await response.json();
-        
-        // Handle success
-        if (window.showNotification) {
-            const message = isEdit ? 'תוכנית מסחר עודכנה בהצלחה' : 'תוכנית מסחר נוספה בהצלחה';
-            window.showNotification(message, 'success', 'business');
-        }
-        
-        // Close modal
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.hideModal('tradePlansModal');
-        }
-        
-        // Refresh data
-        if (window.loadTradePlansData) {
-            window.loadTradePlansData();
-        }
-        
-        window.Logger.info('Trade Plan saved successfully', { tradePlanId: result.id, page: 'trade_plans' });
         
     } catch (error) {
-        window.Logger.error('Error saving trade plan', { error: error.message, page: 'trade_plans' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה בשמירת תוכנית המסחר', 'error', 'system');
-        }
+        CRUDResponseHandler.handleError(error, 'שמירת תוכנית מסחר');
     }
 }
 

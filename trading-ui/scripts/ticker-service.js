@@ -59,13 +59,20 @@ function isCacheValid() {
  * Clear ticker cache
  * @function clearCache
  * @returns {void}
+ * @deprecated Use window.clearCacheQuick() or window.clearAllCacheAdvanced() instead
  */
 function clearCache() {
-  tickersCache = null;
-  tradesCache = null;
-  plansCache = null;
-  lastCacheUpdate = null;
-
+  // Use centralized cache clearing instead of local clearing
+  if (typeof window.clearCacheQuick === 'function') {
+    window.clearCacheQuick();
+  } else {
+    // Fallback to local clearing only if centralized system not available
+    tickersCache = null;
+    tradesCache = null;
+    plansCache = null;
+    lastCacheUpdate = null;
+    console.log('🧹 Tickers cache cleared (local fallback)');
+  }
 }
 
 /**

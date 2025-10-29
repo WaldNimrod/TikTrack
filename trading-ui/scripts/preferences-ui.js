@@ -615,17 +615,17 @@ class PreferencesUI {
         try {
             window.Logger.info('💾 Starting save all preferences process...', { page: "preferences-ui" });
             
-            // 1. Get form element
+            // Get form element
             const form = document.getElementById('preferencesForm');
             if (!form) {
                 throw new Error('Preferences form not found');
             }
             
-            // 2. Collect form data using FormManager (handles both name and id)
+            // Collect form data using FormManager (handles both name and id)
             const formData = this.formManager.collectFormData('preferencesForm');
             const changedPreferences = {};
             
-            // 3. Check for changes and collect only changed preferences
+            // Check for changes and collect only changed preferences
             // Filter out non-preference fields (profile management, etc.)
             const excludedFields = ['profileSelect', 'newProfileName', 'switchProfileBtn', 'createProfileBtn'];
             
@@ -647,7 +647,7 @@ class PreferencesUI {
                 }
             }
             
-            // 4. Check if there are any changes
+            // Check if there are any changes
             if (Object.keys(changedPreferences).length === 0) {
                 window.Logger.info('ℹ️ No changes to save', { page: "preferences-ui" });
                 if (typeof window.showInfoNotification === 'function') {
@@ -656,9 +656,10 @@ class PreferencesUI {
                 return true;
             }
             
-            window.Logger.info(`📊 Found ${Object.keys(changedPreferences, { page: "preferences-ui" }).length} changed preferences`);
+            window.Logger.info(`📊 Found ${Object.keys(changedPreferences).length} changed preferences`);
+            console.log('🔍 DEBUG: Changed preferences:', changedPreferences);
             
-            // 5. Validate all changed preferences
+            // Validate all changed preferences
             for (let [name, value] of Object.entries(changedPreferences)) {
                 window.Logger.info(`🔍 Validating ${name} = ${value} (type: ${typeof value})...`, { page: "preferences-ui" });
                 
@@ -679,60 +680,32 @@ class PreferencesUI {
             
             window.Logger.info('✅ All preferences validated successfully', { page: "preferences-ui" });
             
-            // 6. Save to backend
+            // Save to backend
+            const requestData = {
+                user_id: userId || window.PreferencesCore.currentUserId,
+                profile_id: profileId || window.PreferencesCore.currentProfileId,
+                preferences: changedPreferences
+            };
+            
+            console.log('🔍 DEBUG: Sending to server:', requestData);
+            
             const response = await fetch('/api/preferences/user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: userId || window.PreferencesCore.currentUserId,
-                    profile_id: profileId || window.PreferencesCore.currentProfileId,
-                    preferences: changedPreferences
-                })
+                body: JSON.stringify(requestData)
             });
             
+            console.log('🔍 DEBUG: Server response status:', response.status);
+            
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                const errorText = await response.text();
+                console.log('❌ DEBUG: Server error response:', errorText);
+                throw new Error(`Server error: ${response.status} - ${errorText}`);
             }
             
-            const result = await response.json();
-            if (!result.success) {
-                throw new Error(result.error || 'Failed to save preferences');
-            }
-            
-            window.Logger.info('✅ Preferences saved successfully', { page: "preferences-ui" });
-            
-            // 7. Use Central Refresh System for proper CRUD handling
-            if (window.centralRefresh && window.centralRefresh.initialized) {
-                await window.centralRefresh.showSuccessAndRefresh('preferences', `נשמרו ${Object.keys(changedPreferences).length} העדפות בהצלחה`);
-                window.Logger.info('✅ Preferences updated via Central Refresh System', { page: "preferences-ui" });
-                return true;
-            } else {
-                // Fallback to manual cache clearing
-                try {
-                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-                        await window.UnifiedCacheManager.refreshUserPreferences();
-                        window.Logger.info('✅ User preferences cache cleared', { page: "preferences-ui" });
-                    } else if (window.clearAllUnifiedCacheQuick) {
-                        await window.clearAllUnifiedCacheQuick();
-                        window.Logger.info('✅ All cache layers cleared', { page: "preferences-ui" });
-                    } else {
-                        window.Logger.warn('⚠️ No cache clearing method available', { page: "preferences-ui" });
-                    }
-                } catch (error) {
-                    window.Logger.warn('⚠️ Cache clearing failed:', error, { page: "preferences-ui" });
-                }
-            }
-            
-            // 8. Show success notification
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification(`נשמרו ${Object.keys(changedPreferences).length} העדפות בהצלחה`);
-            }
-            
-            // 9. Reload page after 1.5 seconds
-            window.Logger.info('🔄 Page will reload in 1.5 seconds...', { page: "preferences-ui" });
-            setTimeout(() => {
-                window.location.reload(true);
-            }, 1500);
+            // Simple solution: reload page to show changes
+            console.log('🔄 Reloading page to show changes...');
+            window.location.reload(true);
             
             return true;
             
@@ -923,6 +896,162 @@ window.saveAllPreferences = async function(userId = null, profileId = null) {
  * @param {number} profileId - Profile ID
  * @returns {Promise<boolean>} Success status
  */
+
+/**
+ * Debug function to monitor preferences cache and reload system
+ * @function debugPreferencesCacheSystem
+ */
+window.debugPreferencesCacheSystem = function() {
+    console.log('🔍 === PREFERENCES CACHE SYSTEM DEBUG ===');
+    
+    // Check if required functions exist
+    console.log('📋 Function availability:');
+    console.log('  - window.clearCacheQuick:', typeof window.clearCacheQuick);
+    console.log('  - window.UnifiedCacheManager:', typeof window.UnifiedCacheManager);
+    console.log('  - window.CRUDResponseHandler:', typeof window.CRUDResponseHandler);
+    console.log('  - window.PreferencesCore:', typeof window.PreferencesCore);
+    console.log('  - window.PreferencesUI:', typeof window.PreferencesUI);
+    
+    // Check current profile
+    console.log('👤 Current profile:');
+    console.log('  - User ID:', window.PreferencesCore?.currentUserId || 'undefined');
+    console.log('  - Profile ID:', window.PreferencesCore?.currentProfileId || 'undefined');
+    
+    // Check cache state
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        console.log('💾 Cache state:');
+        console.log('  - Initialized:', window.UnifiedCacheManager.initialized);
+        console.log('  - Cache keys count:', window.UnifiedCacheManager.getAllKeys ? 'Available' : 'Not available');
+    } else {
+        console.log('❌ UnifiedCacheManager not available or not initialized');
+    }
+    
+    // Test clearCacheQuick function
+    console.log('🧪 Testing clearCacheQuick function:');
+    if (typeof window.clearCacheQuick === 'function') {
+        console.log('  - Function exists: ✅');
+        console.log('  - Function type:', typeof window.clearCacheQuick);
+    } else {
+        console.log('  - Function exists: ❌');
+    }
+    
+    console.log('🔍 === END DEBUG ===');
+};
+
+/**
+ * Test preferences save with monitoring (no auto-reload)
+ * @function testPreferencesSaveWithMonitoring
+ */
+window.testPreferencesSaveWithMonitoring = async function() {
+    console.log('🧪 === TESTING PREFERENCES SAVE WITH MONITORING ===');
+    
+    try {
+        // Test cache clearing with auto-reload disabled
+        console.log('🔄 Testing cache clearing with auto-reload disabled...');
+        
+        if (typeof window.clearCacheQuick === 'function') {
+            // Call clearCacheQuick with autoRefresh disabled
+            await window.clearCacheQuick(null, { autoRefresh: false });
+            console.log('✅ Cache cleared successfully (no auto-reload)');
+        } else if (window.UnifiedCacheManager && window.UnifiedCacheManager.clearAllCacheQuick) {
+            // Fallback to direct call
+            const result = await window.UnifiedCacheManager.clearAllCacheQuick({ autoRefresh: false });
+            console.log('✅ Cache cleared successfully (no auto-reload):', result);
+        } else {
+            console.log('❌ No cache clearing function available');
+        }
+        
+        // Test preferences reload
+        console.log('🔄 Testing preferences reload...');
+        if (window.PreferencesUI && window.PreferencesUI.loadAllPreferences) {
+            await window.PreferencesUI.loadAllPreferences();
+            console.log('✅ Preferences reloaded successfully');
+        }
+        
+        console.log('🧪 === TEST COMPLETED ===');
+        
+    } catch (error) {
+        console.error('❌ Test failed:', error);
+    }
+};
+
+/**
+ * Force refresh preferences data (for debug mode)
+ * @function forceRefreshPreferences
+ */
+window.forceRefreshPreferences = async function() {
+    console.log('🔄 === FORCE REFRESHING PREFERENCES ===');
+    
+    try {
+        // Clear cache first
+        if (typeof window.clearCacheQuick === 'function') {
+            console.log('🧹 Clearing cache...');
+            await window.clearCacheQuick(null, { autoRefresh: false });
+        } else if (window.UnifiedCacheManager && window.UnifiedCacheManager.clearAllCacheQuick) {
+            console.log('🧹 Clearing cache (fallback)...');
+            await window.UnifiedCacheManager.clearAllCacheQuick({ autoRefresh: false });
+        }
+        
+        // Reload preferences and UI
+        if (window.PreferencesUI && window.PreferencesUI.loadAllPreferences) {
+            console.log('🔄 Reloading preferences and UI...');
+            await window.PreferencesUI.loadAllPreferences();
+        }
+        
+        console.log('✅ Force refresh completed');
+        
+    } catch (error) {
+        console.error('❌ Force refresh failed:', error);
+    }
+};
+
+/**
+ * Check cache state and preferences data
+ * @function checkCacheAndPreferencesState
+ */
+window.checkCacheAndPreferencesState = async function() {
+    console.log('🔍 === CHECKING CACHE AND PREFERENCES STATE ===');
+    
+    try {
+        // Check cache state
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.getAllKeys) {
+            const keys = await window.UnifiedCacheManager.getAllKeys();
+            const prefKeys = keys.filter(k => k.includes('preference'));
+            console.log('💾 Cache state:');
+            console.log('  - Total cache keys:', keys.length);
+            console.log('  - Preference keys:', prefKeys.length);
+            console.log('  - Preference keys:', prefKeys);
+        }
+        
+        // Check current preferences
+        if (window.PreferencesCore && window.PreferencesCore.getAllPreferences) {
+            const prefs = await window.PreferencesCore.getAllPreferences();
+            console.log('⚙️ Current preferences:');
+            console.log('  - Total preferences:', Object.keys(prefs).length);
+            console.log('  - Sample preferences:', Object.keys(prefs).slice(0, 5));
+        }
+        
+        // Check UI state
+        const form = document.getElementById('preferencesForm');
+        if (form) {
+            const formData = new FormData(form);
+            const formPrefs = {};
+            for (let [key, value] of formData.entries()) {
+                if (!['profileSelect', 'newProfileName', 'switchProfileBtn', 'createProfileBtn'].includes(key)) {
+                    formPrefs[key] = value;
+                }
+            }
+            console.log('🖥️ Form state:');
+            console.log('  - Form preferences:', Object.keys(formPrefs).length);
+            console.log('  - Sample form values:', Object.keys(formPrefs).slice(0, 5));
+        }
+        
+        console.log('🔍 === STATE CHECK COMPLETED ===');
+        
+    } catch (error) {
+        console.error('❌ State check failed:', error);
+    }
+};
 window.saveIndividualPreference = async function(preferenceName, value, userId = null, profileId = null) {
     try {
         window.Logger.info(`💾 Saving individual preference: ${preferenceName} = ${value}`, { page: "preferences-ui" });

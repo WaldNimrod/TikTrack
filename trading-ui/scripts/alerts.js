@@ -2000,19 +2000,13 @@ async function updateAlert() {
       await response.json();
       // התראה עודכנה בהצלחה
 
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה עודכנה בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        // הצגת הודעה
-        if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!', 4000, 'business');
-        }
-
-        // רענון הנתונים
-        await loadAlertsData();
+      // הצגת הודעה
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!', 4000, 'business');
       }
+
+      // רענון הנתונים
+      await loadAlertsData();
 
       // סגירת המודל
       closeModal('editAlertModal');

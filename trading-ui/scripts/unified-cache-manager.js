@@ -1816,11 +1816,38 @@ UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) 
                 );
             }
             
-            // Auto-refresh after 1.5 seconds
+            // Auto-refresh after 1.5 seconds with confirmation dialog
             if (options.autoRefresh !== false) {
+                console.log('🔄 clearAllCacheQuick: Setting up auto-refresh in 1.5 seconds...');
                 setTimeout(() => {
-                    window.location.reload(true);
+                    console.log('🔄 clearAllCacheQuick: Showing confirmation dialog before reload...');
+                    
+                    // Show confirmation dialog before reload
+                    if (typeof window.showConfirmationDialog === 'function') {
+                        window.showConfirmationDialog(
+                            'טעינה מחדש של העמוד',
+                            'המטמון נוקה בהצלחה. האם להמשיך לטעינה מחדש של העמוד?',
+                            () => {
+                                console.log('✅ User confirmed page reload - executing now...');
+                                window.location.reload(true);
+                            },
+                            () => {
+                                console.log('❌ User cancelled page reload - staying on current page');
+                            },
+                            'success'
+                        );
+                    } else {
+                        // Fallback to simple confirm
+                        if (confirm('המטמון נוקה בהצלחה. האם להמשיך לטעינה מחדש של העמוד?')) {
+                            console.log('✅ User confirmed page reload - executing now...');
+                            window.location.reload(true);
+                        } else {
+                            console.log('❌ User cancelled page reload - staying on current page');
+                        }
+                    }
                 }, 1500);
+            } else {
+                console.log('ℹ️ clearAllCacheQuick: autoRefresh disabled, skipping page reload');
             }
             
             window.Logger.info('✅ Quick cache clearing completed - auto-refresh in 1.5 seconds', { page: "unified-cache-manager" });
@@ -2718,16 +2745,19 @@ window.verifyCacheSystem = async function(options = {}) {
  * @param {Event} event - Event object
  * @returns {Promise<void>}
  */
-window.clearCacheQuick = async function(event) {
+window.clearCacheQuick = async function(event, options = {}) {
     if (event) {
         event.preventDefault();
     }
     
-    window.Logger.info('🧹 ניקוי מהיר לצרכי פיתוח...', { page: "unified-cache-manager" });
+    window.Logger.info('🧹 clearCacheQuick called - ניקוי מהיר לצרכי פיתוח...', { page: "unified-cache-manager" });
+    console.log('🔄 clearCacheQuick: Starting cache clearing process...');
+    console.log('🔄 clearCacheQuick: Options:', options);
     
     try {
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-            await window.UnifiedCacheManager.clearAllCacheQuick();
+            console.log('✅ clearCacheQuick: UnifiedCacheManager is initialized, calling clearAllCacheQuick...');
+            await window.UnifiedCacheManager.clearAllCacheQuick(options);
         } else {
             window.Logger.warn('⚠️ UnifiedCacheManager לא זמין', { page: "unified-cache-manager" });
         }
@@ -2864,6 +2894,7 @@ window.clearCacheBeforeCRUD = async function(entity, operation) {
         window.Logger.error(`❌ שגיאה בניקוי מטמון לפני ${operation} של ${entity}:`, error, { page: "unified-cache-manager" });
     }
 };
+
 
 // window.Logger.info('📦 Unified Cache Manager loaded', { page: "unified-cache-manager" });
 

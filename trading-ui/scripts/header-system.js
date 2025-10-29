@@ -34,8 +34,13 @@
  * - CSS: header-system.css
  *
  * @author TikTrack Development Team
- * @version 6.0.0
- * @lastUpdated January 15, 2025
+ * @version 6.0.1
+ * @lastUpdated January 27, 2025
+ * 
+ * Changes:
+ * - Updated filter toggle buttons to use data-onclick instead of onclick
+ * - All filter buttons now use centralized event delegation system
+ * - See documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md
  */
 
 // Logger will be available after initialization
@@ -299,7 +304,7 @@ class HeaderSystem {
             <div class="filter-group account-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle account-filter-toggle" id="accountFilterToggle" 
-                        onclick="toggleAccountFilterMenu()">
+                        data-onclick="toggleAccountFilterMenu()">
                   <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון מסחר</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -315,7 +320,7 @@ class HeaderSystem {
             <div class="filter-group date-range-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle date-range-filter-toggle" id="dateRangeFilterToggle" 
-                        onclick="toggleDateRangeFilterMenu()">
+                        data-onclick="toggleDateRangeFilterMenu()">
                   <span class="selected-value selected-date-text" id="selectedDateRange">כל זמן</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -379,7 +384,7 @@ class HeaderSystem {
             <!-- כפתור פתיחה/סגירה של הפילטר - בתוך הפילטר -->
             <div class="filter-toggle-section filter-toggle-secondary">
               <button class="header-filter-toggle-btn" id="headerFilterToggleBtnSecondary" title="הצג/הסתר פילטרים" 
-                      onclick="toggleHeaderFilters()">
+                      data-onclick="toggleHeaderFilters()">
                 <span class="header-filter-arrow">▼</span>
               </button>
             </div>

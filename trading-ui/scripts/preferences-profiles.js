@@ -106,22 +106,34 @@ class ProfileManager {
                 window.Logger.info('✅ PreferencesCore updated', { page: "preferences-profiles" });
             }
             
-            // Step 3: Clear cache via UnifiedCacheManager
-            if (window.UnifiedCacheManager) {
+            // Step 3: Invalidate cache using CacheSyncManager (if available) or UnifiedCacheManager
+            if (window.CacheSyncManager && typeof window.CacheSyncManager.invalidateByAction === 'function') {
+                // Use centralized cache invalidation system with proper dependency handling
+                await window.CacheSyncManager.invalidateByAction('profile-switched');
+                window.Logger.info('✅ Cache invalidated via CacheSyncManager', { page: "preferences-profiles" });
+            } else if (window.UnifiedCacheManager) {
+                // Fallback to UnifiedCacheManager if CacheSyncManager not available
                 await window.UnifiedCacheManager.refreshUserPreferences();
                 window.Logger.info('✅ Cache cleared via UnifiedCacheManager', { page: "preferences-profiles" });
             }
             
-            // Step 4: Reload preferences
-            if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
-                await window.PreferencesUI.loadAllPreferences(userId, profileId);
-                window.Logger.info('✅ Preferences reloaded', { page: "preferences-profiles" });
-            }
-            
-            // Step 5: Update UI
+            // Step 4: Update UI elements (dropdown, summary)
             if (typeof window.loadProfilesToDropdown === 'function') {
                 await window.loadProfilesToDropdown(userId);
-                window.Logger.info('✅ UI updated', { page: "preferences-profiles" });
+                window.Logger.info('✅ Profile dropdown updated', { page: "preferences-profiles" });
+            }
+            
+            // Step 5: Reload preferences with new profile and update all UI components
+            // This will update statistics, summary, and all UI elements
+            if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
+                const allPreferences = await window.PreferencesUI.loadAllPreferences(userId, profileId);
+                window.Logger.info('✅ Preferences reloaded', { page: "preferences-profiles" });
+                
+                // Update statistics after preferences are loaded
+                if (allPreferences && typeof window.PreferencesUI.updateStatistics === 'function') {
+                    await window.PreferencesUI.updateStatistics(allPreferences);
+                    window.Logger.info('✅ Statistics and UI updated', { page: "preferences-profiles" });
+                }
             }
             
             window.Logger.info('✅ Profile switch completed successfully', { page: "preferences-profiles" });

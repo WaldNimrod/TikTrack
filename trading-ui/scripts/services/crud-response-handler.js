@@ -526,6 +526,7 @@ class CRUDResponseHandler {
      * @param {boolean} [options.requiresHardReload] - דורש hard reload (להעדפות)
      */
     static async handleTableRefresh(options = {}) {
+        console.log('🔥🔥🔥 handleTableRefresh CALLED with options:', options);
         try {
             // אם יש reloadFn מותאם אישית - להשתמש בו
             if (options.reloadFn && typeof options.reloadFn === 'function') {
@@ -533,12 +534,20 @@ class CRUDResponseHandler {
                 
                 // ניקוי מטמון ממוקד לפני רענון
                 const entityType = this.detectEntityType(options);
+                console.log('🔥 handleTableRefresh - detected entityType:', entityType);
+                console.log('🔥 handleTableRefresh - UnifiedCacheManager available?', !!window.UnifiedCacheManager);
+                console.log('🔥 handleTableRefresh - UnifiedCacheManager initialized?', window.UnifiedCacheManager?.initialized);
+                
                 if (entityType && window.UnifiedCacheManager) {
+                    console.log('🔥 handleTableRefresh - Calling clearEntityCache...');
                     await this.clearEntityCache(entityType);
+                    console.log('🔥 handleTableRefresh - clearEntityCache completed');
                 }
                 
                 // קריאה ל-reloadFn
+                console.log('🔥 handleTableRefresh - Calling reloadFn...');
                 await options.reloadFn();
+                console.log('🔥 handleTableRefresh - reloadFn completed');
                 return;
             }
 

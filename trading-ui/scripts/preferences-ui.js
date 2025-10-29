@@ -457,7 +457,10 @@ class PreferencesUI {
             
             const activeProfile = result.data.profiles.find(p => p.active === true);
             if (!activeProfile) {
-                throw new Error('No active profile found');
+                // Default profile is active (ID: 0)
+                window.Logger.info('✅ Default profile is active (ID: 0)', { page: "preferences-ui" });
+                this.currentProfileId = 0;
+                return 0;
             }
             
             this.currentProfileId = activeProfile.id;
@@ -466,10 +469,10 @@ class PreferencesUI {
             
         } catch (error) {
             window.Logger.error('❌ Error loading active profile:', error, { page: "preferences-ui" });
-            // Fallback to default profile
-            this.currentProfileId = 1;
-            window.Logger.info('⚠️ Using fallback profile ID: 1', { page: "preferences-ui" });
-            return 1;
+            // Fallback to default profile (ID: 0)
+            this.currentProfileId = 0;
+            window.Logger.info('✅ Falling back to default profile (ID: 0)', { page: "preferences-ui" });
+            return 0;
         }
     }
     

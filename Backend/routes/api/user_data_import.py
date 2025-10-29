@@ -575,8 +575,7 @@ def refresh_preview(session_id):
             if result['success']:
                 return jsonify({
                     'success': True,
-                    'preview_data': result['preview_data'],
-                    'summary_stats': result['summary_stats']
+                    'preview_data': result['preview_data']
                 })
             else:
                 return jsonify({
@@ -706,8 +705,7 @@ def get_session_status(session_id: int):
             
             return jsonify({
                 'status': 'success',
-                'session': result['session'],
-                'summary_stats': result['summary_stats']
+                'session': result['session']
             }), 200
             
         finally:

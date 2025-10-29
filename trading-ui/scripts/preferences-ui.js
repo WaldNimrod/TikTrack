@@ -621,12 +621,12 @@ class PreferencesUI {
                 throw new Error('Preferences form not found');
             }
             
-            // 2. Collect form data
-            const formData = new FormData(form);
+            // 2. Collect form data using FormManager (handles both name and id)
+            const formData = this.formManager.collectFormData('preferencesForm');
             const changedPreferences = {};
             
             // 3. Check for changes and collect only changed preferences
-            for (let [key, value] of formData.entries()) {
+            for (let [key, value] of Object.entries(formData)) {
                 if (this.hasChanged(key, value)) {
                     changedPreferences[key] = value;
                 }

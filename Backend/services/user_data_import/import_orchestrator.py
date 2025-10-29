@@ -536,7 +536,9 @@ class ImportOrchestrator:
                         'price': record['record'].get('price'),
                         'fee': record['record'].get('fee'),
                         'date': record['record'].get('date'),
-                        'external_id': record['record'].get('external_id')
+                        'external_id': record['record'].get('external_id'),
+                        'realized_pl': record['record'].get('realized_pl'),
+                        'mtm_pl': record['record'].get('mtm_pl')
                     }
                     for record in clean_records
                 ],
@@ -550,7 +552,9 @@ class ImportOrchestrator:
                         'date': record['record'].get('date'),
                         'reason': record['reason'],
                         'details': record.get('errors', []) if record['reason'] == 'validation_error' else record.get('details'),
-                        'confidence_score': record.get('confidence_score', 0) if record['reason'].endswith('_duplicate') else None
+                        'confidence_score': record.get('confidence_score', 0) if record['reason'].endswith('_duplicate') else None,
+                        'realized_pl': record['record'].get('realized_pl'),
+                        'mtm_pl': record['record'].get('mtm_pl')
                     }
                     for record in records_to_skip
                 ],

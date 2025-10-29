@@ -314,12 +314,30 @@ window.debugProfileLoading = async function() {
         console.log('   PreferencesUI.currentProfileId:', window.PreferencesUI?.currentProfileId);
         console.log('');
         
-        console.log('=== ✅ DEBUG COMPLETE ===');
+/**
+ * Local copyDetailedLog function for preferences page
+ */
+async function copyDetailedLogLocal() {
+    try {
+        const log = [];
+        const timestamp = new Date().toLocaleString('he-IL');
         
-    } catch (error) {
-        console.error('❌ Error in debugProfileLoading:', error);
-    }
-};
+        log.push('=== לוג מפורט - עמוד העדפות TikTrack ===');
+        log.push(`📅 תאריך ושעה: ${timestamp}`);
+        log.push('');
+        
+        // System info
+        log.push('--- מידע מערכת ---');
+        log.push(`🌐 URL: ${window.location.href}`);
+        log.push(`📱 User Agent: ${navigator.userAgent}`);
+        log.push(`💾 Local Storage: ${localStorage.length} items`);
+        log.push('');
+        
+        // Preferences info
+        log.push('--- מידע העדפות ---');
+        if (window.PreferencesCore) {
+            log.push(`👤 Current User ID: ${window.PreferencesCore.currentUserId}`);
+            log.push(`📋 Current Profile ID: ${window.PreferencesCore.currentProfileId}`);
         }
         if (window.ProfileManager) {
             log.push(`👤 ProfileManager User ID: ${window.ProfileManager.currentUserId}`);
@@ -359,7 +377,7 @@ window.debugProfileLoading = async function() {
             await navigator.clipboard.writeText(logContent);
             window.Logger.info('✅ Log copied to clipboard', { page: "preferences-page" });
             
-                if (typeof window.showSuccessNotification === 'function') {
+            if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('לוג הועתק ללוח');
             }
         } else {

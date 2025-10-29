@@ -78,14 +78,20 @@ class EventHandlerManager {
         
         // Handle buttons with data-onclick attribute (centralized button system)
         // This is the primary way to handle button clicks in TikTrack
+        // Based on documentation: documentation/frontend/button-system.md
         const buttonWithOnclick = target.closest('button[data-onclick]');
         if (buttonWithOnclick) {
+            // Don't process if button is disabled
+            if (buttonWithOnclick.disabled || buttonWithOnclick.hasAttribute('disabled')) {
+                return;
+            }
+            
             const onclickValue = buttonWithOnclick.getAttribute('data-onclick');
             if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
-                event.preventDefault();
-                event.stopPropagation();
                 try {
                     // Execute the onclick handler using eval (safe because it's controlled)
+                    // Note: Following documentation spec - no preventDefault/stopPropagation
+                    // to allow Bootstrap modals and other standard behaviors to work
                     eval(onclickValue);
                 } catch (error) {
                     if (window.Logger) {
@@ -98,7 +104,8 @@ class EventHandlerManager {
                         console.error('EventHandlerManager: Error executing data-onclick:', onclickValue, error);
                     }
                 }
-                return; // Don't process other handlers if data-onclick was found
+                // Don't return early - allow other handlers to process if needed
+                // This ensures compatibility with Bootstrap and other systems
             }
         }
         

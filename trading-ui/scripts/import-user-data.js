@@ -529,8 +529,8 @@ function updateAnalyzeButton() {
     const modal = document.getElementById('importUserDataModal');
     if (!modal) {
         window.Logger.warn('[Import Modal] Modal not found for button update', { page: 'import-user-data' });
-            return;
-        }
+        return;
+    }
     
     const continueBtn = modal.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
@@ -543,7 +543,11 @@ function updateAnalyzeButton() {
         const accountValue = accountSelect?.value;
         
         // Check if accountValue is not empty and not the default "בחר חשבון מסחר..."
-        const accountValid = accountValue && accountValue !== '';
+        // Also check if it's a valid number (account IDs are numbers)
+        const accountValid = accountValue && 
+                           accountValue !== '' && 
+                           accountValue !== '0' && 
+                           !isNaN(parseInt(accountValue));
         
         const allFieldsFilled = selectedFile && connectorValue && accountValid;
         
@@ -565,6 +569,7 @@ function updateAnalyzeButton() {
                 file: !!selectedFile, 
                 connector: !!connectorValue,
                 account: accountValid,
+                accountValue: accountValue, // Add actual value for debugging
                 page: 'import-user-data'
             });
         }
@@ -812,18 +817,62 @@ function validateAllRequiredFields() {
 async function loadAccounts() {
     window.Logger.debug('[Import Modal] Loading accounts', { page: 'import-user-data' });
     
-    // Use the existing SelectPopulatorService
+    // Get the modal first to ensure we populate the correct select
+    const modal = document.getElementById('importUserDataModal');
+    if (!modal) {
+        window.Logger.error('[Import Modal] Modal not found for loading accounts', { page: 'import-user-data' });
+        return;
+    }
+    
+    const accountSelect = modal.querySelector('#tradingAccountSelect');
+    if (!accountSelect) {
+        window.Logger.error('[Import Modal] Account select not found in modal', { page: 'import-user-data' });
+        return;
+    }
+    
+    // Use the existing SelectPopulatorService but pass the element directly
     if (window.SelectPopulatorService) {
         window.Logger.debug('[Import Modal] Using SelectPopulatorService', { page: 'import-user-data' });
         try {
-            await window.SelectPopulatorService.populateAccountsSelect('tradingAccountSelect', {
-                includeEmpty: true,
-                emptyText: 'בחר חשבון מסחר...',
-                filterFn: (account) => account.status === 'open'
+            // Temporarily set the ID to ensure SelectPopulatorService finds it
+            // But we'll populate it manually to ensure it's the right element
+            const response = await fetch('/api/trading-accounts/');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const responseData = await response.json();
+            let accounts = responseData.data || responseData || [];
+            
+            // Filter only open accounts
+            accounts = accounts.filter(account => account.status === 'open');
+            
+            // Clear existing options
+            accountSelect.innerHTML = '';
+            
+            // Add empty option
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = 'בחר חשבון מסחר...';
+            accountSelect.appendChild(emptyOption);
+            
+            // Add account options
+            accounts.forEach(account => {
+                const option = document.createElement('option');
+                option.value = account.id.toString(); // Ensure it's a string
+                option.textContent = account.name;
+                accountSelect.appendChild(option);
             });
-            window.Logger.info('[Import Modal] Accounts loaded successfully', { page: 'import-user-data' });
+            
+            window.Logger.info('[Import Modal] Accounts loaded successfully', { 
+                count: accounts.length, 
+                page: 'import-user-data' 
+            });
+            
+            // Update button state after loading
+            updateAnalyzeButton();
         } catch (error) {
-            window.Logger.error('[Import Modal] Error loading accounts with SelectPopulatorService', { error: error.message, page: 'import-user-data' });
+            window.Logger.error('[Import Modal] Error loading accounts', { error: error.message, page: 'import-user-data' });
             // Fallback to direct API call
             await loadAccountsFallback();
         }
@@ -840,23 +889,45 @@ async function loadAccounts() {
 function loadAccountsFallback() {
     window.Logger.debug('[Import Modal] Loading accounts via fallback method', { page: 'import-user-data' });
     
+    const modal = document.getElementById('importUserDataModal');
+    if (!modal) {
+        window.Logger.error('[Import Modal] Modal not found for fallback', { page: 'import-user-data' });
+        return;
+    }
+    
+    const accountSelect = modal.querySelector('#tradingAccountSelect');
+    if (!accountSelect) {
+        window.Logger.error('[Import Modal] Account select not found in modal for fallback', { page: 'import-user-data' });
+        return;
+    }
+    
     fetch('/api/trading-accounts/')
         .then(response => response.json())
         .then(data => {
             const accounts = data.data || data || [];
             const openAccounts = accounts.filter(account => account.status === 'open');
             
-            const accountSelect = document.getElementById('tradingAccountSelect');
-            if (accountSelect) {
-                accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
-                openAccounts.forEach(account => {
-                    const option = document.createElement('option');
-                    option.value = account.id;
-                    option.textContent = account.name;
-                    accountSelect.appendChild(option);
-                });
-                window.Logger.info('[Import Modal] Accounts loaded via fallback', { count: openAccounts.length, page: 'import-user-data' });
-            }
+            // Clear existing options
+            accountSelect.innerHTML = '';
+            
+            // Add empty option
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = 'בחר חשבון מסחר...';
+            accountSelect.appendChild(emptyOption);
+            
+            // Add account options
+            openAccounts.forEach(account => {
+                const option = document.createElement('option');
+                option.value = account.id.toString(); // Ensure it's a string
+                option.textContent = account.name;
+                accountSelect.appendChild(option);
+            });
+            
+            window.Logger.info('[Import Modal] Accounts loaded via fallback', { count: openAccounts.length, page: 'import-user-data' });
+            
+            // Update button state after loading
+            updateAnalyzeButton();
         })
         .catch(error => {
             window.Logger.error('[Import Modal] Error loading accounts via fallback', { error: error.message, page: 'import-user-data' });

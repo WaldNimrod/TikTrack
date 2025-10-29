@@ -1040,7 +1040,14 @@ class LocalStorageLayer {
         try {
             const fullKey = this.prefix + key;
             const value = localStorage.getItem(fullKey);
-            return value ? JSON.parse(value) : null;
+            if (value === null || value === undefined) {
+                return null;
+            }
+            // Handle "undefined" string that was stored incorrectly
+            if (value === 'undefined' || value === 'null') {
+                return null;
+            }
+            return JSON.parse(value);
         } catch (error) {
             window.Logger.error('❌ LocalStorage get failed:', error, { page: "unified-cache-manager" });
             return null;

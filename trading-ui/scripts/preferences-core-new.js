@@ -375,7 +375,11 @@ class PreferencesCore {
      * @returns {Promise<any>} Preference value
      */
     async getPreference(preferenceName, userId = null, profileId = null, useLazyLoading = true) {
-        const cacheKey = `preference_${preferenceName}_${userId || this.currentUserId}_${profileId || this.currentProfileId}`;
+        // For default profile, use 0 explicitly
+        const finalUserId = userId || this.currentUserId;
+        const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
+        
+        const cacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
         
         // Use UnifiedCacheManager
         if (window.UnifiedCacheManager) {
@@ -399,7 +403,7 @@ class PreferencesCore {
                 window.Logger.debug(`🎯 Loading ${preferenceName} on demand via lazy loader`, { page: "preferences-core-new" });
                 // Load all preferences at once from API
                 try {
-                    const response = await fetch(`/api/preferences/user?user_id=${userId || this.currentUserId}&profile_id=${profileId || this.currentProfileId}`);
+                    const response = await fetch(`/api/preferences/user?user_id=${finalUserId}&profile_id=${finalProfileId}`);
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
@@ -432,8 +436,8 @@ class PreferencesCore {
             // Load from API
             const value = await this.apiClient.getPreference(
                 preferenceName, 
-                userId || this.currentUserId, 
-                profileId || this.currentProfileId
+                finalUserId, 
+                finalProfileId
             );
             
             // Save to UnifiedCacheManager
@@ -461,7 +465,11 @@ class PreferencesCore {
      * @returns {Promise<Object>} Preferences object
      */
     async getAllPreferences(userId = null, profileId = null, criticalPrefs = []) {
-        const cacheKey = `all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`;
+        // For default profile, use 0 explicitly
+        const finalUserId = userId || this.currentUserId;
+        const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
+        
+        const cacheKey = `all_preferences_${finalUserId}_${finalProfileId}`;
         
         // Check cache first via UnifiedCacheManager
         if (window.UnifiedCacheManager) {
@@ -480,14 +488,14 @@ class PreferencesCore {
             const criticalPreferences = {};
             if (criticalPrefs.length > 0) {
                 for (const prefName of criticalPrefs) {
-                    criticalPreferences[prefName] = await this.getPreference(prefName, userId, profileId);
+                    criticalPreferences[prefName] = await this.getPreference(prefName, finalUserId, finalProfileId);
                 }
             }
             
             // Load all preferences
             const allPreferences = await this.apiClient.getAllPreferences(
-                userId || this.currentUserId, 
-                profileId || this.currentProfileId
+                finalUserId, 
+                finalProfileId
             );
             
             // Merge critical preferences

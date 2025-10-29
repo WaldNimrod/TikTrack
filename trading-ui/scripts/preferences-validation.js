@@ -324,7 +324,7 @@ class ConstraintValidator {
         
         this.constraints.set('tablePageSize', {
             min: 10,
-            max: 1000,
+            max: 100,
             type: 'number'
         });
         
@@ -383,15 +383,21 @@ class ConstraintValidator {
         
         // Number constraints
         if (constraint.type === 'number') {
-            if (typeof value !== 'number') return false;
+            // Convert string to number if needed
+            const numValue = typeof value === 'string' ? parseFloat(value) : value;
             
-            if (constraint.min !== undefined && value < constraint.min) {
-                window.Logger.warn(`⚠️ Constraint violation: ${preferenceName} = ${value} < ${constraint.min}`, { page: "preferences-validation" });
+            if (isNaN(numValue)) {
+                window.Logger.warn(`⚠️ Constraint validation failed: ${preferenceName} = "${value}" is not a number`, { page: "preferences-validation" });
                 return false;
             }
             
-            if (constraint.max !== undefined && value > constraint.max) {
-                window.Logger.warn(`⚠️ Constraint violation: ${preferenceName} = ${value} > ${constraint.max}`, { page: "preferences-validation" });
+            if (constraint.min !== undefined && numValue < constraint.min) {
+                window.Logger.warn(`⚠️ Constraint violation: ${preferenceName} = ${numValue} < ${constraint.min} (min allowed)`, { page: "preferences-validation" });
+                return false;
+            }
+            
+            if (constraint.max !== undefined && numValue > constraint.max) {
+                window.Logger.warn(`⚠️ Constraint violation: ${preferenceName} = ${numValue} > ${constraint.max} (max allowed)`, { page: "preferences-validation" });
                 return false;
             }
         }
@@ -421,12 +427,29 @@ class ConstraintValidator {
      * @returns {ConstraintError|null} Error or null
      */
     getConstraintError(preferenceName, value) {
+        const constraint = this.constraints.get(preferenceName);
+        
+        // Log constraint details for debugging
+        window.Logger.debug(`🔍 Checking constraints for ${preferenceName}:`, {
+            value: value,
+            valueType: typeof value,
+            valueAsNumber: typeof value === 'string' ? parseFloat(value) : value,
+            constraint: constraint,
+            page: "preferences-validation"
+        });
+        
         if (this.validate(preferenceName, value)) {
             return null;
         }
         
-        const constraint = this.constraints.get(preferenceName);
         const constraintText = this.formatConstraintText(constraint);
+        
+        window.Logger.warn(`⚠️ Constraint violation for ${preferenceName}:`, {
+            value: value,
+            constraint: constraintText,
+            fullConstraint: constraint,
+            page: "preferences-validation"
+        });
         
         return new ConstraintError(preferenceName, constraintText, value);
     }

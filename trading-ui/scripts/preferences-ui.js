@@ -658,11 +658,17 @@ class PreferencesUI {
             
             // 5. Validate all changed preferences
             for (let [name, value] of Object.entries(changedPreferences)) {
-                window.Logger.info(`🔍 Validating ${name}...`, { page: "preferences-ui" });
+                window.Logger.info(`🔍 Validating ${name} = ${value} (type: ${typeof value})...`, { page: "preferences-ui" });
                 
                 if (window.PreferenceValidator) {
                     const validation = await window.PreferenceValidator.validatePreference(name, value);
                     if (!validation.valid) {
+                        window.Logger.error(`❌ Validation failed for ${name}:`, {
+                            value: value,
+                            valueType: typeof value,
+                            errors: validation.errors,
+                            page: "preferences-ui"
+                        });
                         const errorMessages = validation.errors.map(e => e.message).join(', ');
                         throw new Error(`Validation failed for ${name}: ${errorMessages}`);
                     }

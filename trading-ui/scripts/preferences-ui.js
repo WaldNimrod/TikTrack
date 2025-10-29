@@ -468,11 +468,26 @@ class PreferencesUI {
                 return 0;
             }
             
-            // Check if active profile is default profile (ID: 0 or is_default = true)
-            if (activeProfile.id === 0 || activeProfile.is_default || activeProfile.default) {
-                window.Logger.info('✅ Active profile is default profile (ID: 0)', { page: "preferences-ui" });
+            // Check if active profile is default system profile (ID: 0)
+            if (activeProfile.id === 0) {
+                window.Logger.info('✅ Active profile is system default profile (ID: 0)', { page: "preferences-ui" });
                 this.currentProfileId = 0;
                 return 0;
+            }
+            
+            // Check if active profile has is_default flag
+            if (activeProfile.is_default || activeProfile.default) {
+                // If it's a user profile marked as default, still check if ID is 0
+                if (activeProfile.id === 0 || activeProfile.user_id === 0) {
+                    window.Logger.info('✅ Active profile is default system profile (ID: 0, user_id: 0)', { page: "preferences-ui" });
+                    this.currentProfileId = 0;
+                    return 0;
+                } else {
+                    // User profile marked as default - use it as-is
+                    this.currentProfileId = activeProfile.id;
+                    window.Logger.info(`✅ Active profile loaded: ${activeProfile.name} (ID: ${activeProfile.id})`, { page: "preferences-ui" });
+                    return activeProfile.id;
+                }
             }
             
             // Regular user profile

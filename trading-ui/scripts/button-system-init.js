@@ -9,8 +9,13 @@
  * - documentation/02-ARCHITECTURE/FRONTEND/button-system.md
  * 
  * Author: TikTrack Development Team
- * Version: 1.0
+ * Version: 1.1
  * Last Updated: 2025-01-27
+ * 
+ * Changes:
+ * - Updated to use data-onclick instead of onclick for event delegation
+ * - Buttons now created with data-onclick attribute for centralized event handling
+ * - See documentation/frontend/button-system.md and documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md
  */
 
 const BUTTON_SYSTEM_CONFIG = {

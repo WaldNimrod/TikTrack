@@ -14,30 +14,53 @@
 ## תכונות חדשות
 
 ### Event Delegation System (חדש!)
-מערכת הכפתורים כוללת מערכת event delegation מתקדמת המטפלת ב-`data-onclick` attributes:
+מערכת הכפתורים כוללת מערכת event delegation מתקדמת המטפלת ב-`data-onclick` attributes דרך `EventHandlerManager`:
+
+**מיקום:** `trading-ui/scripts/event-handler-manager.js`
+
+**איך זה עובד:**
+1. מערכת הכפתורים יוצרת כפתורים עם `data-onclick` במקום `onclick`
+2. `EventHandlerManager` מטפל בכל לחיצות על כפתורים עם `data-onclick` attribute
+3. הפונקציה מוגדרת ב-`data-onclick` מבוצעת דרך `eval()`
 
 ```javascript
 // Event delegation for data-onclick attributes
-document.addEventListener('click', (event) => {
-    const button = event.target.closest('button[data-onclick]');
-    if (button) {
-        const onclickValue = button.getAttribute('data-onclick');
-        if (onclickValue && onclickValue !== 'null') {
-            try {
-                eval(onclickValue);
-            } catch (error) {
-                console.error(`Button System: Error executing data-onclick:`, error);
-            }
+// ממומש ב-event-handler-manager.js -> handleDelegatedClick()
+const buttonWithOnclick = event.target.closest('button[data-onclick]');
+if (buttonWithOnclick) {
+    // בדיקה אם הכפתור disabled
+    if (buttonWithOnclick.disabled || buttonWithOnclick.hasAttribute('disabled')) {
+        return;
+    }
+    
+    const onclickValue = buttonWithOnclick.getAttribute('data-onclick');
+    if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
+        try {
+            // אין preventDefault/stopPropagation כדי לאפשר Bootstrap modals לעבוד
+            eval(onclickValue);
+        } catch (error) {
+            window.Logger.error('EventHandlerManager: Error executing data-onclick', {
+                onclickValue: onclickValue,
+                error: error.message
+            });
         }
     }
-});
+}
 ```
 
 **יתרונות:**
 - ✅ תמיכה מלאה ב-`data-onclick` attributes
-- ✅ טיפול אוטומטי בכפתורים דינמיים
-- ✅ Error handling מובנה
+- ✅ טיפול אוטומטי בכפתורים דינמיים שנוצרים בזמן ריצה
+- ✅ Error handling מובנה עם לוגים מפורטים
+- ✅ תאימות מלאה עם Bootstrap modals (ללא preventDefault)
+- ✅ בדיקה אוטומטית של כפתורים disabled
 - ✅ תאימות מלאה עם המערכת המאוחדת
+
+**הערות חשובות:**
+- ❌ **אסור להשתמש ב-`onclick` בכפתורים** - רק `data-onclick`
+- ✅ הכפתורים נוצרים אוטומטית עם `data-onclick` דרך `button-system-init.js`
+- ✅ המערכת לא מונעת התנהגות ברירת מחדל (`preventDefault`) כדי לאפשר Bootstrap modals לעבוד
+- ✅ אם יש שגיאה בביצוע הפונקציה, היא תתועד בלוגים אבל לא תתרסק את המערכת
 
 ### משתני צבע דינמיים
 כל כפתור משתמש במשתנה CSS דינמי שניתן להתאים אישית:

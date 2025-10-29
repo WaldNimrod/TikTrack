@@ -1,0 +1,354 @@
+# Event Handler System - TikTrack
+## מערכת ניהול אירועים מרכזית
+
+### 📋 סקירה כללית
+
+מערכת ניהול האירועים המרכזית של TikTrack מספקת פתרון אחיד ויעיל לניהול כל מטפלי האירועים במערכת, מונעת כפילויות ומשפרת ביצועים.
+
+**מיקום:** `trading-ui/scripts/event-handler-manager.js`
+
+**גרסה:** 1.0  
+**עודכן לאחרונה:** 2025-01-26
+
+---
+
+## 🎯 מטרות העיצוב
+
+1. **מניעת כפילויות** - מטפל אחד מרכזי לכל סוג אירוע
+2. **ביצועים טובים** - שימוש ב-event delegation במקום listeners מרובים
+3. **תאימות** - עובד עם Bootstrap, מערכת הכפתורים, וכל המערכות האחרות
+4. **תחזוקה קלה** - כל הלוגיקה במקום אחד
+
+---
+
+## 🏗️ ארכיטקטורה
+
+### EventHandlerManager Class
+
+המערכת מבוססת על class מרכזי המנהל את כל האירועים:
+
+```javascript
+class EventHandlerManager {
+    constructor() {
+        this.listeners = new Map();
+        this.delegatedListeners = new Map();
+        this.initialized = false;
+    }
+    
+    init() {
+        // אתחול המערכת
+        this.setupGlobalDelegation();
+        this.initialized = true;
+    }
+}
+```
+
+### Event Delegation
+
+המערכת משתמשת ב-**Event Delegation** - listener אחד על `document` במקום listeners רבים על כל אלמנט:
+
+```javascript
+setupGlobalDelegation() {
+    // Click events delegation
+    document.addEventListener('click', (event) => {
+        this.handleDelegatedClick(event);
+    });
+    
+    // Change events delegation
+    document.addEventListener('change', (event) => {
+        this.handleDelegatedChange(event);
+    });
+    
+    // Input events delegation
+    document.addEventListener('input', (event) => {
+        this.handleDelegatedInput(event);
+    });
+    
+    // Blur events delegation
+    document.addEventListener('blur', (event) => {
+        this.handleDelegatedBlur(event);
+    });
+}
+```
+
+---
+
+## 🔘 טיפול בכפתורים - data-onclick
+
+### סקירה כללית
+
+המערכת מטפלת באופן מיוחד בכפתורים עם `data-onclick` attribute - זה התקן המומלץ לכל הכפתורים במערכת TikTrack.
+
+### איך זה עובד
+
+1. **יצירת כפתור** - מערכת הכפתורים (`button-system-init.js`) יוצרת כפתורים עם `data-onclick` במקום `onclick`
+2. **זיהוי לחיצה** - `EventHandlerManager` מזהה לחיצה על כפתור עם `data-onclick`
+3. **ביצוע פונקציה** - הפונקציה המוגדרת ב-`data-onclick` מבוצעת דרך `eval()`
+
+### קוד המימוש
+
+```javascript
+handleDelegatedClick(event) {
+    const target = event.target;
+    
+    // Handle buttons with data-onclick attribute (centralized button system)
+    const buttonWithOnclick = target.closest('button[data-onclick]');
+    if (buttonWithOnclick) {
+        // בדיקה אם הכפתור disabled
+        if (buttonWithOnclick.disabled || buttonWithOnclick.hasAttribute('disabled')) {
+            return;
+        }
+        
+        const onclickValue = buttonWithOnclick.getAttribute('data-onclick');
+        if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
+            try {
+                // אין preventDefault/stopPropagation כדי לאפשר Bootstrap modals לעבוד
+                eval(onclickValue);
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('EventHandlerManager: Error executing data-onclick', {
+                        onclickValue: onclickValue,
+                        error: error.message,
+                        stack: error.stack
+                    });
+                }
+            }
+            // לא return - מאפשר handlers אחרים לעבוד (Bootstrap וכו')
+        }
+    }
+    
+    // ממשיך לטפל באירועים אחרים...
+}
+```
+
+### הערות חשובות
+
+#### ✅ מה המערכת עושה:
+- **מזהה כפתורים** עם `data-onclick` attribute
+- **בודקת disabled** - לא מבצעת אם הכפתור disabled
+- **מבצעת את הפונקציה** דרך `eval()`
+- **לוגים שגיאות** אבל לא מתרסקת
+
+#### ❌ מה המערכת לא עושה:
+- **אין `preventDefault()`** - כדי לאפשר Bootstrap modals לעבוד
+- **אין `stopPropagation()`** - כדי לאפשר handlers אחרים לעבוד
+- **אין return מוקדם** - מאפשר מטפלי אירועים אחרים לפעול
+
+### דוגמאות שימוש
+
+#### כפתור פשוט
+```html
+<button data-button-type="ADD" data-onclick="openAddModal()" data-text="הוסף">
+    הוסף
+</button>
+```
+
+#### כפתור עם פרמטרים
+```html
+<button data-button-type="EDIT" 
+        data-onclick="editRecord(123)" 
+        data-text="ערוך">
+    ערוך
+</button>
+```
+
+#### כפתור עם פונקציה מורכבת
+```html
+<button data-button-type="VIEW" 
+        data-onclick="window.showEntityDetails('execution', 4, { mode: 'view' })" 
+        data-text="צפה">
+    צפה
+</button>
+```
+
+#### כפתור בתוך טבלה דינמית
+```javascript
+// הכפתור נוצר דינמית ועדיין יעבוד!
+const buttonHtml = `
+    <button data-button-type="DELETE" 
+            data-onclick="deleteRow(${rowId})" 
+            data-text="מחק">
+        מחק
+    </button>
+`;
+tableRow.innerHTML += buttonHtml;
+// הכפתור יעבוד מיד ללא צורך ב-addEventListener!
+```
+
+---
+
+## 🎨 תאימות עם מערכות אחרות
+
+### Bootstrap Modals
+
+המערכת **תואמת Bootstrap** כי היא לא משתמשת ב-`preventDefault()`:
+
+```html
+<!-- כפתור סגירה של Bootstrap modal - יעבוד! -->
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+<!-- כפתור עם data-onclick בתוך modal - יעבוד! -->
+<button data-button-type="SAVE" 
+        data-onclick="saveData()" 
+        data-bs-dismiss="modal"
+        data-text="שמור">
+    שמור
+</button>
+```
+
+### Form Submissions
+
+כפתורי submit בטופסים יעבדו כרגיל:
+
+```html
+<form>
+    <button type="submit" data-onclick="validateForm()">שלח</button>
+</form>
+```
+
+### Dynamic Content
+
+כפתורים שנוצרים דינמית אחרי טעינת הדף יעבדו אוטומטית:
+
+```javascript
+// יצירת כפתור חדש אחרי 5 שניות
+setTimeout(() => {
+    const newButton = document.createElement('button');
+    newButton.setAttribute('data-onclick', 'doSomething()');
+    newButton.textContent = 'לחץ כאן';
+    document.body.appendChild(newButton);
+    // הכפתור יעבוד מיד ללא צורך ב-addEventListener!
+}, 5000);
+```
+
+---
+
+## 🔧 אירועים אחרים
+
+### Click Events - data-action
+
+```javascript
+// אלמנט עם data-action
+if (target.matches('[data-action]')) {
+    const action = target.getAttribute('data-action');
+    this.executeAction(action, target, event);
+}
+```
+
+### Modal Triggers
+
+```javascript
+// אלמנט עם data-modal-trigger
+if (target.matches('[data-modal-trigger]')) {
+    const modalType = target.getAttribute('data-modal-trigger');
+    this.openModal(modalType, target, event);
+}
+```
+
+### Sortable Headers
+
+```javascript
+// headers עם class sortable-header
+if (target.matches('.sortable-header')) {
+    this.handleSortableClick(target, event);
+}
+```
+
+### Change Events
+
+```javascript
+handleDelegatedChange(event) {
+    const target = event.target;
+    
+    // Form field changes
+    if (target.matches('[data-field-change]')) {
+        const fieldName = target.getAttribute('data-field-change');
+        this.handleFieldChange(fieldName, target, event);
+    }
+    
+    // Filter changes
+    if (target.matches('[data-filter-change]')) {
+        const filterType = target.getAttribute('data-filter-change');
+        this.handleFilterChange(filterType, target, event);
+    }
+}
+```
+
+---
+
+## 📝 Best Practices
+
+### ✅ מה לעשות
+
+1. **השתמש ב-`data-onclick`** לכל הכפתורים
+2. **השתמש במערכת הכפתורים** (`button-system-init.js`) ליצירת כפתורים
+3. **בדוק disabled state** לפני ביצוע פעולות
+4. **השתמש בלוגים** לדיבוג בעיות
+
+### ❌ מה לא לעשות
+
+1. **אל תשתמש ב-`onclick`** - רק `data-onclick`
+2. **אל תוסיף listeners ידניים** לכפתורים עם `data-onclick`
+3. **אל תסמוך על `preventDefault()`** - המערכת לא משתמשת בו
+4. **אל תוודא handlers אחרים** - הם יכולים לעבוד במקביל
+
+---
+
+## 🐛 פתרון בעיות
+
+### כפתור לא עובד
+
+**סיבות אפשריות:**
+1. הכפתור לא נוצר עם `data-onclick` - בדוק שהמערכת יצרה אותו נכון
+2. הפונקציה לא קיימת - בדוק שהפונקציה מוגדרת ב-`window`
+3. שגיאה בביצוע - בדוק את הלוגים ב-console
+
+**פתרון:**
+```javascript
+// בדיקה מהירה בקונסולה
+const button = document.querySelector('button[data-onclick]');
+console.log('Button:', button);
+console.log('data-onclick value:', button?.getAttribute('data-onclick'));
+console.log('Function exists:', typeof window[button?.getAttribute('data-onclick')?.split('(')[0]] === 'function');
+```
+
+### Bootstrap Modal לא נסגר
+
+**סיבה:** כפתור עם `data-onclick` בתוך modal עלול להפריע
+
+**פתרון:** ודא שהכפתור לא מונע את האירוע (המערכת כבר לא עושה `preventDefault()`)
+
+### כפתור פועל פעמיים
+
+**סיבה:** אולי יש גם `onclick` רגיל וגם `data-onclick`
+
+**פתרון:** הסר את ה-`onclick` הרגיל, השתמש רק ב-`data-onclick`
+
+---
+
+## 📚 קישורים קשורים
+
+- **מערכת הכפתורים:** `documentation/frontend/button-system.md`
+- **Button System Init:** `trading-ui/scripts/button-system-init.js`
+- **Event Handler Manager:** `trading-ui/scripts/event-handler-manager.js`
+
+---
+
+## 🔄 היסטוריית עדכונים
+
+### 2025-01-26 - עדכון Event Delegation
+- ✅ הוספת תמיכה מלאה ב-`data-onclick`
+- ✅ הסרת `preventDefault()` ו-`stopPropagation()` לתאימות Bootstrap
+- ✅ הוספת בדיקת disabled buttons
+- ✅ שיפור error handling עם לוגים מפורטים
+- ✅ עדכון תיעוד מלא
+
+---
+
+## 📞 תמיכה
+
+לשאלות או בעיות עם מערכת ניהול האירועים:
+1. בדוק את הלוגים ב-console
+2. בדוק את התיעוד ב-`documentation/frontend/button-system.md`
+3. בדוק את הקוד ב-`trading-ui/scripts/event-handler-manager.js`
+

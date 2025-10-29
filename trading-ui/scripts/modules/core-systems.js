@@ -854,6 +854,9 @@ class UnifiedAppInitializer {
         // are optional and not currently loaded in the standard loading system.
         // UnifiedCacheManager provides all necessary functionality for now.
         
+        // Central Refresh System - required for CRUD operations
+        'central-refresh-system.js'
+        
         // Initialize registered core systems - only if not already initialized
         if (window.UnifiedInitializationSystem && !window.coreSystemsInitialized) {
             await window.UnifiedInitializationSystem.initializeCoreSystems();

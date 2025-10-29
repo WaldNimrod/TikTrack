@@ -701,19 +701,26 @@ class PreferencesUI {
             
             window.Logger.info('✅ Preferences saved successfully', { page: "preferences-ui" });
             
-            // 7. Clear all cache layers via UnifiedCacheManager
-            try {
-                if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-                    await window.UnifiedCacheManager.refreshUserPreferences();
-                    window.Logger.info('✅ User preferences cache cleared', { page: "preferences-ui" });
-                } else if (window.clearAllUnifiedCacheQuick) {
-                    await window.clearAllUnifiedCacheQuick();
-                    window.Logger.info('✅ All cache layers cleared', { page: "preferences-ui" });
-                } else {
-                    window.Logger.warn('⚠️ No cache clearing method available', { page: "preferences-ui" });
+            // 7. Use Central Refresh System for proper CRUD handling
+            if (window.centralRefresh && window.centralRefresh.initialized) {
+                await window.centralRefresh.showSuccessAndRefresh('preferences', `נשמרו ${Object.keys(changedPreferences).length} העדפות בהצלחה`);
+                window.Logger.info('✅ Preferences updated via Central Refresh System', { page: "preferences-ui" });
+                return true;
+            } else {
+                // Fallback to manual cache clearing
+                try {
+                    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                        await window.UnifiedCacheManager.refreshUserPreferences();
+                        window.Logger.info('✅ User preferences cache cleared', { page: "preferences-ui" });
+                    } else if (window.clearAllUnifiedCacheQuick) {
+                        await window.clearAllUnifiedCacheQuick();
+                        window.Logger.info('✅ All cache layers cleared', { page: "preferences-ui" });
+                    } else {
+                        window.Logger.warn('⚠️ No cache clearing method available', { page: "preferences-ui" });
+                    }
+                } catch (error) {
+                    window.Logger.warn('⚠️ Cache clearing failed:', error, { page: "preferences-ui" });
                 }
-            } catch (error) {
-                window.Logger.warn('⚠️ Cache clearing failed:', error, { page: "preferences-ui" });
             }
             
             // 8. Show success notification

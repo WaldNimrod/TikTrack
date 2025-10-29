@@ -147,11 +147,31 @@ class DemoConnector(BaseConnector):
                 'quantity': quantity,
                 'price': price,
                 'fee': fee,
+                'currency': 'USD',  # Demo connector defaults to USD
+                'external_id': self._generate_external_id(symbol, action, date, quantity, price),
+                'source': 'demo_import',
                 'row_number': raw_record.get('_row_number', 0)
             }
             
         except Exception as e:
             raise ValueError(f"Failed to normalize demo record: {str(e)}")
+    
+    def _generate_external_id(self, symbol: str, action: str, date: datetime, quantity: float, price: float) -> str:
+        """
+        Generate a unique external ID for a demo record.
+        
+        Args:
+            symbol: Ticker symbol
+            action: Buy/sell action
+            date: Transaction date
+            quantity: Transaction quantity
+            price: Transaction price
+            
+        Returns:
+            str: Unique external ID
+        """
+        date_str = date.strftime('%Y-%m-%d')
+        return f"{date_str}_{symbol}_{action}_{quantity}_{price}"
     
     def get_supported_file_types(self) -> List[str]:
         """

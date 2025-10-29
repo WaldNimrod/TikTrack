@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, g
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from config.database import get_db
 from models.execution import Execution
 from services.validation_service import ValidationService
@@ -21,10 +21,16 @@ class ExecutionService:
         self.model = Execution
     
     def get_all(self, db: Session, filters=None):
-        return db.query(Execution).all()
+        return db.query(Execution).options(
+            joinedload(Execution.trading_account),
+            joinedload(Execution.ticker)
+        ).all()
     
     def get_by_id(self, db: Session, execution_id: int):
-        return db.query(Execution).filter(Execution.id == execution_id).first()
+        return db.query(Execution).options(
+            joinedload(Execution.trading_account),
+            joinedload(Execution.ticker)
+        ).filter(Execution.id == execution_id).first()
 
 # Initialize base API
 execution_service = ExecutionService()

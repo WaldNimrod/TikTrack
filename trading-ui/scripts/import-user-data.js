@@ -449,28 +449,6 @@ function displayProblemResolution(data) {
     `;
 }
 
-/**
- * Display problem resolution detailed
- */
-function displayProblemResolutionDetailed(data) {
-    // Clear previous content
-    clearProblemSections();
-    
-    // Display missing tickers
-    if (data.missing_tickers && data.missing_tickers.length > 0) {
-        displayMissingTickers(data.missing_tickers);
-    }
-    
-    // Display within-file duplicates
-    if (data.within_file_duplicates && data.within_file_duplicates.length > 0) {
-        displayWithinFileDuplicates(data.within_file_duplicates);
-    }
-    
-    // Display existing records
-    if (data.existing_records && data.existing_records.length > 0) {
-        displayExistingRecords(data.existing_records);
-    }
-}
 
 /**
  * Clear problem sections
@@ -480,9 +458,113 @@ function clearProblemSections() {
     const withinFileDuplicatesSection = document.getElementById('withinFileDuplicatesSection');
     const existingRecordsSection = document.getElementById('existingRecordsSection');
     
-    if (missingTickersSection) missingTickersSection.innerHTML = '';
-    if (withinFileDuplicatesSection) withinFileDuplicatesSection.innerHTML = '';
-    if (existingRecordsSection) existingRecordsSection.innerHTML = '';
+    if (missingTickersSection) missingTickersSection.style.display = 'none';
+    if (withinFileDuplicatesSection) withinFileDuplicatesSection.style.display = 'none';
+    if (existingRecordsSection) existingRecordsSection.style.display = 'none';
+}
+
+/**
+ * Display existing records
+ */
+function displayExistingRecords(existingRecords) {
+    const section = document.getElementById('existingRecordsSection');
+    const container = document.getElementById('existingRecordsContainer');
+    
+    if (!section || !container) {
+        window.Logger.warn('[Import Modal] Existing records section not found', { page: 'import-user-data' });
+        return;
+    }
+    
+    section.style.display = 'block';
+    container.innerHTML = '';
+    
+    existingRecords.forEach((recordData, index) => {
+        const card = document.createElement('div');
+        card.className = 'problem-card existing-record-card';
+        
+        // Get the actual record data
+        const record = recordData.record || recordData;
+        const matches = recordData.matches || [];
+        
+        // Calculate confidence score from matches
+        let confidenceScore = 0;
+        if (matches.length > 0) {
+            confidenceScore = matches[0].confidence || 0;
+        }
+        
+        const confidenceColor = confidenceScore >= 80 ? '#28a745' : confidenceScore >= 50 ? '#ffc107' : '#dc3545';
+        
+        card.innerHTML = `
+            <div class="problem-card-header">
+                <div class="problem-card-title">
+                    <i class="bi bi-database"></i>
+                    רשומה קיימת במערכת #${index + 1}
+                </div>
+                <div class="confidence-score" style="color: ${confidenceColor}">
+                    ${confidenceScore.toFixed(1)}% התאמה
+                </div>
+            </div>
+            <div class="problem-card-content">
+                <div class="record-details">
+                    <div class="detail-row">
+                        <span class="detail-label">סמל:</span>
+                        <span class="detail-value">${record.symbol || 'לא זמין'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">פעולה:</span>
+                        <span class="detail-value">${record.action || 'לא זמין'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">כמות:</span>
+                        <span class="detail-value">${record.quantity || 'לא זמין'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">מחיר:</span>
+                        <span class="detail-value">$${record.price || 'לא זמין'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">תאריך:</span>
+                        <span class="detail-value">${record.date || 'לא זמין'}</span>
+                    </div>
+                </div>
+                <div class="problem-card-actions">
+                    <button class="btn btn-sm btn-outline-primary" onclick="importExistingRecord(${index})">
+                        <i class="bi bi-arrow-down-circle"></i> ייבוא בכל זאת
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="skipExistingRecord(${index})">
+                        <i class="bi bi-x-circle"></i> דלג
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(card);
+    });
+    
+    window.Logger.info('[Import Modal] Displayed existing records', { 
+        count: existingRecords.length, 
+        page: 'import-user-data' 
+    });
+}
+
+/**
+ * Import existing record (force import)
+ */
+function importExistingRecord(index) {
+    window.Logger.info('[Import Modal] Importing existing record', { index, page: 'import-user-data' });
+    
+    // TODO: Implement logic to force import this specific record
+    showNotification('ייבוא רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
+}
+
+/**
+ * Skip existing record
+ */
+function skipExistingRecord(index) {
+    window.Logger.info('[Import Modal] Skipping existing record', { index, page: 'import-user-data' });
+    
+    // TODO: Implement logic to skip this specific record
+    showNotification('דילוג על רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
 }
 
 /**
@@ -575,8 +657,8 @@ function updateAnalyzeButton() {
     const modal = document.getElementById('importUserDataModal');
     if (!modal) {
         window.Logger.warn('[Import Modal] Modal not found for button update', { page: 'import-user-data' });
-        return;
-    }
+            return;
+        }
     
     const continueBtn = modal.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
@@ -710,7 +792,7 @@ function handleAccountSelect(event) {
     
     if (!accountId) {
         selectedAccount = null;
-    } else {
+                } else {
         selectedAccount = accountId;
     }
     
@@ -1114,6 +1196,7 @@ function displayAnalysisResults(results) {
         const duplicateRecords = document.getElementById('duplicateRecords');
         const missingTickersCount = document.getElementById('missingTickersCount');
         const missingTickerRecords = document.getElementById('missingTickerRecords');
+        const existingRecords = document.getElementById('existingRecords');
         
         window.Logger.debug('[Import Modal] Found elements', { 
             totalRecords: !!totalRecords, 
@@ -1122,31 +1205,36 @@ function displayAnalysisResults(results) {
             duplicateRecords: !!duplicateRecords, 
             missingTickersCount: !!missingTickersCount,
             missingTickerRecords: !!missingTickerRecords,
+            existingRecords: !!existingRecords,
             page: 'import-user-data' 
         });
         
-        // Calculate actual importable records (excluding missing tickers)
+        // Calculate actual importable records (clean_records minus records with missing tickers)
         const missingTickersCountValue = results.missing_tickers ? results.missing_tickers.length : 0;
         const missingTickerRecordsCount = results.missing_ticker_records || 0;
-        const actualValidRecords = (results.valid_records || 0) - missingTickerRecordsCount;
+        // Calculate records that will actually be imported (clean_records minus missing ticker records)
+        const actualValidRecords = Math.max(0, (results.clean_records || 0) - missingTickerRecordsCount);
         
         window.Logger.info('[Import Modal] Analysis results calculation', {
             total_records: results.total_records || 0,
             original_valid_records: results.valid_records || 0,
+            clean_records: results.clean_records || 0,
             missing_tickers_count: missingTickersCountValue,
             missing_ticker_records_count: missingTickerRecordsCount,
             actual_valid_records: actualValidRecords,
             invalid_records: results.invalid_records || 0,
             duplicate_records: results.duplicate_records || 0,
+            existing_records: results.existing_records || 0,
             page: 'import-user-data'
         });
         
         if (totalRecords) totalRecords.textContent = results.total_records || 0;
-        if (validRecords) validRecords.textContent = actualValidRecords; // Records that will actually be imported
+        if (validRecords) validRecords.textContent = actualValidRecords; // Records that will actually be imported (clean_records)
         if (invalidRecords) invalidRecords.textContent = results.invalid_records || 0;
         if (duplicateRecords) duplicateRecords.textContent = results.duplicate_records || 0;
         if (missingTickersCount) missingTickersCount.textContent = missingTickersCountValue; // Number of missing tickers
         if (missingTickerRecords) missingTickerRecords.textContent = missingTickerRecordsCount; // Records with missing tickers
+        if (existingRecords) existingRecords.textContent = results.existing_records || 0; // Records that already exist in system
         
         window.Logger.info('[Import Modal] Analysis results displayed successfully', { page: 'import-user-data' });
     } catch (error) {
@@ -1376,19 +1464,23 @@ function displayProblemResolution(data) {
             <div class="problem-section">
                 <h5>טיקרים חסרים</h5>
                 <div id="missingTickers" class="problem-cards">
-                    ${data.missing_tickers?.map(ticker => `
+                    ${data.missing_tickers?.map(ticker => {
+                        const symbol = typeof ticker === 'string' ? ticker : ticker.symbol;
+                        const currency = typeof ticker === 'string' ? 'USD' : ticker.currency;
+                        return `
                         <div class="problem-card missing-ticker-card">
                             <div class="problem-card-header">
                                 <i class="fas fa-exclamation-triangle"></i>
-                                <span>${ticker}</span>
+                                <span>${symbol}</span>
                             </div>
                             <div class="problem-card-actions">
-                                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${ticker}')">
+                                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${symbol}', '${currency}')">
                                     הוסף טיקר
                 </button>
                                         </div>
                                     </div>
-                    `).join('') || '<p>אין טיקרים חסרים</p>'}
+                    `;
+                    }).join('') || '<p>אין טיקרים חסרים</p>'}
                                                 </div>
                                                 </div>
             
@@ -1536,14 +1628,27 @@ function rejectDuplicate(index, type) {
 /**
  * Open add ticker modal
  */
-function openAddTickerModal(symbol) {
+function openAddTickerModal(symbol, currency = 'USD') {
     const modal = document.getElementById('addTickerModal');
     const symbolInput = document.getElementById('tickerSymbol');
     const nameInput = document.getElementById('tickerName');
+    const currencySelect = document.getElementById('tickerCurrency');
     
     if (modal && symbolInput && nameInput) {
         symbolInput.value = symbol;
         nameInput.value = symbol; // Default name to symbol
+        
+        // Set currency based on imported data
+        if (currencySelect) {
+            const currencyMap = {
+                'USD': '1',
+                'EUR': '2', 
+                'ILS': '3'
+            };
+            const currencyId = currencyMap[currency] || '1'; // Default to USD
+            currencySelect.value = currencyId;
+        }
+        
         modal.style.display = 'block';
         modal.classList.add('show');
         modal.setAttribute('aria-hidden', 'false');
@@ -1590,7 +1695,7 @@ function saveTickerFromModal(symbol, name) {
             symbol: symbol,
             name: name,
             type: document.getElementById('tickerType')?.value || 'stock',
-            currency: document.getElementById('tickerCurrency')?.value || 'USD'
+            currency_id: parseInt(document.getElementById('tickerCurrency')?.value || '1')
         })
     })
     .then(response => response.json())
@@ -1600,7 +1705,8 @@ function saveTickerFromModal(symbol, name) {
             // Refresh preview data
             refreshPreviewData();
         } else {
-            showNotification(`שגיאה בהוספת טיקר: ${data.error}`, 'error');
+            const errorMsg = data.error?.message || data.error || 'שגיאה לא ידועה';
+            showNotification(`שגיאה בהוספת טיקר: ${errorMsg}`, 'error');
         }
     })
     .catch(error => {
@@ -1813,9 +1919,11 @@ function performImport(generateReport = false) {
             showNotification('ייבוא הנתונים הושלם בהצלחה!', 'success');
             closeImportUserDataModal();
             
-            // Clear cache to show new data
-            if (typeof window.clearCache === 'function') {
-                window.clearCache();
+            // Clear cache to show new data - use centralized cache clearing
+            if (typeof window.clearCacheQuick === 'function') {
+                window.clearCacheQuick();
+            } else if (typeof window.clearAllCacheAdvanced === 'function') {
+                window.clearAllCacheAdvanced();
             }
             
             if (generateReport && data.report_url) {
@@ -1965,20 +2073,23 @@ function displayExistingRecords(existingRecords) {
  * Render missing ticker card
  */
 function renderMissingTickerCard(ticker) {
+    const symbol = typeof ticker === 'string' ? ticker : ticker.symbol;
+    const currency = typeof ticker === 'string' ? 'USD' : ticker.currency;
+    
     return `
         <div class="problem-card missing-ticker-card">
             <div class="problem-card-header">
                 <i class="bi bi-exclamation-circle"></i>
-                <span>${ticker}</span>
+                <span>${symbol}</span>
             </div>
             <div class="problem-card-body">
                 <div class="missing-ticker-info">
                     <i class="bi bi-info-circle"></i>
-                    הטיקר ${ticker} לא קיים במערכת
+                    הטיקר ${symbol} לא קיים במערכת
                 </div>
             </div>
             <div class="problem-card-actions">
-                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${ticker}')">
+                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${symbol}', '${currency}')">
                     <i class="bi bi-plus-circle"></i>
                     הוסף טיקר
                 </button>

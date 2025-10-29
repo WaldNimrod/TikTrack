@@ -16,6 +16,12 @@
 ### Event Delegation System (חדש!)
 מערכת הכפתורים כוללת מערכת event delegation מתקדמת המטפלת ב-`data-onclick` attributes דרך `EventHandlerManager`:
 
+### תמיכה במטבעות (עדכון 2025-10-29)
+מערכת הכפתורים תומכת כעת במטבעות שונים במודל הוספת טיקר:
+- בחירה בין USD, EUR, ILS
+- קריאה אוטומטית מהרשומות המיובאות
+- שליחה נכונה של currency_id לשרת
+
 **מיקום:** `trading-ui/scripts/event-handler-manager.js`
 
 **איך זה עובד:**

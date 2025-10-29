@@ -196,7 +196,22 @@ def create_ticker():
         db: Session = next(get_db())
         
         # Create the ticker first
-        ticker = TickerService.create(db, data)
+        try:
+            ticker = TickerService.create(db, data)
+        except Exception as e:
+            error_msg = str(e)
+            if "UNIQUE constraint failed" in error_msg and "tickers.symbol" in error_msg:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": f"טיקר עם סמל '{data.get('symbol', '')}' כבר קיים במערכת"},
+                    "version": "1.0"
+                }), 400
+            else:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": f"שגיאה ביצירת טיקר: {error_msg}"},
+                    "version": "1.0"
+                }), 400
         
         # AFTER creating the ticker, try to fetch and cache external data
         external_data_available = False

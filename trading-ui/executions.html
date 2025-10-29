@@ -178,36 +178,36 @@
         <!-- Notification system -->
         <div class="notification-container" id="notificationContainer"></div>
 
-    <!-- Toast container for notifications -->
-    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+        <!-- Toast container for notifications -->
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 
     <!-- Import User Data Modal -->
     <div class="modal" id="importUserDataModal" tabindex="-1" role="dialog" aria-labelledby="importUserDataModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
+                <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="importUserDataModalLabel">
                         <i class="bi bi-cloud-upload"></i>
                         ייבוא ביצועים (Executions)
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
+                    </div>
+                    <div class="modal-body">
                     <!-- Progress Steps Indicator -->
                     <div class="import-steps-indicator">
                         <div class="step" data-step="1">
                             <div class="step-number">1</div>
                             <div class="step-label">העלאה</div>
-                        </div>
+                                    </div>
                         <div class="step" data-step="2">
                             <div class="step-number">2</div>
                             <div class="step-label">ניתוח + פתרון בעיות</div>
-                        </div>
+                                </div>
                         <div class="step" data-step="3">
                             <div class="step-number">3</div>
                             <div class="step-label">תצוגה מקדימה + אישור</div>
-                        </div>
-                    </div>
+                                    </div>
+                                </div>
 
                     <!-- Step 1+2: Upload + Account Selection (COMBINED) -->
                     <div class="import-step" id="step-upload" data-step="1">
@@ -241,15 +241,15 @@
                                 <label>בחר חשבון מסחר:</label>
                                 <select id="tradingAccountSelect" class="form-select">
                                     <option value="">בחר חשבון מסחר...</option>
-                                </select>
-                            </div>
+                                        </select>
+                                    </div>
                             
                             <div class="step-actions">
                                 <button data-button-type="PRIMARY" data-text="המשך לניתוח" 
                                         data-onclick="analyzeFile()" id="analyzeBtn" disabled></button>
                             </div>
-                        </div>
-                    </div>
+                                    </div>
+                                </div>
 
                     <!-- Step 2: Analysis Results + Problem Resolution -->
                     <div class="import-step" id="step-analysis" data-step="2" style="display:none;">
@@ -298,8 +298,15 @@
                                         <div class="card-label">רשומות עם טיקר חסר</div>
                                     </div>
                                 </div>
-                            </div>
-                            
+                                <div class="analysis-card existing-records">
+                                    <div class="card-icon"><i class="bi bi-database"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="existingRecords">0</div>
+                                        <div class="card-label">רשומות קיימות במערכת</div>
+            </div>
+        </div>
+    </div>
+
                             <!-- Problem Resolution Section -->
                             <div class="problem-resolution-section" id="problemResolutionSection" style="display:none;">
                                 <h3>פתרון בעיות</h3>
@@ -310,26 +317,27 @@
                                 <p>הסמלים הבאים לא קיימים במערכת. ניתן להוסיף אותם או לדלג על הרשומות:</p>
                                 <div class="problem-card-container" id="missingTickersContainer">
                                     <!-- Missing ticker cards will be populated here -->
-                                </div>
-                            </div>
-                            
+                        </div>
+                    </div>
+                    
+                            <!-- Existing Records Section -->
+                            <div class="problem-section" id="existingRecordsSection" style="display:none;">
+                                <h4><i class="bi bi-database"></i> רשומות קיימות במערכת</h4>
+                                <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג עליהן:</p>
+                                <div class="problem-card-container" id="existingRecordsContainer">
+                                    <!-- Existing records cards will be populated here -->
+                    </div>
+                </div>
+
                             <!-- Within-File Duplicates Section -->
                             <div class="problem-section" id="withinFileDuplicatesSection" style="display:none;">
                                 <h4><i class="bi bi-files"></i> כפילויות בקובץ</h4>
                                 <p>נמצאו רשומות כפולות בתוך הקובץ. ניתן לבחור איזה רשומה לייבא:</p>
                                 <div class="problem-card-container" id="withinFileDuplicatesContainer">
                                     <!-- Within-file duplicate cards will be populated here -->
-                                </div>
-                            </div>
-                            
-                            <!-- Existing Records Section -->
-                            <div class="problem-section" id="existingRecordsSection" style="display:none;">
-                                <h4><i class="bi bi-exclamation-triangle"></i> רשומות קיימות במערכת</h4>
-                                <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג:</p>
-                                <div class="problem-card-container" id="existingRecordsContainer">
-                                    <!-- Existing record cards will be populated here -->
-                                </div>
-                            </div>
+                    </div>
+                </div>
+
                             
                             </div>
                             <!-- End of Problem Resolution Section -->
@@ -341,7 +349,7 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <!-- Step 3: Preview + Confirmation -->
                     <div class="import-step" id="step-preview" data-step="3" style="display:none;">
                         <div class="step-content">
@@ -349,33 +357,33 @@
                             
                             <!-- Confirmation Summary -->
                             <div class="confirmation-summary">
-                                <div class="summary-card">
+                        <div class="summary-card">
                                     <h4>סיכום הייבוא</h4>
-                                    <div class="summary-details">
-                                        <div class="detail-item">
-                                            <span class="detail-label">קובץ:</span>
+                            <div class="summary-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">קובץ:</span>
                                             <span class="detail-value" id="confirmFileName"></span>
-                                        </div>
-                                        <div class="detail-item">
+                                </div>
+                                <div class="detail-item">
                                             <span class="detail-label">חשבון מסחר:</span>
                                             <span class="detail-value" id="confirmAccountName"></span>
-                                        </div>
-                                        <div class="detail-item">
+                                </div>
+                                <div class="detail-item">
                                             <span class="detail-label">סה"כ רשומות:</span>
                                             <span class="detail-value" id="confirmTotalRecords"></span>
-                                        </div>
-                                        <div class="detail-item">
+                                </div>
+                                <div class="detail-item">
                                             <span class="detail-label">רשומות לייבוא:</span>
                                             <span class="detail-value" id="confirmImportRecords"></span>
-                                        </div>
+                                </div>
                                         <div class="detail-item">
                                             <span class="detail-label">רשומות להשמטה:</span>
                                             <span class="detail-value" id="confirmSkipRecords"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
+                </div>
+            </div>
+        </div>
+    </div>
+
                             <!-- Preview Summary -->
                             <div class="preview-summary">
                                 <div class="summary-item">
@@ -389,53 +397,53 @@
                                 <div class="summary-item">
                                     <span class="summary-label">אחוז ייבוא:</span>
                                     <span class="summary-value" id="previewImportRate">0%</span>
-                                </div>
-                            </div>
-                            
+            </div>
+                </div>
+                
                             <!-- Records to Import -->
                             <div class="preview-section">
                                 <h4><i class="bi bi-check-circle text-success"></i> רשומות לייבוא</h4>
                                 <div class="table-container">
                                     <table class="import-table" id="importTable">
-                                        <thead>
-                                            <tr>
+                                <thead>
+                                    <tr>
                                                 <th>סמל</th>
                                                 <th>פעולה</th>
-                                                <th>כמות</th>
-                                                <th>מחיר</th>
-                                                <th>עמלה</th>
+                                        <th>כמות</th>
+                                        <th>מחיר</th>
+                                        <th>עמלה</th>
                                                 <th>Realized P/L</th>
                                                 <th>MTM P/L</th>
-                                                <th>תאריך</th>
-                                            </tr>
-                                        </thead>
+                                        <th>תאריך</th>
+                                    </tr>
+                                </thead>
                                         <tbody id="importTableBody">
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
                             <!-- Records to Skip -->
                             <div class="preview-section">
                                 <h4><i class="bi bi-x-circle text-danger"></i> רשומות להשמטה</h4>
                                 <div class="table-container">
                                     <table class="import-table" id="skipTable">
-                                        <thead>
-                                            <tr>
+                                <thead>
+                                    <tr>
                                                 <th>סמל</th>
                                                 <th>פעולה</th>
-                                                <th>כמות</th>
-                                                <th>מחיר</th>
-                                                <th>עמלה</th>
+                                        <th>כמות</th>
+                                        <th>מחיר</th>
+                                        <th>עמלה</th>
                                                 <th>Realized P/L</th>
                                                 <th>MTM P/L</th>
-                                                <th>תאריך</th>
-                                                <th>סיבה</th>
-                                            </tr>
-                                        </thead>
+                                        <th>תאריך</th>
+                                        <th>סיבה</th>
+                                    </tr>
+                                </thead>
                                         <tbody id="skipTableBody">
-                                        </tbody>
-                                    </table>
+                                </tbody>
+                            </table>
                                 </div>
                             </div>
                             
@@ -610,9 +618,9 @@
                         <div class="mb-3">
                             <label for="tickerCurrency" class="form-label">מטבע</label>
                             <select class="form-select" id="tickerCurrency">
-                                <option value="USD">USD</option>
-                                <option value="EUR">EUR</option>
-                                <option value="ILS">ILS</option>
+                                <option value="1">USD - דולר אמריקאי</option>
+                                <option value="2">EUR - יורו</option>
+                                <option value="3">ILS - שקל ישראלי</option>
                             </select>
                         </div>
                     </form>

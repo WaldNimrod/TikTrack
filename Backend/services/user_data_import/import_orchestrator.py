@@ -299,9 +299,10 @@ class ImportOrchestrator:
             # Prepare analysis results for API response (detailed)
             # Calculate missing ticker records count
             missing_tickers = validation_result['missing_tickers']
+            missing_ticker_symbols = [ticker['symbol'] for ticker in missing_tickers] if isinstance(missing_tickers[0], dict) else missing_tickers
             missing_ticker_records = 0
             for record in validation_result['valid_records']:
-                if record.get('symbol') in missing_tickers:
+                if record.get('symbol') in missing_ticker_symbols:
                     missing_ticker_records += 1
             
             logger.info(f"📊 Missing ticker analysis: {len(missing_tickers)} missing tickers, {missing_ticker_records} records with missing tickers")
@@ -313,8 +314,7 @@ class ImportOrchestrator:
                 'valid_records': len(validation_result['valid_records']),
                 'invalid_records': len(validation_result['invalid_records']),
                 'clean_records': len(duplicate_result['clean_records']),
-                'duplicate_records': len(duplicate_result['within_file_duplicates']) + 
-                                   len(duplicate_result['existing_records']),
+                'duplicate_records': len(duplicate_result['within_file_duplicates']),
                 'missing_tickers': missing_tickers,
                 'missing_ticker_records': missing_ticker_records,
                 'existing_records': len(duplicate_result['existing_records']),
@@ -332,8 +332,7 @@ class ImportOrchestrator:
                 'total_records': session.total_records,
                 'valid_records': len(validation_result['valid_records']),
                 'invalid_records': len(validation_result['invalid_records']),
-                'duplicate_records': len(duplicate_result['within_file_duplicates']) + 
-                                   len(duplicate_result['existing_records']),
+                'duplicate_records': len(duplicate_result['within_file_duplicates']),
                 'existing_records': len(duplicate_result['existing_records']),
                 'missing_tickers': missing_tickers_data,
                 'analysis_timestamp': datetime.now().isoformat(),
@@ -458,10 +457,11 @@ class ImportOrchestrator:
             missing_tickers = validation_result.get('missing_tickers', [])
             
             # Filter out records with missing tickers from clean_records
+            missing_ticker_symbols = [ticker['symbol'] for ticker in missing_tickers] if isinstance(missing_tickers[0], dict) else missing_tickers
             original_clean_count = len(clean_records)
             clean_records = [
                 record for record in clean_records 
-                if record['record'].get('symbol') not in missing_tickers
+                if record['record'].get('symbol') not in missing_ticker_symbols
             ]
             logger.info(f"📊 Clean records: {original_clean_count} -> {len(clean_records)} (filtered out {original_clean_count - len(clean_records)} with missing tickers)")
             
@@ -479,9 +479,10 @@ class ImportOrchestrator:
             
             # Add records with missing tickers
             missing_tickers = validation_result.get('missing_tickers', [])
+            missing_ticker_symbols = [ticker['symbol'] for ticker in missing_tickers] if isinstance(missing_tickers[0], dict) else missing_tickers
             valid_records = validation_result['valid_records']
             for record in valid_records:
-                if record.get('symbol') in missing_tickers:
+                if record.get('symbol') in missing_ticker_symbols:
                     records_to_skip.append({
                         'record': record,
                         'reason': 'missing_ticker',

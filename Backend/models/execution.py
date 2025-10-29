@@ -37,4 +37,16 @@ class Execution(BaseModel):
                 result[c.name] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
             else:
                 result[c.name] = value
+        
+        # Add related data if available
+        if hasattr(self, 'trading_account') and self.trading_account:
+            result['account_name'] = self.trading_account.name
+        else:
+            result['account_name'] = f'TradingAccount_{self.trading_account_id}' if self.trading_account_id else 'לא מוגדר'
+        
+        if hasattr(self, 'ticker') and self.ticker:
+            result['symbol'] = self.ticker.symbol
+        else:
+            result['symbol'] = f'Ticker_{self.ticker_id}' if self.ticker_id else 'לא מוגדר'
+        
         return result

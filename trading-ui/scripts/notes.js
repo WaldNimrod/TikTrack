@@ -1936,15 +1936,23 @@ function getTypeDisplayName(type) {
  */
 function viewNote(noteId) {
   try {
-    // שמירת מזהה ההערה הנוכחית
-    window.currentViewingNoteId = noteId;
+    // צפייה בפרטי הערה באמצעות מודל פרטי ישות הגלובלי
+    if (typeof window.showEntityDetails === 'function') {
+      window.showEntityDetails('note', noteId, { mode: 'view' });
+    } else {
+      // Fallback למצב הישן אם המערכת הגלובלית לא זמינה
+      // שמירת מזהה ההערה הנוכחית
+      window.currentViewingNoteId = noteId;
 
-  // טעינת נתוני ההערה
-  loadNoteForViewing(noteId);
+      // טעינת נתוני ההערה
+      if (typeof loadNoteForViewing === 'function') {
+        loadNoteForViewing(noteId);
+      }
 
-  // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
-  modal.show();
+      // הצגת המודל
+      const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
+      modal.show();
+    }
   
   } catch (error) {
     window.Logger.error('שגיאה בצפייה בהערה:', error, { page: "notes" });

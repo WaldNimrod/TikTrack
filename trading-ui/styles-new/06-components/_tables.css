@@ -578,3 +578,18 @@
     display: inline-block;
     margin: 0 auto;
 }
+
+/* ===== Compact Table Styling for Database Display ===== */
+.db-display-table {
+    font-size: 0.85rem;
+}
+
+.db-display-table td,
+.db-display-table th {
+    padding: 0.4rem 0.5rem;
+    line-height: 1.3;
+}
+
+.db-display-table .section-header {
+    padding: 0.5rem 1rem;
+}

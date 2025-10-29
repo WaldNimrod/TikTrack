@@ -106,6 +106,25 @@
  */
 function viewTickerDetails(tickerId) {
   try {
+    // צפייה בפרטי טיקר באמצעות מודל פרטי ישות הגלובלי
+    if (typeof window.showEntityDetails === 'function') {
+      window.showEntityDetails('ticker', tickerId, { mode: 'view' });
+    } else {
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה', 'מערכת פרטי ישויות לא זמינה');
+      }
+    }
+  } catch (error) {
+    window.Logger.error('Error in viewTickerDetails:', error, { tickerId, page: "tickers" });
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'שגיאה בפתיחת פרטי הטיקר');
+    }
+  }
+}
+
+// Keep old function for backward compatibility
+function viewTickerDetailsOld(tickerId) {
+  try {
     window.Logger.info('👁️ מציג פרטי טיקר:', tickerId, { page: "tickers" });
     
     // חיפוש הטיקר בנתונים

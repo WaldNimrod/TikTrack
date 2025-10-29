@@ -87,8 +87,10 @@
  * @returns {Promise<void>}
  */
 async function loadCashFlowsData() {
+  console.log('🔥🔥🔥 loadCashFlowsData CALLED 🔥🔥🔥');
   try {
     window.Logger.info('Loading cash flows data (bypass cache)', { page: 'cash_flows' });
+    console.log('🔥 loadCashFlowsData - Step 1: Starting fetch');
     
     // קריאה ישירה לשרת עם timestamp למניעת cache
     const response = await fetch(`/api/cash_flows/?_t=${Date.now()}`, {
@@ -99,6 +101,8 @@ async function loadCashFlowsData() {
       }
     });
     
+    console.log('🔥 loadCashFlowsData - Step 2: Response received', response.status, response.ok);
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -106,18 +110,24 @@ async function loadCashFlowsData() {
     const responseData = await response.json();
     const data = responseData.data || responseData;
     
+    console.log('🔥 loadCashFlowsData - Step 3: Data received', data.length, 'items');
+    
     // עדכון הנתונים הגלובליים
     window.cashFlowsData = data;
     cashFlowsData = data;
     
+    console.log('🔥 loadCashFlowsData - Step 4: Updating table');
     // עדכון הטבלה
     updateCashFlowsTable(data);
     
+    console.log('🔥 loadCashFlowsData - Step 5: Updating stats');
     // עדכון הסטטיסטיקות
     updatePageSummaryStats();
     
+    console.log('🔥🔥🔥 loadCashFlowsData COMPLETED SUCCESSFULLY 🔥🔥🔥');
     window.Logger.info(`✅ Loaded ${data.length} cash flows`, { page: 'cash_flows' });
   } catch (error) {
+    console.error('🔥🔥🔥 loadCashFlowsData ERROR:', error);
     window.Logger.error('Error loading cash flows data', error, { page: 'cash_flows' });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);

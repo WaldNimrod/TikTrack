@@ -233,9 +233,9 @@ class LazyLoader {
     /**
      * Initialize lazy loading
      * @param {number} userId - User ID
-     * @param {number} profileId - Profile ID
+     * @param {number} profileId - Profile ID (0 for default profile)
      */
-    async initialize(userId = 1, profileId = 3) {
+    async initialize(userId = 1, profileId = 0) {
         // window.Logger.info('🚀 Initializing lazy loading system...', { page: "preferences-lazy-loader" });
         
         // Check if PreferencesCore is available
@@ -244,11 +244,14 @@ class LazyLoader {
             return;
         }
         
+        // Ensure profileId is explicitly set (0 for default profile, not null/undefined)
+        const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : 0;
+        
         // Load critical preferences immediately
-        await this.loadCriticalPreferences(userId, profileId);
+        await this.loadCriticalPreferences(userId, finalProfileId);
         
         // Start background loading for high priority
-        this.startBackgroundLoading(userId, profileId);
+        this.startBackgroundLoading(userId, finalProfileId);
         
         // window.Logger.info('✅ Lazy loading system initialized', { page: "preferences-lazy-loader" });
     }
@@ -475,16 +478,19 @@ class LazyLoader {
      * Load preference on demand
      * @param {string} preferenceName - Preference name
      * @param {number} userId - User ID
-     * @param {number} profileId - Profile ID
+     * @param {number} profileId - Profile ID (0 for default profile)
      * @returns {Promise<any>} Preference value
      */
-    async loadOnDemand(preferenceName, userId = 1, profileId = 3) {
+    async loadOnDemand(preferenceName, userId = 1, profileId = 0) {
         window.Logger.debug(`🎯 Loading preference on demand: ${preferenceName}`, { page: "preferences-lazy-loader" });
         
         const classification = this.classifier.classify(preferenceName);
         window.Logger.debug(`📊 Classification: ${classification}`, { page: "preferences-lazy-loader" });
         
-        return await this.loadSinglePreference(preferenceName, userId, profileId);
+        // Ensure profileId is explicitly set (0 for default profile, not null/undefined)
+        const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : 0;
+        
+        return await this.loadSinglePreference(preferenceName, userId, finalProfileId);
     }
     
     /**
@@ -538,7 +544,7 @@ window.LazyLoader = new LazyLoader();
  * @param {number} userId - User ID
  * @param {number} profileId - Profile ID
  */
-window.initializeLazyLoading = async function(userId = 1, profileId = 3) {
+window.initializeLazyLoading = async function(userId = 1, profileId = 0) {
     return await window.LazyLoader.initialize(userId, profileId);
 };
 
@@ -546,9 +552,9 @@ window.initializeLazyLoading = async function(userId = 1, profileId = 3) {
  * Load preference on demand
  * @param {string} preferenceName - Preference name
  * @param {number} userId - User ID
- * @param {number} profileId - Profile ID
+ * @param {number} profileId - Profile ID (0 for default profile)
  */
-window.loadPreferenceOnDemand = async function(preferenceName, userId = 1, profileId = 3) {
+window.loadPreferenceOnDemand = async function(preferenceName, userId = 1, profileId = 0) {
     return await window.LazyLoader.loadOnDemand(preferenceName, userId, profileId);
 };
 

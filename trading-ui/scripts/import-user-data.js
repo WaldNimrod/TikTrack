@@ -539,8 +539,30 @@ function updateAnalyzeButton() {
         const connectorSelect = modal.querySelector('#connectorSelect');
         const accountSelect = modal.querySelector('#tradingAccountSelect');
         
+        // Get all possible values for debugging
         const connectorValue = connectorSelect?.value;
         const accountValue = accountSelect?.value;
+        const accountSelectedIndex = accountSelect?.selectedIndex;
+        const accountSelectedOption = accountSelect?.options[accountSelectedIndex];
+        
+        // Detailed debugging information
+        const debugInfo = {
+            selectedFile: !!selectedFile,
+            selectedFileName: selectedFile?.name,
+            connectorSelectExists: !!connectorSelect,
+            connectorValue: connectorValue,
+            accountSelectExists: !!accountSelect,
+            accountValue: accountValue,
+            accountSelectedIndex: accountSelectedIndex,
+            accountSelectedOptionText: accountSelectedOption?.text,
+            accountSelectedOptionValue: accountSelectedOption?.value,
+            allOptions: accountSelect ? Array.from(accountSelect.options).map((opt, idx) => ({
+                index: idx,
+                value: opt.value,
+                text: opt.text,
+                selected: opt.selected
+            })) : []
+        };
         
         // Check if accountValue is not empty and not the default "בחר חשבון מסחר..."
         // Also check if it's a valid number (account IDs are numbers)
@@ -551,10 +573,8 @@ function updateAnalyzeButton() {
         
         const allFieldsFilled = selectedFile && connectorValue && accountValid;
         
-        window.Logger.debug('[Import Modal] Button state check', { 
-            selectedFile: !!selectedFile,
-            connectorValue: connectorValue,
-            accountValue: accountValue,
+        window.Logger.debug('[Import Modal] Button state check - DETAILED', { 
+            ...debugInfo,
             accountValid: accountValid,
             allFieldsFilled,
             page: 'import-user-data'
@@ -562,14 +582,16 @@ function updateAnalyzeButton() {
         
         if (allFieldsFilled) {
             continueBtn.disabled = false;
-            window.Logger.info('[Import Modal] Analyze button enabled', { page: 'import-user-data' });
+            window.Logger.info('[Import Modal] Analyze button enabled', { 
+                accountValue: accountValue,
+                connectorValue: connectorValue,
+                page: 'import-user-data' 
+            });
         } else {
             continueBtn.disabled = true;
             window.Logger.warn('[Import Modal] Analyze button disabled - missing requirements', { 
-                file: !!selectedFile, 
-                connector: !!connectorValue,
-                account: accountValid,
-                accountValue: accountValue, // Add actual value for debugging
+                ...debugInfo,
+                accountValid: accountValid,
                 page: 'import-user-data'
             });
         }
@@ -668,12 +690,22 @@ function handleAccountSelect(event) {
  * Handle connector selection
  */
 function handleConnectorSelect(event) {
-    selectedConnector = event.target.value;
-    window.Logger.info('[Import Modal] Connector selected', { connector: selectedConnector, page: 'import-user-data' });
+    const modal = document.getElementById('importUserDataModal');
+    const target = event?.target || modal?.querySelector('#connectorSelect');
+    selectedConnector = target?.value;
+    window.Logger.info('[Import Modal] Connector selected', { 
+        connector: selectedConnector,
+        value: target?.value,
+        page: 'import-user-data' 
+    });
     
     // Validate connector selection using central validation system
     validateConnectorSelection();
-    updateAnalyzeButton();
+    
+    // Wait a tick to ensure DOM is updated, then update button
+    requestAnimationFrame(() => {
+        updateAnalyzeButton();
+    });
 }
 
 /**
@@ -971,6 +1003,7 @@ function analyzeFile() {
         selectedFile: selectedFile?.name,
         connectorValue: connectorValue,
         accountValue: accountValue,
+        accountValueType: typeof accountValue,
         page: 'import-user-data'
     });
     
@@ -978,6 +1011,15 @@ function analyzeFile() {
     formData.append('file', selectedFile);
     formData.append('trading_account_id', accountValue);
     formData.append('connector_type', connectorValue);
+    
+    // Debug: Log what's being sent
+    window.Logger.debug('[Import Modal] FormData contents', {
+        hasFile: formData.has('file'),
+        fileSize: selectedFile?.size,
+        trading_account_id: formData.get('trading_account_id'),
+        connector_type: formData.get('connector_type'),
+        page: 'import-user-data'
+    });
     
     fetch('/api/user-data-import/upload', {
             method: 'POST',

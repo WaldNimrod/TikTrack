@@ -128,13 +128,17 @@ async function switchActiveProfile() {
         }
         
         // Handle default profile UI state
-        if (profile.id === 0 || profile.default) {
+        const isDefaultProfile = profile.id === 0 || profile.is_default === true || profile.default === true;
+        
+        window.Logger.info(`🔍 Profile switch: ID=${profile.id}, is_default=${profile.is_default}, isDefaultProfile=${isDefaultProfile}`, { page: "preferences-page" });
+        
+        if (isDefaultProfile) {
             // Default profile is active - disable all preferences
             if (typeof window.disableAllPreferencesInterface === 'function') {
                 window.disableAllPreferencesInterface();
             }
         } else {
-            // User profile is active - enable all preferences
+            // User profile is active - enable all preferences and hide warning
             if (typeof window.enableAllPreferencesInterface === 'function') {
                 window.enableAllPreferencesInterface();
             }

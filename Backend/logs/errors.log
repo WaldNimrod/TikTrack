@@ -6111,3 +6111,4 @@ WHERE alerts.is_triggered = ?]
 2025-10-29 19:58:38,379 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST999
 2025-10-29 19:58:41,715 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST777
 2025-10-29 19:58:45,085 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST666
+2025-10-29 19:58:48,439 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/UNIQUE123

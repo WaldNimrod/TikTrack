@@ -503,16 +503,32 @@ class PreferencesService:
                 conn = sqlite3.connect(self.db_path)
                 cursor = conn.cursor()
                 
-                # בניית שאילתה לכל ההעדפות בבת אחת
-                placeholders = ','.join(['?' for _ in preference_names])
-                query = f'''
-                    SELECT pt.preference_name, up.saved_value, pt.data_type, pt.default_value
-                    FROM preference_types pt
-                    LEFT JOIN user_preferences up ON pt.id = up.preference_id 
-                        AND up.user_id = ? AND up.profile_id = ?
-                    WHERE pt.preference_name IN ({placeholders})
-                '''
-                cursor.execute(query, [user_id, profile_id] + preference_names)
+                # Handle default profile (ID: 0) - return default_value only
+                if profile_id == 0:
+                    # בניית שאילתה לכל ההעדפות בבת אחת
+                    placeholders = ','.join(['?' for _ in preference_names])
+                    query = f'''
+                        SELECT pt.preference_name, NULL as saved_value, pt.data_type, pt.default_value
+                        FROM preference_types pt
+                        WHERE pt.preference_name IN ({placeholders}) AND pt.is_active = TRUE
+                    '''
+                    cursor.execute(query, preference_names)
+                else:
+                    # בניית שאילתה לכל ההעדפות בבת אחת
+                    placeholders = ','.join(['?' for _ in preference_names])
+                    query = f'''
+                        SELECT pt.preference_name, up.saved_value, pt.data_type, pt.default_value
+                        FROM preference_types pt
+                        LEFT JOIN (
+                            SELECT preference_id, saved_value, 
+                                   ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
+                            FROM user_preferences 
+                            WHERE user_id = ? AND profile_id = ?
+                        ) up ON pt.id = up.preference_id AND up.rn = 1
+                        WHERE pt.preference_name IN ({placeholders}) AND pt.is_active = TRUE
+                    '''
+                    cursor.execute(query, [user_id, profile_id] + preference_names)
+                
                 results = cursor.fetchall()
                 conn.close()
                 

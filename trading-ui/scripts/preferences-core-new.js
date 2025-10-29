@@ -727,7 +727,7 @@ class PreferencesCore {
             
             // Update current profile if provided
             if (userId !== null && profileId !== null) {
-                this.setCurrentProfile(userId, profileId);
+                await this.setCurrentProfile(userId, profileId);
             }
             
             // Initialize lazy loader if available

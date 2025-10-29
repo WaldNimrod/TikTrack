@@ -148,8 +148,12 @@ class PreferencesAPIClient {
             user_id: userId || this.defaultUserId
         };
         
-        if (profileId) {
+        // For default profile, explicitly use profile_id=0
+        if (profileId !== null && profileId !== undefined) {
             params.profile_id = profileId;
+        } else {
+            // Default profile (ID: 0)
+            params.profile_id = 0;
         }
         
         const result = await this.get('/user/single', params);
@@ -167,8 +171,12 @@ class PreferencesAPIClient {
             user_id: userId || this.defaultUserId
         };
         
-        if (profileId) {
+        // For default profile, explicitly use profile_id=0
+        if (profileId !== null && profileId !== undefined) {
             params.profile_id = profileId;
+        } else {
+            // Default profile (ID: 0)
+            params.profile_id = 0;
         }
         
         const result = await this.get('/user', params);

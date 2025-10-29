@@ -172,6 +172,28 @@ function goToStep(step) {
                         loadPreviewData();
                     }
     
+    // Process buttons in the modal after step change
+    // This ensures all buttons are properly handled by the centralized button system
+    const modal = document.getElementById('importUserDataModal');
+    if (modal && window.advancedButtonSystem) {
+        // Get the current visible step container
+        const currentStepElement = modal.querySelector(`.import-step[data-step="${step}"]`);
+        if (currentStepElement) {
+            window.advancedButtonSystem.processButtons(currentStepElement);
+            window.Logger.debug('[Import Modal] Buttons processed for step', { 
+                step, 
+                page: 'import-user-data' 
+            });
+        } else {
+            // Fallback: process entire modal
+            window.advancedButtonSystem.processButtons(modal);
+            window.Logger.debug('[Import Modal] Buttons processed for entire modal', { 
+                step, 
+                page: 'import-user-data' 
+            });
+        }
+    }
+    
     window.Logger.info('[Import Modal] Step navigation completed', { 
         currentStep, 
         page: 'import-user-data' 

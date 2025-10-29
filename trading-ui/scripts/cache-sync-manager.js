@@ -375,6 +375,12 @@ class CacheSyncManager {
      */
     async performInvalidateBackend(dependencies) {
         try {
+            // Validate dependencies array
+            if (!Array.isArray(dependencies) || dependencies.length === 0) {
+                if (window.Logger) { window.Logger.warn('⚠️ No dependencies provided for invalidation', { page: "cache" }); }
+                return true; // Return true if nothing to invalidate
+            }
+            
             const response = await fetch('/api/cache/invalidate', {
                 method: 'POST',
                 headers: {
@@ -384,7 +390,17 @@ class CacheSyncManager {
             });
             
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                // Get error details from response
+                let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData.error) {
+                        errorMessage += ` - ${errorData.error}`;
+                    }
+                } catch (e) {
+                    // If response is not JSON, use status text
+                }
+                throw new Error(errorMessage);
             }
             
             const result = await response.json();

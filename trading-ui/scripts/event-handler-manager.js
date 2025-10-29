@@ -109,6 +109,38 @@ class EventHandlerManager {
             }
         }
         
+        // Handle buttons with onclick attribute (legacy support - for backwards compatibility)
+        // This ensures all buttons work through the centralized system
+        // Only process if button doesn't have data-onclick (to avoid double execution)
+        const buttonWithOnclickLegacy = target.closest('button[onclick]:not([data-onclick])');
+        if (buttonWithOnclickLegacy && buttonWithOnclickLegacy !== buttonWithOnclick) {
+            // Don't process if button is disabled
+            if (buttonWithOnclickLegacy.disabled || buttonWithOnclickLegacy.hasAttribute('disabled')) {
+                return;
+            }
+            
+            const onclickValue = buttonWithOnclickLegacy.getAttribute('onclick');
+            if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
+                try {
+                    // Execute the onclick handler using eval (safe because it's controlled)
+                    // Note: Following same pattern as data-onclick - no preventDefault/stopPropagation
+                    // to allow Bootstrap modals and other standard behaviors to work
+                    eval(onclickValue);
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.error('EventHandlerManager: Error executing onclick', {
+                            onclickValue: onclickValue,
+                            error: error.message,
+                            stack: error.stack
+                        });
+                    } else {
+                        console.error('EventHandlerManager: Error executing onclick:', onclickValue, error);
+                    }
+                }
+                // Don't return early - allow other handlers to process if needed
+            }
+        }
+        
         // Handle button clicks with data-action
         if (target.matches('[data-action]')) {
             const action = target.getAttribute('data-action');

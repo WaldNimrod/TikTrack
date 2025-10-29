@@ -1043,7 +1043,11 @@ window.loadProfilesToDropdown = async function(userId = 1) {
                 window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ${activeProfile.name}`, { page: "preferences-ui" });
                 
                 // Check if this is the default profile and disable all preferences
-                const isDefaultProfile = activeProfile.is_default || activeProfile.default || activeProfile.name === 'ברירת מחדל';
+                // Updated to handle both old name ("ברירת מחדל") and new name ("פרופיל ברירת מחדל")
+                const isDefaultProfile = activeProfile.is_default || activeProfile.default || 
+                                       activeProfile.name === 'ברירת מחדל' || 
+                                       activeProfile.name === 'פרופיל ברירת מחדל' ||
+                                       activeProfile.id === 0;
                 if (isDefaultProfile) {
                     window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-ui" });
                     window.disableAllPreferencesInterface();

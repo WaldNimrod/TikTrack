@@ -34,13 +34,8 @@
  * - CSS: header-system.css
  *
  * @author TikTrack Development Team
- * @version 6.0.1
- * @lastUpdated January 27, 2025
- * 
- * Changes:
- * - Updated filter toggle buttons to use data-onclick instead of onclick
- * - All filter buttons now use centralized event delegation system
- * - See documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md
+ * @version 6.0.0
+ * @lastUpdated January 15, 2025
  */
 
 // Logger will be available after initialization
@@ -239,7 +234,7 @@ class HeaderSystem {
               <!-- כפתור פתיחה/סגירה של הפילטר - בתוך התפריט הראשי -->
               <div class="filter-toggle-section filter-toggle-main">
                 <button class="header-filter-toggle-btn" id="headerFilterToggleBtnMain" title="הצג/הסתר פילטרים" 
-                        data-onclick="toggleHeaderFilters()">
+                        onclick="toggleHeaderFilters()">
                   <span class="header-filter-arrow">▲</span>
                 </button>
               </div>
@@ -254,7 +249,7 @@ class HeaderSystem {
             <div class="filter-group status-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle status-filter-toggle" id="statusFilterToggle" 
-                        data-onclick="toggleStatusFilterMenu()">
+                        onclick="toggleStatusFilterMenu()">
                   <span class="selected-value selected-status-text" id="selectedStatus">כל סטטוס</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -278,7 +273,7 @@ class HeaderSystem {
             <!-- פילטר סוג השקעה -->
             <div class="filter-group type-filter">
               <div class="filter-dropdown">
-                <button class="filter-toggle type-filter-toggle" id="typeFilterToggle" data-onclick="toggleTypeFilterMenu()">
+                <button class="filter-toggle type-filter-toggle" id="typeFilterToggle" onclick="toggleTypeFilterMenu()">
                                           <span class="selected-value selected-type-text" id="selectedType">כל סוג השקעה</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -304,7 +299,7 @@ class HeaderSystem {
             <div class="filter-group account-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle account-filter-toggle" id="accountFilterToggle" 
-                        data-onclick="toggleAccountFilterMenu()">
+                        onclick="toggleAccountFilterMenu()">
                   <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון מסחר</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -320,7 +315,7 @@ class HeaderSystem {
             <div class="filter-group date-range-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle date-range-filter-toggle" id="dateRangeFilterToggle" 
-                        data-onclick="toggleDateRangeFilterMenu()">
+                        onclick="toggleDateRangeFilterMenu()">
                   <span class="selected-value selected-date-text" id="selectedDateRange">כל זמן</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -384,7 +379,7 @@ class HeaderSystem {
             <!-- כפתור פתיחה/סגירה של הפילטר - בתוך הפילטר -->
             <div class="filter-toggle-section filter-toggle-secondary">
               <button class="header-filter-toggle-btn" id="headerFilterToggleBtnSecondary" title="הצג/הסתר פילטרים" 
-                      data-onclick="toggleHeaderFilters()">
+                      onclick="toggleHeaderFilters()">
                 <span class="header-filter-arrow">▼</span>
               </button>
             </div>

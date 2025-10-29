@@ -8,24 +8,13 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 ## File Location
 - **Main File**: `trading-ui/scripts/header-system.js` (UNIFIED SYSTEM)
 - **CSS File**: `trading-ui/styles-new/header-styles.css` (EXTERNAL CSS)
-- **Version**: 6.0.1 (January 2025)
-- **Status**: **PREFERENCES INTEGRATED + EVENT DELEGATION** - Full integration with unified initialization system and centralized event handling
+- **Version**: 6.0.3 (January 2025)
+- **Status**: **PREFERENCES INTEGRATED** - Full integration with unified initialization system
 - **Performance**: Header visible in ~150ms with proper preferences loading and cache management
 
 ## 🎉 Current Status (January 2025)
 
-### 1. **Unified Header System v6.0.1 - EVENT DELEGATION INTEGRATION** ✅ NEW!
-- **Status**: **COMPLETED** - All filter toggle buttons now use centralized event delegation
-- **Date**: 27 January 2025
-- **Key Improvements**:
-  - **Event Delegation**: All 6 filter toggle buttons use `data-onclick` instead of `onclick`
-  - **Centralized Handling**: All filter buttons handled by `EventHandlerManager`
-  - **No Breaking Changes**: All filter functions remain unchanged
-  - **Main Menu Unchanged**: Navigation menu buttons remain with `onclick` (as intended)
-  - **Filter System Only**: Only filter toggle buttons changed, not menu items
-  - **Documentation**: Updated `HEADER_SYSTEM_README.md` and `EVENT_HANDLER_SYSTEM.md`
-
-### 2. **Unified Header System v6.0.3 - PREFERENCES INTEGRATION COMPLETE** ✅
+### 1. **Unified Header System v6.0.3 - PREFERENCES INTEGRATION COMPLETE** ✅ NEW!
 - **Status**: **COMPLETED** - Full integration with unified initialization system and preferences
 - **Date**: 15 January 2025
 - **Key Improvements**:
@@ -35,7 +24,7 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
   - **Cache Management**: Proper cache clearing and preference loading
   - **Error Handling**: Comprehensive error handling with fallback mechanisms
 
-### 3. **Unified Header System v6.0.2 - FILTER SYSTEM OPTIMIZED** ✅
+### 2. **Unified Header System v6.0.2 - FILTER SYSTEM OPTIMIZED** ✅
 - **Status**: **COMPLETED** - Dynamic table detection and filter improvements
 - **Date**: 12 October 2025
 - **Key Improvements**:
@@ -373,23 +362,10 @@ headerSystem.init();
 - **Existing Filters**: Filter system already integrated
 
 ### **Event Listeners**
-- **Navigation**: Click handlers for menu links (uses `onclick` for menu-specific functions)
+- **Navigation**: Click handlers for menu links
 - **Dropdowns**: Toggle handlers for dropdown menus
-- **Filters**: Toggle handlers for filter buttons (uses `data-onclick` for centralized event delegation)
+- **Filters**: Toggle handlers for filter buttons
 - **Search**: Input handlers for search field
-
-### **Event Delegation (v6.0.1 - January 2025)**
-All filter toggle buttons now use `data-onclick` attribute instead of `onclick`:
-- **Filter Buttons Changed**: All 6 filter toggle buttons use `data-onclick`
-  - `toggleHeaderFilters()` - 2 instances (main and secondary buttons)
-  - `toggleStatusFilterMenu()`
-  - `toggleTypeFilterMenu()`
-  - `toggleAccountFilterMenu()`
-  - `toggleDateRangeFilterMenu()`
-- **Navigation Menu**: Unchanged - all menu buttons still use `onclick` (intentionally)
-- **Filter Items**: Filter dropdown items (divs) still use `onclick` (they are not buttons)
-- **Benefit**: Centralized event handling through `EventHandlerManager`, consistent with button system
-- **See**: `documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md`
 
 ### **Compatibility**
 - **Backward Compatible**: Works with existing page structure

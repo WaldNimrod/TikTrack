@@ -136,23 +136,25 @@ class ProfileManager {
                 window.Logger.info('✅ Backend cache invalidated via CacheSyncManager', { page: "preferences-profiles" });
             }
             
-            // Step 4: Update UI elements (dropdown, summary)
-            if (typeof window.loadProfilesToDropdown === 'function') {
-                await window.loadProfilesToDropdown(userId);
-                window.Logger.info('✅ Profile dropdown updated', { page: "preferences-profiles" });
-            }
-            
-            // Step 5: Reload preferences with new profile and update all UI components
-            // This will update statistics, summary, and all UI elements
+            // Step 4: Reload preferences with new profile FIRST and wait for completion
+            // This must complete before updating UI to ensure data is loaded
             if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
+                window.Logger.info('🔄 Loading preferences for new profile...', { page: "preferences-profiles" });
                 const allPreferences = await window.PreferencesUI.loadAllPreferences(userId, profileId);
                 window.Logger.info('✅ Preferences reloaded', { page: "preferences-profiles" });
                 
                 // Update statistics after preferences are loaded
                 if (allPreferences && typeof window.PreferencesUI.updateStatistics === 'function') {
                     await window.PreferencesUI.updateStatistics(allPreferences);
-                    window.Logger.info('✅ Statistics and UI updated', { page: "preferences-profiles" });
+                    window.Logger.info('✅ Statistics updated', { page: "preferences-profiles" });
                 }
+            }
+            
+            // Step 5: Update UI elements (dropdown, summary, active profile card) AFTER preferences are loaded
+            // This ensures the UI shows the correct active profile information
+            if (typeof window.loadProfilesToDropdown === 'function') {
+                await window.loadProfilesToDropdown(userId);
+                window.Logger.info('✅ Profile dropdown and active profile card updated', { page: "preferences-profiles" });
             }
             
             window.Logger.info('✅ Profile switch completed successfully', { page: "preferences-profiles" });

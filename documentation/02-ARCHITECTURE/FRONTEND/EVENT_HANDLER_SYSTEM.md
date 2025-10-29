@@ -92,6 +92,7 @@ handleDelegatedClick(event) {
     const target = event.target;
     
     // Handle buttons with data-onclick attribute (centralized button system)
+    // זה התקן המומלץ - כל הכפתורים החדשים משתמשים בזה
     const buttonWithOnclick = target.closest('button[data-onclick]');
     if (buttonWithOnclick) {
         // בדיקה אם הכפתור disabled
@@ -117,6 +118,33 @@ handleDelegatedClick(event) {
         }
     }
     
+    // Handle buttons with onclick attribute (legacy support - backwards compatibility)
+    // תמיכה בכפתורים ישנים עם onclick רגיל - רק אם אין data-onclick
+    const buttonWithOnclickLegacy = target.closest('button[onclick]:not([data-onclick])');
+    if (buttonWithOnclickLegacy && buttonWithOnclickLegacy !== buttonWithOnclick) {
+        // בדיקה אם הכפתור disabled
+        if (buttonWithOnclickLegacy.disabled || buttonWithOnclickLegacy.hasAttribute('disabled')) {
+            return;
+        }
+        
+        const onclickValue = buttonWithOnclickLegacy.getAttribute('onclick');
+        if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
+            try {
+                // אין preventDefault/stopPropagation כדי לאפשר Bootstrap modals לעבוד
+                eval(onclickValue);
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('EventHandlerManager: Error executing onclick', {
+                        onclickValue: onclickValue,
+                        error: error.message,
+                        stack: error.stack
+                    });
+                }
+            }
+            // לא return - מאפשר handlers אחרים לעבוד
+        }
+    }
+    
     // ממשיך לטפל באירועים אחרים...
 }
 ```
@@ -124,7 +152,8 @@ handleDelegatedClick(event) {
 ### הערות חשובות
 
 #### ✅ מה המערכת עושה:
-- **מזהה כפתורים** עם `data-onclick` attribute
+- **מזהה כפתורים** עם `data-onclick` attribute (תקן מומלץ)
+- **תומך גם ב-`onclick` רגיל** (legacy support - תאימות לאחור)
 - **בודקת disabled** - לא מבצעת אם הכפתור disabled
 - **מבצעת את הפונקציה** דרך `eval()`
 - **לוגים שגיאות** אבל לא מתרסקת
@@ -133,6 +162,24 @@ handleDelegatedClick(event) {
 - **אין `preventDefault()`** - כדי לאפשר Bootstrap modals לעבוד
 - **אין `stopPropagation()`** - כדי לאפשר handlers אחרים לעבוד
 - **אין return מוקדם** - מאפשר מטפלי אירועים אחרים לפעול
+
+### תמיכה ב-onclick רגיל (Legacy Support)
+
+המערכת תומכת גם בכפתורים עם `onclick` רגיל לתאימות לאחור:
+
+```html
+<!-- כפתור עם onclick רגיל - עדיין יעבוד! -->
+<button onclick="doSomething()">לחץ כאן</button>
+
+<!-- אבל מומלץ להשתמש ב-data-onclick -->
+<button data-button-type="PRIMARY" data-onclick="doSomething()" data-text="לחץ כאן"></button>
+```
+
+**הערות חשובות:**
+- ✅ **תמיכה כפולה** - גם `data-onclick` וגם `onclick` רגיל עובדים
+- ⚠️ **מומלץ: `data-onclick`** - זה התקן החדש והמומלץ
+- ✅ **תאימות לאחור** - כפתורים ישנים עם `onclick` רגיל עדיין עובדים
+- ✅ **אין כפילות** - אם לכפתור יש גם `data-onclick` וגם `onclick`, רק `data-onclick` יבוצע
 
 ### דוגמאות שימוש
 
@@ -174,6 +221,27 @@ const buttonHtml = `
 tableRow.innerHTML += buttonHtml;
 // הכפתור יעבוד מיד ללא צורך ב-addEventListener!
 ```
+
+#### כפתורים במודולים דינמיים
+
+כשמחליפים שלבים במודול, הכפתורים החדשים מעובדים אוטומטית:
+
+```javascript
+function goToStep(step) {
+    // ... קוד של המעבר בין שלבים ...
+    
+    // עיבוד אוטומטי של כפתורים בשלב החדש
+    const modal = document.getElementById('myModal');
+    if (modal && window.advancedButtonSystem) {
+        const currentStepElement = modal.querySelector(`.step[data-step="${step}"]`);
+        if (currentStepElement) {
+            window.advancedButtonSystem.processButtons(currentStepElement);
+        }
+    }
+}
+```
+
+**יתרון:** כל הכפתורים במודול, גם אלה שנוספים דינמית, יעבדו מיד דרך המערכת המרכזית!
 
 ---
 
@@ -335,6 +403,11 @@ console.log('Function exists:', typeof window[button?.getAttribute('data-onclick
 ---
 
 ## 🔄 היסטוריית עדכונים
+
+### 2025-01-27 - תמיכה ב-onclick רגיל ומודולים דינמיים
+- ✅ הוספת תמיכה ב-`onclick` רגיל (legacy support) - תאימות לאחור
+- ✅ עיבוד אוטומטי של כפתורים במודולים אחרי מעבר שלבים
+- ✅ עדכון תיעוד מלא עם דוגמאות למודולים דינמיים
 
 ### 2025-01-26 - עדכון Event Delegation
 - ✅ הוספת תמיכה מלאה ב-`data-onclick`

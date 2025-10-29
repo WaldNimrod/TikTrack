@@ -591,10 +591,13 @@ function updateAnalyzeButton() {
         const accountSelectedIndex = accountSelect?.selectedIndex;
         const accountSelectedOption = accountSelect?.options[accountSelectedIndex];
         
+        // Check both local and global selectedFile variables
+        const currentSelectedFile = selectedFile || window.selectedFile;
+        
         // Detailed debugging information
         const debugInfo = {
-            selectedFile: !!selectedFile,
-            selectedFileName: selectedFile?.name,
+            selectedFile: !!currentSelectedFile,
+            selectedFileName: currentSelectedFile?.name,
             connectorSelectExists: !!connectorSelect,
             connectorValue: connectorValue,
             accountSelectExists: !!accountSelect,
@@ -617,7 +620,7 @@ function updateAnalyzeButton() {
                            accountValue !== '0' && 
                            !isNaN(parseInt(accountValue));
         
-        const allFieldsFilled = selectedFile && connectorValue && accountValid;
+        const allFieldsFilled = currentSelectedFile && connectorValue && accountValid;
         
         window.Logger.debug('[Import Modal] Button state check - DETAILED', { 
             ...debugInfo,

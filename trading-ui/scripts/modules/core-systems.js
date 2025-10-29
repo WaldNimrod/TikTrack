@@ -3502,6 +3502,15 @@ const PAGE_CONFIGS = {
                 } else {
                     console.error('❌ PreferencesSystem not found! preferences-core.js not loaded?');
                 }
+                
+                // Initialize validation for preferences form
+                if (typeof window.initializeValidation === 'function') {
+                    console.log('🔧 Initializing validation for preferences form...');
+                    window.initializeValidation('preferencesForm', {});
+                    console.log('✅ Preferences form validation initialized');
+                } else {
+                    console.warn('⚠️ Validation system not available for preferences form');
+                }
             }
         ]
     },

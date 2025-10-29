@@ -514,7 +514,8 @@ def activate_profile() -> Any:
         user_id = data.get('user_id')
         profile_id = data.get('profile_id')
         
-        if not user_id or not profile_id:
+        # Check if user_id and profile_id are provided (note: profile_id can be 0 for default profile)
+        if user_id is None or profile_id is None:
             return jsonify({
                 'success': False,
                 'error': 'user_id and profile_id are required',

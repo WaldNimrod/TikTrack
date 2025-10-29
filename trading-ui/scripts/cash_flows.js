@@ -568,10 +568,8 @@ function validateEditCashFlowForm() {
  */
 async function deleteCashFlow(id) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('cash_flows', 'delete');
-    }
+    // CRUDResponseHandler will handle cache clearing automatically
+    // No need to call clearCacheBeforeCRUD here
     
     // מציאת התזרים
     const cashFlow = window.cashFlowsData ? window.cashFlowsData.find(cf => cf.id === id) : null;
@@ -1356,10 +1354,8 @@ async function saveCashFlow() {
     
     try {
         console.log('🔥 saveCashFlow - Step 1: Starting execution');
-        // ניקוי מטמון לפני פעולת CRUD
-        if (window.clearCacheBeforeCRUD) {
-            window.clearCacheBeforeCRUD('cash_flows', 'add');
-        }
+        // CRUDResponseHandler will handle cache clearing automatically
+        // No need to call clearCacheBeforeCRUD here
         
         // Collect form data using DataCollectionService
         const form = document.getElementById('cashFlowModalForm');
@@ -1439,10 +1435,8 @@ async function saveCashFlow() {
         const isEdit = form.dataset.mode === 'edit';
         const cashFlowId = form.dataset.cashFlowId;
         
-        // ניקוי מטמון לפני פעולת CRUD - עריכה
-        if (isEdit && window.clearCacheBeforeCRUD) {
-            window.clearCacheBeforeCRUD('cash_flows', 'edit');
-        }
+        // CRUDResponseHandler will handle cache clearing automatically
+        // No need to call clearCacheBeforeCRUD here
         
         // Prepare API call
         const url = isEdit ? `/api/cash_flows/${cashFlowId}` : '/api/cash_flows';

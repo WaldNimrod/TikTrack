@@ -106,15 +106,18 @@ class ProfileManager {
                 window.Logger.info('✅ PreferencesCore updated', { page: "preferences-profiles" });
             }
             
-            // Step 3: Invalidate cache using CacheSyncManager (if available) or UnifiedCacheManager
+            // Step 3: Invalidate cache using CacheSyncManager (if available) + UnifiedCacheManager
+            // First clear local cache, then sync with backend
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.refreshUserPreferences();
+                window.Logger.info('✅ Local cache cleared via UnifiedCacheManager', { page: "preferences-profiles" });
+            }
+            
+            // Then invalidate backend cache using CacheSyncManager (if available)
             if (window.CacheSyncManager && typeof window.CacheSyncManager.invalidateByAction === 'function') {
                 // Use centralized cache invalidation system with proper dependency handling
                 await window.CacheSyncManager.invalidateByAction('profile-switched');
-                window.Logger.info('✅ Cache invalidated via CacheSyncManager', { page: "preferences-profiles" });
-            } else if (window.UnifiedCacheManager) {
-                // Fallback to UnifiedCacheManager if CacheSyncManager not available
-                await window.UnifiedCacheManager.refreshUserPreferences();
-                window.Logger.info('✅ Cache cleared via UnifiedCacheManager', { page: "preferences-profiles" });
+                window.Logger.info('✅ Backend cache invalidated via CacheSyncManager', { page: "preferences-profiles" });
             }
             
             // Step 4: Update UI elements (dropdown, summary)

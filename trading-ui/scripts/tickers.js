@@ -758,6 +758,11 @@ async function saveTicker() {
  * Note: updated_at field is NOT modified during user updates - it's reserved for future pricing system updates
  */
 async function updateTicker() {
+  
+  // ניקוי מטמון לפני פעולת CRUD - עריכה
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('tickers', 'edit');
+  }
 
   // שימוש ב-DataCollectionService לאיסוף נתונים
   const tickerData = DataCollectionService.collectFormData({

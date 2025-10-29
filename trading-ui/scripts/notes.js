@@ -1157,6 +1157,12 @@ async function saveNote() {
 }
 
 async function updateNoteFromModal() {
+  
+  // ניקוי מטמון לפני פעולת CRUD - עריכה
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('notes', 'edit');
+  }
+  
   // שימוש ב-DataCollectionService לאיסוף נתונים
   const noteData = DataCollectionService.collectFormData({
     id: { id: 'editNoteId', type: 'int' },

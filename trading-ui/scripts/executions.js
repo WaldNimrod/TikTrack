@@ -933,7 +933,11 @@ async function saveExecution() {
  * עדכון עסקה קיימת
  */
 async function updateExecutionWrapper() {
-
+  
+  // ניקוי מטמון לפני פעולת CRUD - עריכה
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('executions', 'edit');
+  }
 
   const id = document.getElementById('editExecutionId').value;
   const tradeIdValue = document.getElementById('editExecutionTradeId').value;

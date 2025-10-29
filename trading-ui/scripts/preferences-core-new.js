@@ -323,60 +323,9 @@ class PreferencesValidationManager {
 }
 
 // ============================================================================
-// PROFILE MANAGER CLASS
-// ============================================================================
-
-/**
- * Profile Manager
- * Handles user profile operations
- */
-class ProfileManager {
-    constructor() {
-        this.currentProfile = null;
-        this.profiles = [];
-    }
-    
-    /**
-     * Get user profiles
-     * @param {number} userId - User ID
-     * @returns {Promise<Array>} Profiles array
-     */
-    async getProfiles(userId = 1) {
-        try {
-            const response = await fetch(`/api/preferences/profiles?user_id=${userId}`);
-            if (response.ok) {
-                const result = await response.json();
-                this.profiles = result.data || [];
-                return this.profiles;
-            }
-            return [];
-        } catch (error) {
-            // window.Logger.error('❌ Error loading profiles:', error, { page: "preferences-core-new" });
-            return [];
-        }
-    }
-    
-    /**
-     * Switch to profile
-     * @param {number} profileId - Profile ID
-     */
-    switchProfile(profileId) {
-        this.currentProfile = profileId;
-        // window.Logger.info(`🔄 Switched to profile: ${profileId}`, { page: "preferences-core-new" });
-    }
-    
-    /**
-     * Get current profile
-     * @returns {number} Current profile ID
-     */
-    getCurrentProfile() {
-        return this.currentProfile || 3; // Default profile
-    }
-}
-
-// ============================================================================
 // MAIN PREFERENCES CORE CLASS
 // ============================================================================
+// Note: ProfileManager is now in preferences-profiles.js
 
 /**
  * Main Preferences Core System
@@ -387,7 +336,7 @@ class PreferencesCore {
         this.apiClient = new PreferencesAPIClient();
         // NO cacheManager - using UnifiedCacheManager!
         this.validationManager = new PreferencesValidationManager();
-        this.profileManager = new ProfileManager();
+        // Note: ProfileManager is now in preferences-profiles.js (window.ProfileManager)
         
         this.currentUserId = 1; // Nimrod
         this.currentProfileId = null; // Will be loaded from server

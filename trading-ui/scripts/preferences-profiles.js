@@ -116,20 +116,8 @@ class ProfileManager {
             
             // Step 5: Update UI
             if (typeof window.loadProfilesToDropdown === 'function') {
-                await window.loadProfilesToDropdown();
+                await window.loadProfilesToDropdown(userId);
                 window.Logger.info('✅ UI updated', { page: "preferences-profiles" });
-            }
-            
-            // Update dropdown selection
-            const profileSelect = document.getElementById('profileSelect');
-            if (profileSelect) {
-                // Find profile by ID and set as selected
-                const profiles = await this.getProfiles(userId);
-                const profile = profiles.find(p => p.id === profileId);
-                if (profile) {
-                    profileSelect.value = profile.name;
-                    window.Logger.info(`✅ Dropdown updated to: ${profile.name}`, { page: "preferences-profiles" });
-                }
             }
             
             window.Logger.info('✅ Profile switch completed successfully', { page: "preferences-profiles" });

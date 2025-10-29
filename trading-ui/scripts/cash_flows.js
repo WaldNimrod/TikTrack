@@ -1466,6 +1466,7 @@ async function saveCashFlow() {
         const method = isEdit ? 'PUT' : 'POST';
         
         // Send to API
+        console.log('🔥 saveCashFlow - Sending to API:', { url, method, data: cashFlowData });
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -1473,6 +1474,28 @@ async function saveCashFlow() {
             },
             body: JSON.stringify(cashFlowData)
         });
+        
+        console.log('🔥 saveCashFlow - API Response:', { status: response.status, ok: response.ok });
+        
+        // Handle error response BEFORE passing to CRUDResponseHandler
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('🔥 saveCashFlow - API ERROR:', errorData);
+            
+            // Show validation errors
+            if (errorData.errors && Array.isArray(errorData.errors)) {
+                errorData.errors.forEach(err => {
+                    if (window.showValidationWarning) {
+                        window.showValidationWarning(err.field || 'general', err.message || 'שגיאה בשדה');
+                    }
+                });
+            }
+            
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה בשמירה', errorData.message || 'שגיאה בשמירת תזרים מזומן');
+            }
+            return;
+        }
         
         // Use CRUDResponseHandler for consistent response handling
         console.log('🔥 saveCashFlow - Step 7: Handling response, isEdit =', isEdit);

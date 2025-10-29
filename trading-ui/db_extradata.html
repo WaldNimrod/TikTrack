@@ -82,69 +82,205 @@
 
             <!-- Main content -->
             <div class="main-content">
-                <!-- Extra data management area - content-section -->
-                <div class="content-section" id="main">
-                    <!-- Extra data header -->
+                <!-- constraints Section Start -->
+                <div class="content-section db-display-table" id="constraintsSection">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/db_extradata.svg" alt="ניהול טבלאות עזר" class="section-icon">
-                            ניהול טבלאות עזר
+                            <img src="images/icons/constraints.svg" alt="constraints" class="section-icon">
+                            constraints
                         </div>
-                        <div class="table-count" id="extraDataCount">טוען...</div>
+                        <div class="table-count" id="constraintsCount">0 records</div>
                         <div class="table-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול טבלאות עזר">
+                            <button class="filter-toggle-btn" onclick="toggleSection('constraintsSection')">
                                 <span class="filter-icon">▲</span>
                             </button>
                         </div>
                     </div>
-
-                    <!-- Extra data tables -->
                     <div class="section-body">
-                        <div class="table-responsive" id="extraDataContainer">
-                            <table class="table" id="extraDataTable" data-table-type="db_extradata">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                שם טבלה <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                סוג נתונים <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                מספר רשומות <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
-                                                style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                                                תיאור <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="actions-cell">
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="5" class="loading">טוען נתוני טבלאות עזר...</td>
-                                    </tr>
-                                </tbody>
+                        <div class="table-responsive" id="constraintsContainer">
+                            <table class="table" id="constraintsTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+                <!-- constraints Section End -->
+
+                <!-- currencies Section Start -->
+                <div class="content-section db-display-table" id="currenciesSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/currencies.svg" alt="currencies" class="section-icon">
+                            currencies
+                        </div>
+                        <div class="table-count" id="currenciesCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('currenciesSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="currenciesContainer">
+                            <table class="table" id="currenciesTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- currencies Section End -->
+
+                <!-- preference_groups Section Start -->
+                <div class="content-section db-display-table" id="preferenceGroupsSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/preference_groups.svg" alt="preference_groups" class="section-icon">
+                            preference_groups
+                        </div>
+                        <div class="table-count" id="preferenceGroupsCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('preferenceGroupsSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="preferenceGroupsContainer">
+                            <table class="table" id="preferenceGroupsTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- preference_groups Section End -->
+
+                <!-- system_setting_groups Section Start -->
+                <div class="content-section db-display-table" id="systemSettingGroupsSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/system_setting_groups.svg" alt="system_setting_groups" class="section-icon">
+                            system_setting_groups
+                        </div>
+                        <div class="table-count" id="systemSettingGroupsCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('systemSettingGroupsSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="systemSettingGroupsContainer">
+                            <table class="table" id="systemSettingGroupsTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- system_setting_groups Section End -->
+
+                <!-- external_data_providers Section Start -->
+                <div class="content-section db-display-table" id="externalDataProvidersSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/external_data_providers.svg" alt="external_data_providers" class="section-icon">
+                            external_data_providers
+                        </div>
+                        <div class="table-count" id="externalDataProvidersCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('externalDataProvidersSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="externalDataProvidersContainer">
+                            <table class="table" id="externalDataProvidersTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- external_data_providers Section End -->
+
+                <!-- quotes_last Section Start -->
+                <div class="content-section db-display-table" id="quotesLastSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/quotes_last.svg" alt="quotes_last" class="section-icon">
+                            quotes_last
+                        </div>
+                        <div class="table-count" id="quotesLastCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('quotesLastSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="quotesLastContainer">
+                            <table class="table" id="quotesLastTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- quotes_last Section End -->
+
+                <!-- plan_conditions Section Start -->
+                <div class="content-section db-display-table" id="planConditionsSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/plan_conditions.svg" alt="plan_conditions" class="section-icon">
+                            plan_conditions
+                        </div>
+                        <div class="table-count" id="planConditionsCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('planConditionsSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="planConditionsContainer">
+                            <table class="table" id="planConditionsTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- plan_conditions Section End -->
+
+                <!-- user_preferences Section Start -->
+                <div class="content-section db-display-table" id="userPreferencesSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/user_preferences.svg" alt="user_preferences" class="section-icon">
+                            user_preferences
+                        </div>
+                        <div class="table-count" id="userPreferencesCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('userPreferencesSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="userPreferencesContainer">
+                            <table class="table" id="userPreferencesTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- user_preferences Section End -->
             </div>
         </div>
 

@@ -1112,12 +1112,7 @@ function validateEditNoteForm(content, relationType, relatedId, attachment) {
 // פונקציות שמירה ומחיקה
 async function saveNote() {
   
-  // ניקוי מטמון לפני פעולת CRUD
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('notes', 'add');
-  }
-  
-  // שימוש ב-DataCollectionService לאיסוף נתונים
+  // ניקוי מטמון לפני פעולת CRUD  // שימוש ב-DataCollectionService לאיסוף נתונים
   const noteData = DataCollectionService.collectFormData({
     content: { id: 'addNoteContent', type: 'text', isTextContent: true },
     relationType: { id: 'noteRelationType', type: 'text', isRadioChecked: true },
@@ -1163,12 +1158,7 @@ async function saveNote() {
 
 async function updateNoteFromModal() {
   
-  // ניקוי מטמון לפני פעולת CRUD - עריכה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('notes', 'edit');
-  }
-  
-  // שימוש ב-DataCollectionService לאיסוף נתונים
+  // ניקוי מטמון לפני פעולת CRUD - עריכה  // שימוש ב-DataCollectionService לאיסוף נתונים
   const noteData = DataCollectionService.collectFormData({
     id: { id: 'editNoteId', type: 'int' },
     content: { id: 'editNoteContent', type: 'text', isTextContent: true },
@@ -1260,12 +1250,7 @@ async function confirmDeleteNote(noteId) {
 }
 
 async function deleteNoteFromServer(noteId) {
-  // ניקוי מטמון לפני פעולת CRUD - מחיקה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('notes', 'delete');
-  }
-  
-  const maxRetries = 3;
+  // ניקוי מטמון לפני פעולת CRUD - מחיקה  const maxRetries = 3;
   let retryCount = 0;
 
   while (retryCount < maxRetries) {

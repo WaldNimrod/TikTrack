@@ -615,12 +615,7 @@ async function checkLinkedItemsAndCancel(tradeId) {
  */
 async function performTradeCancellation(tradeId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - ביטול
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'cancel');
-    }
-    
-    // שליחה לשרת
+    // ניקוי מטמון לפני פעולת CRUD - ביטול    // שליחה לשרת
     const response = await fetch(`/api/trades/${tradeId}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -720,12 +715,7 @@ async function deleteTradeRecord(tradeId) {
  */
 async function performTradeDeletion(tradeId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'delete');
-    }
-    
-    // שליחה לשרת
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה    // שליחה לשרת
     const response = await fetch(`/api/trades/${tradeId}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -1100,12 +1090,7 @@ async function loadEditTradeModalData(trade) {
  */
 async function saveEditTradeData() {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - עריכה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'edit');
-    }
-    
-    // איסוף נתונים מהטופס
+    // ניקוי מטמון לפני פעולת CRUD - עריכה    // איסוף נתונים מהטופס
     const formData = {
       id: document.getElementById('editTradeId').value,
       investment_type: document.getElementById('editTradeType').value,
@@ -1438,12 +1423,7 @@ function validateTradeForm() {
  * @returns {Promise<void>}
  */
 async function saveNewTradeRecord() {
-  // ניקוי מטמון לפני פעולת CRUD - הוספה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('trades', 'add');
-  }
-  
-  // שמירת טרייד חדש...
+  // ניקוי מטמון לפני פעולת CRUD - הוספה  // שמירת טרייד חדש...
 
   // בדיקת אלמנטים לפני שמירה
 
@@ -2787,12 +2767,7 @@ async function updateEditTradePriceFromTicker(tickerId) {
  */
 async function reactivateTrade(tradeId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - עריכה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'edit');
-    }
-    
-    // מציאת הטרייד בנתונים
+    // ניקוי מטמון לפני פעולת CRUD - עריכה    // מציאת הטרייד בנתונים
     const trade = tradesData.find(t => t.id === tradeId);
     if (!trade) {
       if (typeof handleElementNotFound === 'function') {

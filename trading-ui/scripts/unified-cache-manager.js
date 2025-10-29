@@ -2862,38 +2862,17 @@ window.clearCacheFull = async function(event) {
 };
 
 /**
- * ניקוי מטמון לפני פעולות CRUD - פונקציה שמוזכרת במקומות רבים
- * @param {string} entity - שם הישות (trades, alerts, trading_accounts, etc.)
- * @param {string} operation - סוג הפעולה (add, edit, delete, cancel)
+ * REMOVED: clearCacheBeforeCRUD
+ * ==========================================
+ * This function was removed as it caused issues with the CRUD refresh flow.
+ * CRUDResponseHandler now handles all cache management automatically.
+ * 
+ * If cache clearing is needed, use CRUDResponseHandler's built-in mechanisms
+ * instead of this function.
+ * 
+ * Date removed: January 2025
+ * Reason: Simplified cache management flow
  */
-/**
- * Clear cache before CRUD operation (global wrapper)
- * @function clearCacheBeforeCRUD
- * @async
- * @param {string} entity - Entity name
- * @param {string} operation - CRUD operation
- * @returns {Promise<void>}
- */
-window.clearCacheBeforeCRUD = async function(entity, operation) {
-    window.Logger.info(`🧹 ניקוי מטמון לפני ${operation} של ${entity}...`, { page: "unified-cache-manager" });
-    
-    try {
-        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-            // ניקוי מהיר לפני פעולות CRUD
-            await window.UnifiedCacheManager.clearAllCacheQuick();
-        } else {
-            window.Logger.warn('⚠️ UnifiedCacheManager לא זמין - ניקוי בסיסי', { page: "unified-cache-manager" });
-            // fallback לניקוי בסיסי
-            localStorage.removeItem(`${entity}_cache`);
-            sessionStorage.removeItem(`${entity}_cache`);
-        }
-        
-        window.Logger.info(`✅ ניקוי מטמון לפני ${operation} של ${entity} הושלם`, { page: "unified-cache-manager" });
-        
-    } catch (error) {
-        window.Logger.error(`❌ שגיאה בניקוי מטמון לפני ${operation} של ${entity}:`, error, { page: "unified-cache-manager" });
-    }
-};
 
 
 // window.Logger.info('📦 Unified Cache Manager loaded', { page: "unified-cache-manager" });

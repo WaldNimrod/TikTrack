@@ -1047,12 +1047,7 @@ async function cancelTradingAccount(tradingAccountId, tradingAccountName) {
  * @param {string} accountName - שם החשבון מסחר
  */
 async function deleteTradingAccount(tradingAccountId, tradingAccountName) {
-  // ניקוי מטמון לפני פעולת CRUD - מחיקה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('trading_accounts', 'delete');
-  }
-
-  // בדיקת פריטים מקושרים לפני מחיקה
+  // ניקוי מטמון לפני פעולת CRUD - מחיקה  // בדיקת פריטים מקושרים לפני מחיקה
   if (typeof window.checkLinkedItemsBeforeDeleteTradingAccount === 'function') {
     const hasLinkedItems = await window.checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId);
     if (hasLinkedItems) {
@@ -1741,12 +1736,7 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
  * @param {string} accountName - שם החשבון מסחר
  */
 async function restoreTradingAccount(tradingAccountId, tradingAccountName) {
-  // ניקוי מטמון לפני פעולת CRUD - עריכה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('trading_accounts', 'edit');
-  }
-  
-  // אישור מהמשתמש
+  // ניקוי מטמון לפני פעולת CRUD - עריכה  // אישור מהמשתמש
   if (typeof window.showConfirmationDialog === 'function') {
     const confirmed = await new Promise(resolve => {
       window.showConfirmationDialog(
@@ -1820,12 +1810,7 @@ async function checkLinkedItemsAndCancelTradingAccount(tradingAccountId) {
  */
 async function performTradingAccountCancellation(tradingAccountId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - ביטול
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trading_accounts', 'cancel');
-    }
-    
-    // שליחה לשרת
+    // ניקוי מטמון לפני פעולת CRUD - ביטול    // שליחה לשרת
     const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -1880,12 +1865,7 @@ async function checkLinkedItemsAndDeleteTradingAccount(tradingAccountId) {
  */
 async function performTradingAccountDeletion(tradingAccountId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trading_accounts', 'delete');
-    }
-    
-    // שליחה לשרת
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה    // שליחה לשרת
     const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
       method: 'DELETE',
     });
@@ -2328,12 +2308,7 @@ async function saveTradingAccount() {
     window.Logger.debug('saveTradingAccount called', { page: 'trading_accounts' });
     
     try {
-        // ניקוי מטמון לפני פעולת CRUD
-        if (window.clearCacheBeforeCRUD) {
-            window.clearCacheBeforeCRUD('trading_accounts', 'add');
-        }
-        
-        // Collect form data using DataCollectionService
+        // ניקוי מטמון לפני פעולת CRUD        // Collect form data using DataCollectionService
         const form = document.getElementById('tradingAccountsModalForm');
         if (!form) {
             throw new Error('Trading Account form not found');
@@ -2465,12 +2440,7 @@ async function deleteTradingAccount(accountId) {
 
 async function performTradingAccountDeletion(accountId) {
     try {
-        // ניקוי מטמון לפני פעולת CRUD - מחיקה
-        if (window.clearCacheBeforeCRUD) {
-            window.clearCacheBeforeCRUD('trading_accounts', 'delete');
-        }
-        
-        // Send delete request
+        // ניקוי מטמון לפני פעולת CRUD - מחיקה        // Send delete request
         const response = await fetch(`/api/trading_accounts/${accountId}`, {
             method: 'DELETE'
         });

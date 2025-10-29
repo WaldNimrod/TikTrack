@@ -1550,12 +1550,7 @@ function parseAlertCondition(condition) {
 async function saveAlert() {
   window.Logger.info('🔧 saveAlert function called', { page: "alerts" });
   
-  // ניקוי מטמון לפני פעולת CRUD - הוספה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('alerts', 'add');
-  }
-  
-  const form = document.getElementById('addAlertForm');
+  // ניקוי מטמון לפני פעולת CRUD - הוספה  const form = document.getElementById('addAlertForm');
   if (!form) {
     window.Logger.warn('⚠️ Form element not found - skipping save operation', { page: "alerts" });
     return;
@@ -1858,12 +1853,7 @@ function updateStatusAndTriggered() {
  * משתמשת במערכת ההתראות הגלובלית להודעות
  */
 async function updateAlert() {
-  // ניקוי מטמון לפני פעולת CRUD - עריכה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('alerts', 'edit');
-  }
-  
-  const form = document.getElementById('editAlertForm');
+  // ניקוי מטמון לפני פעולת CRUD - עריכה  const form = document.getElementById('editAlertForm');
   if (!form) {
     // window.Logger.warn('⚠️ Form element not found - skipping update operation', { page: "alerts" });
     return;
@@ -2057,12 +2047,7 @@ async function confirmDeleteAlert(alertId) {
   // window.Logger.info('🔄 confirmDeleteAlert נקראה עבור ID:', alertId, { page: "alerts" });
 
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('alerts', 'delete');
-    }
-    
-    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });
 

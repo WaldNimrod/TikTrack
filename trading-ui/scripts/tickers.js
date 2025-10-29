@@ -692,12 +692,7 @@ function restoreTickersSectionState() {
  */
 async function saveTicker() {
   
-  // ניקוי מטמון לפני פעולת CRUD
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('tickers', 'add');
-  }
-
-  // איסוף נתונים מהטופס באמצעות DataCollectionService
+  // ניקוי מטמון לפני פעולת CRUD  // איסוף נתונים מהטופס באמצעות DataCollectionService
   const tickerData = DataCollectionService.collectFormData({
     symbol: { id: 'addTickerSymbol', type: 'text' },
     name: { id: 'addTickerName', type: 'text' },
@@ -778,12 +773,7 @@ async function saveTicker() {
  */
 async function updateTicker() {
   
-  // ניקוי מטמון לפני פעולת CRUD - עריכה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('tickers', 'edit');
-  }
-
-  // שימוש ב-DataCollectionService לאיסוף נתונים
+  // ניקוי מטמון לפני פעולת CRUD - עריכה  // שימוש ב-DataCollectionService לאיסוף נתונים
   const tickerData = DataCollectionService.collectFormData({
     id: { id: 'editTickerId', type: 'text' },
     symbol: { id: 'editTickerSymbol', type: 'text' },
@@ -1432,12 +1422,7 @@ async function performTickerDeletion(tickerId) {
  */
 async function confirmDeleteTicker(id) {
   
-  // ניקוי מטמון לפני פעולת CRUD - מחיקה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('tickers', 'delete');
-  }
-
-  // מציאת הטיקר לפני מחיקה כדי להציג פרטים בהודעה
+  // ניקוי מטמון לפני פעולת CRUD - מחיקה  // מציאת הטיקר לפני מחיקה כדי להציג פרטים בהודעה
   const ticker = (window.tickersData || []).find(t => t.id === id);
   const tickerInfo = ticker ? `${ticker.symbol} - ${ticker.name}` : `טיקר ${id}`;
 

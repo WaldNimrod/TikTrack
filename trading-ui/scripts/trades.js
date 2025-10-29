@@ -792,12 +792,7 @@ async function checkLinkedItemsAndCancel(tradeId) {
  */
 async function performTradeCancellation(tradeId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - ביטול
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'cancel');
-    }
-    
-    // שליחה לשרת
+    // ניקוי מטמון לפני פעולת CRUD - ביטול    // שליחה לשרת
     const response = await fetch(`/api/trades/${tradeId}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -896,12 +891,7 @@ async function deleteTradeRecord(tradeId) {
  */
 async function performTradeDeletion(tradeId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'delete');
-    }
-    
-    // שליחה לשרת
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה    // שליחה לשרת
     const response = await fetch(`/api/trades/${tradeId}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -1540,12 +1530,7 @@ async function updateEditTradePriceFromTicker(tickerId) {
  */
 async function reactivateTrade(tradeId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - עריכה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'edit');
-    }
-    
-    // מציאת הטרייד בנתונים
+    // ניקוי מטמון לפני פעולת CRUD - עריכה    // מציאת הטרייד בנתונים
     const trade = tradesData.find(t => t.id === tradeId);
     if (!trade) {
       if (typeof handleElementNotFound === 'function') {
@@ -1998,12 +1983,7 @@ async function saveTrade() {
     window.Logger.debug('saveTrade called', { page: 'trades' });
     
     try {
-        // ניקוי מטמון לפני פעולת CRUD
-        if (window.clearCacheBeforeCRUD) {
-            window.clearCacheBeforeCRUD('trades', 'add');
-        }
-        
-        // Collect form data using DataCollectionService
+        // ניקוי מטמון לפני פעולת CRUD        // Collect form data using DataCollectionService
         const form = document.getElementById('tradesModalForm');
         if (!form) {
             throw new Error('Trade form not found');

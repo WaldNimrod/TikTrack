@@ -360,12 +360,7 @@ function parseAlertCondition(condition) {
  */
 async function cancelAlert(alertId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - ביטול
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('alerts', 'cancel');
-    }
-    
-    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - ביטול    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -420,12 +415,7 @@ async function cancelAlert(alertId) {
  */
 async function deleteAlert(alertId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('alerts', 'delete');
-    }
-    
-    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });
 

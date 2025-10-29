@@ -2274,12 +2274,7 @@ async function saveTradePlan() {
     window.Logger.debug('saveTradePlan called', { page: 'trade_plans' });
     
     try {
-        // ניקוי מטמון לפני פעולת CRUD
-        if (window.clearCacheBeforeCRUD) {
-            window.clearCacheBeforeCRUD('trade_plans', 'add');
-        }
-        
-        // Collect form data using DataCollectionService
+        // ניקוי מטמון לפני פעולת CRUD        // Collect form data using DataCollectionService
         const form = document.getElementById('tradePlansModalForm');
         if (!form) {
             throw new Error('Trade Plan form not found');
@@ -2419,12 +2414,7 @@ async function deleteTradePlan(tradePlanId) {
 
 async function performTradePlanDeletion(tradePlanId) {
     try {
-        // ניקוי מטמון לפני פעולת CRUD - מחיקה
-        if (window.clearCacheBeforeCRUD) {
-            window.clearCacheBeforeCRUD('trade_plans', 'delete');
-        }
-        
-        // Send delete request
+        // ניקוי מטמון לפני פעולת CRUD - מחיקה        // Send delete request
         const response = await fetch(`/api/trade_plans/${tradePlanId}`, {
             method: 'DELETE'
         });

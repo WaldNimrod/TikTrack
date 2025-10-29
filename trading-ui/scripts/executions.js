@@ -835,12 +835,7 @@ function validateCompleteExecutionForm(mode) {
  */
 async function saveExecution() {
   
-  // ניקוי מטמון לפני פעולת CRUD
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('executions', 'add');
-  }
-
-  // איסוף נתונים מהטופס באמצעות DataCollectionService
+  // ניקוי מטמון לפני פעולת CRUD  // איסוף נתונים מהטופס באמצעות DataCollectionService
   const executionData = DataCollectionService.collectFormData({
     trade_id: { id: 'addExecutionTradeId', type: 'int' },
     action: { id: 'addExecutionType', type: 'text' },
@@ -934,12 +929,7 @@ async function saveExecution() {
  */
 async function updateExecutionWrapper() {
   
-  // ניקוי מטמון לפני פעולת CRUD - עריכה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('executions', 'edit');
-  }
-
-  const id = document.getElementById('editExecutionId').value;
+  // ניקוי מטמון לפני פעולת CRUD - עריכה  const id = document.getElementById('editExecutionId').value;
   const tradeIdValue = document.getElementById('editExecutionTradeId').value;
   const type = document.getElementById('editExecutionType').value;
   const quantity = document.getElementById('editExecutionQuantity').value;
@@ -4110,12 +4100,7 @@ async function deleteExecution(executionId) {
 
 async function performExecutionDeletion(executionId) {
     try {
-        // ניקוי מטמון לפני פעולת CRUD - מחיקה
-        if (window.clearCacheBeforeCRUD) {
-            window.clearCacheBeforeCRUD('executions', 'delete');
-        }
-        
-        // Send delete request
+        // ניקוי מטמון לפני פעולת CRUD - מחיקה        // Send delete request
         const response = await fetch(`/api/executions/${executionId}`, {
             method: 'DELETE'
         });

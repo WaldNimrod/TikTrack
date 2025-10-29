@@ -138,11 +138,11 @@ async function fetchTableData(tableType) {
  * Update table display with data
  * @param {Array} data - The data to display
  * @param {string} tableType - The table type (with dashes)
+ * @param {string} containerId - The container ID for the table
  */
-function updateTableDisplay(data, tableType) {
+function updateTableDisplay(data, tableType, containerId) {
   // Convert table type to section ID
   const sectionId = getSectionId(tableType);
-  const containerId = getContainerId(tableType);
   const tableId = getTableId(tableType);
   
   const tableContainer = document.getElementById(containerId);
@@ -188,11 +188,11 @@ function getSectionId(tableType) {
     'trading-accounts': 'accountsSection',
     'trades': 'tradesSection',
     'tickers': 'tickersSection',
-    'trade-plans': 'tradePlansSection',
+    'trade_plans': 'tradePlansSection',
     'executions': 'executionsSection',
     'alerts': 'alertsSection',
     'notes': 'notesSection',
-    'cash-flows': 'cashFlowsSection'
+    'cash_flows': 'cashFlowsSection'
   };
   return mapping[tableType] || tableType + 'Section';
 }
@@ -207,11 +207,11 @@ function getContainerId(tableType) {
     'trading-accounts': 'accountsContainer',
     'trades': 'tradesContainer',
     'tickers': 'tickersContainer',
-    'trade-plans': 'tradePlansContainer',
+    'trade_plans': 'tradePlansContainer',
     'executions': 'executionsContainer',
     'alerts': 'alertsContainer',
     'notes': 'notesContainer',
-    'cash-flows': 'cashFlowsContainer'
+    'cash_flows': 'cashFlowsContainer'
   };
   return mapping[tableType] || tableType + 'Container';
 }
@@ -332,11 +332,11 @@ function getCountElementId(tableType) {
     'trading-accounts': 'accountsCount',
     'trades': 'tradesCount',
     'tickers': 'tickersCount',
-    'trade-plans': 'tradePlansCount',
+    'trade_plans': 'tradePlansCount',
     'executions': 'executionsCount',
     'alerts': 'alertsCount',
     'notes': 'notesCount',
-    'cash-flows': 'cashFlowsCount'
+    'cash_flows': 'cashFlowsCount'
   };
   return mapping[tableType] || tableType + 'Count';
 }

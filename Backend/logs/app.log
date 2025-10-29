@@ -12710,3 +12710,6 @@ FROM alerts]
 2025-10-30 00:20:20,675 - cache - INFO - Cache DELETE: services.ticker_service.get_all:81578798591900a326254b2f7accb2fa (Was accessed 0 times)
 2025-10-30 00:20:20,675 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 3 times)
 2025-10-30 00:20:20,675 - cache - INFO - Cache DELETE: services.ticker_service.get_all:aad30262c38527ccb383f5fac58f1ad0 (Was accessed 0 times)
+2025-10-30 00:25:20,681 - cache - INFO - Cache DELETE: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-30 00:25:20,681 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-30 00:25:20,681 - cache - INFO - Cache DELETE: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)

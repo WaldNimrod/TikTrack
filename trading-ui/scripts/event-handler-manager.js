@@ -110,8 +110,8 @@ class EventHandlerManager {
         }
         
         // Handle buttons with onclick attribute (legacy support - for backwards compatibility)
-        // This ensures all buttons work through the centralized system
-        // Only process if button doesn't have data-onclick (to avoid double execution)
+        // Note: We don't execute onclick handlers here to avoid double execution
+        // The browser will handle onclick naturally, we just log for debugging
         const buttonWithOnclickLegacy = target.closest('button[onclick]:not([data-onclick])');
         if (buttonWithOnclickLegacy && buttonWithOnclickLegacy !== buttonWithOnclick) {
             // Don't process if button is disabled
@@ -121,23 +121,15 @@ class EventHandlerManager {
             
             const onclickValue = buttonWithOnclickLegacy.getAttribute('onclick');
             if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
-                try {
-                    // Execute the onclick handler using eval (safe because it's controlled)
-                    // Note: Following same pattern as data-onclick - no preventDefault/stopPropagation
-                    // to allow Bootstrap modals and other standard behaviors to work
-                    eval(onclickValue);
-                } catch (error) {
-                    if (window.Logger) {
-                        window.Logger.error('EventHandlerManager: Error executing onclick', {
-                            onclickValue: onclickValue,
-                            error: error.message,
-                            stack: error.stack
-                        });
-                    } else {
-                        console.error('EventHandlerManager: Error executing onclick:', onclickValue, error);
-                    }
+                // Just log for debugging - let the browser handle onclick naturally
+                if (window.Logger) {
+                    window.Logger.debug('EventHandlerManager: Detected onclick button (browser will handle)', {
+                        onclickValue: onclickValue,
+                        element: buttonWithOnclickLegacy
+                    });
                 }
-                // Don't return early - allow other handlers to process if needed
+                // Don't execute - browser will handle onclick naturally
+                // This prevents double execution while maintaining compatibility
             }
         }
         

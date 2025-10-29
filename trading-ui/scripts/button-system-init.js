@@ -287,6 +287,37 @@ class AdvancedButtonSystem {
         // this.logger.info(`Processed: ${this.performance.processedButtons}, Errors: ${this.performance.errors}`);
     }
 
+    /**
+     * Process buttons within a specific container element
+     * @param {HTMLElement} container - Container element to search for buttons
+     * @async
+     */
+    async processButtons(container) {
+        if (!container) {
+            this.logger.warn('processButtons: No container provided');
+            return;
+        }
+
+        // Find buttons within the container that haven't been processed yet
+        const buttonElements = container.querySelectorAll('[data-button-type]:not([data-button-processed])');
+        const totalButtons = buttonElements.length;
+
+        if (totalButtons === 0) {
+            this.logger.debug(`processButtons: No unprocessed buttons found in container`);
+            return;
+        }
+
+        this.logger.debug(`processButtons: Found ${totalButtons} buttons to process in container`);
+
+        // Wait for button icons to be loaded
+        await this.waitForButtonIcons();
+        
+        // Process buttons in batches
+        this.processButtonsInBatches(buttonElements);
+        
+        this.logger.debug(`processButtons: Completed processing ${totalButtons} buttons in container`);
+    }
+
     async waitForButtonIcons() {
         const maxWaitTime = 1000; // 1 second max (reduced from 5 seconds)
         const checkInterval = 50; // Check every 50ms (faster)
@@ -545,6 +576,10 @@ window.updateButton = (buttonId, type, onClick, classes = '', attributes = '', t
 
 window.getButtonSystemStats = () => {
     return window.advancedButtonSystem.getStats();
+};
+
+window.processButtons = (container) => {
+    return window.advancedButtonSystem.processButtons(container);
 };
 
 // Initialize Button System function

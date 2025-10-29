@@ -1043,11 +1043,15 @@ window.loadProfilesToDropdown = async function(userId = 1) {
                 window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ${activeProfile.name}`, { page: "preferences-ui" });
                 
                 // Check if this is the default profile and disable all preferences
-                // Updated to handle both old name ("ברירת מחדל") and new name ("פרופיל ברירת מחדל")
-                const isDefaultProfile = activeProfile.is_default || activeProfile.default || 
+                // Default profile is: ID = 0, or is_default = true, or name matches
+                const isDefaultProfile = activeProfile.id === 0 || 
+                                       activeProfile.is_default === true || 
+                                       activeProfile.default === true ||
                                        activeProfile.name === 'ברירת מחדל' || 
-                                       activeProfile.name === 'פרופיל ברירת מחדל' ||
-                                       activeProfile.id === 0;
+                                       activeProfile.name === 'פרופיל ברירת מחדל';
+                
+                window.Logger.info(`🔍 Profile check: ID=${activeProfile.id}, is_default=${activeProfile.is_default}, name="${activeProfile.name}", isDefaultProfile=${isDefaultProfile}`, { page: "preferences-ui" });
+                
                 if (isDefaultProfile) {
                     window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-ui" });
                     window.disableAllPreferencesInterface();
@@ -1211,12 +1215,17 @@ window.disableAllPreferencesInterface = function() {
 window.enableAllPreferencesInterface = function() {
     window.Logger.info('✅ Enabling all preferences interface...', { page: "preferences-ui" });
     
+    // First, hide warning message (this should happen immediately)
+    hideDefaultProfileWarning();
+    window.Logger.info('✅ Hidden default profile warning message', { page: "preferences-ui" });
+    
     // Enable all form inputs
     const allInputs = document.querySelectorAll('#preferencesForm input, #preferencesForm select, #preferencesForm textarea');
     allInputs.forEach(input => {
         input.disabled = false;
         input.classList.remove('disabled');
     });
+    window.Logger.info(`✅ Enabled ${allInputs.length} form inputs`, { page: "preferences-ui" });
     
     // Enable all buttons
     const allButtons = document.querySelectorAll('#preferencesForm button');
@@ -1224,6 +1233,7 @@ window.enableAllPreferencesInterface = function() {
         button.disabled = false;
         button.classList.remove('disabled');
     });
+    window.Logger.info(`✅ Enabled ${allButtons.length} buttons`, { page: "preferences-ui" });
     
     // Restore all save buttons
     const saveButtons = document.querySelectorAll('button[onclick*="saveAllPreferences"], #savePreferencesBtn');
@@ -1233,9 +1243,6 @@ window.enableAllPreferencesInterface = function() {
         saveButton.classList.remove('btn-secondary', 'disabled');
         window.Logger.info(`✅ Enabled save button: ${saveButton.id || 'unnamed'}`, { page: "preferences-ui" });
     });
-    
-    // Hide warning message
-    hideDefaultProfileWarning();
     
     window.Logger.info('✅ All preferences interface enabled', { page: "preferences-ui" });
 };

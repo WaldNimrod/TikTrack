@@ -178,18 +178,25 @@ const PACKAGE_MANIFEST = {
         loadOrder: 12
       },
       {
+        file: 'event-handler-manager.js',
+        globalCheck: 'window.EventHandlerManager',
+        description: 'מערכת ניהול אירועים מרכזית',
+        required: true,
+        loadOrder: 13
+      },
+      {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
         description: 'מערכת כפתורים',
         required: true,
-        loadOrder: 13
+        loadOrder: 14
       },
       {
         file: 'color-scheme-system.js',
         globalCheck: 'window.loadDynamicColors',
         description: 'מערכת צבעים דינמית',
         required: true,
-        loadOrder: 14
+        loadOrder: 15
       }
     ],
     estimatedSize: '~280KB',

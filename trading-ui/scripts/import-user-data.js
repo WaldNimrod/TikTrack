@@ -54,7 +54,10 @@ async function openImportUserDataModal() {
         modal.setAttribute('aria-hidden', 'false');
         
         // Process buttons using centralized button system
-        if (window.advancedButtonSystem) {
+        if (window.processButtons) {
+            window.processButtons(modal);
+            window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
+        } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
             window.advancedButtonSystem.processButtons(modal);
             window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
         } else if (window.initializeButtons) {
@@ -175,18 +178,26 @@ function goToStep(step) {
     // Process buttons in the modal after step change
     // This ensures all buttons are properly handled by the centralized button system
     const modal = document.getElementById('importUserDataModal');
-    if (modal && window.advancedButtonSystem) {
+    if (modal) {
         // Get the current visible step container
         const currentStepElement = modal.querySelector(`.import-step[data-step="${step}"]`);
         if (currentStepElement) {
-            window.advancedButtonSystem.processButtons(currentStepElement);
+            if (window.processButtons) {
+                window.processButtons(currentStepElement);
+            } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+                window.advancedButtonSystem.processButtons(currentStepElement);
+            }
             window.Logger.debug('[Import Modal] Buttons processed for step', { 
                 step, 
                 page: 'import-user-data' 
             });
         } else {
             // Fallback: process entire modal
-            window.advancedButtonSystem.processButtons(modal);
+            if (window.processButtons) {
+                window.processButtons(modal);
+            } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+                window.advancedButtonSystem.processButtons(modal);
+            }
             window.Logger.debug('[Import Modal] Buttons processed for entire modal', { 
                 step, 
                 page: 'import-user-data' 

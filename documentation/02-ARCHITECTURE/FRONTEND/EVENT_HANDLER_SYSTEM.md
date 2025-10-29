@@ -404,6 +404,14 @@ console.log('Function exists:', typeof window[button?.getAttribute('data-onclick
 
 ## 🔄 היסטוריית עדכונים
 
+### 2025-01-27 - תיקון מערכת הכפתורים השבורה
+- ✅ הוספת `event-handler-manager.js` ל-`package-manifest.js` BASE package
+- ✅ הוספת `event-handler-manager.js` ל-`executions.html`
+- ✅ תיקון בעיית כפילות עם `onclick` רגיל - הסרת `eval()` על `onclick` רגיל
+- ✅ שמירה על תמיכה ב-`onclick` רגיל דרך הרצה טבעית של הדפדפן
+- ✅ הוספת לוגים לזיהוי `onclick` כפתורים (debug mode)
+- ✅ עדכון loadOrder ב-package-manifest.js
+
 ### 2025-01-27 - תמיכה ב-onclick רגיל ומודולים דינמיים
 - ✅ הוספת תמיכה ב-`onclick` רגיל (legacy support) - תאימות לאחור
 - ✅ עיבוד אוטומטי של כפתורים במודולים אחרי מעבר שלבים

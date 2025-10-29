@@ -73,6 +73,10 @@ class ProfileManager {
         try {
             window.Logger.info(`🔄 Switching to profile ID: ${profileId}`, { page: "preferences-profiles" });
             
+            // Update current profile ID immediately
+            this.currentUserId = userId;
+            this.currentProfileId = profileId;
+            
             // Step 1: Call API to activate profile
             const response = await fetch('/api/preferences/profiles/activate', {
                 method: 'POST',

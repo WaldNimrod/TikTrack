@@ -1366,9 +1366,11 @@ window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
  * @returns {Promise<void>}
  */
 async function saveCashFlow() {
+    console.log('🔥 saveCashFlow CALLED - Starting execution');
     window.Logger.debug('saveCashFlow called', { page: 'cash_flows' });
     
     try {
+        console.log('🔥 saveCashFlow - Step 1: Starting execution');
         // ניקוי מטמון לפני פעולת CRUD
         if (window.clearCacheBeforeCRUD) {
             window.clearCacheBeforeCRUD('cash_flows', 'add');
@@ -1376,10 +1378,13 @@ async function saveCashFlow() {
         
         // Collect form data using DataCollectionService
         const form = document.getElementById('cashFlowModalForm');
+        console.log('🔥 saveCashFlow - Step 2: Form element:', form);
         if (!form) {
+            console.error('🔥 saveCashFlow - ERROR: Form not found!');
             throw new Error('Cash flow form not found');
         }
         
+        console.log('🔥 saveCashFlow - Step 3: Collecting form data');
         const cashFlowData = DataCollectionService.collectFormData({
             amount: { id: 'cashFlowAmount', type: 'float' },
             type: { id: 'cashFlowType', type: 'text' },
@@ -1393,8 +1398,11 @@ async function saveCashFlow() {
             trade_plan_id: { id: 'cashFlowTradePlan', type: 'int', default: null }
         });
         
+        console.log('🔥 saveCashFlow - Step 4: Form data collected:', cashFlowData);
+        
         // ולידציה מפורטת
         let hasErrors = false;
+        console.log('🔥 saveCashFlow - Step 5: Starting validation');
         if (!cashFlowData.amount || cashFlowData.amount <= 0) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('cashFlowAmount', 'סכום חייב להיות גדול מ-0');
@@ -1438,8 +1446,11 @@ async function saveCashFlow() {
         }
         
         if (hasErrors) {
+            console.error('🔥 saveCashFlow - VALIDATION FAILED - hasErrors = true');
             return;
         }
+        
+        console.log('🔥 saveCashFlow - Step 6: Validation passed, preparing API call');
         
         // Determine if this is add or edit
         const isEdit = form.dataset.mode === 'edit';
@@ -1464,21 +1475,25 @@ async function saveCashFlow() {
         });
         
         // Use CRUDResponseHandler for consistent response handling
+        console.log('🔥 saveCashFlow - Step 7: Handling response, isEdit =', isEdit);
         if (isEdit) {
             await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן עודכן בהצלחה',
                 entityName: 'תזרים מזומן'
             });
+            console.log('🔥 saveCashFlow - UPDATE SUCCESS');
         } else {
             await CRUDResponseHandler.handleSaveResponse(response, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן נוסף בהצלחה',
                 entityName: 'תזרים מזומן'
             });
+            console.log('🔥 saveCashFlow - SAVE SUCCESS');
         }
         
     } catch (error) {
+        console.error('🔥 saveCashFlow - ERROR CAUGHT:', error);
         CRUDResponseHandler.handleError(error, 'שמירת תזרים מזומן');
     }
 }

@@ -88,6 +88,7 @@ def get_trading_account_by_name(account_name: str):
         }), 500
 
 @trading_accounts_bp.route('/', methods=['POST'])
+@invalidate_cache(['trading_accounts'])
 def create_trading_account():
     """Create new trading account"""
     try:
@@ -128,6 +129,7 @@ def create_trading_account():
         db.close()
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['PUT'])
+@invalidate_cache(['trading_accounts'])
 def update_trading_account(trading_account_id: int):
     """Update trading account"""
     try:
@@ -197,6 +199,7 @@ def get_trading_account_open_trades(trading_account_id: int):
         db.close()
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['DELETE'])
+@invalidate_cache(['trading_accounts'])
 def delete_trading_account(trading_account_id: int):
     """Delete trading account"""
     try:

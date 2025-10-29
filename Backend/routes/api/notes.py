@@ -210,6 +210,7 @@ def get_note(note_id: int):
         db.close()
 
 @notes_bp.route('/', methods=['POST'])
+@invalidate_cache(['notes'])
 def create_note():
     """Create new note"""
     db = None
@@ -316,6 +317,7 @@ def create_note():
             db.close()
 
 @notes_bp.route('/<int:note_id>', methods=['PUT'])
+@invalidate_cache(['notes'])
 def update_note(note_id: int):
     """Update note"""
     db = None
@@ -493,6 +495,7 @@ def update_note(note_id: int):
             db.close()
 
 @notes_bp.route('/<int:note_id>', methods=['DELETE'])
+@invalidate_cache(['notes'])
 def delete_note(note_id: int):
     """Delete note"""
     try:

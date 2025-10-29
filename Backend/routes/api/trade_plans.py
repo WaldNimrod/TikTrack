@@ -58,6 +58,7 @@ def get_trade_plans_by_account(trading_account_id: int):
         db.close()
 
 @trade_plans_bp.route('/', methods=['POST'])
+@invalidate_cache(['trade_plans'])
 def create_trade_plan():
     """Create new trade plan"""
     try:
@@ -81,6 +82,7 @@ def create_trade_plan():
         db.close()
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['PUT'])
+@invalidate_cache(['trade_plans'])
 def update_trade_plan(plan_id: int):
     """Update trade plan"""
     try:
@@ -287,6 +289,7 @@ def can_cancel_trade_plan(plan_id: int):
 
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['DELETE'])
+@invalidate_cache(['trade_plans'])
 def delete_trade_plan(plan_id: int):
     """Delete trade plan"""
     try:

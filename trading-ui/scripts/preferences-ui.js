@@ -636,7 +636,12 @@ class PreferencesUI {
                 }
                 
                 if (this.hasChanged(key, value)) {
-                    changedPreferences[key] = value;
+                    // Convert boolean values to strings for checkboxes
+                    if (typeof value === 'boolean') {
+                        changedPreferences[key] = value.toString();
+                    } else {
+                        changedPreferences[key] = value;
+                    }
                 }
             }
             

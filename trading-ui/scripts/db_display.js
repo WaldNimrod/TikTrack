@@ -226,11 +226,11 @@ function getTableId(tableType) {
     'trading-accounts': 'accountsTable',
     'trades': 'tradesTable',
     'tickers': 'tickersTable',
-    'trade-plans': 'tradePlansTable',
+    'trade_plans': 'tradePlansTable',
     'executions': 'executionsTable',
     'alerts': 'alertsTable',
     'notes': 'notesTable',
-    'cash-flows': 'cashFlowsTable'
+    'cash_flows': 'cashFlowsTable'
   };
   return mapping[tableType] || tableType + 'Table';
 }

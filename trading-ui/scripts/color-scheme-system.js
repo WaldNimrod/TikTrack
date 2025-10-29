@@ -536,7 +536,8 @@ const PAGE_TO_ENTITY_MAPPING = {
   'designs-page': 'design',
   'research-page': 'research',
   'preferences-page': 'preference',
-  'db-display-page': 'design' // Database display page uses design colors
+  'db-display-page': 'design', // Database display page uses design colors
+  'db-extradata-page': 'design' // Database extra data page uses design colors
 };
 
 async function getEntityColorFromPreferences(entityType, variant = 'primary') {

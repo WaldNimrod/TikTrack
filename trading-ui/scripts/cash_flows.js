@@ -1477,20 +1477,29 @@ async function saveCashFlow() {
         
         console.log('🔥 saveCashFlow - API Response:', { status: response.status, ok: response.ok });
         
+        // Clone response for debugging
+        const clonedResponse = response.clone();
+        
+        // Check response first
+        const responseData = await clonedResponse.json();
+        console.log('🔥 saveCashFlow - Response Data:', responseData);
+        
         // Use CRUDResponseHandler for consistent response handling
         console.log('🔥 saveCashFlow - Step 7: Handling response, isEdit =', isEdit);
         if (isEdit) {
             await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן עודכן בהצלחה',
-                entityName: 'תזרים מזומן'
+                entityName: 'תזרים מזומן',
+                reloadFn: window.loadCashFlowsData
             });
             console.log('🔥 saveCashFlow - UPDATE SUCCESS');
         } else {
             await CRUDResponseHandler.handleSaveResponse(response, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן נוסף בהצלחה',
-                entityName: 'תזרים מזומן'
+                entityName: 'תזרים מזומן',
+                reloadFn: window.loadCashFlowsData
             });
             console.log('🔥 saveCashFlow - SAVE SUCCESS');
         }

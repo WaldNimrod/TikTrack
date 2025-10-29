@@ -1583,11 +1583,17 @@ function goToNote(noteId) {
  * @returns {Promise<void>}
  */
 async function loadExecutionsData() {
-  // loadExecutionsData called
   try {
-    // טעינת נתוני עסקעות
-
-    const response = await fetch('/api/executions/?_t=' + Date.now());
+    window.Logger.info('Loading executions data (bypass cache)', { page: "executions" });
+    
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/executions/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
     if (response.ok) {
       const data = await response.json();
       executionsData = data.data || data;

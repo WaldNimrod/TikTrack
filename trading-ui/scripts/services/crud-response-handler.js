@@ -529,29 +529,29 @@ class CRUDResponseHandler {
         try {
             // אם יש reloadFn מותאם אישית - להשתמש בו
             if (options.reloadFn && typeof options.reloadFn === 'function') {
+                console.log('🔄 CRUDResponseHandler: Using custom reloadFn');
+                
+                // ניקוי מטמון ממוקד לפני רענון
+                const entityType = this.detectEntityType(options);
+                if (entityType && window.UnifiedCacheManager) {
+                    await this.clearEntityCache(entityType);
+                }
+                
+                // קריאה ל-reloadFn
                 await options.reloadFn();
                 return;
             }
 
-            // אם דורש hard reload (להעדפות) - השתמש ב-clearCacheQuick
+            // אם דורש hard reload (להעדפות בלבד)
             if (options.requiresHardReload) {
                 console.log('🔄 CRUDResponseHandler: requiresHardReload detected, calling clearCacheQuick...');
                 if (typeof window.clearCacheQuick === 'function') {
-                    console.log('✅ CRUDResponseHandler: clearCacheQuick function found, executing...');
                     await window.clearCacheQuick();
-                    console.log('✅ CRUDResponseHandler: Hard reload executed via clearCacheQuick');
-                } else {
-                    console.warn('⚠️ CRUDResponseHandler: clearCacheQuick not available - falling back to regular refresh');
-                    // Fallback to regular refresh
-                    const entityType = this.detectEntityType(options);
-                    if (entityType) {
-                        await this.refreshEntityTables(entityType);
-                    }
                 }
                 return;
             }
 
-            // מערכת אוטומטית - זיהוי entity type מה-URL או מהoptions
+            // ברירת מחדל - רענון אוטומטי
             const entityType = this.detectEntityType(options);
             
             if (entityType) {
@@ -560,6 +560,32 @@ class CRUDResponseHandler {
 
         } catch (error) {
             console.error('❌ שגיאה ברענון טבלה:', error);
+        }
+    }
+
+    /**
+     * ניקוי מטמון ממוקד עבור ישות ספציפית
+     * @param {string} entityType - סוג הישות (trades, alerts, etc.)
+     */
+    static async clearEntityCache(entityType) {
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            return;
+        }
+        
+        try {
+            const keys = await window.UnifiedCacheManager.getAllKeys();
+            const entityKeys = keys.filter(k => 
+                k.startsWith(`${entityType}_`) || 
+                k.startsWith(`all_${entityType}`) ||
+                k.includes(entityType)
+            );
+            
+            for (const key of entityKeys) {
+                await window.UnifiedCacheManager.remove(key);
+            }
+            console.log(`✅ נוקה מטמון עבור ${entityType} (${entityKeys.length} מפתחות)`);
+        } catch (error) {
+            console.error(`❌ שגיאה בניקוי מטמון ${entityType}:`, error);
         }
     }
 

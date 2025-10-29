@@ -1297,8 +1297,16 @@ async function loadTradePlansData() {
       return data;
     } else {
       // Fallback: load data directly from API
-      window.Logger.info('🔄 Loading trade plans data directly from API...', { page: "trade_plans" });
-      const response = await fetch('/api/trade_plans/');
+      window.Logger.info('Loading trade plans data (bypass cache)', { page: "trade_plans" });
+      
+      // קריאה ישירה לשרת עם timestamp למניעת cache
+      const response = await fetch(`/api/trade_plans/?_t=${Date.now()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);

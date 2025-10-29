@@ -1497,6 +1497,8 @@ function clearTickersCache() {
  */
 async function loadTickersData() {
   try {
+    window.Logger.info('Loading tickers data (bypass cache)', { page: "tickers" });
+    
     // ניקוי מטמון לפני טעינה
     clearTickersCache();
     
@@ -1505,7 +1507,14 @@ async function loadTickersData() {
       await loadCurrenciesData();
     }
 
-    const response = await fetch(`/api/tickers/?_t=${Date.now()}`);
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/tickers/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

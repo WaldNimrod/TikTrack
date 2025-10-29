@@ -501,12 +501,17 @@ window.restoreNotesSectionState = restoreNotesSectionState;
  * @returns {Promise<void>}
  */
 async function loadNotesData() {
-  window.Logger.info('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀', { page: "notes" });
+  window.Logger.info('Loading notes data (bypass cache)', { page: "notes" });
 
   try {
-    // קריאה לשרת לקבלת נתוני הערות
-    window.Logger.info('📡 קריאה לשרת לקבלת נתוני הערות...', { page: "notes" });
-    const response = await fetch('/api/notes/');
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/notes/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

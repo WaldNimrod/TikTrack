@@ -356,10 +356,16 @@ function getDemoAlertsData() {
  * @returns {Array} מערך של התראות
  */
 async function loadAlertsData() {
-  window.Logger.info('📊 טעינת נתוני התראות מהשרת...', { page: "alerts" });
+  window.Logger.info('Loading alerts data (bypass cache)', { page: "alerts" });
   try {
-    const response = await fetch('/api/alerts/');
-    window.Logger.info('📊 תגובת שרת:', response.status, response.ok, { page: "alerts" });
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/alerts/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
 
     if (!response.ok) {
       window.Logger.warn(`⚠️ Server error ${response.status}, using demo data`, { page: "alerts" });

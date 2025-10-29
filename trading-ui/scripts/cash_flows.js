@@ -88,64 +88,39 @@
  */
 async function loadCashFlowsData() {
   try {
-    window.Logger.info('Loading cash flows data', { page: 'cash_flows' });
+    window.Logger.info('Loading cash flows data (bypass cache)', { page: 'cash_flows' });
     
-    // הצגת אינדיקטור טעינה
-    if (typeof window.showNotification === 'function') {
-      window.showInfoNotification('טעינה', 'טוען נתוני תזרימי מזומנים...');
-    }
-    
-    // שליחה לשרת
-    fetch('/api/cash_flows/', {
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/cash_flows/?_t=${Date.now()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('שגיאה בטעינת נתוני תזרימי מזומנים');
-      }
-      return response.json();
-    })
-    .then(response => {
-      window.Logger.info('Cash flows data loaded successfully', { count: response.data?.length || 0, page: 'cash_flows' });
-      
-      // הנתונים מגיעים במבנה {data: [...]}
-      const data = response.data || response;
-      
-      // עדכון הנתונים הגלובליים
-      window.cashFlowsData = data;
-      cashFlowsData = data;
-      
-      // עדכון הסטטיסטיקות
-      updatePageSummaryStats();
-      
-      // עדכון הטבלה
-      updateCashFlowsTable(data);
-      
-      // הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('נתוני תזרימי מזומנים נטענו בהצלחה', '', 4000, 'business');
-      } else if (typeof window.showNotification === 'function') {
-        window.showSuccessNotification('נתוני תזרימי מזומנים נטענו בהצלחה', '', 4000, 'business');
-      }
-    })
-    .catch(error => {
-      window.Logger.error('Error loading cash flows data', error, { page: 'cash_flows' });
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message, 6000, 'system');
-      } else if (typeof window.showNotification === 'function') {
-        window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', '', 6000, 'system');
+        'Cache-Control': 'no-cache'
       }
     });
     
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const responseData = await response.json();
+    const data = responseData.data || responseData;
+    
+    // עדכון הנתונים הגלובליים
+    window.cashFlowsData = data;
+    cashFlowsData = data;
+    
+    // עדכון הטבלה
+    updateCashFlowsTable(data);
+    
+    // עדכון הסטטיסטיקות
+    updatePageSummaryStats();
+    
+    window.Logger.info(`✅ Loaded ${data.length} cash flows`, { page: 'cash_flows' });
   } catch (error) {
     window.Logger.error('Error loading cash flows data', error, { page: 'cash_flows' });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים');
     }
   }
 }

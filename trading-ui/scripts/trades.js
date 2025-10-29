@@ -262,9 +262,16 @@ function getInvestmentTypeColor(investmentType) {
  */
 async function loadTradesData() {
   try {
-    window.Logger.info('🚀 loadTradesData: Starting to fetch trades data...', { page: "trades" });
+    window.Logger.info('Loading trades data (bypass cache)', { page: "trades" });
 
-    const response = await fetch('/api/trades/');
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/trades/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

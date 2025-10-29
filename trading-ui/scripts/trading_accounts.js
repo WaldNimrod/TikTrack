@@ -474,33 +474,34 @@ function loadDefaultTradingAccounts() {
 
 // פונקציה לטעינת נתוני חשבונות מסחר מהשרת
 async function loadTradingAccountsData() {
-  window.Logger.info('🚀🚀🚀 loadTradingAccountsData התחיל 🚀🚀🚀', { page: "trading_accounts" });
+  window.Logger.info('Loading trading accounts data (bypass cache)', { page: "trading_accounts" });
   try {
-    // טוען נתוני חשבונות מסחר מהשרת
-
-    // בדיקה אם יש פונקציה apiCall זמינה
-    if (typeof window.apiCall === 'function') {
-      window.Logger.info('📡 משתמש ב-apiCall', { page: "trading_accounts" });
-      const response = await window.apiCall('/api/trading-accounts/');
-      const trading_accounts = response.data || response;
-      window.Logger.info('📊 חשבונות מסחר מ-apiCall:', trading_accounts.length, 'חשבונות', { page: "trading_accounts" });
-      // חשבונות שהתקבלו
-      return trading_accounts;
-    } else {
-      window.Logger.info('📡 apiCall לא זמין - משתמש ב-loadTradingAccountsFromServer', { page: "trading_accounts" });
-      // קריאה ישירה ל-API
-      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const response = await fetch(`${base}/api/trading-accounts/`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/trading-accounts/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       }
-      const result = await response.json();
-      const trading_accounts = result.data || result;
-      // חשבונות שהתקבלו
-      return trading_accounts;
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    
+    const result = await response.json();
+    const trading_accounts = result.data || result;
+    
+    // עדכון הטבלה
+    updateTradingAccountsTable(trading_accounts);
+    
+    window.Logger.info(`✅ Loaded ${trading_accounts.length} trading accounts`, { page: "trading_accounts" });
+    return trading_accounts;
   } catch (error) {
-    handleApiError(error, 'טעינת נתוני חשבונות');
+    window.Logger.error('Error loading trading accounts data', error, { page: "trading_accounts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בטעינת נתוני חשבונות מסחר', error.message);
+    }
     throw error;
   }
 }

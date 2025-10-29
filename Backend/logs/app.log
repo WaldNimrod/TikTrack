@@ -13279,3 +13279,13 @@ FROM alerts]
 FROM alerts]
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
 2025-10-30 00:29:38,273 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:29:38] "[35m[1mGET /api/alerts/ HTTP/1.1[0m" 500 -
+2025-10-30 00:30:20,709 - cache - INFO - Cache DELETE: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-30 00:30:20,709 - cache - INFO - Cache DELETE: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-30 00:30:20,709 - cache - INFO - Cache DELETE: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-30 00:30:20,709 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-30 00:30:20,709 - cache - INFO - Cache DELETE: services.ticker_service.get_all:289accd90832389cedfe8da770b0bfc9 (Was accessed 0 times)
+2025-10-30 00:30:21,391 - routes.api.base_entity.alerts - INFO - Getting all alerts records
+2025-10-30 00:30:21,391 - cache - INFO - Cache MISS: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-30 00:30:21,393 - services.alert_service - INFO - נטענו 28 התראות
+2025-10-30 00:30:21,393 - cache - INFO - Cache SET: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 11977 chars)
+2025-10-30 00:30:21,394 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:30:21] "GET /api/alerts/ HTTP/1.1" 200 -

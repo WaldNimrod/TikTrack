@@ -485,22 +485,26 @@ class PreferencesUI {
             this.loadingManager.startLoading(loaderId, 'טוען העדפות...');
             
             // Load active profile if not provided
-            if (!profileId) {
+            if (!profileId && profileId !== 0) {
                 profileId = await this.loadActiveProfile();
             }
             
+            // For default profile, ensure we use 0 explicitly
+            const finalUserId = userId || this.currentUserId;
+            const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
+            
             // Update currentProfileId to match the loaded profile
-            this.currentProfileId = profileId;
-            window.Logger.info(`✅ PreferencesUI currentProfileId updated to: ${profileId}`, { page: "preferences-ui" });
+            this.currentProfileId = finalProfileId;
+            window.Logger.info(`✅ PreferencesUI currentProfileId updated to: ${finalProfileId}`, { page: "preferences-ui" });
             
             // 🔍 Cache & Profile Debug Logging
-            window.Logger.info(`🔍 CACHE DEBUG: Loading preferences for user ${userId || this.currentUserId}, profile ${profileId || this.currentProfileId}`, { page: "preferences-ui" });
+            window.Logger.info(`🔍 CACHE DEBUG: Loading preferences for user ${finalUserId}, profile ${finalProfileId}`, { page: "preferences-ui" });
             
             // Initialize lazy loading if available
             if (window.LazyLoader) {
                 await window.LazyLoader.initialize(
-                    userId || this.currentUserId, 
-                    profileId || this.currentProfileId
+                    finalUserId, 
+                    finalProfileId
                 );
                 
                 // Get loading stats
@@ -508,7 +512,7 @@ class PreferencesUI {
                 window.Logger.info(`🔍 CACHE DEBUG: Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%, { page: "preferences-ui" })`);
                 
                 // Load ALL preferences at once from API
-                const allPreferences = await window.PreferencesCore.getAllPreferences(userId || this.currentUserId, profileId || this.currentProfileId);
+                const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, finalProfileId);
                 window.Logger.info(`✅ Loaded ${Object.keys(allPreferences, { page: "preferences-ui" }).length} preferences from API`);
                 
                 // Populate form with ALL preferences
@@ -527,15 +531,15 @@ class PreferencesUI {
                 
                 // Load non-color preferences
                 const preferences = await window.PreferencesCore.getAllPreferences(
-                    userId || this.currentUserId, 
-                    profileId || this.currentProfileId
+                    finalUserId, 
+                    finalProfileId
                 );
                 
                 // Load color preferences
                 if (window.ColorManager) {
                     const colors = await window.ColorManager.loadAllColors(
-                        userId || this.currentUserId, 
-                        profileId || this.currentProfileId
+                        finalUserId, 
+                        finalProfileId
                     );
                     Object.assign(preferences, colors);
                     

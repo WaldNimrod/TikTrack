@@ -381,7 +381,12 @@ class CacheSyncManager {
                 return true; // Return true if nothing to invalidate
             }
             
-            const response = await fetch('/api/cache/invalidate', {
+            // Log what we're sending for debugging
+            if (window.Logger) { 
+                window.Logger.debug(`🔄 Invalidating backend cache with dependencies: ${JSON.stringify(dependencies)}`, { page: "cache" }); 
+            }
+            
+            const response = await fetch('/api/cache-sync/invalidate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -392,22 +397,44 @@ class CacheSyncManager {
             if (!response.ok) {
                 // Get error details from response
                 let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                let errorDetails = null;
                 try {
-                    const errorData = await response.json();
-                    if (errorData.error) {
-                        errorMessage += ` - ${errorData.error}`;
+                    errorDetails = await response.json();
+                    if (errorDetails.error) {
+                        errorMessage += ` - ${errorDetails.error}`;
                     }
                 } catch (e) {
                     // If response is not JSON, use status text
                 }
-                throw new Error(errorMessage);
+                
+                // Log full error details for debugging
+                if (window.Logger) {
+                    window.Logger.warn(`⚠️ Cache invalidation returned ${response.status}: ${errorMessage}`, { 
+                        page: "cache",
+                        dependencies,
+                        errorDetails
+                    });
+                }
+                
+                // Don't throw - this is not a critical error, just log it
+                // The local cache was already cleared, so we can continue
+                return false;
             }
             
             const result = await response.json();
+            if (window.Logger) {
+                window.Logger.debug(`✅ Backend cache invalidated: ${result.clearedCount || 0} entries cleared`, { page: "cache" });
+            }
             return result.success === true;
             
         } catch (error) {
-            if (window.Logger) { window.Logger.error('❌ Backend invalidation failed:', error, { page: "cache" }); }
+            // Log error but don't fail the profile switch - cache invalidation is not critical
+            if (window.Logger) { 
+                window.Logger.warn('⚠️ Backend cache invalidation failed (non-critical):', error.message || error, { 
+                    page: "cache",
+                    dependencies 
+                }); 
+            }
             return false;
         }
     }

@@ -178,8 +178,18 @@ function evaluateResults(checks, type) {
     const requiredChecks = requiredSystems[type];
     if (!requiredChecks) return { passed: false, warnings: ['Unknown operation type'] };
     
+    // מיפוי בין שמות השדות ל-checks
+    const fieldMapping = {
+        'clearCacheBeforeCRUD': 'usesClearCache',
+        'DataCollectionService': 'usesDataCollection',
+        'CRUDResponseHandler': 'usesResponseHandler',
+        'showDeleteWarning': 'usesWarning',
+        'showEntityDetails': 'usesEntityDetails'
+    };
+    
     for (const [key, isRequired] of Object.entries(requiredChecks)) {
-        if (isRequired && !checks[key]) {
+        const actualFieldName = fieldMapping[key] || key;
+        if (isRequired && !checks[actualFieldName]) {
             passed = false;
             warnings.push(`Missing: ${key}`);
         }

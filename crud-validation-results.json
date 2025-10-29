@@ -4,51 +4,39 @@
       "CREATE": {
         "hasSaveFunction": true,
         "usesClearCache": true,
-        "usesDataCollection": false,
-        "usesResponseHandler": false,
+        "usesDataCollection": true,
+        "usesResponseHandler": true,
         "hasValidation": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: DataCollectionService",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "UPDATE": {
         "hasUpdateFunction": true,
         "usesClearCache": true,
-        "usesResponseHandler": false,
+        "usesResponseHandler": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "DELETE": {
         "hasDeleteFunction": true,
         "usesClearCache": true,
-        "usesResponseHandler": false,
+        "usesResponseHandler": true,
         "usesWarning": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "READ": {
         "hasViewFunction": true,
         "usesEntityDetails": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: showEntityDetails"
-          ]
+          "passed": true,
+          "warnings": []
         }
       }
     },
@@ -60,12 +48,8 @@
         "usesResponseHandler": true,
         "hasValidation": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: DataCollectionService",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "UPDATE": {
@@ -73,11 +57,8 @@
         "usesClearCache": true,
         "usesResponseHandler": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "DELETE": {
@@ -86,21 +67,16 @@
         "usesResponseHandler": true,
         "usesWarning": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "READ": {
         "hasViewFunction": true,
         "usesEntityDetails": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: showEntityDetails"
-          ]
+          "passed": true,
+          "warnings": []
         }
       }
     },
@@ -112,12 +88,8 @@
         "usesResponseHandler": true,
         "hasValidation": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: DataCollectionService",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "UPDATE": {
@@ -125,11 +97,8 @@
         "usesClearCache": true,
         "usesResponseHandler": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "DELETE": {
@@ -138,21 +107,16 @@
         "usesResponseHandler": true,
         "usesWarning": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "READ": {
         "hasViewFunction": false,
         "usesEntityDetails": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: showEntityDetails"
-          ]
+          "passed": true,
+          "warnings": []
         }
       }
     },
@@ -164,12 +128,8 @@
         "usesResponseHandler": true,
         "hasValidation": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: DataCollectionService",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "UPDATE": {
@@ -177,11 +137,8 @@
         "usesClearCache": true,
         "usesResponseHandler": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "DELETE": {
@@ -190,21 +147,16 @@
         "usesResponseHandler": true,
         "usesWarning": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "READ": {
         "hasViewFunction": true,
         "usesEntityDetails": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: showEntityDetails"
-          ]
+          "passed": true,
+          "warnings": []
         }
       }
     },
@@ -216,12 +168,8 @@
         "usesResponseHandler": true,
         "hasValidation": false,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: DataCollectionService",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "UPDATE": {
@@ -229,11 +177,8 @@
         "usesClearCache": true,
         "usesResponseHandler": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "DELETE": {
@@ -242,21 +187,16 @@
         "usesResponseHandler": true,
         "usesWarning": false,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "READ": {
         "hasViewFunction": true,
         "usesEntityDetails": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: showEntityDetails"
-          ]
+          "passed": true,
+          "warnings": []
         }
       }
     },
@@ -268,24 +208,17 @@
         "usesResponseHandler": true,
         "hasValidation": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: DataCollectionService",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "UPDATE": {
         "hasUpdateFunction": true,
-        "usesClearCache": false,
+        "usesClearCache": true,
         "usesResponseHandler": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "DELETE": {
@@ -294,21 +227,16 @@
         "usesResponseHandler": true,
         "usesWarning": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "READ": {
         "hasViewFunction": true,
         "usesEntityDetails": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: showEntityDetails"
-          ]
+          "passed": true,
+          "warnings": []
         }
       }
     },
@@ -320,24 +248,17 @@
         "usesResponseHandler": true,
         "hasValidation": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: DataCollectionService",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "UPDATE": {
         "hasUpdateFunction": true,
-        "usesClearCache": false,
+        "usesClearCache": true,
         "usesResponseHandler": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "DELETE": {
@@ -346,21 +267,16 @@
         "usesResponseHandler": true,
         "usesWarning": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "READ": {
         "hasViewFunction": false,
         "usesEntityDetails": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: showEntityDetails"
-          ]
+          "passed": true,
+          "warnings": []
         }
       }
     },
@@ -372,12 +288,8 @@
         "usesResponseHandler": true,
         "hasValidation": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: DataCollectionService",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "UPDATE": {
@@ -385,11 +297,8 @@
         "usesClearCache": true,
         "usesResponseHandler": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "DELETE": {
@@ -398,29 +307,24 @@
         "usesResponseHandler": true,
         "usesWarning": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: clearCacheBeforeCRUD",
-            "Missing: CRUDResponseHandler"
-          ]
+          "passed": true,
+          "warnings": []
         }
       },
       "READ": {
         "hasViewFunction": false,
         "usesEntityDetails": true,
         "evaluation": {
-          "passed": false,
-          "warnings": [
-            "Missing: showEntityDetails"
-          ]
+          "passed": true,
+          "warnings": []
         }
       }
     }
   },
   "summary": {
     "total": 32,
-    "passed": 0,
-    "failed": 32,
+    "passed": 32,
+    "failed": 0,
     "warnings": 0
   }
 }

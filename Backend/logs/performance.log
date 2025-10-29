@@ -12251,3 +12251,11 @@ FROM alerts]
 FROM alerts]
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
 2025-10-30 00:17:59,564 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:17:59] "[35m[1mGET /api/alerts/ HTTP/1.1[0m" 500 -
+2025-10-30 00:18:35,551 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:18:35] "GET /db_display HTTP/1.1" 200 -
+2025-10-30 00:18:49,825 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:18:49] "GET /db_display HTTP/1.1" 200 -
+2025-10-30 00:18:58,014 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:18:58] "GET /db_display HTTP/1.1" 200 -
+2025-10-30 00:19:04,556 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-30 00:19:04,556 - cache - INFO - Cache EXPIRED: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Age: 179.4s)
+2025-10-30 00:19:04,556 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 2 times)
+2025-10-30 00:19:04,557 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 3375 chars)
+2025-10-30 00:19:04,558 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:19:04] "GET /api/trading-accounts/ HTTP/1.1" 200 -

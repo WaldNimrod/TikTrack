@@ -2335,6 +2335,11 @@ async function saveTradePlan() {
         const isEdit = form.dataset.mode === 'edit';
         const tradePlanId = form.dataset.tradePlanId;
         
+        // ניקוי מטמון לפני פעולת CRUD - עריכה
+        if (isEdit && window.clearCacheBeforeCRUD) {
+            window.clearCacheBeforeCRUD('trade_plans', 'edit');
+        }
+        
         // Prepare API call
         const url = isEdit ? `/api/trade_plans/${tradePlanId}` : '/api/trade_plans';
         const method = isEdit ? 'PUT' : 'POST';

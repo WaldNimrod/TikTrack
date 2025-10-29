@@ -899,24 +899,15 @@ async function performTradeDeletion(tradeId) {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'שגיאה במחיקת הטרייד');
-    }
-
-    // הצלחה
-    window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה!', 4000, 'business');
-    // רענון הטבלה
-    await loadTradesData();
+    
+    // Use CRUDResponseHandler for consistent response handling
+    await CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: 'טרייד נמחק בהצלחה',
+      entityName: 'טרייד'
+    });
 
   } catch (error) {
-    if (typeof handleDeleteError === 'function') {
-      handleDeleteError(error, 'טרייד');
-    } else {
-      // window.Logger.error('Error deleting trade:', error, { page: "trades" });
-    }
-    window.showErrorNotification('שגיאה', error.message, 6000, 'system');
+    CRUDResponseHandler.handleError(error, 'מחיקת טרייד');
   }
 }
 

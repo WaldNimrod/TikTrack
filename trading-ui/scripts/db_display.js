@@ -39,16 +39,16 @@ function initDatabaseDisplay() {
 async function loadAllTables() {
   console.log('🔄 Loading all tables...');
   
-  // API endpoints use dashes, not underscores
+  // API endpoints - some use dashes, some use underscores
   const tables = [
     'trading-accounts',  // API uses dash
     'trades',
     'tickers', 
-    'trade-plans',       // API uses dash
+    'trade_plans',       // API uses underscore
     'executions',
-    'alerts',
+    'alerts',            // Has SQL error - will show error state
     'notes',
-    'cash-flows'         // API uses dash
+    'cash_flows'         // API uses underscore
   ];
   
   totalRecords = 0;

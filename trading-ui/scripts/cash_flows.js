@@ -1445,6 +1445,11 @@ async function saveCashFlow() {
         const isEdit = form.dataset.mode === 'edit';
         const cashFlowId = form.dataset.cashFlowId;
         
+        // ניקוי מטמון לפני פעולת CRUD - עריכה
+        if (isEdit && window.clearCacheBeforeCRUD) {
+            window.clearCacheBeforeCRUD('cash_flows', 'edit');
+        }
+        
         // Prepare API call
         const url = isEdit ? `/api/cash_flows/${cashFlowId}` : '/api/cash_flows';
         const method = isEdit ? 'PUT' : 'POST';

@@ -4083,9 +4083,30 @@ async function deleteExecution(executionId) {
             }
         }
         
-        // Confirm deletion
-        if (!confirm('האם אתה בטוח שברצונך למחוק את הביצוע?')) {
-            return;
+        // Use warning system for confirmation
+        if (window.showDeleteWarning) {
+            window.showDeleteWarning('execution', executionId, 'ביצוע',
+                async () => await performExecutionDeletion(executionId),
+                () => {}
+            );
+        } else {
+            // Fallback to simple confirm
+            if (!confirm('האם אתה בטוח שברצונך למחוק את הביצוע?')) {
+                return;
+            }
+            await performExecutionDeletion(executionId);
+        }
+        
+    } catch (error) {
+        CRUDResponseHandler.handleError(error, 'מחיקת ביצוע');
+    }
+}
+
+async function performExecutionDeletion(executionId) {
+    try {
+        // ניקוי מטמון לפני פעולת CRUD - מחיקה
+        if (window.clearCacheBeforeCRUD) {
+            window.clearCacheBeforeCRUD('executions', 'delete');
         }
         
         // Send delete request
@@ -4093,28 +4114,14 @@ async function deleteExecution(executionId) {
             method: 'DELETE'
         });
         
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        // Handle success
-        if (window.showNotification) {
-            window.showNotification('ביצוע נמחק בהצלחה', 'success', 'business');
-        }
-        
-        // Refresh data
-        if (window.loadExecutionsData) {
-            window.loadExecutionsData();
-        }
-        
-        window.Logger.info('Execution deleted successfully', { executionId, page: 'executions' });
+        // Use CRUDResponseHandler for consistent response handling
+        await CRUDResponseHandler.handleDeleteResponse(response, {
+            successMessage: 'ביצוע נמחק בהצלחה',
+            entityName: 'ביצוע'
+        });
         
     } catch (error) {
-        window.Logger.error('Error deleting execution', { error: error.message, executionId, page: 'executions' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה במחיקת הביצוע', 'error', 'system');
-        }
+        CRUDResponseHandler.handleError(error, 'מחיקת ביצוע');
     }
 }
 

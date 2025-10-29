@@ -2443,9 +2443,30 @@ async function deleteTradingAccount(accountId) {
             }
         }
         
-        // Confirm deletion
-        if (!confirm('האם אתה בטוח שברצונך למחוק את חשבון מסחר המסחר?')) {
-            return;
+        // Use warning system for confirmation
+        if (window.showDeleteWarning) {
+            window.showDeleteWarning('trading_account', accountId, 'חשבון מסחר',
+                async () => await performTradingAccountDeletion(accountId),
+                () => {}
+            );
+        } else {
+            // Fallback to simple confirm
+            if (!confirm('האם אתה בטוח שברצונך למחוק את חשבון מסחר המסחר?')) {
+                return;
+            }
+            await performTradingAccountDeletion(accountId);
+        }
+        
+    } catch (error) {
+        CRUDResponseHandler.handleError(error, 'מחיקת חשבון מסחר');
+    }
+}
+
+async function performTradingAccountDeletion(accountId) {
+    try {
+        // ניקוי מטמון לפני פעולת CRUD - מחיקה
+        if (window.clearCacheBeforeCRUD) {
+            window.clearCacheBeforeCRUD('trading_accounts', 'delete');
         }
         
         // Send delete request
@@ -2453,28 +2474,14 @@ async function deleteTradingAccount(accountId) {
             method: 'DELETE'
         });
         
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        // Handle success
-        if (window.showNotification) {
-            window.showNotification('חשבון מסחר מסחר נמחק בהצלחה', 'success', 'business');
-        }
-        
-        // Refresh data
-        if (window.loadTradingAccountsData) {
-            window.loadTradingAccountsData();
-        }
-        
-        window.Logger.info('Trading Account deleted successfully', { accountId, page: 'trading_accounts' });
+        // Use CRUDResponseHandler for consistent response handling
+        await CRUDResponseHandler.handleDeleteResponse(response, {
+            successMessage: 'חשבון מסחר נמחק בהצלחה',
+            entityName: 'חשבון מסחר'
+        });
         
     } catch (error) {
-        window.Logger.error('Error deleting trading account', { error: error.message, accountId, page: 'trading_accounts' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה במחיקת חשבון מסחר המסחר', 'error', 'system');
-        }
+        CRUDResponseHandler.handleError(error, 'מחיקת חשבון מסחר');
     }
 }
 

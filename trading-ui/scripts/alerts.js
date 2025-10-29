@@ -2051,6 +2051,11 @@ async function confirmDeleteAlert(alertId) {
   // window.Logger.info('🔄 confirmDeleteAlert נקראה עבור ID:', alertId, { page: "alerts" });
 
   try {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה
+    if (window.clearCacheBeforeCRUD) {
+      window.clearCacheBeforeCRUD('alerts', 'delete');
+    }
+    
     const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });

@@ -583,6 +583,11 @@ function validateEditCashFlowForm() {
  */
 async function deleteCashFlow(id) {
   try {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה
+    if (window.clearCacheBeforeCRUD) {
+      window.clearCacheBeforeCRUD('cash_flows', 'delete');
+    }
+    
     // מציאת התזרים
     const cashFlow = window.cashFlowsData ? window.cashFlowsData.find(cf => cf.id === id) : null;
     if (!cashFlow) {

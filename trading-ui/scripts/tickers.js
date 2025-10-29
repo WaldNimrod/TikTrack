@@ -1412,7 +1412,11 @@ async function performTickerDeletion(tickerId) {
  * אישור מחיקת טיקר (לשמירה על תאימות לאחור)
  */
 async function confirmDeleteTicker(id) {
-
+  
+  // ניקוי מטמון לפני פעולת CRUD - מחיקה
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('tickers', 'delete');
+  }
 
   // מציאת הטיקר לפני מחיקה כדי להציג פרטים בהודעה
   const ticker = (window.tickersData || []).find(t => t.id === id);

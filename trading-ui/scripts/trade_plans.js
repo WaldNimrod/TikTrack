@@ -2385,9 +2385,30 @@ async function deleteTradePlan(tradePlanId) {
             }
         }
         
-        // Confirm deletion
-        if (!confirm('האם אתה בטוח שברצונך למחוק את תוכנית המסחר?')) {
-            return;
+        // Use warning system for confirmation
+        if (window.showDeleteWarning) {
+            window.showDeleteWarning('trade_plan', tradePlanId, 'תוכנית מסחר',
+                async () => await performTradePlanDeletion(tradePlanId),
+                () => {}
+            );
+        } else {
+            // Fallback to simple confirm
+            if (!confirm('האם אתה בטוח שברצונך למחוק את תוכנית המסחר?')) {
+                return;
+            }
+            await performTradePlanDeletion(tradePlanId);
+        }
+        
+    } catch (error) {
+        CRUDResponseHandler.handleError(error, 'מחיקת תוכנית מסחר');
+    }
+}
+
+async function performTradePlanDeletion(tradePlanId) {
+    try {
+        // ניקוי מטמון לפני פעולת CRUD - מחיקה
+        if (window.clearCacheBeforeCRUD) {
+            window.clearCacheBeforeCRUD('trade_plans', 'delete');
         }
         
         // Send delete request
@@ -2395,28 +2416,14 @@ async function deleteTradePlan(tradePlanId) {
             method: 'DELETE'
         });
         
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        // Handle success
-        if (window.showNotification) {
-            window.showNotification('תוכנית מסחר נמחקה בהצלחה', 'success', 'business');
-        }
-        
-        // Refresh data
-        if (window.loadTradePlansData) {
-            window.loadTradePlansData();
-        }
-        
-        window.Logger.info('Trade Plan deleted successfully', { tradePlanId, page: 'trade_plans' });
+        // Use CRUDResponseHandler for consistent response handling
+        await CRUDResponseHandler.handleDeleteResponse(response, {
+            successMessage: 'תוכנית מסחר נמחקה בהצלחה',
+            entityName: 'תוכנית מסחר'
+        });
         
     } catch (error) {
-        window.Logger.error('Error deleting trade plan', { error: error.message, tradePlanId, page: 'trade_plans' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה במחיקת תוכנית המסחר', 'error', 'system');
-        }
+        CRUDResponseHandler.handleError(error, 'מחיקת תוכנית מסחר');
     }
 }
 

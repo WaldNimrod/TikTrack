@@ -1255,6 +1255,11 @@ async function confirmDeleteNote(noteId) {
 }
 
 async function deleteNoteFromServer(noteId) {
+  // ניקוי מטמון לפני פעולת CRUD - מחיקה
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('notes', 'delete');
+  }
+  
   const maxRetries = 3;
   let retryCount = 0;
 

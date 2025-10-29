@@ -702,11 +702,18 @@ class PreferencesUI {
             window.Logger.info('✅ Preferences saved successfully', { page: "preferences-ui" });
             
             // 7. Clear all cache layers via UnifiedCacheManager
-            if (window.clearAllUnifiedCacheQuick) {
-                await window.clearAllUnifiedCacheQuick();
-                window.Logger.info('✅ All cache layers cleared', { page: "preferences-ui" });
-            } else {
-                window.Logger.info('⚠️ UnifiedCacheManager not available for cache clearing', { page: "preferences-ui" });
+            try {
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                    await window.UnifiedCacheManager.refreshUserPreferences();
+                    window.Logger.info('✅ User preferences cache cleared', { page: "preferences-ui" });
+                } else if (window.clearAllUnifiedCacheQuick) {
+                    await window.clearAllUnifiedCacheQuick();
+                    window.Logger.info('✅ All cache layers cleared', { page: "preferences-ui" });
+                } else {
+                    window.Logger.warn('⚠️ No cache clearing method available', { page: "preferences-ui" });
+                }
+            } catch (error) {
+                window.Logger.warn('⚠️ Cache clearing failed:', error, { page: "preferences-ui" });
             }
             
             // 8. Show success notification

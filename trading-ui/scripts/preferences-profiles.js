@@ -115,12 +115,9 @@ class ProfileManager {
             }
             
             // Step 5: Update UI
-            if (typeof window.loadProfilesDropdown === 'function') {
-                await window.loadProfilesDropdown();
-                window.Logger.info('✅ UI updated', { page: "preferences-profiles" });
-            } else if (typeof window.loadProfilesToDropdown === 'function') {
+            if (typeof window.loadProfilesToDropdown === 'function') {
                 await window.loadProfilesToDropdown();
-                window.Logger.info('✅ UI updated (via loadProfilesToDropdown)', { page: "preferences-profiles" });
+                window.Logger.info('✅ UI updated', { page: "preferences-profiles" });
             }
             
             // Update dropdown selection
@@ -192,8 +189,8 @@ class ProfileManager {
             window.Logger.info(`✅ Profile created with ID: ${profileId}`, { page: "preferences-profiles" });
             
             // Reload profiles dropdown
-            if (typeof window.loadProfilesDropdown === 'function') {
-                await window.loadProfilesDropdown();
+            if (typeof window.loadProfilesToDropdown === 'function') {
+                await window.loadProfilesToDropdown();
             }
             
             // Show success notification
@@ -240,8 +237,8 @@ class ProfileManager {
             window.Logger.info('✅ Profile deleted successfully', { page: "preferences-profiles" });
             
             // Reload profiles dropdown
-            if (typeof window.loadProfilesDropdown === 'function') {
-                await window.loadProfilesDropdown();
+            if (typeof window.loadProfilesToDropdown === 'function') {
+                await window.loadProfilesToDropdown();
             }
             
             // Show success notification

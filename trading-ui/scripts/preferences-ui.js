@@ -915,14 +915,15 @@ window.toggleSection = function(sectionName) {
 
 /**
  * Load profiles to dropdown
+ * @param {number} userId - User ID (default: 1)
  * @returns {Promise<boolean>} Success status
  */
-window.loadProfilesToDropdown = async function() {
+window.loadProfilesToDropdown = async function(userId = 1) {
     try {
         window.Logger.info('📂 Loading profiles to dropdown...', { page: "preferences-ui" });
         
         // Get profiles from API
-        const response = await fetch('/api/preferences/profiles');
+        const response = await fetch(`/api/preferences/profiles?user_id=${userId}`);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }

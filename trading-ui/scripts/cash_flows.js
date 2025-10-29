@@ -1477,21 +1477,38 @@ async function saveCashFlow() {
         
         console.log('🔥 saveCashFlow - API Response:', { status: response.status, ok: response.ok });
         
-        // Clone response for debugging
-        const clonedResponse = response.clone();
+        // Check if there's an error BEFORE calling CRUDResponseHandler
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('🔥 saveCashFlow - API ERROR:', errorData);
+            
+            // Show error notification
+            if (window.showErrorNotification) {
+                const errorMessage = errorData.error?.message || errorData.message || 'שגיאה בשמירת תזרים מזומן';
+                window.showErrorNotification('שגיאה בשמירה', errorMessage);
+            }
+            
+            // Show validation errors if they exist
+            if (errorData.errors && Array.isArray(errorData.errors)) {
+                errorData.errors.forEach(err => {
+                    if (window.showValidationWarning) {
+                        window.showValidationWarning(err.field || 'general', err.message || 'שגיאה בשדה');
+                    }
+                });
+            }
+            
+            return;
+        }
         
-        // Check response first
-        const responseData = await clonedResponse.json();
-        console.log('🔥 saveCashFlow - Response Data:', responseData);
-        
-        // Use CRUDResponseHandler for consistent response handling
+        // Response is OK - use CRUDResponseHandler for consistent handling
         console.log('🔥 saveCashFlow - Step 7: Handling response, isEdit =', isEdit);
         if (isEdit) {
             await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן עודכן בהצלחה',
                 entityName: 'תזרים מזומן',
-                reloadFn: window.loadCashFlowsData
+                reloadFn: window.loadCashFlowsData,
+                requiresHardReload: false  // Prevent reload confirmation dialog
             });
             console.log('🔥 saveCashFlow - UPDATE SUCCESS');
         } else {
@@ -1499,7 +1516,8 @@ async function saveCashFlow() {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן נוסף בהצלחה',
                 entityName: 'תזרים מזומן',
-                reloadFn: window.loadCashFlowsData
+                reloadFn: window.loadCashFlowsData,
+                requiresHardReload: false  // Prevent reload confirmation dialog
             });
             console.log('🔥 saveCashFlow - SAVE SUCCESS');
         }

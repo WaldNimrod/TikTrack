@@ -2005,28 +2005,27 @@ async function saveTrade() {
             window.clearCacheBeforeCRUD('trades', 'add');
         }
         
-        // Collect form data
+        // Collect form data using DataCollectionService
         const form = document.getElementById('tradesModalForm');
         if (!form) {
             throw new Error('Trade form not found');
         }
         
-        const formData = new FormData(form);
-        const tradeData = {
-            ticker_id: formData.get('tradeTicker'),
-            account_id: formData.get('tradeAccount'),
-            name: formData.get('tradeName'),
-            type: formData.get('tradeType'),
-            quantity: parseInt(formData.get('tradeQuantity')),
-            entry_price: parseFloat(formData.get('tradeEntryPrice')),
-            exit_price: parseFloat(formData.get('tradeExitPrice')) || null,
-            stop_loss: parseFloat(formData.get('tradeStopLoss')) || null,
-            take_profit: parseFloat(formData.get('tradeTakeProfit')) || null,
-            entry_date: formData.get('tradeEntryDate'),
-            exit_date: formData.get('tradeExitDate') || null,
-            status: formData.get('tradeStatus'),
-            notes: formData.get('tradeNotes')
-        };
+        const tradeData = DataCollectionService.collectFormData({
+            ticker_id: { id: 'tradeTicker', type: 'int' },
+            account_id: { id: 'tradeAccount', type: 'int' },
+            name: { id: 'tradeName', type: 'text' },
+            type: { id: 'tradeType', type: 'text' },
+            quantity: { id: 'tradeQuantity', type: 'int' },
+            entry_price: { id: 'tradeEntryPrice', type: 'float' },
+            exit_price: { id: 'tradeExitPrice', type: 'float', default: null },
+            stop_loss: { id: 'tradeStopLoss', type: 'float', default: null },
+            take_profit: { id: 'tradeTakeProfit', type: 'float', default: null },
+            entry_date: { id: 'tradeEntryDate', type: 'date' },
+            exit_date: { id: 'tradeExitDate', type: 'date', default: null },
+            status: { id: 'tradeStatus', type: 'text' },
+            notes: { id: 'tradeNotes', type: 'text', default: null }
+        });
         
         // Calculate P&L if exit price is provided
         if (tradeData.exit_price && tradeData.entry_price) {

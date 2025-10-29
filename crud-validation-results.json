@@ -1,0 +1,426 @@
+{
+  "pages": {
+    "trades": {
+      "CREATE": {
+        "hasSaveFunction": true,
+        "usesClearCache": true,
+        "usesDataCollection": false,
+        "usesResponseHandler": false,
+        "hasValidation": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: DataCollectionService",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "UPDATE": {
+        "hasUpdateFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": false,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "DELETE": {
+        "hasDeleteFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": false,
+        "usesWarning": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "READ": {
+        "hasViewFunction": true,
+        "usesEntityDetails": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: showEntityDetails"
+          ]
+        }
+      }
+    },
+    "trading_accounts": {
+      "CREATE": {
+        "hasSaveFunction": true,
+        "usesClearCache": true,
+        "usesDataCollection": true,
+        "usesResponseHandler": true,
+        "hasValidation": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: DataCollectionService",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "UPDATE": {
+        "hasUpdateFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "DELETE": {
+        "hasDeleteFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "usesWarning": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "READ": {
+        "hasViewFunction": true,
+        "usesEntityDetails": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: showEntityDetails"
+          ]
+        }
+      }
+    },
+    "alerts": {
+      "CREATE": {
+        "hasSaveFunction": true,
+        "usesClearCache": true,
+        "usesDataCollection": true,
+        "usesResponseHandler": true,
+        "hasValidation": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: DataCollectionService",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "UPDATE": {
+        "hasUpdateFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "DELETE": {
+        "hasDeleteFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "usesWarning": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "READ": {
+        "hasViewFunction": false,
+        "usesEntityDetails": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: showEntityDetails"
+          ]
+        }
+      }
+    },
+    "executions": {
+      "CREATE": {
+        "hasSaveFunction": true,
+        "usesClearCache": true,
+        "usesDataCollection": true,
+        "usesResponseHandler": true,
+        "hasValidation": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: DataCollectionService",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "UPDATE": {
+        "hasUpdateFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "DELETE": {
+        "hasDeleteFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "usesWarning": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "READ": {
+        "hasViewFunction": true,
+        "usesEntityDetails": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: showEntityDetails"
+          ]
+        }
+      }
+    },
+    "tickers": {
+      "CREATE": {
+        "hasSaveFunction": true,
+        "usesClearCache": true,
+        "usesDataCollection": true,
+        "usesResponseHandler": true,
+        "hasValidation": false,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: DataCollectionService",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "UPDATE": {
+        "hasUpdateFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "DELETE": {
+        "hasDeleteFunction": false,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "usesWarning": false,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "READ": {
+        "hasViewFunction": true,
+        "usesEntityDetails": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: showEntityDetails"
+          ]
+        }
+      }
+    },
+    "cash_flows": {
+      "CREATE": {
+        "hasSaveFunction": true,
+        "usesClearCache": true,
+        "usesDataCollection": true,
+        "usesResponseHandler": true,
+        "hasValidation": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: DataCollectionService",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "UPDATE": {
+        "hasUpdateFunction": true,
+        "usesClearCache": false,
+        "usesResponseHandler": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "DELETE": {
+        "hasDeleteFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "usesWarning": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "READ": {
+        "hasViewFunction": true,
+        "usesEntityDetails": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: showEntityDetails"
+          ]
+        }
+      }
+    },
+    "trade_plans": {
+      "CREATE": {
+        "hasSaveFunction": true,
+        "usesClearCache": true,
+        "usesDataCollection": true,
+        "usesResponseHandler": true,
+        "hasValidation": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: DataCollectionService",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "UPDATE": {
+        "hasUpdateFunction": true,
+        "usesClearCache": false,
+        "usesResponseHandler": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "DELETE": {
+        "hasDeleteFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "usesWarning": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "READ": {
+        "hasViewFunction": false,
+        "usesEntityDetails": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: showEntityDetails"
+          ]
+        }
+      }
+    },
+    "notes": {
+      "CREATE": {
+        "hasSaveFunction": true,
+        "usesClearCache": true,
+        "usesDataCollection": true,
+        "usesResponseHandler": true,
+        "hasValidation": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: DataCollectionService",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "UPDATE": {
+        "hasUpdateFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "DELETE": {
+        "hasDeleteFunction": true,
+        "usesClearCache": true,
+        "usesResponseHandler": true,
+        "usesWarning": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: clearCacheBeforeCRUD",
+            "Missing: CRUDResponseHandler"
+          ]
+        }
+      },
+      "READ": {
+        "hasViewFunction": false,
+        "usesEntityDetails": true,
+        "evaluation": {
+          "passed": false,
+          "warnings": [
+            "Missing: showEntityDetails"
+          ]
+        }
+      }
+    }
+  },
+  "summary": {
+    "total": 32,
+    "passed": 0,
+    "failed": 32,
+    "warnings": 0
+  }
+}

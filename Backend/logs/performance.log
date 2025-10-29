@@ -11908,3 +11908,10 @@ WHERE alerts.is_triggered = ?]
 2025-10-30 00:05:22,943 - utils.performance_monitor - INFO - Performance: collect_metrics - Duration: 1.010s - Success: True
 2025-10-30 00:05:22,943 - utils.performance_monitor - WARNING - Slow operation detected: collect_metrics - Duration: 1.010s
 2025-10-30 00:05:22,943 - services.background_tasks - INFO - Background task 'collect_metrics' completed successfully in 1010ms
+2025-10-30 00:15:54,564 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-30 00:15:54,565 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:15:54] "GET /db_display HTTP/1.1" 200 -
+2025-10-30 00:16:05,193 - utils.rate_limiter - INFO - Rate limiter cleanup: removed 0 empty entries
+2025-10-30 00:16:05,193 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-30 00:16:05,193 - cache - INFO - Cache MISS: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-30 00:16:05,195 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 3375 chars)
+2025-10-30 00:16:05,196 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:05] "GET /api/trading-accounts/ HTTP/1.1" 200 -

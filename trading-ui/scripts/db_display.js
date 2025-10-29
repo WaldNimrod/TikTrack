@@ -136,567 +136,244 @@ async function fetchTableData(tableType) {
 /**
  * Update table display with data
  * @param {Array} data - The data to display
- * @param {string} tableType - The table type
+ * @param {string} tableType - The table type (with dashes)
  */
 function updateTableDisplay(data, tableType) {
-  // Find the correct container for this table type
-  let containerId = `${tableType}Container`;
-  
-  // Handle special cases for container IDs
-  if (tableType === 'trade_plans') {
-    containerId = 'tradePlansContainer';
-  } else if (tableType === 'cash_flows') {
-    containerId = 'cashFlowsContainer';
-  }
+  // Convert table type to section ID
+  const sectionId = getSectionId(tableType);
+  const containerId = getContainerId(tableType);
+  const tableId = getTableId(tableType);
   
   const tableContainer = document.getElementById(containerId);
-
   if (!tableContainer) {
     console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
     return;
   }
 
-  // Find the table within the container
-  const table = tableContainer.querySelector('table');
+  const table = document.getElementById(tableId);
   if (!table) {
-    console.error(`❌ Table not found in container ${containerId}`);
+    console.error(`❌ Table not found: ${tableId}`);
     return;
   }
 
-  // Find the table body
   const tbody = table.querySelector('tbody');
   if (!tbody) {
-    console.error(`❌ Table body not found in table ${tableType}`);
-    return;
-  }
-
-  // Get table mappings
-  const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
-  if (!tableMapping) {
-    console.error(`❌ No table mapping found for ${tableType}`);
+    console.error(`❌ Table body not found in table ${tableId}`);
     return;
   }
 
   console.log(`🔧 Updating table display for ${tableType} with ${data.length} records`);
 
+  // Create table headers from first data row
+  const thead = table.querySelector('thead');
+  if (thead && data.length > 0) {
+    thead.innerHTML = createTableHeaders(data);
+  }
+
   // Create table body HTML
-  const tbodyHTML = createTableBodyHTML(data, tableMapping, tableType);
+  const tbodyHTML = createTableBodyHTML(data, tableType);
 
   // Update table body
   tbody.innerHTML = tbodyHTML;
-
-  // Apply sorting functionality
-  applySortingFunctionality(tableType);
 }
 
+/**
+ * Get section ID from table type
+ * @param {string} tableType - Table type with dashes
+ * @returns {string} Section ID
+ */
+function getSectionId(tableType) {
+  const mapping = {
+    'trading-accounts': 'accountsSection',
+    'trades': 'tradesSection',
+    'tickers': 'tickersSection',
+    'trade-plans': 'tradePlansSection',
+    'executions': 'executionsSection',
+    'alerts': 'alertsSection',
+    'notes': 'notesSection',
+    'cash-flows': 'cashFlowsSection'
+  };
+  return mapping[tableType] || tableType + 'Section';
+}
+
+/**
+ * Get container ID from table type
+ * @param {string} tableType - Table type with dashes
+ * @returns {string} Container ID
+ */
+function getContainerId(tableType) {
+  const mapping = {
+    'trading-accounts': 'accountsContainer',
+    'trades': 'tradesContainer',
+    'tickers': 'tickersContainer',
+    'trade-plans': 'tradePlansContainer',
+    'executions': 'executionsContainer',
+    'alerts': 'alertsContainer',
+    'notes': 'notesContainer',
+    'cash-flows': 'cashFlowsContainer'
+  };
+  return mapping[tableType] || tableType + 'Container';
+}
+
+/**
+ * Get table ID from table type
+ * @param {string} tableType - Table type with dashes
+ * @returns {string} Table ID
+ */
+function getTableId(tableType) {
+  const mapping = {
+    'trading-accounts': 'accountsTable',
+    'trades': 'tradesTable',
+    'tickers': 'tickersTable',
+    'trade-plans': 'tradePlansTable',
+    'executions': 'executionsTable',
+    'alerts': 'alertsTable',
+    'notes': 'notesTable',
+    'cash-flows': 'cashFlowsTable'
+  };
+  return mapping[tableType] || tableType + 'Table';
+}
+
+
+/**
+ * Create table headers from data
+ * @param {Array} data - The table data
+ * @returns {string} The table headers HTML
+ */
+function createTableHeaders(data) {
+  if (data.length === 0) return '<tr><th>No data</th></tr>';
+  const fields = Object.keys(data[0]);
+  return '<tr>' + fields.map(f => `<th>${f}</th>`).join('') + '</tr>';
+}
 
 /**
  * Create table body HTML from data
  * @param {Array} data - The table data
- * @param {Array} tableMapping - The table column mapping array
  * @param {string} tableType - The table type
  * @returns {string} The table body HTML
  */
-function createTableBodyHTML(data, tableMapping, tableType) {
-  let tbodyHTML = '';
-
-  console.log(`🔨 Creating table body HTML for ${tableType} with ${data.length} records`);
-
+function createTableBodyHTML(data, tableType) {
   if (data.length === 0) {
-    tbodyHTML += `<tr><td colspan="${tableMapping.length + 1}" class="text-center">אין נתונים</td></tr>`;
-  } else {
-    data.forEach((row, index) => {
-      if (index < 3) { // Log first 3 rows for debugging
-        console.log(`📋 Row ${index} for ${tableType}:`, row);
-      }
-      tbodyHTML += '<tr>';
-      tableMapping.forEach(fieldName => {
-        const value = row[fieldName] || '';
-        const formattedValue = formatCellValue(value, { field: fieldName });
-        tbodyHTML += `<td>${formattedValue}</td>`;
-      });
-      
-      // Add actions column
-      const actionsHTML = createActionsHTML(row, tableType);
-      tbodyHTML += `<td class="actions-cell">${actionsHTML}</td>`;
-      
-      tbodyHTML += '</tr>';
-    });
+    return '<tr><td colspan="100" class="text-center">No data</td></tr>';
   }
-
-  console.log(`✅ Created table body HTML for ${tableType}: ${tbodyHTML.length} characters`);
-  return tbodyHTML;
-}
-
-/**
- * Create actions HTML for a table row
- * @param {Object} row - The row data
- * @param {string} tableType - The table type
- * @returns {string} The actions HTML
- */
-function createActionsHTML(row, tableType) {
-  const recordId = row.id || row.ID || '';
-  if (!recordId) {
-    return '<span class="text-muted">-</span>';
-  }
-
-  const buttons = [
-    { type: 'EDIT', onclick: `editRecord('${tableType}', ${recordId})`, title: 'ערוך' },
-    { type: 'DELETE', onclick: `deleteRecord('${tableType}', ${recordId})`, title: 'מחק' }
-  ];
   
-  return window.createActionsMenu ? window.createActionsMenu(buttons) : `
-    <div class="action-buttons">
-      <button data-button-type="EDIT" data-variant="small" data-onclick="editRecord('${tableType}', ${recordId})" data-text="" title="ערוך"></button>
-      <button data-button-type="DELETE" data-variant="small" data-onclick="deleteRecord('${tableType}', ${recordId})" data-text="" title="מחק"></button>
-    </div>
-  `;
-}
-
-/**
- * Format cell value based on column configuration
- * @param {*} value - The cell value
- * @param {Object} column - The column configuration
- * @returns {string} The formatted value
- */
-function formatCellValue(value, column) {
-  if (value === null || value === undefined) {
-    return '';
-  }
-
-  // Apply formatting based on column type
-  switch (column.type) {
-  case 'date':
-    return formatDate(value);
-  case 'number':
-    return formatNumber(value);
-  case 'currency':
-    return formatCurrency(value);
-  case 'status':
-    return formatStatus(value);
-  default:
-    return String(value);
-  }
-}
-
-/**
- * Apply sorting functionality to table
- * @param {string} tableType - The table type
- */
-function applySortingFunctionality(_tableType) {
-  // Sorting is handled by global sortTable function from main.js
-  // console.log(`🔀 Sorting functionality applied to ${tableType} table`);
+  // Get all fields from first record
+  const fields = Object.keys(data[0]);
+  
+  let html = '';
+  data.forEach(row => {
+    html += '<tr>';
+    fields.forEach(field => {
+      const value = row[field] || '';
+      html += `<td>${value}</td>`;
+    });
+    html += '</tr>';
+  });
+  return html;
 }
 
 // ===== UTILITY FUNCTIONS =====
 
 /**
- * Show loading state
+ * Show loading state for a specific table
+ * @param {string} tableType - The table type
  */
-function showLoadingState() {
-  // Show loading state in the current table's tbody
-  if (currentTableType) {
-    let containerId = `${currentTableType}Container`;
-    
-    // Handle special cases for container IDs
-    if (currentTableType === 'trade_plans') {
-      containerId = 'tradePlansContainer';
-    } else if (currentTableType === 'cash_flows') {
-      containerId = 'cashFlowsContainer';
+function showLoadingState(tableType) {
+  const containerId = getContainerId(tableType);
+  const tableContainer = document.getElementById(containerId);
+  if (tableContainer) {
+    const tbody = tableContainer.querySelector('tbody');
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="100" class="text-center">Loading data...</td></tr>';
     }
-    
-    const tableContainer = document.getElementById(containerId);
-    if (tableContainer) {
-      const tbody = tableContainer.querySelector('tbody');
-      if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center">טוען נתונים...</td></tr>';
-      }
+  }
+}
+
+/**
+ * Show error state for a specific table
+ * @param {string} tableType - The table type
+ * @param {string} errorMessage - The error message
+ */
+function showErrorState(tableType, errorMessage) {
+  const containerId = getContainerId(tableType);
+  const tableContainer = document.getElementById(containerId);
+  if (tableContainer) {
+    const tbody = tableContainer.querySelector('tbody');
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="100" class="text-center text-danger">Error: ${errorMessage}</td></tr>`;
     }
   }
 }
 
 /**
  * Update table information display
- * @param {string} tableType - The table type
+ * @param {string} tableType - The table type (with dashes)
  * @param {number} recordCount - The number of records
  */
 function updateTableInfo(tableType, recordCount) {
-  // Update the count display in the section header
-  let countElementId = `${tableType}Count`;
-  
-  // Handle special cases for count element IDs
-  if (tableType === 'trade_plans') {
-    countElementId = 'tradePlansCount';
-  } else if (tableType === 'cash_flows') {
-    countElementId = 'cashFlowsCount';
-  }
-  
+  // Convert table type to count element ID
+  const countElementId = getCountElementId(tableType);
   const countElement = document.getElementById(countElementId);
   if (countElement) {
-    countElement.textContent = `${recordCount} רשומות`;
+    countElement.textContent = `${recordCount} records`;
   } else {
     console.log(`ℹ️ No count element found for ${countElementId}`);
   }
 }
 
 /**
- * Update summary statistics
- * @param {string} tableType - The table type
- * @param {number} recordCount - The number of records
+ * Get count element ID from table type
+ * @param {string} tableType - Table type with dashes
+ * @returns {string} Count element ID
  */
-function updateSummaryStats(tableType, recordCount) {
-  // Map table types to their display names
-  const statsMapping = {
-    'accounts': 'accountsStats',
-    'trades': 'tradesStats',
-    'tickers': 'tickersStats',
-    'trade_plans': 'tradePlansStats',
-    'alerts': 'alertsStats',
-    'cash_flows': 'cashFlowsStats'
+function getCountElementId(tableType) {
+  const mapping = {
+    'trading-accounts': 'accountsCount',
+    'trades': 'tradesCount',
+    'tickers': 'tickersCount',
+    'trade-plans': 'tradePlansCount',
+    'executions': 'executionsCount',
+    'alerts': 'alertsCount',
+    'notes': 'notesCount',
+    'cash-flows': 'cashFlowsCount'
   };
+  return mapping[tableType] || tableType + 'Count';
+}
 
-  const statsElementId = statsMapping[tableType];
-  if (statsElementId) {
-    const statsElement = document.getElementById(statsElementId);
-    if (statsElement) {
-      statsElement.textContent = recordCount;
-      console.log(`📊 Updated stats for ${tableType}: ${recordCount} records`);
-    } else {
-      console.log(`ℹ️ No stats element found for ${statsElementId}`);
-    }
-  } else {
-    console.log(`ℹ️ No stats mapping found for ${tableType}`);
+/**
+ * Update summary statistics in top section
+ */
+function updateSummaryStats() {
+  const totalTablesElement = document.getElementById('totalTables');
+  const totalRecordsElement = document.getElementById('totalRecords');
+  const lastUpdateElement = document.getElementById('lastUpdate');
+  
+  if (totalTablesElement) {
+    totalTablesElement.textContent = Object.keys(tableData).length;
+  }
+  
+  if (totalRecordsElement) {
+    totalRecordsElement.textContent = totalRecords;
+  }
+  
+  if (lastUpdateElement) {
+    lastUpdateElement.textContent = new Date().toLocaleString('he-IL');
   }
 }
-
-/**
- * Filter table data
- * @param {string} searchTerm - The search term
- */
-function filterTableData(searchTerm) {
-  if (!searchTerm || !tableData[currentTableType]) {
-    updateTableDisplay(tableData[currentTableType] || [], currentTableType);
-    return;
-  }
-
-  const filteredData = tableData[currentTableType].filter(row => Object.values(row).some(value =>
-    String(value).toLowerCase().includes(searchTerm.toLowerCase()),
-  ));
-
-  updateTableDisplay(filteredData, currentTableType);
-}
-
-/**
- * Format date value
- * @param {string} dateString - The date string
- * @returns {string} The formatted date
- */
-function formatDate(dateString) {
-  if (!dateString) {return '';}
-
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('he-IL');
-  } catch {
-    return dateString;
-  }
-}
-
-/**
- * Format number value
- * @param {number} number - The number
- * @returns {string} The formatted number
- */
-function formatNumber(number) {
-  if (number === null || number === undefined) {return '';}
-  return Number(number).toLocaleString('he-IL');
-}
-
-/**
- * Format currency value
- * @param {number} amount - The amount
- * @returns {string} The formatted currency
- */
-function formatCurrency(amount) {
-  if (amount === null || amount === undefined) {return '';}
-  return new Intl.NumberFormat('he-IL', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
-}
-
-/**
- * Format status value
- * @param {string} status - The status
- * @returns {string} The formatted status
- */
-function formatStatus(status) {
-  if (!status) {return '';}
-
-  const statusMap = {
-    'active': 'פעיל',
-    'inactive': 'לא פעיל',
-    'pending': 'ממתין',
-    'completed': 'הושלם',
-    'cancelled': 'בוטל',
-  };
-
-  return statusMap[status] || status;
-}
-
-// ===== מערכת טיפול בשגיאות =====
-// השתמש במערכת הכללית error-handlers.js
-
-/**
- * Toggle top section visibility
- */
-
-/**
- * Toggle main section visibility
- */
-// toggleSection function removed - use toggleSection('main') instead
-
-/**
- * Add new record (placeholder function)
- */
-function addRecord() {
-  // This is a placeholder function - implement based on requirements
-  if (window.showInfoNotification) {
-    window.showInfoNotification('פונקציה זו תשולב בהמשך');
-  }
-}
-
-/**
- * Simple table sorting function for database display page
- * @param {number} columnIndex - The column index to sort by
- * @param {string} tableType - The table type identifier
- */
-
-// ===== ACTION FUNCTIONS =====
-
-/**
- * Edit a record
- * @param {string} tableType - The table type
- * @param {number} recordId - The record ID
- */
-function editRecord(tableType, recordId) {
-  console.log(`✏️ Edit record: ${tableType} ID ${recordId}`);
-  // TODO: Implement edit functionality
-  if (typeof showNotification === 'function') {
-    showNotification(`עריכת רשומה: ${tableType} ID ${recordId}`, 'info');
-  } else {
-    alert(`עריכת רשומה: ${tableType} ID ${recordId}`);
-  }
-}
-
-/**
- * Delete a record
- * @param {string} tableType - The table type
- * @param {number} recordId - The record ID
- */
-function deleteRecord(tableType, recordId) {
-  console.log(`🗑️ Delete record: ${tableType} ID ${recordId}`);
-  if (typeof showConfirmationDialog === 'function') {
-    showConfirmationDialog(
-      `האם אתה בטוח שברצונך למחוק את הרשומה ${recordId}?`,
-      () => {
-        // TODO: Implement delete functionality
-        if (typeof showNotification === 'function') {
-          showNotification(`מחיקת רשומה: ${tableType} ID ${recordId}`, 'info');
-        } else {
-          alert(`מחיקת רשומה: ${tableType} ID ${recordId}`);
-        }
-      },
-      null,
-      'מחיקת רשומה',
-      'מחק',
-      'ביטול'
-    );
-  } else if (confirm(`האם אתה בטוח שברצונך למחוק את הרשומה ${recordId}?`)) {
-    // TODO: Implement delete functionality
-    if (typeof showNotification === 'function') {
-      showNotification(`מחיקת רשומה: ${tableType} ID ${recordId}`, 'info');
-    } else {
-      alert(`מחיקת רשומה: ${tableType} ID ${recordId}`);
-    }
-  }
-}
-
-
-/**
- * Copy detailed log with all data and status
- */
 
 // ===== GLOBAL EXPORTS =====
 
 // Export functions to global scope
 window.initDatabaseDisplay = initDatabaseDisplay;
 window.loadTableData = loadTableData;
-window.filterTableData = filterTableData;
-// window.toggleSection removed - using global version from ui-utils.js
-// toggleSection export removed - use toggleSection('main') instead
-window.addRecord = addRecord;
-// window.sortTable export removed - using global version from tables.js
-window.editRecord = editRecord;
-window.deleteRecord = deleteRecord;
-// window. export removed - using global version from system-management.js
-// window.generateDetailedLog export removed - local function only
 
-/**
- * Generate detailed log for Database Display
- */
-function generateDetailedLog() {
-    const timestamp = new Date().toLocaleString('he-IL');
-    const log = [];
 
-    log.push('=== לוג מפורט - תצוגת בסיס נתונים ===');
-    log.push(`זמן יצירה: ${timestamp}`);
-    log.push(`עמוד: ${window.location.href}`);
-    log.push('');
-
-    // 1. מצב כללי של העמוד
-    log.push('--- מצב כללי של העמוד ---');
-    const sections = document.querySelectorAll('.content-section, .section');
-    sections.forEach((section, index) => {
-        const header = section.querySelector('.section-header, h2, h3');
-        const body = section.querySelector('.section-body, .card-body');
-        const isOpen = body && body.style.display !== 'none' && !section.classList.contains('collapsed');
-        const title = header ? header.textContent.trim() : `סקשן ${index + 1}`;
-        log.push(`  ${index + 1}. "${title}": ${isOpen ? 'פתוח' : 'סגור'}`);
-    });
-
-    // 2. סטטיסטיקות בסיס נתונים
-    log.push('');
-    log.push('--- סטטיסטיקות בסיס נתונים ---');
-    const dbStats = [
-        'accountsStats', 'tradesStats', 'tickersStats', 'tradePlansStats', 
-        'alertsStats', 'cashFlowsStats'
-    ];
-    
-    dbStats.forEach(statId => {
-        const element = document.getElementById(statId);
-        if (element) {
-            const value = element.textContent.trim();
-            const visible = element.offsetParent !== null ? 'נראה' : 'לא נראה';
-            log.push(`${statId}: ${value} (${visible})`);
-        }
-    });
-
-    // 3. טבלאות נתונים
-    log.push('');
-    log.push('--- טבלאות נתונים ---');
-    const tableSections = [
-        'tradePlansSection', 'tradesSection', 'accountsSection', 
-        'tickersSection', 'executionsSection', 'alertsSection', 'notesSection'
-    ];
-    
-    tableSections.forEach(sectionId => {
-        const section = document.getElementById(sectionId);
-        if (section) {
-            const countElement = document.getElementById(sectionId.replace('Section', 'Count'));
-            const count = countElement ? countElement.textContent.trim() : 'לא ידוע';
-            const visible = section.offsetParent !== null ? 'נראה' : 'לא נראה';
-            log.push(`${sectionId}: ${count} רשומות (${visible})`);
-        }
-    });
-
-    // 4. כפתורים וקונטרולים
-    log.push('');
-    log.push('--- כפתורים וקונטרולים ---');
-    const buttonIds = [
-        'addRecordBtn', 'editRecordBtn', 'deleteRecordBtn', 'filterBtn',
-        'exportBtn', 'refreshBtn', 'searchBtn'
-    ];
-    
-    buttonIds.forEach(btnId => {
-        const btn = document.getElementById(btnId);
-        if (btn) {
-            const visible = btn.offsetParent !== null ? 'נראה' : 'לא נראה';
-            const disabled = btn.disabled ? 'מבוטל' : 'פעיל';
-            const text = btn.textContent.trim() || btn.value || 'ללא טקסט';
-            log.push(`${btnId}: ${visible} - ${disabled} - "${text}"`);
-        }
-    });
-
-    // 5. פילטרים וחיפוש
-    log.push('');
-    log.push('--- פילטרים וחיפוש ---');
-    const searchInput = document.querySelector('input[type="search"], input[placeholder*="חיפוש"], input[placeholder*="search"]');
-    if (searchInput) {
-        const value = searchInput.value || 'ריק';
-        const visible = searchInput.offsetParent !== null ? 'נראה' : 'לא נראה';
-        log.push(`חיפוש: "${value}" (${visible})`);
-    }
-
-    const filters = document.querySelectorAll('.filter, .form-select, select');
-    filters.forEach((filter, index) => {
-        const value = filter.value || 'לא נבחר';
-        const visible = filter.offsetParent !== null ? 'נראה' : 'לא נראה';
-        log.push(`פילטר ${index + 1}: "${value}" (${visible})`);
-    });
-
-    // 6. מידע טכני
-    log.push('');
-    log.push('--- מידע טכני ---');
-    log.push(`זמן יצירת הלוג: ${timestamp}`);
-    log.push(`גרסת דפדפן: ${navigator.userAgent}`);
-    log.push(`רזולוציה מסך: ${screen.width}x${screen.height}`);
-    log.push(`גודל חלון: ${window.innerWidth}x${window.innerHeight}`);
-    
-    if (performance.timing) {
-        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-        log.push(`זמן טעינת עמוד: ${loadTime}ms`);
-    }
-    
-    if (navigator.deviceMemory) {
-        log.push(`זיכרון זמין: ${navigator.deviceMemory}GB`);
-    }
-    
-    log.push(`שפת דפדפן: ${navigator.language}`);
-    log.push(`פלטפורמה: ${navigator.platform}`);
-
-    // 7. שגיאות והערות מהקונסולה
-    log.push('');
-    log.push('--- שגיאות והערות מהקונסולה ---');
-    log.push('⚠️ חשוב: הלוג המפורט חייב לכלול שגיאות קונסולה לאבחון בעיות');
-    log.push('📋 הוראות: פתח את Developer Tools (F12) > Console');
-    log.push('📋 העתק את כל השגיאות וההערות מהקונסולה');
-    log.push('📋 הוסף אותן ללוג המפורט לפני שליחה');
-
-    log.push('');
-    log.push('=== סוף לוג ===');
-    return log.join('\n');
-}
-
-// Local  function for db_display page
-async function copyDetailedLog() {
-    try {
-        const detailedLog = await generateDetailedLog();
-        if (detailedLog) {
-            await navigator.clipboard.writeText(detailedLog);
-            
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד', 4000, 'development');
-            } else if (typeof window.showNotification === 'function') {
-                window.showNotification('לוג מפורט הועתק ללוח', 'success');
-            } else {
-                alert('לוג מפורט הועתק ללוח!');
-            }
-        }
-    } catch (error) {
-        console.error('שגיאה בהעתקת הלוג המפורט:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
-        } else {
-            alert('שגיאה בהעתקת הלוג: ' + error.message);
-        }
-    }
-}
+// ===== INITIALIZATION =====
 
 // Initialize when DOM is loaded
-// document.addEventListener('DOMContentLoaded', function() {
-//   console.log('➕ Database display page DOM loaded');
-//   initDatabaseDisplay();
-// });
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('➕ Database display page DOM loaded');
+  initDatabaseDisplay();
+});
 
-// console.log('✅ DB Display script loaded successfully');
+console.log('✅ DB Display script loaded successfully');

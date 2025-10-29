@@ -205,11 +205,15 @@ class PreferencesService:
         logger.info(f"Cache invalidated for user {user_id}, profile {profile_id}")
     
     def _get_active_profile_id(self, user_id: int) -> int:
-        """קבלת פרופיל פעיל של משתמש"""
+        """קבלת פרופיל פעיל של משתמש
+        
+        אם אין פרופיל פעיל של המשתמש, מחזיר פרופיל ברירת מחדל (ID: 0)
+        """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
+            # Search for active user profile
             cursor.execute('''
                 SELECT id FROM preference_profiles 
                 WHERE user_id = ? AND is_active = TRUE 
@@ -223,11 +227,14 @@ class PreferencesService:
             if result:
                 return result[0]
             else:
-                raise ValueError(f"No active profile found for user {user_id}")
+                # No active user profile - return default profile
+                logger.info(f"No active profile found for user {user_id}, using default profile (ID: 0)")
+                return 0
             
         except Exception as e:
             logger.error(f"Error getting active profile for user {user_id}: {e}")
-            raise
+            # In case of error, return default profile
+            return 0
     
     def _get_preference_type_id(self, preference_name: str) -> int:
         """קבלת מזהה סוג העדפה"""

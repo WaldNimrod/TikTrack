@@ -944,19 +944,9 @@ window.loadProfilesToDropdown = async function(userId = 1) {
         // Clear existing options
         profileSelect.innerHTML = '';
         
-        // Add default option first
-        const defaultOption = document.createElement('option');
-        defaultOption.value = 'ברירת מחדל';
-        defaultOption.textContent = 'ברירת מחדל';
-        profileSelect.appendChild(defaultOption);
-        
         if (profiles && profiles.length > 0) {
+            // Add all profiles (including default profile if it exists)
             profiles.forEach(profile => {
-                // Skip if this is already the default profile
-                if (profile.name === 'ברירת מחדל') {
-                    return;
-                }
-                
                 const option = document.createElement('option');
                 option.value = profile.name;
                 option.textContent = profile.name;
@@ -999,6 +989,7 @@ window.loadProfilesToDropdown = async function(userId = 1) {
             // Update active profile info in the new card format
             const activeProfileName = document.getElementById('activeProfileName');
             const activeProfileDescription = document.getElementById('activeProfileDescription');
+            const activeProfileInfo = document.getElementById('activeProfileInfo'); // Summary element
             
             if (activeProfile) {
                 if (activeProfileName) {
@@ -1006,6 +997,9 @@ window.loadProfilesToDropdown = async function(userId = 1) {
                 }
                 if (activeProfileDescription) {
                     activeProfileDescription.textContent = activeProfile.description || 'פרופיל משתמש';
+                }
+                if (activeProfileInfo) {
+                    activeProfileInfo.textContent = activeProfile.name;
                 }
                 window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ${activeProfile.name}`, { page: "preferences-ui" });
                 
@@ -1025,7 +1019,10 @@ window.loadProfilesToDropdown = async function(userId = 1) {
                 if (activeProfileDescription) {
                     activeProfileDescription.textContent = 'פרופיל ברירת מחדל של המערכת';
                 }
-                window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ברירת מחדל (no active profile, { page: "preferences-ui" })`);
+                if (activeProfileInfo) {
+                    activeProfileInfo.textContent = 'ברירת מחדל';
+                }
+                window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ברירת מחדל (no active profile)`, { page: "preferences-ui" });
                 
                 // Default profile is active - disable all preferences
                 window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-ui" });

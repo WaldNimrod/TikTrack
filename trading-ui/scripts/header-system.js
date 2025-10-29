@@ -234,7 +234,7 @@ class HeaderSystem {
               <!-- כפתור פתיחה/סגירה של הפילטר - בתוך התפריט הראשי -->
               <div class="filter-toggle-section filter-toggle-main">
                 <button class="header-filter-toggle-btn" id="headerFilterToggleBtnMain" title="הצג/הסתר פילטרים" 
-                        onclick="toggleHeaderFilters()">
+                        data-onclick="toggleHeaderFilters()">
                   <span class="header-filter-arrow">▲</span>
                 </button>
               </div>
@@ -249,7 +249,7 @@ class HeaderSystem {
             <div class="filter-group status-filter">
               <div class="filter-dropdown">
                 <button class="filter-toggle status-filter-toggle" id="statusFilterToggle" 
-                        onclick="toggleStatusFilterMenu()">
+                        data-onclick="toggleStatusFilterMenu()">
                   <span class="selected-value selected-status-text" id="selectedStatus">כל סטטוס</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -273,7 +273,7 @@ class HeaderSystem {
             <!-- פילטר סוג השקעה -->
             <div class="filter-group type-filter">
               <div class="filter-dropdown">
-                <button class="filter-toggle type-filter-toggle" id="typeFilterToggle" onclick="toggleTypeFilterMenu()">
+                <button class="filter-toggle type-filter-toggle" id="typeFilterToggle" data-onclick="toggleTypeFilterMenu()">
                                           <span class="selected-value selected-type-text" id="selectedType">כל סוג השקעה</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>

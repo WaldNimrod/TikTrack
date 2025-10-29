@@ -6640,3 +6640,38 @@ WHERE alerts.is_triggered = ?]
 2025-10-29 20:52:51,399 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST999
 2025-10-29 20:52:54,776 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST777
 2025-10-29 20:52:58,149 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST666
+2025-10-29 20:53:01,583 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/UNIQUE123
+2025-10-29 20:54:01,881 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-29 20:54:02,038 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-29 20:54:02,173 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-29 20:54:02,308 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-29 20:54:02,309 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 1: List argument must consist only of tuples or dictionaries
+2025-10-29 20:54:02,310 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 2: List argument must consist only of tuples or dictionaries
+2025-10-29 20:54:02,311 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 6: List argument must consist only of tuples or dictionaries
+2025-10-29 20:54:02,312 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 4: List argument must consist only of tuples or dictionaries
+2025-10-29 20:54:05,706 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/
+2025-10-29 20:54:09,090 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST123
+2025-10-29 20:54:12,486 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST999
+2025-10-29 20:54:15,828 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST777
+2025-10-29 20:54:19,304 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST666
+2025-10-29 20:54:22,662 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/UNIQUE123
+2025-10-29 20:55:22,840 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 5: List argument must consist only of tuples or dictionaries
+2025-10-29 20:55:23,005 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 7: List argument must consist only of tuples or dictionaries
+2025-10-29 20:55:23,123 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 8: List argument must consist only of tuples or dictionaries
+2025-10-29 20:55:23,299 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 9: List argument must consist only of tuples or dictionaries
+2025-10-29 20:55:26,651 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/
+2025-10-29 20:55:30,056 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST123
+2025-10-29 20:55:33,446 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST999
+2025-10-29 20:55:36,825 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST777
+2025-10-29 20:55:40,202 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST666
+2025-10-29 20:55:43,568 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/UNIQUE123
+2025-10-29 20:55:43,570 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 5: List argument must consist only of tuples or dictionaries
+2025-10-29 20:55:43,571 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 7: List argument must consist only of tuples or dictionaries
+2025-10-29 20:55:43,572 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 8: List argument must consist only of tuples or dictionaries
+2025-10-29 20:55:43,573 - services.external_data.yahoo_finance_adapter - ERROR - ❌ Error updating quotes_last for ticker 9: List argument must consist only of tuples or dictionaries
+2025-10-29 20:56:46,944 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/
+2025-10-29 20:56:50,427 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST123
+2025-10-29 20:56:53,783 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST999
+2025-10-29 20:56:57,214 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST777
+2025-10-29 20:57:00,570 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/TEST666
+2025-10-29 20:57:04,018 - services.external_data.yahoo_finance_adapter - ERROR - All retry attempts failed for https://query1.finance.yahoo.com/v8/finance/chart/UNIQUE123

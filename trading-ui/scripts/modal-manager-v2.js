@@ -153,10 +153,10 @@ class ModalManagerV2 {
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button data-button-type="CANCEL" data-variant="normal" 
+                            <button type="button" data-button-type="CANCEL" data-variant="normal" 
                                     data-bs-dismiss="modal" data-text="ביטול"></button>
-                            <button data-button-type="SAVE" data-variant="normal" 
-                                    data-onclick="${config.onSave}" data-text="שמור"></button>
+                            <button type="button" id="${config.id}SaveBtn" data-button-type="SAVE" data-variant="normal" 
+                                    data-onclick="${config.onSave}()" data-text="שמור"></button>
                         </div>
                     </div>
                 </div>

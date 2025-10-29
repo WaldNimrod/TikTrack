@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Cash Flow Button</title>
+</head>
+<body>
+    <h1>Test Cash Flow Button Connection</h1>
+    
+    <button onclick="testButtonClick()">Test Button Click</button>
+    
+    <script>
+        function testButtonClick() {
+            console.log('🔵 Button clicked - testing saveCashFlow connection...');
+            
+            // Check if function exists
+            if (typeof window.saveCashFlow === 'function') {
+                console.log('✅ window.saveCashFlow exists');
+                
+                // Try to call it
+                try {
+                    console.log('🔵 Calling window.saveCashFlow()...');
+                    window.saveCashFlow();
+                    console.log('✅ saveCashFlow called successfully');
+                } catch (error) {
+                    console.error('❌ Error calling saveCashFlow:', error);
+                }
+            } else {
+                console.error('❌ window.saveCashFlow is NOT a function!');
+                console.log('typeof window.saveCashFlow:', typeof window.saveCashFlow);
+                console.log('window.saveCashFlow:', window.saveCashFlow);
+            }
+            
+            // Check ModalManagerV2
+            if (window.ModalManagerV2) {
+                console.log('✅ ModalManagerV2 exists');
+            } else {
+                console.error('❌ ModalManagerV2 NOT FOUND');
+            }
+            
+            // Check form element
+            const form = document.getElementById('cashFlowModalForm');
+            if (form) {
+                console.log('✅ Form found:', form);
+            } else {
+                console.error('❌ Form NOT FOUND');
+            }
+        }
+        
+        console.log('🔵 Test page loaded. Click the button to test.');
+    </script>
+</body>
+</html>

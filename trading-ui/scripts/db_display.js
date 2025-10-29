@@ -39,26 +39,26 @@ function initDatabaseDisplay() {
 async function loadAllTables() {
   console.log('🔄 Loading all tables...');
   
-  // API endpoints - some use dashes, some use underscores
+  // API endpoints and their corresponding container IDs
   const tables = [
-    'trading-accounts',  // API uses dash
-    'trades',
-    'tickers', 
-    'trade_plans',       // API uses underscore
-    'executions',
-    'alerts',            // Has SQL error - will show error state
-    'notes',
-    'cash_flows'         // API uses underscore
+    { api: 'trading-accounts', container: 'accountsContainer' },
+    { api: 'trades', container: 'tradesContainer' },
+    { api: 'tickers', container: 'tickersContainer' },
+    { api: 'trade_plans', container: 'tradePlansContainer' },
+    { api: 'executions', container: 'executionsContainer' },
+    { api: 'alerts', container: 'alertsContainer' },
+    { api: 'notes', container: 'notesContainer' },
+    { api: 'cash_flows', container: 'cashFlowsContainer' }
   ];
   
   totalRecords = 0;
   
   for (const table of tables) {
     try {
-      console.log(`📊 Loading ${table}...`);
-      await loadTableData(table);
+      console.log(`📊 Loading ${table.api}...`);
+      await loadTableData(table.api, table.container);
     } catch (error) {
-      console.error(`Error loading ${table}:`, error);
+      console.error(`Error loading ${table.api}:`, error);
     }
   }
   
@@ -72,8 +72,9 @@ async function loadAllTables() {
 /**
  * Load data for a specific table type
  * @param {string} tableType - The table type to load (with dashes)
+ * @param {string} containerId - The container ID for the table
  */
-async function loadTableData(tableType) {
+async function loadTableData(tableType, containerId) {
   try {
     console.log(`📊 Loading data for table type: ${tableType}`);
 
@@ -87,7 +88,7 @@ async function loadTableData(tableType) {
     tableData[tableType] = data;
 
     // Update table display
-    updateTableDisplay(data, tableType);
+    updateTableDisplay(data, tableType, containerId);
 
     // Update table info
     updateTableInfo(tableType, data.length);

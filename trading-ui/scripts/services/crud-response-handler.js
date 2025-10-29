@@ -568,17 +568,24 @@ class CRUDResponseHandler {
      * @param {string} entityType - סוג הישות (trades, alerts, etc.)
      */
     static async clearEntityCache(entityType) {
+        console.log(`🔥 clearEntityCache called for entityType: ${entityType}`);
+        
         if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            console.log(`⚠️ UnifiedCacheManager not available or not initialized`);
             return;
         }
         
         try {
             const keys = await window.UnifiedCacheManager.getAllKeys();
+            console.log(`🔥 clearEntityCache - All keys:`, keys);
+            
             const entityKeys = keys.filter(k => 
                 k.startsWith(`${entityType}_`) || 
                 k.startsWith(`all_${entityType}`) ||
                 k.includes(entityType)
             );
+            
+            console.log(`🔥 clearEntityCache - Entity keys to remove:`, entityKeys);
             
             for (const key of entityKeys) {
                 await window.UnifiedCacheManager.remove(key);

@@ -267,8 +267,9 @@ function setupImportModalEventListeners() {
         window.Logger.debug('[Import Modal] Drop zone event listeners added', { page: 'import-user-data' });
     }
     
-    // Account select
-    const accountSelect = document.getElementById('tradingAccountSelect');
+    // Account select - look INSIDE the modal
+    const modal = document.getElementById('importUserDataModal');
+    const accountSelect = modal?.querySelector('#tradingAccountSelect');
     window.Logger.debug('[Import Modal] Account select element found', { 
         exists: !!accountSelect, 
         id: accountSelect?.id,
@@ -278,25 +279,24 @@ function setupImportModalEventListeners() {
         accountSelect.addEventListener('change', handleAccountSelect);
         window.Logger.info('[Import Modal] Account select event listener added successfully', { page: 'import-user-data' });
     } else {
-        window.Logger.error('[Import Modal] Account select element not found!', { page: 'import-user-data' });
+        window.Logger.error('[Import Modal] Account select element not found in modal!', { page: 'import-user-data' });
     }
     
-    // Connector select
-    const connectorSelect = document.getElementById('connectorSelect');
+    // Connector select - look INSIDE the modal
+    const connectorSelect = modal?.querySelector('#connectorSelect');
     if (connectorSelect) {
         connectorSelect.addEventListener('change', handleConnectorSelect);
         window.Logger.debug('[Import Modal] Connector select event listener added', { page: 'import-user-data' });
     }
     
-    // Continue button
-    const continueBtn = document.querySelector('[data-button-type="PRIMARY"]');
+    // Continue button - look INSIDE the modal
+    const continueBtn = modal?.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
         continueBtn.addEventListener('click', analyzeFile);
         window.Logger.debug('[Import Modal] Continue button event listener added', { page: 'import-user-data' });
     }
     
     // Mark as set up
-    const modal = document.getElementById('importUserDataModal');
     if (modal) {
         modal.setAttribute('data-listeners-setup', 'true');
     }
@@ -526,21 +526,32 @@ function handleFileSelect(event) {
  * Update analyze button state
  */
 function updateAnalyzeButton() {
-    const continueBtn = document.querySelector('[data-button-type="PRIMARY"]');
+    const modal = document.getElementById('importUserDataModal');
+    if (!modal) {
+        window.Logger.warn('[Import Modal] Modal not found for button update', { page: 'import-user-data' });
+            return;
+        }
+    
+    const continueBtn = modal.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
         // Check actual DOM values - more reliable than variables
-        const connectorSelect = document.getElementById('connectorSelect');
-        const accountSelect = document.getElementById('tradingAccountSelect');
+        // Look for selects INSIDE the modal to avoid conflicts
+        const connectorSelect = modal.querySelector('#connectorSelect');
+        const accountSelect = modal.querySelector('#tradingAccountSelect');
         
         const connectorValue = connectorSelect?.value;
         const accountValue = accountSelect?.value;
         
-        const allFieldsFilled = selectedFile && connectorValue && accountValue;
+        // Check if accountValue is not empty and not the default "בחר חשבון מסחר..."
+        const accountValid = accountValue && accountValue !== '';
+        
+        const allFieldsFilled = selectedFile && connectorValue && accountValid;
         
         window.Logger.debug('[Import Modal] Button state check', { 
             selectedFile: !!selectedFile,
             connectorValue: connectorValue,
             accountValue: accountValue,
+            accountValid: accountValid,
             allFieldsFilled,
             page: 'import-user-data'
         });
@@ -553,7 +564,7 @@ function updateAnalyzeButton() {
             window.Logger.warn('[Import Modal] Analyze button disabled - missing requirements', { 
                 file: !!selectedFile, 
                 connector: !!connectorValue,
-                account: !!accountValue,
+                account: accountValid,
                 page: 'import-user-data'
             });
         }
@@ -605,7 +616,9 @@ function resetFile() {
  */
 function handleAccountSelect(event) {
     // Handle both event-based calls and direct calls
-    const target = event?.target || document.getElementById('tradingAccountSelect');
+    // Look for select INSIDE the modal to avoid conflicts
+    const modal = document.getElementById('importUserDataModal');
+    const target = event?.target || modal?.querySelector('#tradingAccountSelect');
     const value = target?.value;
     
     window.Logger.info('[Import Modal] handleAccountSelect called', { 
@@ -629,7 +642,7 @@ function handleAccountSelect(event) {
     
     // Update UI
     const accountInfo = document.getElementById('accountInfo');
-    if (accountInfo) {
+    if (accountInfo && target) {
         const selectedOption = target.options[target.selectedIndex];
         accountInfo.innerHTML = `
             <div class="account-selected">
@@ -640,7 +653,7 @@ function handleAccountSelect(event) {
     }
     
     // Enable analyze button
-    const analyzeBtn = document.getElementById('analyzeBtn');
+    const analyzeBtn = modal?.querySelector('#analyzeBtn');
     if (analyzeBtn && selectedFile) {
         analyzeBtn.disabled = false;
     }
@@ -863,23 +876,37 @@ function analyzeFile() {
     
     window.Logger.info('[Import Modal] Starting file analysis', { sessionId: currentSessionId, page: 'import-user-data' });
     
-    // Additional debug - check actual values
-    const connectorSelect = document.getElementById('connectorSelect');
-    const accountSelect = document.getElementById('tradingAccountSelect');
+    // Get actual values from DOM - more reliable than variables
+    const modal = document.getElementById('importUserDataModal');
+    const connectorSelect = modal?.querySelector('#connectorSelect');
+    const accountSelect = modal?.querySelector('#tradingAccountSelect');
+    
+    const connectorValue = connectorSelect?.value;
+    const accountValue = accountSelect?.value;
+    
+    // Validate values
+    if (!selectedFile || !connectorValue || !accountValue) {
+        window.Logger.error('[Import Modal] Missing required values', {
+            selectedFile: !!selectedFile,
+            connectorValue: connectorValue,
+            accountValue: accountValue,
+            page: 'import-user-data'
+        });
+        showNotification('אנא מלא את כל השדות הנדרשים', 'error');
+        return;
+    }
     
     window.Logger.info('[Import Modal] Analysis starting with values', {
         selectedFile: selectedFile?.name,
-        selectedAccount: selectedAccount,
-        selectedConnector: selectedConnector,
-        connectorValue: connectorSelect?.value,
-        accountValue: accountSelect?.value,
+        connectorValue: connectorValue,
+        accountValue: accountValue,
         page: 'import-user-data'
     });
     
     const formData = new FormData();
     formData.append('file', selectedFile);
-    formData.append('trading_account_id', selectedAccount);
-    formData.append('connector_type', selectedConnector);
+    formData.append('trading_account_id', accountValue);
+    formData.append('connector_type', connectorValue);
     
     fetch('/api/user-data-import/upload', {
             method: 'POST',
@@ -1197,10 +1224,10 @@ function displayProblemResolution(data) {
                                 <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${ticker}')">
                                     הוסף טיקר
                 </button>
-                            </div>
                                         </div>
-                    `).join('') || '<p>אין טיקרים חסרים</p>'}
                                     </div>
+                    `).join('') || '<p>אין טיקרים חסרים</p>'}
+                                                </div>
                                                 </div>
             
             <div class="problem-section">
@@ -1211,18 +1238,18 @@ function displayProblemResolution(data) {
                             <div class="problem-card-header">
                                 <i class="fas fa-copy"></i>
                                 <span>${dup.symbol} - ${dup.date}</span>
-                                                </div>
+                                            </div>
                             <div class="problem-card-body">
                                 <div class="problem-card-details">
                                     <span>כמות: ${dup.quantity}</span>
                                     <span>מחיר: ${dup.price}</span>
-                                            </div>
+                                    </div>
                                 <div class="problem-card-confidence">
                                     <span>רמת ביטחון: ${dup.confidence || 0}%</span>
                                     <div class="confidence-bar">
                                         <div class="confidence-fill" style="width: ${dup.confidence || 0}%"></div>
-                                    </div>
                                 </div>
+                            </div>
                             </div>
                             <div class="problem-card-actions">
                                 <button class="btn btn-sm btn-success" onclick="acceptDuplicate(${index}, 'within_file')">
@@ -1907,9 +1934,9 @@ function confirmImport(withReport = false) {
     // Execute the import
     if (withReport) {
         executeImportWithReport();
-    } else {
+        } else {
         executeImport();
-    }
+        }
 }
 
 // Export functions for global access

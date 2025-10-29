@@ -2546,12 +2546,16 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
         }
         
         // Reload preferences if PreferencesCore is available
+        // Use ProfileManager to get the correct current profile ID
+        let currentUserId = window.PreferencesCore?.currentUserId || 1;
+        let currentProfileId = window.ProfileManager?.currentProfileId || window.PreferencesCore?.currentProfileId || 0;
+        
         if (window.PreferencesCore) {
             await window.PreferencesCore.initializeWithLazyLoading(
-                window.PreferencesCore.currentUserId,
-                window.PreferencesCore.currentProfileId
+                currentUserId,
+                currentProfileId
             );
-            window.Logger.info('✅ User preferences refreshed from backend', { page: "unified-cache-manager" });
+            window.Logger.info(`✅ User preferences refreshed from backend (user: ${currentUserId}, profile: ${currentProfileId})`, { page: "unified-cache-manager" });
         }
         
     } catch (error) {

@@ -76,7 +76,33 @@ class EventHandlerManager {
     handleDelegatedClick(event) {
         const target = event.target;
         
-        // Handle button clicks
+        // Handle buttons with data-onclick attribute (centralized button system)
+        // This is the primary way to handle button clicks in TikTrack
+        const buttonWithOnclick = target.closest('button[data-onclick]');
+        if (buttonWithOnclick) {
+            const onclickValue = buttonWithOnclick.getAttribute('data-onclick');
+            if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
+                event.preventDefault();
+                event.stopPropagation();
+                try {
+                    // Execute the onclick handler using eval (safe because it's controlled)
+                    eval(onclickValue);
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.error('EventHandlerManager: Error executing data-onclick', {
+                            onclickValue: onclickValue,
+                            error: error.message,
+                            stack: error.stack
+                        });
+                    } else {
+                        console.error('EventHandlerManager: Error executing data-onclick:', onclickValue, error);
+                    }
+                }
+                return; // Don't process other handlers if data-onclick was found
+            }
+        }
+        
+        // Handle button clicks with data-action
         if (target.matches('[data-action]')) {
             const action = target.getAttribute('data-action');
             this.executeAction(action, target, event);

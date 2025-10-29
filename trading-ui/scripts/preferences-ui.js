@@ -518,6 +518,8 @@ class PreferencesUI {
             
             // Initialize lazy loading if available
             if (window.LazyLoader) {
+                window.Logger.info(`🔍 PREFERENCES UI DEBUG: Calling LazyLoader.initialize(userId=${finalUserId}, profileId=${finalProfileId})`, { page: "preferences-ui" });
+                
                 await window.LazyLoader.initialize(
                     finalUserId, 
                     finalProfileId
@@ -528,6 +530,8 @@ class PreferencesUI {
                 window.Logger.info(`🔍 CACHE DEBUG: Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%, { page: "preferences-ui" })`);
                 
                 // Load ALL preferences at once from API
+                window.Logger.info(`🔍 PREFERENCES UI DEBUG: Calling PreferencesCore.getAllPreferences(userId=${finalUserId}, profileId=${finalProfileId})`, { page: "preferences-ui" });
+                
                 const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, finalProfileId);
                 window.Logger.info(`✅ Loaded ${Object.keys(allPreferences, { page: "preferences-ui" }).length} preferences from API`);
                 

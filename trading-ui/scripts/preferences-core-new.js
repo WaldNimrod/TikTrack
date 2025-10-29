@@ -151,10 +151,14 @@ class PreferencesAPIClient {
         // For default profile, explicitly use profile_id=0
         if (profileId !== null && profileId !== undefined) {
             params.profile_id = profileId;
+            window.Logger.debug(`🔍 API DEBUG: getPreference(${preferenceName}) - using provided profileId: ${profileId}`, { page: "preferences-core-new" });
         } else {
             // Default profile (ID: 0)
             params.profile_id = 0;
+            window.Logger.debug(`🔍 API DEBUG: getPreference(${preferenceName}) - profileId is null/undefined, using default: 0`, { page: "preferences-core-new" });
         }
+        
+        window.Logger.debug(`🔍 API DEBUG: Requesting preference with params:`, params, { page: "preferences-core-new" });
         
         const result = await this.get('/user/single', params);
         return result.data?.value;

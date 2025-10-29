@@ -209,27 +209,117 @@ async function createNewProfile() {
 /**
  * Local copyDetailedLog function for preferences page
  */
-async function copyDetailedLogLocal() {
+/**
+ * Debug Profile System - Console Function
+ * Run this in console: debugProfileSystem()
+ */
+window.debugProfileSystem = async function() {
+    console.log('=== 🔍 DEBUG PROFILE SYSTEM ===');
+    console.log('');
+    
     try {
-        const log = [];
-        const timestamp = new Date().toLocaleString('he-IL');
+        // 1. Check current profile IDs
+        console.log('1️⃣ Current Profile IDs:');
+        console.log('   PreferencesCore.currentProfileId:', window.PreferencesCore?.currentProfileId);
+        console.log('   PreferencesUI.currentProfileId:', window.PreferencesUI?.currentProfileId);
+        console.log('   ProfileManager.currentProfileId:', window.ProfileManager?.currentProfileId);
+        console.log('   PreferencesCore.currentUserId:', window.PreferencesCore?.currentUserId);
+        console.log('');
         
-        log.push('=== לוג מפורט - עמוד העדפות TikTrack ===');
-        log.push(`📅 תאריך ושעה: ${timestamp}`);
-        log.push('');
+        // 2. Check profiles from API
+        console.log('2️⃣ Profiles from API:');
+        const profilesResponse = await fetch('/api/preferences/profiles?user_id=1');
+        const profilesResult = await profilesResponse.json();
+        console.log('   API Response:', profilesResult);
+        if (profilesResult.success) {
+            const profiles = profilesResult.data.profiles;
+            console.log(`   Total profiles: ${profiles.length}`);
+            profiles.forEach(p => {
+                console.log(`   - Profile ${p.id}: ${p.name} (active: ${p.active}, is_default: ${p.is_default || p.default})`);
+            });
+            const activeProfile = profiles.find(p => p.active === true);
+            console.log('   Active Profile:', activeProfile);
+        }
+        console.log('');
         
-        // System info
-        log.push('--- מידע מערכת ---');
-        log.push(`🌐 URL: ${window.location.href}`);
-        log.push(`📱 User Agent: ${navigator.userAgent}`);
-        log.push(`💾 Local Storage: ${localStorage.length} items`);
-        log.push('');
+        // 3. Test preference loading
+        console.log('3️⃣ Test Preference Loading:');
+        console.log('   Testing with profileId=0 (default):');
+        try {
+            const testPref0 = await window.PreferencesCore.getPreference('statusOpenColor', 1, 0);
+            console.log('   ✅ profileId=0: Success, value:', testPref0);
+        } catch (e) {
+            console.log('   ❌ profileId=0: Error:', e.message);
+        }
         
-        // Preferences info
-        log.push('--- מידע העדפות ---');
-        if (window.PreferencesCore) {
-            log.push(`👤 Current User ID: ${window.PreferencesCore.currentUserId}`);
-            log.push(`📋 Current Profile ID: ${window.PreferencesCore.currentProfileId}`);
+        console.log('   Testing with profileId=1:');
+        try {
+            const testPref1 = await window.PreferencesCore.getPreference('statusOpenColor', 1, 1);
+            console.log('   ✅ profileId=1: Success, value:', testPref1);
+        } catch (e) {
+            console.log('   ❌ profileId=1: Error:', e.message);
+        }
+        console.log('');
+        
+        // 4. Check what LazyLoader is using
+        console.log('4️⃣ LazyLoader State:');
+        if (window.LazyLoader) {
+            const stats = window.LazyLoader.getLoadingStats();
+            console.log('   Loading Stats:', stats);
+        } else {
+            console.log('   ❌ LazyLoader not available');
+        }
+        console.log('');
+        
+        // 5. Check what PreferencesAPIClient would send
+        console.log('5️⃣ PreferencesAPIClient Test:');
+        console.log('   Testing getPreference with profileId=null:');
+        console.log('   (This should use profile_id=0)');
+        // This will show in network tab
+        
+        console.log('');
+        console.log('=== ✅ DEBUG COMPLETE ===');
+        console.log('');
+        console.log('💡 Next steps:');
+        console.log('   1. Check Network tab for API calls');
+        console.log('   2. Look for profile_id=1 vs profile_id=0');
+        console.log('   3. Check what profileId is passed to LazyLoader.initialize');
+        
+    } catch (error) {
+        console.error('❌ Error in debugProfileSystem:', error);
+    }
+};
+
+/**
+ * Debug Profile Loading Flow - Console Function
+ * Run this in console: debugProfileLoading()
+ */
+window.debugProfileLoading = async function() {
+    console.log('=== 🔍 DEBUG PROFILE LOADING FLOW ===');
+    console.log('');
+    
+    try {
+        console.log('Step 1: Load active profile');
+        const activeProfileId = await window.PreferencesUI.loadActiveProfile();
+        console.log('   ✅ Active Profile ID:', activeProfileId);
+        console.log('');
+        
+        console.log('Step 2: Load all preferences');
+        await window.PreferencesUI.loadAllPreferences(1, activeProfileId);
+        console.log('   ✅ Preferences loaded');
+        console.log('');
+        
+        console.log('Step 3: Check final state');
+        console.log('   PreferencesCore.currentProfileId:', window.PreferencesCore?.currentProfileId);
+        console.log('   PreferencesUI.currentProfileId:', window.PreferencesUI?.currentProfileId);
+        console.log('');
+        
+        console.log('=== ✅ DEBUG COMPLETE ===');
+        
+    } catch (error) {
+        console.error('❌ Error in debugProfileLoading:', error);
+    }
+};
         }
         if (window.ProfileManager) {
             log.push(`👤 ProfileManager User ID: ${window.ProfileManager.currentUserId}`);

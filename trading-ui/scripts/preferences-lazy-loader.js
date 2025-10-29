@@ -236,7 +236,7 @@ class LazyLoader {
      * @param {number} profileId - Profile ID (0 for default profile)
      */
     async initialize(userId = 1, profileId = 0) {
-        // window.Logger.info('🚀 Initializing lazy loading system...', { page: "preferences-lazy-loader" });
+        window.Logger.info(`🚀 LAZY LOADER DEBUG: initialize(userId=${userId}, profileId=${profileId})`, { page: "preferences-lazy-loader" });
         
         // Check if PreferencesCore is available
         if (!window.PreferencesCore) {
@@ -246,6 +246,7 @@ class LazyLoader {
         
         // Ensure profileId is explicitly set (0 for default profile, not null/undefined)
         const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : 0;
+        window.Logger.info(`🔍 LAZY LOADER DEBUG: Using finalProfileId=${finalProfileId}`, { page: "preferences-lazy-loader" });
         
         // Load critical preferences immediately
         await this.loadCriticalPreferences(userId, finalProfileId);
@@ -445,6 +446,8 @@ class LazyLoader {
      * @returns {Promise<any>} Preference value
      */
     async loadSinglePreference(preferenceName, userId, profileId) {
+        window.Logger.debug(`🔍 LAZY LOADER DEBUG: loadSinglePreference(${preferenceName}, userId=${userId}, profileId=${profileId})`, { page: "preferences-lazy-loader" });
+        
         // Check if already loading
         if (this.loadingPromises.has(preferenceName)) {
             return await this.loadingPromises.get(preferenceName);
@@ -461,8 +464,12 @@ class LazyLoader {
             return await window.PreferencesCore.getPreference(preferenceName, userId, profileId);
         }
         
+        // Ensure profileId is explicitly set (0 for default profile, not null/undefined)
+        const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : 0;
+        window.Logger.debug(`🔍 LAZY LOADER DEBUG: Using finalProfileId=${finalProfileId} for ${preferenceName}`, { page: "preferences-lazy-loader" });
+        
         // Create loading promise
-        const promise = window.PreferencesCore.getPreference(preferenceName, userId, profileId);
+        const promise = window.PreferencesCore.getPreference(preferenceName, userId, finalProfileId);
         this.loadingPromises.set(preferenceName, promise);
         
         try {

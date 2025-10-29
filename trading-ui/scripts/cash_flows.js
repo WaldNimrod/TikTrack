@@ -1389,13 +1389,11 @@ async function saveCashFlow() {
             amount: { id: 'cashFlowAmount', type: 'float' },
             type: { id: 'cashFlowType', type: 'text' },
             currency_id: { id: 'cashFlowCurrency', type: 'int' },
-            account_id: { id: 'cashFlowAccount', type: 'int' },
-            date: { id: 'cashFlowDate', type: 'date' },
+            trading_account_id: { id: 'cashFlowAccount', type: 'int' },  // Backend expects trading_account_id
+            date: { id: 'cashFlowDate', type: 'dateOnly' },  // Backend expects Date only, not datetime
             description: { id: 'cashFlowDescription', type: 'text', default: null },
             source: { id: 'cashFlowSource', type: 'text' },
-            external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' },
-            trade_id: { id: 'cashFlowTrade', type: 'int', default: null },
-            trade_plan_id: { id: 'cashFlowTradePlan', type: 'int', default: null }
+            external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
         });
         
         console.log('🔥 saveCashFlow - Step 4: Form data collected:', cashFlowData);
@@ -1424,7 +1422,7 @@ async function saveCashFlow() {
             hasErrors = true;
         }
         
-        if (!cashFlowData.account_id) {
+        if (!cashFlowData.trading_account_id) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('cashFlowAccount', 'חשבון מסחר הוא שדה חובה');
             }

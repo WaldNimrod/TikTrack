@@ -4,27 +4,20 @@
  * ========================================
  *
  * This file contains all database display page functionality for the TikTrack application.
- * It handles displaying all database tables in one unified view with sorting and filtering.
+ * It handles displaying all database tables with raw data from the database.
  *
  * Dependencies:
- * - table-mappings.js (for column mappings and sorting)
- * - main.js (global utilities and sorting functions)
- * - translation-utils.js (translation functions)
  * - notification-system.js (for notifications)
- *
- * Table Mapping:
- * - Uses all table types from table-mappings.js
- * - Column mappings are centralized in table-mappings.js
- * - Sorting uses global window.sortTableData() function
+ * - ui-utils.js (for toggleSection)
  *
  * File: trading-ui/scripts/db_display.js
- * Version: 1.0
- * Last Updated: September 1, 2025
+ * Version: 2.0
+ * Last Updated: January 22, 2025
  */
 
 // ===== GLOBAL VARIABLES =====
-let currentTableType = 'accounts'; // Default table type
 const tableData = {};
+let totalRecords = 0;
 
 // ===== PAGE INITIALIZATION =====
 
@@ -37,14 +30,6 @@ function initDatabaseDisplay() {
   // Load all tables
   loadAllTables();
 
-  // Set up event listeners
-  setupEventListeners();
-
-  // Initialize header system
-  if (window.headerSystem) {
-    window.headerSystem.init();
-  }
-
   console.log('✅ Database display page initialized successfully');
 }
 
@@ -53,7 +38,20 @@ function initDatabaseDisplay() {
  */
 async function loadAllTables() {
   console.log('🔄 Loading all tables...');
-  const tables = ['accounts', 'trades', 'tickers', 'trade_plans', 'executions', 'alerts', 'notes', 'cash_flows'];
+  
+  // API endpoints use dashes, not underscores
+  const tables = [
+    'trading-accounts',  // API uses dash
+    'trades',
+    'tickers', 
+    'trade-plans',       // API uses dash
+    'executions',
+    'alerts',
+    'notes',
+    'cash-flows'         // API uses dash
+  ];
+  
+  totalRecords = 0;
   
   for (const table of tables) {
     try {
@@ -63,46 +61,24 @@ async function loadAllTables() {
       console.error(`Error loading ${table}:`, error);
     }
   }
+  
+  // Update summary stats
+  updateSummaryStats();
   console.log('✅ All tables loaded');
-}
-
-/**
- * Set up page event listeners
- */
-function setupEventListeners() {
-  // Table type selector
-  const tableTypeSelect = document.getElementById('tableTypeSelect');
-  if (tableTypeSelect) {
-    tableTypeSelect.addEventListener('change', function() {
-      const selectedType = this.value;
-      loadTableData(selectedType);
-    });
-  }
-
-  // Search functionality
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', function() {
-      filterTableData(this.value);
-    });
-  }
 }
 
 // ===== DATA LOADING =====
 
 /**
  * Load data for a specific table type
- * @param {string} tableType - The table type to load
+ * @param {string} tableType - The table type to load (with dashes)
  */
 async function loadTableData(tableType) {
   try {
     console.log(`📊 Loading data for table type: ${tableType}`);
 
-    // Update current table type
-    currentTableType = tableType;
-
     // Show loading state
-    showLoadingState();
+    showLoadingState(tableType);
 
     // Fetch data from server
     const data = await fetchTableData(tableType);
@@ -116,20 +92,20 @@ async function loadTableData(tableType) {
     // Update table info
     updateTableInfo(tableType, data.length);
 
-    // Update summary statistics
-    updateSummaryStats(tableType, data.length);
+    // Add to total records
+    totalRecords += data.length;
 
     console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
 
   } catch (error) {
     console.error(`❌ Error loading data for ${tableType}:`, error);
-    handleApiError(error, `טעינת נתוני ${tableType}`);
+    showErrorState(tableType, error.message);
   }
 }
 
 /**
  * Fetch table data from server
- * @param {string} tableType - The table type to fetch
+ * @param {string} tableType - The table type to fetch (with dashes)
  * @returns {Promise<Array>} The fetched data
  */
 async function fetchTableData(tableType) {

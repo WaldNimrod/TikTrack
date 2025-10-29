@@ -83,69 +83,205 @@
 
             <!-- Main content -->
             <div class="main-content">
-                <!-- Database management area - content-section -->
-                <div class="content-section" id="main">
-                    <!-- Database header -->
+                <!-- trading_accounts Section Start -->
+                <div class="content-section db-display-table" id="accountsSection">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/db_display.svg" alt="ניהול בסיס נתונים" class="section-icon">
-                            ניהול בסיס נתונים
+                            <img src="images/icons/trading_accounts.svg" alt="trading_accounts">
+                            trading_accounts
                         </div>
-                        <div class="table-count" id="dbCount">טוען...</div>
+                        <div class="table-count" id="accountsCount">0 records</div>
                         <div class="table-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור ניהול בסיס נתונים">
+                            <button class="filter-toggle-btn" onclick="toggleSection('accountsSection')">
                                 <span class="filter-icon">▲</span>
                             </button>
                         </div>
                     </div>
-
-                    <!-- Database tables -->
                     <div class="section-body">
-                        <div class="table-responsive" id="dbContainer">
-                            <table class="table" id="dbTable" data-table-type="db_display">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
-                                                >
-                                                שם טבלה <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
-                                                >
-                                                מספר רשומות <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
-                                                >
-                                                גודל <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th>
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
-                                                >
-                                                עדכון אחרון <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="actions-cell">
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="5" class="loading">טוען נתוני בסיס נתונים...</td>
-                                    </tr>
-                                </tbody>
+                        <div class="table-responsive" id="accountsContainer">
+                            <table class="table" id="accountsTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+                <!-- trading_accounts Section End -->
+
+                <!-- trades Section Start -->
+                <div class="content-section db-display-table" id="tradesSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/trades.svg" alt="trades">
+                            trades
+                        </div>
+                        <div class="table-count" id="tradesCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('tradesSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="tradesContainer">
+                            <table class="table" id="tradesTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- trades Section End -->
+
+                <!-- tickers Section Start -->
+                <div class="content-section db-display-table" id="tickersSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/tickers.svg" alt="tickers">
+                            tickers
+                        </div>
+                        <div class="table-count" id="tickersCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('tickersSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="tickersContainer">
+                            <table class="table" id="tickersTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- tickers Section End -->
+
+                <!-- trade_plans Section Start -->
+                <div class="content-section db-display-table" id="tradePlansSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/trade_plans.svg" alt="trade_plans">
+                            trade_plans
+                        </div>
+                        <div class="table-count" id="tradePlansCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('tradePlansSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="tradePlansContainer">
+                            <table class="table" id="tradePlansTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- trade_plans Section End -->
+
+                <!-- executions Section Start -->
+                <div class="content-section db-display-table" id="executionsSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/executions.svg" alt="executions">
+                            executions
+                        </div>
+                        <div class="table-count" id="executionsCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('executionsSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="executionsContainer">
+                            <table class="table" id="executionsTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- executions Section End -->
+
+                <!-- alerts Section Start -->
+                <div class="content-section db-display-table" id="alertsSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/alerts.svg" alt="alerts">
+                            alerts
+                        </div>
+                        <div class="table-count" id="alertsCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('alertsSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="alertsContainer">
+                            <table class="table" id="alertsTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- alerts Section End -->
+
+                <!-- notes Section Start -->
+                <div class="content-section db-display-table" id="notesSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/notes.svg" alt="notes">
+                            notes
+                        </div>
+                        <div class="table-count" id="notesCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('notesSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="notesContainer">
+                            <table class="table" id="notesTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- notes Section End -->
+
+                <!-- cash_flows Section Start -->
+                <div class="content-section db-display-table" id="cashFlowsSection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/cash_flows.svg" alt="cash_flows">
+                            cash_flows
+                        </div>
+                        <div class="table-count" id="cashFlowsCount">0 records</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('cashFlowsSection')">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="cashFlowsContainer">
+                            <table class="table" id="cashFlowsTable">
+                                <thead><tr><th>Loading...</th></tr></thead>
+                                <tbody><tr><td>Loading data...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- cash_flows Section End -->
             </div>
         </div>
 

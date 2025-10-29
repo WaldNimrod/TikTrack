@@ -314,9 +314,12 @@ window.debugProfileLoading = async function() {
         console.log('   PreferencesUI.currentProfileId:', window.PreferencesUI?.currentProfileId);
         console.log('');
         
-/**
- * Local copyDetailedLog function for preferences page
- */
+        console.log('=== ✅ DEBUG COMPLETE ===');
+        
+    } catch (error) {
+        console.error('❌ Error in debugProfileLoading:', error);
+    }
+};
 async function copyDetailedLogLocal() {
     try {
         const log = [];

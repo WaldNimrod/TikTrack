@@ -3172,8 +3172,8 @@ window.showEditExecutionModal = showEditExecutionModal;
     // כללי וולידציה מותאמים לטופס הוספת ביצוע
     const addExecutionValidationRules = {
       trade_id: {
-        required: true,
-        message: 'יש לבחור טרייד',
+        required: false,
+        message: 'טרייד (אופציונלי)',
       },
       action: {
         required: true,
@@ -3195,8 +3195,8 @@ window.showEditExecutionModal = showEditExecutionModal;
     // כללי וולידציה מותאמים לטופס עריכת ביצוע
     const editExecutionValidationRules = {
       trade_id: {
-        required: true,
-        message: 'יש לבחור טרייד',
+        required: false,
+        message: 'טרייד (אופציונלי)',
       },
       action: {
         required: true,

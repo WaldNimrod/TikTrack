@@ -692,11 +692,14 @@ class PreferencesCore {
     
     /**
      * Set current profile
+     * Note: Cache clearing is handled by ProfileManager.switchProfile()
      * @param {number} userId - User ID
      * @param {number} profileId - Profile ID
      */
     async setCurrentProfile(userId, profileId) {
-        window.Logger.info(`🔄 Setting current profile to user ${userId}, profile ${profileId}`, { page: "preferences-core-new" });
+        if (window.Logger) {
+            window.Logger.info(`🔄 Setting current profile to user ${userId}, profile ${profileId}`, { page: "preferences-core-new" });
+        }
         this.currentUserId = userId;
         this.currentProfileId = profileId;
         
@@ -705,13 +708,12 @@ class PreferencesCore {
             window.PreferencesUI.currentProfileId = profileId;
         }
         
-        // Notify CacheSyncManager of profile switch
-        if (window.CacheSyncManager) {
-            await window.CacheSyncManager.invalidateByAction('profile-switched');
-        }
+        // Note: Cache clearing is handled by ProfileManager.switchProfile()
+        // via UnifiedCacheManager.refreshUserPreferences()
         
-        // Profile switch completed - no cache clearing needed
-        window.Logger.info('✅ Profile switch completed successfully', { page: "preferences-core-new" });
+        if (window.Logger) {
+            window.Logger.info('✅ Profile updated in PreferencesCore', { page: "preferences-core-new" });
+        }
     }
     
     /**

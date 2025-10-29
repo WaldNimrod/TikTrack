@@ -1066,42 +1066,7 @@ window.getUserProfiles = async function(userId = 1) {
     }
 };
 
-/**
- * Switch profile
- * @param {number} profileId - Profile ID
- * @returns {Promise<boolean>} Success status
- */
-window.switchProfile = async function(profileId) {
-    try {
-        window.Logger.info(`🔄 Switching to profile ID: ${profileId}`, { page: "preferences-ui" });
-        
-        const response = await fetch('/api/preferences/profiles/activate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                user_id: 1,
-                profile_id: profileId
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        if (!result.success) {
-            throw new Error(result.error || 'Failed to switch profile');
-        }
-        
-        window.Logger.info('✅ Profile switched successfully', { page: "preferences-ui" });
-        return true;
-    } catch (error) {
-        window.Logger.error('❌ Error switching profile:', error, { page: "preferences-ui" });
-        return false;
-    }
-};
+// Note: switchProfile is now in preferences-profiles.js - ProfileManager.switchProfile()
 
 /**
  * Load preferences (backward compatibility)

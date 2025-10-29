@@ -409,7 +409,7 @@ const PACKAGE_MANIFEST = {
   preferences: {
     id: 'preferences',
     name: 'Preferences Package',
-    description: 'מערכת העדפות משתמש v2.0 (5 קבצים)',
+    description: 'מערכת העדפות משתמש v2.0 (6 קבצים)',
     version: '2.0.0',
     critical: false,
     loadOrder: 5,
@@ -430,36 +430,43 @@ const PACKAGE_MANIFEST = {
         loadOrder: 2
       },
       {
+        file: 'preferences-profiles.js',
+        globalCheck: 'window.ProfileManager',
+        description: 'ניהול פרופילים',
+        required: true,
+        loadOrder: 3
+      },
+      {
         file: 'preferences-lazy-loader.js',
         globalCheck: 'window.LazyLoader',
         description: 'lazy loading system',
         required: true,
-        loadOrder: 3
+        loadOrder: 4
       },
       {
         file: 'preferences-validation.js',
         globalCheck: 'window.PreferenceValidator',
         description: 'validation system',
         required: true,
-        loadOrder: 4
+        loadOrder: 5
       },
       {
         file: 'preferences-ui.js',
         globalCheck: 'window.PreferencesUI',
         description: 'ממשק משתמש',
         required: true,
-        loadOrder: 5
+        loadOrder: 6
       },
       {
         file: 'preferences-page.js',
         globalCheck: 'window.',
         description: 'פונקציות ספציפיות לעמוד העדפות',
         required: false,
-        loadOrder: 6
+        loadOrder: 7
       }
     ],
-    estimatedSize: '~140KB',
-    initTime: '~80ms'
+    estimatedSize: '~150KB',
+    initTime: '~85ms'
   },
 
   // 6. VALIDATION PACKAGE - ולידציה

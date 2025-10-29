@@ -1,0 +1,1260 @@
+{
+  "session_info": {
+    "session_id": 23,
+    "user_id": 1,
+    "created_at": "2025-10-29T01:39:19.876979",
+    "report_version": "1.0"
+  },
+  "steps": {
+    "file_upload": {
+      "timestamp": "2025-10-29T01:39:19.876982",
+      "data": {
+        "file_name": "U16011759_202509_202509.csv",
+        "provider": "IBKR",
+        "connector_info": {
+          "provider_name": "IBKR",
+          "source_value": "ibkr_import",
+          "class_name": "IBKRConnector",
+          "supports_external_id": true,
+          "supports_validation": true
+        }
+      }
+    },
+    "analysis": {
+      "timestamp": "2025-10-29T01:39:19.884962",
+      "data": {
+        "total_records": 56,
+        "parsed_records": 56,
+        "normalized_records": 56,
+        "valid_records": 56,
+        "invalid_records": 0,
+        "clean_records": 54,
+        "duplicate_records": 1,
+        "missing_tickers": [
+          "BAC",
+          "OPEN",
+          "AFRM",
+          "ANET",
+          "HOOD",
+          "PONY",
+          "NNE",
+          "AAL",
+          "PANW",
+          "AVGO",
+          "CVNA",
+          "MSTR",
+          "OKLO",
+          "MARA",
+          "ALAB",
+          "SOUN",
+          "COIN",
+          "IREN",
+          "BULL"
+        ],
+        "existing_records": 0,
+        "normalization_errors": [],
+        "validation_errors": [],
+        "duplicate_details": {
+          "within_file_duplicates": [
+            {
+              "record_index": 24,
+              "record": {
+                "symbol": "MARA",
+                "action": "sell",
+                "date": "2025-09-25T09:30:55",
+                "quantity": 200.0,
+                "price": 16.935,
+                "fee": 1.0376,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 3387.0,
+                "basis": -3721.0044,
+                "realized_pl": -335.042,
+                "mtm_pl": 173.0,
+                "code": "C;LI",
+                "row_number": 296,
+                "external_id": "2025-09-25_MARA_sell_200_0_16_93",
+                "source": "ibkr_import"
+              },
+              "within_file_matches": [
+                {
+                  "record_index": 25,
+                  "record": {
+                    "symbol": "MARA",
+                    "action": "sell",
+                    "date": "2025-09-25T13:15:29",
+                    "quantity": 200.0,
+                    "price": 16.46,
+                    "fee": 1.0376,
+                    "currency": "USD",
+                    "asset_category": "Stocks",
+                    "proceeds": 3292.0,
+                    "basis": -3439.0044,
+                    "realized_pl": -148.042,
+                    "mtm_pl": 78.0,
+                    "code": "C;LI;P",
+                    "row_number": 297,
+                    "external_id": "2025-09-25_MARA_sell_200_0_16_46",
+                    "source": "ibkr_import"
+                  },
+                  "match_type": "field_similarity",
+                  "confidence": 100.0,
+                  "similarity_score": 5
+                }
+              ],
+              "system_matches": [],
+              "duplicate_type": "within_file_only",
+              "confidence_score": 100.0
+            }
+          ],
+          "existing_records": [],
+          "clean_records": [
+            {
+              "record_index": 0,
+              "record": {
+                "symbol": "AAL",
+                "action": "buy",
+                "date": "2025-09-03T09:35:18",
+                "quantity": 250.0,
+                "price": 13.6,
+                "fee": 1.2555,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -3400.0,
+                "basis": 3401.2555,
+                "realized_pl": 0.0,
+                "mtm_pl": -40.0,
+                "code": "O",
+                "row_number": 260,
+                "external_id": "2025-09-03_AAL_buy_250_0_13_60",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 1,
+              "record": {
+                "symbol": "AAL",
+                "action": "sell",
+                "date": "2025-09-04T15:50:53",
+                "quantity": 250.0,
+                "price": 12.865,
+                "fee": 1.29825,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 3216.25,
+                "basis": -3401.2555,
+                "realized_pl": -186.30375,
+                "mtm_pl": 1.25,
+                "code": "C;LI",
+                "row_number": 261,
+                "external_id": "2025-09-04_AAL_sell_250_0_12_87",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 2,
+              "record": {
+                "symbol": "AAL",
+                "action": "sell",
+                "date": "2025-09-16T10:26:39",
+                "quantity": 250.0,
+                "price": 12.225,
+                "fee": 1.297,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 3056.25,
+                "basis": -3336.2555,
+                "realized_pl": -281.3025,
+                "mtm_pl": -46.25,
+                "code": "C;LI",
+                "row_number": 262,
+                "external_id": "2025-09-16_AAL_sell_250_0_12_22",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 3,
+              "record": {
+                "symbol": "AFRM",
+                "action": "buy",
+                "date": "2025-09-17T09:39:03",
+                "quantity": 50.0,
+                "price": 89.5,
+                "fee": 1.0011,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -4475.0,
+                "basis": 4476.0011,
+                "realized_pl": 0.0,
+                "mtm_pl": 45.0,
+                "code": "O",
+                "row_number": 264,
+                "external_id": "2025-09-17_AFRM_buy_50_0_89_50",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 4,
+              "record": {
+                "symbol": "AFRM",
+                "action": "sell",
+                "date": "2025-09-25T09:30:18",
+                "quantity": 50.0,
+                "price": 79.06,
+                "fee": 1.0094,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 3953.0,
+                "basis": -4476.0011,
+                "realized_pl": -524.0105,
+                "mtm_pl": 56.0,
+                "code": "C;LI",
+                "row_number": 265,
+                "external_id": "2025-09-25_AFRM_sell_50_0_79_06",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 5,
+              "record": {
+                "symbol": "ALAB",
+                "action": "sell",
+                "date": "2025-09-23T09:49:46",
+                "quantity": 25.0,
+                "price": 222.69,
+                "fee": 1.0047,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 5567.25,
+                "basis": -2838.250675,
+                "realized_pl": 2727.994625,
+                "mtm_pl": -185.5,
+                "code": "C;LI",
+                "row_number": 267,
+                "external_id": "2025-09-23_ALAB_sell_25_0_222_69",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 6,
+              "record": {
+                "symbol": "ALAB",
+                "action": "sell",
+                "date": "2025-09-25T09:30:18",
+                "quantity": 50.0,
+                "price": 193.21,
+                "fee": 1.0094,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 9660.5,
+                "basis": -4857.5011,
+                "realized_pl": 4801.9895,
+                "mtm_pl": -371.5,
+                "code": "C;LI",
+                "row_number": 268,
+                "external_id": "2025-09-25_ALAB_sell_50_0_193_21",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 7,
+              "record": {
+                "symbol": "ALAB",
+                "action": "buy",
+                "date": "2025-09-25T10:01:17",
+                "quantity": 30.0,
+                "price": 196.0,
+                "fee": 1.00066,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -5880.0,
+                "basis": 5881.00066,
+                "realized_pl": 0.0,
+                "mtm_pl": 139.2,
+                "code": "O",
+                "row_number": 269,
+                "external_id": "2025-09-25_ALAB_buy_30_0_196_00",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 8,
+              "record": {
+                "symbol": "AMZN",
+                "action": "sell",
+                "date": "2025-09-23T09:31:23",
+                "quantity": 30.0,
+                "price": 225.504333333,
+                "fee": 1.00564,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 6765.13,
+                "basis": -6658.450985,
+                "realized_pl": 105.673375,
+                "mtm_pl": 143.83,
+                "code": "C;LI;P",
+                "row_number": 271,
+                "external_id": "2025-09-23_AMZN_sell_30_0_225_50",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 9,
+              "record": {
+                "symbol": "AMZN",
+                "action": "buy",
+                "date": "2025-09-29T11:24:45",
+                "quantity": 10.0,
+                "price": 220.7,
+                "fee": 1.00022,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -2207.0,
+                "basis": 2208.00022,
+                "realized_pl": 0.0,
+                "mtm_pl": 14.7,
+                "code": "O",
+                "row_number": 272,
+                "external_id": "2025-09-29_AMZN_buy_10_0_220_70",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 10,
+              "record": {
+                "symbol": "ANET",
+                "action": "sell",
+                "date": "2025-09-12T15:47:23",
+                "quantity": 30.0,
+                "price": 139.18,
+                "fee": 1.00564,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 4175.4,
+                "basis": -3046.00105,
+                "realized_pl": 1128.39331,
+                "mtm_pl": -6.3,
+                "code": "C;LI",
+                "row_number": 274,
+                "external_id": "2025-09-12_ANET_sell_30_0_139_18",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 11,
+              "record": {
+                "symbol": "ANET",
+                "action": "buy",
+                "date": "2025-09-15T14:11:54",
+                "quantity": 30.0,
+                "price": 144.6,
+                "fee": 1.00066,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -4338.0,
+                "basis": 4339.00066,
+                "realized_pl": 0.0,
+                "mtm_pl": 24.9,
+                "code": "O",
+                "row_number": 275,
+                "external_id": "2025-09-15_ANET_buy_30_0_144_60",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 12,
+              "record": {
+                "symbol": "AVGO",
+                "action": "sell",
+                "date": "2025-09-30T09:50:51",
+                "quantity": 20.0,
+                "price": 327.056,
+                "fee": 1.00376,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 6541.12,
+                "basis": -4941.40092,
+                "realized_pl": 1598.71532,
+                "mtm_pl": -57.08,
+                "code": "C;LI",
+                "row_number": 277,
+                "external_id": "2025-09-30_AVGO_sell_20_0_327_06",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 13,
+              "record": {
+                "symbol": "BAC",
+                "action": "buy",
+                "date": "2025-09-10T11:11:24",
+                "quantity": 100.0,
+                "price": 50.0,
+                "fee": 1.0022,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -5000.0,
+                "basis": 5001.0022,
+                "realized_pl": 0.0,
+                "mtm_pl": 13.0,
+                "code": "O",
+                "row_number": 279,
+                "external_id": "2025-09-10_BAC_buy_100_0_50_00",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 14,
+              "record": {
+                "symbol": "BULL",
+                "action": "buy",
+                "date": "2025-09-23T09:40:50",
+                "quantity": 200.0,
+                "price": 14.0,
+                "fee": 1.0044,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -2800.0,
+                "basis": 2801.0044,
+                "realized_pl": 0.0,
+                "mtm_pl": 0.0,
+                "code": "O",
+                "row_number": 281,
+                "external_id": "2025-09-23_BULL_buy_200_0_14_00",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 15,
+              "record": {
+                "symbol": "COIN",
+                "action": "sell",
+                "date": "2025-09-25T09:39:07",
+                "quantity": 20.0,
+                "price": 307.52,
+                "fee": 1.00376,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 6150.4,
+                "basis": -5556.600505,
+                "realized_pl": 592.795735,
+                "mtm_pl": 16.6,
+                "code": "C;LI",
+                "row_number": 283,
+                "external_id": "2025-09-25_COIN_sell_20_0_307_52",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 16,
+              "record": {
+                "symbol": "COIN",
+                "action": "buy",
+                "date": "2025-09-29T12:03:29",
+                "quantity": 15.0,
+                "price": 329.0,
+                "fee": 1.00033,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -4935.0,
+                "basis": 4936.00033,
+                "realized_pl": 0.0,
+                "mtm_pl": 74.85,
+                "code": "O;P",
+                "row_number": 284,
+                "external_id": "2025-09-29_COIN_buy_15_0_329_00",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 17,
+              "record": {
+                "symbol": "CVNA",
+                "action": "buy",
+                "date": "2025-09-02T10:21:56",
+                "quantity": 15.0,
+                "price": 365.5,
+                "fee": 1.00033,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -5482.5,
+                "basis": 5483.50033,
+                "realized_pl": 0.0,
+                "mtm_pl": 13.35,
+                "code": "O",
+                "row_number": 286,
+                "external_id": "2025-09-02_CVNA_buy_15_0_365_50",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 18,
+              "record": {
+                "symbol": "HOOD",
+                "action": "buy",
+                "date": "2025-09-30T14:56:05",
+                "quantity": 30.0,
+                "price": 141.48,
+                "fee": 1.00066,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -4244.4,
+                "basis": 4245.40066,
+                "realized_pl": 0.0,
+                "mtm_pl": 51.0,
+                "code": "O",
+                "row_number": 288,
+                "external_id": "2025-09-30_HOOD_buy_30_0_141_48",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 19,
+              "record": {
+                "symbol": "IREN",
+                "action": "sell",
+                "date": "2025-09-04T11:12:33",
+                "quantity": 150.0,
+                "price": 26.865,
+                "fee": 1.02895,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 4029.75,
+                "basis": -2450.5033,
+                "realized_pl": 1578.21775,
+                "mtm_pl": 110.25,
+                "code": "C;LI",
+                "row_number": 290,
+                "external_id": "2025-09-04_IREN_sell_150_0_26_86",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 20,
+              "record": {
+                "symbol": "IREN",
+                "action": "sell",
+                "date": "2025-09-26T10:26:57",
+                "quantity": 100.0,
+                "price": 40.17,
+                "fee": 1.0188,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 4017.0,
+                "basis": -1632.320036,
+                "realized_pl": 2383.661164,
+                "mtm_pl": -169.0,
+                "code": "C;LI",
+                "row_number": 291,
+                "external_id": "2025-09-26_IREN_sell_100_0_40_17",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 21,
+              "record": {
+                "symbol": "MARA",
+                "action": "sell",
+                "date": "2025-09-05T10:18:51",
+                "quantity": 200.0,
+                "price": 14.795,
+                "fee": 1.0386,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 2959.0,
+                "basis": -3101.0044,
+                "realized_pl": -143.043,
+                "mtm_pl": -79.0,
+                "code": "C;LI;P",
+                "row_number": 293,
+                "external_id": "2025-09-05_MARA_sell_200_0_14_79",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 22,
+              "record": {
+                "symbol": "MARA",
+                "action": "buy",
+                "date": "2025-09-17T14:13:14",
+                "quantity": 200.0,
+                "price": 17.19,
+                "fee": 1.0044,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -3438.0,
+                "basis": 3439.0044,
+                "realized_pl": 0.0,
+                "mtm_pl": 30.0,
+                "code": "O",
+                "row_number": 294,
+                "external_id": "2025-09-17_MARA_buy_200_0_17_19",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 23,
+              "record": {
+                "symbol": "MARA",
+                "action": "buy",
+                "date": "2025-09-23T09:36:51",
+                "quantity": 200.0,
+                "price": 18.6,
+                "fee": 1.0044,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -3720.0,
+                "basis": 3721.0044,
+                "realized_pl": 0.0,
+                "mtm_pl": -178.0,
+                "code": "O",
+                "row_number": 295,
+                "external_id": "2025-09-23_MARA_buy_200_0_18_60",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 26,
+              "record": {
+                "symbol": "MARA",
+                "action": "buy",
+                "date": "2025-09-30T11:49:18",
+                "quantity": 200.0,
+                "price": 18.2,
+                "fee": 1.0044,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -3640.0,
+                "basis": 3641.0044,
+                "realized_pl": 0.0,
+                "mtm_pl": 12.0,
+                "code": "O",
+                "row_number": 298,
+                "external_id": "2025-09-30_MARA_buy_200_0_18_20",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 27,
+              "record": {
+                "symbol": "MSFT",
+                "action": "sell",
+                "date": "2025-09-05T11:01:42",
+                "quantity": 10.0,
+                "price": 495.01,
+                "fee": 1.00193,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 4950.1,
+                "basis": -4279.15035,
+                "realized_pl": 669.94772,
+                "mtm_pl": 0.1,
+                "code": "C;LI",
+                "row_number": 300,
+                "external_id": "2025-09-05_MSFT_sell_10_0_495_01",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 28,
+              "record": {
+                "symbol": "MSFT",
+                "action": "buy",
+                "date": "2025-09-16T09:46:53",
+                "quantity": 10.0,
+                "price": 512.97,
+                "fee": 1.00022,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -5129.7,
+                "basis": 5130.70022,
+                "realized_pl": 0.0,
+                "mtm_pl": -39.3,
+                "code": "O",
+                "row_number": 301,
+                "external_id": "2025-09-16_MSFT_buy_10_0_512_97",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 29,
+              "record": {
+                "symbol": "MSTR",
+                "action": "buy",
+                "date": "2025-09-19T05:52:24",
+                "quantity": 15.0,
+                "price": 349.02,
+                "fee": 1.00033,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -5235.3,
+                "basis": 5236.30033,
+                "realized_pl": 0.0,
+                "mtm_pl": -64.05,
+                "code": "O;P",
+                "row_number": 303,
+                "external_id": "2025-09-19_MSTR_buy_15_0_349_02",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 30,
+              "record": {
+                "symbol": "MSTR",
+                "action": "sell",
+                "date": "2025-09-25T09:30:18",
+                "quantity": 15.0,
+                "price": 313.2,
+                "fee": 1.00282,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 4698.0,
+                "basis": -5236.30033,
+                "realized_pl": -539.30315,
+                "mtm_pl": 187.5,
+                "code": "C;LI;P",
+                "row_number": 304,
+                "external_id": "2025-09-25_MSTR_sell_15_0_313_20",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 31,
+              "record": {
+                "symbol": "MSTR",
+                "action": "buy",
+                "date": "2025-09-29T11:25:50",
+                "quantity": 10.0,
+                "price": 320.0,
+                "fee": 1.00022,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -3200.0,
+                "basis": 3201.00022,
+                "realized_pl": 0.0,
+                "mtm_pl": 64.2,
+                "code": "O",
+                "row_number": 305,
+                "external_id": "2025-09-29_MSTR_buy_10_0_320_00",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 32,
+              "record": {
+                "symbol": "NNE",
+                "action": "sell",
+                "date": "2025-09-02T09:30:43",
+                "quantity": 100.0,
+                "price": 30.44,
+                "fee": 1.0193,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 3044.0,
+                "basis": -3441.0022,
+                "realized_pl": -398.0215,
+                "mtm_pl": -217.0,
+                "code": "C;LI",
+                "row_number": 307,
+                "external_id": "2025-09-02_NNE_sell_100_0_30_44",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 33,
+              "record": {
+                "symbol": "NNE",
+                "action": "buy",
+                "date": "2025-09-03T09:30:54",
+                "quantity": 100.0,
+                "price": 33.72,
+                "fee": 1.0022,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -3372.0,
+                "basis": 3373.0022,
+                "realized_pl": 0.0,
+                "mtm_pl": -172.0,
+                "code": "O",
+                "row_number": 308,
+                "external_id": "2025-09-03_NNE_buy_100_0_33_72",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 34,
+              "record": {
+                "symbol": "NNE",
+                "action": "buy",
+                "date": "2025-09-03T15:12:40",
+                "quantity": 100.0,
+                "price": 32.8,
+                "fee": 1.0022,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -3280.0,
+                "basis": 3281.0022,
+                "realized_pl": 0.0,
+                "mtm_pl": -80.0,
+                "code": "O",
+                "row_number": 309,
+                "external_id": "2025-09-03_NNE_buy_100_0_32_80",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 35,
+              "record": {
+                "symbol": "NNE",
+                "action": "sell",
+                "date": "2025-09-25T09:30:17",
+                "quantity": 100.0,
+                "price": 40.3932,
+                "fee": 1.0188,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 4039.32,
+                "basis": -3281.0022,
+                "realized_pl": 757.299,
+                "mtm_pl": -100.68,
+                "code": "C;LI;P",
+                "row_number": 310,
+                "external_id": "2025-09-25_NNE_sell_100_0_40_39",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 36,
+              "record": {
+                "symbol": "NNE",
+                "action": "sell",
+                "date": "2025-09-30T09:52:22",
+                "quantity": 100.0,
+                "price": 37.92,
+                "fee": 1.0188,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 3792.0,
+                "basis": -3373.0022,
+                "realized_pl": 417.979,
+                "mtm_pl": -64.0,
+                "code": "C;LI",
+                "row_number": 311,
+                "external_id": "2025-09-30_NNE_sell_100_0_37_92",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 37,
+              "record": {
+                "symbol": "NNE",
+                "action": "buy",
+                "date": "2025-09-30T11:11:53",
+                "quantity": 150.0,
+                "price": 38.65,
+                "fee": 1.0033,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -5797.5,
+                "basis": 5798.5033,
+                "realized_pl": 0.0,
+                "mtm_pl": -13.5,
+                "code": "O;P",
+                "row_number": 312,
+                "external_id": "2025-09-30_NNE_buy_150_0_38_65",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 38,
+              "record": {
+                "symbol": "NVDA",
+                "action": "sell",
+                "date": "2025-09-02T11:40:22",
+                "quantity": 25.0,
+                "price": 167.88,
+                "fee": 1.004825,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 4197.0,
+                "basis": -2948.350875,
+                "realized_pl": 1247.6443,
+                "mtm_pl": -72.5,
+                "code": "C;LI",
+                "row_number": 314,
+                "external_id": "2025-09-02_NVDA_sell_25_0_167_88",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 39,
+              "record": {
+                "symbol": "OKLO",
+                "action": "sell",
+                "date": "2025-09-24T15:50:58",
+                "quantity": 50.0,
+                "price": 130.57,
+                "fee": 1.0094,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 6528.5,
+                "basis": -3901.0011,
+                "realized_pl": 2626.4895,
+                "mtm_pl": -30.0,
+                "code": "C;LI",
+                "row_number": 316,
+                "external_id": "2025-09-24_OKLO_sell_50_0_130_57",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 40,
+              "record": {
+                "symbol": "OKLO",
+                "action": "buy",
+                "date": "2025-09-25T10:03:10",
+                "quantity": 25.0,
+                "price": 117.58,
+                "fee": 1.00055,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -2939.5,
+                "basis": 2940.50055,
+                "realized_pl": 0.0,
+                "mtm_pl": 38.75,
+                "code": "O",
+                "row_number": 317,
+                "external_id": "2025-09-25_OKLO_buy_25_0_117_58",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 41,
+              "record": {
+                "symbol": "OKLO",
+                "action": "sell",
+                "date": "2025-09-26T11:16:06",
+                "quantity": 25.0,
+                "price": 109.37,
+                "fee": 1.0047,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 2734.25,
+                "basis": -2940.50055,
+                "realized_pl": -207.25525,
+                "mtm_pl": -29.0,
+                "code": "C;LI",
+                "row_number": 318,
+                "external_id": "2025-09-26_OKLO_sell_25_0_109_37",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 42,
+              "record": {
+                "symbol": "OPEN",
+                "action": "buy",
+                "date": "2025-09-12T10:01:23",
+                "quantity": 200.0,
+                "price": 10.2,
+                "fee": 1.0044,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -2040.0,
+                "basis": 2041.0044,
+                "realized_pl": 0.0,
+                "mtm_pl": -226.0,
+                "code": "O;P",
+                "row_number": 320,
+                "external_id": "2025-09-12_OPEN_buy_200_0_10_20",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 43,
+              "record": {
+                "symbol": "OPEN",
+                "action": "sell",
+                "date": "2025-09-12T10:43:06",
+                "quantity": 200.0,
+                "price": 9.535,
+                "fee": 1.0376,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 1907.0,
+                "basis": -2041.0044,
+                "realized_pl": -135.042,
+                "mtm_pl": 93.0,
+                "code": "C;LI;P",
+                "row_number": 321,
+                "external_id": "2025-09-12_OPEN_sell_200_0_9_54",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 44,
+              "record": {
+                "symbol": "OPEN",
+                "action": "buy",
+                "date": "2025-09-16T09:30:02",
+                "quantity": 250.0,
+                "price": 9.7,
+                "fee": 1.2555,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -2425.0,
+                "basis": 2426.2555,
+                "realized_pl": 0.0,
+                "mtm_pl": -195.0,
+                "code": "O",
+                "row_number": 322,
+                "external_id": "2025-09-16_OPEN_buy_250_0_9_70",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 45,
+              "record": {
+                "symbol": "OPEN",
+                "action": "buy",
+                "date": "2025-09-17T14:01:31",
+                "quantity": 250.0,
+                "price": 10.0,
+                "fee": 1.2555,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -2500.0,
+                "basis": 2501.2555,
+                "realized_pl": 0.0,
+                "mtm_pl": 52.5,
+                "code": "O",
+                "row_number": 323,
+                "external_id": "2025-09-17_OPEN_buy_250_0_10_00",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 46,
+              "record": {
+                "symbol": "OPEN",
+                "action": "sell",
+                "date": "2025-09-17T14:14:13",
+                "quantity": 250.0,
+                "price": 9.35,
+                "fee": 1.297,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 2337.5,
+                "basis": -2501.2555,
+                "realized_pl": -165.0525,
+                "mtm_pl": -215.0,
+                "code": "C;LI;P",
+                "row_number": 324,
+                "external_id": "2025-09-17_OPEN_sell_250_0_9_35",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 47,
+              "record": {
+                "symbol": "OPEN",
+                "action": "sell",
+                "date": "2025-09-22T15:47:09",
+                "quantity": 250.0,
+                "price": 8.48,
+                "fee": 1.297,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 2120.0,
+                "basis": -2426.2555,
+                "realized_pl": -307.5525,
+                "mtm_pl": 25.0,
+                "code": "C;LI",
+                "row_number": 325,
+                "external_id": "2025-09-22_OPEN_sell_250_0_8_48",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 48,
+              "record": {
+                "symbol": "OPEN",
+                "action": "buy",
+                "date": "2025-09-24T10:26:13",
+                "quantity": 300.0,
+                "price": 8.05,
+                "fee": 1.5066,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -2415.0,
+                "basis": 2416.5066,
+                "realized_pl": 0.0,
+                "mtm_pl": 54.0,
+                "code": "O",
+                "row_number": 326,
+                "external_id": "2025-09-24_OPEN_buy_300_0_8_05",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 49,
+              "record": {
+                "symbol": "OPEN",
+                "action": "buy",
+                "date": "2025-09-25T10:05:29",
+                "quantity": 200.0,
+                "price": 8.3,
+                "fee": 1.0044,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -1660.0,
+                "basis": 1661.0044,
+                "realized_pl": 0.0,
+                "mtm_pl": 158.0,
+                "code": "O",
+                "row_number": 327,
+                "external_id": "2025-09-25_OPEN_buy_200_0_8_30",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 50,
+              "record": {
+                "symbol": "PANW",
+                "action": "buy",
+                "date": "2025-09-29T11:21:09",
+                "quantity": 20.0,
+                "price": 203.4,
+                "fee": 1.00044,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -4068.0,
+                "basis": 4069.00044,
+                "realized_pl": 0.0,
+                "mtm_pl": 11.2,
+                "code": "O",
+                "row_number": 329,
+                "external_id": "2025-09-29_PANW_buy_20_0_203_40",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 51,
+              "record": {
+                "symbol": "PONY",
+                "action": "sell",
+                "date": "2025-09-30T10:20:51",
+                "quantity": 200.0,
+                "price": 22.22,
+                "fee": 1.0376,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 4444.0,
+                "basis": -2765.0044,
+                "realized_pl": 1677.958,
+                "mtm_pl": -54.0,
+                "code": "C;LI",
+                "row_number": 331,
+                "external_id": "2025-09-30_PONY_sell_200_0_22_22",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 52,
+              "record": {
+                "symbol": "SOUN",
+                "action": "buy",
+                "date": "2025-09-15T14:55:21",
+                "quantity": 150.0,
+                "price": 14.2,
+                "fee": 1.0033,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -2130.0,
+                "basis": 2131.0033,
+                "realized_pl": 0.0,
+                "mtm_pl": -1.5,
+                "code": "O",
+                "row_number": 333,
+                "external_id": "2025-09-15_SOUN_buy_150_0_14_20",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 53,
+              "record": {
+                "symbol": "SOUN",
+                "action": "sell",
+                "date": "2025-09-25T09:31:49",
+                "quantity": 150.0,
+                "price": 16.773333333,
+                "fee": 1.0282,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 2516.0,
+                "basis": -2131.0033,
+                "realized_pl": 383.9685,
+                "mtm_pl": 63.5,
+                "code": "C;LI;P",
+                "row_number": 334,
+                "external_id": "2025-09-25_SOUN_sell_150_0_16_77",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 54,
+              "record": {
+                "symbol": "SOUN",
+                "action": "sell",
+                "date": "2025-09-30T09:41:31",
+                "quantity": 250.0,
+                "price": 15.39,
+                "fee": 1.297,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 3847.5,
+                "basis": -3151.2555,
+                "realized_pl": 694.9475,
+                "mtm_pl": -172.5,
+                "code": "C;LI",
+                "row_number": 335,
+                "external_id": "2025-09-30_SOUN_sell_250_0_15_39",
+                "source": "ibkr_import"
+              }
+            },
+            {
+              "record_index": 55,
+              "record": {
+                "symbol": "SOUN",
+                "action": "buy",
+                "date": "2025-09-30T11:07:12",
+                "quantity": 300.0,
+                "price": 15.7,
+                "fee": 1.5066,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -4710.0,
+                "basis": 4711.5066,
+                "realized_pl": 0.0,
+                "mtm_pl": 114.0,
+                "code": "O;P",
+                "row_number": 336,
+                "external_id": "2025-09-30_SOUN_buy_300_0_15_70",
+                "source": "ibkr_import"
+              }
+            }
+          ],
+          "total_checked": 56,
+          "duplicate_count": 1,
+          "clean_count": 54
+        },
+        "analysis_timestamp": "2025-10-29T01:39:19.882756"
+      }
+    }
+  },
+  "summary": {
+    "current_step": "analysis",
+    "total_steps": 6,
+    "progress_percentage": 50.0
+  }
+}

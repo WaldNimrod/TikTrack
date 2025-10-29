@@ -78,27 +78,43 @@ class ProfileManager {
             this.currentProfileId = profileId;
             
             // Step 1: Call API to activate profile
-            const response = await fetch('/api/preferences/profiles/activate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    user_id: userId,
-                    profile_id: profileId
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            // Special handling for default profile (ID: 0) - skip API call
+            if (profileId === 0) {
+                window.Logger.info('🔄 Default profile (ID: 0) selected - skipping API activation', { page: "preferences-profiles" });
+                // For default profile, we don't need to call the API - just update local state
+            } else {
+                const response = await fetch('/api/preferences/profiles/activate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        profile_id: profileId
+                    })
+                });
+                
+                if (!response.ok) {
+                    // Get error details from response body
+                    let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.error) {
+                            errorMessage += ` - ${errorData.error}`;
+                        }
+                    } catch (e) {
+                        // If response is not JSON, use status text
+                    }
+                    throw new Error(errorMessage);
+                }
+                
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to activate profile');
+                }
+                
+                window.Logger.info('✅ Profile activated successfully', { page: "preferences-profiles" });
             }
-            
-            const result = await response.json();
-            if (!result.success) {
-                throw new Error(result.error || 'Failed to activate profile');
-            }
-            
-            window.Logger.info('✅ Profile activated successfully', { page: "preferences-profiles" });
             
             // Step 2: Update PreferencesCore current profile
             if (window.PreferencesCore) {

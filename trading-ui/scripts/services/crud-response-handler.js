@@ -625,6 +625,7 @@ class CRUDResponseHandler {
                 'טיקר': 'tickers',
                 'חשבון מסחר מסחר': 'trading_accounts',
                 'תזרים מזומנים': 'cash_flows',
+                'תזרים מזומן': 'cash_flows',  // Added alternative name
                 'תוכנית מסחר': 'trade_plans'
             };
             return entityMap[options.entityName] || null;

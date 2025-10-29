@@ -350,7 +350,7 @@ class ConstraintValidator {
         
         // Chart constraints
         this.constraints.set('chartRefreshInterval', {
-            min: 1000,
+            min: 30,
             max: 300000,
             type: 'number'
         });

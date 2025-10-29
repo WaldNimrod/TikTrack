@@ -20,19 +20,29 @@
 
 ## שלבים
 
-### שלב 1: הסרת `clearCacheBeforeCRUD` לחלוטין
+### שלב 1: הסרת `clearCacheBeforeCRUD` לחלוטין - ✅ **הושלם!**
 
-**קובץ:** `trading-ui/scripts/unified-cache-manager.js` (שורות 2877-2896)
+**תאריך:** 15 בינואר 2025
 
-מחיקה סתמית:
-```javascript
-// DELETE: window.clearCacheBeforeCRUD = async function(entity, operation) { ... }
-```
+**מה בוצע:**
+1. ✅ הוסרה ההגדרה של `window.clearCacheBeforeCRUD` מ-`unified-cache-manager.js`
+2. ✅ הוסרו כל הקריאות ל-`clearCacheBeforeCRUD` מ-9 קבצים:
+   - `cash_flows.js`
+   - `notes.js`
+   - `alerts.js`
+   - `trade_plans.js`
+   - `tickers.js`
+   - `executions.js`
+   - `trades.js`
+   - `trading_accounts.js`
+   - `modules/business-module.js`
+   - `alert-service.js`
 
 **הסבר:** 
 - זו פונקציית עזר שמוסיפה שכבה מיותרת
 - `CRUDResponseHandler` אמור לעשות את העבודה
 - היא נקראת מכל מקום ויוצרת בלגן
+- **הוסרה לחלוטין והכל נבדק**
 
 ### שלב 2: בחינה מחדש של `clearEntityCache`
 

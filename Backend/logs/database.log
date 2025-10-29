@@ -13487,3 +13487,310 @@ FROM alerts]
 2025-10-30 00:31:35,048 - models.trade_plan - INFO - Trade plan 23: Using loaded account relationship
 2025-10-30 00:31:35,048 - cache - INFO - Cache SET: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 9603 chars)
 2025-10-30 00:31:35,049 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:31:35] "GET /api/trade_plans/ HTTP/1.1" 200 -
+2025-10-30 00:34:40,753 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /db_display HTTP/1.1" 200 -
+2025-10-30 00:34:40,765 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/master.css?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,769 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/header-styles.css?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,774 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /images/icons/db_display.svg HTTP/1.1" 200 -
+2025-10-30 00:34:40,774 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /images/icons/trading_accounts.svg HTTP/1.1" 200 -
+2025-10-30 00:34:40,776 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /images/icons/trades.svg HTTP/1.1" 200 -
+2025-10-30 00:34:40,779 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /images/icons/tickers.svg HTTP/1.1" 200 -
+2025-10-30 00:34:40,780 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,780 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /images/icons/trade_plans.svg HTTP/1.1" 200 -
+2025-10-30 00:34:40,785 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,785 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,786 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,787 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,788 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,788 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,789 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,791 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,792 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,793 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,793 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,794 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,794 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,795 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,795 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,798 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,799 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,800 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,801 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,802 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,803 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,804 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,804 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_actions-menu.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,806 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,806 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_import-system.css?v=2.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,807 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,808 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,808 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,809 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,810 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,811 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,812 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,813 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,814 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,816 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,817 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,817 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,818 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,818 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,820 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,820 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,821 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,822 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,823 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,825 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,826 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,826 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,826 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,826 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/main.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:34:40,827 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /images/icons/notes.svg HTTP/1.1" 200 -
+2025-10-30 00:34:40,829 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /images/icons/executions.svg HTTP/1.1" 200 -
+2025-10-30 00:34:40,829 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /images/icons/cash_flows.svg HTTP/1.1" 200 -
+2025-10-30 00:34:40,830 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /images/icons/alerts.svg HTTP/1.1" 200 -
+2025-10-30 00:34:40,832 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-30T00:34:40.831406', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:34:40,833 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/global-favicon.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,836 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_variables.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,836 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-30T00:34:40.831406', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:34:40,837 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_colors-semantic.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,838 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,839 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_breakpoints.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,839 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_typography.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,840 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-30 00:34:40,840 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_spacing.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,841 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/01-settings/_rtl-logical.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,842 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/02-tools/_functions.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,844 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/02-tools/_mixins.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,844 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/03-generic/_reset.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,845 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/04-elements/_links.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,845 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/03-generic/_base.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,847 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/04-elements/_headings.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,847 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/04-elements/_buttons-base.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,848 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/04-elements/_forms-base.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,850 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,850 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/05-objects/_layout.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,850 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/05-objects/_grid.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,851 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_buttons-advanced.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,854 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_tables.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,854 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_modals.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,855 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_cards.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,857 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_navigation.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,857 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_notifications.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,859 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_forms-advanced.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,859 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_badges-status.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,859 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_page-headers.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,860 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_info-summary.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,861 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_entity-colors.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,862 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_constraints.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,862 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/06-components/_chart-management.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,863 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,864 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/07-trumps/chart-management.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,868 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/08-themes/_light.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,868 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /styles-new/09-utilities/_utilities.css HTTP/1.1" 200 -
+2025-10-30 00:34:40,868 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/ui-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,868 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/notification-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,869 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/warning-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,869 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/error-handlers.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,871 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/unified-cache-manager.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,872 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/logger-service.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,875 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/cache-sync-manager.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,876 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/header-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,877 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/page-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,877 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/translation-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,879 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/button-icons.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,880 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/event-handler-manager.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,882 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/date-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,882 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/button-system-init.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,882 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/color-scheme-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,885 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/data-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,887 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/tables.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,888 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/preferences-core-new.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,889 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/preferences-lazy-loader.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,889 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/preferences-colors.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,891 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/preferences-validation.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,891 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/preferences-ui.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,892 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/init-system/package-manifest.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,893 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/page-initialization-configs.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,893 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/db_display.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,894 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/unified-app-initializer.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,896 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/init-system-check.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:40,897 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:40] "GET /scripts/monitoring-functions.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:34:41,052 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-30 00:34:41,053 - cache - INFO - Cache EXPIRED: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Age: 187.2s)
+2025-10-30 00:34:41,054 - cache - INFO - Cache DELETE: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 1 times)
+2025-10-30 00:34:41,057 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 3375 chars)
+2025-10-30 00:34:41,059 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:41] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-30 00:34:41,081 - services.trade_service - INFO - Loading trades with joinedload for account and ticker
+2025-10-30 00:34:41,082 - services.trade_service - INFO - Loaded 12 trades
+2025-10-30 00:34:41,083 - services.trade_service - INFO - First trade ID: 1
+2025-10-30 00:34:41,083 - services.trade_service - INFO - First trade trading_account_id: 1
+2025-10-30 00:34:41,083 - services.trade_service - INFO - First trade ticker_id: 1
+2025-10-30 00:34:41,083 - services.trade_service - INFO - First trade has account attribute: True
+2025-10-30 00:34:41,084 - services.trade_service - INFO - First trade account object: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-30 00:34:41,084 - services.trade_service - INFO - First trade has ticker attribute: True
+2025-10-30 00:34:41,084 - services.trade_service - INFO - First trade ticker object: <Ticker(symbol='AAPL', name='Apple Inc. - UPDATED', type='stock')>
+2025-10-30 00:34:41,084 - services.trade_service - INFO - First trade account name: חשבון מעודכן
+2025-10-30 00:34:41,084 - services.trade_service - INFO - First trade ticker symbol: AAPL
+2025-10-30 00:34:41,085 - services.position_calculator_service - INFO - Calculated positions for 12 trades
+2025-10-30 00:34:41,085 - models.trade - INFO - Trade 1: Checking trade_plan relationship...
+2025-10-30 00:34:41,086 - models.trade - INFO - Trade 1: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,086 - models.trade - INFO - Trade 1: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-30 00:34:41,086 - models.trade - INFO - Trade 1: trade_plan is not None, adding data...
+2025-10-30 00:34:41,086 - models.trade - INFO - Trade 1: Using loaded account name: חשבון מעודכן
+2025-10-30 00:34:41,086 - models.trade - INFO - Trade 1: Using loaded ticker symbol: AAPL
+2025-10-30 00:34:41,086 - models.trade - INFO - Trade 1 to_dict result: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-30 00:34:41,103 - models.trade - INFO - Trade 2: Checking trade_plan relationship...
+2025-10-30 00:34:41,104 - models.trade - INFO - Trade 2: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,104 - models.trade - INFO - Trade 2: self.trade_plan: <TradePlan(id=14, type='passive')>
+2025-10-30 00:34:41,104 - models.trade - INFO - Trade 2: trade_plan is not None, adding data...
+2025-10-30 00:34:41,104 - models.trade - INFO - Trade 2: Using loaded account name: חשבון טכנולוגיה
+2025-10-30 00:34:41,104 - models.trade - INFO - Trade 2: Using loaded ticker symbol: GOOGL
+2025-10-30 00:34:41,104 - models.trade - INFO - Trade 2 to_dict result: {'id': 2, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': 'טרייד מוצלח ב-Google', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-10 06:51:43', 'created_at': '2025-08-15 03:51:43', 'total_pl': 1500.0, 'trade_plan_created_at': '2025-08-30 03:36:52', 'trade_plan_planned_amount': 300.5, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:34:41,119 - models.trade - INFO - Trade 3: Checking trade_plan relationship...
+2025-10-30 00:34:41,119 - models.trade - INFO - Trade 3: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,119 - models.trade - INFO - Trade 3: self.trade_plan: <TradePlan(id=2, type='swing')>
+2025-10-30 00:34:41,119 - models.trade - INFO - Trade 3: trade_plan is not None, adding data...
+2025-10-30 00:34:41,119 - models.trade - INFO - Trade 3: Using loaded account name: חשבון ETF
+2025-10-30 00:34:41,120 - models.trade - INFO - Trade 3: Using loaded ticker symbol: SPY
+2025-10-30 00:34:41,120 - models.trade - INFO - Trade 3 to_dict result: {'id': 3, 'trading_account_id': 3, 'ticker_id': 9, 'trade_plan_id': 2, 'status': 'cancelled', 'investment_type': 'passive', 'side': 'Long', 'notes': 'השקעה ב-ETF', 'opened_at': '2025-08-15 03:51:43', 'closed_at': None, 'created_at': '2025-08-15 03:51:43', 'total_pl': 800.0, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 8000.0, 'trade_plan_status': 'open', 'account_name': 'חשבון ETF', 'ticker_symbol': 'SPY', 'cancelled_at': '2025-08-22 06:50:57', 'cancel_reason': 'בדיקת ביטול'}
+2025-10-30 00:34:41,122 - models.trade - INFO - Trade 4: Checking trade_plan relationship...
+2025-10-30 00:34:41,122 - models.trade - INFO - Trade 4: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,122 - models.trade - INFO - Trade 4: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-30 00:34:41,123 - models.trade - INFO - Trade 4: trade_plan is not None, adding data...
+2025-10-30 00:34:41,123 - models.trade - INFO - Trade 4: Using loaded account name: חשבון מעודכן
+2025-10-30 00:34:41,123 - models.trade - INFO - Trade 4: Using loaded ticker symbol: AAPL
+2025-10-30 00:34:41,123 - models.trade - INFO - Trade 4 to_dict result: {'id': 4, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-26 00:13:21', 'closed_at': None, 'created_at': '2025-08-26 00:13:21', 'total_pl': None, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:30:08', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-30 00:34:41,132 - models.trade - INFO - Trade 5: Checking trade_plan relationship...
+2025-10-30 00:34:41,133 - models.trade - INFO - Trade 5: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,133 - models.trade - INFO - Trade 5: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-30 00:34:41,133 - models.trade - INFO - Trade 5: trade_plan is not None, adding data...
+2025-10-30 00:34:41,133 - models.trade - INFO - Trade 5: Using loaded account name: חשבון ETF
+2025-10-30 00:34:41,134 - models.trade - INFO - Trade 5: Using loaded ticker symbol: AAPL
+2025-10-30 00:34:41,134 - models.trade - INFO - Trade 5 to_dict result: {'id': 5, 'trading_account_id': 3, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'גכעגעג', 'opened_at': '2025-08-30 22:02:00', 'closed_at': None, 'created_at': '2025-08-30 22:02:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון ETF', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:32:32', 'cancel_reason': 'test'}
+2025-10-30 00:34:41,143 - models.trade - INFO - Trade 6: Checking trade_plan relationship...
+2025-10-30 00:34:41,143 - models.trade - INFO - Trade 6: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,144 - models.trade - INFO - Trade 6: self.trade_plan: <TradePlan(id=1, type='passive')>
+2025-10-30 00:34:41,144 - models.trade - INFO - Trade 6: trade_plan is not None, adding data...
+2025-10-30 00:34:41,144 - models.trade - INFO - Trade 6: Using loaded account name: חשבון טכנולוגיה
+2025-10-30 00:34:41,144 - models.trade - INFO - Trade 6: Using loaded ticker symbol: GOOGL
+2025-10-30 00:34:41,144 - models.trade - INFO - Trade 6 to_dict result: {'id': 6, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': '', 'opened_at': '2025-08-31 16:57:00', 'closed_at': None, 'created_at': '2025-08-31 16:57:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 10250.0, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:34:41,158 - models.trade - INFO - Trade 7: Checking trade_plan relationship...
+2025-10-30 00:34:41,158 - models.trade - INFO - Trade 7: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,158 - models.trade - INFO - Trade 7: self.trade_plan: <TradePlan(id=9, type='swing')>
+2025-10-30 00:34:41,158 - models.trade - INFO - Trade 7: trade_plan is not None, adding data...
+2025-10-30 00:34:41,158 - models.trade - INFO - Trade 7: Using loaded account name: חשבון טכנולוגיה
+2025-10-30 00:34:41,158 - models.trade - INFO - Trade 7: Using loaded ticker symbol: AMZN
+2025-10-30 00:34:41,158 - models.trade - INFO - Trade 7 to_dict result: {'id': 7, 'trading_account_id': 2, 'ticker_id': 6, 'trade_plan_id': 9, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-31 17:38:00', 'closed_at': None, 'created_at': '2025-08-31 17:38:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-06-16 06:52:13', 'trade_plan_planned_amount': 9275.0, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'AMZN', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:34:41,169 - models.trade - INFO - Trade 8: Checking trade_plan relationship...
+2025-10-30 00:34:41,170 - models.trade - INFO - Trade 8: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,170 - models.trade - INFO - Trade 8: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-30 00:34:41,170 - models.trade - INFO - Trade 8: trade_plan is not None, adding data...
+2025-10-30 00:34:41,170 - models.trade - INFO - Trade 8: Using loaded account name: חשבון מעודכן
+2025-10-30 00:34:41,170 - models.trade - INFO - Trade 8: Using loaded ticker symbol: AAPL
+2025-10-30 00:34:41,170 - models.trade - INFO - Trade 8 to_dict result: {'id': 8, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-01 23:51:48', 'closed_at': '2025-09-02 00:36:20', 'created_at': '2025-09-01 23:51:48', 'total_pl': None, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:34:41,177 - models.trade - INFO - Trade 9: Checking trade_plan relationship...
+2025-10-30 00:34:41,177 - models.trade - INFO - Trade 9: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,177 - models.trade - INFO - Trade 9: self.trade_plan: <TradePlan(id=14, type='passive')>
+2025-10-30 00:34:41,177 - models.trade - INFO - Trade 9: trade_plan is not None, adding data...
+2025-10-30 00:34:41,177 - models.trade - INFO - Trade 9: Using loaded account name: חשבון מעודכן
+2025-10-30 00:34:41,177 - models.trade - INFO - Trade 9: Using loaded ticker symbol: GOOGL
+2025-10-30 00:34:41,177 - models.trade - INFO - Trade 9 to_dict result: {'id': 9, 'trading_account_id': 1, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:41:51', 'closed_at': '2025-09-02 00:42:08', 'created_at': '2025-09-02 00:41:51', 'total_pl': None, 'trade_plan_created_at': '2025-08-30 03:36:52', 'trade_plan_planned_amount': 300.5, 'trade_plan_status': 'open', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:34:41,189 - models.trade - INFO - Trade 10: Checking trade_plan relationship...
+2025-10-30 00:34:41,189 - models.trade - INFO - Trade 10: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,189 - models.trade - INFO - Trade 10: self.trade_plan: <TradePlan(id=1, type='passive')>
+2025-10-30 00:34:41,189 - models.trade - INFO - Trade 10: trade_plan is not None, adding data...
+2025-10-30 00:34:41,189 - models.trade - INFO - Trade 10: Using loaded account name: חשבון מעודכן
+2025-10-30 00:34:41,189 - models.trade - INFO - Trade 10: Using loaded ticker symbol: TSLA
+2025-10-30 00:34:41,189 - models.trade - INFO - Trade 10 to_dict result: {'id': 10, 'trading_account_id': 1, 'ticker_id': 4, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:56:03', 'closed_at': None, 'created_at': '2025-09-02 00:56:03', 'total_pl': None, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 10250.0, 'trade_plan_status': 'open', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'TSLA', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:34:41,200 - models.trade - INFO - Trade 11: Checking trade_plan relationship...
+2025-10-30 00:34:41,200 - models.trade - INFO - Trade 11: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,200 - models.trade - INFO - Trade 11: self.trade_plan: None
+2025-10-30 00:34:41,200 - models.trade - INFO - Trade 11: trade_plan is None
+2025-10-30 00:34:41,200 - models.trade - INFO - Trade 11: Using loaded account name: חשבון מעודכן
+2025-10-30 00:34:41,200 - models.trade - INFO - Trade 11: Using loaded ticker symbol: AAPL
+2025-10-30 00:34:41,200 - models.trade - INFO - Trade 11 to_dict result: {'id': 11, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade', 'opened_at': '2025-10-06 21:05:06', 'closed_at': None, 'created_at': '2025-10-06 21:05:06', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:34:41,209 - models.trade - INFO - Trade 18: Checking trade_plan relationship...
+2025-10-30 00:34:41,209 - models.trade - INFO - Trade 18: hasattr(self, 'trade_plan'): True
+2025-10-30 00:34:41,209 - models.trade - INFO - Trade 18: self.trade_plan: None
+2025-10-30 00:34:41,209 - models.trade - INFO - Trade 18: trade_plan is None
+2025-10-30 00:34:41,209 - models.trade - INFO - Trade 18: Using loaded account name: חשבון מעודכן
+2025-10-30 00:34:41,209 - models.trade - INFO - Trade 18: Using loaded ticker symbol: AAPL
+2025-10-30 00:34:41,210 - models.trade - INFO - Trade 18 to_dict result: {'id': 18, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade for CRUD testing', 'opened_at': '2025-10-07 16:13:43', 'closed_at': None, 'created_at': '2025-10-07 16:13:43', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:34:41,218 - routes.api.trades - INFO - First trade data: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש', 'current_price': 269.7, 'daily_change': 0.26022304832713333, 'change_amount': 0.6999999999999886, 'position': {'quantity': 300.0, 'average_price': 150.27666666666667, 'total_cost': 45083.0, 'total_fees': 8.0, 'side': 'long', 'last_updated': '2025-10-07 16:13:46.113000', 'total_bought': 300.0, 'total_sold': 0.0}}
+2025-10-30 00:34:41,219 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:41] "GET /api/trades/ HTTP/1.1" 200 -
+2025-10-30 00:34:41,221 - cache - INFO - Cache MISS: services.ticker_service.get_all:216be29bbc607032fd325f3970349404
+2025-10-30 00:34:41,222 - services.ticker_service - INFO - Found 23 tickers in database
+2025-10-30 00:34:41,293 - cache - INFO - Cache SET: services.ticker_service.get_all:216be29bbc607032fd325f3970349404 (TTL: 30s, Dependencies: ['tickers'], Data size: 1421 chars)
+2025-10-30 00:34:41,294 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:41] "GET /api/tickers/ HTTP/1.1" 200 -
+2025-10-30 00:34:41,335 - routes.api.base_entity.trade_plans - INFO - Getting all trade_plans records
+2025-10-30 00:34:41,335 - cache - INFO - Cache EXPIRED: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (Age: 186.3s)
+2025-10-30 00:34:41,335 - cache - INFO - Cache DELETE: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-30 00:34:41,335 - services.trade_plan_service - INFO - Loading trade plans with joinedload for ticker and account
+2025-10-30 00:34:41,338 - services.trade_plan_service - INFO - Loaded 18 trade plans
+2025-10-30 00:34:41,339 - services.trade_plan_service - INFO - First plan ticker: <Ticker(symbol='TSLA', name='Tesla Inc.', type='stock')>
+2025-10-30 00:34:41,340 - services.trade_plan_service - INFO - First plan account: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-30 00:34:41,340 - models.trade_plan - INFO - Trade plan 1: Using loaded ticker relationship
+2025-10-30 00:34:41,340 - models.trade_plan - INFO - Trade plan 1: Using loaded account relationship
+2025-10-30 00:34:41,340 - models.trade_plan - INFO - Trade plan 2: Using loaded ticker relationship
+2025-10-30 00:34:41,340 - models.trade_plan - INFO - Trade plan 2: Using loaded account relationship
+2025-10-30 00:34:41,340 - models.trade_plan - INFO - Trade plan 3: Using loaded ticker relationship
+2025-10-30 00:34:41,340 - models.trade_plan - INFO - Trade plan 3: Using loaded account relationship
+2025-10-30 00:34:41,340 - models.trade_plan - INFO - Trade plan 4: Using loaded ticker relationship
+2025-10-30 00:34:41,341 - models.trade_plan - INFO - Trade plan 4: Using loaded account relationship
+2025-10-30 00:34:41,341 - models.trade_plan - INFO - Trade plan 5: Using loaded ticker relationship
+2025-10-30 00:34:41,341 - models.trade_plan - INFO - Trade plan 5: Using loaded account relationship
+2025-10-30 00:34:41,341 - models.trade_plan - INFO - Trade plan 6: Using loaded ticker relationship
+2025-10-30 00:34:41,341 - models.trade_plan - INFO - Trade plan 6: Using loaded account relationship
+2025-10-30 00:34:41,341 - models.trade_plan - INFO - Trade plan 7: Using loaded ticker relationship
+2025-10-30 00:34:41,341 - models.trade_plan - INFO - Trade plan 7: Using loaded account relationship
+2025-10-30 00:34:41,341 - models.trade_plan - INFO - Trade plan 8: Using loaded ticker relationship
+2025-10-30 00:34:41,342 - models.trade_plan - INFO - Trade plan 8: Using loaded account relationship
+2025-10-30 00:34:41,342 - models.trade_plan - INFO - Trade plan 9: Using loaded ticker relationship
+2025-10-30 00:34:41,342 - models.trade_plan - INFO - Trade plan 9: Using loaded account relationship
+2025-10-30 00:34:41,342 - models.trade_plan - INFO - Trade plan 10: Using loaded ticker relationship
+2025-10-30 00:34:41,342 - models.trade_plan - INFO - Trade plan 10: Using loaded account relationship
+2025-10-30 00:34:41,342 - models.trade_plan - INFO - Trade plan 11: Using loaded ticker relationship
+2025-10-30 00:34:41,342 - models.trade_plan - INFO - Trade plan 11: Using loaded account relationship
+2025-10-30 00:34:41,342 - models.trade_plan - INFO - Trade plan 12: Using loaded ticker relationship
+2025-10-30 00:34:41,342 - models.trade_plan - INFO - Trade plan 12: Using loaded account relationship
+2025-10-30 00:34:41,342 - models.trade_plan - INFO - Trade plan 14: Using loaded ticker relationship
+2025-10-30 00:34:41,343 - models.trade_plan - INFO - Trade plan 14: Using loaded account relationship
+2025-10-30 00:34:41,343 - models.trade_plan - INFO - Trade plan 15: Using loaded ticker relationship
+2025-10-30 00:34:41,343 - models.trade_plan - INFO - Trade plan 15: Using loaded account relationship
+2025-10-30 00:34:41,343 - models.trade_plan - INFO - Trade plan 20: Using loaded ticker relationship
+2025-10-30 00:34:41,343 - models.trade_plan - INFO - Trade plan 20: Using loaded account relationship
+2025-10-30 00:34:41,343 - models.trade_plan - INFO - Trade plan 21: Using loaded ticker relationship
+2025-10-30 00:34:41,343 - models.trade_plan - INFO - Trade plan 21: Using loaded account relationship
+2025-10-30 00:34:41,344 - models.trade_plan - INFO - Trade plan 22: Using loaded ticker relationship
+2025-10-30 00:34:41,344 - models.trade_plan - INFO - Trade plan 22: Using loaded account relationship
+2025-10-30 00:34:41,344 - models.trade_plan - INFO - Trade plan 23: Using loaded ticker relationship
+2025-10-30 00:34:41,344 - models.trade_plan - INFO - Trade plan 23: Using loaded account relationship
+2025-10-30 00:34:41,345 - cache - INFO - Cache SET: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 9603 chars)
+2025-10-30 00:34:41,345 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:41] "GET /api/trade_plans/ HTTP/1.1" 200 -
+2025-10-30 00:34:41,348 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-30 00:34:41,348 - cache - INFO - Cache MISS: get_all_executions_99914b932bd37a50b983c5e7c90ae93b
+2025-10-30 00:34:41,350 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 8615 chars)
+2025-10-30 00:34:41,351 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:41] "GET /api/executions/ HTTP/1.1" 200 -
+2025-10-30 00:34:41,355 - routes.api.base_entity.alerts - INFO - Getting all alerts records
+2025-10-30 00:34:41,355 - cache - INFO - Cache EXPIRED: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b (Age: 260.0s)
+2025-10-30 00:34:41,355 - cache - INFO - Cache DELETE: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-30 00:34:41,355 - services.alert_service - INFO - נטענו 28 התראות
+2025-10-30 00:34:41,356 - cache - INFO - Cache SET: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 11977 chars)
+2025-10-30 00:34:41,356 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:41] "GET /api/alerts/ HTTP/1.1" 200 -
+2025-10-30 00:34:41,358 - routes.api.notes - INFO - 🔄 Starting get_notes function
+2025-10-30 00:34:41,358 - routes.api.notes - INFO - ✅ Database connection established
+2025-10-30 00:34:41,359 - routes.api.notes - INFO - ✅ Successfully retrieved 4 notes using direct SQL
+2025-10-30 00:34:41,359 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:41] "GET /api/notes/ HTTP/1.1" 200 -
+2025-10-30 00:34:41,361 - routes.api.base_entity.cash_flows - INFO - Getting all cash_flows records
+2025-10-30 00:34:41,361 - cache - INFO - Cache EXPIRED: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (Age: 187.6s)
+2025-10-30 00:34:41,361 - cache - INFO - Cache DELETE: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (Was accessed 0 times)
+2025-10-30 00:34:41,362 - cache - INFO - Cache SET: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 4109 chars)
+2025-10-30 00:34:41,362 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:41] "GET /api/cash_flows/ HTTP/1.1" 200 -
+2025-10-30 00:34:41,810 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:41] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-30 00:34:42,562 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:42] "GET /images/icons/home.svg HTTP/1.1" 200 -
+2025-10-30 00:34:42,562 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:42] "GET /images/logo.svg HTTP/1.1" 200 -
+2025-10-30 00:34:42,680 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-30 00:34:42,681 - cache - INFO - Cache HIT: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-30 00:34:42,682 - routes.api.base_entity.trading_accounts - INFO - Cache hit for trading_accounts get_all
+2025-10-30 00:34:42,683 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:34:42] "GET /api/trading-accounts/ HTTP/1.1" 200 -

@@ -413,7 +413,8 @@ class AdvancedButtonSystem {
             if (style) allAttributes += ` data-style='${style}'`;
             allAttributes += ` data-variant='${variant}'`;
 
-            let onclickAttr = onClick ? ` onclick="${onClick}"` : '';
+            // Use data-onclick instead of onclick for event delegation
+            let dataOnclickAttr = onClick ? ` data-onclick="${onClick}"` : '';
             let titleAttr = buttonText ? ` title='${buttonText}'` : '';
             let idAttr = id ? ` id='${id}'` : '';
 
@@ -430,7 +431,7 @@ class AdvancedButtonSystem {
                 content = buttonText;
             }
 
-            return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${onclickAttr}${titleAttr}${allAttributes}>${content}</button>`;
+            return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${titleAttr}${allAttributes}>${content}</button>`;
         } else {
             this.logger.warn('Button system dependencies not found, using fallback');
             return this.createFallbackButton(type, onClick, classes, attributes, text, id);
@@ -464,11 +465,12 @@ class AdvancedButtonSystem {
         if (attributes) allAttributes += ' ' + attributes;
         allAttributes += ` data-variant='${variant}'`;
 
-        let onclickAttr = onClick ? ` onclick='${onClick}'` : '';
+        // Use data-onclick instead of onclick for event delegation
+        let dataOnclickAttr = onClick ? ` data-onclick='${onClick}'` : '';
         let idAttr = id ? ` id='${id}'` : '';
 
         // For fallback, always show text (normal variant behavior)
-        return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${onclickAttr}${allAttributes}>${buttonText}</button>`;
+        return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${allAttributes}>${buttonText}</button>`;
     }
 
     applyFallbackButton(element) {

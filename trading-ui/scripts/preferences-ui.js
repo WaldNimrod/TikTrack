@@ -445,7 +445,7 @@ class PreferencesUI {
     async loadActiveProfile() {
         try {
             window.Logger.info('🔍 Loading active profile from server...', { page: "preferences-ui" });
-            const response = await fetch('/api/preferences/profiles');
+            const response = await fetch('/api/preferences/profiles?user_id=1');
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
@@ -455,16 +455,29 @@ class PreferencesUI {
                 throw new Error(result.error || 'Failed to load profiles');
             }
             
-            const activeProfile = result.data.profiles.find(p => p.active === true);
+            const profiles = result.data.profiles;
+            window.Logger.info(`🔍 Loaded ${profiles.length} profiles from server`, { page: "preferences-ui" });
+            
+            // Find active profile
+            const activeProfile = profiles.find(p => p.active === true);
+            
+            // If no active profile found, use default profile (ID: 0)
             if (!activeProfile) {
-                // Default profile is active (ID: 0)
-                window.Logger.info('✅ Default profile is active (ID: 0)', { page: "preferences-ui" });
+                window.Logger.info('✅ No active profile found - using default profile (ID: 0)', { page: "preferences-ui" });
                 this.currentProfileId = 0;
                 return 0;
             }
             
+            // Check if active profile is default profile (ID: 0 or is_default = true)
+            if (activeProfile.id === 0 || activeProfile.is_default || activeProfile.default) {
+                window.Logger.info('✅ Active profile is default profile (ID: 0)', { page: "preferences-ui" });
+                this.currentProfileId = 0;
+                return 0;
+            }
+            
+            // Regular user profile
             this.currentProfileId = activeProfile.id;
-            window.Logger.info(`✅ Active profile loaded: ${activeProfile.name} (ID: ${activeProfile.id}, { page: "preferences-ui" })`);
+            window.Logger.info(`✅ Active profile loaded: ${activeProfile.name} (ID: ${activeProfile.id})`, { page: "preferences-ui" });
             return activeProfile.id;
             
         } catch (error) {

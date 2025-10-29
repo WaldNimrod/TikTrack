@@ -233,7 +233,7 @@
                                         <span class="file-name" id="fileName"></span>
                                         <span class="file-size" id="fileSize"></span>
                                     </div>
-                                    <button data-button-type="SECONDARY" data-text="החלף קובץ" onclick="resetFile()"></button>
+                                    <button data-button-type="SECONDARY" data-text="החלף קובץ" data-onclick="resetFile()"></button>
                                 </div>
                             </div>
                             
@@ -246,7 +246,7 @@
                             
                             <div class="step-actions">
                                 <button data-button-type="PRIMARY" data-text="המשך לניתוח" 
-                                        onclick="analyzeFile()" id="analyzeBtn" disabled></button>
+                                        data-onclick="analyzeFile()" id="analyzeBtn" disabled></button>
                             </div>
                         </div>
                     </div>
@@ -618,7 +618,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-primary" onclick="saveTickerFromModal()">שמור טיקר</button>
+                    <button data-button-type="SAVE" data-text="שמור טיקר" data-onclick="saveTickerFromModal()"></button>
                 </div>
             </div>
         </div>

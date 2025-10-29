@@ -53,6 +53,15 @@ async function openImportUserDataModal() {
         modal.classList.add('show');
         modal.setAttribute('aria-hidden', 'false');
         
+        // Process buttons using centralized button system
+        if (window.advancedButtonSystem) {
+            window.advancedButtonSystem.processButtons(modal);
+            window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
+        } else if (window.initializeButtons) {
+            window.initializeButtons();
+            window.Logger.debug('[Import Modal] Buttons initialized via initializeButtons()', { page: 'import-user-data' });
+        }
+        
         // Setup event listeners now that modal is visible
         setupImportModalEventListeners();
         
@@ -289,11 +298,15 @@ function setupImportModalEventListeners() {
         window.Logger.debug('[Import Modal] Connector select event listener added', { page: 'import-user-data' });
     }
     
-    // Continue button - look INSIDE the modal
+    // Continue button - NO manual event listener needed!
+    // The centralized button system handles data-onclick automatically via event delegation
+    // Just ensure the button has data-onclick="analyzeFile()" in HTML
     const continueBtn = modal?.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
-        continueBtn.addEventListener('click', analyzeFile);
-        window.Logger.debug('[Import Modal] Continue button event listener added', { page: 'import-user-data' });
+        window.Logger.debug('[Import Modal] Continue button found - will be handled by centralized button system', { 
+            hasDataOnclick: continueBtn.hasAttribute('data-onclick'),
+            page: 'import-user-data' 
+        });
     }
     
     // Mark as set up

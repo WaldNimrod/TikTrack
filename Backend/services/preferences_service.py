@@ -872,24 +872,57 @@ class PreferencesService:
             return None
     
     def get_user_profiles(self, user_id: int) -> List[Dict[str, Any]]:
-        """קבלת פרופילים של משתמש"""
+        """קבלת פרופילים של משתמש
+        כולל פרופיל ברירת מחדל מיוחד (ID: 0, user_id: 0)
+        """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
+            # Get user-specific profiles
             cursor.execute('''
                 SELECT id, profile_name, is_active, is_default, description,
-                       last_used_at, usage_count, created_at
+                       last_used_at, usage_count, created_at, user_id
                 FROM preference_profiles
                 WHERE user_id = ?
                 ORDER BY is_default DESC, last_used_at DESC
             ''', (user_id,))
             
-            results = cursor.fetchall()
+            user_profiles = cursor.fetchall()
+            
+            # Get default profile (special system profile: ID: 0, user_id: 0)
+            cursor.execute('''
+                SELECT id, profile_name, is_active, is_default, description,
+                       last_used_at, usage_count, created_at, user_id
+                FROM preference_profiles
+                WHERE user_id = 0 AND is_default = 1
+                LIMIT 1
+            ''')
+            
+            default_profile = cursor.fetchone()
             conn.close()
             
             profiles = []
-            for row in results:
+            
+            # Add default profile first if exists
+            if default_profile:
+                # Check if user has any active profile
+                has_active_user_profile = any(row[2] for row in user_profiles)
+                
+                profiles.append({
+                    'id': default_profile[0],
+                    'name': default_profile[1],
+                    'active': not has_active_user_profile,  # Active only if no user profile is active
+                    'default': bool(default_profile[3]),
+                    'description': default_profile[4] or 'פרופיל ברירת מחדל של המערכת',
+                    'last_used': default_profile[5],
+                    'usage_count': default_profile[6],
+                    'created_at': default_profile[7],
+                    'user_id': default_profile[8]
+                })
+            
+            # Add user-specific profiles
+            for row in user_profiles:
                 profiles.append({
                     'id': row[0],
                     'name': row[1],
@@ -898,7 +931,8 @@ class PreferencesService:
                     'description': row[4],
                     'last_used': row[5],
                     'usage_count': row[6],
-                    'created_at': row[7]
+                    'created_at': row[7],
+                    'user_id': row[8]
                 })
             
             return profiles
@@ -942,12 +976,21 @@ class PreferencesService:
             raise
 
     def activate_profile(self, user_id: int, profile_id: int) -> bool:
-        """הפעלת פרופיל"""
+        """הפעלת פרופיל
+        
+        לפרופיל ברירת מחדל (ID: 0) - לא משנה את המסד הנתונים, רק מחזיר True
+        לפרופיל רגיל - מפעיל במסד הנתונים
+        """
         try:
+            # Handle default profile (ID: 0) - special system profile
+            if profile_id == 0:
+                logger.info(f"Default profile (ID: 0) selected - special system profile, no DB activation needed")
+                return True
+            
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # בדוק אם הפרופיל קיים
+            # Check if profile exists for this user
             cursor.execute('''
                 SELECT id FROM preference_profiles 
                 WHERE user_id = ? AND id = ?
@@ -958,14 +1001,14 @@ class PreferencesService:
                 conn.close()
                 return False
             
-            # בטל הפעלה מכל הפרופילים של המשתמש
+            # Deactivate all user profiles
             cursor.execute('''
                 UPDATE preference_profiles 
                 SET is_active = 0 
                 WHERE user_id = ?
             ''', (user_id,))
             
-            # הפעל את הפרופיל הנבחר
+            # Activate the selected profile
             cursor.execute('''
                 UPDATE preference_profiles 
                 SET is_active = 1, last_used_at = CURRENT_TIMESTAMP,
@@ -973,7 +1016,7 @@ class PreferencesService:
                 WHERE user_id = ? AND id = ?
             ''', (user_id, profile_id))
             
-            # בדוק שההפעלה הצליחה
+            # Verify activation succeeded
             cursor.execute('''
                 SELECT is_active FROM preference_profiles 
                 WHERE user_id = ? AND id = ?

@@ -3,7 +3,7 @@ Duplicate Detection Service - Smart duplicate detection for import data
 
 This service implements intelligent duplicate detection using multiple strategies:
 1. Exact external_id matching
-2. 3/5 field similarity matching (ticker, quantity, price, date, action)
+2. 4/5 field similarity matching (ticker, quantity, price, date, action)
 3. Within-file duplicate detection
 4. Against-system duplicate detection
 
@@ -29,7 +29,7 @@ class DuplicateDetectionService:
     
     This service uses multiple strategies to identify potential duplicates:
     - External ID matching (exact)
-    - Field similarity matching (3/5 rule)
+    - Field similarity matching (4/5 rule)
     - Within-file detection
     - Against-system detection
     """
@@ -42,7 +42,7 @@ class DuplicateDetectionService:
             db_session: Database session for querying existing data
         """
         self.db_session = db_session
-        self.similarity_threshold = 5  # All 5 fields must match for existing record detection
+        self.similarity_threshold = 4  # 4 out of 5 fields must match for duplicate detection
         self.price_tolerance = 0.01    # Price difference tolerance
         self.date_tolerance_days = 1   # Date difference tolerance
     

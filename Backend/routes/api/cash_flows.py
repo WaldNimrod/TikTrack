@@ -51,7 +51,6 @@ cash_flow_service = CashFlowService()
 base_api = BaseEntityAPI('cash_flows', cash_flow_service, 'cash_flows')
 
 @cash_flows_bp.route('/', methods=['GET'])
-@api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
 def get_cash_flows():
     """Get all cash flows using base API with custom data enhancement"""

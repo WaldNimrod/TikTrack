@@ -39,6 +39,10 @@ CREATE TABLE "executions" (
     fee FLOAT DEFAULT 0.00,                    -- עמלה
     source VARCHAR(50) DEFAULT 'manual',       -- מקור (manual/api/import)
     
+    -- P/L Fields (עדכון 2025-01-29)
+    realized_pl INTEGER NULL,                  -- Realized P/L: NULL בקנייה, חובה במכירה
+    mtm_pl INTEGER NULL,                       -- MTM P/L: רשות בשני המקרים
+    
     -- Metadata
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     external_id VARCHAR(100) NULL,             -- מזהה חיצוני
@@ -95,7 +99,21 @@ class Execution(BaseModel):
     trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=True)
     
-    # Business fields...
+    # Business fields
+    action = Column(String(20), nullable=False, default='buy')
+    date = Column(DateTime, nullable=False)
+    quantity = Column(Float, nullable=False)
+    price = Column(Float, nullable=False)
+    fee = Column(Float, default=0, nullable=True)
+    source = Column(String(50), default='manual', nullable=True)
+    
+    # P/L Fields (עדכון 2025-01-29)
+    realized_pl = Column(Integer, nullable=True, default=None)  # NULL בקנייה, חובה במכירה
+    mtm_pl = Column(Integer, nullable=True, default=None)       # רשות בשני המקרים
+    
+    # Metadata
+    external_id = Column(String(100), nullable=True)
+    notes = Column(String(500), nullable=True)
     
     # CHECK constraint
     __table_args__ = (

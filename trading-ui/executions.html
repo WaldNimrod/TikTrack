@@ -138,13 +138,23 @@
                                                 P&L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th class="col-execution-date">
+                                        <th class="col-realized-pl">
                                             <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }">
+                                                Realized P/L <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-mtm-pl">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">
+                                                MTM P/L <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-execution-date">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }">
                                                 תאריך <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-source">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">מקור <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(9); }">מקור <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-items">
                                         </th>
@@ -152,7 +162,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="9" class="loading">טוען עסקעות...</td>
+                                        <td colspan="11" class="loading">טוען עסקעות...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -191,19 +201,11 @@
                         </div>
                         <div class="step" data-step="2">
                             <div class="step-number">2</div>
-                            <div class="step-label">ניתוח</div>
+                            <div class="step-label">ניתוח + פתרון בעיות</div>
                         </div>
                         <div class="step" data-step="3">
                             <div class="step-number">3</div>
-                            <div class="step-label">פתרון בעיות</div>
-                        </div>
-                        <div class="step" data-step="4">
-                            <div class="step-number">4</div>
-                            <div class="step-label">תצוגה מקדימה</div>
-                        </div>
-                        <div class="step" data-step="5">
-                            <div class="step-number">5</div>
-                            <div class="step-label">אישור</div>
+                            <div class="step-label">תצוגה מקדימה + אישור</div>
                         </div>
                     </div>
 
@@ -237,7 +239,7 @@
                             
                             <div class="account-section">
                                 <label>בחר חשבון מסחר:</label>
-                                <select id="accountSelect" class="form-select">
+                                <select id="tradingAccountSelect" class="form-select">
                                     <option value="">בחר חשבון מסחר...</option>
                                 </select>
                             </div>
@@ -249,7 +251,7 @@
                         </div>
                     </div>
 
-                    <!-- Step 2: Analysis Results -->
+                    <!-- Step 2: Analysis Results + Problem Resolution -->
                     <div class="import-step" id="step-analysis" data-step="2" style="display:none;">
                         <div class="step-content">
                             <h3>תוצאות ניתוח</h3>
@@ -282,27 +284,25 @@
                                         <div class="card-label">רשומות כפולות</div>
                                     </div>
                                 </div>
-                                <div class="analysis-card missing">
+                                <div class="analysis-card missing-tickers">
                                     <div class="card-icon"><i class="bi bi-question-circle"></i></div>
                                     <div class="card-content">
-                                        <div class="card-number" id="missingTickers">0</div>
-                                        <div class="card-label">סמלים חסרים</div>
+                                        <div class="card-number" id="missingTickersCount">0</div>
+                                        <div class="card-label">טיקרים חסרים</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card missing-records">
+                                    <div class="card-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="missingTickerRecords">0</div>
+                                        <div class="card-label">רשומות עם טיקר חסר</div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="step-actions">
-                                <button data-button-type="BACK" data-text="חזור" onclick="goToStep(1)"></button>
-                                <button data-button-type="PRIMARY" data-text="המשך לפתרון בעיות" 
-                                        onclick="goToStep(3)"></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Problem Resolution -->
-                    <div class="import-step" id="step-problems" data-step="3" style="display:none;">
-                        <div class="step-content">
-                            <h3>פתרון בעיות</h3>
+                            <!-- Problem Resolution Section -->
+                            <div class="problem-resolution-section" id="problemResolutionSection" style="display:none;">
+                                <h3>פתרון בעיות</h3>
                             
                             <!-- Missing Tickers Section -->
                             <div class="problem-section" id="missingTickersSection" style="display:none;">
@@ -331,90 +331,23 @@
                                 </div>
                             </div>
                             
+                            </div>
+                            <!-- End of Problem Resolution Section -->
+                            
                             <div class="step-actions">
-                                <button data-button-type="BACK" data-text="חזור" onclick="goToStep(2)"></button>
+                                <button data-button-type="BACK" data-text="חזור" data-onclick="goToStep(1)"></button>
                                 <button data-button-type="PRIMARY" data-text="המשך לתצוגה מקדימה" 
-                                        onclick="goToStep(4)"></button>
+                                        data-onclick="goToStep(3)" data-id="btn-preview-continue"></button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Step 4: Preview -->
-                    <div class="import-step" id="step-preview" data-step="4" style="display:none;">
+                    <!-- Step 3: Preview + Confirmation -->
+                    <div class="import-step" id="step-preview" data-step="3" style="display:none;">
                         <div class="step-content">
-                            <h3>תצוגה מקדימה</h3>
+                            <h3>תצוגה מקדימה ואישור</h3>
                             
-                            <div class="preview-summary">
-                                <div class="summary-item">
-                                    <span class="summary-label">רשומות לייבוא:</span>
-                                    <span class="summary-value" id="previewImportCount">0</span>
-                                </div>
-                                <div class="summary-item">
-                                    <span class="summary-label">רשומות להשמטה:</span>
-                                    <span class="summary-value" id="previewSkipCount">0</span>
-                                </div>
-                                <div class="summary-item">
-                                    <span class="summary-label">אחוז ייבוא:</span>
-                                    <span class="summary-value" id="previewImportRate">0%</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Records to Import -->
-                            <div class="preview-section">
-                                <h4><i class="bi bi-check-circle text-success"></i> רשומות לייבוא</h4>
-                                <div class="table-container">
-                                    <table class="import-table" id="importTable">
-                                        <thead>
-                                            <tr>
-                                                <th>סמל</th>
-                                                <th>פעולה</th>
-                                                <th>כמות</th>
-                                                <th>מחיר</th>
-                                                <th>עמלה</th>
-                                                <th>תאריך</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="importTableBody">
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <!-- Records to Skip -->
-                            <div class="preview-section">
-                                <h4><i class="bi bi-x-circle text-danger"></i> רשומות להשמטה</h4>
-                                <div class="table-container">
-                                    <table class="import-table" id="skipTable">
-                                        <thead>
-                                            <tr>
-                                                <th>סמל</th>
-                                                <th>פעולה</th>
-                                                <th>כמות</th>
-                                                <th>מחיר</th>
-                                                <th>עמלה</th>
-                                                <th>תאריך</th>
-                                                <th>סיבה</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="skipTableBody">
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div class="step-actions">
-                                <button data-button-type="BACK" data-text="חזור" onclick="goToStep(3)"></button>
-                                <button data-button-type="PRIMARY" data-text="המשך לאישור" 
-                                        onclick="goToStep(5)"></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 5: Final Confirmation -->
-                    <div class="import-step" id="step-confirm" data-step="5" style="display:none;">
-                        <div class="step-content">
-                            <h3>אישור סופי</h3>
-                            
+                            <!-- Confirmation Summary -->
                             <div class="confirmation-summary">
                                 <div class="summary-card">
                                     <h4>סיכום הייבוא</h4>
@@ -443,18 +376,78 @@
                                 </div>
                             </div>
                             
+                            <!-- Preview Summary -->
+                            <div class="preview-summary">
+                                <div class="summary-item">
+                                    <span class="summary-label">רשומות לייבוא:</span>
+                                    <span class="summary-value" id="previewImportCount">0</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">רשומות להשמטה:</span>
+                                    <span class="summary-value" id="previewSkipCount">0</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">אחוז ייבוא:</span>
+                                    <span class="summary-value" id="previewImportRate">0%</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Records to Import -->
+                            <div class="preview-section">
+                                <h4><i class="bi bi-check-circle text-success"></i> רשומות לייבוא</h4>
+                                <div class="table-container">
+                                    <table class="import-table" id="importTable">
+                                        <thead>
+                                            <tr>
+                                                <th>סמל</th>
+                                                <th>פעולה</th>
+                                                <th>כמות</th>
+                                                <th>מחיר</th>
+                                                <th>עמלה</th>
+                                                <th>Realized P/L</th>
+                                                <th>MTM P/L</th>
+                                                <th>תאריך</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="importTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Records to Skip -->
+                            <div class="preview-section">
+                                <h4><i class="bi bi-x-circle text-danger"></i> רשומות להשמטה</h4>
+                                <div class="table-container">
+                                    <table class="import-table" id="skipTable">
+                                        <thead>
+                                            <tr>
+                                                <th>סמל</th>
+                                                <th>פעולה</th>
+                                                <th>כמות</th>
+                                                <th>מחיר</th>
+                                                <th>עמלה</th>
+                                                <th>Realized P/L</th>
+                                                <th>MTM P/L</th>
+                                                <th>תאריך</th>
+                                                <th>סיבה</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="skipTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
                             <div class="step-actions">
-                                <button data-button-type="CANCEL" data-text="ביטול" 
-                                        onclick="resetImport()"></button>
-                                <button data-button-type="BACK" data-text="חזור" 
-                                        onclick="goToStep(4)"></button>
-                                <button data-button-type="SAVE" data-text="ביצוע ייבוא" 
-                                        onclick="executeImport(false)"></button>
-                                <button data-button-type="DOWNLOAD" data-text="ביצוע ייבוא + הורדת דוח" 
-                                        onclick="executeImport(true)"></button>
+                                <button data-button-type="BACK" data-text="חזור" data-onclick="goToStep(2)"></button>
+                                <button data-button-type="CANCEL" data-text="ביטול" data-bs-dismiss="modal"></button>
+                                <button data-button-type="SAVE" data-text="ביצוע ייבוא" data-onclick="confirmImport()"></button>
+                                <button data-button-type="DOWNLOAD" data-text="ביצוע ייבוא + הורדת דוח" data-onclick="confirmImport(true)"></button>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -555,6 +548,9 @@
     <script src="scripts/init-system/package-manifest.js?v=05b6de6f_20251025_005449"></script> <!-- מניפסט חבילות -->
     <script src="scripts/page-initialization-configs.js?v=05b6de6f_20251025_005449"></script> <!-- קונפיגורציות עמודים -->
     <script src="scripts/unified-app-initializer.js?v=05b6de6f_20251025_005449"></script> <!-- אתחול מאוחד -->
+    
+    <!-- Validation System -->
+    <script src="scripts/validation-utils.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת ולידציה -->
     
     <!-- Modal System V2 -->
     <script src="scripts/modal-manager-v2.js?v=05b6de6f_20251025_005449"></script>

@@ -91,6 +91,23 @@ const executionsModalConfig = {
             placeholder: '0.00'
         },
         {
+            type: 'number',
+            id: 'executionRealizedPL',
+            label: 'Realized P/L',
+            required: false,
+            step: 1,
+            placeholder: '0',
+            disabled: true  // Will be enabled/disabled based on action type
+        },
+        {
+            type: 'number',
+            id: 'executionMTMPL',
+            label: 'MTM P/L',
+            required: false,
+            step: 1,
+            placeholder: 'הכנס MTM P/L...'
+        },
+        {
             type: 'select',
             id: 'executionStatus',
             label: 'סטטוס',
@@ -141,6 +158,14 @@ const executionsModalConfig = {
         executionFees: {
             required: false,
             min: 0
+        },
+        executionRealizedPL: {
+            required: false,
+            min: null  // Can be negative
+        },
+        executionMTMPL: {
+            required: false,
+            min: null  // Can be negative
         },
         executionStatus: {
             required: true

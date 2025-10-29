@@ -175,7 +175,9 @@ class DatabaseRecreator:
         cursor.execute("""
             CREATE TABLE executions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                trade_id INTEGER NOT NULL,
+                ticker_id INTEGER,
+                trading_account_id INTEGER,
+                trade_id INTEGER,
                 action VARCHAR(20),
                 date DATETIME NOT NULL,
                 quantity FLOAT,
@@ -185,6 +187,10 @@ class DatabaseRecreator:
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 external_id VARCHAR(100),
                 notes VARCHAR(500),
+                realized_pl INTEGER NULL,
+                mtm_pl INTEGER NULL,
+                FOREIGN KEY (ticker_id) REFERENCES tickers (id),
+                FOREIGN KEY (trading_account_id) REFERENCES trading_accounts (id),
                 FOREIGN KEY (trade_id) REFERENCES trades (id)
             )
         """)

@@ -107,6 +107,16 @@ class ImportSession(BaseModel):
 - `trade_id`: קישור לעסקה (עכשיו nullable)
 - `source`: מקור הנתונים ("ibkr_import", "demo_import", "manual", "api")
 - `external_id`: מזהה חיצוני ייחודי לכל רשומה מיובאת
+- `realized_pl`: רווח/הפסד ממומש סה"כ אחרי עמלות (Integer, nullable) (עדכון 2025-01-29)
+- `mtm_pl`: רווח/הפסד ממומש סה"כ Mark-to-Market (Integer, nullable) (עדכון 2025-01-29)
+
+**התנהגות שדות Realized P/L ו-MTM P/L**:
+- **Realized P/L**:
+  - בקנייה (`buy`): תמיד `NULL` (מושבת ב-UI)
+  - במכירה (`sell`): חובה למלא (NOT NULL constraint)
+- **MTM P/L**: 
+  - בקנייה ובמכירה: רשות (nullable)
+- **תהליך הייבוא**: IBKR מספק את הנתונים בעמודות 'Realized P/L' ו-'MTM P/L' - המערכת שומרת אותם ישירות
 
 ## קונקטורים
 
@@ -159,6 +169,8 @@ class BaseImportConnector(ABC):
     "quantity": 250,
     "price": 13.6,
     "fee": 1.2555,
+    "realized_pl": null,                # NULL בקנייה, חובה במכירה
+    "mtm_pl": null,                      # רשות בשני המקרים
     "external_id": "2025-09-03_AAL_250_13.6",  # ייחודי
     "source": "ibkr_import"             # מקור הנתונים
 }

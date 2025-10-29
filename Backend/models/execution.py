@@ -8,7 +8,7 @@ class Execution(BaseModel):
     
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=True)
-    trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)  # Make nullable
+    trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)  # Make nullable - executions can exist without trades
     action = Column(String(20), nullable=False, default='buy')  # ENUM: buy, sale
     date = Column(DateTime, nullable=False)  # NOT NULL, must be >= trade.open_date
     quantity = Column(Float, nullable=False)  # RANGE: quantity > 0
@@ -17,6 +17,8 @@ class Execution(BaseModel):
     source = Column(String(50), default='manual', nullable=True)  # ENUM: manual, api, file_import, direct_import
     external_id = Column(String(100), nullable=True)  # מזהה חיצוני
     notes = Column(String(500), nullable=True)  # הערות על העסקה
+    realized_pl = Column(Integer, nullable=True, default=None)  # Realized P/L: NULL in buy, required in sell
+    mtm_pl = Column(Integer, nullable=True, default=None)  # MTM P/L: optional in both buy and sell
     
     # Relationships
     ticker = relationship("Ticker")

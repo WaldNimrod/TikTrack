@@ -104,6 +104,15 @@ Statement,Header,Field Name,Field Value
 Account Information,Data,Account,U16011759
 Account Information,Data,Name,Nimrod Wald
 Trades,Header,DataDiscriminator,Asset Category,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code
+
+**הערה**: עמודות **Realized P/L** ו-**MTM P/L** מיובאות ישירות מהקובץ ונשמרות במערכת.
+- **Realized P/L**: רווח/הפסד ממומש סה"כ אחרי עמלות, ריבית, דערי מטבע וכו'
+- **MTM P/L**: רווח/הפסד ממומש סה"כ Mark-to-Market
+
+**התנהגות שדות**:
+- בקנייה: Realized P/L תמיד יהיה 0 (מושבת בעת הוספה ידנית)
+- במכירה: Realized P/L חובה למלא
+- MTM P/L: רשות בקנייה ובמכירה
 Trades,Data,Order,Stocks,AAL,2025-09-03, 09:35:18,250,13.6,13.6,-3400,1.2555,-3401.2555,0,0,O
 ```
 
@@ -112,11 +121,13 @@ Trades,Data,Order,Stocks,AAL,2025-09-03, 09:35:18,250,13.6,13.6,-3400,1.2555,-34
 קובץ Demo פשוט לבדיקות:
 
 ```csv
-symbol,action,date,quantity,price,fee
-AAPL,buy,2025-01-15T10:30:00,100,150.25,1.50
-TSLA,sell,2025-01-15T11:45:00,50,200.75,2.00
-GOOGL,buy,2025-01-16T09:15:00,25,2800.50,3.25
+symbol,action,date,quantity,price,fee,realized_pl,mtm_pl
+AAPL,buy,2025-01-15T10:30:00,100,150.25,1.50,,
+TSLA,sell,2025-01-15T11:45:00,50,200.75,2.00,150.00,145.00
+GOOGL,buy,2025-01-16T09:15:00,25,2800.50,3.25,,
 ```
+
+**הערה**: עמודות `realized_pl` ו-`mtm_pl` הן אופציונליות ומיובאות ישירות מהקובץ אם קיימות.
 
 ## זיהוי כפילויות
 

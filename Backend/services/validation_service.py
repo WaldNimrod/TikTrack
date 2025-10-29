@@ -50,6 +50,18 @@ class ValidationService:
             constraints = db.execute(constraints_query, {"table_name": table_name}).fetchall()
             logger.info(f"Validating {table_name} - found {len(constraints)} constraints")
             
+            # Custom validation for executions.realized_pl based on action
+            if table_name == 'executions':
+                action = data.get('action')
+                realized_pl = data.get('realized_pl')
+                
+                if action == 'sell' and realized_pl is None:
+                    errors.append("Field 'realized_pl' is required for sell actions")
+                elif action == 'buy' and realized_pl is not None and realized_pl != 0:
+                    # In buy, realized_pl should be NULL or 0
+                    logger.warning(f"Realized P/L should be NULL or 0 for buy actions, got: {realized_pl}")
+                    # This is a warning, not an error - we'll allow it but log it
+            
             logger.info(f"Starting constraint loop for {table_name}")
             for constraint in constraints:
                 constraint_id, constraint_type, field_name, definition, is_active = constraint
@@ -95,6 +107,13 @@ class ValidationService:
                 elif constraint_type == 'RANGE':
                     if field_value is not None and not ValidationService._validate_range(field_value, definition):
                         errors.append(f"Field '{field_name}' is out of range")
+                
+                elif constraint_type == 'CUSTOM':
+                    # CUSTOM constraints validate cross-table relationships
+                    if not ValidationService._validate_custom(db, table_name, data, constraint_id, definition, exclude_id):
+                        # Extract error message from constraint_definition or use default
+                        error_msg = definition.split('|')[1].strip() if '|' in definition else f"Custom constraint violation for {field_name}"
+                        errors.append(error_msg)
         
         except Exception as e:
             logger.error(f"Error validating data for table {table_name}: {str(e)}")
@@ -272,4 +291,82 @@ class ValidationService:
             
         except Exception as e:
             logger.error(f"Error validating RANGE constraint '{definition}': {str(e)}")
+            return False
+    
+    @staticmethod
+    def _validate_custom(db: Session, table_name: str, data: Dict[str, Any], constraint_id: int, definition: str, exclude_id: Optional[int] = None) -> bool:
+        """
+        Validate CUSTOM constraint for cross-table relationships
+        
+        Format: "EXECUTION_TRADE_TICKER_MATCH|Error message"
+        Validates that if execution has trade_id, the ticker_id of execution matches ticker_id of trade
+        
+        Args:
+            db: Database session
+            table_name: Name of the table being validated
+            data: Data dictionary with all fields
+            constraint_id: ID of the constraint
+            definition: Constraint definition string
+            exclude_id: ID to exclude from checks (for updates)
+            
+        Returns:
+            bool: True if constraint passes, False otherwise
+        """
+        try:
+            logger.info(f"Validating CUSTOM constraint: {definition}")
+            
+            # Parse constraint type from definition
+            # Format: "CONSTRAINT_TYPE|Error message"
+            constraint_parts = definition.split('|', 1)
+            constraint_type = constraint_parts[0].strip()
+            
+            if constraint_type == 'EXECUTION_TRADE_TICKER_MATCH':
+                # Validate that if execution has trade_id, ticker_id matches trade.ticker_id
+                
+                # Only validate for executions table
+                if table_name != 'executions':
+                    logger.warning(f"CUSTOM constraint EXECUTION_TRADE_TICKER_MATCH only applies to executions table")
+                    return True
+                
+                execution_ticker_id = data.get('ticker_id')
+                trade_id = data.get('trade_id')
+                
+                # If no trade_id, constraint passes (trade_id is optional)
+                if trade_id is None:
+                    logger.info(f"Execution has no trade_id, CUSTOM constraint passes")
+                    return True
+                
+                # If no ticker_id in execution, constraint passes (ticker_id can be null)
+                if execution_ticker_id is None:
+                    logger.info(f"Execution has no ticker_id, CUSTOM constraint passes")
+                    return True
+                
+                # Get ticker_id from trade
+                trade_query = text("SELECT ticker_id FROM trades WHERE id = :trade_id")
+                trade_result = db.execute(trade_query, {"trade_id": trade_id}).fetchone()
+                
+                if trade_result is None:
+                    logger.warning(f"Trade {trade_id} not found, CUSTOM constraint passes (FK will catch this)")
+                    return True
+                
+                trade_ticker_id = trade_result[0]
+                
+                # If trade has no ticker_id, constraint passes
+                if trade_ticker_id is None:
+                    logger.info(f"Trade {trade_id} has no ticker_id, CUSTOM constraint passes")
+                    return True
+                
+                # Check if ticker_ids match
+                if execution_ticker_id != trade_ticker_id:
+                    logger.error(f"CUSTOM constraint violation: execution.ticker_id={execution_ticker_id} != trade.ticker_id={trade_ticker_id}")
+                    return False
+                
+                logger.info(f"CUSTOM constraint passed: execution.ticker_id={execution_ticker_id} == trade.ticker_id={trade_ticker_id}")
+                return True
+            else:
+                logger.warning(f"Unknown CUSTOM constraint type: {constraint_type}")
+                return True
+                
+        except Exception as e:
+            logger.error(f"Error validating CUSTOM constraint '{definition}': {str(e)}")
             return False

@@ -339,6 +339,29 @@ function resetEditExecutionForm() {
 /**
  * הצגת מודל עריכת עסקה
  */
+/**
+ * עדכון שדה Realized P/L לפי סוג הפעולה
+ */
+function updateRealizedPLField(mode = 'add') {
+  const actionSelect = document.getElementById(mode === 'add' ? 'addExecutionType' : 'editExecutionType');
+  const realizedPLField = document.getElementById('executionRealizedPL');
+  
+  if (!actionSelect || !realizedPLField) {
+    return;
+  }
+  
+  const actionType = actionSelect.value;
+  
+  if (actionType === 'buy') {
+    realizedPLField.disabled = true;
+    realizedPLField.required = false;
+    realizedPLField.value = '';
+  } else if (actionType === 'sell' || actionType === 'sale') {
+    realizedPLField.disabled = false;
+    realizedPLField.required = true;
+  }
+}
+
 function showEditExecutionModal(executionId) {
   try {
     // לא ניתן לטעון תכנונים
@@ -491,6 +514,28 @@ async function fillEditExecutionForm(execution, linkedObject, tickerId) {
       }
     } else {
       window.Logger.info('⚠️ [EDIT MODAL] אין עמלה לעסקה', { page: "executions" });
+    }
+
+    // מילוי שדה Realized P/L
+    const realizedPLValue = execution.realized_pl !== null && execution.realized_pl !== undefined ? execution.realized_pl : '';
+    const realizedPLField = document.getElementById('executionRealizedPL');
+    if (realizedPLField) {
+      realizedPLField.value = realizedPLValue;
+      window.Logger.info('✅ [EDIT MODAL] שדה Realized P/L מולא:', realizedPLValue, { page: "executions" });
+      // Enable/disable based on action type
+      updateRealizedPLField('edit');
+    } else {
+      window.Logger.info('❌ [EDIT MODAL] שדה Realized P/L לא נמצא ב-DOM', { page: "executions" });
+    }
+
+    // מילוי שדה MTM P/L
+    const mtmPLValue = execution.mtm_pl !== null && execution.mtm_pl !== undefined ? execution.mtm_pl : '';
+    const mtmPLField = document.getElementById('executionMTMPL');
+    if (mtmPLField) {
+      mtmPLField.value = mtmPLValue;
+      window.Logger.info('✅ [EDIT MODAL] שדה MTM P/L מולא:', mtmPLValue, { page: "executions" });
+    } else {
+      window.Logger.info('❌ [EDIT MODAL] שדה MTM P/L לא נמצא ב-DOM', { page: "executions" });
     }
 
     // מילוי שדה המקור
@@ -800,7 +845,9 @@ async function saveExecution() {
     date: { id: 'addExecutionDate', type: 'date' },
     fee: { id: 'addExecutionCommission', type: 'number' },
     notes: { id: 'addExecutionNotes', type: 'text' },
-    source: { id: 'addExecutionSource', type: 'text', default: 'manual' }
+    source: { id: 'addExecutionSource', type: 'text', default: 'manual' },
+    realized_pl: { id: 'executionRealizedPL', type: 'int' },
+    mtm_pl: { id: 'executionMTMPL', type: 'int' }
   });
 
   const tradeIdValue = executionData.trade_id;
@@ -830,6 +877,19 @@ async function saveExecution() {
   }
 
   try {
+    // Handle realized_pl: NULL for buy, required for sell
+    let realizedPL = null;
+    if (type === 'sell' || type === 'sale') {
+      realizedPL = executionData.realized_pl !== null && executionData.realized_pl !== undefined 
+        ? parseInt(executionData.realized_pl) : null;
+      if (realizedPL === null) {
+        handleValidationError('executionRealizedPL', 'Realized P/L חובה במכירה');
+        return;
+      }
+    } else if (type === 'buy') {
+      realizedPL = null;  // Always NULL for buy
+    }
+
     const executionPayload = {
       trade_id: tradeId,
       action: type,
@@ -839,6 +899,9 @@ async function saveExecution() {
       fee: commission ? parseFloat(commission) : null,
       source: 'manual',
       notes: notes || null,
+      realized_pl: realizedPL,
+      mtm_pl: executionData.mtm_pl !== null && executionData.mtm_pl !== undefined 
+        ? parseInt(executionData.mtm_pl) : null
     };
 
     const response = await fetch('/api/executions', {
@@ -876,6 +939,8 @@ async function updateExecutionWrapper() {
   const executionDate = document.getElementById('editExecutionDate').value;
   const commission = document.getElementById('editExecutionCommission').value;
   const notes = document.getElementById('editExecutionNotes').value.trim();
+  const realizedPLValue = document.getElementById('executionRealizedPL')?.value;
+  const mtmPLValue = document.getElementById('executionMTMPL')?.value;
 
   // ולידציה - משתמש במערכת הכללית window.validateEntityForm
 
@@ -898,6 +963,19 @@ async function updateExecutionWrapper() {
   try {
     const source = document.getElementById('editExecutionSource')?.value || 'manual';
 
+    // Handle realized_pl: NULL for buy, required for sell
+    let realizedPL = null;
+    if (type === 'sell' || type === 'sale') {
+      realizedPL = realizedPLValue !== null && realizedPLValue !== undefined && realizedPLValue !== ''
+        ? parseInt(realizedPLValue) : null;
+      if (realizedPL === null) {
+        handleValidationError('executionRealizedPL', 'Realized P/L חובה במכירה');
+        return;
+      }
+    } else if (type === 'buy') {
+      realizedPL = null;  // Always NULL for buy
+    }
+
     const executionData = {
       trade_id: tradeId,
       action: type,
@@ -907,6 +985,9 @@ async function updateExecutionWrapper() {
       fee: commission ? parseFloat(commission) : null,
       source,
       notes: notes || null,
+      realized_pl: realizedPL,
+      mtm_pl: mtmPLValue !== null && mtmPLValue !== undefined && mtmPLValue !== ''
+        ? parseInt(mtmPLValue) : null
     };
 
 
@@ -1629,17 +1710,36 @@ async function updateExecutionsTableMain(executions) {
   }
 
   tbody.innerHTML = executions.map(execution => {
-    // מציאת הטרייד המקושר
+    // מציאת הטרייד המקושר (אופציונלי)
     const trade = trades.find(t => t.id === execution.trade_id);
     let symbol = 'לא מוגדר';
     let tradeInfo = '';
     let ticker = null;
 
-    if (trade) {
-      // מציאת הטיקר
+    // תמיד להשתמש בטיקר ישירות מהרשומה
+    if (execution.ticker_symbol) {
+      // יש ticker_symbol ישירות מהשרת
+      symbol = execution.ticker_symbol;
+      if (execution.ticker_id) {
+        ticker = tickers.find(t => t.id === execution.ticker_id);
+      }
+    } else if (execution.ticker_id) {
+      // יש ticker_id ישיר ברשומה, לחפש בטבלת הטיקרים
+      ticker = tickers.find(t => t.id === execution.ticker_id);
+      symbol = ticker ? ticker.symbol : 'לא מוגדר';
+    } else if (trade && trade.ticker_symbol) {
+      // אין ticker_id ישיר, אבל יש טרייד עם טיקר - להשתמש בטיקר של הטרייד
+      symbol = trade.ticker_symbol;
+      if (trade.ticker_id) {
+        ticker = tickers.find(t => t.id === trade.ticker_id);
+      }
+    } else if (trade && trade.ticker_id) {
+      // אין ticker_symbol בטרייד, אבל יש ticker_id - לחפש בטבלת הטיקרים
       ticker = tickers.find(t => t.id === trade.ticker_id);
       symbol = ticker ? ticker.symbol : 'לא מוגדר';
+    }
 
+    if (trade) {
       // מידע על הטרייד: תאריך פתיחה | צד | סוג
       const openDate = trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
       const side = trade.side || 'לא מוגדר';
@@ -1647,7 +1747,7 @@ async function updateExecutionsTableMain(executions) {
 
       tradeInfo = `${openDate} | ${side} | ${type}`;
     } else {
-      tradeInfo = `טרייד ${execution.trade_id}`;
+      tradeInfo = execution.trade_id ? `טרייד ${execution.trade_id}` : 'ללא טרייד';
     }
 
     // שמירת הערכים המקוריים באנגלית לפילטר
@@ -1655,8 +1755,8 @@ async function updateExecutionsTableMain(executions) {
       (execution.action || execution.type) === 'sale' ? 'מכירה' :
         execution.action || execution.type;
 
-    // מציאת שם החשבון מסחר מהטרייד
-    const accountName = trade ? trade.account_name : 'לא מוגדר';
+    // תמיד להשתמש בחשבון ישירות מהרשומה, או מהטרייד אם אין ישיר
+    const accountName = execution.account_name || (trade ? trade.account_name : 'לא מוגדר');
 
     return `
             <tr data-execution-id="${execution.id}" class="execution-row">
@@ -1679,6 +1779,20 @@ async function updateExecutionsTableMain(executions) {
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td class="pl-cell">$0</td>
+                <td class="realized-pl-cell" data-realized-pl="${execution.realized_pl || ''}">
+                    ${execution.realized_pl !== null && execution.realized_pl !== undefined ? 
+                        (execution.realized_pl >= 0 ? 
+                            `<span class="numeric-ltr" style="color: ${positiveColor}">$${execution.realized_pl}</span>` : 
+                            `<span class="numeric-ltr" style="color: ${negativeColor}">-$${Math.abs(execution.realized_pl)}</span>`) : 
+                        '-'}
+                </td>
+                <td class="mtm-pl-cell" data-mtm-pl="${execution.mtm_pl || ''}">
+                    ${execution.mtm_pl !== null && execution.mtm_pl !== undefined ? 
+                        (execution.mtm_pl >= 0 ? 
+                            `<span class="numeric-ltr" style="color: ${positiveColor}">$${execution.mtm_pl}</span>` : 
+                            `<span class="numeric-ltr" style="color: ${negativeColor}">-$${Math.abs(execution.mtm_pl)}</span>`) : 
+                        '-'}
+                </td>
                 <td data-date="${execution.date || execution.execution_date}">${window.renderExecutionDate ? window.renderExecutionDate(execution.date || execution.execution_date) : (execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-')}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="actions-cell">
@@ -2116,6 +2230,18 @@ window.initializeExecutionsPage = async function() {
   // אתחול רשימת טיקרים לפי הצ'קבוקס (ברירת מחדל: לא מסומן)
   updateTickersList('add', false);
   updateTickersList('edit', false);
+
+  // Event listeners לעדכון שדה Realized P/L לפי סוג הפעולה
+  const addExecutionType = document.getElementById('addExecutionType');
+  const editExecutionType = document.getElementById('editExecutionType');
+  
+  if (addExecutionType) {
+    addExecutionType.addEventListener('change', () => updateRealizedPLField('add'));
+  }
+  
+  if (editExecutionType) {
+    editExecutionType.addEventListener('change', () => updateRealizedPLField('edit'));
+  }
 
   // עדכון אוטומטי כל 30 שניות - הושבת זמנית למניעת לופים
   // setInterval(() => {

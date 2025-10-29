@@ -28,7 +28,8 @@ from services.user_data_import.report_generator import ImportReportGenerator
 from connectors.user_data_import.ibkr_connector import IBKRConnector
 from connectors.user_data_import.demo_connector import DemoConnector
 
-logger = logging.getLogger(__name__)
+from config.logging import get_logger
+logger = get_logger(__name__)
 
 class ImportOrchestrator:
     """
@@ -149,7 +150,8 @@ class ImportOrchestrator:
         Returns:
             Dict[str, Any]: Session creation results
         """
-        logger.info(f"🔧 Creating import session for account {trading_account_id}, file: {file_name}, connector: {connector_type}")
+        logger.info(f"🔧 [Session Creation] Starting import session creation", 
+                   extra={'trading_account_id': trading_account_id, 'file_name': file_name, 'connector_type': connector_type})
         try:
             # Get connector by type
             connector = self.connectors.get(connector_type)
@@ -235,7 +237,8 @@ class ImportOrchestrator:
         Returns:
             Dict[str, Any]: Analysis results
         """
-        logger.info(f"🔍 Starting file analysis for session {session_id}")
+        logger.info(f"🔍 [File Analysis] Starting file analysis", 
+                   extra={'session_id': session_id})
         try:
             # Get session
             session = self.db_session.query(ImportSession).filter(
@@ -262,27 +265,31 @@ class ImportOrchestrator:
             logger.info(f"✅ Connector found: {connector.get_provider_name()}")
             
             # Parse file
-            logger.info("📊 Parsing file...")
+            logger.info("📊 [File Analysis] Parsing file", 
+                       extra={'session_id': session_id, 'file_name': session.file_name})
             raw_records = connector.parse_file(file_content, session.file_name)
             session.total_records = len(raw_records)
             logger.info(f"✅ File parsed: {len(raw_records)} records found")
             
             # Normalize records
-            logger.info("🔄 Normalizing records...")
+            logger.info("🔄 [File Analysis] Normalizing records", 
+                       extra={'session_id': session_id, 'raw_records_count': len(raw_records)})
             normalization_result = self.normalization_service.normalize_records(
                 raw_records, connector
             )
             logger.info(f"✅ Normalization completed: {len(normalization_result['normalized_records'])} records")
             
             # Validate records
-            logger.info(f"🔍 Starting validation for {len(normalization_result['normalized_records'])} records")
+            logger.info("🔍 [File Analysis] Validating records", 
+                       extra={'session_id': session_id, 'normalized_records_count': len(normalization_result['normalized_records'])})
             validation_result = self.validation_service.validate_records(
                 normalization_result['normalized_records']
             )
             logger.info(f"📊 Validation result: {validation_result.get('missing_tickers', 'NOT_FOUND')}")
             
             # Detect duplicates
-            logger.info("🔍 Detecting duplicates...")
+            logger.info("🔍 [File Analysis] Detecting duplicates", 
+                       extra={'session_id': session_id, 'valid_records_count': len(validation_result['valid_records'])})
             duplicate_result = self.duplicate_detection_service.detect_duplicates(
                 validation_result['valid_records'],
                 session.trading_account_id
@@ -290,6 +297,15 @@ class ImportOrchestrator:
             logger.info(f"✅ Duplicate detection completed: {len(duplicate_result['clean_records'])} clean records")
             
             # Prepare analysis results for API response (detailed)
+            # Calculate missing ticker records count
+            missing_tickers = validation_result['missing_tickers']
+            missing_ticker_records = 0
+            for record in validation_result['valid_records']:
+                if record.get('symbol') in missing_tickers:
+                    missing_ticker_records += 1
+            
+            logger.info(f"📊 Missing ticker analysis: {len(missing_tickers)} missing tickers, {missing_ticker_records} records with missing tickers")
+            
             analysis_results = {
                 'total_records': session.total_records,
                 'parsed_records': len(raw_records),
@@ -299,7 +315,8 @@ class ImportOrchestrator:
                 'clean_records': len(duplicate_result['clean_records']),
                 'duplicate_records': len(duplicate_result['within_file_duplicates']) + 
                                    len(duplicate_result['existing_records']),
-                'missing_tickers': validation_result['missing_tickers'],
+                'missing_tickers': missing_tickers,
+                'missing_ticker_records': missing_ticker_records,
                 'existing_records': len(duplicate_result['existing_records']),
                 'normalization_errors': normalization_result['errors'],
                 'validation_errors': validation_result['validation_errors'],
@@ -350,7 +367,11 @@ class ImportOrchestrator:
                 data=analysis_results
             )
             
-            logger.info(f"🎉 Analysis completed successfully. Results: {analysis_results}")
+            logger.info("🎉 [File Analysis] Analysis completed successfully", 
+                       extra={'session_id': session_id, 'total_records': analysis_results['total_records'], 
+                             'valid_records': analysis_results['valid_records'], 
+                             'duplicate_records': analysis_results['duplicate_records'],
+                             'missing_tickers_count': len(analysis_results['missing_tickers'])})
             
             return {
                 'success': True,
@@ -359,7 +380,9 @@ class ImportOrchestrator:
             }
             
         except Exception as e:
-            logger.error(f"💥 Failed to analyze file: {str(e)}", exc_info=True)
+            logger.error("💥 [File Analysis] Analysis failed", 
+                        extra={'session_id': session_id, 'error': str(e), 'error_type': type(e).__name__}, 
+                        exc_info=True)
             if 'session' in locals():
                 session.update_status('failed')
             return {
@@ -654,6 +677,7 @@ class ImportOrchestrator:
                     execution = Execution(
                         ticker_id=execution_data.get('ticker_id'),
                         trading_account_id=session.trading_account_id,
+                        trade_id=None,  # No trade association - executions can exist independently
                         action=execution_data.get('action'),
                         quantity=execution_data.get('quantity'),
                         price=execution_data.get('price'),
@@ -661,6 +685,8 @@ class ImportOrchestrator:
                         date=execution_date,
                         external_id=unique_execution_id,
                         source='ibkr_import',  # Fixed source for IBKR imports
+                        realized_pl=execution_data.get('realized_pl'),
+                        mtm_pl=execution_data.get('mtm_pl'),
                         created_at=datetime.now()
                     )
                     self.db_session.add(execution)
@@ -675,6 +701,17 @@ class ImportOrchestrator:
             # Commit all changes
             self.db_session.commit()
             logger.info(f"✅ Successfully imported {imported_count} executions")
+            
+            # Invalidate cache after successful import
+            try:
+                from services.advanced_cache_service import AdvancedCacheService
+                cache_service = AdvancedCacheService()
+                cache_service.invalidate_pattern('executions')
+                cache_service.invalidate_pattern('trades')
+                cache_service.invalidate_pattern('dashboard')
+                logger.info("✅ Cache invalidated after import")
+            except Exception as e:
+                logger.warning(f"⚠️ Failed to invalidate cache: {str(e)}")
             
             # Update session
             session.imported_records = imported_count

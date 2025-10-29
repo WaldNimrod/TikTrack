@@ -626,7 +626,15 @@ class PreferencesUI {
             const changedPreferences = {};
             
             // 3. Check for changes and collect only changed preferences
+            // Filter out non-preference fields (profile management, etc.)
+            const excludedFields = ['profileSelect', 'newProfileName', 'switchProfileBtn', 'createProfileBtn'];
+            
             for (let [key, value] of Object.entries(formData)) {
+                // Skip excluded fields
+                if (excludedFields.includes(key)) {
+                    continue;
+                }
+                
                 if (this.hasChanged(key, value)) {
                     changedPreferences[key] = value;
                 }

@@ -11917,3 +11917,339 @@ WHERE alerts.is_triggered = ?]
 2025-10-30 00:16:05,193 - cache - INFO - Cache MISS: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b
 2025-10-30 00:16:05,195 - cache - INFO - Cache SET: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 3375 chars)
 2025-10-30 00:16:05,196 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:05] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-30 00:16:32,086 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /db_display HTTP/1.1" 200 -
+2025-10-30 00:16:32,101 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-30T00:16:32.098867', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/styles-new/07-pages/_db_display.css?v=05b6de6f_20251025_005449', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 162, in styles_new_files\n    response = send_from_directory(UI_DIR / "styles-new", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:16:32,101 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/master.css?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,103 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/header-styles.css?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,105 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /images/icons/trading_accounts.svg HTTP/1.1" 200 -
+2025-10-30 00:16:32,106 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /images/icons/db_display.svg HTTP/1.1" 200 -
+2025-10-30 00:16:32,106 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /images/icons/trades.svg HTTP/1.1" 200 -
+2025-10-30 00:16:32,107 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-30T00:16:32.098867', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/styles-new/07-pages/_db_display.css?v=05b6de6f_20251025_005449', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 162, in styles_new_files\n    response = send_from_directory(UI_DIR / "styles-new", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:16:32,112 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /images/icons/tickers.svg HTTP/1.1" 200 -
+2025-10-30 00:16:32,113 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "[33mGET /styles-new/07-pages/_db_display.css?v=05b6de6f_20251025_005449 HTTP/1.1[0m" 404 -
+2025-10-30 00:16:32,119 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/global-favicon.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,123 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/notification-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,125 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-30T00:16:32.124334', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:16:32,125 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /images/icons/trade_plans.svg HTTP/1.1" 200 -
+2025-10-30 00:16:32,128 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,129 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,132 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-30T00:16:32.124334', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:16:32,133 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,135 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-10-30 00:16:32,140 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,140 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,140 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,140 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,142 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,148 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,149 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,149 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,150 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,150 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,156 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,157 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,158 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,159 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,160 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,162 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,165 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,167 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,169 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,171 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,173 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_actions-menu.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,173 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,175 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_import-system.css?v=2.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,180 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,184 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,184 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,184 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,188 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,194 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,191 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,199 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,201 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,205 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,208 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,209 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,213 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,214 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,220 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,225 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,238 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,240 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,243 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,246 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,249 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,251 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,256 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,256 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/main.css?v=1.0.0 HTTP/1.1" 200 -
+2025-10-30 00:16:32,263 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /images/icons/alerts.svg HTTP/1.1" 200 -
+2025-10-30 00:16:32,263 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /images/icons/executions.svg HTTP/1.1" 200 -
+2025-10-30 00:16:32,264 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /images/icons/notes.svg HTTP/1.1" 200 -
+2025-10-30 00:16:32,265 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/ui-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,265 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_variables.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,265 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /images/icons/cash_flows.svg HTTP/1.1" 200 -
+2025-10-30 00:16:32,271 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_colors-semantic.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,273 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,273 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_spacing.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,277 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_breakpoints.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,280 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_typography.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,282 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/01-settings/_rtl-logical.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,282 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/03-generic/_reset.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,283 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/02-tools/_functions.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,284 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/02-tools/_mixins.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,285 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/03-generic/_base.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,290 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/04-elements/_headings.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,292 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/04-elements/_links.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,293 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/04-elements/_forms-base.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,293 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/04-elements/_buttons-base.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,298 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/05-objects/_layout.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,300 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/05-objects/_grid.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,303 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_buttons-advanced.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,305 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_tables.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,305 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_cards.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,306 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,308 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_modals.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,311 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_notifications.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,314 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_navigation.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,319 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_forms-advanced.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,322 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_badges-status.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,323 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_page-headers.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,326 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_entity-colors.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,330 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_info-summary.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,332 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_constraints.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,334 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/06-components/_chart-management.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,339 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,340 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/07-trumps/chart-management.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,342 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/08-themes/_light.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,346 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /styles-new/09-utilities/_utilities.css HTTP/1.1" 200 -
+2025-10-30 00:16:32,351 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/error-handlers.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,354 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/warning-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,355 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/unified-cache-manager.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,357 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/logger-service.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,359 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/cache-sync-manager.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,363 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/header-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,364 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/page-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,366 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/translation-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,368 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/button-icons.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,369 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/button-system-init.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,373 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/date-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,374 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/color-scheme-system.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,375 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/data-utils.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,380 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/tables.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,381 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/preferences-core-new.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,384 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/preferences-lazy-loader.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,384 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/preferences-colors.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,388 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/preferences-validation.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,391 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/preferences-ui.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,395 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/init-system/package-manifest.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,397 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/page-initialization-configs.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,397 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/unified-app-initializer.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,402 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/db_display.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,406 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/monitoring-functions.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,408 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /scripts/init-system-check.js?v=05b6de6f_20251025_005449 HTTP/1.1" 200 -
+2025-10-30 00:16:32,482 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-30 00:16:32,482 - cache - INFO - Cache HIT: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Access count: 1)
+2025-10-30 00:16:32,482 - routes.api.base_entity.trading_accounts - INFO - Cache hit for trading_accounts get_all
+2025-10-30 00:16:32,484 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-30 00:16:32,488 - services.trade_service - INFO - Loading trades with joinedload for account and ticker
+2025-10-30 00:16:32,500 - services.trade_service - INFO - Loaded 12 trades
+2025-10-30 00:16:32,500 - services.trade_service - INFO - First trade ID: 1
+2025-10-30 00:16:32,501 - services.trade_service - INFO - First trade trading_account_id: 1
+2025-10-30 00:16:32,501 - services.trade_service - INFO - First trade ticker_id: 1
+2025-10-30 00:16:32,501 - services.trade_service - INFO - First trade has account attribute: True
+2025-10-30 00:16:32,505 - services.trade_service - INFO - First trade account object: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-30 00:16:32,505 - services.trade_service - INFO - First trade has ticker attribute: True
+2025-10-30 00:16:32,505 - services.trade_service - INFO - First trade ticker object: <Ticker(symbol='AAPL', name='Apple Inc. - UPDATED', type='stock')>
+2025-10-30 00:16:32,505 - services.trade_service - INFO - First trade account name: חשבון מעודכן
+2025-10-30 00:16:32,506 - services.trade_service - INFO - First trade ticker symbol: AAPL
+2025-10-30 00:16:32,507 - services.position_calculator_service - INFO - Calculated positions for 12 trades
+2025-10-30 00:16:32,508 - models.trade - INFO - Trade 1: Checking trade_plan relationship...
+2025-10-30 00:16:32,508 - models.trade - INFO - Trade 1: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,510 - models.trade - INFO - Trade 1: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-30 00:16:32,511 - models.trade - INFO - Trade 1: trade_plan is not None, adding data...
+2025-10-30 00:16:32,511 - models.trade - INFO - Trade 1: Using loaded account name: חשבון מעודכן
+2025-10-30 00:16:32,512 - models.trade - INFO - Trade 1: Using loaded ticker symbol: AAPL
+2025-10-30 00:16:32,512 - models.trade - INFO - Trade 1 to_dict result: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-30 00:16:32,533 - models.trade - INFO - Trade 2: Checking trade_plan relationship...
+2025-10-30 00:16:32,533 - models.trade - INFO - Trade 2: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,534 - models.trade - INFO - Trade 2: self.trade_plan: <TradePlan(id=14, type='passive')>
+2025-10-30 00:16:32,534 - models.trade - INFO - Trade 2: trade_plan is not None, adding data...
+2025-10-30 00:16:32,534 - models.trade - INFO - Trade 2: Using loaded account name: חשבון טכנולוגיה
+2025-10-30 00:16:32,535 - models.trade - INFO - Trade 2: Using loaded ticker symbol: GOOGL
+2025-10-30 00:16:32,535 - models.trade - INFO - Trade 2 to_dict result: {'id': 2, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': 'טרייד מוצלח ב-Google', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-10 06:51:43', 'created_at': '2025-08-15 03:51:43', 'total_pl': 1500.0, 'trade_plan_created_at': '2025-08-30 03:36:52', 'trade_plan_planned_amount': 300.5, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:16:32,559 - models.trade - INFO - Trade 3: Checking trade_plan relationship...
+2025-10-30 00:16:32,560 - models.trade - INFO - Trade 3: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,560 - models.trade - INFO - Trade 3: self.trade_plan: <TradePlan(id=2, type='swing')>
+2025-10-30 00:16:32,560 - models.trade - INFO - Trade 3: trade_plan is not None, adding data...
+2025-10-30 00:16:32,561 - models.trade - INFO - Trade 3: Using loaded account name: חשבון ETF
+2025-10-30 00:16:32,561 - models.trade - INFO - Trade 3: Using loaded ticker symbol: SPY
+2025-10-30 00:16:32,561 - models.trade - INFO - Trade 3 to_dict result: {'id': 3, 'trading_account_id': 3, 'ticker_id': 9, 'trade_plan_id': 2, 'status': 'cancelled', 'investment_type': 'passive', 'side': 'Long', 'notes': 'השקעה ב-ETF', 'opened_at': '2025-08-15 03:51:43', 'closed_at': None, 'created_at': '2025-08-15 03:51:43', 'total_pl': 800.0, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 8000.0, 'trade_plan_status': 'open', 'account_name': 'חשבון ETF', 'ticker_symbol': 'SPY', 'cancelled_at': '2025-08-22 06:50:57', 'cancel_reason': 'בדיקת ביטול'}
+2025-10-30 00:16:32,568 - models.trade - INFO - Trade 4: Checking trade_plan relationship...
+2025-10-30 00:16:32,568 - models.trade - INFO - Trade 4: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,568 - models.trade - INFO - Trade 4: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-30 00:16:32,569 - models.trade - INFO - Trade 4: trade_plan is not None, adding data...
+2025-10-30 00:16:32,569 - models.trade - INFO - Trade 4: Using loaded account name: חשבון מעודכן
+2025-10-30 00:16:32,569 - models.trade - INFO - Trade 4: Using loaded ticker symbol: AAPL
+2025-10-30 00:16:32,569 - models.trade - INFO - Trade 4 to_dict result: {'id': 4, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-26 00:13:21', 'closed_at': None, 'created_at': '2025-08-26 00:13:21', 'total_pl': None, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:30:08', 'cancel_reason': 'בוטל על ידי המשתמש'}
+2025-10-30 00:16:32,585 - models.trade - INFO - Trade 5: Checking trade_plan relationship...
+2025-10-30 00:16:32,585 - models.trade - INFO - Trade 5: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,586 - models.trade - INFO - Trade 5: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-30 00:16:32,586 - models.trade - INFO - Trade 5: trade_plan is not None, adding data...
+2025-10-30 00:16:32,586 - models.trade - INFO - Trade 5: Using loaded account name: חשבון ETF
+2025-10-30 00:16:32,586 - models.trade - INFO - Trade 5: Using loaded ticker symbol: AAPL
+2025-10-30 00:16:32,587 - models.trade - INFO - Trade 5 to_dict result: {'id': 5, 'trading_account_id': 3, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'גכעגעג', 'opened_at': '2025-08-30 22:02:00', 'closed_at': None, 'created_at': '2025-08-30 22:02:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון ETF', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:32:32', 'cancel_reason': 'test'}
+2025-10-30 00:16:32,600 - models.trade - INFO - Trade 6: Checking trade_plan relationship...
+2025-10-30 00:16:32,601 - models.trade - INFO - Trade 6: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,601 - models.trade - INFO - Trade 6: self.trade_plan: <TradePlan(id=1, type='passive')>
+2025-10-30 00:16:32,601 - models.trade - INFO - Trade 6: trade_plan is not None, adding data...
+2025-10-30 00:16:32,601 - models.trade - INFO - Trade 6: Using loaded account name: חשבון טכנולוגיה
+2025-10-30 00:16:32,602 - models.trade - INFO - Trade 6: Using loaded ticker symbol: GOOGL
+2025-10-30 00:16:32,602 - models.trade - INFO - Trade 6 to_dict result: {'id': 6, 'trading_account_id': 2, 'ticker_id': 2, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': '', 'opened_at': '2025-08-31 16:57:00', 'closed_at': None, 'created_at': '2025-08-31 16:57:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 10250.0, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:16:32,628 - models.trade - INFO - Trade 7: Checking trade_plan relationship...
+2025-10-30 00:16:32,628 - models.trade - INFO - Trade 7: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,628 - models.trade - INFO - Trade 7: self.trade_plan: <TradePlan(id=9, type='swing')>
+2025-10-30 00:16:32,629 - models.trade - INFO - Trade 7: trade_plan is not None, adding data...
+2025-10-30 00:16:32,629 - models.trade - INFO - Trade 7: Using loaded account name: חשבון טכנולוגיה
+2025-10-30 00:16:32,629 - models.trade - INFO - Trade 7: Using loaded ticker symbol: AMZN
+2025-10-30 00:16:32,629 - models.trade - INFO - Trade 7 to_dict result: {'id': 7, 'trading_account_id': 2, 'ticker_id': 6, 'trade_plan_id': 9, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': None, 'opened_at': '2025-08-31 17:38:00', 'closed_at': None, 'created_at': '2025-08-31 17:38:00', 'total_pl': 0.0, 'trade_plan_created_at': '2025-06-16 06:52:13', 'trade_plan_planned_amount': 9275.0, 'trade_plan_status': 'open', 'account_name': 'חשבון טכנולוגיה', 'ticker_symbol': 'AMZN', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:16:32,653 - models.trade - INFO - Trade 8: Checking trade_plan relationship...
+2025-10-30 00:16:32,653 - models.trade - INFO - Trade 8: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,653 - models.trade - INFO - Trade 8: self.trade_plan: <TradePlan(id=4, type='swing')>
+2025-10-30 00:16:32,654 - models.trade - INFO - Trade 8: trade_plan is not None, adding data...
+2025-10-30 00:16:32,654 - models.trade - INFO - Trade 8: Using loaded account name: חשבון מעודכן
+2025-10-30 00:16:32,654 - models.trade - INFO - Trade 8: Using loaded ticker symbol: AAPL
+2025-10-30 00:16:32,654 - models.trade - INFO - Trade 8 to_dict result: {'id': 8, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-01 23:51:48', 'closed_at': '2025-09-02 00:36:20', 'created_at': '2025-09-01 23:51:48', 'total_pl': None, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:16:32,670 - models.trade - INFO - Trade 9: Checking trade_plan relationship...
+2025-10-30 00:16:32,671 - models.trade - INFO - Trade 9: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,671 - models.trade - INFO - Trade 9: self.trade_plan: <TradePlan(id=14, type='passive')>
+2025-10-30 00:16:32,671 - models.trade - INFO - Trade 9: trade_plan is not None, adding data...
+2025-10-30 00:16:32,671 - models.trade - INFO - Trade 9: Using loaded account name: חשבון מעודכן
+2025-10-30 00:16:32,672 - models.trade - INFO - Trade 9: Using loaded ticker symbol: GOOGL
+2025-10-30 00:16:32,672 - models.trade - INFO - Trade 9 to_dict result: {'id': 9, 'trading_account_id': 1, 'ticker_id': 2, 'trade_plan_id': 14, 'status': 'closed', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:41:51', 'closed_at': '2025-09-02 00:42:08', 'created_at': '2025-09-02 00:41:51', 'total_pl': None, 'trade_plan_created_at': '2025-08-30 03:36:52', 'trade_plan_planned_amount': 300.5, 'trade_plan_status': 'open', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'GOOGL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:16:32,695 - models.trade - INFO - Trade 10: Checking trade_plan relationship...
+2025-10-30 00:16:32,695 - models.trade - INFO - Trade 10: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,696 - models.trade - INFO - Trade 10: self.trade_plan: <TradePlan(id=1, type='passive')>
+2025-10-30 00:16:32,696 - models.trade - INFO - Trade 10: trade_plan is not None, adding data...
+2025-10-30 00:16:32,696 - models.trade - INFO - Trade 10: Using loaded account name: חשבון מעודכן
+2025-10-30 00:16:32,696 - models.trade - INFO - Trade 10: Using loaded ticker symbol: TSLA
+2025-10-30 00:16:32,696 - models.trade - INFO - Trade 10 to_dict result: {'id': 10, 'trading_account_id': 1, 'ticker_id': 4, 'trade_plan_id': 1, 'status': 'open', 'investment_type': 'investment', 'side': 'Long', 'notes': None, 'opened_at': '2025-09-02 00:56:03', 'closed_at': None, 'created_at': '2025-09-02 00:56:03', 'total_pl': None, 'trade_plan_created_at': '2025-08-15 03:51:43', 'trade_plan_planned_amount': 10250.0, 'trade_plan_status': 'open', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'TSLA', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:16:32,721 - models.trade - INFO - Trade 11: Checking trade_plan relationship...
+2025-10-30 00:16:32,722 - models.trade - INFO - Trade 11: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,722 - models.trade - INFO - Trade 11: self.trade_plan: None
+2025-10-30 00:16:32,722 - models.trade - INFO - Trade 11: trade_plan is None
+2025-10-30 00:16:32,722 - models.trade - INFO - Trade 11: Using loaded account name: חשבון מעודכן
+2025-10-30 00:16:32,722 - models.trade - INFO - Trade 11: Using loaded ticker symbol: AAPL
+2025-10-30 00:16:32,723 - models.trade - INFO - Trade 11 to_dict result: {'id': 11, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade', 'opened_at': '2025-10-06 21:05:06', 'closed_at': None, 'created_at': '2025-10-06 21:05:06', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:16:32,737 - models.trade - INFO - Trade 18: Checking trade_plan relationship...
+2025-10-30 00:16:32,738 - models.trade - INFO - Trade 18: hasattr(self, 'trade_plan'): True
+2025-10-30 00:16:32,738 - models.trade - INFO - Trade 18: self.trade_plan: None
+2025-10-30 00:16:32,738 - models.trade - INFO - Trade 18: trade_plan is None
+2025-10-30 00:16:32,738 - models.trade - INFO - Trade 18: Using loaded account name: חשבון מעודכן
+2025-10-30 00:16:32,739 - models.trade - INFO - Trade 18: Using loaded ticker symbol: AAPL
+2025-10-30 00:16:32,739 - models.trade - INFO - Trade 18 to_dict result: {'id': 18, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': None, 'status': 'open', 'investment_type': 'swing', 'side': 'Long', 'notes': 'Test trade for CRUD testing', 'opened_at': '2025-10-07 16:13:43', 'closed_at': None, 'created_at': '2025-10-07 16:13:43', 'total_pl': 0.0, 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': None, 'cancel_reason': None}
+2025-10-30 00:16:32,751 - routes.api.trades - INFO - First trade data: {'id': 1, 'trading_account_id': 1, 'ticker_id': 1, 'trade_plan_id': 4, 'status': 'cancelled', 'investment_type': 'swing', 'side': 'Long', 'notes': 'קנייה של Apple', 'opened_at': '2025-08-15 03:51:43', 'closed_at': '2025-08-21 12:36:00', 'created_at': '2025-08-15 03:51:43', 'total_pl': 2500.0, 'trade_plan_created_at': '2025-08-14 06:52:13', 'trade_plan_planned_amount': 9892.0, 'trade_plan_status': 'closed', 'account_name': 'חשבון מעודכן', 'ticker_symbol': 'AAPL', 'cancelled_at': '2025-08-31 14:28:23', 'cancel_reason': 'בוטל על ידי המשתמש', 'current_price': 269.7, 'daily_change': 0.26022304832713333, 'change_amount': 0.6999999999999886, 'position': {'quantity': 300.0, 'average_price': 150.27666666666667, 'total_cost': 45083.0, 'total_fees': 8.0, 'side': 'long', 'last_updated': '2025-10-07 16:13:46.113000', 'total_bought': 300.0, 'total_sold': 0.0}}
+2025-10-30 00:16:32,752 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /api/trades/ HTTP/1.1" 200 -
+2025-10-30 00:16:32,779 - cache - INFO - Cache MISS: services.ticker_service.get_all:81578798591900a326254b2f7accb2fa
+2025-10-30 00:16:32,781 - services.ticker_service - INFO - Found 23 tickers in database
+2025-10-30 00:16:32,828 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /favicon.ico HTTP/1.1" 200 -
+2025-10-30 00:16:32,863 - cache - INFO - Cache SET: services.ticker_service.get_all:81578798591900a326254b2f7accb2fa (TTL: 30s, Dependencies: ['tickers'], Data size: 1421 chars)
+2025-10-30 00:16:32,864 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /api/tickers/ HTTP/1.1" 200 -
+2025-10-30 00:16:32,867 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-30T00:16:32.867707', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/trade-plans/', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:16:32,868 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-30T00:16:32.867707', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/trade-plans/', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:16:32,868 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "[33mGET /api/trade-plans/ HTTP/1.1[0m" 404 -
+2025-10-30 00:16:32,875 - routes.api.base_entity.executions - INFO - Getting all executions records
+2025-10-30 00:16:32,876 - cache - INFO - Cache MISS: get_all_executions_99914b932bd37a50b983c5e7c90ae93b
+2025-10-30 00:16:32,881 - cache - INFO - Cache SET: get_all_executions_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 8615 chars)
+2025-10-30 00:16:32,881 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /api/executions/ HTTP/1.1" 200 -
+2025-10-30 00:16:32,884 - routes.api.base_entity.alerts - INFO - Getting all alerts records
+2025-10-30 00:16:32,884 - cache - INFO - Cache MISS: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-30 00:16:32,885 - services.alert_service - ERROR - שגיאה בטעינת התראות: (sqlite3.OperationalError) no such column: alerts.plan_condition_id
+[SQL: SELECT alerts.ticker_id AS alerts_ticker_id, alerts.message AS alerts_message, alerts.triggered_at AS alerts_triggered_at, alerts.status AS alerts_status, alerts.is_triggered AS alerts_is_triggered, alerts.related_type_id AS alerts_related_type_id, alerts.related_id AS alerts_related_id, alerts.condition_attribute AS alerts_condition_attribute, alerts.condition_operator AS alerts_condition_operator, alerts.condition_number AS alerts_condition_number, alerts.plan_condition_id AS alerts_plan_condition_id, alerts.trade_condition_id AS alerts_trade_condition_id, alerts.id AS alerts_id, alerts.created_at AS alerts_created_at 
+FROM alerts]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-30 00:16:32,886 - routes.api.base_entity.alerts - ERROR - Error in get_all_alerts: (sqlite3.OperationalError) no such column: alerts.plan_condition_id
+[SQL: SELECT alerts.ticker_id AS alerts_ticker_id, alerts.message AS alerts_message, alerts.triggered_at AS alerts_triggered_at, alerts.status AS alerts_status, alerts.is_triggered AS alerts_is_triggered, alerts.related_type_id AS alerts_related_type_id, alerts.related_id AS alerts_related_id, alerts.condition_attribute AS alerts_condition_attribute, alerts.condition_operator AS alerts_condition_operator, alerts.condition_number AS alerts_condition_number, alerts.plan_condition_id AS alerts_plan_condition_id, alerts.trade_condition_id AS alerts_trade_condition_id, alerts.id AS alerts_id, alerts.created_at AS alerts_created_at 
+FROM alerts]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-30 00:16:32,886 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "[35m[1mGET /api/alerts/ HTTP/1.1[0m" 500 -
+2025-10-30 00:16:32,888 - routes.api.notes - INFO - 🔄 Starting get_notes function
+2025-10-30 00:16:32,888 - routes.api.notes - INFO - ✅ Database connection established
+2025-10-30 00:16:32,889 - routes.api.notes - INFO - ✅ Successfully retrieved 4 notes using direct SQL
+2025-10-30 00:16:32,890 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "GET /api/notes/ HTTP/1.1" 200 -
+2025-10-30 00:16:32,892 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-30T00:16:32.892570', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/cash-flows/', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:16:32,892 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-30T00:16:32.892570', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://localhost:8080/api/cash-flows/', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:16:32,893 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:32] "[33mGET /api/cash-flows/ HTTP/1.1[0m" 404 -
+2025-10-30 00:16:33,991 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:33] "GET /images/icons/home.svg HTTP/1.1" 200 -
+2025-10-30 00:16:33,991 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:33] "GET /images/logo.svg HTTP/1.1" 200 -
+2025-10-30 00:16:34,087 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-10-30 00:16:34,087 - cache - INFO - Cache HIT: get_all_trading_accounts_99914b932bd37a50b983c5e7c90ae93b (Access count: 2)
+2025-10-30 00:16:34,088 - routes.api.base_entity.trading_accounts - INFO - Cache hit for trading_accounts get_all
+2025-10-30 00:16:34,088 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:34] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-10-30 00:16:52,480 - root - INFO - FRONTEND [WARN]: ⚠️ No mapping found for page class: db-display-page
+2025-10-30 00:16:52,480 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:16:52] "POST /api/logs/batch HTTP/1.1" 200 -
+2025-10-30 00:17:23,435 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-30T00:17:23.435236', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/styles-new/07-pages/_db_display.css', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 162, in styles_new_files\n    response = send_from_directory(UI_DIR / "styles-new", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:17:23,435 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-30T00:17:23.435236', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/styles-new/07-pages/_db_display.css', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 162, in styles_new_files\n    response = send_from_directory(UI_DIR / "styles-new", filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:17:23,436 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:17:23] "[33mGET /styles-new/07-pages/_db_display.css HTTP/1.1[0m" 404 -
+2025-10-30 00:17:44,348 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-10-30T00:17:44.348085', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/trade-plans/', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:17:44,348 - error_handler - ERROR - Detailed error: {'timestamp': '2025-10-30T00:17:44.348085', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/api/trade-plans/', 'user_agent': 'curl/8.7.1', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-10-30 00:17:44,348 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:17:44] "[33mGET /api/trade-plans/ HTTP/1.1[0m" 404 -
+2025-10-30 00:17:49,515 - routes.api.base_entity.trade_plans - INFO - Getting all trade_plans records
+2025-10-30 00:17:49,516 - cache - INFO - Cache MISS: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b
+2025-10-30 00:17:49,516 - services.trade_plan_service - INFO - Loading trade plans with joinedload for ticker and account
+2025-10-30 00:17:49,518 - services.trade_plan_service - INFO - Loaded 18 trade plans
+2025-10-30 00:17:49,519 - services.trade_plan_service - INFO - First plan ticker: <Ticker(symbol='TSLA', name='Tesla Inc.', type='stock')>
+2025-10-30 00:17:49,519 - services.trade_plan_service - INFO - First plan account: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-10-30 00:17:49,519 - models.trade_plan - INFO - Trade plan 1: Using loaded ticker relationship
+2025-10-30 00:17:49,519 - models.trade_plan - INFO - Trade plan 1: Using loaded account relationship
+2025-10-30 00:17:49,519 - models.trade_plan - INFO - Trade plan 2: Using loaded ticker relationship
+2025-10-30 00:17:49,519 - models.trade_plan - INFO - Trade plan 2: Using loaded account relationship
+2025-10-30 00:17:49,519 - models.trade_plan - INFO - Trade plan 3: Using loaded ticker relationship
+2025-10-30 00:17:49,519 - models.trade_plan - INFO - Trade plan 3: Using loaded account relationship
+2025-10-30 00:17:49,519 - models.trade_plan - INFO - Trade plan 4: Using loaded ticker relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 4: Using loaded account relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 5: Using loaded ticker relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 5: Using loaded account relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 6: Using loaded ticker relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 6: Using loaded account relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 7: Using loaded ticker relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 7: Using loaded account relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 8: Using loaded ticker relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 8: Using loaded account relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 9: Using loaded ticker relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 9: Using loaded account relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 10: Using loaded ticker relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 10: Using loaded account relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 11: Using loaded ticker relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 11: Using loaded account relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 12: Using loaded ticker relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 12: Using loaded account relationship
+2025-10-30 00:17:49,520 - models.trade_plan - INFO - Trade plan 14: Using loaded ticker relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 14: Using loaded account relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 15: Using loaded ticker relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 15: Using loaded account relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 20: Using loaded ticker relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 20: Using loaded account relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 21: Using loaded ticker relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 21: Using loaded account relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 22: Using loaded ticker relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 22: Using loaded account relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 23: Using loaded ticker relationship
+2025-10-30 00:17:49,521 - models.trade_plan - INFO - Trade plan 23: Using loaded account relationship
+2025-10-30 00:17:49,521 - cache - INFO - Cache SET: get_all_trade_plans_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 9603 chars)
+2025-10-30 00:17:49,522 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:17:49] "GET /api/trade_plans/ HTTP/1.1" 200 -
+2025-10-30 00:17:54,571 - routes.api.base_entity.cash_flows - INFO - Getting all cash_flows records
+2025-10-30 00:17:54,572 - cache - INFO - Cache MISS: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b
+2025-10-30 00:17:54,575 - cache - INFO - Cache SET: get_all_cash_flows_99914b932bd37a50b983c5e7c90ae93b (TTL: 60s, Dependencies: None, Data size: 4109 chars)
+2025-10-30 00:17:54,575 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:17:54] "GET /api/cash_flows/ HTTP/1.1" 200 -
+2025-10-30 00:17:59,562 - routes.api.base_entity.alerts - INFO - Getting all alerts records
+2025-10-30 00:17:59,562 - cache - INFO - Cache MISS: get_all_alerts_99914b932bd37a50b983c5e7c90ae93b
+2025-10-30 00:17:59,563 - services.alert_service - ERROR - שגיאה בטעינת התראות: (sqlite3.OperationalError) no such column: alerts.plan_condition_id
+[SQL: SELECT alerts.ticker_id AS alerts_ticker_id, alerts.message AS alerts_message, alerts.triggered_at AS alerts_triggered_at, alerts.status AS alerts_status, alerts.is_triggered AS alerts_is_triggered, alerts.related_type_id AS alerts_related_type_id, alerts.related_id AS alerts_related_id, alerts.condition_attribute AS alerts_condition_attribute, alerts.condition_operator AS alerts_condition_operator, alerts.condition_number AS alerts_condition_number, alerts.plan_condition_id AS alerts_plan_condition_id, alerts.trade_condition_id AS alerts_trade_condition_id, alerts.id AS alerts_id, alerts.created_at AS alerts_created_at 
+FROM alerts]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-30 00:17:59,563 - routes.api.base_entity.alerts - ERROR - Error in get_all_alerts: (sqlite3.OperationalError) no such column: alerts.plan_condition_id
+[SQL: SELECT alerts.ticker_id AS alerts_ticker_id, alerts.message AS alerts_message, alerts.triggered_at AS alerts_triggered_at, alerts.status AS alerts_status, alerts.is_triggered AS alerts_is_triggered, alerts.related_type_id AS alerts_related_type_id, alerts.related_id AS alerts_related_id, alerts.condition_attribute AS alerts_condition_attribute, alerts.condition_operator AS alerts_condition_operator, alerts.condition_number AS alerts_condition_number, alerts.plan_condition_id AS alerts_plan_condition_id, alerts.trade_condition_id AS alerts_trade_condition_id, alerts.id AS alerts_id, alerts.created_at AS alerts_created_at 
+FROM alerts]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-10-30 00:17:59,564 - werkzeug - INFO - 127.0.0.1 - - [30/Oct/2025 00:17:59] "[35m[1mGET /api/alerts/ HTTP/1.1[0m" 500 -

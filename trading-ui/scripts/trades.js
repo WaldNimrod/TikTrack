@@ -2076,36 +2076,23 @@ async function saveTrade() {
             body: JSON.stringify(tradeData)
         });
         
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
+        // Use CRUDResponseHandler for consistent response handling
+        if (isEdit) {
+            await CRUDResponseHandler.handleUpdateResponse(response, {
+                modalId: 'tradesModal',
+                successMessage: 'טרייד עודכן בהצלחה',
+                entityName: 'טרייד'
+            });
+        } else {
+            await CRUDResponseHandler.handleSaveResponse(response, {
+                modalId: 'tradesModal',
+                successMessage: 'טרייד נוסף בהצלחה',
+                entityName: 'טרייד'
+            });
         }
-        
-        const result = await response.json();
-        
-        // Handle success
-        if (window.showNotification) {
-            const message = isEdit ? 'טרייד עודכן בהצלחה' : 'טרייד נוסף בהצלחה';
-            window.showNotification(message, 'success', 'business');
-        }
-        
-        // Close modal
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.hideModal('tradesModal');
-        }
-        
-        // Refresh data
-        if (window.loadTradesData) {
-            window.loadTradesData();
-        }
-        
-        window.Logger.info('Trade saved successfully', { tradeId: result.id, page: 'trades' });
         
     } catch (error) {
-        window.Logger.error('Error saving trade', { error: error.message, page: 'trades' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה בשמירת הטרייד', 'error', 'system');
-        }
+        CRUDResponseHandler.handleError(error, 'שמירת טרייד');
     }
 }
 

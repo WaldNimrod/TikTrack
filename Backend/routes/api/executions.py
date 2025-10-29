@@ -37,7 +37,6 @@ execution_service = ExecutionService()
 base_api = BaseEntityAPI('executions', execution_service, 'executions')
 
 @executions_bp.route('/', methods=['GET'])
-@api_endpoint(cache_ttl=30, dependencies=['executions'], rate_limit=60)
 @handle_database_session()
 def get_executions():
     """Get all executions using base API with rate limiting"""
@@ -46,7 +45,6 @@ def get_executions():
     return jsonify(response), status_code
 
 @executions_bp.route('/<int:execution_id>', methods=['GET'])
-@api_endpoint(cache_ttl=30, rate_limit=60)
 @handle_database_session()
 def get_execution(execution_id: int):
     """Get execution by ID using base API"""

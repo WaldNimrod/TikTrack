@@ -18,7 +18,6 @@ alerts_bp = Blueprint('alerts', __name__, url_prefix='/api/alerts')
 base_api = BaseEntityAPI('alerts', AlertService, 'alerts')
 
 @alerts_bp.route('/', methods=['GET'])
-@api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
 def get_alerts():
     """Get all alerts using base API"""

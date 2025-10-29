@@ -22,7 +22,6 @@ base_api = BaseEntityAPI('trades', TradeService, 'trades')
 position_calculator = PositionCalculatorService()
 
 @trades_bp.route('/', methods=['GET'])
-@api_endpoint(cache_ttl=30, dependencies=['trades'], rate_limit=60)
 @handle_database_session()
 def get_trades():
     """Get all trades with filtering options - enhanced with market data"""

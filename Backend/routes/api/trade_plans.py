@@ -18,7 +18,6 @@ trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/trade_plans
 base_api = BaseEntityAPI('trade_plans', TradePlanService, 'trade_plans')
 
 @trade_plans_bp.route('/', methods=['GET'])
-@api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
 def get_trade_plans():
     """Get all trade plans using base API"""

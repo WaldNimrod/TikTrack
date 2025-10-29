@@ -38,7 +38,6 @@ tickers_bp = Blueprint('tickers', __name__, url_prefix='/api/tickers')
 base_api = BaseEntityAPI('tickers', TickerService, 'tickers')
 
 @tickers_bp.route('/', methods=['GET'])
-@api_endpoint(cache_ttl=300, rate_limit=60)
 @handle_database_session()
 def get_tickers():
     """Get all tickers - enhanced with market data"""
@@ -82,7 +81,6 @@ def get_tickers():
         }), 500
 
 @tickers_bp.route('/<int:ticker_id>', methods=['GET'])
-@api_endpoint(cache_ttl=300, rate_limit=60)
 @handle_database_session()
 def get_ticker(ticker_id: int):
     """Get ticker by ID with market data"""

@@ -652,6 +652,7 @@ function handleAccountSelect(event) {
         event: event?.type || 'direct_call', 
         target: target?.id,
         value: value,
+        selectedIndex: target?.selectedIndex,
         page: 'import-user-data' 
     });
     
@@ -664,10 +665,7 @@ function handleAccountSelect(event) {
         selectedAccount = accountId;
     }
     
-    // Update analyze button
-    updateAnalyzeButton();
-    
-    // Update UI
+    // Update UI first
     const accountInfo = document.getElementById('accountInfo');
     if (accountInfo && target) {
         const selectedOption = target.options[target.selectedIndex];
@@ -679,11 +677,13 @@ function handleAccountSelect(event) {
         `;
     }
     
-    // Enable analyze button
-    const analyzeBtn = modal?.querySelector('#analyzeBtn');
-    if (analyzeBtn && selectedFile) {
-        analyzeBtn.disabled = false;
-    }
+    // Wait a tick to ensure DOM is updated, then update button
+    // Use requestAnimationFrame to ensure DOM updates are complete
+    requestAnimationFrame(() => {
+        updateAnalyzeButton();
+    });
+    
+    // Remove duplicate button update code below
 }
 
 /**

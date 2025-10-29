@@ -697,9 +697,13 @@ class PreferencesCore {
             
             // Initialize lazy loader if available
             if (window.LazyLoader) {
+                // Ensure profileId is explicitly set (0 for default profile, not null/undefined)
+                const finalUserId = userId || this.currentUserId || 1;
+                const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
+                
                 await window.LazyLoader.initialize(
-                    userId || this.currentUserId, 
-                    profileId || this.currentProfileId
+                    finalUserId, 
+                    finalProfileId
                 );
                 window.Logger.info('✅ Lazy loading initialized', { page: "preferences-core-new" });
             } else {

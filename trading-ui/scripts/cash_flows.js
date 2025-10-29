@@ -1466,6 +1466,7 @@ async function saveCashFlow() {
         const method = isEdit ? 'PUT' : 'POST';
         
         // Send to API
+        console.log('🔥 saveCashFlow - Full data being sent:', JSON.stringify(cashFlowData, null, 2));
         console.log('🔥 saveCashFlow - Sending to API:', { url, method, data: cashFlowData });
         const response = await fetch(url, {
             method: method,

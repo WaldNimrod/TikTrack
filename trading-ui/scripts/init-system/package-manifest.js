@@ -466,10 +466,17 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'preferences-page.js',
-        globalCheck: 'window.',
+        globalCheck: 'window.loadAccountsForPreferences',
         description: 'פונקציות ספציפיות לעמוד העדפות',
         required: false,
         loadOrder: 7
+      },
+      {
+        file: 'preferences-group-manager.js',
+        globalCheck: 'window.PreferencesGroupManager',
+        description: 'מנהל קבוצות העדפות',
+        required: false,
+        loadOrder: 8
       }
     ],
     estimatedSize: '~150KB',

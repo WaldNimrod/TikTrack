@@ -16925,3 +16925,43 @@
 2025-10-26 17:54:19,756 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
 2025-10-26 17:54:19,767 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
 2025-10-26 17:54:19,768 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-30 17:55:16,371 - root - INFO - 🚀 Starting TikTrack server...
+2025-10-30 17:55:16,372 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-10-30 17:55:16,372 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-10-30 17:55:16,372 - root - INFO - 📦 Flask version: 2.3.3
+2025-10-30 17:55:16,372 - root - INFO - 🗄️ Initializing database...
+2025-10-30 17:55:16,373 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-10-30 17:55:16,377 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-10-30 17:55:16,377 - root - INFO - ✅ Database initialized successfully
+2025-10-30 17:55:17,383 - utils.performance_monitor - INFO - System metrics: CPU: 67.2%, Memory: 65.0%, Disk: 3.9%
+2025-10-30 17:55:17,383 - root - INFO - ✅ Database initialized successfully
+2025-10-30 17:55:17,383 - root - INFO - ✅ Server initialization completed
+2025-10-30 17:55:17,456 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-10-30 17:55:17,456 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-10-30 17:55:17,456 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-10-30 17:55:17,457 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-10-30 17:55:17,457 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-10-30 17:55:17,457 - root - INFO - 🚀 Starting background task scheduler...
+2025-10-30 17:55:17,457 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-10-30 17:55:17,457 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-10-30 17:55:17,457 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-10-30 17:55:17,457 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-10-30 17:55:17,457 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-10-30 17:55:17,458 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-10-30 17:55:17,458 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-10-30 17:55:17,458 - services.background_tasks - INFO - Background task scheduler started
+2025-10-30 17:55:17,459 - root - INFO - ✅ Background task scheduler started successfully
+2025-10-30 17:55:17,459 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:629c8d7264615df4213ac39d1d31c17f
+2025-10-30 17:55:17,459 - cache - INFO - Cache MISS: services.system_settings_service.get_setting:629c8d7264615df4213ac39d1d31c17f
+2025-10-30 17:55:17,517 - cache - INFO - Cache SET: services.system_settings_service.get_setting:629c8d7264615df4213ac39d1d31c17f (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-30 17:55:17,517 - cache - INFO - Cache SET: services.system_settings_service.get_setting:629c8d7264615df4213ac39d1d31c17f (TTL: 300s, Dependencies: ['preferences', 'external_data'], Data size: 4 chars)
+2025-10-30 17:55:17,517 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-10-30 17:55:17,519 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-10-30 17:55:17,519 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-10-30 17:55:17,519 - services.data_refresh_scheduler - INFO - Refreshing 4 active tickers during trading hours
+2025-10-30 17:55:17,534 - services.data_refresh_scheduler - INFO - Group refresh started: active_trades/in_hours - 4 tickers (ID: 31205)
+2025-10-30 17:55:17,536 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-10-30 17:55:17,536 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-10-30 17:55:17,537 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-10-30 17:55:17,540 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem

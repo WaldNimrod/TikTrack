@@ -269,6 +269,9 @@ const PAGE_CONFIGS = {
         preloadAssets: ['preferences-data'],
         cacheStrategy: 'persistent',
         
+        // ← NEW: Accordion mode - only one section open at a time
+        accordionMode: true,
+        
         // קיים
         requiresFilters: false,
         requiresValidation: true,
@@ -277,6 +280,11 @@ const PAGE_CONFIGS = {
             // Preferences-specific initialization
             async (pageConfig) => {
                 window.Logger.info('⚙️ Initializing Preferences...', { page: "page-initialization-configs" });
+                
+                // Load trading accounts for default account preference
+                if (typeof window.loadAccountsForPreferences === 'function') {
+                    await window.loadAccountsForPreferences();
+                }
                 
                 // טעינת מערכת העדפות
                 if (typeof window.initializePreferences === 'function') {

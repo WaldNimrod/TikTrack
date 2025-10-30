@@ -352,16 +352,24 @@ class ModalManagerV2 {
             this.applyUserColors(modalElement, modalInfo.config.entityType);
             
             // מילוי selects (חייב להיות לפני populateForm)
+            // Note: populateSelects already handles defaultFromPreferences
             await this.populateSelects(modalElement, modalInfo.config);
             
             // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
             if (mode === 'edit' && entityData) {
                 await this.populateForm(modalElement, entityData);
             }
+            // In add mode, defaults are applied by populateSelects for fields with defaultFromPreferences
+            // Additional defaults (date, source) are handled below after modal shows
             
             // הצגת המודל
             const modal = new bootstrap.Modal(modalElement);
             modal.show();
+            
+            // Apply remaining defaults after modal shows (date, source, etc.)
+            if (mode === 'add') {
+                this.applyRemainingDefaults(modalElement.querySelector('form'));
+            }
             
             // עדכון מצב
             modalInfo.isActive = true;
@@ -616,42 +624,101 @@ class ModalManagerV2 {
      * @param {HTMLElement} form - אלמנט הטופס
      * @private
      */
+    /**
+     * Apply remaining defaults (non-select fields only)
+     * SelectPopulatorService handles account/currency defaults
+     */
+    applyRemainingDefaults(form) {
+        if (!form) return;
+        
+        // Get modal config
+        const modalElement = form.closest('.modal');
+        const modalInfo = this.modals.get(modalElement?.id);
+        const config = modalInfo?.config;
+        
+        // Apply defaults from config
+        if (config && config.fields) {
+            config.fields.forEach(field => {
+                const fieldElement = form.querySelector(`#${field.id}`);
+                if (!fieldElement) return;
+                
+                // Skip if field already has a value
+                if (fieldElement.value) return;
+                
+                // For select fields, check if SelectPopulatorService already handled it
+                // Only apply manual defaults for fields that SelectPopulatorService doesn't handle
+                if (fieldElement.tagName === 'SELECT') {
+                    // Skip if this is an account or currency field (handled by SelectPopulatorService)
+                    if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency') {
+                        return;
+                    }
+                    
+                    // Apply defaultValue for other select fields (e.g., source)
+                    if (field.defaultValue !== undefined && field.defaultValue !== null) {
+                        fieldElement.value = field.defaultValue;
+                        console.log(`Applied default value for ${field.id}:`, field.defaultValue);
+                        return;
+                    }
+                    return;
+                }
+                
+                // Apply defaultValue if exists
+                if (field.defaultValue !== undefined && field.defaultValue !== null) {
+                    fieldElement.value = field.defaultValue;
+                    console.log(`Applied default value for ${field.id}:`, field.defaultValue);
+                    return;
+                }
+                
+                // Apply defaultTime if field is date
+                if (field.type === 'date' && field.defaultTime === 'now') {
+                    const today = new Date();
+                    fieldElement.value = today.toISOString().slice(0, 10);
+                    console.log(`Applied default date for ${field.id}`);
+                    return;
+                }
+            });
+        }
+    }
+    
+    /**
+     * Legacy method - kept for backward compatibility (resetForm)
+     */
     applyDefaultValues(form) {
-        if (!window.PreferencesSystem) return;
+        if (!form) return;
         
-        const preferences = window.PreferencesSystem.manager?.currentPreferences || {};
+        // This is now just a wrapper for applyRemainingDefaults
+        this.applyRemainingDefaults(form);
+    }
+    
+    /**
+     * Apply preference default value for field
+     * @param {Object} field - Field config
+     * @param {HTMLElement} fieldElement - Field element
+     * @param {Object} preferences - User preferences
+     * @private
+     */
+    _applyPreferenceDefault(field, fieldElement, preferences) {
+        // Map field IDs to preference names
+        const preferenceMap = {
+            'cashFlowAccount': 'defaultTradingAccount',
+            'cashFlowCurrency': 'defaultCurrency',
+            'tradingAccount': 'defaultTradingAccount',
+            'currency': 'defaultCurrency'
+        };
         
-        // ברירת מחדל לחשבון מסחר מסחר - חיפוש מדויק יותר
-        const accountField = form.querySelector('[id*="Account"], [name*="account"], [id*="account"], [name*="Account"]');
-        if (accountField && preferences.defaultTradingAccount) {
-            accountField.value = preferences.defaultTradingAccount;
-            console.log('Applied default account:', preferences.defaultTradingAccount);
+        // Try to find matching preference
+        for (const [fieldPattern, prefName] of Object.entries(preferenceMap)) {
+            if (field.id.includes(fieldPattern) || field.id === fieldPattern) {
+                const prefValue = preferences[prefName];
+                if (prefValue) {
+                    fieldElement.value = prefValue;
+                    console.log(`Applied preference default for ${field.id}:`, prefValue);
+                    return true;
+                }
+            }
         }
         
-        // ברירת מחדל למטבע - חיפוש מדויק יותר
-        const currencyField = form.querySelector('[id*="Currency"], [name*="currency"], [id*="currency"], [name*="Currency"]');
-        if (currencyField && preferences.defaultCurrency) {
-            currencyField.value = preferences.defaultCurrency;
-            console.log('Applied default currency:', preferences.defaultCurrency);
-        }
-        
-        // ברירת מחדל לתאריך - היום
-        const dateField = form.querySelector('input[type="date"], input[type="datetime-local"]');
-        if (dateField && !dateField.value) {
-            const today = new Date();
-            const dateValue = dateField.type === 'datetime-local' 
-                ? today.toISOString().slice(0, 16) 
-                : today.toISOString().slice(0, 10);
-            dateField.value = dateValue;
-            console.log('Applied default date:', dateValue);
-        }
-        
-        // ברירת מחדל למקור - ידני
-        const sourceField = form.querySelector('[id*="Source"], [name*="source"], [id*="source"], [name*="Source"]');
-        if (sourceField && !sourceField.value) {
-            sourceField.value = 'manual';
-            console.log('Applied default source: manual');
-        }
+        return false;
     }
 
     /**
@@ -757,6 +824,7 @@ class ModalManagerV2 {
             }
         }
     }
+    
 
     /**
      * Handle modal shown event - טיפול באירוע הצגת מודל

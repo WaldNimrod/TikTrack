@@ -11,7 +11,7 @@
  * - initializePreferencesPage() - initializePreferencesPage function
  * 
  * DATA LOADING (1)
- * - loadAccountsForPreferences() - loadAccountsForPreferences function
+ * - loadAccountsForPreferences() - Loads trading accounts for default account preference
  * 
  * DATA MANIPULATION (1)
  * - createNewProfile() - createNewProfile function
@@ -27,7 +27,7 @@
  * Handles page-specific functionality for preferences.html
  * 
  * @author TikTrack Development Team
- * @version 3.0 - Clean Rewrite
+ * @version 3.1 - Removed auto-initialization (moved to unifiedAppInitializer)
  * @since January 2025
  */
 
@@ -38,7 +38,7 @@ window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "prefe
  * ==============
  * 
  * DATA LOADING:
- * - loadAccountsForPreferences()
+ * - loadAccountsForPreferences() - Loads trading accounts for default account preference
  * 
  * PREFERENCES MANAGEMENT:
  * - savePreferences()
@@ -54,33 +54,47 @@ window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "prefe
 
 // ===== DATA LOADING =====
 /**
- * Load accounts using global function
+ * Load trading accounts for default account preference
+ * Fetches all trading accounts from API and populates the default_trading_account select
  */
 async function loadAccountsForPreferences() {
     try {
-        window.Logger.info('🔄 Loading accounts for preferences...', { page: "preferences-page" });
-        if (typeof window.loadAccountsDataFromAPI === 'function') {
-            const accounts = await window.loadAccountsDataFromAPI();
-            window.Logger.info('📊 Accounts loaded:', accounts, { page: "preferences-page" });
-            
-            const accountSelect = document.getElementById('defaultAccountFilter');
-            if (accountSelect && accounts) {
-                accountSelect.innerHTML = '<option>כל החשבונות</option>';
-                
-                accounts.forEach(account => {
-                    if (account.status === 'open') {
-                        const option = document.createElement('option');
-                        option.value = account.id;
-                        option.textContent = account.name;
-                        accountSelect.appendChild(option);
-                    }
-                });
-                
-                window.Logger.info('✅ Loaded accounts for preferences:', accounts.length, { page: "preferences-page" });
+        window.Logger.info('🔄 Loading trading accounts for default account preference...', { page: "preferences-page" });
+        
+        // Fetch accounts directly from API
+        const response = await fetch(`/api/trading-accounts/?_t=${Date.now()}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
             }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        const accounts = result.data || result;
+        window.Logger.info('📊 Trading accounts loaded:', accounts, { page: "preferences-page" });
+        
+        const accountSelect = document.getElementById('default_trading_account');
+        if (accountSelect && accounts && Array.isArray(accounts)) {
+            accountSelect.innerHTML = '<option value="">בחר חשבון...</option>';
+            
+            accounts.forEach(account => {
+                if (account.status === 'open') {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = account.name;
+                    accountSelect.appendChild(option);
+                }
+            });
+            
+            window.Logger.info('✅ Loaded trading accounts for default account preference:', accounts.length, { page: "preferences-page" });
         }
     } catch (error) {
-        window.Logger.error('❌ Error loading accounts:', error, { page: "preferences-page" });
+        window.Logger.error('❌ Error loading trading accounts for default account preference:', error, { page: "preferences-page" });
     }
 }
 
@@ -402,26 +416,41 @@ async function copyDetailedLogLocal() {
 
 /**
  * Initialize page-specific functionality
+ * NOTE: This function is NO LONGER called automatically.
+ * Page initialization is now handled by unifiedAppInitializer via customInitializers in page-initialization-configs.js
+ * This function is kept for backward compatibility and manual initialization if needed.
  */
 function initializePreferencesPage() {
-    window.Logger.info('🚀 Initializing preferences page...', { page: "preferences-page" });
+    window.Logger.info('🚀 Initializing preferences page (manual)...', { page: "preferences-page" });
     
-    // Load accounts when page loads
-    loadAccountsForPreferences();
+    // NOTE: loadAccountsForPreferences() is now called via customInitializers in page-initialization-configs.js
+    // This prevents double-loading of accounts
+    // loadAccountsForPreferences(); // MOVED TO customInitializers
     
-    // Make functions globally available
-    window.switchActiveProfile = switchActiveProfile;
-    window.createNewProfile = createNewProfile;
-    // window. export removed - using global version from system-management.js
-    
-    window.Logger.info('✅ Preferences page initialized', { page: "preferences-page" });
+    // Functions are now exported globally outside this function for immediate availability
+    window.Logger.info('✅ Preferences page initialized (manual)', { page: "preferences-page" });
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializePreferencesPage);
-} else {
-    initializePreferencesPage();
-}
+// NOTE: Auto-initialization is now handled by unifiedAppInitializer
+// This DOMContentLoaded listener is KEPT for backward compatibility but should not be needed
+// if (document.readyState === 'loading') {
+//     document.addEventListener('DOMContentLoaded', initializePreferencesPage);
+// } else {
+//     initializePreferencesPage();
+// }
 
-window.Logger.info('✅ preferences-page.js v3.0 loaded successfully', { page: "preferences-page" });
+// ============================================================================
+// GLOBAL EXPORTS (Moved outside function for immediate availability)
+// ============================================================================
+
+/**
+ * Make functions globally available immediately (not in init function)
+ * This ensures they are available for the monitoring system
+ */
+window.switchActiveProfile = switchActiveProfile;
+window.createNewProfile = createNewProfile;
+window.loadAccountsForPreferences = loadAccountsForPreferences;
+window.initializePreferencesPage = initializePreferencesPage;
+window.copyDetailedLogLocal = copyDetailedLogLocal;
+
+window.Logger.info('✅ preferences-page.js v3.1 loaded successfully', { page: "preferences-page" });

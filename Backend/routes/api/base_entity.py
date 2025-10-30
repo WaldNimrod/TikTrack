@@ -56,22 +56,15 @@ class BaseEntityAPI:
             
         Returns:
             Tuple of (response_dict, status_code)
+        
+        Note: Cache removed to ensure fresh data on every request
+        See: Cache Architecture Simplification Plan
         """
         try:
             self.logger.info(f"Getting all {self.entity_name} records")
             
-            # Check cache first
-            from services.advanced_cache_service import advanced_cache_service
-            import hashlib
-            
-            # Generate cache key
-            cache_key = f"get_all_{self.entity_name}_{hashlib.md5(str(filters or {}).encode()).hexdigest()}"
-            cached_result = advanced_cache_service.get(cache_key)
-            if cached_result is not None:
-                self.logger.info(f"Cache hit for {self.entity_name} get_all")
-                return cached_result, 200
-            
-            # Cache miss - get records from service
+            # Get records from service directly (no cache for CRUD tables)
+            # This ensures fresh data on every request
             if hasattr(self.service_class, 'get_all'):
                 # Check if service.get_all accepts filters parameter
                 import inspect
@@ -92,9 +85,7 @@ class BaseEntityAPI:
                 records = db.query(self.service_class.model).all()
                 data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
             
-            # Cache the result
             response = self._success_response(data, f"Retrieved {len(data)} {self.entity_name} records")
-            advanced_cache_service.set(cache_key, response, ttl=60)  # Cache for 1 minute
             
             return response, 200
             

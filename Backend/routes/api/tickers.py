@@ -177,10 +177,10 @@ def check_linked_items(ticker_id: int):
         db.close()
 
 @tickers_bp.route('/', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after creating ticker
 def create_ticker():
     """Create new ticker"""
-    db = None
     try:
         data = request.get_json()
         if data is None:
@@ -190,8 +190,8 @@ def create_ticker():
                 "version": "1.0"
             }), 400
         
-        # Get database session first
-        db: Session = next(get_db())
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
         
         # Create the ticker first
         try:
@@ -282,15 +282,13 @@ def create_ticker():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        if db:
-            db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @tickers_bp.route('/<int:ticker_id>', methods=['PUT'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after updating ticker
 def update_ticker(ticker_id: int):
     """Update ticker"""
-    db = None
     try:
         data = request.get_json()
         if data is None:
@@ -300,7 +298,8 @@ def update_ticker(ticker_id: int):
                 "version": "1.0"
             }), 400
         
-        db: Session = next(get_db())
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
         
         # Check that ticker exists
         ticker = TickerService.get_by_id(db, ticker_id)
@@ -357,16 +356,16 @@ def update_ticker(ticker_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        if db:
-            db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @tickers_bp.route('/<int:ticker_id>', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after deleting ticker
 def delete_ticker(ticker_id: int):
     """Delete ticker"""
     try:
-        db: Session = next(get_db())
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
         
         # Check that ticker exists
         ticker = TickerService.get_by_id(db, ticker_id)
@@ -419,8 +418,7 @@ def delete_ticker(ticker_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @tickers_bp.route('/<int:ticker_id>/update-active-trades', methods=['PUT'])
 def update_active_trades(ticker_id: int):

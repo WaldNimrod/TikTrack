@@ -87,16 +87,14 @@ def get_trading_account_by_name(account_name: str):
         }), 500
 
 @trading_accounts_bp.route('/', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trading_accounts'])
 def create_trading_account():
     """Create new trading account"""
     try:
         data = request.get_json()
-        db: Session = next(get_db())
+        db: Session = g.db
         trading_account = TradingAccountService.create(db, data)
-        
-        # Invalidate cache when creating new trading account
-        invalidate_cache('trading_accounts')
         
         return jsonify({
             "status": "success",
@@ -124,21 +122,17 @@ def create_trading_account():
             "details": "The server encountered an unexpected error",
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['PUT'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trading_accounts'])
 def update_trading_account(trading_account_id: int):
     """Update trading account"""
     try:
         data = request.get_json()
-        db: Session = next(get_db())
+        db: Session = g.db
         trading_account = TradingAccountService.update(db, trading_account_id, data)
         if trading_account:
-            # Invalidate cache when updating trading account
-            invalidate_cache('trading_accounts')
-            invalidate_cache(f'trading_account_{trading_account_id}')
             return jsonify({
                 "status": "success",
                 "data": trading_account.to_dict(),
@@ -171,8 +165,6 @@ def update_trading_account(trading_account_id: int):
             "details": "The server encountered an unexpected error",
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @trading_accounts_bp.route('/<int:trading_account_id>/open-trades', methods=['GET'])
 @cache_for(ttl=30)  # Cache for 30 seconds - open trades change frequently
@@ -198,11 +190,12 @@ def get_trading_account_open_trades(trading_account_id: int):
         db.close()
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trading_accounts'])
 def delete_trading_account(trading_account_id: int):
     """Delete trading account"""
     try:
-        db: Session = next(get_db())
+        db: Session = g.db
         
         # הגנה על החשבון האחרון
         all_trading_accounts = TradingAccountService.get_all(db)
@@ -230,9 +223,6 @@ def delete_trading_account(trading_account_id: int):
         # Try to delete (this will check for all linked items)
         success = TradingAccountService.delete(db, trading_account_id)
         if success:
-            # Invalidate cache when deleting trading account
-            invalidate_cache('trading_accounts')
-            invalidate_cache(f'trading_account_{trading_account_id}')
             return jsonify({
                 "status": "success",
                 "message": "Trading account deleted successfully",
@@ -253,8 +243,6 @@ def delete_trading_account(trading_account_id: int):
             "error": {"message": "Failed to delete trading account"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @trading_accounts_bp.route('/<int:trading_account_id>/stats', methods=['GET'])
 @cache_for(ttl=60)  # Cache for 1 minute - stats don't change frequently

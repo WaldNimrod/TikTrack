@@ -22,12 +22,34 @@
 class SelectPopulatorService {
     static _getPreferenceFromMemory(preferenceName, aliases = []) {
         try {
-            const prefs = window.PreferencesSystem?.manager?.currentPreferences || {};
-            if (preferenceName in prefs) return prefs[preferenceName];
-            for (const key of aliases) {
-                if (key in prefs) return prefs[key];
+            // Try PreferencesSystem first
+            let prefs = {};
+            if (window.PreferencesSystem?.manager?.currentPreferences) {
+                prefs = window.PreferencesSystem.manager.currentPreferences;
+            } else {
+                // Fallback to localStorage
+                try {
+                    const stored = localStorage.getItem('tikTrack_preferences');
+                    if (stored) {
+                        prefs = JSON.parse(stored);
+                    }
+                } catch (e) {
+                    console.warn(`⚠️ Failed to parse localStorage preferences:`, e);
+                }
             }
-        } catch (_) {}
+            
+            if (preferenceName in prefs) {
+                return prefs[preferenceName];
+            }
+            
+            for (const key of aliases) {
+                if (key in prefs) {
+                    return prefs[key];
+                }
+            }
+        } catch (e) {
+            console.error(`❌ Error in _getPreferenceFromMemory:`, e);
+        }
         return null;
     }
     /**
@@ -100,6 +122,8 @@ class SelectPopulatorService {
             return;
         }
         
+        console.log(`🔍 populateAccountsSelect called for ${selectId}`, { options });
+        
         try {
             // טעינת חשבונות מ-API
             const response = await fetch('/api/trading-accounts/');
@@ -119,9 +143,17 @@ class SelectPopulatorService {
             let defaultValue = options.defaultValue;
             if (options.defaultFromPreferences) {
                 try {
-                    const prefValue = this._getPreferenceFromMemory('default_trading_account', ['defaultTradingAccount', 'trading_account_id']);
-                    if (prefValue) defaultValue = parseInt(prefValue);
-                } catch (_) { /* שקט */ }
+                    const prefValue = this._getPreferenceFromMemory('default_trading_account', ['defaultAccountFilter', 'defaultTradingAccount', 'trading_account_id']);
+                    if (prefValue) {
+                        // Try to parse as integer ID first
+                        const parsed = parseInt(prefValue);
+                        if (!isNaN(parsed)) {
+                            defaultValue = parsed;
+                        }
+                    }
+                } catch (e) { 
+                    console.warn(`⚠️ Error getting account preference:`, e);
+                }
             }
             
             // מילוי ה-select
@@ -133,8 +165,6 @@ class SelectPopulatorService {
                 defaultValue: defaultValue,
                 defaultText: options.defaultText
             });
-            
-            console.log(`✅ נטענו ${accounts.length} חשבונות ל-${selectId}`);
             
         } catch (error) {
             console.error('❌ שגיאה בטעינת חשבונות:', error);
@@ -240,20 +270,6 @@ class SelectPopulatorService {
                 defaultValue: defaultValue,
                 defaultText: options.defaultText
             });
-
-            // Debug
-            try {
-                if (select && select.id) {
-                    const selectedText = select.options[select.selectedIndex]?.text || '';
-                    console.debug(`[SelectPopulator] ${select.id} defaultFromPreferences=${!!options.defaultFromPreferences}`, {
-                        defaultValue,
-                        selectedValue: select.value,
-                        selectedText
-                    });
-                }
-            } catch (_) {}
-            
-            console.log(`✅ נטענו ${currencies.length} מטבעות ל-${selectId}`);
             
         } catch (error) {
             console.error('❌ שגיאה בטעינת מטבעות:', error);

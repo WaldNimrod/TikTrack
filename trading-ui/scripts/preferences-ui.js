@@ -5,8 +5,11 @@
  * UI helpers and form management for preferences
  * Handles all user interface interactions
  * 
- * @version 1.0.0
+ * @version 1.3.0
  * @date January 23, 2025
+ * @updated January 30, 2025 - Fixed saveAllPreferences to clear cache before reload
+ * @updated January 30, 2025 - Fixed cache clearing to work directly with localStorage keys
+ * @updated January 30, 2025 - Replaced page reload with refreshUserPreferences + loadAllPreferences
  * @author TikTrack Development Team
  * 
  * @description
@@ -85,12 +88,18 @@ class FormManager {
             return {};
         }
         
+        // Reverse field name mapping for UI elements to preferences
+        const fieldMapping = {};
+        
         const formData = {};
         const inputs = form.querySelectorAll('input, select, textarea');
         
         inputs.forEach(input => {
             const name = input.name || input.id;
             if (!name) return;
+            
+            // Apply reverse field mapping if exists
+            const mappedName = fieldMapping[name] || name;
             
             let value = input.value;
             
@@ -107,7 +116,7 @@ class FormManager {
                 value = parseFloat(value) || 0;
             }
             
-            formData[name] = value;
+            formData[mappedName] = value;
         });
         
         window.Logger.info('📋 Collected form data:', formData, { page: "preferences-ui" });
@@ -126,15 +135,20 @@ class FormManager {
             return;
         }
         
+        // Field name mapping for preferences to UI elements
+        const fieldMapping = {};
+        
         Object.entries(data).forEach(([name, value]) => {
-            const input = form.querySelector(`[name="${name}"], #${name}`);
+            // Apply field mapping if exists
+            const mappedName = fieldMapping[name] || name;
+            const input = form.querySelector(`[name="${mappedName}"], #${mappedName}`);
             if (!input) return;
             
             // Handle different input types
             if (input.type === 'checkbox') {
                 input.checked = Boolean(value);
             } else if (input.type === 'radio') {
-                const radioInput = form.querySelector(`[name="${name}"][value="${value}"]`);
+                const radioInput = form.querySelector(`[name="${mappedName}"][value="${value}"]`);
                 if (radioInput) {
                     radioInput.checked = true;
                 }
@@ -680,10 +694,24 @@ class PreferencesUI {
             
             window.Logger.info('✅ All preferences validated successfully', { page: "preferences-ui" });
             
+            // Get current profile IDs for debugging
+            const finalUserId = userId || window.PreferencesCore?.currentUserId || 1;
+            const finalProfileId = profileId || window.PreferencesCore?.currentProfileId || null;
+            
+            console.log('🔍 DEBUG: Profile IDs before save:', {
+                userId_param: userId,
+                profileId_param: profileId,
+                PreferencesCore_currentUserId: window.PreferencesCore?.currentUserId,
+                PreferencesCore_currentProfileId: window.PreferencesCore?.currentProfileId,
+                PreferencesUI_currentProfileId: this.currentProfileId,
+                finalUserId: finalUserId,
+                finalProfileId: finalProfileId
+            });
+            
             // Save to backend
             const requestData = {
-                user_id: userId || window.PreferencesCore.currentUserId,
-                profile_id: profileId || window.PreferencesCore.currentProfileId,
+                user_id: finalUserId,
+                profile_id: finalProfileId,
                 preferences: changedPreferences
             };
             
@@ -703,9 +731,99 @@ class PreferencesUI {
                 throw new Error(`Server error: ${response.status} - ${errorText}`);
             }
             
-            // Simple solution: reload page to show changes
-            console.log('🔄 Reloading page to show changes...');
-            window.location.reload(true);
+            const result = await response.json();
+            console.log('🔍 DEBUG: Server response:', result);
+            
+            // Show success notification
+            if (typeof window.showSuccessNotification === 'function') {
+                const savedCount = Object.keys(changedPreferences).length;
+                window.showSuccessNotification(
+                    `העדפות נשמרו בהצלחה! (${savedCount} העדפות)`,
+                    3000
+                );
+            }
+            
+            // Clear preferences cache and reload using UnifiedCacheManager.refreshUserPreferences
+            // This is the CORRECT way according to the architecture
+            console.log('🧹 ===== CACHE CLEARING DEBUG START =====');
+            window.Logger.info('🧹 Clearing preferences cache and reloading from backend...', { page: "preferences-ui" });
+            
+            // DEBUG: Check localStorage before clearing
+            const allKeysBefore = Object.keys(localStorage);
+            const prefKeysBefore = allKeysBefore.filter(k => 
+                k.includes('preference') || k.includes('all_preferences')
+            );
+            console.log('🔍 DEBUG: localStorage keys BEFORE clearing:', prefKeysBefore);
+            console.log('🔍 DEBUG: Total localStorage keys before:', allKeysBefore.length);
+            
+            try {
+                // Use the official refreshUserPreferences method which:
+                // 1. Clears all preference cache keys
+                // 2. Reloads preferences from backend via PreferencesCore
+                // 3. Updates the UI automatically via LazyLoader
+                console.log('🔍 DEBUG: Checking UnifiedCacheManager:', {
+                    exists: !!window.UnifiedCacheManager,
+                    hasRefreshMethod: !!window.UnifiedCacheManager?.refreshUserPreferences
+                });
+                
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.refreshUserPreferences) {
+                    console.log('✅ DEBUG: Calling UnifiedCacheManager.refreshUserPreferences()...');
+                    
+                    // CRITICAL: Use the same profileId that was used for saving
+                    // Otherwise we'll reload the wrong profile's preferences
+                    const saveProfileId = finalProfileId;
+                    console.log('🔍 DEBUG: Will reload preferences for profileId:', saveProfileId);
+                    
+                    await window.UnifiedCacheManager.refreshUserPreferences(saveProfileId);
+                    console.log('✅ DEBUG: refreshUserPreferences completed');
+                    window.Logger.info('✅ Preferences cache cleared and reloaded from backend', { page: "preferences-ui" });
+                    
+                    // DEBUG: Check localStorage after clearing
+                    const allKeysAfter = Object.keys(localStorage);
+                    const prefKeysAfter = allKeysAfter.filter(k => 
+                        k.includes('preference') || k.includes('all_preferences')
+                    );
+                    console.log('🔍 DEBUG: localStorage keys AFTER clearing:', prefKeysAfter);
+                    console.log('🔍 DEBUG: Keys removed:', prefKeysBefore.length - prefKeysAfter.length);
+                    
+                    // NOTE: refreshUserPreferences already calls initializeWithLazyLoading which loads preferences
+                    // We just need to reload the form with the already-loaded preferences
+                    window.Logger.info('🔄 Reloading preferences into form...', { page: "preferences-ui" });
+                    await this.loadAllPreferences();
+                    window.Logger.info('✅ Preferences form updated with new values', { page: "preferences-ui" });
+                    
+                    console.log('🧹 ===== CACHE CLEARING DEBUG END =====');
+                } else {
+                    // Fallback to manual clearing if refreshUserPreferences not available
+                    window.Logger.warn('⚠️ refreshUserPreferences not available, using manual clearing', { page: "preferences-ui" });
+                    
+                    const finalUserId = userId || window.PreferencesCore.currentUserId;
+                    const finalProfileId = profileId || window.PreferencesCore.currentProfileId;
+                    
+                    const allKeys = Object.keys(localStorage);
+                    const prefKeys = allKeys.filter(key => 
+                        (key.startsWith(`preference_`) && key.includes(`_${finalUserId}_${finalProfileId}`)) ||
+                        (key.startsWith(`tiktrack_preference_`) && key.includes(`_${finalUserId}_${finalProfileId}`)) ||
+                        key === `all_preferences_${finalUserId}_${finalProfileId}` ||
+                        key === `tiktrack_all_preferences_${finalUserId}_${finalProfileId}` ||
+                        key === 'user-preferences' ||
+                        key === 'tiktrack_user-preferences'
+                    );
+                    
+                    for (const key of prefKeys) {
+                        localStorage.removeItem(key);
+                        if (window.UnifiedCacheManager && window.UnifiedCacheManager.remove) {
+                            await window.UnifiedCacheManager.remove(key);
+                        }
+                    }
+                    
+                    // Reload preferences
+                    await this.loadAllPreferences();
+                }
+            } catch (cacheError) {
+                window.Logger.warn('⚠️ Error refreshing preferences cache:', cacheError, { page: "preferences-ui" });
+                // Continue even if cache clearing fails
+            }
             
             return true;
             
@@ -1112,9 +1230,12 @@ window.updateCounters = async function(preferences) {
  * Toggle section (backward compatibility)
  * @param {string} sectionName - Section name
  */
-window.toggleSection = function(sectionName) {
-    return window.PreferencesUI.toggleSection(sectionName);
-};
+// Define only if a global toggleSection is not already provided by the unified UI system
+if (!window.toggleSection) {
+    window.toggleSection = function(sectionName) {
+        return window.PreferencesUI.toggleSection(sectionName);
+    };
+}
 
 /**
  * Load profiles to dropdown

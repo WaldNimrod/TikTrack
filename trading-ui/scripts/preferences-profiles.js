@@ -213,6 +213,12 @@ class ProfileManager {
             const profileId = result.data?.profile_id || result.data?.id;
             window.Logger.info(`✅ Profile created with ID: ${profileId}`, { page: "preferences-profiles" });
             
+            // Invalidate cache for profile creation
+            if (window.CacheSyncManager && typeof window.CacheSyncManager.invalidateByAction === 'function') {
+                await window.CacheSyncManager.invalidateByAction('profile-created');
+                window.Logger.info('✅ Backend cache invalidated via CacheSyncManager', { page: "preferences-profiles" });
+            }
+            
             // Reload profiles dropdown
             if (typeof window.loadProfilesToDropdown === 'function') {
                 await window.loadProfilesToDropdown();

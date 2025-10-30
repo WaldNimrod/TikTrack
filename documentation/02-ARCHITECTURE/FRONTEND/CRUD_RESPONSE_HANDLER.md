@@ -78,37 +78,38 @@ await CRUDResponseHandler.handleDeleteResponse(response, {
 
 ## רענון טבלאות
 
-### רענון רגיל
+### רענון רגיל עם reloadFn (מומלץ)
 ```javascript
-// רענון אוטומטי לפי entity type
+// רענון עם פונקציית טעינה מותאמת אישית
 await CRUDResponseHandler.handleSaveResponse(response, {
     successMessage: 'פריט נשמר בהצלחה',
-    entityName: 'פריט'
-    // רענון אוטומטי דרך refreshEntityTables
+    entityName: 'פריט',
+    reloadFn: window.loadCashFlowsData,
+    requiresHardReload: false  // מונע reload confirmation dialog
 });
 ```
 
-### Hard Reload (להעדפות)
+### Hard Reload (להעדפות בלבד)
 ```javascript
 // hard reload דרך clearCacheQuick
 await CRUDResponseHandler.handleSaveResponse(response, {
     successMessage: 'העדפות נשמרו בהצלחה',
     entityName: 'העדפות',
-    requiresHardReload: true
+    requiresHardReload: true  // רק להעדפות!
 });
 ```
 
-### פונקציית רענון מותאמת אישית
+### Cache Bypass בכל load*Data
 ```javascript
-// רענון מותאם אישית
-await CRUDResponseHandler.handleSaveResponse(response, {
-    successMessage: 'פריט נשמר בהצלחה',
-    entityName: 'פריט',
-    reloadFn: async () => {
-        // קוד רענון מותאם אישית
-        await customReloadFunction();
-    }
-});
+// כל פונקציית load*Data משתמשת ב-cache bypass
+async function loadCashFlowsData() {
+    const response = await fetch(`/api/cash_flows/?_t=${Date.now()}`, {
+        headers: {
+            'Cache-Control': 'no-cache'
+        }
+    });
+    // ...
+}
 ```
 
 ## אינטגרציה עם UnifiedCacheManager
@@ -186,13 +187,19 @@ async function saveAllPreferences() {
 
 ## היסטוריית שינויים
 
+- **30 ינואר 2025**: סיום סטנדרטיזציה מלאה - כל 21 endpoints + 8 pages אחידים
+- **30 ינואר 2025**: הוספת cache bypass עם `?_t=` + `Cache-Control: no-cache` בכל load*Data
+- **30 ינואר 2025**: וידוא `reloadFn` + `requiresHardReload: false` בכל עמודי CRUD
 - **ינואר 2025**: הוספת תמיכה ב-`requiresHardReload` ל-hard reload
 - **ינואר 2025**: אינטגרציה עם `window.clearCacheQuick()` מהתפריט הראשי
 - **ינואר 2025**: הסרת CentralRefreshSystem הכפולה
 - **ינואר 2025**: איחוד כל עמודי CRUD תחת מערכת אחת
+- **ינואר 2025**: הסרת 200ms delay - רענון מיידי של טבלאות
+- **ינואר 2025**: הסרת `clearCacheBeforeCRUD` - מעבר למערכת פשוטה יותר
 
 ## קישורים קשורים
 
+- [Backend Implementation Guide](CRUD_BACKEND_IMPLEMENTATION_GUIDE.md) - ⚠️ **CRITICAL**: Read before implementing backend CRUD!
 - [אינטגרציה עם UnifiedCacheManager](CRUD_CACHE_INTEGRATION.md)
 - [מערכת מטמון מאוחדת](../04-FEATURES/CORE/UNIFIED_CACHE_SYSTEM.md)
 - [מערכת אתחול מאוחדת](UNIFIED_INITIALIZATION_SYSTEM.md)

@@ -382,6 +382,14 @@ class UnifiedAppInitializer {
             }
         }
         
+        // Restore section states with small delay to ensure DOM is ready
+        if (typeof window.restoreAllSectionStates === 'function') {
+            setTimeout(async () => {
+                const restoredCount = await window.restoreAllSectionStates();
+                window.Logger.info(`✅ Restored ${restoredCount} section states`, { page: "unified-app-initializer" });
+            }, 100);
+        }
+        
         this.performanceMetrics.stageTimes.finalize = Date.now() - stageStart;
         
         // ← NEW: מדידת ביצועים

@@ -1697,15 +1697,60 @@ let hoverTimeouts = new Map();
 // ===== Update filter selections in UI =====
 function updateFilterSelections(filters) {
   console.log('🔄 Updating filter selections:', filters);
+
+  // Map backend preference values (English keys) to UI values (Hebrew labels)
+  const mapToUi = {
+    // generic
+    all: 'הכול',
+    // date ranges
+    all_time: 'כל זמן',
+    any: 'כל זמן',
+    everything: 'כל זמן',
+    today: 'היום',
+    yesterday: 'אתמול',
+    this_week: 'השבוע',
+    last_7_days: 'שבוע',
+    this_month: 'החודש',
+    this_year: 'השנה',
+    last_year: 'שנה קודמת',
+    last_month: 'חודש קודם',
+    last_week: 'שבוע קודם',
+    last_30_days: 'כל זמן' // אין לנו 30 ימים בתפריט, נבחר כל זמן כברירת מחדל
+  };
+
+  const normalizeMulti = (val) => {
+    if (!val || (Array.isArray(val) && val.length === 0)) return [];
+    if (Array.isArray(val)) return val.map(v => mapToUi[v] || v).filter(Boolean).filter(v => v !== 'הכול');
+    // single value
+    if (String(val).toLowerCase() === 'all') return [];
+    const mapped = mapToUi[val] || val;
+    return mapped === 'הכול' ? [] : [mapped];
+  };
+
+  const normalizeDate = (val) => {
+    if (!val) return 'כל זמן';
+    const mapped = mapToUi[val] || val;
+    // אם הערך עדיין באנגלית/לא קיים בתפריט – ננעל ל"כל זמן"
+    const uiValues = new Set(Array.from(document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item'))
+      .map(el => el.getAttribute('data-value')));
+    return uiValues.has(mapped) ? mapped : 'כל זמן';
+  };
+
+  const uiFilters = {
+    status: normalizeMulti(filters.status),
+    type: normalizeMulti(filters.type),
+    account: normalizeMulti(filters.account),
+    dateRange: normalizeDate(filters.dateRange)
+  };
   
   // עדכון סטטוס
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
   statusItems.forEach(item => {
     item.classList.remove('selected');
     const value = item.getAttribute('data-value');
-    if (filters.status && filters.status.includes(value)) {
+    if (uiFilters.status && uiFilters.status.includes(value)) {
       item.classList.add('selected');
-    } else if (!filters.status || filters.status.length === 0) {
+    } else if (!uiFilters.status || uiFilters.status.length === 0) {
       if (value === 'הכול') item.classList.add('selected');
     }
   });
@@ -1715,9 +1760,9 @@ function updateFilterSelections(filters) {
   typeItems.forEach(item => {
     item.classList.remove('selected');
     const value = item.getAttribute('data-value');
-    if (filters.type && filters.type.includes(value)) {
+    if (uiFilters.type && uiFilters.type.includes(value)) {
       item.classList.add('selected');
-    } else if (!filters.type || filters.type.length === 0) {
+    } else if (!uiFilters.type || uiFilters.type.length === 0) {
       if (value === 'הכול') item.classList.add('selected');
     }
   });
@@ -1727,9 +1772,9 @@ function updateFilterSelections(filters) {
   accountItems.forEach(item => {
     item.classList.remove('selected');
     const value = item.getAttribute('data-value');
-    if (filters.account && filters.account.includes(value)) {
+    if (uiFilters.account && uiFilters.account.includes(value)) {
       item.classList.add('selected');
-    } else if (!filters.account || filters.account.length === 0) {
+    } else if (!uiFilters.account || uiFilters.account.length === 0) {
       if (value === 'הכול') item.classList.add('selected');
     }
   });
@@ -1739,10 +1784,37 @@ function updateFilterSelections(filters) {
   dateRangeItems.forEach(item => {
     item.classList.remove('selected');
     const value = item.getAttribute('data-value');
-    if (value === filters.dateRange) {
+    if (value === uiFilters.dateRange) {
       item.classList.add('selected');
     }
   });
+
+  // Update main buttons data-selected for Button System and fire a unified event
+  try {
+    const statusBtn = document.getElementById('statusFilterToggle');
+    const typeBtn = document.getElementById('typeFilterToggle');
+    const accountBtn = document.getElementById('accountFilterToggle');
+    const dateBtn = document.getElementById('dateRangeFilterToggle');
+
+    if (statusBtn) statusBtn.setAttribute('data-selected', (uiFilters.status || []).join(','));
+    if (typeBtn) typeBtn.setAttribute('data-selected', (uiFilters.type || []).join(','));
+    if (accountBtn) accountBtn.setAttribute('data-selected', (uiFilters.account || []).join(','));
+    if (dateBtn) dateBtn.setAttribute('data-selected', uiFilters.dateRange || 'כל זמן');
+
+    // Update visible texts
+    if (typeof window.updateStatusFilterText === 'function') window.updateStatusFilterText();
+    if (typeof window.updateTypeFilterText === 'function') window.updateTypeFilterText();
+    if (typeof window.updateAccountFilterText === 'function') window.updateAccountFilterText();
+    if (typeof window.updateDateRangeFilterText === 'function') window.updateDateRangeFilterText();
+
+    // Notify systems listening for filter updates
+    const evt = new CustomEvent('tiktrack:filters-updated', {
+      detail: { filters: uiFilters, source: 'header-system' }
+    });
+    document.dispatchEvent(evt);
+  } catch (e) {
+    console.warn('Failed updating main button state:', e?.message);
+  }
 }
 
 // ===== Add event listeners to portal items =====
@@ -2317,8 +2389,16 @@ window.resetAllFilters = async function() {
     window.Logger.info('↻ בודק אם getPreference קיימת:', typeof window.getPreference, { page: "header-system" });
     
     if (typeof window.getPreference !== 'function') {
-      console.log('❌ getPreference לא קיימת - עובר ל-fallback');
-      throw new Error('getPreference לא קיימת');
+      console.log('❌ getPreference לא קיימת - לא מתבצע איפוס, מציג הודעה למשתמש');
+      const msg = 'לא ניתן לאפס פילטרים: מערכת העדפות לא זמינה. נסה לרענן או לבדוק התחברות.';
+      if (typeof window.showNotification === 'function') {
+        window.showNotification(msg, 'error', 'שגיאה', 4000, 'system');
+      } else if (window.Logger && window.Logger.error) {
+        window.Logger.error(msg, { page: 'header-system' });
+      } else {
+        alert(msg);
+      }
+      return; // אל תבצע ניקוי או ברירת מחדל
     }
     
     // טעינת העדפות ברירת מחדל
@@ -2387,11 +2467,13 @@ window.resetAllFilters = async function() {
     
   } catch (error) {
     console.log('❌ שגיאה בטעינת העדפות:', error.message);
-    window.Logger.error('❌ שגיאה בטעינת העדפות:', error, { page: "header-system" });
-    window.Logger.error('❌ פרטי השגיאה:', error.message, error.stack, { page: "header-system" });
-    console.log('🔄 עובר ל-fallback - clearAllFilters');
-    // fallback לאיפוס רגיל
-    window.clearAllFilters();
+    window.Logger && window.Logger.error('❌ שגיאה בטעינת העדפות:', error, { page: "header-system" });
+    window.Logger && window.Logger.error('❌ פרטי השגיאה:', error.message, error.stack, { page: "header-system" });
+    const msg = 'לא ניתן לאפס פילטרים: שגיאה בקריאת העדפות. נסה שוב מאוחר יותר.';
+    if (typeof window.showNotification === 'function') {
+      window.showNotification(msg, 'error', 'שגיאה', 4000, 'system');
+    }
+    return; // ללא fallback ניקוי
   }
 };
 

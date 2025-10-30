@@ -19,6 +19,43 @@ function log(message) {
 }
 
 // ===== NEW HEADER SYSTEM TESTING FUNCTIONS =====
+// Quick debug for header filters
+window.debugHeaderFilters = function() {
+    try {
+        const ids = ['statusFilterMenu','typeFilterMenu','accountFilterMenu','dateRangeFilterMenu'];
+        const state = ids.map(id => {
+            const el = document.getElementById(id);
+            if (!el) return { id, exists: false };
+            const cs = getComputedStyle(el);
+            return {
+                id,
+                exists: true,
+                hasShowClass: el.classList.contains('show'),
+                display: cs.display,
+                visibility: cs.visibility,
+                opacity: cs.opacity,
+                zIndex: cs.zIndex,
+                rect: el.getBoundingClientRect(),
+            };
+        });
+        console.table(state);
+        return state;
+    } catch (e) {
+        console.error('debugHeaderFilters error', e);
+        return null;
+    }
+};
+
+// Force open all menus (dev only)
+window.forceOpenAllHeaderMenus = function() {
+    ['statusFilterMenu','typeFilterMenu','accountFilterMenu','dateRangeFilterMenu'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('show');
+    });
+    console.log('✅ Forced all header filter menus open');
+    window.debugHeaderFilters && window.debugHeaderFilters();
+};
+
 
 // Global variables for testing
 let headerSystem = null;
@@ -851,7 +888,7 @@ window.toggleTopSection = toggleTopSection;
 /**
  * Copy detailed log to clipboard - Test Header Only Page
  */
-async function  {
+async function copyDetailedLog() {
     try {
         const log = generateDetailedLog();
         await navigator.clipboard.writeText(log);
@@ -890,7 +927,7 @@ async function  {
 window.registerTablesWithFilterSystem = registerTablesWithFilterSystem;
 
 // Local  function for test-header-only page
-async function  {
+async function copyDetailedLogAlt() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

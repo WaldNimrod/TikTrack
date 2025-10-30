@@ -355,13 +355,13 @@ class ConstraintValidator {
             type: 'number'
         });
         
-        // String length constraints
-        this.constraints.set('defaultAccountFilter', {
-            minLength: 1,
-            maxLength: 100,
-            type: 'string'
+        // Integer constraints
+        this.constraints.set('default_trading_account', {
+            min: 1,
+            type: 'number'
         });
         
+        // String length constraints
         this.constraints.set('defaultSearchFilter', {
             minLength: 0,
             maxLength: 200,

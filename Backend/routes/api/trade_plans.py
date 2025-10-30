@@ -57,12 +57,13 @@ def get_trade_plans_by_account(trading_account_id: int):
         db.close()
 
 @trade_plans_bp.route('/', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trade_plans'])
 def create_trade_plan():
     """Create new trade plan"""
     try:
         data = request.get_json()
-        db: Session = next(get_db())
+        db: Session = g.db
         plan = TradePlanService.create(db, data)
         return jsonify({
             "status": "success",
@@ -77,16 +78,15 @@ def create_trade_plan():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['PUT'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trade_plans'])
 def update_trade_plan(plan_id: int):
     """Update trade plan"""
     try:
         data = request.get_json()
-        db: Session = next(get_db())
+        db: Session = g.db
         
         # בדיקה אם המשתמש רוצה לסגור או לבטל את התכנית
         new_status = data.get('status')
@@ -130,8 +130,6 @@ def update_trade_plan(plan_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @trade_plans_bp.route('/<int:plan_id>/confirm-status-change', methods=['POST'])
 def confirm_status_change(plan_id: int):
@@ -288,11 +286,12 @@ def can_cancel_trade_plan(plan_id: int):
 
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trade_plans'])
 def delete_trade_plan(plan_id: int):
     """Delete trade plan"""
     try:
-        db: Session = next(get_db())
+        db: Session = g.db
         success = TradePlanService.delete(db, plan_id)
         if success:
             return jsonify({
@@ -316,5 +315,3 @@ def delete_trade_plan(plan_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()

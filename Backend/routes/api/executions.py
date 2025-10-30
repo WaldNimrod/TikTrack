@@ -53,13 +53,14 @@ def get_execution(execution_id: int):
     return jsonify(response), status_code
 
 @executions_bp.route('/', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after creating execution
 def create_execution():
     """Create new execution"""
     try:
         data = request.get_json()
         logger.info(f"Received execution data: {data}")
-        db: Session = next(get_db())
+        db: Session = g.db
         
         # Validate data against constraints
         logger.info("Validating execution data before creation")
@@ -100,16 +101,15 @@ def create_execution():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @executions_bp.route('/<int:execution_id>', methods=['PUT'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after updating execution
 def update_execution(execution_id: int):
     """Update execution"""
     try:
         data = request.get_json()
-        db: Session = next(get_db())
+        db: Session = g.db
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
         if execution:
             # Validate data against constraints
@@ -155,15 +155,14 @@ def update_execution(execution_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @executions_bp.route('/<int:execution_id>', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after deleting execution
 def delete_execution(execution_id: int):
     """Delete execution"""
     try:
-        db: Session = next(get_db())
+        db: Session = g.db
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
         if execution:
             db.delete(execution)
@@ -185,5 +184,3 @@ def delete_execution(execution_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()

@@ -40,7 +40,6 @@ class PreferenceClassifier {
             // CRITICAL - Load immediately (affects core functionality)
             critical: [
                 // User settings
-                'defaultAccountFilter',
                 'default_trading_account',
                 'defaultCommission',
                 'defaultStopLoss',

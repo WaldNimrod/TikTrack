@@ -188,6 +188,31 @@ class PreferencesAPIClient {
     }
     
     /**
+     * Get group preferences
+     * @param {string} groupName - Group name
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     * @returns {Promise<Object>} Group preferences
+     */
+    async getGroupPreferences(groupName, userId = null, profileId = null) {
+        const params = {
+            group: groupName,
+            user_id: userId || this.defaultUserId
+        };
+        
+        // For default profile, explicitly use profile_id=0
+        if (profileId !== null && profileId !== undefined) {
+            params.profile_id = profileId;
+        } else {
+            // Default profile (ID: 0)
+            params.profile_id = 0;
+        }
+        
+        const result = await this.get('/user/group', params);
+        return result.data?.preferences || {};
+    }
+    
+    /**
      * Save single preference
      * @param {string} preferenceName - Preference name
      * @param {any} value - Preference value
@@ -657,6 +682,93 @@ class PreferencesCore {
             keys.forEach(key => window.UnifiedCacheManager.remove(key));
         }
         window.Logger.info(`🧹 Invalidated ${preferenceNames.length} preferences`, { page: "preferences-core-new" });
+    }
+    
+    /**
+     * Load group preferences with caching
+     * @param {string} groupName - Group name
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     * @returns {Promise<Object>} Group preferences
+     */
+    async loadGroupPreferences(groupName, userId = null, profileId = null) {
+        const finalUserId = userId || this.currentUserId;
+        const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
+        
+        // Cache key for group
+        const cacheKey = `preference_group_${groupName}_${finalUserId}_${finalProfileId}`;
+        
+        // Check cache
+        if (window.UnifiedCacheManager) {
+            const cached = await window.UnifiedCacheManager.get(cacheKey, {
+                layer: 'localStorage',
+                ttl: 300000 // 5 minutes
+            });
+            
+            if (cached !== null) {
+                window.Logger.debug(`🔍 Cache hit for group ${groupName}`, { page: "preferences-core-new" });
+                return cached;
+            }
+        }
+        
+        // Load from server
+        window.Logger.info(`📥 Loading group ${groupName} from server...`, { page: "preferences-core-new" });
+        const preferences = await this.apiClient.getGroupPreferences(
+            groupName, 
+            finalUserId, 
+            finalProfileId
+        );
+        
+        // Save to cache
+        if (window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.save(cacheKey, preferences, {
+                layer: 'localStorage',
+                ttl: 300000
+            });
+        }
+        
+        window.Logger.info(`✅ Loaded ${Object.keys(preferences).length} preferences from group ${groupName}`, { page: "preferences-core-new" });
+        return preferences;
+    }
+    
+    /**
+     * Save group preferences
+     * @param {string} groupName - Group name
+     * @param {Object} preferences - Preferences to save
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     * @returns {Promise<Object>} Save results
+     */
+    async saveGroupPreferences(groupName, preferences, userId = null, profileId = null) {
+        const finalUserId = userId || this.currentUserId;
+        const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
+        
+        // Save to server
+        const results = await this.savePreferences(preferences, finalUserId, finalProfileId);
+        
+        // Clear cache for this group
+        await this.clearGroupCache(groupName, finalUserId, finalProfileId);
+        
+        window.Logger.info(`✅ Saved ${results.saved} preferences from group ${groupName}`, { page: "preferences-core-new" });
+        return results;
+    }
+    
+    /**
+     * Clear cache for specific group
+     * @param {string} groupName - Group name
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    async clearGroupCache(groupName, userId = null, profileId = null) {
+        const finalUserId = userId || this.currentUserId;
+        const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
+        
+        const cacheKey = `preference_group_${groupName}_${finalUserId}_${finalProfileId}`;
+        
+        if (window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.remove(cacheKey);
+            window.Logger.debug(`🧹 Cleared cache for group ${groupName}`, { page: "preferences-core-new" });
+        }
     }
     
     /**

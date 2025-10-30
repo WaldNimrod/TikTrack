@@ -129,6 +129,7 @@ def get_trades_by_account(trading_account_id: int):
         db.close()
 
 @trades_bp.route('/', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trades', 'tickers', 'dashboard'])  # Invalidate cache after creating trade
 def create_trade():
     """Create a new trade"""
@@ -143,7 +144,7 @@ def create_trade():
         if 'investment_type' not in data or not data['investment_type']:
             data['investment_type'] = 'swing'
         
-        db: Session = next(get_db())
+        db: Session = g.db
         trade = TradeService.create(db, data)
         return jsonify({
             "status": "success",
@@ -158,10 +159,9 @@ def create_trade():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @trades_bp.route('/<int:trade_id>', methods=['PUT'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trades', 'tickers', 'dashboard'])  # Invalidate cache after updating trade
 def update_trade(trade_id: int):
     """Update trade"""
@@ -176,7 +176,7 @@ def update_trade(trade_id: int):
         if 'investment_type' not in data or not data['investment_type']:
             data['investment_type'] = 'swing'
         
-        db: Session = next(get_db())
+        db: Session = g.db
         trade = TradeService.update(db, trade_id, data)
         if trade:
             # Commit the transaction
@@ -223,17 +223,15 @@ def update_trade(trade_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @trades_bp.route('/<int:trade_id>/close', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trades', 'tickers', 'dashboard'])  # Invalidate cache after closing trade
 def close_trade(trade_id: int):
     """Close trade"""
-    db = None
     try:
         data = request.get_json() if request.is_json else {}
-        db: Session = next(get_db())
+        db: Session = g.db
         trade = TradeService.close_trade(db, trade_id, data)
         if trade:
             return jsonify({
@@ -254,19 +252,16 @@ def close_trade(trade_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        if db:
-            db.close()
 
 @trades_bp.route('/<int:trade_id>/cancel', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trades', 'tickers', 'dashboard'])  # Invalidate cache after cancelling trade
 def cancel_trade(trade_id: int):
     """Cancel trade"""
-    db = None
     try:
         data = request.get_json() if request.is_json else {}
         cancel_reason = data.get('cancel_reason', 'Cancelled by user')
-        db: Session = next(get_db())
+        db: Session = g.db
         trade = TradeService.cancel_trade(db, trade_id, cancel_reason)
         if trade:
             return jsonify({
@@ -287,16 +282,14 @@ def cancel_trade(trade_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        if db:
-            db.close()
 
 @trades_bp.route('/<int:trade_id>', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['trades', 'tickers', 'dashboard'])  # Invalidate cache after deleting trade
 def delete_trade(trade_id: int):
     """Delete trade"""
     try:
-        db: Session = next(get_db())
+        db: Session = g.db
         success = TradeService.delete(db, trade_id)
         if success:
             return jsonify({
@@ -320,8 +313,6 @@ def delete_trade(trade_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @trades_bp.route('/summary', methods=['GET'])
 def get_trade_summary():

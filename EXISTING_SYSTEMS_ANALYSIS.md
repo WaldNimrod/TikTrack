@@ -296,3 +296,5 @@ ModalManagerV2.hideModal('entityModal');
 
 **המערכת מוכנה לשימוש מלא! 🎉**
 
+
+

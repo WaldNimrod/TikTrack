@@ -2563,36 +2563,119 @@ UnifiedCacheManager.prototype.getKeyPolicy = function(key) {
  * @async
  * @returns {Promise<void>}
  */
-UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
+UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProfileId = null, groupName = null) {
+    console.log('🔍 DEBUG: refreshUserPreferences() called with targetProfileId:', targetProfileId, 'groupName:', groupName);
+    
     try {
-        // Clear all preferences cache keys
+        // Clear all preferences cache keys OR specific group keys
+        // NOTE: getAllKeys() returns keys WITH prefix (e.g., 'tiktrack_preference_...')
+        // But we also need to check localStorage directly for keys without prefix
+        console.log('🔍 DEBUG: Getting all keys from UnifiedCacheManager...');
         const keys = await this.getAllKeys();
-        const prefKeys = keys.filter(k => 
-            k.startsWith('preference_') || 
-            k.startsWith('all_preferences_') ||
-            k === 'user-preferences'
-        );
+        console.log('🔍 DEBUG: getAllKeys() returned:', keys.length, 'keys');
+        console.log('🔍 DEBUG: Sample keys from UnifiedCacheManager:', keys.slice(0, 5));
         
-        window.Logger.info(`🔄 Refreshing user preferences - clearing ${prefKeys.length} keys`, { page: "unified-cache-manager" });
+        console.log('🔍 DEBUG: Getting keys directly from localStorage...');
+        const localStorageKeys = Object.keys(localStorage);
+        console.log('🔍 DEBUG: localStorage has', localStorageKeys.length, 'total keys');
         
+        const prefKeys = [];
+        
+        // If groupName is specified, only clear that group's cache
+        if (groupName) {
+            const groupPattern = `preference_group_${groupName}_`;
+            console.log(`🔍 DEBUG: Filtering for specific group: ${groupPattern}`);
+            
+            // Add keys from UnifiedCacheManager (with prefix)
+            keys.forEach(key => {
+                if (key.includes(groupPattern)) {
+                    prefKeys.push(key);
+                }
+            });
+            
+            // Add keys directly from localStorage (without prefix)
+            localStorageKeys.forEach(key => {
+                if (key.includes(groupPattern)) {
+                    prefKeys.push(key);
+                }
+            });
+            
+            console.log('🔍 DEBUG: Found', prefKeys.length, `keys for group ${groupName}`);
+        } else {
+            // Clear all preferences cache keys
+            console.log('🔍 DEBUG: Filtering ALL preference keys...');
+            
+            // Add keys from UnifiedCacheManager (with prefix)
+            keys.forEach(key => {
+                if (key.startsWith('tiktrack_preference_') || 
+                    key.startsWith('tiktrack_all_preferences_') ||
+                    key.startsWith('tiktrack_preference_group_') ||
+                    key === 'tiktrack_user-preferences') {
+                    prefKeys.push(key);
+                }
+            });
+            console.log('🔍 DEBUG: Found', prefKeys.length, 'keys from UnifiedCacheManager');
+            
+            // Add keys directly from localStorage (without prefix)
+            localStorageKeys.forEach(key => {
+                if (key.startsWith('preference_') || 
+                    key.startsWith('all_preferences_') ||
+                    key.startsWith('preference_group_') ||
+                    key === 'user-preferences') {
+                    prefKeys.push(key);
+                }
+            });
+            console.log('🔍 DEBUG: Total preference keys to remove:', prefKeys.length);
+        }
+        
+        window.Logger.info(`🔄 Refreshing user preferences${groupName ? ` for group ${groupName}` : ''} - clearing ${prefKeys.length} keys`, { page: "unified-cache-manager" });
+        if (prefKeys.length > 0) {
+            window.Logger.info(`🔍 Preference keys found:`, prefKeys.slice(0, 10), { page: "unified-cache-manager" });
+        }
+        
+        let removedCount = 0;
         for (const key of prefKeys) {
-            await this.remove(key);
+            try {
+                console.log(`🗑️ DEBUG: Processing key: ${key}`);
+                
+                // Remove directly from localStorage (simplest and most reliable)
+                if (localStorage.getItem(key) !== null) {
+                    localStorage.removeItem(key);
+                    removedCount++;
+                    console.log(`✅ DEBUG: Removed ${key} from localStorage directly`);
+                    window.Logger.debug(`🗑️ Removed ${key} from localStorage`, { page: "unified-cache-manager" });
+                } else {
+                    console.log(`⚠️ DEBUG: Key ${key} not found in localStorage (already removed?)`);
+                }
+                
+                // Also try removing via UnifiedCacheManager (which will try all layers)
+                // This handles the key both with and without prefix
+                if (key.startsWith('tiktrack_')) {
+                    // Key has prefix, remove without prefix for UnifiedCacheManager
+                    const keyWithoutPrefix = key.replace('tiktrack_', '');
+                    console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${keyWithoutPrefix}")`);
+                    await this.remove(keyWithoutPrefix);
+                } else {
+                    // Key without prefix
+                    console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${key}")`);
+                    await this.remove(key);
+                }
+            } catch (removeError) {
+                console.error(`❌ DEBUG: Failed to remove key ${key}:`, removeError);
+                window.Logger.warn(`⚠️ Failed to remove key ${key}:`, removeError, { page: "unified-cache-manager" });
+            }
         }
         
-        // Reload preferences if PreferencesCore is available
-        // Use ProfileManager to get the correct current profile ID
-        let currentUserId = window.PreferencesCore?.currentUserId || 1;
-        let currentProfileId = window.ProfileManager?.currentProfileId || window.PreferencesCore?.currentProfileId || 0;
+        console.log(`✅ DEBUG: Successfully removed ${removedCount} keys from localStorage`);
         
-        if (window.PreferencesCore) {
-            await window.PreferencesCore.initializeWithLazyLoading(
-                currentUserId,
-                currentProfileId
-            );
-            window.Logger.info(`✅ User preferences refreshed from backend (user: ${currentUserId}, profile: ${currentProfileId})`, { page: "unified-cache-manager" });
-        }
+        // NOTE: We do NOT reload preferences here anymore
+        // The caller (PreferencesUI.saveAllPreferences) should handle reloading the form
+        // This prevents double-loading and rate limiting issues
+        
+        console.log('✅ DEBUG: Cache cleared successfully - preferences will be reloaded by caller');
         
     } catch (error) {
+        console.error('❌ DEBUG: Error in refreshUserPreferences:', error);
         window.Logger.warn('⚠️ Error refreshing user preferences:', error, { page: "unified-cache-manager" });
         throw error;
     }
@@ -2874,6 +2957,114 @@ window.clearCacheFull = async function(event) {
  * Reason: Simplified cache management flow
  */
 
+// ===== NEW SIMPLIFIED CACHE CLEARING FUNCTIONS FOR DEVELOPMENT =====
+// Simplified functions for the new cache architecture (localStorage only)
+
+/**
+ * Clear UI state for development (sorting, filters, etc.)
+ * @function clearUIState
+ * @param {Event} event - Event object
+ */
+window.clearUIState = async function(event) {
+    if (event) event.preventDefault();
+    
+    try {
+        window.Logger.info('🧹 Clearing UI state only...', { page: "unified-cache-manager" });
+        
+        const keys = Object.keys(localStorage);
+        let cleared = 0;
+        
+        keys.forEach(key => {
+            if (key.startsWith('ui_state_') || key.startsWith('filter_') || key.startsWith('sort_')) {
+                localStorage.removeItem(key);
+                cleared++;
+            }
+        });
+        
+        const message = `נקו ${cleared} פריטי העדפות UI`;
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('ניקוי UI', message);
+        }
+        
+        window.Logger.info(`✅ Cleared ${cleared} UI state items`, { page: "unified-cache-manager" });
+    } catch (error) {
+        window.Logger.error('❌ Error clearing UI state:', error, { page: "unified-cache-manager" });
+    }
+};
+
+/**
+ * Clear all localStorage for development testing
+ * @function clearAllCacheForDevelopment
+ * @param {Event} event - Event object
+ */
+window.clearAllCacheForDevelopment = async function(event) {
+    if (event) event.preventDefault();
+    
+    try {
+        window.Logger.info('🧹 Clearing all localStorage...', { page: "unified-cache-manager" });
+        
+        const itemCount = localStorage.length;
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        const message = `נוקה כל ה-localStorage (${itemCount} פריטים)`;
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('ניקוי מטמון', message);
+        }
+        
+        window.Logger.info(`✅ Cleared ${itemCount} localStorage items`, { page: "unified-cache-manager" });
+    } catch (error) {
+        window.Logger.error('❌ Error clearing localStorage:', error, { page: "unified-cache-manager" });
+    }
+};
+
+/**
+ * Hard reload of the page for development
+ * @function hardReload
+ * @param {Event} event - Event object
+ */
+window.hardReload = function(event) {
+    if (event) event.preventDefault();
+    
+    window.Logger.info('🔄 Performing hard reload...', { page: "unified-cache-manager" });
+    
+    // Hard reload - bypass cache
+    if (typeof window.location !== 'undefined') {
+        window.location.reload(true);
+    } else {
+        window.location.href = window.location.href;
+    }
+};
+
+/**
+ * Main cache clearing function for development (wrapper)
+ * @function clearCacheForDevelopment
+ * @param {Event} event - Event object
+ */
+window.clearCacheForDevelopment = async function(event) {
+    if (event) event.preventDefault();
+    
+    try {
+        // Clear localStorage
+        await window.clearAllCacheForDevelopment(event);
+        
+        // Show notification
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification(
+                'ניקוי מטמון לפיתוח',
+                'המטמון נוקה. רענון עמוד בעוד 2 שניות...'
+            );
+        }
+        
+        // Auto-reload after 2 seconds
+        setTimeout(() => {
+            window.hardReload(event);
+        }, 2000);
+        
+    } catch (error) {
+        window.Logger.error('❌ Error in clearCacheForDevelopment:', error, { page: "unified-cache-manager" });
+    }
+};
 
 // window.Logger.info('📦 Unified Cache Manager loaded', { page: "unified-cache-manager" });
 

@@ -269,11 +269,13 @@ class EventHandlerManager {
      * @private
      */
     handleSortableClick(element, event) {
-        const tableId = element.closest('table').getAttribute('data-table-id');
+        const table = element.closest('table');
+        // Try data-table-type first (most common), then data-table-id as fallback
+        const tableType = table.getAttribute('data-table-type') || table.getAttribute('data-table-id');
         const column = element.getAttribute('data-column');
         
         if (window.tables && window.tables.sortTable) {
-            window.tables.sortTable(tableId, column);
+            window.tables.sortTable(tableType, column);
         }
     }
 

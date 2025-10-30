@@ -270,15 +270,54 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   }
 
   // Update sort icons
-  if (typeof window.updateSortIcons === 'function') {
-    window.updateSortIcons(tableType, columnIndex, newDirection);
-  } else {
-    console.warn('⚠️ updateSortIcons function is not available');
-  }
+  updateSortIconsLocal(tableType, columnIndex, newDirection);
 
   // Table sorted by column
   return sortedData;
 };
+
+/**
+ * Update sort icons in table headers
+ *
+ * @param {string} tableType - Type of table
+ * @param {number} columnIndex - Column index
+ * @param {string} direction - Sort direction (asc/desc)
+ */
+function updateSortIconsLocal(tableType, columnIndex, direction) {
+  try {
+    // Find the table by data-table-type attribute
+    const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+    if (!table) {
+      console.warn(`⚠️ Table with type "${tableType}" not found for sort icons update`);
+      return;
+    }
+
+    // Clear all sort icons first
+    const headers = table.querySelectorAll('th .sort-icon');
+    headers.forEach(header => {
+      header.textContent = '↕';
+      header.className = 'sort-icon';
+    });
+
+    // Update the specific column's sort icon
+    const targetHeader = table.querySelector(`th:nth-child(${columnIndex + 1}) .sort-icon`);
+    if (targetHeader) {
+      if (direction === 'asc') {
+        targetHeader.textContent = '↑';
+        targetHeader.className = 'sort-icon sort-asc';
+      } else if (direction === 'desc') {
+        targetHeader.textContent = '↓';
+        targetHeader.className = 'sort-icon sort-desc';
+      } else {
+        targetHeader.textContent = '↕';
+        targetHeader.className = 'sort-icon';
+      }
+    }
+
+  } catch (error) {
+    console.error('❌ Error updating sort icons:', error);
+  }
+}
 
 /**
  * Check if value is a valid date

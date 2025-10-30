@@ -342,11 +342,6 @@ class ModalManagerV2 {
             // איפוס טופס
             this.resetForm(modalElement);
             
-            // מילוי נתונים אם במצב עריכה/צפייה
-            if (mode === 'edit' && entityData) {
-                await this.populateForm(modalElement, entityData);
-            }
-            
             // הפעלת ולידציה
             this.initializeValidation(modalElement, modalInfo.config);
             
@@ -356,8 +351,13 @@ class ModalManagerV2 {
             // יישום צבעים
             this.applyUserColors(modalElement, modalInfo.config.entityType);
             
-            // מילוי selects
+            // מילוי selects (חייב להיות לפני populateForm)
             await this.populateSelects(modalElement, modalInfo.config);
+            
+            // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
+            if (mode === 'edit' && entityData) {
+                await this.populateForm(modalElement, entityData);
+            }
             
             // הצגת המודל
             const modal = new bootstrap.Modal(modalElement);

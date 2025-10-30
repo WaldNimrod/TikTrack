@@ -59,7 +59,7 @@ const cashFlowModalConfig = {
             id: 'cashFlowDate',
             label: 'תאריך תזרים',
             required: true,
-            dateTime: true,
+            dateTime: false,
             defaultTime: 'now'
         },
         {

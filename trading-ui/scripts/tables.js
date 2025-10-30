@@ -409,6 +409,11 @@ window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
 window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, updateFunction) {
   // Handle legacy call with only column index
   if (typeof tableTypeOrColumnIndex === 'number' && arguments.length === 1) {
+    return; // Skip legacy mode
+  }
+  
+  // Handle call with string tableType and number columnIndex
+  if (typeof tableTypeOrColumnIndex === 'string' && typeof columnIndex === 'number' && arguments.length === 2) {
     // Find the current table element
     const currentTable = document.querySelector('table[data-table-type]');
     if (!currentTable) {

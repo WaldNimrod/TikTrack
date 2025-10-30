@@ -165,6 +165,17 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
 window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   // Global sortTableData called for table
 
+  // Validate input data
+  if (!data || !Array.isArray(data)) {
+    console.error(`❌ [SORT] Invalid data: expected array, got ${typeof data}`, data);
+    return [];
+  }
+
+  if (data.length === 0) {
+    console.warn(`⚠️ [SORT] No data to sort for table type: ${tableType}`);
+    return [];
+  }
+
   // Get current sort state
   const currentSortState = window.getSortState(tableType);
 
@@ -259,7 +270,11 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   }
 
   // Update sort icons
-  updateSortIcons(tableType, columnIndex, newDirection);
+  if (typeof window.updateSortIcons === 'function') {
+    window.updateSortIcons(tableType, columnIndex, newDirection);
+  } else {
+    console.warn('⚠️ updateSortIcons function is not available');
+  }
 
   // Table sorted by column
   return sortedData;

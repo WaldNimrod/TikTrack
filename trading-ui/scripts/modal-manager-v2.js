@@ -493,8 +493,13 @@ class ModalManagerV2 {
         const modalInfo = this.modals.get(modalElement.id);
         const config = modalInfo?.config;
         
+        // Debug: Log received data
+        console.log('📝 populateForm - received data:', data);
+        console.log('📝 populateForm - entity type:', config?.entityType);
+        
         // Field mapping for different entities
         const fieldMapping = this.getFieldMapping(config?.entityType);
+        console.log('📝 populateForm - field mapping:', fieldMapping);
         
         // מילוי שדות רגילים
         Object.entries(data).forEach(([key, value]) => {
@@ -507,6 +512,7 @@ class ModalManagerV2 {
             }
             
             if (field) {
+                console.log(`✅ Found field for ${key} (value: ${value})`);
                 if (field.type === 'checkbox' || field.type === 'radio') {
                     field.checked = Boolean(value);
                 } else if (field.tagName === 'SELECT') {
@@ -515,6 +521,8 @@ class ModalManagerV2 {
                 } else {
                     field.value = value || '';
                 }
+            } else {
+                console.log(`❌ No field found for ${key} (value: ${value})`);
             }
         });
         

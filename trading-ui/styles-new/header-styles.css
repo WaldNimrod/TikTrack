@@ -63,7 +63,7 @@
     max-width: var(--container-xl, 1400px);
     margin: 0 auto;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* Header Filters - No side padding, no top margin */
@@ -481,13 +481,15 @@
     border-radius: 5.4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 200px;
-    padding: 0.5rem 0;
+    padding: 0.35rem 0 0.7rem 0; /* less top space, a bit more bottom space */
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.3s ease;
     z-index: 951;
     list-style: none;
+    font-size: 0.9rem; /* match .filter-toggle */
+    font-weight: 400;   /* match .filter-toggle */
 }
 
 .filter-group:hover .filter-menu,
@@ -499,10 +501,41 @@
 }
 
 .filter-option {
-    padding: 0.25rem 0.9rem;
+    padding: 0.25rem 0.9rem; /* 4px top/bottom */
     cursor: pointer;
     transition: all 0.2s ease;
     color: #1d1d1f;
+    font-size: 0.9rem;  /* align with button font size */
+    font-weight: 300;    /* slightly lighter than button */
+}
+
+/* Ensure consistent vertical padding (4px) for all filter item elements */
+.status-filter-item,
+.type-filter-item,
+.account-filter-item,
+.date-range-filter-item {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+/* Selected state for filter items */
+.status-filter-item.selected,
+.type-filter-item.selected,
+.account-filter-item.selected,
+.date-range-filter-item.selected {
+    background-color: #f0f8ff;
+    color: #26baac;
+    font-weight: 500;
+}
+
+.status-filter-item.selected::before,
+.type-filter-item.selected::before,
+.account-filter-item.selected::before,
+.date-range-filter-item.selected::before {
+    content: "✓";
+    margin-left: 8px;
+    color: #26baac;
+    font-weight: bold;
 }
 
 .filter-option:hover {

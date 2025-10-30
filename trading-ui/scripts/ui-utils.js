@@ -868,6 +868,15 @@ window.toggleSection = function (sectionId) {
     const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
     console.log(`🔍 Section found:`, section ? 'YES' : 'NO', section ? `(ID: ${section.id || 'no-id'}, data-section: ${section.getAttribute('data-section') || 'no-data-section'})` : '');
     
+    // If this is the top section and page has >=3 sections, toggle all sections together
+    const isTopSection = section && section.classList.contains('top-section');
+    const sectionsCount = document.querySelectorAll('.top-section, .content-section, [data-section]').length;
+    if (isTopSection && sectionsCount >= 3 && typeof window.toggleAllSections === 'function') {
+      window.toggleAllSections();
+      if (window.Logger) { window.Logger.debug(`🔁 Top section toggle: toggled ALL sections (count=${sectionsCount})`, { page: "ui-utils" }); }
+      return;
+    }
+
     const sectionBody = section ? section.querySelector('.section-body') : null;
     if (window.Logger) { window.Logger.debug(`🔍 Section body found:`, sectionBody ? 'YES' : 'NO', { page: "ui-utils" }); }
     

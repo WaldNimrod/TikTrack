@@ -39,9 +39,8 @@
  */
 
 // Logger will be available after initialization
-if (window.Logger) {
-    window.Logger.info('🚀 Loading Header System v6.0.0...', { page: "header-system" });
-}
+try { console.log('🚀 header-system.js loaded'); } catch(_) {}
+if (window.Logger) { window.Logger.info('🚀 Loading Header System v6.0.0...', { page: "header-system" }); }
 
 /**
  * מערכת ראש דף מאוחדת עם פילטרים
@@ -197,20 +196,20 @@ class HeaderSystem {
                     </li>
 
                     <li class="tiktrack-nav-item">
-                      <a href="#" class="tiktrack-nav-link" onclick="clearCacheQuick(event)" 
-                         title="נקה מטמון מהיר - זיכרון בלבד">
+                      <a href="#" class="tiktrack-nav-link" onclick="clearCacheForDevelopment(event)" 
+                         title="ניקוי מטמון לפיתוח">
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
                       </a>
                       <ul class="submenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 200px; z-index: 1000; padding: 0; margin: 0; list-style: none;">
-                        <li><a href="#" onclick="clearCacheLayer('localStorage', event)" 
+                        <li><a href="#" onclick="clearUIState(event)" 
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
-                               title="נקה localStorage בלבד">נקה localStorage</a></li>
-                        <li><a href="#" onclick="clearAllCacheAdvanced(event)" 
+                               title="נקה העדפות UI בלבד">נקה העדפות UI</a></li>
+                        <li><a href="#" onclick="clearAllCacheForDevelopment(event)" 
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
-                               title="נקה כל שכבות המטמון">נקה כל המטמון</a></li>
-                        <li><a href="#" onclick="clearCacheFull(event)" 
+                               title="נקה כל ה-localStorage">נקה כל localStorage</a></li>
+                        <li><a href="#" onclick="hardReload(event)" 
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px;"
-                               title="נקה הכל + רענון עמוד">נקה הכל + רענון</a></li>
+                               title="רענון קשיח של העמוד">רענון קשיח</a></li>
                       </ul>
                     </li>
 
@@ -234,7 +233,7 @@ class HeaderSystem {
               <!-- כפתור פתיחה/סגירה של הפילטר - בתוך התפריט הראשי -->
               <div class="filter-toggle-section filter-toggle-main">
                 <button class="header-filter-toggle-btn" id="headerFilterToggleBtnMain" title="הצג/הסתר פילטרים" 
-                        onclick="toggleHeaderFilters()">
+                        data-onclick="toggleHeaderFilters()">
                   <span class="header-filter-arrow">▲</span>
                 </button>
               </div>
@@ -248,8 +247,7 @@ class HeaderSystem {
             <!-- פילטר סטטוס -->
             <div class="filter-group status-filter">
               <div class="filter-dropdown">
-                <button class="filter-toggle status-filter-toggle" id="statusFilterToggle" 
-                        onclick="toggleStatusFilterMenu()">
+                <button class="filter-toggle status-filter-toggle" id="statusFilterToggle">
                   <span class="selected-value selected-status-text" id="selectedStatus">כל סטטוס</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -273,7 +271,7 @@ class HeaderSystem {
             <!-- פילטר סוג השקעה -->
             <div class="filter-group type-filter">
               <div class="filter-dropdown">
-                <button class="filter-toggle type-filter-toggle" id="typeFilterToggle" onclick="toggleTypeFilterMenu()">
+                <button class="filter-toggle type-filter-toggle" id="typeFilterToggle">
                                           <span class="selected-value selected-type-text" id="selectedType">כל סוג השקעה</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -298,8 +296,7 @@ class HeaderSystem {
             <!-- פילטר חשבון מסחר -->
             <div class="filter-group account-filter">
               <div class="filter-dropdown">
-                <button class="filter-toggle account-filter-toggle" id="accountFilterToggle" 
-                        onclick="toggleAccountFilterMenu()">
+                <button class="filter-toggle account-filter-toggle" id="accountFilterToggle">
                   <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון מסחר</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -314,8 +311,7 @@ class HeaderSystem {
             <!-- פילטר תאריכים -->
             <div class="filter-group date-range-filter">
               <div class="filter-dropdown">
-                <button class="filter-toggle date-range-filter-toggle" id="dateRangeFilterToggle" 
-                        onclick="toggleDateRangeFilterMenu()">
+                <button class="filter-toggle date-range-filter-toggle" id="dateRangeFilterToggle">
                   <span class="selected-value selected-date-text" id="selectedDateRange">כל זמן</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -379,7 +375,7 @@ class HeaderSystem {
             <!-- כפתור פתיחה/סגירה של הפילטר - בתוך הפילטר -->
             <div class="filter-toggle-section filter-toggle-secondary">
               <button class="header-filter-toggle-btn" id="headerFilterToggleBtnSecondary" title="הצג/הסתר פילטרים" 
-                      onclick="toggleHeaderFilters()">
+                      data-onclick="toggleHeaderFilters()">
                 <span class="header-filter-arrow">▼</span>
               </button>
             </div>
@@ -406,6 +402,39 @@ class HeaderSystem {
     setTimeout(() => {
       window.updateToggleButtons();
     }, 500);
+    
+    // אין מאזיני click כפולים כאן. הטיפול מתבצע דרך data-onclick ע"י EventHandlerManager.
+    
+    // בדיקת מעבר עכבר לכפתורי פילטר
+    setTimeout(() => {
+      const filterButtons = document.querySelectorAll('.filter-toggle[data-onclick]');
+      console.log('🔍 Found filter buttons:', filterButtons.length);
+      
+      filterButtons.forEach((btn, index) => {
+        console.log(`🔍 Button ${index}:`, {
+          id: btn.id,
+          className: btn.className,
+          dataOnclick: btn.getAttribute('data-onclick'),
+          visible: btn.offsetParent !== null,
+          clickable: btn.offsetWidth > 0 && btn.offsetHeight > 0
+        });
+        
+        // בדיקת מעבר עכבר
+        btn.addEventListener('mouseenter', () => {
+          console.log('🖱️ Mouse ENTER on filter button:', btn.id, btn.getAttribute('data-onclick'));
+        });
+        
+        btn.addEventListener('click', (e) => {
+          console.log('🖱️ CLICK on filter button:', btn.id, btn.getAttribute('data-onclick'));
+          console.log('🖱️ Event details:', {
+            target: e.target,
+            currentTarget: e.currentTarget,
+            bubbles: e.bubbles,
+            cancelable: e.cancelable
+          });
+        });
+      });
+    }, 1000);
     
     // הוספת event listeners לתפריט משנה של ניקוי
     setTimeout(() => {
@@ -465,6 +494,21 @@ class HeaderSystem {
         align-items: center;
         overflow: visible;
       }
+
+      /* Ensure dropdown menus render above all header elements */
+      #unified-header .filter-menu {
+        z-index: 2000;
+        pointer-events: auto;
+      }
+      #unified-header .filter-menu.show {
+        display: block;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        z-index: 2000;
+      }
+      /* Header wrapper above main content just in case */
+      #unified-header .header-content { z-index: 1990; }
 
       /* דריסת CSS חיצוני */
       #unified-header .header-top .logo-section {
@@ -1370,11 +1414,31 @@ window.toggleHeaderFilters = function() {
 };
 
 window.toggleStatusFilterMenu = function() {
-  window.Logger.info('🔧 toggleStatusFilterMenu called', { page: "header-system" });
+  console.log('🚀 toggleStatusFilterMenu CALLED! (legacy click handler)', { timestamp: new Date().toISOString() });
+  window.Logger.info('🔧 toggleStatusFilterMenu called (legacy)', { page: "header-system" });
   const menu = document.getElementById('statusFilterMenu');
-  if (menu) {
-    menu.classList.toggle('show');
-    window.Logger.info('🔧 Status filter menu toggled:', menu.classList.contains('show', { page: "header-system" }) ? 'opened' : 'closed');
+  const btn = document.getElementById('statusFilterToggle');
+  
+  if (menu && btn) {
+    const isCurrentlyOpen = menu.classList.contains('show');
+    
+    if (isCurrentlyOpen) {
+      // If currently open, close it
+      menu.classList.remove('show');
+      closeFilterMenuPortal(menu);
+      if (window.Logger) { window.Logger.info('🔧 Status filter menu closed (legacy)', { page: "header-system" }); }
+      console.log('[header] toggleStatusFilterMenu -> closed (legacy)');
+    } else {
+      // If closed, close all other menus first, then open this one
+      closeAllFilterMenus();
+      menu.classList.add('show');
+      openFilterMenuPortal(menu, btn, 'status');
+      if (window.Logger) { window.Logger.info('🔧 Status filter menu opened (legacy)', { page: "header-system" }); }
+      console.log('[header] toggleStatusFilterMenu -> open (legacy)');
+      logFilterMenuDiagnostics('statusFilterMenu');
+    }
+  } else {
+    console.error('❌ statusFilterMenu element not found!');
   }
 };
 
@@ -1382,8 +1446,26 @@ window.toggleTypeFilterMenu = function() {
   window.Logger.info('🔧 toggleTypeFilterMenu called', { page: "header-system" });
   const menu = document.getElementById('typeFilterMenu');
   if (menu) {
-    menu.classList.toggle('show');
-    window.Logger.info('🔧 Type filter menu toggled:', menu.classList.contains('show', { page: "header-system" }) ? 'opened' : 'closed');
+    const isCurrentlyOpen = menu.classList.contains('show');
+    
+    if (isCurrentlyOpen) {
+      // If currently open, close it
+      menu.classList.remove('show');
+      closeFilterMenuPortal(menu);
+      if (window.Logger) { window.Logger.info('🔧 Type filter menu closed', { page: "header-system" }); }
+      console.log('[header] toggleTypeFilterMenu -> closed');
+    } else {
+      // If closed, close all other menus first, then open this one
+      closeAllFilterMenus();
+      menu.classList.add('show');
+      const btn = document.getElementById('typeFilterToggle');
+      if (btn) {
+        openFilterMenuPortal(menu, btn, 'type');
+      }
+      if (window.Logger) { window.Logger.info('🔧 Type filter menu opened', { page: "header-system" }); }
+      console.log('[header] toggleTypeFilterMenu -> open');
+      logFilterMenuDiagnostics('typeFilterMenu');
+    }
   }
 };
 
@@ -1391,8 +1473,26 @@ window.toggleAccountFilterMenu = function() {
   window.Logger.info('🔧 toggleAccountFilterMenu called', { page: "header-system" });
   const menu = document.getElementById('accountFilterMenu');
   if (menu) {
-    menu.classList.toggle('show');
-    window.Logger.info('🔧 Account filter menu toggled:', menu.classList.contains('show', { page: "header-system" }) ? 'opened' : 'closed');
+    const isCurrentlyOpen = menu.classList.contains('show');
+    
+    if (isCurrentlyOpen) {
+      // If currently open, close it
+      menu.classList.remove('show');
+      closeFilterMenuPortal(menu);
+      if (window.Logger) { window.Logger.info('🔧 Account filter menu closed', { page: "header-system" }); }
+      console.log('[header] toggleAccountFilterMenu -> closed');
+    } else {
+      // If closed, close all other menus first, then open this one
+      closeAllFilterMenus();
+      menu.classList.add('show');
+      const btn = document.getElementById('accountFilterToggle');
+      if (btn) {
+        openFilterMenuPortal(menu, btn, 'account');
+      }
+      if (window.Logger) { window.Logger.info('🔧 Account filter menu opened', { page: "header-system" }); }
+      console.log('[header] toggleAccountFilterMenu -> open');
+      logFilterMenuDiagnostics('accountFilterMenu');
+    }
   }
 };
 
@@ -1400,10 +1500,396 @@ window.toggleDateRangeFilterMenu = function() {
   window.Logger.info('🔧 toggleDateRangeFilterMenu called', { page: "header-system" });
   const menu = document.getElementById('dateRangeFilterMenu');
   if (menu) {
-    menu.classList.toggle('show');
-    window.Logger.info('🔧 Date range filter menu toggled:', menu.classList.contains('show', { page: "header-system" }) ? 'opened' : 'closed');
+    const isCurrentlyOpen = menu.classList.contains('show');
+    
+    if (isCurrentlyOpen) {
+      // If currently open, close it
+      menu.classList.remove('show');
+      closeFilterMenuPortal(menu);
+      if (window.Logger) { window.Logger.info('🔧 Date range filter menu closed', { page: "header-system" }); }
+      console.log('[header] toggleDateRangeFilterMenu -> closed');
+    } else {
+      // If closed, close all other menus first, then open this one
+      closeAllFilterMenus();
+      menu.classList.add('show');
+      const btn = document.getElementById('dateRangeFilterToggle');
+      if (btn) {
+        openFilterMenuPortal(menu, btn, 'date');
+      }
+      if (window.Logger) { window.Logger.info('🔧 Date range filter menu opened', { page: "header-system" }); }
+      console.log('[header] toggleDateRangeFilterMenu -> open');
+      logFilterMenuDiagnostics('dateRangeFilterMenu');
+    }
   }
 };
+
+// ===== Diagnostics for filter menus visibility/z-index =====
+function logFilterMenuDiagnostics(menuId) {
+  try {
+    const el = document.getElementById(menuId);
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const cs = window.getComputedStyle(el);
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + Math.min(10, rect.height / 2);
+    const topEl = document.elementFromPoint(centerX, centerY);
+    const stackInfo = {
+      position: cs.position,
+      display: cs.display,
+      visibility: cs.visibility,
+      opacity: cs.opacity,
+      zIndex: cs.zIndex,
+      transform: cs.transform,
+      pointerEvents: cs.pointerEvents,
+    };
+    const parent = el.parentElement;
+    const parentCS = parent ? window.getComputedStyle(parent) : null;
+    const parentInfo = parent ? {
+      tag: parent.tagName,
+      class: parent.className,
+      id: parent.id,
+      position: parentCS.position,
+      zIndex: parentCS.zIndex,
+      overflow: parentCS.overflow,
+    } : null;
+    window.Logger && window.Logger.info('🔎 FilterMenu diagnostics', {
+      menuId,
+      rect: { x: rect.left, y: rect.top, w: rect.width, h: rect.height },
+      computed: stackInfo,
+      parent: parentInfo,
+      topElement: topEl ? { tag: topEl.tagName, class: topEl.className, id: topEl.id } : null,
+      page: 'header-system'
+    });
+  } catch (e) {
+    console.error('Diagnostics error:', e);
+  }
+}
+
+// ===== Portal helpers for filter menus =====
+let __headerFilterPortals = new Map();
+
+function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
+  try {
+    // If already portaled, just ensure position and return
+    if (__headerFilterPortals.has(originalMenuEl.id)) {
+      positionPortal(__headerFilterPortals.get(originalMenuEl.id), anchorBtn);
+      return;
+    }
+
+    // Create portal container
+    const portal = originalMenuEl.cloneNode(true);
+    portal.id = originalMenuEl.id + '_portal';
+    portal.classList.add('show');
+    Object.assign(portal.style, {
+      position: 'fixed',
+      display: 'block',
+      visibility: 'visible',
+      opacity: '0',
+      pointerEvents: 'auto',
+      zIndex: '2000',
+      transition: 'opacity 0.2s ease-in-out'
+    });
+
+    // append first so measurements (offsetWidth/Height) are valid
+    document.body.appendChild(portal);
+    // lock width to original (or fallback to 200px)
+    const originalWidth = originalMenuEl.offsetWidth || 200;
+    portal.style.width = originalWidth + 'px';
+    portal.style.minWidth = originalWidth + 'px';
+    portal.style.maxWidth = originalWidth + 'px';
+    
+    positionPortal(portal, anchorBtn);
+
+    // Remember and wire cleanup
+    __headerFilterPortals.set(originalMenuEl.id, portal);
+    const reposition = () => positionPortal(portal, anchorBtn);
+    portal.__repositionHandler = reposition;
+    
+    // Update portal selections to match original
+    updatePortalSelections();
+    
+    // Add event listeners to portal items
+    addPortalEventListeners(portal, originalMenuEl);
+    
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition);
+
+    // Fade in effect
+    requestAnimationFrame(() => {
+      portal.style.opacity = '1';
+    });
+
+    console.log(`🧩 Portal opened for ${kind} menu`, { id: originalMenuEl.id, portalId: portal.id });
+  } catch (e) {
+    console.warn('⚠️ Failed to open portal menu:', e?.message);
+  }
+}
+
+function closeFilterMenuPortal(originalMenuEl) {
+  try {
+    const portal = __headerFilterPortals.get(originalMenuEl.id);
+    if (!portal) return;
+    
+    // Fade out effect
+    portal.style.opacity = '0';
+    setTimeout(() => {
+      window.removeEventListener('scroll', portal.__repositionHandler, true);
+      window.removeEventListener('resize', portal.__repositionHandler);
+      portal.remove();
+      __headerFilterPortals.delete(originalMenuEl.id);
+      console.log('🧩 Portal removed for menu', originalMenuEl.id);
+    }, 200); // Match transition duration
+  } catch (e) {
+    console.warn('⚠️ Failed to close portal menu:', e?.message);
+  }
+}
+
+function positionPortal(portalEl, anchorBtn) {
+  const rect = anchorBtn.getBoundingClientRect();
+  const margin = 4;
+  const isRTL = (document.documentElement.getAttribute('dir') || 'rtl').toLowerCase() === 'rtl';
+  const top = Math.min(rect.bottom + margin, window.innerHeight - portalEl.offsetHeight - 8);
+  if (isRTL) {
+    const rightPx = Math.max(8, Math.min(window.innerWidth - rect.right, window.innerWidth - 8));
+    portalEl.style.right = rightPx + 'px';
+    portalEl.style.left = 'auto';
+  } else {
+    const leftPx = Math.max(8, Math.min(rect.left, window.innerWidth - portalEl.offsetWidth - 8));
+    portalEl.style.left = leftPx + 'px';
+    portalEl.style.right = 'auto';
+  }
+  portalEl.style.top = top + 'px';
+}
+
+// ===== Auto-close other filter menus when opening one =====
+function closeAllFilterMenus() {
+  const menuIds = ['statusFilterMenu', 'typeFilterMenu', 'accountFilterMenu', 'dateRangeFilterMenu'];
+  menuIds.forEach(id => {
+    const menu = document.getElementById(id);
+    if (menu && menu.classList.contains('show')) {
+      menu.classList.remove('show');
+      closeFilterMenuPortal(menu);
+    }
+  });
+  
+  // Also close any existing portals
+  if (__headerFilterPortals) {
+    __headerFilterPortals.forEach((portal, menuId) => {
+      try {
+        portal.style.opacity = '0';
+        setTimeout(() => {
+          window.removeEventListener('scroll', portal.__repositionHandler, true);
+          window.removeEventListener('resize', portal.__repositionHandler);
+          portal.remove();
+          __headerFilterPortals.delete(menuId);
+          console.log('🧩 Portal removed for menu', menuId);
+        }, 200);
+      } catch (e) {
+        console.warn('⚠️ Failed to close portal menu:', e?.message);
+      }
+    });
+  }
+}
+
+// ===== Hover behavior for filter menus =====
+let hoverTimeouts = new Map();
+
+// ===== Update filter selections in UI =====
+function updateFilterSelections(filters) {
+  console.log('🔄 Updating filter selections:', filters);
+  
+  // עדכון סטטוס
+  const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
+  statusItems.forEach(item => {
+    item.classList.remove('selected');
+    const value = item.getAttribute('data-value');
+    if (filters.status && filters.status.includes(value)) {
+      item.classList.add('selected');
+    } else if (!filters.status || filters.status.length === 0) {
+      if (value === 'הכול') item.classList.add('selected');
+    }
+  });
+  
+  // עדכון סוג
+  const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
+  typeItems.forEach(item => {
+    item.classList.remove('selected');
+    const value = item.getAttribute('data-value');
+    if (filters.type && filters.type.includes(value)) {
+      item.classList.add('selected');
+    } else if (!filters.type || filters.type.length === 0) {
+      if (value === 'הכול') item.classList.add('selected');
+    }
+  });
+  
+  // עדכון חשבון
+  const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
+  accountItems.forEach(item => {
+    item.classList.remove('selected');
+    const value = item.getAttribute('data-value');
+    if (filters.account && filters.account.includes(value)) {
+      item.classList.add('selected');
+    } else if (!filters.account || filters.account.length === 0) {
+      if (value === 'הכול') item.classList.add('selected');
+    }
+  });
+  
+  // עדכון טווח תאריכים
+  const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+  dateRangeItems.forEach(item => {
+    item.classList.remove('selected');
+    const value = item.getAttribute('data-value');
+    if (value === filters.dateRange) {
+      item.classList.add('selected');
+    }
+  });
+}
+
+// ===== Add event listeners to portal items =====
+function addPortalEventListeners(portal, originalMenu) {
+  const portalItems = portal.querySelectorAll('[data-value]');
+  portalItems.forEach(portalItem => {
+    const value = portalItem.getAttribute('data-value');
+    const menuId = originalMenu.id;
+    
+    portalItem.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log(`🖱️ Portal item clicked:`, { value, menuId });
+      
+      // Call the appropriate selection function based on menu type
+      if (menuId === 'statusFilterMenu') {
+        window.selectStatusOption(value);
+      } else if (menuId === 'typeFilterMenu') {
+        window.selectTypeOption(value);
+      } else if (menuId === 'accountFilterMenu') {
+        window.selectAccountOption(value);
+      } else if (menuId === 'dateRangeFilterMenu') {
+        window.selectDateRangeOption(value);
+      }
+    });
+  });
+}
+
+// ===== Update portal selections =====
+function updatePortalSelections() {
+  if (__headerFilterPortals) {
+    __headerFilterPortals.forEach((portal, menuId) => {
+      const originalMenu = document.getElementById(menuId);
+      if (originalMenu) {
+        // Copy selected state from original to portal
+        const originalItems = originalMenu.querySelectorAll('[data-value]');
+        const portalItems = portal.querySelectorAll('[data-value]');
+        
+        console.log(`🔄 Updating portal selections for ${menuId}:`, {
+          originalItems: originalItems.length,
+          portalItems: portalItems.length,
+          selected: Array.from(originalItems).filter(item => item.classList.contains('selected')).map(item => item.getAttribute('data-value'))
+        });
+        
+        originalItems.forEach((originalItem, index) => {
+          const portalItem = portalItems[index];
+          if (portalItem) {
+            if (originalItem.classList.contains('selected')) {
+              portalItem.classList.add('selected');
+              console.log(`✅ Added selected to portal item:`, portalItem.getAttribute('data-value'));
+            } else {
+              portalItem.classList.remove('selected');
+            }
+          }
+        });
+      }
+    });
+  }
+}
+
+function setupHoverBehavior() {
+  const filterButtons = [
+    { buttonId: 'statusFilterToggle', menuId: 'statusFilterMenu', type: 'status' },
+    { buttonId: 'typeFilterToggle', menuId: 'typeFilterMenu', type: 'type' },
+    { buttonId: 'accountFilterToggle', menuId: 'accountFilterMenu', type: 'account' },
+    { buttonId: 'dateRangeFilterToggle', menuId: 'dateRangeFilterMenu', type: 'date' }
+  ];
+
+  filterButtons.forEach(({ buttonId, menuId, type }) => {
+    const button = document.getElementById(buttonId);
+    const menu = document.getElementById(menuId);
+    
+    if (button && menu) {
+      // Remove existing click handlers
+      button.removeAttribute('data-onclick');
+      
+      // Add hover events
+      button.addEventListener('mouseenter', () => {
+        // Clear any existing timeout
+        if (hoverTimeouts.has(buttonId)) {
+          clearTimeout(hoverTimeouts.get(buttonId));
+          hoverTimeouts.delete(buttonId);
+        }
+        
+        // Open menu after short delay
+        hoverTimeouts.set(buttonId, setTimeout(() => {
+          if (!menu.classList.contains('show')) {
+            closeAllFilterMenus();
+            menu.classList.add('show');
+            openFilterMenuPortal(menu, button, type);
+            console.log(`🖱️ Hover opened ${menuId}`);
+          }
+        }, 150)); // 150ms delay
+      });
+      
+      button.addEventListener('mouseleave', () => {
+        // Clear open timeout
+        if (hoverTimeouts.has(buttonId)) {
+          clearTimeout(hoverTimeouts.get(buttonId));
+          hoverTimeouts.delete(buttonId);
+        }
+
+        // Defer close; only close if neither button nor portal is hovered
+        hoverTimeouts.set(buttonId, setTimeout(() => {
+          const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
+          const buttonHovered = button.matches(':hover');
+          const portalHovered = portal ? portal.matches(':hover') : false;
+          const menuHovered = menu.matches(':hover');
+          if (!buttonHovered && !portalHovered && !menuHovered && menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            closeFilterMenuPortal(menu);
+            console.log(`🖱️ Hover closed ${menuId}`);
+          }
+        }, 220)); // short defer to allow cursor to enter portal
+      });
+      
+      // Also handle menu hover to keep it open
+      menu.addEventListener('mouseenter', () => {
+        if (hoverTimeouts.has(buttonId)) {
+          clearTimeout(hoverTimeouts.get(buttonId));
+          hoverTimeouts.delete(buttonId);
+        }
+      });
+      
+      menu.addEventListener('mouseleave', () => {
+        if (hoverTimeouts.has(buttonId)) {
+          clearTimeout(hoverTimeouts.get(buttonId));
+          hoverTimeouts.delete(buttonId);
+        }
+
+        // Defer close; only close if neither menu/portal nor button is hovered
+        hoverTimeouts.set(buttonId, setTimeout(() => {
+          const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
+          const buttonHovered = button.matches(':hover');
+          const portalHovered = portal ? portal.matches(':hover') : false;
+          const menuHovered = menu.matches(':hover');
+          if (!buttonHovered && !portalHovered && !menuHovered && menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            closeFilterMenuPortal(menu);
+            console.log(`🖱️ Menu hover closed ${menuId}`);
+          }
+        }, 220));
+      });
+    }
+  });
+}
 
 // ===== GLOBAL FILTER FUNCTIONS =====
 
@@ -1436,6 +1922,7 @@ window.selectStatusOption = function(status) {
   }
   
   updateStatusFilterText();
+  updatePortalSelections();
   
   // עדכון מיידי של הפילטר במערכת
   if (window.filterSystem) {
@@ -1478,6 +1965,7 @@ window.selectTypeOption = function(type) {
   }
   
   updateTypeFilterText();
+  updatePortalSelections();
   
   if (window.filterSystem) {
     const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
@@ -1499,10 +1987,17 @@ window.selectAccountOption = function(account) {
   const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
   const clickedItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === account);
   
+  console.log('🔧 Account selection debug:', {
+    account,
+    accountItems: accountItems.length,
+    clickedItem: clickedItem ? clickedItem.getAttribute('data-value') : 'not found'
+  });
+  
   if (clickedItem) {
     if (account === 'הכול') {
       accountItems.forEach(item => item.classList.remove('selected'));
       clickedItem.classList.add('selected');
+      console.log('✅ Selected "הכול" - removed all others');
     } else {
       const allItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
       if (allItem) {
@@ -1514,10 +2009,17 @@ window.selectAccountOption = function(account) {
       if (selectedItems.length === 0 && allItem) {
         allItem.classList.add('selected');
       }
+      
+      console.log('✅ Toggled account selection:', {
+        account,
+        isSelected: clickedItem.classList.contains('selected'),
+        totalSelected: selectedItems.length
+      });
     }
   }
   
   updateAccountFilterText();
+  updatePortalSelections();
   
   if (window.filterSystem) {
     const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
@@ -1548,6 +2050,7 @@ window.selectDateRangeOption = function(dateRange) {
   }
 
   updateDateRangeFilterText();
+  updatePortalSelections();
   
   if (window.filterSystem) {
     window.filterSystem.currentFilters.dateRange = dateRange;
@@ -1652,6 +2155,7 @@ window.applyDateRangeFilter = function(dateRange) {
 
 // פונקציות כלליות - פשוטות ויעילות
 window.clearAllFilters = function() {
+  console.log('🧹 clearAllFilters - מוחק את כל הפילטרים');
   window.Logger.info('🧹 clearAllFilters - מוחק את כל הפילטרים', { page: "header-system" });
   if (window.filterSystem) {
     window.filterSystem.currentFilters = {
@@ -1684,6 +2188,18 @@ window.clearAllFilters = function() {
     
     const allDateItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="כל זמן"]');
     if (allDateItem) allDateItem.classList.add('selected');
+    
+    // עדכון פורטלים
+    updatePortalSelections();
+    
+    // עדכון בחירות בתפריטים
+    updateFilterSelections({
+      search: '',
+      dateRange: 'כל זמן',
+      status: [],
+      type: [],
+      account: []
+    });
     
     // עדכון טקסטים
     if (typeof window.updateStatusFilterText === 'function') window.updateStatusFilterText();
@@ -1765,37 +2281,68 @@ window.updateFilterUI = function(filters) {
   if (typeof window.updateDateRangeFilterText === 'function') window.updateDateRangeFilterText();
 }
 
+// ===== Initialize Header System =====
+try {
+  if (!window.headerSystem) {
+    window.headerSystem = new HeaderSystem();
+  }
+  const initHeader = () => {
+    try {
+      window.headerSystem.init();
+      window.headerSystemReady = true;
+      // Setup hover behavior for filter menus
+      setupHoverBehavior();
+      window.Logger && window.Logger.info('✅ HeaderSystem initialized with hover behavior', { page: 'header-system' });
+    } catch (e) {
+      window.Logger && window.Logger.error('❌ HeaderSystem init failed', { error: e?.message, page: 'header-system' });
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeader);
+  } else {
+    initHeader();
+  }
+} catch (e) {
+  console.error('HeaderSystem bootstrap error:', e);
+}
+
 window.resetAllFilters = async function() {
+  console.log('↻ resetAllFilters - מחזיר לערכי ברירת מחדל מהעדפות');
   window.Logger.info('↻ resetAllFilters - מחזיר לערכי ברירת מחדל מהעדפות', { page: "header-system" });
   window.Logger.info('↻ resetAllFilters - פונקציה נקראת!', { page: "header-system" });
   
   try {
     // טעינת הגדרות ברירת מחדל מהעדפות באמצעות מערכת ההעדפות הקיימת
-    const preferenceNames = [
-      'defaultSearchFilter',
-      'defaultDateRangeFilter', 
-      'defaultStatusFilter',
-      'defaultTypeFilter',
-      'defaultAccountFilter'
-    ];
+    console.log('↻ בודק אם getPreference קיימת:', typeof window.getPreference);
+    window.Logger.info('↻ בודק אם getPreference קיימת:', typeof window.getPreference, { page: "header-system" });
     
-    window.Logger.info('↻ בודק אם getPreferencesByNames קיימת:', typeof window.getPreferencesByNames, { page: "header-system" });
-    
-    if (typeof window.getPreferencesByNames !== 'function') {
-      throw new Error('getPreferencesByNames לא קיימת');
+    if (typeof window.getPreference !== 'function') {
+      console.log('❌ getPreference לא קיימת - עובר ל-fallback');
+      throw new Error('getPreference לא קיימת');
     }
     
-    const prefs = await window.getPreferencesByNames(preferenceNames);
+    // טעינת העדפות ברירת מחדל
+    const defaultSearch = await window.getPreference('defaultSearchFilter') || '';
+    const defaultDateRange = await window.getPreference('defaultDateRangeFilter') || 'כל זמן';
+    const defaultStatus = await window.getPreference('defaultStatusFilter') || [];
+    const defaultType = await window.getPreference('defaultTypeFilter') || [];
+    const defaultAccount = await window.getPreference('defaultAccountFilter') || [];
     
-    window.Logger.info('↻ העדפות מקוריות:', prefs, { page: "header-system" });
+    console.log('↻ העדפות ברירת מחדל:', {
+      search: defaultSearch,
+      dateRange: defaultDateRange,
+      status: defaultStatus,
+      type: defaultType,
+      account: defaultAccount
+    });
     
     // הגדרות ברירת מחדל מהעדפות
     const defaultFilters = {
-      search: prefs.defaultSearchFilter || '',
-      dateRange: prefs.defaultDateRangeFilter || 'כל זמן',
-      status: prefs.defaultStatusFilter === 'הכל' ? [] : [prefs.defaultStatusFilter],
-      type: prefs.defaultTypeFilter === 'הכל' ? [] : [prefs.defaultTypeFilter],
-      account: prefs.defaultAccountFilter === 'כל החשבונות' ? [] : [prefs.defaultAccountFilter]
+      search: defaultSearch,
+      dateRange: defaultDateRange,
+      status: Array.isArray(defaultStatus) ? defaultStatus : (defaultStatus === 'הכל' ? [] : [defaultStatus]),
+      type: Array.isArray(defaultType) ? defaultType : (defaultType === 'הכל' ? [] : [defaultType]),
+      account: Array.isArray(defaultAccount) ? defaultAccount : (defaultAccount === 'כל החשבונות' ? [] : [defaultAccount])
     };
     
     window.Logger.info('↻ טוען הגדרות ברירת מחדל:', defaultFilters, { page: "header-system" });
@@ -1806,17 +2353,30 @@ window.resetAllFilters = async function() {
       window.filterSystem.saveFilters();
       window.filterSystem.applyAllFilters();
       
-      // עדכון UI
-      window.Logger.info('↻ קורא ל-updateFilterUI', { page: "header-system" });
-      if (typeof window.updateFilterUI === 'function') {
-        window.updateFilterUI(defaultFilters);
-      } else {
-        window.Logger.error('❌ window.updateFilterUI לא קיימת!', { page: "header-system" });
+      // עדכון UI ישיר
+      console.log('↻ מעדכן UI עם העדפות:', defaultFilters);
+      
+      // עדכון שדה החיפוש
+      const searchInput = document.getElementById('searchFilterInput');
+      if (searchInput) {
+        searchInput.value = defaultFilters.search || '';
       }
+      
+      // עדכון בחירות בתפריטים
+      updateFilterSelections(defaultFilters);
+      
+      // עדכון טקסטים של הפילטרים
+      if (typeof window.updateStatusFilterText === 'function') window.updateStatusFilterText();
+      if (typeof window.updateTypeFilterText === 'function') window.updateTypeFilterText();
+      if (typeof window.updateAccountFilterText === 'function') window.updateAccountFilterText();
+      if (typeof window.updateDateRangeFilterText === 'function') window.updateDateRangeFilterText();
       
     }
     
     window.Logger.info('✅ פילטרים אופסו לערכי ברירת מחדל', { page: "header-system" });
+    
+    // עדכון פורטלים
+    updatePortalSelections();
     
     // הצגת הודעת הצלחה
     if (typeof window.showNotification === 'function') {
@@ -1826,8 +2386,10 @@ window.resetAllFilters = async function() {
     }
     
   } catch (error) {
+    console.log('❌ שגיאה בטעינת העדפות:', error.message);
     window.Logger.error('❌ שגיאה בטעינת העדפות:', error, { page: "header-system" });
     window.Logger.error('❌ פרטי השגיאה:', error.message, error.stack, { page: "header-system" });
+    console.log('🔄 עובר ל-fallback - clearAllFilters');
     // fallback לאיפוס רגיל
     window.clearAllFilters();
   }
@@ -1876,6 +2438,8 @@ window.HeaderSystem = {
         if (typeof window.headerSystem.init === 'function') {
           window.headerSystem.init();
         }
+        // Setup hover behavior for filter menus
+        setupHoverBehavior();
         return true;
       } else {
         window.Logger.info('⚠️ HeaderSystem class not available yet', { page: "header-system" });

@@ -527,6 +527,10 @@ class ModalManagerV2 {
                 } else if (field.tagName === 'SELECT') {
                     // For selects, set value directly
                     field.value = value || '';
+                } else if (field.type === 'datetime-local' && value) {
+                    // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)
+                    const dateStr = typeof value === 'string' ? value : value.toString();
+                    field.value = dateStr.includes('T') ? dateStr : `${dateStr}T00:00`;
                 } else {
                     field.value = value || '';
                 }

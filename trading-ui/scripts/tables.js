@@ -382,12 +382,37 @@ window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, upd
       tableData = window.accountsData;
       updateFn = () => window.updateAccountsTableMain();
       console.log(`🔍 [SORT] Found accounts data:`, tableData.length, 'items');
+    } else if (tableType === 'cash_flows' && window.cashFlowsData) {
+      tableData = window.cashFlowsData;
+      updateFn = () => window.updateCashFlowsTable(window.cashFlowsData);
+      console.log(`🔍 [SORT] Found cash_flows data:`, tableData.length, 'items');
+    } else if (tableType === 'alerts' && window.alertsData) {
+      tableData = window.alertsData;
+      updateFn = () => window.updateAlertsTable(window.alertsData);
+      console.log(`🔍 [SORT] Found alerts data:`, tableData.length, 'items');
+    } else if (tableType === 'notes' && window.notesData) {
+      tableData = window.notesData;
+      updateFn = () => window.updateNotesTable(window.notesData);
+      console.log(`🔍 [SORT] Found notes data:`, tableData.length, 'items');
+    } else if (tableType === 'trades' && window.tradesData) {
+      tableData = window.tradesData;
+      updateFn = () => window.updateTradesTable(window.tradesData);
+      console.log(`🔍 [SORT] Found trades data:`, tableData.length, 'items');
+    } else if (tableType === 'trade_plans' && window.tradePlansData) {
+      tableData = window.tradePlansData;
+      updateFn = () => window.updateTradePlansTable(window.tradePlansData);
+      console.log(`🔍 [SORT] Found trade_plans data:`, tableData.length, 'items');
     } else {
       console.warn(`❌ [SORT] No data found for table type: ${tableType}`);
       console.warn(`❌ [SORT] Available data:`, {
         executionsData: !!window.executionsData,
         tickersData: !!window.tickersData,
-        accountsData: !!window.accountsData
+        accountsData: !!window.accountsData,
+        cashFlowsData: !!window.cashFlowsData,
+        alertsData: !!window.alertsData,
+        notesData: !!window.notesData,
+        tradesData: !!window.tradesData,
+        tradePlansData: !!window.tradePlansData
       });
       return;
     }

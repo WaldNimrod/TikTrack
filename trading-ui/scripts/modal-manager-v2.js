@@ -489,12 +489,29 @@ class ModalManagerV2 {
         
         if (!form || !data) return;
         
+        // Get modal config for field mapping
+        const modalInfo = this.modals.get(modalElement.id);
+        const config = modalInfo?.config;
+        
+        // Field mapping for different entities
+        const fieldMapping = this.getFieldMapping(config?.entityType);
+        
         // מילוי שדות רגילים
         Object.entries(data).forEach(([key, value]) => {
-            const field = form.querySelector(`#${key}, [name="${key}"]`);
+            // Try direct match first
+            let field = form.querySelector(`#${key}, [name="${key}"]`);
+            
+            // If no direct match, try field mapping
+            if (!field && fieldMapping[key]) {
+                field = form.querySelector(`#${fieldMapping[key]}, [name="${fieldMapping[key]}"]`);
+            }
+            
             if (field) {
                 if (field.type === 'checkbox' || field.type === 'radio') {
                     field.checked = Boolean(value);
+                } else if (field.tagName === 'SELECT') {
+                    // For selects, set value directly
+                    field.value = value || '';
                 } else {
                     field.value = value || '';
                 }
@@ -503,6 +520,73 @@ class ModalManagerV2 {
         
         // מילוי selects מיוחדים
         this.populateSpecialSelects(form, data);
+    }
+    
+    /**
+     * Get field mapping for entity type - מיפוי שדות לפי סוג ישות
+     * Maps backend field names to frontend field IDs
+     */
+    getFieldMapping(entityType) {
+        const mappings = {
+            'cash_flow': {
+                'amount': 'cashFlowAmount',
+                'type': 'cashFlowType',
+                'currency_id': 'cashFlowCurrency',
+                'trading_account_id': 'cashFlowAccount',
+                'date': 'cashFlowDate',
+                'description': 'cashFlowDescription',
+                'source': 'cashFlowSource',
+                'external_id': 'cashFlowExternalId',
+                'trade_id': 'cashFlowTrade',
+                'trade_plan_id': 'cashFlowTradePlan'
+            },
+            'ticker': {
+                'symbol': 'tickerSymbol',
+                'name': 'tickerName',
+                'sector': 'tickerSector',
+                'industry': 'tickerIndustry'
+            },
+            'trade': {
+                'account_id': 'tradeAccount',
+                'ticker_id': 'tradeTicker',
+                'side': 'tradeSide',
+                'status': 'tradeStatus',
+                'notes': 'tradeNotes'
+            },
+            'trade_plan': {
+                'ticker_id': 'planTicker',
+                'account_id': 'planAccount',
+                'side': 'planSide',
+                'planned_amount': 'planAmount',
+                'stop_loss': 'planStopLoss',
+                'target_price': 'planTargetPrice'
+            },
+            'alert': {
+                'ticker_id': 'alertTicker',
+                'condition': 'alertCondition',
+                'threshold': 'alertThreshold'
+            },
+            'execution': {
+                'trade_id': 'executionTrade',
+                'ticker_id': 'executionTicker',
+                'side': 'executionSide',
+                'quantity': 'executionQuantity',
+                'price': 'executionPrice'
+            },
+            'trading_account': {
+                'name': 'accountName',
+                'type': 'accountType',
+                'currency_id': 'accountCurrency'
+            },
+            'note': {
+                'title': 'noteTitle',
+                'content': 'noteContent',
+                'related_entity_type': 'noteEntityType',
+                'related_entity_id': 'noteEntityId'
+            }
+        };
+        
+        return mappings[entityType] || {};
     }
 
     /**

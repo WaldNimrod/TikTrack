@@ -409,7 +409,9 @@ class ModalManagerV2 {
      */
     async loadEntityData(entityType, entityId) {
         try {
-            const response = await fetch(`/api/${entityType}/${entityId}`);
+            // Convert singular to plural for API endpoints
+            const apiEndpoint = this.getPluralEndpoint(entityType);
+            const response = await fetch(`/api/${apiEndpoint}/${entityId}`);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -422,6 +424,25 @@ class ModalManagerV2 {
             console.error(`Error loading entity data for ${entityType} ${entityId}:`, error);
             return null;
         }
+    }
+    
+    /**
+     * Convert singular entity type to plural API endpoint
+     * @param {string} entityType - סוג הישות ביחיד
+     * @returns {string} שם ה-endpoint ברבים
+     */
+    getPluralEndpoint(entityType) {
+        const pluralMap = {
+            'cash_flow': 'cash_flows',
+            'trade': 'trades',
+            'trading_account': 'trading-accounts',
+            'alert': 'alerts',
+            'execution': 'executions',
+            'ticker': 'tickers',
+            'trade_plan': 'trade_plans',
+            'note': 'notes'
+        };
+        return pluralMap[entityType] || `${entityType}s`;
     }
 
     /**

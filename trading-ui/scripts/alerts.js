@@ -1707,7 +1707,9 @@ async function saveAlert() {
       modalId: 'addAlertModal',
       successMessage: 'התראה נשמרה בהצלחה!',
       apiUrl: '/api/alerts/',
-      entityName: 'התראה'
+      entityName: 'התראה',
+      reloadFn: window.loadAlertsData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -1999,7 +2001,9 @@ async function updateAlert() {
       modalId: 'editAlertModal',
       successMessage: 'התראה עודכנה בהצלחה!',
       apiUrl: '/api/alerts/',
-      entityName: 'התראה'
+      entityName: 'התראה',
+      reloadFn: window.loadAlertsData,
+      requiresHardReload: false
     });
 
   } catch (error) {

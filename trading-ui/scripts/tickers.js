@@ -753,7 +753,9 @@ async function saveTicker() {
       modalId: 'addTickerModal',
       successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
       apiUrl: '/api/tickers/',
-      entityName: 'טיקר'
+      entityName: 'טיקר',
+      reloadFn: window.loadTickersData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -912,7 +914,9 @@ async function updateTicker() {
       modalId: 'editTickerModal',
       successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
       apiUrl: '/api/tickers/',
-      entityName: 'טיקר'
+      entityName: 'טיקר',
+      reloadFn: window.loadTickersData,
+      requiresHardReload: false
     });
 
   } catch (error) {

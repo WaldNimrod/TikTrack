@@ -2061,13 +2061,17 @@ async function saveTrade() {
             await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'tradesModal',
                 successMessage: 'טרייד עודכן בהצלחה',
-                entityName: 'טרייד'
+                entityName: 'טרייד',
+                reloadFn: window.loadTradesData,
+                requiresHardReload: false
             });
         } else {
             await CRUDResponseHandler.handleSaveResponse(response, {
                 modalId: 'tradesModal',
                 successMessage: 'טרייד נוסף בהצלחה',
-                entityName: 'טרייד'
+                entityName: 'טרייד',
+                reloadFn: window.loadTradesData,
+                requiresHardReload: false
             });
         }
         

@@ -1021,7 +1021,9 @@ async function saveEditTradePlan() {
       modalId: 'editTradePlanModal',
       successMessage: 'תכנון עודכן בהצלחה!',
       apiUrl: '/api/trade_plans/',
-      entityName: 'תכנון'
+      entityName: 'תכנון',
+      reloadFn: window.loadTradePlansData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -2361,13 +2363,17 @@ async function saveTradePlan() {
             await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'tradePlansModal',
                 successMessage: 'תוכנית מסחר עודכנה בהצלחה',
-                entityName: 'תוכנית מסחר'
+                entityName: 'תוכנית מסחר',
+                reloadFn: window.loadTradePlansData,
+                requiresHardReload: false
             });
         } else {
             await CRUDResponseHandler.handleSaveResponse(response, {
                 modalId: 'tradePlansModal',
                 successMessage: 'תוכנית מסחר נוספה בהצלחה',
-                entityName: 'תוכנית מסחר'
+                entityName: 'תוכנית מסחר',
+                reloadFn: window.loadTradePlansData,
+                requiresHardReload: false
             });
         }
         

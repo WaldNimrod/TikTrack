@@ -916,7 +916,9 @@ async function saveExecution() {
       modalId: 'addExecutionModal',
       successMessage: 'עסקה נשמרה בהצלחה!',
       apiUrl: '/api/executions/',
-      entityName: 'עסקה'
+      entityName: 'עסקה',
+      reloadFn: window.loadExecutionsData,
+      requiresHardReload: false
     });
 
   } catch (error) {

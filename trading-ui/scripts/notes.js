@@ -1149,7 +1149,9 @@ async function saveNote() {
       modalId: 'addNoteModal',
       successMessage: 'הערה נשמרה בהצלחה!',
       apiUrl: '/api/notes/',
-      entityName: 'הערה'
+      entityName: 'הערה',
+      reloadFn: window.loadNotesData,
+      requiresHardReload: false
     });
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'שמירת הערה');
@@ -1224,7 +1226,9 @@ async function updateNoteFromModal() {
       modalId: 'editNoteModal',
       successMessage: 'הערה עודכנה בהצלחה!',
       apiUrl: '/api/notes/',
-      entityName: 'הערה'
+      entityName: 'הערה',
+      reloadFn: window.loadNotesData,
+      requiresHardReload: false
     });
 
     // ניקוי דגלים

@@ -2389,13 +2389,17 @@ async function saveTradingAccount() {
             await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'tradingAccountsModal',
                 successMessage: 'חשבון מסחר עודכן בהצלחה',
-                entityName: 'חשבון מסחר'
+                entityName: 'חשבון מסחר',
+                reloadFn: window.loadTradingAccountsData,
+                requiresHardReload: false
             });
         } else {
             await CRUDResponseHandler.handleSaveResponse(response, {
                 modalId: 'tradingAccountsModal',
                 successMessage: 'חשבון מסחר נוסף בהצלחה',
-                entityName: 'חשבון מסחר'
+                entityName: 'חשבון מסחר',
+                reloadFn: window.loadTradingAccountsData,
+                requiresHardReload: false
             });
         }
         

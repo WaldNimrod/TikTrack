@@ -501,8 +501,17 @@ class ModalManagerV2 {
         const fieldMapping = this.getFieldMapping(config?.entityType);
         console.log('📝 populateForm - field mapping:', fieldMapping);
         
+        // Fields to ignore (metadata/relationship fields)
+        const fieldsToIgnore = ['id', 'created_at', 'updated_at', 'account_name', 'currency_name', 'currency_symbol', 'usd_rate'];
+        
         // מילוי שדות רגילים
         Object.entries(data).forEach(([key, value]) => {
+            // Ignore metadata fields
+            if (fieldsToIgnore.includes(key)) {
+                console.log(`⏭️ Skipping ${key} (metadata field)`);
+                return;
+            }
+            
             // Try direct match first
             let field = form.querySelector(`#${key}, [name="${key}"]`);
             

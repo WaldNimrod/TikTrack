@@ -87,10 +87,8 @@
  * @returns {Promise<void>}
  */
 async function loadCashFlowsData() {
-  console.log('🔥🔥🔥 loadCashFlowsData CALLED 🔥🔥🔥');
   try {
     window.Logger.info('Loading cash flows data (bypass cache)', { page: 'cash_flows' });
-    console.log('🔥 loadCashFlowsData - Step 1: Starting fetch');
     
     // קריאה ישירה לשרת עם timestamp למניעת cache
     const response = await fetch(`/api/cash_flows/?_t=${Date.now()}`, {
@@ -101,8 +99,6 @@ async function loadCashFlowsData() {
       }
     });
     
-    console.log('🔥 loadCashFlowsData - Step 2: Response received', response.status, response.ok);
-    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -110,24 +106,18 @@ async function loadCashFlowsData() {
     const responseData = await response.json();
     const data = responseData.data || responseData;
     
-    console.log('🔥 loadCashFlowsData - Step 3: Data received', data.length, 'items');
-    
     // עדכון הנתונים הגלובליים
     window.cashFlowsData = data;
     cashFlowsData = data;
     
-    console.log('🔥 loadCashFlowsData - Step 4: Updating table');
     // עדכון הטבלה
     updateCashFlowsTable(data);
     
-    console.log('🔥 loadCashFlowsData - Step 5: Updating stats');
     // עדכון הסטטיסטיקות
     updatePageSummaryStats();
     
-    console.log('🔥🔥🔥 loadCashFlowsData COMPLETED SUCCESSFULLY 🔥🔥🔥');
     window.Logger.info(`✅ Loaded ${data.length} cash flows`, { page: 'cash_flows' });
   } catch (error) {
-    console.error('🔥🔥🔥 loadCashFlowsData ERROR:', error);
     window.Logger.error('Error loading cash flows data', error, { page: 'cash_flows' });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);
@@ -1349,23 +1339,18 @@ window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
  * @returns {Promise<void>}
  */
 async function saveCashFlow() {
-    console.log('🔥 saveCashFlow CALLED - Starting execution');
     window.Logger.debug('saveCashFlow called', { page: 'cash_flows' });
     
     try {
-        console.log('🔥 saveCashFlow - Step 1: Starting execution');
         // CRUDResponseHandler will handle cache clearing automatically
         // No need to call clearCacheBeforeCRUD here
         
         // Collect form data using DataCollectionService
         const form = document.getElementById('cashFlowModalForm');
-        console.log('🔥 saveCashFlow - Step 2: Form element:', form);
         if (!form) {
-            console.error('🔥 saveCashFlow - ERROR: Form not found!');
             throw new Error('Cash flow form not found');
         }
         
-        console.log('🔥 saveCashFlow - Step 3: Collecting form data');
         const cashFlowData = DataCollectionService.collectFormData({
             amount: { id: 'cashFlowAmount', type: 'float' },
             type: { id: 'cashFlowType', type: 'text' },
@@ -1377,11 +1362,8 @@ async function saveCashFlow() {
             external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
         });
         
-        console.log('🔥 saveCashFlow - Step 4: Form data collected:', cashFlowData);
-        
         // ולידציה מפורטת
         let hasErrors = false;
-        console.log('🔥 saveCashFlow - Step 5: Starting validation');
         if (!cashFlowData.amount || cashFlowData.amount <= 0) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('cashFlowAmount', 'סכום חייב להיות גדול מ-0');
@@ -1425,11 +1407,8 @@ async function saveCashFlow() {
         }
         
         if (hasErrors) {
-            console.error('🔥 saveCashFlow - VALIDATION FAILED - hasErrors = true');
             return;
         }
-        
-        console.log('🔥 saveCashFlow - Step 6: Validation passed, preparing API call');
         
         // Determine if this is add or edit
         const isEdit = form.dataset.mode === 'edit';
@@ -1443,8 +1422,6 @@ async function saveCashFlow() {
         const method = isEdit ? 'PUT' : 'POST';
         
         // Send to API
-        console.log('🔥 saveCashFlow - Full data being sent:', JSON.stringify(cashFlowData, null, 2));
-        console.log('🔥 saveCashFlow - Sending to API:', { url, method, data: cashFlowData });
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -1453,12 +1430,9 @@ async function saveCashFlow() {
             body: JSON.stringify(cashFlowData)
         });
         
-        console.log('🔥 saveCashFlow - API Response:', { status: response.status, ok: response.ok });
-        
         // Check if there's an error BEFORE calling CRUDResponseHandler
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('🔥 saveCashFlow - API ERROR:', errorData);
             
             // Show error notification
             if (window.showErrorNotification) {
@@ -1479,7 +1453,6 @@ async function saveCashFlow() {
         }
         
         // Response is OK - use CRUDResponseHandler for consistent handling
-        console.log('🔥 saveCashFlow - Step 7: Handling response, isEdit =', isEdit);
         if (isEdit) {
             await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'cashFlowModal',
@@ -1488,7 +1461,6 @@ async function saveCashFlow() {
                 reloadFn: window.loadCashFlowsData,
                 requiresHardReload: false  // Prevent reload confirmation dialog
             });
-            console.log('🔥 saveCashFlow - UPDATE SUCCESS');
         } else {
             await CRUDResponseHandler.handleSaveResponse(response, {
                 modalId: 'cashFlowModal',
@@ -1497,11 +1469,9 @@ async function saveCashFlow() {
                 reloadFn: window.loadCashFlowsData,
                 requiresHardReload: false  // Prevent reload confirmation dialog
             });
-            console.log('🔥 saveCashFlow - SAVE SUCCESS');
         }
         
     } catch (error) {
-        console.error('🔥 saveCashFlow - ERROR CAUGHT:', error);
         CRUDResponseHandler.handleError(error, 'שמירת תזרים מזומן');
     }
 }

@@ -2422,7 +2422,9 @@ async function performTradePlanDeletion(tradePlanId) {
         // Use CRUDResponseHandler for consistent response handling
         await CRUDResponseHandler.handleDeleteResponse(response, {
             successMessage: 'תוכנית מסחר נמחקה בהצלחה',
-            entityName: 'תוכנית מסחר'
+            entityName: 'תוכנית מסחר',
+            reloadFn: window.loadTradePlansData,
+            requiresHardReload: false
         });
         
     } catch (error) {

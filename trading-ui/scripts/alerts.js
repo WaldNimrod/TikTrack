@@ -2055,7 +2055,9 @@ async function confirmDeleteAlert(alertId) {
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'התראה נמחקה בהצלחה!',
       apiUrl: '/api/alerts/',
-      entityName: 'התראה'
+      entityName: 'התראה',
+      reloadFn: window.loadAlertsData,
+      requiresHardReload: false
     });
 
   } catch (error) {

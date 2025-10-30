@@ -608,7 +608,9 @@ async function deleteCashFlow(id) {
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'תזרים המזומנים נמחק בהצלחה!',
       apiUrl: '/api/cash_flows/',
-      entityName: 'תזרים מזומנים'
+      entityName: 'תזרים מזומנים',
+      reloadFn: window.loadCashFlowsData,
+      requiresHardReload: false
     });
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'מחיקת תזרים מזומנים');

@@ -1435,7 +1435,9 @@ async function confirmDeleteTicker(id) {
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: `טיקר ${tickerInfo} נמחק בהצלחה!`,
       apiUrl: '/api/tickers/',
-      entityName: 'טיקר'
+      entityName: 'טיקר',
+      reloadFn: window.loadTickersData,
+      requiresHardReload: false
     });
 
   } catch (error) {

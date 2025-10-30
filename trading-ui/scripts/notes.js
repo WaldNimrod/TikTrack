@@ -1263,7 +1263,9 @@ async function deleteNoteFromServer(noteId) {
       await CRUDResponseHandler.handleDeleteResponse(response, {
         successMessage: 'הערה נמחקה בהצלחה!',
         apiUrl: '/api/notes/',
-        entityName: 'הערה'
+        entityName: 'הערה',
+        reloadFn: window.loadNotesData,
+        requiresHardReload: false
       });
       return; // יציאה מוצלחת
     } catch (error) {

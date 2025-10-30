@@ -900,7 +900,9 @@ async function performTradeDeletion(tradeId) {
     // Use CRUDResponseHandler for consistent response handling
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'טרייד נמחק בהצלחה',
-      entityName: 'טרייד'
+      entityName: 'טרייד',
+      reloadFn: window.loadTradesData,
+      requiresHardReload: false
     });
 
   } catch (error) {

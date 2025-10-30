@@ -1110,7 +1110,9 @@ async function confirmDeleteExecution(_id) {
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'עסקה נמחקה בהצלחה!',
       apiUrl: '/api/executions/',
-      entityName: 'עסקה'
+      entityName: 'עסקה',
+      reloadFn: window.loadExecutionsData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -4108,7 +4110,9 @@ async function performExecutionDeletion(executionId) {
         // Use CRUDResponseHandler for consistent response handling
         await CRUDResponseHandler.handleDeleteResponse(response, {
             successMessage: 'ביצוע נמחק בהצלחה',
-            entityName: 'ביצוע'
+            entityName: 'ביצוע',
+            reloadFn: window.loadExecutionsData,
+            requiresHardReload: false
         });
         
     } catch (error) {

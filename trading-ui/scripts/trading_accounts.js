@@ -887,7 +887,9 @@ async function deleteTradingAccountFromAPI(tradingAccountId, tradingAccountName)
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: `החשבון מסחר "${tradingAccountName}" נמחק בהצלחה!`,
       apiUrl: '/api/trading-accounts/',
-      entityName: 'חשבון מסחר מסחר'
+      entityName: 'חשבון מסחר מסחר',
+      reloadFn: window.loadTradingAccountsData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -2448,7 +2450,9 @@ async function performTradingAccountDeletion(accountId) {
         // Use CRUDResponseHandler for consistent response handling
         await CRUDResponseHandler.handleDeleteResponse(response, {
             successMessage: 'חשבון מסחר נמחק בהצלחה',
-            entityName: 'חשבון מסחר'
+            entityName: 'חשבון מסחר',
+            reloadFn: window.loadTradingAccountsData,
+            requiresHardReload: false
         });
         
     } catch (error) {

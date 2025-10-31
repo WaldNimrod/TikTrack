@@ -266,45 +266,8 @@ class PreferencesGroupManager {
 // אתחול גלובלי
 window.PreferencesGroupManager = new PreferencesGroupManager();
 
-// פונקציות עטיפה ל-toggleSection קיים
-window.toggleSection = function(sectionId) {
-    if (!sectionId) {
-        window.Logger?.warn('toggleSection called without sectionId', { page: "preferences-group-manager" });
-        return;
-    }
-    
-    // הסקשן העליון לא מנוהל על ידי PreferencesGroupManager
-    // משתמש בלוגיקה המקורית
-    if (sectionId === 'top') {
-        const section = document.getElementById(sectionId);
-        const sectionBody = section?.querySelector('.section-body');
-        const icon = section?.querySelector('.section-toggle-icon');
-        
-        if (sectionBody) {
-            const isCollapsed = sectionBody.style.display === 'none';
-            sectionBody.style.display = isCollapsed ? 'block' : 'none';
-            if (icon) icon.textContent = isCollapsed ? '▲' : '▼';
-        }
-        return;
-    }
-    
-    // sections אחרים - דרך PreferencesGroupManager
-    if (!window.PreferencesGroupManager) {
-        window.Logger?.error('PreferencesGroupManager not available', { page: "preferences-group-manager" });
-        return;
-    }
-    
-    const section = document.getElementById(sectionId);
-    const sectionBody = section?.querySelector('.section-body');
-    const isCollapsed = sectionBody?.style.display === 'none' || 
-                       sectionBody?.classList.contains('collapsed');
-    
-    if (isCollapsed) {
-        window.PreferencesGroupManager.openSection(sectionId);
-    } else {
-        window.PreferencesGroupManager.closeSection(sectionId);
-    }
-};
+// NOTE: toggleSection is handled by ui-utils.js with accordion logic
+// We don't override it here - the accordion mode is configured in page-initialization-configs.js
 
 /**
  * שמירת קבוצה
@@ -318,41 +281,8 @@ window.savePreferenceGroup = function(groupName) {
     window.PreferencesGroupManager.saveGroup(groupName);
 };
 
-// Override toggleAllSections for preferences page to use our unique accordion
-window.toggleAllSectionsOriginal = window.toggleAllSections;
-window.toggleAllSections = function() {
-    if (!window.PreferencesGroupManager) {
-        // Fallback to original if manager not available
-        if (window.toggleAllSectionsOriginal) {
-            return window.toggleAllSectionsOriginal();
-        }
-        return;
-    }
-    
-    // Get all sections
-    const sections = ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7'];
-    const allClosed = sections.every(sectionId => {
-        const section = document.getElementById(sectionId);
-        const sectionBody = section?.querySelector('.section-body');
-        return !sectionBody || sectionBody.style.display === 'none' || section.classList.contains('collapsed');
-    });
-    
-    window.Logger?.info(`Toggle all sections: ${allClosed ? 'EXPAND (will show only one)' : 'COLLAPSE all'}`, { page: "preferences-group-manager" });
-    
-    if (allClosed) {
-        // Open first preference section (skip top)
-        window.PreferencesGroupManager.openSection('section2');
-        window.Logger?.info('Opened first preference section (section2)', { page: "preferences-group-manager" });
-    } else {
-        // Close all sections
-        sections.forEach(sectionId => {
-            if (window.PreferencesGroupManager.openSectionId === sectionId) {
-                window.PreferencesGroupManager.closeSection(sectionId);
-            }
-        });
-        window.Logger?.info('Closed all sections', { page: "preferences-group-manager" });
-    }
-};
+// NOTE: toggleAllSections is handled by ui-utils.js with accordion logic
+// We don't override it here - the accordion mode is configured in page-initialization-configs.js
 
 window.Logger?.info('✅ PreferencesGroupManager loaded successfully', { page: "preferences-group-manager" });
 

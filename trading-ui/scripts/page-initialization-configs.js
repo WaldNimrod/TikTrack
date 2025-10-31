@@ -272,6 +272,9 @@ const PAGE_CONFIGS = {
         // ← NEW: Accordion mode - only one section open at a time
         accordionMode: true,
         
+        // ← NEW: Default state for sections (when no cache exists)
+        sectionsDefaultState: 'closed',  // 'closed' | 'open'
+        
         // קיים
         requiresFilters: false,
         requiresValidation: true,

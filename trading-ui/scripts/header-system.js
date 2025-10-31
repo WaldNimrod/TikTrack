@@ -1051,8 +1051,9 @@ class HeaderSystem {
           openAccounts.forEach(account => {
             const accountItem = document.createElement('div');
             accountItem.className = 'account-filter-item';
-            accountItem.setAttribute('data-value', account.name);
-            accountItem.onclick = () => selectAccountOption(account.name);
+            // שימוש ב-ID במקום שם - כפי ששמור בהעדפות (default_trading_account)
+            accountItem.setAttribute('data-value', account.id);
+            accountItem.onclick = () => selectAccountOption(account.id);
             accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
             accountMenu.appendChild(accountItem);
             // window.Logger.info('🔧 הוספתי חשבון מסחר:', account.name, { page: "header-system" });
@@ -1702,6 +1703,17 @@ function updateFilterSelections(filters) {
   const mapToUi = {
     // generic
     all: 'הכול',
+    // status values
+    open: 'פתוח',
+    closed: 'סגור',
+    cancelled: 'בוטל',
+    // type values (case insensitive)
+    swing: 'סווינג',
+    Swing: 'סווינג',
+    investment: 'השקעה',
+    Investment: 'השקעה',
+    passive: 'פסיבי',
+    Passive: 'פסיבי',
     // date ranges
     all_time: 'כל זמן',
     any: 'כל זמן',
@@ -1715,7 +1727,7 @@ function updateFilterSelections(filters) {
     last_year: 'שנה קודמת',
     last_month: 'חודש קודם',
     last_week: 'שבוע קודם',
-    last_30_days: 'כל זמן' // אין לנו 30 ימים בתפריט, נבחר כל זמן כברירת מחדל
+    last_30_days: 'שנה' // נשתמש ב-365 ימים (שנה) כקרוב ביותר ל-30 ימים
   };
 
   const normalizeMulti = (val) => {
@@ -1743,12 +1755,17 @@ function updateFilterSelections(filters) {
     dateRange: normalizeDate(filters.dateRange)
   };
   
+  console.log('🔍 מיפוי ערכים - original status:', filters.status, 'mapped status:', uiFilters.status);
+  console.log('🔍 מיפוי ערכים - original type:', filters.type, 'mapped type:', uiFilters.type);
+  console.log('🔍 מיפוי ערכים - original account:', filters.account, 'mapped account:', uiFilters.account);
+  console.log('🔍 מיפוי ערכים - original dateRange:', filters.dateRange, 'mapped dateRange:', uiFilters.dateRange);
+  
   // עדכון סטטוס
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
   statusItems.forEach(item => {
     item.classList.remove('selected');
     const value = item.getAttribute('data-value');
-    if (uiFilters.status && uiFilters.status.includes(value)) {
+    if (uiFilters.status && uiFilters.status.length > 0 && uiFilters.status.includes(value)) {
       item.classList.add('selected');
     } else if (!uiFilters.status || uiFilters.status.length === 0) {
       if (value === 'הכול') item.classList.add('selected');
@@ -1760,7 +1777,7 @@ function updateFilterSelections(filters) {
   typeItems.forEach(item => {
     item.classList.remove('selected');
     const value = item.getAttribute('data-value');
-    if (uiFilters.type && uiFilters.type.includes(value)) {
+    if (uiFilters.type && uiFilters.type.length > 0 && uiFilters.type.includes(value)) {
       item.classList.add('selected');
     } else if (!uiFilters.type || uiFilters.type.length === 0) {
       if (value === 'הכול') item.classList.add('selected');
@@ -2141,14 +2158,21 @@ window.updateStatusFilterText = function() {
   const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
   const statusElement = document.getElementById('selectedStatus');
   
+  console.log('🔄 updateStatusFilterText - selectedItems:', selectedItems.length);
+  
   if (statusElement) {
     if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
       statusElement.textContent = 'כל סטטוס';
+      console.log('✅ עדכנתי ל-"כל סטטוס"');
     } else if (selectedItems.length === 1) {
       statusElement.textContent = selectedItems[0].getAttribute('data-value');
+      console.log('✅ עדכנתי ל:', selectedItems[0].getAttribute('data-value'));
     } else {
       statusElement.textContent = `${selectedItems.length} סטטוסים`;
+      console.log('✅ עדכנתי ל:', `${selectedItems.length} סטטוסים`);
     }
+  } else {
+    console.error('❌ selectedStatus לא נמצא');
   }
 };
 
@@ -2156,14 +2180,24 @@ window.updateTypeFilterText = function() {
   const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
   const typeElement = document.getElementById('selectedType');
   
+  console.log('🔄 updateTypeFilterText - selectedItems:', selectedItems.length);
+  Array.from(selectedItems).forEach((item, idx) => {
+    console.log(`  [${idx}] data-value: ${item.getAttribute('data-value')}, text: ${item.textContent.trim()}`);
+  });
+  
   if (typeElement) {
     if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
       typeElement.textContent = 'כל סוג השקעה';
+      console.log('✅ עדכנתי ל-"כל סוג השקעה"');
     } else if (selectedItems.length === 1) {
       typeElement.textContent = selectedItems[0].getAttribute('data-value');
+      console.log('✅ עדכנתי ל:', selectedItems[0].getAttribute('data-value'));
     } else {
       typeElement.textContent = `${selectedItems.length} סוגים`;
+      console.log('✅ עדכנתי ל:', `${selectedItems.length} סוגים`);
     }
+  } else {
+    console.error('❌ selectedType לא נמצא');
   }
 };
 
@@ -2171,14 +2205,27 @@ window.updateAccountFilterText = function() {
   const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
   const accountElement = document.getElementById('selectedAccount');
 
+  console.log('🔄 updateAccountFilterText - selectedItems:', selectedItems.length);
+  Array.from(selectedItems).forEach((item, idx) => {
+    console.log(`  [${idx}] data-value: ${item.getAttribute('data-value')}, text: ${item.textContent.trim()}`);
+  });
+
   if (accountElement) {
     if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
       accountElement.textContent = 'כל חשבון מסחר';
+      console.log('✅ עדכנתי ל-"כל חשבון מסחר"');
     } else if (selectedItems.length === 1) {
-      accountElement.textContent = selectedItems[0].getAttribute('data-value');
+      // שימוש בטקסט האמיתי של הפריט (שם החשבון) במקום data-value (ID)
+      const optionText = selectedItems[0].querySelector('.option-text');
+      const displayText = optionText ? optionText.textContent.trim() : selectedItems[0].getAttribute('data-value');
+      accountElement.textContent = displayText;
+      console.log('✅ עדכנתי ל:', displayText);
     } else {
       accountElement.textContent = `${selectedItems.length} חשבונות`;
+      console.log('✅ עדכנתי ל:', `${selectedItems.length} חשבונות`);
     }
+  } else {
+    console.error('❌ selectedAccount לא נמצא');
   }
 };
 
@@ -2186,17 +2233,27 @@ window.updateDateRangeFilterText = function() {
   const selectedItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected');
   const dateRangeElement = document.getElementById('selectedDateRange');
 
+  console.log('🔄 updateDateRangeFilterText - selectedItems:', selectedItems.length);
+  Array.from(selectedItems).forEach((item, idx) => {
+    console.log(`  [${idx}] data-value: ${item.getAttribute('data-value')}, text: ${item.textContent.trim()}`);
+  });
+
   if (dateRangeElement) {
     if (selectedItems.length === 0) {
       dateRangeElement.textContent = 'כל זמן';
+      console.log('✅ עדכנתי ל-"כל זמן"');
     } else if (selectedItems.length === 1) {
       const item = selectedItems[0];
       const value = item.getAttribute('data-value');
       dateRangeElement.textContent = value;
+      console.log('✅ עדכנתי ל:', value);
     } else {
       // בחירה יחידה - לא אמור לקרות
       dateRangeElement.textContent = 'כל זמן';
+      console.log('✅ עדכנתי ל-"כל זמן" (multiple selection - unexpected)');
     }
+  } else {
+    console.error('❌ selectedDateRange לא נמצא');
   }
 };
 
@@ -2384,6 +2441,16 @@ window.resetAllFilters = async function() {
   window.Logger.info('↻ resetAllFilters - פונקציה נקראת!', { page: "header-system" });
   
   try {
+    // Clear preference cache to ensure fresh values from database
+    const filterPrefNames = ['defaultSearchFilter', 'defaultDateRangeFilter', 'defaultStatusFilter', 'defaultTypeFilter', 'default_trading_account'];
+    for (const prefName of filterPrefNames) {
+      const cacheKey = `preference_${prefName}_1_0`; // user_id=1, profile_id=0
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+        await window.UnifiedCacheManager.remove(cacheKey, { layer: 'localStorage' });
+        console.log(`🗑️ Cleared cache for ${prefName}`);
+      }
+    }
+    
     // טעינת הגדרות ברירת מחדל מהעדפות באמצעות מערכת ההעדפות הקיימת
     console.log('↻ בודק אם getPreference קיימת:', typeof window.getPreference);
     window.Logger.info('↻ בודק אם getPreference קיימת:', typeof window.getPreference, { page: "header-system" });
@@ -2406,7 +2473,7 @@ window.resetAllFilters = async function() {
     const defaultDateRange = await window.getPreference('defaultDateRangeFilter') || 'כל זמן';
     const defaultStatus = await window.getPreference('defaultStatusFilter') || [];
     const defaultType = await window.getPreference('defaultTypeFilter') || [];
-    const defaultAccount = await window.getPreference('defaultAccountFilter') || [];
+    const defaultAccount = await window.getPreference('default_trading_account') || [];
     
     console.log('↻ העדפות ברירת מחדל:', {
       search: defaultSearch,
@@ -2427,8 +2494,15 @@ window.resetAllFilters = async function() {
     
     window.Logger.info('↻ טוען הגדרות ברירת מחדל:', defaultFilters, { page: "header-system" });
     
+    // יצירת filterSystem אם לא קיים
+    if (!window.filterSystem && typeof window.HeaderSystemClass !== 'undefined') {
+      console.log('⚠️ filterSystem לא קיים - יוצר עכשיו');
+      window.HeaderSystemClass.createFilterSystem();
+    }
+    
     // עדכון הפילטרים הנוכחיים
     if (window.filterSystem) {
+      console.log('✅ filterSystem קיים, מעדכן פילטרים');
       window.filterSystem.currentFilters = defaultFilters;
       window.filterSystem.saveFilters();
       window.filterSystem.applyAllFilters();
@@ -2443,14 +2517,13 @@ window.resetAllFilters = async function() {
       }
       
       // עדכון בחירות בתפריטים
+      console.log('🔄 קורא ל-updateFilterSelections עם:', defaultFilters);
       updateFilterSelections(defaultFilters);
       
-      // עדכון טקסטים של הפילטרים
-      if (typeof window.updateStatusFilterText === 'function') window.updateStatusFilterText();
-      if (typeof window.updateTypeFilterText === 'function') window.updateTypeFilterText();
-      if (typeof window.updateAccountFilterText === 'function') window.updateAccountFilterText();
-      if (typeof window.updateDateRangeFilterText === 'function') window.updateDateRangeFilterText();
+      // updateFilterSelections כבר מעדכנת את הטקסטים, אין צורך לקרוא שוב
       
+    } else {
+      console.error('❌ filterSystem לא קיים אחרי ניסיון יצירה');
     }
     
     window.Logger.info('✅ פילטרים אופסו לערכי ברירת מחדל', { page: "header-system" });

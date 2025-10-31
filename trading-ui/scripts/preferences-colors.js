@@ -40,7 +40,7 @@ class ColorManager {
         this.colorCache = new Map();
         this.colorGroups = {
             'chart': ['chartBackgroundColor', 'chartBorderColor', 'chartGridColor', 'chartPointColor', 'chartPrimaryColor', 'chartTextColor'],
-            'entity': ['entityAlertColor', 'entityAlertColorDark', 'entityAlertColorLight', 'entityInfoColor', 'entityInfoColorDark', 'entityInfoColorLight'],
+            'entity': ['entityAlertColor', 'entityAlertColorDark', 'entityAlertColorLight', 'entityInfoColor', 'entityInfoColorDark', 'entityInfoColorLight', 'entityNoteColor', 'entityNoteColorDark', 'entityNoteColorLight', 'entityTradeColor', 'entityTradeColorDark', 'entityTradeColorLight', 'entityTickerColor', 'entityTickerColorDark', 'entityTickerColorLight', 'entityExecutionColor', 'entityExecutionColorDark', 'entityExecutionColorLight', 'entityTradingAccountColor', 'entityTradingAccountColorDark', 'entityTradingAccountColorLight', 'entityTradePlanColor', 'entityTradePlanColorDark', 'entityTradePlanColorLight', 'entityCashFlowColor', 'entityCashFlowColorDark', 'entityCashFlowColorLight', 'entityPreferencesColor', 'entityPreferencesColorDark', 'entityPreferencesColorLight', 'entityResearchColor', 'entityResearchColorDark', 'entityResearchColorLight'],
             'status': ['statusOpenColor', 'statusClosedColor', 'statusCancelledColor', 'statusPendingColor'],
             'value': ['valuePositiveColor', 'valueNegativeColor', 'valueNeutralColor', 'valuePositiveColorLight', 'valuePositiveColorDark', 'valueNegativeColorLight', 'valueNegativeColorDark', 'valueNeutralColorLight', 'valueNeutralColorDark'],
             'theme': ['primaryColor', 'secondaryColor', 'successColor', 'dangerColor', 'warningColor', 'infoColor'],
@@ -57,12 +57,39 @@ class ColorManager {
             'chartTextColor': '#333333',
             
             // Entity colors
-            'entityAlertColor': '#dc3545',
-            'entityAlertColorDark': '#c82333',
-            'entityAlertColorLight': '#f8d7da',
+            'entityAlertColor': '#ff9800',
+            'entityAlertColorDark': '#f57c00',
+            'entityAlertColorLight': '#ffb74d',
             'entityInfoColor': '#17a2b8',
             'entityInfoColorDark': '#138496',
-            'entityInfoColorLight': '#d1ecf1',
+            'entityInfoColorLight': '#bee5eb',
+            'entityNoteColor': '#607d8b',
+            'entityNoteColorDark': '#455a64',
+            'entityNoteColorLight': '#90a4ae',
+            'entityTradeColor': '#007bff',
+            'entityTradeColorDark': '#004085',
+            'entityTradeColorLight': '#0056b3',
+            'entityTickerColor': '#17a2b8',
+            'entityTickerColorDark': '#138496',
+            'entityTickerColorLight': '#20c997',
+            'entityExecutionColor': '#6f42c1',
+            'entityExecutionColorDark': '#5a2d91',
+            'entityExecutionColorLight': '#8e44ad',
+            'entityTradingAccountColor': '#28a745',
+            'entityTradingAccountColorDark': '#1e7e34',
+            'entityTradingAccountColorLight': '#34ce57',
+            'entityTradePlanColor': '#9c27b0',
+            'entityTradePlanColorDark': '#7b1fa2',
+            'entityTradePlanColorLight': '#ba68c8',
+            'entityCashFlowColor': '#20c997',
+            'entityCashFlowColorDark': '#138496',
+            'entityCashFlowColorLight': '#20c997',
+            'entityPreferencesColor': '#607d8b',
+            'entityPreferencesColorDark': '#455a64',
+            'entityPreferencesColorLight': '#90a4ae',
+            'entityResearchColor': '#9c27b0',
+            'entityResearchColorDark': '#7b1fa2',
+            'entityResearchColorLight': '#ba68c8',
             
             // Status colors
             'statusOpenColor': '#28a745',
@@ -93,7 +120,7 @@ class ColorManager {
             'backgroundColor': '#ffffff',
             'textColor': '#333333',
             'borderColor': '#dee2e6',
-            'shadowColor': '#000000',
+            'shadowColor': '#666666',
             'highlightColor': '#007bff'
         };
     }
@@ -445,10 +472,35 @@ class ColorPickerManager {
             // Find picker by color key
             const picker = Array.from(this.pickers.values()).find(p => p.colorKey === colorKey);
             if (picker && picker.element) {
-                picker.element.value = colorValue;
-                this.updatePreview(picker.element.id, colorValue);
+                // Convert RGBA to RGB for color inputs (they don't support alpha)
+                const cleanValue = this.convertToColorInputFormat(colorValue);
+                picker.element.value = cleanValue;
+                this.updatePreview(picker.element.id, cleanValue);
             }
         });
+    }
+    
+    /**
+     * Convert color value to color input format
+     * Converts rgba/rgba hex to rgb hex
+     * @param {string} colorValue - Color value
+     * @returns {string} RGB hex color
+     */
+    convertToColorInputFormat(colorValue) {
+        if (!colorValue) return '#000000';
+        
+        // If it's already a valid 6-digit hex, return as is
+        if (/^#[0-9A-Fa-f]{6}$/.test(colorValue)) {
+            return colorValue;
+        }
+        
+        // If it's an 8-digit hex (with alpha), strip the alpha
+        if (/^#[0-9A-Fa-f]{8}$/.test(colorValue)) {
+            return colorValue.substring(0, 7);
+        }
+        
+        // Fallback
+        return '#000000';
     }
     
     /**
@@ -496,50 +548,6 @@ window.loadColorsForPreferences = async function(userId = 1, profileId = 3) {
         
     } catch (error) {
         window.Logger.error('❌ Error loading colors for preferences:', error, { page: "preferences-colors" });
-    }
-};
-
-/**
- * Save all color preferences
- * @param {number} userId - User ID
- * @param {number} profileId - Profile ID
- */
-window.saveAllColorPreferences = async function(userId = 1, profileId = 3) {
-    try {
-        window.Logger.info('🎨 Saving all color preferences...', { page: "preferences-colors" });
-        
-        const colorPickers = document.querySelectorAll('input[type="color"]');
-        let savedCount = 0;
-        let errorCount = 0;
-        
-        for (const picker of colorPickers) {
-            const colorKey = picker.getAttribute('data-color-key') || picker.id;
-            const colorValue = picker.value;
-            
-            try {
-                const success = await window.ColorManager.saveColor(colorKey, colorValue, userId, profileId);
-                if (success) {
-                    savedCount++;
-                } else {
-                    errorCount++;
-                }
-            } catch (error) {
-                window.Logger.error(`❌ Error saving color ${colorKey}:`, error, { page: "preferences-colors" });
-                errorCount++;
-            }
-        }
-        
-        window.Logger.info(`✅ Saved ${savedCount} colors, ${errorCount} errors`, { page: "preferences-colors" });
-        
-        return {
-            saved: savedCount,
-            errors: errorCount,
-            total: colorPickers.length
-        };
-        
-    } catch (error) {
-        window.Logger.error('❌ Error saving all color preferences:', error, { page: "preferences-colors" });
-        return { saved: 0, errors: 1, total: 0 };
     }
 };
 

@@ -17,6 +17,7 @@ display: block;
   background: var(--apple-bg-primary, #FFFFFF);
   border: 1px solid var(--apple-border, #C6C6C8);
   color: var(--apple-text-primary, #000000);
+  max-width: 250px;
 }
 
 .form-select:focus {

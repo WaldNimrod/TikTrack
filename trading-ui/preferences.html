@@ -43,8 +43,12 @@
                     <div class="section-header">
                         <h2><i class="bi bi-gear-fill"></i> העדפות</h2>
                         <div class="section-header-controls">
-                            <button data-button-type="COPY" data-variant="full" data-onclick="" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
-                            <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleSection('infoSummary')" id="toggleInfoBtn">
+                            <button type="button" 
+                                    class="btn btn-success btn-sm" 
+                                    onclick="window.PreferencesUI.saveAllPreferences()">
+                                <i class="bi bi-save"></i> שמור הכל
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleSection('top')" id="toggleInfoBtn">
                                 <i class="bi bi-chevron-down"></i>
                             </button>
                         </div>
@@ -60,14 +64,14 @@
                 </div>
                 <!-- UI Content Section Top End -->  
                 <!-- UI Content Section 1 Start - Profile Management -->
-                <div class="content-section collapsed" id="section1" data-group="profile_management">
+                <div class="content-section" id="section1" data-group="profile_management">
                     <div class="section-header">
                         <h2>👤 ניהול פרופילים</h2>
-                        <button class="btn btn-outline-warning" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
+                        <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
-                    <div class="section-body collapsed" style="display:none;">
+                    <div class="section-body" style="display:none;">
                         <div class="row">
                             <!-- Current Active Profile - Column 1 -->
                             <div class="col-md-6">
@@ -81,53 +85,47 @@
                                                 <i class="bi bi-person-circle fs-2 text-primary"></i>
                                             </div>
                                             <div class="flex-grow-1">
-                                            <!-- Profile Management - Column 2 -->
-                                            <div class="col-md-6">
-                                                <div class="card h-100">
-                                                    <div class="card-header bg-light">
-                                                        <h6 class="mb-0 text-muted">ניהול פרופילים</h6>
-                                                    </div>
-                                                    <div class="card-body">
-                                                    <!-- Switch Profile -->
-                                                    <div class="mb-3">
-                                                        <label class="form-label small">החלף פרופיל:</label>
-                                                        <div class="input-group">
-                                                            <select id="profileSelect" class="form-select">
-                                                                <option>טוען פרופילים...</option>
-                                                            </select>
-                                                            <button type="button" 
-                                                                    class="btn btn-primary" 
-                                                                    onclick="switchActiveProfile()"
-                                                                    id="switchProfileBtn">
-                                                                    <i class="bi bi-arrow-repeat"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <!-- Create New Profile -->
-                                                    <div class="mb-3">
-                                                        <label class="form-label small">צור פרופיל חדש:</label>
-                                                        <div class="input-group">
-                                                            <input type="text" id="newProfileName" class="form-control" placeholder="שם פרופיל חדש">
-                                                            <button type="button" 
-                                                                    class="btn btn-success" 
-                                                                    onclick="createNewProfile()"
-                                                                    id="createProfileBtn">
-                                                                    <i class="bi bi-plus"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <!-- Save Preferences Button -->
-                                                    <div class="mt-3 pt-3 border-top">
-                                                        <button type="button" 
-                                                                class="btn btn-success w-100" 
-                                                                onclick="window.PreferencesUI.saveAllPreferences()"
-                                                                id="savePreferencesBtn">
-                                                                <i class="bi bi-save me-2"></i>שמור העדפות
-                                                            </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <h5 class="mb-1" id="activeProfileName_display">טוען...</h5>
+                                                <p class="text-muted mb-1 small" id="activeProfileDescription_display">טוען תיאור פרופיל...</p>
+                                                <div class="badge bg-success small">פעיל</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Profile Management - Column 2 -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0 text-muted">ניהול פרופילים</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Switch Profile -->
+                                        <div class="mb-3">
+                                            <label class="form-label small">החלף פרופיל:</label>
+                                            <div class="input-group">
+                                                <select id="profileSelect" class="form-select">
+                                                    <option>טוען פרופילים...</option>
+                                                </select>
+                                                <button type="button" 
+                                                        class="btn btn-primary" 
+                                                        onclick="switchActiveProfile()"
+                                                        id="switchProfileBtn">
+                                                    <i class="bi bi-arrow-repeat"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- Create New Profile -->
+                                        <div class="mb-3">
+                                            <label class="form-label small">צור פרופיל חדש:</label>
+                                            <div class="input-group">
+                                                <input type="text" id="newProfileName" class="form-control" placeholder="שם פרופיל חדש">
+                                                <button type="button" 
+                                                        class="btn btn-success" 
+                                                        onclick="createNewProfile()"
+                                                        id="createProfileBtn">
+                                                    <i class="bi bi-plus"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -138,27 +136,41 @@
                 </div>
                 <!-- UI Content Section 1 End -->  
                  <!-- UI Content Section 2 Start-->
-                <div class="content-section collapsed" id="section2" data-group="basic_settings">
+                <div class="content-section" id="section2" data-group="basic_settings">
                     <div class="section-header">
                         <h2>🏦 הגדרות בסיסיות</h2>
-                        <button class="btn btn-outline-warning" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div style="display: flex; gap: 5px;">
+                            <button type="button" class="btn" style="background-color: #26baac; color: white; border-color: #26baac;" onclick="window.savePreferenceGroup('basic_settings')">
+                                <i class="bi bi-save"></i> שמור
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="section-body collapsed" style="display:none;">
+                    <div class="section-body" style="display:none;">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">מטבע ראשי</label>
-                                    <select id="primaryCurrency" class="form-select control-narrow">
-                                        <option value="USD - דולר ארה"ב">USD - דולר ארה"ב</option>
-                                        <option value="EUR - יורו">EUR - יורו</option>
-                                        <option value="GBP - לירה שטרלינג">GBP - לירה שטרלינג</option>
-                                        <option value="ILS - שקל חדש">ILS - שקל חדש</option>
+                                    <select id="primaryCurrency" name="primaryCurrency" class="form-select control-narrow">
+                                        <option value="USD">USD - דולר ארה"ב</option>
+                                        <option value="ILS">ILS - שקל חדש</option>
+                                        <option value="EUR">EUR - יורו</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">מטבע משני</label>
+                                    <select id="secondaryCurrency" name="secondaryCurrency" class="form-select control-narrow">
+                                        <option value="USD">USD - דולר ארה"ב</option>
+                                        <option value="ILS">ILS - שקל חדש</option>
+                                        <option value="EUR">EUR - יורו</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">אזור זמן</label>
                                     <select id="timezone" name="timezone" class="form-select">
@@ -170,247 +182,165 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">חשבון מסחר ברירת מחדל</label>
-                            <select id="default_trading_account" class="form-select">
-                                <option value="">בחר חשבון...</option>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">מצב קומפקטי <span class="text-muted">(עתידי)</span>:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="compactMode" disabled>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">שפה</label>
+                                    <select id="language" name="language" class="form-select control-narrow">
+                                        <option value="he">עברית</option>
+                                        <option value="en">English</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">חשבון מסחר ברירת מחדל</label>
+                                    <select id="default_trading_account" name="default_trading_account" class="form-select">
+                                        <option value="">בחר חשבון...</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">הצג אנימציות <span class="text-muted">(עתידי)</span>:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="showAnimations" checked disabled>
-                                <label class="form-check-label" for="showAnimations">
-                                    הפעל אנימציות
-                                </label>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">גודל עמוד בטבלה <span class="text-muted">(עתידי)</span>:</label>
-                            <select id="tablePageSize" class="form-select control-narrow" disabled>
-                                <option value="10">10</option>
-                                <option value="25" selected>25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                        </div>
+                    </div>
                 </div>
                  <!-- UI Content Section 2 End--> 
                 <!-- UI Content Section 3 Start-->
-                <div class="content-section collapsed" id="section3" data-group="trading_settings">
+                <div class="content-section" id="section3" data-group="trading_settings">
                     <div class="section-header">
                         <h2>📈 הגדרות מסחר</h2>
-                        <button class="btn btn-outline-warning" onclick="window.toggleSection('section3')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div style="display: flex; gap: 5px;">
+                            <button type="button" class="btn" style="background-color: #26baac; color: white; border-color: #26baac;" onclick="window.savePreferenceGroup('trading_settings')">
+                                <i class="bi bi-save"></i> שמור
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section3')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="section-body collapsed" style="display:none;">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>הגדרות בסיסיות</h5>
-                        <div class="mb-3">
-                            <label class="form-label">Stop Loss ברירת מחדל (%)</label>
-                            <input type="number" id="defaultStopLoss" class="form-control control-narrow" 
-                                   step="0.1" min="0" max="100">
-                 </div>
-                        <div class="mb-3">
-                            <label class="form-label">Target Price ברירת מחדל (%)</label>
-                            <input type="number" id="defaultTargetPrice" class="form-control control-narrow" 
-                                   step="0.1" min="0" max="1000">
-                </div>
-                        <div class="mb-3">
-                            <label class="form-label">עמלה ברירת מחדל ($)</label>
-                            <input type="number" id="defaultCommission" class="form-control control-narrow" 
-                                   step="0.01" min="0">
-                </div>
-                </div>
-                    <div class="col-md-6">
-                        <h5>ניהול סיכונים <span class="text-muted">(עתידי)</span></h5>
-                        <div class="mb-3">
-                            <label class="form-label">סיכון מקסימלי לחשבון מסחר (%)</label>
-                            <input type="number" id="maxAccountRisk" class="form-control control-narrow" 
-                                   step="0.1" min="0" max="100" disabled>
+                    <div class="section-body" style="display:none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>הגדרות בסיסיות</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">Stop Loss ברירת מחדל (%)</label>
+                                    <input type="number" id="defaultStopLoss" class="form-control control-narrow" 
+                                           step="0.1" min="0" max="100">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Target Price ברירת מחדל (%)</label>
+                                    <input type="number" id="defaultTargetPrice" class="form-control control-narrow" 
+                                           step="0.1" min="0" max="1000">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">עמלה ברירת מחדל ($)</label>
+                                    <input type="number" id="defaultCommission" class="form-control control-narrow" 
+                                           step="0.01" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>ניהול סיכונים <span class="text-muted">(עתידי)</span></h5>
+                                <div class="mb-3">
+                                    <label class="form-label">סיכון מקסימלי לחשבון מסחר (%)</label>
+                                    <input type="number" id="maxAccountRisk" class="form-control control-narrow" 
+                                           step="0.1" min="0" max="100" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">סיכון מקסימלי לטריד (%)</label>
+                                    <input type="number" id="maxTradeRisk" class="form-control control-narrow" 
+                                           step="0.1" min="0" max="100" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">גודל פוזיציה מקסימלי (%)</label>
+                                    <input type="number" id="maxPositionSize" class="form-control control-narrow" 
+                                           step="0.1" min="0" max="100" disabled>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">סיכון מקסימלי לטריד (%)</label>
-                            <input type="number" id="maxTradeRisk" class="form-control control-narrow" 
-                                   step="0.1" min="0" max="100" disabled>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">גודל פוזיציה מקסימלי (%)</label>
-                            <input type="number" id="maxPositionSize" class="form-control control-narrow" 
-                                   step="0.1" min="0" max="100" disabled>
-                        </div></div></div>
                     </div>
                 </div>
                 <!-- UI Content Section 3 End--> 
                 <!-- UI Content Section 4 Start-->
-                <div class="content-section collapsed" id="section4" data-group="filter_settings">
+                <div class="content-section" id="section4" data-group="filter_settings">
                     <div class="section-header">
                         <h2>🔍 פילטרים ברירת מחדל</h2>
-                        <button class="btn btn-outline-warning" onclick="window.toggleSection('section4')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div style="display: flex; gap: 5px;">
+                            <button type="button" class="btn" style="background-color: #26baac; color: white; border-color: #26baac;" onclick="window.savePreferenceGroup('filter_settings')">
+                                <i class="bi bi-save"></i> שמור
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section4')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="section-body collapsed" style="display:none;">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>פילטרים בסיסיים</h5>
-                        <div class="mb-3">
-                            <label class="form-label">סטטוס ברירת מחדל</label>
-                            <select id="defaultStatusFilter" class="form-select control-narrow">
-                                <option value="הכל">הכל</option>
-                                <option value="פתוח" selected>פתוח</option>
-                                <option value="סגור">סגור</option>
-                                <option value="מבוטל">מבוטל</option>
-                    </select>
-                    </div>
-                        <div class="mb-3">
-                            <label class="form-label">סוג ברירת מחדל</label>
-                            <select id="defaultTypeFilter" class="form-select control-narrow">
-                                <option value="הכל">הכל</option>
-                                <option value="Swing" selected>Swing</option>
-                                <option value="השקעה">השקעה</option>
-                                <option value="פסיבי">פסיבי</option>
-                    </select>
-                  </div>
-                        <div class="mb-3">
-                            <label class="form-label">טווח תאריכים</label>
-                            <select id="defaultDateRangeFilter" class="form-select">
-                                <option value="היום">היום</option>
-                                <option value="אתמול">אתמול</option>
-                                <option value="השבוע">השבוע</option>
-                                <option value="השבוע שעבר">השבוע שעבר</option>
-                                <option value="החודש">החודש</option>
-                                <option value="החודש שעבר">החודש שעבר</option>
-                                <option value="השנה">השנה</option>
-                                <option value="השנה שעברה">השנה שעברה</option>
-                                <option value="7 ימים אחרונים">7 ימים אחרונים</option>
-                                <option value="30 ימים אחרונים">30 ימים אחרונים</option>
-                                <option value="90 ימים אחרונים">90 ימים אחרונים</option>
-                                <option value="הכל">הכל</option>
-                                <option value="מותאם אישית">מותאם אישית</option>
-                    </select>
-                  </div>
-                </div>
-                    <div class="col-md-6">
-                        <h5>פילטרים נוספים</h5>
-                        <div class="mb-3">
-                            <label class="form-label">חיפוש ברירת מחדל</label>
-                            <input type="text" id="defaultSearchFilter" class="form-control" 
-                                   placeholder="טקסט חיפוש ברירת מחדל">
+                    <div class="section-body" style="display:none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>פילטרים בסיסיים</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">סטטוס ברירת מחדל</label>
+                                    <select id="defaultStatusFilter" name="defaultStatusFilter" class="form-select">
+                                        <option value="הכל">הכל</option>
+                                        <option value="פתוח" selected>פתוח</option>
+                                        <option value="סגור">סגור</option>
+                                        <option value="מבוטל">מבוטל</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">סוג ברירת מחדל</label>
+                                    <select id="defaultTypeFilter" name="defaultTypeFilter" class="form-select">
+                                        <option value="הכל">הכל</option>
+                                        <option value="Swing" selected>Swing</option>
+                                        <option value="השקעה">השקעה</option>
+                                        <option value="פסיבי">פסיבי</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>פילטרים נוספים</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">טווח תאריכים</label>
+                                    <select id="defaultDateRangeFilter" name="defaultDateRangeFilter" class="form-select">
+                                        <option value="היום">היום</option>
+                                        <option value="אתמול">אתמול</option>
+                                        <option value="השבוע">השבוע</option>
+                                        <option value="השבוע שעבר">השבוע שעבר</option>
+                                        <option value="החודש">החודש</option>
+                                        <option value="החודש שעבר">החודש שעבר</option>
+                                        <option value="השנה">השנה</option>
+                                        <option value="השנה שעברה">השנה שעברה</option>
+                                        <option value="7 ימים אחרונים">7 ימים אחרונים</option>
+                                        <option value="30 ימים אחרונים">30 ימים אחרונים</option>
+                                        <option value="90 ימים אחרונים">90 ימים אחרונים</option>
+                                        <option value="הכל">הכל</option>
+                                        <option value="מותאם אישית">מותאם אישית</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">חיפוש ברירת מחדל</label>
+                                    <input type="text" id="defaultSearchFilter" name="defaultSearchFilter" class="form-control" 
+                                           placeholder="טקסט חיפוש ברירת מחדל">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             <!-- UI Content Section 4 End-->    
             <!-- Notification Modes Section Start-->
-            <div class="content-section collapsed" id="section5" data-group="notification_settings">
+            <div class="content-section" id="section5" data-group="notification_settings">
                 <div class="section-header">
                         <h2>🔔 מצבי עבודה להתראות</h2>
-                        <button class="btn btn-outline-warning" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div style="display: flex; gap: 5px;">
+                            <button type="button" class="btn" style="background-color: #26baac; color: white; border-color: #26baac;" onclick="window.savePreferenceGroup('notification_settings')">
+                                <i class="bi bi-save"></i> שמור
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="section-body collapsed" style="display:none;">
+                    <div class="section-body" style="display:none;">
                         <div class="row">
-                            <div class="col-md-8">
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h5 class="card-title">בחר מצב עבודה למערכת ההתראות</h5>
-                                        <p class="card-text text-muted">כל מצב עבודה מגדיר רמת פירוט שונה של התראות שמוצגות במערכת</p>
-                                            <div class="row">
-                            <div class="col-md-6">
-                                <h6 class="text-primary mb-3">בחר מצב עבודה:</h6>
-                                
-                                                <!-- Debug Mode -->
-                                <div class="card mb-2">
-                                    <div class="card-body p-2">
-                                        <div class="form-check mb-0">
-                                                        <input class="form-check-input" type="radio" name="notificationMode" id="modeDebug" value="debug">
-                                                        <label class="form-check-label" for="modeDebug">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-bug text-muted me-2"></i>
-                                                    <div>
-                                                                <strong>מצב דיבג</strong>
-                                                        <br><small class="text-muted">כל ההתראות המפורטות</small>
-                                                            </div>
-                                                            </div>
-                                                        </label>
-                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Development Mode -->
-                                <div class="card mb-2">
-                                    <div class="card-body p-2">
-                                        <div class="form-check mb-0">
-                                                        <input class="form-check-input" type="radio" name="notificationMode" id="modeDevelopment" value="development">
-                                                        <label class="form-check-label" for="modeDevelopment">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-code text-primary me-2"></i>
-                                                    <div>
-                                                                <strong>מצב פיתוח</strong>
-                                                        <br><small class="text-muted">הודעות מרכזיות בלבד</small>
-                                                            </div>
-                                                            </div>
-                                                        </label>
-                                        </div>
-                                    </div>
-                                                    </div>
-                                                </div>
-                            
-                            <div class="col-md-6">
-                                <h6 class="text-success mb-3">מצבים מומלצים:</h6>
-
-                                                <!-- Work Mode -->
-                                <div class="card mb-2">
-                                    <div class="card-body p-2">
-                                        <div class="form-check mb-0">
-                                                        <input class="form-check-input" type="radio" name="notificationMode" id="modeWork" value="work" checked>
-                                                        <label class="form-check-label" for="modeWork">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-briefcase text-success me-2"></i>
-                                                    <div>
-                                                                <strong>מצב עבודה</strong>
-                                                        <br><small class="text-muted">הודעות שגיאה ופעולות משתמש</small>
-                                                            </div>
-                                                            </div>
-                                                        </label>
-                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Silent Mode -->
-                                <div class="card mb-2">
-                                    <div class="card-body p-2">
-                                        <div class="form-check mb-0">
-                                                        <input class="form-check-input" type="radio" name="notificationMode" id="modeSilent" value="silent">
-                                                        <label class="form-check-label" for="modeSilent">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-volume-mute text-danger me-2"></i>
-                                                    <div>
-                                                                <strong>מצב מושתק</strong>
-                                                        <br><small class="text-muted">הודעות שגיאה בלבד</small>
-                                                            </div>
-                                                            </div>
-                                                        </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                            <!-- Current Mode Status -->
+                            <!-- Column 1: מצב נוכחי + כפתורים -->
                             <div class="col-md-4">
                                 <h6 class="text-info mb-3">
                                     <i class="fas fa-info-circle me-2"></i>
@@ -429,113 +359,205 @@
                                 <!-- Action Buttons -->
                                 <div class="mt-3">
                                     <button type="button" class="btn btn-primary btn-sm w-100 mb-2" onclick="saveNotificationMode()">
-                                                <i class="fas fa-save me-2"></i>
-                                                שמור מצב עבודה
-                                            </button>
+                                        <i class="fas fa-save me-2"></i>
+                                        שמור מצב עבודה
+                                    </button>
                                     <button type="button" class="btn btn-outline-secondary btn-sm w-100" onclick="testNotificationMode()">
-                                                <i class="fas fa-play me-2"></i>
-                                                בדוק מצב נוכחי
-                                            </button>
+                                        <i class="fas fa-play me-2"></i>
+                                        בדוק מצב נוכחי
+                                    </button>
                                 </div>
                             </div>
                             
-                <!-- קטגוריות התראות ולוגים -->
-                <div class="col-md-12 mt-4">
+                            <!-- Column 2 & 3: בחירת מצב -->
+                            <div class="col-md-8">
+                                <h5 class="mb-3">בחר מצב עבודה למערכת ההתראות</h5>
+                                <p class="text-muted mb-3">כל מצב עבודה מגדיר רמת פירוט שונה של התראות שמוצגות במערכת</p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary mb-3">בחר מצב עבודה:</h6>
+                                        
+                                        <!-- Debug Mode -->
+                                        <div class="card mb-2">
+                                            <div class="card-body p-2">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input" type="radio" name="notificationMode" id="modeDebug" value="debug">
+                                                    <label class="form-check-label" for="modeDebug">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fas fa-bug text-muted me-2"></i>
+                                                            <div>
+                                                                <strong>מצב דיבג</strong>
+                                                                <br><small class="text-muted">כל ההתראות המפורטות</small>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Development Mode -->
+                                        <div class="card mb-2">
+                                            <div class="card-body p-2">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input" type="radio" name="notificationMode" id="modeDevelopment" value="development">
+                                                    <label class="form-check-label" for="modeDevelopment">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fas fa-code text-primary me-2"></i>
+                                                            <div>
+                                                                <strong>מצב פיתוח</strong>
+                                                                <br><small class="text-muted">הודעות מרכזיות בלבד</small>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <h6 class="text-success mb-3">מצבים מומלצים:</h6>
+
+                                        <!-- Work Mode -->
+                                        <div class="card mb-2">
+                                            <div class="card-body p-2">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input" type="radio" name="notificationMode" id="modeWork" value="work" checked>
+                                                    <label class="form-check-label" for="modeWork">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fas fa-briefcase text-success me-2"></i>
+                                                            <div>
+                                                                <strong>מצב עבודה</strong>
+                                                                <br><small class="text-muted">הודעות שגיאה ופעולות משתמש</small>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Silent Mode -->
+                                        <div class="card mb-2">
+                                            <div class="card-body p-2">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input" type="radio" name="notificationMode" id="modeSilent" value="silent">
+                                                    <label class="form-check-label" for="modeSilent">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fas fa-volume-mute text-danger me-2"></i>
+                                                            <div>
+                                                                <strong>מצב מושתק</strong>
+                                                                <br><small class="text-muted">הודעות שגיאה בלבד</small>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- קטגוריות התראות ולוגים -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-body">
                                         <h6 class="card-title">
-                                <i class="fas fa-list me-2"></i>
-                                קטגוריות התראות ולוגים
+                                            <i class="fas fa-list me-2"></i>
+                                            קטגוריות התראות ולוגים
                                         </h6>
-                            <p class="card-text text-muted">
-                                הגדר אילו סוגי התראות ולוגים יוצגו במערכת
-                            </p>
-                            
-                            <div class="notification-categories-section">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6 class="text-primary mb-2">התראות מערכת:</h6>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notifications_development_enabled" checked>
-                                            <label class="form-check-label" for="notifications_development_enabled">
-                                                התראות פיתוח
-                                            </label>
+                                        <p class="card-text text-muted">
+                                            הגדר אילו סוגי התראות ולוגים יוצגו במערכת
+                                        </p>
+                                        
+                                        <div class="notification-categories-section">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h6 class="text-primary mb-2">התראות מערכת:</h6>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="notifications_development_enabled" checked>
+                                                        <label class="form-check-label" for="notifications_development_enabled">
+                                                            התראות פיתוח
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="notifications_system_enabled" checked>
+                                                        <label class="form-check-label" for="notifications_system_enabled">
+                                                            התראות מערכת
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="notifications_business_enabled" checked>
+                                                        <label class="form-check-label" for="notifications_business_enabled">
+                                                            התראות עסקיות
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="notifications_general_enabled" checked>
+                                                        <label class="form-check-label" for="notifications_general_enabled">
+                                                            התראות כלליות
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="notifications_performance_enabled">
+                                                        <label class="form-check-label" for="notifications_performance_enabled">
+                                                            התראות ביצועים
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="notifications_ui_enabled" checked>
+                                                        <label class="form-check-label" for="notifications_ui_enabled">
+                                                            התראות ממשק משתמש
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <h6 class="text-success mb-2">לוגים לקונסול:</h6>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="console_logs_initialization_enabled">
+                                                        <label class="form-check-label" for="console_logs_initialization_enabled">
+                                                            לוגי אתחול מערכות
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="console_logs_system_enabled">
+                                                        <label class="form-check-label" for="console_logs_system_enabled">
+                                                            לוגי מערכת כלליים
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="console_logs_business_enabled">
+                                                        <label class="form-check-label" for="console_logs_business_enabled">
+                                                            לוגי עסקיים
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="console_logs_performance_enabled">
+                                                        <label class="form-check-label" for="console_logs_performance_enabled">
+                                                            לוגי ביצועים
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="console_logs_ui_components_enabled">
+                                                        <label class="form-check-label" for="console_logs_ui_components_enabled">
+                                                            לוגי רכיבי ממשק
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="console_logs_cache_enabled">
+                                                        <label class="form-check-label" for="console_logs_cache_enabled">
+                                                            לוגי מטמון
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="console_logs_notifications_enabled">
+                                                        <label class="form-check-label" for="console_logs_notifications_enabled">
+                                                            לוגי התראות
+                                                        </label>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notifications_system_enabled" checked>
-                                            <label class="form-check-label" for="notifications_system_enabled">
-                                                התראות מערכת
-                                            </label>
-                                            </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notifications_business_enabled" checked>
-                                            <label class="form-check-label" for="notifications_business_enabled">
-                                                התראות עסקיות
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notifications_general_enabled" checked>
-                                            <label class="form-check-label" for="notifications_general_enabled">
-                                                התראות כלליות
-                                            </label>
-                                    </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notifications_performance_enabled">
-                                            <label class="form-check-label" for="notifications_performance_enabled">
-                                                התראות ביצועים
-                                            </label>
-                                </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notifications_ui_enabled" checked>
-                                            <label class="form-check-label" for="notifications_ui_enabled">
-                                                התראות ממשק משתמש
-                                            </label>
-                            </div>
-                        </div>
-                                    
-                                    <div class="col-md-6">
-                                        <h6 class="text-success mb-2">לוגים לקונסול:</h6>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="console_logs_initialization_enabled">
-                                            <label class="form-check-label" for="console_logs_initialization_enabled">
-                                                לוגי אתחול מערכות
-                                            </label>
-                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="console_logs_system_enabled">
-                                            <label class="form-check-label" for="console_logs_system_enabled">
-                                                לוגי מערכת כלליים
-                                            </label>
-                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="console_logs_business_enabled">
-                                            <label class="form-check-label" for="console_logs_business_enabled">
-                                                לוגי עסקיים
-                                            </label>
-                    </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="console_logs_performance_enabled">
-                                            <label class="form-check-label" for="console_logs_performance_enabled">
-                                                לוגי ביצועים
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="console_logs_ui_components_enabled">
-                                            <label class="form-check-label" for="console_logs_ui_components_enabled">
-                                                לוגי רכיבי ממשק
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="console_logs_cache_enabled">
-                                            <label class="form-check-label" for="console_logs_cache_enabled">
-                                                לוגי מטמון
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="console_logs_notifications_enabled">
-                                            <label class="form-check-label" for="console_logs_notifications_enabled">
-                                                לוגי התראות
-                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -545,22 +567,22 @@
                 </div>
             </div>
         </div>
-      </div> <!-- End notification modes section -->
+        <!-- UI Content Section 5 End -->
 
         <!-- UI Content Section 6 Start-->
-      <div class="content-section" id="section6" data-group="colors_unified">
-        <div class="section-header">
-            <h2>🎨 צבעים</h2>
-            <button class="btn btn-outline-warning" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-                </button>
-                        </div>
-                    <div class="section-body collapsed" style="display:none;">
-            <div class="mb-3 text-end">
-                <button type="button" class="btn btn-success" onclick="window.savePreferenceGroup('colors_unified')">
-                    <i class="bi bi-save"></i> שמור צבעים
-                </button>
+        <div class="content-section" id="section6" data-group="colors_unified">
+            <div class="section-header">
+                <h2>🎨 צבעים</h2>
+                <div style="display: flex; gap: 5px;">
+                    <button type="button" class="btn" style="background-color: #26baac; color: white; border-color: #26baac;" onclick="window.savePreferenceGroup('colors_unified')">
+                        <i class="bi bi-save"></i> שמור
+                    </button>
+                    <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
             </div>
+            <div class="section-body" style="display:none;">
                 <!-- Basic System Colors -->
                 <div class="row">
                     <div class="col-12">
@@ -582,6 +604,14 @@
                             <label class="form-label mb-0 w-25">הצלחה:</label>
                             <input type="color" id="successColor" class="form-control form-control-color color-picker" data-color-key="successColor">
                 </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">רקע:</label>
+                            <input type="color" id="backgroundColor" class="form-control form-control-color color-picker" data-color-key="backgroundColor">
+                </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">טקסט:</label>
+                            <input type="color" id="textColor" class="form-control form-control-color color-picker" data-color-key="textColor">
+                </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3 d-flex align-items-center gap-2">
@@ -595,6 +625,18 @@
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">מידע:</label>
                             <input type="color" id="infoColor" class="form-control form-control-color color-picker" data-color-key="infoColor">
+                </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">גבול:</label>
+                            <input type="color" id="borderColor" class="form-control form-control-color color-picker" data-color-key="borderColor">
+                </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">הדגשה:</label>
+                            <input type="color" id="highlightColor" class="form-control form-control-color color-picker" data-color-key="highlightColor">
+                </div>
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">צל:</label>
+                            <input type="color" id="shadowColor" class="form-control form-control-color color-picker" data-color-key="shadowColor">
                 </div>
             </div>
         </div>
@@ -708,10 +750,82 @@
                                 <input type="color" id="entityCashFlowColorDark" class="form-control form-control-color color-picker" data-color-key="entityCashFlowColorDark">
               </div>
                   </div>
+                        <!-- Info -->
+          <div class="mb-3">
+                            <label class="form-label">מידע:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityInfoColor" class="form-control form-control-color color-picker" data-color-key="entityInfoColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityInfoColorLight" class="form-control form-control-color color-picker" data-color-key="entityInfoColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityInfoColorDark" class="form-control form-control-color color-picker" data-color-key="entityInfoColorDark">
+              </div>
+                  </div>
+                        <!-- Preferences -->
+          <div class="mb-3">
+                            <label class="form-label">העדפות:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityPreferencesColor" class="form-control form-control-color color-picker" data-color-key="entityPreferencesColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityPreferencesColorLight" class="form-control form-control-color color-picker" data-color-key="entityPreferencesColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityPreferencesColorDark" class="form-control form-control-color color-picker" data-color-key="entityPreferencesColorDark">
+              </div>
+                  </div>
+                        <!-- Research -->
+          <div class="mb-3">
+                            <label class="form-label">מחקר:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityResearchColor" class="form-control form-control-color color-picker" data-color-key="entityResearchColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityResearchColorLight" class="form-control form-control-color color-picker" data-color-key="entityResearchColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityResearchColorDark" class="form-control form-control-color color-picker" data-color-key="entityResearchColorDark">
+              </div>
+                  </div>
                     </div>
                   </div>
 
 
+
+                  <div class="section-divider"></div>
+                
+                  <!-- Status Colors -->
+                  <div class="row">
+                      <div class="col-12">
+                          <h5>צבעי סטטוס</h5>
+                          <small class="text-muted">צבעים לסטטוסים של טריידים והזמנות</small>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="mb-3">
+                              <label class="form-label">פתוח:</label>
+                              <input type="color" id="statusOpenColor" class="form-control form-control-color color-picker" data-color-key="statusOpenColor">
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="mb-3">
+                              <label class="form-label">סגור:</label>
+                              <input type="color" id="statusClosedColor" class="form-control form-control-color color-picker" data-color-key="statusClosedColor">
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="mb-3">
+                              <label class="form-label">מבוטל:</label>
+                              <input type="color" id="statusCancelledColor" class="form-control form-control-color color-picker" data-color-key="statusCancelledColor">
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="mb-3">
+                              <label class="form-label">בהמתנה:</label>
+                              <input type="color" id="statusPendingColor" class="form-control form-control-color color-picker" data-color-key="statusPendingColor">
+                          </div>
+                      </div>
+                  </div>
 
                   <div class="section-divider"></div>
                 
@@ -729,6 +843,10 @@
                               <div class="d-flex gap-2 align-items-center">
                                   <label class="form-label mb-0">רגיל:</label>
                                   <input type="color" id="valuePositiveColor" class="form-control form-control-color color-picker" data-color-key="valuePositiveColor">
+                                  <label class="form-label mb-0">בהיר:</label>
+                                  <input type="color" id="valuePositiveColorLight" class="form-control form-control-color color-picker" data-color-key="valuePositiveColorLight">
+                                  <label class="form-label mb-0">כהה:</label>
+                                  <input type="color" id="valuePositiveColorDark" class="form-control form-control-color color-picker" data-color-key="valuePositiveColorDark">
                               </div>
                           </div>
                       </div>
@@ -745,13 +863,17 @@
                               </div>
                           </div>
                       </div>
-                  </div>
-                  <div class="col-md-4">
-                      <div class="mb-3">
-                          <label class="form-label">ערכים נייטרליים:</label>
-                          <div class="d-flex gap-2 align-items-center">
-                              <label class="form-label mb-0">רגיל:</label>
-                              <input type="color" id="valueNeutralColor" class="form-control form-control-color color-picker" data-color-key="valueNeutralColor">
+                      <div class="col-md-4">
+                          <div class="mb-3">
+                              <label class="form-label">ערכים נייטרליים:</label>
+                              <div class="d-flex gap-2 align-items-center">
+                                  <label class="form-label mb-0">רגיל:</label>
+                                  <input type="color" id="valueNeutralColor" class="form-control form-control-color color-picker" data-color-key="valueNeutralColor">
+                                  <label class="form-label mb-0">בהיר:</label>
+                                  <input type="color" id="valueNeutralColorLight" class="form-control form-control-color color-picker" data-color-key="valueNeutralColorLight">
+                                  <label class="form-label mb-0">כהה:</label>
+                                  <input type="color" id="valueNeutralColorDark" class="form-control form-control-color color-picker" data-color-key="valueNeutralColorDark">
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -763,27 +885,26 @@
 
 
 
-
-
+                  </div>
                   </div>
         
        
         <!-- UI Content Section 6 End--> 
       
         <!-- UI Content Section 7 Start-->
-      <div class="content-section" id="section7" data-group="chart_settings_unified">
-        <div class="section-header">
-            <h2>📊 הגדרות גרפים</h2>
-            <button class="btn btn-outline-warning" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-            </button>
-                    </div>
-        <div class="section-body collapsed" style="display:none;">
-            <div class="mb-3 text-end">
-                <button type="button" class="btn btn-success" onclick="window.savePreferenceGroup('chart_settings_unified')">
-                    <i class="bi bi-save"></i> שמור הגדרות גרפים
-                </button>
+        <div class="content-section" id="section7" data-group="chart_settings_unified">
+            <div class="section-header">
+                <h2>📊 הגדרות גרפים</h2>
+                <div style="display: flex; gap: 5px;">
+                    <button type="button" class="btn" style="background-color: #26baac; color: white; border-color: #26baac;" onclick="window.savePreferenceGroup('chart_settings_unified')">
+                        <i class="bi bi-save"></i> שמור
+                    </button>
+                    <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
             </div>
+            <div class="section-body" style="display:none;">
                 <div class="row">
                     <div class="col-12">
                         <h5>צבעי גרפים</h5>
@@ -890,7 +1011,6 @@
                 </div>
                     </div>
                   </div>
-                </div>
             
                 <div class="section-divider"></div>
                 
@@ -950,7 +1070,7 @@
                         </div>
                     </div>
                         </div>
-                
+                </div>
                     <!-- UI Content Section 7 End--> 
                     
     <!-- Preferences Form End -->
@@ -958,22 +1078,11 @@
 
             
             
-                    
+       </div>            
      
-    
-    <!-- Save Button Section -->
-    <div class="text-center mt-4 mb-4">
-        <button type="button" 
-                class="btn btn-success btn-lg" 
-                onclick="window.PreferencesUI.saveAllPreferences()">
-            <i class="bi bi-save"></i> שמור העדפות
-        </button>
-    </div>
-    
 </div>
 </div>
        
-            </div>
             <!-- 🔒 LOCKED TEMPLATE ZONE 4 - End Main Content Container (DO NOT MODIFY) -->
         </div>
         <!-- 🔒 LOCKED TEMPLATE ZONE 5 - End Page Body (DO NOT MODIFY) -->

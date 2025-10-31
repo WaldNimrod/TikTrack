@@ -12,8 +12,8 @@ HOST = '127.0.0.1'
 PORT = 8080
 
 # Development settings
-DEVELOPMENT_MODE = os.getenv('TIKTRACK_DEV_MODE', 'false').lower() == 'true'
-CACHE_DISABLED = os.getenv('TIKTRACK_CACHE_DISABLED', 'false').lower() == 'true'
+DEVELOPMENT_MODE = os.getenv('TIKTRACK_DEV_MODE', 'true').lower() == 'true'  # Changed to 'true' for development
+CACHE_DISABLED = os.getenv('TIKTRACK_CACHE_DISABLED', 'true').lower() == 'true'  # Changed to 'true' to disable cache
 
 # Cache settings
 if DEVELOPMENT_MODE:

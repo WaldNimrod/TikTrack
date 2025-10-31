@@ -198,6 +198,10 @@ class ResponseOptimizer:
         Returns:
             str: Cache type
         """
+        # JavaScript and CSS files from /scripts/ and /styles/ - NO CACHE in development
+        if request_path.startswith('/scripts/') or request_path.startswith('/styles/') or request_path.startswith('/styles-new/'):
+            return 'api'  # Return 'api' type which has no-cache headers
+        
         # Static files - long cache
         if any(ext in request_path for ext in ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico']):
             return 'static'

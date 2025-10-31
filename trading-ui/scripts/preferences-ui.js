@@ -529,6 +529,11 @@ class PreferencesUI {
         try {
             this.loadingManager.startLoading(loaderId, 'טוען העדפות...');
             
+            // Initialize color pickers first if available
+            if (window.ColorPickerManager) {
+                window.ColorPickerManager.initializePickers();
+            }
+            
             // Load active profile if not provided
             if (profileId === null || profileId === undefined) {
                 profileId = await this.loadActiveProfile();
@@ -563,6 +568,14 @@ class PreferencesUI {
                 
                 const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, finalProfileId);
                 window.Logger.info(`✅ Loaded ${Object.keys(allPreferences, { page: "preferences-ui" }).length} preferences from API`);
+                
+                // Load colors separately for color pickers
+                if (window.ColorManager && window.ColorPickerManager) {
+                    const colors = await window.ColorManager.loadAllColors(finalUserId, finalProfileId);
+                    window.ColorPickerManager.loadColors(colors);
+                    // Merge colors into allPreferences for populateForm
+                    Object.assign(allPreferences, colors);
+                }
                 
                 // Populate form with ALL preferences
                 this.formManager.populateForm(allPreferences);

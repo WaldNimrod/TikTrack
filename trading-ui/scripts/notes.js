@@ -149,95 +149,9 @@ window.loadNotesData = async function() {
   }
 };
 
-/**
- * Add new note
- * @function addNote
- * @returns {void}
- */
-function addNote() {
-  try {
-    window.Logger.info('➕ מוסיף הערה חדשה', { page: "notes" });
-    
-    // פתיחת מודל הוספת הערה
-    showAddNoteModal();
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בהוספת הערה:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהוספת הערה', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בהוספת הערה');
-    }
-  }
-}
+// REMOVED: addNote - deprecated wrapper, use showAddNoteModal() directly
 
-/**
- * Upload file for note
- * @function uploadFile
- * @param {string} noteId - Note ID
- * @returns {void}
- */
-function uploadFile(noteId) {
-  try {
-    window.Logger.info('📤 מעלה קובץ להערה:', noteId, { page: "notes" });
-    
-    // יצירת input file
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '*/*';
-    
-    fileInput.onchange = function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      // יצירת FormData
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('note_id', noteId);
-      
-      // שליחה לשרת
-      fetch('/api/notes/' + noteId + '/upload', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('שגיאה בהעלאת קובץ');
-        }
-        return response.json();
-      })
-      .then(data => {
-        window.Logger.info('✅ קובץ הועלה:', data, { page: "notes" });
-        
-        // הודעת הצלחה
-        if (typeof window.showSuccessNotification === 'function') {
-          window.showSuccessNotification('קובץ הועלה בהצלחה', '', 4000, 'business');
-        } else if (typeof window.showNotification === 'function') {
-          window.showSuccessNotification('קובץ הועלה בהצלחה', '', 4000, 'business');
-        }
-      })
-      .catch(error => {
-        window.Logger.error('שגיאה בהעלאת קובץ:', error, { page: "notes" });
-        if (typeof window.showErrorNotification === 'function') {
-          window.showErrorNotification('שגיאה בהעלאת קובץ', error.message);
-        } else if (typeof window.showNotification === 'function') {
-          window.showErrorNotification('שגיאה בהעלאת קובץ');
-        }
-      });
-    };
-    
-    // הפעלת בחירת הקובץ
-    fileInput.click();
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בהעלאת קובץ:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהעלאת קובץ', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בהעלאת קובץ');
-    }
-  }
-}
+// REMOVED: uploadFile - unused function
 
 /**
  * Download file from note
@@ -2223,11 +2137,9 @@ function showEditNoteModal(noteId) {
 
 // ===== GLOBAL EXPORTS =====
 // window.loadNotesData כבר מוגדר בשורה 99
-window.addNote = addNote;
+// REMOVED: window exports for removed functions
 window.editNote = editNote;
 // Note: deleteNote and saveNote removed - using ModalManagerV2 and confirmDeleteNote instead
-window.uploadFile = uploadFile;
-window.downloadFile = downloadFile;
 window.viewLinkedItems = viewLinkedItems;
 window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (שורה 2240)', { page: "notes" });
 // ייצוא ישיר של הפונקציה המקורית - ללא wrapper כדי למנוע רקורסיה

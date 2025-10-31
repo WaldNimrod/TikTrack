@@ -922,9 +922,19 @@ class EntityDetailsRenderer {
                 { key: 'updated_at', label: 'תאריך עדכון', type: 'datetime' }
             ],
             trade: [
-                { key: 'symbol', label: 'טיקר', type: 'text' },
+                { key: 'id', label: 'מזהה', type: 'number' },
+                { key: 'ticker_symbol', label: 'טיקר', type: 'text' },
+                { key: 'account_name', label: 'חשבון מסחר', type: 'text' },
                 { key: 'status', label: 'סטטוס', type: 'status' },
-                { key: 'quantity', label: 'כמות', type: 'number' }
+                { key: 'investment_type', label: 'סוג השקעה', type: 'text' },
+                { key: 'side', label: 'צד', type: 'text' },
+                { key: 'opened_at', label: 'נפתח ב', type: 'datetime' },
+                { key: 'closed_at', label: 'נסגר ב', type: 'datetime' },
+                { key: 'cancelled_at', label: 'בוטל ב', type: 'datetime' },
+                { key: 'cancel_reason', label: 'סיבת ביטול', type: 'text' },
+                { key: 'total_pl', label: 'סה"כ P/L', type: 'currency' },
+                { key: 'notes', label: 'הערות', type: 'text' },
+                { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' }
             ],
             trade_plan: [
                 { key: 'id', label: 'מזהה', type: 'number' },
@@ -948,6 +958,49 @@ class EntityDetailsRenderer {
                 { key: 'notes', label: 'הערות', type: 'text' },
                 { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' },
                 { key: 'updated_at', label: 'תאריך עדכון', type: 'datetime' }
+            ],
+            execution: [
+                { key: 'id', label: 'מזהה', type: 'number' },
+                { key: 'trade_id', label: 'מזהה טרייד', type: 'number' },
+                { key: 'action', label: 'פעולה', type: 'text' },
+                { key: 'date', label: 'תאריך ושעה', type: 'datetime' },
+                { key: 'quantity', label: 'כמות', type: 'number' },
+                { key: 'price', label: 'מחיר', type: 'currency' },
+                { key: 'commission', label: 'עמלה', type: 'currency' },
+                { key: 'fees', label: 'עמלות נוספות', type: 'currency' },
+                { key: 'source', label: 'מקור', type: 'text' },
+                { key: 'notes', label: 'הערות', type: 'text' },
+                { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' }
+            ],
+            note: [
+                { key: 'id', label: 'מזהה', type: 'number' },
+                { key: 'content', label: 'תוכן', type: 'text' },
+                { key: 'attachment', label: 'קובץ מצורף', type: 'text' },
+                { key: 'related_type_id', label: 'סוג קשור', type: 'text' },
+                { key: 'related_id', label: 'מזהה קשור', type: 'number' },
+                { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' }
+            ],
+            alert: [
+                { key: 'id', label: 'מזהה', type: 'number' },
+                { key: 'ticker_symbol', label: 'טיקר', type: 'text' },
+                { key: 'status', label: 'סטטוס', type: 'status' },
+                { key: 'condition_attribute', label: 'מאפיין תנאי', type: 'text' },
+                { key: 'condition_operator', label: 'אופרטור תנאי', type: 'text' },
+                { key: 'condition_value', label: 'ערך תנאי', type: 'text' },
+                { key: 'is_triggered', label: 'הופעל', type: 'boolean' },
+                { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' },
+                { key: 'triggered_at', label: 'תאריך הפעלה', type: 'datetime' }
+            ],
+            cash_flow: [
+                { key: 'id', label: 'מזהה', type: 'number' },
+                { key: 'type', label: 'סוג תזרים', type: 'text' },
+                { key: 'amount', label: 'סכום', type: 'currency' },
+                { key: 'currency_symbol', label: 'מטבע', type: 'text' },
+                { key: 'date', label: 'תאריך', type: 'datetime' },
+                { key: 'source', label: 'מקור', type: 'text' },
+                { key: 'account_name', label: 'חשבון מסחר', type: 'text' },
+                { key: 'external_id', label: 'מזהה חיצוני', type: 'text' },
+                { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' }
             ]
         };
         return fieldMappings[entityType] || [];
@@ -1159,7 +1212,47 @@ class EntityDetailsRenderer {
         `;
     }
     
-    renderExecution(executionData, options) { return '<div>ביצוע עסקה</div>'; }
+    /**
+     * Render execution details - רנדור פרטי ביצוע
+     * 
+     * @param {Object} executionData - נתוני ביצוע
+     * @param {Object} options - אפשרויות רנדור
+     * @returns {string} - HTML מרונדר
+     * @public
+     */
+    renderExecution(executionData, options = {}) {
+        window.Logger.info(`🎨 Rendering execution data:`, executionData, { page: "entity-details-renderer" });
+        
+        // קבלת צבע הביצוע מההעדפות
+        const executionColor = this.entityColors.execution || '#17a2b8';
+        
+        return `
+            <div class="entity-details-container execution-details">
+                <!-- כותרת מידע בסיסי -->
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${executionColor} !important;">מידע בסיסי</h6>
+                    </div>
+                </div>
+                
+                <!-- מידע בסיסי בשתי עמודות -->
+                <div class="row">
+                    <div class="col-md-6">
+                        ${this.renderBasicInfo(executionData, 'execution', executionColor)}
+                    </div>
+                    <div class="col-md-6">
+                        ${this.renderAdditionalInfo(executionData, 'execution', executionColor)}
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        ${this.renderLinkedItems(executionData.linked_items || [], executionColor)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
     
     renderAccount(accountData, options = {}) {
         window.Logger.info(`🎨 Rendering account data:`, accountData, { page: "entity-details-renderer" });
@@ -1574,7 +1667,47 @@ class EntityDetailsRenderer {
         };
         return labels[entityType] || entityType;
     }
-    renderNote(noteData, options) { return '<div>הערה</div>'; }
+    /**
+     * Render note details - רנדור פרטי הערה
+     * 
+     * @param {Object} noteData - נתוני הערה
+     * @param {Object} options - אפשרויות רנדור
+     * @returns {string} - HTML מרונדר
+     * @public
+     */
+    renderNote(noteData, options = {}) {
+        window.Logger.info(`🎨 Rendering note data:`, noteData, { page: "entity-details-renderer" });
+        
+        // קבלת צבע ההערה מההעדפות
+        const noteColor = this.entityColors.note || '#6c757d';
+        
+        return `
+            <div class="entity-details-container note-details">
+                <!-- כותרת מידע בסיסי -->
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${noteColor} !important;">מידע בסיסי</h6>
+                    </div>
+                </div>
+                
+                <!-- מידע בסיסי בשתי עמודות -->
+                <div class="row">
+                    <div class="col-md-6">
+                        ${this.renderBasicInfo(noteData, 'note', noteColor)}
+                    </div>
+                    <div class="col-md-6">
+                        ${this.renderAdditionalInfo(noteData, 'note', noteColor)}
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        ${this.renderLinkedItems(noteData.linked_items || [], noteColor)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
     renderGeneric(entityData, entityType, options) { return '<div>ישות כללית</div>'; }
 }
 

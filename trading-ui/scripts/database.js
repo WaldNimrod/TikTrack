@@ -319,7 +319,7 @@ function formatCellValue(value, column) {
     // Apply formatting based on column type
     switch (column.type) {
     case 'date':
-      return formatDate(value);
+      return window.formatDate ? window.formatDate(value) : value;
     case 'number':
       return formatNumber(value);
     case 'currency':
@@ -429,15 +429,6 @@ function filterTableData(searchTerm) {
  * @returns {string} The formatted date
  */
 // REMOVED: formatDate - use window.formatDate from date-utils.js directly
-  if (!dateString) {return '';}
-
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('he-IL');
-  } catch {
-    return dateString;
-  }
-}
 
 /**
  * Format number value

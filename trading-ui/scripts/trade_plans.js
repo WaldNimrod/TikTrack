@@ -2303,7 +2303,7 @@ function updateTradePlansTable(trade_plans) {
               const result = window.createActionsMenu([
                 { type: 'VIEW', onclick: `window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })`, title: 'צפה בפרטי תכנון' },
                 { type: 'LINK', onclick: `if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }`, title: 'קישור' },
-                { type: 'EDIT', onclick: `if (typeof window.showEditTradePlanModal === 'function') { window.showEditTradePlanModal(${design.id}); }`, title: 'ערוך' },
+                { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', ${design.id})`, title: 'ערוך' },
                 { type: 'CANCEL', onclick: `if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }`, title: 'בטל' },
                 { type: 'DELETE', onclick: `if (typeof window.deleteTradePlan === 'function') { window.deleteTradePlan(${design.id}); }`, title: 'מחק' }
               ]);
@@ -2847,8 +2847,8 @@ window.addReminder = addReminder;
 window.updateTickerInfo = updateTickerInfo;
 window.updateSharesFromAmount = updateSharesFromAmount;
 window.updateAmountFromShares = updateAmountFromShares;
-window.showAddTradePlanModal = showAddTradePlanModal;
-window.showEditTradePlanModal = showEditTradePlanModal;
+// REMOVED: window.showAddTradePlanModal - use window.ModalManagerV2.showModal('tradePlansModal', 'add') directly
+// REMOVED: window.showEditTradePlanModal - use window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', id) directly
 window.saveTradePlanData = saveTradePlanData;
 /**
  * Filter trade plans by investment type
@@ -2920,28 +2920,12 @@ window.filterTradePlansByType = filterTradePlansByType;
  * @returns {void}
  */
 // REMOVED: showAddTradePlanModal - use window.ModalManagerV2.showModal('tradePlansModal', 'add') directly
-    window.Logger.debug('showAddTradePlanModal called', { page: 'trade_plans' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showModal('tradePlansModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
 
 /**
  * הצגת מודל עריכת תוכנית מסחר
  * Uses ModalManagerV2 for consistent modal experience
  */
 // REMOVED: showEditTradePlanModal - use window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', tradePlanId) directly
-    window.Logger.debug('showEditTradePlanModal called', { tradePlanId, page: 'trade_plans' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', tradePlanId);
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
 
 /**
  * שמירת תוכנית מסחר

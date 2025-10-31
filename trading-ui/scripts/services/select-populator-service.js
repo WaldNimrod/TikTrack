@@ -20,10 +20,30 @@
 // ===== SELECT POPULATOR SERVICE =====
 
 class SelectPopulatorService {
-    static _getPreferenceFromMemory(preferenceName, aliases = []) {
+    static async _getPreferenceFromMemory(preferenceName, aliases = []) {
         console.log(`🔍 _getPreferenceFromMemory called for: ${preferenceName} with aliases:`, aliases);
         try {
-            // Try window.currentPreferences first (used by PreferencesCore)
+            // First, try PreferencesCore (synchronous check with cached data)
+            if (window.PreferencesCore && window.UnifiedCacheManager) {
+                // Build cache key like PreferencesCore does
+                const userId = window.PreferencesCore.currentUserId || 1;
+                const profileId = window.PreferencesCore.currentProfileId !== null ? window.PreferencesCore.currentProfileId : 0;
+                const cacheKey = `preference_${preferenceName}_${userId}_${profileId}`;
+                
+                // Try to get from cache synchronously
+                try {
+                    const cached = localStorage.getItem(`tiktrack_${cacheKey}`);
+                    if (cached) {
+                        const parsed = JSON.parse(cached);
+                        console.log(`✅ Found preference ${preferenceName} in UnifiedCache:`, parsed);
+                        return parsed;
+                    }
+                } catch (e) {
+                    console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName}`);
+                }
+            }
+            
+            // Try window.currentPreferences
             let prefs = {};
             if (window.currentPreferences) {
                 prefs = window.currentPreferences;

@@ -416,6 +416,12 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 window.Logger.info('⚡ Initializing Executions...', { page: "page-initialization-configs" });
                 
+                // Load user preferences first
+                if (typeof window.loadUserPreferences === 'function') {
+                    window.Logger.info('⚙️ Loading user preferences for Executions...', { page: "page-initialization-configs" });
+                    await window.loadUserPreferences();
+                }
+                
                 if (typeof window.loadExecutionsData === 'function') {
                     await window.loadExecutionsData();
                 }

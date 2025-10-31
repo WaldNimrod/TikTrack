@@ -28,31 +28,39 @@ class SelectPopulatorService {
                 // Build cache key like PreferencesCore does
                 const userId = window.PreferencesCore.currentUserId || 1;
                 const profileId = window.PreferencesCore.currentProfileId !== null ? window.PreferencesCore.currentProfileId : 0;
-                const cacheKey = `preference_${preferenceName}_${userId}_${profileId}`;
                 
-                // Try to get from cache synchronously - check both tiktrack_ prefix and without it
-                try {
-                    // Try tiktrack_ prefix first
-                    let cached = localStorage.getItem(`tiktrack_${cacheKey}`);
-                    if (cached) {
-                        const parsed = JSON.parse(cached);
-                        console.log(`✅ Found preference ${preferenceName} in UnifiedCache (tiktrack_ prefix):`, parsed);
-                        return parsed;
-                    }
+                console.log(`🔍 Looking for preference ${preferenceName} with userId=${userId}, profileId=${profileId}`);
+                
+                // Try multiple profile IDs in case preferences are saved for different profiles
+                const profileIdsToTry = profileId !== 0 ? [profileId, 0] : [0];
+                
+                for (const tryProfileId of profileIdsToTry) {
+                    const cacheKey = `preference_${preferenceName}_${userId}_${tryProfileId}`;
+                    console.log(`🔍 Trying cache key: tiktrack_${cacheKey}`);
                     
-                    // Try without prefix
-                    cached = localStorage.getItem(cacheKey);
-                    if (cached) {
-                        const parsed = JSON.parse(cached);
-                        console.log(`✅ Found preference ${preferenceName} in UnifiedCache (no prefix):`, parsed);
-                        return parsed;
+                    // Try to get from cache synchronously - check both tiktrack_ prefix and without it
+                    try {
+                        // Try tiktrack_ prefix first
+                        let cached = localStorage.getItem(`tiktrack_${cacheKey}`);
+                        if (cached) {
+                            const parsed = JSON.parse(cached);
+                            console.log(`✅ Found preference ${preferenceName} in UnifiedCache (profileId=${tryProfileId}):`, parsed);
+                            return parsed;
+                        }
+                        
+                        // Try without prefix
+                        cached = localStorage.getItem(cacheKey);
+                        if (cached) {
+                            const parsed = JSON.parse(cached);
+                            console.log(`✅ Found preference ${preferenceName} in UnifiedCache (no prefix, profileId=${tryProfileId}):`, parsed);
+                            return parsed;
+                        }
+                    } catch (e) {
+                        console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName} (profileId=${tryProfileId}):`, e);
                     }
-                    
-                    console.log(`🔍 Looking in localStorage for key: tiktrack_${cacheKey} not found`);
-                    console.log(`🔍 Looking in localStorage for key: ${cacheKey} not found`);
-                } catch (e) {
-                    console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName}:`, e);
                 }
+                
+                console.log(`⚠️ Preference ${preferenceName} not found in localStorage for any profile`);
             }
             
             // Try window.currentPreferences

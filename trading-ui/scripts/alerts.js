@@ -5,13 +5,13 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 66
+ * Total Functions: 63
  * 
  * PAGE INITIALIZATION (2)
  * - initializeAlertModalTabs() - initializeAlertModalTabs function
  * - initializeAlertConditionBuilder() - * עדכון סטטיסטיקות הערכת תנאים
  * 
- * DATA LOADING (13)
+ * DATA LOADING (14)
  * - getDemoAlertsData() - getDemoAlertsData function
  * - loadAlertsData() - loadAlertsData function
  * - loadModalData() - loadModalData function
@@ -25,8 +25,9 @@
  * - loadConditionsFromItem() - * Load trades for conditions selection
  * - showEvaluationLoading() - showEvaluationLoading function
  * - getMethodIdFromCondition() - getMethodIdFromCondition function
+ * - loadAlertTickerInfo() - * הצגת מודל הוספת התראה
  * 
- * DATA MANIPULATION (15)
+ * DATA MANIPULATION (16)
  * - updatePageSummaryStats() - updatePageSummaryStats function
  * - updateRadioButtons() - updateRadioButtons function
  * - saveAlert() - * פירוק מחרוזת תנאי התראה
@@ -35,16 +36,16 @@
  * - deleteAlertInternal() - deleteAlertInternal function
  * - confirmDeleteAlert() - * מחיקת התראה
  * - updateAlertStatus() - updateAlertStatus function
+ * - hideAddAlertModal() - hideAddAlertModal function
+ * - updateEvaluationStats() - updateEvaluationStats function
+ * - saveAlertData() - * Update evaluation statistics
  * - updateAlertsSummary() - updateAlertsSummary function
  * - createAlertFromCondition() - * Select condition for alert creation
  * - updateModalButtons() - * Initialize tab management for add alert modal
  * - updateEvaluationSummary() - updateEvaluationSummary function
  * - showAddAlertModal() - * ניקוי הממשק המתקדם
- * - saveAlert() - * הצגת מודל הוספת התראה
- * - deleteAlert() - deleteAlert function
  * 
- * EVENT HANDLING (23)
- * - clearAlertValidation() - * עדכון סטטיסטיקות סיכום
+ * EVENT HANDLING (17)
  * - onRelationTypeChange() - onRelationTypeChange function
  * - onRelatedObjectChange() - * טיפול בשינוי סוג שיוך
  * - toggleConditionFields() - * טיפול בבחירת אובייקט
@@ -52,12 +53,7 @@
  * - disableConditionFields() - * Enable condition fields for add modal
  * - enableEditConditionFields() - * Enable condition fields for add modal
  * - disableEditConditionFields() - * Enable condition fields for add modal
- * - onEditRelationTypeChange() - onEditRelationTypeChange function
- * - onEditRelatedObjectChange() - * טיפול בשינוי סוג שיוך במודל העריכה
- * - enableEditConditionFields() - * טיפול בבחירת אובייקט במודל העריכה
- * - disableEditConditionFields() - * טיפול בבחירת אובייקט במודל העריכה
- * - buildAlertCondition() - buildAlertCondition function
- * - parseAlertCondition() - * בניית מחרוזת תנאי התראה
+ * - parseAlertCondition() - parseAlertCondition function
  * - validateAlertStatusCombination() - validateAlertStatusCombination function
  * - restoreAlertsSectionState() - * קבלת מחלקת סטטוס
  * - checkAlertCondition() - checkAlertCondition function
@@ -68,20 +64,21 @@
  * - displayEvaluationResults() - * הצגת אינדיקטור טעינה להערכת תנאים
  * - cleanupAlertConditionBuilder() - * קבלת מזהה שיטה מתנאי קיים
  * 
- * UI UPDATES (1)
+ * UI UPDATES (3)
+ * - hideEditAlertModal() - * Hide add alert modal wrapper
  * - showEditAlertModal() - * ניקוי הממשק המתקדם
+ * - displayAlertTickerInfo() - * מחיקת התראה
  * 
- * VALIDATION (2)
- * - checkAlertVariable() - * הפעלת שדות התנאי במודל העריכה
- * - checkAlertOperator() - checkAlertOperator function
+ * VALIDATION (1)
+ * - validateAlertForm() - * Hide edit alert modal wrapper
  * 
  * OTHER (10)
- * - filterAlertsLocally() - filterAlertsLocally function
  * - populateSelect() - populateSelect function
  * - populateRelatedObjects() - * Enable condition fields for add modal
  * - populateEditRelatedObjects() - populateEditRelatedObjects function
  * - editAlert() - editAlert function
  * - filterAlertsByRelatedObjectTypeWrapper() - filterAlertsByRelatedObjectTypeWrapper function
+ * - filterAlertsByRelatedObjectType() - filterAlertsByRelatedObjectType function
  * - reactivateAlert() - reactivateAlert function
  * - toggleAlert() - toggleAlert function
  * - generateDetailedLog() - generateDetailedLog function
@@ -446,148 +443,7 @@ async function loadAlertsData() {
   }
 }
 
-/**
- * פילטור מקומי להתראות
- */
-function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-  try {
-    let filteredAlerts = [...alerts];
-
-    // Extracting start and end dates
-    let startDate = null;
-    let endDate = null;
-
-  if (selectedDateRange && selectedDateRange !== 'כל זמן') {
-    const dateRange = window.translateDateRangeToDates
-      ? window.translateDateRangeToDates(selectedDateRange)
-      : { startDate: null, endDate: null };
-    startDate = dateRange.startDate;
-    endDate = dateRange.endDate;
-  }
-
-  // Filtering by status
-  if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
-    filteredAlerts = filteredAlerts.filter(alert => {
-      // המרת הערכים הנבחרים לאנגלית
-      const statusTranslations = {
-        'פתוח': 'open',
-        'סגור': 'closed',
-        'מבוטל': 'cancelled',
-      };
-
-      const translatedSelectedStatuses = selectedStatuses.map(status =>
-        statusTranslations[status] || status,
-      );
-
-      const isMatch = translatedSelectedStatuses.includes(alert.status);
-      return isMatch;
-    });
-  }
-
-  // Filtering by type
-  if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
-    filteredAlerts = filteredAlerts.filter(() => {
-      // הסרת פילטור לפי סוג התראה - השדה type הוסר
-      const isMatch = true;
-      return isMatch;
-    });
-  }
-
-  // Filtering by dates
-  if (startDate && endDate) {
-    filteredAlerts = filteredAlerts.filter(alert => {
-      if (!alert.created_at) {return false;}
-
-      const alertDate = new Date(alert.created_at);
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-
-      // Setting time to start of day for start date and end of day for end date
-      start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999);
-
-      const isInRange = alertDate >= start && alertDate <= end;
-      return isInRange;
-    });
-  }
-
-  // Filtering by search term
-  if (searchTerm && searchTerm.trim() !== '') {
-    const searchLower = searchTerm.toLowerCase();
-
-    // Bi-directional search term translations
-    const searchTranslations = {
-      // Status translations
-      'פתוח': 'open',
-      'סגור': 'closed',
-      'מבוטל': 'cancelled',
-      'open': 'open',
-      'closed': 'closed',
-      'cancelled': 'cancelled',
-
-      // Alert type translations
-      'התראה על מחיר': 'price_alert',
-      'סטופ לוס': 'stop_loss',
-      'התראה על נפח': 'volume_alert',
-      'התראה מותאמת': 'custom_alert',
-      'price_alert': 'price_alert',
-      'stop_loss': 'stop_loss',
-      'volume_alert': 'volume_alert',
-      'custom_alert': 'custom_alert',
-    };
-
-    // Creating an array of search terms including translations
-    const searchTerms = [searchLower];
-
-    // Adding exact translation
-    if (searchTranslations[searchLower]) {
-      searchTerms.push(searchTranslations[searchLower]);
-    }
-
-    // Adding partial search - if user searches for part of a word
-    Object.keys(searchTranslations).forEach(hebrewTerm => {
-      if (hebrewTerm.includes(searchLower) && !searchTerms.includes(searchTranslations[hebrewTerm])) {
-        searchTerms.push(searchTranslations[hebrewTerm]);
-      }
-    });
-
-    filteredAlerts = filteredAlerts.filter(alert => {
-      // Searching in all relevant fields
-      const titleMatch = alert.title && searchTerms.some(term =>
-        alert.title.toLowerCase().includes(term),
-      );
-
-      // הסרת חיפוש לפי סוג התראה - השדה type הוסר
-      const typeMatch = false;
-
-      const statusMatch = alert.status && searchTerms.some(term =>
-        alert.status.toLowerCase().includes(term),
-      );
-
-      const conditionMatch = alert.condition && searchTerms.some(term =>
-        alert.condition.toLowerCase().includes(term),
-      );
-
-      const messageMatch = alert.message && searchTerms.some(term =>
-        alert.message.toLowerCase().includes(term),
-      );
-
-      const isMatch = titleMatch || typeMatch || statusMatch || conditionMatch || messageMatch;
-
-      return isMatch;
-    });
-  }
-
-  return filteredAlerts;
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בפילטור מקומי של התראות:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בפילטור מקומי של התראות', error.message);
-    }
-    return alerts; // החזרת הנתונים המקוריים במקרה של שגיאה
-  }
-}
+// REMOVED: filterAlertsLocally - unused function
 
 /**
  * עדכון טבלת התראות
@@ -881,55 +737,7 @@ function updatePageSummaryStats() {
  * @param {number} [alertId] - מזהה ההתראה (נדרש רק בעריכה)
  */
 
-/**
- * ניקוי ולידציה של טפסי התראות
- */
-function clearAlertValidation() {
-  try {
-    // ניקוי ולידציה למודל הוספה
-    const addFormFields = [
-      'alertRelationType',
-      'alertRelatedObjectSelect',
-      'conditionAttribute',
-      'conditionOperator',
-      'conditionNumber',
-      'alertMessage',
-    ];
-
-    addFormFields.forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        field.classList.remove('is-invalid');
-        field.style.borderColor = '';
-        field.style.boxShadow = '';
-      }
-    });
-
-    // ניקוי ולידציה למודל עריכה
-    const editFormFields = [
-      'editAlertRelationType',
-      'editAlertRelatedObjectSelect',
-      'editConditionAttribute',
-      'editConditionOperator',
-      'editConditionNumber',
-      'editAlertMessage',
-    ];
-
-    editFormFields.forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        field.classList.remove('is-invalid');
-        field.style.borderColor = '';
-        field.style.boxShadow = '';
-      }
-    });
-  } catch (error) {
-    window.Logger.error('שגיאה בניקוי ולידציה של התראות:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בניקוי ולידציה של התראות', error.message);
-    }
-  }
-}
+// REMOVED: clearAlertValidation - unused function
 
 // ===== DATA MANAGEMENT FUNCTIONS =====
 // Data loading, saving, and modal data management
@@ -1378,154 +1186,10 @@ function populateEditRelatedObjects(relationTypeId) {
   }
 }
 
-/**
- * טיפול בשינוי סוג שיוך במודל העריכה
- * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
- */
-function onEditRelationTypeChange(radioElement) {
-  try {
-    // window.Logger.info('🔧 Edit relation type changed:', radioElement.value, { page: "alerts" });
+// REMOVED: onEditRelationTypeChange, onEditRelatedObjectChange - unused functions
+// REMOVED: enableEditConditionFields, disableEditConditionFields (second occurrence) - deprecated wrappers
 
-    // מילוי רשימת האובייקטים לפי הסוג שנבחר
-    populateEditRelatedObjects(parseInt(radioElement.value));
-  } catch (error) {
-    window.Logger.error('שגיאה בשינוי סוג שיוך בעריכה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בשינוי סוג שיוך בעריכה', error.message);
-    }
-  }
-}
-
-/**
- * טיפול בבחירת אובייקט במודל העריכה
- * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
- */
-function onEditRelatedObjectChange(selectElement) {
-  try {
-    // window.Logger.info('🔧 Edit related object changed:', selectElement.value, { page: "alerts" });
-
-    if (selectElement.value) {
-      // הפעלת שדות התנאי ישירות
-      enableEditConditionFields();
-    } else {
-      // השבתת שדות התנאי
-      disableEditConditionFields();
-    }
-  } catch (error) {
-    window.Logger.error('שגיאה בבחירת אובייקט בעריכה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בבחירת אובייקט בעריכה', error.message);
-    }
-  }
-}
-
-/**
- * הפעלת שדות התנאי במודל העריכה
- * @deprecated Use toggleConditionFields(true, 'edit') instead
- */
-function enableEditConditionFields() {
-  toggleConditionFields(true, 'edit');
-}
-
-/**
- * השבתת שדות התנאי במודל העריכה
- * @deprecated Use toggleConditionFields(false, 'edit') instead
- */
-function disableEditConditionFields() {
-  toggleConditionFields(false, 'edit');
-}
-
-/**
- * בדיקת משתנה התראה
- *
- * פונקציה זו בודקת אם המשתנה שנבחר נתמך
- * כרגע נתמך רק 'price' (מחיר)
- *
- * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
- * @returns {boolean} true אם נתמך, false אם לא
- */
-function checkAlertVariable(selectElement) {
-  try {
-    // window.Logger.info('🔍 === CHECK ALERT VARIABLE ===', { page: "alerts" });
-    // window.Logger.info('🔍 Element:', selectElement, { page: "alerts" });
-    // window.Logger.info('🔍 Selected value:', selectElement.value, { page: "alerts" });
-
-    // כרגע מאפשרים את כל התכונות
-    const selectedValue = selectElement.value;
-
-    if (!selectedValue) {
-      // window.Logger.info('❌ No variable selected', { page: "alerts" });
-      return false;
-    }
-
-    // window.Logger.info('✅ Variable accepted:', selectedValue, { page: "alerts" });
-    return true;
-  } catch (error) {
-    window.Logger.error('שגיאה בבדיקת משתנה התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בבדיקת משתנה התראה', error.message);
-    }
-    return false;
-  }
-}
-
-/**
- * בדיקת אופרטור התראה
- *
- * פונקציה זו בודקת אם האופרטור שנבחר נתמך
- * כרגע נתמכים רק 'greater_than' ו-'less_than'
- *
- * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
- * @returns {boolean} true אם נתמך, false אם לא
- */
-function checkAlertOperator(selectElement) {
-  try {
-    // window.Logger.info('🔍 === CHECK ALERT OPERATOR ===', { page: "alerts" });
-    // window.Logger.info('🔍 Element:', selectElement, { page: "alerts" });
-    // window.Logger.info('🔍 Selected value:', selectElement.value, { page: "alerts" });
-
-    // כרגע מאפשרים את כל האופרטורים
-    const selectedValue = selectElement.value;
-
-  if (!selectedValue) {
-    // window.Logger.info('❌ No operator selected', { page: "alerts" });
-    return false;
-  }
-
-  // window.Logger.info('✅ Operator accepted:', selectedValue, { page: "alerts" });
-  return true;
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בבדיקת אופרטור התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בבדיקת אופרטור התראה', error.message);
-    }
-    return false;
-  }
-}
-
-/**
- * בניית מחרוזת תנאי התראה
- *
- * פונקציה זו בונה מחרוזת תנאי מהמשתנה, האופרטור והערך
- * המחרוזת נשמרת בפורמט: "variable|operator|value"
- *
- * @param {string} variable - המשתנה (price, daily_change, etc.)
- * @param {string} operator - האופרטור (greater_than, less_than, etc.)
- * @param {string} value - הערך
- * @returns {string} מחרוזת התנאי
- */
-function buildAlertCondition(variable, operator, value) {
-  try {
-    return `${variable} | ${operator} | ${value}`;
-  } catch (error) {
-    window.Logger.error('שגיאה בבניית תנאי התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בבניית תנאי התראה', error.message);
-    }
-    return '';
-  }
-}
+// REMOVED: checkAlertVariable, checkAlertOperator, buildAlertCondition - unused functions
 
 /**
  * פירוק מחרוזת תנאי התראה
@@ -2333,13 +1997,8 @@ window.validateAlertStatusCombination = validateAlertStatusCombination;
 
 window.onRelationTypeChange = onRelationTypeChange;
 window.onRelatedObjectChange = onRelatedObjectChange;
-window.onEditRelationTypeChange = onEditRelationTypeChange;
-window.onEditRelatedObjectChange = onEditRelatedObjectChange;
-window.checkAlertVariable = checkAlertVariable;
-window.checkAlertOperator = checkAlertOperator;
-window.buildAlertCondition = buildAlertCondition;
+// REMOVED: window exports for removed functions (onEditRelationTypeChange, onEditRelatedObjectChange, checkAlertVariable, checkAlertOperator, buildAlertCondition, clearAlertValidation)
 window.parseAlertCondition = parseAlertCondition;
-window.clearAlertValidation = clearAlertValidation;
 
 // פונקציה לטעינת התראות (alias ל-loadAlertsData)
 function loadAlerts() {

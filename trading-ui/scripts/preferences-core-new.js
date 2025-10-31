@@ -418,12 +418,34 @@ class PreferencesCore {
         
         const cacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
         
-        // Use UnifiedCacheManager
+        // Use UnifiedCacheManager with fallback to localStorage if not initialized
         if (window.UnifiedCacheManager) {
-            const cached = await window.UnifiedCacheManager.get(cacheKey, {
-                layer: 'localStorage',
-                ttl: 300000 // 5 minutes
-            });
+            // Check if UnifiedCacheManager is initialized
+            const isInitialized = window.UnifiedCacheManager.initialized === true || 
+                                  (typeof window.UnifiedCacheManager.isInitialized === 'function' && 
+                                   window.UnifiedCacheManager.isInitialized());
+            
+            let cached = null;
+            if (isInitialized) {
+                cached = await window.UnifiedCacheManager.get(cacheKey, {
+                    layer: 'localStorage',
+                    ttl: 300000 // 5 minutes
+                });
+            } else {
+                // Fallback to localStorage directly if UnifiedCacheManager not initialized
+                try {
+                    const stored = localStorage.getItem(cacheKey);
+                    if (stored !== null) {
+                        const parsed = JSON.parse(stored);
+                        // Check if cache is still valid (if has timestamp)
+                        if (parsed && (!parsed.timestamp || (Date.now() - parsed.timestamp) < 300000)) {
+                            cached = parsed.value;
+                        }
+                    }
+                } catch (e) {
+                    // localStorage fallback failed - continue to API
+                }
+            }
             
             if (cached !== null) {
                 window.Logger.debug(`🔍 CACHE DEBUG: Cache hit for ${preferenceName} = ${cached} (key: ${cacheKey}, { page: "preferences-core-new" })`);

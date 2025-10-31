@@ -172,9 +172,6 @@ def create_preferences_tables():
             (3, 'string', 'defaultAccountFilter', 'פילטר חשבון ברירת מחדל', '{"options": ["all"]}', 'all', False),
             (3, 'string', 'defaultDateRangeFilter', 'פילטר טווח תאריכים ברירת מחדל', '{"options": ["today", "this_week", "this_month", "all"]}', 'this_week', False),
             
-            # קבוצת trading_settings (ברירות מחדל למסחר)
-            (3, 'integer', 'default_trading_account', 'חשבון מסחר ברירת מחדל', '{"min": 1}', '1', False),
-            
             # קבוצת ui
             (4, 'string', 'theme', 'ערכת נושא', '{"options": ["light", "dark", "auto"]}', 'light', False),
             (4, 'boolean', 'compactMode', 'מצב קומפקטי', '{}', 'false', False),

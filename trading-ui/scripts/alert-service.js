@@ -360,7 +360,8 @@ function parseAlertCondition(condition) {
  */
 async function cancelAlert(alertId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - ביטול    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - ביטול
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -375,14 +376,13 @@ async function cancelAlert(alertId) {
 
     if (response.ok) {
       // התראה בוטלה בהצלחה
-        if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'התראה בוטלה בהצלחה!');
-        }
-        
-        // רענון הטבלה
-        if (window.loadAlertsData) {
-          await window.loadAlertsData();
-        }
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification('הצלחה', 'התראה בוטלה בהצלחה!');
+      }
+      
+      // רענון הטבלה
+      if (window.loadAlertsData) {
+        await window.loadAlertsData();
       }
       
       return true;

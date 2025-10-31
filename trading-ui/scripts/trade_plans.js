@@ -459,6 +459,41 @@ function hideTickerInfo() {
 }
 
 /**
+ * Update ticker info in add modal
+ * Updates display elements and form fields when ticker is selected in add modal
+ */
+async function updateTickerInfo() {
+  try {
+    const tickerSelect = document.getElementById('ticker');
+    const tickerDisplay = document.getElementById('selectedTickerDisplay');
+    const priceDisplay = document.getElementById('currentPriceDisplay');
+    const changeDisplay = document.getElementById('dailyChangeDisplay');
+    const tickerId = tickerSelect ? tickerSelect.value : null;
+
+    if (!tickerId) {
+      if (tickerDisplay) tickerDisplay.textContent = 'לא נבחר';
+      if (priceDisplay) priceDisplay.textContent = '-';
+      if (changeDisplay) {
+        changeDisplay.textContent = '-';
+        changeDisplay.style.color = '#6c757d';
+      }
+      // Hide ticker info section
+      hideTickerInfo();
+      return;
+    }
+
+    // Load ticker data
+    await loadTickerInfo(tickerId);
+
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון מידע טיקר:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון מידע טיקר', error.message);
+    }
+  }
+}
+
+/**
  * Update form fields with calculated values based on ticker data and user preferences
  */
 async function updateFormFieldsWithTickerData(ticker, currentPrice) {
@@ -1178,6 +1213,40 @@ function addEditReminder() {
     window.Logger.error('שגיאה בהוספת תזכורת בעריכה:', error, { page: "trade_plans" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהוספת תזכורת בעריכה', error.message);
+    }
+  }
+}
+
+/**
+ * Add important note functionality (placeholder for add modal)
+ * @returns {void}
+ */
+function addImportantNote() {
+  try {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית', 'info');
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהוספת הערה חשובה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת הערה חשובה', error.message);
+    }
+  }
+}
+
+/**
+ * Add reminder functionality (placeholder for add modal)
+ * @returns {void}
+ */
+function addReminder() {
+  try {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'info');
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהוספת תזכורת:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת תזכורת', error.message);
     }
   }
 }
@@ -2388,28 +2457,40 @@ window.addEditImportantNote = addEditImportantNote;
  */
 function initializeTradePlanConditionsSystem() {
   try {
-    // Check if conditions system is available
-    if (typeof window.ConditionsInitializer !== 'undefined') {
-      // System is already initialized globally - just verify it's working
-      if (window.conditionsSystem && window.conditionsSystem.initializer) {
-        window.Logger?.info('Conditions system already initialized for trade plans', { page: "trade_plans" });
-        return true;
-      }
-      
-      // Try to initialize if not already done
-      const initializer = new window.ConditionsInitializer();
-      if (initializer && typeof initializer.initialize === 'function') {
-        initializer.initialize().then(() => {
-          window.Logger?.info('✅ Trade plans conditions system initialized successfully', { page: "trade_plans" });
-        }).catch(error => {
-          window.Logger?.error('Error initializing trade plans conditions system:', error, { page: "trade_plans" });
-        });
-        return true;
-      }
-    } else {
-      window.Logger?.warn('ConditionsInitializer not available - conditions package may not be loaded', { page: "trade_plans" });
-      return false;
+    // First check if conditionsSystem is already available (most reliable check)
+    if (window.conditionsSystem && window.conditionsSystem.initializer) {
+      window.Logger?.info('✅ Conditions system already initialized for trade plans', { page: "trade_plans" });
+      return true;
     }
+    
+    // Try to initialize using ConditionsInitializer class
+    if (typeof window.ConditionsInitializer !== 'undefined') {
+      try {
+        const initializer = new window.ConditionsInitializer();
+        if (initializer && typeof initializer.initialize === 'function') {
+          initializer.initialize().then(() => {
+            window.Logger?.info('✅ Trade plans conditions system initialized successfully', { page: "trade_plans" });
+          }).catch(error => {
+            window.Logger?.error('Error initializing trade plans conditions system:', error, { page: "trade_plans" });
+          });
+          return true;
+        }
+      } catch (error) {
+        window.Logger?.warn('Error creating ConditionsInitializer instance:', error, { page: "trade_plans" });
+      }
+    }
+    
+    // If not available immediately, try deferred check
+    setTimeout(() => {
+      if (window.conditionsSystem && window.conditionsSystem.initializer) {
+        window.Logger?.info('✅ Conditions system initialized for trade plans (deferred check)', { page: "trade_plans" });
+        return true;
+      } else {
+        window.Logger?.warn('⚠️ ConditionsInitializer not available - conditions package may not be loaded', { page: "trade_plans" });
+      }
+    }, 500);
+    
+    return false;
   } catch (error) {
     window.Logger?.error('Error in initializeTradePlanConditionsSystem:', error, { page: "trade_plans" });
     return false;

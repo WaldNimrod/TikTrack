@@ -232,26 +232,7 @@ function formatPrice(price) {
  * @param {string} modalId - מזהה המודל
  * @param {Object} options - אפשרויות נוספות
  */
-function showModal(modalId, options = {}) {
-  const modal = document.getElementById(modalId);
-  if (!modal) {
-    handleElementNotFound('showModal', `Modal ${modalId} not found`);
-    return;
-  }
-
-  // הגדרת אפשרויות ברירת מחדל
-  const defaultOptions = {
-    backdrop: true,
-    keyboard: true,
-    focus: true,
-  };
-
-  const modalOptions = { ...defaultOptions, ...options };
-
-  // הצגת המודל
-  const bootstrapModal = new bootstrap.Modal(modal, modalOptions);
-  bootstrapModal.show();
-}
+// REMOVED: showModal - use window.ModalManagerV2.showModal() for new modals or bootstrap.Modal directly for legacy modals
 
 /**
  * הצגת הודעת אישור שנייה
@@ -635,17 +616,7 @@ function initializeModalBackdrop() {
  * @param {string} message - הודעת האישור
  * @param {Function} onConfirm - פונקציה לביצוע אם אושר
  */
-function showSecondConfirmationModal(message, onConfirm) {
-  if (window.showConfirmationDialog) {
-    window.showConfirmationDialog('אישור', message, onConfirm, () => {});
-  } else {
-    // Fallback למקרה שמערכת התראות לא זמינה
-    const confirmed = window.confirm(message);
-    if (confirmed) {
-      onConfirm();
-    }
-  }
-}
+// REMOVED: showSecondConfirmationModal - use window.showConfirmationDialog from warning-system.js directly
 
 // פונקציה createWarningModal כבר מוגדרת בשורה 1041
 

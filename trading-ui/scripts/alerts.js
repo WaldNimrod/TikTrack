@@ -2098,58 +2098,6 @@ window.reactivateAlert = reactivateAlert;
 // window.Logger.info('- clearAlertValidation:', typeof window.clearAlertValidation, { page: "alerts" });
 
 // REMOVED: checkAlertCondition - unused function
-// function checkAlertCondition(alert, tickerData) {
-  try {
-    window.Logger.info('🔍 בודק תנאי התראה:', alert.id, tickerData, { page: "alerts" });
-    
-    if (!alert || !tickerData) {
-      throw new Error('נתונים חסרים לבדיקת תנאי התראה');
-    }
-    
-    // פרסור תנאי ההתראה
-    const condition = alert.condition || '';
-    const targetValue = parseFloat(alert.target_value) || 0;
-    const currentPrice = parseFloat(tickerData.price) || 0;
-    
-    let conditionMet = false;
-    let message = '';
-    
-    // בדיקת תנאים שונים
-    if (condition.includes('>') && condition.includes('price')) {
-      conditionMet = currentPrice > targetValue;
-      message = `מחיר ${tickerData.symbol} (${currentPrice}) גבוה מ-${targetValue}`;
-    } else if (condition.includes('<') && condition.includes('price')) {
-      conditionMet = currentPrice < targetValue;
-      message = `מחיר ${tickerData.symbol} (${currentPrice}) נמוך מ-${targetValue}`;
-    } else if (condition.includes('=') && condition.includes('price')) {
-      conditionMet = Math.abs(currentPrice - targetValue) < 0.01;
-      message = `מחיר ${tickerData.symbol} (${currentPrice}) שווה ל-${targetValue}`;
-    }
-    
-    // אם התנאי מתקיים, הצגת התראה
-    if (conditionMet) {
-      if (typeof window.showWarningNotification === 'function') {
-        window.showWarningNotification('התראה פעילה!', message);
-      } else if (typeof window.showNotification === 'function') {
-        window.showNotification(`התראה: ${message}`, 'warning');
-      }
-      
-      // עדכון סטטוס ההתראה
-      updateAlertStatus(alert.id, 'triggered');
-    }
-    
-    return conditionMet;
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בבדיקת תנאי התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בבדיקת תנאי התראה', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בבדיקת תנאי התראה', 'error');
-    }
-    return false;
-  }
-}
 
 /**
  * הפעלה/כיבוי התראה

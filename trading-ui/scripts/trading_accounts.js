@@ -1022,7 +1022,9 @@ async function cancelTradingAccount(tradingAccountId, tradingAccountName) {
     });
 
     if (response.ok) {
-      showSuccessMessage('חשבון מסחר בוטל בהצלחה!');
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('חשבון מסחר בוטל בהצלחה!');
+      }
 
       // רענון הטבלה
       if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
@@ -1035,11 +1037,15 @@ async function cancelTradingAccount(tradingAccountId, tradingAccountName) {
       }
     } else {
       const data = await response.json();
-      showErrorMessage(data.message || 'שגיאה בביטול חשבון מסחר');
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification(data.message || 'שגיאה בביטול חשבון מסחר');
+      }
     }
   } catch (error) {
     handleSystemError(error, 'ביטול חשבון מסחר');
-    showErrorMessage('שגיאה בביטול חשבון מסחר');
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בביטול חשבון מסחר');
+    }
   }
 }
 
@@ -1116,7 +1122,9 @@ async function deleteTradingAccount(tradingAccountId, tradingAccountName) {
     });
 
     if (response.ok) {
-      showSuccessMessage('חשבון מסחר נמחק בהצלחה!');
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('חשבון מסחר נמחק בהצלחה!');
+      }
 
       // רענון הטבלה
       if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
@@ -1129,41 +1137,23 @@ async function deleteTradingAccount(tradingAccountId, tradingAccountName) {
       }
     } else {
       const data = await response.json();
-      showErrorMessage(data.message || 'שגיאה במחיקת חשבון מסחר');
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification(data.message || 'שגיאה במחיקת חשבון מסחר');
+      }
     }
   } catch (error) {
     handleDeleteError(error, 'מחיקת חשבון מסחר');
-    showErrorMessage('שגיאה במחיקת חשבון מסחר');
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במחיקת חשבון מסחר');
+    }
   }
 }
 
 // הפונקציה הועברה למטה - גרסה מפורטת יותר
 
-/**
- * Show success message
- * @function showSuccessMessage
- * @param {string} message - Success message
- * @returns {void}
- */
-function showSuccessMessage(message) {
-  if (typeof window.showSuccessNotification === 'function') {
-    window.showSuccessNotification('הצלחה', message);
-  }
-}
+// REMOVED: showSuccessMessage - use window.showSuccessNotification from notification-system.js directly
 
-/**
- * Show error message
- * @function showErrorMessage
- * @param {string} message - Error message
- * @returns {void}
- */
-function showErrorMessage(message) {
-  if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification('שגיאה', message);
-  } else {
-    handleSystemError(new Error(message), 'שגיאת הודעה');
-  }
-}
+// REMOVED: showErrorMessage - use window.showErrorNotification from notification-system.js directly
 
 // פונקציות עזר - הועברו ל-ui-utils.js
 
@@ -1201,9 +1191,9 @@ function showOpenTradesWarning(tradingAccountId, tradingAccountName) {
 // createWarningModal הועברה ל-ui-utils.js
 
 // ייצוא הפונקציות הנוספות
-window.showAddTradingAccountModal = showAddTradingAccountModal;
-window.showEditTradingAccountModal = showEditTradingAccountModal;
-window.showEditTradingAccountModalById = showEditTradingAccountModalById;
+// REMOVED: window.showAddTradingAccountModal - use window.ModalManagerV2.showModal('tradingAccountsModal', 'add') directly
+// REMOVED: window.showEditTradingAccountModal - use window.ModalManagerV2.showEditModal('tradingAccountsModal', 'account', id) directly
+window.showEditTradingAccountModalById = showEditTradingAccountModalById; // Keep this as it's a wrapper with additional logic
 window.cancelTradingAccount = cancelTradingAccount;
 window.deleteTradingAccount = deleteTradingAccount;
 window.showTradingAccountSuccessMessage = showSuccessMessage;
@@ -1776,7 +1766,9 @@ async function restoreTradingAccount(tradingAccountId, tradingAccountName) {
     });
 
     if (response.ok) {
-      showSuccessMessage('חשבון מסחר הוחזר בהצלחה לסטטוס סגור!');
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('חשבון מסחר הוחזר בהצלחה לסטטוס סגור!');
+      }
 
       // רענון הטבלה
       if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
@@ -1789,11 +1781,15 @@ async function restoreTradingAccount(tradingAccountId, tradingAccountName) {
       }
     } else {
       const data = await response.json();
-      showErrorMessage(data.message || 'שגיאה בהחזרת חשבון מסחר');
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification(data.message || 'שגיאה בהחזרת חשבון מסחר');
+      }
     }
   } catch (error) {
     handleSystemError(error, 'החזרת חשבון מסחר');
-    showErrorMessage('שגיאה בהחזרת חשבון מסחר');
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהחזרת חשבון מסחר');
+    }
   }
 }
 
@@ -2257,41 +2253,16 @@ function getTradingAccounts() {
     });
 }
 
-// Define function as global
-window.sortTable = sortTable;
+// REMOVED: window.sortTable - use window.sortTableData from tables.js directly
 //  removed - no longer needed
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 window.getTradingAccounts = getTradingAccounts;
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
 
-/**
- * Show add trading account modal
- * @function showAddTradingAccountModal
- * @returns {void}
- */
-function showAddTradingAccountModal() {
-    window.Logger.debug('showAddTradingAccountModal called', { page: 'trading_accounts' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showModal('tradingAccountsModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showAddTradingAccountModal - use window.ModalManagerV2.showModal('tradingAccountsModal', 'add') directly
 
-/**
- * Show edit trading account modal
- * @function showEditTradingAccountModal
- * @param {string} accountId - Account ID
- * @returns {void}
- */
-function showEditTradingAccountModal(accountId) {
-    window.Logger.debug('showEditTradingAccountModal called', { accountId, page: 'trading_accounts' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showEditModal('tradingAccountsModal', 'account', accountId);
-    } else {
+// REMOVED: showEditTradingAccountModal - use window.ModalManagerV2.showEditModal('tradingAccountsModal', 'account', accountId) directly
         console.error('ModalManagerV2 not available');
     }
 }
@@ -2495,7 +2466,7 @@ window.getTradingAccountName = getTradingAccountName;
 window.updateTradingAccount = updateTradingAccount;
 window.viewTradingAccountDetails = viewTradingAccountDetails;
 window.showTradingAccountDetails = showTradingAccountDetails;
-window.sortTable = sortTable;
+// REMOVED: window.sortTable - use window.sortTableData from tables.js directly
 window.generateDetailedLog = generateDetailedLog;
 window.getTradingAccounts = getTradingAccounts;
 // Note: saveTradingAccount already exported above

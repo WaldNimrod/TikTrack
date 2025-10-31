@@ -226,20 +226,24 @@ function deleteExecution(id) {
   // deleteExecution called with id
   // window.showDeleteWarning exists check
 
-  // קבלת פרטי העסקה מהטבלה
-  const executionRow = document.querySelector(`tr[data-execution-id="${id}"]`);
+  // קבלת פרטי העסקה מנתוני הביצועים
   let executionDetails = `עסקה #${id}`;
   
-  if (executionRow) {
-    const cells = executionRow.querySelectorAll('td');
-    if (cells.length >= 9) {
-      const ticker = cells[0]?.textContent?.trim() || '';
-      const action = cells[1]?.textContent?.trim() || '';
-      const quantity = cells[3]?.textContent?.trim() || '';
-      const price = cells[4]?.textContent?.trim() || '';
-      const date = cells[8]?.textContent?.trim() || '';
-      executionDetails = `${ticker} - ${action}, ${quantity} יחידות ב-${price}, תאריך: ${date}`;
-    }
+  // ניסיון לקבל את הנתונים מ-executionsData
+  const execution = window.executionsData?.find(exec => exec.id === id);
+  
+  if (execution) {
+    const ticker = execution.ticker_symbol || execution.symbol || 'לא מוגדר';
+    // שימוש ב-renderAction לתרגום נכון
+    const actionText = window.renderAction ? 
+                       window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
+                       ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
+    const quantity = execution.quantity || '0';
+    const price = execution.price ? `$${execution.price}` : '$0';
+    const date = execution.date || execution.execution_date ? 
+                 new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : 
+                 'לא מוגדר';
+    executionDetails = `${ticker} - ${actionText}, ${quantity} יחידות ב-${price}, תאריך: ${date}`;
   }
 
   // שימוש במערכת הגלובלית למחיקה

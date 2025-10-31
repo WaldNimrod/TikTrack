@@ -314,8 +314,19 @@
         // Make the local  function available globally for this page only
         
         // Test preferences availability
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             console.log('🧪 Testing preferences availability...');
+            
+            // First, try to load preferences
+            if (window.loadUserPreferences) {
+                console.log('🔄 Loading preferences...');
+                try {
+                    const prefs = await window.loadUserPreferences();
+                    console.log('✅ Preferences loaded:', prefs);
+                } catch (error) {
+                    console.error('❌ Error loading preferences:', error);
+                }
+            }
             
             setTimeout(async () => {
                 try {
@@ -329,15 +340,14 @@
                         const defaultCommission = window.getPreferenceFromMemory('defaultCommission');
                         console.log('🧪 defaultCommission value:', defaultCommission);
                         
-                        // Test PreferencesSystem
-                        if (window.PreferencesSystem?.manager?.currentPreferences) {
-                            console.log('✅ PreferencesSystem.currentPreferences available');
-                            const allPrefs = window.PreferencesSystem.manager.currentPreferences;
-                            console.log('🧪 All preferences count:', Object.keys(allPrefs).length);
-                            console.log('🧪 default_trading_account in prefs:', allPrefs['default_trading_account']);
-                            console.log('🧪 defaultCommission in prefs:', allPrefs['defaultCommission']);
+                        // Test window.currentPreferences
+                        if (window.currentPreferences) {
+                            console.log('✅ window.currentPreferences available');
+                            console.log('🧪 All preferences count:', Object.keys(window.currentPreferences).length);
+                            console.log('🧪 default_trading_account in prefs:', window.currentPreferences['default_trading_account']);
+                            console.log('🧪 defaultCommission in prefs:', window.currentPreferences['defaultCommission']);
                         } else {
-                            console.log('⚠️ PreferencesSystem.currentPreferences not available');
+                            console.log('⚠️ window.currentPreferences not available');
                         }
                         
                         // Test localStorage fallback

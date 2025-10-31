@@ -1584,7 +1584,8 @@ function parseAlertCondition(condition) {
 async function saveAlert() {
   window.Logger.info('🔧 saveAlert function called', { page: "alerts" });
   
-  // ניקוי מטמון לפני פעולת CRUD - הוספה  const form = document.getElementById('addAlertForm');
+  // ניקוי מטמון לפני פעולת CRUD - הוספה
+  const form = document.getElementById('addAlertForm');
   if (!form) {
     window.Logger.warn('⚠️ Form element not found - skipping save operation', { page: "alerts" });
     return;
@@ -3536,7 +3537,107 @@ function showEditAlertModal(alertId) {
  */
 // REMOVED: Duplicate deleteAlert function - using confirmDeleteAlert instead
 
+/**
+ * טעינת מידע על הטיקר (למודל החדש)
+ */
+async function loadAlertTickerInfo(tickerId) {
+  try {
+    window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "alerts" });
+    
+    // Get ticker data from API
+    const response = await fetch(`/api/tickers/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const tickers = data.data || data;
+    
+    // Find the specific ticker
+    const ticker = tickers.find(t => t.id == tickerId);
+    if (!ticker) {
+      throw new Error('Ticker not found');
+    }
+    
+    // Display ticker info
+    displayAlertTickerInfo(ticker);
+    
+  } catch (error) {
+    window.Logger.error('❌ Error loading ticker info:', error, { page: "alerts" });
+  }
+}
+
+/**
+ * הצגת מידע על הטיקר (למודל החדש)
+ */
+function displayAlertTickerInfo(ticker) {
+  // Create or update ticker info display
+  let tickerInfoDiv = document.getElementById('alertTickerInfo');
+  if (!tickerInfoDiv) {
+    // Create a new row for ticker info spanning full width
+    const tickerInfoRow = document.createElement('div');
+    tickerInfoRow.className = 'row';
+    tickerInfoRow.id = 'alertTickerInfoRow';
+    
+    // Create column for ticker info - full width
+    const tickerInfoCol = document.createElement('div');
+    tickerInfoCol.className = 'col-12';
+    
+    tickerInfoDiv = document.createElement('div');
+    tickerInfoDiv.id = 'alertTickerInfo';
+    tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
+    
+    tickerInfoCol.appendChild(tickerInfoDiv);
+    tickerInfoRow.appendChild(tickerInfoCol);
+    
+    // Insert after the ticker field
+    const tickerSelect = document.getElementById('alertTicker');
+    if (tickerSelect) {
+      const tickerField = tickerSelect.closest('.mb-3');
+      if (tickerField && tickerField.parentNode) {
+        // Find the row containing the ticker field
+        const row = tickerField.closest('.row');
+        if (row && row.parentNode) {
+          row.parentNode.insertBefore(tickerInfoRow, row.nextSibling);
+        }
+      }
+    }
+  }
+  
+  // Use the new global renderTickerInfo function
+  if (window.renderTickerInfo) {
+    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+  } else {
+    // Fallback if renderTickerInfo not available
+    tickerInfoDiv.innerHTML = `
+      <div class="ticker-info-display">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}
+          </div>
+          <div class="col-md-6 text-end">
+            <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
+            <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+              ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </span>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12">
+            <small class="text-muted">
+              נפח: ${(ticker.volume || 0).toLocaleString()} | 
+              שינוי יומי: ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </small>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
 // Export functions to window for global access
 window.showAddAlertModal = showAddAlertModal;
 window.showEditAlertModal = showEditAlertModal;
+window.loadAlertTickerInfo = loadAlertTickerInfo;
+window.displayAlertTickerInfo = displayAlertTickerInfo;
 // Note: saveAlert and deleteAlert removed - using ModalManagerV2 and confirmDeleteAlert instead

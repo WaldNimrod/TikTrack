@@ -404,6 +404,36 @@ async function loadTickerInfo(tickerId) {
   }
 }
 
+/**
+ * טעינת מידע על הטיקר (למודל החדש)
+ */
+async function loadTradePlanTickerInfo(tickerId) {
+  try {
+    window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "trade_plans" });
+    
+    // Get ticker data from API
+    const response = await fetch(`/api/tickers/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const tickers = data.data || data;
+    
+    // Find the specific ticker
+    const ticker = tickers.find(t => t.id == tickerId);
+    if (!ticker) {
+      throw new Error('Ticker not found');
+    }
+    
+    // Display ticker info
+    displayTradePlanTickerInfo(ticker);
+    
+  } catch (error) {
+    window.Logger.error('❌ Error loading ticker info:', error, { page: "trade_plans" });
+  }
+}
+
 async function displayTickerInfo(ticker) {
   const tickerInfo = document.getElementById('tickerInfo');
   const tickerPrice = document.getElementById('tickerPrice');
@@ -431,6 +461,80 @@ async function displayTickerInfo(ticker) {
     
     // Update form fields with calculated values
     await updateFormFieldsWithTickerData(ticker, currentPrice);
+  }
+}
+
+/**
+ * הצגת מידע על הטיקר (למודל החדש)
+ */
+function displayTradePlanTickerInfo(ticker) {
+  // Create or update ticker info display
+  let tickerInfoDiv = document.getElementById('tradePlanTickerInfo');
+  if (!tickerInfoDiv) {
+    // Create a new row for ticker info spanning full width
+    const tickerInfoRow = document.createElement('div');
+    tickerInfoRow.className = 'row';
+    tickerInfoRow.id = 'tradePlanTickerInfoRow';
+    
+    // Create column for ticker info - full width
+    const tickerInfoCol = document.createElement('div');
+    tickerInfoCol.className = 'col-12';
+    
+    tickerInfoDiv = document.createElement('div');
+    tickerInfoDiv.id = 'tradePlanTickerInfo';
+    tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
+    
+    tickerInfoCol.appendChild(tickerInfoDiv);
+    tickerInfoRow.appendChild(tickerInfoCol);
+    
+    // Insert after the ticker/account row
+    const tickerSelect = document.getElementById('tradePlanTicker');
+    if (tickerSelect) {
+      const tickerField = tickerSelect.closest('.mb-3');
+      if (tickerField && tickerField.parentNode) {
+        // Find the row containing the ticker field
+        const row = tickerField.closest('.row');
+        if (row && row.parentNode) {
+          row.parentNode.insertBefore(tickerInfoRow, row.nextSibling);
+        }
+      }
+    }
+  }
+  
+  // Use the new global renderTickerInfo function
+  if (window.renderTickerInfo) {
+    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+  } else {
+    // Fallback if renderTickerInfo not available
+    tickerInfoDiv.innerHTML = `
+      <div class="ticker-info-display">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}
+          </div>
+          <div class="col-md-6 text-end">
+            <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
+            <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+              ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </span>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12">
+            <small class="text-muted">
+              נפח: ${(ticker.volume || 0).toLocaleString()} | 
+              שינוי יומי: ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </small>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Set default entry price to current price if field exists
+  const entryPriceField = document.getElementById('tradePlanEntryPrice');
+  if (entryPriceField && ticker.current_price) {
+    entryPriceField.value = ticker.current_price;
   }
 }
 
@@ -1793,7 +1897,7 @@ function filterTradePlansData(filters) {
   // פילטור לפי חשבון מסחר
   if (filters.accounts && filters.accounts.length > 0) {
     filteredData = filteredData.filter(plan =>
-      filters.accounts.includes(plan.account_id),
+      filters.accounts.includes(plan.account?.id || plan.trading_account_id),
     );
   }
 
@@ -2781,6 +2885,7 @@ async function saveTradePlan() {
         }
         
         const tradePlanData = DataCollectionService.collectFormData({
+            trading_account_id: { id: 'tradePlanAccount', type: 'int' }, // Backend expects trading_account_id
             ticker_id: { id: 'tradePlanTicker', type: 'int' },
             name: { id: 'tradePlanName', type: 'text' },
             type: { id: 'tradePlanType', type: 'text' },
@@ -2795,6 +2900,13 @@ async function saveTradePlan() {
         
         // ולידציה מפורטת
         let hasErrors = false;
+        if (!tradePlanData.trading_account_id) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('tradePlanAccount', 'חשבון מסחר הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
         if (!tradePlanData.ticker_id) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanTicker', 'טיקר הוא שדה חובה');
@@ -2938,3 +3050,5 @@ async function performTradePlanDeletion(tradePlanId) {
 
 // Export functions to window for global access
 // Note: saveTradePlan already exported above
+window.loadTradePlanTickerInfo = loadTradePlanTickerInfo;
+window.displayTradePlanTickerInfo = displayTradePlanTickerInfo;

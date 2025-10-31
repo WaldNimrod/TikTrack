@@ -604,15 +604,15 @@ class ModalManagerV2 {
                 'industry': 'tickerIndustry'
             },
             'trade': {
-                'account_id': 'tradeAccount',
+                'trading_account_id': 'tradeAccount',
                 'ticker_id': 'tradeTicker',
                 'side': 'tradeSide',
                 'status': 'tradeStatus',
                 'notes': 'tradeNotes'
             },
             'trade_plan': {
+                'trading_account_id': 'tradePlanAccount',
                 'ticker_id': 'planTicker',
-                'account_id': 'planAccount',
                 'side': 'planSide',
                 'planned_amount': 'planAmount',
                 'stop_loss': 'planStopLoss',
@@ -976,6 +976,60 @@ class ModalManagerV2 {
                     const tickerId = e.target.value;
                     if (tickerId && window.loadExecutionTickerInfo) {
                         await window.loadExecutionTickerInfo(tickerId);
+                    }
+                });
+            }
+        }
+        
+        // For Trade Plans modal - handle ticker selection
+        if (modalId === 'tradePlansModal') {
+            const tickerSelect = modalElement.querySelector('#tradePlanTicker');
+            if (tickerSelect) {
+                // Remove existing listeners
+                const newTickerSelect = tickerSelect.cloneNode(true);
+                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Add change listener
+                newTickerSelect.addEventListener('change', async (e) => {
+                    const tickerId = e.target.value;
+                    if (tickerId && window.loadTradePlanTickerInfo) {
+                        await window.loadTradePlanTickerInfo(tickerId);
+                    }
+                });
+            }
+        }
+        
+        // For Trades modal - handle ticker selection
+        if (modalId === 'tradesModal') {
+            const tickerSelect = modalElement.querySelector('#tradeTicker');
+            if (tickerSelect) {
+                // Remove existing listeners
+                const newTickerSelect = tickerSelect.cloneNode(true);
+                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Add change listener
+                newTickerSelect.addEventListener('change', async (e) => {
+                    const tickerId = e.target.value;
+                    if (tickerId && window.loadTradeTickerInfo) {
+                        await window.loadTradeTickerInfo(tickerId);
+                    }
+                });
+            }
+        }
+        
+        // For Alerts modal - handle ticker selection
+        if (modalId === 'alertsModal') {
+            const tickerSelect = modalElement.querySelector('#alertTicker');
+            if (tickerSelect) {
+                // Remove existing listeners
+                const newTickerSelect = tickerSelect.cloneNode(true);
+                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Add change listener
+                newTickerSelect.addEventListener('change', async (e) => {
+                    const tickerId = e.target.value;
+                    if (tickerId && window.loadAlertTickerInfo) {
+                        await window.loadAlertTickerInfo(tickerId);
                     }
                 });
             }

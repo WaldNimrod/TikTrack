@@ -304,7 +304,7 @@ async function loadTradesData() {
     // עדכון הנתונים המקומיים - שימוש בשמות אחידים מה-API
     const localTradesData = apiData.map(trade => ({
       id: trade.id,
-      account_id: trade.account_id,
+      trading_account_id: trade.trading_account_id, // Backend uses trading_account_id
       account_name: trade.account_name,
       ticker_id: trade.ticker_id,
       ticker_symbol: trade.ticker_symbol,
@@ -379,6 +379,110 @@ async function loadTradesData() {
  * - Action buttons for edit, cancel, and delete operations
  * - Automatic row count updates
  */
+/**
+ * טעינת מידע על הטיקר (למודל החדש)
+ */
+async function loadTradeTickerInfo(tickerId) {
+  try {
+    window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "trades" });
+    
+    // Get ticker data from API
+    const response = await fetch(`/api/tickers/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const tickers = data.data || data;
+    
+    // Find the specific ticker
+    const ticker = tickers.find(t => t.id == tickerId);
+    if (!ticker) {
+      throw new Error('Ticker not found');
+    }
+    
+    // Display ticker info
+    displayTradeTickerInfo(ticker);
+    
+  } catch (error) {
+    window.Logger.error('❌ Error loading ticker info:', error, { page: "trades" });
+  }
+}
+
+/**
+ * הצגת מידע על הטיקר (למודל החדש)
+ */
+function displayTradeTickerInfo(ticker) {
+  // Create or update ticker info display
+  let tickerInfoDiv = document.getElementById('tradeTickerInfo');
+  if (!tickerInfoDiv) {
+    // Create a new row for ticker info spanning full width
+    const tickerInfoRow = document.createElement('div');
+    tickerInfoRow.className = 'row';
+    tickerInfoRow.id = 'tradeTickerInfoRow';
+    
+    // Create column for ticker info - full width
+    const tickerInfoCol = document.createElement('div');
+    tickerInfoCol.className = 'col-12';
+    
+    tickerInfoDiv = document.createElement('div');
+    tickerInfoDiv.id = 'tradeTickerInfo';
+    tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
+    
+    tickerInfoCol.appendChild(tickerInfoDiv);
+    tickerInfoRow.appendChild(tickerInfoCol);
+    
+    // Insert after the ticker/account row
+    const tickerSelect = document.getElementById('tradeTicker');
+    if (tickerSelect) {
+      const tickerField = tickerSelect.closest('.mb-3');
+      if (tickerField && tickerField.parentNode) {
+        // Find the row containing the ticker field
+        const row = tickerField.closest('.row');
+        if (row && row.parentNode) {
+          row.parentNode.insertBefore(tickerInfoRow, row.nextSibling);
+        }
+      }
+    }
+  }
+  
+  // Use the new global renderTickerInfo function
+  if (window.renderTickerInfo) {
+    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+  } else {
+    // Fallback if renderTickerInfo not available
+    tickerInfoDiv.innerHTML = `
+      <div class="ticker-info-display">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}
+          </div>
+          <div class="col-md-6 text-end">
+            <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
+            <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+              ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </span>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12">
+            <small class="text-muted">
+              נפח: ${(ticker.volume || 0).toLocaleString()} | 
+              שינוי יומי: ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </small>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Set default entry price to current price if field exists
+  const entryPriceField = document.getElementById('tradeEntryPrice');
+  if (entryPriceField && ticker.current_price) {
+    entryPriceField.value = ticker.current_price;
+  }
+}
+
 /**
  * טעינת נתוני טיקר עדכניים
  * Load current ticker data for trades
@@ -568,7 +672,7 @@ async function updateTradesTable(trades) {
         window.Logger.info('🔍 trades.js RESULT:', result, { page: "trades" });
         return result;
       })() : `<span class="text-danger">❌ FieldRendererService לא זמין</span>`) : '-'}</td>
-      <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון מסחר לא ידוע'}</a></strong></td>
+      <td><strong><a href="#" onclick="viewAccountDetails('${trade.trading_account_id}')" class="account-link">${trade.account_name || trade.trading_account_id || 'חשבון מסחר לא ידוע'}</a></strong></td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : ''}</td>
       <td class="actions-cell">
@@ -1084,6 +1188,8 @@ function editTrade(tradeId) {
 window.editTrade = editTrade;
 window.deleteTrade = deleteTrade;
 window.updateTrade = updateTrade;
+window.loadTradeTickerInfo = loadTradeTickerInfo;
+window.displayTradeTickerInfo = displayTradeTickerInfo;
 
 /**
  * Clear trade form validation
@@ -3021,7 +3127,7 @@ async function saveTrade() {
         
         const tradeData = DataCollectionService.collectFormData({
             ticker_id: { id: 'tradeTicker', type: 'int' },
-            account_id: { id: 'tradeAccount', type: 'int' },
+            trading_account_id: { id: 'tradeAccount', type: 'int' }, // Backend expects trading_account_id
             name: { id: 'tradeName', type: 'text' },
             type: { id: 'tradeType', type: 'text' },
             quantity: { id: 'tradeQuantity', type: 'int' },

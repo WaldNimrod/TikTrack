@@ -32,7 +32,8 @@ const tradesModalConfig = {
             label: 'חשבון מסחר',
             required: true,
             options: [], // יטען דינמית מ-API
-            placeholder: 'בחר חשבון מסחר...'
+            placeholder: 'בחר חשבון מסחר...',
+            defaultFromPreferences: true // ברירת מחדל מהעדפות
         },
         {
             type: 'text',

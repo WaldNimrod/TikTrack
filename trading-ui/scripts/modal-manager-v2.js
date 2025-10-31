@@ -142,7 +142,7 @@ class ModalManagerV2 {
                 <div class="modal-dialog modal-${config.size || 'lg'}">
                     <div class="modal-content">
                         <div class="modal-header modal-header-dynamic" 
-                             style="background: linear-gradient(135deg, var(--current-entity-color-light), var(--current-entity-color-dark))">
+                             style="background-color: var(--current-entity-color-light); border-bottom: 2px solid var(--current-entity-color)">
                             <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark)">${config.title.add || 'הוספת ישות'}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" 
                                     aria-label="סגור"></button>

@@ -237,52 +237,8 @@ def delete_user(user_id: int):
             'message': str(e)
         }), 500
 
-@users_bp.route('/<int:user_id>/preferences', methods=['GET'])
-def get_user_preferences(user_id: int):
-    """Get user preferences"""
-    try:
-        preferences = user_service.get_user_preferences(user_id)
-        return jsonify({
-            'status': 'success',
-            'data': preferences,
-            'count': len(preferences)
-        }), 200
-    except Exception as e:
-        logger.error(f"Error getting preferences for user {user_id}: {e}")
-        return jsonify({
-            'status': 'error',
-            'message': str(e)
-        }), 500
-
-@users_bp.route('/<int:user_id>/preferences', methods=['POST'])
-def set_user_preferences(user_id: int):
-    """Set user preferences"""
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({
-                'status': 'error',
-                'message': 'No preferences data provided'
-            }), 400
-        
-        success = user_service.set_user_preferences(user_id, data)
-        if success:
-            return jsonify({
-                'status': 'success',
-                'message': f'Preferences for user {user_id} updated successfully'
-            }), 200
-        else:
-            return jsonify({
-                'status': 'error',
-                'message': f'Failed to update preferences for user {user_id}'
-            }), 400
-            
-    except Exception as e:
-        logger.error(f"Error setting preferences for user {user_id}: {e}")
-        return jsonify({
-            'status': 'error',
-            'message': str(e)
-        }), 500
+# REMOVED: /api/users/<user_id>/preferences endpoints
+# Use /api/preferences/user instead (more robust with profiles support)
 
 @users_bp.route('/<int:user_id>/statistics', methods=['GET'])
 def get_user_statistics(user_id: int):

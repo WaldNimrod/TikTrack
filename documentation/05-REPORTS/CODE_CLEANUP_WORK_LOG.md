@@ -101,6 +101,7 @@
 | `executions.js` | 6 | ⏳ ממתין | - | - |
 | `trading_accounts.js` | 5 | ⏳ ממתין | - | - |
 | `cash_flows.js` | 4 | ✅ הושלם | 2.11.2025 | הוחלפו: toggleCashFlowsSection→toggleSection, updatePageSummaryStats→InfoSummarySystem, showAddCashFlowModal/showEditCashFlowModal→ModalManagerV2 |
+| `tickers.js` | 4 | ✅ הושלם | 2.11.2025 | הוחלפו: clearTickersCache→UnifiedCacheManager, toggleTickersSection→toggleSection, showAddTickerModal/showEditTickerModal→ModalManagerV2 |
 | `business-module.js` | 3 | ✅ הושלם | 2.11.2025 | הוחלפו: showAddTradeModal/showEditTradeModal→ModalManagerV2, showDateValidationError→showFieldError |
 | `trades.js` | 3 | ✅ הושלם | 2.11.2025 | הוחלפו: showAddTradeModal/showEditTradeModal→ModalManagerV2, showDateValidationError→showFieldError |
 | `alerts.js` | 3 | ✅ הושלם | 2.11.2025 | הוחלפו: showAddAlertModal/showEditAlertModal→ModalManagerV2, updatePageSummaryStats→InfoSummarySystem |
@@ -109,17 +110,15 @@
 | `data-advanced.js` | 2 | ✅ הושלם | 2.11.2025 | הוחלפו: isNumeric→window.isNumeric, clearUserPreferencesCache→UnifiedCacheManager |
 | `database.js` | 1 | ✅ הושלם | 2.11.2025 | הוחלף: formatDate→window.formatDate |
 | `data-basic.js` | 1 | ✅ הושלם | 2.11.2025 | הוחלף: sortTable→window.sortTableData |
-| `tickers.js` | 4 | ⏳ ממתין | - | - |
-| `business-module.js` | 4 | ⏳ ממתין | - | - |
-| `trades.js` | 3 | ⏳ ממתין | - | - |
-| `alerts.js` | 3 | ⏳ ממתין | - | - |
-| `notes.js` | 3 | ⏳ ממתין | - | - |
+| `ui-basic.js` | 9 | ✅ הושלם | 2.11.2025 | הוחלפו: enhancedTableRefresh, handleApiResponseWithRefresh, toggleTopSection, toggleAllSections, showModal, showSecondConfirmationModal, viewLinkedItems, showFieldError, showFieldSuccess |
+| `executions.js` | 5 | ✅ הושלם | 2.11.2025 | הוחלפו: showExecutionLinkedItemsModal→viewLinkedItems, toggleTickersSection/toggleExecutionsSection→toggleSection, showAddExecutionModal/showEditExecutionModal→ModalManagerV2 |
+| `trading_accounts.js` | 5 | ✅ הושלם | 2.11.2025 | הוחלפו: showSuccessMessage/showErrorMessage→notification-system, sortTable→sortTableData, showAddTradingAccountModal/showEditTradingAccountModal→ModalManagerV2 |
 | `trade_plans.js` | 2 | ⏳ ממתין | - | - |
 | `data-advanced.js` | 2 | ⏳ ממתין | - | - |
 | `database.js` | 1 | ⏳ ממתין | - | - |
 | `data-basic.js` | 1 | ⏳ ממתין | - | - |
 
-**סה"כ טופל**: 1 / 14 קבצים (4 פונקציות)
+**סה"כ טופל**: 13 / 14 קבצים (~45 פונקציות) ✅ **הושלם מלבד core-systems.js (נדחה)**
 
 ---
 

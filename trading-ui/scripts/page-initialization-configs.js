@@ -419,7 +419,10 @@ const PAGE_CONFIGS = {
                 // Load user preferences first
                 if (typeof window.loadUserPreferences === 'function') {
                     window.Logger.info('⚙️ Loading user preferences for Executions...', { page: "page-initialization-configs" });
-                    await window.loadUserPreferences();
+                    const prefs = await window.loadUserPreferences();
+                    console.log('🧪 loadUserPreferences returned:', prefs);
+                } else {
+                    console.warn('⚠️ loadUserPreferences not available!');
                 }
                 
                 if (typeof window.loadExecutionsData === 'function') {

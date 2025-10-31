@@ -1599,6 +1599,7 @@ async function loadExecutionsData() {
     if (response.ok) {
       const data = await response.json();
       executionsData = data.data || data;
+      window.executionsData = executionsData; // עדכון הנתונים הגלובליים
       // נטענו עסקעות
 
       // בדיקה אם יש פילטרים פעילים

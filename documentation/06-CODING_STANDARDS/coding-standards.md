@@ -3,6 +3,44 @@
 ## Overview
 סטנדרטי קוד אחידים לכל מערכת TikTrack - JavaScript, HTML, CSS.
 
+## 🚨 Rule #1 - Use Existing General Systems (CRITICAL)
+**לפני כל כתיבת פונקציה או קוד מקומי - חובה לבדוק היטב אם קיים קוד כללי במערכת.**
+
+### כללים מחייבים:
+1. **בדיקה ראשונית חובה**: לפני כתיבת כל פונקציה מקומית - יש לחפש קודם אם קיים קוד כללי
+2. **עדיפות למערכות כלליות**: רוב הלוגיקה נמצא במערכות כלליות - יש להשתמש בהן תמיד לפני כתיבת קוד מקומי
+3. **התייחסות לתיעוד**: יש לבדוק את המקורות הבאים:
+   - **רשימת מערכות כלליות**: [`documentation/frontend/GENERAL_SYSTEMS_LIST.md`](../../frontend/GENERAL_SYSTEMS_LIST.md) - רשימה מלאה של כל המערכות הכלליות במערכת
+   - **מניפסט חבילות**: `trading-ui/scripts/init-system/package-manifest.js` - רשימת חבילות טעינה ומערכות
+   - **אינדקס תיעוד**: `documentation/INDEX.md` - אינדקס מלא של כל התיעוד
+4. **רק אם חסר**: יש לכתוב קוד מקומי רק אם לאחר חיפוש יסודי לא נמצאה מערכת כללית
+
+### דוגמאות למערכות כלליות:
+- `FieldRendererService` - לרנדור סטטוסים, סוגים, סכומים, צדדים
+- `checkLinkedItemsBeforeAction()` - לבדיקת פריטים מקושרים לפני מחיקה/ביטול
+- `updatePageSummaryStats()` - לעדכון סטטיסטיקות עמוד (ב-ui-utils.js)
+- `ModalManagerV2` - לניהול מודלים
+- `CRUDResponseHandler` - לטיפול בפעולות CRUD
+
+### דוגמה לעבירה (שגוי):
+```javascript
+// ❌ אסור: כתיבת פונקציה מקומית בלי לבדוק מערכות כלליות
+function getStatusClassForTradePlan(status) {
+  switch (status) {
+    case 'open': return 'status-open';
+    // ...
+  }
+}
+```
+
+### גישה נכונה (נכון):
+```javascript
+// ✅ נכון: שימוש במערכת כללית קיימת
+window.FieldRendererService.renderStatus(design.status, 'trade_plan')
+```
+
+**חוק זה הוא כללי יסוד שכל מפתח חייב לעמוד בו.**
+
 ## 📋 Table of Contents
 1. [JavaScript Standards](#javascript-standards)
 2. [HTML Standards](#html-standards)

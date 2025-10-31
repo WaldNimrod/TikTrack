@@ -186,16 +186,44 @@
 
 ## 🎨 **מערכות ממשק משתמש**
 
-### **UI Utilities**
+### **UI Utilities** 🔵 **חבילת CRUD**
 - **קובץ:** `ui-utils.js`
 - **תיאור:** כלי עזר לממשק משתמש
 - **דוקומנטציה:** [JAVASCRIPT_ARCHITECTURE.md](JAVASCRIPT_ARCHITECTURE.md#ui-utilities)
 - **פונקציות עיקריות:**
-  - `toggleSection()`
+  - `toggleSection()` ✅ **מערכת כללית - יש להשתמש במקום פונקציות מקומיות**
   - `toggleAllSections()`
   - `restoreSectionStates()`
   - `enhancedTableRefresh()`
   - `handleApiResponseWithRefresh()`
+
+### **Modal Manager V2** 🔵 **חבילת CRUD** 🟢 **חבילת בסיס**
+- **קובץ:** `modal-manager-v2.js`
+- **תיאור:** מערכת ניהול מודלים מאוחדת לכל פעולות CRUD
+- **דוקומנטציה:** [MODAL_SYSTEM_V2.md](../02-ARCHITECTURE/FRONTEND/MODAL_SYSTEM_V2.md)
+- **פונקציות עיקריות:**
+  - `window.ModalManagerV2.showModal(modalId, mode)` ✅ **יש להשתמש במקום פונקציות מקומיות `showAdd*Modal`**
+  - `window.ModalManagerV2.showEditModal(modalId, entityType, entityId)` ✅ **יש להשתמש במקום פונקציות מקומיות `showEdit*Modal`**
+  - תמיכה מלאה ב-CRUD operations, validation, ועוד
+
+### **Info Summary System** 📊 **חבילת גרפים ותצוגה**
+- **קובץ:** `services/statistics-calculator.js` (InfoSummarySystem)
+- **תיאור:** מערכת סיכום נתונים מאוחדת לכל עמודי המשתמש
+- **דוקומנטציה:** [INFO_SUMMARY_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/INFO_SUMMARY_SYSTEM.md)
+- **פונקציות עיקריות:**
+  - `window.InfoSummarySystem.calculateAndRender(data, config)` ✅ **יש להשתמש במקום פונקציות מקומיות `updatePageSummaryStats`**
+  - תמיכה במחשבונים מובנים (count, sum, avg, min, max)
+  - תמיכה בפרמטרים דינמיים וסטטיסטיקות משניות
+
+### **Validation Utilities** 🔵 **חבילת CRUD**
+- **קובץ:** `validation-utils.js` (או `modules/ui-basic.js` - בהתאם לגרסה)
+- **תיאור:** מערכת ולידציה מאוחדת לכל הטפסים
+- **דוקומנטציה:** [VALIDATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/VALIDATION_SYSTEM.md), [STANDARD_VALIDATION_GUIDE.md](../03-DEVELOPMENT/GUIDELINES/STANDARD_VALIDATION_GUIDE.md)
+- **פונקציות עיקריות:**
+  - `window.showFieldError(field, message)` ✅ **יש להשתמש במקום פונקציות מקומיות לוולידציה**
+  - `window.showFieldSuccess(field)`
+  - `window.clearFieldError(field)`
+  - `window.validateEntityForm(formId, rules)`
 
 ### **Header System** 🎨 **חבילת ממשק משתמש מתקדם** 🔍 **חבילת פילטרים**
 - **קובץ:** `header-system.js`

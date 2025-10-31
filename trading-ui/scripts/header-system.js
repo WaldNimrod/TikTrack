@@ -1987,6 +1987,15 @@ function setupHoverBehavior() {
       // Remove existing click handlers
       button.removeAttribute('data-onclick');
       
+      // Prevent click events from triggering toggle actions
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        console.log(`🚫 Click prevented on ${buttonId}`);
+        return false;
+      }, true); // Use capture phase to catch before other handlers
+      
       // Add hover events
       button.addEventListener('mouseenter', () => {
         // Clear any existing timeout

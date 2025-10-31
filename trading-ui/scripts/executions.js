@@ -894,7 +894,7 @@ async function saveExecution() {
       action: type,
       quantity: parseInt(quantity),
       price: parseFloat(price),
-      date: executionDate ? new Date(executionDate).toISOString() : null,
+      date: executionDate, // Already converted to ISO string by DataCollectionService
       fee: commission ? parseFloat(commission) : null,
       source: 'manual',
       notes: notes || null,

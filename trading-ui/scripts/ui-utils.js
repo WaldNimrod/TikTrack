@@ -1385,7 +1385,7 @@ window.loadTableActionButtons = loadTableActionButtons;
 
 // Export demo functions for testing
 window.viewTickerDetails = viewTickerDetails;
-window.viewLinkedItems = viewLinkedItems;
+// REMOVED: window.viewLinkedItems demo - use window.viewLinkedItems from linked-items.js instead
 window.editTicker = editTicker;
 window.cancelTicker = cancelTicker;
 window.restoreTicker = restoreTicker;

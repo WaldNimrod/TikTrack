@@ -1131,9 +1131,7 @@ function viewTickerDetails(entityType, id) {
     window.showInfoNotification(`🔍 פונקציה: viewTickerDetails - פרמטרים: entityType='${entityType}', id=${id}`);
 }
 
-function viewLinkedItems(entityType, id) {
-    window.showInfoNotification(`🔗 פונקציה: viewLinkedItems - פרמטרים: entityType='${entityType}', id=${id}`);
-}
+// REMOVED: viewLinkedItems demo function - use window.viewLinkedItems from linked-items.js directly
 
 function editTicker(entityType, id) {
     window.showInfoNotification(`✏️ פונקציה: editTicker - פרמטרים: entityType='${entityType}', id=${id}`);

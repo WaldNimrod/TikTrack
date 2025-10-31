@@ -2138,7 +2138,7 @@ function showEditNoteModal(noteId) {
 // REMOVED: window exports for removed functions
 window.editNote = editNote;
 // Note: deleteNote and saveNote removed - using ModalManagerV2 and confirmDeleteNote instead
-window.viewLinkedItems = viewLinkedItems;
+// REMOVED: window.viewLinkedItems - use window.viewLinkedItems or window.viewLinkedItemsForNote from linked-items.js instead
 window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (שורה 2240)', { page: "notes" });
 // ייצוא ישיר של הפונקציה המקורית - ללא wrapper כדי למנוע רקורסיה
 window.updateNotesTable = updateNotesTable;

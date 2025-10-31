@@ -1208,7 +1208,7 @@ window.cancelTradingAccount = cancelTradingAccount;
 window.deleteTradingAccount = deleteTradingAccount;
 window.showTradingAccountSuccessMessage = showSuccessMessage;
 window.showTradingAccountErrorMessage = showErrorMessage;
-window.showSecondConfirmationModal = showSecondConfirmationModal;
+// REMOVED: window.showSecondConfirmationModal - use window.showSecondConfirmationModal from ui-utils.js or window.showConfirmationDialog directly
 window.confirmDeleteTradingAccount = confirmDeleteTradingAccount;
 // window.checkLinkedItems = checkLinkedItems; // הוסר - הוחלף ב-checkLinkedItemsBeforeDelete
 window.showOpenTradesWarning = showOpenTradesWarning;

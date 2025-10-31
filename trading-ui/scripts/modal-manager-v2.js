@@ -368,7 +368,7 @@ class ModalManagerV2 {
             
             // Apply remaining defaults after modal shows (date, source, etc.)
             if (mode === 'add') {
-                this.applyRemainingDefaults(modalElement.querySelector('form'));
+                await this.applyRemainingDefaults(modalElement.querySelector('form'));
             }
             
             // עדכון מצב
@@ -628,7 +628,7 @@ class ModalManagerV2 {
      * Apply remaining defaults (non-select fields only)
      * SelectPopulatorService handles account/currency defaults
      */
-    applyRemainingDefaults(form) {
+    async applyRemainingDefaults(form) {
         if (!form) return;
         
         // Get modal config
@@ -638,12 +638,12 @@ class ModalManagerV2 {
         
         // Apply defaults from config
         if (config && config.fields) {
-            config.fields.forEach(field => {
+            for (const field of config.fields) {
                 const fieldElement = form.querySelector(`#${field.id}`);
-                if (!fieldElement) return;
+                if (!fieldElement) continue;
                 
                 // Skip if field already has a value
-                if (fieldElement.value) return;
+                if (fieldElement.value) continue;
                 
                 // For select fields with defaultFromPreferences, let SelectPopulatorService handle it
                 // BUT we still need to handle other select fields (like executionCommission which is an INPUT)
@@ -652,21 +652,21 @@ class ModalManagerV2 {
                     // BUT only if it doesn't have defaultFromPreferences in config
                     if (field.defaultFromPreferences) {
                         console.log(`⏭️ Skipping ${field.id} - will be handled by SelectPopulatorService`);
-                        return;
+                        continue;
                     }
                     
                     // Skip cashFlowAccount and cashFlowCurrency (always handled by SelectPopulatorService)
                     if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency') {
-                        return;
+                        continue;
                     }
                     
                     // Apply defaultValue for other select fields (e.g., source)
                     if (field.defaultValue !== undefined && field.defaultValue !== null) {
                         fieldElement.value = field.defaultValue;
                         console.log(`Applied default value for ${field.id}:`, field.defaultValue);
-                        return;
+                        continue;
                     }
-                    return;
+                    continue;
                 }
                 
                 // Apply defaultFromPreferences first (before defaultValue)
@@ -676,12 +676,12 @@ class ModalManagerV2 {
                         const prefName = this._getPreferenceNameForField(field.id);
                         console.log(`🔍 Mapped field ${field.id} to preference: ${prefName}`);
                         if (prefName) {
-                            const prefValue = window.getPreferenceFromMemory(prefName);
+                            const prefValue = await window.getPreferenceFromMemory(prefName);
                             console.log(`🔍 Retrieved preference value for ${prefName}:`, prefValue);
                             if (prefValue !== null && prefValue !== undefined) {
                                 fieldElement.value = prefValue;
                                 console.log(`✅ Applied preference default for ${field.id} (${prefName}):`, prefValue);
-                                return;
+                                continue;
                             } else {
                                 console.log(`⚠️ No preference value found for ${prefName}`);
                             }
@@ -697,7 +697,7 @@ class ModalManagerV2 {
                 if (field.defaultValue !== undefined && field.defaultValue !== null) {
                     fieldElement.value = field.defaultValue;
                     console.log(`Applied default value for ${field.id}:`, field.defaultValue);
-                    return;
+                    continue;
                 }
                 
                 // Apply defaultTime if field is date
@@ -705,20 +705,20 @@ class ModalManagerV2 {
                     const today = new Date();
                     fieldElement.value = today.toISOString().slice(0, 10);
                     console.log(`Applied default date for ${field.id}`);
-                    return;
+                    continue;
                 }
-            });
+            }
         }
     }
     
     /**
      * Legacy method - kept for backward compatibility (resetForm)
      */
-    applyDefaultValues(form) {
+    async applyDefaultValues(form) {
         if (!form) return;
         
         // This is now just a wrapper for applyRemainingDefaults
-        this.applyRemainingDefaults(form);
+        await this.applyRemainingDefaults(form);
     }
     
     /**

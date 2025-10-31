@@ -5,15 +5,13 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 68
+ * Total Functions: 61
  * 
  * PAGE INITIALIZATION (2)
  * - setupModalConfigurations() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
  * - setupExecutionsFilterFunctions() - setupExecutionsFilterFunctions function
  * 
- * DATA LOADING (8)
- * - loadLinkedItemsDetails() - loadLinkedItemsDetails function
- * - loadLinkedItemsFromMultipleSources() - * טעינת פרטי הפריטים המקושרים
+ * DATA LOADING (6)
  * - loadExecutionsData() - * מעבר להתראה ספציפית
  * - loadTickersWithOpenOrClosedTradesAndPlans() - * הגדרת תצורות מודלים
  * - loadActiveTradesForTicker() - * הפעלה/השבתה של שדה מזהה חיצוני לפי בחירת מקור
@@ -21,13 +19,11 @@
  * - loadTradeExecutions() - * מעבר לטרייד המקושר
  * - loadTickersSummaryData() - loadTickersSummaryData function
  * 
- * DATA MANIPULATION (21)
+ * DATA MANIPULATION (19)
  * - addExecution() - addExecution function
  * - updateRealizedPLField() - updateRealizedPLField function
- * - saveExecution() - * הצגת שגיאת שדה
- * - updateExecutionWrapper() - updateExecutionWrapper function
+ * - updateExecutionWrapper() - * הצגת שגיאת שדה
  * - updateExecutionsTableMain() - updateExecutionsTableMain function
- * - updateExecution() - updateExecution function
  * - updateTradesOnCheckboxChange() - updateTradesOnCheckboxChange function
  * - updateTradesOnTickerChange() - updateTradesOnTickerChange function
  * - addNewTicker() - * Show ticker help
@@ -44,14 +40,12 @@
  * - showAddExecutionModal() - showAddExecutionModal function
  * - deleteExecution() - * Show add execution modal
  * 
- * EVENT HANDLING (21)
+ * EVENT HANDLING (19)
  * - editExecution() - editExecution function
  * - resetExecutionForm() - resetExecutionForm function
  * - fillEditExecutionForm() - * הצגת מודל עריכת עסקה
- * - validateExecutionTradeId() - validateExecutionTradeId function
  * - showExecutionLinkedItemsModal() - showExecutionLinkedItemsModal function
  * - goToNote() - * מעבר לתכנון ספציפי
- * - clearNewExecutionHighlights() - clearNewExecutionHighlights function
  * - filterExecutionsLocally() - filterExecutionsLocally function
  * - toggleExecutionFormFields() - toggleExecutionFormFields function
  * - enableExecutionFormFields() - * הפעלה/השבתה של שדות הטופס
@@ -67,17 +61,16 @@
  * - showEditExecutionModal() - * Show add execution modal
  * - performExecutionDeletion() - performExecutionDeletion function
  * 
- * UI UPDATES (3)
- * - displayLinkedItems() - displayLinkedItems function
+ * UI UPDATES (2)
  * - displayLinkedItems() - displayLinkedItems function
  * - showTickerHelp() - * מעבר לדף טיקר (בפיתוח)
  * 
  * OTHER (13)
  * - clearFieldError() - clearFieldError function
- * - goToTrade() - * Display linked items for execution
+ * - goToTrade() - goToTrade function
  * - goToPlan() - * מעבר לטרייד ספציפי
  * - goToAlert() - * מעבר לטרייד ספציפי
- * - isDateInRange() - * ניקוי צביעת רשומות חדשות
+ * - isDateInRange() - isDateInRange function
  * - restoreSortState() - restoreSortState function
  * - enableAllFields() - enableAllFields function
  * - goToTickerPage() - * עדכון טריידים כאשר הטיקר משתנה
@@ -533,47 +526,7 @@ async function fillEditExecutionForm(execution, linkedObject, tickerId) {
 // ========================================
 
 
-/**
- * ולידציה של מזהה טרייד
- */
-function validateExecutionTradeId(input) {
-  try {
-  const selectedValue = input.value.trim();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  if (!selectedValue) {
-    // סימון השדה כשגוי
-    input.classList.add('is-invalid');
-    if (errorElement) {
-      errorElement.textContent = 'בחירת טרייד או תכנון היא שדה חובה';
-      errorElement.style.display = 'block';
-    }
-    return false;
-  }
-
-  // בדיקה שהערך הוא מספר חיובי
-  const numId = parseInt(selectedValue);
-  if (isNaN(numId) || numId < 0) {
-    // סימון השדה כשגוי
-    input.classList.add('is-invalid');
-    if (errorElement) {
-      errorElement.textContent = 'מזהה טרייד חייב להיות מספר חיובי';
-      errorElement.style.display = 'block';
-    }
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בוולידציה של מזהה טרייד:', error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בוולידציה של מזהה טרייד', error.message);
-    }
-    return false;
-  }
-}
+// REMOVED: validateExecutionTradeId - deprecated, use window.validateField() instead
 
 // REMOVED: Deprecated validation functions - use window.validateField() instead
 // - validateExecutionQuantity
@@ -620,109 +573,7 @@ function clearFieldError(input, errorElement) {
 // פונקציות שמירה ועדכון
 // ========================================
 
-/**
- * שמירת עסקה חדשה
- */
-async function saveExecution() {
-  
-  // ניקוי מטמון לפני פעולת CRUD
-  
-  // איסוף נתונים מהטופס (ModalManagerV2 uses executionTicker, executionAccount, etc.)
-  const executionData = DataCollectionService.collectFormData({
-    ticker_id: { id: 'executionTicker', type: 'int' },
-    trading_account_id: { id: 'executionAccount', type: 'int' },
-    trade_id: { id: 'executionTradePlanId', type: 'int' }, // Optional linked trade
-    action: { id: 'executionType', type: 'text' },
-    quantity: { id: 'executionQuantity', type: 'int' },
-    price: { id: 'executionPrice', type: 'number' },
-    date: { id: 'executionDate', type: 'date' },
-    fee: { id: 'executionCommission', type: 'number' },
-    notes: { id: 'executionNotes', type: 'text' },
-    source: { id: 'executionSource', type: 'text', default: 'manual' },
-    realized_pl: { id: 'executionRealizedPL', type: 'int' },
-    mtm_pl: { id: 'executionMTMPL', type: 'int' }
-  });
-
-  const tradeIdValue = executionData.trade_id;
-  const type = executionData.action;
-  const quantity = executionData.quantity;
-  const price = executionData.price;
-  const executionDate = executionData.date;
-  const commission = executionData.fee;
-  const notes = executionData.notes;
-
-  // ולידציה - משתמש במערכת הכללית window.validateEntityForm
-
-  // בדיקת ערך action
-  if (!type || type !== 'buy' && type !== 'sale') {
-    handleValidationError('executionType', 'יש לבחור פעולה תקינה (קניה או מכירה)');
-    return;
-  }
-
-  // עיבוד ערך trade_id - עכשיו זה מספר ישיר
-  let tradeId = null;
-  if (tradeIdValue) {
-    tradeId = parseInt(tradeIdValue);
-    if (isNaN(tradeId) || tradeId < 0) {
-      handleValidationError('executionTradePlanId', 'מזהה טרייד לא תקין');
-      return;
-    }
-  }
-
-  try {
-    // Handle realized_pl: NULL for buy, required for sell
-    let realizedPL = null;
-    if (type === 'sell' || type === 'sale') {
-      realizedPL = executionData.realized_pl !== null && executionData.realized_pl !== undefined 
-        ? parseInt(executionData.realized_pl) : null;
-      if (realizedPL === null) {
-        handleValidationError('executionRealizedPL', 'Realized P/L חובה במכירה');
-        return;
-      }
-    } else if (type === 'buy') {
-      realizedPL = null;  // Always NULL for buy
-    }
-
-    const executionPayload = {
-      ticker_id: executionData.ticker_id,
-      trading_account_id: executionData.trading_account_id,
-      trade_id: tradeId,
-      action: type,
-      quantity: parseInt(quantity),
-      price: parseFloat(price),
-      date: executionDate, // Already converted to ISO string by DataCollectionService
-      fee: commission ? parseFloat(commission) : null,
-      source: 'manual',
-      notes: notes || null,
-      realized_pl: realizedPL,
-      mtm_pl: executionData.mtm_pl !== null && executionData.mtm_pl !== undefined 
-        ? parseInt(executionData.mtm_pl) : null
-    };
-
-    console.log('📦 Sending execution payload:', executionPayload);
-
-    const response = await fetch('/api/executions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(executionPayload),
-    });
-
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: 'executionsModal',
-      successMessage: 'ביצוע נשמר בהצלחה!',
-      apiUrl: '/api/executions/',
-      entityName: 'ביצוע',
-      reloadFn: window.loadExecutionsData,
-      requiresHardReload: false
-    });
-
-  } catch (error) {
-    CRUDResponseHandler.handleError(error, 'שמירת עסקה');
-  }
-}
+// REMOVED: saveExecution - unused function, replaced by general CRUD system
 
 /**
  * עדכון עסקה קיימת
@@ -934,118 +785,8 @@ async function showExecutionLinkedItemsModal(executionId, _errorData) {
   }
 }
 
-/**
- * טעינת פרטי הפריטים המקושרים
- */
-async function loadLinkedItemsDetails(executionId, _errorData = null) {
-
-
-  const contentDiv = document.getElementById('linkedItemsContent');
-  contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><br>טוען פרטים...</div>';
-
-  try {
-    // קריאה ל-API לקבלת פרטי הפריטים המקושרים
-    const response = await fetch(`/api/executions/${executionId}/linked-items`);
-
-    if (response.ok) {
-      const data = await response.json();
-
-      displayLinkedItems(data.data);
-    } else {
-
-      // אם אין API ספציפי, ננסה לטעון מכל ה-APIs
-      await loadLinkedItemsFromMultipleSources(executionId);
-    }
-
-  } catch (error) {
-    handleApiError(error, 'פריטים מקושרים');
-    // אם יש שגיאה, ננסה לטעון מכל ה-APIs
-    await loadLinkedItemsFromMultipleSources(executionId);
-  }
-}
-
-/**
- * טעינת פריטים מקושרים ממקורות מרובים
- */
-async function loadLinkedItemsFromMultipleSources(executionId) {
-
-
-  const execution = executionsData.find(e => e.id === executionId);
-  if (!execution) {return;}
-
-  const linkedItems = {
-    trades: [],
-    trade_plans: [],
-    alerts: [],
-    notes: [],
-  };
-
-  try {
-    // טעינת טריידים
-    try {
-      const tradesResponse = await fetch('/api/trades/');
-      if (tradesResponse.ok) {
-        const linkedTradesData = await tradesResponse.json();
-        const trades = linkedTradesData.data || linkedTradesData || [];
-        linkedItems.trades = trades.filter(trade =>
-          trade.id === execution.trade_id,
-        );
-      }
-    } catch (e) { 
-      window.Logger.warn('לא ניתן לטעון טריידים:', e, { page: "executions" }); 
-    }
-
-    // טעינת תכנונים
-    try {
-      const plansResponse = await fetch('/api/trade_plans/');
-      if (plansResponse.ok) {
-        const plansData = await plansResponse.json();
-        const plans = plansData.data || plansData || [];
-        linkedItems.trade_plans = plans.filter(plan =>
-          plan.trade_id === execution.trade_id,
-        );
-      }
-    } catch (e) { 
-      window.Logger.warn('לא ניתן לטעון תכנונים:', e, { page: "executions" }); 
-    }
-
-    // טעינת התראות
-    try {
-      const alertsResponse = await fetch('/api/alerts/');
-      if (alertsResponse.ok) {
-        const alertsData = await alertsResponse.json();
-        const alerts = alertsData.data || alertsData || [];
-        linkedItems.alerts = alerts.filter(alert =>
-          alert.related_type_id === 5 && alert.related_id === executionId &&
-                    alert.status === 'open',
-        );
-      }
-    } catch (e) { 
-      window.Logger.warn('לא ניתן לטעון התראות:', e, { page: "executions" }); 
-    }
-
-    // טעינת הערות
-    try {
-      const notesResponse = await fetch('/api/notes/');
-      if (notesResponse.ok) {
-        const notesData = await notesResponse.json();
-        const notes = notesData.data || notesData || [];
-        linkedItems.notes = notes.filter(note =>
-          note.related_type_id === 5 && note.related_id === executionId,
-        );
-      }
-    } catch (e) { 
-      window.Logger.warn('לא ניתן לטעון הערות:', e, { page: "executions" }); 
-    }
-
-    displayLinkedItems(linkedItems);
-
-  } catch (error) {
-    handleApiError(error, 'פריטים מקושרים');
-    document.getElementById('linkedItemsContent').innerHTML =
-            '<div class="alert alert-danger">שגיאה בטעינת פרטי הפריטים המקושרים</div>';
-  }
-}
+// REMOVED: loadLinkedItemsDetails and loadLinkedItemsFromMultipleSources - unused functions
+// Use viewLinkedItemsForExecution from linked-items.js instead
 
 /**
  * הצגת הפריטים המקושרים
@@ -1243,29 +984,7 @@ function displayLinkedItems(linkedItems) {
 // ===== UI MANAGEMENT FUNCTIONS =====
 // UI interactions, linked items, and navigation
 
-/**
- * Display linked items for execution
- * Shows modal with related items
- * 
- * @function displayLinkedItems
- * @param {number} executionId - ID of the execution
- * @returns {void}
- */
-function displayLinkedItems(executionId) {
-  try {
-  // סגירת המודל
-  const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsModal'));
-  modal.hide();
-
-  // מעבר לדף הניהול הרלוונטי (לפי הפריט הראשון שנמצא)
-  window.location.href = '/trade_plans'; // ברירת מחדל - דף תכנון
-  } catch (error) {
-    window.Logger.error('שגיאה במעבר לפריטים מקושרים:', error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה במעבר לפריטים מקושרים', error.message);
-    }
-  }
-}
+// REMOVED: displayLinkedItems(executionId) - duplicate function (there's another displayLinkedItems(linkedItems) that's used)
 
 /**
  * מעבר לטרייד ספציפי
@@ -1669,23 +1388,7 @@ async function updateExecutionsTableMain(executions) {
   // === END UPDATE EXECUTIONS TABLE ===
 }
 
-/**
- * ניקוי צביעת רשומות חדשות
- */
-function clearNewExecutionHighlights() {
-  const highlightedRows = document.querySelectorAll('.execution-row.newly-added');
-  highlightedRows.forEach(row => {
-    row.classList.remove('newly-added');
-  });
-  
-  // הסתרת כפתור הניקוי
-  const clearBtn = document.getElementById('clearHighlightsBtn');
-  if (clearBtn) {
-    clearBtn.style.display = 'none';
-  }
-  
-  console.log(`🧹 Cleared highlights from ${highlightedRows.length} rows`);
-}
+// REMOVED: clearNewExecutionHighlights - unused function
 
 // פונקציה formatDate מוגדרת בקובץ main.js
 
@@ -1882,43 +1585,13 @@ window.editExecution = editExecution;
 // window.showAddExecutionModal = showAddExecutionModal; // הועבר למערכת הכללית
 window.showEditExecutionModal = showEditExecutionModal;
 // window.showDeleteExecutionModal = showDeleteExecutionModal; // הוסר - שימוש במערכת הגלובלית
-window.saveExecution = saveExecution;
+// REMOVED: window.saveExecution - function removed
 
-/**
- * עדכון ביצוע - פונקציה גלובלית
- */
-function updateExecution() {
-  try {
-    // קריאה לפונקציה הראשית
-    updateExecutionWrapper();
-  } catch (error) {
-    window.Logger.error('שגיאה בעדכון עסקה:', error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעדכון עסקה', error.message);
-    }
-  }
-}
-
-window.updateExecution = updateExecution;
+// REMOVED: updateExecution - unused wrapper, use updateExecutionWrapper directly
 window.confirmDeleteExecution = confirmDeleteExecution;
 
-// פונקציות ולידציה
-window.validateExecutionTradeId = validateExecutionTradeId;
-window.validateExecutionQuantity = validateExecutionQuantity;
-window.validateExecutionPrice = validateExecutionPrice;
-window.validateExecutionCommission = validateExecutionCommission;
-window.validateExecutionType = validateExecutionType;
-window.validateExecutionSource = validateExecutionSource;
-window.validateExecutionNotes = validateExecutionNotes;
-
-
-window.validateExecutionExternalId = validateExecutionExternalId;
-window.validateExecutionDate = validateExecutionDate;
-
-// פונקציות מודל פריטים מקושרים
-window.showExecutionLinkedItemsModal = showExecutionLinkedItemsModal;
-window.loadLinkedItemsDetails = loadLinkedItemsDetails;
-window.displayLinkedItems = displayLinkedItems;
+// REMOVED: window exports for removed validation functions
+// REMOVED: window exports for removed linked items functions
 window.goToTrade = goToTrade;
 window.goToPlan = goToPlan;
 window.goToAlert = goToAlert;
@@ -2886,7 +2559,7 @@ window.unlinkExecution = unlinkExecution;
 window.addExecution = addExecution;
 window.editExecution = editExecution;
 window.deleteExecution = deleteExecution;
-window.updateExecution = updateExecution;
+// REMOVED: window.updateExecution - function removed
 window.validateExecutionDate = validateExecutionDate;
 window.validateExecutionType = validateExecutionType;
 window.clearFieldError = clearFieldError;

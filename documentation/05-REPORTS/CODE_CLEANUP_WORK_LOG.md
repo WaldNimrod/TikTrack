@@ -85,11 +85,33 @@
 
 ---
 
-## Phase 3: תכנון החלפה בפונקציות כלליות (78 פונקציות)
+## Phase 3: החלפה בפונקציות כלליות (78 פונקציות)
 
 ### סטטוס
-- ⏳ ממתין ל-Phase 1-2
-- דוח תכנון: `documentation/05-REPORTS/CODE_CLEANUP_REPLACEMENT_PLAN.md` (יעודו ב-Phase 3)
+- 🔄 בעבודה - החל מ-2 בנובמבר 2025
+- דוח תכנון: `documentation/05-REPORTS/PHASE3_WORK_APPROACH_COMPARISON.md`
+- גישה נבחרה: גישה C (לפי קבצים) עם קיבוץ לפי מערכת בקבצים גדולים
+
+### סדר עבודה (לפי כמות פונקציות - גדול → קטן):
+
+| קובץ | פונקציות | סטטוס | תאריך | הערות |
+|------|-----------|-------|-------|-------|
+| `core-systems.js` | 27 | ⏳ ממתין | - | - |
+| `ui-basic.js` | 13 | ⏳ ממתין | - | - |
+| `executions.js` | 6 | ⏳ ממתין | - | - |
+| `trading_accounts.js` | 5 | ⏳ ממתין | - | - |
+| `cash_flows.js` | 4 | ✅ הושלם | 2.11.2025 | הוחלפו: toggleCashFlowsSection→toggleSection, updatePageSummaryStats→InfoSummarySystem, showAddCashFlowModal/showEditCashFlowModal→ModalManagerV2 |
+| `tickers.js` | 4 | ⏳ ממתין | - | - |
+| `business-module.js` | 4 | ⏳ ממתין | - | - |
+| `trades.js` | 3 | ⏳ ממתין | - | - |
+| `alerts.js` | 3 | ⏳ ממתין | - | - |
+| `notes.js` | 3 | ⏳ ממתין | - | - |
+| `trade_plans.js` | 2 | ⏳ ממתין | - | - |
+| `data-advanced.js` | 2 | ⏳ ממתין | - | - |
+| `database.js` | 1 | ⏳ ממתין | - | - |
+| `data-basic.js` | 1 | ⏳ ממתין | - | - |
+
+**סה"כ טופל**: 1 / 14 קבצים (4 פונקציות)
 
 ---
 

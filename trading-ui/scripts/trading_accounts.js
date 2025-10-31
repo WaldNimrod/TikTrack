@@ -2408,21 +2408,42 @@ async function saveTradingAccount() {
  * Includes linked items check
  */
 async function deleteTradingAccount(accountId) {
-    window.Logger.debug('deleteTradingAccount called', { accountId, page: 'trading_accounts' });
+    window.Logger.info(`🗑️ deleteTradingAccount called for account ${accountId}`, { accountId, page: 'trading_accounts' });
     
     try {
-        // Check linked items first
-        if (window.checkLinkedItemsBeforeAction) {
-            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('account', accountId, 'delete');
-            if (hasLinkedItems) {
-                window.Logger.info('Trading Account has linked items, deletion cancelled', { accountId, page: 'trading_accounts' });
-                return;
-            }
+        // Get account details for confirmation message
+        let accountDetails = `חשבון מסחר #${accountId}`;
+        const account = window.tradingAccountsData?.find(acc => acc.id === accountId || acc.id === parseInt(accountId));
+        
+        if (account) {
+            const name = account.name || 'לא מוגדר';
+            const statusText = account.status === 'open' ? 'פתוח' :
+                             account.status === 'closed' ? 'סגור' :
+                             account.status === 'cancelled' ? 'מבוטל' : account.status || 'לא מוגדר';
+            const balance = account.cash_balance !== undefined && account.cash_balance !== null ? 
+                          `$${account.cash_balance}` : '$0';
+            const currency = account.currency_symbol || '';
+            
+            accountDetails = `${name} - סטטוס: ${statusText}, יתרה: ${balance}${currency}`;
         }
         
-        // Use warning system for confirmation
+        // Check linked items first (Trades, Cash Flows, Notes)
+        window.Logger.info('🔍 Checking for linked items before deletion', { accountId, page: 'trading_accounts' });
+        if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+            window.Logger.info('✅ checkLinkedItemsBeforeAction function exists', { accountId, page: 'trading_accounts' });
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('account', accountId, 'delete');
+            window.Logger.info(`🔍 Linked items check result: hasLinkedItems=${hasLinkedItems}`, { accountId, page: 'trading_accounts' });
+            if (hasLinkedItems) {
+                window.Logger.info('🚫 Trading Account has linked items, deletion cancelled', { accountId, page: 'trading_accounts' });
+                return;
+            }
+        } else {
+            window.Logger.warn('⚠️ checkLinkedItemsBeforeAction function not available', { accountId, page: 'trading_accounts' });
+        }
+        
+        // Use warning system for confirmation with detailed information
         if (window.showDeleteWarning) {
-            window.showDeleteWarning('trading_account', accountId, 'חשבון מסחר',
+            window.showDeleteWarning('account', accountDetails, 'חשבון מסחר',
                 async () => await performTradingAccountDeletion(accountId),
                 () => {}
             );
@@ -2435,6 +2456,7 @@ async function deleteTradingAccount(accountId) {
         }
         
     } catch (error) {
+        window.Logger.error('Error deleting trading account:', error, { accountId, page: 'trading_accounts' });
         CRUDResponseHandler.handleError(error, 'מחיקת חשבון מסחר');
     }
 }

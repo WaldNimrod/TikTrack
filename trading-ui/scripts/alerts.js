@@ -5,18 +5,17 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 59
+ * Total Functions: 58
  * 
  * PAGE INITIALIZATION (2)
  * - initializeAlertModalTabs() - initializeAlertModalTabs function
  * - initializeAlertConditionBuilder() - * עדכון סטטיסטיקות הערכת תנאים
  * 
- * DATA LOADING (13)
+ * DATA LOADING (12)
  * - getDemoAlertsData() - getDemoAlertsData function
  * - loadAlertsData() - loadAlertsData function
  * - loadModalData() - loadModalData function
  * - getAlertState() - * עריכת התראה
- * - getRelatedClass() - * אישור מחיקת התראה
  * - loadAlerts() - loadAlerts function
  * - loadConditionsFromSource() - loadConditionsFromSource function
  * - loadTradePlansForConditions() - * Load conditions from source type (trade_plan or trade)
@@ -53,7 +52,7 @@
  * - disableEditConditionFields() - * Enable condition fields for add modal
  * - parseAlertCondition() - parseAlertCondition function
  * - validateAlertStatusCombination() - validateAlertStatusCombination function
- * - restoreAlertsSectionState() - * קבלת מחלקת CSS לאובייקט מקושר
+ * - restoreAlertsSectionState() - * אישור מחיקת התראה
  * - displayAvailableConditions() - displayAvailableConditions function
  * - selectConditionForAlert() - selectConditionForAlert function
  * - evaluateAllConditions() - evaluateAllConditions function

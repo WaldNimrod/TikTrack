@@ -5,21 +5,19 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 42
+ * Total Functions: 40
  * 
  * PAGE INITIALIZATION (1)
  * - setupNoteValidationEvents() - setupNoteValidationEvents function
  * 
- * DATA LOADING (6)
- * - uploadFile() - * Add new note
+ * DATA LOADING (5)
  * - downloadFile() - downloadFile function
  * - getEditorContent() - * ניקוי עיצוב בעורך
  * - getTypeDisplayName() - getTypeDisplayName function
  * - loadNoteForViewing() - * View a note
  * - getNoteRelatedDisplay() - getNoteRelatedDisplay function
  * 
- * DATA MANIPULATION (12)
- * - addNote() - addNote function
+ * DATA MANIPULATION (11)
  * - deleteNote() - * Open note details modal
  * - updateNotesTable() - updateNotesTable function
  * - updateNotesSummary() - updateNotesSummary function

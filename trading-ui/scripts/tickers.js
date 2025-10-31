@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 42
+ * Total Functions: 43
  * 
  * DATA LOADING (11)
  * - loadCurrenciesData() - loadCurrenciesData function
@@ -20,7 +20,7 @@
  * - tryLoadData() - tryLoadData function
  * - getTypeDisplayName() - getTypeDisplayName function
  * 
- * DATA MANIPULATION (13)
+ * DATA MANIPULATION (14)
  * - updateCurrencyOptions() - updateCurrencyOptions function
  * - updateActiveTradesField() - * פונקציה לעדכון אפשרויות מטבע בטופס
  * - updateTickerActiveTradesStatus() - updateTickerActiveTradesStatus function
@@ -30,6 +30,7 @@
  * - checkLinkedItemsBeforeDeleteTicker() - checkLinkedItemsBeforeDeleteTicker function
  * - updateAllTickerStatuses() - * בדיקת פריטים מקושרים לפני מחיקת טיקר
  * - checkLinkedItemsAndDeleteTicker() - checkLinkedItemsAndDeleteTicker function
+ * - deleteTicker() - deleteTicker function
  * - confirmDeleteTicker() - confirmDeleteTicker function
  * - updateTickersSummaryStats() - updateTickersSummaryStats function
  * - updateTickersTable() - * עדכון סטטיסטיקות סיכום טיקרים
@@ -1419,7 +1420,65 @@ async function performTickerDeletion(tickerId) {
 }
 
 /**
+ * מחיקת טיקר
+ * Includes linked items check
+ */
+async function deleteTicker(tickerId) {
+    window.Logger.info(`🗑️ deleteTicker called for ticker ${tickerId}`, { tickerId, page: 'tickers' });
+    
+    try {
+        // Get ticker details for confirmation message
+        let tickerDetails = `טיקר #${tickerId}`;
+        const ticker = window.tickersData?.find(t => t.id === tickerId || t.id === parseInt(tickerId));
+        
+        if (ticker) {
+            const symbol = ticker.symbol || 'לא מוגדר';
+            const name = ticker.name || 'לא מוגדר';
+            const statusText = ticker.status === 'open' ? 'פתוח' :
+                             ticker.status === 'closed' ? 'סגור' :
+                             ticker.status === 'cancelled' ? 'מבוטל' : ticker.status || 'לא מוגדר';
+            const typeText = ticker.type || 'לא מוגדר';
+            
+            tickerDetails = `${symbol} - ${name}, סטטוס: ${statusText}, סוג: ${typeText}`;
+        }
+        
+        // Check linked items first (Trades, Trade Plans, Alerts, Notes)
+        window.Logger.info('🔍 Checking for linked items before deletion', { tickerId, page: 'tickers' });
+        if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+            window.Logger.info('✅ checkLinkedItemsBeforeAction function exists', { tickerId, page: 'tickers' });
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('ticker', tickerId, 'delete');
+            window.Logger.info(`🔍 Linked items check result: hasLinkedItems=${hasLinkedItems}`, { tickerId, page: 'tickers' });
+            if (hasLinkedItems) {
+                window.Logger.info('🚫 Ticker has linked items, deletion cancelled', { tickerId, page: 'tickers' });
+                return;
+            }
+        } else {
+            window.Logger.warn('⚠️ checkLinkedItemsBeforeAction function not available', { tickerId, page: 'tickers' });
+        }
+        
+        // Use warning system for confirmation with detailed information
+        if (window.showDeleteWarning) {
+            window.showDeleteWarning('ticker', tickerDetails, 'טיקר',
+                async () => await performTickerDeletion(tickerId),
+                () => {}
+            );
+        } else {
+            // Fallback to simple confirm
+            if (!confirm('האם אתה בטוח שברצונך למחוק את הטיקר?')) {
+                return;
+            }
+            await performTickerDeletion(tickerId);
+        }
+        
+    } catch (error) {
+        window.Logger.error('Error deleting ticker:', error, { tickerId, page: 'tickers' });
+        CRUDResponseHandler.handleError(error, 'מחיקת טיקר');
+    }
+}
+
+/**
  * אישור מחיקת טיקר (לשמירה על תאימות לאחור)
+ * @deprecated Use deleteTicker instead
  */
 async function confirmDeleteTicker(id) {
   
@@ -1671,12 +1730,18 @@ function updateTickersTable(tickers) {
                         ${ticker.yahoo_updated_at ? (window.formatShortDate ? window.formatShortDate(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleDateString('he-IL')) + ' ' + (window.formatTimeOnly ? window.formatTimeOnly(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleTimeString('he-IL', {hour: '2-digit', minute: '2-digit'})) : 'N/A'}
                     </td>
                     <td class="actions-cell">
-                        ${window.createActionsMenu ? window.createActionsMenu([
-                          { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
-                          { type: 'LINK', onclick: `window.viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
-                          { type: 'EDIT', onclick: `showEditTickerModal(${ticker.id})`, title: 'ערוך' },
-                          { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' }
-                        ]) : `
+                        ${(() => {
+                          if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                          const result = window.createActionsMenu([
+                            { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
+                            { type: 'LINK', onclick: `window.viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
+                            { type: 'EDIT', onclick: `showEditTickerModal(${ticker.id})`, title: 'ערוך' },
+                            { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' },
+                            { type: 'DELETE', onclick: `deleteTicker(${ticker.id})`, title: 'מחק' }
+                          ]);
+                          return result || '';
+                        })()}
+                        ${!window.createActionsMenu ? `
                         <div class="btn-group btn-group-sm" role="group">
                             <button data-button-type="VIEW" data-variant="small" 
                                     data-onclick="window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })" 
@@ -1688,15 +1753,14 @@ function updateTickersTable(tickers) {
                                     data-onclick="showEditTickerModal(${ticker.id})" 
                                     data-text="" title="ערוך"></button>
                             ${ticker.status === 'cancelled' ?
-    `<button data-button-type="REACTIVATE" data-variant="small" 
-             data-onclick="reactivateTicker(${ticker.id})" 
-             data-text="" title="הפעל מחדש טיקר"></button>` :
-    `<button data-button-type="CANCEL" data-variant="small" 
-             data-onclick="performTickerCancellation(${ticker.id})" 
-             data-text="" title="בטל טיקר"></button>`
-                            }
+                            `<button data-button-type="REACTIVATE" data-variant="small" 
+                                     data-onclick="reactivateTicker(${ticker.id})" 
+                                     data-text="" title="הפעל מחדש טיקר"></button>` :
+                            `<button data-button-type="CANCEL" data-variant="small" 
+                                     data-onclick="performTickerCancellation(${ticker.id})" 
+                                     data-text="" title="בטל טיקר"></button>`}
                         </div>
-                        `}
+                        ` : ''}
                     </td>
                 </tr>
             `;

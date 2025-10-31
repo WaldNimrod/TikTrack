@@ -649,7 +649,8 @@ class ModalManagerV2 {
                 // Only apply manual defaults for fields that SelectPopulatorService doesn't handle
                 if (fieldElement.tagName === 'SELECT') {
                     // Skip if this is an account or currency field (handled by SelectPopulatorService)
-                    if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency') {
+                    if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency' || 
+                        field.id === 'executionAccount' || field.id === 'executionTicker') {
                         return;
                     }
                     
@@ -660,6 +661,19 @@ class ModalManagerV2 {
                         return;
                     }
                     return;
+                }
+                
+                // Apply defaultFromPreferences first (before defaultValue)
+                if (field.defaultFromPreferences && window.getPreferenceFromMemory) {
+                    const prefName = this._getPreferenceNameForField(field.id);
+                    if (prefName) {
+                        const prefValue = window.getPreferenceFromMemory(prefName);
+                        if (prefValue !== null && prefValue !== undefined) {
+                            fieldElement.value = prefValue;
+                            console.log(`Applied preference default for ${field.id} (${prefName}):`, prefValue);
+                            return;
+                        }
+                    }
                 }
                 
                 // Apply defaultValue if exists
@@ -688,6 +702,31 @@ class ModalManagerV2 {
         
         // This is now just a wrapper for applyRemainingDefaults
         this.applyRemainingDefaults(form);
+    }
+    
+    /**
+     * Get preference name for field - קבלת שם העדפה לשדה
+     * @param {string} fieldId - Field ID
+     * @returns {string|null} Preference name
+     * @private
+     */
+    _getPreferenceNameForField(fieldId) {
+        // Map field IDs to preference names
+        const preferenceMap = {
+            'cashFlowAccount': 'default_trading_account',
+            'cashFlowCurrency': 'primaryCurrency',
+            'executionAccount': 'default_trading_account',
+            'executionCommission': 'defaultCommission'
+        };
+        
+        // Try to find matching preference
+        for (const [fieldPattern, prefName] of Object.entries(preferenceMap)) {
+            if (fieldId.includes(fieldPattern) || fieldId === fieldPattern) {
+                return prefName;
+            }
+        }
+        
+        return null;
     }
     
     /**

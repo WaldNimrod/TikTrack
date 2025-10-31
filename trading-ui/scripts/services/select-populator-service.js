@@ -709,6 +709,9 @@ function handleTickerChange(tickerSelect, config) {
 
 window.SelectPopulatorService = SelectPopulatorService;
 
+// Export public method for getting preferences
+window.getPreferenceFromMemory = (preferenceName, aliases = []) => SelectPopulatorService._getPreferenceFromMemory(preferenceName, aliases);
+
 // ייצוא פונקציות לטיפול באובייקטים מקושרים
 window.getFilteredTickers = getFilteredTickers;
 window.populateRelatedObjects = populateRelatedObjects;

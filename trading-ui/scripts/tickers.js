@@ -1201,9 +1201,14 @@ async function performCancelTicker(id) {
       if (typeof loadTickersData === 'function') {
         // אנחנו בעמוד tickers
         // ניקוי מטמון לפני רענון
-        if (typeof window.clearTickersCache === 'function') {
-          window.clearTickersCache();
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearAllCache === 'function') {
+          await window.UnifiedCacheManager.clearAllCache('Light');
+        } else if (typeof window.clearAllCache === 'function') {
+          window.clearAllCache();
         }
+        // Clear local tickers data
+        window.tickersData = [];
+        tickersData = [];
         await loadTickersData();
         // עדכון שדה active_trades רק בעמוד tickers
         await updateActiveTradesField();
@@ -1227,9 +1232,14 @@ async function performCancelTicker(id) {
       // רענון הנתונים כמו במקרה של הצלחה
       if (typeof loadTickersData === 'function') {
         // ניקוי מטמון לפני רענון
-        if (typeof window.clearTickersCache === 'function') {
-          window.clearTickersCache();
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearAllCache === 'function') {
+          await window.UnifiedCacheManager.clearAllCache('Light');
+        } else if (typeof window.clearAllCache === 'function') {
+          window.clearAllCache();
         }
+        // Clear local tickers data
+        window.tickersData = [];
+        tickersData = [];
         await loadTickersData();
         await updateActiveTradesField();
       } else {
@@ -1547,7 +1557,14 @@ async function loadTickersData() {
     window.Logger.info('Loading tickers data (bypass cache)', { page: "tickers" });
     
     // ניקוי מטמון לפני טעינה
-    clearTickersCache();
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearAllCache === 'function') {
+      await window.UnifiedCacheManager.clearAllCache('Light');
+    } else if (typeof window.clearAllCache === 'function') {
+      window.clearAllCache();
+    }
+    // Clear local tickers data
+    window.tickersData = [];
+    tickersData = [];
     
     // טעינת מטבעות אם עוד לא נטענו
     if (!window.currenciesLoaded) {
@@ -1750,7 +1767,7 @@ function updateTickersTable(tickers) {
                                     data-onclick="window.viewLinkedItemsForTicker(${ticker.id})" 
                                     data-text="" title="פריטים מקושרים"></button>
                             <button data-button-type="EDIT" data-variant="small" 
-                                    data-onclick="showEditTickerModal(${ticker.id})" 
+                                    data-onclick="window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})" 
                                     data-text="" title="ערוך"></button>
                             ${ticker.status === 'cancelled' ?
                             `<button data-button-type="REACTIVATE" data-variant="small" 
@@ -2189,61 +2206,14 @@ function getTypeDisplayName(type) {
 
 // toggleSection function removed - using global version from ui-basic.js
 
-function toggleTickersSection() {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection('tickers');
-    } else {
-        window.Logger.warn('toggleSection function not found', { page: "tickers" });
-    }
-}
+// REMOVED: toggleTickersSection - use window.toggleSection('tickers') from ui-utils.js directly
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
 // Modal management using ModalManagerV2
 
-/**
- * Show add ticker modal
- * Uses ModalManagerV2 for consistent modal experience
- * 
- * @function showAddTickerModal
- * @returns {void}
- */
-function showAddTickerModal() {
-    try {
-        window.Logger.debug('showAddTickerModal called', { page: 'tickers' });
-        
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.showModal('tickersModal', 'add');
-        } else {
-            console.error('ModalManagerV2 not available');
-        }
-    } catch (error) {
-        console.error('showAddTickerModal failed:', error);
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל הוספת טיקר');
-        }
-    }
-}
+// REMOVED: showAddTickerModal - use window.ModalManagerV2.showModal('tickersModal', 'add') directly
 
-/**
- * הצגת מודל עריכת טיקר
- * Uses ModalManagerV2 for consistent modal experience
- */
-function showEditTickerModal(tickerId) {
-    try {
-        window.Logger.debug('showEditTickerModal called', { tickerId, page: 'tickers' });
-        
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.showEditModal('tickersModal', 'ticker', tickerId);
-        } else {
-            console.error('ModalManagerV2 not available');
-        }
-    } catch (error) {
-        console.error('showEditTickerModal failed:', error);
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל עריכת טיקר');
-        }
-    }
-}
+// REMOVED: showEditTickerModal - use window.ModalManagerV2.showEditModal('tickersModal', 'ticker', tickerId) directly
 
 /**
  * שמירת טיקר

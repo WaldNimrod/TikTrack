@@ -122,3 +122,6 @@ class TradeCondition(BaseModel):
         return f"<TradeCondition(id={self.id}, trade_id={self.trade_id}, method_id={self.method_id})>"
 
 
+
+
+

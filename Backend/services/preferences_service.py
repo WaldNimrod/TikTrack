@@ -205,11 +205,15 @@ class PreferencesService:
         logger.info(f"Cache invalidated for user {user_id}, profile {profile_id}")
     
     def _get_active_profile_id(self, user_id: int) -> int:
-        """קבלת פרופיל פעיל של משתמש"""
+        """קבלת פרופיל פעיל של משתמש
+        
+        אם אין פרופיל פעיל של המשתמש, מחזיר פרופיל ברירת מחדל (ID: 0)
+        """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
+            # Search for active user profile
             cursor.execute('''
                 SELECT id FROM preference_profiles 
                 WHERE user_id = ? AND is_active = TRUE 
@@ -223,11 +227,14 @@ class PreferencesService:
             if result:
                 return result[0]
             else:
-                raise ValueError(f"No active profile found for user {user_id}")
+                # No active user profile - return default profile
+                logger.info(f"No active profile found for user {user_id}, using default profile (ID: 0)")
+                return 0
             
         except Exception as e:
             logger.error(f"Error getting active profile for user {user_id}: {e}")
-            raise
+            # In case of error, return default profile
+            return 0
     
     def _get_preference_type_id(self, preference_name: str) -> int:
         """קבלת מזהה סוג העדפה"""
@@ -308,12 +315,43 @@ class PreferencesService:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
+            # Handle default profile (ID: 0) - return default_value only
+            if profile_id == 0:
+                cursor.execute('''
+                    SELECT default_value, data_type FROM preference_types 
+                    WHERE preference_name = ? AND is_active = TRUE
+                ''', (preference_name,))
+                
+                result = cursor.fetchone()
+                conn.close()
+                
+                if result:
+                    default_value, data_type = result
+                    value = self._convert_value(default_value, data_type)
+                    
+                    # שמירה במטמון
+                    if use_cache:
+                        cache_key = self._get_cache_key(user_id, profile_id, preference_name)
+                        self.cache[cache_key] = value
+                        self.cache_timestamps[cache_key] = time.time()
+                    
+                    logger.debug(f"Using default value for {preference_name}: {value}")
+                    return value
+                else:
+                    raise ValueError(f"Preference not found: {preference_name}")
+            
+            # Regular profile - query user_preferences
             cursor.execute('''
-                SELECT upv3.saved_value, pt.data_type, pt.default_value
-                FROM user_preferences_v3 upv3
-                JOIN preference_types pt ON upv3.preference_id = pt.id
-                WHERE upv3.user_id = ? AND upv3.profile_id = ? AND pt.preference_name = ?
-                ORDER BY upv3.id DESC
+                SELECT up.saved_value, pt.data_type, pt.default_value
+                FROM preference_types pt
+                LEFT JOIN (
+                    SELECT preference_id, saved_value, 
+                           ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
+                    FROM user_preferences 
+                    WHERE user_id = ? AND profile_id = ?
+                ) up ON pt.id = up.preference_id AND up.rn = 1
+                WHERE pt.preference_name = ? AND pt.is_active = TRUE
+                ORDER BY up.rn DESC
                 LIMIT 1
             ''', (user_id, profile_id, preference_name))
             
@@ -322,7 +360,9 @@ class PreferencesService:
             
             if result:
                 saved_value, data_type, default_value = result
-                value = self._convert_value(saved_value, data_type)
+                # Use saved_value if exists, otherwise default_value
+                value_to_use = saved_value if saved_value is not None else default_value
+                value = self._convert_value(value_to_use, data_type)
                 
                 # שמירה במטמון
                 if use_cache:
@@ -396,15 +436,30 @@ class PreferencesService:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            cursor.execute('''
-                SELECT pt.preference_name, 
-                       COALESCE(upv3.saved_value, pt.default_value) as value,
-                       pt.data_type
-                FROM preference_types pt
-                LEFT JOIN user_preferences_v3 upv3 ON pt.id = upv3.preference_id 
-                    AND upv3.user_id = ? AND upv3.profile_id = ?
-                WHERE pt.group_id = ? AND pt.is_active = TRUE
-            ''', (user_id, profile_id, group_id))
+            # Handle default profile (ID: 0) - return default_value only
+            if profile_id == 0:
+                cursor.execute('''
+                    SELECT pt.preference_name, 
+                           pt.default_value as value,
+                           pt.data_type
+                    FROM preference_types pt
+                    JOIN preference_groups pg ON pt.group_id = pg.id
+                    WHERE pt.group_id = ? AND pt.is_active = TRUE
+                ''', (group_id,))
+            else:
+                cursor.execute('''
+                    SELECT pt.preference_name, 
+                           COALESCE(up.saved_value, pt.default_value) as value,
+                           pt.data_type
+                    FROM preference_types pt
+                    LEFT JOIN (
+                        SELECT preference_id, saved_value, 
+                               ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
+                        FROM user_preferences 
+                        WHERE user_id = ? AND profile_id = ?
+                    ) up ON pt.id = up.preference_id AND up.rn = 1
+                    WHERE pt.group_id = ? AND pt.is_active = TRUE
+                ''', (user_id, profile_id, group_id))
             
             results = cursor.fetchall()
             conn.close()
@@ -455,16 +510,32 @@ class PreferencesService:
                 conn = sqlite3.connect(self.db_path)
                 cursor = conn.cursor()
                 
-                # בניית שאילתה לכל ההעדפות בבת אחת
-                placeholders = ','.join(['?' for _ in preference_names])
-                query = f'''
-                    SELECT pt.preference_name, up.saved_value, pt.data_type, pt.default_value
-                    FROM preference_types pt
-                    LEFT JOIN user_preferences up ON pt.id = up.preference_id 
-                        AND up.user_id = ? AND up.profile_id = ?
-                    WHERE pt.preference_name IN ({placeholders})
-                '''
-                cursor.execute(query, [user_id, profile_id] + preference_names)
+                # Handle default profile (ID: 0) - return default_value only
+                if profile_id == 0:
+                    # בניית שאילתה לכל ההעדפות בבת אחת
+                    placeholders = ','.join(['?' for _ in preference_names])
+                    query = f'''
+                        SELECT pt.preference_name, NULL as saved_value, pt.data_type, pt.default_value
+                        FROM preference_types pt
+                        WHERE pt.preference_name IN ({placeholders}) AND pt.is_active = TRUE
+                    '''
+                    cursor.execute(query, preference_names)
+                else:
+                    # בניית שאילתה לכל ההעדפות בבת אחת
+                    placeholders = ','.join(['?' for _ in preference_names])
+                    query = f'''
+                        SELECT pt.preference_name, up.saved_value, pt.data_type, pt.default_value
+                        FROM preference_types pt
+                        LEFT JOIN (
+                            SELECT preference_id, saved_value, 
+                                   ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
+                            FROM user_preferences 
+                            WHERE user_id = ? AND profile_id = ?
+                        ) up ON pt.id = up.preference_id AND up.rn = 1
+                        WHERE pt.preference_name IN ({placeholders}) AND pt.is_active = TRUE
+                    '''
+                    cursor.execute(query, [user_id, profile_id] + preference_names)
+                
                 results = cursor.fetchall()
                 conn.close()
                 
@@ -526,22 +597,35 @@ class PreferencesService:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            cursor.execute('''
-                SELECT pt.preference_name, 
-                       COALESCE(upv3.saved_value, pt.default_value) as value,
-                       pt.data_type,
-                       pg.group_name
-                FROM preference_types pt
-                JOIN preference_groups pg ON pt.group_id = pg.id
-                LEFT JOIN (
-                    SELECT preference_id, saved_value, 
-                           ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
-                    FROM user_preferences_v3 
-                    WHERE user_id = ? AND profile_id = ?
-                ) upv3 ON pt.id = upv3.preference_id AND upv3.rn = 1
-                WHERE pt.is_active = TRUE
-                ORDER BY pg.group_name, pt.preference_name
-            ''', (user_id, profile_id))
+            # Handle default profile (ID: 0) - return default_value only
+            if profile_id == 0:
+                cursor.execute('''
+                    SELECT pt.preference_name, 
+                           pt.default_value as value,
+                           pt.data_type,
+                           pg.group_name
+                    FROM preference_types pt
+                    JOIN preference_groups pg ON pt.group_id = pg.id
+                    WHERE pt.is_active = TRUE
+                    ORDER BY pg.group_name, pt.preference_name
+                ''')
+            else:
+                cursor.execute('''
+                    SELECT pt.preference_name, 
+                           COALESCE(up.saved_value, pt.default_value) as value,
+                           pt.data_type,
+                           pg.group_name
+                    FROM preference_types pt
+                    JOIN preference_groups pg ON pt.group_id = pg.id
+                    LEFT JOIN (
+                        SELECT preference_id, saved_value, 
+                               ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
+                        FROM user_preferences 
+                        WHERE user_id = ? AND profile_id = ?
+                    ) up ON pt.id = up.preference_id AND up.rn = 1
+                    WHERE pt.is_active = TRUE
+                    ORDER BY pg.group_name, pt.preference_name
+                ''', (user_id, profile_id))
             
             results = cursor.fetchall()
             conn.close()
@@ -594,11 +678,28 @@ class PreferencesService:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
+            # Check if preference already exists
             cursor.execute('''
-                INSERT OR REPLACE INTO user_preferences_v3 
-                (user_id, profile_id, preference_id, saved_value)
-                VALUES (?, ?, ?, ?)
-            ''', (user_id, profile_id, preference_id, string_value))
+                SELECT id FROM user_preferences 
+                WHERE user_id = ? AND profile_id = ? AND preference_id = ?
+            ''', (user_id, profile_id, preference_id))
+            
+            existing = cursor.fetchone()
+            
+            if existing:
+                # Update existing preference
+                cursor.execute('''
+                    UPDATE user_preferences 
+                    SET saved_value = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE user_id = ? AND profile_id = ? AND preference_id = ?
+                ''', (string_value, user_id, profile_id, preference_id))
+            else:
+                # Insert new preference
+                cursor.execute('''
+                    INSERT INTO user_preferences 
+                    (user_id, profile_id, preference_id, saved_value)
+                    VALUES (?, ?, ?, ?)
+                ''', (user_id, profile_id, preference_id, string_value))
             
             conn.commit()
             conn.close()
@@ -641,12 +742,28 @@ class PreferencesService:
                     # המרת ערך למחרוזת
                     string_value = str(value)
                     
-                    # שמירה לבסיס הנתונים
+                    # Check if preference already exists
                     cursor.execute('''
-                        INSERT OR REPLACE INTO user_preferences_v3 
-                        (user_id, profile_id, preference_id, saved_value)
-                        VALUES (?, ?, ?, ?)
-                    ''', (user_id, profile_id, preference_id, string_value))
+                        SELECT id FROM user_preferences 
+                        WHERE user_id = ? AND profile_id = ? AND preference_id = ?
+                    ''', (user_id, profile_id, preference_id))
+                    
+                    existing = cursor.fetchone()
+                    
+                    if existing:
+                        # Update existing preference
+                        cursor.execute('''
+                            UPDATE user_preferences 
+                            SET saved_value = ?, updated_at = CURRENT_TIMESTAMP
+                            WHERE user_id = ? AND profile_id = ? AND preference_id = ?
+                        ''', (string_value, user_id, profile_id, preference_id))
+                    else:
+                        # Insert new preference
+                        cursor.execute('''
+                            INSERT INTO user_preferences 
+                            (user_id, profile_id, preference_id, saved_value)
+                            VALUES (?, ?, ?, ?)
+                        ''', (user_id, profile_id, preference_id, string_value))
                 except Exception as e:
                     logger.warning(f"Failed to save preference {preference_name}: {e}")
                     continue
@@ -762,24 +879,57 @@ class PreferencesService:
             return None
     
     def get_user_profiles(self, user_id: int) -> List[Dict[str, Any]]:
-        """קבלת פרופילים של משתמש"""
+        """קבלת פרופילים של משתמש
+        כולל פרופיל ברירת מחדל מיוחד (ID: 0, user_id: 0)
+        """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
+            # Get user-specific profiles
             cursor.execute('''
                 SELECT id, profile_name, is_active, is_default, description,
-                       last_used_at, usage_count, created_at
+                       last_used_at, usage_count, created_at, user_id
                 FROM preference_profiles
                 WHERE user_id = ?
                 ORDER BY is_default DESC, last_used_at DESC
             ''', (user_id,))
             
-            results = cursor.fetchall()
+            user_profiles = cursor.fetchall()
+            
+            # Get default profile (special system profile: ID: 0, user_id: 0)
+            cursor.execute('''
+                SELECT id, profile_name, is_active, is_default, description,
+                       last_used_at, usage_count, created_at, user_id
+                FROM preference_profiles
+                WHERE user_id = 0 AND is_default = 1
+                LIMIT 1
+            ''')
+            
+            default_profile = cursor.fetchone()
             conn.close()
             
             profiles = []
-            for row in results:
+            
+            # Add default profile first if exists
+            if default_profile:
+                # Check if user has any active profile
+                has_active_user_profile = any(row[2] for row in user_profiles)
+                
+                profiles.append({
+                    'id': default_profile[0],
+                    'name': default_profile[1],
+                    'active': not has_active_user_profile,  # Active only if no user profile is active
+                    'default': bool(default_profile[3]),
+                    'description': default_profile[4] or 'פרופיל ברירת מחדל של המערכת',
+                    'last_used': default_profile[5],
+                    'usage_count': default_profile[6],
+                    'created_at': default_profile[7],
+                    'user_id': default_profile[8]
+                })
+            
+            # Add user-specific profiles
+            for row in user_profiles:
                 profiles.append({
                     'id': row[0],
                     'name': row[1],
@@ -788,7 +938,8 @@ class PreferencesService:
                     'description': row[4],
                     'last_used': row[5],
                     'usage_count': row[6],
-                    'created_at': row[7]
+                    'created_at': row[7],
+                    'user_id': row[8]
                 })
             
             return profiles
@@ -832,12 +983,21 @@ class PreferencesService:
             raise
 
     def activate_profile(self, user_id: int, profile_id: int) -> bool:
-        """הפעלת פרופיל"""
+        """הפעלת פרופיל
+        
+        לפרופיל ברירת מחדל (ID: 0) - לא משנה את המסד הנתונים, רק מחזיר True
+        לפרופיל רגיל - מפעיל במסד הנתונים
+        """
         try:
+            # Handle default profile (ID: 0) - special system profile
+            if profile_id == 0:
+                logger.info(f"Default profile (ID: 0) selected - special system profile, no DB activation needed")
+                return True
+            
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # בדוק אם הפרופיל קיים
+            # Check if profile exists for this user
             cursor.execute('''
                 SELECT id FROM preference_profiles 
                 WHERE user_id = ? AND id = ?
@@ -848,14 +1008,14 @@ class PreferencesService:
                 conn.close()
                 return False
             
-            # בטל הפעלה מכל הפרופילים של המשתמש
+            # Deactivate all user profiles
             cursor.execute('''
                 UPDATE preference_profiles 
                 SET is_active = 0 
                 WHERE user_id = ?
             ''', (user_id,))
             
-            # הפעל את הפרופיל הנבחר
+            # Activate the selected profile
             cursor.execute('''
                 UPDATE preference_profiles 
                 SET is_active = 1, last_used_at = CURRENT_TIMESTAMP,
@@ -863,7 +1023,7 @@ class PreferencesService:
                 WHERE user_id = ? AND id = ?
             ''', (user_id, profile_id))
             
-            # בדוק שההפעלה הצליחה
+            # Verify activation succeeded
             cursor.execute('''
                 SELECT is_active FROM preference_profiles 
                 WHERE user_id = ? AND id = ?
@@ -884,6 +1044,34 @@ class PreferencesService:
             
         except Exception as e:
             logger.error(f"Error activating profile {profile_id} for user {user_id}: {e}")
+            return False
+    
+    def check_preference_type_exists(self, preference_name: str) -> bool:
+        """
+        בדיקת קיום סוג העדפה במסד הנתונים
+        
+        Args:
+            preference_name: שם סוג ההעדפה
+        
+        Returns:
+            True אם הסוג קיים, False אחרת
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT COUNT(*) FROM preference_types 
+                WHERE preference_name = ? AND is_active = 1
+            ''', (preference_name,))
+            
+            count = cursor.fetchone()[0]
+            conn.close()
+            
+            return count > 0
+            
+        except Exception as e:
+            logger.error(f"Error checking preference type existence for {preference_name}: {e}")
             return False
 
 

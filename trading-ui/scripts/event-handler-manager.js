@@ -74,9 +74,144 @@ class EventHandlerManager {
      * @private
      */
     handleDelegatedClick(event) {
+        // Prevent double handling in bubbling chain
+        if (event._ehmHandled) {
+            return;
+        }
         const target = event.target;
         
-        // Handle button clicks
+        // Handle buttons with data-onclick attribute (centralized button system)
+        // This is the primary way to handle button clicks in TikTrack
+        // Based on documentation: documentation/frontend/button-system.md
+        const buttonWithOnclick = target.closest('button[data-onclick]');
+        if (buttonWithOnclick) {
+            // Don't process if button is disabled
+            if (buttonWithOnclick.disabled || buttonWithOnclick.hasAttribute('disabled')) {
+                return;
+            }
+            
+            const onclickValue = buttonWithOnclick.getAttribute('data-onclick');
+            if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
+                try {
+                    // Execute the onclick handler using eval (safe because it's controlled)
+                    // Note: Following documentation spec - no preventDefault/stopPropagation
+                    // to allow Bootstrap modals and other standard behaviors to work
+                    eval(onclickValue);
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.error('EventHandlerManager: Error executing data-onclick', {
+                            onclickValue: onclickValue,
+                            error: error.message,
+                            stack: error.stack
+                        });
+                    } else {
+                        console.error('EventHandlerManager: Error executing data-onclick:', onclickValue, error);
+                    }
+                }
+                // Mark event as handled to avoid duplicate toggles from fallback handlers
+                event._ehmHandled = true;
+                if (typeof event.stopImmediatePropagation === 'function') {
+                    event.stopImmediatePropagation();
+                }
+                return;
+            }
+        }
+        
+        // Handle TOGGLE buttons without data-onclick (auto-wire to nearest section)
+        const toggleBtn = target.closest('button[data-button-type="TOGGLE"]:not([data-onclick])');
+        if (toggleBtn && typeof window.toggleSection === 'function') {
+            try {
+                // Find nearest section container
+                const sectionEl = toggleBtn.closest('.top-section, .content-section, [data-section]');
+                let sectionId = null;
+                if (sectionEl) {
+                    if (sectionEl.classList.contains('top-section')) {
+                        sectionId = sectionEl.getAttribute('data-section') || 'top';
+                    } else if (sectionEl.hasAttribute('data-section')) {
+                        sectionId = sectionEl.getAttribute('data-section');
+                    } else if (sectionEl.id) {
+                        sectionId = sectionEl.id;
+                    }
+                }
+
+                if (sectionId) {
+                    window.toggleSection(sectionId);
+                }
+            } catch (err) {
+                if (window.Logger) {
+                    window.Logger.error('EventHandlerManager: TOGGLE auto-wire failed', { error: err?.message });
+                }
+            }
+        }
+
+        // Header filter toggles (fallback when inline onclick is blocked/missing)
+        const headerFilterBtn = target.closest('button.filter-toggle');
+        if (!event._ehmHandled && headerFilterBtn && window.headerSystemReady !== false) {
+            try {
+                if (headerFilterBtn.classList.contains('status-filter-toggle') && typeof window.toggleStatusFilterMenu === 'function') {
+                    window.toggleStatusFilterMenu();
+                    event._ehmHandled = true;
+                    if (typeof event.stopImmediatePropagation === 'function') { event.stopImmediatePropagation(); }
+                    return;
+                }
+                if (headerFilterBtn.classList.contains('type-filter-toggle') && typeof window.toggleTypeFilterMenu === 'function') {
+                    window.toggleTypeFilterMenu();
+                    event._ehmHandled = true;
+                    if (typeof event.stopImmediatePropagation === 'function') { event.stopImmediatePropagation(); }
+                    return;
+                }
+                if (headerFilterBtn.classList.contains('account-filter-toggle') && typeof window.toggleAccountFilterMenu === 'function') {
+                    window.toggleAccountFilterMenu();
+                    event._ehmHandled = true;
+                    if (typeof event.stopImmediatePropagation === 'function') { event.stopImmediatePropagation(); }
+                    return;
+                }
+                if (headerFilterBtn.classList.contains('date-range-filter-toggle') && typeof window.toggleDateRangeFilterMenu === 'function') {
+                    window.toggleDateRangeFilterMenu();
+                    event._ehmHandled = true;
+                    if (typeof event.stopImmediatePropagation === 'function') { event.stopImmediatePropagation(); }
+                    return;
+                }
+                if (headerFilterBtn.id === 'headerFilterToggleBtnMain' || headerFilterBtn.id === 'headerFilterToggleBtnSecondary') {
+                    if (typeof window.toggleHeaderFilters === 'function') {
+                        window.toggleHeaderFilters();
+                        event._ehmHandled = true;
+                        if (typeof event.stopImmediatePropagation === 'function') { event.stopImmediatePropagation(); }
+                        return;
+                    }
+                }
+            } catch (e) {
+                if (window.Logger) {
+                    window.Logger.error('EventHandlerManager: header filter toggle fallback failed', { error: e?.message });
+                }
+            }
+        }
+
+        // Handle buttons with onclick attribute (legacy support - for backwards compatibility)
+        // Note: We don't execute onclick handlers here to avoid double execution
+        // The browser will handle onclick naturally, we just log for debugging
+        const buttonWithOnclickLegacy = target.closest('button[onclick]:not([data-onclick])');
+        if (buttonWithOnclickLegacy && buttonWithOnclickLegacy !== buttonWithOnclick) {
+            // Don't process if button is disabled
+            if (buttonWithOnclickLegacy.disabled || buttonWithOnclickLegacy.hasAttribute('disabled')) {
+                return;
+            }
+            
+            const onclickValue = buttonWithOnclickLegacy.getAttribute('onclick');
+            if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
+                // Just log for debugging - let the browser handle onclick naturally
+                if (window.Logger) {
+                    window.Logger.debug('EventHandlerManager: Detected onclick button (browser will handle)', {
+                        onclickValue: onclickValue,
+                        element: buttonWithOnclickLegacy
+                    });
+                }
+                // Don't execute - browser will handle onclick naturally
+                // This prevents double execution while maintaining compatibility
+            }
+        }
+        
+        // Handle button clicks with data-action
         if (target.matches('[data-action]')) {
             const action = target.getAttribute('data-action');
             this.executeAction(action, target, event);
@@ -212,11 +347,20 @@ class EventHandlerManager {
      * @private
      */
     handleSortableClick(element, event) {
-        const tableId = element.closest('table').getAttribute('data-table-id');
-        const column = element.getAttribute('data-column');
+        // If this click is already handled by data-onclick button system, skip to avoid double execution
+        const delegatedBtn = element.closest('button[data-onclick]');
+        if (delegatedBtn) {
+            return;
+        }
+        const table = element.closest('table');
+        // Try data-table-type first (most common), then data-table-id as fallback
+        const tableType = table.getAttribute('data-table-type') || table.getAttribute('data-table-id');
+        // Get column index from element's parent (th) cell index
+        const th = element.closest('th');
+        const columnIndex = th ? th.cellIndex : null;
         
-        if (window.tables && window.tables.sortTable) {
-            window.tables.sortTable(tableId, column);
+        if (columnIndex !== null && window.sortTable) {
+            window.sortTable(tableType, columnIndex);
         }
     }
 

@@ -86,6 +86,36 @@ const ENTITY_BORDER_COLORS = {
   preference: 'rgba(40, 167, 69, 0.3)'
 };
 
+const ENTITY_LIGHT_COLORS = {
+  trade: '#cce5ff',
+  trade_plan: '#c3e6cb',
+  execution: '#bee5eb',
+  account: '#e2d9f3',
+  cash_flow: '#ffe5d3',
+  ticker: '#c5f4ea',
+  alert: '#f5c6cb',
+  note: '#e2e3e5',
+  constraint: '#f8d7da',
+  design: '#e2d9f3',
+  research: '#bee5eb',
+  preference: '#c3e6cb'
+};
+
+const ENTITY_DARK_COLORS = {
+  trade: '#004085',
+  trade_plan: '#155724',
+  execution: '#0c5460',
+  account: '#383d41',
+  cash_flow: '#842029',
+  ticker: '#1e7e34',
+  alert: '#b02a37',
+  note: '#383d41',
+  constraint: '#b02a37',
+  design: '#383d41',
+  research: '#0c5460',
+  preference: '#155724'
+};
+
 const STATUS_COLORS = {
   active: '#28a745',
   inactive: '#6c757d',
@@ -491,8 +521,8 @@ async function setCurrentEntityColorFromPage() {
         
         // Set current entity color and variants
         const entityColor = ENTITY_COLORS[entityType] || ENTITY_COLORS.trade;
-        const lightColor = lightenColor(entityColor, 10);
-        const darkColor = darkenColor(entityColor, 20);
+        const lightColor = window.ENTITY_LIGHT_COLORS ? (window.ENTITY_LIGHT_COLORS[entityType] || lightenColor(entityColor, 10)) : lightenColor(entityColor, 10);
+        const darkColor = window.ENTITY_DARK_COLORS ? (window.ENTITY_DARK_COLORS[entityType] || darkenColor(entityColor, 20)) : darkenColor(entityColor, 20);
         
         document.documentElement.style.setProperty('--current-entity-color', entityColor);
         document.documentElement.style.setProperty('--current-entity-color-light', lightColor);
@@ -535,7 +565,9 @@ const PAGE_TO_ENTITY_MAPPING = {
   'constraints-page': 'constraint',
   'designs-page': 'design',
   'research-page': 'research',
-  'preferences-page': 'preference'
+  'preferences-page': 'preference',
+  'db-display-page': 'design', // Database display page uses design colors
+  'db-extradata-page': 'design' // Database extra data page uses design colors
 };
 
 async function getEntityColorFromPreferences(entityType, variant = 'primary') {
@@ -784,6 +816,8 @@ window.ENTITY_COLORS = ENTITY_COLORS;
 window.ENTITY_BACKGROUND_COLORS = ENTITY_BACKGROUND_COLORS;
 window.ENTITY_TEXT_COLORS = ENTITY_TEXT_COLORS;
 window.ENTITY_BORDER_COLORS = ENTITY_BORDER_COLORS;
+window.ENTITY_LIGHT_COLORS = ENTITY_LIGHT_COLORS;
+window.ENTITY_DARK_COLORS = ENTITY_DARK_COLORS;
 window.STATUS_COLORS = STATUS_COLORS;
 window.INVESTMENT_TYPE_COLORS = INVESTMENT_TYPE_COLORS;
 window.NUMERIC_VALUE_COLORS = NUMERIC_VALUE_COLORS;

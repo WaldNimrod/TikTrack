@@ -20,14 +20,92 @@
 // ===== SELECT POPULATOR SERVICE =====
 
 class SelectPopulatorService {
-    static _getPreferenceFromMemory(preferenceName, aliases = []) {
+    static async _getPreferenceFromMemory(preferenceName, aliases = []) {
+        console.log(`🔍 _getPreferenceFromMemory called for: ${preferenceName} with aliases:`, aliases);
         try {
-            const prefs = window.PreferencesSystem?.manager?.currentPreferences || {};
-            if (preferenceName in prefs) return prefs[preferenceName];
-            for (const key of aliases) {
-                if (key in prefs) return prefs[key];
+            // First, try PreferencesCore (synchronous check with cached data)
+            if (window.PreferencesCore && window.UnifiedCacheManager) {
+                // Build cache key like PreferencesCore does
+                const userId = window.PreferencesCore.currentUserId || 1;
+                const profileId = window.PreferencesCore.currentProfileId !== null ? window.PreferencesCore.currentProfileId : 0;
+                
+                console.log(`🔍 Looking for preference ${preferenceName} with userId=${userId}, profileId=${profileId}`);
+                
+                // Try multiple profile IDs in case preferences are saved for different profiles
+                const profileIdsToTry = profileId !== 0 ? [profileId, 0] : [0];
+                
+                for (const tryProfileId of profileIdsToTry) {
+                    const cacheKey = `preference_${preferenceName}_${userId}_${tryProfileId}`;
+                    console.log(`🔍 Trying cache key: tiktrack_${cacheKey}`);
+                    
+                    // Try to get from cache synchronously - check both tiktrack_ prefix and without it
+                    try {
+                        // Try tiktrack_ prefix first
+                        let cached = localStorage.getItem(`tiktrack_${cacheKey}`);
+                        if (cached) {
+                            const parsed = JSON.parse(cached);
+                            console.log(`✅ Found preference ${preferenceName} in UnifiedCache (profileId=${tryProfileId}):`, parsed);
+                            return parsed;
+                        }
+                        
+                        // Try without prefix
+                        cached = localStorage.getItem(cacheKey);
+                        if (cached) {
+                            const parsed = JSON.parse(cached);
+                            console.log(`✅ Found preference ${preferenceName} in UnifiedCache (no prefix, profileId=${tryProfileId}):`, parsed);
+                            return parsed;
+                        }
+                    } catch (e) {
+                        console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName} (profileId=${tryProfileId}):`, e);
+                    }
+                }
+                
+                console.log(`⚠️ Preference ${preferenceName} not found in localStorage for any profile`);
             }
-        } catch (_) {}
+            
+            // Try window.currentPreferences
+            let prefs = {};
+            if (window.currentPreferences) {
+                prefs = window.currentPreferences;
+                console.log(`✅ Using window.currentPreferences, found ${Object.keys(prefs).length} preferences`);
+            } else if (window.PreferencesSystem?.manager?.currentPreferences) {
+                prefs = window.PreferencesSystem.manager.currentPreferences;
+                console.log(`✅ Using PreferencesSystem.currentPreferences, found ${Object.keys(prefs).length} preferences`);
+            } else {
+                console.log(`⚠️ window.currentPreferences not available, trying localStorage`);
+                // Fallback to localStorage
+                try {
+                    const stored = localStorage.getItem('tikTrack_preferences');
+                    if (stored) {
+                        prefs = JSON.parse(stored);
+                        console.log(`✅ Loaded preferences from localStorage, found ${Object.keys(prefs).length} preferences`);
+                    } else {
+                        console.log(`⚠️ No preferences found in localStorage 'tikTrack_preferences'`);
+                    }
+                } catch (e) {
+                    console.warn(`⚠️ Failed to parse localStorage preferences:`, e);
+                }
+            }
+            
+            console.log(`🔍 Looking for preference: ${preferenceName}`);
+            if (preferenceName in prefs) {
+                console.log(`✅ Found preference ${preferenceName}: ${prefs[preferenceName]}`);
+                return prefs[preferenceName];
+            } else {
+                console.log(`⚠️ Preference ${preferenceName} not found directly`);
+            }
+            
+            console.log(`🔍 Trying aliases:`, aliases);
+            for (const key of aliases) {
+                if (key in prefs) {
+                    console.log(`✅ Found preference via alias ${key}: ${prefs[key]}`);
+                    return prefs[key];
+                }
+            }
+            console.log(`⚠️ No preference found for ${preferenceName} or any aliases`);
+        } catch (e) {
+            console.error(`❌ Error in _getPreferenceFromMemory:`, e);
+        }
         return null;
     }
     /**
@@ -100,6 +178,8 @@ class SelectPopulatorService {
             return;
         }
         
+        console.log(`🔍 populateAccountsSelect called for ${selectId}`, { options });
+        
         try {
             // טעינת חשבונות מ-API
             const response = await fetch('/api/trading-accounts/');
@@ -119,9 +199,17 @@ class SelectPopulatorService {
             let defaultValue = options.defaultValue;
             if (options.defaultFromPreferences) {
                 try {
-                    const prefValue = this._getPreferenceFromMemory('default_trading_account', ['defaultTradingAccount', 'trading_account_id']);
-                    if (prefValue) defaultValue = parseInt(prefValue);
-                } catch (_) { /* שקט */ }
+                    const prefValue = this._getPreferenceFromMemory('default_trading_account', ['defaultAccountFilter', 'defaultTradingAccount', 'trading_account_id']);
+                    if (prefValue) {
+                        // Try to parse as integer ID first
+                        const parsed = parseInt(prefValue);
+                        if (!isNaN(parsed)) {
+                            defaultValue = parsed;
+                        }
+                    }
+                } catch (e) { 
+                    console.warn(`⚠️ Error getting account preference:`, e);
+                }
             }
             
             // מילוי ה-select
@@ -133,8 +221,6 @@ class SelectPopulatorService {
                 defaultValue: defaultValue,
                 defaultText: options.defaultText
             });
-            
-            console.log(`✅ נטענו ${accounts.length} חשבונות ל-${selectId}`);
             
         } catch (error) {
             console.error('❌ שגיאה בטעינת חשבונות:', error);
@@ -240,20 +326,6 @@ class SelectPopulatorService {
                 defaultValue: defaultValue,
                 defaultText: options.defaultText
             });
-
-            // Debug
-            try {
-                if (select && select.id) {
-                    const selectedText = select.options[select.selectedIndex]?.text || '';
-                    console.debug(`[SelectPopulator] ${select.id} defaultFromPreferences=${!!options.defaultFromPreferences}`, {
-                        defaultValue,
-                        selectedValue: select.value,
-                        selectedText
-                    });
-                }
-            } catch (_) {}
-            
-            console.log(`✅ נטענו ${currencies.length} מטבעות ל-${selectId}`);
             
         } catch (error) {
             console.error('❌ שגיאה בטעינת מטבעות:', error);
@@ -692,6 +764,9 @@ function handleTickerChange(tickerSelect, config) {
 // ===== EXPORT TO GLOBAL SCOPE =====
 
 window.SelectPopulatorService = SelectPopulatorService;
+
+// Export public method for getting preferences
+window.getPreferenceFromMemory = async (preferenceName, aliases = []) => await SelectPopulatorService._getPreferenceFromMemory(preferenceName, aliases);
 
 // ייצוא פונקציות לטיפול באובייקטים מקושרים
 window.getFilteredTickers = getFilteredTickers;

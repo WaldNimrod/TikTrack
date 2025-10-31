@@ -106,6 +106,25 @@
  */
 function viewTickerDetails(tickerId) {
   try {
+    // צפייה בפרטי טיקר באמצעות מודל פרטי ישות הגלובלי
+    if (typeof window.showEntityDetails === 'function') {
+      window.showEntityDetails('ticker', tickerId, { mode: 'view' });
+    } else {
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה', 'מערכת פרטי ישויות לא זמינה');
+      }
+    }
+  } catch (error) {
+    window.Logger.error('Error in viewTickerDetails:', error, { tickerId, page: "tickers" });
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'שגיאה בפתיחת פרטי הטיקר');
+    }
+  }
+}
+
+// Keep old function for backward compatibility
+function viewTickerDetailsOld(tickerId) {
+  try {
     window.Logger.info('👁️ מציג פרטי טיקר:', tickerId, { page: "tickers" });
     
     // חיפוש הטיקר בנתונים
@@ -672,8 +691,8 @@ function restoreTickersSectionState() {
  * @returns {Promise<void>}
  */
 async function saveTicker() {
-
-  // איסוף נתונים מהטופס באמצעות DataCollectionService
+  
+  // ניקוי מטמון לפני פעולת CRUD  // איסוף נתונים מהטופס באמצעות DataCollectionService
   const tickerData = DataCollectionService.collectFormData({
     symbol: { id: 'addTickerSymbol', type: 'text' },
     name: { id: 'addTickerName', type: 'text' },
@@ -734,7 +753,9 @@ async function saveTicker() {
       modalId: 'addTickerModal',
       successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
       apiUrl: '/api/tickers/',
-      entityName: 'טיקר'
+      entityName: 'טיקר',
+      reloadFn: window.loadTickersData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -753,8 +774,8 @@ async function saveTicker() {
  * Note: updated_at field is NOT modified during user updates - it's reserved for future pricing system updates
  */
 async function updateTicker() {
-
-  // שימוש ב-DataCollectionService לאיסוף נתונים
+  
+  // ניקוי מטמון לפני פעולת CRUD - עריכה  // שימוש ב-DataCollectionService לאיסוף נתונים
   const tickerData = DataCollectionService.collectFormData({
     id: { id: 'editTickerId', type: 'text' },
     symbol: { id: 'editTickerSymbol', type: 'text' },
@@ -893,7 +914,9 @@ async function updateTicker() {
       modalId: 'editTickerModal',
       successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
       apiUrl: '/api/tickers/',
-      entityName: 'טיקר'
+      entityName: 'טיקר',
+      reloadFn: window.loadTickersData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -1402,9 +1425,8 @@ async function performTickerDeletion(tickerId) {
  * אישור מחיקת טיקר (לשמירה על תאימות לאחור)
  */
 async function confirmDeleteTicker(id) {
-
-
-  // מציאת הטיקר לפני מחיקה כדי להציג פרטים בהודעה
+  
+  // ניקוי מטמון לפני פעולת CRUD - מחיקה  // מציאת הטיקר לפני מחיקה כדי להציג פרטים בהודעה
   const ticker = (window.tickersData || []).find(t => t.id === id);
   const tickerInfo = ticker ? `${ticker.symbol} - ${ticker.name}` : `טיקר ${id}`;
 
@@ -1417,7 +1439,9 @@ async function confirmDeleteTicker(id) {
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: `טיקר ${tickerInfo} נמחק בהצלחה!`,
       apiUrl: '/api/tickers/',
-      entityName: 'טיקר'
+      entityName: 'טיקר',
+      reloadFn: window.loadTickersData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -1464,6 +1488,8 @@ function clearTickersCache() {
  */
 async function loadTickersData() {
   try {
+    window.Logger.info('Loading tickers data (bypass cache)', { page: "tickers" });
+    
     // ניקוי מטמון לפני טעינה
     clearTickersCache();
     
@@ -1472,7 +1498,14 @@ async function loadTickersData() {
       await loadCurrenciesData();
     }
 
-    const response = await fetch(`/api/tickers/?_t=${Date.now()}`);
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/tickers/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -1609,7 +1642,7 @@ function updateTickersTable(tickers) {
                     <td title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${formattedPrice}</td>
                     <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${changeDisplay}</td>
                     <td title="${volume !== 'N/A' ? `נפח: ${volume}` : 'אין נתוני נפח'}" style="text-align: center; direction: ltr;">${window.renderVolume ? window.renderVolume(volume, true) : volume}</td>
-                    <td title="${statusLabel}">
+                    <td class="status-cell" data-status="${ticker.status || ''}" title="${statusLabel}">
                         <span style="background-color: ${statusStyle.backgroundColor}; 
                                      color: ${statusStyle.color}; 
                                      padding: ${statusStyle.padding}; 
@@ -1621,7 +1654,7 @@ function updateTickersTable(tickers) {
                             ${statusLabel}
                         </span>
                     </td>
-                    <td title="${typeLabel}">
+                    <td class="type-cell" data-type="${ticker.type || ''}" title="${typeLabel}">
                         <span style="background-color: ${typeStyle.backgroundColor}; 
                                      color: ${typeStyle.color}; 
                                      padding: ${typeStyle.padding}; 
@@ -1637,7 +1670,7 @@ function updateTickersTable(tickers) {
                     <td title="${ticker.currency_id ? `מטבע: ${getCurrencySymbol(ticker.currency_id)}` : 'אין נתוני מטבע'}" style="text-align: center;">
                         ${window.renderCurrency ? window.renderCurrency(ticker.currency_id, ticker.currency_name, getCurrencySymbol(ticker.currency_id)) : getCurrencySymbol(ticker.currency_id)}
                     </td>
-                    <td title="${ticker.yahoo_updated_at ? `עודכן: ${new Date(ticker.yahoo_updated_at).toLocaleString('he-IL')}` : 'אין נתוני עדכון'}" style="text-align: center;">
+                    <td class="date-cell" data-date="${ticker.yahoo_updated_at ? new Date(ticker.yahoo_updated_at).toISOString().split('T')[0] : ''}" title="${ticker.yahoo_updated_at ? `עודכן: ${new Date(ticker.yahoo_updated_at).toLocaleString('he-IL')}` : 'אין נתוני עדכון'}" style="text-align: center;">
                         ${ticker.yahoo_updated_at ? (window.formatShortDate ? window.formatShortDate(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleDateString('he-IL')) + ' ' + (window.formatTimeOnly ? window.formatTimeOnly(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleTimeString('he-IL', {hour: '2-digit', minute: '2-digit'})) : 'N/A'}
                     </td>
                     <td class="actions-cell">

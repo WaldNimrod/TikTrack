@@ -25,6 +25,9 @@ logger = logging.getLogger(__name__)
 
 quotes_bp = Blueprint('quotes', __name__, url_prefix='/api')
 
+# Initialize user service for preferences access
+user_service = UserService()
+
 # Initialize base API (quotes is complex, so we'll use it selectively)
 
 @quotes_bp.route('/quotes/batch', methods=['GET'])
@@ -201,7 +204,7 @@ def get_user_preferences():
         
         try:
             # Get user preferences using UserService (with fallback)
-            preferences = UserService.get_user_preferences(db, user_id)
+            preferences = user_service.get_user_preferences(user_id)
             
             # Extract external data specific preferences according to specification
             external_data_prefs = {
@@ -317,11 +320,11 @@ def update_user_preferences():
                     update_data[field] = data[field]
             
             # Update preferences
-            success = UserService.update_user_preferences(db, user_id, update_data)
+            success = user_service.set_user_preferences(user_id, update_data)
             
             if success:
                 # Get updated preferences
-                updated_preferences = UserService.get_user_preferences(db, user_id)
+                updated_preferences = user_service.get_user_preferences(user_id)
                 
                 return jsonify({
                     "status": "success",

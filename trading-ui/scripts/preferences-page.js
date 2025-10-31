@@ -11,7 +11,7 @@
  * - initializePreferencesPage() - initializePreferencesPage function
  * 
  * DATA LOADING (1)
- * - loadAccountsForPreferences() - loadAccountsForPreferences function
+ * - loadAccountsForPreferences() - Loads trading accounts for default account preference
  * 
  * DATA MANIPULATION (1)
  * - createNewProfile() - createNewProfile function
@@ -27,7 +27,7 @@
  * Handles page-specific functionality for preferences.html
  * 
  * @author TikTrack Development Team
- * @version 3.0 - Clean Rewrite
+ * @version 3.1 - Removed auto-initialization (moved to unifiedAppInitializer)
  * @since January 2025
  */
 
@@ -38,7 +38,7 @@ window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "prefe
  * ==============
  * 
  * DATA LOADING:
- * - loadAccountsForPreferences()
+ * - loadAccountsForPreferences() - Loads trading accounts for default account preference
  * 
  * PREFERENCES MANAGEMENT:
  * - savePreferences()
@@ -54,39 +54,53 @@ window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "prefe
 
 // ===== DATA LOADING =====
 /**
- * Load accounts using global function
+ * Load trading accounts for default account preference
+ * Fetches all trading accounts from API and populates the default_trading_account select
  */
 async function loadAccountsForPreferences() {
     try {
-        window.Logger.info('🔄 Loading accounts for preferences...', { page: "preferences-page" });
-        if (typeof window.loadAccountsDataFromAPI === 'function') {
-            const accounts = await window.loadAccountsDataFromAPI();
-            window.Logger.info('📊 Accounts loaded:', accounts, { page: "preferences-page" });
-            
-            const accountSelect = document.getElementById('defaultAccountFilter');
-            if (accountSelect && accounts) {
-                accountSelect.innerHTML = '<option>כל החשבונות</option>';
-                
-                accounts.forEach(account => {
-                    if (account.status === 'open') {
-                        const option = document.createElement('option');
-                        option.value = account.id;
-                        option.textContent = account.name;
-                        accountSelect.appendChild(option);
-                    }
-                });
-                
-                window.Logger.info('✅ Loaded accounts for preferences:', accounts.length, { page: "preferences-page" });
+        window.Logger.info('🔄 Loading trading accounts for default account preference...', { page: "preferences-page" });
+        
+        // Fetch accounts directly from API
+        const response = await fetch(`/api/trading-accounts/?_t=${Date.now()}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
             }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        const accounts = result.data || result;
+        window.Logger.info('📊 Trading accounts loaded:', accounts, { page: "preferences-page" });
+        
+        const accountSelect = document.getElementById('default_trading_account');
+        if (accountSelect && accounts && Array.isArray(accounts)) {
+            accountSelect.innerHTML = '<option value="">בחר חשבון...</option>';
+            
+            accounts.forEach(account => {
+                if (account.status === 'open') {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = account.name;
+                    accountSelect.appendChild(option);
+                }
+            });
+            
+            window.Logger.info('✅ Loaded trading accounts for default account preference:', accounts.length, { page: "preferences-page" });
         }
     } catch (error) {
-        window.Logger.error('❌ Error loading accounts:', error, { page: "preferences-page" });
+        window.Logger.error('❌ Error loading trading accounts for default account preference:', error, { page: "preferences-page" });
     }
 }
 
 /**
- * Switch Active Profile - Clean Implementation
- * Handles profile switching with proper validation and error handling
+ * Switch Active Profile - Simple Implementation
+ * Uses ProfileManager for clean profile switching
  */
 async function switchActiveProfile() {
     try {
@@ -102,216 +116,46 @@ async function switchActiveProfile() {
             throw new Error('Please select a profile');
         }
         
-        window.Logger.info(`🔍 PROFILE DEBUG: Switching to profile: ${selectedProfileName}`, { page: "preferences-page" });
-        window.Logger.info(`🔍 CACHE DEBUG: Current cache state before switch:`, window.PreferencesCore?.cacheManager?.getAll?.({ page: "preferences-page" }) || 'Cache not available');
-        
-        // 1. Get all profiles
+        // Get all profiles to find profile ID
         const profiles = await window.getUserProfiles();
         if (!profiles || profiles.length === 0) {
             throw new Error('No profiles available');
         }
-        window.Logger.info(`🔍 PROFILE DEBUG: Found ${profiles.length} profiles:`, profiles.map(p => `${p.name} (ID: ${p.id}, active: ${p.active}, default: ${p.default}, { page: "preferences-page" })`));
         
-        // 2. Handle default profile vs regular profiles
-        if (selectedProfileName === 'ברירת מחדל') {
-            window.Logger.info('📋 Switching to default profile (system defaults, { page: "preferences-page" })');
-            
-            // Find the default profile in the database
-            const defaultProfile = profiles.find(p => p.default === true || p.default === 1 || p.is_default === true || p.is_default === 1);
-            if (!defaultProfile) {
-                throw new Error('Default profile not found in database');
-            }
-            
-            window.Logger.info(`📋 Found default profile: ${defaultProfile.name} (ID: ${defaultProfile.id}, { page: "preferences-page" })`);
-            
-            // Call API to activate the default profile
-            const response = await fetch('/api/preferences/profiles/activate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: 1,
-                    profile_id: defaultProfile.id
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-                    const result = await response.json();
-            if (!result.success) {
-                throw new Error(result.error || 'Failed to activate default profile');
-            }
-            
-            window.Logger.info('✅ Default profile activated successfully', { page: "preferences-page" });
-            
-            // Update PreferencesCore current profile BEFORE clearing cache
-            // Update PreferencesCore and clear cache
-            window.Logger.info('🔄 Updating PreferencesCore and clearing cache...', { page: "preferences-page" });
-            
-            if (window.PreferencesCore) {
-                await window.PreferencesCore.setCurrentProfile(1, defaultProfile.id);
-                window.Logger.info('✅ PreferencesCore updated and cache cleared', { page: "preferences-page" });
-            } else {
-                window.Logger.warn('⚠️ PreferencesCore not available', { page: "preferences-page" });
-            }
-            
-            // Update PreferencesUI currentProfileId for synchronization
-            if (window.PreferencesUI) {
-                window.PreferencesUI.currentProfileId = defaultProfile.id;
-                window.Logger.info('✅ PreferencesUI currentProfileId synchronized', { page: "preferences-page" });
-            }
-            
-            // Show success notification
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('פרופיל הוחלף לברירת מחדל');
-            }
-            
-            // Reload all form data for the new profile
-            window.Logger.info('🔍 PROFILE DEBUG: Profile switch completed successfully', { page: "preferences-page" });
-            window.Logger.info('🔍 CACHE DEBUG: Final cache state:', window.PreferencesCore?.cacheManager?.getAll?.({ page: "preferences-page" }) || 'Cache not available');
-            
-            // Show loading notification
-            if (typeof window.showInfoNotification === 'function') {
-                window.showInfoNotification('טוען נתונים לפרופיל ברירת מחדל...');
-            }
-            
-            // Reload all preferences and form data for the new profile
-            window.Logger.info('🔄 Reloading all form data for default profile...', { page: "preferences-page" });
-            try {
-                // Reload preferences using the UI system with cache-busting
-                if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
-                    window.Logger.info('🔄 Reloading preferences with cache-busting...', { page: "preferences-page" });
-                    window.Logger.info(`🔄 Using cache buster: ${window.cacheBuster || 'none'}`, { page: "preferences-page" });
-                    await window.PreferencesUI.loadAllPreferences(1, defaultProfile.id);
-                    window.Logger.info('✅ Preferences reloaded for default profile', { page: "preferences-page" });
-                }
-                
-                // Reload profiles dropdown to show current active profile
-                if (typeof window.loadProfilesToDropdown === 'function') {
-                    window.Logger.info('🔄 Reloading profiles dropdown to show active profile...', { page: "preferences-page" });
-                    await window.loadProfilesToDropdown();
-                    window.Logger.info('✅ Profiles dropdown reloaded', { page: "preferences-page" });
-                    
-                    // Verify the dropdown shows the correct active profile
-                    const profileSelectElement = document.getElementById('profileSelect');
-                    if (profileSelectElement) {
-                        const selectedValue = profileSelectElement.value;
-                        window.Logger.info(`🔍 UI DEBUG: Dropdown now shows: ${selectedValue}`, { page: "preferences-page" });
-                        window.Logger.info(`🔍 UI DEBUG: Expected profile: ברירת מחדל`, { page: "preferences-page" });
-                        
-                        // Force update the dropdown if it doesn't match
-                        if (selectedValue !== 'ברירת מחדל') {
-                            window.Logger.info(`⚠️ MISMATCH: Dropdown shows "${selectedValue}" but expected "ברירת מחדל"`, { page: "preferences-page" });
-                            window.Logger.info(`🔄 Forcing dropdown update...`, { page: "preferences-page" });
-                            
-                            // Find and select the correct option
-                            const correctOption = profileSelectElement.querySelector('option[value="ברירת מחדל"]');
-                            if (correctOption) {
-                                correctOption.selected = true;
-                                window.Logger.info(`✅ Forced selection of "ברירת מחדל" in dropdown`, { page: "preferences-page" });
-                            } else {
-                                window.Logger.error(`❌ Option "ברירת מחדל" not found in dropdown!`, { page: "preferences-page" });
-                                window.Logger.info(`🔍 Available options:`, Array.from(profileSelectElement.options, { page: "preferences-page" }).map(opt => opt.value));
-                            }
-                        } else {
-                            window.Logger.info(`✅ Dropdown correctly shows "ברירת מחדל"`, { page: "preferences-page" });
-                        }
-                    }
-                }
-                
-                // Update active profile info display in the new card format
-                const activeProfileName = document.getElementById('activeProfileName');
-                const activeProfileDescription = document.getElementById('activeProfileDescription');
-                
-                if (activeProfileName) {
-                    activeProfileName.textContent = 'ברירת מחדל';
-                }
-                if (activeProfileDescription) {
-                    activeProfileDescription.textContent = 'פרופיל ברירת מחדל של המערכת';
-                }
-                window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ברירת מחדל`, { page: "preferences-page" });
-                
-                // Default profile is active - disable all preferences
-                window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-page" });
-                window.disableAllPreferencesInterface();
-                
-                // Show success notification
-                if (typeof window.showSuccessNotification === 'function') {
-                    window.showSuccessNotification('פרופיל הוחלף לברירת מחדל! כל הנתונים נטענו מחדש.');
-                }
-                
-                // Show confirmation dialog before reload
-                const shouldReload = confirm('הפרופיל הוחלף בהצלחה. האם לרענן את העמוד כדי לראות את השינויים?');
-                
-                if (shouldReload) {
-                    window.Logger.info('🔄 User requested page reload', { page: "preferences-page" });
-                    window.location.reload();
-                }
-                
-                window.Logger.info('✅ Profile switch completed - all form data reloaded', { page: "preferences-page" });
-                
-            } catch (error) {
-                window.Logger.error('❌ Error reloading form data:', error, { page: "preferences-page" });
-                if (typeof window.showErrorNotification === 'function') {
-                    window.showErrorNotification(`שגיאה בטעינת נתונים לפרופיל ברירת מחדל: ${error.message}`);
-                }
-            }
-            
-            return; // Exit early for default profile
-        }
-        
-        // 3. Find regular profile
+        // Find profile by name
         const profile = profiles.find(p => p.name === selectedProfileName);
         if (!profile) {
             throw new Error(`Profile "${selectedProfileName}" not found`);
         }
-        window.Logger.info(`📋 Found profile: ${profile.name} (ID: ${profile.id}, { page: "preferences-page" })`);
         
-        // 4. Call API to activate profile
-        const response = await fetch('/api/preferences/profiles/activate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_id: 1,
-                profile_id: profile.id
-            })
-        });
+        // Use ProfileManager to switch profile
+        const success = await window.switchProfile(profile.id, 1);
         
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        if (!success) {
+            throw new Error('Profile switch failed');
         }
         
-        const result = await response.json();
-        if (!result.success) {
-            throw new Error(result.error || 'Failed to activate profile');
+        // Update active profile info in summary
+        const activeProfileInfoElement = document.getElementById('activeProfileInfo');
+        if (activeProfileInfoElement) {
+            activeProfileInfoElement.textContent = profile.name;
         }
         
-        window.Logger.info('✅ Profile activated successfully', { page: "preferences-page" });
+        // Handle default profile UI state
+        const isDefaultProfile = profile.id === 0 || profile.is_default === true || profile.default === true;
         
-        // 5. Update PreferencesCore current profile BEFORE clearing cache
-        // 6. Update PreferencesCore and clear cache
-        window.Logger.info('🔄 Updating PreferencesCore and clearing cache...', { page: "preferences-page" });
+        window.Logger.info(`🔍 Profile switch: ID=${profile.id}, is_default=${profile.is_default}, isDefaultProfile=${isDefaultProfile}`, { page: "preferences-page" });
         
-        if (window.PreferencesCore) {
-            await window.PreferencesCore.setCurrentProfile(1, profile.id);
-            window.Logger.info('✅ PreferencesCore updated and cache cleared', { page: "preferences-page" });
+        if (isDefaultProfile) {
+            // Default profile is active - disable all preferences
+            if (typeof window.disableAllPreferencesInterface === 'function') {
+                window.disableAllPreferencesInterface();
+            }
         } else {
-            window.Logger.warn('⚠️ PreferencesCore not available', { page: "preferences-page" });
-        }
-        
-        // Update PreferencesUI currentProfileId for synchronization
-        if (window.PreferencesUI) {
-            window.PreferencesUI.currentProfileId = profile.id;
-            window.Logger.info('✅ PreferencesUI currentProfileId synchronized', { page: "preferences-page" });
-        }
-        
-        // Profile switch completed successfully
-        window.Logger.info('✅ Profile switch completed successfully', { page: "preferences-page" });
-        
-        // Show success notification
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification(`פרופיל הוחלף ל: ${profile.name} בהצלחה!`);
+            // User profile is active - enable all preferences and hide warning
+            if (typeof window.enableAllPreferencesInterface === 'function') {
+                window.enableAllPreferencesInterface();
+            }
         }
         
     } catch (error) {
@@ -350,42 +194,21 @@ async function createNewProfile() {
         window.Logger.info(`📋 Creating profile: ${profileName}`, { page: "preferences-page" });
         
         // Check if profile already exists
-            const profiles = await window.getUserProfiles();
+        const profiles = await window.getUserProfiles();
         const existingProfile = profiles.find(p => p.name === profileName);
         if (existingProfile) {
             throw new Error(`Profile "${profileName}" already exists`);
         }
         
-        // Create profile via API (assuming this endpoint exists)
-        const response = await fetch('/api/preferences/profiles', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_id: 1,
-                profile_name: profileName,
-                description: `פרופיל ${profileName}`,
-                is_default: false
-            })
-        });
+        // Use ProfileManager to create profile
+        const profileId = await window.createProfile(profileName, `פרופיל ${profileName}`, 1);
         
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        if (!profileId) {
+            throw new Error('Failed to create profile');
         }
-        
-        const result = await response.json();
-        if (!result.success) {
-            throw new Error(result.error || 'Failed to create profile');
-        }
-        
-        window.Logger.info('✅ Profile created successfully', { page: "preferences-page" });
         
         // Clear input
         nameInput.value = '';
-                                
-                                // Show success notification
-                                if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification(`פרופיל "${profileName}" נוצר בהצלחה`);
-        }
         
         // Reload page after 1.5 seconds
         setTimeout(() => {
@@ -404,6 +227,117 @@ async function createNewProfile() {
 /**
  * Local copyDetailedLog function for preferences page
  */
+/**
+ * Debug Profile System - Console Function
+ * Run this in console: debugProfileSystem()
+ */
+window.debugProfileSystem = async function() {
+    console.log('=== 🔍 DEBUG PROFILE SYSTEM ===');
+    console.log('');
+    
+    try {
+        // 1. Check current profile IDs
+        console.log('1️⃣ Current Profile IDs:');
+        console.log('   PreferencesCore.currentProfileId:', window.PreferencesCore?.currentProfileId);
+        console.log('   PreferencesUI.currentProfileId:', window.PreferencesUI?.currentProfileId);
+        console.log('   ProfileManager.currentProfileId:', window.ProfileManager?.currentProfileId);
+        console.log('   PreferencesCore.currentUserId:', window.PreferencesCore?.currentUserId);
+        console.log('');
+        
+        // 2. Check profiles from API
+        console.log('2️⃣ Profiles from API:');
+        const profilesResponse = await fetch('/api/preferences/profiles?user_id=1');
+        const profilesResult = await profilesResponse.json();
+        console.log('   API Response:', profilesResult);
+        if (profilesResult.success) {
+            const profiles = profilesResult.data.profiles;
+            console.log(`   Total profiles: ${profiles.length}`);
+            profiles.forEach(p => {
+                console.log(`   - Profile ${p.id}: ${p.name} (active: ${p.active}, is_default: ${p.is_default || p.default})`);
+            });
+            const activeProfile = profiles.find(p => p.active === true);
+            console.log('   Active Profile:', activeProfile);
+        }
+        console.log('');
+        
+        // 3. Test preference loading
+        console.log('3️⃣ Test Preference Loading:');
+        console.log('   Testing with profileId=0 (default):');
+        try {
+            const testPref0 = await window.PreferencesCore.getPreference('statusOpenColor', 1, 0);
+            console.log('   ✅ profileId=0: Success, value:', testPref0);
+        } catch (e) {
+            console.log('   ❌ profileId=0: Error:', e.message);
+        }
+        
+        console.log('   Testing with profileId=1:');
+        try {
+            const testPref1 = await window.PreferencesCore.getPreference('statusOpenColor', 1, 1);
+            console.log('   ✅ profileId=1: Success, value:', testPref1);
+        } catch (e) {
+            console.log('   ❌ profileId=1: Error:', e.message);
+        }
+        console.log('');
+        
+        // 4. Check what LazyLoader is using
+        console.log('4️⃣ LazyLoader State:');
+        if (window.LazyLoader) {
+            const stats = window.LazyLoader.getLoadingStats();
+            console.log('   Loading Stats:', stats);
+        } else {
+            console.log('   ❌ LazyLoader not available');
+        }
+        console.log('');
+        
+        // 5. Check what PreferencesAPIClient would send
+        console.log('5️⃣ PreferencesAPIClient Test:');
+        console.log('   Testing getPreference with profileId=null:');
+        console.log('   (This should use profile_id=0)');
+        // This will show in network tab
+        
+        console.log('');
+        console.log('=== ✅ DEBUG COMPLETE ===');
+        console.log('');
+        console.log('💡 Next steps:');
+        console.log('   1. Check Network tab for API calls');
+        console.log('   2. Look for profile_id=1 vs profile_id=0');
+        console.log('   3. Check what profileId is passed to LazyLoader.initialize');
+        
+    } catch (error) {
+        console.error('❌ Error in debugProfileSystem:', error);
+    }
+};
+
+/**
+ * Debug Profile Loading Flow - Console Function
+ * Run this in console: debugProfileLoading()
+ */
+window.debugProfileLoading = async function() {
+    console.log('=== 🔍 DEBUG PROFILE LOADING FLOW ===');
+    console.log('');
+    
+    try {
+        console.log('Step 1: Load active profile');
+        const activeProfileId = await window.PreferencesUI.loadActiveProfile();
+        console.log('   ✅ Active Profile ID:', activeProfileId);
+        console.log('');
+        
+        console.log('Step 2: Load all preferences');
+        await window.PreferencesUI.loadAllPreferences(1, activeProfileId);
+        console.log('   ✅ Preferences loaded');
+        console.log('');
+        
+        console.log('Step 3: Check final state');
+        console.log('   PreferencesCore.currentProfileId:', window.PreferencesCore?.currentProfileId);
+        console.log('   PreferencesUI.currentProfileId:', window.PreferencesUI?.currentProfileId);
+        console.log('');
+        
+        console.log('=== ✅ DEBUG COMPLETE ===');
+        
+    } catch (error) {
+        console.error('❌ Error in debugProfileLoading:', error);
+    }
+};
 async function copyDetailedLogLocal() {
     try {
         const log = [];
@@ -425,7 +359,10 @@ async function copyDetailedLogLocal() {
         if (window.PreferencesCore) {
             log.push(`👤 Current User ID: ${window.PreferencesCore.currentUserId}`);
             log.push(`📋 Current Profile ID: ${window.PreferencesCore.currentProfileId}`);
-            log.push(`💾 Cache Size: ${Object.keys(window.PreferencesCore.cacheManager.cache || {}).length} items`);
+        }
+        if (window.ProfileManager) {
+            log.push(`👤 ProfileManager User ID: ${window.ProfileManager.currentUserId}`);
+            log.push(`📋 ProfileManager Profile ID: ${window.ProfileManager.currentProfileId}`);
         }
         
         // Statistics
@@ -461,7 +398,7 @@ async function copyDetailedLogLocal() {
             await navigator.clipboard.writeText(logContent);
             window.Logger.info('✅ Log copied to clipboard', { page: "preferences-page" });
             
-                if (typeof window.showSuccessNotification === 'function') {
+            if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('לוג הועתק ללוח');
             }
         } else {
@@ -479,26 +416,41 @@ async function copyDetailedLogLocal() {
 
 /**
  * Initialize page-specific functionality
+ * NOTE: This function is NO LONGER called automatically.
+ * Page initialization is now handled by unifiedAppInitializer via customInitializers in page-initialization-configs.js
+ * This function is kept for backward compatibility and manual initialization if needed.
  */
 function initializePreferencesPage() {
-    window.Logger.info('🚀 Initializing preferences page...', { page: "preferences-page" });
+    window.Logger.info('🚀 Initializing preferences page (manual)...', { page: "preferences-page" });
     
-    // Load accounts when page loads
-    loadAccountsForPreferences();
+    // NOTE: loadAccountsForPreferences() is now called via customInitializers in page-initialization-configs.js
+    // This prevents double-loading of accounts
+    // loadAccountsForPreferences(); // MOVED TO customInitializers
     
-    // Make functions globally available
-    window.switchActiveProfile = switchActiveProfile;
-    window.createNewProfile = createNewProfile;
-    // window. export removed - using global version from system-management.js
-    
-    window.Logger.info('✅ Preferences page initialized', { page: "preferences-page" });
+    // Functions are now exported globally outside this function for immediate availability
+    window.Logger.info('✅ Preferences page initialized (manual)', { page: "preferences-page" });
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializePreferencesPage);
-} else {
-    initializePreferencesPage();
-}
+// NOTE: Auto-initialization is now handled by unifiedAppInitializer
+// This DOMContentLoaded listener is KEPT for backward compatibility but should not be needed
+// if (document.readyState === 'loading') {
+//     document.addEventListener('DOMContentLoaded', initializePreferencesPage);
+// } else {
+//     initializePreferencesPage();
+// }
 
-window.Logger.info('✅ preferences-page.js v3.0 loaded successfully', { page: "preferences-page" });
+// ============================================================================
+// GLOBAL EXPORTS (Moved outside function for immediate availability)
+// ============================================================================
+
+/**
+ * Make functions globally available immediately (not in init function)
+ * This ensures they are available for the monitoring system
+ */
+window.switchActiveProfile = switchActiveProfile;
+window.createNewProfile = createNewProfile;
+window.loadAccountsForPreferences = loadAccountsForPreferences;
+window.initializePreferencesPage = initializePreferencesPage;
+window.copyDetailedLogLocal = copyDetailedLogLocal;
+
+window.Logger.info('✅ preferences-page.js v3.1 loaded successfully', { page: "preferences-page" });

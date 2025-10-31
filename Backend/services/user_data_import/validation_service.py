@@ -352,7 +352,7 @@ class ValidationService:
         
         return violations
     
-    def _check_missing_tickers(self, records: List[Dict[str, Any]]) -> List[str]:
+    def _check_missing_tickers(self, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Check which tickers are missing from the database.
         
@@ -360,7 +360,7 @@ class ValidationService:
             records: List of valid records to check
             
         Returns:
-            List[str]: List of missing ticker symbols
+            List[Dict[str, Any]]: List of missing ticker info with symbol and currency
         """
         logger.info(f"🔍 _check_missing_tickers called with {len(records)} records")
         
@@ -369,8 +369,15 @@ class ValidationService:
             return []
         
         try:
-            # Get unique symbols from records
-            symbols = list(set([record.get('symbol') for record in records if record.get('symbol')]))
+            # Get unique symbols with currency info from records
+            symbol_currency_map = {}
+            for record in records:
+                symbol = record.get('symbol')
+                currency = record.get('currency', 'USD')  # Default to USD
+                if symbol:
+                    symbol_currency_map[symbol] = currency
+            
+            symbols = list(symbol_currency_map.keys())
             logger.info(f"📊 Found {len(symbols)} unique symbols: {symbols[:10]}...")
             
             if not symbols:
@@ -390,9 +397,15 @@ class ValidationService:
             if hasattr(self, 'ticker_cache') and self.ticker_cache:
                 logger.info(f"🔍 Using ticker cache for {len(symbols)} symbols")
                 existing_symbols = set(self.ticker_cache.keys())
-                missing_symbols = [symbol for symbol in symbols if symbol not in existing_symbols]
-                logger.info(f"✅ Found {len(missing_symbols)} missing tickers: {missing_symbols}")
-                return missing_symbols
+                missing_tickers = []
+                for symbol in symbols:
+                    if symbol not in existing_symbols:
+                        missing_tickers.append({
+                            'symbol': symbol,
+                            'currency': symbol_currency_map[symbol]
+                        })
+                logger.info(f"✅ Found {len(missing_tickers)} missing tickers: {[t['symbol'] for t in missing_tickers]}")
+                return missing_tickers
             
             logger.info(f"🔍 Querying database for {len(symbols)} symbols")
             existing_tickers = self.db_session.query(Ticker.symbol).filter(
@@ -401,10 +414,16 @@ class ValidationService:
             logger.info(f"📊 Found {len(existing_tickers)} existing tickers in DB")
             
             existing_symbols = {ticker.symbol for ticker in existing_tickers}
-            missing_symbols = [symbol for symbol in symbols if symbol not in existing_symbols]
+            missing_tickers = []
+            for symbol in symbols:
+                if symbol not in existing_symbols:
+                    missing_tickers.append({
+                        'symbol': symbol,
+                        'currency': symbol_currency_map[symbol]
+                    })
             
-            logger.info(f"✅ Found {len(missing_symbols)} missing tickers: {missing_symbols}")
-            return missing_symbols
+            logger.info(f"✅ Found {len(missing_tickers)} missing tickers: {[t['symbol'] for t in missing_tickers]}")
+            return missing_tickers
             
         except Exception as e:
             logger.error(f"❌ Failed to check missing tickers: {str(e)}")

@@ -9,8 +9,13 @@
  * - documentation/02-ARCHITECTURE/FRONTEND/button-system.md
  * 
  * Author: TikTrack Development Team
- * Version: 1.0
+ * Version: 1.1
  * Last Updated: 2025-01-27
+ * 
+ * Changes:
+ * - Updated to use data-onclick instead of onclick for event delegation
+ * - Buttons now created with data-onclick attribute for centralized event handling
+ * - See documentation/frontend/button-system.md and documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md
  */
 
 const BUTTON_SYSTEM_CONFIG = {
@@ -282,6 +287,37 @@ class AdvancedButtonSystem {
         // this.logger.info(`Processed: ${this.performance.processedButtons}, Errors: ${this.performance.errors}`);
     }
 
+    /**
+     * Process buttons within a specific container element
+     * @param {HTMLElement} container - Container element to search for buttons
+     * @async
+     */
+    async processButtons(container) {
+        if (!container) {
+            this.logger.warn('processButtons: No container provided');
+            return;
+        }
+
+        // Find buttons within the container that haven't been processed yet
+        const buttonElements = container.querySelectorAll('[data-button-type]:not([data-button-processed])');
+        const totalButtons = buttonElements.length;
+
+        if (totalButtons === 0) {
+            this.logger.debug(`processButtons: No unprocessed buttons found in container`);
+            return;
+        }
+
+        this.logger.debug(`processButtons: Found ${totalButtons} buttons to process in container`);
+
+        // Wait for button icons to be loaded
+        await this.waitForButtonIcons();
+        
+        // Process buttons in batches
+        this.processButtonsInBatches(buttonElements);
+        
+        this.logger.debug(`processButtons: Completed processing ${totalButtons} buttons in container`);
+    }
+
     async waitForButtonIcons() {
         const maxWaitTime = 1000; // 1 second max (reduced from 5 seconds)
         const checkInterval = 50; // Check every 50ms (faster)
@@ -413,7 +449,8 @@ class AdvancedButtonSystem {
             if (style) allAttributes += ` data-style='${style}'`;
             allAttributes += ` data-variant='${variant}'`;
 
-            let onclickAttr = onClick ? ` onclick="${onClick}"` : '';
+            // Use data-onclick instead of onclick for event delegation
+            let dataOnclickAttr = onClick ? ` data-onclick="${onClick}"` : '';
             let titleAttr = buttonText ? ` title='${buttonText}'` : '';
             let idAttr = id ? ` id='${id}'` : '';
 
@@ -430,7 +467,7 @@ class AdvancedButtonSystem {
                 content = buttonText;
             }
 
-            return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${onclickAttr}${titleAttr}${allAttributes}>${content}</button>`;
+            return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${titleAttr}${allAttributes}>${content}</button>`;
         } else {
             this.logger.warn('Button system dependencies not found, using fallback');
             return this.createFallbackButton(type, onClick, classes, attributes, text, id);
@@ -464,11 +501,12 @@ class AdvancedButtonSystem {
         if (attributes) allAttributes += ' ' + attributes;
         allAttributes += ` data-variant='${variant}'`;
 
-        let onclickAttr = onClick ? ` onclick='${onClick}'` : '';
+        // Use data-onclick instead of onclick for event delegation
+        let dataOnclickAttr = onClick ? ` data-onclick='${onClick}'` : '';
         let idAttr = id ? ` id='${id}'` : '';
 
         // For fallback, always show text (normal variant behavior)
-        return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${onclickAttr}${allAttributes}>${buttonText}</button>`;
+        return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${allAttributes}>${buttonText}</button>`;
     }
 
     applyFallbackButton(element) {
@@ -538,6 +576,10 @@ window.updateButton = (buttonId, type, onClick, classes = '', attributes = '', t
 
 window.getButtonSystemStats = () => {
     return window.advancedButtonSystem.getStats();
+};
+
+window.processButtons = (container) => {
+    return window.advancedButtonSystem.processButtons(container);
 };
 
 // Initialize Button System function

@@ -178,18 +178,25 @@ const PACKAGE_MANIFEST = {
         loadOrder: 12
       },
       {
+        file: 'event-handler-manager.js',
+        globalCheck: 'window.EventHandlerManager',
+        description: 'מערכת ניהול אירועים מרכזית',
+        required: true,
+        loadOrder: 13
+      },
+      {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
         description: 'מערכת כפתורים',
         required: true,
-        loadOrder: 13
+        loadOrder: 14
       },
       {
         file: 'color-scheme-system.js',
         globalCheck: 'window.loadDynamicColors',
         description: 'מערכת צבעים דינמית',
         required: true,
-        loadOrder: 14
+        loadOrder: 15
       }
     ],
     estimatedSize: '~280KB',
@@ -409,7 +416,7 @@ const PACKAGE_MANIFEST = {
   preferences: {
     id: 'preferences',
     name: 'Preferences Package',
-    description: 'מערכת העדפות משתמש v2.0 (5 קבצים)',
+    description: 'מערכת העדפות משתמש v2.0 (6 קבצים)',
     version: '2.0.0',
     critical: false,
     loadOrder: 5,
@@ -430,36 +437,50 @@ const PACKAGE_MANIFEST = {
         loadOrder: 2
       },
       {
+        file: 'preferences-profiles.js',
+        globalCheck: 'window.ProfileManager',
+        description: 'ניהול פרופילים',
+        required: true,
+        loadOrder: 3
+      },
+      {
         file: 'preferences-lazy-loader.js',
         globalCheck: 'window.LazyLoader',
         description: 'lazy loading system',
         required: true,
-        loadOrder: 3
+        loadOrder: 4
       },
       {
         file: 'preferences-validation.js',
         globalCheck: 'window.PreferenceValidator',
         description: 'validation system',
         required: true,
-        loadOrder: 4
+        loadOrder: 5
       },
       {
         file: 'preferences-ui.js',
         globalCheck: 'window.PreferencesUI',
         description: 'ממשק משתמש',
         required: true,
-        loadOrder: 5
+        loadOrder: 6
       },
       {
         file: 'preferences-page.js',
-        globalCheck: 'window.',
+        globalCheck: 'window.loadAccountsForPreferences',
         description: 'פונקציות ספציפיות לעמוד העדפות',
         required: false,
-        loadOrder: 6
+        loadOrder: 7
+      },
+      {
+        file: 'preferences-group-manager.js',
+        globalCheck: 'window.PreferencesGroupManager',
+        description: 'מנהל קבוצות העדפות',
+        required: false,
+        loadOrder: 8
       }
     ],
-    estimatedSize: '~140KB',
-    initTime: '~80ms'
+    estimatedSize: '~150KB',
+    initTime: '~85ms'
   },
 
   // 6. VALIDATION PACKAGE - ולידציה

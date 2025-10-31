@@ -514,7 +514,8 @@ def activate_profile() -> Any:
         user_id = data.get('user_id')
         profile_id = data.get('profile_id')
         
-        if not user_id or not profile_id:
+        # Check if user_id and profile_id are provided (note: profile_id can be 0 for default profile)
+        if user_id is None or profile_id is None:
             return jsonify({
                 'success': False,
                 'error': 'user_id and profile_id are required',
@@ -572,6 +573,38 @@ def clear_cache():
 # ============================================================================
 # Admin Endpoints
 # ============================================================================
+
+@preferences_bp.route('/types/check', methods=['GET'])
+def check_preference_type() -> Any:
+    """
+    בדיקת קיום סוג העדפה
+    """
+    try:
+        preference_name = request.args.get('name')
+        if not preference_name:
+            return jsonify({
+                "success": False,
+                "error": "Missing preference name parameter",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        # בדיקה אם סוג ההעדפה קיים
+        exists = preferences_service.check_preference_type_exists(preference_name)
+        
+        return jsonify({
+            "success": True,
+            "exists": exists,
+            "preference_name": preference_name,
+            "timestamp": datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error checking preference type: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
 
 @preferences_bp.route('/admin/types', methods=['GET'])
 def get_preference_types() -> Any:

@@ -736,7 +736,7 @@ window.showAddConstraintModal = showAddConstraintModal;
 window.selectConstraint = selectConstraint;
 window.addNewConstraint = addNewConstraint;
 window.handleModalAddConstraint = handleModalAddConstraint;
-window.deleteConstraint = deleteConstraint;
+window.deleteConstraint = (constraintId) => constraintManager.deleteConstraint(constraintId);
 window.removeEnumValue = removeEnumValue;
-window.loadConstraintsData = loadConstraintsData;
+window.loadConstraintsData = () => constraintManager.loadConstraints();
 

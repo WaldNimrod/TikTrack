@@ -29,10 +29,11 @@ const executionsModalConfig = {
         {
             type: 'select',
             id: 'executionAccount',
-            label: 'חשבון מסחר מסחר',
+            label: 'חשבון מסחר',
             required: true,
             options: [], // יטען דינמית מ-API
-            placeholder: 'בחר חשבון מסחר...'
+            placeholder: 'בחר חשבון מסחר...',
+            defaultFromPreferences: true // ברירת מחדל מהעדפות
         },
         {
             type: 'select',
@@ -54,7 +55,8 @@ const executionsModalConfig = {
             required: true,
             min: 1,
             step: 1,
-            placeholder: 'הכנס כמות...'
+            placeholder: 'הכנס כמות...',
+            defaultValue: 100
         },
         {
             type: 'number',
@@ -79,7 +81,8 @@ const executionsModalConfig = {
             required: false,
             min: 0,
             step: 0.01,
-            placeholder: '0.00'
+            placeholder: '0.00',
+            defaultFromPreferences: true // ברירת מחדל מהעדפות
         },
         {
             type: 'number',
@@ -106,19 +109,6 @@ const executionsModalConfig = {
             required: false,
             step: 1,
             placeholder: 'הכנס MTM P/L...'
-        },
-        {
-            type: 'select',
-            id: 'executionStatus',
-            label: 'סטטוס',
-            required: true,
-            options: [
-                { value: 'pending', label: 'ממתין' },
-                { value: 'filled', label: 'מבוצע' },
-                { value: 'cancelled', label: 'מבוטל' },
-                { value: 'rejected', label: 'נדחה' }
-            ],
-            defaultValue: 'filled'
         },
         {
             type: 'textarea',
@@ -166,9 +156,6 @@ const executionsModalConfig = {
         executionMTMPL: {
             required: false,
             min: null  // Can be negative
-        },
-        executionStatus: {
-            required: true
         },
         executionNotes: {
             required: false,

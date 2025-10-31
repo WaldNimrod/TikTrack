@@ -452,7 +452,6 @@ class DatabaseRecreator:
             ('tickers', 'symbol', 'NOT_NULL', 'ticker_symbol_required', 'ticker_symbol_required', 1),
             ('tickers', 'type', 'ENUM', 'ticker_type_enum', 'ticker_type_enum', 1),
             ('tickers', 'status', 'ENUM', 'ticker_status_enum', 'ticker_status_enum', 1),
-            ('executions', 'trade_id', 'NOT_NULL', 'execution_trade_required', 'execution_trade_required', 1),
             ('executions', 'action', 'ENUM', 'valid_execution_action', 'valid_execution_action', 1),
             ('executions', 'date', 'NOT_NULL', 'execution_date_required', 'execution_date_required', 1),
             ('cash_flows', 'trading_account_id', 'NOT_NULL', 'cash_flow_account_required', 'cash_flow_account_required', 1),

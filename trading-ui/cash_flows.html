@@ -53,7 +53,6 @@
                             תזרימי מזומנים
                         </div>
                         <div class="table-actions">
-                            <button data-button-type="COPY" data-variant="full" data-onclick="" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר"></button>
                         </div>
                     </div>
@@ -61,7 +60,6 @@
                     <!-- Alert cards -->
                     <div class="section-body">
                         <active-alerts></active-alerts>
-
 
                         <!-- Data summary -->
                         <div class="info-summary" id="summaryStats">
@@ -94,22 +92,22 @@
                                 <thead>
                                     <tr>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }" >חשבון מסחר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 0)">חשבון מסחר <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-type">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }" >סוג <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 1)">סוג <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-amount">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }" >סכום <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 2)">סכום <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-date">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }" >תאריך <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 3)">תאריך <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-description">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }" >תיאור <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 4)">תיאור <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-source">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }" >מקור <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 5)">מקור <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-4-items">
                                         </th>
@@ -154,15 +152,16 @@
     <script src="scripts/global-favicon.js?v=05b6de6f_20251025_005449"></script> <!-- ניהול favicon -->
     <script src="scripts/notification-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת התראות -->
     <script src="scripts/ui-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לממשק משתמש -->
-    <script src="scripts/warning-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת אזהרות -->
+    <script src="scripts/warning-system.js?v=20250130d"></script> <!-- מערכת אזהרות -->
     <script src="scripts/error-handlers.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת טיפול בשגיאות -->
-    <script src="scripts/unified-cache-manager.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/unified-cache-manager.js?v=20250130"></script>
     <script src="scripts/logger-service.js?v=05b6de6f_20251025_005449"></script> <!-- שירות לוגים מתקדם --> <!-- מנהל מטמון מאוחד -->
     <script src="scripts/cache-sync-manager.js?v=05b6de6f_20251025_005449"></script> <!-- מנהל סנכרון מטמון -->
     <script src="scripts/header-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת כותרת -->
     <script src="scripts/page-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לעמודים -->
     <script src="scripts/translation-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לתרגום -->
     <script src="scripts/button-icons.js?v=05b6de6f_20251025_005449"></script> <!-- אייקונים לכפתורים -->
+    <script src="scripts/event-handler-manager.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת ניהול אירועים מרכזית -->
     <script src="scripts/button-system-init.js?v=05b6de6f_20251025_005449"></script> <!-- אתחול מערכת כפתורים -->
     <script src="scripts/color-scheme-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת צבעים דינמית -->
 
@@ -172,9 +171,9 @@
     <!-- Critical: NO | Version: 2.0.0 -->
     <script src="scripts/services/data-collection-service.js?v=05b6de6f_20251025_005449"></script> <!-- שירות איסוף נתונים -->
     <script src="scripts/services/field-renderer-service.js?v=05b6de6f_20251025_005449"></script> <!-- שירות רינדור שדות -->
-    <script src="scripts/services/select-populator-service.js?v=05b6de6f_20251025_005449"></script> <!-- שירות מילוי select -->
+    <script src="scripts/services/select-populator-service.js?v=20250130w"></script> <!-- שירות מילוי select -->
     <script src="scripts/services/statistics-calculator.js?v=05b6de6f_20251025_005449"></script> <!-- מחשבון מסחר סטטיסטיקות -->
-    <script src="scripts/services/crud-response-handler.js?v=05b6de6f_20251025_005449"></script> <!-- מטפל בתגובות CRUD -->
+    <script src="scripts/services/crud-response-handler.js?v=20250130l"></script> <!-- מטפל בתגובות CRUD -->
     <script src="scripts/services/default-value-setter.js?v=05b6de6f_20251025_005449"></script> <!-- קובע ערכי ברירת מחדל -->
 
     <!-- ===== UI-ADVANCED PACKAGE (loadOrder: 3) ===== -->
@@ -190,7 +189,7 @@
     <!-- Critical: NO | Version: 2.0.0 -->
     <script src="scripts/date-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לתאריכים -->
     <script src="scripts/data-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לנתונים -->
-    <script src="scripts/tables.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת טבלאות -->
+    <script src="scripts/tables.js?v=20250130a"></script> <!-- מערכת טבלאות -->
 
     <!-- ===== PREFERENCES PACKAGE (loadOrder: 5) ===== -->
     <!-- מערכת העדפות משתמש -->
@@ -216,13 +215,13 @@
     
     <!-- ===== MODAL SYSTEM V2 ===== -->
     <!-- מערכת מודלים מרכזית חדשה -->
-    <script src="scripts/modal-manager-v2.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/modal-manager-v2.js?v=20250130r"></script>
     <script src="scripts/modal-configs/cash-flows-config.js?v=05b6de6f_20251025_005449"></script>
     
     <script src="scripts/unified-app-initializer.js?v=05b6de6f_20251025_005449"></script> <!-- אתחול מאוחד -->
     
     <!-- Page-specific Scripts -->
-    <script src="scripts/cash_flows.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/cash_flows.js?v=20250130l"></script>
     
     <!-- 14. Init System Check (Available on all pages) -->
     <script src="scripts/init-system-check.js?v=05b6de6f_20251025_005449"></script>

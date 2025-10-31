@@ -72,7 +72,12 @@ function getColumnValue(item, columnIndex, tableType) {
       'id', 'symbol', 'side', 'investment_type', 'status', 'account_name', 'created_at', 'amount',
     ],
     'cash_flows': [
-      'id', 'type', 'amount', 'currency', 'account_name', 'description', 'created_at',
+      'account_name',  // 0 - חשבון מסחר (Account)
+      'type',          // 1 - סוג (Type)
+      'amount',        // 2 - סכום (Amount)
+      'date',          // 3 - תאריך (Date)
+      'description',   // 4 - תיאור (Description)
+      'source',        // 5 - מקור (Source)
     ],
     'notes': [
       'id', 'title', 'content', 'type', 'status', 'created_at',
@@ -165,14 +170,34 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
 window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   // Global sortTableData called for table
 
-  // Get current sort state
-  const currentSortState = window.getSortState(tableType);
+  // Validate input data
+  if (!data || !Array.isArray(data)) {
+    console.error(`❌ [SORT] Invalid data: expected array, got ${typeof data}`, data);
+    return [];
+  }
+
+  if (data.length === 0) {
+    console.warn(`⚠️ [SORT] No data to sort for table type: ${tableType}`);
+    return [];
+  }
+
+  // Get current sort state for this specific column
+  const columnStateKey = `sortState_${tableType}_col_${columnIndex}`;
+  const savedColumnState = localStorage.getItem(columnStateKey);
+  let currentColumnState = null;
+  if (savedColumnState) {
+    try {
+      currentColumnState = JSON.parse(savedColumnState);
+    } catch {
+      // Invalid state for this column
+    }
+  }
 
   // Determine new sort direction
   let newDirection = 'asc';
-  if (currentSortState.columnIndex === columnIndex) {
-    // If same column - toggle direction
-    newDirection = currentSortState.direction === 'asc' ? 'desc' : 'asc';
+  if (currentColumnState) {
+    // If column has previous state - toggle direction
+    newDirection = currentColumnState.direction === 'asc' ? 'desc' : 'asc';
   }
 
   // Save new sort state
@@ -215,41 +240,8 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
     }
 
     // Secondary sort by previous column if exists
-    if (currentSortState.columnIndex !== null && currentSortState.columnIndex !== columnIndex) {
-      const prevColumnIndex = currentSortState.columnIndex;
-      const prevDirection = currentSortState.direction;
-      
-      let aPrevValue = getColumnValue(a, prevColumnIndex, tableType);
-      let bPrevValue = getColumnValue(b, prevColumnIndex, tableType);
-
-      // Custom sorting logic for previous column
-      const prevCustomSortResult = getCustomSortValue(a, b, prevColumnIndex, tableType, aPrevValue, bPrevValue);
-      if (prevCustomSortResult !== null) {
-        return prevDirection === 'asc' ? prevCustomSortResult : -prevCustomSortResult;
-      }
-
-      // Standard sorting logic for previous column
-      // Convert to numbers if possible
-      if (!isNaN(aPrevValue) && !isNaN(bPrevValue)) {
-        aPrevValue = parseFloat(aPrevValue);
-        bPrevValue = parseFloat(bPrevValue);
-      }
-
-      // Convert to dates if possible
-      if (isDateValue(aPrevValue) && isDateValue(bPrevValue)) {
-        aPrevValue = new Date(aPrevValue);
-        bPrevValue = new Date(bPrevValue);
-      }
-
-      // Perform secondary sort comparison
-      if (aPrevValue < bPrevValue) {
-        return prevDirection === 'asc' ? -1 : 1;
-      }
-      if (aPrevValue > bPrevValue) {
-        return prevDirection === 'asc' ? 1 : -1;
-      }
-    }
-
+    // Note: We skip secondary sort for now as each column has its own independent sort state
+    
     return 0;
   });
 
@@ -259,11 +251,54 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   }
 
   // Update sort icons
-  updateSortIcons(tableType, columnIndex, newDirection);
+  updateSortIconsLocal(tableType, columnIndex, newDirection);
 
   // Table sorted by column
   return sortedData;
 };
+
+/**
+ * Update sort icons in table headers
+ *
+ * @param {string} tableType - Type of table
+ * @param {number} columnIndex - Column index
+ * @param {string} direction - Sort direction (asc/desc)
+ */
+function updateSortIconsLocal(tableType, columnIndex, direction) {
+  try {
+    // Find the table by data-table-type attribute
+    const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+    if (!table) {
+      console.warn(`⚠️ Table with type "${tableType}" not found for sort icons update`);
+      return;
+    }
+
+    // Clear all sort icons first
+    const headers = table.querySelectorAll('th .sort-icon');
+    headers.forEach(header => {
+      header.textContent = '↕';
+      header.className = 'sort-icon';
+    });
+
+    // Update the specific column's sort icon
+    const targetHeader = table.querySelector(`th:nth-child(${columnIndex + 1}) .sort-icon`);
+    if (targetHeader) {
+      if (direction === 'asc') {
+        targetHeader.textContent = '↑';
+        targetHeader.className = 'sort-icon sort-asc';
+      } else if (direction === 'desc') {
+        targetHeader.textContent = '↓';
+        targetHeader.className = 'sort-icon sort-desc';
+      } else {
+        targetHeader.textContent = '↕';
+        targetHeader.className = 'sort-icon';
+      }
+    }
+
+  } catch (error) {
+    console.error('❌ Error updating sort icons:', error);
+  }
+}
 
 /**
  * Check if value is a valid date
@@ -290,8 +325,9 @@ window.saveSortState = function (tableType, columnIndex, direction) {
     direction,
     timestamp: Date.now(),
   };
+  // Save state for both table type (current column) and specific column
   localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState));
-  // Sort state saved for table
+  localStorage.setItem(`sortState_${tableType}_col_${columnIndex}`, JSON.stringify(sortState));
 };
 
 /**
@@ -353,8 +389,8 @@ window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
  * @returns {Array} Sorted data
  */
 window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, updateFunction) {
-  // Handle legacy call with only column index
-  if (typeof tableTypeOrColumnIndex === 'number' && arguments.length === 1) {
+  // Handle call with string tableType and number columnIndex
+  if (typeof tableTypeOrColumnIndex === 'string' && typeof columnIndex === 'number' && arguments.length === 2) {
     // Find the current table element
     const currentTable = document.querySelector('table[data-table-type]');
     if (!currentTable) {
@@ -372,22 +408,47 @@ window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, upd
     // Try to get data from page-specific functions
     if (tableType === 'executions' && window.executionsData) {
       tableData = window.executionsData;
-      updateFn = () => window.updateExecutionsTableMain(window.executionsData);
+      updateFn = (sortedData) => window.updateExecutionsTableMain(sortedData);
       console.log(`🔍 [SORT] Found executions data:`, tableData.length, 'items');
     } else if (tableType === 'tickers' && window.tickersData) {
       tableData = window.tickersData;
-      updateFn = () => window.updateTickersTableMain();
+      updateFn = (sortedData) => window.updateTickersTableMain(sortedData);
       console.log(`🔍 [SORT] Found tickers data:`, tableData.length, 'items');
     } else if (tableType === 'accounts' && window.accountsData) {
       tableData = window.accountsData;
-      updateFn = () => window.updateAccountsTableMain();
+      updateFn = (sortedData) => window.updateAccountsTableMain(sortedData);
       console.log(`🔍 [SORT] Found accounts data:`, tableData.length, 'items');
+    } else if (tableType === 'cash_flows' && window.cashFlowsData) {
+      tableData = window.cashFlowsData;
+      updateFn = (sortedData) => window.updateCashFlowsTable(sortedData);
+      console.log(`🔍 [SORT] Found cash_flows data:`, tableData.length, 'items');
+    } else if (tableType === 'alerts' && window.alertsData) {
+      tableData = window.alertsData;
+      updateFn = (sortedData) => window.updateAlertsTable(sortedData);
+      console.log(`🔍 [SORT] Found alerts data:`, tableData.length, 'items');
+    } else if (tableType === 'notes' && window.notesData) {
+      tableData = window.notesData;
+      updateFn = (sortedData) => window.updateNotesTable(sortedData);
+      console.log(`🔍 [SORT] Found notes data:`, tableData.length, 'items');
+    } else if (tableType === 'trades' && window.tradesData) {
+      tableData = window.tradesData;
+      updateFn = (sortedData) => window.updateTradesTable(sortedData);
+      console.log(`🔍 [SORT] Found trades data:`, tableData.length, 'items');
+    } else if (tableType === 'trade_plans' && window.tradePlansData) {
+      tableData = window.tradePlansData;
+      updateFn = (sortedData) => window.updateTradePlansTable(sortedData);
+      console.log(`🔍 [SORT] Found trade_plans data:`, tableData.length, 'items');
     } else {
       console.warn(`❌ [SORT] No data found for table type: ${tableType}`);
       console.warn(`❌ [SORT] Available data:`, {
         executionsData: !!window.executionsData,
         tickersData: !!window.tickersData,
-        accountsData: !!window.accountsData
+        accountsData: !!window.accountsData,
+        cashFlowsData: !!window.cashFlowsData,
+        alertsData: !!window.alertsData,
+        notesData: !!window.notesData,
+        tradesData: !!window.tradesData,
+        tradePlansData: !!window.tradePlansData
       });
       return;
     }
@@ -403,12 +464,24 @@ window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, upd
       return;
     }
     
-    console.log(`🔍 [SORT] Sorting ${tableData.length} items by column ${tableTypeOrColumnIndex}`);
-    return window.sortTableData(tableTypeOrColumnIndex, tableData, tableType, updateFn);
+    console.log(`🔍 [SORT] Sorting ${tableData.length} items by column ${columnIndex}`);
+    const result = window.sortTableData(columnIndex, tableData, tableType, updateFn);
+    return result;
   }
   
-  // Handle new call with all parameters
-  return window.sortTableData(columnIndex, dataArray, tableTypeOrColumnIndex, updateFunction);
+  // Handle new call with all parameters (explicit call with data array)
+  if (typeof tableTypeOrColumnIndex === 'string' && typeof columnIndex === 'number' && Array.isArray(dataArray)) {
+    return window.sortTableData(columnIndex, dataArray, tableTypeOrColumnIndex, updateFunction);
+  }
+  
+  // If we get here, parameters are invalid
+  console.error('❌ [SORT] Invalid parameters for sortTable:', {
+    tableTypeOrColumnIndex,
+    columnIndex,
+    dataArrayType: typeof dataArray,
+    updateFunctionType: typeof updateFunction
+  });
+  return [];
 };
 
 /**

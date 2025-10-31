@@ -87,65 +87,60 @@
  * @returns {Promise<void>}
  */
 async function loadCashFlowsData() {
+  console.log('🔥🔥🔥 loadCashFlowsData CALLED');
   try {
-    window.Logger.info('Loading cash flows data', { page: 'cash_flows' });
+    // Count records BEFORE refresh
+    const beforeTableCount = cashFlowsData ? cashFlowsData.length : 0;
+    console.log('📊 BEFORE REFRESH: Table has', beforeTableCount, 'records');
     
-    // הצגת אינדיקטור טעינה
-    if (typeof window.showNotification === 'function') {
-      window.showInfoNotification('טעינה', 'טוען נתוני תזרימי מזומנים...');
-    }
+    console.log('🔥 loadCashFlowsData: Starting fetch...');
+    window.Logger.info('Loading cash flows data (bypass cache)', { page: 'cash_flows' });
     
-    // שליחה לשרת
-    fetch('/api/cash_flows/', {
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/cash_flows/?_t=${Date.now()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('שגיאה בטעינת נתוני תזרימי מזומנים');
-      }
-      return response.json();
-    })
-    .then(response => {
-      window.Logger.info('Cash flows data loaded successfully', { count: response.data?.length || 0, page: 'cash_flows' });
-      
-      // הנתונים מגיעים במבנה {data: [...]}
-      const data = response.data || response;
-      
-      // עדכון הנתונים הגלובליים
-      window.cashFlowsData = data;
-      cashFlowsData = data;
-      
-      // עדכון הסטטיסטיקות
-      updatePageSummaryStats();
-      
-      // עדכון הטבלה
-      updateCashFlowsTable(data);
-      
-      // הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('נתוני תזרימי מזומנים נטענו בהצלחה', '', 4000, 'business');
-      } else if (typeof window.showNotification === 'function') {
-        window.showSuccessNotification('נתוני תזרימי מזומנים נטענו בהצלחה', '', 4000, 'business');
-      }
-    })
-    .catch(error => {
-      window.Logger.error('Error loading cash flows data', error, { page: 'cash_flows' });
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message, 6000, 'system');
-      } else if (typeof window.showNotification === 'function') {
-        window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', '', 6000, 'system');
+        'Cache-Control': 'no-cache'
       }
     });
     
+    console.log('🔥 loadCashFlowsData: Response status:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+      
+    const responseData = await response.json();
+    const data = responseData.data || responseData;
+    
+    console.log('🔥 loadCashFlowsData: Received data length:', data.length);
+    console.log('🔥 loadCashFlowsData: First item:', data[0]);
+      
+    // עדכון הנתונים הגלובליים
+    window.cashFlowsData = data;
+    cashFlowsData = data;
+    
+    console.log('🔥 loadCashFlowsData: Calling updateCashFlowsTable...');
+    // עדכון הטבלה
+    updateCashFlowsTable(data);
+    console.log('🔥 loadCashFlowsData: updateCashFlowsTable completed');
+    
+    // Count records AFTER refresh
+    const afterTableCount = data.length;
+    console.log('📊 AFTER REFRESH: Table now has', afterTableCount, 'records');
+    console.log('📊 CHANGE:', afterTableCount - beforeTableCount > 0 ? '+' : '', afterTableCount - beforeTableCount);
+    
+    // עדכון הסטטיסטיקות
+    updatePageSummaryStats();
+    
+    console.log('✅ loadCashFlowsData: Loaded', data.length, 'cash flows');
+    window.Logger.info(`✅ Loaded ${data.length} cash flows`, { page: 'cash_flows' });
   } catch (error) {
+    console.error('❌ loadCashFlowsData: Error:', error);
     window.Logger.error('Error loading cash flows data', error, { page: 'cash_flows' });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים');
     }
   }
 }
@@ -585,6 +580,7 @@ async function deleteCashFlow(id) {
   try {
     // מציאת התזרים
     const cashFlow = window.cashFlowsData ? window.cashFlowsData.find(cf => cf.id === id) : null;
+    
     if (!cashFlow) {
       window.showErrorNotification('שגיאה', 'תזרים המזומנים לא נמצא', 6000, 'system');
       return;
@@ -608,17 +604,14 @@ async function deleteCashFlow(id) {
           'מחיקת תזרים מזומנים',
           confirmMessage,
           () => resolve(true),
-          () => resolve(false),
+          () => resolve(false)
         );
       });
-      if (!confirmed) {
-        return;
-      }
+      
+      if (!confirmed) return;
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      if (!window.confirm(confirmMessage)) {
-        return;
-      }
+      if (!window.confirm(confirmMessage)) return;
     }
 
     // שליחת בקשת מחיקה
@@ -630,9 +623,12 @@ async function deleteCashFlow(id) {
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'תזרים המזומנים נמחק בהצלחה!',
       apiUrl: '/api/cash_flows/',
-      entityName: 'תזרים מזומנים'
+      entityName: 'תזרים מזומנים',
+      reloadFn: window.loadCashFlowsData,
+      requiresHardReload: false
     });
   } catch (error) {
+    console.error('❌ deleteCashFlow: Error occurred:', error);
     CRUDResponseHandler.handleError(error, 'מחיקת תזרים מזומנים');
   }
 }
@@ -1075,14 +1071,14 @@ function showCashFlowDetails(cashFlowId) {
  * @param {Array} cashFlows - Cash flows array
  * @returns {void}
  */
-function updateCashFlowsTable(cashFlows) {
+async function updateCashFlowsTable(cashFlows) {
 
   // עדכון הנתונים הגלובליים
   window.cashFlowsData = cashFlows;
   cashFlowsData = cashFlows;
 
   // רינדור הטבלה
-  renderCashFlowsTable();
+  await renderCashFlowsTable();
 
   // עדכון סטטיסטיקות
   updatePageSummaryStats();
@@ -1361,55 +1357,98 @@ window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
  * @returns {Promise<void>}
  */
 async function saveCashFlow() {
+    console.log('🔵 saveCashFlow CALLED');
     window.Logger.debug('saveCashFlow called', { page: 'cash_flows' });
     
     try {
-        // Collect form data
+        // Count records BEFORE save
+        const initialTableCount = cashFlowsData ? cashFlowsData.length : 0;
+        console.log('📊 INITIAL STATE: Table has', initialTableCount, 'records');
+        
+        // CRUDResponseHandler will handle cache clearing automatically
+        // No need to call clearCacheBeforeCRUD here
+        
+        // Collect form data using DataCollectionService
         const form = document.getElementById('cashFlowModalForm');
         if (!form) {
             throw new Error('Cash flow form not found');
         }
+        console.log('🔵 saveCashFlow - Form found');
         
-        const formData = new FormData(form);
-        const cashFlowData = {
-            amount: parseFloat(formData.get('cashFlowAmount')),
-            type: formData.get('cashFlowType'),
-            currency_id: formData.get('cashFlowCurrency'),
-            account_id: formData.get('cashFlowAccount'),
-            date: formData.get('cashFlowDate'),
-            description: formData.get('cashFlowDescription'),
-            source: formData.get('cashFlowSource'),
-            external_id: formData.get('cashFlowExternalId') || '0',
-            trade_id: formData.get('cashFlowTrade') || null,
-            trade_plan_id: formData.get('cashFlowTradePlan') || null
-        };
-        
-        // Validate data
-        if (!window.validateEntityForm) {
-            throw new Error('Validation system not available');
-        }
-        
-        const isValid = window.validateEntityForm('cashFlowModalForm', {
-            cashFlowAmount: { required: true, min: 0.01 },
-            cashFlowType: { required: true },
-            cashFlowCurrency: { required: true },
-            cashFlowAccount: { required: true },
-            cashFlowDate: { required: true },
-            cashFlowSource: { required: true }
+        const cashFlowData = DataCollectionService.collectFormData({
+            amount: { id: 'cashFlowAmount', type: 'float' },
+            type: { id: 'cashFlowType', type: 'text' },
+            currency_id: { id: 'cashFlowCurrency', type: 'int' },
+            trading_account_id: { id: 'cashFlowAccount', type: 'int' },  // Backend expects trading_account_id
+            date: { id: 'cashFlowDate', type: 'dateOnly' },  // Backend expects Date only, not datetime
+            description: { id: 'cashFlowDescription', type: 'text', default: null },
+            source: { id: 'cashFlowSource', type: 'text' },
+            external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
         });
         
-        if (!isValid) {
-            window.Logger.warn('Cash flow validation failed', { page: 'cash_flows' });
+        // ולידציה מפורטת
+        let hasErrors = false;
+        if (!cashFlowData.amount || cashFlowData.amount <= 0) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('cashFlowAmount', 'סכום חייב להיות גדול מ-0');
+            }
+            hasErrors = true;
+        }
+        
+        if (!cashFlowData.type) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('cashFlowType', 'סוג תזרים הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!cashFlowData.currency_id) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('cashFlowCurrency', 'מטבע הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!cashFlowData.trading_account_id) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('cashFlowAccount', 'חשבון מסחר הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!cashFlowData.date) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('cashFlowDate', 'תאריך הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!cashFlowData.source) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('cashFlowSource', 'מקור הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (hasErrors) {
+            console.log('❌ saveCashFlow - Validation errors, returning');
             return;
         }
+        
+        console.log('✅ saveCashFlow - Validation passed');
         
         // Determine if this is add or edit
         const isEdit = form.dataset.mode === 'edit';
         const cashFlowId = form.dataset.cashFlowId;
+        console.log('🔵 saveCashFlow - isEdit:', isEdit);
+        
+        // CRUDResponseHandler will handle cache clearing automatically
+        // No need to call clearCacheBeforeCRUD here
         
         // Prepare API call
         const url = isEdit ? `/api/cash_flows/${cashFlowId}` : '/api/cash_flows';
         const method = isEdit ? 'PUT' : 'POST';
+        console.log('🔵 saveCashFlow - Fetching to:', url, 'method:', method);
         
         // Send to API
         const response = await fetch(url, {
@@ -1420,37 +1459,36 @@ async function saveCashFlow() {
             body: JSON.stringify(cashFlowData)
         });
         
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        console.log('🔵 saveCashFlow - Fetch completed, response ok:', response.ok);
+        
+        // CRUDResponseHandler handles ALL response processing including errors
+        // No need to pre-check or call response.json() here
+        if (isEdit) {
+            console.log('🔵 saveCashFlow - Calling handleUpdateResponse...');
+            await CRUDResponseHandler.handleUpdateResponse(response, {
+                modalId: 'cashFlowModal',
+                successMessage: 'תזרים מזומן עודכן בהצלחה',
+                entityName: 'תזרים מזומן',
+                reloadFn: window.loadCashFlowsData,
+                requiresHardReload: false  // Prevent reload confirmation dialog
+            });
+        } else {
+            console.log('🔵 saveCashFlow - Calling handleSaveResponse...');
+            await CRUDResponseHandler.handleSaveResponse(response, {
+                modalId: 'cashFlowModal',
+                successMessage: 'תזרים מזומן נוסף בהצלחה',
+                entityName: 'תזרים מזומן',
+                reloadFn: window.loadCashFlowsData,
+                requiresHardReload: false  // Prevent reload confirmation dialog
+            });
         }
         
-        const result = await response.json();
-        
-        // Handle success
-        if (window.showNotification) {
-            const message = isEdit ? 'תזרים מזומן עודכן בהצלחה' : 'תזרים מזומן נוסף בהצלחה';
-            window.showNotification(message, 'success', 'business');
-        }
-        
-        // Close modal
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.hideModal('cashFlowModal');
-        }
-        
-        // Refresh data
-        if (window.loadCashFlowsData) {
-            window.loadCashFlowsData();
-        }
-        
-        window.Logger.info('Cash flow saved successfully', { cashFlowId: result.id, page: 'cash_flows' });
+        console.log('🔵 saveCashFlow - CRUDResponseHandler completed');
         
     } catch (error) {
-        window.Logger.error('Error saving cash flow', { error: error.message, page: 'cash_flows' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה בשמירת תזרים המזומן', 'error', 'system');
-        }
+        console.error('❌ saveCashFlow - Error caught:', error);
+        console.error('❌ saveCashFlow - Error message:', error.message);
+        CRUDResponseHandler.handleError(error, 'שמירת תזרים מזומן');
     }
 }
 

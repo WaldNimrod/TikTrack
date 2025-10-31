@@ -127,6 +127,14 @@ from routes.api import (
 from routes.api.server_logs import server_logs_bp
 from routes.api.cache_changes import cache_changes_bp
 
+# Import new database display API blueprints
+from routes.api.preference_groups import preference_groups_bp
+from routes.api.system_setting_groups import system_setting_groups_bp
+from routes.api.external_data_providers import external_data_providers_bp
+from routes.api.quotes_last import quotes_last_bp
+from routes.api.plan_conditions_list import plan_conditions_list_bp
+from routes.api.user_preferences_list import user_preferences_list_bp
+
 # Import CRUD testing modules
 import subprocess
 import json
@@ -256,6 +264,14 @@ app.register_blueprint(trading_methods_bp)
 app.register_blueprint(plan_conditions_bp)
 app.register_blueprint(trade_conditions_bp)
 
+# Register Database Display API blueprints
+app.register_blueprint(preference_groups_bp)
+app.register_blueprint(system_setting_groups_bp)
+app.register_blueprint(external_data_providers_bp)
+app.register_blueprint(quotes_last_bp)
+app.register_blueprint(plan_conditions_list_bp)
+app.register_blueprint(user_preferences_list_bp)
+
 # Debug logging endpoint
 @app.route('/api/debug/log', methods=['POST'])
 def debug_log():
@@ -367,6 +383,10 @@ app.wsgi_app = RateLimitMiddleware(app.wsgi_app)
 def optimize_response(response):
     """Optimize response headers"""
     try:
+        # Skip optimization for scripts and styles to allow pages.py to handle cache headers
+        if request.path.startswith('/scripts/') or request.path.startswith('/styles/') or request.path.startswith('/styles-new/'):
+            return response
+        
         # Get request start time from g
         start_time = getattr(g, 'request_start_time', None)
         

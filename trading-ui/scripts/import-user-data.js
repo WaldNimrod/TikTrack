@@ -53,6 +53,18 @@ async function openImportUserDataModal() {
         modal.classList.add('show');
         modal.setAttribute('aria-hidden', 'false');
         
+        // Process buttons using centralized button system
+        if (window.processButtons) {
+            window.processButtons(modal);
+            window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
+        } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+            window.advancedButtonSystem.processButtons(modal);
+            window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
+        } else if (window.initializeButtons) {
+            window.initializeButtons();
+            window.Logger.debug('[Import Modal] Buttons initialized via initializeButtons()', { page: 'import-user-data' });
+        }
+        
         // Setup event listeners now that modal is visible
         setupImportModalEventListeners();
         
@@ -163,6 +175,36 @@ function goToStep(step) {
                         loadPreviewData();
                     }
     
+    // Process buttons in the modal after step change
+    // This ensures all buttons are properly handled by the centralized button system
+    const modal = document.getElementById('importUserDataModal');
+    if (modal) {
+        // Get the current visible step container
+        const currentStepElement = modal.querySelector(`.import-step[data-step="${step}"]`);
+        if (currentStepElement) {
+            if (window.processButtons) {
+                window.processButtons(currentStepElement);
+            } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+                window.advancedButtonSystem.processButtons(currentStepElement);
+            }
+            window.Logger.debug('[Import Modal] Buttons processed for step', { 
+                step, 
+                page: 'import-user-data' 
+            });
+        } else {
+            // Fallback: process entire modal
+            if (window.processButtons) {
+                window.processButtons(modal);
+            } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+                window.advancedButtonSystem.processButtons(modal);
+            }
+            window.Logger.debug('[Import Modal] Buttons processed for entire modal', { 
+                step, 
+                page: 'import-user-data' 
+            });
+        }
+    }
+    
     window.Logger.info('[Import Modal] Step navigation completed', { 
         currentStep, 
         page: 'import-user-data' 
@@ -267,8 +309,9 @@ function setupImportModalEventListeners() {
         window.Logger.debug('[Import Modal] Drop zone event listeners added', { page: 'import-user-data' });
     }
     
-    // Account select
-    const accountSelect = document.getElementById('tradingAccountSelect');
+    // Account select - look INSIDE the modal
+    const modal = document.getElementById('importUserDataModal');
+    const accountSelect = modal?.querySelector('#tradingAccountSelect');
     window.Logger.debug('[Import Modal] Account select element found', { 
         exists: !!accountSelect, 
         id: accountSelect?.id,
@@ -278,25 +321,28 @@ function setupImportModalEventListeners() {
         accountSelect.addEventListener('change', handleAccountSelect);
         window.Logger.info('[Import Modal] Account select event listener added successfully', { page: 'import-user-data' });
     } else {
-        window.Logger.error('[Import Modal] Account select element not found!', { page: 'import-user-data' });
+        window.Logger.error('[Import Modal] Account select element not found in modal!', { page: 'import-user-data' });
     }
     
-    // Connector select
-    const connectorSelect = document.getElementById('connectorSelect');
+    // Connector select - look INSIDE the modal
+    const connectorSelect = modal?.querySelector('#connectorSelect');
     if (connectorSelect) {
         connectorSelect.addEventListener('change', handleConnectorSelect);
         window.Logger.debug('[Import Modal] Connector select event listener added', { page: 'import-user-data' });
     }
     
-    // Continue button
-    const continueBtn = document.querySelector('[data-button-type="PRIMARY"]');
+    // Continue button - NO manual event listener needed!
+    // The centralized button system handles data-onclick automatically via event delegation
+    // Just ensure the button has data-onclick="analyzeFile()" in HTML
+    const continueBtn = modal?.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
-        continueBtn.addEventListener('click', analyzeFile);
-        window.Logger.debug('[Import Modal] Continue button event listener added', { page: 'import-user-data' });
+        window.Logger.debug('[Import Modal] Continue button found - will be handled by centralized button system', { 
+            hasDataOnclick: continueBtn.hasAttribute('data-onclick'),
+            page: 'import-user-data' 
+        });
     }
     
     // Mark as set up
-    const modal = document.getElementById('importUserDataModal');
     if (modal) {
         modal.setAttribute('data-listeners-setup', 'true');
     }
@@ -403,28 +449,6 @@ function displayProblemResolution(data) {
     `;
 }
 
-/**
- * Display problem resolution detailed
- */
-function displayProblemResolutionDetailed(data) {
-    // Clear previous content
-    clearProblemSections();
-    
-    // Display missing tickers
-    if (data.missing_tickers && data.missing_tickers.length > 0) {
-        displayMissingTickers(data.missing_tickers);
-    }
-    
-    // Display within-file duplicates
-    if (data.within_file_duplicates && data.within_file_duplicates.length > 0) {
-        displayWithinFileDuplicates(data.within_file_duplicates);
-    }
-    
-    // Display existing records
-    if (data.existing_records && data.existing_records.length > 0) {
-        displayExistingRecords(data.existing_records);
-    }
-}
 
 /**
  * Clear problem sections
@@ -434,9 +458,113 @@ function clearProblemSections() {
     const withinFileDuplicatesSection = document.getElementById('withinFileDuplicatesSection');
     const existingRecordsSection = document.getElementById('existingRecordsSection');
     
-    if (missingTickersSection) missingTickersSection.innerHTML = '';
-    if (withinFileDuplicatesSection) withinFileDuplicatesSection.innerHTML = '';
-    if (existingRecordsSection) existingRecordsSection.innerHTML = '';
+    if (missingTickersSection) missingTickersSection.style.display = 'none';
+    if (withinFileDuplicatesSection) withinFileDuplicatesSection.style.display = 'none';
+    if (existingRecordsSection) existingRecordsSection.style.display = 'none';
+}
+
+/**
+ * Display existing records
+ */
+function displayExistingRecords(existingRecords) {
+    const section = document.getElementById('existingRecordsSection');
+    const container = document.getElementById('existingRecordsContainer');
+    
+    if (!section || !container) {
+        window.Logger.warn('[Import Modal] Existing records section not found', { page: 'import-user-data' });
+        return;
+    }
+    
+    section.style.display = 'block';
+    container.innerHTML = '';
+    
+    existingRecords.forEach((recordData, index) => {
+        const card = document.createElement('div');
+        card.className = 'problem-card existing-record-card';
+        
+        // Get the actual record data
+        const record = recordData.record || recordData;
+        const matches = recordData.matches || [];
+        
+        // Calculate confidence score from matches
+        let confidenceScore = 0;
+        if (matches.length > 0) {
+            confidenceScore = matches[0].confidence || 0;
+        }
+        
+        const confidenceColor = confidenceScore >= 80 ? '#28a745' : confidenceScore >= 50 ? '#ffc107' : '#dc3545';
+        
+        card.innerHTML = `
+            <div class="problem-card-header">
+                <div class="problem-card-title">
+                    <i class="bi bi-database"></i>
+                    רשומה קיימת במערכת #${index + 1}
+                </div>
+                <div class="confidence-score" style="color: ${confidenceColor}">
+                    ${confidenceScore.toFixed(1)}% התאמה
+                </div>
+            </div>
+            <div class="problem-card-content">
+                <div class="record-details">
+                    <div class="detail-row">
+                        <span class="detail-label">סמל:</span>
+                        <span class="detail-value">${record.symbol || 'לא זמין'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">פעולה:</span>
+                        <span class="detail-value">${record.action || 'לא זמין'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">כמות:</span>
+                        <span class="detail-value">${record.quantity || 'לא זמין'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">מחיר:</span>
+                        <span class="detail-value">$${record.price || 'לא זמין'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">תאריך:</span>
+                        <span class="detail-value">${record.date || 'לא זמין'}</span>
+                    </div>
+                </div>
+                <div class="problem-card-actions">
+                    <button class="btn btn-sm btn-outline-primary" onclick="importExistingRecord(${index})">
+                        <i class="bi bi-arrow-down-circle"></i> ייבוא בכל זאת
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="skipExistingRecord(${index})">
+                        <i class="bi bi-x-circle"></i> דלג
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(card);
+    });
+    
+    window.Logger.info('[Import Modal] Displayed existing records', { 
+        count: existingRecords.length, 
+        page: 'import-user-data' 
+    });
+}
+
+/**
+ * Import existing record (force import)
+ */
+function importExistingRecord(index) {
+    window.Logger.info('[Import Modal] Importing existing record', { index, page: 'import-user-data' });
+    
+    // TODO: Implement logic to force import this specific record
+    showNotification('ייבוא רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
+}
+
+/**
+ * Skip existing record
+ */
+function skipExistingRecord(index) {
+    window.Logger.info('[Import Modal] Skipping existing record', { index, page: 'import-user-data' });
+    
+    // TODO: Implement logic to skip this specific record
+    showNotification('דילוג על רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
 }
 
 /**
@@ -526,34 +654,75 @@ function handleFileSelect(event) {
  * Update analyze button state
  */
 function updateAnalyzeButton() {
-    const continueBtn = document.querySelector('[data-button-type="PRIMARY"]');
+    const modal = document.getElementById('importUserDataModal');
+    if (!modal) {
+        window.Logger.warn('[Import Modal] Modal not found for button update', { page: 'import-user-data' });
+            return;
+        }
+    
+    const continueBtn = modal.querySelector('[data-button-type="PRIMARY"]');
     if (continueBtn) {
         // Check actual DOM values - more reliable than variables
-        const connectorSelect = document.getElementById('connectorSelect');
-        const accountSelect = document.getElementById('tradingAccountSelect');
+        // Look for selects INSIDE the modal to avoid conflicts
+        const connectorSelect = modal.querySelector('#connectorSelect');
+        const accountSelect = modal.querySelector('#tradingAccountSelect');
         
+        // Get all possible values for debugging
         const connectorValue = connectorSelect?.value;
         const accountValue = accountSelect?.value;
+        const accountSelectedIndex = accountSelect?.selectedIndex;
+        const accountSelectedOption = accountSelect?.options[accountSelectedIndex];
         
-        const allFieldsFilled = selectedFile && connectorValue && accountValue;
+        // Check both local and global selectedFile variables
+        const currentSelectedFile = selectedFile || window.selectedFile;
         
-        window.Logger.debug('[Import Modal] Button state check', { 
-            selectedFile: !!selectedFile,
+        // Detailed debugging information
+        const debugInfo = {
+            selectedFile: !!currentSelectedFile,
+            selectedFileName: currentSelectedFile?.name,
+            connectorSelectExists: !!connectorSelect,
             connectorValue: connectorValue,
+            accountSelectExists: !!accountSelect,
             accountValue: accountValue,
+            accountSelectedIndex: accountSelectedIndex,
+            accountSelectedOptionText: accountSelectedOption?.text,
+            accountSelectedOptionValue: accountSelectedOption?.value,
+            allOptions: accountSelect ? Array.from(accountSelect.options).map((opt, idx) => ({
+                index: idx,
+                value: opt.value,
+                text: opt.text,
+                selected: opt.selected
+            })) : []
+        };
+        
+        // Check if accountValue is not empty and not the default "בחר חשבון מסחר..."
+        // Also check if it's a valid number (account IDs are numbers)
+        const accountValid = accountValue && 
+                           accountValue !== '' && 
+                           accountValue !== '0' && 
+                           !isNaN(parseInt(accountValue));
+        
+        const allFieldsFilled = currentSelectedFile && connectorValue && accountValid;
+        
+        window.Logger.debug('[Import Modal] Button state check - DETAILED', { 
+            ...debugInfo,
+            accountValid: accountValid,
             allFieldsFilled,
             page: 'import-user-data'
         });
         
         if (allFieldsFilled) {
             continueBtn.disabled = false;
-            window.Logger.info('[Import Modal] Analyze button enabled', { page: 'import-user-data' });
+            window.Logger.info('[Import Modal] Analyze button enabled', { 
+                accountValue: accountValue,
+                connectorValue: connectorValue,
+                page: 'import-user-data' 
+            });
         } else {
             continueBtn.disabled = true;
             window.Logger.warn('[Import Modal] Analyze button disabled - missing requirements', { 
-                file: !!selectedFile, 
-                connector: !!connectorValue,
-                account: !!accountValue,
+                ...debugInfo,
+                accountValid: accountValid,
                 page: 'import-user-data'
             });
         }
@@ -605,13 +774,16 @@ function resetFile() {
  */
 function handleAccountSelect(event) {
     // Handle both event-based calls and direct calls
-    const target = event?.target || document.getElementById('tradingAccountSelect');
+    // Look for select INSIDE the modal to avoid conflicts
+    const modal = document.getElementById('importUserDataModal');
+    const target = event?.target || modal?.querySelector('#tradingAccountSelect');
     const value = target?.value;
     
     window.Logger.info('[Import Modal] handleAccountSelect called', { 
         event: event?.type || 'direct_call', 
         target: target?.id,
         value: value,
+        selectedIndex: target?.selectedIndex,
         page: 'import-user-data' 
     });
     
@@ -620,16 +792,13 @@ function handleAccountSelect(event) {
     
     if (!accountId) {
         selectedAccount = null;
-    } else {
+                } else {
         selectedAccount = accountId;
     }
     
-    // Update analyze button
-    updateAnalyzeButton();
-    
-    // Update UI
+    // Update UI first
     const accountInfo = document.getElementById('accountInfo');
-    if (accountInfo) {
+    if (accountInfo && target) {
         const selectedOption = target.options[target.selectedIndex];
         accountInfo.innerHTML = `
             <div class="account-selected">
@@ -639,23 +808,35 @@ function handleAccountSelect(event) {
         `;
     }
     
-    // Enable analyze button
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    if (analyzeBtn && selectedFile) {
-        analyzeBtn.disabled = false;
-    }
+    // Wait a tick to ensure DOM is updated, then update button
+    // Use requestAnimationFrame to ensure DOM updates are complete
+    requestAnimationFrame(() => {
+        updateAnalyzeButton();
+    });
+    
+    // Remove duplicate button update code below
 }
 
 /**
  * Handle connector selection
  */
 function handleConnectorSelect(event) {
-    selectedConnector = event.target.value;
-    window.Logger.info('[Import Modal] Connector selected', { connector: selectedConnector, page: 'import-user-data' });
+    const modal = document.getElementById('importUserDataModal');
+    const target = event?.target || modal?.querySelector('#connectorSelect');
+    selectedConnector = target?.value;
+    window.Logger.info('[Import Modal] Connector selected', { 
+        connector: selectedConnector,
+        value: target?.value,
+        page: 'import-user-data' 
+    });
     
     // Validate connector selection using central validation system
     validateConnectorSelection();
-    updateAnalyzeButton();
+    
+    // Wait a tick to ensure DOM is updated, then update button
+    requestAnimationFrame(() => {
+        updateAnalyzeButton();
+    });
 }
 
 /**
@@ -799,18 +980,62 @@ function validateAllRequiredFields() {
 async function loadAccounts() {
     window.Logger.debug('[Import Modal] Loading accounts', { page: 'import-user-data' });
     
-    // Use the existing SelectPopulatorService
+    // Get the modal first to ensure we populate the correct select
+    const modal = document.getElementById('importUserDataModal');
+    if (!modal) {
+        window.Logger.error('[Import Modal] Modal not found for loading accounts', { page: 'import-user-data' });
+        return;
+    }
+    
+    const accountSelect = modal.querySelector('#tradingAccountSelect');
+    if (!accountSelect) {
+        window.Logger.error('[Import Modal] Account select not found in modal', { page: 'import-user-data' });
+        return;
+    }
+    
+    // Use the existing SelectPopulatorService but pass the element directly
     if (window.SelectPopulatorService) {
         window.Logger.debug('[Import Modal] Using SelectPopulatorService', { page: 'import-user-data' });
         try {
-            await window.SelectPopulatorService.populateAccountsSelect('tradingAccountSelect', {
-                includeEmpty: true,
-                emptyText: 'בחר חשבון מסחר...',
-                filterFn: (account) => account.status === 'open'
+            // Temporarily set the ID to ensure SelectPopulatorService finds it
+            // But we'll populate it manually to ensure it's the right element
+            const response = await fetch('/api/trading-accounts/');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const responseData = await response.json();
+            let accounts = responseData.data || responseData || [];
+            
+            // Filter only open accounts
+            accounts = accounts.filter(account => account.status === 'open');
+            
+            // Clear existing options
+            accountSelect.innerHTML = '';
+            
+            // Add empty option
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = 'בחר חשבון מסחר...';
+            accountSelect.appendChild(emptyOption);
+            
+            // Add account options
+            accounts.forEach(account => {
+                const option = document.createElement('option');
+                option.value = account.id.toString(); // Ensure it's a string
+                option.textContent = account.name;
+                accountSelect.appendChild(option);
             });
-            window.Logger.info('[Import Modal] Accounts loaded successfully', { page: 'import-user-data' });
+            
+            window.Logger.info('[Import Modal] Accounts loaded successfully', { 
+                count: accounts.length, 
+                page: 'import-user-data' 
+            });
+            
+            // Update button state after loading
+            updateAnalyzeButton();
         } catch (error) {
-            window.Logger.error('[Import Modal] Error loading accounts with SelectPopulatorService', { error: error.message, page: 'import-user-data' });
+            window.Logger.error('[Import Modal] Error loading accounts', { error: error.message, page: 'import-user-data' });
             // Fallback to direct API call
             await loadAccountsFallback();
         }
@@ -827,23 +1052,45 @@ async function loadAccounts() {
 function loadAccountsFallback() {
     window.Logger.debug('[Import Modal] Loading accounts via fallback method', { page: 'import-user-data' });
     
+    const modal = document.getElementById('importUserDataModal');
+    if (!modal) {
+        window.Logger.error('[Import Modal] Modal not found for fallback', { page: 'import-user-data' });
+        return;
+    }
+    
+    const accountSelect = modal.querySelector('#tradingAccountSelect');
+    if (!accountSelect) {
+        window.Logger.error('[Import Modal] Account select not found in modal for fallback', { page: 'import-user-data' });
+        return;
+    }
+    
     fetch('/api/trading-accounts/')
         .then(response => response.json())
         .then(data => {
             const accounts = data.data || data || [];
             const openAccounts = accounts.filter(account => account.status === 'open');
             
-            const accountSelect = document.getElementById('tradingAccountSelect');
-            if (accountSelect) {
-                accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
-                openAccounts.forEach(account => {
-                    const option = document.createElement('option');
-                    option.value = account.id;
-                    option.textContent = account.name;
-                    accountSelect.appendChild(option);
-                });
-                window.Logger.info('[Import Modal] Accounts loaded via fallback', { count: openAccounts.length, page: 'import-user-data' });
-            }
+            // Clear existing options
+            accountSelect.innerHTML = '';
+            
+            // Add empty option
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = 'בחר חשבון מסחר...';
+            accountSelect.appendChild(emptyOption);
+            
+            // Add account options
+            openAccounts.forEach(account => {
+                const option = document.createElement('option');
+                option.value = account.id.toString(); // Ensure it's a string
+                option.textContent = account.name;
+                accountSelect.appendChild(option);
+            });
+            
+            window.Logger.info('[Import Modal] Accounts loaded via fallback', { count: openAccounts.length, page: 'import-user-data' });
+            
+            // Update button state after loading
+            updateAnalyzeButton();
         })
         .catch(error => {
             window.Logger.error('[Import Modal] Error loading accounts via fallback', { error: error.message, page: 'import-user-data' });
@@ -863,23 +1110,47 @@ function analyzeFile() {
     
     window.Logger.info('[Import Modal] Starting file analysis', { sessionId: currentSessionId, page: 'import-user-data' });
     
-    // Additional debug - check actual values
-    const connectorSelect = document.getElementById('connectorSelect');
-    const accountSelect = document.getElementById('tradingAccountSelect');
+    // Get actual values from DOM - more reliable than variables
+    const modal = document.getElementById('importUserDataModal');
+    const connectorSelect = modal?.querySelector('#connectorSelect');
+    const accountSelect = modal?.querySelector('#tradingAccountSelect');
+    
+    const connectorValue = connectorSelect?.value;
+    const accountValue = accountSelect?.value;
+    
+    // Validate values
+    if (!selectedFile || !connectorValue || !accountValue) {
+        window.Logger.error('[Import Modal] Missing required values', {
+            selectedFile: !!selectedFile,
+            connectorValue: connectorValue,
+            accountValue: accountValue,
+            page: 'import-user-data'
+        });
+        showNotification('אנא מלא את כל השדות הנדרשים', 'error');
+        return;
+    }
     
     window.Logger.info('[Import Modal] Analysis starting with values', {
         selectedFile: selectedFile?.name,
-        selectedAccount: selectedAccount,
-        selectedConnector: selectedConnector,
-        connectorValue: connectorSelect?.value,
-        accountValue: accountSelect?.value,
+        connectorValue: connectorValue,
+        accountValue: accountValue,
+        accountValueType: typeof accountValue,
         page: 'import-user-data'
     });
     
     const formData = new FormData();
     formData.append('file', selectedFile);
-    formData.append('trading_account_id', selectedAccount);
-    formData.append('connector_type', selectedConnector);
+    formData.append('trading_account_id', accountValue);
+    formData.append('connector_type', connectorValue);
+    
+    // Debug: Log what's being sent
+    window.Logger.debug('[Import Modal] FormData contents', {
+        hasFile: formData.has('file'),
+        fileSize: selectedFile?.size,
+        trading_account_id: formData.get('trading_account_id'),
+        connector_type: formData.get('connector_type'),
+        page: 'import-user-data'
+    });
     
     fetch('/api/user-data-import/upload', {
             method: 'POST',
@@ -925,6 +1196,7 @@ function displayAnalysisResults(results) {
         const duplicateRecords = document.getElementById('duplicateRecords');
         const missingTickersCount = document.getElementById('missingTickersCount');
         const missingTickerRecords = document.getElementById('missingTickerRecords');
+        const existingRecords = document.getElementById('existingRecords');
         
         window.Logger.debug('[Import Modal] Found elements', { 
             totalRecords: !!totalRecords, 
@@ -933,31 +1205,36 @@ function displayAnalysisResults(results) {
             duplicateRecords: !!duplicateRecords, 
             missingTickersCount: !!missingTickersCount,
             missingTickerRecords: !!missingTickerRecords,
+            existingRecords: !!existingRecords,
             page: 'import-user-data' 
         });
         
-        // Calculate actual importable records (excluding missing tickers)
+        // Calculate actual importable records (clean_records minus records with missing tickers)
         const missingTickersCountValue = results.missing_tickers ? results.missing_tickers.length : 0;
         const missingTickerRecordsCount = results.missing_ticker_records || 0;
-        const actualValidRecords = (results.valid_records || 0) - missingTickerRecordsCount;
+        // Calculate records that will actually be imported (clean_records minus missing ticker records)
+        const actualValidRecords = Math.max(0, (results.clean_records || 0) - missingTickerRecordsCount);
         
         window.Logger.info('[Import Modal] Analysis results calculation', {
             total_records: results.total_records || 0,
             original_valid_records: results.valid_records || 0,
+            clean_records: results.clean_records || 0,
             missing_tickers_count: missingTickersCountValue,
             missing_ticker_records_count: missingTickerRecordsCount,
             actual_valid_records: actualValidRecords,
             invalid_records: results.invalid_records || 0,
             duplicate_records: results.duplicate_records || 0,
+            existing_records: results.existing_records || 0,
             page: 'import-user-data'
         });
         
         if (totalRecords) totalRecords.textContent = results.total_records || 0;
-        if (validRecords) validRecords.textContent = actualValidRecords; // Records that will actually be imported
+        if (validRecords) validRecords.textContent = actualValidRecords; // Records that will actually be imported (clean_records)
         if (invalidRecords) invalidRecords.textContent = results.invalid_records || 0;
         if (duplicateRecords) duplicateRecords.textContent = results.duplicate_records || 0;
         if (missingTickersCount) missingTickersCount.textContent = missingTickersCountValue; // Number of missing tickers
         if (missingTickerRecords) missingTickerRecords.textContent = missingTickerRecordsCount; // Records with missing tickers
+        if (existingRecords) existingRecords.textContent = results.existing_records || 0; // Records that already exist in system
         
         window.Logger.info('[Import Modal] Analysis results displayed successfully', { page: 'import-user-data' });
     } catch (error) {
@@ -1187,20 +1464,24 @@ function displayProblemResolution(data) {
             <div class="problem-section">
                 <h5>טיקרים חסרים</h5>
                 <div id="missingTickers" class="problem-cards">
-                    ${data.missing_tickers?.map(ticker => `
+                    ${data.missing_tickers?.map(ticker => {
+                        const symbol = typeof ticker === 'string' ? ticker : ticker.symbol;
+                        const currency = typeof ticker === 'string' ? 'USD' : ticker.currency;
+                        return `
                         <div class="problem-card missing-ticker-card">
                             <div class="problem-card-header">
                                 <i class="fas fa-exclamation-triangle"></i>
-                                <span>${ticker}</span>
+                                <span>${symbol}</span>
                             </div>
                             <div class="problem-card-actions">
-                                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${ticker}')">
+                                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${symbol}', '${currency}')">
                                     הוסף טיקר
                 </button>
-                            </div>
                                         </div>
-                    `).join('') || '<p>אין טיקרים חסרים</p>'}
                                     </div>
+                    `;
+                    }).join('') || '<p>אין טיקרים חסרים</p>'}
+                                                </div>
                                                 </div>
             
             <div class="problem-section">
@@ -1211,18 +1492,18 @@ function displayProblemResolution(data) {
                             <div class="problem-card-header">
                                 <i class="fas fa-copy"></i>
                                 <span>${dup.symbol} - ${dup.date}</span>
-                                                </div>
+                                            </div>
                             <div class="problem-card-body">
                                 <div class="problem-card-details">
                                     <span>כמות: ${dup.quantity}</span>
                                     <span>מחיר: ${dup.price}</span>
-                                            </div>
+                                    </div>
                                 <div class="problem-card-confidence">
                                     <span>רמת ביטחון: ${dup.confidence || 0}%</span>
                                     <div class="confidence-bar">
                                         <div class="confidence-fill" style="width: ${dup.confidence || 0}%"></div>
-                                    </div>
                                 </div>
+                            </div>
                             </div>
                             <div class="problem-card-actions">
                                 <button class="btn btn-sm btn-success" onclick="acceptDuplicate(${index}, 'within_file')">
@@ -1347,14 +1628,27 @@ function rejectDuplicate(index, type) {
 /**
  * Open add ticker modal
  */
-function openAddTickerModal(symbol) {
+function openAddTickerModal(symbol, currency = 'USD') {
     const modal = document.getElementById('addTickerModal');
     const symbolInput = document.getElementById('tickerSymbol');
     const nameInput = document.getElementById('tickerName');
+    const currencySelect = document.getElementById('tickerCurrency');
     
     if (modal && symbolInput && nameInput) {
         symbolInput.value = symbol;
         nameInput.value = symbol; // Default name to symbol
+        
+        // Set currency based on imported data
+        if (currencySelect) {
+            const currencyMap = {
+                'USD': '1',
+                'EUR': '2', 
+                'ILS': '3'
+            };
+            const currencyId = currencyMap[currency] || '1'; // Default to USD
+            currencySelect.value = currencyId;
+        }
+        
         modal.style.display = 'block';
         modal.classList.add('show');
         modal.setAttribute('aria-hidden', 'false');
@@ -1401,7 +1695,7 @@ function saveTickerFromModal(symbol, name) {
             symbol: symbol,
             name: name,
             type: document.getElementById('tickerType')?.value || 'stock',
-            currency: document.getElementById('tickerCurrency')?.value || 'USD'
+            currency_id: parseInt(document.getElementById('tickerCurrency')?.value || '1')
         })
     })
     .then(response => response.json())
@@ -1411,7 +1705,8 @@ function saveTickerFromModal(symbol, name) {
             // Refresh preview data
             refreshPreviewData();
         } else {
-            showNotification(`שגיאה בהוספת טיקר: ${data.error}`, 'error');
+            const errorMsg = data.error?.message || data.error || 'שגיאה לא ידועה';
+            showNotification(`שגיאה בהוספת טיקר: ${errorMsg}`, 'error');
         }
     })
     .catch(error => {
@@ -1624,9 +1919,11 @@ function performImport(generateReport = false) {
             showNotification('ייבוא הנתונים הושלם בהצלחה!', 'success');
             closeImportUserDataModal();
             
-            // Clear cache to show new data
-            if (typeof window.clearCache === 'function') {
-                window.clearCache();
+            // Clear cache to show new data - use centralized cache clearing
+            if (typeof window.clearCacheQuick === 'function') {
+                window.clearCacheQuick();
+            } else if (typeof window.clearAllCacheAdvanced === 'function') {
+                window.clearAllCacheAdvanced();
             }
             
             if (generateReport && data.report_url) {
@@ -1776,20 +2073,23 @@ function displayExistingRecords(existingRecords) {
  * Render missing ticker card
  */
 function renderMissingTickerCard(ticker) {
+    const symbol = typeof ticker === 'string' ? ticker : ticker.symbol;
+    const currency = typeof ticker === 'string' ? 'USD' : ticker.currency;
+    
     return `
         <div class="problem-card missing-ticker-card">
             <div class="problem-card-header">
                 <i class="bi bi-exclamation-circle"></i>
-                <span>${ticker}</span>
+                <span>${symbol}</span>
             </div>
             <div class="problem-card-body">
                 <div class="missing-ticker-info">
                     <i class="bi bi-info-circle"></i>
-                    הטיקר ${ticker} לא קיים במערכת
+                    הטיקר ${symbol} לא קיים במערכת
                 </div>
             </div>
             <div class="problem-card-actions">
-                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${ticker}')">
+                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${symbol}', '${currency}')">
                     <i class="bi bi-plus-circle"></i>
                     הוסף טיקר
                 </button>
@@ -1907,9 +2207,9 @@ function confirmImport(withReport = false) {
     // Execute the import
     if (withReport) {
         executeImportWithReport();
-    } else {
+        } else {
         executeImport();
-    }
+        }
 }
 
 // Export functions for global access

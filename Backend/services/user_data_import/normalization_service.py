@@ -29,7 +29,7 @@ class NormalizationService:
         """Initialize the normalization service"""
         self.standard_fields = [
             'symbol', 'action', 'date', 'quantity', 'price', 'fee',
-            'external_id', 'source'
+            'external_id', 'source', 'currency'
         ]
     
     def normalize_records(self, raw_records: List[Dict[str, Any]], 

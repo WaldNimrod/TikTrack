@@ -210,11 +210,13 @@ def get_note(note_id: int):
         db.close()
 
 @notes_bp.route('/', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['notes'])
 def create_note():
     """Create new note"""
-    db = None
     try:
-        db = next(get_db())
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
         
         # Check if there's a file or JSON
         if request.files:
@@ -311,14 +313,13 @@ def create_note():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        if db:
-            db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @notes_bp.route('/<int:note_id>', methods=['PUT'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['notes'])
 def update_note(note_id: int):
     """Update note"""
-    db = None
     try:
         logger.info(f"🔄 Starting update_note for note_id: {note_id}")
         logger.info(f"📋 Request method: {request.method}")
@@ -327,7 +328,8 @@ def update_note(note_id: int):
         logger.info(f"📋 Request form: {dict(request.form) if request.form else 'No form data'}")
         logger.info(f"📋 Request JSON: {request.get_json() if request.is_json else 'Not JSON'}")
         
-        db = next(get_db())
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
             logger.info(f"✅ Found note: {note.id}")
@@ -487,16 +489,16 @@ def update_note(note_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        if db:
-            logger.info("🔒 Closing database connection")
-            db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @notes_bp.route('/<int:note_id>', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['notes'])
 def delete_note(note_id: int):
     """Delete note"""
     try:
-        db = next(get_db())
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
             # Delete attached file if exists
@@ -523,8 +525,7 @@ def delete_note(note_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @notes_bp.route('/files/cleanup', methods=['POST'])
 def cleanup_files():

@@ -360,12 +360,7 @@ function parseAlertCondition(condition) {
  */
 async function cancelAlert(alertId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - ביטול
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('alerts', 'cancel');
-    }
-    
-    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - ביטול    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -379,12 +374,7 @@ async function cancelAlert(alertId) {
     const result = await response.json();
 
     if (response.ok) {
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה בוטלה בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        // התראה בוטלה בהצלחה
+      // התראה בוטלה בהצלחה
         if (window.showSuccessNotification) {
           window.showSuccessNotification('הצלחה', 'התראה בוטלה בהצלחה!');
         }
@@ -425,24 +415,14 @@ async function cancelAlert(alertId) {
  */
 async function deleteAlert(alertId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('alerts', 'delete');
-    }
-    
-    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });
 
     const result = await response.json();
 
     if (response.ok && result.status === 'success') {
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה נמחקה בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        // התראה נמחקה בהצלחה
+      // התראה נמחקה בהצלחה
         if (window.showSuccessNotification) {
           window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
         }

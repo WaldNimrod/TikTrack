@@ -64,7 +64,6 @@
                         עסקעות
                     </div>
                     <div class="table-actions">
-                        <button data-button-type="COPY" data-variant="full" data-onclick="" data-text="העתק לוג מפורט" title="העתק לוג מפורט"></button>
                         <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר"></button>
                     </div>
                 </div>
@@ -109,52 +108,52 @@
                                 <thead>
                                     <tr>
                                         <th class="col-ticker">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }">
+                                            <button class="btn btn-link sortable-header" data-onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }">
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-action">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }">
+                                            <button class="btn btn-link sortable-header" data-onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }">
                                                 פעולה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }">
+                                            <button class="btn btn-link sortable-header" data-onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }">
                                                 חשבון מסחר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-quantity">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">
+                                            <button class="btn btn-link sortable-header" data-onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">
                                                 כמות <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-price">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">
+                                            <button class="btn btn-link sortable-header" data-onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">
                                                 מחיר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-pnl">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">
+                                            <button class="btn btn-link sortable-header" data-onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">
                                                 P&L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-realized-pl">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }">
+                                            <button class="btn btn-link sortable-header" data-onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }">
                                                 Realized P/L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-mtm-pl">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">
+                                            <button class="btn btn-link sortable-header" data-onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">
                                                 MTM P/L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-execution-date">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }">
+                                            <button class="btn btn-link sortable-header" data-onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }">
                                                 תאריך <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-source">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(9); }">מקור <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="if (typeof window.sortTable === 'function') { window.sortTable(9); }">מקור <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-items">
                                         </th>
@@ -178,36 +177,36 @@
         <!-- Notification system -->
         <div class="notification-container" id="notificationContainer"></div>
 
-    <!-- Toast container for notifications -->
-    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+        <!-- Toast container for notifications -->
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 
     <!-- Import User Data Modal -->
     <div class="modal" id="importUserDataModal" tabindex="-1" role="dialog" aria-labelledby="importUserDataModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
+                <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="importUserDataModalLabel">
                         <i class="bi bi-cloud-upload"></i>
                         ייבוא ביצועים (Executions)
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
+                    </div>
+                    <div class="modal-body">
                     <!-- Progress Steps Indicator -->
                     <div class="import-steps-indicator">
                         <div class="step" data-step="1">
                             <div class="step-number">1</div>
                             <div class="step-label">העלאה</div>
-                        </div>
+                                    </div>
                         <div class="step" data-step="2">
                             <div class="step-number">2</div>
                             <div class="step-label">ניתוח + פתרון בעיות</div>
-                        </div>
+                                </div>
                         <div class="step" data-step="3">
                             <div class="step-number">3</div>
                             <div class="step-label">תצוגה מקדימה + אישור</div>
-                        </div>
-                    </div>
+                                    </div>
+                                </div>
 
                     <!-- Step 1+2: Upload + Account Selection (COMBINED) -->
                     <div class="import-step" id="step-upload" data-step="1">
@@ -233,7 +232,7 @@
                                         <span class="file-name" id="fileName"></span>
                                         <span class="file-size" id="fileSize"></span>
                                     </div>
-                                    <button data-button-type="SECONDARY" data-text="החלף קובץ" onclick="resetFile()"></button>
+                                    <button data-button-type="SECONDARY" data-text="החלף קובץ" data-onclick="resetFile()"></button>
                                 </div>
                             </div>
                             
@@ -241,15 +240,15 @@
                                 <label>בחר חשבון מסחר:</label>
                                 <select id="tradingAccountSelect" class="form-select">
                                     <option value="">בחר חשבון מסחר...</option>
-                                </select>
-                            </div>
+                                        </select>
+                                    </div>
                             
                             <div class="step-actions">
                                 <button data-button-type="PRIMARY" data-text="המשך לניתוח" 
-                                        onclick="analyzeFile()" id="analyzeBtn" disabled></button>
+                                        data-onclick="analyzeFile()" id="analyzeBtn" disabled></button>
                             </div>
-                        </div>
-                    </div>
+                                    </div>
+                                </div>
 
                     <!-- Step 2: Analysis Results + Problem Resolution -->
                     <div class="import-step" id="step-analysis" data-step="2" style="display:none;">
@@ -298,8 +297,15 @@
                                         <div class="card-label">רשומות עם טיקר חסר</div>
                                     </div>
                                 </div>
-                            </div>
-                            
+                                <div class="analysis-card existing-records">
+                                    <div class="card-icon"><i class="bi bi-database"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="existingRecords">0</div>
+                                        <div class="card-label">רשומות קיימות במערכת</div>
+            </div>
+        </div>
+    </div>
+
                             <!-- Problem Resolution Section -->
                             <div class="problem-resolution-section" id="problemResolutionSection" style="display:none;">
                                 <h3>פתרון בעיות</h3>
@@ -310,26 +316,27 @@
                                 <p>הסמלים הבאים לא קיימים במערכת. ניתן להוסיף אותם או לדלג על הרשומות:</p>
                                 <div class="problem-card-container" id="missingTickersContainer">
                                     <!-- Missing ticker cards will be populated here -->
-                                </div>
-                            </div>
-                            
+                        </div>
+                    </div>
+                    
+                            <!-- Existing Records Section -->
+                            <div class="problem-section" id="existingRecordsSection" style="display:none;">
+                                <h4><i class="bi bi-database"></i> רשומות קיימות במערכת</h4>
+                                <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג עליהן:</p>
+                                <div class="problem-card-container" id="existingRecordsContainer">
+                                    <!-- Existing records cards will be populated here -->
+                    </div>
+                </div>
+
                             <!-- Within-File Duplicates Section -->
                             <div class="problem-section" id="withinFileDuplicatesSection" style="display:none;">
                                 <h4><i class="bi bi-files"></i> כפילויות בקובץ</h4>
                                 <p>נמצאו רשומות כפולות בתוך הקובץ. ניתן לבחור איזה רשומה לייבא:</p>
                                 <div class="problem-card-container" id="withinFileDuplicatesContainer">
                                     <!-- Within-file duplicate cards will be populated here -->
-                                </div>
-                            </div>
-                            
-                            <!-- Existing Records Section -->
-                            <div class="problem-section" id="existingRecordsSection" style="display:none;">
-                                <h4><i class="bi bi-exclamation-triangle"></i> רשומות קיימות במערכת</h4>
-                                <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג:</p>
-                                <div class="problem-card-container" id="existingRecordsContainer">
-                                    <!-- Existing record cards will be populated here -->
-                                </div>
-                            </div>
+                    </div>
+                </div>
+
                             
                             </div>
                             <!-- End of Problem Resolution Section -->
@@ -341,7 +348,7 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <!-- Step 3: Preview + Confirmation -->
                     <div class="import-step" id="step-preview" data-step="3" style="display:none;">
                         <div class="step-content">
@@ -349,33 +356,33 @@
                             
                             <!-- Confirmation Summary -->
                             <div class="confirmation-summary">
-                                <div class="summary-card">
+                        <div class="summary-card">
                                     <h4>סיכום הייבוא</h4>
-                                    <div class="summary-details">
-                                        <div class="detail-item">
-                                            <span class="detail-label">קובץ:</span>
+                            <div class="summary-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">קובץ:</span>
                                             <span class="detail-value" id="confirmFileName"></span>
-                                        </div>
-                                        <div class="detail-item">
+                                </div>
+                                <div class="detail-item">
                                             <span class="detail-label">חשבון מסחר:</span>
                                             <span class="detail-value" id="confirmAccountName"></span>
-                                        </div>
-                                        <div class="detail-item">
+                                </div>
+                                <div class="detail-item">
                                             <span class="detail-label">סה"כ רשומות:</span>
                                             <span class="detail-value" id="confirmTotalRecords"></span>
-                                        </div>
-                                        <div class="detail-item">
+                                </div>
+                                <div class="detail-item">
                                             <span class="detail-label">רשומות לייבוא:</span>
                                             <span class="detail-value" id="confirmImportRecords"></span>
-                                        </div>
+                                </div>
                                         <div class="detail-item">
                                             <span class="detail-label">רשומות להשמטה:</span>
                                             <span class="detail-value" id="confirmSkipRecords"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
+                </div>
+            </div>
+        </div>
+    </div>
+
                             <!-- Preview Summary -->
                             <div class="preview-summary">
                                 <div class="summary-item">
@@ -389,53 +396,53 @@
                                 <div class="summary-item">
                                     <span class="summary-label">אחוז ייבוא:</span>
                                     <span class="summary-value" id="previewImportRate">0%</span>
-                                </div>
-                            </div>
-                            
+            </div>
+                </div>
+                
                             <!-- Records to Import -->
                             <div class="preview-section">
                                 <h4><i class="bi bi-check-circle text-success"></i> רשומות לייבוא</h4>
                                 <div class="table-container">
                                     <table class="import-table" id="importTable">
-                                        <thead>
-                                            <tr>
+                                <thead>
+                                    <tr>
                                                 <th>סמל</th>
                                                 <th>פעולה</th>
-                                                <th>כמות</th>
-                                                <th>מחיר</th>
-                                                <th>עמלה</th>
+                                        <th>כמות</th>
+                                        <th>מחיר</th>
+                                        <th>עמלה</th>
                                                 <th>Realized P/L</th>
                                                 <th>MTM P/L</th>
-                                                <th>תאריך</th>
-                                            </tr>
-                                        </thead>
+                                        <th>תאריך</th>
+                                    </tr>
+                                </thead>
                                         <tbody id="importTableBody">
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
                             <!-- Records to Skip -->
                             <div class="preview-section">
                                 <h4><i class="bi bi-x-circle text-danger"></i> רשומות להשמטה</h4>
                                 <div class="table-container">
                                     <table class="import-table" id="skipTable">
-                                        <thead>
-                                            <tr>
+                                <thead>
+                                    <tr>
                                                 <th>סמל</th>
                                                 <th>פעולה</th>
-                                                <th>כמות</th>
-                                                <th>מחיר</th>
-                                                <th>עמלה</th>
+                                        <th>כמות</th>
+                                        <th>מחיר</th>
+                                        <th>עמלה</th>
                                                 <th>Realized P/L</th>
                                                 <th>MTM P/L</th>
-                                                <th>תאריך</th>
-                                                <th>סיבה</th>
-                                            </tr>
-                                        </thead>
+                                        <th>תאריך</th>
+                                        <th>סיבה</th>
+                                    </tr>
+                                </thead>
                                         <tbody id="skipTableBody">
-                                        </tbody>
-                                    </table>
+                                </tbody>
+                            </table>
                                 </div>
                             </div>
                             
@@ -483,6 +490,7 @@
     <script src="scripts/page-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לעמודים -->
     <script src="scripts/translation-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לתרגום -->
     <script src="scripts/button-icons.js?v=05b6de6f_20251025_005449"></script> <!-- אייקונים לכפתורים -->
+    <script src="scripts/event-handler-manager.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת ניהול אירועים מרכזית -->
     <script src="scripts/button-system-init.js?v=05b6de6f_20251025_005449"></script> <!-- אתחול מערכת כפתורים -->
     <script src="scripts/color-scheme-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת צבעים דינמית -->
 
@@ -503,6 +511,7 @@
     <!-- Critical: NO | Version: 2.0.0 -->
     <script src="scripts/pagination-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת עמודים -->
     <script src="scripts/modules/actions-menu-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת תפריט פעולות -->
+    <script src="scripts/modules/ui-advanced.js?v=05b6de6f_20251025_005449"></script> <!-- ממשק מתקדם - צבעים, העדפות -->
 
     <!-- ===== CRUD PACKAGE (loadOrder: 4) ===== -->
     <!-- מערכות לניהול נתונים וטבלאות -->
@@ -609,16 +618,16 @@
                         <div class="mb-3">
                             <label for="tickerCurrency" class="form-label">מטבע</label>
                             <select class="form-select" id="tickerCurrency">
-                                <option value="USD">USD</option>
-                                <option value="EUR">EUR</option>
-                                <option value="ILS">ILS</option>
+                                <option value="1">USD - דולר אמריקאי</option>
+                                <option value="2">EUR - יורו</option>
+                                <option value="3">ILS - שקל ישראלי</option>
                             </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-primary" onclick="saveTickerFromModal()">שמור טיקר</button>
+                    <button data-button-type="SAVE" data-text="שמור טיקר" data-onclick="saveTickerFromModal()"></button>
                 </div>
             </div>
         </div>

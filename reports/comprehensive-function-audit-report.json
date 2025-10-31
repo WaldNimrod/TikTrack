@@ -2771,12 +2771,6 @@
     {
       "type": "JS_FUNCTION_CALL",
       "page": "trades.html",
-      "issue": "קריאה לפונקציה לא קיימת: showSuccessAndRefresh()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "trades.html",
       "issue": "קריאה לפונקציה לא קיימת: handleSaveError()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
@@ -2844,12 +2838,6 @@
       "type": "JS_FUNCTION_CALL",
       "page": "trades.html",
       "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "trades.html",
-      "issue": "קריאה לפונקציה לא קיימת: showSuccessAndRefresh()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
@@ -3378,12 +3366,6 @@
       "type": "JS_FUNCTION_CALL",
       "page": "trades.html",
       "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "trades.html",
-      "issue": "קריאה לפונקציה לא קיימת: showSuccessAndRefresh()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
@@ -4637,30 +4619,6 @@
     {
       "type": "JS_GLOBALEXPORTS",
       "page": "trade_plans.html",
-      "issue": "דפוס חשוד: window.showAddTradePlanModal = showAddTradePlanModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trade_plans.html",
-      "issue": "דפוס חשוד: window.showEditTradePlanModal = showEditTradePlanModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trade_plans.html",
-      "issue": "דפוס חשוד: window.saveTradePlan = saveTradePlan;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trade_plans.html",
-      "issue": "דפוס חשוד: window.deleteTradePlan = deleteTradePlan;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trade_plans.html",
       "issue": "דפוס חשוד: window.tradePlansLoaded = false;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
@@ -4992,30 +4950,6 @@
       "type": "JS_GLOBALEXPORTS",
       "page": "trade_plans.html",
       "issue": "דפוס חשוד: window.filterTradePlansByType = filterTradePlansByType;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trade_plans.html",
-      "issue": "דפוס חשוד: window.showAddTradePlanModal = showAddTradePlanModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trade_plans.html",
-      "issue": "דפוס חשוד: window.showEditTradePlanModal = showEditTradePlanModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trade_plans.html",
-      "issue": "דפוס חשוד: window.saveTradePlan = saveTradePlan;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trade_plans.html",
-      "issue": "דפוס חשוד: window.deleteTradePlan = deleteTradePlan;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
@@ -7379,43 +7313,13 @@
     {
       "type": "HTML_ONCLICK",
       "page": "executions.html",
-      "issue": "קריאה לפונקציה לא מדויקת: goToStep(4)",
+      "issue": "קריאה לפונקציה לא מדויקת: confirmImport()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית"
     },
     {
       "type": "HTML_ONCLICK",
       "page": "executions.html",
-      "issue": "קריאה לפונקציה לא מדויקת: goToStep(3)",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית"
-    },
-    {
-      "type": "HTML_ONCLICK",
-      "page": "executions.html",
-      "issue": "קריאה לפונקציה לא מדויקת: goToStep(5)",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית"
-    },
-    {
-      "type": "HTML_ONCLICK",
-      "page": "executions.html",
-      "issue": "קריאה לפונקציה לא מדויקת: resetImport()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית"
-    },
-    {
-      "type": "HTML_ONCLICK",
-      "page": "executions.html",
-      "issue": "קריאה לפונקציה לא מדויקת: goToStep(4)",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית"
-    },
-    {
-      "type": "HTML_ONCLICK",
-      "page": "executions.html",
-      "issue": "קריאה לפונקציה לא מדויקת: executeImport(false)",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית"
-    },
-    {
-      "type": "HTML_ONCLICK",
-      "page": "executions.html",
-      "issue": "קריאה לפונקציה לא מדויקת: executeImport(true)",
+      "issue": "קריאה לפונקציה לא מדויקת: confirmImport(true)",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית"
     },
     {
@@ -8165,24 +8069,6 @@
     {
       "type": "JS_GLOBALEXPORTS",
       "page": "executions.html",
-      "issue": "דפוס חשוד: window.clearNewExecutionHighlights = clearNewExecutionHighlights;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.saveExecution = saveExecution;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.updateExecutionWrapper = updateExecutionWrapper;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
       "issue": "דפוס חשוד: window.setupModalConfigurations = setupModalConfigurations;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
@@ -8352,30 +8238,6 @@
       "type": "JS_GLOBALEXPORTS",
       "page": "executions.html",
       "issue": "דפוס חשוד: window.updateTickersList = updateTickersList;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.showAddExecutionModal = showAddExecutionModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.showEditExecutionModal = showEditExecutionModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.saveExecution = saveExecution;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.deleteExecution = deleteExecution;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
@@ -8831,24 +8693,6 @@
     {
       "type": "JS_GLOBALEXPORTS",
       "page": "executions.html",
-      "issue": "דפוס חשוד: window.clearNewExecutionHighlights = clearNewExecutionHighlights;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.saveExecution = saveExecution;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.updateExecutionWrapper = updateExecutionWrapper;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
       "issue": "דפוס חשוד: window.setupModalConfigurations = setupModalConfigurations;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
@@ -9027,30 +8871,6 @@
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.showAddExecutionModal = showAddExecutionModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.showEditExecutionModal = showEditExecutionModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.saveExecution = saveExecution;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "executions.html",
-      "issue": "דפוס חשוד: window.deleteExecution = deleteExecution;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
       "type": "JS_GLOBAL_EXPORT",
       "page": "executions.html",
       "issue": "ייצוא גלובלי של פונקציה לא קיימת: showDeleteExecutionModal",
@@ -9180,6 +9000,18 @@
       "type": "JS_FUNCTION_CALL",
       "page": "executions.html",
       "issue": "קריאה לפונקציה לא קיימת: error()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
@@ -9515,6 +9347,42 @@
     {
       "type": "JS_FUNCTION_CALL",
       "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: info()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: info()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: info()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: info()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
       "issue": "קריאה לפונקציה לא קיימת: info()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
@@ -9737,6 +9605,12 @@
     {
       "type": "JS_FUNCTION_CALL",
       "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: handleValidationError()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
       "issue": "קריאה לפונקציה לא קיימת: Date()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
@@ -9821,6 +9695,18 @@
     {
       "type": "JS_FUNCTION_CALL",
       "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
       "issue": "קריאה לפונקציה לא קיימת: handleValidationError()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
@@ -9840,6 +9726,12 @@
       "type": "JS_FUNCTION_CALL",
       "page": "executions.html",
       "issue": "קריאה לפונקציה לא קיימת: getElementById()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: handleValidationError()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
@@ -10457,6 +10349,24 @@
     {
       "type": "JS_FUNCTION_CALL",
       "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: find()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: find()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: find()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
       "issue": "קריאה לפונקציה לא קיימת: Date()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
@@ -10488,6 +10398,18 @@
       "type": "JS_FUNCTION_CALL",
       "page": "executions.html",
       "issue": "קריאה לפונקציה לא קיימת: info()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: abs()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: abs()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
@@ -11064,6 +10986,30 @@
       "type": "JS_FUNCTION_CALL",
       "page": "executions.html",
       "issue": "קריאה לפונקציה לא קיימת: info()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: addEventListener()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "executions.html",
+      "issue": "קריאה לפונקציה לא קיימת: addEventListener()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
@@ -12989,12 +12935,6 @@
     {
       "type": "JS_DELETEFUNCTIONS",
       "page": "alerts.html",
-      "issue": "דפוס חשוד: deleteAlert(",
-      "recommendation": "השתמש ב-EventHandlerManager.handleDeleteAction או EntityDetailsAPI.deleteEntity"
-    },
-    {
-      "type": "JS_DELETEFUNCTIONS",
-      "page": "alerts.html",
       "issue": "דפוס חשוד: confirmDeleteAlert(",
       "recommendation": "השתמש ב-EventHandlerManager.handleDeleteAction או EntityDetailsAPI.deleteEntity"
     },
@@ -13021,12 +12961,6 @@
       "page": "alerts.html",
       "issue": "דפוס חשוד: confirmDeleteAlert(",
       "recommendation": "השתמש ב-EventHandlerManager.handleDeleteAction או EntityDetailsAPI.deleteEntity"
-    },
-    {
-      "type": "JS_SAVEFUNCTIONS",
-      "page": "alerts.html",
-      "issue": "דפוס חשוד: saveAlert(",
-      "recommendation": "השתמש ב-ModalManagerV2 (טיפול אוטומטי) או CRUDResponseHandler"
     },
     {
       "type": "JS_SAVEFUNCTIONS",
@@ -13337,24 +13271,6 @@
     {
       "type": "JS_GLOBALEXPORTS",
       "page": "alerts.html",
-      "issue": "דפוס חשוד: window.loadModalData = loadModalData;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "alerts.html",
-      "issue": "דפוס חשוד: window.saveAlert = saveAlert;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "alerts.html",
-      "issue": "דפוס חשוד: window.updateAlert = updateAlert;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "alerts.html",
       "issue": "דפוס חשוד: window.updateStatusAndTriggered = updateStatusAndTriggered;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
@@ -13524,18 +13440,6 @@
       "type": "JS_GLOBALEXPORTS",
       "page": "alerts.html",
       "issue": "דפוס חשוד: window.showEditAlertModal = showEditAlertModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "alerts.html",
-      "issue": "דפוס חשוד: window.saveAlert = saveAlert;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "alerts.html",
-      "issue": "דפוס חשוד: window.deleteAlert = deleteAlert;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
@@ -13799,24 +13703,6 @@
     {
       "type": "JS_GLOBALEXPORTS",
       "page": "alerts.html",
-      "issue": "דפוס חשוד: window.loadModalData = loadModalData;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "alerts.html",
-      "issue": "דפוס חשוד: window.saveAlert = saveAlert;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "alerts.html",
-      "issue": "דפוס חשוד: window.updateAlert = updateAlert;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "alerts.html",
       "issue": "דפוס חשוד: window.updateStatusAndTriggered = updateStatusAndTriggered;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
@@ -13998,18 +13884,6 @@
       "type": "JS_GLOBALEXPORTS",
       "page": "alerts.html",
       "issue": "דפוס חשוד: window.showEditAlertModal = showEditAlertModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "alerts.html",
-      "issue": "דפוס חשוד: window.saveAlert = saveAlert;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "alerts.html",
-      "issue": "דפוס חשוד: window.deleteAlert = deleteAlert;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
@@ -15809,12 +15683,6 @@
     {
       "type": "JS_FUNCTION_CALL",
       "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: showSuccessAndRefresh()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
       "issue": "קריאה לפונקציה לא קיימת: closeModal()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
@@ -17049,108 +16917,6 @@
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: debug()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: FormData()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: warn()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: stringify()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: json()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: hideModal()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: info()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: debug()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: info()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: info()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "alerts.html",
-      "issue": "קריאה לפונקציה לא קיימת: error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
       "type": "HTML_ONCLICK",
       "page": "tickers.html",
       "issue": "קריאה לפונקציה לא מדויקת: toggleSection('top')",
@@ -17177,12 +16943,6 @@
     {
       "type": "JS_EDITFUNCTIONS",
       "page": "tickers.html",
-      "issue": "דפוס חשוד: editTicker(",
-      "recommendation": "השתמש ב-showEditModal או ModalManagerV2.showEditModal"
-    },
-    {
-      "type": "JS_EDITFUNCTIONS",
-      "page": "tickers.html",
       "issue": "דפוס חשוד: showEditTickerModal(",
       "recommendation": "השתמש ב-showEditModal או ModalManagerV2.showEditModal"
     },
@@ -17203,12 +16963,6 @@
       "page": "tickers.html",
       "issue": "דפוס חשוד: showEditTickerModal(",
       "recommendation": "השתמש ב-showEditModal או ModalManagerV2.showEditModal"
-    },
-    {
-      "type": "JS_DELETEFUNCTIONS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: deleteTicker(",
-      "recommendation": "השתמש ב-EventHandlerManager.handleDeleteAction או EntityDetailsAPI.deleteEntity"
     },
     {
       "type": "JS_DELETEFUNCTIONS",
@@ -17247,12 +17001,6 @@
       "recommendation": "השתמש ב-ModalManagerV2 (טיפול אוטומטי) או CRUDResponseHandler"
     },
     {
-      "type": "JS_SAVEFUNCTIONS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: saveTicker(",
-      "recommendation": "השתמש ב-ModalManagerV2 (טיפול אוטומטי) או CRUDResponseHandler"
-    },
-    {
       "type": "JS_MODALFUNCTIONS",
       "page": "tickers.html",
       "issue": "דפוס חשוד: showAddTickerModal(",
@@ -17262,12 +17010,6 @@
       "type": "JS_MODALFUNCTIONS",
       "page": "tickers.html",
       "issue": "דפוס חשוד: showEditTickerModal(",
-      "recommendation": "השתמש ב-ModalManagerV2.showModal"
-    },
-    {
-      "type": "JS_MODALFUNCTIONS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: showAddTickerModal(",
       "recommendation": "השתמש ב-ModalManagerV2.showModal"
     },
     {
@@ -17615,30 +17357,6 @@
     {
       "type": "JS_GLOBALEXPORTS",
       "page": "tickers.html",
-      "issue": "דפוס חשוד: window.showAddTickerModal = showAddTickerModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: window.showEditTickerModal = showEditTickerModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: window.saveTicker = saveTicker;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: window.updateTicker = updateTicker;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "tickers.html",
       "issue": "דפוס חשוד: window.clearTickersCache = clearTickersCache;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
@@ -17730,18 +17448,6 @@
       "type": "JS_GLOBALEXPORTS",
       "page": "tickers.html",
       "issue": "דפוס חשוד: window.showEditTickerModal = showEditTickerModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: window.saveTicker = saveTicker;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: window.deleteTicker = deleteTicker;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
@@ -18017,30 +17723,6 @@
     {
       "type": "JS_GLOBALEXPORTS",
       "page": "tickers.html",
-      "issue": "דפוס חשוד: window.showAddTickerModal = showAddTickerModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: window.showEditTickerModal = showEditTickerModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: window.saveTicker = saveTicker;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "tickers.html",
-      "issue": "דפוס חשוד: window.updateTicker = updateTicker;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "tickers.html",
       "issue": "דפוס חשוד: window.clearTickersCache = clearTickersCache;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
@@ -18135,46 +17817,28 @@
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
-      "type": "JS_GLOBALEXPORTS",
+      "type": "JS_GLOBAL_EXPORT",
       "page": "tickers.html",
-      "issue": "דפוס חשוד: window.saveTicker = saveTicker;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
+      "issue": "ייצוא גלובלי של פונקציה לא קיימת: deleteTicker",
+      "recommendation": "מחק את הייצוא או הגדר את הפונקציה"
     },
     {
-      "type": "JS_GLOBALEXPORTS",
+      "type": "JS_GLOBAL_EXPORT",
       "page": "tickers.html",
-      "issue": "דפוס חשוד: window.deleteTicker = deleteTicker;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
+      "issue": "ייצוא גלובלי של פונקציה לא קיימת: deleteTicker",
+      "recommendation": "מחק את הייצוא או הגדר את הפונקציה"
+    },
+    {
+      "type": "JS_GLOBAL_EXPORT",
+      "page": "tickers.html",
+      "issue": "ייצוא גלובלי של פונקציה לא קיימת: editTicker",
+      "recommendation": "מחק את הייצוא או הגדר את הפונקציה"
     },
     {
       "type": "JS_GLOBAL_EXPORT",
       "page": "tickers.html",
       "issue": "ייצוא גלובלי של פונקציה לא קיימת: toggleSection",
       "recommendation": "מחק את הייצוא או הגדר את הפונקציה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: info()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: find()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
       "type": "JS_FUNCTION_CALL",
@@ -19431,108 +19095,6 @@
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: debug()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: FormData()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: warn()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: stringify()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: json()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: hideModal()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: info()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: debug()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: info()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: info()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "tickers.html",
-      "issue": "קריאה לפונקציה לא קיימת: error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
       "type": "HTML_ONCLICK",
       "page": "trading_accounts.html",
       "issue": "קריאה לפונקציה לא מדויקת: toggleSection('top')",
@@ -20111,30 +19673,6 @@
     {
       "type": "JS_GLOBALEXPORTS",
       "page": "trading_accounts.html",
-      "issue": "דפוס חשוד: window.showAddTradingAccountModal = showAddTradingAccountModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trading_accounts.html",
-      "issue": "דפוס חשוד: window.showEditTradingAccountModal = showEditTradingAccountModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trading_accounts.html",
-      "issue": "דפוס חשוד: window.saveTradingAccount = saveTradingAccount;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trading_accounts.html",
-      "issue": "דפוס חשוד: window.deleteTradingAccount = deleteTradingAccount;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trading_accounts.html",
       "issue": "דפוס חשוד: window.trading_accountsData = trading_accounts;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
@@ -20664,30 +20202,6 @@
       "type": "JS_GLOBALEXPORTS",
       "page": "trading_accounts.html",
       "issue": "דפוס חשוד: window.getTradingAccounts = getTradingAccounts;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trading_accounts.html",
-      "issue": "דפוס חשוד: window.showAddTradingAccountModal = showAddTradingAccountModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trading_accounts.html",
-      "issue": "דפוס חשוד: window.showEditTradingAccountModal = showEditTradingAccountModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trading_accounts.html",
-      "issue": "דפוס חשוד: window.saveTradingAccount = saveTradingAccount;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "trading_accounts.html",
-      "issue": "דפוס חשוד: window.deleteTradingAccount = deleteTradingAccount;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
@@ -21677,12 +21191,6 @@
     {
       "type": "JS_FUNCTION_CALL",
       "page": "trading_accounts.html",
-      "issue": "קריאה לפונקציה לא קיימת: showSuccessAndRefresh()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "trading_accounts.html",
       "issue": "קריאה לפונקציה לא קיימת: json()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
@@ -22313,12 +21821,6 @@
     {
       "type": "JS_FUNCTION_CALL",
       "page": "trading_accounts.html",
-      "issue": "קריאה לפונקציה לא קיימת: showSuccessAndRefresh()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "trading_accounts.html",
       "issue": "קריאה לפונקציה לא קיימת: json()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
@@ -22343,12 +21845,6 @@
     {
       "type": "JS_FUNCTION_CALL",
       "page": "trading_accounts.html",
-      "issue": "קריאה לפונקציה לא קיימת: showSuccessAndRefresh()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "trading_accounts.html",
       "issue": "קריאה לפונקציה לא קיימת: text()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
@@ -22368,12 +21864,6 @@
       "type": "JS_FUNCTION_CALL",
       "page": "trading_accounts.html",
       "issue": "קריאה לפונקציה לא קיימת: json()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "trading_accounts.html",
-      "issue": "קריאה לפונקציה לא קיימת: showSuccessAndRefresh()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
@@ -22959,6 +22449,12 @@
       "recommendation": "השתמש ב-EventHandlerManager.handleDeleteAction או EntityDetailsAPI.deleteEntity"
     },
     {
+      "type": "JS_SAVEFUNCTIONS",
+      "page": "cash_flows.html",
+      "issue": "דפוס חשוד: saveCashFlow(",
+      "recommendation": "השתמש ב-ModalManagerV2 (טיפול אוטומטי) או CRUDResponseHandler"
+    },
+    {
       "type": "JS_MODALFUNCTIONS",
       "page": "cash_flows.html",
       "issue": "דפוס חשוד: showAddCashFlowModal(",
@@ -23058,6 +22554,12 @@
       "type": "JS_GLOBALEXPORTS",
       "page": "cash_flows.html",
       "issue": "דפוס חשוד: window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;",
+      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
+    },
+    {
+      "type": "JS_GLOBALEXPORTS",
+      "page": "cash_flows.html",
+      "issue": "דפוס חשוד: window.saveCashFlow = saveCashFlow;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
@@ -23484,6 +22986,12 @@
       "type": "JS_GLOBALEXPORTS",
       "page": "cash_flows.html",
       "issue": "דפוס חשוד: window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;",
+      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
+    },
+    {
+      "type": "JS_GLOBALEXPORTS",
+      "page": "cash_flows.html",
+      "issue": "דפוס חשוד: window.saveCashFlow = saveCashFlow;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
@@ -24713,6 +24221,84 @@
     {
       "type": "JS_FUNCTION_CALL",
       "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: debug()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: Error()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: FormData()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: Error()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: warn()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: stringify()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: json()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: Error()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: json()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: hideModal()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: info()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
+      "issue": "קריאה לפונקציה לא קיימת: error()",
+      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
+    },
+    {
+      "type": "JS_FUNCTION_CALL",
+      "page": "cash_flows.html",
       "issue": "קריאה לפונקציה לא קיימת: getElementById()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
@@ -25793,12 +25379,6 @@
     {
       "type": "JS_DELETEFUNCTIONS",
       "page": "notes.html",
-      "issue": "דפוס חשוד: deleteNote(",
-      "recommendation": "השתמש ב-EventHandlerManager.handleDeleteAction או EntityDetailsAPI.deleteEntity"
-    },
-    {
-      "type": "JS_DELETEFUNCTIONS",
-      "page": "notes.html",
       "issue": "דפוס חשוד: confirmDeleteNote(",
       "recommendation": "השתמש ב-EventHandlerManager.handleDeleteAction או EntityDetailsAPI.deleteEntity"
     },
@@ -25837,12 +25417,6 @@
       "page": "notes.html",
       "issue": "דפוס חשוד: confirmDeleteNote(",
       "recommendation": "השתמש ב-EventHandlerManager.handleDeleteAction או EntityDetailsAPI.deleteEntity"
-    },
-    {
-      "type": "JS_SAVEFUNCTIONS",
-      "page": "notes.html",
-      "issue": "דפוס חשוד: saveNote(",
-      "recommendation": "השתמש ב-ModalManagerV2 (טיפול אוטומטי) או CRUDResponseHandler"
     },
     {
       "type": "JS_SAVEFUNCTIONS",
@@ -26189,12 +25763,6 @@
     {
       "type": "JS_GLOBALEXPORTS",
       "page": "notes.html",
-      "issue": "דפוס חשוד: window.deleteNote = deleteNote;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "notes.html",
       "issue": "דפוס חשוד: window.uploadFile = uploadFile;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
@@ -26226,12 +25794,6 @@
       "type": "JS_GLOBALEXPORTS",
       "page": "notes.html",
       "issue": "דפוס חשוד: window.showEditNoteModal = showEditNoteModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "notes.html",
-      "issue": "דפוס חשוד: window.saveNote = saveNote;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
@@ -26543,12 +26105,6 @@
     {
       "type": "JS_GLOBALEXPORTS",
       "page": "notes.html",
-      "issue": "דפוס חשוד: window.deleteNote = deleteNote;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "notes.html",
       "issue": "דפוס חשוד: window.uploadFile = uploadFile;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
@@ -26580,12 +26136,6 @@
       "type": "JS_GLOBALEXPORTS",
       "page": "notes.html",
       "issue": "דפוס חשוד: window.showEditNoteModal = showEditNoteModal;",
-      "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
-    },
-    {
-      "type": "JS_GLOBALEXPORTS",
-      "page": "notes.html",
-      "issue": "דפוס חשוד: window.saveNote = saveNote;",
       "recommendation": "בדוק את המערכת המרכזית לפונקציה המתאימה"
     },
     {
@@ -27234,66 +26784,6 @@
       "type": "JS_FUNCTION_CALL",
       "page": "notes.html",
       "issue": "קריאה לפונקציה לא קיימת: error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: addEventListener()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: addEventListener()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: addEventListener()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: addEventListener()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: addEventListener()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: addEventListener()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {
@@ -28338,108 +27828,6 @@
       "type": "JS_FUNCTION_CALL",
       "page": "notes.html",
       "issue": "קריאה לפונקציה לא קיימת: showEditModal()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: debug()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: getElementById()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: FormData()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: warn()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: stringify()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: json()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: hideModal()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: info()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: debug()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: info()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: Error()",
-      "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
-    },
-    {
-      "type": "JS_FUNCTION_CALL",
-      "page": "notes.html",
-      "issue": "קריאה לפונקציה לא קיימת: info()",
       "recommendation": "בדוק אם הפונקציה קיימת במערכת המרכזית או הגדר אותה"
     },
     {

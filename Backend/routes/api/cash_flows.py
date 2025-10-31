@@ -51,10 +51,10 @@ cash_flow_service = CashFlowService()
 base_api = BaseEntityAPI('cash_flows', cash_flow_service, 'cash_flows')
 
 @cash_flows_bp.route('/', methods=['GET'])
-@api_endpoint(cache_ttl=60, rate_limit=60)
-@handle_database_session()
+@handle_database_session(auto_commit=True, auto_close=True)
 def get_cash_flows():
     """Get all cash flows using base API with custom data enhancement"""
+    # Use the session from the decorator (in g.db)
     db: Session = g.db
     response, status_code = base_api.get_all(db)
     
@@ -109,17 +109,19 @@ def get_cash_flow(cash_flow_id: int):
             "error": {"message": "Failed to retrieve cash flow"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @cash_flows_bp.route('/', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['cash_flows'])
 def create_cash_flow():
     """Create new cash flow"""
     try:
         logger.info("=== CREATE CASH FLOW START ===")
         data = request.get_json()
         logger.info(f"Received data: {data}")
-        db: Session = next(get_db())
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
         
         # Set default values
         if 'currency_id' not in data or data['currency_id'] is None:
@@ -159,8 +161,9 @@ def create_cash_flow():
         
         cash_flow = CashFlow(**data)
         db.add(cash_flow)
+        # CRITICAL: Must commit here to make data visible to subsequent queries
         db.commit()
-        db.refresh(cash_flow)
+        db.refresh(cash_flow)  # Refresh from database to get complete data
         
         # Return data with additional information
         cf_dict = cash_flow.to_dict()
@@ -183,15 +186,17 @@ def create_cash_flow():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['PUT'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['cash_flows'])
 def update_cash_flow(cash_flow_id: int):
     """Update cash flow"""
     try:
         data = request.get_json()
-        db: Session = next(get_db())
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
         cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
         
         if cash_flow:
@@ -235,8 +240,9 @@ def update_cash_flow(cash_flow_id: int):
                 if hasattr(cash_flow, key):
                     setattr(cash_flow, key, value)
             
+            # CRITICAL: Must commit here to make data visible to subsequent queries
             db.commit()
-            db.refresh(cash_flow)
+            db.refresh(cash_flow)  # Refresh from database to get complete data
             
             # Return data with additional information
             cf_dict = cash_flow.to_dict()
@@ -264,18 +270,21 @@ def update_cash_flow(cash_flow_id: int):
             "error": {"message": "Failed to update cash flow"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['cash_flows'])
 def delete_cash_flow(cash_flow_id: int):
     """Delete cash flow"""
     try:
-        db: Session = next(get_db())
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
         cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
         
         if cash_flow:
             db.delete(cash_flow)
+            # CRITICAL: Must commit here to make deletion visible to subsequent queries
             db.commit()
             return jsonify({
                 "status": "success",
@@ -294,5 +303,49 @@ def delete_cash_flow(cash_flow_id: int):
             "error": {"message": "Failed to delete cash flow"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
+    # Don't close db here - handle_database_session decorator will do it
+
+@cash_flows_bp.route('/delete-all', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['cash_flows'])
+def delete_all_cash_flows():
+    """Delete all cash flows - Admin/dev utility"""
+    try:
+        logger.info("=== DELETE ALL CASH FLOWS START ===")
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
+        
+        # Count existing records
+        count = db.query(CashFlow).count()
+        logger.info(f"Found {count} cash flows to delete")
+        
+        if count == 0:
+            logger.info("No cash flows to delete")
+            return jsonify({
+                "status": "success",
+                "message": "No cash flows to delete - table is already empty",
+                "deleted_count": 0,
+                "version": "1.0"
+            }), 200
+        
+        # Delete all records
+        deleted_count = db.query(CashFlow).delete()
+        # CRITICAL: Must commit here to make deletion visible to subsequent queries
+        db.commit()
+        
+        logger.info(f"Successfully deleted {deleted_count} cash flows")
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Successfully deleted {deleted_count} cash flows",
+            "deleted_count": deleted_count,
+            "version": "1.0"
+        }), 200
+    except Exception as e:
+        logger.error(f"Error deleting all cash flows: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to delete all cash flows"},
+            "version": "1.0"
+        }), 500
+    # Don't close db here - handle_database_session decorator will do it

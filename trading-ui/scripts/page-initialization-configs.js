@@ -269,6 +269,12 @@ const PAGE_CONFIGS = {
         preloadAssets: ['preferences-data'],
         cacheStrategy: 'persistent',
         
+        // ← NEW: Accordion mode - only one section open at a time
+        accordionMode: true,
+        
+        // ← NEW: Default state for sections (when no cache exists)
+        sectionsDefaultState: 'closed',  // 'closed' | 'open'
+        
         // קיים
         requiresFilters: false,
         requiresValidation: true,
@@ -277,6 +283,11 @@ const PAGE_CONFIGS = {
             // Preferences-specific initialization
             async (pageConfig) => {
                 window.Logger.info('⚙️ Initializing Preferences...', { page: "page-initialization-configs" });
+                
+                // Load trading accounts for default account preference
+                if (typeof window.loadAccountsForPreferences === 'function') {
+                    await window.loadAccountsForPreferences();
+                }
                 
                 // טעינת מערכת העדפות
                 if (typeof window.initializePreferences === 'function') {
@@ -404,6 +415,22 @@ const PAGE_CONFIGS = {
         customInitializers: [
             async (pageConfig) => {
                 window.Logger.info('⚡ Initializing Executions...', { page: "page-initialization-configs" });
+                
+                // Load user preferences first
+                if (typeof window.loadUserPreferences === 'function') {
+                    window.Logger.info('⚙️ Loading user preferences for Executions...', { page: "page-initialization-configs" });
+                    
+                    // Debug current profile
+                    console.log('🧪 Current PreferencesCore state:', {
+                        currentUserId: window.PreferencesCore?.currentUserId,
+                        currentProfileId: window.PreferencesCore?.currentProfileId
+                    });
+                    
+                    const prefs = await window.loadUserPreferences();
+                    console.log('🧪 loadUserPreferences returned:', prefs);
+                } else {
+                    console.warn('⚠️ loadUserPreferences not available!');
+                }
                 
                 if (typeof window.loadExecutionsData === 'function') {
                     await window.loadExecutionsData();

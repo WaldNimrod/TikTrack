@@ -3,7 +3,7 @@ Duplicate Detection Service - Smart duplicate detection for import data
 
 This service implements intelligent duplicate detection using multiple strategies:
 1. Exact external_id matching
-2. 3/5 field similarity matching (ticker, quantity, price, date, action)
+2. 4/5 field similarity matching (ticker, quantity, price, date, action)
 3. Within-file duplicate detection
 4. Against-system duplicate detection
 
@@ -29,7 +29,7 @@ class DuplicateDetectionService:
     
     This service uses multiple strategies to identify potential duplicates:
     - External ID matching (exact)
-    - Field similarity matching (3/5 rule)
+    - Field similarity matching (4/5 rule)
     - Within-file detection
     - Against-system detection
     """
@@ -42,7 +42,7 @@ class DuplicateDetectionService:
             db_session: Database session for querying existing data
         """
         self.db_session = db_session
-        self.similarity_threshold = 5  # All 5 fields must match for existing record detection
+        self.similarity_threshold = 4  # 4 out of 5 fields must match for duplicate detection
         self.price_tolerance = 0.01    # Price difference tolerance
         self.date_tolerance_days = 1   # Date difference tolerance
     
@@ -243,30 +243,35 @@ class DuplicateDetectionService:
         
         # Check price match - integer part only
         if (record1.get('price') and record2.get('price')):
-            price1 = int(float(record1['price']))
-            price2 = int(float(record2['price']))
+            price1 = float(record1['price'])
+            price2 = float(record2['price'])
             if price1 == price2:
                 score += 1
         
-        # Check date match - same day only, ignore time
+        # Check date match - same day AND within 5 minutes time window
         if (record1.get('date') and record2.get('date')):
             try:
                 # Handle both date objects and date strings
                 if hasattr(record1['date'], 'date'):
-                    date1 = record1['date'].date()
+                    date1 = record1['date']
                 elif isinstance(record1['date'], str):
-                    date1 = datetime.fromisoformat(record1['date'].replace('Z', '+00:00')).date()
+                    date1 = datetime.fromisoformat(record1['date'].replace('Z', '+00:00'))
                 else:
                     date1 = record1['date']
                 
                 if hasattr(record2['date'], 'date'):
-                    date2 = record2['date'].date()
+                    date2 = record2['date']
                 elif isinstance(record2['date'], str):
-                    date2 = datetime.fromisoformat(record2['date'].replace('Z', '+00:00')).date()
+                    date2 = datetime.fromisoformat(record2['date'].replace('Z', '+00:00'))
                 else:
                     date2 = record2['date']
                 
-                if date1 == date2:
+                # Check if dates are on the same day AND within 5 minutes of each other
+                same_day = date1.date() == date2.date()
+                time_diff = abs((date1 - date2).total_seconds())
+                within_5_minutes = time_diff <= 300  # 5 minutes = 300 seconds
+                
+                if same_day and within_5_minutes:
                     score += 1
             except (ValueError, TypeError, AttributeError):
                 pass
@@ -332,14 +337,28 @@ class DuplicateDetectionService:
                 logger.info(f"Querying executions for symbols {symbols} between {min_date} and {max_date}")
                 
                 # Query executions in date range for these symbols
+                # Check both direct ticker_id and through trade
                 executions = self.db_session.query(Execution)\
                     .outerjoin(Trade, Execution.trade_id == Trade.id)\
-                    .outerjoin(Ticker, Trade.ticker_id == Ticker.id)\
+                    .outerjoin(Ticker, (Trade.ticker_id == Ticker.id) | (Execution.ticker_id == Ticker.id))\
                     .filter(
                         Ticker.symbol.in_(symbols),
                         Execution.date >= min_date,
                         Execution.date <= max_date
                     ).all()
+                
+                # Also check executions with direct ticker_id that match symbols
+                direct_executions = self.db_session.query(Execution)\
+                    .join(Ticker, Execution.ticker_id == Ticker.id)\
+                    .filter(
+                        Ticker.symbol.in_(symbols),
+                        Execution.date >= min_date,
+                        Execution.date <= max_date
+                    ).all()
+                
+                # Combine results and remove duplicates
+                all_executions = executions + direct_executions
+                executions = list({execution.id: execution for execution in all_executions}.values())
             
             logger.info(f"Found {len(executions)} existing executions")
             

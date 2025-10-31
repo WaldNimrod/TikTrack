@@ -356,10 +356,16 @@ function getDemoAlertsData() {
  * @returns {Array} מערך של התראות
  */
 async function loadAlertsData() {
-  window.Logger.info('📊 טעינת נתוני התראות מהשרת...', { page: "alerts" });
+  window.Logger.info('Loading alerts data (bypass cache)', { page: "alerts" });
   try {
-    const response = await fetch('/api/alerts/');
-    window.Logger.info('📊 תגובת שרת:', response.status, response.ok, { page: "alerts" });
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/alerts/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
 
     if (!response.ok) {
       window.Logger.warn(`⚠️ Server error ${response.status}, using demo data`, { page: "alerts" });
@@ -1544,12 +1550,7 @@ function parseAlertCondition(condition) {
 async function saveAlert() {
   window.Logger.info('🔧 saveAlert function called', { page: "alerts" });
   
-  // ניקוי מטמון לפני פעולת CRUD - הוספה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('alerts', 'add');
-  }
-  
-  const form = document.getElementById('addAlertForm');
+  // ניקוי מטמון לפני פעולת CRUD - הוספה  const form = document.getElementById('addAlertForm');
   if (!form) {
     window.Logger.warn('⚠️ Form element not found - skipping save operation', { page: "alerts" });
     return;
@@ -1706,7 +1707,9 @@ async function saveAlert() {
       modalId: 'addAlertModal',
       successMessage: 'התראה נשמרה בהצלחה!',
       apiUrl: '/api/alerts/',
-      entityName: 'התראה'
+      entityName: 'התראה',
+      reloadFn: window.loadAlertsData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -1852,24 +1855,37 @@ function updateStatusAndTriggered() {
  * משתמשת במערכת ההתראות הגלובלית להודעות
  */
 async function updateAlert() {
-  // ניקוי מטמון לפני פעולת CRUD - עריכה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('alerts', 'edit');
-  }
-  
-  const form = document.getElementById('editAlertForm');
+  // ניקוי מטמון לפני פעולת CRUD - עריכה  const form = document.getElementById('editAlertForm');
   if (!form) {
     // window.Logger.warn('⚠️ Form element not found - skipping update operation', { page: "alerts" });
     return;
   }
 
+  // איסוף נתונים באמצעות DataCollectionService
+  const alertData = DataCollectionService.collectFormData({
+    related_type_id: { id: 'editAlertRelationType', type: 'int' },
+    related_id: { id: 'editAlertRelatedObjectSelect', type: 'int' },
+    condition_attribute: { id: 'editConditionAttribute', type: 'text' },
+    condition_operator: { id: 'editConditionOperator', type: 'text' },
+    condition_number: { id: 'editConditionNumber', type: 'number' },
+    message: { id: 'editAlertMessage', type: 'text', default: null },
+    status: { id: 'editAlertStatus', type: 'text' },
+    is_triggered: { id: 'editAlertIsTriggered', type: 'text' }
+  });
 
   // עדכון status ו-is_triggered לפי המצב הנבחר
   updateStatusAndTriggered();
 
-  // בדיקת תקינות הקשר בין status ו-is_triggered
-  const status = document.getElementById('editAlertStatus').value;
-  const isTriggered = document.getElementById('editAlertIsTriggered').value;
+  const relatedTypeId = alertData.related_type_id;
+  const relatedId = alertData.related_id;
+  const conditionAttribute = alertData.condition_attribute;
+  const conditionOperator = alertData.condition_operator;
+  const conditionNumber = alertData.condition_number;
+  const status = alertData.status;
+  const isTriggered = alertData.is_triggered;
+
+  // ולידציה באמצעות מערכת הולידציה הגלובלית
+  let hasErrors = false;
 
   if (!validateAlertStatusCombination(status, isTriggered)) {
     if (window.showErrorNotification) {
@@ -1878,35 +1894,19 @@ async function updateAlert() {
     return;
   }
 
-  // בדיקת בחירת אובייקט
-  const relatedTypeId = parseInt(document.querySelector('input[name="editAlertRelationType"]:checked')?.value);
-  const relatedId = parseInt(document.getElementById('editAlertRelatedObjectSelect').value);
-
-  // ולידציה באמצעות מערכת הולידציה הגלובלית
-  let hasErrors = false;
-
-  if (!relatedTypeId || isNaN(relatedTypeId)) {
+  if (!relatedTypeId) {
     if (window.showValidationWarning) {
       window.showValidationWarning('editAlertRelationType', 'יש לבחור סוג אובייקט לשיוך');
     }
     hasErrors = true;
   }
 
-  if (!relatedId || isNaN(relatedId)) {
+  if (!relatedId) {
     if (window.showValidationWarning) {
       window.showValidationWarning('editAlertRelatedObjectSelect', 'יש לבחור אובייקט לשיוך');
     }
     hasErrors = true;
   }
-
-  // בדיקת תנאי התראה
-  const conditionAttributeElement = document.getElementById('editConditionAttribute');
-  const conditionOperatorElement = document.getElementById('editConditionOperator');
-  const conditionNumberElement = document.getElementById('editConditionNumber');
-
-  const conditionAttribute = conditionAttributeElement.value;
-  const conditionOperator = conditionOperatorElement.value;
-  const conditionNumber = conditionNumberElement.value;
 
   if (!conditionAttribute) {
     if (window.showValidationWarning) {
@@ -1969,15 +1969,15 @@ async function updateAlert() {
   }
 
   const alertId = document.getElementById('editAlertId').value;
-  const alertData = {
+  const alertPayload = {
     related_type_id: relatedTypeId,
     related_id: relatedId,
     condition_attribute: conditionAttribute,
     condition_operator: conditionOperator,
     condition_number: conditionNumber,
-    message: document.getElementById('editAlertMessage').value || null,
-    status: document.getElementById('editAlertStatus').value,
-    is_triggered: document.getElementById('editAlertIsTriggered').value,
+    message: alertData.message || null,
+    status: status,
+    is_triggered: isTriggered,
   };
 
   // מעדכן התראה
@@ -1993,38 +1993,21 @@ async function updateAlert() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(alertData),
+      body: JSON.stringify(alertPayload),
     });
 
-    if (response.ok) {
-      await response.json();
-      // התראה עודכנה בהצלחה
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleUpdateResponse(response, {
+      modalId: 'editAlertModal',
+      successMessage: 'התראה עודכנה בהצלחה!',
+      apiUrl: '/api/alerts/',
+      entityName: 'התראה',
+      reloadFn: window.loadAlertsData,
+      requiresHardReload: false
+    });
 
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה עודכנה בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        // הצגת הודעה
-        if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!', 4000, 'business');
-        }
-
-        // רענון הנתונים
-        await loadAlertsData();
-      }
-
-      // סגירת המודל
-      closeModal('editAlertModal');
-      
-    } else {
-      throw new Error(`שגיאה בעדכון התראה: ${response.status}`);
-    }
-  } catch {
-    // window.Logger.error('שגיאה בעדכון התראה:', error, { page: "alerts" });
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה בעדכון התראה', 'שגיאה בעדכון התראה');
-    }
+  } catch (error) {
+    CRUDResponseHandler.handleError(error, 'עדכון התראה');
   }
 }
 
@@ -2068,7 +2051,7 @@ async function confirmDeleteAlert(alertId) {
   // window.Logger.info('🔄 confirmDeleteAlert נקראה עבור ID:', alertId, { page: "alerts" });
 
   try {
-    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });
 
@@ -2076,7 +2059,9 @@ async function confirmDeleteAlert(alertId) {
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'התראה נמחקה בהצלחה!',
       apiUrl: '/api/alerts/',
-      entityName: 'התראה'
+      entityName: 'התראה',
+      reloadFn: window.loadAlertsData,
+      requiresHardReload: false
     });
 
   } catch (error) {

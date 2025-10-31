@@ -615,12 +615,7 @@ async function checkLinkedItemsAndCancel(tradeId) {
  */
 async function performTradeCancellation(tradeId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - ביטול
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'cancel');
-    }
-    
-    // שליחה לשרת
+    // ניקוי מטמון לפני פעולת CRUD - ביטול    // שליחה לשרת
     const response = await fetch(`/api/trades/${tradeId}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -632,12 +627,7 @@ async function performTradeCancellation(tradeId) {
       throw new Error(errorData.error?.message || 'שגיאה בביטול הטרייד');
     }
 
-    // שימוש במערכת הריענון המרכזית
-    if (window.centralRefresh) {
-      await window.centralRefresh.showSuccessAndRefresh('trades', 'טרייד בוטל בהצלחה!');
-    } else {
-      // Fallback למערכת הישנה
-      // הצלחה
+    // הצלחה
       window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה!', 4000, 'business');
       // רענון הטבלה
       await loadTradesData();
@@ -725,12 +715,7 @@ async function deleteTradeRecord(tradeId) {
  */
 async function performTradeDeletion(tradeId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'delete');
-    }
-    
-    // שליחה לשרת
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה    // שליחה לשרת
     const response = await fetch(`/api/trades/${tradeId}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -741,12 +726,7 @@ async function performTradeDeletion(tradeId) {
       throw new Error(errorData.error?.message || 'שגיאה במחיקת הטרייד');
     }
 
-    // שימוש במערכת הריענון המרכזית
-    if (window.centralRefresh) {
-      await window.centralRefresh.showSuccessAndRefresh('trades', 'טרייד נמחק בהצלחה!');
-    } else {
-      // Fallback למערכת הישנה
-      // הצלחה
+    // הצלחה
       window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה!', 4000, 'business');
       // רענון הטבלה
       await loadTradesData();
@@ -1110,12 +1090,7 @@ async function loadEditTradeModalData(trade) {
  */
 async function saveEditTradeData() {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - עריכה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'edit');
-    }
-    
-    // איסוף נתונים מהטופס
+    // ניקוי מטמון לפני פעולת CRUD - עריכה    // איסוף נתונים מהטופס
     const formData = {
       id: document.getElementById('editTradeId').value,
       investment_type: document.getElementById('editTradeType').value,
@@ -1217,12 +1192,7 @@ async function saveEditTradeData() {
       throw new Error(errorData.error?.message || 'שגיאה בעדכון הטרייד');
     }
 
-    // שימוש במערכת הריענון המרכזית
-    if (window.centralRefresh) {
-      await window.centralRefresh.showSuccessAndRefresh('trades', 'טרייד עודכן בהצלחה!');
-    } else {
-      // Fallback למערכת הישנה
-      // הצלחה
+    // הצלחה
       window.showSuccessNotification('הצלחה', 'טרייד עודכן בהצלחה!', 4000, 'business');
       // רענון הטבלה
       await loadTradesData();
@@ -1453,12 +1423,7 @@ function validateTradeForm() {
  * @returns {Promise<void>}
  */
 async function saveNewTradeRecord() {
-  // ניקוי מטמון לפני פעולת CRUD - הוספה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('trades', 'add');
-  }
-  
-  // שמירת טרייד חדש...
+  // ניקוי מטמון לפני פעולת CRUD - הוספה  // שמירת טרייד חדש...
 
   // בדיקת אלמנטים לפני שמירה
 
@@ -1514,12 +1479,7 @@ async function saveNewTradeRecord() {
     if (response.ok) {
       await response.json(); // newTrade not used
       
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('trades', 'טרייד נשמר בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        window.showSuccessNotification('הצלחה', 'טרייד נשמר בהצלחה!', 4000, 'business');
+      window.showSuccessNotification('הצלחה', 'טרייד נשמר בהצלחה!', 4000, 'business');
         // רענון הטבלה
         loadTradesData();
       }
@@ -2807,12 +2767,7 @@ async function updateEditTradePriceFromTicker(tickerId) {
  */
 async function reactivateTrade(tradeId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - עריכה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trades', 'edit');
-    }
-    
-    // מציאת הטרייד בנתונים
+    // ניקוי מטמון לפני פעולת CRUD - עריכה    // מציאת הטרייד בנתונים
     const trade = tradesData.find(t => t.id === tradeId);
     if (!trade) {
       if (typeof handleElementNotFound === 'function') {
@@ -2838,12 +2793,7 @@ async function reactivateTrade(tradeId) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    // שימוש במערכת הריענון המרכזית
-    if (window.centralRefresh) {
-      await window.centralRefresh.showSuccessAndRefresh('trades', 'טרייד הופעל מחדש בהצלחה!');
-    } else {
-      // Fallback למערכת הישנה
-      // הצגת הודעת הצלחה
+    // הצגת הודעת הצלחה
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
       } else if (typeof window.showNotification === 'function') {

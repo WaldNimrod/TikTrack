@@ -834,9 +834,8 @@ function validateCompleteExecutionForm(mode) {
  * שמירת עסקה חדשה
  */
 async function saveExecution() {
-
-
-  // איסוף נתונים מהטופס באמצעות DataCollectionService
+  
+  // ניקוי מטמון לפני פעולת CRUD  // איסוף נתונים מהטופס באמצעות DataCollectionService
   const executionData = DataCollectionService.collectFormData({
     trade_id: { id: 'addExecutionTradeId', type: 'int' },
     action: { id: 'addExecutionType', type: 'text' },
@@ -917,7 +916,9 @@ async function saveExecution() {
       modalId: 'addExecutionModal',
       successMessage: 'עסקה נשמרה בהצלחה!',
       apiUrl: '/api/executions/',
-      entityName: 'עסקה'
+      entityName: 'עסקה',
+      reloadFn: window.loadExecutionsData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -929,9 +930,8 @@ async function saveExecution() {
  * עדכון עסקה קיימת
  */
 async function updateExecutionWrapper() {
-
-
-  const id = document.getElementById('editExecutionId').value;
+  
+  // ניקוי מטמון לפני פעולת CRUD - עריכה  const id = document.getElementById('editExecutionId').value;
   const tradeIdValue = document.getElementById('editExecutionTradeId').value;
   const type = document.getElementById('editExecutionType').value;
   const quantity = document.getElementById('editExecutionQuantity').value;
@@ -1112,7 +1112,9 @@ async function confirmDeleteExecution(_id) {
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'עסקה נמחקה בהצלחה!',
       apiUrl: '/api/executions/',
-      entityName: 'עסקה'
+      entityName: 'עסקה',
+      reloadFn: window.loadExecutionsData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -1575,11 +1577,17 @@ function goToNote(noteId) {
  * @returns {Promise<void>}
  */
 async function loadExecutionsData() {
-  // loadExecutionsData called
   try {
-    // טעינת נתוני עסקעות
-
-    const response = await fetch('/api/executions/?_t=' + Date.now());
+    window.Logger.info('Loading executions data (bypass cache)', { page: "executions" });
+    
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/executions/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
     if (response.ok) {
       const data = await response.json();
       executionsData = data.data || data;
@@ -3172,8 +3180,8 @@ window.showEditExecutionModal = showEditExecutionModal;
     // כללי וולידציה מותאמים לטופס הוספת ביצוע
     const addExecutionValidationRules = {
       trade_id: {
-        required: true,
-        message: 'יש לבחור טרייד',
+        required: false,
+        message: 'טרייד (אופציונלי)',
       },
       action: {
         required: true,
@@ -3195,8 +3203,8 @@ window.showEditExecutionModal = showEditExecutionModal;
     // כללי וולידציה מותאמים לטופס עריכת ביצוע
     const editExecutionValidationRules = {
       trade_id: {
-        required: true,
-        message: 'יש לבחור טרייד',
+        required: false,
+        message: 'טרייד (אופציונלי)',
       },
       action: {
         required: true,
@@ -4075,38 +4083,42 @@ async function deleteExecution(executionId) {
             }
         }
         
-        // Confirm deletion
-        if (!confirm('האם אתה בטוח שברצונך למחוק את הביצוע?')) {
-            return;
+        // Use warning system for confirmation
+        if (window.showDeleteWarning) {
+            window.showDeleteWarning('execution', executionId, 'ביצוע',
+                async () => await performExecutionDeletion(executionId),
+                () => {}
+            );
+        } else {
+            // Fallback to simple confirm
+            if (!confirm('האם אתה בטוח שברצונך למחוק את הביצוע?')) {
+                return;
+            }
+            await performExecutionDeletion(executionId);
         }
         
-        // Send delete request
+    } catch (error) {
+        CRUDResponseHandler.handleError(error, 'מחיקת ביצוע');
+    }
+}
+
+async function performExecutionDeletion(executionId) {
+    try {
+        // ניקוי מטמון לפני פעולת CRUD - מחיקה        // Send delete request
         const response = await fetch(`/api/executions/${executionId}`, {
             method: 'DELETE'
         });
         
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        // Handle success
-        if (window.showNotification) {
-            window.showNotification('ביצוע נמחק בהצלחה', 'success', 'business');
-        }
-        
-        // Refresh data
-        if (window.loadExecutionsData) {
-            window.loadExecutionsData();
-        }
-        
-        window.Logger.info('Execution deleted successfully', { executionId, page: 'executions' });
+        // Use CRUDResponseHandler for consistent response handling
+        await CRUDResponseHandler.handleDeleteResponse(response, {
+            successMessage: 'ביצוע נמחק בהצלחה',
+            entityName: 'ביצוע',
+            reloadFn: window.loadExecutionsData,
+            requiresHardReload: false
+        });
         
     } catch (error) {
-        window.Logger.error('Error deleting execution', { error: error.message, executionId, page: 'executions' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה במחיקת הביצוע', 'error', 'system');
-        }
+        CRUDResponseHandler.handleError(error, 'מחיקת ביצוע');
     }
 }
 

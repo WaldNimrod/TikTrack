@@ -459,14 +459,7 @@
   margin-bottom: var(--apple-spacing-md);
 }
 
-/* מצב סגור */
-.content-section.collapsed {
-  padding: 20px 0;
-}
-
-.section-body.collapsed {
-  padding: 20px 0;
-}
+/* מצב סגור - מוסר - משתמשים ב-display:none במקום */
 
 /* אזור פעולות הכותרת */
 .table-actions {

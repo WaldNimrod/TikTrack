@@ -655,14 +655,18 @@ def invalidate_cache(dependencies: List[str]):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            logger.info(f"🔄 DECORATOR CALLED: About to execute {func.__name__} and then invalidate cache for dependencies {dependencies}")
+            logger.info(f"🔄 INVALIDATE_CACHE DECORATOR: Wrapping {func.__name__}, will invalidate {dependencies}")
             
             # Execute the original function
+            logger.info(f"🟢 INVALIDATE_CACHE: Calling {func.__name__}")
             result = func(*args, **kwargs)
+            logger.info(f"🟢 INVALIDATE_CACHE: {func.__name__} completed")
             
-            # Invalidate cache after successful execution
+            # CRITICAL: Invalidate cache AFTER function completes
+            # If handle_database_session is also a decorator, it will commit FIRST
+            # Then this will invalidate cache AFTER the commit
             try:
-                logger.info(f"🧹 Starting cache invalidation for dependencies {dependencies}")
+                logger.info(f"🧹 INVALIDATE_CACHE: Starting cache invalidation for dependencies {dependencies}")
                 
                 total_invalidated = 0
                 for dependency in dependencies:
@@ -670,7 +674,7 @@ def invalidate_cache(dependencies: List[str]):
                     advanced_cache_service.invalidate_by_dependency(dependency)
                     total_invalidated += invalidated_count
                 
-                logger.info(f"✅ Cache invalidated for dependencies {dependencies}: {total_invalidated} entries removed")
+                logger.info(f"✅ INVALIDATE_CACHE: Cache invalidated for dependencies {dependencies}: {total_invalidated} entries removed")
                 
             except Exception as e:
                 logger.error(f"❌ Failed to invalidate cache for dependencies {dependencies}: {e}")

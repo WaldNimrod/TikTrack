@@ -142,7 +142,7 @@ class ModalManagerV2 {
                 <div class="modal-dialog modal-${config.size || 'lg'}">
                     <div class="modal-content">
                         <div class="modal-header modal-header-dynamic" 
-                             style="background: linear-gradient(135deg, var(--current-entity-color-light), var(--current-entity-color-dark))">
+                             style="background-color: var(--current-entity-color-light); border-bottom: 2px solid var(--current-entity-color)">
                             <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark)">${config.title.add || 'הוספת ישות'}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" 
                                     aria-label="סגור"></button>
@@ -153,10 +153,10 @@ class ModalManagerV2 {
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button data-button-type="CANCEL" data-variant="normal" 
+                            <button type="button" data-button-type="CANCEL" data-variant="normal" 
                                     data-bs-dismiss="modal" data-text="ביטול"></button>
-                            <button data-button-type="SAVE" data-variant="normal" 
-                                    data-onclick="${config.onSave}" data-text="שמור"></button>
+                            <button type="button" id="${config.id}SaveBtn" data-button-type="SAVE" data-variant="normal" 
+                                    data-onclick="${config.onSave}()" data-text="שמור"></button>
                         </div>
                     </div>
                 </div>
@@ -342,11 +342,6 @@ class ModalManagerV2 {
             // איפוס טופס
             this.resetForm(modalElement);
             
-            // מילוי נתונים אם במצב עריכה/צפייה
-            if (mode === 'edit' && entityData) {
-                await this.populateForm(modalElement, entityData);
-            }
-            
             // הפעלת ולידציה
             this.initializeValidation(modalElement, modalInfo.config);
             
@@ -356,12 +351,25 @@ class ModalManagerV2 {
             // יישום צבעים
             this.applyUserColors(modalElement, modalInfo.config.entityType);
             
-            // מילוי selects
+            // מילוי selects (חייב להיות לפני populateForm)
+            // Note: populateSelects already handles defaultFromPreferences
             await this.populateSelects(modalElement, modalInfo.config);
+            
+            // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
+            if (mode === 'edit' && entityData) {
+                await this.populateForm(modalElement, entityData);
+            }
+            // In add mode, defaults are applied by populateSelects for fields with defaultFromPreferences
+            // Additional defaults (date, source) are handled below after modal shows
             
             // הצגת המודל
             const modal = new bootstrap.Modal(modalElement);
             modal.show();
+            
+            // Apply remaining defaults after modal shows (date, source, etc.)
+            if (mode === 'add') {
+                await this.applyRemainingDefaults(modalElement.querySelector('form'));
+            }
             
             // עדכון מצב
             modalInfo.isActive = true;
@@ -409,7 +417,9 @@ class ModalManagerV2 {
      */
     async loadEntityData(entityType, entityId) {
         try {
-            const response = await fetch(`/api/${entityType}/${entityId}`);
+            // Convert singular to plural for API endpoints
+            const apiEndpoint = this.getPluralEndpoint(entityType);
+            const response = await fetch(`/api/${apiEndpoint}/${entityId}`);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -422,6 +432,25 @@ class ModalManagerV2 {
             console.error(`Error loading entity data for ${entityType} ${entityId}:`, error);
             return null;
         }
+    }
+    
+    /**
+     * Convert singular entity type to plural API endpoint
+     * @param {string} entityType - סוג הישות ביחיד
+     * @returns {string} שם ה-endpoint ברבים
+     */
+    getPluralEndpoint(entityType) {
+        const pluralMap = {
+            'cash_flow': 'cash_flows',
+            'trade': 'trades',
+            'trading_account': 'trading-accounts',
+            'alert': 'alerts',
+            'execution': 'executions',
+            'ticker': 'tickers',
+            'trade_plan': 'trade_plans',
+            'note': 'notes'
+        };
+        return pluralMap[entityType] || `${entityType}s`;
     }
 
     /**
@@ -468,20 +497,125 @@ class ModalManagerV2 {
         
         if (!form || !data) return;
         
+        // Get modal config for field mapping
+        const modalInfo = this.modals.get(modalElement.id);
+        const config = modalInfo?.config;
+        
+        // Debug: Log received data
+        console.log('📝 populateForm - received data:', data);
+        console.log('📝 populateForm - entity type:', config?.entityType);
+        
+        // Field mapping for different entities
+        const fieldMapping = this.getFieldMapping(config?.entityType);
+        console.log('📝 populateForm - field mapping:', fieldMapping);
+        
+        // Fields to ignore (metadata/relationship fields)
+        const fieldsToIgnore = ['id', 'created_at', 'updated_at', 'account_name', 'currency_name', 'currency_symbol', 'usd_rate'];
+        
         // מילוי שדות רגילים
         Object.entries(data).forEach(([key, value]) => {
-            const field = form.querySelector(`#${key}, [name="${key}"]`);
+            // Ignore metadata fields
+            if (fieldsToIgnore.includes(key)) {
+                console.log(`⏭️ Skipping ${key} (metadata field)`);
+                return;
+            }
+            
+            // Try direct match first
+            let field = form.querySelector(`#${key}, [name="${key}"]`);
+            
+            // If no direct match, try field mapping
+            if (!field && fieldMapping[key]) {
+                field = form.querySelector(`#${fieldMapping[key]}, [name="${fieldMapping[key]}"]`);
+            }
+            
             if (field) {
+                console.log(`✅ Found field for ${key} (value: ${value})`);
                 if (field.type === 'checkbox' || field.type === 'radio') {
                     field.checked = Boolean(value);
+                } else if (field.tagName === 'SELECT') {
+                    // For selects, set value directly
+                    field.value = value || '';
+                } else if (field.type === 'datetime-local' && value) {
+                    // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)
+                    const dateStr = typeof value === 'string' ? value : value.toString();
+                    field.value = dateStr.includes('T') ? dateStr : `${dateStr}T00:00`;
                 } else {
                     field.value = value || '';
                 }
+            } else {
+                console.log(`❌ No field found for ${key} (value: ${value})`);
             }
         });
         
         // מילוי selects מיוחדים
         this.populateSpecialSelects(form, data);
+    }
+    
+    /**
+     * Get field mapping for entity type - מיפוי שדות לפי סוג ישות
+     * Maps backend field names to frontend field IDs
+     */
+    getFieldMapping(entityType) {
+        const mappings = {
+            'cash_flow': {
+                'amount': 'cashFlowAmount',
+                'type': 'cashFlowType',
+                'currency_id': 'cashFlowCurrency',
+                'trading_account_id': 'cashFlowAccount',
+                'date': 'cashFlowDate',
+                'description': 'cashFlowDescription',
+                'source': 'cashFlowSource',
+                'external_id': 'cashFlowExternalId',
+                'trade_id': 'cashFlowTrade',
+                'trade_plan_id': 'cashFlowTradePlan'
+            },
+            'ticker': {
+                'symbol': 'tickerSymbol',
+                'name': 'tickerName',
+                'sector': 'tickerSector',
+                'industry': 'tickerIndustry'
+            },
+            'trade': {
+                'account_id': 'tradeAccount',
+                'ticker_id': 'tradeTicker',
+                'side': 'tradeSide',
+                'status': 'tradeStatus',
+                'notes': 'tradeNotes'
+            },
+            'trade_plan': {
+                'ticker_id': 'planTicker',
+                'account_id': 'planAccount',
+                'side': 'planSide',
+                'planned_amount': 'planAmount',
+                'stop_loss': 'planStopLoss',
+                'target_price': 'planTargetPrice'
+            },
+            'alert': {
+                'ticker_id': 'alertTicker',
+                'condition': 'alertCondition',
+                'threshold': 'alertThreshold'
+            },
+            'execution': {
+                'trade_id': 'executionTrade',
+                'ticker_id': 'executionTicker',
+                'side': 'executionSide',
+                'quantity': 'executionQuantity',
+                'price': 'executionPrice'
+            },
+            'trading_account': {
+                'name': 'accountName',
+                'type': 'accountType',
+                'currency_id': 'accountCurrency'
+            },
+            'note': {
+                'title': 'noteTitle',
+                'content': 'noteContent',
+                'related_entity_type': 'noteEntityType',
+                'related_entity_id': 'noteEntityId'
+            }
+        };
+        
+        return mappings[entityType] || {};
     }
 
     /**
@@ -490,42 +624,157 @@ class ModalManagerV2 {
      * @param {HTMLElement} form - אלמנט הטופס
      * @private
      */
-    applyDefaultValues(form) {
-        if (!window.PreferencesSystem) return;
+    /**
+     * Apply remaining defaults (non-select fields only)
+     * SelectPopulatorService handles account/currency defaults
+     */
+    async applyRemainingDefaults(form) {
+        if (!form) return;
         
-        const preferences = window.PreferencesSystem.manager?.currentPreferences || {};
+        // Get modal config
+        const modalElement = form.closest('.modal');
+        const modalInfo = this.modals.get(modalElement?.id);
+        const config = modalInfo?.config;
         
-        // ברירת מחדל לחשבון מסחר מסחר - חיפוש מדויק יותר
-        const accountField = form.querySelector('[id*="Account"], [name*="account"], [id*="account"], [name*="Account"]');
-        if (accountField && preferences.defaultTradingAccount) {
-            accountField.value = preferences.defaultTradingAccount;
-            console.log('Applied default account:', preferences.defaultTradingAccount);
+        // Apply defaults from config
+        if (config && config.fields) {
+            for (const field of config.fields) {
+                const fieldElement = form.querySelector(`#${field.id}`);
+                if (!fieldElement) continue;
+                
+                // Skip if field already has a value
+                if (fieldElement.value) continue;
+                
+                // For select fields with defaultFromPreferences, let SelectPopulatorService handle it
+                // BUT we still need to handle other select fields (like executionCommission which is an INPUT)
+                if (fieldElement.tagName === 'SELECT') {
+                    // Skip if this is an account or currency field handled by SelectPopulatorService
+                    // BUT only if it doesn't have defaultFromPreferences in config
+                    if (field.defaultFromPreferences) {
+                        console.log(`⏭️ Skipping ${field.id} - will be handled by SelectPopulatorService`);
+                        continue;
+                    }
+                    
+                    // Skip cashFlowAccount and cashFlowCurrency (always handled by SelectPopulatorService)
+                    if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency') {
+                        continue;
+                    }
+                    
+                    // Apply defaultValue for other select fields (e.g., source)
+                    if (field.defaultValue !== undefined && field.defaultValue !== null) {
+                        fieldElement.value = field.defaultValue;
+                        console.log(`Applied default value for ${field.id}:`, field.defaultValue);
+                        continue;
+                    }
+                    continue;
+                }
+                
+                // Apply defaultFromPreferences first (before defaultValue)
+                if (field.defaultFromPreferences) {
+                    console.log(`🔍 Checking defaultFromPreferences for field: ${field.id}`);
+                    if (window.getPreferenceFromMemory) {
+                        const prefName = this._getPreferenceNameForField(field.id);
+                        console.log(`🔍 Mapped field ${field.id} to preference: ${prefName}`);
+                        if (prefName) {
+                            const prefValue = await window.getPreferenceFromMemory(prefName);
+                            console.log(`🔍 Retrieved preference value for ${prefName}:`, prefValue);
+                            if (prefValue !== null && prefValue !== undefined) {
+                                fieldElement.value = prefValue;
+                                console.log(`✅ Applied preference default for ${field.id} (${prefName}):`, prefValue);
+                                continue;
+                            } else {
+                                console.log(`⚠️ No preference value found for ${prefName}`);
+                            }
+                        } else {
+                            console.log(`⚠️ No preference name mapping found for field: ${field.id}`);
+                        }
+                    } else {
+                        console.log(`⚠️ getPreferenceFromMemory not available`);
+                    }
+                }
+                
+                // Apply defaultValue if exists
+                if (field.defaultValue !== undefined && field.defaultValue !== null) {
+                    fieldElement.value = field.defaultValue;
+                    console.log(`Applied default value for ${field.id}:`, field.defaultValue);
+                    continue;
+                }
+                
+                // Apply defaultTime if field is date
+                if (field.type === 'date' && field.defaultTime === 'now') {
+                    const today = new Date();
+                    fieldElement.value = today.toISOString().slice(0, 10);
+                    console.log(`Applied default date for ${field.id}`);
+                    continue;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Legacy method - kept for backward compatibility (resetForm)
+     */
+    async applyDefaultValues(form) {
+        if (!form) return;
+        
+        // This is now just a wrapper for applyRemainingDefaults
+        await this.applyRemainingDefaults(form);
+    }
+    
+    /**
+     * Get preference name for field - קבלת שם העדפה לשדה
+     * @param {string} fieldId - Field ID
+     * @returns {string|null} Preference name
+     * @private
+     */
+    _getPreferenceNameForField(fieldId) {
+        // Map field IDs to preference names
+        const preferenceMap = {
+            'cashFlowAccount': 'default_trading_account',
+            'cashFlowCurrency': 'primaryCurrency',
+            'executionAccount': 'default_trading_account',
+            'executionCommission': 'defaultCommission'
+        };
+        
+        // Try to find matching preference
+        for (const [fieldPattern, prefName] of Object.entries(preferenceMap)) {
+            if (fieldId.includes(fieldPattern) || fieldId === fieldPattern) {
+                return prefName;
+            }
         }
         
-        // ברירת מחדל למטבע - חיפוש מדויק יותר
-        const currencyField = form.querySelector('[id*="Currency"], [name*="currency"], [id*="currency"], [name*="Currency"]');
-        if (currencyField && preferences.defaultCurrency) {
-            currencyField.value = preferences.defaultCurrency;
-            console.log('Applied default currency:', preferences.defaultCurrency);
+        return null;
+    }
+    
+    /**
+     * Apply preference default value for field
+     * @param {Object} field - Field config
+     * @param {HTMLElement} fieldElement - Field element
+     * @param {Object} preferences - User preferences
+     * @private
+     */
+    _applyPreferenceDefault(field, fieldElement, preferences) {
+        // Map field IDs to preference names
+        const preferenceMap = {
+            'cashFlowAccount': 'defaultTradingAccount',
+            'cashFlowCurrency': 'defaultCurrency',
+            'tradingAccount': 'defaultTradingAccount',
+            'currency': 'defaultCurrency'
+        };
+        
+        // Try to find matching preference
+        for (const [fieldPattern, prefName] of Object.entries(preferenceMap)) {
+            if (field.id.includes(fieldPattern) || field.id === fieldPattern) {
+                const prefValue = preferences[prefName];
+                if (prefValue) {
+                    fieldElement.value = prefValue;
+                    console.log(`Applied preference default for ${field.id}:`, prefValue);
+                    return true;
+                }
+            }
         }
         
-        // ברירת מחדל לתאריך - היום
-        const dateField = form.querySelector('input[type="date"], input[type="datetime-local"]');
-        if (dateField && !dateField.value) {
-            const today = new Date();
-            const dateValue = dateField.type === 'datetime-local' 
-                ? today.toISOString().slice(0, 16) 
-                : today.toISOString().slice(0, 10);
-            dateField.value = dateValue;
-            console.log('Applied default date:', dateValue);
-        }
-        
-        // ברירת מחדל למקור - ידני
-        const sourceField = form.querySelector('[id*="Source"], [name*="source"], [id*="source"], [name*="Source"]');
-        if (sourceField && !sourceField.value) {
-            sourceField.value = 'manual';
-            console.log('Applied default source: manual');
-        }
+        return false;
     }
 
     /**
@@ -600,28 +849,46 @@ class ModalManagerV2 {
      * @private
      */
     async populateSelects(modalElement, config) {
-        if (!window.SelectPopulatorService) return;
+        if (!window.SelectPopulatorService) {
+            console.log('⚠️ SelectPopulatorService not available');
+            return;
+        }
         
         const selects = modalElement.querySelectorAll('select');
+        console.log(`🔍 populateSelects: Found ${selects.length} select elements`);
         
         for (const select of selects) {
             const selectId = select.id;
             
+            // Check if this field has defaultFromPreferences in config
+            let shouldUseDefaultFromPrefs = false;
+            if (config && config.fields) {
+                const fieldConfig = config.fields.find(f => f.id === selectId);
+                if (fieldConfig && fieldConfig.defaultFromPreferences) {
+                    shouldUseDefaultFromPrefs = true;
+                    console.log(`🔍 Field ${selectId} has defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
+                }
+            }
+            
             try {
                 // מילוי לפי סוג השדה
                 if (selectId.includes('Account') || selectId.includes('account')) {
+                    console.log(`📋 Populating accounts select: ${selectId} with defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
                     await window.SelectPopulatorService.populateAccountsSelect(selectId, {
-                        defaultFromPreferences: true
+                        defaultFromPreferences: shouldUseDefaultFromPrefs
                     });
                 } else if (selectId.includes('Ticker') || selectId.includes('ticker')) {
+                    console.log(`📋 Populating tickers select: ${selectId}`);
                     await window.SelectPopulatorService.populateTickersSelect(selectId, {
                         includeEmpty: true
                     });
                 } else if (selectId.includes('Currency') || selectId.includes('currency')) {
+                    console.log(`📋 Populating currencies select: ${selectId} with defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
                     await window.SelectPopulatorService.populateCurrenciesSelect(selectId, {
-                        defaultFromPreferences: true
+                        defaultFromPreferences: shouldUseDefaultFromPrefs
                     });
                 } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
+                    console.log(`📋 Populating trade plans select: ${selectId}`);
                     await window.SelectPopulatorService.populateTradePlansSelect(selectId, {
                         includeEmpty: true
                     });
@@ -631,6 +898,7 @@ class ModalManagerV2 {
             }
         }
     }
+    
 
     /**
      * Handle modal shown event - טיפול באירוע הצגת מודל

@@ -26,7 +26,7 @@ class CRUDResponseHandler {
      * טיפול בתגובת שמירה (POST)
      * 
      * @param {Response} response - תגובת fetch
-     * @param {Object} options - אופציות: { modalId, successMessage, reloadFn, entityName }
+     * @param {Object} options - אופציות: { modalId, successMessage, reloadFn, entityName, requiresHardReload }
      * @returns {Promise<Object|null>} - נתוני התגובה או null במקרה של שגיאה
      * 
      * @example
@@ -38,9 +38,14 @@ class CRUDResponseHandler {
      * });
      */
     static async handleSaveResponse(response, options = {}) {
+        console.log('🔵 handleSaveResponse CALLED');
+        console.log('🔵 handleSaveResponse - response ok:', response.ok);
+        console.log('🔵 handleSaveResponse - options:', options);
+        
         try {
             // טיפול בתגובה לא תקינה
             if (!response.ok) {
+                console.log('❌ handleSaveResponse - Response not OK');
                 const errorData = await response.json();
                 
                 // שגיאת ולידציה (HTTP 400)
@@ -80,16 +85,20 @@ class CRUDResponseHandler {
             }
 
             // תגובה תקינה
+            console.log('✅ handleSaveResponse - Response OK, reading JSON...');
             const result = await response.json();
+            console.log('✅ handleSaveResponse - JSON read successfully');
             
             // הצגת הודעת הצלחה
             if (typeof window.showSuccessNotification === 'function') {
                 const message = options.successMessage || `${options.entityName || 'פריט'} נוסף בהצלחה`;
+                console.log('✅ handleSaveResponse - Showing success notification:', message);
                 window.showSuccessNotification('הצלחה', message);
             }
 
             // סגירת modal
             if (options.modalId) {
+                console.log('✅ handleSaveResponse - Closing modal:', options.modalId);
                 const modal = bootstrap.Modal.getInstance(document.getElementById(options.modalId));
                 if (modal) {
                     modal.hide();
@@ -97,12 +106,17 @@ class CRUDResponseHandler {
             }
 
             // רענון טבלה - מערכת מרכזית
+            console.log('✅ handleSaveResponse - Calling handleTableRefresh...');
+            
             await this.handleTableRefresh(options);
+            console.log('✅ handleSaveResponse - handleTableRefresh completed');
 
             return result;
             
         } catch (error) {
-            console.error('❌ שגיאה בשמירה:', error);
+            console.error('❌ handleSaveResponse - Error caught:', error);
+            console.error('❌ handleSaveResponse - Error message:', error.message);
+            console.error('❌ handleSaveResponse - Error stack:', error.stack);
             
             if (typeof window.showErrorNotification === 'function') {
                 const message = `שגיאה בשמירת ${options.entityName || 'פריט'}`;
@@ -117,7 +131,7 @@ class CRUDResponseHandler {
      * טיפול בתגובת עדכון (PUT)
      * 
      * @param {Response} response - תגובת fetch
-     * @param {Object} options - אופציות: { modalId, successMessage, reloadFn, entityName }
+     * @param {Object} options - אופציות: { modalId, successMessage, reloadFn, entityName, requiresHardReload }
      * @returns {Promise<Object|null>} - נתוני התגובה או null במקרה של שגיאה
      * 
      * @example
@@ -189,7 +203,7 @@ class CRUDResponseHandler {
 
             // רענון טבלה - מערכת מרכזית
             await this.handleTableRefresh(options);
-
+            
             return result;
             
         } catch (error) {
@@ -219,43 +233,101 @@ class CRUDResponseHandler {
      * });
      */
     static async handleDeleteResponse(response, options = {}) {
+        console.log('🔥🔥🔥 handleDeleteResponse CALLED with response status:', response.status);
+        console.log('🔥 handleDeleteResponse - options:', options);
+        
         try {
             // טיפול בתגובה לא תקינה
             if (!response.ok) {
+                console.log('❌ handleDeleteResponse - Response not OK, status:', response.status);
                 const errorData = await response.json();
+                console.log('❌ handleDeleteResponse - Error data:', errorData);
                 
                 // שגיאת ולידציה (HTTP 400) - למשל פריט מקושר
                 if (response.status === 400) {
+                    console.log('❌ handleDeleteResponse - 400 error, showing validation error');
                     if (typeof window.showSimpleErrorNotification === 'function') {
-                        const message = errorData.message || errorData.error || 'לא ניתן למחוק';
-                        window.showSimpleErrorNotification('שגיאה במחיקה', message);
+                        const errorMsg = typeof errorData.error === 'object' ? errorData.error?.message : errorData.error;
+                        const message = typeof errorData.message === 'object' ? errorData.message?.message : errorData.message;
+                        
+                        // Provide detailed error message
+                        const entityTypeName = options.entityName || 'הפריט';
+                        let finalMessage;
+                        
+                        if (errorMsg || message) {
+                            finalMessage = `לא ניתן למחוק את ${entityTypeName}: ${errorMsg || message}`;
+                        } else {
+                            finalMessage = `לא ניתן למחוק את ${entityTypeName}. ייתכן שהפריט קשור לפריטים אחרים במערכת (למשל, טריידים או הערות).`;
+                        }
+                        
+                        window.showSimpleErrorNotification('שגיאה במחיקה', finalMessage);
                     }
                     return false;
                 }
                 
+                // שגיאת 404 - פריט לא נמצא
+                // NOTE: Even if item not found (404), we still need to refresh the table
+                // because the item might have been deleted by another user or the UI state is stale
+                if (response.status === 404) {
+                    console.log('❌ handleDeleteResponse - 404 error, item not found - refreshing table anyway');
+                    if (typeof window.showErrorNotification === 'function') {
+                        const errorMsg = typeof errorData.error === 'object' ? errorData.error?.message : errorData.error;
+                        const message = typeof errorData.message === 'object' ? errorData.message?.message : errorData.message;
+                        
+                        // Provide detailed error message to user
+                        const entityTypeName = options.entityName || 'הפריט';
+                        let finalMessage;
+                        
+                        if (errorMsg || message) {
+                            finalMessage = `${entityTypeName} לא נמצא במערכת: ${errorMsg || message}`;
+                        } else {
+                            finalMessage = `${entityTypeName} לא נמצא במערכת. ייתכן שכבר נמחק על ידי משתמש אחר או שהמצב הנוכחי של הדף לא מעודכן.`;
+                        }
+                        
+                        window.showErrorNotification('שגיאה במחיקה', finalMessage);
+                    }
+                    
+                    // Still refresh the table to sync with server state
+                    console.log('🔥 handleDeleteResponse - 404: Calling handleTableRefresh to sync UI with server...');
+                    await this.handleTableRefresh(options);
+                    console.log('🔥 handleDeleteResponse - 404: handleTableRefresh completed');
+                    
+                    return false;
+                }
+                
                 // שגיאת מערכת אחרת
-                throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
+                console.log('❌ handleDeleteResponse - System error, throwing:', errorData.message || errorData.error);
+                const errorMsg = typeof errorData.error === 'object' ? errorData.error?.message : errorData.error;
+                const message = typeof errorData.message === 'object' ? errorData.message?.message : errorData.message;
+                throw new Error(message || errorMsg || `HTTP error! status: ${response.status}`);
             }
 
             // תגובה תקינה
+            console.log('✅ handleDeleteResponse - Response OK, proceeding with success flow');
             
             // הצגת הודעת הצלחה
             if (typeof window.showSuccessNotification === 'function') {
                 const message = options.successMessage || `${options.entityName || 'פריט'} נמחק בהצלחה`;
+                console.log('🔥 handleDeleteResponse - Showing success notification:', message);
                 window.showSuccessNotification('הצלחה', message);
             }
 
             // רענון טבלה - מערכת מרכזית
+            console.log('🔥 handleDeleteResponse - Calling handleTableRefresh...');
             await this.handleTableRefresh(options);
+            console.log('🔥 handleDeleteResponse - handleTableRefresh completed');
 
+            console.log('✅ handleDeleteResponse - Success flow completed, returning true');
             return true;
             
         } catch (error) {
-            console.error('❌ שגיאה במחיקה:', error);
+            console.error('❌ handleDeleteResponse - Error occurred:', error);
             
             if (typeof window.showErrorNotification === 'function') {
-                const message = `שגיאה במחיקת ${options.entityName || 'פריט'}`;
-                window.showErrorNotification(message, error.message);
+                const entityTypeName = options.entityName || 'הפריט';
+                const errorMessage = error.message || 'שגיאה לא ידועה';
+                const message = `שגיאה במחיקת ${entityTypeName}: ${errorMessage}`;
+                window.showErrorNotification('שגיאה במחיקה', message);
             }
             
             return false;
@@ -517,26 +589,74 @@ class CRUDResponseHandler {
     }
 
     /**
-     * מערכת רענון טבלאות אוטומטית
-     * מטפלת בניקוי מטמון ורענון אוטומטי לפי תלויות
+     * רענון טבלאות - פשוט וממוקד
+     * 
+     * פשוט וקל: אם יש reloadFn - קוראים לו ישירות, ללא cache clearing.
+     * זה מבטיח רענון מיידי של נתונים מהשרת.
+     * 
+     * @param {Object} options - אופציות רענון
+     * @param {Function} [options.reloadFn] - פונקציית רענון מותאמת אישית
+     * @param {boolean} [options.requiresHardReload] - דורש hard reload (להעדפות בלבד)
      */
     static async handleTableRefresh(options = {}) {
         try {
-            // אם יש reloadFn מותאם אישית - להשתמש בו
+            console.log('🔄 handleTableRefresh called with options:', options);
+            
+            // פשטות מקסימלית: אם יש reloadFn - קוראים לו ישירות ללא cache clearing
             if (options.reloadFn && typeof options.reloadFn === 'function') {
+                console.log('✅ handleTableRefresh: Calling reloadFn...');
                 await options.reloadFn();
+                console.log('✅ handleTableRefresh: reloadFn completed');
                 return;
             }
 
-            // מערכת אוטומטית - זיהוי entity type מה-URL או מהoptions
-            const entityType = this.detectEntityType(options);
-            
-            if (entityType) {
-                await this.refreshEntityTables(entityType);
+            // אם דורש hard reload (להעדפות בלבד)
+            if (options.requiresHardReload) {
+                console.log('⚠️ handleTableRefresh: requiresHardReload=true, calling clearCacheQuick');
+                if (typeof window.clearCacheQuick === 'function') {
+                    await window.clearCacheQuick();
+                }
+                return;
             }
 
+            // ברירת מחדל - אין פעולה
+            // זה מגיע רק אם לא הועבר reloadFn, מה שאומר שזה כנראה old code
+            console.warn('⚠️ handleTableRefresh called without reloadFn - no action taken');
         } catch (error) {
             console.error('❌ שגיאה ברענון טבלה:', error);
+        }
+    }
+
+    /**
+     * ניקוי מטמון ממוקד עבור ישות ספציפית
+     * @param {string} entityType - סוג הישות (trades, alerts, etc.)
+     */
+    static async clearEntityCache(entityType) {
+        console.log(`🔥 clearEntityCache called for entityType: ${entityType}`);
+        
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            console.log(`⚠️ UnifiedCacheManager not available or not initialized`);
+            return;
+        }
+        
+        try {
+            const keys = await window.UnifiedCacheManager.getAllKeys();
+            console.log(`🔥 clearEntityCache - All keys:`, keys);
+            
+            const entityKeys = keys.filter(k => 
+                k.startsWith(`${entityType}_`) || 
+                k.startsWith(`all_${entityType}`) ||
+                k.includes(entityType)
+            );
+            
+            console.log(`🔥 clearEntityCache - Entity keys to remove:`, entityKeys);
+            
+            for (const key of entityKeys) {
+                await window.UnifiedCacheManager.remove(key);
+            }
+            console.log(`✅ נוקה מטמון עבור ${entityType} (${entityKeys.length} מפתחות)`);
+        } catch (error) {
+            console.error(`❌ שגיאה בניקוי מטמון ${entityType}:`, error);
         }
     }
 
@@ -560,6 +680,7 @@ class CRUDResponseHandler {
                 'טיקר': 'tickers',
                 'חשבון מסחר מסחר': 'trading_accounts',
                 'תזרים מזומנים': 'cash_flows',
+                'תזרים מזומן': 'cash_flows',  // Added alternative name
                 'תוכנית מסחר': 'trade_plans'
             };
             return entityMap[options.entityName] || null;
@@ -573,10 +694,20 @@ class CRUDResponseHandler {
      */
     static async refreshEntityTables(entityType) {
         try {
-            // ניקוי מטמון עבור הישות
-            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-                await window.UnifiedCacheManager.remove(entityType);
-                console.log(`🔄 נוקה מטמון עבור ${entityType}`);
+            // ניקוי מטמון עבור הישות - שימוש נכון ב-UnifiedCacheManager
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                // ניקוי ממוקד לפי entity type
+                const keys = await window.UnifiedCacheManager.getAllKeys();
+                const entityKeys = keys.filter(k => 
+                    k.startsWith(`${entityType}_`) || 
+                    k.startsWith(`all_${entityType}`) ||
+                    k.includes(entityType)
+                );
+                
+                for (const key of entityKeys) {
+                    await window.UnifiedCacheManager.remove(key);
+                }
+                console.log(`🔄 נוקה מטמון עבור ${entityType} (${entityKeys.length} מפתחות)`);
             }
 
             // איפוס דגלי טעינה קיימים אם יש גישה אליהם

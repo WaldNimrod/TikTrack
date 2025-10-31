@@ -585,42 +585,37 @@ class SMCacheSection extends SMBaseSection {
   /**
    * Clear cache (static method for global access)
    * ניקוי מטמון (מתודה סטטית לגישה גלובלית)
+   * Uses existing UnifiedCacheManager functions to avoid duplication
    */
   static async clearCache(level) {
     try {
-      console.log(`🧹 Clearing cache level: ${level}`);
+      console.log(`🧹 Clearing cache level: ${level} via UnifiedCacheManager`);
       
-      const response = await fetch('/api/cache/clear', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ level })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      
-      if (result.status === 'success') {
-        // Show success notification
-        if (window.showNotification) {
-          window.showNotification(result.message || 'מטמון נוקה בהצלחה', 'success');
-        }
-        
-        // Refresh cache section if it exists
-        const cacheSection = document.getElementById('sm-cache');
-        if (cacheSection) {
-          const sectionInstance = window.systemManagementMain?.sections?.get('sm-cache');
-          if (sectionInstance) {
-            await sectionInstance.refresh();
-          }
-        }
+      // Use existing UnifiedCacheManager functions instead of duplicating
+      if (level === 'light' && typeof window.clearCacheLayer === 'function') {
+        await window.clearCacheLayer('localStorage');
+      } else if (level === 'medium' && typeof window.clearAllCacheAdvanced === 'function') {
+        await window.clearAllCacheAdvanced();
+      } else if (level === 'full' && typeof window.clearAllCacheAdvanced === 'function') {
+        await window.clearAllCacheAdvanced();
+      } else if (level === 'nuclear' && typeof window.clearCacheFull === 'function') {
+        await window.clearCacheFull();
       } else {
-        throw new Error(result.message || 'Failed to clear cache');
+        // Fallback to basic cache clearing
+        if (typeof window.clearAllCacheAdvanced === 'function') {
+          await window.clearAllCacheAdvanced();
+        } else {
+          throw new Error('No cache clearing functions available');
+        }
+      }
+      
+      // Refresh cache section if it exists
+      const cacheSection = document.getElementById('sm-cache');
+      if (cacheSection) {
+        const sectionInstance = window.systemManagementMain?.sections?.get('sm-cache');
+        if (sectionInstance) {
+          await sectionInstance.refresh();
+        }
       }
       
     } catch (error) {

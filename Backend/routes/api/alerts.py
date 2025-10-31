@@ -18,7 +18,6 @@ alerts_bp = Blueprint('alerts', __name__, url_prefix='/api/alerts')
 base_api = BaseEntityAPI('alerts', AlertService, 'alerts')
 
 @alerts_bp.route('/', methods=['GET'])
-@api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
 def get_alerts():
     """Get all alerts using base API"""
@@ -38,11 +37,13 @@ def get_alert(alert_id: int):
     return jsonify(response), status_code
 
 @alerts_bp.route('/', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['alerts'])
 def create_alert():
     """Create new alert"""
     try:
         data = request.get_json()
-        db: Session = next(get_db())
+        db: Session = g.db
         alert = AlertService.create(db, data)
         return jsonify({
             "status": "success",
@@ -57,15 +58,15 @@ def create_alert():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @alerts_bp.route('/<int:alert_id>', methods=['PUT'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['alerts'])
 def update_alert(alert_id: int):
     """Update alert"""
     try:
         data = request.get_json()
-        db: Session = next(get_db())
+        db: Session = g.db
         alert = AlertService.update(db, alert_id, data)
         return jsonify({
             "status": "success",
@@ -87,14 +88,14 @@ def update_alert(alert_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @alerts_bp.route('/<int:alert_id>', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['alerts'])
 def delete_alert(alert_id: int):
     """Delete alert"""
     try:
-        db: Session = next(get_db())
+        db: Session = g.db
         AlertService.delete(db, alert_id)
         return jsonify({
             "status": "success",
@@ -117,8 +118,6 @@ def delete_alert(alert_id: int):
             "error": {"message": f"Failed to delete alert: {str(e)}"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @alerts_bp.route('/<int:alert_id>/trigger', methods=['POST'])
 def mark_as_triggered(alert_id: int):

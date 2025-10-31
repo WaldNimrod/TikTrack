@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, g
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from config.database import get_db
 from models.execution import Execution
 from services.validation_service import ValidationService
@@ -21,17 +21,22 @@ class ExecutionService:
         self.model = Execution
     
     def get_all(self, db: Session, filters=None):
-        return db.query(Execution).all()
+        return db.query(Execution).options(
+            joinedload(Execution.trading_account),
+            joinedload(Execution.ticker)
+        ).all()
     
     def get_by_id(self, db: Session, execution_id: int):
-        return db.query(Execution).filter(Execution.id == execution_id).first()
+        return db.query(Execution).options(
+            joinedload(Execution.trading_account),
+            joinedload(Execution.ticker)
+        ).filter(Execution.id == execution_id).first()
 
 # Initialize base API
 execution_service = ExecutionService()
 base_api = BaseEntityAPI('executions', execution_service, 'executions')
 
 @executions_bp.route('/', methods=['GET'])
-@api_endpoint(cache_ttl=30, dependencies=['executions'], rate_limit=60)
 @handle_database_session()
 def get_executions():
     """Get all executions using base API with rate limiting"""
@@ -40,7 +45,6 @@ def get_executions():
     return jsonify(response), status_code
 
 @executions_bp.route('/<int:execution_id>', methods=['GET'])
-@api_endpoint(cache_ttl=30, rate_limit=60)
 @handle_database_session()
 def get_execution(execution_id: int):
     """Get execution by ID using base API"""
@@ -49,13 +53,14 @@ def get_execution(execution_id: int):
     return jsonify(response), status_code
 
 @executions_bp.route('/', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after creating execution
 def create_execution():
     """Create new execution"""
     try:
         data = request.get_json()
         logger.info(f"Received execution data: {data}")
-        db: Session = next(get_db())
+        db: Session = g.db
         
         # Validate data against constraints
         logger.info("Validating execution data before creation")
@@ -96,16 +101,15 @@ def create_execution():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @executions_bp.route('/<int:execution_id>', methods=['PUT'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after updating execution
 def update_execution(execution_id: int):
     """Update execution"""
     try:
         data = request.get_json()
-        db: Session = next(get_db())
+        db: Session = g.db
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
         if execution:
             # Validate data against constraints
@@ -151,15 +155,14 @@ def update_execution(execution_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @executions_bp.route('/<int:execution_id>', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after deleting execution
 def delete_execution(execution_id: int):
     """Delete execution"""
     try:
-        db: Session = next(get_db())
+        db: Session = g.db
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
         if execution:
             db.delete(execution)
@@ -181,5 +184,3 @@ def delete_execution(execution_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()

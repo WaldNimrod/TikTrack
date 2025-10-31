@@ -868,6 +868,15 @@ window.toggleSection = function (sectionId) {
     const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
     console.log(`🔍 Section found:`, section ? 'YES' : 'NO', section ? `(ID: ${section.id || 'no-id'}, data-section: ${section.getAttribute('data-section') || 'no-data-section'})` : '');
     
+    // If this is the top section and page has >=3 sections, toggle all sections together
+    const isTopSection = section && section.classList.contains('top-section');
+    const sectionsCount = document.querySelectorAll('.top-section, .content-section, [data-section]').length;
+    if (isTopSection && sectionsCount >= 3 && typeof window.toggleAllSections === 'function') {
+      window.toggleAllSections();
+      if (window.Logger) { window.Logger.debug(`🔁 Top section toggle: toggled ALL sections (count=${sectionsCount})`, { page: "ui-utils" }); }
+      return;
+    }
+
     const sectionBody = section ? section.querySelector('.section-body') : null;
     if (window.Logger) { window.Logger.debug(`🔍 Section body found:`, sectionBody ? 'YES' : 'NO', { page: "ui-utils" }); }
     
@@ -878,15 +887,49 @@ window.toggleSection = function (sectionId) {
     if (window.Logger) { window.Logger.debug(`🔍 Icon found:`, icon ? 'YES' : 'NO', { page: "ui-utils" }); }
     
     if (sectionBody) {
-      const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
+      const isCollapsed = sectionBody.style.display === 'none';
       if (window.Logger) { window.Logger.debug(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${sectionBody.style.display}"`, { page: "ui-utils" }); }
 
+      // Check if we're in accordion mode
+      const pageName = getCurrentPageName();
+      const pageConfig = typeof window.pageInitializationConfigs !== 'undefined' && 
+                         window.pageInitializationConfigs[pageName] ? 
+                         window.pageInitializationConfigs[pageName] : 
+                         (typeof window.PAGE_CONFIGS !== 'undefined' && window.PAGE_CONFIGS[pageName] ? 
+                          window.PAGE_CONFIGS[pageName] : null);
+      const accordionMode = pageConfig?.accordionMode === true;
+      
+      if (window.Logger && accordionMode) {
+        window.Logger.debug(`🎯 Accordion mode detected - checking for other open sections`, { page: "ui-utils" });
+      }
+
       if (isCollapsed) {
-        sectionBody.classList.remove('collapsed');
+        // Opening section
+        if (accordionMode) {
+          // Close all other sections first
+          const allContentSections = document.querySelectorAll('.content-section');
+          allContentSections.forEach(otherSection => {
+            if (otherSection !== section) {
+              const otherSectionBody = otherSection.querySelector('.section-body');
+              const otherIcon = otherSection.querySelector('.section-toggle-icon');
+              if (otherSectionBody && (otherSectionBody.style.display !== 'none')) {
+                otherSectionBody.style.display = 'none';
+                if (otherIcon) otherIcon.textContent = '▼';
+                // Save state for other sections too
+                const otherSectionId = otherSection.getAttribute('data-section') || otherSection.id;
+                if (otherSectionId) {
+                  const otherStorageKey = `${pageName}_${otherSectionId}_SectionHidden`;
+                  localStorage.setItem(otherStorageKey, 'true');
+                }
+              }
+            }
+          });
+        }
+        
         sectionBody.style.display = 'block';
         if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" EXPANDED`, { page: "ui-utils" }); }
       } else {
-        sectionBody.classList.add('collapsed');
+        // Closing section
         sectionBody.style.display = 'none';
         if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" COLLAPSED`, { page: "ui-utils" }); }
       }
@@ -900,7 +943,6 @@ window.toggleSection = function (sectionId) {
 
       // Save state with page-specific key
       const isHidden = sectionBody.style.display === 'none';
-      const pageName = getCurrentPageName();
       const storageKey = `${pageName}_${sectionId}_SectionHidden`;
       localStorage.setItem(storageKey, isHidden.toString());
       if (window.Logger) { window.Logger.debug(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`, { page: "ui-utils" }); }
@@ -941,8 +983,36 @@ window.restoreAllSectionStates = function () {
     window.Logger.debug(`🔧 restoreAllSectionStates called for page: "${pageName}"`, { page: 'ui-utils' });
   }
   
+  // Check for accordion mode (only one section open at a time)
+  const pageConfig = typeof window.pageInitializationConfigs !== 'undefined' && 
+                     window.pageInitializationConfigs[pageName] ? 
+                     window.pageInitializationConfigs[pageName] : 
+                     (typeof window.PAGE_CONFIGS !== 'undefined' && window.PAGE_CONFIGS[pageName] ? 
+                      window.PAGE_CONFIGS[pageName] : null);
+  
+  const accordionMode = pageConfig?.accordionMode === true;
+  const defaultState = pageConfig?.sectionsDefaultState || 'open'; // 'closed' | 'open' - backward compatible
+  
+  if (accordionMode && window.Logger) {
+    window.Logger.debug(`🎯 Accordion mode enabled for page "${pageName}"`, { page: 'ui-utils' });
+  }
+  
+  if (window.Logger) {
+    window.Logger.debug(`📋 Default state for page "${pageName}": ${defaultState}`, { page: 'ui-utils' });
+  }
+  
+  // For accordion mode, track which section should be open
+  let openSectionId = null;
+  
   sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
+    
+    // Skip top section - it stays open always (per user requirements)
+    if (section.classList.contains('top-section')) {
+      if (window.Logger) { window.Logger.debug(`⏭️ Skipping top section (always open)`, { page: "ui-utils" }); }
+      return;
+    }
+    
     const sectionBody = section.querySelector('.section-body, .section-content');
     const toggleBtn = section.querySelector('button[onclick*="toggleSection"], button[data-onclick*="toggleSection"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : 
@@ -956,20 +1026,83 @@ window.restoreAllSectionStates = function () {
       const isHidden = localStorage.getItem(storageKey) === 'true';
       if (window.Logger) { window.Logger.debug(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isHidden}`, { page: "ui-utils" }); }
 
-      if (isHidden) {
-        // Restore collapsed state
-        sectionBody.classList.add('collapsed');
-        section.classList.add('collapsed');
-        sectionBody.style.display = 'none';
-        if (icon) { icon.textContent = '▼'; }
-        // if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" RESTORED to COLLAPSED`, { page: "ui-utils" }); }
+      if (accordionMode) {
+        // In accordion mode, only one section should be open
+        // If no state is saved (null), respect HTML default (closed)
+        const storageKeyValue = localStorage.getItem(storageKey);
+        const hasSavedState = storageKeyValue !== null;
+        const shouldBeOpen = hasSavedState && isHidden === false;
+        
+        if (window.Logger) {
+          window.Logger.debug(`🔍 ACCORDION DEBUG for "${sectionId}":`, { 
+            page: "ui-utils",
+            storageKeyValue: storageKeyValue,
+            hasSavedState: hasSavedState,
+            isHidden: isHidden,
+            shouldBeOpen: shouldBeOpen,
+            openSectionId: openSectionId,
+            bodyDisplayStyle: sectionBody.style.display
+          });
+        }
+        
+        // Only modify state if we have a saved preference
+        if (hasSavedState) {
+          if (shouldBeOpen) {
+            // This section should be open
+            if (openSectionId) {
+              // Already have an open section, close this one
+              sectionBody.style.display = 'none';
+              if (icon) { icon.textContent = '▼'; }
+              if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" closed (accordion mode - another section is open)`, { page: "ui-utils" }); }
+            } else {
+              // This is the first open section
+              openSectionId = sectionId;
+              sectionBody.style.display = 'block';
+              if (icon) { icon.textContent = '▲'; }
+              if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" opened (accordion mode)`, { page: "ui-utils" }); }
+            }
+          } else {
+            // This section should be closed
+            sectionBody.style.display = 'none';
+            if (icon) { icon.textContent = '▼'; }
+            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" closed (accordion mode)`, { page: "ui-utils" }); }
+          }
+        } else {
+          // No saved state - in accordion mode, always closed
+          sectionBody.style.display = 'none';
+          if (icon) { icon.textContent = '▼'; }
+          if (window.Logger) { window.Logger.debug(`⏭️ Section "${sectionId}" has no saved state - accordion mode default (closed)`, { page: "ui-utils" }); }
+        }
       } else {
-        // Restore expanded state (default)
-        sectionBody.classList.remove('collapsed');
-        section.classList.remove('collapsed');
-        sectionBody.style.display = 'block';
-        if (icon) { icon.textContent = '▲'; }
-        // if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" RESTORED to EXPANDED`, { page: "ui-utils" }); }
+        // Normal mode - restore each section independently
+        const storageKeyValue = localStorage.getItem(storageKey);
+        const hasSavedStateInNormalMode = storageKeyValue !== null;
+        
+        if (hasSavedStateInNormalMode) {
+          // Has saved state - restore it
+          if (isHidden) {
+            // Restore collapsed state
+            sectionBody.style.display = 'none';
+            if (icon) { icon.textContent = '▼'; }
+            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" RESTORED to COLLAPSED`, { page: "ui-utils" }); }
+          } else {
+            // Restore expanded state
+            sectionBody.style.display = 'block';
+            if (icon) { icon.textContent = '▲'; }
+            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" RESTORED to EXPANDED`, { page: "ui-utils" }); }
+          }
+        } else {
+          // No saved state - apply default state from page config
+          if (defaultState === 'closed') {
+            sectionBody.style.display = 'none';
+            if (icon) { icon.textContent = '▼'; }
+            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state CLOSED (no cache)`, { page: "ui-utils" }); }
+          } else {
+            sectionBody.style.display = 'block';
+            if (icon) { icon.textContent = '▲'; }
+            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state OPEN (no cache)`, { page: "ui-utils" }); }
+          }
+        }
       }
       
       restoredCount++;
@@ -978,7 +1111,10 @@ window.restoreAllSectionStates = function () {
     }
   });
   
-  if (window.Logger) { window.Logger.debug(`✅ restoreAllSectionStates completed - restored ${restoredCount}/${sections.length} sections`, { page: "ui-utils" }); }
+  // In accordion mode, if no section was opened (all closed), keep all closed
+  // (do not auto-open first section - let user manually open sections)
+  
+  if (window.Logger) { window.Logger.debug(`✅ restoreAllSectionStates completed - restored ${restoredCount}/${sections.length} sections${accordionMode ? ' (accordion mode)' : ''}`, { page: "ui-utils" }); }
   return restoredCount;
 };
 

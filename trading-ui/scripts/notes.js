@@ -501,12 +501,17 @@ window.restoreNotesSectionState = restoreNotesSectionState;
  * @returns {Promise<void>}
  */
 async function loadNotesData() {
-  window.Logger.info('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀', { page: "notes" });
+  window.Logger.info('Loading notes data (bypass cache)', { page: "notes" });
 
   try {
-    // קריאה לשרת לקבלת נתוני הערות
-    window.Logger.info('📡 קריאה לשרת לקבלת נתוני הערות...', { page: "notes" });
-    const response = await fetch('/api/notes/');
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/notes/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -1106,7 +1111,8 @@ function validateEditNoteForm(content, relationType, relatedId, attachment) {
 
 // פונקציות שמירה ומחיקה
 async function saveNote() {
-  // שימוש ב-DataCollectionService לאיסוף נתונים
+  
+  // ניקוי מטמון לפני פעולת CRUD  // שימוש ב-DataCollectionService לאיסוף נתונים
   const noteData = DataCollectionService.collectFormData({
     content: { id: 'addNoteContent', type: 'text', isTextContent: true },
     relationType: { id: 'noteRelationType', type: 'text', isRadioChecked: true },
@@ -1143,7 +1149,9 @@ async function saveNote() {
       modalId: 'addNoteModal',
       successMessage: 'הערה נשמרה בהצלחה!',
       apiUrl: '/api/notes/',
-      entityName: 'הערה'
+      entityName: 'הערה',
+      reloadFn: window.loadNotesData,
+      requiresHardReload: false
     });
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'שמירת הערה');
@@ -1151,7 +1159,8 @@ async function saveNote() {
 }
 
 async function updateNoteFromModal() {
-  // שימוש ב-DataCollectionService לאיסוף נתונים
+  
+  // ניקוי מטמון לפני פעולת CRUD - עריכה  // שימוש ב-DataCollectionService לאיסוף נתונים
   const noteData = DataCollectionService.collectFormData({
     id: { id: 'editNoteId', type: 'int' },
     content: { id: 'editNoteContent', type: 'text', isTextContent: true },
@@ -1217,7 +1226,9 @@ async function updateNoteFromModal() {
       modalId: 'editNoteModal',
       successMessage: 'הערה עודכנה בהצלחה!',
       apiUrl: '/api/notes/',
-      entityName: 'הערה'
+      entityName: 'הערה',
+      reloadFn: window.loadNotesData,
+      requiresHardReload: false
     });
 
     // ניקוי דגלים
@@ -1243,7 +1254,7 @@ async function confirmDeleteNote(noteId) {
 }
 
 async function deleteNoteFromServer(noteId) {
-  const maxRetries = 3;
+  // ניקוי מטמון לפני פעולת CRUD - מחיקה  const maxRetries = 3;
   let retryCount = 0;
 
   while (retryCount < maxRetries) {
@@ -1256,7 +1267,9 @@ async function deleteNoteFromServer(noteId) {
       await CRUDResponseHandler.handleDeleteResponse(response, {
         successMessage: 'הערה נמחקה בהצלחה!',
         apiUrl: '/api/notes/',
-        entityName: 'הערה'
+        entityName: 'הערה',
+        reloadFn: window.loadNotesData,
+        requiresHardReload: false
       });
       return; // יציאה מוצלחת
     } catch (error) {
@@ -1919,15 +1932,23 @@ function getTypeDisplayName(type) {
  */
 function viewNote(noteId) {
   try {
-    // שמירת מזהה ההערה הנוכחית
-    window.currentViewingNoteId = noteId;
+    // צפייה בפרטי הערה באמצעות מודל פרטי ישות הגלובלי
+    if (typeof window.showEntityDetails === 'function') {
+      window.showEntityDetails('note', noteId, { mode: 'view' });
+    } else {
+      // Fallback למצב הישן אם המערכת הגלובלית לא זמינה
+      // שמירת מזהה ההערה הנוכחית
+      window.currentViewingNoteId = noteId;
 
-  // טעינת נתוני ההערה
-  loadNoteForViewing(noteId);
+      // טעינת נתוני ההערה
+      if (typeof loadNoteForViewing === 'function') {
+        loadNoteForViewing(noteId);
+      }
 
-  // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
-  modal.show();
+      // הצגת המודל
+      const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
+      modal.show();
+    }
   
   } catch (error) {
     window.Logger.error('שגיאה בצפייה בהערה:', error, { page: "notes" });

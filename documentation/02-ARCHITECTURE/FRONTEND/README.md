@@ -78,6 +78,11 @@
 - **ארכיטקטורת JavaScript**: [JAVASCRIPT_ARCHITECTURE.md](JAVASCRIPT_ARCHITECTURE.md)
 - **מערכת אתחול מאוחדת**: [UNIFIED_INITIALIZATION_SYSTEM.md](UNIFIED_INITIALIZATION_SYSTEM.md)
 
+### **CRUD Systems - ⚠️ CRITICAL:**
+- **CRUD Response Handler**: [CRUD_RESPONSE_HANDLER.md](CRUD_RESPONSE_HANDLER.md) - Frontend CRUD handling
+- **CRUD Cache Integration**: [CRUD_CACHE_INTEGRATION.md](CRUD_CACHE_INTEGRATION.md) - Cache integration
+- **CRUD Backend Implementation**: [CRUD_BACKEND_IMPLEMENTATION_GUIDE.md](CRUD_BACKEND_IMPLEMENTATION_GUIDE.md) - **CRITICAL** backend best practices
+
 ## 🔧 **שימוש במערכת החדשה**
 
 ### **טעינת מודולים:**

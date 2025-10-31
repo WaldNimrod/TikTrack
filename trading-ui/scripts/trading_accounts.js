@@ -474,33 +474,34 @@ function loadDefaultTradingAccounts() {
 
 // פונקציה לטעינת נתוני חשבונות מסחר מהשרת
 async function loadTradingAccountsData() {
-  window.Logger.info('🚀🚀🚀 loadTradingAccountsData התחיל 🚀🚀🚀', { page: "trading_accounts" });
+  window.Logger.info('Loading trading accounts data (bypass cache)', { page: "trading_accounts" });
   try {
-    // טוען נתוני חשבונות מסחר מהשרת
-
-    // בדיקה אם יש פונקציה apiCall זמינה
-    if (typeof window.apiCall === 'function') {
-      window.Logger.info('📡 משתמש ב-apiCall', { page: "trading_accounts" });
-      const response = await window.apiCall('/api/trading-accounts/');
-      const trading_accounts = response.data || response;
-      window.Logger.info('📊 חשבונות מסחר מ-apiCall:', trading_accounts.length, 'חשבונות', { page: "trading_accounts" });
-      // חשבונות שהתקבלו
-      return trading_accounts;
-    } else {
-      window.Logger.info('📡 apiCall לא זמין - משתמש ב-loadTradingAccountsFromServer', { page: "trading_accounts" });
-      // קריאה ישירה ל-API
-      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const response = await fetch(`${base}/api/trading-accounts/`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    // קריאה ישירה לשרת עם timestamp למניעת cache
+    const response = await fetch(`/api/trading-accounts/?_t=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       }
-      const result = await response.json();
-      const trading_accounts = result.data || result;
-      // חשבונות שהתקבלו
-      return trading_accounts;
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    
+    const result = await response.json();
+    const trading_accounts = result.data || result;
+    
+    // עדכון הטבלה
+    updateTradingAccountsTable(trading_accounts);
+    
+    window.Logger.info(`✅ Loaded ${trading_accounts.length} trading accounts`, { page: "trading_accounts" });
+    return trading_accounts;
   } catch (error) {
-    handleApiError(error, 'טעינת נתוני חשבונות');
+    window.Logger.error('Error loading trading accounts data', error, { page: "trading_accounts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בטעינת נתוני חשבונות מסחר', error.message);
+    }
     throw error;
   }
 }
@@ -886,7 +887,9 @@ async function deleteTradingAccountFromAPI(tradingAccountId, tradingAccountName)
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: `החשבון מסחר "${tradingAccountName}" נמחק בהצלחה!`,
       apiUrl: '/api/trading-accounts/',
-      entityName: 'חשבון מסחר מסחר'
+      entityName: 'חשבון מסחר מסחר',
+      reloadFn: window.loadTradingAccountsData,
+      requiresHardReload: false
     });
 
   } catch (error) {
@@ -1046,12 +1049,7 @@ async function cancelTradingAccount(tradingAccountId, tradingAccountName) {
  * @param {string} accountName - שם החשבון מסחר
  */
 async function deleteTradingAccount(tradingAccountId, tradingAccountName) {
-  // ניקוי מטמון לפני פעולת CRUD - מחיקה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('trading_accounts', 'delete');
-  }
-
-  // בדיקת פריטים מקושרים לפני מחיקה
+  // ניקוי מטמון לפני פעולת CRUD - מחיקה  // בדיקת פריטים מקושרים לפני מחיקה
   if (typeof window.checkLinkedItemsBeforeDeleteTradingAccount === 'function') {
     const hasLinkedItems = await window.checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId);
     if (hasLinkedItems) {
@@ -1118,12 +1116,7 @@ async function deleteTradingAccount(tradingAccountId, tradingAccountName) {
     });
 
     if (response.ok) {
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('trading_accounts', 'חשבון מסחר נמחק בהצלחה!');
-      } else {
-        // Fallback למערכת הישנה
-        showSuccessMessage('חשבון מסחר נמחק בהצלחה!');
+      showSuccessMessage('חשבון מסחר נמחק בהצלחה!');
 
         // רענון הטבלה
         if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
@@ -1745,12 +1738,7 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
  * @param {string} accountName - שם החשבון מסחר
  */
 async function restoreTradingAccount(tradingAccountId, tradingAccountName) {
-  // ניקוי מטמון לפני פעולת CRUD - עריכה
-  if (window.clearCacheBeforeCRUD) {
-    window.clearCacheBeforeCRUD('trading_accounts', 'edit');
-  }
-  
-  // אישור מהמשתמש
+  // ניקוי מטמון לפני פעולת CRUD - עריכה  // אישור מהמשתמש
   if (typeof window.showConfirmationDialog === 'function') {
     const confirmed = await new Promise(resolve => {
       window.showConfirmationDialog(
@@ -1789,12 +1777,7 @@ async function restoreTradingAccount(tradingAccountId, tradingAccountName) {
     });
 
     if (response.ok) {
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('trading_accounts', 'חשבון מסחר הוחזר בהצלחה לסטטוס סגור!');
-      } else {
-        // Fallback למערכת הישנה
-        showSuccessMessage('חשבון מסחר הוחזר בהצלחה לסטטוס סגור!');
+      showSuccessMessage('חשבון מסחר הוחזר בהצלחה לסטטוס סגור!');
 
         // רענון הטבלה
         if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
@@ -1829,12 +1812,7 @@ async function checkLinkedItemsAndCancelTradingAccount(tradingAccountId) {
  */
 async function performTradingAccountCancellation(tradingAccountId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - ביטול
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trading_accounts', 'cancel');
-    }
-    
-    // שליחה לשרת
+    // ניקוי מטמון לפני פעולת CRUD - ביטול    // שליחה לשרת
     const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -1844,12 +1822,7 @@ async function performTradingAccountCancellation(tradingAccountId) {
     if (response.ok) {
       await response.json(); // result not used
 
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('trading_accounts', 'החשבון מסחר בוטל בהצלחה');
-      } else {
-        // Fallback למערכת הישנה
-        // הצגת הודעת הצלחה
+      // הצגת הודעת הצלחה
         if (window.showSuccessNotification) {
           window.showSuccessNotification('הצלחה', 'החשבון מסחר בוטל בהצלחה', 4000, 'business');
         }
@@ -1894,12 +1867,7 @@ async function checkLinkedItemsAndDeleteTradingAccount(tradingAccountId) {
  */
 async function performTradingAccountDeletion(tradingAccountId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה
-    if (window.clearCacheBeforeCRUD) {
-      window.clearCacheBeforeCRUD('trading_accounts', 'delete');
-    }
-    
-    // שליחה לשרת
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה    // שליחה לשרת
     const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
       method: 'DELETE',
     });
@@ -1907,12 +1875,7 @@ async function performTradingAccountDeletion(tradingAccountId) {
     if (response.ok) {
       await response.json(); // result not used
 
-      // שימוש במערכת הריענון המרכזית
-      if (window.centralRefresh) {
-        await window.centralRefresh.showSuccessAndRefresh('trading_accounts', 'החשבון מסחר נמחק בהצלחה');
-      } else {
-        // Fallback למערכת הישנה
-        // הצגת הודעת הצלחה
+      // הצגת הודעת הצלחה
         if (window.showSuccessNotification) {
           window.showSuccessNotification('הצלחה', 'החשבון מסחר נמחק בהצלחה', 4000, 'business');
         }
@@ -2347,40 +2310,60 @@ async function saveTradingAccount() {
     window.Logger.debug('saveTradingAccount called', { page: 'trading_accounts' });
     
     try {
-        // Collect form data
+        // ניקוי מטמון לפני פעולת CRUD        // Collect form data using DataCollectionService
         const form = document.getElementById('tradingAccountsModalForm');
         if (!form) {
             throw new Error('Trading Account form not found');
         }
         
-        const formData = new FormData(form);
-        const accountData = {
-            name: formData.get('accountName'),
-            number: formData.get('accountNumber'),
-            type: formData.get('accountType'),
-            currency: formData.get('accountCurrency'),
-            balance: parseFloat(formData.get('accountBalance')) || 0,
-            status: formData.get('accountStatus'),
-            notes: formData.get('accountNotes')
-        };
-        
-        // Validate data
-        if (!window.validateEntityForm) {
-            throw new Error('Validation system not available');
-        }
-        
-        const isValid = window.validateEntityForm('tradingAccountsModalForm', {
-            accountName: { required: true, minLength: 2, maxLength: 100 },
-            accountNumber: { required: true, minLength: 3, maxLength: 50 },
-            accountType: { required: true },
-            accountCurrency: { required: true },
-            accountBalance: { required: false, min: 0 },
-            accountStatus: { required: true },
-            accountNotes: { required: false, maxLength: 500 }
+        const accountData = DataCollectionService.collectFormData({
+            name: { id: 'accountName', type: 'text' },
+            number: { id: 'accountNumber', type: 'text' },
+            type: { id: 'accountType', type: 'text' },
+            currency: { id: 'accountCurrency', type: 'text' },
+            balance: { id: 'accountBalance', type: 'float', default: 0 },
+            status: { id: 'accountStatus', type: 'text' },
+            notes: { id: 'accountNotes', type: 'text', default: null }
         });
         
-        if (!isValid) {
-            window.Logger.warn('Trading Account validation failed', { page: 'trading_accounts' });
+        // ולידציה מפורטת
+        let hasErrors = false;
+        if (!accountData.name || accountData.name.trim() === '') {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('accountName', 'שם החשבון הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!accountData.number || accountData.number.trim() === '') {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('accountNumber', 'מספר החשבון הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!accountData.type) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('accountType', 'סוג החשבון הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!accountData.currency) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('accountCurrency', 'מטבע החשבון הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!accountData.status) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('accountStatus', 'סטטוס החשבון הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (hasErrors) {
             return;
         }
         
@@ -2401,36 +2384,27 @@ async function saveTradingAccount() {
             body: JSON.stringify(accountData)
         });
         
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
+        // Use CRUDResponseHandler for consistent response handling
+        if (isEdit) {
+            await CRUDResponseHandler.handleUpdateResponse(response, {
+                modalId: 'tradingAccountsModal',
+                successMessage: 'חשבון מסחר עודכן בהצלחה',
+                entityName: 'חשבון מסחר',
+                reloadFn: window.loadTradingAccountsData,
+                requiresHardReload: false
+            });
+        } else {
+            await CRUDResponseHandler.handleSaveResponse(response, {
+                modalId: 'tradingAccountsModal',
+                successMessage: 'חשבון מסחר נוסף בהצלחה',
+                entityName: 'חשבון מסחר',
+                reloadFn: window.loadTradingAccountsData,
+                requiresHardReload: false
+            });
         }
-        
-        const result = await response.json();
-        
-        // Handle success
-        if (window.showNotification) {
-            const message = isEdit ? 'חשבון מסחר מסחר עודכן בהצלחה' : 'חשבון מסחר מסחר נוסף בהצלחה';
-            window.showNotification(message, 'success', 'business');
-        }
-        
-        // Close modal
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.hideModal('tradingAccountsModal');
-        }
-        
-        // Refresh data
-        if (window.loadTradingAccountsData) {
-            window.loadTradingAccountsData();
-        }
-        
-        window.Logger.info('Trading Account saved successfully', { accountId: result.id, page: 'trading_accounts' });
         
     } catch (error) {
-        window.Logger.error('Error saving trading account', { error: error.message, page: 'trading_accounts' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה בשמירת חשבון מסחר המסחר', 'error', 'system');
-        }
+        CRUDResponseHandler.handleError(error, 'שמירת חשבון מסחר');
     }
 }
 
@@ -2451,38 +2425,42 @@ async function deleteTradingAccount(accountId) {
             }
         }
         
-        // Confirm deletion
-        if (!confirm('האם אתה בטוח שברצונך למחוק את חשבון מסחר המסחר?')) {
-            return;
+        // Use warning system for confirmation
+        if (window.showDeleteWarning) {
+            window.showDeleteWarning('trading_account', accountId, 'חשבון מסחר',
+                async () => await performTradingAccountDeletion(accountId),
+                () => {}
+            );
+        } else {
+            // Fallback to simple confirm
+            if (!confirm('האם אתה בטוח שברצונך למחוק את חשבון מסחר המסחר?')) {
+                return;
+            }
+            await performTradingAccountDeletion(accountId);
         }
         
-        // Send delete request
+    } catch (error) {
+        CRUDResponseHandler.handleError(error, 'מחיקת חשבון מסחר');
+    }
+}
+
+async function performTradingAccountDeletion(accountId) {
+    try {
+        // ניקוי מטמון לפני פעולת CRUD - מחיקה        // Send delete request
         const response = await fetch(`/api/trading_accounts/${accountId}`, {
             method: 'DELETE'
         });
         
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        // Handle success
-        if (window.showNotification) {
-            window.showNotification('חשבון מסחר מסחר נמחק בהצלחה', 'success', 'business');
-        }
-        
-        // Refresh data
-        if (window.loadTradingAccountsData) {
-            window.loadTradingAccountsData();
-        }
-        
-        window.Logger.info('Trading Account deleted successfully', { accountId, page: 'trading_accounts' });
+        // Use CRUDResponseHandler for consistent response handling
+        await CRUDResponseHandler.handleDeleteResponse(response, {
+            successMessage: 'חשבון מסחר נמחק בהצלחה',
+            entityName: 'חשבון מסחר',
+            reloadFn: window.loadTradingAccountsData,
+            requiresHardReload: false
+        });
         
     } catch (error) {
-        window.Logger.error('Error deleting trading account', { error: error.message, accountId, page: 'trading_accounts' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה במחיקת חשבון מסחר המסחר', 'error', 'system');
-        }
+        CRUDResponseHandler.handleError(error, 'מחיקת חשבון מסחר');
     }
 }
 

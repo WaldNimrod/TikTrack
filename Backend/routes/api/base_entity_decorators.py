@@ -143,18 +143,27 @@ def handle_database_session(auto_commit: bool = True, auto_close: bool = True):
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
+            logging.info(f"🔵 HANDLE_DB_SESSION: Wrapping {func.__name__}, auto_commit={auto_commit}")
             db: Session = None
             try:
                 # Get database session
                 db = next(get_db())
                 g.db = db  # Store in Flask g for access in function
+                logging.info(f"✅ HANDLE_DB_SESSION: Got database session")
                 
                 # Call the function
+                logging.info(f"🟢 HANDLE_DB_SESSION: Calling {func.__name__}")
                 result = func(*args, **kwargs)
+                logging.info(f"🟢 HANDLE_DB_SESSION: {func.__name__} completed")
                 
                 # Auto commit if enabled
+                # NOTE: If function already committed, this is a no-op
                 if auto_commit and db:
+                    logging.info(f"🔵 COMMIT: About to commit database transaction")
                     db.commit()
+                    logging.info(f"✅ COMMIT: Database transaction committed successfully")
+                else:
+                    logging.info(f"⏭️ COMMIT: Auto-commit disabled, skipping")
                 
                 return result
                 

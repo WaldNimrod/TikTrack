@@ -14,30 +14,64 @@
 ## תכונות חדשות
 
 ### Event Delegation System (חדש!)
-מערכת הכפתורים כוללת מערכת event delegation מתקדמת המטפלת ב-`data-onclick` attributes:
+מערכת הכפתורים כוללת מערכת event delegation מתקדמת המטפלת ב-`data-onclick` attributes דרך `EventHandlerManager`:
+
+### תמיכה במטבעות (עדכון 2025-10-29)
+מערכת הכפתורים תומכת כעת במטבעות שונים במודל הוספת טיקר:
+- בחירה בין USD, EUR, ILS
+- קריאה אוטומטית מהרשומות המיובאות
+- שליחה נכונה של currency_id לשרת
+
+**מיקום:** `trading-ui/scripts/event-handler-manager.js`
+
+**איך זה עובד:**
+1. מערכת הכפתורים יוצרת כפתורים עם `data-onclick` במקום `onclick`
+2. `EventHandlerManager` מטפל בכל לחיצות על כפתורים עם `data-onclick` attribute
+3. הפונקציה מוגדרת ב-`data-onclick` מבוצעת דרך `eval()`
 
 ```javascript
 // Event delegation for data-onclick attributes
-document.addEventListener('click', (event) => {
-    const button = event.target.closest('button[data-onclick]');
-    if (button) {
-        const onclickValue = button.getAttribute('data-onclick');
-        if (onclickValue && onclickValue !== 'null') {
-            try {
-                eval(onclickValue);
-            } catch (error) {
-                console.error(`Button System: Error executing data-onclick:`, error);
-            }
+// ממומש ב-event-handler-manager.js -> handleDelegatedClick()
+const buttonWithOnclick = event.target.closest('button[data-onclick]');
+if (buttonWithOnclick) {
+    // בדיקה אם הכפתור disabled
+    if (buttonWithOnclick.disabled || buttonWithOnclick.hasAttribute('disabled')) {
+        return;
+    }
+    
+    const onclickValue = buttonWithOnclick.getAttribute('data-onclick');
+    if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
+        try {
+            // אין preventDefault/stopPropagation כדי לאפשר Bootstrap modals לעבוד
+            eval(onclickValue);
+        } catch (error) {
+            window.Logger.error('EventHandlerManager: Error executing data-onclick', {
+                onclickValue: onclickValue,
+                error: error.message
+            });
         }
     }
-});
+}
 ```
 
 **יתרונות:**
 - ✅ תמיכה מלאה ב-`data-onclick` attributes
-- ✅ טיפול אוטומטי בכפתורים דינמיים
-- ✅ Error handling מובנה
+- ✅ טיפול אוטומטי בכפתורים דינמיים שנוצרים בזמן ריצה
+- ✅ Error handling מובנה עם לוגים מפורטים
+- ✅ תאימות מלאה עם Bootstrap modals (ללא preventDefault)
+- ✅ בדיקה אוטומטית של כפתורים disabled
 - ✅ תאימות מלאה עם המערכת המאוחדת
+
+**הערות חשובות:**
+- ✅ **מומלץ: `data-onclick`** - זה התקן החדש והמומלץ לכל הכפתורים החדשים
+- ✅ **תמיכה לאחור:** המערכת תומכת גם ב-`onclick` רגיל (legacy support) - כפתורים ישנים עדיין יעבדו
+- ✅ הכפתורים נוצרים אוטומטית עם `data-onclick` דרך `button-system-init.js`
+- ✅ במודולים דינמיים - הכפתורים מעובדים אוטומטית אחרי כל מעבר שלב
+- ✅ המערכת לא מונעת התנהגות ברירת מחדל (`preventDefault`) כדי לאפשר Bootstrap modals לעבוד
+- ✅ אם יש שגיאה בביצוע הפונקציה, היא תתועד בלוגים אבל לא תתרסק את המערכת
+
+**תמיכה במודולים דינמיים:**
+כשמחליפים שלבים במודול, הכפתורים בשלב החדש מעובדים אוטומטית דרך `window.advancedButtonSystem.processButtons()`. זה מבטיח שכל הכפתורים יעבדו דרך המערכת המרכזית.
 
 ### משתני צבע דינמיים
 כל כפתור משתמש במשתנה CSS דינמי שניתן להתאים אישית:
@@ -600,3 +634,18 @@ ${createNewButton(`newFunction(${item.id})`)}
 ## סיכום
 
 מערכת הכפתורים המרוכזת של TikTrack מספקת פתרון יעיל, עקבי וקל לתחזוקה לניהול כל כפתורי הפעולה במערכת. המערכת מבטיחה עקביות, ביצועים טובים ותחזוקה קלה.
+
+## 🔄 היסטוריית עדכונים
+
+### 2025-01-27 - תיקון מערכת הכפתורים השבורה
+- ✅ הוספת `event-handler-manager.js` ל-`package-manifest.js` BASE package
+- ✅ הוספת `event-handler-manager.js` ל-`executions.html`
+- ✅ תיקון בעיית כפילות עם `onclick` רגיל - הסרת `eval()` על `onclick` רגיל
+- ✅ שמירה על תמיכה ב-`onclick` רגיל דרך הרצה טבעית של הדפדפן
+- ✅ הוספת לוגים לזיהוי `onclick` כפתורים (debug mode)
+- ✅ עדכון loadOrder ב-package-manifest.js
+
+### 2025-01-27 - תמיכה ב-onclick רגיל ומודולים דינמיים
+- ✅ הוספת תמיכה ב-`onclick` רגיל (legacy support) - תאימות לאחור
+- ✅ עיבוד אוטומטי של כפתורים במודולים אחרי מעבר שלבים
+- ✅ עדכון תיעוד מלא עם דוגמאות למודולים דינמיים

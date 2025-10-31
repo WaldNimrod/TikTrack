@@ -15,6 +15,11 @@
  * Last Updated: 2025-01-27
  */
 
+// Store reference to global updatePageSummaryStats function before any local override
+const globalUpdatePageSummaryStats = (typeof window !== 'undefined' && typeof window.updatePageSummaryStats === 'function') 
+  ? window.updatePageSummaryStats 
+  : null;
+
 /**
  * ========================================
  * Trade Plans Page - Trade Plans Page
@@ -1211,10 +1216,8 @@ function openCancelTradePlanModal(tradePlanId) {
   }
 }
 
-/**
- * פתיחת מודל מחיקת תכנון
- */
-window.confirmDeleteTradePlan = confirmDeleteTradePlan;
+// Using global deleteTradePlan function - no need for confirmDeleteTradePlan wrapper
+// The deleteTradePlan function already handles confirmation via checkLinkedItemsBeforeAction
 window.checkLinkedItemsBeforeCancel = checkLinkedItemsBeforeCancel;
 window.cancelTradePlan = cancelTradePlan;
 window.deleteTradePlan = deleteTradePlan;
@@ -1423,6 +1426,9 @@ function filterTradePlansData(filters) {
   }
 }
 
+// Note: Using global FieldRendererService for status and type rendering
+// No local functions needed - use window.FieldRendererService.renderStatus() and renderType()
+
 /**
  * עדכון טבלת תכנונים
  *
@@ -1530,8 +1536,7 @@ function updateTradePlansTable(trade_plans) {
       }
 
 
-    const statusClass = getStatusClass(design.status);
-    const typeClass = getTypeClass(design.investment_type);
+    // Using global FieldRendererService for rendering - no need for local CSS classes
 
     // Date correction - converting to Hebrew format
     let dateDisplay = 'לא מוגדר';
@@ -1595,7 +1600,9 @@ function updateTradePlansTable(trade_plans) {
           return `<span class="date-text">-</span>`;
         })()}</td>
         <td class="type-cell" data-type="${typeForFilter}">
-          ${window.renderType ? window.renderType(design.investment_type) : `<span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${typeDisplay}</span>`}
+          ${(window.FieldRendererService && window.FieldRendererService.renderType) 
+            ? window.FieldRendererService.renderType(design.investment_type) 
+            : (window.renderType ? window.renderType(design.investment_type) : `<span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${typeDisplay}</span>`)}
         </td>
         <td class="side-cell" data-side="${design.side}">
           ${window.renderSide ? window.renderSide(design.side) : `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${sideDisplay}</span>`}
@@ -1632,7 +1639,9 @@ function updateTradePlansTable(trade_plans) {
           })()}
         </td>
         <td class="status-cell" data-status="${statusForFilter}">
-          ${window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${statusDisplay}</span>`}
+          ${(window.FieldRendererService && window.FieldRendererService.renderStatus) 
+            ? window.FieldRendererService.renderStatus(design.status, 'trade_plan') 
+            : (window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${statusDisplay}</span>`)}
         </td>
         <td class="reward-cell">
           ${(() => {
@@ -1768,12 +1777,20 @@ function updateTradePlansTable(trade_plans) {
  * Update page summary statistics
  * Calculates and displays trade plan statistics
  * 
+ * Note: This function delegates to the global updatePageSummaryStats in ui-utils.js
+ * to avoid naming conflicts and recursion issues.
+ * 
  * @function updatePageSummaryStats
  * @returns {void}
  */
 function updatePageSummaryStats() {
-  // Use unified function from ui-utils.js
-  window.updatePageSummaryStats('trade_plans', window.tradePlansData, 'designsCount');
+  // Use the stored reference to global function to avoid recursion
+  if (globalUpdatePageSummaryStats && typeof globalUpdatePageSummaryStats === 'function') {
+    globalUpdatePageSummaryStats('trade_plans', window.tradePlansData, 'designsCount');
+  } else if (typeof window.updatePageSummaryStats === 'function' && window.updatePageSummaryStats !== updatePageSummaryStats) {
+    // Fallback: try to get the global function if it exists and is different from local
+    window.updatePageSummaryStats('trade_plans', window.tradePlansData, 'designsCount');
+  }
 }
 
 /**

@@ -193,51 +193,7 @@ function downloadFile(noteId, fileName) {
   }
 }
 
-/**
- * View linked items for note
- * @function viewLinkedItems
- * @param {string} noteId - Note ID
- * @returns {void}
- */
-function viewLinkedItems(noteId) {
-  try {
-    window.Logger.info('🔗 מציג פריטים מקושרים להערה:', noteId, { page: "notes" });
-    
-    // חיפוש ההערה בנתונים
-    const note = window.notesData.find(n => n.id === noteId);
-    if (!note) {
-      throw new Error('הערה לא נמצאה');
-    }
-    
-    // הצגת מודל פריטים מקושרים
-    if (typeof window.showLinkedItemsModal === 'function') {
-      window.showLinkedItemsModal('notes', noteId, note.title || 'הערה');
-    } else if (typeof window.showModalNotification === 'function') {
-      const content = `
-        <div class="linked-items">
-          <h5>פריטים מקושרים</h5>
-          <p>הערה: ${note.title || 'ללא כותרת'}</p>
-          <p>תוכן: ${note.content || 'ללא תוכן'}</p>
-          <p><em>פונקציונליות מקושרים זמינה במערכת הגלובלית</em></p>
-        </div>
-      `;
-      window.showModalNotification('פריטים מקושרים', content, 'info');
-    } else {
-      alert(`פריטים מקושרים להערה:\n\n` +
-        `כותרת: ${note.title || 'ללא כותרת'}\n` +
-        `תוכן: ${note.content || 'ללא תוכן'}\n\n` +
-        `פונקציונליות מקושרים זמינה במערכת הגלובלית`);
-    }
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בהצגת פריטים מקושרים:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהצגת פריטים מקושרים', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בהצגת פריטים מקושרים');
-    }
-  }
-}
+// REMOVED: viewLinkedItems - use window.viewLinkedItems(noteId, 'note') or window.viewLinkedItemsForNote(noteId) from linked-items.js instead
 /*
  * Notes.js - Notes Page Management
  * =================================

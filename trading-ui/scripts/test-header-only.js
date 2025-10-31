@@ -580,23 +580,11 @@ async function loadRealData() {
     console.log('🔄 טעינת נתונים אמיתיים מבסיס הנתונים...');
     
     try {
-        // טעינת נתוני טיקרים
-        if (typeof window.loadTickersData === 'function') {
-            console.log('🔄 טוען נתוני טיקרים...');
-            await window.loadTickersData();
-            console.log('✅ נתוני טיקרים נטענו');
-        } else {
-            console.warn('⚠️ פונקציית loadTickersData לא זמינה');
-        }
-        
         // טעינת נתוני תכנוני טריידים
-        if (typeof window.loadTradePlansData === 'function') {
-            console.log('🔄 טוען נתוני תכנוני טריידים...');
-            await window.loadTradePlansData();
-            console.log('✅ נתוני תכנוני טריידים נטענו');
-        } else {
-            console.warn('⚠️ פונקציית loadTradePlansData לא זמינה');
-        }
+        await loadTradePlansTableData();
+        
+        // טעינת נתוני עסקעות
+        await loadExecutionsTableData();
         
         log('נתונים אמיתיים נטענו מבסיס הנתונים');
         
@@ -605,6 +593,121 @@ async function loadRealData() {
         log('שגיאה בטעינת נתונים: ' + error.message);
     }
 }
+
+/**
+ * טעינת נתוני תכנוני טריידים ישירות מה-API
+ */
+async function loadTradePlansTableData() {
+    try {
+        console.log('🔄 טוען נתוני תכנוני טריידים...');
+        const response = await fetch(`/api/trade_plans/?_t=${Date.now()}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }
+        });
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        
+        const result = await response.json();
+        const data = result.data || [];
+        
+        window.tradePlansData = data;
+        updateTradePlansTableDisplay(data);
+        console.log(`✅ טענו ${data.length} תכנוני טריידים`);
+        
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת תכנוני טריידים:', error);
+    }
+}
+
+/**
+ * טעינת נתוני עסקעות ישירות מה-API
+ */
+async function loadExecutionsTableData() {
+    try {
+        console.log('🔄 טוען נתוני עסקעות...');
+        const response = await fetch(`/api/executions/?_t=${Date.now()}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }
+        });
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        
+        const result = await response.json();
+        const data = result.data || [];
+        
+        window.executionsData = data;
+        updateExecutionsTableDisplay(data);
+        console.log(`✅ טענו ${data.length} עסקעות`);
+        
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת עסקעות:', error);
+    }
+}
+
+/**
+ * עדכון תצוגת טבלת תכנוני טריידים
+ */
+function updateTradePlansTableDisplay(data) {
+    const tbody = document.querySelector('#trade_plansTable tbody');
+    if (!tbody) return;
+    
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="12" class="text-center">אין תכנוני טריידים</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = data.map(item => `
+        <tr>
+            <td>${item.ticker?.symbol || item.ticker_symbol || '-'}</td>
+            <td>${item.date || item.created_at || '-'}</td>
+            <td>${item.investment_type || item.type || '-'}</td>
+            <td>${item.side || '-'}</td>
+            <td>${item.quantity || item.shares || '-'}</td>
+            <td>${item.price || '-'}</td>
+            <td>${item.investment || item.amount || '-'}</td>
+            <td>${item.status || '-'}</td>
+            <td>${item.reward_potential || '-'}</td>
+            <td>${item.risk_level || '-'}</td>
+            <td>${item.risk_reward_ratio || '-'}</td>
+            <td></td>
+        </tr>
+    `).join('');
+}
+
+/**
+ * עדכון תצוגת טבלת עסקעות
+ */
+function updateExecutionsTableDisplay(data) {
+    const tbody = document.querySelector('#executionsTable tbody');
+    if (!tbody) return;
+    
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center">אין עסקעות</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = data.map(item => `
+        <tr>
+            <td>${item.symbol || item.ticker_symbol || '-'}</td>
+            <td>${item.action || '-'}</td>
+            <td>${item.account_name || '-'}</td>
+            <td>${item.quantity || '-'}</td>
+            <td>${item.price || '-'}</td>
+            <td>${item.pnl || '-'}</td>
+            <td>${item.realized_pl || '-'}</td>
+            <td>${item.mark_to_market || '-'}</td>
+            <td>${item.execution_date || '-'}</td>
+            <td>${item.source || '-'}</td>
+            <td></td>
+        </tr>
+    `).join('');
+}
+
+// שמירת נתונים גלובליים
+window.tradePlansData = window.tradePlansData || [];
+window.executionsData = window.executionsData || [];
+window.updateTradePlansTable = updateTradePlansTableDisplay;
+window.updateExecutionsTable = updateExecutionsTableDisplay;
 
 // ===== TICKER TABLE FUNCTIONS =====
 

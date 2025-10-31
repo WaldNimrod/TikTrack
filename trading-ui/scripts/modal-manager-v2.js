@@ -287,12 +287,6 @@ class ModalManagerV2 {
                     });
                 }
                 
-                // Add debug label if defaultFromPreferences
-                let debugLabel = '';
-                if (field.defaultFromPreferences) {
-                    debugLabel = '<small class="text-muted d-block mt-1">🔍 DEBUG: defaultFromPreferences=true</small>';
-                }
-                
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
@@ -304,7 +298,6 @@ class ModalManagerV2 {
                                 ${requiredAttr}>
                             ${optionsHTML}
                         </select>
-                        ${debugLabel}
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
@@ -775,10 +768,12 @@ class ModalManagerV2 {
     _applyPreferenceDefault(field, fieldElement, preferences) {
         // Map field IDs to preference names
         const preferenceMap = {
-            'cashFlowAccount': 'defaultTradingAccount',
-            'cashFlowCurrency': 'defaultCurrency',
-            'tradingAccount': 'defaultTradingAccount',
-            'currency': 'defaultCurrency'
+            'cashFlowAccount': 'default_trading_account',
+            'cashFlowCurrency': 'primaryCurrency',
+            'executionAccount': 'default_trading_account',
+            'executionCommission': 'defaultCommission',
+            'tradingAccount': 'default_trading_account',
+            'currency': 'primaryCurrency'
         };
         
         // Try to find matching preference
@@ -885,29 +880,24 @@ class ModalManagerV2 {
                 const fieldConfig = config.fields.find(f => f.id === selectId);
                 if (fieldConfig && fieldConfig.defaultFromPreferences) {
                     shouldUseDefaultFromPrefs = true;
-                    console.log(`🔍 Field ${selectId} has defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
                 }
             }
             
             try {
                 // מילוי לפי סוג השדה
                 if (selectId.includes('Account') || selectId.includes('account')) {
-                    console.log(`📋 Populating accounts select: ${selectId} with defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
                     await window.SelectPopulatorService.populateAccountsSelect(selectId, {
                         defaultFromPreferences: shouldUseDefaultFromPrefs
                     });
                 } else if (selectId.includes('Ticker') || selectId.includes('ticker')) {
-                    console.log(`📋 Populating tickers select: ${selectId}`);
                     await window.SelectPopulatorService.populateTickersSelect(selectId, {
                         includeEmpty: true
                     });
                 } else if (selectId.includes('Currency') || selectId.includes('currency')) {
-                    console.log(`📋 Populating currencies select: ${selectId} with defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
                     await window.SelectPopulatorService.populateCurrenciesSelect(selectId, {
                         defaultFromPreferences: shouldUseDefaultFromPrefs
                     });
                 } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
-                    console.log(`📋 Populating trade plans select: ${selectId}`);
                     await window.SelectPopulatorService.populateTradePlansSelect(selectId, {
                         includeEmpty: true
                     });

@@ -1357,7 +1357,6 @@ window.debugSectionStates = async function() {
 
 // REMOVED: toggleAllSections - use window.toggleAllSections from ui-utils.js instead
 // The global function provides the same functionality
-async function toggleAllSections_LEGACY() {
   
   // Find all possible section types
   const contentSections = document.querySelectorAll('.content-section, .top-section');

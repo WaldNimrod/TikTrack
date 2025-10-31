@@ -57,20 +57,12 @@ class HeaderSystem {
       return;
     }
 
-    console.log('🚀 HeaderSystem.init starting...');
-
     // יצירת אלמנט הכותרת
-    console.log('📝 Creating header HTML...');
     HeaderSystem.createHeader();
-    console.log('✅ Header HTML created');
     
     // יצירת מערכת הפילטרים
-    console.log('📝 Creating filter system...');
     if (typeof HeaderSystem.createFilterSystem === 'function') {
       HeaderSystem.createFilterSystem();
-      console.log('✅ Filter system created');
-    } else {
-      console.error('❌ createFilterSystem function not found!');
     }
     
     // טעינת חשבונות לפילטר - עם עיכוב קצר לוודא שה-HTML נוצר

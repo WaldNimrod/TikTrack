@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 61
+ * Total Functions: 62
  * 
  * PAGE INITIALIZATION (2)
  * - setupModalConfigurations() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
@@ -19,10 +19,11 @@
  * - loadTradeExecutions() - * מעבר לטרייד המקושר
  * - loadTickersSummaryData() - loadTickersSummaryData function
  * 
- * DATA MANIPULATION (19)
+ * DATA MANIPULATION (20)
  * - addExecution() - addExecution function
+ * - resetAddExecutionForm() - resetAddExecutionForm function
  * - updateRealizedPLField() - updateRealizedPLField function
- * - updateExecutionWrapper() - * הצגת שגיאת שדה
+ * - updateExecutionWrapper() - updateExecutionWrapper function
  * - updateExecutionsTableMain() - updateExecutionsTableMain function
  * - updateTradesOnCheckboxChange() - updateTradesOnCheckboxChange function
  * - updateTradesOnTickerChange() - updateTradesOnTickerChange function
@@ -40,9 +41,10 @@
  * - showAddExecutionModal() - showAddExecutionModal function
  * - deleteExecution() - * Show add execution modal
  * 
- * EVENT HANDLING (19)
+ * EVENT HANDLING (20)
  * - editExecution() - editExecution function
  * - resetExecutionForm() - resetExecutionForm function
+ * - resetEditExecutionForm() - resetEditExecutionForm function
  * - fillEditExecutionForm() - * הצגת מודל עריכת עסקה
  * - showExecutionLinkedItemsModal() - showExecutionLinkedItemsModal function
  * - goToNote() - * מעבר לתכנון ספציפי
@@ -65,8 +67,7 @@
  * - displayLinkedItems() - displayLinkedItems function
  * - showTickerHelp() - * מעבר לדף טיקר (בפיתוח)
  * 
- * OTHER (13)
- * - clearFieldError() - clearFieldError function
+ * OTHER (12)
  * - goToTrade() - goToTrade function
  * - goToPlan() - * מעבר לטרייד ספציפי
  * - goToAlert() - * מעבר לטרייד ספציפי
@@ -209,7 +210,11 @@ function resetExecutionForm(formType) {
   if (form) {
     form.reset();
   }
-  clearExecutionValidationErrors();
+  
+  // Use general validation system
+  if (typeof window.clearValidation === 'function') {
+    window.clearValidation(formId);
+  }
 
   // השבתת כל השדות חוץ מטיקר
   const fieldsToDisable = [
@@ -244,11 +249,16 @@ function resetExecutionForm(formType) {
   }
 }
 
-// REMOVED: resetAddExecutionForm - deprecated wrapper, use resetExecutionForm('add') instead
+// Wrapper functions for backward compatibility
+function resetAddExecutionForm() {
+  return resetExecutionForm('add');
+}
+
+function resetEditExecutionForm() {
+  return resetExecutionForm('edit');
+}
 
 // showAddExecutionModal הועבר למערכת הכללית
-
-// REMOVED: resetEditExecutionForm - deprecated wrapper, use resetExecutionForm('edit') instead
 
 /**
  * הצגת מודל עריכת עסקה
@@ -497,7 +507,10 @@ async function fillEditExecutionForm(execution, linkedObject, tickerId) {
     handleApiError(error, 'פרטי אובייקט מקושר');
   }
 
-  clearExecutionValidationErrors();
+  // Use general validation system
+  if (typeof window.clearValidation === 'function') {
+    window.clearValidation('editExecutionForm');
+  }
 
   // הפעלת כל השדות בעריכת עסקה
   enableAllFields('edit');
@@ -545,28 +558,10 @@ async function fillEditExecutionForm(execution, linkedObject, tickerId) {
  */
 // showFieldError() - זמינה גלובלית מ-ui-utils.js כ-showValidationWarning
 
-/**
- * ניקוי שגיאת שדה
- */
-function clearFieldError(input, errorElement) {
-  try {
-  input.classList.remove('is-invalid');
-  if (errorElement) {
-    errorElement.textContent = '';
-    errorElement.style.display = 'none';
-    }
-  } catch (error) {
-    window.Logger.error('שגיאה בניקוי שגיאת שדה:', error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בניקוי שגיאת שדה', error.message);
-    }
-  }
-}
+// REMOVED: clearFieldError - use window.clearFieldValidation() from validation-utils.js instead
 
-// REMOVED: clearExecutionValidationErrors - unused function
-// Use general validation system instead
-
-// REMOVED: validateCompleteExecutionForm - deprecated, use window.validateForm() or window.validateEntityForm() instead
+// REMOVED: clearExecutionValidationErrors - use window.clearValidation() instead
+// REMOVED: validateCompleteExecutionForm - use window.validateForm() or window.validateEntityForm() instead
 
 
 // ========================================
@@ -2560,44 +2555,25 @@ window.addExecution = addExecution;
 window.editExecution = editExecution;
 window.deleteExecution = deleteExecution;
 // REMOVED: window.updateExecution - function removed
-window.validateExecutionDate = validateExecutionDate;
-window.validateExecutionType = validateExecutionType;
-window.clearFieldError = clearFieldError;
-window.clearExecutionValidationErrors = clearExecutionValidationErrors;
-window.validateCompleteExecutionForm = validateCompleteExecutionForm;
+// REMOVED: window.validateExecutionDate - function removed, use window.validateField() instead
+// REMOVED: window.validateExecutionType - function removed, use window.validateField() instead
+// REMOVED: window.clearFieldError - use window.clearFieldValidation() from validation-utils.js instead
+// REMOVED: window.clearExecutionValidationErrors - use window.clearValidation() from validation-utils.js instead
+// REMOVED: window.validateCompleteExecutionForm - use window.validateForm() or window.validateEntityForm() instead
 window.displayLinkedItems = displayLinkedItems;
-window.goToTrade = goToTrade;
-window.goToPlan = goToPlan;
-window.goToAlert = goToAlert;
-window.goToNote = goToNote;
-window.goToTickerPage = goToTickerPage;
-window.showTickerHelp = showTickerHelp;
-window.addNewTicker = addNewTicker;
-window.isDateInRange = isDateInRange;
-window.filterExecutionsLocally = filterExecutionsLocally;
+// REMOVED DUPLICATES: goToTrade, goToPlan, goToAlert, goToNote, goToTickerPage, showTickerHelp, addNewTicker, isDateInRange, filterExecutionsLocally already exported above
 window.restoreSortState = restoreSortState;
-window.setupModalConfigurations = setupModalConfigurations;
-window.enableAllFields = enableAllFields;
-// window.loadExecutionsData = loadExecutionsData; // Not needed here - will be set later with wrapper
-window.updateExecutionsTableMain = updateExecutionsTableMain;
-// Note: saveExecution already exported above
+// REMOVED DUPLICATES: setupModalConfigurations, enableAllFields, updateExecutionsTableMain already exported above
 window.initializeExecutionsPage = window.initializeExecutionsPage;
-window.setupModalConfigurations = setupModalConfigurations;
 window.loadTickersWithOpenOrClosedTradesAndPlans = loadTickersWithOpenOrClosedTradesAndPlans;
 window.updateTickersList = updateTickersList;
-window.showTickerHelp = showTickerHelp;
-window.addNewTicker = addNewTicker;
 window.addNewPlan = addNewPlan;
 window.addNewTrade = addNewTrade;
 window.enableExecutionFormFields = enableExecutionFormFields;
 window.disableExecutionFormFields = disableExecutionFormFields;
 window.loadExecutionTickerInfo = loadExecutionTickerInfo;
 window.hideExecutionTickerInfo = hideExecutionTickerInfo;
-window.calculateAddExecutionValues = calculateAddExecutionValues;
-window.calculateEditExecutionValues = calculateEditExecutionValues;
-window.addEditBuySell = addEditBuySell;
-window.linkExistingExecution = linkExistingExecution;
-window.unlinkExecution = unlinkExecution;
+// REMOVED DUPLICATES: calculateAddExecutionValues, calculateEditExecutionValues, addEditBuySell, linkExistingExecution, unlinkExecution already exported above
 window.filterExecutionsByAccount = window.filterExecutionsByAccount;
 window.searchExecutions = window.searchExecutions;
 window.resetExecutionsFilters = window.resetExecutionsFilters;

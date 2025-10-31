@@ -71,7 +71,7 @@
 | קובץ | פונקציות | סטטוס | תאריך | הערות |
 |------|-----------|-------|-------|-------|
 | `executions.js` | 89 | ✅ הושלם | 2.11.2025 | הוסרו 22 פונקציות: openExecutionDetails, resetAddExecutionForm, resetEditExecutionForm, validateExecutionTradeId, saveExecution, + 9 validation, clearNewExecutionHighlights, updateExecution, loadLinkedItemsDetails, loadLinkedItemsFromMultipleSources, displayLinkedItems(executionId). 7 פונקציות בשימוש נשמרו |
-| `alerts.js` | 68 | 🔄 בעבודה | 2.11.2025 | הוסרו 9 פונקציות: filterAlertsLocally, clearAlertValidation, deprecated wrappers. עוד 23 בטוחות למחיקה, 8 בשימוש |
+| `alerts.js` | 68 | ✅ הושלם | 2.11.2025 | הוסרו 14 פונקציות: filterAlertsLocally, clearAlertValidation, deprecated wrappers, getStatusClass, getRelatedClass, hideAddAlertModal, hideEditAlertModal, checkAlertCondition. 54 פונקציות נוספות נשארות - רובן בשימוש |
 | `trade_plans.js` | 65 | ⏳ ממתין | - | - |
 | `trading_accounts.js` | 56 | ⏳ ממתין | - | - |
 | `cash_flows.js` | 50 | ⏳ ממתין | - | - |

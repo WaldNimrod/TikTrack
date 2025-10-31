@@ -2053,6 +2053,7 @@ window.selectTypeOption = function(type) {
       }
       clickedItem.classList.toggle('selected');
       
+      // אם לא נבחר אף סוג, חזור ל"הכול"
       const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
       if (selectedItems.length === 0 && allItem) {
         allItem.classList.add('selected');

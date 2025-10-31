@@ -2382,6 +2382,40 @@ window.updateEditAmountFromShares = updateEditAmountFromShares;
 window.addEditCondition = addEditCondition;
 window.addEditReason = addEditReason;
 window.addEditImportantNote = addEditImportantNote;
+/**
+ * Initialize conditions system for trade plans
+ * Uses global ConditionsInitializer from conditions package
+ */
+function initializeTradePlanConditionsSystem() {
+  try {
+    // Check if conditions system is available
+    if (typeof window.ConditionsInitializer !== 'undefined') {
+      // System is already initialized globally - just verify it's working
+      if (window.conditionsSystem && window.conditionsSystem.initializer) {
+        window.Logger?.info('Conditions system already initialized for trade plans', { page: "trade_plans" });
+        return true;
+      }
+      
+      // Try to initialize if not already done
+      const initializer = new window.ConditionsInitializer();
+      if (initializer && typeof initializer.initialize === 'function') {
+        initializer.initialize().then(() => {
+          window.Logger?.info('✅ Trade plans conditions system initialized successfully', { page: "trade_plans" });
+        }).catch(error => {
+          window.Logger?.error('Error initializing trade plans conditions system:', error, { page: "trade_plans" });
+        });
+        return true;
+      }
+    } else {
+      window.Logger?.warn('ConditionsInitializer not available - conditions package may not be loaded', { page: "trade_plans" });
+      return false;
+    }
+  } catch (error) {
+    window.Logger?.error('Error in initializeTradePlanConditionsSystem:', error, { page: "trade_plans" });
+    return false;
+  }
+}
+
 window.addEditReminder = addEditReminder;
 window.updatePageSummaryStats = updatePageSummaryStats;
 window.restoreSortState = restoreSortState;

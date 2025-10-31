@@ -835,16 +835,20 @@ function validateCompleteExecutionForm(mode) {
  */
 async function saveExecution() {
   
-  // ניקוי מטמון לפני פעולת CRUD  // איסוף נתונים מהטופס באמצעות DataCollectionService
+  // ניקוי מטמון לפני פעולת CRUD
+  
+  // איסוף נתונים מהטופס (ModalManagerV2 uses executionTicker, executionAccount, etc.)
   const executionData = DataCollectionService.collectFormData({
-    trade_id: { id: 'addExecutionTradeId', type: 'int' },
-    action: { id: 'addExecutionType', type: 'text' },
-    quantity: { id: 'addExecutionQuantity', type: 'int' },
-    price: { id: 'addExecutionPrice', type: 'number' },
-    date: { id: 'addExecutionDate', type: 'date' },
-    fee: { id: 'addExecutionCommission', type: 'number' },
-    notes: { id: 'addExecutionNotes', type: 'text' },
-    source: { id: 'addExecutionSource', type: 'text', default: 'manual' },
+    ticker_id: { id: 'executionTicker', type: 'int' },
+    account_id: { id: 'executionAccount', type: 'int' },
+    trade_id: { id: 'executionTradePlanId', type: 'int' }, // Optional linked trade
+    action: { id: 'executionType', type: 'text' },
+    quantity: { id: 'executionQuantity', type: 'int' },
+    price: { id: 'executionPrice', type: 'number' },
+    date: { id: 'executionDate', type: 'date' },
+    fee: { id: 'executionCommission', type: 'number' },
+    notes: { id: 'executionNotes', type: 'text' },
+    source: { id: 'executionSource', type: 'text', default: 'manual' },
     realized_pl: { id: 'executionRealizedPL', type: 'int' },
     mtm_pl: { id: 'executionMTMPL', type: 'int' }
   });
@@ -861,7 +865,7 @@ async function saveExecution() {
 
   // בדיקת ערך action
   if (!type || type !== 'buy' && type !== 'sale') {
-    handleValidationError('addExecutionType', 'יש לבחור פעולה תקינה (קניה או מכירה)');
+    handleValidationError('executionType', 'יש לבחור פעולה תקינה (קניה או מכירה)');
     return;
   }
 
@@ -870,7 +874,7 @@ async function saveExecution() {
   if (tradeIdValue) {
     tradeId = parseInt(tradeIdValue);
     if (isNaN(tradeId) || tradeId < 0) {
-      handleValidationError('addExecutionTradeId', 'מזהה טרייד לא תקין');
+      handleValidationError('executionTradePlanId', 'מזהה טרייד לא תקין');
       return;
     }
   }
@@ -890,6 +894,8 @@ async function saveExecution() {
     }
 
     const executionPayload = {
+      ticker_id: executionData.ticker_id,
+      account_id: executionData.account_id,
       trade_id: tradeId,
       action: type,
       quantity: parseInt(quantity),
@@ -913,10 +919,10 @@ async function saveExecution() {
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: 'addExecutionModal',
-      successMessage: 'עסקה נשמרה בהצלחה!',
+      modalId: 'executionsModal',
+      successMessage: 'ביצוע נשמר בהצלחה!',
       apiUrl: '/api/executions/',
-      entityName: 'עסקה',
+      entityName: 'ביצוע',
       reloadFn: window.loadExecutionsData,
       requiresHardReload: false
     });

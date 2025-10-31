@@ -221,36 +221,9 @@ def static_files(filename: str) -> Any:
     # Otherwise, return the file as is
     return send_from_directory(UI_DIR, filename)
 
-@pages_bp.after_request
-def add_cache_headers(response):
-    """Add cache control headers for static files"""
-    if request.path.startswith('/scripts/') and request.path.endswith('.js'):
-        # Force no-cache for JavaScript files - OVERRIDE everything
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        # Remove ALL conflicting headers
-        response.headers.pop('ETag', None)
-        response.headers.pop('Last-Modified', None)
-        # Force override at the end
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
-        # Add additional headers to ensure no caching
-        response.headers['Surrogate-Control'] = 'no-store'
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
-    elif request.path.startswith('/styles/') and request.path.endswith('.css'):
-        # Force no-cache for CSS files - OVERRIDE everything
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        # Remove ALL conflicting headers
-        response.headers.pop('ETag', None)
-        response.headers.pop('Last-Modified', None)
-        # Force override at the end
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
-        # Add additional headers to ensure no caching
-        response.headers['Surrogate-Control'] = 'no-store'
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
-    
-    return response
+# NOTE: Cache headers are now handled by ResponseOptimizer in app.py
+# This removes duplication and ensures consistent cache control headers
+# ResponseOptimizer handles /scripts/ and /styles/ paths with no-cache headers
+# See: Backend/utils/response_optimizer.py - determine_cache_type() and CACHE_HEADERS['api']
 
 

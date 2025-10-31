@@ -1593,16 +1593,30 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
         // 2. Clear localStorage (only our keys)
         try {
             const keys = Object.keys(localStorage);
-            const ourKeys = keys.filter(key => 
-                key.startsWith('tiktrack_') || 
-                key.startsWith('preference_') || 
-                key.startsWith('all_preferences_') ||
-                key === 'user-preferences'
-            );
+            const ourKeys = keys.filter(key => {
+                // UnifiedCacheManager keys (with prefix)
+                if (key.startsWith('tiktrack_')) return true;
+                
+                // Preferences keys (without prefix)
+                if (key.startsWith('preference_')) return true;
+                if (key.startsWith('all_preferences_')) return true;
+                if (key.startsWith('preference_group_')) return true;
+                
+                // Explicit patterns (with prefix)
+                if (key.startsWith('tiktrack_preference_')) return true;
+                if (key.startsWith('tiktrack_all_preferences_')) return true;
+                if (key.startsWith('tiktrack_preference_group_')) return true;
+                
+                // User preferences
+                if (key === 'user-preferences') return true;
+                if (key === 'tiktrack_user-preferences') return true;
+                
+                return false;
+            });
             
             ourKeys.forEach(key => localStorage.removeItem(key));
             clearedLayers.push(`localStorage (${ourKeys.length} keys)`);
-            window.Logger.info(`✅ localStorage cleared successfully (${ourKeys.length} keys, { page: "unified-cache-manager" })`);
+            window.Logger.info(`✅ localStorage cleared successfully (${ourKeys.length} keys)`, { page: "unified-cache-manager" });
         } catch (error) {
             window.Logger.error('❌ Error clearing localStorage:', error, { page: "unified-cache-manager" });
             errors.push(`localStorage: ${error.message}`);
@@ -1611,16 +1625,30 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
         // 3. Clear sessionStorage (only our keys)
         try {
             const keys = Object.keys(sessionStorage);
-            const ourKeys = keys.filter(key => 
-                key.startsWith('tiktrack_') || 
-                key.startsWith('preference_') || 
-                key.startsWith('all_preferences_') ||
-                key === 'user-preferences'
-            );
+            const ourKeys = keys.filter(key => {
+                // UnifiedCacheManager keys (with prefix)
+                if (key.startsWith('tiktrack_')) return true;
+                
+                // Preferences keys (without prefix)
+                if (key.startsWith('preference_')) return true;
+                if (key.startsWith('all_preferences_')) return true;
+                if (key.startsWith('preference_group_')) return true;
+                
+                // Explicit patterns (with prefix)
+                if (key.startsWith('tiktrack_preference_')) return true;
+                if (key.startsWith('tiktrack_all_preferences_')) return true;
+                if (key.startsWith('tiktrack_preference_group_')) return true;
+                
+                // User preferences
+                if (key === 'user-preferences') return true;
+                if (key === 'tiktrack_user-preferences') return true;
+                
+                return false;
+            });
             
             ourKeys.forEach(key => sessionStorage.removeItem(key));
             clearedLayers.push(`sessionStorage (${ourKeys.length} keys)`);
-            window.Logger.info(`✅ sessionStorage cleared successfully (${ourKeys.length} keys, { page: "unified-cache-manager" })`);
+            window.Logger.info(`✅ sessionStorage cleared successfully (${ourKeys.length} keys)`, { page: "unified-cache-manager" });
         } catch (error) {
             window.Logger.error('❌ Error clearing sessionStorage:', error, { page: "unified-cache-manager" });
             errors.push(`sessionStorage: ${error.message}`);

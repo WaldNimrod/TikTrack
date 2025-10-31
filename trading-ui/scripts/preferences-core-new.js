@@ -601,6 +601,9 @@ class PreferencesCore {
             if (success) {
                 window.Logger.info(`✅ Saved preference ${preferenceName}:`, value, { page: "preferences-core-new" });
 
+                // ✅ מוחק cache אחרי שמירה מוצלחת
+                await this.invalidatePreference(preferenceName, userId, profileId);
+
                 return {
                     success: true,
                     validation: { valid: true, errors: [] }
@@ -671,15 +674,44 @@ class PreferencesCore {
     }
     
     /**
-     * Invalidate specific preferences
+     * Invalidate single preference cache
+     * @param {string} preferenceName - Preference name
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    async invalidatePreference(preferenceName, userId = null, profileId = null) {
+        const finalUserId = userId || this.currentUserId;
+        const finalProfileId = (profileId !== null && profileId !== undefined) ? 
+            profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
+        
+        // מוחק cache של preference בודד
+        const cacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
+        if (window.UnifiedCacheManager) {
+            // מוחק את ה-key עם prefix (tiktrack_)
+            await window.UnifiedCacheManager.remove(cacheKey, { layer: 'localStorage' });
+            // מוחק גם את ה-key עם prefix
+            const prefixedKey = `tiktrack_${cacheKey}`;
+            await window.UnifiedCacheManager.remove(prefixedKey, { layer: 'localStorage' });
+        }
+        
+        // מוחק גם את all_preferences_* cache
+        const allPrefsKey = `all_preferences_${finalUserId}_${finalProfileId}`;
+        if (window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.remove(allPrefsKey, { layer: 'localStorage' });
+            const prefixedAllPrefsKey = `tiktrack_${allPrefsKey}`;
+            await window.UnifiedCacheManager.remove(prefixedAllPrefsKey, { layer: 'localStorage' });
+        }
+        
+        window.Logger.info(`🧹 Invalidated preference cache: ${preferenceName}`, { page: "preferences-core-new" });
+    }
+
+    /**
+     * Invalidate specific preferences (multiple)
      * @param {Array<string>} preferenceNames - Preference names to invalidate
      */
-    invalidatePreferences(preferenceNames) {
-        const keys = preferenceNames.map(name => 
-            `preference_${name}_${this.currentUserId}_${this.currentProfileId}`
-        );
-        if (window.UnifiedCacheManager) {
-            keys.forEach(key => window.UnifiedCacheManager.remove(key));
+    async invalidatePreferences(preferenceNames) {
+        for (const name of preferenceNames) {
+            await this.invalidatePreference(name);
         }
         window.Logger.info(`🧹 Invalidated ${preferenceNames.length} preferences`, { page: "preferences-core-new" });
     }

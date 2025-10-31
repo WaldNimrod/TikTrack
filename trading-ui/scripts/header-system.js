@@ -53,15 +53,24 @@ class HeaderSystem {
 
   init() {
     if (this.isInitialized) {
+      console.log('⚠️ HeaderSystem.init already initialized');
       return;
     }
 
+    console.log('🚀 HeaderSystem.init starting...');
+
     // יצירת אלמנט הכותרת
+    console.log('📝 Creating header HTML...');
     HeaderSystem.createHeader();
+    console.log('✅ Header HTML created');
     
     // יצירת מערכת הפילטרים
+    console.log('📝 Creating filter system...');
     if (typeof HeaderSystem.createFilterSystem === 'function') {
       HeaderSystem.createFilterSystem();
+      console.log('✅ Filter system created');
+    } else {
+      console.error('❌ createFilterSystem function not found!');
     }
     
     // טעינת חשבונות לפילטר - עם עיכוב קצר לוודא שה-HTML נוצר
@@ -1359,11 +1368,12 @@ class HeaderSystem {
               yesterday.setDate(today.getDate() - 1);
               return date.toDateString() === yesterday.toDateString();
               
-            case 'השבוע':
+            case 'השבוע': {
               const startOfWeek = new Date(today);
               const dayOfWeek = today.getDay();
               startOfWeek.setDate(today.getDate() - dayOfWeek);
               return date >= startOfWeek && date <= today;
+            }
               
             case 'שבוע':
               const weekAgo = new Date(today);
@@ -1383,7 +1393,7 @@ class HeaderSystem {
               yearAgo.setFullYear(today.getFullYear() - 1);
               return date >= yearAgo && date <= today;
               
-            case 'שבוע קודם':
+            case 'שבוע קודם': {
               const lastWeekStart = new Date(today);
               const dayOfWeek = today.getDay();
               lastWeekStart.setDate(today.getDate() - dayOfWeek - 7);
@@ -1392,6 +1402,7 @@ class HeaderSystem {
               lastWeekEnd.setDate(lastWeekStart.getDate() + 6);
               lastWeekEnd.setHours(23, 59, 59, 999);
               return date >= lastWeekStart && date <= lastWeekEnd;
+            }
               
             case 'חודש קודם':
               const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);

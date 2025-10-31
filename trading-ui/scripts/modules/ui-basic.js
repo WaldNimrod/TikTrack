@@ -1499,59 +1499,11 @@ function isValidPhone(phone) {
 
 // ===== פונקציות ויזואליות =====
 
-/**
- * הצגת שגיאה בשדה
- */
-function showFieldError(input, message) {
-  // אם input הוא מחרוזת (ID), נקבל את האלמנט
-  const element = typeof input === 'string' ? document.getElementById(input) : input;
+// REMOVED: showFieldError - use window.showFieldError from validation-utils.js instead
+// These are validation functions for form fields, NOT notification functions
 
-  // בדיקה שהאלמנט קיים
-  if (!element) {
-    // showFieldError: Element not found for input
-    return;
-  }
-
-  // הסרת סימון קודם
-  element.classList.remove('is-valid');
-  element.classList.add('is-invalid');
-
-  // הסרת הודעת שגיאה קודמת
-  const existingError = element.parentNode.querySelector('.invalid-feedback');
-  if (existingError) {
-    existingError.remove();
-  }
-
-  // הוספת הודעת שגיאה חדשה
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'invalid-feedback';
-  errorDiv.textContent = message;
-  element.parentNode.appendChild(errorDiv);
-}
-
-/**
- * הצגת הצלחה בשדה
- */
-function showFieldSuccess(input) {
-  // אם input הוא מחרוזת (ID), נקבל את האלמנט
-  const element = typeof input === 'string' ? document.getElementById(input) : input;
-
-  // בדיקה שהאלמנט קיים
-  if (!element) {
-    // showFieldSuccess: Element not found for input
-    return;
-  }
-
-  // הסרת סימון קודם
-  element.classList.remove('is-invalid');
-  element.classList.add('is-valid');
-
-  // הסרת הודעת שגיאה
-  const existingError = element.parentNode.querySelector('.invalid-feedback');
-  if (existingError) {
-    existingError.remove();
-  }
-}
+// REMOVED: showFieldSuccess - use window.showFieldSuccess from validation-utils.js instead
+// These are validation functions for form fields, NOT notification functions
 
 /**
  * ניקוי שגיאה משדה
@@ -1748,9 +1700,7 @@ window.isValidDate = isValidDate;
 window.isValidEmail = isValidEmail;
 window.isValidPhone = isValidPhone;
 
-// ייצוא פונקציות ויזואליות
-window.showFieldError = showFieldError;
-window.showFieldSuccess = showFieldSuccess;
+// REMOVED: window.showFieldError/window.showFieldSuccess - use window.showFieldError/window.showFieldSuccess from validation-utils.js instead
 window.clearFieldError = clearFieldError;
 window.clearFieldValidation = clearFieldValidation;
 window.clearValidationErrors = clearValidationErrors;
@@ -1817,8 +1767,7 @@ window.clearValidation = clearValidation;
 window.validationUtils = {
   // פונקציות ולידציה הועברו ל-validation-utils.js
   // validateForm, validateEntityForm, validateField, etc. - בשימוש מ-validation-utils.js
-  showFieldError,
-  showFieldSuccess,
+  // REMOVED: showFieldError, showFieldSuccess - use window.showFieldError/window.showFieldSuccess from validation-utils.js
   clearFieldError,
   clearFieldValidation,
   clearValidationErrors,

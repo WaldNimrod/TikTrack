@@ -33,13 +33,14 @@ class SelectPopulatorService {
                 // Try to get from cache synchronously
                 try {
                     const cached = localStorage.getItem(`tiktrack_${cacheKey}`);
+                    console.log(`🔍 Looking in localStorage for key: tiktrack_${cacheKey}`, cached ? 'found' : 'not found');
                     if (cached) {
                         const parsed = JSON.parse(cached);
                         console.log(`✅ Found preference ${preferenceName} in UnifiedCache:`, parsed);
                         return parsed;
                     }
                 } catch (e) {
-                    console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName}`);
+                    console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName}:`, e);
                 }
             }
             

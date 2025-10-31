@@ -1813,25 +1813,20 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.date || execution.execution_date}">${window.renderExecutionDate ? window.renderExecutionDate(execution.date || execution.execution_date) : (execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-')}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
                 <td class="actions-cell">
-                    ${window.createActionsMenu ? window.createActionsMenu([
-                      { type: 'VIEW', onclick: `window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })`, title: 'צפה בפרטי עסקה' },
-                      { type: 'LINK', onclick: `window.Logger.info('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}, { page: "executions" }); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { window.Logger.info('🔗 [LINKED ITEMS] נתונים נטענו:', data, { page: "executions" }); if(data) { window.Logger.info('🔗 [LINKED ITEMS] מציג מודל עם נתונים', { page: "executions" }); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { window.Logger.info('❌ [LINKED ITEMS] אין נתונים להצגה', { page: "executions" }); } }); } else { window.Logger.info('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין', { page: "executions" }); }`, title: 'פריטים מקושרים' },
-                      { type: 'EDIT', onclick: `editExecution(${execution.id})`, title: 'ערוך' },
-                      { type: 'DELETE', onclick: `deleteExecution(${execution.id})`, title: 'מחק' }
-                    ]) : `
-                    <button class="btn btn-sm" 
-                      onclick="window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })" 
-                      title="צפה בפרטי עסקה">👁️</button>
-                    <button class="btn btn-sm" 
-                      onclick="window.Logger.info('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}, { page: "executions" }); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { window.Logger.info('🔗 [LINKED ITEMS] נתונים נטענו:', data, { page: "executions" }); if(data) { window.Logger.info('🔗 [LINKED ITEMS] מציג מודל עם נתונים', { page: "executions" }); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { window.Logger.info('❌ [LINKED ITEMS] אין נתונים להצגה', { page: "executions" }); } }); } else { window.Logger.info('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין', { page: "executions" }); }" 
-                      title="פריטים מקושרים">🔗</button>
-                    <button class="btn btn-sm" 
-                      onclick="editExecution(${execution.id})" 
-                      title="ערוך">✏️</button>
-                    <button class="btn btn-sm" 
-                      onclick="deleteExecution(${execution.id})" 
-                      title="מחק">🗑️</button>
-                    `}
+                    <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
+                      ${(() => {
+                        if (!window.createActionsMenu) {
+                          return '<!-- Actions menu not available -->';
+                        }
+                        const result = window.createActionsMenu([
+                          { type: 'VIEW', onclick: `window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })`, title: 'צפה בפרטי עסקה' },
+                          { type: 'LINK', onclick: `viewLinkedItemsForExecution(${execution.id})`, title: 'פריטים מקושרים' },
+                          { type: 'EDIT', onclick: `editExecution(${execution.id})`, title: 'ערוך' },
+                          { type: 'DELETE', onclick: `deleteExecution(${execution.id})`, title: 'מחק' }
+                        ]);
+                        return result || '';
+                      })()}
+                    </div>
                 </td>
             </tr>
         `;

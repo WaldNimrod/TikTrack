@@ -383,14 +383,14 @@ app.wsgi_app = RateLimitMiddleware(app.wsgi_app)
 def optimize_response(response):
     """Optimize response headers"""
     try:
-        # Skip optimization for scripts and styles to allow pages.py to handle cache headers
-        if request.path.startswith('/scripts/') or request.path.startswith('/styles/') or request.path.startswith('/styles-new/'):
-            return response
+        # NOTE: ResponseOptimizer now handles ALL paths including /scripts/ and /styles/
+        # It determines cache type and applies appropriate headers (no-cache for JS/CSS in development)
+        # See: Backend/utils/response_optimizer.py - determine_cache_type() and CACHE_HEADERS['api']
         
         # Get request start time from g
         start_time = getattr(g, 'request_start_time', None)
         
-        # Optimize response headers
+        # Optimize response headers (includes /scripts/ and /styles/ handling)
         optimized_response = ResponseOptimizer.optimize_response(
             response,
             cache_type=ResponseOptimizer.determine_cache_type(request.path),

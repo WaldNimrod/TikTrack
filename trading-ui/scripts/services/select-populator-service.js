@@ -490,7 +490,9 @@ class SelectPopulatorService {
         if (config.defaultValue !== undefined && config.defaultValue !== null) {
             console.log(`🔍 Setting default value for ${select.id}:`, config.defaultValue, `(type: ${typeof config.defaultValue})`);
             select.value = config.defaultValue;
-            console.log(`✅ After setting default, select.value is:`, select.value, `(type: ${typeof select.value})`);
+            const selectedOption = Array.from(select.options).find(opt => opt.value == config.defaultValue);
+            const selectedText = selectedOption ? selectedOption.textContent : 'NOT FOUND';
+            console.log(`✅ After setting default, select.value is:`, select.value, `(type: ${typeof select.value}), selected text: "${selectedText}"`);
         } else if (config.defaultText) {
             const options = Array.from(select.options);
             const match = options.find(opt => (opt.textContent || '').trim() === String(config.defaultText).trim());

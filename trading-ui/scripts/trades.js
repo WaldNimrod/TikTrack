@@ -1190,7 +1190,137 @@ function hideEditTradeModal() {
 }
 
 window.hideEditTradeModal = hideEditTradeModal;
+
+/**
+ * Update radio buttons for relation type selection
+ * Sets up event listeners for relation type radio buttons
+ * 
+ * @function updateRadioButtons
+ * @param {Array} accounts - Array of account objects
+ * @param {Array} trades - Array of trade objects
+ * @param {Array} tradePlans - Array of trade plan objects
+ * @param {Array} tickers - Array of ticker objects
+ * @returns {void}
+ */
+function updateRadioButtons(accounts, trades, tradePlans, tickers) {
+  try {
+    // Update account radio button
+    const accountRadio = document.getElementById('tradeRelationAccount');
+    const editAccountRadio = document.getElementById('editTradeRelationAccount');
+
+    if (accountRadio) {
+      accountRadio.addEventListener('change', () => {
+        populateSelect('tradeRelatedObjectSelect', accounts, 'name', 'חשבון מסחר');
+      });
+    }
+
+    if (editAccountRadio) {
+      editAccountRadio.addEventListener('change', () => {
+        populateSelect('editTradeRelatedObjectSelect', accounts, 'name', 'חשבון מסחר');
+      });
+    }
+
+    // Update trade radio button
+    const tradeRadio = document.getElementById('tradeRelationTrade');
+    const editTradeRadio = document.getElementById('editTradeRelationTrade');
+
+    if (tradeRadio) {
+      tradeRadio.addEventListener('change', () => {
+        populateSelect('tradeRelatedObjectSelect', trades, 'id', 'טרייד');
+      });
+    }
+
+    if (editTradeRadio) {
+      editTradeRadio.addEventListener('change', () => {
+        populateSelect('editTradeRelatedObjectSelect', trades, 'id', 'טרייד');
+      });
+    }
+
+    // Update trade plan radio button
+    const planRadio = document.getElementById('tradeRelationTradePlan');
+    const editPlanRadio = document.getElementById('editTradeRelationTradePlan');
+
+    if (planRadio) {
+      planRadio.addEventListener('change', () => {
+        populateSelect('tradeRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+      });
+    }
+
+    if (editPlanRadio) {
+      editPlanRadio.addEventListener('change', () => {
+        populateSelect('editTradeRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+      });
+    }
+
+    // Update ticker radio button
+    const tickerRadio = document.getElementById('tradeRelationTicker');
+    const editTickerRadio = document.getElementById('editTradeRelationTicker');
+
+    if (tickerRadio) {
+      tickerRadio.addEventListener('change', () => {
+        populateSelect('tradeRelatedObjectSelect', tickers, 'symbol', '');
+      });
+    }
+
+    if (editTickerRadio) {
+      editTickerRadio.addEventListener('change', () => {
+        populateSelect('editTradeRelatedObjectSelect', tickers, 'symbol', '');
+      });
+    }
+    
+  } catch (error) {
+    window.Logger?.error('שגיאה בעדכון רדיו באטונים:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בעדכון רדיו באטונים');
+    }
+  }
+}
+
 window.updateRadioButtons = updateRadioButtons;
+
+/**
+ * Populate select element with data
+ * 
+ * @function populateSelect
+ * @param {string} selectId - ID of the select element
+ * @param {Array} data - Array of data objects
+ * @param {string} field - Field name to use as value
+ * @param {string} prefix - Optional prefix for option text
+ * @returns {void}
+ */
+function populateSelect(selectId, data, field, prefix = '') {
+  try {
+    const select = document.getElementById(selectId);
+    if (!select) {
+      window.Logger?.debug('Select element not found', { selectId, page: "trades" });
+      return;
+    }
+
+    select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+    if (!data || data.length === 0) {
+      window.Logger?.debug('No data available for select', { selectId, page: "trades" });
+      return;
+    }
+
+    data.forEach(item => {
+      const option = document.createElement('option');
+      const value = item[field] || item.id || item.name || '';
+      const text = prefix ? `${prefix}: ${value}` : value;
+      
+      option.value = value;
+      option.textContent = text;
+      select.appendChild(option);
+    });
+    
+  } catch (error) {
+    window.Logger?.error('Error in populateSelect', error, { selectId, page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה במילוי select');
+    }
+  }
+}
+
 window.populateSelect = populateSelect;
 window.onRelationTypeChange = onRelationTypeChange;
 window.onRelatedObjectChange = onRelatedObjectChange;

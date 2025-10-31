@@ -229,8 +229,8 @@ function deleteExecution(id) {
   // קבלת פרטי העסקה מנתוני הביצועים
   let executionDetails = `עסקה #${id}`;
   
-  // ניסיון לקבל את הנתונים מ-executionsData
-  const execution = window.executionsData?.find(exec => exec.id === id);
+  // ניסיון לקבל את הנתונים מ-executionsData (תמיכה גם ב-String וגם ב-Number)
+  const execution = window.executionsData?.find(exec => exec.id === id || exec.id === parseInt(id));
   
   if (execution) {
     const ticker = execution.ticker_symbol || execution.symbol || 'לא מוגדר';

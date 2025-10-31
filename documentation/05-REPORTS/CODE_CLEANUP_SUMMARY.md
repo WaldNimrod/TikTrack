@@ -12,16 +12,23 @@
 
 ### סה"כ הוסרו: 39 פונקציות
 
-## קבצים נותרים לעיבוד
+## קבצים שנבדקו ונמצאו בשימוש מלא
 
-1. **trade_plans.js** - 45 HIGH severity (רוב בשימוש)
-2. **notes.js** - 37 HIGH severity  
-3. **trading_accounts.js** - 36 HIGH severity
-4. **cash_flows.js** - 35 HIGH severity
-5. **tickers.js** - 30 HIGH
-6. **linked-items.js** - 29 HIGH
-7. **translation-utils.js** - 22 HIGH
-8. **page-utils.js** - 17 HIGH
+1. ✅ **trading_accounts.js** - כל הפונקציות בשימוש (מיוצאות ל-window)
+2. ✅ **cash_flows.js** - כל הפונקציות בשימוש (מיוצאות ל-window)
+3. ✅ **tickers.js** - כל הפונקציות בשימוש (מיוצאות ל-window)
+4. ✅ **translation-utils.js** - כל הפונקציות בשימוש (מערכת תרגומים)
+5. ✅ **page-utils.js** - כל הפונקציות בשימוש (מערכת כללית)
+6. ✅ **linked-items.js** - כל הפונקציות בשימוש פנימי
+
+## מסקנה
+
+רוב הפונקציות שזוהו כ-HIGH severity שלא בשימוש הן למעשה:
+- מיוצאות ל-`window` ונקראות מדפים אחרים
+- נקראות דרך HTML `onclick` attributes
+- חלק ממערכות כלליות שמיועדות לשימוש בכל המערכת
+
+רק wrappers מיותרים ופונקציות deprecated הוסרו.
 
 ## גישה לעבודה
 

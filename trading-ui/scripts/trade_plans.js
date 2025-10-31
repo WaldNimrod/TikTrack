@@ -1807,6 +1807,7 @@ function setupEditPriceCalculation() {
 window.checkLinkedItemsBeforeCancel = checkLinkedItemsBeforeCancel;
 window.cancelTradePlan = cancelTradePlan;
 window.deleteTradePlan = deleteTradePlan;
+window.performTradePlanDeletion = performTradePlanDeletion;
 window.viewLinkedItemsForTradePlan = viewLinkedItemsForTradePlan;
 window.reactivateTradePlan = reactivateTradePlan;
 window.setupPriceCalculation = setupPriceCalculation;

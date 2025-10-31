@@ -1770,24 +1770,7 @@ async function confirmDeleteAlert(alertId) {
 // REMOVED: getStatusClass - use window.getStatusClass or FieldRendererService.renderStatus instead
 
 
-/**
- * קבלת מחלקת CSS לאובייקט מקושר
- *
- * פונקציה זו מחזירה את שם המחלקה CSS המתאימה לסוג האובייקט המקושר
- * משמשת לעיצוב התאים בטבלה
- *
- * @param {number} relatedType - מזהה סוג האובייקט (1=חשבון מסחר, 2=טרייד, 3=תכנון, 4=טיקר)
- * @returns {string} שם המחלקה CSS
- */
-function getRelatedClass(relatedType) {
-  switch (relatedType) {
-  case 4: return 'related-ticker'; // ticker
-  case 2: return 'related-trade'; // trade
-  case 3: return 'related-plan'; // trade_plan
-  case 1: return 'related-account'; // account
-  default: return 'related-other';
-  }
-}
+// REMOVED: getRelatedClass - unused function
 
 
 // ===== UI STATE MANAGEMENT FUNCTIONS =====
@@ -1874,7 +1857,7 @@ if (window.location.pathname.includes('/alerts')) {
 // window.loadAlertsData כבר מוגדר בתחילת הקובץ
 window.updateAlertsTable = updateAlertsTable;
 window.updateAlertsSummary = updateAlertsSummary;
-window.filterAlertsLocally = filterAlertsLocally;
+// REMOVED: window.filterAlertsLocally - function removed
 
 /**
  * פילטר התראות לפי סוג אובייקט מקושר
@@ -2300,10 +2283,8 @@ function validateAlertForm() {
   }
 }
 
-window.hideAddAlertModal = hideAddAlertModal;
+// REMOVED: window exports for removed functions
 window.showEditAlertModal = showEditAlertModal;
-window.hideEditAlertModal = hideEditAlertModal;
-window.clearAlertValidation = clearAlertValidation;
 window.validateAlertForm = validateAlertForm;
 window.updateRadioButtons = updateRadioButtons;
 window.populateSelect = populateSelect;
@@ -2313,7 +2294,7 @@ window.enableConditionFields = enableConditionFields;
 window.disableConditionFields = disableConditionFields;
 window.populateRelatedObjects = populateRelatedObjects;
 window.getDemoAlertsData = getDemoAlertsData;
-window.filterAlertsLocally = filterAlertsLocally;
+// REMOVED: window.filterAlertsLocally - function removed
 // Note: saveAlert already exported above
 window.updateStatusAndTriggered = updateStatusAndTriggered;
 window.restoreAlertsSectionState = restoreAlertsSectionState;

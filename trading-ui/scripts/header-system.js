@@ -1890,10 +1890,12 @@ function updateFilterSelections(filters) {
 
 // ===== Add event listeners to portal items =====
 function addPortalEventListeners(portal, originalMenu) {
+  const menuId = originalMenu.id;
+  
+  // Add click listeners to portal items
   const portalItems = portal.querySelectorAll('[data-value]');
   portalItems.forEach(portalItem => {
     const value = portalItem.getAttribute('data-value');
-    const menuId = originalMenu.id;
     
     portalItem.addEventListener('click', (e) => {
       e.preventDefault();
@@ -1912,6 +1914,36 @@ function addPortalEventListeners(portal, originalMenu) {
         window.selectDateRangeOption(value);
       }
     });
+  });
+  
+  // Add hover listeners to portal to prevent premature closing
+  portal.addEventListener('mouseenter', () => {
+    // Clear any existing timeout for this menu
+    if (hoverTimeouts.has(menuId)) {
+      clearTimeout(hoverTimeouts.get(menuId));
+      hoverTimeouts.delete(menuId);
+    }
+  });
+  
+  portal.addEventListener('mouseleave', () => {
+    if (hoverTimeouts.has(menuId)) {
+      clearTimeout(hoverTimeouts.get(menuId));
+      hoverTimeouts.delete(menuId);
+    }
+
+    // Defer close with delay; only close if nothing is hovered
+    hoverTimeouts.set(menuId, setTimeout(() => {
+      const button = document.getElementById(menuId.replace('Menu', 'Toggle'));
+      const buttonHovered = button ? button.matches(':hover') : false;
+      const portalHovered = portal.matches(':hover');
+      const originalMenuHovered = originalMenu.matches(':hover');
+      
+      if (!buttonHovered && !portalHovered && !originalMenuHovered && originalMenu.classList.contains('show')) {
+        originalMenu.classList.remove('show');
+        closeFilterMenuPortal(originalMenu);
+        console.log(`🖱️ Portal hover closed ${menuId}`);
+      }
+    }, 300)); // Longer delay for portal
   });
 }
 

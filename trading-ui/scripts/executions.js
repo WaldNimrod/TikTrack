@@ -2811,8 +2811,8 @@ async function loadExecutionTickerInfo(tickerId) {
     const commissionField = document.getElementById('executionCommission');
     if (commissionField) {
       try {
-        if (typeof window.getCurrentPreference === 'function') {
-          const defaultCommission = await window.getCurrentPreference('defaultCommission');
+        if (typeof window.getPreference === 'function') {
+          const defaultCommission = await window.getPreference('defaultCommission');
           if (defaultCommission !== null && defaultCommission !== undefined) {
             commissionField.value = defaultCommission;
           }
@@ -2834,12 +2834,12 @@ function displayExecutionTickerInfo(ticker) {
   // Create or update ticker info display
   let tickerInfoDiv = document.getElementById('executionTickerInfo');
   if (!tickerInfoDiv) {
-    // Create a new row for ticker info
+    // Create a new row for ticker info spanning full width
     const tickerInfoRow = document.createElement('div');
     tickerInfoRow.className = 'row';
     tickerInfoRow.id = 'executionTickerInfoRow';
     
-    // Create column for ticker info
+    // Create column for ticker info - full width
     const tickerInfoCol = document.createElement('div');
     tickerInfoCol.className = 'col-12';
     
@@ -2850,15 +2850,49 @@ function displayExecutionTickerInfo(ticker) {
     tickerInfoCol.appendChild(tickerInfoDiv);
     tickerInfoRow.appendChild(tickerInfoCol);
     
-    // Insert after the ticker/type row
-    const tickerTypeRow = document.getElementById('executionTicker').closest('.row');
-    if (tickerTypeRow && tickerTypeRow.parentNode) {
-      tickerTypeRow.parentNode.insertBefore(tickerInfoRow, tickerTypeRow.nextSibling);
+    // Insert after the ticker/account row
+    const tickerSelect = document.getElementById('executionTicker');
+    if (tickerSelect) {
+      const tickerField = tickerSelect.closest('.mb-3');
+      if (tickerField && tickerField.parentNode) {
+        // Find the row containing the ticker field
+        const row = tickerField.closest('.row');
+        if (row && row.parentNode) {
+          row.parentNode.insertBefore(tickerInfoRow, row.nextSibling);
+        }
+      }
     }
   }
   
   // Use the new global renderTickerInfo function
-  tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+  if (window.renderTickerInfo) {
+    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+  } else {
+    // Fallback if renderTickerInfo not available
+    tickerInfoDiv.innerHTML = `
+      <div class="ticker-info-display">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}
+          </div>
+          <div class="col-md-6 text-end">
+            <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
+            <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+              ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </span>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12">
+            <small class="text-muted">
+              נפח: ${(ticker.volume || 0).toLocaleString()} | 
+              שינוי יומי: ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </small>
+          </div>
+        </div>
+      </div>
+    `;
+  }
 }
 
 /**

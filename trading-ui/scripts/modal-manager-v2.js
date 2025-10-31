@@ -928,6 +928,36 @@ class ModalManagerV2 {
         if (firstInput) {
             setTimeout(() => firstInput.focus(), 100);
         }
+        
+        // Initialize special handlers for specific modals
+        this.initializeSpecialHandlers(modalElement);
+    }
+    
+    /**
+     * Initialize special handlers for specific modals
+     * @param {HTMLElement} modalElement - The modal element
+     * @private
+     */
+    initializeSpecialHandlers(modalElement) {
+        const modalId = modalElement.id;
+        
+        // For Executions modal - handle ticker selection
+        if (modalId === 'executionsModal') {
+            const tickerSelect = modalElement.querySelector('#executionTicker');
+            if (tickerSelect) {
+                // Remove existing listeners
+                const newTickerSelect = tickerSelect.cloneNode(true);
+                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Add change listener
+                newTickerSelect.addEventListener('change', async (e) => {
+                    const tickerId = e.target.value;
+                    if (tickerId && window.loadExecutionTickerInfo) {
+                        await window.loadExecutionTickerInfo(tickerId);
+                    }
+                });
+            }
+        }
     }
 
     /**

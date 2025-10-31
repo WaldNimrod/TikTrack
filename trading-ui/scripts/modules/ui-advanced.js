@@ -2149,6 +2149,13 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
       return false;
     }
     const json = await res.json();
+    
+    // Update PreferencesCore with the profile ID from server
+    if (window.PreferencesCore && json?.data?.profile_id !== undefined) {
+      window.PreferencesCore.currentProfileId = json.data.profile_id;
+      console.log('✅ Updated PreferencesCore.currentProfileId to:', json.data.profile_id);
+    }
+    
     const prefsRaw = json?.data?.preferences || {};
     let prefs = { ...prefsRaw };
 

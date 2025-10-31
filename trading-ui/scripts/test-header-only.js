@@ -656,16 +656,27 @@ function updateTradePlansTableDisplay(data) {
         return;
     }
     
+    // פונקציות תרגום
+    const translateStatus = window.translateTradePlanStatus || ((status) => {
+        const map = { 'open': 'פתוח', 'closed': 'סגור', 'cancelled': 'מבוטל', 'canceled': 'מבוטל' };
+        return map[status] || status;
+    });
+    
+    const translateType = window.translateTradePlanType || ((type) => {
+        const map = { 'swing': 'סווינג', 'investment': 'השקעה', 'passive': 'פאסיבי' };
+        return map[type?.toLowerCase()] || type;
+    });
+    
     tbody.innerHTML = data.map(item => `
         <tr>
             <td>${item.ticker?.symbol || item.ticker_symbol || '-'}</td>
             <td>${item.date || item.created_at || '-'}</td>
-            <td>${item.investment_type || item.type || '-'}</td>
+            <td data-type="${item.investment_type || item.type || ''}">${translateType(item.investment_type || item.type)}</td>
             <td>${item.side || '-'}</td>
             <td>${item.quantity || item.shares || '-'}</td>
             <td>${item.price || '-'}</td>
             <td>${item.investment || item.amount || '-'}</td>
-            <td>${item.status || '-'}</td>
+            <td data-status="${item.status || ''}">${translateStatus(item.status)}</td>
             <td>${item.reward_potential || '-'}</td>
             <td>${item.risk_level || '-'}</td>
             <td>${item.risk_reward_ratio || '-'}</td>
@@ -686,10 +697,22 @@ function updateExecutionsTableDisplay(data) {
         return;
     }
     
+    // פונקציית תרגום גנרית לסטטוסים (executions משתמשים בתרגום גנרי)
+    const translateStatus = ((status) => {
+        const map = { 'open': 'פתוח', 'closed': 'סגור', 'cancelled': 'מבוטל', 'canceled': 'מבוטל' };
+        return map[status?.toLowerCase()] || status;
+    });
+    
+    // translation for action field (buy/sell)
+    const translateAction = ((action) => {
+        const map = { 'buy': 'קנייה', 'sell': 'מכירה' };
+        return map[action?.toLowerCase()] || action;
+    });
+    
     tbody.innerHTML = data.map(item => `
         <tr>
             <td>${item.symbol || item.ticker_symbol || '-'}</td>
-            <td>${item.action || '-'}</td>
+            <td data-action="${item.action || ''}">${translateAction(item.action)}</td>
             <td>${item.account_name || '-'}</td>
             <td>${item.quantity || '-'}</td>
             <td>${item.price || '-'}</td>

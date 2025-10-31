@@ -152,6 +152,46 @@ let ENTITY_BORDER_COLORS = {
   'preference': 'rgba(173, 181, 189, 0.3)',
 };
 
+/**
+ * צבעי Light של ישויות - נטענים מההעדפות
+ * Entity Light colors - loaded from preferences
+ */
+let ENTITY_LIGHT_COLORS = {
+  // ברירות מחדל
+  'trade': '#bee5eb',
+  'trade_plan': '#ba68c8',
+  'execution': '#8e44ad',
+  'account': '#34ce57',
+  'cash_flow': '#bee5eb',
+  'ticker': '#20c997',
+  'alert': '#ffb74d',
+  'note': '#90a4ae',
+  'constraint': '#f8f9fa',
+  'design': '#e9ecef',
+  'research': '#dee2e6',
+  'preference': '#ced4da',
+};
+
+/**
+ * צבעי Dark של ישויות - נטענים מההעדפות
+ * Entity Dark colors - loaded from preferences
+ */
+let ENTITY_DARK_COLORS = {
+  // ברירות מחדל
+  'trade': '#004085',
+  'trade_plan': '#7b1fa2',
+  'execution': '#5a2d91',
+  'account': '#1e7e34',
+  'cash_flow': '#138496',
+  'ticker': '#138496',
+  'alert': '#f57c00',
+  'note': '#455a64',
+  'constraint': '#495057',
+  'design': '#343a40',
+  'research': '#212529',
+  'preference': '#6c757d',
+};
+
 // ===== INVESTMENT TYPE SPECIFIC COLORS =====
 // צבעים ספציפיים לסוגי השקעה
 
@@ -239,6 +279,8 @@ function loadEntityColorsFromPreferences(preferences) {
       ENTITY_BACKGROUND_COLORS.execution = preferences.entityExecutionColorLight || `rgba(${hexToRgb(preferences.entityExecutionColor)?.r || 253}, ${hexToRgb(preferences.entityExecutionColor)?.g || 126}, ${hexToRgb(preferences.entityExecutionColor)?.b || 20}, 0.1)`;
       ENTITY_TEXT_COLORS.execution = preferences.entityExecutionColorDark || darkenColor(preferences.entityExecutionColor, 20);
       ENTITY_BORDER_COLORS.execution = `rgba(${hexToRgb(preferences.entityExecutionColor)?.r || 253}, ${hexToRgb(preferences.entityExecutionColor)?.g || 126}, ${hexToRgb(preferences.entityExecutionColor)?.b || 20}, 0.3)`;
+      ENTITY_LIGHT_COLORS.execution = preferences.entityExecutionColorLight || lightenColor(preferences.entityExecutionColor, 10);
+      ENTITY_DARK_COLORS.execution = preferences.entityExecutionColorDark || darkenColor(preferences.entityExecutionColor, 20);
     }
     
     // עדכון צבעי trades
@@ -247,6 +289,8 @@ function loadEntityColorsFromPreferences(preferences) {
       ENTITY_BACKGROUND_COLORS.trade = preferences.entityTradeColorLight || `rgba(${hexToRgb(preferences.entityTradeColor)?.r || 40}, ${hexToRgb(preferences.entityTradeColor)?.g || 167}, ${hexToRgb(preferences.entityTradeColor)?.b || 69}, 0.1)`;
       ENTITY_TEXT_COLORS.trade = preferences.entityTradeColorDark || darkenColor(preferences.entityTradeColor, 20);
       ENTITY_BORDER_COLORS.trade = `rgba(${hexToRgb(preferences.entityTradeColor)?.r || 40}, ${hexToRgb(preferences.entityTradeColor)?.g || 167}, ${hexToRgb(preferences.entityTradeColor)?.b || 69}, 0.3)`;
+      ENTITY_LIGHT_COLORS.trade = preferences.entityTradeColorLight || lightenColor(preferences.entityTradeColor, 10);
+      ENTITY_DARK_COLORS.trade = preferences.entityTradeColorDark || darkenColor(preferences.entityTradeColor, 20);
     }
     
     // עדכון צבעי trading accounts
@@ -255,6 +299,8 @@ function loadEntityColorsFromPreferences(preferences) {
       ENTITY_BACKGROUND_COLORS.account = preferences.entityTradingAccountColorLight || `rgba(${hexToRgb(preferences.entityTradingAccountColor)?.r || 23}, ${hexToRgb(preferences.entityTradingAccountColor)?.g || 162}, ${hexToRgb(preferences.entityTradingAccountColor)?.b || 184}, 0.1)`;
       ENTITY_TEXT_COLORS.account = preferences.entityTradingAccountColorDark || darkenColor(preferences.entityTradingAccountColor, 20);
       ENTITY_BORDER_COLORS.account = `rgba(${hexToRgb(preferences.entityTradingAccountColor)?.r || 23}, ${hexToRgb(preferences.entityTradingAccountColor)?.g || 162}, ${hexToRgb(preferences.entityTradingAccountColor)?.b || 184}, 0.3)`;
+      ENTITY_LIGHT_COLORS.account = preferences.entityTradingAccountColorLight || lightenColor(preferences.entityTradingAccountColor, 10);
+      ENTITY_DARK_COLORS.account = preferences.entityTradingAccountColorDark || darkenColor(preferences.entityTradingAccountColor, 20);
     }
     
     // עדכון צבעי alerts
@@ -263,6 +309,8 @@ function loadEntityColorsFromPreferences(preferences) {
       ENTITY_BACKGROUND_COLORS.alert = preferences.entityAlertColorLight || `rgba(${hexToRgb(preferences.entityAlertColor)?.r || 255}, ${hexToRgb(preferences.entityAlertColor)?.g || 193}, ${hexToRgb(preferences.entityAlertColor)?.b || 7}, 0.1)`;
       ENTITY_TEXT_COLORS.alert = preferences.entityAlertColorDark || darkenColor(preferences.entityAlertColor, 20);
       ENTITY_BORDER_COLORS.alert = `rgba(${hexToRgb(preferences.entityAlertColor)?.r || 255}, ${hexToRgb(preferences.entityAlertColor)?.g || 193}, ${hexToRgb(preferences.entityAlertColor)?.b || 7}, 0.3)`;
+      ENTITY_LIGHT_COLORS.alert = preferences.entityAlertColorLight || lightenColor(preferences.entityAlertColor, 10);
+      ENTITY_DARK_COLORS.alert = preferences.entityAlertColorDark || darkenColor(preferences.entityAlertColor, 20);
     }
     
     // עדכון צבעי tickers
@@ -271,6 +319,8 @@ function loadEntityColorsFromPreferences(preferences) {
       ENTITY_BACKGROUND_COLORS.ticker = preferences.entityTickerColorLight || `rgba(${hexToRgb(preferences.entityTickerColor)?.r || 111}, ${hexToRgb(preferences.entityTickerColor)?.g || 66}, ${hexToRgb(preferences.entityTickerColor)?.b || 193}, 0.1)`;
       ENTITY_TEXT_COLORS.ticker = preferences.entityTickerColorDark || darkenColor(preferences.entityTickerColor, 20);
       ENTITY_BORDER_COLORS.ticker = `rgba(${hexToRgb(preferences.entityTickerColor)?.r || 111}, ${hexToRgb(preferences.entityTickerColor)?.g || 66}, ${hexToRgb(preferences.entityTickerColor)?.b || 193}, 0.3)`;
+      ENTITY_LIGHT_COLORS.ticker = preferences.entityTickerColorLight || lightenColor(preferences.entityTickerColor, 10);
+      ENTITY_DARK_COLORS.ticker = preferences.entityTickerColorDark || darkenColor(preferences.entityTickerColor, 20);
     }
     
     // עדכון צבעי cash flows
@@ -279,6 +329,8 @@ function loadEntityColorsFromPreferences(preferences) {
       ENTITY_BACKGROUND_COLORS['cash_flow'] = preferences.entityCashFlowColorLight || `rgba(${hexToRgb(preferences.entityCashFlowColor)?.r || 32}, ${hexToRgb(preferences.entityCashFlowColor)?.g || 201}, ${hexToRgb(preferences.entityCashFlowColor)?.b || 151}, 0.1)`;
       ENTITY_TEXT_COLORS['cash_flow'] = preferences.entityCashFlowColorDark || darkenColor(preferences.entityCashFlowColor, 20);
       ENTITY_BORDER_COLORS['cash_flow'] = `rgba(${hexToRgb(preferences.entityCashFlowColor)?.r || 32}, ${hexToRgb(preferences.entityCashFlowColor)?.g || 201}, ${hexToRgb(preferences.entityCashFlowColor)?.b || 151}, 0.3)`;
+      ENTITY_LIGHT_COLORS['cash_flow'] = preferences.entityCashFlowColorLight || lightenColor(preferences.entityCashFlowColor, 10);
+      ENTITY_DARK_COLORS['cash_flow'] = preferences.entityCashFlowColorDark || darkenColor(preferences.entityCashFlowColor, 20);
     }
     
     // עדכון צבעי notes
@@ -287,6 +339,8 @@ function loadEntityColorsFromPreferences(preferences) {
       ENTITY_BACKGROUND_COLORS.note = preferences.entityNoteColorLight || `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 108}, ${hexToRgb(preferences.entityNoteColor)?.g || 117}, ${hexToRgb(preferences.entityNoteColor)?.b || 125}, 0.1)`;
       ENTITY_TEXT_COLORS.note = preferences.entityNoteColorDark || darkenColor(preferences.entityNoteColor, 20);
       ENTITY_BORDER_COLORS.note = `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 108}, ${hexToRgb(preferences.entityNoteColor)?.g || 117}, ${hexToRgb(preferences.entityNoteColor)?.b || 125}, 0.3)`;
+      ENTITY_LIGHT_COLORS.note = preferences.entityNoteColorLight || lightenColor(preferences.entityNoteColor, 10);
+      ENTITY_DARK_COLORS.note = preferences.entityNoteColorDark || darkenColor(preferences.entityNoteColor, 20);
     }
     
     // עדכון צבעי trade plans
@@ -295,6 +349,8 @@ function loadEntityColorsFromPreferences(preferences) {
       ENTITY_BACKGROUND_COLORS['trade_plan'] = preferences.entityTradePlanColorLight || `rgba(${hexToRgb(preferences.entityTradePlanColor)?.r || 0}, ${hexToRgb(preferences.entityTradePlanColor)?.g || 123}, ${hexToRgb(preferences.entityTradePlanColor)?.b || 255}, 0.1)`;
       ENTITY_TEXT_COLORS['trade_plan'] = preferences.entityTradePlanColorDark || darkenColor(preferences.entityTradePlanColor, 20);
       ENTITY_BORDER_COLORS['trade_plan'] = `rgba(${hexToRgb(preferences.entityTradePlanColor)?.r || 0}, ${hexToRgb(preferences.entityTradePlanColor)?.g || 123}, ${hexToRgb(preferences.entityTradePlanColor)?.b || 255}, 0.3)`;
+      ENTITY_LIGHT_COLORS['trade_plan'] = preferences.entityTradePlanColorLight || lightenColor(preferences.entityTradePlanColor, 10);
+      ENTITY_DARK_COLORS['trade_plan'] = preferences.entityTradePlanColorDark || darkenColor(preferences.entityTradePlanColor, 20);
     }
     
   }
@@ -2655,6 +2711,8 @@ window.ENTITY_COLORS = ENTITY_COLORS;
 window.ENTITY_BACKGROUND_COLORS = ENTITY_BACKGROUND_COLORS;
 window.ENTITY_TEXT_COLORS = ENTITY_TEXT_COLORS;
 window.ENTITY_BORDER_COLORS = ENTITY_BORDER_COLORS;
+window.ENTITY_LIGHT_COLORS = ENTITY_LIGHT_COLORS;
+window.ENTITY_DARK_COLORS = ENTITY_DARK_COLORS;
 window.STATUS_COLORS = STATUS_COLORS;
 window.INVESTMENT_TYPE_COLORS = INVESTMENT_TYPE_COLORS;
 
@@ -2726,6 +2784,8 @@ window.colorSchemeSystem = {
   ENTITY_BACKGROUND_COLORS,
   ENTITY_TEXT_COLORS,
   ENTITY_BORDER_COLORS,
+  ENTITY_LIGHT_COLORS,
+  ENTITY_DARK_COLORS,
   STATUS_COLORS,
   INVESTMENT_TYPE_COLORS,
 

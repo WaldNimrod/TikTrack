@@ -306,15 +306,18 @@ class ActionsMenuSystem {
                 default: icon = '⚙️'; break;
             }
             
-            // Escape onclick for HTML attribute - escape double quotes and ensure single quotes work
-            // In HTML, we can use double quotes for the attribute and single quotes inside
+            // Escape onclick for HTML attribute - use single quotes in template literals to avoid conflicts
+            // Escape single quotes for safety, and double quotes for HTML attributes
             let escapedOnclick = onclick || '';
             if (escapedOnclick) {
-                // Escape double quotes (they break HTML attributes)
-                escapedOnclick = escapedOnclick.replace(/"/g, '&quot;');
+                // First escape single quotes (for JavaScript), then escape double quotes (for HTML)
+                escapedOnclick = escapedOnclick.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+                // Alternative: use single quotes in the attribute value itself
+                // But we'll use the escaped version to be safe
             }
             
-            const buttonHTML = `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick="${escapedOnclick}" title="${title || ''}" style="margin-right: 4px;">${icon}</button>`;
+            // Use single quotes for the data-onclick attribute value to avoid conflicts with double quotes
+            const buttonHTML = `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${onclick || ''}' title="${title || ''}" style="margin-right: 4px;">${icon}</button>`;
             console.log(`✅ [ActionsMenuSystem] Created button ${index + 1}:`, {
                 type: buttonType,
                 onclick: onclick,
@@ -609,9 +612,9 @@ window.createActionsMenu = function(buttons) {
         }
         
         // Escape onclick for HTML attribute
-        const escapedOnclick = onclick.replace(/"/g, '&quot;');
-        console.log(`🔧 [window.createActionsMenu fallback] Button ${buttonType}:`, { onclick, escapedOnclick });
-        return `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick="${escapedOnclick}" title="${title || ''}" style="margin-right: 4px;">${icon}</button>`;
+        // Use single quotes for data-onclick attribute to avoid conflicts with double quotes in onclick
+        console.log(`🔧 [window.createActionsMenu fallback] Button ${buttonType}:`, { onclick });
+        return `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${onclick || ''}' title="${title || ''}" style="margin-right: 4px;">${icon}</button>`;
     }).join('');
     
     const fallbackHTML = `

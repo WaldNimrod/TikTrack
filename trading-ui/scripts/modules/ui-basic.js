@@ -1188,7 +1188,7 @@ window.getPageDataFunctions = getPageDataFunctions;
 window.autoRefreshCurrentPage = autoRefreshCurrentPage;
 
 // Export account utility functions
-window.showSecondConfirmationModal = showSecondConfirmationModal;
+// REMOVED: window.showSecondConfirmationModal - use window.showConfirmationDialog directly
 
 // Export section toggle system functions
 // toggleSection removed - use toggleSection('top') instead
@@ -1272,7 +1272,7 @@ window.loadTableActionButtons = loadTableActionButtons;
 
 // Export demo functions for testing
 window.viewTickerDetails = viewTickerDetails;
-window.viewLinkedItems = viewLinkedItems;
+// REMOVED: window.viewLinkedItems - use window.viewLinkedItems from linked-items.js directly
 window.editTicker = editTicker;
 window.cancelTicker = cancelTicker;
 window.restoreTicker = restoreTicker;
@@ -1284,76 +1284,8 @@ window.deleteTicker = deleteTicker;
 // ===== SECTION TOGGLE FUNCTIONS =====
 // These functions handle opening/closing sections across all pages
 
-/**
- * Toggle top section visibility
- * Used for the main top section of each page
- */
-async function toggleTopSection(sectionId = 'top-section') {
-  const section = document.getElementById(sectionId);
-  if (!section) {
-    console.warn(`⚠️ Section ${sectionId} not found`);
-    return;
-  }
-  
-  // Handle special cases for development sections
-  if (section.classList.contains('development-section')) {
-    if (typeof window.toggleDevelopmentSection === 'function') {
-      window.toggleDevelopmentSection(sectionId);
-      return;
-    }
-  }
-  
-  // Find the toggle button and icon
-  const toggleBtn = document.querySelector(`[onclick*="${sectionId}"]`);
-  const toggleIcon = section.querySelector('.section-toggle-icon') || 
-                    (toggleBtn ? toggleBtn.querySelector('.section-toggle-icon') : null);
-  
-  // Find the content area to toggle
-  const sectionBody = section.querySelector('.section-body') ||
-                     section.querySelector('.section-content') ||
-                     section.querySelector('.content');
-  
-  if (!sectionBody) {
-    console.warn(`⚠️ No content area found in section ${sectionId}`);
-    return;
-  }
-  
-  // Determine current state
-  const isCollapsed = sectionBody.style.display === 'none' || 
-                     section.classList.contains('collapsed');
-  
-  // Toggle visibility
-  if (isCollapsed) {
-    // Expand
-    sectionBody.style.display = 'block';
-    section.classList.remove('collapsed');
-    section.classList.add('expanded');
-    if (toggleIcon) toggleIcon.textContent = '▼';
-    console.log(`📂 Expanded section: ${sectionId}`);
-  } else {
-    // Collapse
-    sectionBody.style.display = 'none';
-    section.classList.add('collapsed');
-    section.classList.remove('expanded');
-    if (toggleIcon) toggleIcon.textContent = '▶';
-    console.log(`📁 Collapsed section: ${sectionId}`);
-  }
-  
-  // Save state to localStorage with page-specific key
-  const pageName = getCurrentPageName();
-  const storageKey = `${pageName}_${sectionId}_collapsed`;
-  if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
-    await window.UnifiedCacheManager.save(storageKey, !isCollapsed, {
-      layer: 'localStorage',
-      ttl: null, // persistent
-      syncToBackend: false
-    });
-    console.log(`💾 Top section state saved to Unified Cache: ${storageKey} = "${!isCollapsed}"`);
-  } else {
-    // UnifiedCacheManager לא זמין - כלל 44 violation prevented
-    console.error(`UnifiedCacheManager לא זמין - לא ניתן לשמור מצב Top Section (כלל 44 violation prevented): ${storageKey}`);
-  }
-}
+// REMOVED: toggleTopSection - use window.toggleSection(sectionId) from ui-utils.js instead
+// The global function handles section toggling with improved state management
 
 // toggleSection function removed - use toggleSection('main') instead
 
@@ -1423,12 +1355,9 @@ window.debugSectionStates = async function() {
   console.log('=====================================');
 };
 
-/**
- * Toggle all sections on the page
- * Generic function that toggles all collapsible sections
- * UPDATED: Now uses page-specific localStorage keys
- */
-async function toggleAllSections() {
+// REMOVED: toggleAllSections - use window.toggleAllSections from ui-utils.js instead
+// The global function provides the same functionality
+async function toggleAllSections_LEGACY() {
   
   // Find all possible section types
   const contentSections = document.querySelectorAll('.content-section, .top-section');
@@ -1571,10 +1500,10 @@ async function loadSectionStates() {
 // Export functions to global scope
 // toggleSection removed - use toggleSection('top') instead
 // window.toggleSection export removed - using global version from ui-utils.js
-window.toggleAllSections = toggleAllSections;
+// REMOVED: window.toggleAllSections - use window.toggleAllSections from ui-utils.js instead
 window.toggleSectionGlobal = window.toggleSection;
 window.toggleAllSectionsGlobal = window.toggleAllSections;
-window.toggleTopSection = toggleTopSection;
+// REMOVED: window.toggleTopSection - use window.toggleSection(sectionId) instead
 window.loadSectionStates = loadSectionStates;
 
 // Load section states when DOM is ready - הוסר כדי למנוע כפילות עם core-systems.js

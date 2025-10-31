@@ -917,12 +917,11 @@ async function cancelTradingAccount(tradingAccountId, tradingAccountName) {
               () => resolve(false),
             );
           } else {
-            if (typeof window.showSecondConfirmationModal === 'function') {
-              window.showSecondConfirmationModal(
-                'ביטול חשבון מסחר',
+            if (typeof window.showConfirmationDialog === 'function') {
+              window.showConfirmationDialog('אישור',
                 `הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון מסחר "${accountName}"?`,
                 () => resolve(true),
-                () => resolve(false),
+                () => resolve(false)
               );
             } else {
               resolve(false);

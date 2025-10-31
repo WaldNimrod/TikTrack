@@ -20,6 +20,11 @@
     transition: opacity 0.3s ease;
 }
 
+/* Keep wrapper hovered when popup is hovered */
+.actions-menu-wrapper:hover {
+    /* Ensure wrapper stays "hovered" */
+}
+
 /* Actions Menu Trigger Button - uses default button system */
 .actions-trigger {
     /* Let the default button system handle styling */
@@ -38,7 +43,7 @@
     position: absolute;
     top: -5px;
     right: 100%;
-    margin-right: 2px;
+    margin-right: 0;
     background: white;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -49,13 +54,28 @@
     display: none;
     transition: opacity 0.3s ease;
     pointer-events: auto;
+    visibility: hidden;
+}
+
+/* Create bridge area to prevent hover gap between button and popup */
+.actions-menu-popup::before {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    pointer-events: auto;
+    background: transparent;
 }
 
 /* Show popup on hover */
-.actions-menu-wrapper:hover .actions-menu-popup {
-    display: block !important;
+.actions-menu-wrapper:hover .actions-menu-popup,
+.actions-menu-popup:hover {
+    display: block;
     opacity: 1;
     pointer-events: auto;
+    visibility: visible;
 }
 
 
@@ -109,8 +129,20 @@
 [dir="rtl"] .actions-menu-popup {
     right: auto;
     left: 100%;
-    margin-left: 8px;
+    margin-left: 0;
     margin-right: 0;
+}
+
+/* Create bridge area to prevent hover gap between button and popup (RTL) */
+[dir="rtl"] .actions-menu-popup::before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    pointer-events: auto;
+    background: transparent;
 }
 
 /* Responsive Design */

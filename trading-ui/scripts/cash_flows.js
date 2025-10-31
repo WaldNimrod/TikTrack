@@ -26,7 +26,7 @@
  * 
  * DATA MANIPULATION (6)
  * - deleteCashFlow() - deleteCashFlow function
- * - updatePageSummaryStats() - updatePageSummaryStats function
+ * - updatePageSummaryStats() - Uses InfoSummarySystem from services/statistics-calculator.js
  * - updateCashFlowsTable() - * Format USD rate
  * - updateCashFlow() - updateCashFlow function
  * - saveCashFlow() - saveCashFlow function

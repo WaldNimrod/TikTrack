@@ -1242,7 +1242,13 @@ class HeaderSystem {
               const statusCell = row.querySelector('td[data-status]');
               if (statusCell) {
                 const rowStatus = statusCell.getAttribute('data-status');
-                shouldShow = shouldShow && this.currentFilters.status.includes(rowStatus);
+                // תרגום סטטוס מאנגלית לעברית כדי להתאים לפילטר
+                const translatedRowStatus = rowStatus && (
+                  window.translateTickerStatus && window.translateTickerStatus(rowStatus) ||
+                  window.translateTradePlanStatus && window.translateTradePlanStatus(rowStatus) ||
+                  rowStatus
+                );
+                shouldShow = shouldShow && this.currentFilters.status.includes(translatedRowStatus);
               }
             }
             
@@ -1255,8 +1261,15 @@ class HeaderSystem {
                 const rowType = typeCell.getAttribute('data-investment-type') || typeCell.getAttribute('data-type');
                 const rowTypeText = typeCell.textContent.trim();
                 
+                // תרגום סוג מאנגלית לעברית כדי להתאים לפילטר
+                const translatedRowType = rowType && (
+                  window.translateTradePlanType && window.translateTradePlanType(rowType) ||
+                  window.translateTradeType && window.translateTradeType(rowType) ||
+                  rowType
+                );
+                
                 // בדיקה גם לפי data attribute וגם לפי טקסט
-                const typeMatches = this.currentFilters.type.includes(rowType) || 
+                const typeMatches = this.currentFilters.type.includes(translatedRowType) || 
                                   this.currentFilters.type.includes(rowTypeText);
                 shouldShow = shouldShow && typeMatches;
               }

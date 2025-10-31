@@ -377,10 +377,16 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.UIBasic',
         description: 'ממשק בסיסי',
         required: true
+      },
+      {
+        file: 'modal-manager-v2.js',
+        globalCheck: 'window.ModalManagerV2',
+        description: 'מנהל מודלים V2',
+        required: true
       }
     ],
-    estimatedSize: '~200KB',
-    initTime: '~120ms'
+    estimatedSize: '~250KB',
+    initTime: '~140ms'
   },
 
   // 4. CRUD PACKAGE - עמודים עם טבלאות

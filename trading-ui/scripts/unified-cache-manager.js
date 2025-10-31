@@ -1781,7 +1781,35 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             errors.push(`Cache Keys: ${error.message}`);
         }
         
-        // 6.5. Clear global preference variables
+        // 6.5. Clear Window Variables (page data objects)
+        try {
+            const windowVars = [
+                'tradePlansData', 'tradePlansLoaded',
+                'trading_accountsData', 'allTradingAccountsData',
+                'trading_accountsLoaded', 'currenciesData', 'currenciesLoaded',
+                'colorPreferencesLoaded', 'alertsData', 'alertsLoaded',
+                'tradesData', 'tradesLoaded', 'tickersData', 'tickersLoaded',
+                'executionsData', 'executionsLoaded', 'notesData', 'notesLoaded',
+                'cashFlowsData', 'cashFlowsLoaded', 'researchData', 'researchLoaded'
+            ];
+            
+            let clearedCount = 0;
+            windowVars.forEach(varName => {
+                if (window.hasOwnProperty(varName)) {
+                    delete window[varName];
+                    clearedCount++;
+                }
+            });
+            
+            if (clearedCount > 0) {
+                clearedLayers.push(`Window Variables (${clearedCount} variables)`);
+                window.Logger.info(`✅ Window variables cleared successfully (${clearedCount} variables)`, { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing window variables:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.6. Clear global preference variables
         try {
             window.__latestPrefs = null;
             window.currentPreferences = null;
@@ -1789,6 +1817,114 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             window.Logger.info('✅ Global preference variables cleared successfully', { page: "unified-cache-manager" });
         } catch (error) {
             window.Logger.warn('⚠️ Error clearing global variables:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.7. Clear Service Caches
+        try {
+            const servicesToClear = [
+                'EntityDetailsAPI', 'entityDetailsAPI', 'ExternalDataService', 
+                'externalDataService', 'YahooFinanceService', 'yahooFinanceService',
+                'TradesAdapter', 'LinterAdapter', 'PerformanceAdapter',
+                'AccountService', 'accountService', 'TickerService', 'tickerService'
+            ];
+            
+            const clearedServices = [];
+            servicesToClear.forEach(serviceName => {
+                const service = window[serviceName];
+                if (service && service.cache && typeof service.cache.clear === 'function') {
+                    service.cache.clear();
+                    clearedServices.push(serviceName);
+                }
+                // Special case: YahooFinanceService has loadingPromises too
+                if ((serviceName === 'YahooFinanceService' || serviceName === 'yahooFinanceService') && 
+                    service?.loadingPromises?.clear) {
+                    service.loadingPromises.clear();
+                }
+            });
+            
+            // Dynamic scan for any remaining cache objects
+            for (const key in window) {
+                if (window[key] && 
+                    typeof window[key] === 'object' && 
+                    window[key].cache instanceof Map) {
+                    window[key].cache.clear();
+                    if (!clearedServices.includes(key)) {
+                        clearedServices.push(key);
+                    }
+                }
+            }
+            
+            if (clearedServices.length > 0) {
+                clearedLayers.push(`Service Caches (${clearedServices.length} services)`);
+                window.Logger.info(`✅ Service caches cleared: ${clearedServices.join(', ')}`, { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing service caches:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.8. Clear Preferences Cache Objects
+        try {
+            const preferencesObjects = [
+                'PreferenceValidator', 'PreferencesUI', 
+                'PreferencesLazyLoader', 'PreferencesColors', 'PreferencesCore'
+            ];
+            
+            const clearedObjects = [];
+            preferencesObjects.forEach(objName => {
+                const obj = window[objName];
+                if (obj) {
+                    // Clear all Map and Set properties
+                    Object.keys(obj).forEach(key => {
+                        try {
+                            const value = obj[key];
+                            if (value instanceof Map || value instanceof Set) {
+                                value.clear();
+                                clearedObjects.push(`${objName}.${key}`);
+                            }
+                        } catch (e) {
+                            // Skip if property is not accessible
+                        }
+                    });
+                }
+            });
+            
+            // Also check PreferencesCore instance
+            if (window.PreferencesCore) {
+                ['existenceCache', 'validators', 'timestamps', 'constraints'].forEach(prop => {
+                    if (window.PreferencesCore.validationManager && 
+                        window.PreferencesCore.validationManager[prop]?.clear) {
+                        window.PreferencesCore.validationManager[prop].clear();
+                        clearedObjects.push(`PreferencesCore.validationManager.${prop}`);
+                    }
+                });
+            }
+            
+            if (clearedObjects.length > 0) {
+                clearedLayers.push(`Preferences Cache Objects (${clearedObjects.length} objects)`);
+                window.Logger.info(`✅ Preferences cache objects cleared: ${clearedObjects.length} objects`, { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing preferences cache objects:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.9. Clear CSS Management Cache
+        try {
+            let cssCleared = false;
+            if (typeof mergedDuplicates !== 'undefined' && mergedDuplicates?.clear) {
+                mergedDuplicates.clear();
+                cssCleared = true;
+            }
+            if (typeof removedDuplicates !== 'undefined' && removedDuplicates?.clear) {
+                removedDuplicates.clear();
+                cssCleared = true;
+            }
+            
+            if (cssCleared) {
+                clearedLayers.push('CSS Management Cache');
+                window.Logger.info('✅ CSS Management cache cleared successfully', { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing CSS management cache:', error, { page: "unified-cache-manager" });
         }
         
         // 7. Garbage Collection

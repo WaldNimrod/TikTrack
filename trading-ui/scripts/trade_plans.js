@@ -2416,12 +2416,46 @@ function initializeTradePlanConditionsSystem() {
   }
 }
 
+/**
+ * Setup sortable headers for trade plans table
+ * Uses global setupSortableHeaders function from page-utils.js
+ */
+function setupSortableHeadersLocal() {
+  try {
+    if (typeof window.setupSortableHeaders === 'function') {
+      window.setupSortableHeaders('trade_plans');
+      window.Logger?.debug('Sortable headers setup completed for trade plans', { page: "trade_plans" });
+    } else {
+      window.Logger?.warn('Global setupSortableHeaders not available', { page: "trade_plans" });
+    }
+  } catch (error) {
+    window.Logger?.error('Error setting up sortable headers:', error, { page: "trade_plans" });
+  }
+}
+
 window.addEditReminder = addEditReminder;
 window.updatePageSummaryStats = updatePageSummaryStats;
 window.restoreSortState = restoreSortState;
 window.initializeTradePlanConditionsSystem = initializeTradePlanConditionsSystem;
 window.setupPriceCalculation = setupPriceCalculation;
 window.setupEditPriceCalculation = setupEditPriceCalculation;
+/**
+ * Restore planning section state for trade plans
+ * Uses global restoreAllSectionStates function from ui-utils.js
+ */
+function restorePlanningSectionState() {
+  try {
+    if (typeof window.restoreAllSectionStates === 'function') {
+      window.restoreAllSectionStates('trade_plans');
+      window.Logger?.debug('Planning section state restored for trade plans', { page: "trade_plans" });
+    } else {
+      window.Logger?.warn('Global restoreAllSectionStates not available', { page: "trade_plans" });
+    }
+  } catch (error) {
+    window.Logger?.error('Error restoring planning section state:', error, { page: "trade_plans" });
+  }
+}
+
 window.setupSortableHeadersLocal = setupSortableHeadersLocal;
 window.toggleSection = toggleSection;
 window.restorePlanningSectionState = restorePlanningSectionState;

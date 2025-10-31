@@ -177,6 +177,7 @@
 
 // ===== PAGE CONFIGURATIONS =====
 
+if (typeof window.PAGE_CONFIGS === 'undefined') {
 const PAGE_CONFIGS = {
     // Main Pages
     'index': {
@@ -703,11 +704,15 @@ const PAGE_CONFIGS = {
         // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
         // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
         // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'modules': מודולים כלליים (modal-manager-v2, business-module, etc.)
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'validation': מערכות ולידציה
+        // - 'entity-services': שירותי ישויות (account-service, ticker-service, etc.)
+        // - 'entity-details': מערכות פרטי ישות
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -722,9 +727,26 @@ const PAGE_CONFIGS = {
         customInitializers: [
             async (pageConfig) => {
                 window.Logger.info('📝 Initializing Notes...', { page: "page-initialization-configs" });
+                window.Logger.info('🔍 Checking loadNotesData availability:', typeof window.loadNotesData, { page: "page-initialization-configs" });
+                
+                // Deferred initialization with retries
+                let retries = 10;
+                while (retries > 0 && typeof window.loadNotesData !== 'function') {
+                    window.Logger.info(`⏳ Waiting for loadNotesData... (${retries} retries left)`, { page: "page-initialization-configs" });
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    retries--;
+                }
                 
                 if (typeof window.loadNotesData === 'function') {
-                    await window.loadNotesData();
+                    window.Logger.info('✅ loadNotesData found, calling...', { page: "page-initialization-configs" });
+                    try {
+                        await window.loadNotesData();
+                        window.Logger.info('✅ loadNotesData completed', { page: "page-initialization-configs" });
+                    } catch (error) {
+                        window.Logger.error('❌ Error in loadNotesData:', error, { page: "page-initialization-configs" });
+                    }
+                } else {
+                    window.Logger.warn('⚠️ loadNotesData not available after retries', { page: "page-initialization-configs" });
                 }
             }
         ]
@@ -1690,4 +1712,10 @@ Object.assign(PAGE_CONFIGS, ADDITIONAL_PAGE_CONFIGS);
 
 window.PAGE_CONFIGS = PAGE_CONFIGS;
 window.pageInitializationConfigs = PAGE_CONFIGS;
+} else {
+  // אם PAGE_CONFIGS כבר הוגדר, נמזג רק את הקונפיגים החדשים
+  if (typeof PAGE_CONFIGS !== 'undefined') {
+    Object.assign(window.PAGE_CONFIGS, PAGE_CONFIGS);
+  }
+}
 

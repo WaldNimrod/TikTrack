@@ -2097,18 +2097,20 @@ window.closeModal = function (modalId) {
  *
  * @returns {Array} Array of default column definitions
  */
-const getDefaultColumnDefs = () => [
-  { field: 'id', headerName: 'ID', width: 80, sortable: true },
-  { field: 'name', headerName: 'Name', width: 200, sortable: true },
-  { field: 'status', headerName: 'Status', width: 120, sortable: true },
-  { field: 'created_at', headerName: 'Created', width: 150, sortable: true },
-  { field: 'updated_at', headerName: 'Updated', width: 150, sortable: true },
-];
+if (typeof window.getDefaultColumnDefs === 'undefined') {
+  const getDefaultColumnDefs = () => [
+    { field: 'id', headerName: 'ID', width: 80, sortable: true },
+    { field: 'name', headerName: 'Name', width: 200, sortable: true },
+    { field: 'status', headerName: 'Status', width: 120, sortable: true },
+    { field: 'created_at', headerName: 'Created', width: 150, sortable: true },
+    { field: 'updated_at', headerName: 'Updated', width: 150, sortable: true },
+  ];
 
-/**
- * Export default column definitions to global scope
- */
-window.getDefaultColumnDefs = getDefaultColumnDefs;
+  /**
+   * Export default column definitions to global scope
+   */
+  window.getDefaultColumnDefs = getDefaultColumnDefs;
+}
 
 // ייצוא המודול עצמו
 window.tables = {

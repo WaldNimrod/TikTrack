@@ -647,10 +647,10 @@ function updateAlertsTable(alerts) {
         fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
       ]);
 
-      accounts = (accountsResponse.data || accountsResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-      trades = (tradesResponse.data || tradesResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-      tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-      tickers = (tickersResponse.data || tickersResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
+      accounts = (accountsResponse.data || accountsResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+      trades = (tradesResponse.data || tradesResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+      tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+      tickers = (tickersResponse.data || tickersResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
     } catch {
       // // window.Logger.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error, { page: "alerts" });
       // המשך עם מערכים ריקים
@@ -797,31 +797,17 @@ function updateAlertsTable(alerts) {
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
-            ${window.createActionsMenu ? window.createActionsMenu([
-              { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
-              { type: 'LINK', onclick: `viewLinkedItemsForAlert(${alert.id})`, title: 'צפה בפריטים מקושרים' },
-              { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
-              { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
-              { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
-            ]) : `
-            <div class="btn-group btn-group-sm actions-btn-group" role="group">
-              <button class="btn btn-sm" onclick="window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })" title="צפה בפרטי התראה">
-                👁️
-              </button>
-              <button class="btn btn-sm" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה בפריטים מקושרים">
-                🔗
-              </button>
-              <button class="btn btn-sm" onclick="editAlert(${alert.id})" title="ערוך התראה">
-                ✏️
-              </button>
-              <button class="btn btn-sm" onclick="window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})" title="${alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}">
-                ${alert.status === 'cancelled' ? '🔄' : '⏸️'}
-              </button>
-              <button class="btn btn-sm" onclick="deleteAlert(${alert.id})" title="מחק התראה">
-                🗑️
-              </button>
-            </div>
-            `}
+            ${(() => {
+              if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+              const result = window.createActionsMenu([
+                { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
+                { type: 'LINK', onclick: `viewLinkedItemsForAlert(${alert.id})`, title: 'צפה בפריטים מקושרים' },
+                { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
+                { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
+                { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
+              ]);
+              return result || '';
+            })()}
           </td>
         </tr>
       `;

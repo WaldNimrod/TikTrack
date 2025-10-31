@@ -1590,10 +1590,23 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
 
   switch (item.related_type_id) {
     case 1: { // חשבון מסחר
-      const account = accounts.find(a => a.id === item.related_id);
+      // לוגים לבדיקת חיפוש החשבון
+      if (window.Logger && window.Logger.info) {
+        window.Logger.info('🔍 חיפוש חשבון:', {
+          related_id: item.related_id,
+          accountsCount: accounts.length,
+          accountsIds: accounts.map(a => a?.id).slice(0, 5) // רק 5 ראשונים ללוג
+        }, { page: "linked-items" });
+      }
+      
+      const account = accounts.find(a => a && a.id === item.related_id);
       if (account) {
         const name = account.name || account.account_name || 'לא מוגדר';
-        const currency = account.currency || 'ILS';
+        const currency = account.currency_symbol || account.currency || 'ILS';
+        
+        if (window.Logger && window.Logger.info) {
+          window.Logger.info('✅ חשבון נמצא:', { name, currency, id: account.id }, { page: "linked-items" });
+        }
         
         if (format === 'minimal') {
           relatedDisplay = name;
@@ -1603,6 +1616,12 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
           relatedDisplay = `${name} (${currency})`;
         }
       } else {
+        if (window.Logger && window.Logger.warn) {
+          window.Logger.warn('⚠️ חשבון לא נמצא:', {
+            related_id: item.related_id,
+            accountsCount: accounts.length
+          }, { page: "linked-items" });
+        }
         relatedDisplay = `חשבון מסחר ${item.related_id}`;
       }
       relatedIcon = '🏦';
@@ -1619,12 +1638,21 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
         const side = trade.side || 'לא מוגדר';
         const investmentType = trade.investment_type || 'לא מוגדר';
         
+        // קבלת הטיקר מהטרייד
+        let tickerSymbol = '-';
+        if (trade.ticker_id) {
+          const ticker = tickers.find(t => t.id === trade.ticker_id);
+          if (ticker) {
+            tickerSymbol = ticker.symbol || '-';
+          }
+        }
+        
         if (format === 'minimal') {
           relatedDisplay = `טרייד ${item.related_id}`;
         } else if (format === 'simple') {
-          relatedDisplay = `טרייד | ${side} | ${formattedDate}`;
+          relatedDisplay = `טרייד | ${tickerSymbol} | ${side} | ${formattedDate}`;
         } else {
-          relatedDisplay = `טרייד | ${side} | ${investmentType} | ${formattedDate}`;
+          relatedDisplay = `טרייד | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
         }
       } else {
         relatedDisplay = `טרייד ${item.related_id}`;
@@ -1643,12 +1671,21 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
         const side = plan.side || 'לא מוגדר';
         const investmentType = plan.investment_type || 'לא מוגדר';
         
+        // קבלת הטיקר מהתוכנית
+        let tickerSymbol = '-';
+        if (plan.ticker_id) {
+          const ticker = tickers.find(t => t.id === plan.ticker_id);
+          if (ticker) {
+            tickerSymbol = ticker.symbol || '-';
+          }
+        }
+        
         if (format === 'minimal') {
           relatedDisplay = `תוכנית ${item.related_id}`;
         } else if (format === 'simple') {
-          relatedDisplay = `תוכנית | ${side} | ${formattedDate}`;
+          relatedDisplay = `תוכנית | ${tickerSymbol} | ${side} | ${formattedDate}`;
         } else {
-          relatedDisplay = `תוכנית | ${side} | ${investmentType} | ${formattedDate}`;
+          relatedDisplay = `תוכנית | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
         }
       } else {
         relatedDisplay = `תוכנית ${item.related_id}`;

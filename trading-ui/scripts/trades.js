@@ -1004,27 +1004,44 @@ async function performTradeCancellation(tradeId) {
  */
 async function deleteTradeRecord(tradeId) {
   try {
-    // בדיקה אם יש פריטים מקושרים לפני מחיקה
-    if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
-      const hasLinkedItems = await window.checkLinkedItemsBeforeDelete(tradeId);
+    // Get trade details for confirmation message
+    let tradeDetails = `עסקה #${tradeId}`;
+    const trade = window.tradesData?.find(t => t.id === tradeId || t.id === parseInt(tradeId));
+    
+    if (trade) {
+      // Build detailed trade info
+      const ticker = trade.ticker_symbol || trade.symbol || 'לא מוגדר';
+      const sideText = trade.side === 'buy' ? 'קנייה' : 
+                     trade.side === 'sell' ? 'מכירה' : trade.side || 'לא מוגדר';
+      const quantity = trade.quantity || '0';
+      const entryPrice = trade.entry_price ? `$${trade.entry_price}` : 'לא מוגדר';
+      const date = trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      
+      tradeDetails = `${ticker} - ${sideText}, ${quantity} יחידות ב-${entryPrice}, תאריך פתיחה: ${date}`;
+    }
+    
+    // Check linked items first (Executions, Notes, Alerts)
+    if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+      const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade', tradeId, 'delete');
       if (hasLinkedItems) {
-        return; // הפונקציה תטפל בהצגת המודול
+        window.Logger.info('Trade has linked items, deletion cancelled', { tradeId, page: 'trades' });
+        return;
       }
     }
 
-    // אישור מהמשתמש באמצעות המערכת הגלובלית
+    // Show delete warning with detailed information
     if (typeof window.showDeleteWarning === 'function') {
-      window.showDeleteWarning('trade', tradeId, 'טרייד',
+      window.showDeleteWarning('trade', tradeDetails, 'עסקה',
         async () => {
-          // המשתמש אישר - ביצוע המחיקה
+          // User confirmed - perform deletion
           await performTradeDeletion(tradeId);
         },
         () => {
-          // המשתמש ביטל - לא עושים כלום
+          // User cancelled - do nothing
         },
       );
     } else {
-      // Fallback למקרה שהמערכת הגלובלית לא זמינה
+      // Fallback in case global system not available
       if (typeof window.showConfirmationDialog === 'function') {
         const confirmed = await new Promise(resolve => {
           window.showConfirmationDialog(
@@ -3215,55 +3232,10 @@ async function saveTrade() {
 }
 
 /**
- * מחיקת טרייד
- * Includes linked items check
+ * מחיקת טרייד - alias ל-deleteTradeRecord
  */
 async function deleteTrade(tradeId) {
-    window.Logger.debug('deleteTrade called', { tradeId, page: 'trades' });
-    
-    try {
-        // Check linked items first
-        if (window.checkLinkedItemsBeforeAction) {
-            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade', tradeId, 'delete');
-            if (hasLinkedItems) {
-                window.Logger.info('Trade has linked items, deletion cancelled', { tradeId, page: 'trades' });
-                return;
-            }
-        }
-        
-        // Confirm deletion
-        if (!confirm('האם אתה בטוח שברצונך למחוק את הטרייד?')) {
-            return;
-        }
-        
-        // Send delete request
-        const response = await fetch(`/api/trades/${tradeId}`, {
-            method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        // Handle success
-        if (window.showNotification) {
-            window.showNotification('טרייד נמחק בהצלחה', 'success', 'business');
-        }
-        
-        // Refresh data
-        if (window.loadTradesData) {
-            window.loadTradesData();
-        }
-        
-        window.Logger.info('Trade deleted successfully', { tradeId, page: 'trades' });
-        
-    } catch (error) {
-        window.Logger.error('Error deleting trade', { error: error.message, tradeId, page: 'trades' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה במחיקת הטרייד', 'error', 'system');
-        }
-    }
+    return await deleteTradeRecord(tradeId);
 }
 
 // Export functions to window for global access
@@ -3271,4 +3243,5 @@ window.showAddTradeModal = showAddTradeModal;
 window.showEditTradeModal = showEditTradeModal;
 window.saveTrade = saveTrade;
 window.deleteTrade = deleteTrade;
+window.performTradeDeletion = performTradeDeletion;
 

@@ -338,7 +338,10 @@ class PreferencesService:
                     logger.debug(f"Using default value for {preference_name}: {value}")
                     return value
                 else:
-                    raise ValueError(f"Preference not found: {preference_name}")
+                    # Preference type not found in database
+                    logger.warning(f"Preference type '{preference_name}' not found in preference_types table")
+                    # Return None instead of raising exception - let API handle it
+                    return None
             
             # Regular profile - query user_preferences
             cursor.execute('''
@@ -398,7 +401,10 @@ class PreferencesService:
                     logger.debug(f"Using default value for {preference_name}: {value}")
                     return value
                 else:
-                    raise ValueError(f"Preference not found: {preference_name}")
+                    # Preference type not found in database
+                    logger.warning(f"Preference type '{preference_name}' not found in preference_types table")
+                    # Return None instead of raising exception - let API handle it
+                    return None
             
         except Exception as e:
             logger.error(f"Error getting preference {preference_name} for user {user_id}: {e}")

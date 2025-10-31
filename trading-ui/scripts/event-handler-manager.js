@@ -29,12 +29,17 @@ class EventHandlerManager {
      * @function init
      */
     init() {
-        if (this.initialized) return;
+        if (this.initialized) {
+            console.log('⚠️ [EventHandlerManager] Already initialized, skipping');
+            return;
+        }
         
+        console.log('🔧 [EventHandlerManager] init() called, setting up delegation');
         // Set up global event delegation
         this.setupGlobalDelegation();
         this.initialized = true;
         
+        console.log('✅ [EventHandlerManager] Initialized successfully, listener attached');
         if (window.Logger) {
             window.Logger.info('EventHandlerManager initialized successfully');
         }
@@ -46,10 +51,16 @@ class EventHandlerManager {
      * @private
      */
     setupGlobalDelegation() {
+        console.log('🔧 [EventHandlerManager] Setting up global delegation');
         // Click events delegation
         document.addEventListener('click', (event) => {
+            console.log('🔍 [EventHandlerManager] Document click event detected:', {
+                target: event.target,
+                tagName: event.target?.tagName,
+                className: event.target?.className
+            });
             this.handleDelegatedClick(event);
-        });
+        }, true); // Use capture phase to catch events early
 
         // Change events delegation
         document.addEventListener('change', (event) => {
@@ -76,28 +87,56 @@ class EventHandlerManager {
     handleDelegatedClick(event) {
         // Prevent double handling in bubbling chain
         if (event._ehmHandled) {
+            console.log('🔄 [EventHandlerManager] Event already handled, skipping');
             return;
         }
         const target = event.target;
+        console.log('🔧 [EventHandlerManager] Click detected on:', {
+            tagName: target.tagName,
+            className: target.className,
+            id: target.id,
+            text: target.textContent?.substring(0, 50),
+            hasDataOnclick: target.hasAttribute('data-onclick'),
+            dataOnclick: target.getAttribute('data-onclick')
+        });
         
         // Handle buttons with data-onclick attribute (centralized button system)
         // This is the primary way to handle button clicks in TikTrack
         // Based on documentation: documentation/frontend/button-system.md
         const buttonWithOnclick = target.closest('button[data-onclick]');
+        console.log('🔍 [EventHandlerManager] Closest button with data-onclick:', {
+            found: !!buttonWithOnclick,
+            element: buttonWithOnclick,
+            onclick: buttonWithOnclick?.getAttribute('data-onclick'),
+            disabled: buttonWithOnclick?.disabled,
+            hasDisabledAttr: buttonWithOnclick?.hasAttribute('disabled'),
+            className: buttonWithOnclick?.className
+        });
+        
         if (buttonWithOnclick) {
             // Don't process if button is disabled
             if (buttonWithOnclick.disabled || buttonWithOnclick.hasAttribute('disabled')) {
+                console.warn('⚠️ [EventHandlerManager] Button is disabled, skipping');
                 return;
             }
             
             const onclickValue = buttonWithOnclick.getAttribute('data-onclick');
+            console.log('✅ [EventHandlerManager] Found onclick value:', onclickValue);
+            
             if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
+                console.log('🚀 [EventHandlerManager] Executing onclick:', onclickValue);
                 try {
                     // Execute the onclick handler using eval (safe because it's controlled)
                     // Note: Following documentation spec - no preventDefault/stopPropagation
                     // to allow Bootstrap modals and other standard behaviors to work
                     eval(onclickValue);
+                    console.log('✅ [EventHandlerManager] onclick executed successfully');
                 } catch (error) {
+                    console.error('❌ [EventHandlerManager] Error executing data-onclick:', {
+                        onclickValue: onclickValue,
+                        error: error.message,
+                        stack: error.stack
+                    });
                     if (window.Logger) {
                         window.Logger.error('EventHandlerManager: Error executing data-onclick', {
                             onclickValue: onclickValue,
@@ -110,11 +149,17 @@ class EventHandlerManager {
                 }
                 // Mark event as handled to avoid duplicate toggles from fallback handlers
                 event._ehmHandled = true;
-                if (typeof event.stopImmediatePropagation === 'function') {
-                    event.stopImmediatePropagation();
+                // Don't stop propagation - let other systems work normally
+                // Only prevent default if it's a form submit or link click
+                if (event.target.tagName === 'BUTTON' && event.target.type === 'submit') {
+                    event.preventDefault();
                 }
                 return;
+            } else {
+                console.warn('⚠️ [EventHandlerManager] onclick value is empty or null:', onclickValue);
             }
+        } else {
+            console.log('ℹ️ [EventHandlerManager] No button with data-onclick found, checking other handlers...');
         }
         
         // Handle TOGGLE buttons without data-onclick (auto-wire to nearest section)

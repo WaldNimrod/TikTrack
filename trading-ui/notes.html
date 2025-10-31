@@ -89,14 +89,14 @@
                             <table class="table" id="notesTable" data-table-type="notes">
                                 <thead>
                                     <tr>
+                                        <th class="col-linked-object">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredNotesData || window.notesData, 'notes', updateNotesTable); }">קשור ל: <span class="sort-icon">↕</span></button>
+                                        </th>
                                         <th class="col-symbol">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }">סימבול <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredNotesData || window.notesData, 'notes', updateNotesTable); }">סימבול <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-content">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }">תוכן <span class="sort-icon">↕</span></button>
-                                        </th>
-                                        <th class="col-related">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }">אובייקט מקושר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredNotesData || window.notesData, 'notes', updateNotesTable); }">תוכן <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-created">
                                             <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">נוצר ב <span class="sort-icon">↕</span></button>
@@ -176,6 +176,23 @@
     <script src="scripts/pagination-system.js?v=46bd8173_20251031_164748"></script> <!-- מערכת עמודים -->
     <script src="scripts/modules/actions-menu-system.js?v=46bd8173_20251031_164748"></script> <!-- מערכת תפריט פעולות -->
 
+    <!-- ===== MODULES PACKAGE (loadOrder: 3.5) ===== -->
+    <!-- מודולים כלליים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+    <script src="scripts/modules/business-module.js?v=46bd8173_20251031_164748"></script> <!-- מודול עסקי -->
+    <!-- cache-module.js not loaded - exists only as .backup -->
+    <script src="scripts/modules/communication-module.js?v=46bd8173_20251031_164748"></script> <!-- מודול תקשורת -->
+    <script src="scripts/modules/core-systems.js?v=46bd8173_20251031_164748"></script> <!-- מערכות ליבה -->
+    <script src="scripts/modules/data-advanced.js?v=46bd8173_20251031_164748"></script> <!-- נתונים מתקדמים -->
+    <script src="scripts/modules/data-basic.js?v=46bd8173_20251031_164748"></script> <!-- נתונים בסיסיים -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=46bd8173_20251031_164748"></script> <!-- תצורת טעינה דינמית -->
+    <script src="scripts/modules/localstorage-sync.js?v=46bd8173_20251031_164748"></script> <!-- סנכרון localStorage -->
+    <!-- polling-manager.js not loaded - exists only as .backup -->
+    <script src="scripts/modules/ui-advanced.js?v=46bd8173_20251031_164748"></script> <!-- ממשק מתקדם -->
+    <script src="scripts/modules/ui-basic.js?v=46bd8173_20251031_164748"></script> <!-- ממשק בסיסי -->
+    <script src="scripts/modal-manager-v2.js?v=46bd8173_20251031_164748"></script> <!-- מנהל מודלים V2 -->
+
     <!-- ===== CRUD PACKAGE (loadOrder: 4) ===== -->
     <!-- מערכות לניהול נתונים וטבלאות -->
     <!-- Dependencies: base, services -->
@@ -194,6 +211,26 @@
     <script src="scripts/preferences-validation.js?v=46bd8173_20251031_164748"></script> <!-- validation -->
     <script src="scripts/preferences-ui.js?v=46bd8173_20251031_164748"></script> <!-- ממשק משתמש -->
 
+    <!-- ===== VALIDATION PACKAGE (loadOrder: 6) ===== -->
+    <!-- מערכות ולידציה -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+    <script src="scripts/validation-utils.js?v=46bd8173_20251031_164748"></script> <!-- כלי ולידציה -->
+
+    <!-- ===== ENTITY SERVICES PACKAGE (loadOrder: 10) ===== -->
+    <!-- שירותי ישויות -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+    <script src="scripts/account-service.js?v=46bd8173_20251031_164748"></script> <!-- שירות חשבונות -->
+    <script src="scripts/alert-service.js?v=46bd8173_20251031_164748"></script> <!-- שירות התראות -->
+    <script src="scripts/ticker-service.js?v=46bd8173_20251031_164748"></script> <!-- שירות טיקרים -->
+    <script src="scripts/trade-plan-service.js?v=46bd8173_20251031_164748"></script> <!-- שירות תכניות מסחר -->
+    <script src="scripts/active-alerts-component.js?v=46bd8173_20251031_164748"></script> <!-- רכיב התראות פעילות -->
+    <script src="scripts/condition-translator.js?v=46bd8173_20251031_164748"></script> <!-- מתרגם תנאים -->
+    <script src="scripts/constraints.js?v=46bd8173_20251031_164748"></script> <!-- מערכת אילוצים -->
+    <script src="scripts/linked-items.js?v=46bd8173_20251031_164748"></script> <!-- פריטים מקושרים -->
+    <script src="scripts/related-object-filters.js?v=46bd8173_20251031_164748"></script> <!-- פילטרים של אובייקטים קשורים -->
+
     <!-- ===== ENTITY DETAILS SYSTEMS (Depend on Header) ===== -->
     <script src="scripts/entity-details-api.js?v=46bd8173_20251031_164748"></script>
     <script src="scripts/entity-details-renderer.js?v=46bd8173_20251031_164748"></script>
@@ -207,26 +244,21 @@
     <script src="scripts/page-initialization-configs.js?v=46bd8173_20251031_164748"></script> <!-- קונפיגורציות עמודים -->
     <script src="scripts/unified-app-initializer.js?v=46bd8173_20251031_164748"></script> <!-- אתחול מאוחד -->
     
-    <!-- Modal System V2 -->
-    <script src="scripts/modal-manager-v2.js?v=46bd8173_20251031_164748"></script>
+    <!-- Modal Config (Loaded after ModalManagerV2 from MODULES package) -->
     <script src="scripts/modal-configs/notes-config.js?v=46bd8173_20251031_164748"></script>
     
     <!-- Page-specific Scripts -->
     <script src="scripts/notes.js?v=46bd8173_20251031_164748"></script>
-    
-    <!-- 14. Init System Check (Available on all pages) -->
-    <script src="scripts/init-system-check.js?v=46bd8173_20251031_164748"></script>
-    
-    <!-- 15. Monitoring Functions (Required for page checks) -->
-    <script src="scripts/monitoring-functions.js?v=46bd8173_20251031_164748"></script>
     
     <!-- ===== INFO SUMMARY SYSTEM ===== -->
     <!-- מערכת סיכום נתונים מאוחדת -->
     <script src="scripts/info-summary-system.js?v=46bd8173_20251031_164748"></script>
     <script src="scripts/info-summary-configs.js?v=46bd8173_20251031_164748"></script>
     
-    <!-- Page-specific functions are now handled by the unified initialization system -->
+    <!-- 14. Init System Check (Available on all pages) -->
+    <script src="scripts/init-system-check.js?v=46bd8173_20251031_164748"></script>
     
-    <!-- Page-specific functions are now handled by the unified initialization system -->
+    <!-- 15. Monitoring Functions (Required for page checks) -->
+    <script src="scripts/monitoring-functions.js?v=46bd8173_20251031_164748"></script>
 </body>
 </html>

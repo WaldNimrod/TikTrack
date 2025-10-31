@@ -578,7 +578,8 @@ function validateEditCashFlowForm() {
  */
 async function deleteCashFlow(id) {
   try {
-    // מציאת התזרים
+    // Get cash flow details for confirmation message
+    let cashFlowDetails = `תזרים מזומנים #${id}`;
     const cashFlow = window.cashFlowsData ? window.cashFlowsData.find(cf => cf.id === id) : null;
     
     if (!cashFlow) {
@@ -586,34 +587,45 @@ async function deleteCashFlow(id) {
       return;
     }
 
-    // הצגת חלון אישור מפורט
-    const confirmMessage = `האם אתה בטוח שברצונך למחוק את תזרים המזומנים הבא?
+    // Build detailed cash flow info
+    const accountName = getAccountNameById(cashFlow.trading_account_id) || 'לא מוגדר';
+    const type = getCashFlowTypeText(cashFlow.type);
+    const amount = cashFlow.amount;
+    const currency = cashFlow.currency_symbol || '';
+    const date = formatDate(cashFlow.date);
+    const description = cashFlow.description || 'ללא תיאור';
+    
+    cashFlowDetails = `${accountName} - ${type}, ${amount}${currency}, תאריך: ${date}, תיאור: ${description}`;
 
-חשבון מסחר: ${getAccountNameById(cashFlow.trading_account_id) || 'לא מוגדר'}
-סוג: ${getCashFlowTypeText(cashFlow.type)}
-סכום: ${cashFlow.amount} ${cashFlow.currency_symbol || ''}
-תאריך: ${formatDate(cashFlow.date)}
-תיאור: ${cashFlow.description || 'ללא תיאור'}
-
-⚠️  פעולה זו אינה הפיכה!`;
-
-    // אישור מהמשתמש
-    if (typeof window.showConfirmationDialog === 'function') {
-      const confirmed = await new Promise(resolve => {
-        window.showConfirmationDialog(
-          'מחיקת תזרים מזומנים',
-          confirmMessage,
-          () => resolve(true),
-          () => resolve(false)
-        );
-      });
-      
-      if (!confirmed) return;
+    // Show delete warning with detailed information
+    if (window.showDeleteWarning) {
+      window.showDeleteWarning('cash_flow', cashFlowDetails, 'תזרים מזומנים',
+        async () => await performCashFlowDeletion(id),
+        () => {}
+      );
     } else {
-      // Fallback למקרה שמערכת התראות לא זמינה
-      if (!window.confirm(confirmMessage)) return;
+      // Fallback to simple confirm
+      if (!confirm('האם אתה בטוח שברצונך למחוק את תזרים המזומנים?')) {
+        return;
+      }
+      await performCashFlowDeletion(id);
     }
+    
+  } catch (error) {
+    console.error('❌ deleteCashFlow: Error occurred:', error);
+    CRUDResponseHandler.handleError(error, 'מחיקת תזרים מזומנים');
+  }
+}
 
+/**
+ * Perform cash flow deletion
+ * @function performCashFlowDeletion
+ * @async
+ * @param {number} id - Cash flow ID
+ * @returns {Promise<void>}
+ */
+async function performCashFlowDeletion(id) {
+  try {
     // שליחת בקשת מחיקה
     const response = await fetch(`/api/cash_flows/${id}`, {
       method: 'DELETE',
@@ -622,13 +634,12 @@ async function deleteCashFlow(id) {
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'תזרים המזומנים נמחק בהצלחה!',
-      apiUrl: '/api/cash_flows/',
       entityName: 'תזרים מזומנים',
       reloadFn: window.loadCashFlowsData,
       requiresHardReload: false
     });
   } catch (error) {
-    console.error('❌ deleteCashFlow: Error occurred:', error);
+    console.error('❌ performCashFlowDeletion: Error occurred:', error);
     CRUDResponseHandler.handleError(error, 'מחיקת תזרים מזומנים');
   }
 }
@@ -830,22 +841,16 @@ async function renderCashFlowsTable() {
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
             <td class="col-actions actions-cell actions-4-items">
-              ${window.createActionsMenu ? window.createActionsMenu([
-                { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, text: 'פרטים', title: 'הצג פרטי תזרים' },
-                { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, text: 'פריטים מקושרים', title: 'צפה בפריטים מקושרים' },
-                { type: 'EDIT', onclick: `showEditCashFlowModal(${cashFlow.id})`, text: 'ערוך', title: 'ערוך תזרים' },
-                { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, text: 'מחק', title: 'מחק תזרים' }
-              ]) : `
-              <div class="actions-menu-wrapper">
-                <button class="btn actions-trigger" title="פעולות">⚙️</button>
-                <div class="actions-menu-popup">
-                  <button class="btn" data-variant="small" data-button-type="VIEW" data-onclick="showCashFlowDetails(${cashFlow.id})" title="הצג פרטי תזרים">👁️</button>
-                  <button class="btn" data-variant="small" data-button-type="LINK" data-onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})" title="צפה בפריטים מקושרים">🔗</button>
-                  <button class="btn" data-variant="small" data-button-type="EDIT" data-onclick="showEditCashFlowModal(${cashFlow.id})" title="ערוך תזרים">✏️</button>
-                  <button class="btn" data-variant="small" data-button-type="DELETE" data-onclick="deleteCashFlow(${cashFlow.id})" title="מחק תזרים">🗑️</button>
-                </div>
-              </div>
-              `}
+              ${(() => {
+                if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                const result = window.createActionsMenu([
+                  { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, title: 'הצג פרטי תזרים' },
+                  { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, title: 'צפה בפריטים מקושרים' },
+                  { type: 'EDIT', onclick: `showEditCashFlowModal(${cashFlow.id})`, title: 'ערוך תזרים' },
+                  { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, title: 'מחק תזרים' }
+                ]);
+                return result || '';
+              })()}
             </td>
         `;
     tbody.appendChild(row);
@@ -1763,6 +1768,7 @@ window.manageExternalIdField = manageExternalIdField;
 window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.deleteCashFlow = deleteCashFlow;
+window.performCashFlowDeletion = performCashFlowDeletion;
 window.showAddCashFlowModal = showAddCashFlowModal;
 window.showEditCashFlowModal = showEditCashFlowModal;
 // window.toggleSection removed - using global version from ui-utils.js

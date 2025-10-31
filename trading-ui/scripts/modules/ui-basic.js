@@ -888,7 +888,7 @@ window.toggleSection = async function (sectionId) {
               const otherSectionId = otherSection.getAttribute('data-section') || otherSection.id;
               if (otherSectionId) {
                 const otherStorageKey = `${pageName}_${otherSectionId}_SectionHidden`;
-                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
                   window.UnifiedCacheManager.save(otherStorageKey, true, {
                     layer: 'localStorage',
                     ttl: null,
@@ -919,7 +919,7 @@ window.toggleSection = async function (sectionId) {
     const isHidden = sectionBody.style.display === 'none';
     const storageKey = `${pageName}_${sectionId}_SectionHidden`;
     
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         await window.UnifiedCacheManager.save(storageKey, isHidden, {
             layer: 'localStorage',
             ttl: null, // persistent
@@ -997,7 +997,7 @@ window.restoreAllSectionStates = async function () {
       let isHidden = false;
       let cachedState = null;
       
-      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         cachedState = await window.UnifiedCacheManager.get(storageKey);
         isHidden = cachedState === true;
         console.log(`💾 Retrieved state from Unified Cache for "${sectionId}" on page "${pageName}": hidden=${isHidden}`);
@@ -1113,7 +1113,7 @@ window.restoreSectionStates = async function () {
   
   let topSectionHidden = false;
   
-  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+  if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
     const cachedState = await window.UnifiedCacheManager.get(`${pageName}_top-section_collapsed`);
     topSectionHidden = cachedState === true;
     console.log(`💾 Retrieved top section state from Unified Cache for page "${pageName}": collapsed=${topSectionHidden}`);
@@ -1151,7 +1151,7 @@ window.restoreSectionStates = async function () {
     if (sectionId) {
       let sectionHidden = false;
       
-      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         const cachedState = await window.UnifiedCacheManager.get(`${pageName}_${sectionId}_SectionHidden`);
         sectionHidden = cachedState === true;
         console.log(`💾 Retrieved state from Unified Cache for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
@@ -1454,7 +1454,7 @@ async function toggleTopSection(sectionId = 'top-section') {
   // Save state to localStorage with page-specific key
   const pageName = getCurrentPageName();
   const storageKey = `${pageName}_${sectionId}_collapsed`;
-  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+  if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
     await window.UnifiedCacheManager.save(storageKey, !isCollapsed, {
       layer: 'localStorage',
       ttl: null, // persistent
@@ -1501,7 +1501,7 @@ window.debugSectionStates = async function() {
   const topSectionKey = `${pageName}_top-section_collapsed`;
   let topSectionState = null;
   
-  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+  if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
     topSectionState = await window.UnifiedCacheManager.get(topSectionKey);
     console.log(`📍 Top Section from Unified Cache: ${topSectionKey} = "${topSectionState}"`);
   } else {
@@ -1520,7 +1520,7 @@ window.debugSectionStates = async function() {
       const sectionKey = `${pageName}_${sectionId}_SectionHidden`;
       let sectionState = null;
       
-      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         sectionState = await window.UnifiedCacheManager.get(sectionKey);
         console.log(`📍 Section ${index + 1} from Unified Cache: ${sectionKey} = "${sectionState}"`);
       } else {
@@ -1600,7 +1600,7 @@ async function toggleAllSections() {
       // Save state with page-specific key
       const isHidden = sectionBody.style.display === 'none';
       const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         await window.UnifiedCacheManager.save(storageKey, isHidden, {
           layer: 'localStorage',
           ttl: null, // persistent
@@ -1649,7 +1649,7 @@ async function loadSectionStates() {
     const storageKey = `${pageName}_${sectionId}_SectionHidden`;
     let isCollapsed = false;
     
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
       const cachedState = await window.UnifiedCacheManager.get(storageKey);
       isCollapsed = cachedState === true;
       console.log(`💾 Retrieved state from Unified Cache for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`);
@@ -2056,20 +2056,42 @@ window.clearFieldError = clearFieldError;
 window.clearFieldValidation = clearFieldValidation;
 window.clearValidationErrors = clearValidationErrors;
 
-// ייצוא פונקציות ולידציה
-window.validateForm = validateForm;
-window.validateField = validateField;
-window.validateTextField = validateTextField;
-window.validateNumberField = validateNumberField;
-window.validateEmailField = validateEmailField;
-window.validateDateField = validateDateField;
-window.validateSelectField = validateSelectField;
-window.setupFieldValidation = setupFieldValidation;
+// ייצוא פונקציות ולידציה (רק אם לא מוגדרות כבר ב-validation-utils.js)
+if (typeof window.validateForm === 'undefined' && typeof validateForm !== 'undefined') {
+  window.validateForm = validateForm;
+}
+if (typeof window.validateField === 'undefined' && typeof validateField !== 'undefined') {
+  window.validateField = validateField;
+}
+if (typeof window.validateTextField === 'undefined' && typeof validateTextField !== 'undefined') {
+  window.validateTextField = validateTextField;
+}
+if (typeof window.validateNumberField === 'undefined' && typeof validateNumberField !== 'undefined') {
+  window.validateNumberField = validateNumberField;
+}
+if (typeof window.validateEmailField === 'undefined' && typeof validateEmailField !== 'undefined') {
+  window.validateEmailField = validateEmailField;
+}
+if (typeof window.validateDateField === 'undefined' && typeof validateDateField !== 'undefined') {
+  window.validateDateField = validateDateField;
+}
+if (typeof window.validateSelectField === 'undefined' && typeof validateSelectField !== 'undefined') {
+  window.validateSelectField = validateSelectField;
+}
+if (typeof window.setupFieldValidation === 'undefined' && typeof setupFieldValidation !== 'undefined') {
+  window.setupFieldValidation = setupFieldValidation;
+}
 
 // ייצוא פונקציות ולידציה מותאמות
-window.validateCurrencySymbol = validateCurrencySymbol;
-window.validateCurrencyRate = validateCurrencyRate;
-window.validateTickerSymbol = validateTickerSymbol;
+if (typeof window.validateCurrencySymbol === 'undefined' && typeof validateCurrencySymbol !== 'undefined') {
+  window.validateCurrencySymbol = validateCurrencySymbol;
+}
+if (typeof window.validateCurrencyRate === 'undefined' && typeof validateCurrencyRate !== 'undefined') {
+  window.validateCurrencyRate = validateCurrencyRate;
+}
+if (typeof window.validateTickerSymbol === 'undefined' && typeof validateTickerSymbol !== 'undefined') {
+  window.validateTickerSymbol = validateTickerSymbol;
+}
 
 // ייצוא פונקציות אתחול
 window.initializeValidation = initializeValidation;

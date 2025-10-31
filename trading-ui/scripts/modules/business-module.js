@@ -628,10 +628,9 @@ async function performTradeCancellation(tradeId) {
     }
 
     // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה!', 4000, 'business');
-      // רענון הטבלה
-      await loadTradesData();
-    }
+    window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה!', 4000, 'business');
+    // רענון הטבלה
+    await loadTradesData();
 
   } catch (error) {
     if (typeof handleSaveError === 'function') {
@@ -727,10 +726,9 @@ async function performTradeDeletion(tradeId) {
     }
 
     // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה!', 4000, 'business');
-      // רענון הטבלה
-      await loadTradesData();
-    }
+    window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה!', 4000, 'business');
+    // רענון הטבלה
+    await loadTradesData();
 
   } catch (error) {
     if (typeof handleDeleteError === 'function') {
@@ -1193,10 +1191,9 @@ async function saveEditTradeData() {
     }
 
     // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד עודכן בהצלחה!', 4000, 'business');
-      // רענון הטבלה
-      await loadTradesData();
-    }
+    window.showSuccessNotification('הצלחה', 'טרייד עודכן בהצלחה!', 4000, 'business');
+    // רענון הטבלה
+    await loadTradesData();
 
     // סגירת המודל
     bootstrap.Modal.getInstance(document.getElementById('editTradeModal')).hide();
@@ -1480,9 +1477,8 @@ async function saveNewTradeRecord() {
       await response.json(); // newTrade not used
       
       window.showSuccessNotification('הצלחה', 'טרייד נשמר בהצלחה!', 4000, 'business');
-        // רענון הטבלה
-        loadTradesData();
-      }
+      // רענון הטבלה
+      loadTradesData();
 
       // סגירת המודל
       const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
@@ -2794,11 +2790,10 @@ async function reactivateTrade(tradeId) {
     }
 
     // הצגת הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
-      } else if (typeof window.showNotification === 'function') {
-        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
-      }
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
+    } else if (typeof window.showNotification === 'function') {
+      window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
     }
 
     // רענון הטבלה

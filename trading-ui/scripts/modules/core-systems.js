@@ -10,6 +10,7 @@
 
 // ===== UNIFIED APP INITIALIZER =====
 
+if (typeof window.UnifiedAppInitializer === 'undefined') {
 class UnifiedAppInitializer {
     constructor() {
         this.initialized = false;
@@ -699,38 +700,69 @@ class UnifiedAppInitializer {
         this.performanceMetrics.stageTimes.finalize = Date.now() - stageStart;
         console.log('✅ Stage 4 Complete');
     }
+}
 
-    /**
-     * Detect page information
-     */
-    detectPageInfo() {
-        const path = window.location.pathname;
-        const filename = path.split('/').pop() || 'index';
-        const pageName = filename.replace('.html', '');
-        
-        console.log('🔍 Page detection:', { path, filename, pageName });
-        
-        const pageInfo = {
-            name: pageName,
-            path: path,
-            filename: filename,
-            type: this.determinePageType(pageName),
-            requirements: {
-                filters: this.requiresFilters(pageName),
-                validation: this.requiresValidation(pageName),
-                tables: this.requiresTables(pageName),
-                charts: this.requiresCharts(pageName)
-            }
-        };
-        
-        console.log('📊 Detected page info:', pageInfo);
-        return pageInfo;
-    }
+window.UnifiedAppInitializer = UnifiedAppInitializer;
+} // End of UnifiedAppInitializer class definition
 
-    /**
-     * Detect available systems
-     */
-    detectAvailableSystems() {
+// Methods outside class (legacy support) - should be inside class
+// These methods were moved outside for backward compatibility
+// They are now part of the UnifiedAppInitializer class above
+
+/**
+ * Detect page information (Legacy - moved inside class)
+ */
+function detectPageInfo() {
+    const path = window.location.pathname;
+    const filename = path.split('/').pop() || 'index';
+    const pageName = filename.replace('.html', '');
+    
+    console.log('🔍 Page detection:', { path, filename, pageName });
+    
+    // Helper functions for page detection
+    const determinePageType = (page) => {
+        if (['trades', 'executions', 'trade_plans'].includes(page)) return 'trading';
+        if (['alerts', 'notes'].includes(page)) return 'management';
+        return 'general';
+    };
+    
+    const requiresFilters = (page) => {
+        return ['trades', 'executions', 'alerts', 'notes'].includes(page);
+    };
+    
+    const requiresValidation = (page) => {
+        return ['trades', 'trade_plans', 'alerts'].includes(page);
+    };
+    
+    const requiresTables = (page) => {
+        return ['trades', 'executions', 'alerts', 'notes', 'trade_plans'].includes(page);
+    };
+    
+    const requiresCharts = (page) => {
+        return ['trades', 'executions'].includes(page);
+    };
+    
+    const pageInfo = {
+        name: pageName,
+        path: path,
+        filename: filename,
+        type: determinePageType(pageName),
+        requirements: {
+            filters: requiresFilters(pageName),
+            validation: requiresValidation(pageName),
+            tables: requiresTables(pageName),
+            charts: requiresCharts(pageName)
+        }
+    };
+    
+    console.log('📊 Detected page info:', pageInfo);
+    return pageInfo;
+}
+
+/**
+ * Detect available systems (Legacy - moved outside class)
+ */
+function detectAvailableSystems() {
         const systems = new Set();
         
         // Core Systems
@@ -752,119 +784,118 @@ class UnifiedAppInitializer {
         if (typeof window.showNotification === 'function') systems.add('notifications');
         if (typeof window.ActionsMenuSystem !== 'undefined') systems.add('actionsMenu');
         
-        return systems;
-    }
+    return systems;
+}
 
-    /**
-     * Analyze page requirements
-     */
-    analyzePageRequirements() {
-        // This is already done in detectPageInfo, but can be extended
-        console.log('📊 Page requirements analyzed');
-    }
+/**
+ * Analyze page requirements (Legacy - moved outside class)
+ */
+function analyzePageRequirements() {
+    // This is already done in detectPageInfo, but can be extended
+    console.log('📊 Page requirements analyzed');
+}
 
-    /**
-     * Determine page type
-     */
-    determinePageType(pageName) {
-        if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
-        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-management'].includes(pageName)) return 'development';
-        if (['preferences'].includes(pageName)) return 'preferences';
-        if (['index'].includes(pageName)) return 'dashboard';
-        return 'general';
-    }
+/**
+ * Determine page type (Legacy - moved outside class)
+ */
+function determinePageType(pageName) {
+    if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
+    if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-management'].includes(pageName)) return 'development';
+    if (['preferences'].includes(pageName)) return 'preferences';
+    if (['index'].includes(pageName)) return 'dashboard';
+    return 'general';
+}
 
-    /**
-     * Check if page requires filters
-     */
-    requiresFilters(pageName) {
-        const filterPages = [
-            'index', 'trades', 'executions', 'alerts', 'trading_accounts',
-            'cash_flows', 'tickers', 'research'
-        ];
-        return filterPages.includes(pageName) || document.querySelectorAll('.filter-section, .header-filters').length > 0;
-    }
+/**
+ * Check if page requires filters (Legacy - moved outside class)
+ */
+function requiresFilters(pageName) {
+    const filterPages = [
+        'index', 'trades', 'executions', 'alerts', 'trading_accounts',
+        'cash_flows', 'tickers', 'research'
+    ];
+    return filterPages.includes(pageName) || document.querySelectorAll('.filter-section, .header-filters').length > 0;
+}
 
-    /**
-     * Check if page requires validation
-     */
-    requiresValidation(pageName) {
-        const validationPages = [
-            'preferences', 'trades', 'alerts', 'trading_accounts', 'notes',
-            'crud-testing-dashboard'
-        ];
-        return validationPages.includes(pageName) || document.querySelectorAll('form').length > 0;
-    }
+/**
+ * Check if page requires validation (Legacy - moved outside class)
+ */
+function requiresValidation(pageName) {
+    const validationPages = [
+        'preferences', 'trades', 'alerts', 'trading_accounts', 'notes',
+        'crud-testing-dashboard'
+    ];
+    return validationPages.includes(pageName) || document.querySelectorAll('form').length > 0;
+}
 
-    /**
-     * Check if page requires tables
-     */
-    requiresTables(pageName) {
-        const tablePages = [
-            'index', 'trades', 'executions', 'alerts', 'trading_accounts',
-            'cash_flows', 'tickers', 'db_display', 'crud-testing-dashboard',
-            'external-data-dashboard'
-        ];
-        return tablePages.includes(pageName) || document.querySelectorAll('table').length > 0;
-    }
+/**
+ * Check if page requires tables (Legacy - moved outside class)
+ */
+function requiresTables(pageName) {
+    const tablePages = [
+        'index', 'trades', 'executions', 'alerts', 'trading_accounts',
+        'cash_flows', 'tickers', 'db_display', 'crud-testing-dashboard',
+        'external-data-dashboard'
+    ];
+    return tablePages.includes(pageName) || document.querySelectorAll('table').length > 0;
+}
 
-    /**
-     * Check if page requires charts
-     */
-    requiresCharts(pageName) {
-        return pageName === 'index' || document.querySelectorAll('canvas, .chart-container').length > 0;
-    }
+/**
+ * Check if page requires charts (Legacy - moved outside class)
+ */
+function requiresCharts(pageName) {
+    return pageName === 'index' || document.querySelectorAll('canvas, .chart-container').length > 0;
+}
 
-    /**
-     * Initialize Unified Cache System
-     */
-    async initializeCacheSystem() {
-        console.log('🔧 Initializing Unified Cache System...');
-        
-        // Initialize UnifiedCacheManager with timeout - only if not already initialized
-        if (typeof window.UnifiedCacheManager !== 'undefined' && !window.UnifiedCacheManager.initialized) {
-            try {
-                console.log('🔧 Initializing UnifiedCacheManager...');
-                
-                // Add timeout to prevent hanging
-                const initPromise = window.UnifiedCacheManager.initialize();
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 10000)
-                );
-                
-                const initResult = await Promise.race([initPromise, timeoutPromise]);
-                if (initResult) {
-                    console.log('✅ UnifiedCacheManager initialized successfully');
-                } else {
-                    throw new Error('UnifiedCacheManager initialization returned false');
-                }
-            } catch (error) {
-                console.error('❌ UnifiedCacheManager initialization failed:', error);
-                console.log('⚠️ Using localStorage fallback');
-                // Set a flag to indicate cache system is not available
-                window.UnifiedCacheManager = null;
+/**
+ * Initialize Unified Cache System (Legacy - moved outside class)
+ */
+async function initializeCacheSystem() {
+    console.log('🔧 Initializing Unified Cache System...');
+    
+    // Initialize UnifiedCacheManager with timeout - only if not already initialized
+    if (typeof window.UnifiedCacheManager !== 'undefined' && !window.UnifiedCacheManager.initialized) {
+        try {
+            console.log('🔧 Initializing UnifiedCacheManager...');
+            
+            // Add timeout to prevent hanging
+            const initPromise = window.UnifiedCacheManager.initialize();
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 10000)
+            );
+            
+            const initResult = await Promise.race([initPromise, timeoutPromise]);
+            if (initResult) {
+                console.log('✅ UnifiedCacheManager initialized successfully');
+            } else {
+                throw new Error('UnifiedCacheManager initialization returned false');
             }
-        } else if (window.UnifiedCacheManager?.initialized) {
-            console.log('✅ UnifiedCacheManager already initialized');
-        } else {
-            console.log('⚠️ UnifiedCacheManager not available, using localStorage fallback');
+        } catch (error) {
+            console.error('❌ UnifiedCacheManager initialization failed:', error);
+            console.log('⚠️ Using localStorage fallback');
+            // Set a flag to indicate cache system is not available
+            window.UnifiedCacheManager = null;
         }
-
-        // Advanced cache systems (CacheSyncManager, CachePolicyManager, MemoryOptimizer)
-        // are optional and not currently loaded in the standard loading system.
-        // UnifiedCacheManager provides all necessary functionality for now.
-        
-        // Initialize registered core systems - only if not already initialized
-        if (window.UnifiedInitializationSystem && !window.coreSystemsInitialized) {
-            await window.UnifiedInitializationSystem.initializeCoreSystems();
-            window.coreSystemsInitialized = true;
-        } else if (window.coreSystemsInitialized) {
-            console.log('✅ Core systems already initialized, skipping...');
-        }
-        
-        // Final verification and reporting
-        this.reportCacheSystemStatus();
+    } else if (window.UnifiedCacheManager?.initialized) {
+        console.log('✅ UnifiedCacheManager already initialized');
+    } else {
+        console.log('⚠️ UnifiedCacheManager not available, using localStorage fallback');
     }
+
+    // Advanced cache systems (CacheSyncManager, CachePolicyManager, MemoryOptimizer)
+    // are optional and not currently loaded in the standard loading system.
+    // UnifiedCacheManager provides all necessary functionality for now.
+    
+    // Initialize registered core systems - only if not already initialized
+    if (window.UnifiedInitializationSystem && !window.coreSystemsInitialized) {
+        await window.UnifiedInitializationSystem.initializeCoreSystems();
+        window.coreSystemsInitialized = true;
+    } else if (window.coreSystemsInitialized) {
+        console.log('✅ Core systems already initialized, skipping...');
+    }
+    
+    // Final verification and reporting - removed reportCacheSystemStatus call (not available as standalone function)
+}
     
     /**
      * Report cache system status
@@ -2934,7 +2965,7 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
     // Fallback דרך UnifiedCacheManager - כלל 44
     try {
       let globalHistory = [];
-      if (window.UnifiedCacheManager?.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         try {
           const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
             layer: 'localStorage'
@@ -2997,7 +3028,7 @@ async function updateGlobalNotificationStats() {
     // Fallback ל-localStorage
     if (history.length === 0) {
       try {
-        if (window.UnifiedCacheManager?.isInitialized()) {
+        if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
           const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
             layer: 'localStorage'
           });
@@ -3040,7 +3071,7 @@ async function updateGlobalNotificationStats() {
 
     // Fallback דרך UnifiedCacheManager - כלל 44
     try {
-      if (window.UnifiedCacheManager?.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         await window.UnifiedCacheManager.save('tiktrack_global_notifications_stats', stats, {
           layer: 'localStorage',
           ttl: 24 * 60 * 60 * 1000 // 24 hours
@@ -3464,6 +3495,7 @@ console.log('✅ Core Systems module loaded successfully (Static Loading)');
 // Unified page configurations - previously in page-initialization-configs.js
 // Moved here as part of loading system standardization (October 2025)
 
+if (typeof window.PAGE_CONFIGS === 'undefined') {
 const PAGE_CONFIGS = {
 
     // Main Pages
@@ -4339,3 +4371,4 @@ window.getPageInitSummary = function(pageName) {
 
 window.PAGE_CONFIGS = PAGE_CONFIGS;
 window.pageInitializationConfigs = PAGE_CONFIGS;
+}

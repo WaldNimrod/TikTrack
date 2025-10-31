@@ -133,6 +133,7 @@
 
 // ===== UNIFIED APP INITIALIZER =====
 
+if (typeof window.UnifiedAppInitializer === 'undefined') {
 class UnifiedAppInitializer {
     constructor() {
         this.initialized = false;
@@ -709,11 +710,27 @@ class UnifiedAppInitializer {
         
         // Initialize page-specific custom initializers
         if (config.customInitializers && Array.isArray(config.customInitializers)) {
-            for (const initializer of config.customInitializers) {
+            window.Logger.info(`🔧 Found ${config.customInitializers.length} custom initializers for ${config.name}`, { page: "unified-app-initializer" });
+            for (let i = 0; i < config.customInitializers.length; i++) {
+                const initializer = config.customInitializers[i];
+                window.Logger.info(`🔧 Executing custom initializer ${i + 1}/${config.customInitializers.length} for ${config.name}`, { page: "unified-app-initializer" });
                 if (typeof initializer === 'function') {
-                    await initializer(config);
+                    try {
+                        await initializer(config);
+                        window.Logger.info(`✅ Custom initializer ${i + 1} completed`, { page: "unified-app-initializer" });
+                    } catch (error) {
+                        window.Logger.error(`❌ Error in custom initializer ${i + 1}:`, error, { page: "unified-app-initializer" });
+                    }
+                } else {
+                    window.Logger.warn(`⚠️ Custom initializer ${i + 1} is not a function:`, typeof initializer, { page: "unified-app-initializer" });
                 }
             }
+        } else {
+            window.Logger.info(`⚠️ No custom initializers found for ${config.name}`, { 
+                hasCustomInitializers: !!config.customInitializers,
+                isArray: Array.isArray(config.customInitializers),
+                customInitializers: config.customInitializers
+            }, { page: "unified-app-initializer" });
         }
     }
 
@@ -1362,7 +1379,9 @@ class UnifiedAppInitializer {
 window.handlePageSpecificFunctions = handlePageSpecificFunctions;
 
 window.UnifiedAppInitializer = UnifiedAppInitializer;
+window.UnifiedAppInitializer = UnifiedAppInitializer;
 window.unifiedAppInit = new UnifiedAppInitializer();
+}
 
 window.Logger.info('🔧 UnifiedAppInitializer created:', window.unifiedAppInit, { page: "unified-app-initializer" });
 

@@ -3154,7 +3154,7 @@ window.filterExecutionsLocally = filterExecutionsLocally;
 window.restoreSortState = restoreSortState;
 window.setupModalConfigurations = setupModalConfigurations;
 window.enableAllFields = enableAllFields;
-window.loadExecutionsData = loadExecutionsData;
+// window.loadExecutionsData = loadExecutionsData; // Not needed here - will be set later with wrapper
 window.updateExecutionsTableMain = updateExecutionsTableMain;
 // Note: saveExecution already exported above
 window.initializeExecutionsPage = window.initializeExecutionsPage;
@@ -3534,8 +3534,8 @@ window.loadExecutionsData = async function() {
   await originalLoadExecutionsData();
 
   // עדכון הנתונים הגלובליים לאחר טעינה
-  if (executionsData && executionsData.length > 0) {
-    updateExecutionsGlobalData(executionsData);
+  if (window.executionsData && window.executionsData.length > 0) {
+    updateExecutionsGlobalData(window.executionsData);
 
     // טעינת נתוני טריידים לטובת פילטר החשבונות
     try {
@@ -3583,8 +3583,8 @@ if (typeof window.registerCRUDFunctions === 'function') {
  */
 
 
-// ייצוא הפונקציה הגלובלית
-window.loadExecutionsData = loadExecutionsData;
+// ייצוא הפונקציה הגלובלית - לא צורך כי זה כבר ה-wrapped version מ-line 3533
+// window.loadExecutionsData = loadExecutionsData; // This was overriding the wrapper!
 
 // ========================================
 // פונקציות ביטול טיקר - שימוש בפונקציות הגלובליות

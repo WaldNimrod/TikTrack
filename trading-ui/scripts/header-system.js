@@ -1385,10 +1385,13 @@ class HeaderSystem {
               
             case 'שבוע קודם':
               const lastWeekStart = new Date(today);
-              lastWeekStart.setDate(today.getDate() - 14);
-              const lastWeekEnd = new Date(today);
-              lastWeekEnd.setDate(today.getDate() - 7);
-              return date >= lastWeekStart && date < lastWeekEnd;
+              const dayOfWeek = today.getDay();
+              lastWeekStart.setDate(today.getDate() - dayOfWeek - 7);
+              lastWeekStart.setHours(0, 0, 0, 0);
+              const lastWeekEnd = new Date(lastWeekStart);
+              lastWeekEnd.setDate(lastWeekStart.getDate() + 6);
+              lastWeekEnd.setHours(23, 59, 59, 999);
+              return date >= lastWeekStart && date <= lastWeekEnd;
               
             case 'חודש קודם':
               const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);

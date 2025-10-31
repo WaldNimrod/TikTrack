@@ -279,11 +279,18 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
  * @param {Function} onCancel - Callback for cancel action
  */
 function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null, onCancel = null) {
-  // showDeleteWarning נקראה עם
-  // showConfirmationDialog קיים
-
+  console.log('🔍 showDeleteWarning called with:', {
+    itemType,
+    itemName,
+    itemTypeDisplay,
+    hasOnConfirm: !!onConfirm,
+    hasOnCancel: !!onCancel
+  });
+  
   const title = `מחיקת ${itemTypeDisplay}`;
   const message = `האם אתה בטוח שברצונך למחוק את ${itemTypeDisplay} "${itemName}"?\n\nפעולה זו אינה ניתנת לביטול.`;
+  
+  console.log('🔍 showDeleteWarning generated:', { title, message });
 
   // קורא ל-showConfirmationDialog עם צבע לבן למחיקה
   showConfirmationDialog(title, message, onConfirm, onCancel, 'warning');

@@ -223,14 +223,17 @@ function editExecution(id) {
 
 function deleteExecution(id) {
   try {
-  // deleteExecution called with id
-  // window.showDeleteWarning exists check
+  console.log('🔍 deleteExecution called with id:', id);
+  console.log('🔍 window.executionsData:', window.executionsData);
+  console.log('🔍 window.executionsData length:', window.executionsData?.length);
 
   // קבלת פרטי העסקה מנתוני הביצועים
   let executionDetails = `עסקה #${id}`;
   
   // ניסיון לקבל את הנתונים מ-executionsData (תמיכה גם ב-String וגם ב-Number)
   const execution = window.executionsData?.find(exec => exec.id === id || exec.id === parseInt(id));
+  
+  console.log('🔍 Found execution:', execution);
   
   if (execution) {
     const ticker = execution.ticker_symbol || execution.symbol || 'לא מוגדר';
@@ -244,23 +247,30 @@ function deleteExecution(id) {
                  new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : 
                  'לא מוגדר';
     executionDetails = `${ticker} - ${actionText}, ${quantity} יחידות ב-${price}, תאריך: ${date}`;
+    console.log('✅ executionDetails:', executionDetails);
+  } else {
+    console.log('❌ No execution found for id:', id);
   }
 
   // שימוש במערכת הגלובלית למחיקה
+  console.log('🔍 Calling showDeleteWarning with:', {
+    itemType: 'executions',
+    itemName: executionDetails,
+    itemTypeDisplay: 'עסקה'
+  });
+  
   if (typeof window.showDeleteWarning === 'function') {
-    // Using global showDeleteWarning with relevant details
     window.showDeleteWarning('executions', executionDetails, 'עסקה', async () => {
-      // Delete confirmed, calling confirmDeleteExecution
-      // קריאה לפונקציה המקומית לאחר אישור
+      console.log('✅ Delete confirmed, calling confirmDeleteExecution');
       await confirmDeleteExecution(id);
     }, null);
   } else {
-    // Using fallback - global system not available
-    // גיבוי למקרה שהמערכת הגלובלית לא זמינה
+    console.error('❌ showDeleteWarning not available!');
     handleSystemError(new Error('מערכת מחיקה לא זמינה'), 'מערכת מחיקה');
   }
   
   } catch (error) {
+    console.error('❌ Error in deleteExecution:', error);
     window.Logger.error('שגיאה במחיקת ביצוע:', error, { page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה במחיקת ביצוע', error.message);

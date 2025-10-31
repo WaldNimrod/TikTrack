@@ -415,7 +415,8 @@ async function cancelAlert(alertId) {
  */
 async function deleteAlert(alertId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });
 
@@ -423,14 +424,13 @@ async function deleteAlert(alertId) {
 
     if (response.ok && result.status === 'success') {
       // התראה נמחקה בהצלחה
-        if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
-        }
-        
-        // רענון הטבלה
-        if (window.loadAlertsData) {
-          await window.loadAlertsData();
-        }
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
+      }
+      
+      // רענון הטבלה
+      if (window.loadAlertsData) {
+        await window.loadAlertsData();
       }
       
       return true;

@@ -2055,117 +2055,7 @@ function updateTradePlansPageSummaryStats() {
 // We use updateTradePlansPageSummaryStats() directly in the code
 // This avoids the recursion issue with the global function
 
-/**
- * הצגת מודל הוספת תכנון
- */
-async function showAddTradePlanModal() {
-  window.Logger.info('🚀 showAddTradePlanModal: Starting modal preparation...', { page: "trade_plans" });
-  window.Logger.info('🔍 showAddTradePlanModal: Checking if modal is already open...', { page: "trade_plans" });
-  
-  // Check if modal is already open
-  const existingModal = document.querySelector('#addTradePlanModal.show');
-  if (existingModal) {
-    window.Logger.info('⚠️ showAddTradePlanModal: Modal already open, closing first...', { page: "trade_plans" });
-    const modal = bootstrap.Modal.getInstance(existingModal);
-    if (modal) modal.hide();
-  }
-  
-  // Clearing the form completely
-  const form = document.getElementById('addTradePlanForm');
-  if (form) {
-    window.Logger.info('✅ showAddTradePlanModal: Form found, starting reset...', { page: "trade_plans" });
-    form.reset();
-
-    // Clear all form fields manually to ensure complete reset
-    const allInputs = form.querySelectorAll('input, select, textarea');
-    window.Logger.info(`🔧 showAddTradePlanModal: Clearing ${allInputs.length} form inputs...`, { page: "trade_plans" });
-    allInputs.forEach(input => {
-      // Clear all inputs except date (which will be set later)
-      if (input.type !== 'date') {
-        window.Logger.info(`🔧 Clearing input: ${input.id || input.name || input.type} (old value: "${input.value}", { page: "trade_plans" })`);
-        input.value = '';
-      }
-      // Remove validation classes
-      input.classList.remove('is-valid', 'is-invalid');
-      // Remove any disabled state
-      input.disabled = false;
-      // Remove any required attribute that was added
-      input.removeAttribute('required');
-    });
-
-    // Clear any validation messages
-    const validationMessages = form.querySelectorAll('.invalid-feedback');
-    validationMessages.forEach(msg => msg.remove());
-
-    // Clear any ticker display information
-    const tickerDisplay = document.getElementById('selectedTickerDisplay');
-    const priceDisplay = document.getElementById('currentPriceDisplay');
-    const changeDisplay = document.getElementById('dailyChangeDisplay');
-    
-    if (tickerDisplay) tickerDisplay.textContent = 'לא נבחר';
-    if (priceDisplay) priceDisplay.textContent = '-';
-    if (changeDisplay) {
-      changeDisplay.textContent = '-';
-      changeDisplay.style.color = '#6c757d';
-    }
-  }
-
-  // Set default values for required fields AFTER clearing
-  const investmentTypeSelect = document.getElementById('type');
-  if (investmentTypeSelect) {
-    investmentTypeSelect.value = 'swing'; // Default investment type
-  }
-
-  const sideSelect = document.getElementById('side');
-  if (sideSelect) {
-    sideSelect.value = 'Long'; // Default side
-  }
-
-  const plannedAmountInput = document.getElementById('quantity');
-  if (plannedAmountInput) {
-    plannedAmountInput.value = '1000'; // Default planned amount
-  }
-
-  // Set default date to today (for display)
-  const todayDate = new Date();
-  const todayDisplay = todayDate.toLocaleDateString('he-IL');
-  const planDateDisplay = document.getElementById('planDateDisplay');
-  if (planDateDisplay) {
-    planDateDisplay.textContent = todayDisplay;
-  }
-
-  // Loading tickers with default from preferences
-  window.Logger.info('🔄 showAddTradePlanModal: Loading tickers with SelectPopulatorService...', { page: "trade_plans" });
-  await SelectPopulatorService.populateTickersSelect('ticker', {
-    includeEmpty: true,
-    emptyText: 'בחר טיקר',
-    defaultFromPreferences: true,
-    filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
-  });
-  window.Logger.info('✅ showAddTradePlanModal: Tickers loaded with SelectPopulatorService', { page: "trade_plans" });
-
-
-  // Clear any existing validation errors
-  if (typeof window.clearValidation === 'function') {
-    window.clearValidation('addTradePlanForm');
-  }
-
-  // Ensure ticker select is reset to default AFTER loading tickers
-  window.Logger.info('🔄 showAddTradePlanModal: Resetting ticker select...', { page: "trade_plans" });
-  const tickerSelect = document.getElementById('ticker');
-  if (tickerSelect) {
-    window.Logger.info(`🔧 showAddTradePlanModal: Ticker select found, current value: "${tickerSelect.value}"`, { page: "trade_plans" });
-    
-    // Add event listener for ticker selection
-    tickerSelect.addEventListener('change', function() {
-      window.Logger.info('🎯 Ticker selected:', this.value, { page: "trade_plans" });
-      if (this.value) {
-        // Enable all form fields
-        enableFormFields();
-      }
-    });
-  }
-}
+// REMOVED: Old showAddTradePlanModal - replaced by ModalManagerV2 version below
 
 // Validation rules for trade plans
 const tradePlanValidationRules = {
@@ -2479,10 +2369,8 @@ async function saveNewTradePlan() {
 
 // Export all necessary functions to global scope
 window.executeTradePlan = executeTradePlan;
-window.addTradePlan = addTradePlan;
-window.editTradePlan = editTradePlan;
+// REMOVED: addTradePlan, editTradePlan, updateTradePlan - deprecated wrappers, using saveTradePlanData and ModalManagerV2
 window.deleteTradePlan = deleteTradePlan;
-window.updateTradePlan = updateTradePlan;
 window.enableFormFields = enableFormFields;
 window.disableFormFields = disableFormFields;
 window.enableEditFieldsWrapper = enableEditFieldsWrapper;

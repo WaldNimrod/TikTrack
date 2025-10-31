@@ -1196,8 +1196,8 @@ function showOpenTradesWarning(tradingAccountId, tradingAccountName) {
 window.showEditTradingAccountModalById = showEditTradingAccountModalById; // Keep this as it's a wrapper with additional logic
 window.cancelTradingAccount = cancelTradingAccount;
 window.deleteTradingAccount = deleteTradingAccount;
-window.showTradingAccountSuccessMessage = showSuccessMessage;
-window.showTradingAccountErrorMessage = showErrorMessage;
+// REMOVED: window.showTradingAccountSuccessMessage - use window.showSuccessNotification from notification-system.js directly
+// REMOVED: window.showTradingAccountErrorMessage - use window.showErrorNotification from notification-system.js directly
 // REMOVED: window.showSecondConfirmationModal - use window.showSecondConfirmationModal from ui-utils.js or window.showConfirmationDialog directly
 window.confirmDeleteTradingAccount = confirmDeleteTradingAccount;
 // window.checkLinkedItems = checkLinkedItems; // הוסר - הוחלף ב-checkLinkedItemsBeforeDelete
@@ -2263,9 +2263,6 @@ window.getTradingAccounts = getTradingAccounts;
 // REMOVED: showAddTradingAccountModal - use window.ModalManagerV2.showModal('tradingAccountsModal', 'add') directly
 
 // REMOVED: showEditTradingAccountModal - use window.ModalManagerV2.showEditModal('tradingAccountsModal', 'account', accountId) directly
-        console.error('ModalManagerV2 not available');
-    }
-}
 
 /**
  * שמירת חשבון מסחר מסחר

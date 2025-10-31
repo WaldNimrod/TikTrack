@@ -1,3 +1,80 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 52
+ * 
+ * PAGE INITIALIZATION (4)
+ * - setupPriceCalculation() - * View linked items for trade plan
+ * - setupEditPriceCalculation() - setupEditPriceCalculation function
+ * - initializeTradePlanConditionsSystem() - initializeTradePlanConditionsSystem function
+ * - setupSortableHeadersLocal() - setupSortableHeadersLocal function
+ * 
+ * DATA LOADING (4)
+ * - loadTickerInfo() - * Disable edit form fields
+ * - loadTradePlanTickerInfo() - loadTradePlanTickerInfo function
+ * - loadEditTickerInfo() - loadEditTickerInfo function
+ * - loadTradePlansData() - loadTradePlansData function
+ * 
+ * DATA MANIPULATION (23)
+ * - updateTickerInfo() - * Hide ticker information display
+ * - updateSharesFromAmount() - updateSharesFromAmount function
+ * - updateAmountFromShares() - updateAmountFromShares function
+ * - updateFormFieldsWithTickerData() - updateFormFieldsWithTickerData function
+ * - updateEditFormFieldsWithTickerData() - * Hide edit ticker information section
+ * - updateEditTickerInfo() - updateEditTickerInfo function
+ * - updateEditSharesFromAmount() - updateEditSharesFromAmount function
+ * - updateEditAmountFromShares() - updateEditAmountFromShares function
+ * - saveEditTradePlan() - * עדכון סכום מתוכנן ממספר מניות במודל העריכה
+ * - addEditCondition() - addEditCondition function
+ * - addEditReason() - * Add condition to edit modal
+ * - addEditImportantNote() - * Add edit reason functionality (placeholder)
+ * - addEditReminder() - * Add edit important note functionality (placeholder)
+ * - addImportantNote() - * Add edit reminder functionality (placeholder)
+ * - addReminder() - * Add important note functionality (placeholder for add modal)
+ * - updateDesignsTable() - updateDesignsTable function
+ * - updateTradePlansTable() - updateTradePlansTable function
+ * - updateTradePlansPageSummaryStats() - updateTradePlansPageSummaryStats function
+ * - saveTradePlanData() - saveTradePlanData function
+ * - saveNewTradePlan() - saveNewTradePlan function
+ * - showAddTradePlanModal() - showAddTradePlanModal function
+ * - saveTradePlan() - * Show add trade plan modal
+ * - deleteTradePlan() - deleteTradePlan function
+ * 
+ * EVENT HANDLING (2)
+ * - restorePlanningSectionState() - * Setup sortable headers for trade plans table
+ * - performTradePlanDeletion() - performTradePlanDeletion function
+ * 
+ * UI UPDATES (6)
+ * - displayTickerInfo() - * טעינת מידע על הטיקר (למודל החדש)
+ * - displayTradePlanTickerInfo() - displayTradePlanTickerInfo function
+ * - hideTickerInfo() - hideTickerInfo function
+ * - displayEditTickerInfo() - displayEditTickerInfo function
+ * - hideEditTickerInfo() - hideEditTickerInfo function
+ * - showEditTradePlanModal() - * Show add trade plan modal
+ * 
+ * VALIDATION (1)
+ * - checkLinkedItemsBeforeCancel() - checkLinkedItemsBeforeCancel function
+ * 
+ * OTHER (12)
+ * - executeTradePlan() - executeTradePlan function
+ * - copyTradePlan() - copyTradePlan function
+ * - enableFormFields() - enableFormFields function
+ * - disableFormFields() - * פתיחת מודל הוספת תכנון חדש
+ * - enableEditFieldsWrapper() - * Disable form fields for trade plan creation
+ * - disableEditFields() - * Enable edit form fields wrapper
+ * - reactivateTradePlan() - * בדיקת פריטים מקושרים לפני ביטול תכנון
+ * - openCancelTradePlanModal() - * Add reminder functionality (placeholder for add modal)
+ * - cancelTradePlan() - cancelTradePlan function
+ * - viewLinkedItemsForTradePlan() - viewLinkedItemsForTradePlan function
+ * - filterTradePlansData() - * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
+ * - filterTradePlansByType() - filterTradePlansByType function
+ * 
+ * ==========================================
+ */
 /**
  * Trade Plans Page - Comprehensive Function Index
  * ================================================
@@ -2647,13 +2724,8 @@ async function saveTradePlanData(mode) {
   }
 }
 
-/**
- * שמירת תכנון בעריכה
- * @deprecated Use saveTradePlanData('edit') instead
- */
-async function saveEditTradePlan() {
-  await saveTradePlanData('edit');
-}
+// REMOVED: saveEditTradePlan deprecated wrapper - using saveTradePlanData('edit') directly
+// Original wrapper at line 2654 has been removed - function is now defined at line 1207 with full implementation
 
 /**
  * שמירת תכנון חדש

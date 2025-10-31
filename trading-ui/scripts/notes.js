@@ -941,6 +941,91 @@ function populateSelect(selectId, data, field, prefix = '') {
 }
 
 /**
+ * Update radio buttons for note relation types
+ * Sets up event listeners for relation type radio buttons
+ * 
+ * @function updateRadioButtons
+ * @param {Array} accounts - Accounts array
+ * @param {Array} trades - Trades array
+ * @param {Array} tradePlans - Trade plans array
+ * @param {Array} tickers - Tickers array
+ * @returns {void}
+ */
+function updateRadioButtons(accounts = [], trades = [], tradePlans = [], tickers = []) {
+  try {
+    // עדכון רדיו באטון לחשבונות
+    const accountRadio = document.getElementById('noteRelationAccount');
+    const editAccountRadio = document.getElementById('editNoteRelationAccount');
+
+    if (accountRadio) {
+      accountRadio.addEventListener('change', () => {
+        populateSelect('noteRelatedObjectSelect', accounts, 'name', 'חשבון מסחר');
+      });
+    }
+
+    if (editAccountRadio) {
+      editAccountRadio.addEventListener('change', () => {
+        populateSelect('editNoteRelatedObjectSelect', accounts, 'name', 'חשבון מסחר');
+      });
+    }
+
+    // עדכון רדיו באטון לטריידים
+    const tradeRadio = document.getElementById('noteRelationTrade');
+    const editTradeRadio = document.getElementById('editNoteRelationTrade');
+
+    if (tradeRadio) {
+      tradeRadio.addEventListener('change', () => {
+        populateSelect('noteRelatedObjectSelect', trades, 'id', 'טרייד');
+      });
+    }
+
+    if (editTradeRadio) {
+      editTradeRadio.addEventListener('change', () => {
+        populateSelect('editNoteRelatedObjectSelect', trades, 'id', 'טרייד');
+      });
+    }
+
+    // עדכון רדיו באטון לתכנונים
+    const planRadio = document.getElementById('noteRelationTradePlan');
+    const editPlanRadio = document.getElementById('editNoteRelationTradePlan');
+
+    if (planRadio) {
+      planRadio.addEventListener('change', () => {
+        populateSelect('noteRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+      });
+    }
+
+    if (editPlanRadio) {
+      editPlanRadio.addEventListener('change', () => {
+        populateSelect('editNoteRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+      });
+    }
+
+    // עדכון רדיו באטון לטיקרים
+    const tickerRadio = document.getElementById('noteRelationTicker');
+    const editTickerRadio = document.getElementById('editNoteRelationTicker');
+
+    if (tickerRadio) {
+      tickerRadio.addEventListener('change', () => {
+        populateSelect('noteRelatedObjectSelect', tickers, 'symbol', '');
+      });
+    }
+
+    if (editTickerRadio) {
+      editTickerRadio.addEventListener('change', () => {
+        populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
+      });
+    }
+    
+  } catch (error) {
+    window.Logger?.error('שגיאה בעדכון רדיו באטונים:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון רדיו באטונים', error.message);
+    }
+  }
+}
+
+/**
  * Handle note relation type change
  * Called when radio button for relation type changes
  */

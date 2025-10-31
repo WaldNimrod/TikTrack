@@ -109,6 +109,11 @@
 
 // alerts.js loaded successfully - removed debug log
 
+// Save global function reference BEFORE we export our own function
+// We'll capture it when the function is first called, not at module load time
+// This ensures we get the actual global function even if it loads after this file
+let globalUpdatePageSummaryStats = null;
+
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
 window.loadAlertsData = window.loadAlertsData || function() {
   // loadAlertsData not yet defined, using placeholder
@@ -847,11 +852,40 @@ function updateAlertsTable(alerts) {
 }
 
 /**
- * עדכון סטטיסטיקות סיכום
+ * Update page summary statistics wrapper
+ * Uses global updatePageSummaryStats from ui-utils.js
+ * 
+ * IMPORTANT: We saved the global function reference at the top of the file before export
+ * to avoid infinite recursion.
+ * 
+ * @function updatePageSummaryStats
+ * @returns {void}
  */
 function updatePageSummaryStats() {
-  // Use unified function from ui-utils.js
-  window.updatePageSummaryStats('alerts', alertsData);
+  try {
+    // Get alerts data from global scope
+    const dataToUse = window.alertsData || alertsData || [];
+    
+    // Capture global function reference on first call if not already captured
+    if (!globalUpdatePageSummaryStats) {
+      // Check if global function exists and it's different from our local function
+      if (typeof window.updatePageSummaryStats === 'function' && 
+          window.updatePageSummaryStats !== updatePageSummaryStats) {
+        globalUpdatePageSummaryStats = window.updatePageSummaryStats;
+      } else {
+        // Global function not available or it's already us - skip to prevent recursion
+        window.Logger?.warn('Global updatePageSummaryStats not available or recursion detected', { page: "alerts" });
+        return;
+      }
+    }
+    
+    // Use the captured global function reference
+    if (globalUpdatePageSummaryStats) {
+      globalUpdatePageSummaryStats('alerts', dataToUse);
+    }
+  } catch (error) {
+    window.Logger?.error('Error updating page summary stats:', error, { page: "alerts" });
+  }
 }
 
 
@@ -2051,7 +2085,8 @@ async function confirmDeleteAlert(alertId) {
   // window.Logger.info('🔄 confirmDeleteAlert נקראה עבור ID:', alertId, { page: "alerts" });
 
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });
 
@@ -2262,6 +2297,39 @@ function filterAlertsByRelatedObjectTypeWrapper(type) {
   }
 
   // window.Logger.info(`✅ Filtered alerts by type '${type}': ${filteredAlerts.length} alerts found`, { page: "alerts" });
+}
+
+/**
+ * Filter alerts by related object type
+ * Wrapper that uses global function from related-object-filters.js or local wrapper
+ * 
+ * @function filterAlertsByRelatedObjectType
+ * @param {string} type - Object type to filter by
+ * @returns {void}
+ */
+function filterAlertsByRelatedObjectType(type) {
+  try {
+    // First try global function from related-object-filters.js (if loaded)
+    // Check if global exists and it's not our local function (will be set later)
+    const globalFilterFn = typeof window.filterAlertsByRelatedObjectType === 'function' 
+      ? window.filterAlertsByRelatedObjectType 
+      : null;
+    
+    // If global exists and it's different from our local (before we export), use it
+    if (globalFilterFn && globalFilterFn !== filterAlertsByRelatedObjectType) {
+      globalFilterFn(type);
+      return;
+    }
+    
+    // Fallback to local wrapper
+    if (typeof filterAlertsByRelatedObjectTypeWrapper === 'function') {
+      filterAlertsByRelatedObjectTypeWrapper(type);
+    } else {
+      window.Logger?.warn('filterAlertsByRelatedObjectTypeWrapper not available', { page: "alerts" });
+    }
+  } catch (error) {
+    window.Logger?.error('Error filtering alerts by related object type:', error, { page: "alerts" });
+  }
 }
 
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
@@ -2625,6 +2693,88 @@ window.loadAlertsData = window.loadAlertsData;
 window.updateAlertsTable = updateAlertsTable;
 window.updatePageSummaryStats = updatePageSummaryStats;
 window.showAddAlertModal = showAddAlertModal;
+/**
+ * Hide add alert modal wrapper
+ * Uses ModalManagerV2.hideModal
+ * 
+ * @function hideAddAlertModal
+ * @returns {void}
+ */
+function hideAddAlertModal() {
+  try {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+      window.ModalManagerV2.hideModal('alertsModal');
+    } else {
+      // Fallback to Bootstrap modal
+      const modal = document.getElementById('alertsModal');
+      if (modal && typeof bootstrap !== 'undefined') {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        if (bsModal) {
+          bsModal.hide();
+        }
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error hiding add alert modal:', error, { page: "alerts" });
+  }
+}
+
+/**
+ * Hide edit alert modal wrapper
+ * Uses ModalManagerV2.hideModal
+ * 
+ * @function hideEditAlertModal
+ * @returns {void}
+ */
+function hideEditAlertModal() {
+  try {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+      window.ModalManagerV2.hideModal('alertsModal');
+    } else {
+      // Fallback to Bootstrap modal
+      const modal = document.getElementById('alertsModal');
+      if (modal && typeof bootstrap !== 'undefined') {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        if (bsModal) {
+          bsModal.hide();
+        }
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error hiding edit alert modal:', error, { page: "alerts" });
+  }
+}
+
+/**
+ * Validate alert form wrapper
+ * Uses global validateForm from validation-utils.js
+ * 
+ * @function validateAlertForm
+ * @returns {boolean} true if form is valid
+ */
+function validateAlertForm() {
+  try {
+    const formId = 'alertsModalForm';
+    if (typeof window.validateForm === 'function') {
+      return window.validateForm(formId);
+    } else if (typeof window.validateEntityForm === 'function') {
+      return window.validateEntityForm('alert', formId);
+    } else {
+      window.Logger?.warn('validateForm not available - using basic validation', { page: "alerts" });
+      // Basic validation fallback
+      const form = document.getElementById(formId);
+      if (!form) {
+        window.Logger?.warn('Alert form not found', { page: "alerts" });
+        return false;
+      }
+      return form.checkValidity();
+    }
+  } catch (error) {
+    window.Logger?.error('Error validating alert form:', error, { page: "alerts" });
+    return false;
+  }
+}
+
 window.hideAddAlertModal = hideAddAlertModal;
 window.showEditAlertModal = showEditAlertModal;
 window.hideEditAlertModal = hideEditAlertModal;
@@ -2646,6 +2796,63 @@ window.loadConditionsFromSource = loadConditionsFromSource;
 window.loadTradePlansForConditions = loadTradePlansForConditions;
 window.loadTradesForConditions = loadTradesForConditions;
 window.loadConditionsFromItem = loadConditionsFromItem;
+/**
+ * Update evaluation statistics
+ * Updates statistics display after condition evaluation
+ * 
+ * @function updateEvaluationStats
+ * @param {Object} data - Evaluation results data
+ * @returns {void}
+ */
+function updateEvaluationStats(data) {
+  try {
+    if (!data || typeof data !== 'object') {
+      window.Logger?.warn('Invalid data for updateEvaluationStats', { page: "alerts" });
+      return;
+    }
+    
+    // Update evaluation summary if function exists
+    if (typeof updateEvaluationSummary === 'function') {
+      updateEvaluationSummary(data);
+    } else {
+      window.Logger?.debug('updateEvaluationSummary not available', { page: "alerts" });
+    }
+    
+    // Update display if results container exists
+    if (typeof displayEvaluationResults === 'function') {
+      displayEvaluationResults(data);
+    }
+  } catch (error) {
+    window.Logger?.error('Error updating evaluation stats:', error, { page: "alerts" });
+  }
+}
+
+/**
+ * Save alert data wrapper
+ * Wrapper for saveAlert that handles ModalManagerV2 integration
+ * 
+ * @function saveAlertData
+ * @returns {Promise<void>}
+ */
+async function saveAlertData() {
+  try {
+    // Use existing saveAlert function
+    if (typeof saveAlert === 'function') {
+      await saveAlert();
+    } else {
+      window.Logger?.error('saveAlert function not available', { page: "alerts" });
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'פונקציית שמירת התראה לא זמינה');
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error in saveAlertData:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בשמירת התראה');
+    }
+  }
+}
+
 window.evaluateAllConditions = evaluateAllConditions;
 window.updateEvaluationStats = updateEvaluationStats;
 window.initializeAlertConditionBuilder = initializeAlertConditionBuilder;

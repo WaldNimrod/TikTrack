@@ -318,6 +318,28 @@ class ModalManagerV2 {
                     </div>
                 `;
                 
+            case 'checkbox':
+                const checkedAttr = field.defaultValue === true || field.defaultValue === 'true' ? 'checked' : '';
+                return `
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" 
+                                   class="form-check-input" 
+                                   id="${field.id}" 
+                                   name="${field.id}"
+                                   value="true"
+                                   ${checkedAttr}
+                                   ${requiredAttr}
+                                   ${disabledAttr}>
+                            <label for="${field.id}" class="form-check-label">
+                                ${field.label} ${requiredStar}
+                            </label>
+                        </div>
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
             default:
                 console.warn(`Unknown field type: ${field.type}`);
                 return '';

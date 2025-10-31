@@ -1724,18 +1724,37 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             }
         }
         
-        // 5. Clear Browser Cache
+        // 5. Clear Service Worker (if exists)
+        if ('serviceWorker' in navigator) {
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const registration of registrations) {
+                    await registration.unregister();
+                    window.Logger.info('✅ Service Worker unregistered', { page: "unified-cache-manager" });
+                }
+                if (registrations.length > 0) {
+                    clearedLayers.push(`Service Worker (${registrations.length} registrations)`);
+                }
+            } catch (error) {
+                window.Logger.warn('⚠️ Error unregistering Service Worker:', error, { page: "unified-cache-manager" });
+                errors.push(`Service Worker: ${error.message}`);
+            }
+        }
+        
+        // 5.5. Clear Cache API (Browser Cache)
         if ('caches' in window) {
             try {
                 const cacheNames = await caches.keys();
                 await Promise.all(
                     cacheNames.map(cacheName => caches.delete(cacheName))
                 );
-                clearedLayers.push('Browser Cache');
-                window.Logger.info('✅ Browser Cache cleared successfully', { page: "unified-cache-manager" });
+                if (cacheNames.length > 0) {
+                    clearedLayers.push(`Cache API (${cacheNames.length} caches)`);
+                }
+                window.Logger.info('✅ Cache API cleared successfully', { page: "unified-cache-manager" });
             } catch (error) {
-                window.Logger.error('❌ Error clearing Browser Cache:', error, { page: "unified-cache-manager" });
-                errors.push(`Browser Cache: ${error.message}`);
+                window.Logger.error('❌ Error clearing Cache API:', error, { page: "unified-cache-manager" });
+                errors.push(`Cache API: ${error.message}`);
             }
         }
         

@@ -656,122 +656,11 @@ function showSecondConfirmationModal(message, onConfirm) {
  * מטפלת ברענון טבלאות אחרי פעולות CRUD עם שיפורי ביצועים
  */
 
-/**
- * רענון טבלה משופר עם כפיית DOM reflow
- * @param {Function} loadDataFunction - פונקציית טעינת הנתונים
- * @param {Function} updateActiveFieldsFunction - פונקציית עדכון שדות פעילים (אופציונלי)
- * @param {string} operationName - שם הפעולה לצורך לוגים
- * @param {number} delay - עיכוב במילישניות לפני הרענון (ברירת מחדל: 100)
- */
-async function enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName = 'פעולה', delay = 100) {
-  try {
-    // עיכוב קטן לוודא שהשרת עדכן את הנתונים
-    if (delay > 0) {
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-    
-    
-    // טעינת נתונים חדשים
-    if (typeof loadDataFunction === 'function') {
-      await loadDataFunction();
-    }
-    
-    // עדכון שדות פעילים אם קיים
-    if (typeof updateActiveFieldsFunction === 'function') {
-      await updateActiveFieldsFunction();
-    }
-    
-    
-    return true;
-  } catch (error) {
-    console.error(`❌ שגיאה ברענון טבלה אחרי ${operationName}:`, error);
-    return false;
-  }
-}
+// REMOVED: enhancedTableRefresh - use window.enhancedTableRefresh from ui-utils.js instead
+// The global function provides the same functionality with improved logging
 
-/**
- * טיפול משופר בתגובות API עם רענון טבלה אוטומטי
- * @param {Response} response - תגובת ה-API
- * @param {Object} options - אפשרויות הטיפול
- * @param {Function} options.loadDataFunction - פונקציית טעינת נתונים
- * @param {Function} options.updateActiveFieldsFunction - פונקציית עדכון שדות פעילים
- * @param {string} options.operationName - שם הפעולה
- * @param {string} options.itemName - שם הפריט (טיקר, עסקה וכו')
- * @param {string} options.successMessage - הודעת הצלחה מותאמת אישית
- * @param {Function} options.onSuccess - פונקציה נוספת לביצוע בהצלחה
- * @param {Function} options.onNotFound - פונקציה מותאמת אישית ל-404
- */
-async function handleApiResponseWithRefresh(response, options = {}) {
-  const {
-    loadDataFunction,
-    updateActiveFieldsFunction,
-    operationName = 'פעולה',
-    itemName = 'פריט',
-    successMessage,
-    onSuccess,
-    onNotFound
-  } = options;
-
-  if (response.ok) {
-    // פעולה הצליחה
-    const defaultMessage = `${itemName} ${operationName === 'מחיקה' ? 'נמחק' : 
-                                      operationName === 'עדכון' ? 'עודכן' : 
-                                      operationName === 'הוספה' ? 'נוסף' : 
-                                      operationName === 'ביטול' ? 'בוטל' : 
-                                      operationName === 'שיחזור' ? 'שוחזר' : 'עובד'} בהצלחה`;
-    
-    if (window.showSuccessNotification) {
-      window.showSuccessNotification('הצלחה', successMessage || defaultMessage);
-    }
-
-    // ביצוע פונקציה נוספת אם קיימת
-    if (typeof onSuccess === 'function') {
-      await onSuccess();
-    }
-
-    // רענון טבלה
-    await enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName);
-    
-    return true;
-
-  } else if (response.status === 404) {
-    // פריט לא קיים - טיפול ב-404
-    console.warn(`${itemName} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
-    
-    if (typeof onNotFound === 'function') {
-      await onNotFound();
-    } else {
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('מידע', `${itemName} כבר לא קיים במערכת - מרענן נתונים`);
-      }
-    }
-
-    // רענון טבלה גם במקרה של 404
-    await enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, `זיהוי 404 ב${operationName}`);
-    
-    return true;
-
-  } else {
-    // שגיאה אחרת
-    const errorResponse = await response.text();
-    console.error(`שגיאה ב${operationName}:`, errorResponse);
-    
-    try {
-      const errorData = JSON.parse(errorResponse);
-      const errorMessage = errorData.error?.message || errorResponse;
-      
-      if (window.showErrorNotification) {
-        window.showErrorNotification(`שגיאה ב${operationName}`, errorMessage);
-      }
-    } catch {
-      if (window.showErrorNotification) {
-        window.showErrorNotification(`שגיאה ב${operationName}`, 'שגיאה לא מזוהה');
-      }
-    }
-    
-    return false;
-  }
-}
+// REMOVED: handleApiResponseWithRefresh - use window.handleApiResponseWithRefresh from ui-utils.js instead
+// The global function provides the same functionality with improved error handling
 
 /**
  * פונקציית עזר לזיהוי אוטומטי של פונקציות טעינת נתונים לפי עמוד נוכחי
@@ -825,7 +714,7 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
   const { loadData, updateActive } = getPageDataFunctions();
   
   if (loadData) {
-    await enhancedTableRefresh(loadData, updateActive, operationName);
+    await window.enhancedTableRefresh(loadData, updateActive, operationName);
   } else {
     console.warn('לא נמצאה פונקציית טעינת נתונים לעמוד הנוכחי');
     location.reload(); // fallback
@@ -1294,8 +1183,7 @@ function deleteTicker(entityType, id) {
 // ===== EXPORTS =====
 
 // Export table refresh system functions
-window.enhancedTableRefresh = enhancedTableRefresh;
-window.handleApiResponseWithRefresh = handleApiResponseWithRefresh;
+// REMOVED: window exports - use window.enhancedTableRefresh and window.handleApiResponseWithRefresh from ui-utils.js instead
 window.getPageDataFunctions = getPageDataFunctions;
 window.autoRefreshCurrentPage = autoRefreshCurrentPage;
 

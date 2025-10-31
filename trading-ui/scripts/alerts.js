@@ -5,19 +5,18 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 63
+ * Total Functions: 59
  * 
  * PAGE INITIALIZATION (2)
  * - initializeAlertModalTabs() - initializeAlertModalTabs function
  * - initializeAlertConditionBuilder() - * עדכון סטטיסטיקות הערכת תנאים
  * 
- * DATA LOADING (14)
+ * DATA LOADING (13)
  * - getDemoAlertsData() - getDemoAlertsData function
  * - loadAlertsData() - loadAlertsData function
  * - loadModalData() - loadModalData function
  * - getAlertState() - * עריכת התראה
- * - getStatusClass() - * אישור מחיקת התראה
- * - getRelatedClass() - * פונקציה לסידור טבלת התראות
+ * - getRelatedClass() - * אישור מחיקת התראה
  * - loadAlerts() - loadAlerts function
  * - loadConditionsFromSource() - loadConditionsFromSource function
  * - loadTradePlansForConditions() - * Load conditions from source type (trade_plan or trade)
@@ -27,7 +26,7 @@
  * - getMethodIdFromCondition() - getMethodIdFromCondition function
  * - loadAlertTickerInfo() - * הצגת מודל הוספת התראה
  * 
- * DATA MANIPULATION (16)
+ * DATA MANIPULATION (15)
  * - updatePageSummaryStats() - updatePageSummaryStats function
  * - updateRadioButtons() - updateRadioButtons function
  * - saveAlert() - * פירוק מחרוזת תנאי התראה
@@ -36,7 +35,6 @@
  * - deleteAlertInternal() - deleteAlertInternal function
  * - confirmDeleteAlert() - * מחיקת התראה
  * - updateAlertStatus() - updateAlertStatus function
- * - hideAddAlertModal() - hideAddAlertModal function
  * - updateEvaluationStats() - updateEvaluationStats function
  * - saveAlertData() - * Update evaluation statistics
  * - updateAlertsSummary() - updateAlertsSummary function
@@ -45,7 +43,7 @@
  * - updateEvaluationSummary() - updateEvaluationSummary function
  * - showAddAlertModal() - * ניקוי הממשק המתקדם
  * 
- * EVENT HANDLING (17)
+ * EVENT HANDLING (16)
  * - onRelationTypeChange() - onRelationTypeChange function
  * - onRelatedObjectChange() - * טיפול בשינוי סוג שיוך
  * - toggleConditionFields() - * טיפול בבחירת אובייקט
@@ -55,8 +53,7 @@
  * - disableEditConditionFields() - * Enable condition fields for add modal
  * - parseAlertCondition() - parseAlertCondition function
  * - validateAlertStatusCombination() - validateAlertStatusCombination function
- * - restoreAlertsSectionState() - * קבלת מחלקת סטטוס
- * - checkAlertCondition() - checkAlertCondition function
+ * - restoreAlertsSectionState() - * קבלת מחלקת CSS לאובייקט מקושר
  * - displayAvailableConditions() - displayAvailableConditions function
  * - selectConditionForAlert() - selectConditionForAlert function
  * - evaluateAllConditions() - evaluateAllConditions function
@@ -64,13 +61,12 @@
  * - displayEvaluationResults() - * הצגת אינדיקטור טעינה להערכת תנאים
  * - cleanupAlertConditionBuilder() - * קבלת מזהה שיטה מתנאי קיים
  * 
- * UI UPDATES (3)
- * - hideEditAlertModal() - * Hide add alert modal wrapper
+ * UI UPDATES (2)
  * - showEditAlertModal() - * ניקוי הממשק המתקדם
  * - displayAlertTickerInfo() - * מחיקת התראה
  * 
  * VALIDATION (1)
- * - validateAlertForm() - * Hide edit alert modal wrapper
+ * - validateAlertForm() - validateAlertForm function
  * 
  * OTHER (10)
  * - populateSelect() - populateSelect function
@@ -1771,17 +1767,7 @@ async function confirmDeleteAlert(alertId) {
  * @requires updateAlertsTable - פונקציה לעדכון הטבלה
  */
 
-/**
- * קבלת מחלקת סטטוס
- */
-function getStatusClass(status) {
-  switch (status) {
-  case 'open': return 'status-open';
-  case 'closed': return 'status-closed';
-  case 'cancelled': return 'status-cancelled';
-  default: return 'status-cancelled';
-  }
-}
+// REMOVED: getStatusClass - use window.getStatusClass or FieldRendererService.renderStatus instead
 
 
 /**
@@ -2111,13 +2097,8 @@ window.reactivateAlert = reactivateAlert;
 // window.Logger.info('- parseAlertCondition:', typeof window.parseAlertCondition, { page: "alerts" });
 // window.Logger.info('- clearAlertValidation:', typeof window.clearAlertValidation, { page: "alerts" });
 
-/**
- * בדיקת תנאי התראה
- * בודק אם תנאי התראה מתקיים עבור טיקר מסוים
- * @param {Object} alert - אובייקט ההתראה
- * @param {Object} tickerData - נתוני הטיקר הנוכחיים
- */
-function checkAlertCondition(alert, tickerData) {
+// REMOVED: checkAlertCondition - unused function
+// function checkAlertCondition(alert, tickerData) {
   try {
     window.Logger.info('🔍 בודק תנאי התראה:', alert.id, tickerData, { page: "alerts" });
     
@@ -2339,57 +2320,7 @@ window.loadAlertsData = window.loadAlertsData;
 window.updateAlertsTable = updateAlertsTable;
 window.updatePageSummaryStats = updatePageSummaryStats;
 window.showAddAlertModal = showAddAlertModal;
-/**
- * Hide add alert modal wrapper
- * Uses ModalManagerV2.hideModal
- * 
- * @function hideAddAlertModal
- * @returns {void}
- */
-function hideAddAlertModal() {
-  try {
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
-      window.ModalManagerV2.hideModal('alertsModal');
-    } else {
-      // Fallback to Bootstrap modal
-      const modal = document.getElementById('alertsModal');
-      if (modal && typeof bootstrap !== 'undefined') {
-        const bsModal = bootstrap.Modal.getInstance(modal);
-        if (bsModal) {
-          bsModal.hide();
-        }
-      }
-    }
-  } catch (error) {
-    window.Logger?.error('Error hiding add alert modal:', error, { page: "alerts" });
-  }
-}
-
-/**
- * Hide edit alert modal wrapper
- * Uses ModalManagerV2.hideModal
- * 
- * @function hideEditAlertModal
- * @returns {void}
- */
-function hideEditAlertModal() {
-  try {
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
-      window.ModalManagerV2.hideModal('alertsModal');
-    } else {
-      // Fallback to Bootstrap modal
-      const modal = document.getElementById('alertsModal');
-      if (modal && typeof bootstrap !== 'undefined') {
-        const bsModal = bootstrap.Modal.getInstance(modal);
-        if (bsModal) {
-          bsModal.hide();
-        }
-      }
-    }
-  } catch (error) {
-    window.Logger?.error('Error hiding edit alert modal:', error, { page: "alerts" });
-  }
-}
+// REMOVED: hideAddAlertModal, hideEditAlertModal - use ModalManagerV2.hideModal directly
 
 /**
  * Validate alert form wrapper

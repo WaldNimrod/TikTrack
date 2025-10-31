@@ -662,17 +662,6 @@ class Logger {
 // יצירת instance גלובלי
 window.Logger = new Logger();
 
-// Fallback למקרה ש-Logger לא זמין
-if (!window.Logger) {
-    window.Logger = {
-        info: () => {},
-        error: () => {},
-        warn: () => {},
-        debug: () => {},
-        critical: () => {}
-    };
-}
-
 // ===== DETAILED LOG GENERATION FUNCTIONS =====
 // These functions are used across multiple pages for detailed logging
 

@@ -601,6 +601,126 @@ async function getAllEntityColorVariantsFromPreferences(entityType) {
 }
 
 // ===== PREFERENCES FUNCTIONS =====
+/**
+ * טעינת צבעי ישויות מהעדפות
+ * Load entity colors from preferences
+ * @param {Object} preferences - העדפות המשתמש
+ */
+function loadEntityColorsFromPreferences(preferences) {
+  // עדכון צבעי ישויות מההעדפות
+  if (preferences) {
+    // Set global preferences for easy access
+    window.currentPreferences = preferences;
+    
+    // עדכון צבעי executions
+    if (preferences.entityExecutionColor) {
+      ENTITY_COLORS.execution = preferences.entityExecutionColor;
+      ENTITY_BACKGROUND_COLORS.execution = preferences.entityExecutionColorLight || `rgba(${hexToRgb(preferences.entityExecutionColor)?.r || 253}, ${hexToRgb(preferences.entityExecutionColor)?.g || 126}, ${hexToRgb(preferences.entityExecutionColor)?.b || 20}, 0.1)`;
+      ENTITY_TEXT_COLORS.execution = preferences.entityExecutionColorDark || darkenColor(preferences.entityExecutionColor, 20);
+      ENTITY_BORDER_COLORS.execution = `rgba(${hexToRgb(preferences.entityExecutionColor)?.r || 253}, ${hexToRgb(preferences.entityExecutionColor)?.g || 126}, ${hexToRgb(preferences.entityExecutionColor)?.b || 20}, 0.3)`;
+      ENTITY_LIGHT_COLORS.execution = preferences.entityExecutionColorLight || lightenColor(preferences.entityExecutionColor, 10);
+      ENTITY_DARK_COLORS.execution = preferences.entityExecutionColorDark || darkenColor(preferences.entityExecutionColor, 20);
+    }
+    
+    // עדכון צבעי trades
+    if (preferences.entityTradeColor) {
+      ENTITY_COLORS.trade = preferences.entityTradeColor;
+      ENTITY_BACKGROUND_COLORS.trade = preferences.entityTradeColorLight || `rgba(${hexToRgb(preferences.entityTradeColor)?.r || 40}, ${hexToRgb(preferences.entityTradeColor)?.g || 167}, ${hexToRgb(preferences.entityTradeColor)?.b || 69}, 0.1)`;
+      ENTITY_TEXT_COLORS.trade = preferences.entityTradeColorDark || darkenColor(preferences.entityTradeColor, 20);
+      ENTITY_BORDER_COLORS.trade = `rgba(${hexToRgb(preferences.entityTradeColor)?.r || 40}, ${hexToRgb(preferences.entityTradeColor)?.g || 167}, ${hexToRgb(preferences.entityTradeColor)?.b || 69}, 0.3)`;
+      ENTITY_LIGHT_COLORS.trade = preferences.entityTradeColorLight || lightenColor(preferences.entityTradeColor, 10);
+      ENTITY_DARK_COLORS.trade = preferences.entityTradeColorDark || darkenColor(preferences.entityTradeColor, 20);
+    }
+    
+    // עדכון צבעי trading accounts
+    if (preferences.entityTradingAccountColor) {
+      ENTITY_COLORS.account = preferences.entityTradingAccountColor;
+      ENTITY_BACKGROUND_COLORS.account = preferences.entityTradingAccountColorLight || `rgba(${hexToRgb(preferences.entityTradingAccountColor)?.r || 23}, ${hexToRgb(preferences.entityTradingAccountColor)?.g || 162}, ${hexToRgb(preferences.entityTradingAccountColor)?.b || 184}, 0.1)`;
+      ENTITY_TEXT_COLORS.account = preferences.entityTradingAccountColorDark || darkenColor(preferences.entityTradingAccountColor, 20);
+      ENTITY_BORDER_COLORS.account = `rgba(${hexToRgb(preferences.entityTradingAccountColor)?.r || 23}, ${hexToRgb(preferences.entityTradingAccountColor)?.g || 162}, ${hexToRgb(preferences.entityTradingAccountColor)?.b || 184}, 0.3)`;
+      ENTITY_LIGHT_COLORS.account = preferences.entityTradingAccountColorLight || lightenColor(preferences.entityTradingAccountColor, 10);
+      ENTITY_DARK_COLORS.account = preferences.entityTradingAccountColorDark || darkenColor(preferences.entityTradingAccountColor, 20);
+    }
+    
+    // עדכון צבעי alerts
+    if (preferences.entityAlertColor) {
+      ENTITY_COLORS.alert = preferences.entityAlertColor;
+      ENTITY_BACKGROUND_COLORS.alert = preferences.entityAlertColorLight || `rgba(${hexToRgb(preferences.entityAlertColor)?.r || 255}, ${hexToRgb(preferences.entityAlertColor)?.g || 193}, ${hexToRgb(preferences.entityAlertColor)?.b || 7}, 0.1)`;
+      ENTITY_TEXT_COLORS.alert = preferences.entityAlertColorDark || darkenColor(preferences.entityAlertColor, 20);
+      ENTITY_BORDER_COLORS.alert = `rgba(${hexToRgb(preferences.entityAlertColor)?.r || 255}, ${hexToRgb(preferences.entityAlertColor)?.g || 193}, ${hexToRgb(preferences.entityAlertColor)?.b || 7}, 0.3)`;
+      ENTITY_LIGHT_COLORS.alert = preferences.entityAlertColorLight || lightenColor(preferences.entityAlertColor, 10);
+      ENTITY_DARK_COLORS.alert = preferences.entityAlertColorDark || darkenColor(preferences.entityAlertColor, 20);
+    }
+    
+    // עדכון צבעי tickers
+    if (preferences.entityTickerColor) {
+      ENTITY_COLORS.ticker = preferences.entityTickerColor;
+      ENTITY_BACKGROUND_COLORS.ticker = preferences.entityTickerColorLight || `rgba(${hexToRgb(preferences.entityTickerColor)?.r || 111}, ${hexToRgb(preferences.entityTickerColor)?.g || 66}, ${hexToRgb(preferences.entityTickerColor)?.b || 193}, 0.1)`;
+      ENTITY_TEXT_COLORS.ticker = preferences.entityTickerColorDark || darkenColor(preferences.entityTickerColor, 20);
+      ENTITY_BORDER_COLORS.ticker = `rgba(${hexToRgb(preferences.entityTickerColor)?.r || 111}, ${hexToRgb(preferences.entityTickerColor)?.g || 66}, ${hexToRgb(preferences.entityTickerColor)?.b || 193}, 0.3)`;
+      ENTITY_LIGHT_COLORS.ticker = preferences.entityTickerColorLight || lightenColor(preferences.entityTickerColor, 10);
+      ENTITY_DARK_COLORS.ticker = preferences.entityTickerColorDark || darkenColor(preferences.entityTickerColor, 20);
+    }
+    
+    // עדכון צבעי cash flows
+    if (preferences.entityCashFlowColor) {
+      ENTITY_COLORS['cash_flow'] = preferences.entityCashFlowColor;
+      ENTITY_BACKGROUND_COLORS['cash_flow'] = preferences.entityCashFlowColorLight || `rgba(${hexToRgb(preferences.entityCashFlowColor)?.r || 32}, ${hexToRgb(preferences.entityCashFlowColor)?.g || 201}, ${hexToRgb(preferences.entityCashFlowColor)?.b || 151}, 0.1)`;
+      ENTITY_TEXT_COLORS['cash_flow'] = preferences.entityCashFlowColorDark || darkenColor(preferences.entityCashFlowColor, 20);
+      ENTITY_BORDER_COLORS['cash_flow'] = `rgba(${hexToRgb(preferences.entityCashFlowColor)?.r || 32}, ${hexToRgb(preferences.entityCashFlowColor)?.g || 201}, ${hexToRgb(preferences.entityCashFlowColor)?.b || 151}, 0.3)`;
+      ENTITY_LIGHT_COLORS['cash_flow'] = preferences.entityCashFlowColorLight || lightenColor(preferences.entityCashFlowColor, 10);
+      ENTITY_DARK_COLORS['cash_flow'] = preferences.entityCashFlowColorDark || darkenColor(preferences.entityCashFlowColor, 20);
+    }
+    
+    // עדכון צבעי notes
+    if (preferences.entityNoteColor) {
+      ENTITY_COLORS.note = preferences.entityNoteColor;
+      ENTITY_BACKGROUND_COLORS.note = preferences.entityNoteColorLight || `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 108}, ${hexToRgb(preferences.entityNoteColor)?.g || 117}, ${hexToRgb(preferences.entityNoteColor)?.b || 125}, 0.1)`;
+      ENTITY_TEXT_COLORS.note = preferences.entityNoteColorDark || darkenColor(preferences.entityNoteColor, 20);
+      ENTITY_BORDER_COLORS.note = `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 108}, ${hexToRgb(preferences.entityNoteColor)?.g || 117}, ${hexToRgb(preferences.entityNoteColor)?.b || 125}, 0.3)`;
+      ENTITY_LIGHT_COLORS.note = preferences.entityNoteColorLight || lightenColor(preferences.entityNoteColor, 10);
+      ENTITY_DARK_COLORS.note = preferences.entityNoteColorDark || darkenColor(preferences.entityNoteColor, 20);
+    }
+    
+    // עדכון צבעי trade plans
+    if (preferences.entityTradePlanColor) {
+      ENTITY_COLORS['trade_plan'] = preferences.entityTradePlanColor;
+      ENTITY_BACKGROUND_COLORS['trade_plan'] = preferences.entityTradePlanColorLight || `rgba(${hexToRgb(preferences.entityTradePlanColor)?.r || 0}, ${hexToRgb(preferences.entityTradePlanColor)?.g || 123}, ${hexToRgb(preferences.entityTradePlanColor)?.b || 255}, 0.1)`;
+      ENTITY_TEXT_COLORS['trade_plan'] = preferences.entityTradePlanColorDark || darkenColor(preferences.entityTradePlanColor, 20);
+      ENTITY_BORDER_COLORS['trade_plan'] = `rgba(${hexToRgb(preferences.entityTradePlanColor)?.r || 0}, ${hexToRgb(preferences.entityTradePlanColor)?.g || 123}, ${hexToRgb(preferences.entityTradePlanColor)?.b || 255}, 0.3)`;
+      ENTITY_LIGHT_COLORS['trade_plan'] = preferences.entityTradePlanColorLight || lightenColor(preferences.entityTradePlanColor, 10);
+      ENTITY_DARK_COLORS['trade_plan'] = preferences.entityTradePlanColorDark || darkenColor(preferences.entityTradePlanColor, 20);
+    }
+  }
+  
+  // יצירת CSS דינמי
+  generateAndApplyEntityCSS();
+}
+
+/**
+ * יצירת CSS דינמי ויישום על הדף
+ * Generate dynamic CSS and apply to page
+ */
+function generateAndApplyEntityCSS() {
+  try {
+    // יצירת CSS חדש
+    const newCSS = generateEntityCSS();
+    
+    // חיפוש או יצירת אלמנט style
+    let styleElement = document.getElementById('dynamic-entity-colors');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'dynamic-entity-colors';
+      document.head.appendChild(styleElement);
+    }
+    
+    // עדכון התוכן
+    styleElement.textContent = newCSS;
+  } catch (error) {
+    console.error('❌ שגיאה ביצירת CSS דינמי:', error);
+  }
+}
+
 async function loadColorPreferences() {
   try {
     // This would typically load from the preferences API
@@ -626,42 +746,6 @@ function updateEntityColors(preferences) {
     }
   } catch (error) {
     if (window.Logger) { window.Logger.error('❌ Error updating entity colors:', error, { page: "color-scheme" }); }
-  }
-}
-
-function updateCSSVariablesFromPreferences(preferences) {
-  try {
-    if (preferences && preferences.colorScheme) {
-      // Update CSS variables based on preferences
-      if (preferences.colorScheme.entities) {
-        Object.entries(preferences.colorScheme.entities).forEach(([entityType, color]) => {
-          document.documentElement.style.setProperty(`--entity-${entityType}-color`, color);
-          
-          // Add light and dark variants
-          const lightColor = lightenColor(color, 10);
-          const darkColor = darkenColor(color, 20);
-          
-          document.documentElement.style.setProperty(`--entity-${entityType}-color-light`, lightColor);
-          document.documentElement.style.setProperty(`--entity-${entityType}-color-dark`, darkColor);
-        });
-      }
-
-      // Update status colors from preferences
-      if (preferences.colorScheme.status) {
-        Object.entries(preferences.colorScheme.status).forEach(([statusType, color]) => {
-          document.documentElement.style.setProperty(`--user-status-${statusType}-color`, color);
-          
-          // Add background and border variants
-          const bgColor = lightenColor(color, 10);
-          const borderColor = color;
-          
-          document.documentElement.style.setProperty(`--user-status-${statusType}-bg`, bgColor);
-          document.documentElement.style.setProperty(`--user-status-${statusType}-border`, borderColor);
-        });
-      }
-    }
-  } catch (error) {
-    if (window.Logger) { window.Logger.error('❌ Error updating CSS variables from preferences:', error, { page: "color-scheme" }); }
   }
 }
 

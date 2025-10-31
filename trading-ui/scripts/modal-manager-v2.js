@@ -287,6 +287,12 @@ class ModalManagerV2 {
                     });
                 }
                 
+                // Add debug label if defaultFromPreferences
+                let debugLabel = '';
+                if (field.defaultFromPreferences) {
+                    debugLabel = '<small class="text-muted d-block mt-1">🔍 DEBUG: defaultFromPreferences=true</small>';
+                }
+                
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
@@ -298,6 +304,7 @@ class ModalManagerV2 {
                                 ${requiredAttr}>
                             ${optionsHTML}
                         </select>
+                        ${debugLabel}
                         <div class="invalid-feedback"></div>
                     </div>
                 `;

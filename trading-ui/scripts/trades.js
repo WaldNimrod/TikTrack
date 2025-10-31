@@ -278,14 +278,28 @@ async function loadTradesData() {
     }
 
     const responseData = await response.json();
-    window.Logger.info('📊 loadTradesData: Received data:', responseData?.data?.length || 0, 'trades', { page: "trades" });
+    window.Logger.info('📊 loadTradesData: Received response:', { 
+      status: responseData?.status, 
+      dataLength: responseData?.data?.length || 0,
+      hasData: !!responseData?.data,
+      responseKeys: Object.keys(responseData || {})
+    }, { page: "trades" });
 
     if (responseData.status !== 'success') {
+      window.Logger.error('❌ API returned error status:', responseData, { page: "trades" });
       throw new Error(`API error: ${responseData.message || 'Unknown error'}`);
     }
 
     // בדיקה שהנתונים בפורמט הנכון
     const apiData = responseData.data || responseData;
+    
+    if (!apiData || !Array.isArray(apiData)) {
+      window.Logger.warn('⚠️ API data is not an array:', { apiData, responseData }, { page: "trades" });
+      // אם אין נתונים, נגדיר מערך ריק
+      window.tradesData = [];
+      updateTradesTable([]);
+      return;
+    }
 
     // עדכון הנתונים המקומיים - שימוש בשמות אחידים מה-API
     const localTradesData = apiData.map(trade => ({
@@ -583,8 +597,65 @@ async function updateTradesTable(trades) {
     }
   }
 
-  // טעינת תאריכי יצירה של תוכניות
-  loadTradePlanDates();
+  // טעינת תאריכי יצירה של תוכניות (רק אם יש קישורים לתוכניות)
+  const planLinks = document.querySelectorAll('.plan-link[data-plan-id]');
+  if (planLinks.length > 0) {
+    if (typeof loadTradePlanDates === 'function') {
+      loadTradePlanDates();
+    } else if (typeof window.loadTradePlanDates === 'function') {
+      window.loadTradePlanDates();
+    } else {
+      window.Logger?.debug('loadTradePlanDates not available', { page: "trades" });
+    }
+  }
+}
+
+/**
+ * Load trade plan dates for plan links in the trades table
+ * This function updates plan link text with the actual creation date
+ * 
+ * @function loadTradePlanDates
+ * @returns {Promise<void>}
+ */
+async function loadTradePlanDates() {
+  try {
+    const planLinks = document.querySelectorAll('.plan-link[data-plan-id]');
+    if (planLinks.length === 0) {
+      return; // No plan links to update
+    }
+    
+    window.Logger?.debug(`Loading dates for ${planLinks.length} trade plan links`, { page: "trades" });
+    
+    for (const link of planLinks) {
+      const planId = link.getAttribute('data-plan-id');
+      if (!planId) continue;
+      
+      try {
+        const response = await fetch(`/api/trade_plans/${planId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'success' && data.data) {
+            const plan = data.data;
+            const createdDate = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL', { 
+              day: '2-digit', 
+              month: '2-digit', 
+              year: '2-digit' 
+            }) : 'תאריך לא ידוע';
+            link.textContent = createdDate;
+          } else {
+            link.textContent = 'תוכנית קיימת';
+          }
+        } else {
+          link.textContent = 'תוכנית קיימת';
+        }
+      } catch (error) {
+        window.Logger?.warn('Error loading trade plan date', { planId, error }, { page: "trades" });
+        link.textContent = 'תוכנית קיימת';
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error in loadTradePlanDates', error, { page: "trades" });
+  }
 }
 
 // פונקציות נוספות
@@ -1027,11 +1098,97 @@ function clearTradeValidation(formId = 'addTradeForm') {
   }
 }
 
+/**
+ * Validate trade form
+ * Wrapper for global validation system
+ * 
+ * @function validateTradeForm
+ * @param {string} formId - Form ID to validate (optional, defaults to 'addTradeForm')
+ * @returns {boolean} - True if form is valid, false otherwise
+ */
+function validateTradeForm(formId = 'addTradeForm') {
+  const form = document.getElementById(formId);
+  if (!form) {
+    window.Logger?.warn('Form not found for validation', { formId, page: "trades" });
+    return false;
+  }
+  
+  // Use global validation system if available
+  if (typeof window.validateForm === 'function') {
+    const result = window.validateForm(formId);
+    // Handle both boolean and object results
+    return typeof result === 'boolean' ? result : (result?.isValid !== false);
+  }
+  
+  // Fallback: check required fields
+  const requiredFields = form.querySelectorAll('[required]');
+  let isValid = true;
+  
+  requiredFields.forEach(field => {
+    if (!field.value.trim()) {
+      isValid = false;
+      field.classList.add('is-invalid');
+    } else {
+      field.classList.remove('is-invalid');
+    }
+  });
+  
+  return isValid;
+}
+
 window.clearTradeValidation = clearTradeValidation;
 window.validateTradeForm = validateTradeForm;
 window.showAddTradeModal = showAddTradeModal;
+
+/**
+ * Hide add trade modal
+ * Wrapper for ModalManagerV2 hideModal
+ * 
+ * @function hideAddTradeModal
+ * @returns {void}
+ */
+function hideAddTradeModal() {
+  try {
+    if (window.ModalManagerV2) {
+      window.ModalManagerV2.hideModal('tradesModal');
+    } else {
+      // Fallback to Bootstrap modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('tradesModal'));
+      if (modal) {
+        modal.hide();
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error in hideAddTradeModal', error, { page: "trades" });
+  }
+}
+
 window.hideAddTradeModal = hideAddTradeModal;
 window.showEditTradeModal = showEditTradeModal;
+
+/**
+ * Hide edit trade modal
+ * Wrapper for ModalManagerV2 hideModal
+ * 
+ * @function hideEditTradeModal
+ * @returns {void}
+ */
+function hideEditTradeModal() {
+  try {
+    if (window.ModalManagerV2) {
+      window.ModalManagerV2.hideModal('tradesModal');
+    } else {
+      // Fallback to Bootstrap modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('tradesModal'));
+      if (modal) {
+        modal.hide();
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error in hideEditTradeModal', error, { page: "trades" });
+  }
+}
+
 window.hideEditTradeModal = hideEditTradeModal;
 window.updateRadioButtons = updateRadioButtons;
 window.populateSelect = populateSelect;
@@ -1049,7 +1206,35 @@ window.addEditReminder = addEditReminder;
 window.enableTradeFormFields = enableTradeFormFields;
 window.disableTradeFormFields = disableTradeFormFields;
 window.loadModalData = loadModalData;
-window.initializeTradesPage = window.initializeTradesPage;
+/**
+ * Initialize trades page - called from page-initialization-configs.js
+ * 
+ * @function initializeTradesPage
+ * @returns {Promise<void>}
+ */
+async function initializeTradesPage() {
+  try {
+    window.Logger?.info('📈 Initializing Trades page...', { page: "trades" });
+    
+    // Load trades data
+    if (typeof loadTradesData === 'function') {
+      await loadTradesData();
+    } else if (typeof window.loadTradesData === 'function') {
+      await window.loadTradesData();
+    } else {
+      window.Logger?.warn('⚠️ loadTradesData not available', { page: "trades" });
+    }
+    
+    window.Logger?.info('✅ Trades page initialized successfully', { page: "trades" });
+  } catch (error) {
+    window.Logger?.error('❌ Error initializing Trades page:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה באתחול עמוד טריידים');
+    }
+  }
+}
+
+window.initializeTradesPage = initializeTradesPage;
 window.setupDateValidation = setupDateValidation;
 window.validateDateFields = validateDateFields;
 window.clearDateValidationMessages = clearDateValidationMessages;

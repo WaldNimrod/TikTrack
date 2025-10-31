@@ -197,20 +197,25 @@ class SelectPopulatorService {
             
             // ברירת מחדל מהעדפות
             let defaultValue = options.defaultValue;
+            console.log(`🔍 DEBUG populateAccountsSelect: defaultValue before preference:`, defaultValue);
             if (options.defaultFromPreferences) {
                 try {
-                    const prefValue = this._getPreferenceFromMemory('default_trading_account', ['defaultAccountFilter', 'defaultTradingAccount', 'trading_account_id']);
+                    const prefValue = await this._getPreferenceFromMemory('default_trading_account', ['defaultAccountFilter', 'defaultTradingAccount', 'trading_account_id']);
+                    console.log(`🔍 DEBUG populateAccountsSelect: prefValue from _getPreferenceFromMemory:`, prefValue, `(type: ${typeof prefValue})`);
                     if (prefValue) {
                         // Try to parse as integer ID first
                         const parsed = parseInt(prefValue);
+                        console.log(`🔍 DEBUG populateAccountsSelect: parsed value:`, parsed, `(isNaN: ${isNaN(parsed)})`);
                         if (!isNaN(parsed)) {
                             defaultValue = parsed;
+                            console.log(`🔍 DEBUG populateAccountsSelect: defaultValue set to:`, defaultValue, `(type: ${typeof defaultValue})`);
                         }
                     }
                 } catch (e) { 
                     console.warn(`⚠️ Error getting account preference:`, e);
                 }
             }
+            console.log(`🔍 DEBUG populateAccountsSelect: final defaultValue:`, defaultValue, `(type: ${typeof defaultValue})`);
             
             // מילוי ה-select
             this._populateSelect(select, accounts, {
@@ -475,6 +480,13 @@ class SelectPopulatorService {
         });
         
         // סימון ברירת מחדל לפי value או לפי טקסט
+        console.log(`🔍 DEBUG: About to set default for ${select.id}:`, {
+            defaultValue: config.defaultValue,
+            defaultValueType: typeof config.defaultValue,
+            defaultText: config.defaultText,
+            optionsCount: select.options.length
+        });
+        
         if (config.defaultValue !== undefined && config.defaultValue !== null) {
             console.log(`🔍 Setting default value for ${select.id}:`, config.defaultValue, `(type: ${typeof config.defaultValue})`);
             select.value = config.defaultValue;

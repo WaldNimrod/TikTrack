@@ -118,10 +118,10 @@ function addExecution() {
     window.Logger.info('➕ מוסיף ביצוע חדש', { page: "executions" });
     
     // פתיחת מודל הוספת ביצוע - שימוש במערכת הכללית
-    if (typeof window.showAddExecutionModal === 'function') {
-      window.showAddExecutionModal();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('executionsModal', 'add');
     } else {
-      window.Logger.error('❌ showAddExecutionModal לא זמין במערכת הכללית', { page: "executions" });
+      window.Logger.error('❌ ModalManagerV2 לא זמין במערכת הכללית', { page: "executions" });
     }
     
   } catch (error) {
@@ -177,7 +177,12 @@ let tradesData = []; // נתוני טריידים לשמירת מפת חשבונ
 
 function editExecution(id) {
   try {
-  showEditExecutionModal(id);
+  // Use ModalManagerV2 directly
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+    window.ModalManagerV2.showEditModal('executionsModal', 'execution', id);
+  } else {
+    window.Logger.error('❌ ModalManagerV2 לא זמין במערכת הכללית', { page: "executions" });
+  }
   } catch (error) {
     window.Logger.error('שגיאה בעריכת ביצוע:', error, { page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
@@ -740,45 +745,7 @@ async function updateExecutionWrapper() {
  * הצגת מודל פריטים מקושרים
  * שימוש בפונקציה הגלובלית מ-linked-items.js
  */
-async function showExecutionLinkedItemsModal(executionId, _errorData) {
-
-
-  // מציאת העסקה לפי ID
-  const execution = executionsData.find(e => e.id === executionId);
-  if (!execution) {
-    handleElementNotFound('execution', 'CRITICAL');
-    return;
-  }
-
-  // טעינת נתונים מקושרים מהשרת
-  try {
-    const response = await fetch(`http://127.0.0.1:8080/api/executions/${executionId}/linked-items`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const linkedData = await response.json();
-
-
-    // שימוש בפונקציה הגלובלית מ-linked-items.js
-    if (typeof window.showLinkedItemsModal === 'function') {
-      // הוספת פרטי העסקה לנתונים
-      const enhancedData = {
-        ...linkedData,
-        executionId: execution.id,
-        tradeId: execution.trade_id,
-      };
-
-      // קריאה לפונקציה הגלובלית
-      window.showLinkedItemsModal(enhancedData, 'execution', executionId);
-    } else {
-      handleFunctionNotFound('showLinkedItemsModal', 'CRITICAL');
-    }
-
-  } catch (error) {
-    handleApiError(error, 'נתונים מקושרים');
-  }
-}
+// REMOVED: showExecutionLinkedItemsModal - use window.viewLinkedItems(executionId, 'execution') or window.viewLinkedItemsForExecution(executionId) from linked-items.js instead
 
 // REMOVED: loadLinkedItemsDetails and loadLinkedItemsFromMultipleSources - unused functions
 // Use viewLinkedItemsForExecution from linked-items.js instead
@@ -2578,9 +2545,9 @@ window.filterExecutionsByAccount = window.filterExecutionsByAccount;
 window.searchExecutions = window.searchExecutions;
 window.resetExecutionsFilters = window.resetExecutionsFilters;
 window.setupExecutionsFilterFunctions = setupExecutionsFilterFunctions;
-window.toggleExecutionsSection = toggleExecutionsSection;
-window.showAddExecutionModal = showAddExecutionModal;
-window.showEditExecutionModal = showEditExecutionModal;
+// REMOVED: window.toggleExecutionsSection - use window.toggleSection('executions') directly
+// REMOVED: window.showAddExecutionModal - use window.ModalManagerV2.showModal('executionsModal', 'add') directly
+// REMOVED: window.showEditExecutionModal - use window.ModalManagerV2.showEditModal('executionsModal', 'execution', id) directly
 
 // פונקציה זו הוסרה - כפילות עם הפונקציה הראשונה
 
@@ -2969,8 +2936,8 @@ if (typeof window.registerCRUDFunctions === 'function') {
     read: loadExecutionsData,
     update: updateExecution,
     delete: deleteExecution, // Using deleteExecution which includes confirmation
-    showAddModal: window.showAddExecutionModal, // שימוש במערכת הכללית
-    showEditModal: showEditExecutionModal,
+    showAddModal: () => window.ModalManagerV2?.showModal('executionsModal', 'add'), // שימוש במערכת הכללית
+    showEditModal: (id) => window.ModalManagerV2?.showEditModal('executionsModal', 'execution', id),
     showDeleteModal: deleteExecution,
   });
 }
@@ -3236,7 +3203,11 @@ function addExecutionForTicker(tickerId) {
 
   // פתיחת מודל הוספת עסקה - שימוש במערכת הכללית
   if (typeof window.showAddExecutionModal === 'function') {
-    window.showAddExecutionModal();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('executionsModal', 'add');
+    } else {
+      window.Logger.error('❌ ModalManagerV2 לא זמין במערכת הכללית', { page: "executions" });
+    }
   } else {
     window.Logger.error('❌ showAddExecutionModal לא זמין במערכת הכללית', { page: "executions" });
   }
@@ -3257,21 +3228,7 @@ function addExecutionForTicker(tickerId) {
 /**
  * הצגה/הסתרה של סקשן הטיקרים
  */
-function toggleTickersSection() {
-  const section = document.querySelector('.content-section:has(#tickersContainer)');
-  if (section) {
-    const body = section.querySelector('.section-body');
-    const icon = section.querySelector('.filter-icon');
-
-    if (body.style.display === 'none') {
-      body.style.display = 'block';
-      icon.textContent = '▲';
-    } else {
-      body.style.display = 'none';
-      icon.textContent = '▼';
-    }
-  }
-}
+// REMOVED: toggleTickersSection - use window.toggleSection('tickers') from ui-utils.js instead
 
 // ייצוא פונקציות
 window.loadTickersSummaryData = loadTickersSummaryData;
@@ -3279,7 +3236,7 @@ window.updateTickersSummaryTable = updateTickersSummaryTable;
 window.refreshTickersSummary = refreshTickersSummary;
 window.viewTickerDetails = viewTickerDetails;
 window.addExecutionForTicker = addExecutionForTicker;
-window.toggleTickersSection = toggleTickersSection;
+// REMOVED: window.toggleTickersSection - use window.toggleSection('tickers') directly
 
 /**
  * עדכון רשימת הטיקרים לפי הצ'קבוקס
@@ -3359,13 +3316,7 @@ window.updateTickersList = updateTickersList;
 
 // Toggle functions
 
-function toggleExecutionsSection() {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection('executions');
-    } else {
-        window.Logger.warn('toggleSection function not found', { page: "executions" });
-    }
-}
+// REMOVED: toggleExecutionsSection - use window.toggleSection('executions') from ui-utils.js directly
 
 // ===== IMPORT MODAL FUNCTIONS =====
 // Import functionality is handled by import-user-data.js
@@ -3374,36 +3325,9 @@ function toggleExecutionsSection() {
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
 // Modal management using ModalManagerV2
 
-/**
- * Show add execution modal
- * Uses ModalManagerV2 for consistent modal experience
- * 
- * @function showAddExecutionModal
- * @returns {void}
- */
-function showAddExecutionModal() {
-    window.Logger.debug('showAddExecutionModal called', { page: 'executions' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showModal('executionsModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showAddExecutionModal - use window.ModalManagerV2.showModal('executionsModal', 'add') directly
 
-/**
- * הצגת מודל עריכת ביצוע
- * Uses ModalManagerV2 for consistent modal experience
- */
-function showEditExecutionModal(executionId) {
-    window.Logger.debug('showEditExecutionModal called', { executionId, page: 'executions' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showEditModal('executionsModal', 'execution', executionId);
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showEditExecutionModal - use window.ModalManagerV2.showEditModal('executionsModal', 'execution', executionId) directly
 
 /**
  * מחיקת ביצוע

@@ -347,8 +347,8 @@ def get_trade_child_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     # Get executions
     cursor.execute("""
         SELECT id, 'execution' as type, 'ביצוע' as title, 
-               CONCAT('ביצוע ', action, ' ', quantity, ' יחידות') as description,
-               created_at, status
+               'ביצוע ' || action || ' ' || quantity || ' יחידות' as description,
+               created_at, 'active' as status
         FROM executions 
         WHERE trade_id = ?
     """, (trade_id,))
@@ -411,7 +411,7 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
     # Get trades
     cursor.execute("""
         SELECT id, 'trade' as type, 'טרייד' as title, 
-               CONCAT('טרייד ', side, ' על ', ticker_symbol) as description,
+               'טרייד ' || side || ' על ' || ticker_symbol as description,
                created_at, status
         FROM trades t
         JOIN tickers tk ON t.ticker_id = tk.id
@@ -431,7 +431,7 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
     # Get cash flows
     cursor.execute("""
         SELECT id, 'cash_flow' as type, 'תזרים מזומנים' as title, 
-               CONCAT(type, ': ', amount, ' ', currency) as description,
+               type || ': ' || amount || ' ' || currency as description,
                date, 'active' as status
         FROM cash_flows 
         WHERE trading_account_id = ?
@@ -581,7 +581,7 @@ def get_trade_parent_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     # Get ticker
     cursor.execute("""
         SELECT tk.id, 'ticker' as type, 'טיקר' as title, 
-               CONCAT(tk.symbol, ' - ', tk.name) as description,
+               tk.symbol || ' - ' || tk.name as description,
                tk.created_at, 'active' as status
         FROM trades t
         JOIN tickers tk ON t.ticker_id = tk.id
@@ -602,7 +602,7 @@ def get_trade_parent_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     # Get trade plan
     cursor.execute("""
         SELECT tp.id, 'trade_plan' as type, 'תוכנית טרייד' as title, 
-               CONCAT('תוכנית ', tp.side, ' - ', tp.investment_type) as description,
+               'תוכנית ' || tp.side || ' - ' || tp.investment_type as description,
                tp.created_at, tp.status
         FROM trades t
         JOIN trade_plans tp ON t.trade_plan_id = tp.id
@@ -630,7 +630,7 @@ def get_execution_parent_entities(cursor, execution_id: int) -> List[Dict[str, A
     # Get trade
     cursor.execute("""
         SELECT t.id, 'trade' as type, 'טרייד' as title, 
-               CONCAT('טרייד ', t.side, ' על ', tk.symbol) as description,
+               'טרייד ' || t.side || ' על ' || tk.symbol as description,
                t.created_at, t.status
         FROM executions e
         JOIN trades t ON e.trade_id = t.id
@@ -792,7 +792,7 @@ def get_trade_plan_child_entities(cursor, trade_plan_id: int) -> List[Dict[str, 
     # Get trades
     cursor.execute("""
         SELECT t.id, 'trade' as type, 'טרייד' as title, 
-               CONCAT('טרייד ', t.side, ' על ', tk.symbol) as description,
+               'טרייד ' || t.side || ' על ' || tk.symbol as description,
                t.created_at, t.status
         FROM trades t
         JOIN tickers tk ON t.ticker_id = tk.id

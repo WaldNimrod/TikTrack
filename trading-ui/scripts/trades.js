@@ -5,51 +5,83 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 35
+ * Total Functions: 67
  * 
- * PAGE INITIALIZATION (1)
- * - setupSortEventListeners() - * Add important note to edit modal
+ * PAGE INITIALIZATION (4)
+ * - initializeTradesPage() - * Load modal data (placeholder - ModalManagerV2 handles this automatically)
+ * - setupDateValidation() - setupDateValidation function
+ * - initializeTradeConditionsSystem() - * Add buy/sell transaction to trade (placeholder - in development)
+ * - setupSortEventListeners() - setupSortEventListeners function
  * 
- * DATA LOADING (3)
+ * DATA LOADING (6)
  * - getInvestmentTypeColor() - * עיצוב שינוי יומי עם צבעים לפי העדפות
- * - loadTradesData() - * קביעת צבע לפי סוג השקעה
+ * - loadTradesData() - loadTradesData function
+ * - loadTradeTickerInfo() - loadTradeTickerInfo function
  * - loadTickerDataForTrades() - loadTickerDataForTrades function
+ * - loadTradePlanDates() - loadTradePlanDates function
+ * - loadModalData() - loadModalData function
  * 
- * DATA MANIPULATION (11)
+ * DATA MANIPULATION (18)
  * - updateTradesTable() - updateTradesTable function
- * - deleteTradeRecord() - deleteTradeRecord function
- * - addEditImportantNote() - addEditImportantNote function
+ * - deleteTradeRecord() - * ביצוע הביטול בפועל
+ * - addEditImportantNote() - * ביצוע המחיקה בפועל
  * - addEditReminder() - * Add important note to edit modal
+ * - addTrade() - * Add edit reminder functionality (placeholder)
+ * - hideAddTradeModal() - hideAddTradeModal function
+ * - updateRadioButtons() - * Hide edit trade modal
+ * - addImportantNote() - * Clear date validation messages
+ * - addReminder() - * Add important note (alias for addEditImportantNote)
+ * - updateTableStats() - updateTableStats function
+ * - addEditBuySell() - * Update table statistics
  * - updateEditTradeTickerFromPlan() - updateEditTradeTickerFromPlan function
  * - updateEditTradePriceFromTicker() - updateEditTradePriceFromTicker function
  * - updateTrade() - updateTrade function
  * - confirmDeleteTrade() - confirmDeleteTrade function
  * - showAddTradeModal() - showAddTradeModal function
- * - saveTrade() - * Show add trade modal
+ * - saveTrade() - * הצגת מודל עריכת טרייד
  * - deleteTrade() - deleteTrade function
  * 
- * EVENT HANDLING (7)
+ * EVENT HANDLING (16)
  * - formatDailyChange() - formatDailyChange function
  * - performTradeCancellation() - * בדיקת מקושרים וביצוע ביטול
  * - performTradeDeletion() - performTradeDeletion function
+ * - clearTradeValidation() - * Edit trade function - wrapper for showEditTradeModal
+ * - onRelationTypeChange() - onRelationTypeChange function
+ * - onRelatedObjectChange() - * Handle relation type change
+ * - enableConditionFields() - * Handle related object change
+ * - disableConditionFields() - * Enable condition fields for trade modal
+ * - refreshPositions() - * Initialize trades page - called from page-initialization-configs.js
+ * - showDateValidationError() - showDateValidationError function
+ * - clearDateValidationMessages() - * Show date validation error message
+ * - onShowClosedTradesChange() - * Add important note (alias for addEditImportantNote)
  * - validateTradePlanChange() - validateTradePlanChange function
  * - validateTradeChanges() - validateTradeChanges function
  * - validateTickerChange() - validateTickerChange function
  * - showTickerChangeConfirmation() - showTickerChangeConfirmation function
  * 
- * UI UPDATES (1)
+ * UI UPDATES (3)
+ * - displayTradeTickerInfo() - * טעינת מידע על הטיקר (למודל החדש)
+ * - hideEditTradeModal() - * Hide add trade modal
  * - showEditTradeModal() - * Show add trade modal
  * 
- * VALIDATION (2)
+ * VALIDATION (4)
  * - checkLinkedItemsAndCancel() - checkLinkedItemsAndCancel function
+ * - validateTradeForm() - * Clear trade form validation
+ * - validateDateFields() - validateDateFields function
  * - validateTradePlanDate() - validateTradePlanDate function
  * 
- * OTHER (10)
+ * OTHER (16)
  * - viewTickerDetails() - viewTickerDetails function
- * - viewAccountDetails() - viewAccountDetails function
- * - viewTradePlanDetails() - viewTradePlanDetails function
- * - editTradeRecord() - editTradeRecord function
- * - cancelTradeRecord() - cancelTradeRecord function
+ * - viewAccountDetails() - * View ticker details for a specific ticker ID
+ * - viewTradePlanDetails() - * View account details for a specific account ID
+ * - editTradeRecord() - * View trade plan details for a specific trade plan ID
+ * - cancelTradeRecord() - * Edit trade record for a specific trade ID
+ * - editTrade() - * פונקציה להצגת מודל עריכת טרייד
+ * - populateSelect() - populateSelect function
+ * - populateRelatedObjects() - * Disable condition fields for trade modal
+ * - restoreSortState() - restoreSortState function
+ * - enableTradeFormFields() - * Restore sort state wrapper
+ * - disableTradeFormFields() - disableTradeFormFields function
  * - applyStatusFilterToTrades() - applyStatusFilterToTrades function
  * - reactivateTrade() - reactivateTrade function
  * - refreshTrades() - refreshTrades function

@@ -1565,7 +1565,7 @@ function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, se
 window.filterExecutionsLocally = filterExecutionsLocally;
 
 // הגדרת הפונקציות כגלובליות
-window.openExecutionDetails = openExecutionDetails;
+// window.openExecutionDetails removed - function no longer exists (replaced by showAddExecutionModal)
 window.editExecution = editExecution;
 // window.deleteExecution removed - now exported once at line 3054
 
@@ -1588,7 +1588,7 @@ window.showEditExecutionModal = showEditExecutionModal;
 // REMOVED: window.saveExecution - function removed
 
 // REMOVED: updateExecution - unused wrapper, use updateExecutionWrapper directly
-window.confirmDeleteExecution = confirmDeleteExecution;
+// REMOVED: window.confirmDeleteExecution - function removed, using deleteExecution instead
 
 // REMOVED: window exports for removed validation functions
 // REMOVED: window exports for removed linked items functions
@@ -2992,7 +2992,7 @@ if (typeof window.registerCRUDFunctions === 'function') {
     create: saveExecution,
     read: loadExecutionsData,
     update: updateExecution,
-    delete: confirmDeleteExecution,
+    delete: deleteExecution, // Using deleteExecution which includes confirmation
     showAddModal: window.showAddExecutionModal, // שימוש במערכת הכללית
     showEditModal: showEditExecutionModal,
     showDeleteModal: deleteExecution,

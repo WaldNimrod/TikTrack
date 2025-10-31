@@ -5,27 +5,27 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 45
+ * Total Functions: 42
  * 
  * DATA LOADING (11)
  * - loadCurrenciesData() - loadCurrenciesData function
  * - getCurrencySymbol() - * Load currencies data from server
- * - getTimeDuration() - * Load currencies data from server
- * - getTickerTypeStyle() - * קבלת סמל מטבע לפי מזהה
+ * - getTimeDuration() - * קבלת סמל מטבע לפי מזהה
+ * - getTickerTypeStyle() - * חישוב משך הזמן שעבר מתאריך נתון - פורמט אחיד מלא
  * - getTickerStatusStyle() - * קבלת עיצוב סוג טיקר
- * - getTickerStatusLabel() - * קבלת עיצוב סוג טיקר
+ * - getTickerStatusLabel() - * קבלת עיצוב סטטוס טיקר
  * - getTickerSymbol() - * בדיקת פריטים מקושרים לפני מחיקת טיקר
  * - loadTickersData() - * הצגת הודעה
  * - loadColorsAndApplyToHeaders() - loadColorsAndApplyToHeaders function
  * - tryLoadData() - tryLoadData function
  * - getTypeDisplayName() - getTypeDisplayName function
  * 
- * DATA MANIPULATION (15)
+ * DATA MANIPULATION (13)
  * - updateCurrencyOptions() - updateCurrencyOptions function
  * - updateActiveTradesField() - * פונקציה לעדכון אפשרויות מטבע בטופס
  * - updateTickerActiveTradesStatus() - updateTickerActiveTradesStatus function
  * - updateAllActiveTradesStatuses() - updateAllActiveTradesStatuses function
- * - saveTicker() - * Restore tickers section state
+ * - saveTicker() - saveTicker function
  * - updateTicker() - updateTicker function
  * - checkLinkedItemsBeforeDeleteTicker() - checkLinkedItemsBeforeDeleteTicker function
  * - updateAllTickerStatuses() - * בדיקת פריטים מקושרים לפני מחיקת טיקר
@@ -33,17 +33,14 @@
  * - confirmDeleteTicker() - confirmDeleteTicker function
  * - updateTickersSummaryStats() - updateTickersSummaryStats function
  * - updateTickersTable() - * עדכון סטטיסטיקות סיכום טיקרים
- * - showAddTickerModal() - * Toggle section visibility
- * - saveTicker() - * Show add ticker modal
- * - deleteTicker() - deleteTicker function
+ * - showAddTickerModal() - showAddTickerModal function
  * 
- * EVENT HANDLING (6)
- * - generateTickerCurrencyOptions() - * קבלת עיצוב סטטוס טיקר
+ * EVENT HANDLING (5)
+ * - generateTickerCurrencyOptions() - * קבלת תווית סטטוס טיקר
  * - restoreTickersSectionState() - restoreTickersSectionState function
  * - performTickerCancellation() - * בדיקת מקושרים וביצוע ביטול טיקר
  * - performTickerDeletion() - * בדיקת מקושרים וביצוע מחיקת טיקר
- * - toggleSection() - toggleSection function
- * - toggleTickersSection() - * Toggle section visibility
+ * - toggleTickersSection() - toggleTickersSection function
  * 
  * UI UPDATES (1)
  * - showEditTickerModal() - * Show add ticker modal
@@ -53,13 +50,13 @@
  * - checkLinkedItemsBeforeCancelTicker() - * בדיקת פריטים מקושרים לפני מחיקת טיקר
  * 
  * OTHER (10)
- * - editTicker() - editTicker function
- * - viewTickerDetails() - * Edit existing ticker
+ * - viewTickerDetails() - viewTickerDetails function
+ * - viewTickerDetailsOld() - * צפייה בפרטי טיקר
  * - refreshTickerData() - refreshTickerData function
  * - cancelTicker() - cancelTicker function
  * - performCancelTicker() - performCancelTicker function
  * - reactivateTicker() - reactivateTicker function
- * - clearTickersCache() - * אישור מחיקת טיקר (לשמירה על תאימות לאחור)
+ * - clearTickersCache() - clearTickersCache function
  * - refreshYahooFinanceData() - refreshYahooFinanceData function
  * - refreshYahooFinanceDataSilently() - refreshYahooFinanceDataSilently function
  * - filterTickersByType() - filterTickersByType function

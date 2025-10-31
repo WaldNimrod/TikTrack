@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 36
+ * Total Functions: 39
  * 
  * PAGE INITIALIZATION (3)
  * - initializeCashFlowsPage() - initializeCashFlowsPage function
@@ -24,16 +24,19 @@
  * - loadTradesForCashFlow() - * Show edit cash flow modal
  * - loadTradePlansForCashFlow() - loadTradePlansForCashFlow function
  * 
- * DATA MANIPULATION (5)
+ * DATA MANIPULATION (7)
  * - deleteCashFlow() - deleteCashFlow function
  * - updatePageSummaryStats() - updatePageSummaryStats function
  * - updateCashFlowsTable() - * Format USD rate
+ * - updateCashFlow() - updateCashFlow function
+ * - saveCashFlow() - saveCashFlow function
  * - confirmDeleteCashFlow() - confirmDeleteCashFlow function
  * - showAddCashFlowModal() - * הצגת שגיאה לשדה בודד
  * 
- * EVENT HANDLING (2)
+ * EVENT HANDLING (3)
  * - toggleCashFlowsSection() - * טעינת נתוני חשבונות מסחר אם הם לא נטענו
  * - restoreCashFlowsSectionState() - restoreCashFlowsSectionState function
+ * - performCashFlowDeletion() - performCashFlowDeletion function
  * 
  * UI UPDATES (3)
  * - renderCashFlowsTable() - * טעינת רשימת מטבעות למודולי cash flow

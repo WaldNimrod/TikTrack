@@ -169,8 +169,14 @@ def handle_database_session(auto_commit: bool = True, auto_close: bool = True):
                 
             except Exception as e:
                 # Rollback on error
+                import traceback
+                error_trace = traceback.format_exc()
+                logging.error(f"❌ HANDLE_DB_SESSION: Error in {func.__name__}: {str(e)}\nTraceback:\n{error_trace}")
                 if db:
-                    db.rollback()
+                    try:
+                        db.rollback()
+                    except Exception as rollback_error:
+                        logging.error(f"❌ HANDLE_DB_SESSION: Error during rollback: {str(rollback_error)}")
                 raise e
             finally:
                 # Auto close if enabled

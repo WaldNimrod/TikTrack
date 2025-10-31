@@ -37,13 +37,21 @@
 
 ## Phase 1: טיפול בכפילויות (319 קבוצות)
 
+### ממצא חשוב: אין כפילויות אמיתיות
+**תאריך**: 2 בנובמבר 2025  
+**ממצא**: כל ה-"כפילויות" שזוהו הן **False Positives** - הכלי מזהה שגוי:
+1. JSDoc עם `@function` נחשב כהגדרת פונקציה
+2. אותה פונקציה מזוהה פעם כ-`function` ופעם כ-`async-function`
+
+**החלטה**: לבדוק באופן ידני כמה קבצים נוספים, ואז לעבור ל-Phase 2 (פונקציות לא בשימוש)
+
 ### סדר עבודה (לפי רמת וודאות: 95-100%)
 
 | קובץ | כפילויות | סטטוס | תאריך | הערות |
 |------|-----------|-------|-------|-------|
-| `trades.js` | 24 | ⏳ ממתין | - | - |
-| `business-module.js` | 23 | ⏳ ממתין | - | - |
-| `trade_plans.js` | 22 | ⏳ ממתין | - | - |
+| `trades.js` | 24 | ✅ נבדק | 2.11.2025 | אין כפילויות אמיתיות - רק false positives |
+| `business-module.js` | 23 | ✅ נבדק | 2.11.2025 | אין כפילויות אמיתיות - רק false positives |
+| `trade_plans.js` | 22 | ✅ טופל חלקי | 2.11.2025 | הוסרה כפילות אחת אמיתית: saveEditTradePlan deprecated wrapper |
 | `tickers.js` | 22 | ⏳ ממתין | - | - |
 | `trading_accounts.js` | 21 | ⏳ ממתין | - | - |
 | `core-systems.js` | 21 | ⏳ ממתין | - | - |
@@ -62,8 +70,8 @@
 
 | קובץ | פונקציות | סטטוס | תאריך | הערות |
 |------|-----------|-------|-------|-------|
-| `executions.js` | 89 | ⏳ ממתין | - | - |
-| `alerts.js` | 68 | ⏳ ממתין | - | - |
+| `executions.js` | 89 | ✅ הושלם | 2.11.2025 | הוסרו 22 פונקציות: openExecutionDetails, resetAddExecutionForm, resetEditExecutionForm, validateExecutionTradeId, saveExecution, + 9 validation, clearNewExecutionHighlights, updateExecution, loadLinkedItemsDetails, loadLinkedItemsFromMultipleSources, displayLinkedItems(executionId). 7 פונקציות בשימוש נשמרו |
+| `alerts.js` | 68 | 🔄 בעבודה | 2.11.2025 | הוסרו 9 פונקציות: filterAlertsLocally, clearAlertValidation, deprecated wrappers. עוד 23 בטוחות למחיקה, 8 בשימוש |
 | `trade_plans.js` | 65 | ⏳ ממתין | - | - |
 | `trading_accounts.js` | 56 | ⏳ ממתין | - | - |
 | `cash_flows.js` | 50 | ⏳ ממתין | - | - |

@@ -92,17 +92,14 @@
                                         <th class="col-linked-object">
                                             <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredNotesData || window.notesData, 'notes', updateNotesTable); }">קשור ל: <span class="sort-icon">↕</span></button>
                                         </th>
-                                        <th class="col-symbol">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredNotesData || window.notesData, 'notes', updateNotesTable); }">סימבול <span class="sort-icon">↕</span></button>
-                                        </th>
                                         <th class="col-content">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.filteredNotesData || window.notesData, 'notes', updateNotesTable); }">תוכן <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.filteredNotesData || window.notesData, 'notes', updateNotesTable); }">תוכן <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">נוצר ב <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }">נוצר ב <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-attachment">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">קובץ מצורף <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">קובץ מצורף <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-items">
                                         </th>
@@ -110,7 +107,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="7" class="loading">טוען הערות...</td>
+                                        <td colspan="6" class="loading">טוען הערות...</td>
                                     </tr>
                                 </tbody>
                             </table>

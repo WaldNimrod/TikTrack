@@ -5,41 +5,38 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 45
+ * Total Functions: 42
  * 
  * PAGE INITIALIZATION (1)
  * - setupNoteValidationEvents() - setupNoteValidationEvents function
  * 
- * DATA LOADING (7)
+ * DATA LOADING (6)
  * - uploadFile() - * Add new note
  * - downloadFile() - downloadFile function
- * - loadNotesData() - loadNotesData function
  * - getEditorContent() - * ניקוי עיצוב בעורך
  * - getTypeDisplayName() - getTypeDisplayName function
  * - loadNoteForViewing() - * View a note
  * - getNoteRelatedDisplay() - getNoteRelatedDisplay function
  * 
- * DATA MANIPULATION (13)
+ * DATA MANIPULATION (12)
  * - addNote() - addNote function
  * - deleteNote() - * Open note details modal
  * - updateNotesTable() - updateNotesTable function
  * - updateNotesSummary() - updateNotesSummary function
  * - updateGridFromComponent() - updateGridFromComponent function
+ * - updateRadioButtons() - updateRadioButtons function
  * - saveNote() - saveNote function
  * - updateNoteFromModal() - updateNoteFromModal function
  * - confirmDeleteNote() - confirmDeleteNote function
  * - deleteNoteFromServer() - deleteNoteFromServer function
  * - removeCurrentAttachment() - removeCurrentAttachment function
  * - showAddNoteModal() - * Replace current attachment
- * - saveNote() - * הצגת מודל הוספת הערה
- * - deleteNote() - deleteNote function
  * 
- * EVENT HANDLING (5)
+ * EVENT HANDLING (4)
  * - restoreNotesSectionState() - restoreNotesSectionState function
  * - onNoteRelationTypeChange() - onNoteRelationTypeChange function
  * - clearNoteValidationErrors() - clearNoteValidationErrors function
  * - setEditorContent() - * קבלת תוכן מעורך הטקסט
- * - toggleSection() - * Replace current attachment
  * 
  * UI UPDATES (3)
  * - showTickerPage() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
@@ -63,7 +60,7 @@
  * - clearSelectedFile() - clearSelectedFile function
  * - restoreSortState() - restoreSortState function
  * - filterNotesData() - filterNotesData function
- * - filterNotesByType() - filterNotesByType function
+ * - filterNotesByType() - * Filter notes data by search term
  * - viewNote() - * Get display name for type
  * - editCurrentNote() - editCurrentNote function
  * - replaceCurrentAttachment() - replaceCurrentAttachment function
@@ -560,14 +557,14 @@ function updateNotesTable(notes) {
       // בדיקה שהנתונים קיימים
       if (!notes || !Array.isArray(notes)) {
         window.Logger.warn('⚠️ notes parameter is not available or not an array', { page: "notes" });
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center">אין הערות להצגה</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין הערות להצגה</td></tr>';
         return;
       }
 
       if (notes.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="text-center text-muted">
+            <td colspan="6" class="text-center text-muted">
             <div style="padding: 20px;">
               <h5>📝 אין הערות</h5>
               <p>לא נמצאו הערות במערכת</p>
@@ -659,10 +656,6 @@ function updateNotesTable(notes) {
       const relatedColor = relatedObjectInfo.color;
       const relatedBgColor = relatedObjectInfo.bgColor;
 
-      // קביעת הסימבול באמצעות המערכת הכללית
-      const symbolDisplay = window.getRelatedObjectSymbol ? 
-        window.getRelatedObjectSymbol(note, dataSources) : '-';
-
       return `
         <tr style='cursor: pointer;'>
           <td class="related-cell">
@@ -670,15 +663,6 @@ function updateNotesTable(notes) {
              style="${relatedColor ? `color: ${relatedColor};` : ''} ${relatedBgColor ? `background-color: ${relatedBgColor};` : ''}"
              title="${relatedObjectInfo.type || 'כללי'}">
               ${relatedDisplay}
-            </div>
-          </td>
-          <td class="ticker-cell">
-            <div class="ticker-cell-content">
-              <span class="ticker-symbol-link" 
-                    onclick="showEntityDetails('note', ${note.id}); return false;" 
-                    title="פרטי הערה">
-                ${symbolDisplay}
-              </span>
             </div>
           </td>
           <td>${contentDisplay}</td>

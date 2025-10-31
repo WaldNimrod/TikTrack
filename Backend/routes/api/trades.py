@@ -57,16 +57,23 @@ def get_trades():
             # Add market data from ticker if available
             if hasattr(trade, 'ticker') and trade.ticker:
                 # Get latest market data for the ticker
-                from models.external_data import MarketDataQuote
-                latest_quote = db.query(MarketDataQuote).filter(
-                    MarketDataQuote.ticker_id == trade.ticker.id
-                ).order_by(MarketDataQuote.fetched_at.desc()).first()
-                
-                if latest_quote:
-                    trade_dict['current_price'] = latest_quote.price
-                    trade_dict['daily_change'] = latest_quote.change_pct_day
-                    trade_dict['change_amount'] = latest_quote.change_amount_day
-                else:
+                try:
+                    from models.external_data import MarketDataQuote
+                    latest_quote = db.query(MarketDataQuote).filter(
+                        MarketDataQuote.ticker_id == trade.ticker.id
+                    ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                    
+                    if latest_quote:
+                        trade_dict['current_price'] = latest_quote.price
+                        trade_dict['daily_change'] = latest_quote.change_pct_day
+                        trade_dict['change_amount'] = latest_quote.change_amount_day
+                    else:
+                        trade_dict['current_price'] = None
+                        trade_dict['daily_change'] = None
+                        trade_dict['change_amount'] = None
+                except Exception as market_error:
+                    # Handle database corruption or other errors gracefully
+                    logger.warning(f"Error fetching market data for trade {trade.id} (ticker {trade.ticker.id}): {str(market_error)}")
                     trade_dict['current_price'] = None
                     trade_dict['daily_change'] = None
                     trade_dict['change_amount'] = None
@@ -90,10 +97,12 @@ def get_trades():
             "version": "1.0"
         })
     except Exception as e:
-        logger.error(f"Error getting trades: {str(e)}")
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error getting trades: {str(e)}\nTraceback:\n{error_trace}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve trades"},
+            "error": {"message": f"Failed to retrieve trades: {str(e)}"},
             "version": "1.0"
         }), 500
 

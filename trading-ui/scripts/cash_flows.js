@@ -93,12 +93,6 @@ async function loadCashFlowsData() {
     const beforeTableCount = cashFlowsData ? cashFlowsData.length : 0;
     console.log('📊 BEFORE REFRESH: Table has', beforeTableCount, 'records');
     
-    // Update debug panel
-    const debugBefore = document.getElementById('debugBefore');
-    if (debugBefore) {
-      debugBefore.textContent = beforeTableCount;
-    }
-    
     console.log('🔥 loadCashFlowsData: Starting fetch...');
     window.Logger.info('Loading cash flows data (bypass cache)', { page: 'cash_flows' });
     
@@ -136,16 +130,6 @@ async function loadCashFlowsData() {
     const afterTableCount = data.length;
     console.log('📊 AFTER REFRESH: Table now has', afterTableCount, 'records');
     console.log('📊 CHANGE:', afterTableCount - beforeTableCount > 0 ? '+' : '', afterTableCount - beforeTableCount);
-    
-    // Update debug panel
-    const debugAfter = document.getElementById('debugAfter');
-    const debugChange = document.getElementById('debugChange');
-    if (debugAfter && debugChange) {
-      debugAfter.textContent = afterTableCount;
-      const change = afterTableCount - beforeTableCount;
-      debugChange.textContent = change > 0 ? `+${change}` : change.toString();
-      debugChange.style.color = change > 0 ? 'green' : change < 0 ? 'red' : 'black';
-    }
     
     // עדכון הסטטיסטיקות
     updatePageSummaryStats();
@@ -1380,17 +1364,6 @@ async function saveCashFlow() {
         // Count records BEFORE save
         const initialTableCount = cashFlowsData ? cashFlowsData.length : 0;
         console.log('📊 INITIAL STATE: Table has', initialTableCount, 'records');
-        
-        // Update debug panel
-        const debugPanel = document.getElementById('debugPanel');
-        const debugInitial = document.getElementById('debugInitial');
-        if (debugPanel && debugInitial) {
-            debugPanel.style.display = 'block';
-            debugInitial.textContent = initialTableCount;
-            console.log('📊 Debug panel displayed, Initial set to:', initialTableCount);
-        } else {
-            console.error('❌ Debug panel elements not found:', { debugPanel: !!debugPanel, debugInitial: !!debugInitial });
-        }
         
         // CRUDResponseHandler will handle cache clearing automatically
         // No need to call clearCacheBeforeCRUD here

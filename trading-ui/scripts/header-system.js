@@ -1248,10 +1248,11 @@ class HeaderSystem {
             
             // פילטר סוג - רק אם יש שדה רלוונטי בטבלה
             if (this.currentFilters.type.length > 0 && !this.currentFilters.type.includes('הכול')) {
-              const typeCell = row.querySelector('td[data-investment-type]');
+              // בדיקת שתי התכונות שונות - data-investment-type לטבלאות trades/trade_plans ו-data-type לטבלאות tickers
+              const typeCell = row.querySelector('td[data-investment-type]') || row.querySelector('td[data-type]');
               if (typeCell) {
                 // יש שדה סוג - בדוק את הפילטר
-                const rowType = typeCell.getAttribute('data-investment-type');
+                const rowType = typeCell.getAttribute('data-investment-type') || typeCell.getAttribute('data-type');
                 const rowTypeText = typeCell.textContent.trim();
                 
                 // בדיקה גם לפי data attribute וגם לפי טקסט
@@ -1732,7 +1733,13 @@ function updateFilterSelections(filters) {
 
   const normalizeMulti = (val) => {
     if (!val || (Array.isArray(val) && val.length === 0)) return [];
-    if (Array.isArray(val)) return val.map(v => mapToUi[v] || v).filter(Boolean).filter(v => v !== 'הכול');
+    if (Array.isArray(val)) {
+      const mapped = val.map(v => mapToUi[v] || v).filter(Boolean);
+      // אם יש רק 'הכול' - החזר מערך ריק (זה אומר "כל")
+      if (mapped.length === 1 && mapped[0] === 'הכול') return [];
+      // אחרת, סנן את 'הכול' אם יש ערכים אחרים
+      return mapped.filter(v => v !== 'הכול');
+    }
     // single value
     if (String(val).toLowerCase() === 'all') return [];
     const mapped = mapToUi[val] || val;

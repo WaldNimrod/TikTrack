@@ -1642,7 +1642,7 @@ function updateTickersTable(tickers) {
                     <td title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${formattedPrice}</td>
                     <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${changeDisplay}</td>
                     <td title="${volume !== 'N/A' ? `נפח: ${volume}` : 'אין נתוני נפח'}" style="text-align: center; direction: ltr;">${window.renderVolume ? window.renderVolume(volume, true) : volume}</td>
-                    <td title="${statusLabel}">
+                    <td class="status-cell" data-status="${ticker.status || ''}" title="${statusLabel}">
                         <span style="background-color: ${statusStyle.backgroundColor}; 
                                      color: ${statusStyle.color}; 
                                      padding: ${statusStyle.padding}; 
@@ -1654,7 +1654,7 @@ function updateTickersTable(tickers) {
                             ${statusLabel}
                         </span>
                     </td>
-                    <td title="${typeLabel}">
+                    <td class="type-cell" data-type="${ticker.type || ''}" title="${typeLabel}">
                         <span style="background-color: ${typeStyle.backgroundColor}; 
                                      color: ${typeStyle.color}; 
                                      padding: ${typeStyle.padding}; 

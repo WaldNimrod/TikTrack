@@ -3202,14 +3202,10 @@ function addExecutionForTicker(tickerId) {
   }
 
   // פתיחת מודל הוספת עסקה - שימוש במערכת הכללית
-  if (typeof window.showAddExecutionModal === 'function') {
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-      window.ModalManagerV2.showModal('executionsModal', 'add');
-    } else {
-      window.Logger.error('❌ ModalManagerV2 לא זמין במערכת הכללית', { page: "executions" });
-    }
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    window.ModalManagerV2.showModal('executionsModal', 'add');
   } else {
-    window.Logger.error('❌ showAddExecutionModal לא זמין במערכת הכללית', { page: "executions" });
+    window.Logger.error('❌ ModalManagerV2 לא זמין במערכת הכללית', { page: "executions" });
   }
 
   // בחירת הטיקר במודל

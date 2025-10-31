@@ -1816,8 +1816,8 @@ window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
 
 // פונקציות מודלים
-window.showAddTickerModal = showAddTickerModal;
-window.showEditTickerModal = showEditTickerModal;
+// REMOVED: window.showAddTickerModal - use window.ModalManagerV2.showModal('tickersModal', 'add') directly
+// REMOVED: window.showEditTickerModal - use window.ModalManagerV2.showEditModal('tickersModal', 'ticker', id) directly
 // Note: showDeleteTickerModal removed - not needed (using confirmDeleteTicker directly)
 window.saveTicker = saveTicker;
 window.updateTicker = updateTicker;
@@ -1880,15 +1880,15 @@ window.updateActiveTradesField = updateActiveTradesField;
 window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
 window.restoreTickersSectionState = restoreTickersSectionState;
 // Note: saveTicker already exported above
-window.clearTickersCache = clearTickersCache;
+// REMOVED: window.clearTickersCache - use window.UnifiedCacheManager.clearAllCache() or window.clearAllCache() directly
 window.loadTickersData = loadTickersData;
 window.loadColorsAndApplyToHeaders = loadColorsAndApplyToHeaders;
 window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
 window.toggleSection = toggleSection;
-window.toggleTickersSection = toggleTickersSection;
-window.showAddTickerModal = showAddTickerModal;
-window.showEditTickerModal = showEditTickerModal;
+// REMOVED: window.toggleTickersSection - use window.toggleSection('tickers') directly
+// REMOVED: window.showAddTickerModal - use window.ModalManagerV2.showModal('tickersModal', 'add') directly
+// REMOVED: window.showEditTickerModal - use window.ModalManagerV2.showEditModal('tickersModal', 'ticker', id) directly
 // Note: saveTickerData removed - not needed (using saveTicker directly)
 window.performTickerCancellation = performTickerCancellation;
 window.checkLinkedItemsBeforeCancelTicker = checkLinkedItemsBeforeCancelTicker;
@@ -2213,7 +2213,7 @@ function getTypeDisplayName(type) {
 // REMOVED: Duplicate deleteTicker function - using confirmDeleteTicker instead
 
 // Export functions to window for global access
-window.showAddTickerModal = showAddTickerModal;
-window.showEditTickerModal = showEditTickerModal;
+// REMOVED: window.showAddTickerModal - use window.ModalManagerV2.showModal('tickersModal', 'add') directly
+// REMOVED: window.showEditTickerModal - use window.ModalManagerV2.showEditModal('tickersModal', 'ticker', id) directly
 // Note: saveTicker and deleteTicker removed - using ModalManagerV2 and confirmDeleteTicker instead
 

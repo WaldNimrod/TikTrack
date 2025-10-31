@@ -1532,22 +1532,7 @@ async function confirmDeleteTicker(id) {
 // ===== DATA MANAGEMENT FUNCTIONS =====
 // Data loading, caching, and table management
 
-/**
- * Clear tickers cache
- * Clears cached ticker data
- * 
- * @function clearTickersCache
- * @returns {void}
- */
-function clearTickersCache() {
-  try {
-    window.tickersData = [];
-    tickersData = [];
-    window.Logger.debug('🗑️ מטמון הטיקרים נוקה', { page: "tickers" });
-  } catch (error) {
-    console.error('clearTickersCache failed:', error);
-  }
-}
+// REMOVED: clearTickersCache - use window.UnifiedCacheManager.clearAllCache() or window.clearAllCache() from unified-cache-manager.js instead
 
 /**
  * טעינת נתוני טיקרים - גרסה פשוטה
@@ -1752,7 +1737,7 @@ function updateTickersTable(tickers) {
                           const result = window.createActionsMenu([
                             { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
                             { type: 'LINK', onclick: `window.viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
-                            { type: 'EDIT', onclick: `showEditTickerModal(${ticker.id})`, title: 'ערוך' },
+                            { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})`, title: 'ערוך' },
                             { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' },
                             { type: 'DELETE', onclick: `deleteTicker(${ticker.id})`, title: 'מחק' }
                           ]);

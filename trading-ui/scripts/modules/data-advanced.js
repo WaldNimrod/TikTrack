@@ -21,7 +21,7 @@
  * @param {*} value - הערך לבדיקה
  * @returns {boolean} true אם הערך הוא מספרי
  */
-function isNumeric(value) {
+// REMOVED: isNumeric - use window.isNumeric from data-utils.js directly
   if (value === null || value === undefined || value === '') {
     return false;
   }

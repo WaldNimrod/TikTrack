@@ -1489,7 +1489,7 @@ window.tableMappings = {
  * @param {string} tableType - סוג הטבלה
  * @param {Function} updateFunction - פונקציה לעדכון הטבלה
  */
-function sortTable(columnIndex, data, tableType, updateFunction) {
+// REMOVED: sortTable - use window.sortTableData from tables.js directly
   // Call the global sortTableData function directly
   window.sortTableData(columnIndex, data, tableType, updateFunction);
 }

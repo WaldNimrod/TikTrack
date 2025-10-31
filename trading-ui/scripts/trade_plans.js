@@ -2919,7 +2919,7 @@ window.filterTradePlansByType = filterTradePlansByType;
  * @function showAddTradePlanModal
  * @returns {void}
  */
-function showAddTradePlanModal() {
+// REMOVED: showAddTradePlanModal - use window.ModalManagerV2.showModal('tradePlansModal', 'add') directly
     window.Logger.debug('showAddTradePlanModal called', { page: 'trade_plans' });
     
     if (window.ModalManagerV2) {
@@ -2933,7 +2933,7 @@ function showAddTradePlanModal() {
  * הצגת מודל עריכת תוכנית מסחר
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showEditTradePlanModal(tradePlanId) {
+// REMOVED: showEditTradePlanModal - use window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', tradePlanId) directly
     window.Logger.debug('showEditTradePlanModal called', { tradePlanId, page: 'trade_plans' });
     
     if (window.ModalManagerV2) {

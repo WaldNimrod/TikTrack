@@ -428,7 +428,7 @@ function filterTableData(searchTerm) {
  * @param {string} dateString - The date string
  * @returns {string} The formatted date
  */
-function formatDate(dateString) {
+// REMOVED: formatDate - use window.formatDate from date-utils.js directly
   if (!dateString) {return '';}
 
   try {

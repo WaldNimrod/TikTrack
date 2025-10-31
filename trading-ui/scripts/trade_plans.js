@@ -15,10 +15,8 @@
  * Last Updated: 2025-01-27
  */
 
-// Store reference to global updatePageSummaryStats function before any local override
-const globalUpdatePageSummaryStats = (typeof window !== 'undefined' && typeof window.updatePageSummaryStats === 'function') 
-  ? window.updatePageSummaryStats 
-  : null;
+// Note: We'll capture the global function reference when updatePageSummaryStats is first called
+// This avoids issues with function hoisting and ensures we get the true global function
 
 /**
  * ========================================
@@ -1216,8 +1214,238 @@ function openCancelTradePlanModal(tradePlanId) {
   }
 }
 
+/**
+ * ביטול תכנון מסחר
+ * Uses global cancelItem function from ui-utils.js
+ * @param {number} tradePlanId - Trade plan ID
+ */
+async function cancelTradePlan(tradePlanId) {
+  try {
+    // Use global cancelItem function if available
+    if (typeof window.cancelItem === 'function') {
+      const tradePlan = window.tradePlansData?.find(tp => tp.id === tradePlanId);
+      const tradePlanName = tradePlan?.name || `תכנון ${tradePlanId}`;
+      await window.cancelItem('trade_plan', tradePlanId, tradePlanName);
+      // Reload data after cancellation
+      if (typeof loadTradePlansData === 'function') {
+        await loadTradePlansData();
+      }
+    } else {
+      // Fallback to opening modal if global function not available
+      openCancelTradePlanModal(tradePlanId);
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בביטול תכנון:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בביטול תכנון', error.message);
+    }
+  }
+}
+
 // Using global deleteTradePlan function - no need for confirmDeleteTradePlan wrapper
 // The deleteTradePlan function already handles confirmation via checkLinkedItemsBeforeAction
+
+/**
+ * View linked items for trade plan
+ * Uses global viewLinkedItems function from linked-items.js
+ * @param {number} tradePlanId - Trade plan ID
+ */
+function viewLinkedItemsForTradePlan(tradePlanId) {
+  if (typeof window.viewLinkedItems === 'function') {
+    return window.viewLinkedItems(tradePlanId, 'trade_plan');
+  } else {
+    window.Logger?.warn('viewLinkedItems global function not available', { page: "trade_plans" });
+  }
+}
+
+/**
+ * Setup price calculation event listeners for add modal
+ * Sets up automatic price/percentage calculations when form fields change
+ */
+function setupPriceCalculation() {
+  try {
+    // Get form elements
+    const priceInput = document.getElementById('price');
+    const sideInput = document.getElementById('side');
+    const stopPriceInput = document.getElementById('stopPrice');
+    const stopPercentageInput = document.getElementById('stopPercentage');
+    const targetPriceInput = document.getElementById('targetPrice');
+    const targetPercentageInput = document.getElementById('targetPercentage');
+
+    if (!priceInput || !sideInput) {
+      return; // Required fields not found
+    }
+
+    // Function to update prices from percentages
+    const updatePricesFromPercentages = () => {
+      const currentPrice = parseFloat(priceInput.value) || 0;
+      const side = sideInput.value || 'Long';
+      
+      if (currentPrice > 0 && stopPercentageInput && stopPriceInput) {
+        const stopPercentage = parseFloat(stopPercentageInput.value) || 0;
+        if (stopPercentage > 0 && typeof window.calculateStopPrice === 'function') {
+          const stopPrice = window.calculateStopPrice(currentPrice, stopPercentage, side);
+          stopPriceInput.value = stopPrice.toFixed(2);
+        }
+      }
+      
+      if (currentPrice > 0 && targetPercentageInput && targetPriceInput) {
+        const targetPercentage = parseFloat(targetPercentageInput.value) || 0;
+        if (targetPercentage > 0 && typeof window.calculateTargetPrice === 'function') {
+          const targetPrice = window.calculateTargetPrice(currentPrice, targetPercentage, side);
+          targetPriceInput.value = targetPrice.toFixed(2);
+        }
+      }
+    };
+
+    // Function to update percentages from prices
+    const updatePercentagesFromPrices = () => {
+      const currentPrice = parseFloat(priceInput.value) || 0;
+      const side = sideInput.value || 'Long';
+      
+      if (currentPrice > 0 && stopPriceInput && stopPercentageInput) {
+        const stopPrice = parseFloat(stopPriceInput.value) || 0;
+        if (stopPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
+          const stopPercentage = window.calculatePercentageFromPrice(currentPrice, stopPrice, side);
+          stopPercentageInput.value = stopPercentage.toFixed(2);
+        }
+      }
+      
+      if (currentPrice > 0 && targetPriceInput && targetPercentageInput) {
+        const targetPrice = parseFloat(targetPriceInput.value) || 0;
+        if (targetPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
+          const targetPercentage = window.calculatePercentageFromPrice(currentPrice, targetPrice, side);
+          targetPercentageInput.value = targetPercentage.toFixed(2);
+        }
+      }
+    };
+
+    // Remove existing listeners if any
+    const newPriceInput = priceInput.cloneNode(true);
+    priceInput.parentNode.replaceChild(newPriceInput, priceInput);
+    
+    // Setup event listeners
+    if (newPriceInput && sideInput) {
+      newPriceInput.addEventListener('input', updatePricesFromPercentages);
+      sideInput.addEventListener('change', updatePricesFromPercentages);
+    }
+    
+    if (stopPercentageInput) {
+      stopPercentageInput.addEventListener('input', updatePricesFromPercentages);
+    }
+    
+    if (targetPercentageInput) {
+      targetPercentageInput.addEventListener('input', updatePricesFromPercentages);
+    }
+    
+    if (stopPriceInput) {
+      stopPriceInput.addEventListener('input', updatePercentagesFromPrices);
+    }
+    
+    if (targetPriceInput) {
+      targetPriceInput.addEventListener('input', updatePercentagesFromPrices);
+    }
+    
+    window.Logger?.debug('Price calculation event listeners setup completed', { page: "trade_plans" });
+  } catch (error) {
+    window.Logger?.error('Error setting up price calculation:', error, { page: "trade_plans" });
+  }
+}
+
+/**
+ * Setup price calculation event listeners for edit modal
+ * Sets up automatic price/percentage calculations when edit form fields change
+ */
+function setupEditPriceCalculation() {
+  try {
+    // Get edit form elements
+    const priceInput = document.getElementById('editPrice');
+    const sideInput = document.getElementById('editSide');
+    const stopPriceInput = document.getElementById('editStopPrice');
+    const stopPercentageInput = document.getElementById('editStopPercentage');
+    const targetPriceInput = document.getElementById('editTargetPrice');
+    const targetPercentageInput = document.getElementById('editTargetPercentage');
+
+    if (!priceInput || !sideInput) {
+      return; // Required fields not found
+    }
+
+    // Function to update prices from percentages
+    const updatePricesFromPercentages = () => {
+      const currentPrice = parseFloat(priceInput.value) || 0;
+      const side = sideInput.value || 'Long';
+      
+      if (currentPrice > 0 && stopPercentageInput && stopPriceInput) {
+        const stopPercentage = parseFloat(stopPercentageInput.value) || 0;
+        if (stopPercentage > 0 && typeof window.calculateStopPrice === 'function') {
+          const stopPrice = window.calculateStopPrice(currentPrice, stopPercentage, side);
+          stopPriceInput.value = stopPrice.toFixed(2);
+        }
+      }
+      
+      if (currentPrice > 0 && targetPercentageInput && targetPriceInput) {
+        const targetPercentage = parseFloat(targetPercentageInput.value) || 0;
+        if (targetPercentage > 0 && typeof window.calculateTargetPrice === 'function') {
+          const targetPrice = window.calculateTargetPrice(currentPrice, targetPercentage, side);
+          targetPriceInput.value = targetPrice.toFixed(2);
+        }
+      }
+    };
+
+    // Function to update percentages from prices
+    const updatePercentagesFromPrices = () => {
+      const currentPrice = parseFloat(priceInput.value) || 0;
+      const side = sideInput.value || 'Long';
+      
+      if (currentPrice > 0 && stopPriceInput && stopPercentageInput) {
+        const stopPrice = parseFloat(stopPriceInput.value) || 0;
+        if (stopPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
+          const stopPercentage = window.calculatePercentageFromPrice(currentPrice, stopPrice, side);
+          stopPercentageInput.value = stopPercentage.toFixed(2);
+        }
+      }
+      
+      if (currentPrice > 0 && targetPriceInput && targetPercentageInput) {
+        const targetPrice = parseFloat(targetPriceInput.value) || 0;
+        if (targetPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
+          const targetPercentage = window.calculatePercentageFromPrice(currentPrice, targetPrice, side);
+          targetPercentageInput.value = targetPercentage.toFixed(2);
+        }
+      }
+    };
+
+    // Remove existing listeners if any
+    const newPriceInput = priceInput.cloneNode(true);
+    priceInput.parentNode.replaceChild(newPriceInput, priceInput);
+    
+    // Setup event listeners
+    if (newPriceInput && sideInput) {
+      newPriceInput.addEventListener('input', updatePricesFromPercentages);
+      sideInput.addEventListener('change', updatePricesFromPercentages);
+    }
+    
+    if (stopPercentageInput) {
+      stopPercentageInput.addEventListener('input', updatePricesFromPercentages);
+    }
+    
+    if (targetPercentageInput) {
+      targetPercentageInput.addEventListener('input', updatePricesFromPercentages);
+    }
+    
+    if (stopPriceInput) {
+      stopPriceInput.addEventListener('input', updatePercentagesFromPrices);
+    }
+    
+    if (targetPriceInput) {
+      targetPriceInput.addEventListener('input', updatePercentagesFromPrices);
+    }
+    
+    window.Logger?.debug('Edit price calculation event listeners setup completed', { page: "trade_plans" });
+  } catch (error) {
+    window.Logger?.error('Error setting up edit price calculation:', error, { page: "trade_plans" });
+  }
+}
+
 window.checkLinkedItemsBeforeCancel = checkLinkedItemsBeforeCancel;
 window.cancelTradePlan = cancelTradePlan;
 window.deleteTradePlan = deleteTradePlan;
@@ -1519,8 +1747,8 @@ function updateTradePlansTable(trade_plans) {
       countElement.textContent = '0 תכנונים';
     }
 
-    // Updating statistics
-    updatePageSummaryStats();
+    // Updating statistics - use the non-recursive function
+    updateTradePlansPageSummaryStats();
     return;
   }
 
@@ -1754,8 +1982,8 @@ function updateTradePlansTable(trade_plans) {
       countElement.textContent = `${trade_plans.length} תכנונים`;
     }
 
-    // Updating statistics
-    updatePageSummaryStats();
+    // Updating statistics - use the non-recursive function
+    updateTradePlansPageSummaryStats();
     
     // יישום צבעי ישויות על כותרות
     if (window.applyEntityColorsToHeaders) {
@@ -1774,24 +2002,58 @@ function updateTradePlansTable(trade_plans) {
 // Data loading, filtering, and statistics
 
 /**
- * Update page summary statistics
- * Calculates and displays trade plan statistics
+ * Update page summary statistics for trade plans
  * 
- * Note: This function delegates to the global updatePageSummaryStats in ui-utils.js
- * to avoid naming conflicts and recursion issues.
+ * IMPORTANT: This function uses a DIFFERENT name to avoid recursion with global function.
+ * The global function is window.updatePageSummaryStats(pageName, data, countElementId).
+ * We call it directly without creating a local override.
  * 
- * @function updatePageSummaryStats
+ * @function updateTradePlansPageSummaryStats
  * @returns {void}
  */
-function updatePageSummaryStats() {
-  // Use the stored reference to global function to avoid recursion
-  if (globalUpdatePageSummaryStats && typeof globalUpdatePageSummaryStats === 'function') {
-    globalUpdatePageSummaryStats('trade_plans', window.tradePlansData, 'designsCount');
-  } else if (typeof window.updatePageSummaryStats === 'function' && window.updatePageSummaryStats !== updatePageSummaryStats) {
-    // Fallback: try to get the global function if it exists and is different from local
-    window.updatePageSummaryStats('trade_plans', window.tradePlansData, 'designsCount');
+function updateTradePlansPageSummaryStats() {
+  try {
+    // Call global function directly - it's in ui-utils.js
+    if (typeof window.updatePageSummaryStats === 'function') {
+      // Store reference to verify it's not our local function (by checking if it accepts 3 params)
+      const fnString = window.updatePageSummaryStats.toString();
+      if (fnString.includes('pageName') && fnString.includes('countElementId')) {
+        // This is the global function from ui-utils.js - call it
+        window.updatePageSummaryStats('trade_plans', window.tradePlansData, 'designsCount');
+      } else {
+        // Fallback: Use InfoSummarySystem directly
+        if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+          const config = window.INFO_SUMMARY_CONFIGS['trade_plans'];
+          if (config) {
+            const dataToUse = window.filteredTradePlansData || window.tradePlansData || [];
+            window.InfoSummarySystem.calculateAndRender(dataToUse, config);
+            const countElement = document.getElementById('designsCount');
+            if (countElement && dataToUse) {
+              countElement.textContent = `${dataToUse.length} תכנונים`;
+            }
+          }
+        }
+      }
+    } else if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+      // Fallback: Use InfoSummarySystem directly if global function not available
+      const config = window.INFO_SUMMARY_CONFIGS['trade_plans'];
+      if (config) {
+        const dataToUse = window.filteredTradePlansData || window.tradePlansData || [];
+        window.InfoSummarySystem.calculateAndRender(dataToUse, config);
+        const countElement = document.getElementById('designsCount');
+        if (countElement && dataToUse) {
+          countElement.textContent = `${dataToUse.length} תכנונים`;
+        }
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error updating page summary stats:', error, { page: "trade_plans" });
   }
 }
+
+// NO LOCAL updatePageSummaryStats function - it causes recursion!
+// We use updateTradePlansPageSummaryStats() directly in the code
+// This avoids the recursion issue with the global function
 
 /**
  * הצגת מודל הוספת תכנון

@@ -232,11 +232,13 @@ function deleteExecution(id) {
   
   if (executionRow) {
     const cells = executionRow.querySelectorAll('td');
-    if (cells.length >= 4) {
+    if (cells.length >= 9) {
+      const ticker = cells[0]?.textContent?.trim() || '';
       const action = cells[1]?.textContent?.trim() || '';
-      const quantity = cells[2]?.textContent?.trim() || '';
-      const price = cells[3]?.textContent?.trim() || '';
-      executionDetails = `${action} ${quantity} יחידות ב-${price}`;
+      const quantity = cells[3]?.textContent?.trim() || '';
+      const price = cells[4]?.textContent?.trim() || '';
+      const date = cells[8]?.textContent?.trim() || '';
+      executionDetails = `${ticker} - ${action}, ${quantity} יחידות ב-${price}, תאריך: ${date}`;
     }
   }
 

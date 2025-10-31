@@ -285,8 +285,8 @@ function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null
   const title = `מחיקת ${itemTypeDisplay}`;
   const message = `האם אתה בטוח שברצונך למחוק את ${itemTypeDisplay} "${itemName}"?\n\nפעולה זו אינה ניתנת לביטול.`;
 
-  // קורא ל-showConfirmationDialog עם צבע אדום למחיקה
-  showConfirmationDialog(title, message, onConfirm, onCancel, 'danger');
+  // קורא ל-showConfirmationDialog עם צבע לבן למחיקה
+  showConfirmationDialog(title, message, onConfirm, onCancel, 'warning');
 }
 
 // ===== GLOBAL CONFIRM REPLACEMENT =====

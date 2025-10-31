@@ -333,7 +333,12 @@ async function loadTradesData() {
     await updateTradesTable(localTradesData);
 
     // עדכון סטטיסטיקות
-    updateTableStats();
+    // Update table statistics using local wrapper that delegates to global function
+    if (typeof updateTableStats === 'function') {
+      updateTableStats();
+    } else if (typeof window.updatePageSummaryStats === 'function') {
+      window.updatePageSummaryStats('trades', window.tradesData);
+    }
 
   } catch (error) {
     if (typeof handleDataLoadError === 'function') {
@@ -1322,15 +1327,308 @@ function populateSelect(selectId, data, field, prefix = '') {
 }
 
 window.populateSelect = populateSelect;
+
+/**
+ * Handle relation type change
+ * Called when radio button for relation type changes
+ * 
+ * @function onRelationTypeChange
+ * @param {HTMLInputElement} radioElement - The radio button element that was selected
+ * @returns {void}
+ */
+function onRelationTypeChange(radioElement) {
+  try {
+    if (!radioElement || !radioElement.value) {
+      return;
+    }
+
+    // Enable the related object select field
+    const relatedObjectSelect = document.getElementById('tradeRelatedObjectSelect');
+    if (relatedObjectSelect) {
+      relatedObjectSelect.disabled = false;
+      relatedObjectSelect.classList.remove('disabled-field');
+    }
+
+    // Populate related objects based on selected type
+    populateRelatedObjects(parseInt(radioElement.value));
+    
+  } catch (error) {
+    window.Logger?.error('שגיאה בשינוי סוג שיוך:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בשינוי סוג שיוך');
+    }
+  }
+}
+
+/**
+ * Handle related object change
+ * Called when select element for related object changes
+ * 
+ * @function onRelatedObjectChange
+ * @param {HTMLSelectElement} selectElement - The select element that was changed
+ * @returns {void}
+ */
+function onRelatedObjectChange(selectElement) {
+  try {
+    if (!selectElement) {
+      return;
+    }
+
+    if (selectElement.value) {
+      // Enable condition fields when object is selected
+      enableConditionFields();
+    } else {
+      // Disable condition fields when no object is selected
+      disableConditionFields();
+    }
+  } catch (error) {
+    window.Logger?.error('שגיאה בבחירת אובייקט:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בבחירת אובייקט');
+    }
+  }
+}
+
+/**
+ * Enable condition fields for trade modal
+ * 
+ * @function enableConditionFields
+ * @returns {void}
+ */
+function enableConditionFields() {
+  try {
+    const fields = [
+      'tradeConditionAttribute',
+      'tradeConditionOperator',
+      'tradeConditionNumber',
+      'tradeConditionMessage'
+    ];
+
+    fields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = false;
+        field.classList.remove('disabled-field');
+      }
+    });
+  } catch (error) {
+    window.Logger?.error('שגיאה בהפעלת שדות תנאי:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Disable condition fields for trade modal
+ * 
+ * @function disableConditionFields
+ * @returns {void}
+ */
+function disableConditionFields() {
+  try {
+    const fields = [
+      'tradeConditionAttribute',
+      'tradeConditionOperator',
+      'tradeConditionNumber',
+      'tradeConditionMessage'
+    ];
+
+    fields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = true;
+        field.classList.add('disabled-field');
+        field.value = '';
+      }
+    });
+  } catch (error) {
+    window.Logger?.error('שגיאה בהשבתת שדות תנאי:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Populate related objects select based on relation type
+ * 
+ * @function populateRelatedObjects
+ * @param {number} relationTypeId - The relation type ID (1=account, 2=trade, 3=trade_plan, 4=ticker)
+ * @returns {void}
+ */
+function populateRelatedObjects(relationTypeId) {
+  try {
+    const selectId = 'tradeRelatedObjectSelect';
+    const select = document.getElementById(selectId);
+    if (!select) {
+      window.Logger?.debug('Select element not found for populateRelatedObjects', { selectId, page: "trades" });
+      return;
+    }
+
+    select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+    switch (relationTypeId) {
+      case 1: // Account
+        populateSelect(selectId, window.accountsData || [], 'name', 'חשבון מסחר');
+        break;
+      case 2: // Trade
+        populateSelect(selectId, window.tradesData || [], 'id', 'טרייד');
+        break;
+      case 3: // Trade Plan
+        populateSelect(selectId, window.tradePlansData || [], 'id', 'תכנון');
+        break;
+      case 4: // Ticker
+        populateSelect(selectId, window.tickersData || [], 'symbol', '');
+        break;
+      default:
+        window.Logger?.debug('Unknown relation type', { relationTypeId, page: "trades" });
+    }
+  } catch (error) {
+    window.Logger?.error('שגיאה במילוי אובייקטים קשורים:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה במילוי אובייקטים קשורים');
+    }
+  }
+}
+
 window.onRelationTypeChange = onRelationTypeChange;
 window.onRelatedObjectChange = onRelatedObjectChange;
 window.enableConditionFields = enableConditionFields;
 window.disableConditionFields = disableConditionFields;
 window.populateRelatedObjects = populateRelatedObjects;
-window.filterTradesLocally = filterTradesLocally;
-window.getDemoTradesData = getDemoTradesData;
+// Note: filterTradesLocally and filterTradesData removed - use unified filter system from header-system.js
+// The unified filter system handles all filtering through applyFilter() and related functions
+// Note: getDemoTradesData removed - we don't use demo data in the system. If no data is available, show clear message to user
+/**
+ * Restore sort state wrapper
+ * Uses global restoreSortState from page-utils.js
+ * 
+ * @function restoreSortState
+ * @returns {void}
+ */
+function restoreSortState() {
+  try {
+    if (typeof window.pageUtils?.restoreSortState === 'function') {
+      window.pageUtils.restoreSortState('trades', null);
+    } else if (typeof window.restoreSortState === 'function') {
+      window.restoreSortState('trades', null);
+    } else {
+      window.Logger?.debug('restoreSortState not available - using setupSortableHeaders instead', { page: "trades" });
+      // Fallback - setup sortable headers will restore state automatically
+      if (typeof window.setupSortableHeaders === 'function') {
+        window.setupSortableHeaders('trades');
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error restoring sort state:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Enable trade form fields
+ * Activates form fields in the add/edit modals
+ * 
+ * @function enableTradeFormFields
+ * @returns {void}
+ */
+function enableTradeFormFields() {
+  try {
+    const fieldsToEnable = [
+      'addTradeType',
+      'addTradeSide',
+      'addTradeAccountId',
+      'addTradeOpenedAt',
+      'addTradeNotes',
+    ];
+
+    fieldsToEnable.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = false;
+        field.classList.remove('disabled');
+      }
+    });
+    
+    // Also enable edit modal fields
+    const editFieldsToEnable = [
+      'editTradeType',
+      'editTradeSide',
+      'editTradeAccountId',
+      'editTradeOpenedAt',
+      'editTradeNotes',
+    ];
+    
+    editFieldsToEnable.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = false;
+        field.classList.remove('disabled');
+      }
+    });
+  } catch (error) {
+    window.Logger?.error('Error enabling trade form fields:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Disable trade form fields
+ * Deactivates form fields in the add/edit modals
+ * 
+ * @function disableTradeFormFields
+ * @returns {void}
+ */
+function disableTradeFormFields() {
+  try {
+    const fieldsToDisable = [
+      'addTradeType',
+      'addTradeSide',
+      'addTradeAccountId',
+      'addTradeOpenedAt',
+      'addTradeNotes',
+    ];
+
+    fieldsToDisable.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = true;
+        field.classList.add('disabled');
+      }
+    });
+    
+    // Also disable edit modal fields
+    const editFieldsToDisable = [
+      'editTradeType',
+      'editTradeSide',
+      'editTradeAccountId',
+      'editTradeOpenedAt',
+      'editTradeNotes',
+    ];
+    
+    editFieldsToDisable.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = true;
+        field.classList.add('disabled');
+      }
+    });
+  } catch (error) {
+    window.Logger?.error('Error disabling trade form fields:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Load modal data (placeholder - ModalManagerV2 handles this automatically)
+ * 
+ * @function loadModalData
+ * @returns {void}
+ */
+function loadModalData() {
+  try {
+    // ModalManagerV2 handles modal data loading automatically
+    // This function is kept for backward compatibility but doesn't need to do anything
+    window.Logger?.debug('loadModalData called - ModalManagerV2 handles data loading automatically', { page: "trades" });
+  } catch (error) {
+    window.Logger?.error('Error in loadModalData:', error, { page: "trades" });
+  }
+}
+
 window.restoreSortState = restoreSortState;
-window.setupModalConfigurations = setupModalConfigurations;
+// Note: setupModalConfigurations removed - ModalManagerV2 handles modal configurations automatically via modal-configs/trades-config.js
 window.addEditImportantNote = addEditImportantNote;
 window.addEditReminder = addEditReminder;
 window.enableTradeFormFields = enableTradeFormFields;
@@ -1364,6 +1662,266 @@ async function initializeTradesPage() {
   }
 }
 
+/**
+ * רענון נתוני פוזיציות
+ * מרענן את נתוני הטריידים והפוזיציות מהשרת
+ * 
+ * @function refreshPositions
+ * @returns {Promise<void>}
+ */
+async function refreshPositions() {
+  try {
+    window.Logger?.info('🔄 Refreshing positions data...', { page: "trades" });
+    
+    // Invalidate cache if UnifiedCacheManager is available
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+      try {
+        await window.UnifiedCacheManager.remove('trade-positions');
+        window.Logger?.debug('Cache invalidated for trade-positions', { page: "trades" });
+      } catch (cacheError) {
+        window.Logger?.warn('Failed to invalidate cache:', cacheError, { page: "trades" });
+      }
+    }
+    
+    // Show notification
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('מרענן פוזיציות...', 'מעדכן נתוני פוזיציה מהשרת');
+    }
+    
+    // Reload data
+    if (typeof loadTradesData === 'function') {
+      await loadTradesData();
+    } else if (typeof window.loadTradesData === 'function') {
+      await window.loadTradesData();
+    } else {
+      window.Logger?.error('loadTradesData not available', { page: "trades" });
+      throw new Error('loadTradesData not available');
+    }
+    
+    // Show success notification
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('פוזיציות עודכנו', 'נתוני הפוזיציה עודכנו בהצלחה', 3000);
+    }
+    
+    window.Logger?.info('✅ Positions refreshed successfully', { page: "trades" });
+  } catch (error) {
+    window.Logger?.error('❌ Error refreshing positions:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה ברענון נתוני פוזיציות', 5000);
+    }
+  }
+}
+
+/**
+ * Setup date validation for trade forms
+ * Sets up event listeners for date field validation (openedAt/closedAt)
+ * 
+ * @function setupDateValidation
+ * @returns {void}
+ */
+function setupDateValidation() {
+  try {
+    const openedAtField = document.getElementById('editTradeOpenedAt');
+    const closedAtField = document.getElementById('editTradeClosedAt');
+
+    if (openedAtField && closedAtField) {
+      // ולידציה בעת שינוי תאריך יצירה
+      openedAtField.addEventListener('change', function () {
+        validateDateFields();
+      });
+
+      // ולידציה בעת שינוי תאריך סגירה
+      closedAtField.addEventListener('change', function () {
+        validateDateFields();
+      });
+    }
+    
+    // Also setup for add modal
+    const addOpenedAtField = document.getElementById('addTradeOpenedAt');
+    const addClosedAtField = document.getElementById('addTradeClosedAt');
+    
+    if (addOpenedAtField && addClosedAtField) {
+      addOpenedAtField.addEventListener('change', function () {
+        validateDateFields();
+      });
+      
+      addClosedAtField.addEventListener('change', function () {
+        validateDateFields();
+      });
+    }
+  } catch (error) {
+    window.Logger?.error('Error setting up date validation:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Validate date fields (openedAt must be before closedAt)
+ * 
+ * @function validateDateFields
+ * @returns {void}
+ */
+function validateDateFields() {
+  try {
+    // Check edit modal first
+    const openedAtField = document.getElementById('editTradeOpenedAt');
+    const closedAtField = document.getElementById('editTradeClosedAt');
+
+    if (openedAtField && closedAtField) {
+      const openedAt = openedAtField.value;
+      const closedAt = closedAtField.value;
+
+      // הסרת הודעות שגיאה קודמות
+      clearDateValidationMessages();
+
+      if (openedAt && closedAt) {
+        const openedDate = new Date(openedAt);
+        const closedDate = new Date(closedAt);
+
+        if (closedDate < openedDate) {
+          showDateValidationError('תאריך סגירה לא יכול להיות לפני תאריך יצירה', closedAtField);
+          closedAtField.classList.add('is-invalid');
+        } else {
+          closedAtField.classList.remove('is-invalid');
+          closedAtField.classList.add('is-valid');
+        }
+      }
+    }
+    
+    // Also validate add modal
+    const addOpenedAtField = document.getElementById('addTradeOpenedAt');
+    const addClosedAtField = document.getElementById('addTradeClosedAt');
+    
+    if (addOpenedAtField && addClosedAtField) {
+      const addOpenedAt = addOpenedAtField.value;
+      const addClosedAt = addClosedAtField.value;
+      
+      if (addOpenedAt && addClosedAt) {
+        const addOpenedDate = new Date(addOpenedAt);
+        const addClosedDate = new Date(addClosedAt);
+        
+        if (addClosedDate < addOpenedDate) {
+          showDateValidationError('תאריך סגירה לא יכול להיות לפני תאריך יצירה', addClosedAtField);
+          addClosedAtField.classList.add('is-invalid');
+        } else {
+          addClosedAtField.classList.remove('is-invalid');
+          addClosedAtField.classList.add('is-valid');
+        }
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error validating date fields:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Show date validation error message
+ * 
+ * @function showDateValidationError
+ * @param {string} message - Error message to display
+ * @param {HTMLElement} field - Field to attach error to
+ * @returns {void}
+ */
+function showDateValidationError(message, field) {
+  try {
+    if (!field) return;
+
+    // הסרת הודעות קודמות
+    const existingError = field.parentNode?.querySelector('.invalid-feedback');
+    if (existingError) {
+      existingError.remove();
+    }
+
+    // הוספת הודעת שגיאה
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'invalid-feedback';
+    errorDiv.textContent = message;
+    if (field.parentNode) {
+      field.parentNode.appendChild(errorDiv);
+    }
+  } catch (error) {
+    window.Logger?.error('Error showing date validation error:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Clear date validation messages
+ * 
+ * @function clearDateValidationMessages
+ * @returns {void}
+ */
+function clearDateValidationMessages() {
+  try {
+    // Clear edit modal
+    const closedAtField = document.getElementById('editTradeClosedAt');
+    if (closedAtField) {
+      const existingError = closedAtField.parentNode?.querySelector('.invalid-feedback');
+      if (existingError) {
+        existingError.remove();
+      }
+      closedAtField.classList.remove('is-invalid', 'is-valid');
+    }
+    
+    // Clear add modal
+    const addClosedAtField = document.getElementById('addTradeClosedAt');
+    if (addClosedAtField) {
+      const existingError = addClosedAtField.parentNode?.querySelector('.invalid-feedback');
+      if (existingError) {
+        existingError.remove();
+      }
+      addClosedAtField.classList.remove('is-invalid', 'is-valid');
+    }
+  } catch (error) {
+    window.Logger?.error('Error clearing date validation messages:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Add important note (alias for addEditImportantNote)
+ * Placeholder for future note functionality
+ * 
+ * @function addImportantNote
+ * @returns {void}
+ */
+function addImportantNote() {
+  return addEditImportantNote();
+}
+
+/**
+ * Add reminder (alias for addEditReminder)
+ * Placeholder for future reminder functionality
+ * 
+ * @function addReminder
+ * @returns {void}
+ */
+function addReminder() {
+  return addEditReminder();
+}
+
+/**
+ * Handle change in "Show Closed Trades" checkbox
+ * Reloads modal data to update the trades list
+ * 
+ * @function onShowClosedTradesChange
+ * @param {Event} event - Change event from checkbox
+ * @returns {void}
+ */
+function onShowClosedTradesChange(event) {
+  try {
+    const showClosed = event?.target?.checked || false;
+    window.Logger?.debug('Show closed trades changed:', showClosed, { page: "trades" });
+    
+    // Reload modal data to update the trades list
+    // This will refresh the trade plan selection dropdown based on the filter
+    if (typeof loadModalData === 'function') {
+      loadModalData();
+    } else {
+      window.Logger?.warn('loadModalData not available', { page: "trades" });
+    }
+  } catch (error) {
+    window.Logger?.error('Error in onShowClosedTradesChange:', error, { page: "trades" });
+  }
+}
+
 window.initializeTradesPage = initializeTradesPage;
 window.setupDateValidation = setupDateValidation;
 window.validateDateFields = validateDateFields;
@@ -1371,9 +1929,53 @@ window.clearDateValidationMessages = clearDateValidationMessages;
 window.addImportantNote = addImportantNote;
 window.addReminder = addReminder;
 window.setupSortEventListeners = setupSortEventListeners;
-window.filterTradesData = filterTradesData;
+// Note: filterTradesData removed - use unified filter system from header-system.js
 window.onShowClosedTradesChange = onShowClosedTradesChange;
 window.refreshPositions = refreshPositions;
+
+/**
+ * Update table statistics
+ * Wrapper that delegates to global updatePageSummaryStats from ui-utils.js
+ * 
+ * IMPORTANT: We use updatePageSummaryStats directly (not updateTableStats) to avoid recursion
+ * since we're exporting a function with the same name.
+ * 
+ * @function updateTableStats
+ * @returns {void}
+ */
+function updateTableStats() {
+  try {
+    // Use updatePageSummaryStats directly - it's the unified system function
+    if (typeof window.updatePageSummaryStats === 'function') {
+      window.updatePageSummaryStats('trades', window.tradesData);
+    } else {
+      window.Logger?.warn('updatePageSummaryStats not available', { page: "trades" });
+    }
+  } catch (error) {
+    window.Logger?.error('Error updating table stats:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Add buy/sell transaction to trade (placeholder - in development)
+ * 
+ * @function addEditBuySell
+ * @returns {void}
+ */
+function addEditBuySell() {
+  try {
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('בפיתוח', 'הפונקציונליות להוספת עסקת קניה/מכירה לטרייד נמצאת כרגע בפיתוח');
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('בפיתוח', 'info');
+    }
+    window.Logger?.debug('addEditBuySell called - feature in development', { page: "trades" });
+  } catch (error) {
+    window.Logger?.error('Error in addEditBuySell:', error, { page: "trades" });
+  }
+}
+
+// Export - safe because we only call updatePageSummaryStats, not updateTableStats
 window.updateTableStats = updateTableStats;
 window.loadTradePlanDates = loadTradePlanDates;
 window.addEditBuySell = addEditBuySell;

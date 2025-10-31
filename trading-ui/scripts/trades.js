@@ -881,7 +881,12 @@ function editTradeRecord(tradeId) {
   // מציאת הטרייד במערך
   const trade = tradesData.find(t => t.id === tradeId);
   if (trade) {
-    showEditTradeModal(trade);
+    // Use ModalManagerV2 directly
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+      window.ModalManagerV2.showEditModal('tradesModal', 'trade', trade.id);
+    } else {
+      window.Logger?.error('ModalManagerV2 לא זמין', { page: "trades" });
+    }
   } else {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('trade', 'CRITICAL');
@@ -1222,9 +1227,10 @@ window.updatePageSummaryStats = updatePageSummaryStats;
  */
 function addTrade() {
   if (typeof showAddTradeModal === 'function') {
-    showAddTradeModal();
-  } else if (typeof window.showAddTradeModal === 'function') {
-    window.showAddTradeModal();
+    // Use ModalManagerV2 directly
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('tradesModal', 'add');
+    } else {
   } else {
     window.Logger?.error('showAddTradeModal not available', { page: "trades" });
     if (typeof window.showErrorNotification === 'function') {
@@ -1244,10 +1250,10 @@ window.addTrade = addTrade;
  * @returns {void}
  */
 function editTrade(tradeId) {
-  if (typeof showEditTradeModal === 'function') {
-    showEditTradeModal(tradeId);
-  } else if (typeof window.showEditTradeModal === 'function') {
-    window.showEditTradeModal(tradeId);
+  // Use ModalManagerV2 directly
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+    window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
+  } else {
   } else {
     window.Logger?.error('showEditTradeModal not available', { page: "trades" });
     if (typeof window.showErrorNotification === 'function') {
@@ -1320,7 +1326,7 @@ function validateTradeForm(formId = 'addTradeForm') {
 
 window.clearTradeValidation = clearTradeValidation;
 window.validateTradeForm = validateTradeForm;
-window.showAddTradeModal = showAddTradeModal;
+// REMOVED: window.showAddTradeModal - use window.ModalManagerV2.showModal('tradesModal', 'add') directly
 
 /**
  * Hide add trade modal
@@ -1346,7 +1352,7 @@ function hideAddTradeModal() {
 }
 
 window.hideAddTradeModal = hideAddTradeModal;
-window.showEditTradeModal = showEditTradeModal;
+// REMOVED: window.showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', id) directly
 
 /**
  * Hide edit trade modal
@@ -1955,7 +1961,9 @@ function validateDateFields() {
         const closedDate = new Date(closedAt);
 
         if (closedDate < openedDate) {
-          showDateValidationError('תאריך סגירה לא יכול להיות לפני תאריך יצירה', closedAtField);
+          if (typeof window.showFieldError === 'function') {
+            window.showFieldError(closedAtField, 'תאריך סגירה לא יכול להיות לפני תאריך יצירה');
+          }
           closedAtField.classList.add('is-invalid');
         } else {
           closedAtField.classList.remove('is-invalid');
@@ -1977,7 +1985,9 @@ function validateDateFields() {
         const addClosedDate = new Date(addClosedAt);
         
         if (addClosedDate < addOpenedDate) {
-          showDateValidationError('תאריך סגירה לא יכול להיות לפני תאריך יצירה', addClosedAtField);
+          if (typeof window.showFieldError === 'function') {
+            window.showFieldError(addClosedAtField, 'תאריך סגירה לא יכול להיות לפני תאריך יצירה');
+          }
           addClosedAtField.classList.add('is-invalid');
         } else {
           addClosedAtField.classList.remove('is-invalid');
@@ -1998,27 +2008,7 @@ function validateDateFields() {
  * @param {HTMLElement} field - Field to attach error to
  * @returns {void}
  */
-function showDateValidationError(message, field) {
-  try {
-    if (!field) return;
-
-    // הסרת הודעות קודמות
-    const existingError = field.parentNode?.querySelector('.invalid-feedback');
-    if (existingError) {
-      existingError.remove();
-    }
-
-    // הוספת הודעת שגיאה
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'invalid-feedback';
-    errorDiv.textContent = message;
-    if (field.parentNode) {
-      field.parentNode.appendChild(errorDiv);
-    }
-  } catch (error) {
-    window.Logger?.error('Error showing date validation error:', error, { page: "trades" });
-  }
-}
+// REMOVED: showDateValidationError - use window.showFieldError(field, message) from validation-utils.js directly
 
 /**
  * Clear date validation messages
@@ -3013,7 +3003,7 @@ function generateDetailedLog() {
                 linkedItemsModal: document.getElementById('linkedItemsModal') ? 'זמין' : 'לא זמין'
             },
             functions: {
-                showAddTradeModal: typeof window.showAddTradeModal === 'function' ? 'זמין' : 'לא זמין',
+                showAddTradeModal: typeof window.ModalManagerV2?.showModal === 'function' ? 'זמין (ModalManagerV2)' : 'לא זמין',
                 editTradeRecord: typeof window.editTradeRecord === 'function' ? 'זמין' : 'לא זמין',
                 deleteTradeRecord: typeof window.deleteTradeRecord === 'function' ? 'זמין' : 'לא זמין',
                 toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
@@ -3138,49 +3128,13 @@ async function generateDetailedLogForTrades() {
  * @function showAddTradeModal
  * @returns {void}
  */
-function showAddTradeModal() {
-    try {
-        window.Logger.debug('showAddTradeModal called', { page: 'trades' });
-        
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.showModal('tradesModal', 'add');
-        } else {
-            console.error('ModalManagerV2 not available');
-            if (window.showErrorNotification) {
-                window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה');
-            }
-        }
-    } catch (error) {
-        window.Logger.error('Error in showAddTradeModal:', error, { page: 'trades' });
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל הוספת טרייד');
-        }
-    }
-}
+// REMOVED: showAddTradeModal - use window.ModalManagerV2.showModal('tradesModal', 'add') directly
 
 /**
  * הצגת מודל עריכת טרייד
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showEditTradeModal(tradeId) {
-    try {
-        window.Logger.debug('showEditTradeModal called', { tradeId, page: 'trades' });
-        
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
-        } else {
-            console.error('ModalManagerV2 not available');
-            if (window.showErrorNotification) {
-                window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה');
-            }
-        }
-    } catch (error) {
-        window.Logger.error('Error in showEditTradeModal:', error, { tradeId, page: 'trades' });
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל עריכת טרייד');
-        }
-    }
-}
+// REMOVED: showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId) directly
 
 /**
  * שמירת טרייד
@@ -3293,8 +3247,8 @@ async function deleteTrade(tradeId) {
 }
 
 // Export functions to window for global access
-window.showAddTradeModal = showAddTradeModal;
-window.showEditTradeModal = showEditTradeModal;
+// REMOVED: window.showAddTradeModal - use window.ModalManagerV2.showModal('tradesModal', 'add') directly
+// REMOVED: window.showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', id) directly
 window.saveTrade = saveTrade;
 window.deleteTrade = deleteTrade;
 window.performTradeDeletion = performTradeDeletion;

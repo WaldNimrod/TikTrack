@@ -362,13 +362,7 @@ function updateRealizedPLField(mode = 'add') {
   }
 }
 
-function showEditExecutionModal(executionId) {
-  try {
-    // לא ניתן לטעון תכנונים
-      } catch {
-        // לא ניתן לטעון תכנונים
-      }
-    }
+// NOTE: showEditExecutionModal is defined later in the file (line ~3995)
 
 /**
  * מילוי טופס עריכת עסקה
@@ -3999,110 +3993,6 @@ function showEditExecutionModal(executionId) {
         window.ModalManagerV2.showEditModal('executionsModal', 'execution', executionId);
     } else {
         console.error('ModalManagerV2 not available');
-    }
-}
-
-/**
- * שמירת ביצוע
- * Handles both add and edit modes
- */
-async function saveExecution() {
-    window.Logger.debug('saveExecution called', { page: 'executions' });
-    
-    try {
-        // Collect form data
-        const form = document.getElementById('executionsModalForm');
-        if (!form) {
-            throw new Error('Execution form not found');
-        }
-        
-        const formData = new FormData(form);
-        const executionData = {
-            ticker_id: formData.get('executionTicker'),
-            account_id: formData.get('executionAccount'),
-            type: formData.get('executionType'),
-            quantity: parseInt(formData.get('executionQuantity')),
-            price: parseFloat(formData.get('executionPrice')),
-            execution_date: formData.get('executionDate'),
-            commission: parseFloat(formData.get('executionCommission')) || 0,
-            fees: parseFloat(formData.get('executionFees')) || 0,
-            status: formData.get('executionStatus'),
-            notes: formData.get('executionNotes')
-        };
-        
-        // Calculate total value
-        executionData.total_value = executionData.quantity * executionData.price;
-        
-        // Validate data
-        if (!window.validateEntityForm) {
-            throw new Error('Validation system not available');
-        }
-        
-        const isValid = window.validateEntityForm('executionsModalForm', {
-            executionTicker: { required: true },
-            executionAccount: { required: true },
-            executionType: { required: true },
-            executionQuantity: { required: true, min: 1 },
-            executionPrice: { required: true, min: 0.01 },
-            executionDate: { required: true },
-            executionCommission: { required: false, min: 0 },
-            executionFees: { required: false, min: 0 },
-            executionStatus: { required: true },
-            executionNotes: { required: false, maxLength: 500 }
-        });
-        
-        if (!isValid) {
-            window.Logger.warn('Execution validation failed', { page: 'executions' });
-            return;
-        }
-        
-        // Determine if this is add or edit
-        const isEdit = form.dataset.mode === 'edit';
-        const executionId = form.dataset.executionId;
-        
-        // Prepare API call
-        const url = isEdit ? `/api/executions/${executionId}` : '/api/executions';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        // Send to API
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(executionData)
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        
-        // Handle success
-        if (window.showNotification) {
-            const message = isEdit ? 'ביצוע עודכן בהצלחה' : 'ביצוע נוסף בהצלחה';
-            window.showNotification(message, 'success', 'business');
-        }
-        
-        // Close modal
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.hideModal('executionsModal');
-        }
-        
-        // Refresh data
-        if (window.loadExecutionsData) {
-            window.loadExecutionsData();
-        }
-        
-        window.Logger.info('Execution saved successfully', { executionId: result.id, page: 'executions' });
-        
-    } catch (error) {
-        window.Logger.error('Error saving execution', { error: error.message, page: 'executions' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה בשמירת הביצוע', 'error', 'system');
-        }
     }
 }
 

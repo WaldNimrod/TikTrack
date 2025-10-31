@@ -101,6 +101,14 @@
 | `executions.js` | 6 | ⏳ ממתין | - | - |
 | `trading_accounts.js` | 5 | ⏳ ממתין | - | - |
 | `cash_flows.js` | 4 | ✅ הושלם | 2.11.2025 | הוחלפו: toggleCashFlowsSection→toggleSection, updatePageSummaryStats→InfoSummarySystem, showAddCashFlowModal/showEditCashFlowModal→ModalManagerV2 |
+| `business-module.js` | 3 | ✅ הושלם | 2.11.2025 | הוחלפו: showAddTradeModal/showEditTradeModal→ModalManagerV2, showDateValidationError→showFieldError |
+| `trades.js` | 3 | ✅ הושלם | 2.11.2025 | הוחלפו: showAddTradeModal/showEditTradeModal→ModalManagerV2, showDateValidationError→showFieldError |
+| `alerts.js` | 3 | ✅ הושלם | 2.11.2025 | הוחלפו: showAddAlertModal/showEditAlertModal→ModalManagerV2, updatePageSummaryStats→InfoSummarySystem |
+| `notes.js` | 3 | ✅ הושלם | 2.11.2025 | הוחלפו: showAddNoteModal/showEditNoteModal→ModalManagerV2 |
+| `trade_plans.js` | 2 | ✅ הושלם | 2.11.2025 | הוחלפו: showAddTradePlanModal/showEditTradePlanModal→ModalManagerV2 |
+| `data-advanced.js` | 2 | ✅ הושלם | 2.11.2025 | הוחלפו: isNumeric→window.isNumeric, clearUserPreferencesCache→UnifiedCacheManager |
+| `database.js` | 1 | ✅ הושלם | 2.11.2025 | הוחלף: formatDate→window.formatDate |
+| `data-basic.js` | 1 | ✅ הושלם | 2.11.2025 | הוחלף: sortTable→window.sortTableData |
 | `tickers.js` | 4 | ⏳ ממתין | - | - |
 | `business-module.js` | 4 | ⏳ ממתין | - | - |
 | `trades.js` | 3 | ⏳ ממתין | - | - |

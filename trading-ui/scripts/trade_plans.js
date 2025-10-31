@@ -494,6 +494,114 @@ async function updateTickerInfo() {
 }
 
 /**
+ * Update shares from planned amount in add modal
+ * Calculates number of shares based on planned amount and current price
+ * 
+ * @function updateSharesFromAmount
+ * @returns {void}
+ */
+function updateSharesFromAmount() {
+  try {
+    const amountInput = document.getElementById('plannedAmount');
+    const sharesInput = document.getElementById('shares');
+    const priceDisplay = document.getElementById('currentPriceDisplay');
+    
+    // Fallback to alternative field names
+    if (!amountInput) {
+      const altAmountInput = document.getElementById('addTradePlanPlannedAmount');
+      if (altAmountInput) amountInput = altAmountInput;
+    }
+    if (!sharesInput) {
+      const altSharesInput = document.getElementById('addTradePlanShares');
+      if (altSharesInput) sharesInput = altSharesInput;
+    }
+
+    if (!amountInput || !sharesInput || !priceDisplay) {
+      return;
+    }
+
+    const amount = parseFloat(amountInput.value) || 0;
+    const priceText = priceDisplay.textContent;
+    const price = parseFloat(priceText.replace('$', '')) || 0;
+
+    if (price > 0) {
+      // Try to use global function first
+      if (typeof window.convertAmountToShares === 'function') {
+        const result = window.convertAmountToShares(amount, price);
+        sharesInput.value = result.shares || result;
+      } else if (typeof convertAmountToShares === 'function') {
+        // Fallback to local function if exists
+        const result = convertAmountToShares(amount, price);
+        sharesInput.value = result.shares || result;
+      } else {
+        // Simple calculation fallback
+        sharesInput.value = Math.floor(amount / price);
+      }
+    }
+    
+  } catch (error) {
+    window.Logger?.error('שגיאה בעדכון מניות מסכום:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון מניות מסכום', error.message);
+    }
+  }
+}
+
+/**
+ * Update amount from shares in add modal
+ * Calculates planned amount based on number of shares and current price
+ * 
+ * @function updateAmountFromShares
+ * @returns {void}
+ */
+function updateAmountFromShares() {
+  try {
+    const amountInput = document.getElementById('plannedAmount');
+    const sharesInput = document.getElementById('shares');
+    const priceDisplay = document.getElementById('currentPriceDisplay');
+    
+    // Fallback to alternative field names
+    if (!amountInput) {
+      const altAmountInput = document.getElementById('addTradePlanPlannedAmount');
+      if (altAmountInput) amountInput = altAmountInput;
+    }
+    if (!sharesInput) {
+      const altSharesInput = document.getElementById('addTradePlanShares');
+      if (altSharesInput) sharesInput = altSharesInput;
+    }
+
+    if (!amountInput || !sharesInput || !priceDisplay) {
+      return;
+    }
+
+    const shares = parseFloat(sharesInput.value) || 0;
+    const priceText = priceDisplay.textContent;
+    const price = parseFloat(priceText.replace('$', '')) || 0;
+
+    if (price > 0) {
+      // Try to use global function first
+      if (typeof window.convertSharesToAmount === 'function') {
+        const amount = window.convertSharesToAmount(shares, price);
+        amountInput.value = amount;
+      } else if (typeof convertSharesToAmount === 'function') {
+        // Fallback to local function if exists
+        const amount = convertSharesToAmount(shares, price);
+        amountInput.value = amount;
+      } else {
+        // Simple calculation fallback
+        amountInput.value = (shares * price).toFixed(2);
+      }
+    }
+    
+  } catch (error) {
+    window.Logger?.error('שגיאה בעדכון סכום ממניות:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון סכום ממניות', error.message);
+    }
+  }
+}
+
+/**
  * Update form fields with calculated values based on ticker data and user preferences
  */
 async function updateFormFieldsWithTickerData(ticker, currentPrice) {
@@ -1826,9 +1934,7 @@ function updateTradePlansTable(trade_plans) {
     try {
       // Safeguarding against invalid data
       if (!design || typeof design !== 'object') {
-        if (typeof window.showNotification === 'function') {
-          window.showNotification('Invalid design data in table', 'warning');
-        }
+        window.Logger?.warn('Invalid design data in table', { design: design, page: "trade_plans" });
         return '';
       }
 
@@ -2203,15 +2309,35 @@ const tradePlanValidationRules = {
       },
     };
 
-    try {
-      window.initializeValidation('addTradePlanForm', validationRules);
-    } catch (error) {
-      handleSystemError(error, 'אתחול ולידציה');
-    }
+    // Initialize validation with deferred check (validation-utils.js may not be loaded yet)
+    const initializeFormValidation = () => {
+      if (typeof window.initializeValidation === 'function') {
+        try {
+          window.initializeValidation('addTradePlanForm', validationRules);
+          window.Logger?.debug('Form validation initialized successfully', { page: "trade_plans" });
+          return true;
+        } catch (error) {
+          window.Logger?.error('Error initializing validation:', error, { page: "trade_plans" });
+          return false;
+        }
+      }
+      return false;
+    };
 
-  if (typeof window.showNotification === 'function') {
-    window.showNotification('window.initializeValidation not available', 'warning');
-  }
+    // Try immediate initialization
+    if (!initializeFormValidation()) {
+      // If not available, try with delay (validation package may still be loading)
+      setTimeout(() => {
+        if (!initializeFormValidation()) {
+          // Final retry after additional delay
+          setTimeout(() => {
+            if (!initializeFormValidation()) {
+              window.Logger?.debug('Validation system not available after retries - will be initialized when available', { page: "trade_plans" });
+            }
+          }, 300);
+        }
+      }, 100);
+    }
 
   // השבתת כל השדות עד לבחירת טיקר
   const fieldsToDisable = [
@@ -2251,9 +2377,7 @@ const tradePlanValidationRules = {
   if (typeof window.tickerService?.loadTickersForTradePlan === 'function') {
     window.tickerService.loadTickersForTradePlan();
   } else {
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('tickerService.loadTickersForTradePlan not available', 'warning');
-    }
+    window.Logger?.debug('tickerService.loadTickersForTradePlan not available - using fallback', { page: "trade_plans" });
   }
 
   // Displaying the modal
@@ -2366,8 +2490,9 @@ async function saveTradePlanData(mode) {
     } else {
       const form = document.getElementById('addTradePlanForm');
       if (!form) {
-        if (typeof window.showNotification === 'function') {
-          window.showNotification('Form element not found - skipping save operation', 'warning');
+        window.Logger?.warn('Form element not found - skipping save operation', { page: "trade_plans" });
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('שגיאה', 'הטופס לא נמצא. יש לרענן את העמוד.');
         }
         return;
       }
@@ -2548,6 +2673,63 @@ window.updateAmountFromShares = updateAmountFromShares;
 window.showAddTradePlanModal = showAddTradePlanModal;
 window.showEditTradePlanModal = showEditTradePlanModal;
 window.saveTradePlanData = saveTradePlanData;
+/**
+ * Filter trade plans by investment type
+ * Filters the trade plans table by investment type (swing, investment, passive, or all)
+ * 
+ * @function filterTradePlansByType
+ * @param {string} type - Investment type to filter by ('all', 'swing', 'investment', 'passive')
+ * @returns {void}
+ */
+function filterTradePlansByType(type) {
+  try {
+    if (!window.tradePlansData || !Array.isArray(window.tradePlansData)) {
+      window.Logger?.warn('Trade plans data not available for filtering', { page: "trade_plans" });
+      return;
+    }
+
+    let filteredData;
+    
+    if (type === 'all') {
+      // Show all trade plans
+      filteredData = [...window.tradePlansData];
+    } else {
+      // Filter by investment type
+      filteredData = window.tradePlansData.filter(plan => {
+        // Handle both investment_type and type fields
+        const planType = plan.investment_type || plan.type;
+        return planType === type;
+      });
+    }
+
+    // Update the table with filtered data
+    if (typeof updateTradePlansTable === 'function') {
+      updateTradePlansTable(filteredData);
+    } else if (typeof window.updateTradePlansTable === 'function') {
+      window.updateTradePlansTable(filteredData);
+    }
+
+    // Update active button state
+    const filterButtons = document.querySelectorAll('.filter-icon-btn, .btn[onclick*="filterTradePlansByType"]');
+    filterButtons.forEach(btn => {
+      const btnType = btn.getAttribute('data-type') || btn.getAttribute('onclick')?.match(/filterTradePlansByType\(['"](.*?)['"]\)/)?.[1];
+      if (btnType === type) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    window.Logger?.info(`Trade plans filtered by type: ${type}`, { count: filteredData.length, page: "trade_plans" });
+    
+  } catch (error) {
+    window.Logger?.error('Error filtering trade plans by type:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפילטור תכנונים לפי סוג', error.message);
+    }
+  }
+}
+
 window.filterTradePlansByType = filterTradePlansByType;
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====

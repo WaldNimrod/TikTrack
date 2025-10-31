@@ -125,16 +125,47 @@ const tradingAccountsModalConfig = {
     onSave: 'saveTradingAccount'
 };
 
-// יצירת המודל אם ModalManagerV2 זמין
-if (window.ModalManagerV2) {
-    try {
-        window.ModalManagerV2.createCRUDModal(tradingAccountsModalConfig);
-        console.log('✅ Trading Accounts modal created successfully');
-    } catch (error) {
-        console.error('❌ Error creating Trading Accounts modal:', error);
+// יצירת המודל אם ModalManagerV2 זמין - Deferred initialization
+function initializeTradingAccountsModal() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
+        try {
+            window.ModalManagerV2.createCRUDModal(tradingAccountsModalConfig);
+            console.log('✅ Trading Accounts modal created successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Error creating Trading Accounts modal:', error);
+            return false;
+        }
     }
+    return false;
+}
+
+if (window.ModalManagerV2) {
+    initializeTradingAccountsModal();
 } else {
-    console.warn('⚠️ ModalManagerV2 not available for Trading Accounts modal');
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (!initializeTradingAccountsModal()) {
+                    setTimeout(() => {
+                        if (!initializeTradingAccountsModal()) {
+                            console.warn('⚠️ ModalManagerV2 not available for Trading Accounts modal after retries');
+                        }
+                    }, 500);
+                }
+            }, 100);
+        });
+    } else {
+        setTimeout(() => {
+            if (!initializeTradingAccountsModal()) {
+                setTimeout(() => {
+                    if (!initializeTradingAccountsModal()) {
+                        console.warn('⚠️ ModalManagerV2 not available for Trading Accounts modal after retries');
+                    }
+                }, 500);
+            }
+        }, 100);
+    }
 }
 
 // ייצוא לקונסול (לצורך debug)

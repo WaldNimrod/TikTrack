@@ -961,10 +961,72 @@ function addEditReminder() {
 window.loadTradesData = loadTradesData;
 window.updateTradesTable = updateTradesTable;
 window.updatePageSummaryStats = updatePageSummaryStats;
+
+/**
+ * Add trade function - wrapper for showAddTradeModal
+ * Maintains backward compatibility with old function name
+ * 
+ * @function addTrade
+ * @returns {void}
+ */
+function addTrade() {
+  if (typeof showAddTradeModal === 'function') {
+    showAddTradeModal();
+  } else if (typeof window.showAddTradeModal === 'function') {
+    window.showAddTradeModal();
+  } else {
+    window.Logger?.error('showAddTradeModal not available', { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'לא ניתן לפתוח מודל הוספת טרייד');
+    }
+  }
+}
+
 window.addTrade = addTrade;
+
+/**
+ * Edit trade function - wrapper for showEditTradeModal
+ * Maintains backward compatibility with old function name
+ * 
+ * @function editTrade
+ * @param {number} tradeId - Trade ID to edit
+ * @returns {void}
+ */
+function editTrade(tradeId) {
+  if (typeof showEditTradeModal === 'function') {
+    showEditTradeModal(tradeId);
+  } else if (typeof window.showEditTradeModal === 'function') {
+    window.showEditTradeModal(tradeId);
+  } else {
+    window.Logger?.error('showEditTradeModal not available', { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'לא ניתן לפתוח מודל עריכת טרייד');
+    }
+  }
+}
+
 window.editTrade = editTrade;
 window.deleteTrade = deleteTrade;
 window.updateTrade = updateTrade;
+
+/**
+ * Clear trade form validation
+ * Wrapper for global clearValidation function
+ * 
+ * @function clearTradeValidation
+ * @param {string} formId - Form ID to clear validation for (optional, defaults to 'addTradeForm')
+ * @returns {void}
+ */
+function clearTradeValidation(formId = 'addTradeForm') {
+  if (typeof window.clearValidation === 'function') {
+    window.clearValidation(formId);
+  } else if (typeof window.clearValidationErrors === 'function') {
+    window.clearValidationErrors(formId);
+  } else {
+    window.Logger?.debug('Validation clearing functions not available', { formId, page: "trades" });
+  }
+}
+
 window.clearTradeValidation = clearTradeValidation;
 window.validateTradeForm = validateTradeForm;
 window.showAddTradeModal = showAddTradeModal;
@@ -1000,6 +1062,55 @@ window.refreshPositions = refreshPositions;
 window.updateTableStats = updateTableStats;
 window.loadTradePlanDates = loadTradePlanDates;
 window.addEditBuySell = addEditBuySell;
+
+/**
+ * Initialize conditions system for trades
+ * Uses global ConditionsInitializer from conditions package
+ */
+function initializeTradeConditionsSystem() {
+  try {
+    // First check if conditionsSystem is already available (most reliable check)
+    if (window.conditionsSystem && window.conditionsSystem.initializer) {
+      window.Logger?.info('✅ Conditions system already initialized for trades', { page: "trades" });
+      return true;
+    }
+    
+    // Try to initialize using ConditionsInitializer class
+    if (typeof window.ConditionsInitializer !== 'undefined') {
+      try {
+        const initializer = new window.ConditionsInitializer();
+        if (initializer && typeof initializer.initialize === 'function') {
+          initializer.initialize().then(() => {
+            window.Logger?.info('✅ Trades conditions system initialized successfully', { page: "trades" });
+          }).catch(error => {
+            window.Logger?.error('Error initializing trades conditions system:', error, { page: "trades" });
+          });
+          return true;
+        }
+      } catch (error) {
+        window.Logger?.warn('Error creating ConditionsInitializer instance:', error, { page: "trades" });
+      }
+    }
+    
+    // If not available immediately, try deferred check
+    setTimeout(() => {
+      if (window.conditionsSystem && window.conditionsSystem.initializer) {
+        window.Logger?.info('✅ Conditions system initialized for trades (deferred check)', { page: "trades" });
+        return true;
+      } else {
+        // Only log debug level - conditions system is optional
+        window.Logger?.debug('ConditionsInitializer not available after deferred check - conditions package may not be loaded', { page: "trades" });
+      }
+    }, 500);
+    
+    return false;
+  } catch (error) {
+    window.Logger?.error('Error in initializeTradeConditionsSystem:', error, { page: "trades" });
+    return false;
+  }
+}
+
+window.initializeTradeConditionsSystem = initializeTradeConditionsSystem;
 
 // ===== SORTING AND FILTERING FUNCTIONS =====
 // Table sorting, filtering, and state management

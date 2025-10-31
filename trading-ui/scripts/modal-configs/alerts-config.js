@@ -157,16 +157,47 @@ const alertsModalConfig = {
     onSave: 'saveAlert'
 };
 
-// יצירת המודל אם ModalManagerV2 זמין
-if (window.ModalManagerV2) {
-    try {
-        window.ModalManagerV2.createCRUDModal(alertsModalConfig);
-        console.log('✅ Alerts modal created successfully');
-    } catch (error) {
-        console.error('❌ Error creating Alerts modal:', error);
+// יצירת המודל אם ModalManagerV2 זמין - Deferred initialization
+function initializeAlertsModal() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
+        try {
+            window.ModalManagerV2.createCRUDModal(alertsModalConfig);
+            console.log('✅ Alerts modal created successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Error creating Alerts modal:', error);
+            return false;
+        }
     }
+    return false;
+}
+
+if (window.ModalManagerV2) {
+    initializeAlertsModal();
 } else {
-    console.warn('⚠️ ModalManagerV2 not available for Alerts modal');
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (!initializeAlertsModal()) {
+                    setTimeout(() => {
+                        if (!initializeAlertsModal()) {
+                            console.warn('⚠️ ModalManagerV2 not available for Alerts modal after retries');
+                        }
+                    }, 500);
+                }
+            }, 100);
+        });
+    } else {
+        setTimeout(() => {
+            if (!initializeAlertsModal()) {
+                setTimeout(() => {
+                    if (!initializeAlertsModal()) {
+                        console.warn('⚠️ ModalManagerV2 not available for Alerts modal after retries');
+                    }
+                }, 500);
+            }
+        }, 100);
+    }
 }
 
 // ייצוא לקונסול (לצורך debug)

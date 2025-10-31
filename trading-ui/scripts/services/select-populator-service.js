@@ -222,6 +222,8 @@ class SelectPopulatorService {
                 defaultText: options.defaultText
             });
             
+            console.log(`✅ נטענו ${accounts.length} חשבונות ל-${selectId}`);
+            
         } catch (error) {
             console.error('❌ שגיאה בטעינת חשבונות:', error);
         }
@@ -474,7 +476,9 @@ class SelectPopulatorService {
         
         // סימון ברירת מחדל לפי value או לפי טקסט
         if (config.defaultValue !== undefined && config.defaultValue !== null) {
+            console.log(`🔍 Setting default value for ${select.id}:`, config.defaultValue, `(type: ${typeof config.defaultValue})`);
             select.value = config.defaultValue;
+            console.log(`✅ After setting default, select.value is:`, select.value, `(type: ${typeof select.value})`);
         } else if (config.defaultText) {
             const options = Array.from(select.options);
             const match = options.find(opt => (opt.textContent || '').trim() === String(config.defaultText).trim());

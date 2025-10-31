@@ -250,6 +250,12 @@ class ModalManagerV2 {
                 
             case 'date':
             case 'datetime-local':
+                // Handle 'today' special value for datetime-local
+                let dateValue = field.defaultValue || '';
+                if (dateValue === 'today') {
+                    const today = new Date();
+                    dateValue = today.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
+                }
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
@@ -260,7 +266,7 @@ class ModalManagerV2 {
                                id="${field.id}" 
                                name="${field.id}"
                                ${requiredAttr}
-                               value="${field.defaultValue || ''}">
+                               value="${dateValue}">
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
@@ -661,9 +667,15 @@ class ModalManagerV2 {
                     }
                     
                     // Apply defaultValue for other select fields (e.g., source)
+                    // Handle 'today' special value for datetime-local fields
                     if (field.defaultValue !== undefined && field.defaultValue !== null) {
-                        fieldElement.value = field.defaultValue;
-                        console.log(`Applied default value for ${field.id}:`, field.defaultValue);
+                        if (field.type === 'datetime-local' && field.defaultValue === 'today') {
+                            const today = new Date();
+                            fieldElement.value = today.toISOString().slice(0, 16);
+                        } else {
+                            fieldElement.value = field.defaultValue;
+                        }
+                        console.log(`Applied default value for ${field.id}:`, fieldElement.value);
                         continue;
                     }
                     continue;

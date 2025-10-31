@@ -1613,6 +1613,25 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 if (key === 'tikTrack_preferences') return true; // Legacy fallback key
                 if (key === 'tt:preferences') return true; // Cross-tab sync key
                 
+                // Orphan Keys - State Management
+                if (key === 'cashFlowsSectionState') return true;
+                if (key === 'executionsTopSectionCollapsed') return true;
+                if (key.startsWith('sortState_')) return true;
+                if (key.startsWith('section-visibility-')) return true;
+                if (key.startsWith('top-section-collapsed-')) return true;
+                
+                // Orphan Keys - User Preferences
+                if (key === 'colorScheme') return true;
+                if (key === 'customColorScheme') return true;
+                if (key === 'headerFilters') return true;
+                if (key === 'consoleSettings') return true;
+                
+                // Orphan Keys - Testing/Debug
+                if (key === 'crud_test_results') return true;
+                if (key === 'linterLogs') return true;
+                if (key === 'css-duplicates-results') return true;
+                if (key === 'serverMonitorSettings') return true;
+                
                 return false;
             });
             
@@ -1646,6 +1665,25 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 if (key === 'tiktrack_user-preferences') return true;
                 if (key === 'tikTrack_preferences') return true; // Legacy fallback key
                 if (key === 'tt:preferences') return true; // Cross-tab sync key
+                
+                // Orphan Keys - State Management
+                if (key === 'cashFlowsSectionState') return true;
+                if (key === 'executionsTopSectionCollapsed') return true;
+                if (key.startsWith('sortState_')) return true;
+                if (key.startsWith('section-visibility-')) return true;
+                if (key.startsWith('top-section-collapsed-')) return true;
+                
+                // Orphan Keys - User Preferences
+                if (key === 'colorScheme') return true;
+                if (key === 'customColorScheme') return true;
+                if (key === 'headerFilters') return true;
+                if (key === 'consoleSettings') return true;
+                
+                // Orphan Keys - Testing/Debug
+                if (key === 'crud_test_results') return true;
+                if (key === 'linterLogs') return true;
+                if (key === 'css-duplicates-results') return true;
+                if (key === 'serverMonitorSettings') return true;
                 
                 return false;
             });
@@ -1925,6 +1963,95 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             }
         } catch (error) {
             window.Logger.warn('⚠️ Error clearing CSS management cache:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.10. Clear Dynamic Window Variables (catch-all for any remaining data variables)
+        try {
+            const dynamicPatterns = [
+                /Data$/,           // e.g., alertsData, tradesData
+                /Loaded$/,        // e.g., alertsLoaded, tradesLoaded
+                /Cache$/,         // e.g., preferencesCache
+                /State$/,          // e.g., uiState, formState
+                /Config$/,        // e.g., modalConfig
+                /ModalConfig$/    // e.g., tradePlansModalConfig
+            ];
+            
+            let dynamicCleared = 0;
+            for (const key in window) {
+                // Skip standard window properties and functions
+                if (key.startsWith('webkit') || key.startsWith('moz') || 
+                    key.startsWith('ms') || key === 'console' || 
+                    key === 'localStorage' || key === 'sessionStorage' ||
+                    key === 'indexedDB' || key === 'document' || key === 'navigator' ||
+                    typeof window[key] === 'function' || key.startsWith('on') ||
+                    key === 'location' || key === 'history' || key === 'screen') {
+                    continue;
+                }
+                
+                // Check if variable matches data patterns
+                const matchesPattern = dynamicPatterns.some(pattern => pattern.test(key));
+                if (matchesPattern && window.hasOwnProperty(key)) {
+                    try {
+                        delete window[key];
+                        dynamicCleared++;
+                    } catch (e) {
+                        // Skip if cannot delete (e.g., read-only property)
+                    }
+                }
+            }
+            
+            if (dynamicCleared > 0) {
+                clearedLayers.push(`Dynamic Window Variables (${dynamicCleared} variables)`);
+                window.Logger.info(`✅ Dynamic window variables cleared successfully (${dynamicCleared} variables)`, { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing dynamic window variables:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.11. Clear Cookies (if any TikTrack cookies exist)
+        try {
+            if (document.cookie) {
+                const cookies = document.cookie.split(';');
+                let cookiesCleared = 0;
+                cookies.forEach(cookie => {
+                    const cookieName = cookie.split('=')[0].trim();
+                    // Only clear cookies that look like TikTrack cookies
+                    if (cookieName.toLowerCase().includes('tiktrack') || 
+                        cookieName.toLowerCase().includes('tt_') ||
+                        cookieName.toLowerCase().includes('cache')) {
+                        // Clear cookie by setting expiration to past
+                        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+                        cookiesCleared++;
+                    }
+                });
+                
+                if (cookiesCleared > 0) {
+                    clearedLayers.push(`Cookies (${cookiesCleared} cookies)`);
+                    window.Logger.info(`✅ Cookies cleared successfully (${cookiesCleared} cookies)`, { page: "unified-cache-manager" });
+                }
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing cookies:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.12. Clear DOM Cache (data attributes that might be used as cache)
+        try {
+            // Clear any data-cache attributes on elements
+            const elementsWithCache = document.querySelectorAll('[data-cache], [data-cached]');
+            let domCacheCleared = 0;
+            elementsWithCache.forEach(el => {
+                el.removeAttribute('data-cache');
+                el.removeAttribute('data-cached');
+                domCacheCleared++;
+            });
+            
+            if (domCacheCleared > 0) {
+                clearedLayers.push(`DOM Cache (${domCacheCleared} elements)`);
+                window.Logger.info(`✅ DOM cache attributes cleared successfully (${domCacheCleared} elements)`, { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing DOM cache:', error, { page: "unified-cache-manager" });
         }
         
         // 7. Garbage Collection

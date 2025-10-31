@@ -1607,9 +1607,11 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 if (key.startsWith('tiktrack_all_preferences_')) return true;
                 if (key.startsWith('tiktrack_preference_group_')) return true;
                 
-                // User preferences
+                // User preferences - legacy keys
                 if (key === 'user-preferences') return true;
                 if (key === 'tiktrack_user-preferences') return true;
+                if (key === 'tikTrack_preferences') return true; // Legacy fallback key
+                if (key === 'tt:preferences') return true; // Cross-tab sync key
                 
                 return false;
             });
@@ -1639,9 +1641,11 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 if (key.startsWith('tiktrack_all_preferences_')) return true;
                 if (key.startsWith('tiktrack_preference_group_')) return true;
                 
-                // User preferences
+                // User preferences - legacy keys
                 if (key === 'user-preferences') return true;
                 if (key === 'tiktrack_user-preferences') return true;
+                if (key === 'tikTrack_preferences') return true; // Legacy fallback key
+                if (key === 'tt:preferences') return true; // Cross-tab sync key
                 
                 return false;
             });
@@ -1758,11 +1762,11 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             }
         }
         
-        // 6. Clear specific cache keys
+        // 6. Clear specific cache keys and global variables
         const cacheKeys = [
             'user-preferences', 'ui-state', 'filter-state', 'notifications-history',
             'file-mappings', 'linter-results', 'js-analysis', 'market-data',
-            'trade-data', 'dashboard-data'
+            'trade-data', 'dashboard-data', 'tikTrack_preferences'
         ];
         
         try {
@@ -1775,6 +1779,16 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
         } catch (error) {
             window.Logger.error('❌ Error clearing specific cache keys:', error, { page: "unified-cache-manager" });
             errors.push(`Cache Keys: ${error.message}`);
+        }
+        
+        // 6.5. Clear global preference variables
+        try {
+            window.__latestPrefs = null;
+            window.currentPreferences = null;
+            clearedLayers.push('Global Preference Variables');
+            window.Logger.info('✅ Global preference variables cleared successfully', { page: "unified-cache-manager" });
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing global variables:', error, { page: "unified-cache-manager" });
         }
         
         // 7. Garbage Collection
@@ -1810,7 +1824,29 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             }
         }
         
-        // 10. Refresh data from backend database
+        // 10. Clear Backend Cache (Server-side cache)
+        try {
+            window.Logger.info('🔄 Clearing backend server cache...', { page: "unified-cache-manager" });
+            const response = await fetch('/api/cache/clear', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                clearedLayers.push(`Backend Cache (${result.data?.preferences_cache || 'cleared'})`);
+                window.Logger.info('✅ Backend cache cleared successfully', { page: "unified-cache-manager" });
+            } else {
+                throw new Error(`Backend cache clear failed: ${response.status}`);
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Failed to clear backend cache:', error, { page: "unified-cache-manager" });
+            errors.push(`Backend Cache: ${error.message}`);
+        }
+        
+        // 11. Refresh data from backend database
         try {
             window.Logger.info('🔄 Refreshing data from backend database...', { page: "unified-cache-manager" });
             await this.refreshDataFromBackend();

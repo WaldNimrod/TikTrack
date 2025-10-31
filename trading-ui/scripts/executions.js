@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 83
+ * Total Functions: 78
  * 
  * PAGE INITIALIZATION (2)
  * - setupModalConfigurations() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
@@ -21,13 +21,11 @@
  * - loadTradeExecutions() - * מעבר לטרייד המקושר
  * - loadTickersSummaryData() - loadTickersSummaryData function
  * 
- * DATA MANIPULATION (24)
+ * DATA MANIPULATION (21)
  * - addExecution() - addExecution function
- * - deleteExecution() - deleteExecution function
- * - resetAddExecutionForm() - resetAddExecutionForm function
+ * - updateRealizedPLField() - updateRealizedPLField function
  * - saveExecution() - saveExecution function
  * - updateExecutionWrapper() - updateExecutionWrapper function
- * - confirmDeleteExecution() - confirmDeleteExecution function
  * - updateExecutionsTableMain() - updateExecutionsTableMain function
  * - updateExecution() - updateExecution function
  * - updateTradesOnCheckboxChange() - updateTradesOnCheckboxChange function
@@ -44,16 +42,12 @@
  * - addExecutionForTicker() - * צפייה בפרטי טיקר
  * - updateTickersList() - * הצגה/הסתרה של סקשן הטיקרים
  * - showAddExecutionModal() - showAddExecutionModal function
- * - saveExecution() - * Show add execution modal
- * - deleteExecution() - deleteExecution function
+ * - deleteExecution() - * Show add execution modal
  * 
- * EVENT HANDLING (33)
- * - openExecutionDetails() - openExecutionDetails function
+ * EVENT HANDLING (31)
  * - editExecution() - editExecution function
  * - resetExecutionForm() - resetExecutionForm function
- * - resetEditExecutionForm() - * ניקוי והשבתת שדות בטופס הוספת עסקה
- * - showEditExecutionModal() - * ניקוי והשבתת שדות בטופס הוספת עסקה
- * - fillEditExecutionForm() - * ניקוי והשבתת שדות בטופס הוספת עסקה
+ * - fillEditExecutionForm() - * הצגת מודל עריכת עסקה
  * - validateExecutionTradeId() - validateExecutionTradeId function
  * - validateExecutionQuantity() - validateExecutionQuantity function
  * - validateExecutionPrice() - * ולידציה של כמות
@@ -81,6 +75,7 @@
  * - toggleTickersSection() - * הוספת עסקה לטיקר
  * - toggleExecutionsSection() - toggleExecutionsSection function
  * - showEditExecutionModal() - * Show add execution modal
+ * - performExecutionDeletion() - performExecutionDeletion function
  * 
  * UI UPDATES (3)
  * - displayLinkedItems() - displayLinkedItems function
@@ -194,21 +189,7 @@ let filteredExecutions = [];
 let tradesData = []; // נתוני טריידים לשמירת מפת חשבונות
 
 // פונקציות בסיסיות
-function openExecutionDetails(_id) {
-  try {
-  // שימוש במערכת הכללית
-  if (typeof window.showAddExecutionModal === 'function') {
-    window.showAddExecutionModal();
-  } else {
-    window.Logger.error('❌ showAddExecutionModal לא זמין במערכת הכללית', { page: "executions" });
-    }
-  } catch (error) {
-    window.Logger.error('שגיאה בפתיחת פרטי ביצוע:', error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בפתיחת פרטי ביצוע', error.message);
-    }
-  }
-}
+// REMOVED: openExecutionDetails - unused function, replaced by showAddExecutionModal
 
 function editExecution(id) {
   try {
@@ -280,23 +261,11 @@ function resetExecutionForm(formType) {
   }
 }
 
-/**
- * ניקוי והשבתת שדות בטופס הוספת עסקה
- * @deprecated Use resetExecutionForm('add') instead
- */
-function resetAddExecutionForm() {
-  resetExecutionForm('add');
-}
+// REMOVED: resetAddExecutionForm - deprecated wrapper, use resetExecutionForm('add') instead
 
 // showAddExecutionModal הועבר למערכת הכללית
 
-/**
- * ניקוי והשבתת שדות בטופס עריכת עסקה
- * @deprecated Use resetExecutionForm('edit') instead
- */
-function resetEditExecutionForm() {
-  resetExecutionForm('edit');
-}
+// REMOVED: resetEditExecutionForm - deprecated wrapper, use resetExecutionForm('edit') instead
 
 /**
  * הצגת מודל עריכת עסקה

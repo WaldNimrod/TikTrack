@@ -834,7 +834,7 @@ async function saveExecution() {
   // איסוף נתונים מהטופס (ModalManagerV2 uses executionTicker, executionAccount, etc.)
   const executionData = DataCollectionService.collectFormData({
     ticker_id: { id: 'executionTicker', type: 'int' },
-    account_id: { id: 'executionAccount', type: 'int' },
+    trading_account_id: { id: 'executionAccount', type: 'int' },
     trade_id: { id: 'executionTradePlanId', type: 'int' }, // Optional linked trade
     action: { id: 'executionType', type: 'text' },
     quantity: { id: 'executionQuantity', type: 'int' },
@@ -889,7 +889,7 @@ async function saveExecution() {
 
     const executionPayload = {
       ticker_id: executionData.ticker_id,
-      account_id: executionData.account_id,
+      trading_account_id: executionData.trading_account_id,
       trade_id: tradeId,
       action: type,
       quantity: parseInt(quantity),
@@ -902,6 +902,8 @@ async function saveExecution() {
       mtm_pl: executionData.mtm_pl !== null && executionData.mtm_pl !== undefined 
         ? parseInt(executionData.mtm_pl) : null
     };
+
+    console.log('📦 Sending execution payload:', executionPayload);
 
     const response = await fetch('/api/executions', {
       method: 'POST',

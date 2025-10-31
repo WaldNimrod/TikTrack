@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 78
+ * Total Functions: 68
  * 
  * PAGE INITIALIZATION (2)
  * - setupModalConfigurations() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
@@ -24,7 +24,7 @@
  * DATA MANIPULATION (21)
  * - addExecution() - addExecution function
  * - updateRealizedPLField() - updateRealizedPLField function
- * - saveExecution() - saveExecution function
+ * - saveExecution() - * הצגת שגיאת שדה
  * - updateExecutionWrapper() - updateExecutionWrapper function
  * - updateExecutionsTableMain() - updateExecutionsTableMain function
  * - updateExecution() - updateExecution function
@@ -44,21 +44,11 @@
  * - showAddExecutionModal() - showAddExecutionModal function
  * - deleteExecution() - * Show add execution modal
  * 
- * EVENT HANDLING (31)
+ * EVENT HANDLING (21)
  * - editExecution() - editExecution function
  * - resetExecutionForm() - resetExecutionForm function
  * - fillEditExecutionForm() - * הצגת מודל עריכת עסקה
  * - validateExecutionTradeId() - validateExecutionTradeId function
- * - validateExecutionQuantity() - validateExecutionQuantity function
- * - validateExecutionPrice() - * ולידציה של כמות
- * - validateExecutionCommission() - * ולידציה של כמות
- * - validateExecutionSource() - * ולידציה של כמות
- * - validateExecutionNotes() - * ולידציה של כמות
- * - validateExecutionExternalId() - * ולידציה של כמות
- * - validateExecutionDate() - * ולידציה של עמלה (fee)
- * - validateExecutionType() - * ולידציה של מקור (source)
- * - clearExecutionValidationErrors() - * ולידציה של סוג עסקה (action)
- * - validateCompleteExecutionForm() - validateCompleteExecutionForm function
  * - showExecutionLinkedItemsModal() - showExecutionLinkedItemsModal function
  * - goToNote() - * מעבר לתכנון ספציפי
  * - clearNewExecutionHighlights() - clearNewExecutionHighlights function
@@ -83,7 +73,7 @@
  * - showTickerHelp() - * מעבר לדף טיקר (בפיתוח)
  * 
  * OTHER (13)
- * - clearFieldError() - * ולידציה של הערות (notes)
+ * - clearFieldError() - clearFieldError function
  * - goToTrade() - * Display linked items for execution
  * - goToPlan() - * מעבר לטרייד ספציפי
  * - goToAlert() - * מעבר לטרייד ספציפי
@@ -585,75 +575,17 @@ function validateExecutionTradeId(input) {
   }
 }
 
-/**
- * ולידציה של כמות
- * @deprecated השתמש ב-window.validateField() במקום
- */
-function validateExecutionQuantity(input) {
-  return window.validateField(input, {required: true, min: 0.01});
-}
+// REMOVED: Deprecated validation functions - use window.validateField() instead
+// - validateExecutionQuantity
+// - validateExecutionPrice
+// - validateExecutionCommission
+// - validateExecutionSource
+// - validateExecutionNotes
+// - validateExecutionExternalId
 
-/**
- * ולידציה של מחיר
- * @deprecated השתמש ב-window.validateField() במקום
- */
-function validateExecutionPrice(input) {
-  return window.validateField(input, {required: true, min: 0.01});
-}
-
-/**
- * ולידציה של עמלה (fee)
- * @deprecated השתמש ב-window.validateField() במקום
- */
-function validateExecutionCommission(input) {
-  return window.validateField(input, {required: false, min: 0});
-}
-
-/**
- * ולידציה של מקור (source)
- * @deprecated השתמש ב-window.validateField() במקום
- */
-function validateExecutionSource(input) {
-  return window.validateField(input, {required: false, maxLength: 100});
-}
-
-/**
- * ולידציה של הערות (notes)
- * @deprecated השתמש ב-window.validateField() במקום
- */
-function validateExecutionNotes(input) {
-  return window.validateField(input, {required: false, maxLength: 500});
-}
-
-/**
- * ולידציה של מזהה חיצוני (external_id)
- * @deprecated השתמש ב-window.validateField() במקום
- */
-function validateExecutionExternalId(input) {
-  return window.validateField(input, {required: false, maxLength: 100});
-}
-
-/**
- * ולידציה של תאריך (date)
- */
-/**
- * ולידציה של תאריך (date)
- * @deprecated השתמש ב-window.validateField() במקום
- */
-function validateExecutionDate(input) {
-  return window.validateField(input, {required: true});
-}
-
-/**
- * ולידציה של סוג עסקה (action)
- */
-/**
- * ולידציה של סוג עסקה (action)
- * @deprecated השתמש ב-window.validateField() במקום
- */
-function validateExecutionType(input) {
-  return window.validateField(input, {required: true, enum: ['buy', 'sale']});
-}
+// REMOVED: Deprecated validation functions - use window.validateField() instead
+// - validateExecutionDate
+// - validateExecutionType
 
 /**
  * הצגת שגיאת שדה
@@ -678,77 +610,10 @@ function clearFieldError(input, errorElement) {
   }
 }
 
-/**
- * ניקוי כל שגיאות הולידציה
- */
-function clearExecutionValidationErrors() {
-  try {
-  const form = document.getElementById('addExecutionForm');
-  if (form) {
-    const inputs = form.querySelectorAll('.is-invalid');
-    inputs.forEach(input => {
-      input.classList.remove('is-invalid');
-      const errorElement = document.getElementById(input.id + 'Error');
-      if (errorElement) {
-        errorElement.textContent = '';
-        errorElement.style.display = 'none';
-      }
-    });
-  }
+// REMOVED: clearExecutionValidationErrors - unused function
+// Use general validation system instead
 
-  const editForm = document.getElementById('editExecutionForm');
-  if (editForm) {
-    const inputs = editForm.querySelectorAll('.is-invalid');
-    inputs.forEach(input => {
-      input.classList.remove('is-invalid');
-      const errorElement = document.getElementById(input.id + 'Error');
-      if (errorElement) {
-        errorElement.textContent = '';
-        errorElement.style.display = 'none';
-      }
-    });
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בניקוי שגיאות ולידציה:', error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בניקוי שגיאות ולידציה', error.message);
-    }
-  }
-}
-
-// ולידציה - משתמש במערכת הכללית window.validateEntityForm
-/**
- * ולידציה מלאה של טופס ביצוע
- * @deprecated השתמש ב-window.validateForm() או window.validateEntityForm() במקום
- */
-function validateCompleteExecutionForm(mode) {
-  const prefix = mode === 'add' ? 'add' : 'edit';
-  const formId = `${prefix}ExecutionForm`;
-  
-  const fieldConfigs = [
-    {id: `${prefix}ExecutionTradeId`, name: 'טרייד/תוכנית', rules: {required: true}},
-    {id: `${prefix}ExecutionType`, name: 'סוג עסקה', rules: {required: true}},
-    {id: `${prefix}ExecutionQuantity`, name: 'כמות', rules: {required: true, min: 0.01, max: 1000000}},
-    {id: `${prefix}ExecutionPrice`, name: 'מחיר', rules: {required: true, min: 0.01, max: 1000000}},
-    {id: `${prefix}ExecutionDate`, name: 'תאריך', rules: {required: true}},
-    {id: `${prefix}ExecutionCommission`, name: 'עמלה', rules: {required: false, min: 0, max: 10000}},
-    {id: `${prefix}ExecutionNotes`, name: 'הערות', rules: {required: false, maxLength: 500}},
-    {id: `${prefix}ExecutionSource`, name: 'מקור', rules: {required: false, maxLength: 100}},
-    {id: `${prefix}ExecutionExternalId`, name: 'מזהה חיצוני', rules: {required: false, maxLength: 100}}
-  ];
-  
-  const result = window.validateEntityForm(formId, fieldConfigs);
-
-  // הצגת הודעת שגיאה מפורטת אם יש שגיאות
-  if (!result.isValid && result.errorMessages.length > 0) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאות ולידציה', result.errorMessages.join('\n'));
-    }
-  }
-
-  return result.isValid;
-}
+// REMOVED: validateCompleteExecutionForm - deprecated, use window.validateForm() or window.validateEntityForm() instead
 
 
 // ========================================

@@ -419,6 +419,13 @@ const PAGE_CONFIGS = {
                 // Load user preferences first
                 if (typeof window.loadUserPreferences === 'function') {
                     window.Logger.info('⚙️ Loading user preferences for Executions...', { page: "page-initialization-configs" });
+                    
+                    // Debug current profile
+                    console.log('🧪 Current PreferencesCore state:', {
+                        currentUserId: window.PreferencesCore?.currentUserId,
+                        currentProfileId: window.PreferencesCore?.currentProfileId
+                    });
+                    
                     const prefs = await window.loadUserPreferences();
                     console.log('🧪 loadUserPreferences returned:', prefs);
                 } else {

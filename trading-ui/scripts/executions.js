@@ -221,62 +221,8 @@ function editExecution(id) {
   }
 }
 
-function deleteExecution(id) {
-  try {
-  console.log('🔍 deleteExecution called with id:', id);
-  console.log('🔍 window.executionsData:', window.executionsData);
-  console.log('🔍 window.executionsData length:', window.executionsData?.length);
-
-  // קבלת פרטי העסקה מנתוני הביצועים
-  let executionDetails = `עסקה #${id}`;
-  
-  // ניסיון לקבל את הנתונים מ-executionsData (תמיכה גם ב-String וגם ב-Number)
-  const execution = window.executionsData?.find(exec => exec.id === id || exec.id === parseInt(id));
-  
-  console.log('🔍 Found execution:', execution);
-  
-  if (execution) {
-    const ticker = execution.ticker_symbol || execution.symbol || 'לא מוגדר';
-    // שימוש ב-renderAction לתרגום נכון
-    const actionText = window.renderAction ? 
-                       window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
-                       ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
-    const quantity = execution.quantity || '0';
-    const price = execution.price ? `$${execution.price}` : '$0';
-    const date = execution.date || execution.execution_date ? 
-                 new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : 
-                 'לא מוגדר';
-    executionDetails = `${ticker} - ${actionText}, ${quantity} יחידות ב-${price}, תאריך: ${date}`;
-    console.log('✅ executionDetails:', executionDetails);
-  } else {
-    console.log('❌ No execution found for id:', id);
-  }
-
-  // שימוש במערכת הגלובלית למחיקה
-  console.log('🔍 Calling showDeleteWarning with:', {
-    itemType: 'executions',
-    itemName: executionDetails,
-    itemTypeDisplay: 'עסקה'
-  });
-  
-  if (typeof window.showDeleteWarning === 'function') {
-    window.showDeleteWarning('executions', executionDetails, 'עסקה', async () => {
-      console.log('✅ Delete confirmed, calling confirmDeleteExecution');
-      await confirmDeleteExecution(id);
-    }, null);
-  } else {
-    console.error('❌ showDeleteWarning not available!');
-    handleSystemError(new Error('מערכת מחיקה לא זמינה'), 'מערכת מחיקה');
-  }
-  
-  } catch (error) {
-    console.error('❌ Error in deleteExecution:', error);
-    window.Logger.error('שגיאה במחיקת ביצוע:', error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה במחיקת ביצוע', error.message);
-    }
-  }
-}
+// deleteExecution function removed - now defined at line 4017
+// This stub prevents old code from breaking - new implementation uses the general CRUD pattern
 
 // פונקציות לפתיחה/סגירה של סקשנים - שימוש במערכת הכללית
 
@@ -1104,41 +1050,7 @@ async function updateExecutionWrapper() {
   }
 }
 
-/**
- * אישור מחיקת עסקה
- */
-async function confirmDeleteExecution(_id) {
-  // confirmDeleteExecution called with id
-
-  // אם לא קיבלנו ID כפרמטר, ננסה לקבל אותו מהטופס
-  let executionId = _id;
-  if (!executionId) {
-    executionId = document.getElementById('deleteExecutionId').value;
-    // Got id from form
-  }
-
-  // ביצועים לא צריכים בדיקת מקושרים - אין להם ילדים
-  // Executions do not require linked items check - no children
-
-  try {
-    // Making DELETE request
-    const response = await fetch(`/api/executions/${executionId}`, {
-      method: 'DELETE',
-    });
-
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleDeleteResponse(response, {
-      successMessage: 'עסקה נמחקה בהצלחה!',
-      apiUrl: '/api/executions/',
-      entityName: 'עסקה',
-      reloadFn: window.loadExecutionsData,
-      requiresHardReload: false
-    });
-
-  } catch (error) {
-    CRUDResponseHandler.handleError(error, 'מחיקת עסקה');
-  }
-}
+// confirmDeleteExecution function removed - now using performExecutionDeletion in general CRUD pattern
 
 // ========================================
 // פונקציות מודל פריטים מקושרים
@@ -2118,7 +2030,7 @@ window.filterExecutionsLocally = filterExecutionsLocally;
 // הגדרת הפונקציות כגלובליות
 window.openExecutionDetails = openExecutionDetails;
 window.editExecution = editExecution;
-window.deleteExecution = deleteExecution;
+// window.deleteExecution removed - now exported once at line 3054
 
 /**
  * פונקציה לסגירה/פתיחה של executions-section
@@ -4012,12 +3924,27 @@ function showEditExecutionModal(executionId) {
 
 /**
  * מחיקת ביצוע
- * Includes linked items check
+ * Includes linked items check and detailed execution information
  */
 async function deleteExecution(executionId) {
-    window.Logger.debug('deleteExecution called', { executionId, page: 'executions' });
-    
     try {
+        // Get execution details for confirmation message
+        let executionDetails = `ביצוע #${executionId}`;
+        const execution = window.executionsData?.find(exec => exec.id === executionId || exec.id === parseInt(executionId));
+        
+        if (execution) {
+            const ticker = execution.ticker_symbol || execution.symbol || 'לא מוגדר';
+            const actionText = window.renderAction ? 
+                               window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
+                               ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
+            const quantity = execution.quantity || '0';
+            const price = execution.price ? `$${execution.price}` : '$0';
+            const date = execution.date || execution.execution_date ? 
+                         new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : 
+                         'לא מוגדר';
+            executionDetails = `${ticker} - ${actionText}, ${quantity} יחידות ב-${price}, תאריך: ${date}`;
+        }
+        
         // Check linked items first
         if (window.checkLinkedItemsBeforeAction) {
             const hasLinkedItems = await window.checkLinkedItemsBeforeAction('execution', executionId, 'delete');
@@ -4027,9 +3954,9 @@ async function deleteExecution(executionId) {
             }
         }
         
-        // Use warning system for confirmation
+        // Use warning system for confirmation with detailed information
         if (window.showDeleteWarning) {
-            window.showDeleteWarning('execution', executionId, 'ביצוע',
+            window.showDeleteWarning('execution', executionDetails, 'ביצוע',
                 async () => await performExecutionDeletion(executionId),
                 () => {}
             );

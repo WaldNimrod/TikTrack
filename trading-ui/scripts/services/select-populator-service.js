@@ -21,32 +21,48 @@
 
 class SelectPopulatorService {
     static _getPreferenceFromMemory(preferenceName, aliases = []) {
+        console.log(`🔍 _getPreferenceFromMemory called for: ${preferenceName} with aliases:`, aliases);
         try {
-            // Try PreferencesSystem first
+            // Try window.currentPreferences first (used by PreferencesCore)
             let prefs = {};
-            if (window.PreferencesSystem?.manager?.currentPreferences) {
+            if (window.currentPreferences) {
+                prefs = window.currentPreferences;
+                console.log(`✅ Using window.currentPreferences, found ${Object.keys(prefs).length} preferences`);
+            } else if (window.PreferencesSystem?.manager?.currentPreferences) {
                 prefs = window.PreferencesSystem.manager.currentPreferences;
+                console.log(`✅ Using PreferencesSystem.currentPreferences, found ${Object.keys(prefs).length} preferences`);
             } else {
+                console.log(`⚠️ window.currentPreferences not available, trying localStorage`);
                 // Fallback to localStorage
                 try {
                     const stored = localStorage.getItem('tikTrack_preferences');
                     if (stored) {
                         prefs = JSON.parse(stored);
+                        console.log(`✅ Loaded preferences from localStorage, found ${Object.keys(prefs).length} preferences`);
+                    } else {
+                        console.log(`⚠️ No preferences found in localStorage 'tikTrack_preferences'`);
                     }
                 } catch (e) {
                     console.warn(`⚠️ Failed to parse localStorage preferences:`, e);
                 }
             }
             
+            console.log(`🔍 Looking for preference: ${preferenceName}`);
             if (preferenceName in prefs) {
+                console.log(`✅ Found preference ${preferenceName}: ${prefs[preferenceName]}`);
                 return prefs[preferenceName];
+            } else {
+                console.log(`⚠️ Preference ${preferenceName} not found directly`);
             }
             
+            console.log(`🔍 Trying aliases:`, aliases);
             for (const key of aliases) {
                 if (key in prefs) {
+                    console.log(`✅ Found preference via alias ${key}: ${prefs[key]}`);
                     return prefs[key];
                 }
             }
+            console.log(`⚠️ No preference found for ${preferenceName} or any aliases`);
         } catch (e) {
             console.error(`❌ Error in _getPreferenceFromMemory:`, e);
         }

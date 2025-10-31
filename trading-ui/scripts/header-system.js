@@ -1276,7 +1276,19 @@ class HeaderSystem {
                 // בדיקה גם לפי data attribute וגם לפי טקסט
                 const typeMatches = this.currentFilters.type.includes(translatedRowType) || 
                                   this.currentFilters.type.includes(rowTypeText);
+                
+                // לוג לדיבוג
+                console.log('🔍 Type filter:', {
+                  rowType,
+                  translatedRowType,
+                  rowTypeText,
+                  filterValues: this.currentFilters.type,
+                  typeMatches
+                });
+                
                 shouldShow = shouldShow && typeMatches;
+              } else {
+                console.log('✅ No type cell - showing all rows');
               }
               // אם אין שדה סוג - תמיד הצג (לא מסנן)
             }

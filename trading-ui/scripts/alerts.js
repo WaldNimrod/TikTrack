@@ -673,7 +673,16 @@ function updateAlertsTable(alerts) {
     }
 
     // עדכון סטטיסטיקות
-    updatePageSummaryStats();
+    // Use InfoSummarySystem directly
+    if (window.InfoSummarySystem && typeof window.InfoSummarySystem.calculateAndRender === 'function') {
+      const config = {
+        entityType: 'alert',
+        summaryContainerId: 'alertsSummaryStats'
+      };
+      window.InfoSummarySystem.calculateAndRender(alertsData || [], config);
+    } else if (typeof updatePageSummaryStats_LEGACY === 'function') {
+      updatePageSummaryStats_LEGACY();
+    }
     
     window.Logger.info('✅ טבלת התראות עודכנה בהצלחה עם', alerts.length, 'התראות', { page: "alerts" });
     
@@ -698,7 +707,8 @@ function updateAlertsTable(alerts) {
  * @function updatePageSummaryStats
  * @returns {void}
  */
-function updatePageSummaryStats() {
+// REMOVED: updatePageSummaryStats - use window.InfoSummarySystem.calculateAndRender from services/statistics-calculator.js directly
+async function updatePageSummaryStats_LEGACY() {
   try {
     // Get alerts data from global scope
     const dataToUse = window.alertsData || alertsData || [];
@@ -1952,7 +1962,7 @@ function filterAlertsByRelatedObjectType(type) {
 }
 
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
-window.showAddAlertModal = showAddAlertModal;
+// REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
 window.editAlert = editAlert;
 // window.deleteAlert - הועבר ל-alert-service.js
 window.saveAlert = saveAlert;
@@ -2248,8 +2258,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // Export all necessary functions to global scope
 window.loadAlertsData = window.loadAlertsData;
 window.updateAlertsTable = updateAlertsTable;
-window.updatePageSummaryStats = updatePageSummaryStats;
-window.showAddAlertModal = showAddAlertModal;
+// REMOVED: window.updatePageSummaryStats - use window.InfoSummarySystem.calculateAndRender from services/statistics-calculator.js directly
+// REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
 // REMOVED: hideAddAlertModal, hideEditAlertModal - use ModalManagerV2.hideModal directly
 
 /**
@@ -2283,7 +2293,7 @@ function validateAlertForm() {
 }
 
 // REMOVED: window exports for removed functions
-window.showEditAlertModal = showEditAlertModal;
+// REMOVED: window.showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', id) directly
 window.validateAlertForm = validateAlertForm;
 window.updateRadioButtons = updateRadioButtons;
 window.populateSelect = populateSelect;
@@ -2362,8 +2372,8 @@ window.evaluateAllConditions = evaluateAllConditions;
 window.updateEvaluationStats = updateEvaluationStats;
 window.initializeAlertConditionBuilder = initializeAlertConditionBuilder;
 window.cleanupAlertConditionBuilder = cleanupAlertConditionBuilder;
-window.showAddAlertModal = showAddAlertModal;
-window.showEditAlertModal = showEditAlertModal;
+// REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
+// REMOVED: window.showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', id) directly
 window.saveAlertData = saveAlertData;
 window.generateDetailedLog = generateDetailedLog;
 window.generateDetailedLogForAlerts = generateDetailedLogForAlerts;
@@ -2448,7 +2458,7 @@ function updateAlertsSummary(alerts) {
     week: weekAlerts
   }, { page: "alerts" });
 }
-window.showAddAlertModal = showAddAlertModal;
+// REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
 window.editAlert = editAlert;
 // window.deleteAlert לא מוגדר - צריך ליצור את הפונקציה
 // window. export removed - using global version from system-management.js
@@ -3005,29 +3015,13 @@ function cleanupAlertConditionBuilder() {
  * הצגת מודל הוספת התראה
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showAddAlertModal() {
-    window.Logger.debug('showAddAlertModal called', { page: 'alerts' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showModal('alertsModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
 
 /**
  * הצגת מודל עריכת התראה
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showEditAlertModal(alertId) {
-    window.Logger.debug('showEditAlertModal called', { alertId, page: 'alerts' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showEditModal('alertsModal', 'alert', alertId);
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', alertId) directly
 
 /**
  * שמירת התראה
@@ -3140,8 +3134,8 @@ function displayAlertTickerInfo(ticker) {
 }
 
 // Export functions to window for global access
-window.showAddAlertModal = showAddAlertModal;
-window.showEditAlertModal = showEditAlertModal;
+// REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
+// REMOVED: window.showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', id) directly
 window.loadAlertTickerInfo = loadAlertTickerInfo;
 window.displayAlertTickerInfo = displayAlertTickerInfo;
 // Note: saveAlert and deleteAlert removed - using ModalManagerV2 and confirmDeleteAlert instead

@@ -223,7 +223,12 @@ function downloadFile(noteId, fileName) {
  */
 function openNoteDetails(_id) {
   try {
-    showAddNoteModal();
+    // Use ModalManagerV2 directly
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('notesModal', 'add');
+    } else {
+      window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
+    }
   } catch (error) {
     window.Logger.error('שגיאה בפתיחת פרטי הערה:', error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {
@@ -239,7 +244,12 @@ function openNoteDetails(_id) {
  * @returns {void}
  */
 function editNote(_id) {
-  showEditNoteModal(_id);
+  // Use ModalManagerV2 directly
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+    window.ModalManagerV2.showEditModal('notesModal', 'note', _id);
+  } else {
+    window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
+  }
 }
 
 /**
@@ -1196,8 +1206,8 @@ function clearNoteValidationErrors() {
 // window.updateNotesTable יוצא בשורה 2241
 window.updateNotesSummary = updateNotesSummary;
 window.updateGridFromComponent = updateGridFromComponent;
-window.showAddNoteModal = showAddNoteModal;
-window.showEditNoteModal = showEditNoteModal;
+// REMOVED: window.showAddNoteModal - use window.ModalManagerV2.showModal('notesModal', 'add') directly
+// REMOVED: window.showEditNoteModal - use window.ModalManagerV2.showEditModal('notesModal', 'note', id) directly
 window.saveNote = saveNote;
 window.updateNoteFromModal = updateNoteFromModal;
 window.deleteNoteFromServer = deleteNoteFromServer;
@@ -1913,7 +1923,12 @@ function editCurrentNote() {
       viewModal.hide();
 
     // פתיחת מודל העריכה
-    showEditNoteModal(noteId);
+    // Use ModalManagerV2 directly
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+      window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
+    } else {
+      window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
+    }
   }
   
   } catch (error) {
@@ -2053,29 +2068,13 @@ function replaceCurrentAttachment() {
  * הצגת מודל הוספת הערה
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showAddNoteModal() {
-    window.Logger.debug('showAddNoteModal called', { page: 'notes' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showModal('notesModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showAddNoteModal - use window.ModalManagerV2.showModal('notesModal', 'add') directly
 
 /**
  * הצגת מודל עריכת הערה
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showEditNoteModal(noteId) {
-    window.Logger.debug('showEditNoteModal called', { noteId, page: 'notes' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showEditNoteModal - use window.ModalManagerV2.showEditModal('notesModal', 'note', noteId) directly
 
 /**
  * שמירת הערה
@@ -2098,7 +2097,7 @@ window.editNote = editNote;
 window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (שורה 2240)', { page: "notes" });
 // ייצוא ישיר של הפונקציה המקורית - ללא wrapper כדי למנוע רקורסיה
 window.updateNotesTable = updateNotesTable;
-window.showAddNoteModal = showAddNoteModal;
-window.showEditNoteModal = showEditNoteModal;
+// REMOVED: window.showAddNoteModal - use window.ModalManagerV2.showModal('notesModal', 'add') directly
+// REMOVED: window.showEditNoteModal - use window.ModalManagerV2.showEditModal('notesModal', 'note', id) directly
 window.restoreNotesSectionState = restoreNotesSectionState;
 

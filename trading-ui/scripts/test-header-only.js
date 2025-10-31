@@ -671,7 +671,7 @@ function updateTradePlansTableDisplay(data) {
         <tr>
             <td>${item.ticker?.symbol || item.ticker_symbol || '-'}</td>
             <td>${item.date || item.created_at || '-'}</td>
-            <td data-type="${item.investment_type || item.type || ''}">${translateType(item.investment_type || item.type)}</td>
+            <td data-investment-type="${item.investment_type || item.type || ''}">${translateType(item.investment_type || item.type)}</td>
             <td>${item.side || '-'}</td>
             <td>${item.quantity || item.shares || '-'}</td>
             <td>${item.price || '-'}</td>

@@ -2184,26 +2184,8 @@ let tradingAccountsCurrentSortDirection = 'asc';
  * @param {number} columnIndex - Column index
  * @returns {void}
  */
-function sortTable(columnIndex) {
-  window.Logger.info(`🔄 מיון טבלת חשבונות לפי עמודה ${columnIndex}`, { page: "trading_accounts" });
-
-  // Use global function
-  if (typeof window.sortTableData === 'function') {
-    const sortedData = window.sortTableData(
-      columnIndex,
-      window.filteredTradingAccountsData || window.trading_accountsData,
-      'trading_accounts',
-      updateTradingAccountsTable
-    );
-
-    // Update filtered data
-    window.filteredTradingAccountsData = sortedData;
-  } else {
-    if (typeof handleFunctionNotFound === 'function') {
-      handleFunctionNotFound('sortTableData', 'פונקציית מיון טבלה לא נמצאה');
-    }
-  }
-}
+// REMOVED: sortTable - use window.sortTableData directly from tables.js
+// Usage: window.sortTableData(columnIndex, data, 'trading_accounts', updateTradingAccountsTable)
 
 // Detailed Log Functions for Accounts Page
 /**

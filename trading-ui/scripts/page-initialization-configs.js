@@ -324,7 +324,7 @@ const PAGE_CONFIGS = {
         // - 'validation': מערכת ולידציה מאוחדת
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'validation', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -332,7 +332,8 @@ const PAGE_CONFIGS = {
             'DataUtils',
             'window.Logger',
             'window.CacheSyncManager',
-            'window.loadTradesData'
+            'window.loadTradesData',
+            'window.checkLinkedItemsBeforeAction'
         ],
         
         // ← NEW: מטאדאטה

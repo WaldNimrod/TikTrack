@@ -3069,21 +3069,46 @@ async function saveTradePlan() {
  * Includes linked items check
  */
 async function deleteTradePlan(tradePlanId) {
-    window.Logger.debug('deleteTradePlan called', { tradePlanId, page: 'trade_plans' });
+    window.Logger.info(`🗑️ deleteTradePlan called for trade plan ${tradePlanId}`, { tradePlanId, page: 'trade_plans' });
     
     try {
-        // Check linked items first
-        if (window.checkLinkedItemsBeforeAction) {
-            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade_plan', tradePlanId, 'delete');
-            if (hasLinkedItems) {
-                window.Logger.info('Trade Plan has linked items, deletion cancelled', { tradePlanId, page: 'trade_plans' });
-                return;
-            }
+        // Get trade plan details for confirmation message
+        let tradePlanDetails = `תוכנית מסחר #${tradePlanId}`;
+        const tradePlan = window.tradePlansData?.find(tp => tp.id === tradePlanId || tp.id === parseInt(tradePlanId));
+        
+        if (tradePlan) {
+            const ticker = tradePlan.ticker_symbol || tradePlan.symbol || 'לא מוגדר';
+            const sideText = tradePlan.side === 'buy' ? 'קנייה' : 
+                           tradePlan.side === 'sell' ? 'מכירה' : 
+                           tradePlan.side === 'Long' ? 'קנייה' :
+                           tradePlan.side === 'Short' ? 'מכירה' : tradePlan.side || 'לא מוגדר';
+            const typeText = tradePlan.investment_type || tradePlan.type || 'לא מוגדר';
+            const statusText = tradePlan.status === 'open' ? 'פתוח' :
+                             tradePlan.status === 'closed' ? 'סגור' :
+                             tradePlan.status === 'cancelled' ? 'מבוטל' : tradePlan.status || 'לא מוגדר';
+            const amount = tradePlan.planned_amount ? `$${tradePlan.planned_amount}` : 'לא מוגדר';
+            const date = tradePlan.created_at ? new Date(tradePlan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+            
+            tradePlanDetails = `${ticker} - ${sideText} ${typeText}, סטטוס: ${statusText}, סכום: ${amount}, תאריך: ${date}`;
         }
         
-        // Use warning system for confirmation
+        // Check linked items first (Trades, Notes)
+        window.Logger.info('🔍 Checking for linked items before deletion', { tradePlanId, page: 'trade_plans' });
+        if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+            window.Logger.info('✅ checkLinkedItemsBeforeAction function exists', { tradePlanId, page: 'trade_plans' });
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade_plan', tradePlanId, 'delete');
+            window.Logger.info(`🔍 Linked items check result: hasLinkedItems=${hasLinkedItems}`, { tradePlanId, page: 'trade_plans' });
+            if (hasLinkedItems) {
+                window.Logger.info('🚫 Trade Plan has linked items, deletion cancelled', { tradePlanId, page: 'trade_plans' });
+                return;
+            }
+        } else {
+            window.Logger.warn('⚠️ checkLinkedItemsBeforeAction function not available', { tradePlanId, page: 'trade_plans' });
+        }
+        
+        // Use warning system for confirmation with detailed information
         if (window.showDeleteWarning) {
-            window.showDeleteWarning('trade_plan', tradePlanId, 'תוכנית מסחר',
+            window.showDeleteWarning('trade_plan', tradePlanDetails, 'תוכנית מסחר',
                 async () => await performTradePlanDeletion(tradePlanId),
                 () => {}
             );
@@ -3096,6 +3121,7 @@ async function deleteTradePlan(tradePlanId) {
         }
         
     } catch (error) {
+        window.Logger.error('Error deleting trade plan:', error, { tradePlanId, page: 'trade_plans' });
         CRUDResponseHandler.handleError(error, 'מחיקת תוכנית מסחר');
     }
 }

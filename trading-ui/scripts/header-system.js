@@ -1610,6 +1610,9 @@ function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
     // Update portal selections to match original
     updatePortalSelections();
     
+    // Remove onclick attributes from portal items (prevent duplicate events)
+    portal.querySelectorAll('[onclick]').forEach(item => item.removeAttribute('onclick'));
+    
     // Add event listeners to portal items
     addPortalEventListeners(portal, originalMenuEl);
     
@@ -1992,9 +1995,12 @@ function setupHoverBehavior() {
 // פונקציות בחירת פילטרים (מולטיסלקט)
 window.selectStatusOption = function(status) {
   window.Logger.info('🔧 selectStatusOption called with:', status, { page: "header-system" });
+  console.log('🔧 selectStatusOption called with:', status);
   
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
+  console.log('🔧 Found statusItems:', statusItems.length);
   const clickedItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === status);
+  console.log('🔧 clickedItem found:', clickedItem ? 'YES' : 'NO');
   
   if (clickedItem) {
     if (status === 'הכול') {
@@ -2038,9 +2044,12 @@ window.selectStatusOption = function(status) {
 
 window.selectTypeOption = function(type) {
   window.Logger.info('🔧 selectTypeOption called with:', type, { page: "header-system" });
+  console.log('🔧 selectTypeOption called with:', type);
   
   const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
+  console.log('🔧 Found typeItems:', typeItems.length);
   const clickedItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === type);
+  console.log('🔧 clickedItem found:', clickedItem ? 'YES' : 'NO');
   
   if (clickedItem) {
     if (type === 'הכול') {

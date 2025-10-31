@@ -645,12 +645,18 @@ class ModalManagerV2 {
                 // Skip if field already has a value
                 if (fieldElement.value) return;
                 
-                // For select fields, check if SelectPopulatorService already handled it
-                // Only apply manual defaults for fields that SelectPopulatorService doesn't handle
+                // For select fields with defaultFromPreferences, let SelectPopulatorService handle it
+                // BUT we still need to handle other select fields (like executionCommission which is an INPUT)
                 if (fieldElement.tagName === 'SELECT') {
-                    // Skip if this is an account or currency field (handled by SelectPopulatorService)
-                    if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency' || 
-                        field.id === 'executionAccount' || field.id === 'executionTicker') {
+                    // Skip if this is an account or currency field handled by SelectPopulatorService
+                    // BUT only if it doesn't have defaultFromPreferences in config
+                    if (field.defaultFromPreferences) {
+                        console.log(`⏭️ Skipping ${field.id} - will be handled by SelectPopulatorService`);
+                        return;
+                    }
+                    
+                    // Skip cashFlowAccount and cashFlowCurrency (always handled by SelectPopulatorService)
+                    if (field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency') {
                         return;
                     }
                     
@@ -664,15 +670,26 @@ class ModalManagerV2 {
                 }
                 
                 // Apply defaultFromPreferences first (before defaultValue)
-                if (field.defaultFromPreferences && window.getPreferenceFromMemory) {
-                    const prefName = this._getPreferenceNameForField(field.id);
-                    if (prefName) {
-                        const prefValue = window.getPreferenceFromMemory(prefName);
-                        if (prefValue !== null && prefValue !== undefined) {
-                            fieldElement.value = prefValue;
-                            console.log(`Applied preference default for ${field.id} (${prefName}):`, prefValue);
-                            return;
+                if (field.defaultFromPreferences) {
+                    console.log(`🔍 Checking defaultFromPreferences for field: ${field.id}`);
+                    if (window.getPreferenceFromMemory) {
+                        const prefName = this._getPreferenceNameForField(field.id);
+                        console.log(`🔍 Mapped field ${field.id} to preference: ${prefName}`);
+                        if (prefName) {
+                            const prefValue = window.getPreferenceFromMemory(prefName);
+                            console.log(`🔍 Retrieved preference value for ${prefName}:`, prefValue);
+                            if (prefValue !== null && prefValue !== undefined) {
+                                fieldElement.value = prefValue;
+                                console.log(`✅ Applied preference default for ${field.id} (${prefName}):`, prefValue);
+                                return;
+                            } else {
+                                console.log(`⚠️ No preference value found for ${prefName}`);
+                            }
+                        } else {
+                            console.log(`⚠️ No preference name mapping found for field: ${field.id}`);
                         }
+                    } else {
+                        console.log(`⚠️ getPreferenceFromMemory not available`);
                     }
                 }
                 
@@ -832,28 +849,46 @@ class ModalManagerV2 {
      * @private
      */
     async populateSelects(modalElement, config) {
-        if (!window.SelectPopulatorService) return;
+        if (!window.SelectPopulatorService) {
+            console.log('⚠️ SelectPopulatorService not available');
+            return;
+        }
         
         const selects = modalElement.querySelectorAll('select');
+        console.log(`🔍 populateSelects: Found ${selects.length} select elements`);
         
         for (const select of selects) {
             const selectId = select.id;
             
+            // Check if this field has defaultFromPreferences in config
+            let shouldUseDefaultFromPrefs = false;
+            if (config && config.fields) {
+                const fieldConfig = config.fields.find(f => f.id === selectId);
+                if (fieldConfig && fieldConfig.defaultFromPreferences) {
+                    shouldUseDefaultFromPrefs = true;
+                    console.log(`🔍 Field ${selectId} has defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
+                }
+            }
+            
             try {
                 // מילוי לפי סוג השדה
                 if (selectId.includes('Account') || selectId.includes('account')) {
+                    console.log(`📋 Populating accounts select: ${selectId} with defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
                     await window.SelectPopulatorService.populateAccountsSelect(selectId, {
-                        defaultFromPreferences: true
+                        defaultFromPreferences: shouldUseDefaultFromPrefs
                     });
                 } else if (selectId.includes('Ticker') || selectId.includes('ticker')) {
+                    console.log(`📋 Populating tickers select: ${selectId}`);
                     await window.SelectPopulatorService.populateTickersSelect(selectId, {
                         includeEmpty: true
                     });
                 } else if (selectId.includes('Currency') || selectId.includes('currency')) {
+                    console.log(`📋 Populating currencies select: ${selectId} with defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
                     await window.SelectPopulatorService.populateCurrenciesSelect(selectId, {
-                        defaultFromPreferences: true
+                        defaultFromPreferences: shouldUseDefaultFromPrefs
                     });
                 } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
+                    console.log(`📋 Populating trade plans select: ${selectId}`);
                     await window.SelectPopulatorService.populateTradePlansSelect(selectId, {
                         includeEmpty: true
                     });

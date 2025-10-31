@@ -312,6 +312,52 @@
     <!-- Local  function for test-header-only page -->
     <script>
         // Make the local  function available globally for this page only
+        
+        // Test preferences availability
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Testing preferences availability...');
+            
+            setTimeout(async () => {
+                try {
+                    // Test getPreferenceFromMemory
+                    if (window.getPreferenceFromMemory) {
+                        console.log('✅ getPreferenceFromMemory is available');
+                        
+                        const defaultAccount = window.getPreferenceFromMemory('default_trading_account');
+                        console.log('🧪 default_trading_account value:', defaultAccount);
+                        
+                        const defaultCommission = window.getPreferenceFromMemory('defaultCommission');
+                        console.log('🧪 defaultCommission value:', defaultCommission);
+                        
+                        // Test PreferencesSystem
+                        if (window.PreferencesSystem?.manager?.currentPreferences) {
+                            console.log('✅ PreferencesSystem.currentPreferences available');
+                            const allPrefs = window.PreferencesSystem.manager.currentPreferences;
+                            console.log('🧪 All preferences count:', Object.keys(allPrefs).length);
+                            console.log('🧪 default_trading_account in prefs:', allPrefs['default_trading_account']);
+                            console.log('🧪 defaultCommission in prefs:', allPrefs['defaultCommission']);
+                        } else {
+                            console.log('⚠️ PreferencesSystem.currentPreferences not available');
+                        }
+                        
+                        // Test localStorage fallback
+                        const stored = localStorage.getItem('tikTrack_preferences');
+                        if (stored) {
+                            console.log('✅ localStorage tikTrack_preferences found');
+                            const parsed = JSON.parse(stored);
+                            console.log('🧪 default_trading_account in localStorage:', parsed['default_trading_account']);
+                            console.log('🧪 defaultCommission in localStorage:', parsed['defaultCommission']);
+                        } else {
+                            console.log('⚠️ localStorage tikTrack_preferences not found');
+                        }
+                    } else {
+                        console.log('❌ getPreferenceFromMemory is not available');
+                    }
+                } catch (error) {
+                    console.error('❌ Error testing preferences:', error);
+                }
+            }, 2000);
+        });
     </script>
     
 </body>

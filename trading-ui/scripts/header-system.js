@@ -59,6 +59,11 @@ class HeaderSystem {
     // יצירת אלמנט הכותרת
     HeaderSystem.createHeader();
     
+    // יצירת מערכת הפילטרים
+    if (typeof HeaderSystem.createFilterSystem === 'function') {
+      HeaderSystem.createFilterSystem();
+    }
+    
     // טעינת חשבונות לפילטר - עם עיכוב קצר לוודא שה-HTML נוצר
     setTimeout(async () => {
       await HeaderSystem.loadAccountsForFilter();
@@ -2040,11 +2045,13 @@ window.selectStatusOption = function(status) {
   updatePortalSelections();
   
   // עדכון מיידי של הפילטר במערכת
+  console.log('🔧 window.filterSystem:', window.filterSystem ? 'exists' : 'NOT FOUND');
   if (window.filterSystem) {
     const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
     const selectedStatuses = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
     window.filterSystem.currentFilters.status = selectedStatuses;
     window.filterSystem.saveFilters();
+    console.log('🔧 Calling applyAllFilters...');
     window.filterSystem.applyAllFilters();
   }
   
@@ -2086,11 +2093,13 @@ window.selectTypeOption = function(type) {
   updateTypeFilterText();
   updatePortalSelections();
   
+  console.log('🔧 window.filterSystem for type:', window.filterSystem ? 'exists' : 'NOT FOUND');
   if (window.filterSystem) {
     const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
     const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
     window.filterSystem.currentFilters.type = selectedTypes;
     window.filterSystem.saveFilters();
+    console.log('🔧 Calling applyAllFilters for type...');
     window.filterSystem.applyAllFilters();
   }
   

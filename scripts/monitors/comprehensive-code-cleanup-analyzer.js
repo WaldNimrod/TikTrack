@@ -375,7 +375,9 @@ class ComprehensiveCodeCleanupAnalyzer {
                 // window.ObjectName = { methodName: functionName } (object exports)
                 /window\.(\w+)\s*=\s*\{[^}]*(\w+)\s*:\s*(?:\2|\w+)\s*[,}]/g,
                 // window.ObjectName = class { methodName() {} }
-                /window\.(\w+)\s*=\s*class\s+[^{]*\{[^}]*(\w+)\s*\([^)]*\)\s*\{[^}]+\}/g
+                /window\.(\w+)\s*=\s*class\s+[^{]*\{[^}]*(\w+)\s*\([^)]*\)\s*\{[^}]+\}/g,
+                // object exports with function as property (updateNumericValueColors)
+                /\{\s*[^}]*(\w+)\s*:\s*\1\s*[,}]/g
             ];
             
             for (const pattern of exportPatterns) {
@@ -411,6 +413,22 @@ class ComprehensiveCodeCleanupAnalyzer {
                         /=\s*\{[^}]*$/.test(beforeText)) {
                         exports.add(methodName);
                         calls.add(methodName);
+                    }
+                }
+            }
+            
+            // ⚠️ שיפור: זיהוי exports דרך object properties (updateNumericValueColors, etc.)
+            const objectPropertyExportPattern = /(\w+)\s*:\s*(\w+)\s*[,}]/g;
+            let propExportMatch;
+            while ((propExportMatch = objectPropertyExportPattern.exec(content)) !== null) {
+                const propName = propExportMatch[1];
+                const functionName = propExportMatch[2];
+                if (propName === functionName && this.isValidFunction(functionName) && !isInRemovedSection(propExportMatch.index)) {
+                    // בדיקה אם זה export (לפני זה יש window או =)
+                    const beforeText = content.substring(Math.max(0, propExportMatch.index - 50), propExportMatch.index);
+                    if (/window\.[\w]+|=\s*\{/.test(beforeText)) {
+                        exports.add(functionName);
+                        calls.add(functionName);
                     }
                 }
             }
@@ -593,6 +611,7 @@ class ComprehensiveCodeCleanupAnalyzer {
     
     /**
      * בדיקה אם יש קריאה פנימית לפונקציה בקובץ (מחוץ להגדרת הפונקציה עצמה)
+     * ⚠️ שיפור: מזהה גם קריאות דרך object properties ו-arrow functions
      */
     hasInternalCall(fileContent, functionName, functionStartIndex) {
         if (!fileContent || !functionName) return false;
@@ -618,6 +637,45 @@ class ComprehensiveCodeCleanupAnalyzer {
                     if (!beforeCall.includes('//') && !beforeCall.includes('/*') && 
                         !afterCall.includes('*/') && !beforeCall.match(/['"`]$/)) {
                         return true; // נמצאה קריאה פנימית אמיתית
+                    }
+                }
+            }
+        }
+        
+        // ⚠️ שיפור: זיהוי קריאות דרך object properties (validation: functionName)
+        const objectPropertyPattern = new RegExp(`(?:validation|callback|handler|fn|func|function)\\s*:\\s*${functionName}\\b`, 'g');
+        let propMatch;
+        while ((propMatch = objectPropertyPattern.exec(fileContent)) !== null) {
+            const propIndex = propMatch.index;
+            if (Math.abs(propIndex - functionStartIndex) > 20) {
+                const beforeProp = fileContent.substring(Math.max(0, propIndex - 10), propIndex);
+                if (!beforeProp.includes('//') && !beforeProp.includes('/*') && !beforeProp.match(/['"`]$/)) {
+                    return true; // נמצאה קריאה דרך object property
+                }
+            }
+        }
+        
+        // ⚠️ שיפור: זיהוי arrow functions שמוגדרות ונקראות באותו קובץ
+        // בדיקה אם יש const/let עם אותו שם לפני או אחרי
+        const arrowDefPattern = new RegExp(`(?:const|let|var)\\s+${functionName}\\s*=`, 'g');
+        const arrowCallPattern = new RegExp(`\\b${functionName}\\s*\\(`, 'g');
+        
+        let arrowDefMatch;
+        while ((arrowDefMatch = arrowDefPattern.exec(fileContent)) !== null) {
+            const defIndex = arrowDefMatch.index;
+            // אם ההגדרה היא קרובה להגדרת הפונקציה (אותו מקום) - זה אותו דבר
+            if (Math.abs(defIndex - functionStartIndex) < 100) {
+                // בדיקה אם יש קריאה ל-arrow function הזה
+                arrowCallPattern.lastIndex = 0;
+                let arrowCallMatch;
+                while ((arrowCallMatch = arrowCallPattern.exec(fileContent)) !== null) {
+                    const callIndex = arrowCallMatch.index;
+                    if (Math.abs(callIndex - defIndex) > 20 && 
+                        Math.abs(callIndex - functionStartIndex) > 20) {
+                        const beforeCall = fileContent.substring(Math.max(0, callIndex - 10), callIndex);
+                        if (!beforeCall.includes('//') && !beforeCall.includes('/*') && !beforeCall.match(/['"`]$/)) {
+                            return true; // נמצאה קריאה ל-arrow function
+                        }
                     }
                 }
             }

@@ -1,0 +1,1374 @@
+{
+  "timestamp": "2025-11-01T00:38:01.052Z",
+  "summary": {
+    "totalFiles": 61,
+    "totalFunctions": 870,
+    "unusedCount": 132,
+    "duplicateCount": 6,
+    "localAlternativeCount": 12
+  },
+  "unusedFunctions": [
+    {
+      "functionName": "createTradesStatusChart",
+      "file": "index.js",
+      "filePath": "trading-ui/scripts/index.js",
+      "lineNumber": 145,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createPerformanceChart",
+      "file": "index.js",
+      "filePath": "trading-ui/scripts/index.js",
+      "lineNumber": 188,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createAccountChart",
+      "file": "index.js",
+      "filePath": "trading-ui/scripts/index.js",
+      "lineNumber": 229,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createMixedChart",
+      "file": "index.js",
+      "filePath": "trading-ui/scripts/index.js",
+      "lineNumber": 270,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "loadTickerDataForTrades",
+      "file": "trades.js",
+      "filePath": "trading-ui/scripts/trades.js",
+      "lineNumber": 522,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "generateDetailedLogForTrades",
+      "file": "trades.js",
+      "filePath": "trading-ui/scripts/trades.js",
+      "lineNumber": 3093,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updateRealizedPLField",
+      "file": "executions.js",
+      "filePath": "trading-ui/scripts/executions.js",
+      "lineNumber": 214,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "setupModalConfigurations",
+      "file": "executions.js",
+      "filePath": "trading-ui/scripts/executions.js",
+      "lineNumber": 1610,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "toggleExecutionFormFields",
+      "file": "executions.js",
+      "filePath": "trading-ui/scripts/executions.js",
+      "lineNumber": 2069,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "displayExecutionTickerInfo",
+      "file": "executions.js",
+      "filePath": "trading-ui/scripts/executions.js",
+      "lineNumber": 2170,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "calculateExecutionValues",
+      "file": "executions.js",
+      "filePath": "trading-ui/scripts/executions.js",
+      "lineNumber": 2249,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "applyAccountFilterWithTradesData",
+      "file": "executions.js",
+      "filePath": "trading-ui/scripts/executions.js",
+      "lineNumber": 2669,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updateExecutionsGlobalData",
+      "file": "executions.js",
+      "filePath": "trading-ui/scripts/executions.js",
+      "lineNumber": 2833,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "performExecutionDeletion",
+      "file": "executions.js",
+      "filePath": "trading-ui/scripts/executions.js",
+      "lineNumber": 3321,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "trySetTradeValue",
+      "file": "executions.js",
+      "filePath": "trading-ui/scripts/executions.js",
+      "lineNumber": 269,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "getConditionSourceDisplay",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 452,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updatePageSummaryStats_LEGACY",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 711,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "toggleConditionFields",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 1041,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "enableEditConditionFields",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 1104,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "disableEditConditionFields",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 1112,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "deleteAlertInternal",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 1708,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "confirmDeleteAlert",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 1741,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "filterAlertsByRelatedObjectTypeWrapper",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 1877,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "displayAvailableConditions",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 2610,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "refreshConditionEvaluations",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 2829,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "showEvaluationLoading",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 2866,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "displayEvaluationResults",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 2887,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updateEvaluationSummary",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 2913,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "getMethodIdFromCondition",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "lineNumber": 2985,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "openCancelTradePlanModal",
+      "file": "trade_plans.js",
+      "filePath": "trading-ui/scripts/trade_plans.js",
+      "lineNumber": 1550,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "saveTradePlan",
+      "file": "trade_plans.js",
+      "filePath": "trading-ui/scripts/trade_plans.js",
+      "lineNumber": 2941,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "hasActiveFilters",
+      "file": "trade_plans.js",
+      "filePath": "trading-ui/scripts/trade_plans.js",
+      "lineNumber": 2059,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "initializeFormValidation",
+      "file": "trade_plans.js",
+      "filePath": "trading-ui/scripts/trade_plans.js",
+      "lineNumber": 2501,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "ensureTradingAccountsLoaded",
+      "file": "cash_flows.js",
+      "filePath": "trading-ui/scripts/cash_flows.js",
+      "lineNumber": 280,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateCashFlowAmount",
+      "file": "cash_flows.js",
+      "filePath": "trading-ui/scripts/cash_flows.js",
+      "lineNumber": 377,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateCashFlowDate",
+      "file": "cash_flows.js",
+      "filePath": "trading-ui/scripts/cash_flows.js",
+      "lineNumber": 390,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateNoteForm",
+      "file": "notes.js",
+      "filePath": "trading-ui/scripts/notes.js",
+      "lineNumber": 886,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "clearNoteValidationErrors",
+      "file": "notes.js",
+      "filePath": "trading-ui/scripts/notes.js",
+      "lineNumber": 1159,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "getFieldByErrorId",
+      "file": "notes.js",
+      "filePath": "trading-ui/scripts/notes.js",
+      "lineNumber": 1187,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "insertLink",
+      "file": "notes.js",
+      "filePath": "trading-ui/scripts/notes.js",
+      "lineNumber": 1520,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "getTimeDuration",
+      "file": "tickers.js",
+      "filePath": "trading-ui/scripts/tickers.js",
+      "lineNumber": 346,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "tryLoadData",
+      "file": "tickers.js",
+      "filePath": "trading-ui/scripts/tickers.js",
+      "lineNumber": 1993,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "filterTickersByType",
+      "file": "tickers.js",
+      "filePath": "trading-ui/scripts/tickers.js",
+      "lineNumber": 2098,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "fetchTableData",
+      "file": "database.js",
+      "filePath": "trading-ui/scripts/database.js",
+      "lineNumber": 195,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updateTableDisplay",
+      "file": "database.js",
+      "filePath": "trading-ui/scripts/database.js",
+      "lineNumber": 223,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createTableBodyHTML",
+      "file": "database.js",
+      "filePath": "trading-ui/scripts/database.js",
+      "lineNumber": 279,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "formatCellValue",
+      "file": "database.js",
+      "filePath": "trading-ui/scripts/database.js",
+      "lineNumber": 313,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "applySortingFunctionality",
+      "file": "database.js",
+      "filePath": "trading-ui/scripts/database.js",
+      "lineNumber": 345,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updateTableInfo",
+      "file": "database.js",
+      "filePath": "trading-ui/scripts/database.js",
+      "lineNumber": 387,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "formatStatus",
+      "file": "database.js",
+      "filePath": "trading-ui/scripts/database.js",
+      "lineNumber": 477,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "isPrimarySeverity",
+      "file": "notification-system.js",
+      "filePath": "trading-ui/scripts/notification-system.js",
+      "lineNumber": 106,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "shouldShowInMode",
+      "file": "notification-system.js",
+      "filePath": "trading-ui/scripts/notification-system.js",
+      "lineNumber": 176,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "critical",
+      "file": "logger-service.js",
+      "filePath": "trading-ui/scripts/logger-service.js",
+      "lineNumber": 8,
+      "type": "arrow-method",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "logFilterMenuDiagnostics",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1565,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "openFilterMenuPortal",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1609,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "closeFilterMenuPortal",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1669,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "positionPortal",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1688,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "closeAllFilterMenus",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1706,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updateFilterSelections",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1739,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "addPortalEventListeners",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1884,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updatePortalSelections",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1943,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "setupHoverBehavior",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1974,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "normalizeMulti",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1773,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "normalizeDate",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 1788,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "initHeader",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 2516,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "createFilterSystem",
+      "file": "header-system.js",
+      "filePath": "trading-ui/scripts/header-system.js",
+      "lineNumber": 2706,
+      "type": "method",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "translateAlertConditionById",
+      "file": "translation-utils.js",
+      "filePath": "trading-ui/scripts/translation-utils.js",
+      "lineNumber": 730,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "lightenColor",
+      "file": "color-scheme-system.js",
+      "filePath": "trading-ui/scripts/color-scheme-system.js",
+      "lineNumber": 186,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "findPageClass",
+      "file": "color-scheme-system.js",
+      "filePath": "trading-ui/scripts/color-scheme-system.js",
+      "lineNumber": 750,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "getEntityColorPref",
+      "file": "color-scheme-system.js",
+      "filePath": "trading-ui/scripts/color-scheme-system.js",
+      "lineNumber": 704,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "destroy",
+      "file": "pagination-system.js",
+      "filePath": "trading-ui/scripts/pagination-system.js",
+      "lineNumber": 67,
+      "type": "method",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "checkOverflow",
+      "file": "actions-menu-system.js",
+      "filePath": "trading-ui/scripts/modules/actions-menu-system.js",
+      "lineNumber": 194,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "addInvestmentTypeColorLegend",
+      "file": "business-module.js",
+      "filePath": "trading-ui/scripts/modules/business-module.js",
+      "lineNumber": 152,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "detectPageInfo",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 715,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "detectAvailableSystems",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 743,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "analyzePageRequirements",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 771,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "determinePageType",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 779,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "requiresFilters",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 790,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "requiresValidation",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 801,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "requiresTables",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 812,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "requiresCharts",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 824,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "initializeCacheSystem",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 831,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "generateNotificationId",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 1155,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createDetailedErrorMessage",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 1953,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "showFinalSuccessModal",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 2163,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "showFinalSuccessModalWithReload",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 2294,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "showCriticalErrorModal",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 2408,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "showNotificationLegacy",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 2825,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "formatSuccessForCopy",
+      "file": "core-systems.js",
+      "filePath": "trading-ui/scripts/modules/core-systems.js",
+      "lineNumber": 3092,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "loadStatusColorsFromPreferences",
+      "file": "ui-advanced.js",
+      "filePath": "trading-ui/scripts/modules/ui-advanced.js",
+      "lineNumber": 310,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "loadInvestmentTypeColorsFromPreferences",
+      "file": "ui-advanced.js",
+      "filePath": "trading-ui/scripts/modules/ui-advanced.js",
+      "lineNumber": 324,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "getInvestmentTypeBackgroundColorWrapper3",
+      "file": "ui-advanced.js",
+      "filePath": "trading-ui/scripts/modules/ui-advanced.js",
+      "lineNumber": 570,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "getInvestmentTypeEntityType",
+      "file": "ui-advanced.js",
+      "filePath": "trading-ui/scripts/modules/ui-advanced.js",
+      "lineNumber": 618,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updateNumericValueColors",
+      "file": "ui-advanced.js",
+      "filePath": "trading-ui/scripts/modules/ui-advanced.js",
+      "lineNumber": 1230,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "getContrastColor",
+      "file": "ui-advanced.js",
+      "filePath": "trading-ui/scripts/modules/ui-advanced.js",
+      "lineNumber": 1387,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "toHex",
+      "file": "ui-advanced.js",
+      "filePath": "trading-ui/scripts/modules/ui-advanced.js",
+      "lineNumber": 931,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "getEntityColorFromPrefs",
+      "file": "ui-advanced.js",
+      "filePath": "trading-ui/scripts/modules/ui-advanced.js",
+      "lineNumber": 2175,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "ensureVar",
+      "file": "ui-advanced.js",
+      "filePath": "trading-ui/scripts/modules/ui-advanced.js",
+      "lineNumber": 2210,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "initializeDateUtils",
+      "file": "date-utils.js",
+      "filePath": "trading-ui/scripts/date-utils.js",
+      "lineNumber": 577,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "showDefaultProfileWarning",
+      "file": "preferences-ui.js",
+      "filePath": "trading-ui/scripts/preferences-ui.js",
+      "lineNumber": 1551,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "hideDefaultProfileWarning",
+      "file": "preferences-ui.js",
+      "filePath": "trading-ui/scripts/preferences-ui.js",
+      "lineNumber": 1577,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "showValidationModal",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 764,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "startValidation",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 827,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "performRealValidation",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 878,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "checkDatabaseConstraint",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 938,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "checkDataViolations",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 953,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateConstraintData",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 989,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateNotNullConstraint",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 1034,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateUniqueConstraint",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 1043,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateCheckConstraint",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 1052,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateEnumConstraint",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 1061,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateForeignKeyConstraint",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 1070,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateRangeConstraint",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 1079,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "checkUIValidation",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 1090,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateSingleConstraint",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 1105,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "displayValidationResults",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 1116,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "validateNext",
+      "file": "constraints.js",
+      "filePath": "trading-ui/scripts/constraints.js",
+      "lineNumber": 837,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    },
+    {
+      "functionName": "createLinkedItemsList",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 557,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "getRulesExplanation",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 619,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "getTradePlanDetails",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 802,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createBasicItemInfo",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 937,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createModal",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 954,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createTradeDetails",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 1039,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createAccountDetails",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 1063,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createTickerDetails",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 1076,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createAlertDetails",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 1100,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createCashFlowDetails",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 1141,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createNoteDetails",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 1163,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createTradePlanDetails",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 1180,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "createExecutionDetails",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 1194,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "openItemPage",
+      "file": "linked-items.js",
+      "filePath": "trading-ui/scripts/linked-items.js",
+      "lineNumber": 1398,
+      "type": "function",
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "handleResponse",
+      "file": "external-data-settings-service.js",
+      "filePath": "trading-ui/scripts/external-data-settings-service.js",
+      "lineNumber": 27,
+      "type": "function",
+      "severity": "HIGH"
+    }
+  ],
+  "duplicateFunctions": [
+    {
+      "functionName": "if",
+      "file": "trades.js",
+      "filePath": "trading-ui/scripts/trades.js",
+      "occurrences": [
+        {
+          "lineNumber": 368,
+          "type": "function"
+        },
+        {
+          "lineNumber": 481,
+          "type": "function"
+        },
+        {
+          "lineNumber": 2114,
+          "type": "function"
+        }
+      ],
+      "count": 3,
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "if",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "occurrences": [
+        {
+          "lineNumber": 718,
+          "type": "function"
+        },
+        {
+          "lineNumber": 2356,
+          "type": "function"
+        },
+        {
+          "lineNumber": 3107,
+          "type": "function"
+        }
+      ],
+      "count": 3,
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "if",
+      "file": "trade_plans.js",
+      "filePath": "trading-ui/scripts/trade_plans.js",
+      "occurrences": [
+        {
+          "lineNumber": 583,
+          "type": "function"
+        },
+        {
+          "lineNumber": 1863,
+          "type": "function"
+        }
+      ],
+      "count": 2,
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updatePricesFromPercentages",
+      "file": "trade_plans.js",
+      "filePath": "trading-ui/scripts/trade_plans.js",
+      "occurrences": [
+        {
+          "lineNumber": 1642,
+          "type": "arrow"
+        },
+        {
+          "lineNumber": 1736,
+          "type": "arrow"
+        }
+      ],
+      "count": 2,
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "updatePercentagesFromPrices",
+      "file": "trade_plans.js",
+      "filePath": "trading-ui/scripts/trade_plans.js",
+      "occurrences": [
+        {
+          "lineNumber": 1664,
+          "type": "arrow"
+        },
+        {
+          "lineNumber": 1758,
+          "type": "arrow"
+        }
+      ],
+      "count": 2,
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "onSuccess",
+      "file": "tickers.js",
+      "filePath": "trading-ui/scripts/tickers.js",
+      "occurrences": [
+        {
+          "lineNumber": 1016,
+          "type": "arrow-method"
+        },
+        {
+          "lineNumber": 1324,
+          "type": "arrow-method"
+        },
+        {
+          "lineNumber": 1373,
+          "type": "arrow-method"
+        }
+      ],
+      "count": 3,
+      "severity": "HIGH"
+    }
+  ],
+  "localWithGlobalAlternative": [
+    {
+      "localFunction": "shouldShowNotification",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1310,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.22727272727272727,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showNotification",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1411,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 1,
+      "severity": "HIGH"
+    },
+    {
+      "localFunction": "showSimpleErrorNotification",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1775,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.18518518518518517,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showFinalSuccessNotification",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1853,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.14285714285714285,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showCriticalErrorNotification",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1920,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.13793103448275862,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showFinalSuccessModal",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 2163,
+      "globalAlternative": "showSuccessNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.21739130434782608,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showFinalSuccessNotificationWithReload",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 2242,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.10526315789473684,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showFinalSuccessModalWithReload",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 2294,
+      "globalAlternative": "showSuccessNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.16129032258064516,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showCriticalErrorModal",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 2408,
+      "globalAlternative": "showErrorNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.22727272727272727,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showDetailsModal",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 2609,
+      "globalAlternative": "showModal",
+      "globalSystem": "modal-manager-v2.js",
+      "category": "UI_MANAGEMENT",
+      "similarity": 0.3125,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showNotificationLegacy",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 2825,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.7272727272727273,
+      "severity": "MEDIUM"
+    },
+    {
+      "localFunction": "clearUserPreferencesCache",
+      "localFile": "data-advanced.js",
+      "localFilePath": "trading-ui/scripts/modules/data-advanced.js",
+      "localLineNumber": 460,
+      "globalAlternative": "clearAllCache",
+      "globalSystem": "unified-cache-manager.js",
+      "category": "CACHE",
+      "similarity": 0.2,
+      "severity": "LOW"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "issue": "Unused functions found",
+      "count": 132,
+      "action": "Review and remove unused functions to reduce code complexity",
+      "files": [
+        "index.js",
+        "trades.js",
+        "executions.js",
+        "alerts.js",
+        "trade_plans.js",
+        "cash_flows.js",
+        "notes.js",
+        "tickers.js",
+        "database.js",
+        "notification-system.js",
+        "logger-service.js",
+        "header-system.js",
+        "translation-utils.js",
+        "color-scheme-system.js",
+        "pagination-system.js",
+        "actions-menu-system.js",
+        "business-module.js",
+        "core-systems.js",
+        "ui-advanced.js",
+        "date-utils.js",
+        "preferences-ui.js",
+        "constraints.js",
+        "linked-items.js",
+        "external-data-settings-service.js"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "issue": "Duplicate functions found within files",
+      "count": 6,
+      "action": "Consolidate duplicate functions into single implementation",
+      "files": [
+        "trades.js",
+        "alerts.js",
+        "trade_plans.js",
+        "tickers.js"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "issue": "Local functions with global alternatives found",
+      "count": 12,
+      "action": "Replace local functions with global system functions for consistency",
+      "files": [
+        "core-systems.js",
+        "data-advanced.js"
+      ]
+    }
+  ]
+}

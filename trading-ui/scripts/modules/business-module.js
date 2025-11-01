@@ -1927,7 +1927,7 @@ window.validateTradeForm = validateTradeForm;              // ולידציה ש�
 
 // פונקציות עזר:
 window.loadModalData = loadModalData;                      // טעינת נתונים למודל
-window.loadEditModalData = loadEditTradeModalData;              // טעינת נתונים למודל עריכה
+// REMOVED: window.loadEditModalData = loadEditTradeModalData - loadEditTradeModalData removed, ModalManagerV2 handles modal data loading
 window.updateTickerFromTradePlan = updateTickerFromTradePlan; // עדכון טיקר מתוכנית
 window.updateTickersListForClosedTrades = updateTickersListForClosedTrades; // עדכון רשימת טיקרים
 // window.updateTickersForClosedTradesFilter = window.updateTickersForClosedTradesFilter;

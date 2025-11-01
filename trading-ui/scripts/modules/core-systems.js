@@ -875,94 +875,13 @@ async function initializeCacheSystem() {
     // Final verification and reporting - removed reportCacheSystemStatus call (not available as standalone function)
 }
 
-    // REMOVED: Duplicate manualInitialization - see line 532 for the unified version
-
-    /**
-     * Add custom initializer
-     */
-    addCustomInitializer(initializer) {
-        this.customInitializers.push(initializer);
-    }
-
-    /**
-     * Add error handler
-     */
-    addErrorHandler(handler) {
-        this.errorHandlers.push(handler);
-    }
-
-    /**
-     * Handle errors
-     */
-    handleError(error) {
-        console.error('❌ Unified App Initialization Error:', error);
-        
-        // Execute error handlers
-        for (const handler of this.errorHandlers) {
-            try {
-                handler(error);
-            } catch (handlerError) {
-                console.error('❌ Error handler failed:', handlerError);
-            }
-        }
-        
-        // Show user notification
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('❌ Application initialization failed', 'error');
-        }
-    }
-
-    /**
-     * Log success
-     */
-    logSuccess() {
-        console.log('🎉 Unified App Initialization Success!', {
-            page: this.pageInfo.name,
-            type: this.pageInfo.type,
-            systems: this.availableSystems.size,
-            totalTime: `${this.performanceMetrics.totalTime}ms`,
-            stages: this.performanceMetrics.stageTimes
-        });
-        
-        // Show success notification
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('✅ המערכת אותחלה בהצלחה', 'success');
-        }
-    }
-
-    /**
-     * Get initialization status
-     */
-    getStatus() {
-        return {
-            initialized: this.initialized,
-            inProgress: this.initializationInProgress,
-            pageInfo: this.pageInfo,
-            availableSystems: Array.from(this.availableSystems),
-            performanceMetrics: this.performanceMetrics,
-            customInitializers: this.customInitializers.length,
-            errorHandlers: this.errorHandlers.length
-        };
-    }
-
-    /**
-     * Reset for testing
-     */
-    reset() {
-        this.initialized = false;
-        this.initializationInProgress = false;
-        this.pageInfo = null;
-        this.availableSystems.clear();
-        this.performanceMetrics = {
-            startTime: null,
-            endTime: null,
-            stageTimes: {},
-            totalTime: 0
-        };
-        this.errorHandlers = [];
-        this.customInitializers = [];
-    }
-}
+// REMOVED: Orphaned methods - these are already part of UnifiedAppInitializer class (lines 14-703)
+// - addCustomInitializer (part of UnifiedAppInitializer class)
+// - addErrorHandler (part of UnifiedAppInitializer class)
+// - handleError (part of UnifiedAppInitializer class)
+// - logSuccess (part of UnifiedAppInitializer class)
+// - getStatus (part of UnifiedAppInitializer class)
+// - reset (part of UnifiedAppInitializer class)
 
 // ===== GLOBAL INSTANCE =====
 

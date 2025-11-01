@@ -1111,23 +1111,11 @@ async function confirmDeleteNote(noteId) {
     modal.hide();
   }
 
-  // Use unified deletion process with linked items check
-  await checkLinkedItemsAndDeleteNote(noteId);
+  // מחיקת ההערה
+  await deleteNoteFromServer(noteId);
 }
 
-/**
- * בדיקת מקושרים לפני מחיקת הערה
- * @param {number|string} noteId - מזהה ההערה
- */
-async function checkLinkedItemsAndDeleteNote(noteId) {
-  await window.checkLinkedItemsAndPerformAction('note', noteId, 'delete', performNoteDeletion);
-}
-
-/**
- * ביצוע המחיקה בפועל עם retry logic
- * @param {number|string} noteId - מזהה ההערה
- */
-async function performNoteDeletion(noteId) {
+async function deleteNoteFromServer(noteId) {
   // Clear cache before deletion to ensure fresh data after reload
   if (window.unifiedCacheManager) {
     await window.unifiedCacheManager.clearByPattern('notes-data');
@@ -1165,14 +1153,6 @@ async function performNoteDeletion(noteId) {
       }
     }
   }
-}
-
-/**
- * Legacy function - wrapper for backward compatibility
- * @deprecated Use checkLinkedItemsAndDeleteNote instead
- */
-async function deleteNoteFromServer(noteId) {
-  await checkLinkedItemsAndDeleteNote(noteId);
 }
 
 // פונקציות ולידציה
@@ -1226,8 +1206,6 @@ window.updateGridFromComponent = updateGridFromComponent;
 window.saveNote = saveNote;
 window.updateNoteFromModal = updateNoteFromModal;
 window.deleteNoteFromServer = deleteNoteFromServer;
-window.performNoteDeletion = performNoteDeletion;
-window.checkLinkedItemsAndDeleteNote = checkLinkedItemsAndDeleteNote;
 // window.showDeleteNoteModal = showDeleteNoteModal; // הוסר - שימוש במערכת הגלובלית
 window.confirmDeleteNote = confirmDeleteNote;
 window.onNoteRelationTypeChange = onNoteRelationTypeChange;

@@ -1039,20 +1039,98 @@ async function performTradeCancellation(tradeId) {
 /**
  * מחיקת טרייד - גרסה פשוטה
  */
-/**
- * בדיקת מקושרים לפני מחיקת טרייד
- * @param {number|string} tradeId - מזהה הטרייד
- */
-async function checkLinkedItemsAndDeleteTrade(tradeId) {
-  await window.checkLinkedItemsAndPerformAction('trade', tradeId, 'delete', performTradeDeletion);
-}
-
 async function deleteTradeRecord(tradeId) {
   try {
     window.Logger.info(`🗑️ deleteTradeRecord called for trade ${tradeId}`, { tradeId, page: 'trades' });
     
-    // Use unified deletion process with linked items check
-    await checkLinkedItemsAndDeleteTrade(tradeId);
+    // Get trade details for confirmation message
+    let tradeDetails = `עסקה #${tradeId}`;
+    const trade = window.tradesData?.find(t => t.id === tradeId || t.id === parseInt(tradeId));
+    
+    if (trade) {
+      // Build detailed trade info
+      const ticker = trade.ticker_symbol || trade.symbol || 'לא מוגדר';
+      const sideText = trade.side === 'buy' ? 'קנייה' : 
+                     trade.side === 'sell' ? 'מכירה' : 
+                     trade.side === 'Long' ? 'קנייה' :
+                     trade.side === 'Short' ? 'מכירה' : trade.side || 'לא מוגדר';
+      
+      // Get quantity from trade or position
+      let quantity = trade.quantity;
+      if (!quantity && trade.position && trade.position.quantity) {
+        quantity = trade.position.quantity;
+      }
+      quantity = quantity || '0';
+      
+      // Get entry price from trade or position
+      let entryPrice = trade.entry_price;
+      if (!entryPrice && trade.position && trade.position.average_price) {
+        entryPrice = trade.position.average_price;
+      }
+      entryPrice = entryPrice ? `$${entryPrice}` : 'לא מוגדר';
+      
+      const date = trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      
+      tradeDetails = `${ticker} - ${sideText}, ${quantity} יחידות ב-${entryPrice}, תאריך פתיחה: ${date}`;
+    }
+    
+    // Check linked items first (Executions, Notes, Alerts)
+    window.Logger.info('🔍 Checking for linked items before deletion', { tradeId, page: 'trades' });
+    if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+      window.Logger.info('✅ checkLinkedItemsBeforeAction function exists', { tradeId, page: 'trades' });
+      const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade', tradeId, 'delete');
+      window.Logger.info(`🔍 Linked items check result: hasLinkedItems=${hasLinkedItems}`, { tradeId, page: 'trades' });
+      if (hasLinkedItems) {
+        window.Logger.info('🚫 Trade has linked items, deletion cancelled', { tradeId, page: 'trades' });
+        return;
+      }
+    } else {
+      window.Logger.warn('⚠️ checkLinkedItemsBeforeAction function not available', { tradeId, page: 'trades' });
+    }
+
+    // Show delete warning with detailed information
+    if (typeof window.showDeleteWarning === 'function') {
+      window.showDeleteWarning('trade', tradeDetails, 'עסקה',
+        async () => {
+          // User confirmed - perform deletion
+          await performTradeDeletion(tradeId);
+        },
+        () => {
+          // User cancelled - do nothing
+        },
+      );
+    } else {
+      // Fallback in case global system not available
+      if (typeof window.showConfirmationDialog === 'function') {
+        const confirmed = await new Promise(resolve => {
+          window.showConfirmationDialog(
+            'מחיקת טרייד',
+            'האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.',
+            () => resolve(true),
+            () => resolve(false),
+          );
+        });
+        if (!confirmed) {return;}
+      } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+          const confirmed = await new Promise(resolve => {
+            window.showConfirmationDialog(
+              'מחיקת טרייד',
+              'האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.',
+              () => resolve(true),
+              () => resolve(false),
+            );
+          });
+          if (!confirmed) {return;}
+        } else {
+          // Fallback למקרה שמערכת התראות לא זמינה
+          if (!window.window.showConfirmationDialog('אישור', 'האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+            return;
+          }
+        }
+      }
+      await performTradeDeletion(tradeId);
+    }
 
   } catch (error) {
     if (typeof handleDeleteError === 'function') {
@@ -3210,5 +3288,4 @@ window.showEditTradeModal = function(tradeId) {
 window.saveTrade = saveTrade;
 window.deleteTrade = deleteTrade;
 window.performTradeDeletion = performTradeDeletion;
-window.checkLinkedItemsAndDeleteTrade = checkLinkedItemsAndDeleteTrade;
 

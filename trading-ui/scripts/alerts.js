@@ -1743,14 +1743,22 @@ async function confirmDeleteAlert(alertId) {
   // window.Logger.info('🔄 confirmDeleteAlert נקראה עבור ID:', alertId, { page: "alerts" });
 
   try {
-    // Use unified deletion process with linked items check
-    if (window.checkLinkedItemsAndDeleteAlert) {
-      await window.checkLinkedItemsAndDeleteAlert(alertId);
-    } else if (window.performAlertDeletion) {
-      // Fallback if checkLinkedItemsAndDeleteAlert not available
+    // Use performAlertDeletion which handles cache clearing
+    if (window.performAlertDeletion) {
       await window.performAlertDeletion(alertId);
     } else {
-      CRUDResponseHandler.handleError(new Error('Deletion functions not available'), 'מחיקת התראה');
+      // Fallback if performAlertDeletion not available
+      const response = await fetch(`/api/alerts/${alertId}`, {
+        method: 'DELETE',
+      });
+
+      await CRUDResponseHandler.handleDeleteResponse(response, {
+        successMessage: 'התראה נמחקה בהצלחה!',
+        apiUrl: '/api/alerts/',
+        entityName: 'התראה',
+        reloadFn: window.loadAlertsData,
+        requiresHardReload: false
+      });
     }
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'מחיקת התראה');

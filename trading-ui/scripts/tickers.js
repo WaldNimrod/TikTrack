@@ -1364,34 +1364,76 @@ async function performTickerDeletion(tickerId) {
       await window.unifiedCacheManager.clearByPattern('market-data');
     }
 
-    // Send delete request
+    // שליחה לשרת
     const response = await fetch(`/api/tickers/${tickerId}`, {
       method: 'DELETE',
     });
 
-    // Use CRUDResponseHandler for consistent response handling
-    await CRUDResponseHandler.handleDeleteResponse(response, {
-      successMessage: 'טיקר נמחק בהצלחה',
-      entityName: 'טיקר',
-      reloadFn: async () => {
-        // Reload tickers data
-        if (window.loadTickersData) {
-          await window.loadTickersData();
-        }
-        // Update active trades field if function exists
-        if (window.updateActiveTradesField) {
-          window.updateActiveTradesField();
-        }
-        // Call onTickerDeleted callback if exists
+    // השתמש במערכת הגלובלית החדשה
+    const handled = await window.handleApiResponseWithRefresh(response, {
+      loadDataFunction: window.loadTickersData,
+      updateActiveFieldsFunction: window.updateActiveTradesField,
+      operationName: 'מחיקה',
+      itemName: 'הטיקר',
+      successMessage: 'הטיקר נמחק בהצלחה',
+      onSuccess: () => {
         if (typeof window.onTickerDeleted === 'function') {
           window.onTickerDeleted(tickerId);
         }
-      },
-      requiresHardReload: false
+      }
     });
 
+    if (!handled) {
+      const errorResponse = await response.text();
+
+      try {
+        const errorData = JSON.parse(errorResponse);
+
+        // בדיקה אם השגיאה קשורה לפריטים מקושרים
+        if (errorData.error && errorData.error.message &&
+                    (errorData.error.message.includes('linked items') ||
+                        errorData.error.message.includes('Cannot delete ticker with linked items'))) {
+
+          // הצגת אזהרת פריטים מקושרים
+          if (window.showLinkedItemsModal) {
+            try {
+              const response = await fetch(`/api/linked-items/ticker/${tickerId}`);
+              if (response.ok) {
+                const data = await response.json();
+                window.showLinkedItemsModal(data, 'ticker', tickerId);
+              } else {
+                throw new Error('Failed to load linked items data');
+              }
+            } catch (error) {
+              handleApiError(error, 'פריטים מקושרים');
+            }
+          } else {
+            if (window.showErrorNotification) {
+              window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק טיקר זה - יש פריטים מקושרים אליו');
+            }
+          }
+          return;
+        }
+
+        // שגיאה אחרת
+        handleApiError('שגיאה במחיקת טיקר', errorResponse);
+        if (window.showErrorNotification) {
+          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת הטיקר: ' + errorData.error.message);
+        }
+
+      } catch {
+        handleApiError('שגיאה במחיקת טיקר', errorResponse);
+        if (window.showErrorNotification) {
+          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת הטיקר');
+        }
+      }
+    }
+
   } catch (error) {
-    CRUDResponseHandler.handleError(error, 'מחיקת טיקר');
+    handleSystemError(error, 'ביצוע מחיקת טיקר');
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת הטיקר');
+    }
   }
 }
 

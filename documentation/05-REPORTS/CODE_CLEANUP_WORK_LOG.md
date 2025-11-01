@@ -169,6 +169,11 @@
 | hexToRgb | ui-advanced.js | 2 (שורה 353, 1375) | שורה 353 | שורות 1370-1382 | 1.11.2025 | שתי הגדרות זהות - הוסרה השנייה |
 | getInvestmentTypeTextColor | ui-advanced.js | 2 (שורה 569, 596) | שורה 567 | שורות 562-571 | 1.11.2025 | wrapper פשוט הוסר - נשארה ההגדרה המלאה |
 | getInvestmentTypeBorderColor | ui-advanced.js | 2 (שורה 580, 612) | שורה 605 | שורות 562-571 | 1.11.2025 | wrapper פשוט הוסר - נשארה ההגדרה המלאה |
+| deleteTradingAccount | trading_accounts.js | 2 (שורה 1057, 2359) | שורה 2359 | שורות 1052-1150 | 1.11.2025 | הגדרה ישנה הוסרה - נשארה החדשה עם CRUDResponseHandler |
+| performTradingAccountDeletion | trading_accounts.js | 2 (שורה 1860, 2413) | שורה 2413 | שורות 1857-1927 | 1.11.2025 | הגדרה ישנה הוסרה - נשארה החדשה עם CRUDResponseHandler |
+| "if" statements | trade_plans.js | 2 (שורה 581, 1859) | - | - | 1.11.2025 | False Positive - statements רגילים, לא פונקציות |
+| updatePricesFromPercentages | trade_plans.js | 2 (שורה 1638, 1732) | שתיהן | - | 1.11.2025 | Arrow functions מקומיים בשתי פונקציות שונות (add/edit) - לא כפילות אמיתית |
+| updatePercentagesFromPrices | trade_plans.js | 2 (שורה 1660, 1754) | שתיהן | - | 1.11.2025 | Arrow functions מקומיים בשתי פונקציות שונות (add/edit) - לא כפילות אמיתית |
 
 ---
 

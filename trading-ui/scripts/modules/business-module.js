@@ -1918,7 +1918,7 @@ window.performTradeCancellation = performTradeCancellation;  // ביצוע בי�
 // REMOVED: window.showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', id) directly
 window.disableTradeFormFields = disableTradeFormFields;    // ניטרול שדות טופס
 window.enableTradeFormFields = enableTradeFormFields;      // הפעלת שדות טופס
-window.saveEditTrade = saveEditTradeData;                      // שמירת עריכת טרייד
+// REMOVED: window.saveEditTrade = saveEditTradeData - saveEditTradeData removed, ModalManagerV2 handles saving
 window.saveNewTradeRecord = saveNewTradeRecord;            // שמירת טרייד חדש
 
 // פונקציות ולידציה:

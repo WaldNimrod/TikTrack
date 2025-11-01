@@ -874,32 +874,6 @@ async function initializeCacheSystem() {
     
     // Final verification and reporting - removed reportCacheSystemStatus call (not available as standalone function)
 }
-    
-    /**
-     * Report cache system status
-     */
-    reportCacheSystemStatus() {
-        console.log('📊 Cache System Status:');
-        console.log('================================');
-        
-        if (window.UnifiedCacheManager) {
-            const status = window.UnifiedCacheManager.initialized ? '✅ Ready' : '⚠️ Not Initialized';
-            console.log(`UnifiedCacheManager: ${status}`);
-        } else {
-            console.log('UnifiedCacheManager: ❌ Not Available');
-        }
-        
-        console.log('================================');
-        
-        // Cache system is ready if UnifiedCacheManager is initialized
-        window.cacheSystemReady = window.UnifiedCacheManager?.initialized || false;
-        
-        if (window.cacheSystemReady) {
-            console.log('✅ Cache system ready (4-layer architecture)');
-        } else {
-            console.log('⚠️ Cache system not ready - using localStorage fallback');
-        }
-    }
 
     // REMOVED: Duplicate manualInitialization - see line 532 for the unified version
 

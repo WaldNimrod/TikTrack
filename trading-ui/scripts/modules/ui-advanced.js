@@ -560,28 +560,6 @@ function getInvestmentTypeBackgroundColorWrapper3(investmentType) {
 }
 
 /**
- * קבלת צבע טקסט לסוג השקעה
- * Get text color for investment type
- *
- * @param {string} investmentType - סוג ההשקעה
- * @returns {string} קוד הצבע
- */
-function getInvestmentTypeTextColor(investmentType) {
-  return getInvestmentTypeColor(investmentType, 'medium');
-}
-
-/**
- * קבלת צבע גבול לסוג השקעה
- * Get border color for investment type
- *
- * @param {string} investmentType - סוג ההשקעה
- * @returns {string} קוד הצבע
- */
-function getInvestmentTypeBorderColor(investmentType) {
-  return getInvestmentTypeColor(investmentType, 'border');
-}
-
-/**
  * קבלת צבע רקע לסוג השקעה (תאימות לאחור) - removed duplicate
  * Get background color for investment type (backward compatibility)
  */
@@ -1390,20 +1368,6 @@ function resetEntityColors() {
 }
 
 /**
- * המרת hex ל-RGB
- * @param {string} hex - ערך hex
- * @returns {Object|null} אובייקט RGB או null אם לא תקין
- */
-function hexToRgb(hex) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16),
-  } : null;
-}
-
-/**
  * קבלת צבע ניגוד לצבע נתון
  * @param {string} hexColor - צבע hex
  * @returns {string} צבע ניגוד (שחור או לבן)
@@ -1642,6 +1606,13 @@ function updateCSSVariablesFromPreferences(preferences) {
         document.documentElement.style.setProperty('--entity-trade-plan-bg', preferences.entityTradePlanColorLight || '#d4edda');
         document.documentElement.style.setProperty('--entity-trade-plan-text', preferences.entityTradePlanColorDark || '#155724');
         document.documentElement.style.setProperty('--entity-trade-plan-border', preferences.entityTradePlanColorDark || '#155724');
+      }
+      
+      if (preferences.entityPreferencesColor) {
+        document.documentElement.style.setProperty('--entity-preference-color', preferences.entityPreferencesColor);
+        document.documentElement.style.setProperty('--entity-preference-bg', preferences.entityPreferencesColorLight || 'rgba(173, 181, 189, 0.1)');
+        document.documentElement.style.setProperty('--entity-preference-text', preferences.entityPreferencesColorDark || '#6c757d');
+        document.documentElement.style.setProperty('--entity-preference-border', preferences.entityPreferencesColorDark || '#6c757d');
       }
 
       // עדכון צבעי גרפים
@@ -1901,6 +1872,12 @@ function updateCSSVariablesFromPreferences(preferences) {
       document.documentElement.style.setProperty('--entity-note-text', preferences.entityNoteColorDark || '#89840a');
       document.documentElement.style.setProperty('--entity-note-border', `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 196}, ${hexToRgb(preferences.entityNoteColor)?.g || 188}, ${hexToRgb(preferences.entityNoteColor)?.b || 0}, 0.3)`);
     }
+    if (preferences.entityPreferencesColor) {
+      document.documentElement.style.setProperty('--entity-preference-color', preferences.entityPreferencesColor);
+      document.documentElement.style.setProperty('--entity-preference-bg', preferences.entityPreferencesColorLight || 'rgba(173, 181, 189, 0.1)');
+      document.documentElement.style.setProperty('--entity-preference-text', preferences.entityPreferencesColorDark || '#6c757d');
+      document.documentElement.style.setProperty('--entity-preference-border', `rgba(${hexToRgb(preferences.entityPreferencesColor)?.r || 173}, ${hexToRgb(preferences.entityPreferencesColor)?.g || 181}, ${hexToRgb(preferences.entityPreferencesColor)?.b || 189}, 0.3)`);
+    }
 
     // console.log('🎨 צבעים מעודכנים:', {
     //   primary: preferences.primaryColor,
@@ -1964,11 +1941,15 @@ async function loadColorPreferences() {
           const bodyClass = document.body.className;
           if (bodyClass) {
             const entityType = bodyClass.split(' ').find(cls => 
-              ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page'].includes(cls)
+              ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
             );
             
             if (entityType) {
-              const entity = entityType.replace('-page', '').replace('tickers', 'ticker');
+              let entity = entityType.replace('-page', '').replace('tickers', 'ticker');
+              // תיקון שמות ישויות לפורמט יחיד
+              if (entity === 'preferences') entity = 'preference';
+              else if (entity === 'cash-flows') entity = 'cash_flow';
+              else if (entity === 'trade-plans') entity = 'trade_plan';
               if (ENTITY_COLORS[entity]) {
                 applyEntityColorsToHeaders(entity);
               }
@@ -2005,7 +1986,7 @@ async function loadColorPreferences() {
       const bodyClass = document.body.className;
       if (bodyClass) {
         const entityType = bodyClass.split(' ').find(cls => 
-          ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page'].includes(cls)
+          ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
         );
         
         if (entityType) {
@@ -2015,10 +1996,11 @@ async function loadColorPreferences() {
           else if (type === 'trades') type = 'trade';
           else if (type === 'accounts') type = 'account';
           else if (type === 'alerts') type = 'alert';
-          else if (type === 'cash-flows') type = 'cash-flow';
+          else if (type === 'cash-flows') type = 'cash_flow';
           else if (type === 'notes') type = 'note';
-          else if (type === 'trade-plans') type = 'trade-plan';
+          else if (type === 'trade-plans') type = 'trade_plan';
           else if (type === 'executions') type = 'execution';
+          else if (type === 'preferences') type = 'preference';
           
           if (window.applyEntityColorsToHeaders) {
             setTimeout(() => {
@@ -2148,7 +2130,8 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
           cash_flow: prefs.entityCashFlowColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-cash-flow-color') || '#d4a574',
           ticker: prefs.entityTickerColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color') || '#229954',
           alert: prefs.entityAlertColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-alert-color') || '#e67e22',
-          note: prefs.entityNoteColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-note-color') || '#a29bfe'
+          note: prefs.entityNoteColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-note-color') || '#a29bfe',
+          preference: prefs.entityPreferencesColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-preference-color') || '#adb5bd'
         };
         Object.entries(entityMap).forEach(([k, v]) => {
           const val = String(v).trim();

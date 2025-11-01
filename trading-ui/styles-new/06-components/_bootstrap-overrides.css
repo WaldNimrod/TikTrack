@@ -82,6 +82,19 @@
     color: white;
 }
 
+.btn[data-button-type="BACK"] {
+    border-color: var(--current-entity-color-dark, var(--color-action-cancel));
+    color: var(--current-entity-color-dark, var(--color-action-cancel));
+    --current-button-color: var(--current-entity-color-dark, var(--color-action-cancel));
+    --current-button-hover: var(--current-entity-color-dark, var(--color-action-cancel));
+    background: transparent;
+}
+.btn[data-button-type="BACK"]:hover {
+    background-color: var(--current-entity-color-dark, var(--color-action-cancel));
+    color: white;
+    border-color: var(--current-entity-color-dark, var(--color-action-cancel));
+}
+
 .btn[data-button-type="REFRESH"] {
     border-color: var(--color-action-refresh);
     color: var(--color-action-refresh);

@@ -167,7 +167,9 @@ class UnifiedCacheManager {
             'market-data': { layer: 'backend', ttl: 30000, compress: false },
             'trade-data': { layer: 'backend', ttl: 30000, compress: false },
             'dashboard-data': { layer: 'backend', ttl: 300000, compress: false },
-            'trade-positions': { layer: 'memory', ttl: 300000, compress: false, maxSize: 500 * 1024, validate: true, syncToBackend: false }
+            'trade-positions': { layer: 'memory', ttl: 300000, compress: false, maxSize: 500 * 1024, validate: true, syncToBackend: false },
+            'account-activity-data': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
+            'account-activity-*': { layer: 'backend', ttl: 60000, compress: false }
         };
         
         // ממשקי שכבות מטמון
@@ -1578,16 +1580,19 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             errors.push(`Unified Cache: ${error.message}`);
         }
         
-        // 1.5. Clear Preferences Cache Manager
+        // 1.5. Clear Preferences Cache (PreferencesCore uses UnifiedCacheManager, so already cleared above)
+        // PreferencesCore no longer has its own cacheManager - it uses UnifiedCacheManager directly
+        // All preference cache keys are prefixed with 'preference_' and are already cleared in step 1
+        // No need to clear PreferencesCore.cacheManager because it doesn't exist anymore
         try {
-            if (window.PreferencesCore && window.PreferencesCore.cacheManager) {
-                window.PreferencesCore.cacheManager.clear();
-                clearedLayers.push('Preferences Cache Manager');
-                window.Logger.info('✅ Preferences Cache Manager cleared successfully', { page: "unified-cache-manager" });
+            // Just log that preferences cache is cleared via UnifiedCacheManager
+            if (window.PreferencesCore) {
+                clearedLayers.push('Preferences Cache (via UnifiedCacheManager)');
+                window.Logger.info('✅ Preferences cache cleared via UnifiedCacheManager', { page: "unified-cache-manager" });
             }
         } catch (error) {
-            window.Logger.error('❌ Error clearing Preferences Cache Manager:', error, { page: "unified-cache-manager" });
-            errors.push(`Preferences Cache Manager: ${error.message}`);
+            window.Logger.error('❌ Error logging preferences cache clear:', error, { page: "unified-cache-manager" });
+            // Don't add to errors - this is just logging
         }
         
         // 2. Clear localStorage (only our keys)

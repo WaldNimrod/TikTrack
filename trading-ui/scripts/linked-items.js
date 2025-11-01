@@ -550,17 +550,46 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
  *
  * Generates HTML for displaying a list of linked items with
  * detailed information and action buttons for each item.
+ * 
+ * מעודכן להשתמש ב-LinkedItemsService ללוגיקה משותפת
  *
  * @param {Array} items - Array of linked items
+ * @param {string} mode - Mode ('view' or 'warningBlock')
  * @returns {string} HTML content for the linked items list
  */
 function createLinkedItemsList(items, mode = 'view') {
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return '<div class="linked-items-list"></div>';
+  }
+  
+  // מיון פריטים באמצעות LinkedItemsService
+  const sortedItems = (window.LinkedItemsService && window.LinkedItemsService.sortLinkedItems)
+    ? window.LinkedItemsService.sortLinkedItems(items)
+    : items; // Fallback אם Service לא זמין
+
   let listHtml = '<div class="linked-items-list">';
 
-  items.forEach(item => {
-    const icon = getItemTypeIcon(item.type);
-    const displayName = getItemTypeDisplayName(item.type);
-    const basicInfo = createBasicItemInfo(item);
+  sortedItems.forEach(item => {
+    // קבלת איקון - LinkedItemsService מחזיר נתיב, צריך ליצור HTML
+    const iconPath = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemIcon)
+      ? window.LinkedItemsService.getLinkedItemIcon(item.type)
+      : '/images/icons/home.svg'; // Fallback
+    const icon = `<img src="${iconPath}" alt="${item.type}" class="linked-item-icon-img" width="48" height="48">`;
+    
+    // קבלת שם תצוגה - שימוש ב-LinkedItemsService
+    const displayName = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
+      ? window.LinkedItemsService.getEntityLabel(item.type)
+      : getItemTypeDisplayName(item.type); // Fallback
+    
+    // פורמט שם פריט - שימוש ב-LinkedItemsService
+    const formattedName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
+      ? window.LinkedItemsService.formatLinkedItemName(item)
+      : (item.description || item.title || item.name || `אלמנט ${item.id}`); // Fallback
+    
+    // מידע בסיסי - שילוב של שם מעוצב + תאריך
+    const createdAt = item.created_at ? new Date(item.created_at).toLocaleDateString('he-IL') : '';
+    const basicInfo = `${formattedName}${createdAt ? ` | נוצר: ${createdAt}` : ''}`;
+    
     const statusBadge = getStatusBadge(item.status);
 
     listHtml += `
@@ -572,30 +601,23 @@ function createLinkedItemsList(items, mode = 'view') {
           </div>
         </div>
         <div class="linked-item-col">
-          <div class="linked-item-title">${item.title || `אלמנט ${item.id}`}</div>
-          <div class="linked-item-description">${item.description || 'אין תיאור'} (מזהה: ${item.id})</div>
+          <div class="linked-item-title">${formattedName}</div>
+          <div class="linked-item-description">${item.description || item.title || 'אין תיאור'} (מזהה: ${item.id})</div>
           <div class="linked-item-status">${statusBadge}</div>
         </div>
         <div class="linked-item-col">
           <div class="linked-item-basic-details">${basicInfo}</div>
           ${mode === 'warningBlock' ? '' : `
           <div class="linked-item-actions">
-            <div class="btn-group btn-group-sm" role="group">
-              <button class="btn" 
-                      onclick="viewItemDetails('${item.type}', ${item.id})" 
-                      title="צפה בפרטים">
-                👁️
-              </button>
-              <button class="btn" onclick="editItem('${item.type}', ${item.id})" title="ערוך">
-                ✏️
-              </button>
-              <button class="btn" onclick="openItemPage('${item.type}', ${item.id})" title="פתח דף">
-                🔗
-              </button>
-              <button class="btn" onclick="deleteItem('${item.type}', ${item.id})" title="מחק">
-                🗑️
-              </button>
-            </div>
+            ${(window.LinkedItemsService && window.LinkedItemsService.generateLinkedItemActions)
+              ? window.LinkedItemsService.generateLinkedItemActions(item, 'modal', {
+                  sourceInfo: {
+                    sourceModal: 'linked-items',
+                    sourceType: itemType || item.type,
+                    sourceId: itemId || item.id
+                  }
+                })
+              : _generateLinkedItemActionsFallback(item)} 
           </div>
           `}
         </div>
@@ -605,6 +627,34 @@ function createLinkedItemsList(items, mode = 'view') {
 
   listHtml += '</div>';
   return listHtml;
+}
+
+/**
+ * Fallback method for generating linked item actions if LinkedItemsService is not available
+ * 
+ * @private
+ * @param {Object} item - פריט מקושר
+ * @returns {string} - HTML של כפתורים
+ */
+function _generateLinkedItemActionsFallback(item) {
+  return `
+    <div class="btn-group btn-group-sm" role="group">
+      <button class="btn" 
+              onclick="viewItemDetails('${item.type}', ${item.id})" 
+              title="צפה בפרטים">
+        👁️
+      </button>
+      <button class="btn" onclick="editItem('${item.type}', ${item.id})" title="ערוך">
+        ✏️
+      </button>
+      <button class="btn" onclick="openItemPage('${item.type}', ${item.id})" title="פתח דף">
+        🔗
+      </button>
+      <button class="btn" onclick="deleteItem('${item.type}', ${item.id})" title="מחק">
+        🗑️
+      </button>
+    </div>
+  `;
 }
 
 /**
@@ -908,11 +958,19 @@ function getItemTypeIcon(type) {
  * Get display name for item type
  *
  * Returns a human-readable display name for each item type
+ * 
+ * מעודכן להשתמש ב-LinkedItemsService ללוגיקה משותפת
  *
  * @param {string} type - Item type
  * @returns {string} Display name
  */
 function getItemTypeDisplayName(type) {
+  // שימוש ב-LinkedItemsService אם זמין
+  if (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) {
+    return window.LinkedItemsService.getEntityLabel(type);
+  }
+  
+  // Fallback אם Service לא זמין
   const names = {
     'trade': 'טרייד',
     'account': 'חשבון מסחר',
@@ -930,16 +988,23 @@ function getItemTypeDisplayName(type) {
  * Create basic item info for display
  *
  * Creates a simple string with basic information about the item
+ * 
+ * מעודכן להשתמש ב-LinkedItemsService ללוגיקה משותפת
  *
  * @param {Object} item - Item data
  * @returns {string} Basic info string
  */
 function createBasicItemInfo(item) {
+  // פורמט שם פריט - שימוש ב-LinkedItemsService
+  const formattedName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
+    ? window.LinkedItemsService.formatLinkedItemName(item)
+    : (item.description || item.title || item.name || `אלמנט ${item.id}`); // Fallback
+  
   // השתמש בנתונים שמגיעים מהשרת
   const status = item.status || 'לא מוגדר';
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
 
-  return `סטטוס: ${status} | נוצר: ${createdAt}`;
+  return `${formattedName} | סטטוס: ${status} | נוצר: ${createdAt}`;
 }
 
 /**
@@ -1356,9 +1421,59 @@ function downloadCSV(csvContent, filename) {
  * @param {string} type - Item type
  * @param {string|number} id - Item ID
  */
+/**
+ * View item details - צפייה בפרטי פריט מקושר
+ * 
+ * פותח modal של entity details עם המידע של הפריט המקושר.
+ * מעדכן את מערכת הניווט כדי לוודא שהמידע מועבר נכון בין מודולים מקוננים.
+ * 
+ * @param {string} type - סוג הפריט
+ * @param {number|string} id - מזהה הפריט
+ */
 function viewItemDetails(type, id) {
-  // Viewing details
-  // Implementation for viewing item details
+  try {
+    // וידוא ש-showEntityDetails זמין
+    if (window.showEntityDetails) {
+      // שמירת הקשר למודול המקור (linked items) במערכת הניווט
+      if (window.modalNavigationManager && window.modalNavigationManager.modalHistory.length > 0) {
+        const currentModal = window.modalNavigationManager.modalHistory[window.modalNavigationManager.modalHistory.length - 1];
+        if (currentModal && currentModal.info) {
+          // שמירת מידע על המודול המקור
+          const sourceInfo = {
+            sourceModal: 'linked-items',
+            sourceType: currentModal.info.entityType,
+            sourceId: currentModal.info.entityId
+          };
+          
+          // פתיחת entity details modal עם מידע על המקור
+          window.showEntityDetails(type, id, {
+            source: sourceInfo,
+            includeLinkedItems: true // תמיד לכלול פריטים מקושרים במודול החדש
+          });
+        } else {
+          // אם אין מידע על המקור, פתיחה רגילה
+          window.showEntityDetails(type, id, {
+            includeLinkedItems: true
+          });
+        }
+      } else {
+        // אם אין modal navigation manager, פתיחה רגילה
+        window.showEntityDetails(type, id, {
+          includeLinkedItems: true
+        });
+      }
+    } else {
+      window.Logger?.warn('showEntityDetails not available', { page: "linked-items" });
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה: לא ניתן לפתוח פרטי ישות - המערכת לא זמינה');
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error in viewItemDetails:', error, { page: "linked-items" });
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה בפתיחת פרטי הישות');
+    }
+  }
 }
 
 /**

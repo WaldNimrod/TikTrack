@@ -64,7 +64,7 @@
  * ============================================
  *
  * 1. BASE (13 scripts) - חובה לכל עמוד
- * 2. SERVICES (5 scripts) - שירותים כלליים
+ * 2. SERVICES (6 scripts) - שירותים כלליים
  * 3. UI-ADVANCED (3 scripts) - ממשק מתקדם
  * 4. CRUD (6 scripts) - עמודים עם טבלאות
  * 5. PREFERENCES (3 scripts) - העדפות
@@ -260,6 +260,13 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.AlertConditionRenderer',
         description: 'מציג תנאי התראות',
         required: false
+      },
+      {
+        file: 'services/linked-items-service.js',
+        globalCheck: 'window.LinkedItemsService',
+        description: 'שירות לוגיקה משותפת לפריטים מקושרים',
+        required: true,
+        loadOrder: 7
       }
     ],
     estimatedSize: '~120KB',
@@ -379,10 +386,18 @@ const PACKAGE_MANIFEST = {
         required: true
       },
       {
+        file: 'modal-navigation-manager.js',
+        globalCheck: 'window.modalNavigationManager',
+        description: 'מערכת ניווט מודולים מקוננים',
+        required: true,
+        loadOrder: 1
+      },
+      {
         file: 'modal-manager-v2.js',
         globalCheck: 'window.ModalManagerV2',
         description: 'מנהל מודלים V2',
-        required: true
+        required: true,
+        loadOrder: 2
       }
     ],
     estimatedSize: '~250KB',

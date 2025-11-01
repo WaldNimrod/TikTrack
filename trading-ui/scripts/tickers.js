@@ -205,11 +205,11 @@ function _REMOVED_refreshTickerData(tickerId) {
       }
       return response.json();
     })
-    .then(data => {
+    .then(async data => {
       window.Logger.info('✅ נתוני טיקר רוענו:', data, { page: "tickers" });
       
       // רענון הטבלה
-      loadTickersData();
+      await loadTickersData();
       
       // הודעת הצלחה
       if (typeof window.showSuccessNotification === 'function') {
@@ -1809,9 +1809,49 @@ window.cancelTicker = cancelTicker;
 window.performCancelTicker = performCancelTicker;
 window.updateAllTickerStatuses = updateAllTickerStatuses;
 // window.toggleSection removed - using global version from ui-utils.js
-window.toggleTickersSection = toggleTickersSection;
+// Wrapper function for backward compatibility - uses global toggleSection
+window.toggleTickersSection = function() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('tickers');
+    } else {
+        console.error('toggleSection not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת הסתרת סקשנים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
 window.restoreTickersSectionState = restoreTickersSectionState;
-window.clearTickersCache = clearTickersCache;
+// Wrapper function for backward compatibility - uses UnifiedCacheManager
+window.clearTickersCache = async function() {
+    // Clear tickers data from memory
+    if (window.tickersData) {
+        window.tickersData = [];
+    }
+    
+    // Use UnifiedCacheManager if available
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clear === 'function') {
+        try {
+            // Clear cache related to tickers
+            await window.UnifiedCacheManager.clear('all', { 
+                pattern: /ticker|tickers/i 
+            });
+            if (window.Logger) {
+                window.Logger.info('✅ Tickers cache cleared via UnifiedCacheManager', { page: "tickers" });
+            }
+        } catch (error) {
+            console.warn('Failed to clear cache via UnifiedCacheManager:', error);
+            // Fallback to window.clearAllCache if available
+            if (typeof window.clearAllCache === 'function') {
+                await window.clearAllCache();
+            }
+        }
+    } else if (typeof window.clearAllCache === 'function') {
+        // Fallback to global clearAllCache
+        await window.clearAllCache();
+    } else {
+        console.warn('No cache clearing system available');
+    }
+};
 
 // פונקציות נתונים חיצוניים
 window.refreshYahooFinanceData = refreshYahooFinanceData;
@@ -1971,7 +2011,9 @@ async function loadColorsAndApplyToHeaders() {
   restoreSortState();
 
   // טעינת נתוני טיקרים
-  loadTickersData();
+  (async () => {
+    await loadTickersData();
+  })();
 // });
 
 // אתחול נוסף כשהדף נטען לחלוטין
@@ -2000,14 +2042,18 @@ window.addEventListener('load', function () {
     if (tbody) {
       // נמצא tbody, טוען נתונים
       // קורא ל-loadTickersData
-      loadTickersData();
+      (async () => {
+        await loadTickersData();
+      })();
     } else if (attempts < maxAttempts) {
       attempts++;
       setTimeout(tryLoadData, 500);
     } else {
       handleElementNotFound('tryLoadData', 'לא הצלחתי למצוא את הטבלה אחרי 10 ניסיונות');
       // מנסה לטעון נתונים בכל מקרה
-      loadTickersData();
+      (async () => {
+        await loadTickersData();
+      })();
     }
   }
 

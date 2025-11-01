@@ -310,7 +310,17 @@ window.deleteCurrency = deleteCurrency;
 window.showDeleteCurrencyModal = showDeleteCurrencyModal;
 window.confirmDeleteCurrency = confirmDeleteCurrency;
 window.checkLinkedItemsBeforeDelete = checkLinkedItemsBeforeDelete;  // בדיקת אובייקטים מקושרים למחיקה
-window.toggleCurrenciesSection = toggleCurrenciesSection;
+// Wrapper function for backward compatibility - uses global toggleSection
+window.toggleCurrenciesSection = function() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('currencies');
+    } else {
+        console.error('toggleSection not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת הסתרת סקשנים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
 window.restoreCurrenciesSectionState = restoreCurrenciesSectionState;
 window.renderCurrenciesTable = renderCurrenciesTable;
 window.updatePageSummaryStats = updatePageSummaryStats;

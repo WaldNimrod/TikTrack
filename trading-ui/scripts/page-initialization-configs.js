@@ -727,27 +727,51 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                window.Logger.info('📝 Initializing Notes...', { page: "page-initialization-configs" });
-                window.Logger.info('🔍 Checking loadNotesData availability:', typeof window.loadNotesData, { page: "page-initialization-configs" });
+                console.log('📝 [page-initialization-configs] Notes customInitializer started');
                 
-                // Deferred initialization with retries
-                let retries = 10;
-                while (retries > 0 && typeof window.loadNotesData !== 'function') {
-                    window.Logger.info(`⏳ Waiting for loadNotesData... (${retries} retries left)`, { page: "page-initialization-configs" });
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    retries--;
-                }
-                
-                if (typeof window.loadNotesData === 'function') {
-                    window.Logger.info('✅ loadNotesData found, calling...', { page: "page-initialization-configs" });
-                    try {
-                        await window.loadNotesData();
-                        window.Logger.info('✅ loadNotesData completed', { page: "page-initialization-configs" });
-                    } catch (error) {
-                        window.Logger.error('❌ Error in loadNotesData:', error, { page: "page-initialization-configs" });
+                // Use general system getPageDataFunctions() instead of local code
+                if (typeof window.getPageDataFunctions === 'function') {
+                    console.log('✅ [page-initialization-configs] getPageDataFunctions found');
+                    const { loadData } = window.getPageDataFunctions();
+                    console.log('🔍 [page-initialization-configs] loadData type:', typeof loadData);
+                    
+                    if (loadData && typeof loadData === 'function') {
+                        console.log('📝 [page-initialization-configs] Initializing Notes via general system...');
+                        try {
+                            await loadData();
+                            console.log('✅ [page-initialization-configs] Notes data loaded successfully');
+                        } catch (error) {
+                            console.error('❌ [page-initialization-configs] Error loading notes data:', error);
+                        }
+                    } else {
+                        console.warn('⚠️ [page-initialization-configs] loadData is not a function, trying fallback...');
+                        // Fallback to direct function call if general system doesn't have it
+                        if (typeof window.loadNotesData === 'function') {
+                            console.log('📝 [page-initialization-configs] Initializing Notes (fallback to loadNotesData)...');
+                            try {
+                                await window.loadNotesData();
+                                console.log('✅ [page-initialization-configs] Notes data loaded successfully (fallback)');
+                            } catch (error) {
+                                console.error('❌ [page-initialization-configs] Error in loadNotesData:', error);
+                            }
+                        } else {
+                            console.error('❌ [page-initialization-configs] loadNotesData function not available');
+                        }
                     }
                 } else {
-                    window.Logger.warn('⚠️ loadNotesData not available after retries', { page: "page-initialization-configs" });
+                    console.warn('⚠️ [page-initialization-configs] getPageDataFunctions not found, trying direct loadNotesData...');
+                    // Fallback if getPageDataFunctions doesn't exist
+                    if (typeof window.loadNotesData === 'function') {
+                        console.log('📝 [page-initialization-configs] Initializing Notes (direct loadNotesData)...');
+                        try {
+                            await window.loadNotesData();
+                            console.log('✅ [page-initialization-configs] Notes data loaded successfully (direct)');
+                        } catch (error) {
+                            console.error('❌ [page-initialization-configs] Error in loadNotesData:', error);
+                        }
+                    } else {
+                        console.error('❌ [page-initialization-configs] loadNotesData function not available');
+                    }
                 }
             }
         ]

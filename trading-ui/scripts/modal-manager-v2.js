@@ -50,6 +50,24 @@ class ModalManagerV2 {
     }
 
     /**
+     * Check if required dependencies are available
+     * בדיקת תלויות נדרשות
+     * @private
+     * @returns {Object} Dependency status
+     */
+    _checkDependencies() {
+        return {
+            preferencesSystem: {
+                available: typeof window.PreferencesSystem !== 'undefined' && window.PreferencesSystem !== null,
+                initialized: window.PreferencesSystem?.initialized === true
+            },
+            selectPopulatorService: {
+                available: typeof window.SelectPopulatorService !== 'undefined' && window.SelectPopulatorService !== null
+            }
+        };
+    }
+    
+    /**
      * Setup event listeners - הגדרת מאזיני אירועים
      * 
      * @private
@@ -65,11 +83,21 @@ class ModalManagerV2 {
             this.handleModalShown(event.target);
         });
         
-        // מאזין לשינוי העדפות משתמש
-        if (window.PreferencesSystem) {
-            window.PreferencesSystem.onPreferencesChanged(() => {
-                this.updateAllModalColors();
-            });
+        // מאזין לשינוי העדפות משתמש - עם validation
+        const deps = this._checkDependencies();
+        if (deps.preferencesSystem.available && deps.preferencesSystem.initialized) {
+            try {
+                if (typeof window.PreferencesSystem.onPreferencesChanged === 'function') {
+                    window.PreferencesSystem.onPreferencesChanged(() => {
+                        this.updateAllModalColors();
+                    });
+                    console.log('✅ PreferencesSystem listener registered');
+                }
+            } catch (e) {
+                console.warn('⚠️ Failed to register PreferencesSystem listener:', e);
+            }
+        } else {
+            console.warn('⚠️ PreferencesSystem not available or not initialized - preferences changes won\'t update modal colors');
         }
     }
 
@@ -927,8 +955,13 @@ class ModalManagerV2 {
      * @private
      */
     async populateSelects(modalElement, config) {
-        if (!window.SelectPopulatorService) {
-            console.log('⚠️ SelectPopulatorService not available');
+        // Check dependencies with validation
+        const deps = this._checkDependencies();
+        
+        if (!deps.selectPopulatorService.available) {
+            console.warn('⚠️ SelectPopulatorService not available - select fields may not be populated correctly');
+            console.warn('⚠️ Make sure SelectPopulatorService is loaded before ModalManagerV2');
+            // Continue without populating - let the form work without defaults
             return;
         }
         

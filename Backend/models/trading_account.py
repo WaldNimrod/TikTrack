@@ -37,9 +37,9 @@ class TradingAccount(BaseModel):
     name = Column(String(100), nullable=False)
     currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False)  # Foreign key to currencies table
     status = Column(String(20), default='open')
-    cash_balance = Column(Float, default=0)
+    # cash_balance removed - calculated in real-time via AccountActivityService
     total_value = Column(Float, default=0)
-    total_pl = Column(Float, default=0)
+    total_pl = Column(Float, default=0)  # Not updated - shows "בפיתוח" in UI
     notes = Column(String(500))
     
     # Relationships with other entities
@@ -82,9 +82,9 @@ class TradingAccount(BaseModel):
             'currency_symbol': self.currency.symbol if self.currency else None,
             'currency_name': self.currency.name if self.currency else None,
             'status': self.status,
-            'cash_balance': self.cash_balance,
+            # cash_balance removed - use /api/account-activity/<account_id>/balances for real-time calculation
             'total_value': self.total_value,
-            'total_pl': self.total_pl,
+            'total_pl': self.total_pl,  # Not updated - shows "בפיתוח" in UI
             'notes': self.notes,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }

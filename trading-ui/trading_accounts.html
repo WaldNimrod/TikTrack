@@ -99,11 +99,14 @@
                                         <th class="col-balance">
                                             <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">יתרה <span class="sort-icon">↕</span></button>
                                         </th>
+                                        <th class="col-total-pl">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">רווח/הפסד <span class="sort-icon">↕</span></button>
+                                        </th>
                                         <th class="col-status">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">סטטוס <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">סטטוס <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">נוצר ב <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }">נוצר ב <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-items">
                                         </th>
@@ -111,13 +114,68 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="7" class="loading">טוען חשבונות...</td>
+                                        <td colspan="8" class="loading">טוען חשבונות...</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>
+                </div> <!-- End content-section -->
+                
+                <!-- Account Activity area - content-section -->
+                <div class="content-section" data-section="account-activity">
+                    <!-- Account Activity header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/trading_accounts.svg" alt="תנועות חשבון" class="section-icon">
+                            תנועות חשבון
+                        </div>
+                        <div class="table-count" id="accountActivityCount">בחר חשבון...</div>
+                        <div class="table-actions">
+                            <!-- Account selector -->
+                            <select id="accountActivitySelector" class="form-select form-select-sm" style="margin-inline-end: 0.5rem; min-width: 200px;">
+                                <option value="">בחר חשבון...</option>
+                            </select>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('account-activity')" data-text="הצג/הסתר"></button>
+                        </div>
+                    </div>
+
+                    <!-- Account Activity body -->
+                    <div class="section-body" style="display: none;">
+                        <!-- Activity table container -->
+                        <div class="table-responsive" id="accountActivityContainer">
+                            <table class="table" id="accountActivityTable" data-table-type="account_activity">
+                                <thead>
+                                    <tr>
+                                        <th class="col-date">תאריך</th>
+                                        <th class="col-type">סוג</th>
+                                        <th class="col-subtype">תת-סוג</th>
+                                        <th class="col-ticker">טיקר</th>
+                                        <th class="col-amount">סכום</th>
+                                        <th class="col-currency">מטבע</th>
+                                        <th class="col-balance">יתרה שוטפת</th>
+                                        <th class="col-actions actions-cell actions-1-item">פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="8" class="loading">בחר חשבון להצגת תנועות...</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot id="accountActivityFooter" style="display: none;">
+                                    <tr class="summary-row">
+                                        <td colspan="4" class="text-end"><strong>סה"כ לפי מטבע:</strong></td>
+                                        <td colspan="4" id="currencyBalancesSummary"></td>
+                                    </tr>
+                                    <tr class="summary-row">
+                                        <td colspan="4" class="text-end"><strong>סה"כ במטבע בסיס:</strong></td>
+                                        <td colspan="4" id="baseCurrencyTotal"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- End content-section -->
             </div>
         </div>
 
@@ -197,6 +255,9 @@
     <script src="scripts/preferences-ui.js?v=46bd8173_20251031_164748"></script> <!-- ממשק משתמש -->
 
     <!-- ===== ENTITY DETAILS SYSTEMS (Depend on Header) ===== -->
+    <!-- ===== MODAL NAVIGATION MANAGER (Must load before entity-details-modal) ===== -->
+    <script src="scripts/modal-navigation-manager.js?v=46bd8173_20251031_164748"></script>
+    
     <script src="scripts/entity-details-api.js?v=46bd8173_20251031_164748"></script>
     <script src="scripts/entity-details-renderer.js?v=46bd8173_20251031_164748"></script>
     <script src="scripts/entity-details-modal.js?v=46bd8173_20251031_164748"></script>
@@ -215,6 +276,7 @@
     
     <!-- Page-specific Scripts -->
     <script src="scripts/trading_accounts.js?v=46bd8173_20251031_164748"></script>
+    <script src="scripts/account-activity.js?v=46bd8173_20251031_164748"></script>
     
     <!-- 14. Init System Check (Available on all pages) -->
     <script src="scripts/init-system-check.js?v=46bd8173_20251031_164748"></script>

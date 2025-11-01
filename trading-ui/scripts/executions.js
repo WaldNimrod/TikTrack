@@ -1486,10 +1486,29 @@ window.editExecution = editExecution;
 // פונקציה לאיפוס פילטרים וטעינה מחדש
 // resetAllFiltersAndReloadData() - לא בשימוש, הוסרה
 
-// פונקציות מודלים
-// window.showAddExecutionModal = showAddExecutionModal; // הועבר למערכת הכללית
-window.showEditExecutionModal = showEditExecutionModal;
-// window.showDeleteExecutionModal = showDeleteExecutionModal; // הוסר - שימוש במערכת הגלובלית
+// פונקציות מודלים - Wrapper functions for backward compatibility
+window.showAddExecutionModal = function() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        window.ModalManagerV2.showModal('executionsModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
+window.showEditExecutionModal = function(executionId) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('executionsModal', 'execution', executionId);
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
 // REMOVED: window.saveExecution - function removed
 
 // REMOVED: updateExecution - unused wrapper, use updateExecutionWrapper directly

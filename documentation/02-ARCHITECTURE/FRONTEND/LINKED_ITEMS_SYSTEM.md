@@ -43,9 +43,41 @@ Usage notes:
 
 # מערכת פריטים מקושרים - TikTrack (מעודכן)
 
+**תאריך עדכון אחרון:** 2025-01-12  
+**גרסה:** 2.0.0
+
 ## 📋 סקירה כללית
 
 מערכת הפריטים המקושרים (Linked Items System) היא מערכת גנרית לבדיקה והצגת אזהרות על פריטים מקושרים לפני ביצוע פעולות מסוכנות כמו מחיקה או ביטול. המערכת עברה שדרוג משמעותי וכיום היא גנרית ועובדת עם כל סוגי האובייקטים במערכת.
+
+## ✨ שינויים אחרונים (2025-01-12)
+
+### LinkedItemsService - מערכת מרכזית חדשה
+
+יצירת `LinkedItemsService` לאיחוד לוגיקה משותפת בין:
+- `linked-items.js` (standalone modal)
+- `entity-details-renderer.js` (טבלה בתוך modal)
+
+**תכונות:**
+- מיון פריטים מקושרים (פתוחים ראשון, אחר כך תאריך)
+- פורמט שם נקי של פריט
+- יצירת כפתורי פעולות (VIEW, EDIT, DELETE, LINK, CANCEL/REACTIVATE)
+- קבלת איקונים וצבעים לסוגי ישויות
+- בדיקה אם להציג פעולה מסוימת
+- טיפול במקרה אין פריטים מקושרים
+
+**קובץ:** `trading-ui/scripts/services/linked-items-service.js`
+
+### אינטגרציה עם UnifiedCacheManager
+
+- ✅ `ModalNavigationManager` שומר היסטוריה ב-`localStorage` (TTL: 1 שעה)
+- ✅ `getLinkedItems()` שומר תוצאות ב-memory cache (TTL: 5 דקות)
+
+### העברת מידע בין מודולים מקוננים
+
+- ✅ `viewItemDetails()` מעביר `sourceInfo` על מודול המקור
+- ✅ `EntityDetailsModal` שומר `sourceInfo` מה-options
+- ✅ לוגים משופרים לניפוי בעיות
 
 ## 🎯 מטרה
 
@@ -628,14 +660,28 @@ window.ENTITY_BACKGROUND_COLORS['new_entity'] = 'rgba(255, 107, 107, 0.1)';
 const newColor = window.getEntityColor('new_entity');
 ```
 
-## 📚 קבצים רלוונטיים
+## 📚 קבצים רלוונטיים (מעודכן 2025-01-12)
 
-- **Backend**: `Backend/routes/api/linked_items.py`
+### Backend
+- **Backend API**: `Backend/routes/api/linked_items.py`
 - **Services**: `Backend/services/ticker_service.py` (פונקציה `check_linked_items_generic`)
-- **Frontend**: `trading-ui/scripts/ui-utils.js` (פונקציות UI)
-- **API Endpoints**: 
-  - `GET /api/linked-items/{entity_type}/{entity_id}`
-  - `GET /api/linked-items/{entity_type}/{entity_id}/check-deletion`
+
+### Frontend - מערכות core
+- **LinkedItemsService**: `trading-ui/scripts/services/linked-items-service.js` ✨ **חדש (2025-01-12)**
+- **Linked Items Modal**: `trading-ui/scripts/linked-items.js` ✅ **עודכן (2025-01-12)**
+- **Entity Details Renderer**: `trading-ui/scripts/entity-details-renderer.js` ✅ **עודכן (2025-01-12)**
+- **Entity Details API**: `trading-ui/scripts/entity-details-api.js` ✅ **עודכן (2025-01-12 - אינטגרציה עם מטמון)**
+- **Entity Details Modal**: `trading-ui/scripts/entity-details-modal.js` ✅ **עודכן (2025-01-12 - העברת מידע מקוננים)**
+- **Modal Navigation**: `trading-ui/scripts/modal-navigation-manager.js` ✅ **עודכן (2025-01-12 - אינטגרציה עם מטמון)**
+
+### API Endpoints
+- `GET /api/linked-items/{entity_type}/{entity_id}` - קבלת פריטים מקושרים
+- `GET /api/linked-items/{entity_type}/{entity_id}/check-deletion` - בדיקת בטיחות מחיקה
+
+### תיעוד
+- **תיעוד מערכת:** `documentation/02-ARCHITECTURE/FRONTEND/LINKED_ITEMS_SYSTEM.md` (קובץ זה)
+- **סיכום אינטגרציה:** `documentation/02-ARCHITECTURE/FRONTEND/INTEGRATION_AUDIT_SUMMARY.md`
+- **ניתוח אינטגרציה:** `documentation/02-ARCHITECTURE/FRONTEND/SYSTEMS_INTEGRATION_ANALYSIS.md`
 
 ## 🎓 **למידות מהעבודה על עמוד טיקרים - 29 באוגוסט 2025**
 

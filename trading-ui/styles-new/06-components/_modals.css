@@ -44,6 +44,79 @@
   z-index: 999999998 ;
 }
 
+/* ===== Modal Navigation System ===== */
+/* Backdrop גלובלי - תמיד רק אחד */
+#globalModalBackdrop,
+.global-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040; /* Base z-index, יוגדל דינמית */
+}
+
+/* Breadcrumb navigation בכותרת מודול */
+.modal-navigation-breadcrumb {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--current-entity-color-dark, #6c757d);
+  direction: rtl;
+  text-align: right;
+}
+
+.modal-breadcrumb-trail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+  color: var(--current-entity-color-dark, #6c757d);
+  font-weight: 500;
+}
+
+.breadcrumb-item:not(:last-child) {
+  cursor: default;
+}
+
+/* כפתור חזור בכותרת מודול */
+.modal-back-btn,
+button[data-button-type="BACK"] {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  flex-shrink: 0;
+  padding: 0;
+  display: none; /* יוצג רק אם יש היסטוריה */
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--current-entity-color-dark, #6c757d);
+  background: transparent;
+  color: var(--current-entity-color-dark, #6c757d);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.modal-back-btn:hover,
+button[data-button-type="BACK"]:hover {
+  background: var(--current-entity-color-dark, #6c757d);
+  color: white;
+  border-color: var(--current-entity-color-dark, #6c757d);
+}
+
+/* Modal header layout עם navigation */
+.modal-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* הודעות - וידוא שהן מופיעות מעל הכל */
 .toast {
   z-index: 1000000002 ;

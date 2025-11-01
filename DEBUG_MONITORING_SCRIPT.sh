@@ -14,3 +14,5 @@ tail -f Backend/logs/app.log | grep --line-buffered -E "CREATE CASH FLOW|HANDLE_
 
 
 
+
+

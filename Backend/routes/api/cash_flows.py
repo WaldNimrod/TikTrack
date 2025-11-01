@@ -113,7 +113,7 @@ def get_cash_flow(cash_flow_id: int):
 
 @cash_flows_bp.route('/', methods=['POST'])
 @handle_database_session(auto_commit=True, auto_close=True)
-@invalidate_cache(['cash_flows'])
+@invalidate_cache(['cash_flows', 'account-activity-*'])
 def create_cash_flow():
     """Create new cash flow"""
     try:
@@ -190,7 +190,7 @@ def create_cash_flow():
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['PUT'])
 @handle_database_session(auto_commit=True, auto_close=True)
-@invalidate_cache(['cash_flows'])
+@invalidate_cache(['cash_flows', 'account-activity-*'])
 def update_cash_flow(cash_flow_id: int):
     """Update cash flow"""
     try:
@@ -274,7 +274,7 @@ def update_cash_flow(cash_flow_id: int):
 
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)
-@invalidate_cache(['cash_flows'])
+@invalidate_cache(['cash_flows', 'account-activity-*'])
 def delete_cash_flow(cash_flow_id: int):
     """Delete cash flow"""
     try:

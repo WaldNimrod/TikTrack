@@ -525,8 +525,8 @@ function updateAlertsTable(alerts) {
       // לוג לבדיקת מבנה הנתונים
       // window.Logger.info('🔍 Alert data structure:', alert, { page: "alerts" });
       
-      // קבלת צבעי סטטוס דינמיים
-      const statusClass = getStatusClass(alert.status);
+      // קבלת צבעי סטטוס דינמיים - שימוש במערכת הכללית
+      // Note: statusClass removed - use window.renderStatus or FieldRendererService.renderStatus instead
       const statusColor = window.getStatusColor ? window.getStatusColor(alert.status, 'medium') : '#6c757d';
       const statusBgColor = window.getStatusBackgroundColor ? window.getStatusBackgroundColor(alert.status) : 'rgba(108, 117, 125, 0.1)';
       
@@ -636,7 +636,8 @@ function updateAlertsTable(alerts) {
   })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}">
             ${window.renderStatus ? window.renderStatus(alert.status, 'alert') : 
-              `<span class="status-badge ${statusClass}">${statusDisplay}</span>`}
+              (window.FieldRendererService ? window.FieldRendererService.renderStatus(alert.status, 'alert') : 
+                `<span class="status-badge" data-status-category="unknown">${statusDisplay}</span>`)}
           </td>
           <td>
             ${window.renderBoolean ? window.renderBoolean(alert.is_triggered) : 

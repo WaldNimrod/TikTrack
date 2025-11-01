@@ -28,6 +28,7 @@ from .trades import trades_bp
 from .users import users_bp
 from .wal_management import wal_bp
 from .quality_check import bp as quality_check_bp
+from .account_activity import account_activity_bp
 
 # Base classes for unified API
 from .base_entity import BaseEntityAPI
@@ -42,6 +43,7 @@ from .base_entity_decorators import (
 
 __all__ = [
     # Blueprints
+    'account_activity_bp',
     'trading_accounts_bp',
     'alerts_bp',
     'background_tasks_bp',

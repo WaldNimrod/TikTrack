@@ -229,6 +229,9 @@
     <script src="scripts/related-object-filters.js?v=46bd8173_20251031_164748"></script> <!-- פילטרים של אובייקטים קשורים -->
 
     <!-- ===== ENTITY DETAILS SYSTEMS (Depend on Header) ===== -->
+    <!-- ===== MODAL NAVIGATION MANAGER (Must load before entity-details-modal) ===== -->
+    <script src="scripts/modal-navigation-manager.js?v=46bd8173_20251031_164748"></script>
+    
     <script src="scripts/entity-details-api.js?v=46bd8173_20251031_164748"></script>
     <script src="scripts/entity-details-renderer.js?v=46bd8173_20251031_164748"></script>
     <script src="scripts/entity-details-modal.js?v=46bd8173_20251031_164748"></script>
@@ -239,23 +242,24 @@
     <!-- Critical: NO | Version: 2.0.0 -->
     <script src="scripts/init-system/package-manifest.js?v=46bd8173_20251031_164748"></script> <!-- מניפסט חבילות -->
     <script src="scripts/page-initialization-configs.js?v=46bd8173_20251031_164748"></script> <!-- קונפיגורציות עמודים -->
-    <script src="scripts/unified-app-initializer.js?v=46bd8173_20251031_164748"></script> <!-- אתחול מאוחד -->
     
     <!-- Modal Config (Loaded after ModalManagerV2 from MODULES package) -->
     <script src="scripts/modal-configs/notes-config.js?v=46bd8173_20251031_164748"></script>
     
+    <script src="scripts/unified-app-initializer.js?v=46bd8173_20251031_164748"></script> <!-- אתחול מאוחד -->
+    
     <!-- Page-specific Scripts -->
     <script src="scripts/notes.js?v=46bd8173_20251031_164748"></script>
-    
-    <!-- ===== INFO SUMMARY SYSTEM ===== -->
-    <!-- מערכת סיכום נתונים מאוחדת -->
-    <script src="scripts/info-summary-system.js?v=46bd8173_20251031_164748"></script>
-    <script src="scripts/info-summary-configs.js?v=46bd8173_20251031_164748"></script>
     
     <!-- 14. Init System Check (Available on all pages) -->
     <script src="scripts/init-system-check.js?v=46bd8173_20251031_164748"></script>
     
     <!-- 15. Monitoring Functions (Required for page checks) -->
     <script src="scripts/monitoring-functions.js?v=46bd8173_20251031_164748"></script>
+    
+    <!-- ===== INFO SUMMARY SYSTEM ===== -->
+    <!-- מערכת סיכום נתונים מאוחדת -->
+    <script src="scripts/info-summary-system.js?v=46bd8173_20251031_164748"></script>
+    <script src="scripts/info-summary-configs.js?v=46bd8173_20251031_164748"></script>
 </body>
 </html>

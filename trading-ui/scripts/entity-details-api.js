@@ -92,11 +92,28 @@ class EntityDetailsAPI {
             }
 
             // בדיקת cache אם לא נדרש refresh
+            // חשוב: אם ביקשנו linked_items, נבדוק שה-cache כולל אותם
             if (!options.forceRefresh) {
                 const cachedData = this.getCachedData(entityType, entityId);
                 if (cachedData) {
-                    window.Logger.debug(`Returning cached data for ${entityType} ${entityId}`, { page: "entity-details-api" });
-                    return cachedData;
+                    // אם ביקשנו linked_items אבל הם לא ב-cache - נטען מחדש
+                    const needsLinkedItems = options.includeLinkedItems !== false;
+                    const hasLinkedItems = cachedData.linked_items && Array.isArray(cachedData.linked_items);
+                    
+                    if (needsLinkedItems && !hasLinkedItems) {
+                        window.Logger.info(`🔄 Cache exists but missing linked_items for ${entityType} ${entityId}, fetching fresh data`, { 
+                            cachedDataKeys: Object.keys(cachedData),
+                            page: "entity-details-api" 
+                        });
+                        // נמשיך לטעון מחדש - לא נחזיר מה-cache
+                    } else {
+                        window.Logger.debug(`✅ Returning cached data for ${entityType} ${entityId}`, { 
+                            hasLinkedItems,
+                            linkedItemsCount: cachedData.linked_items?.length || 0,
+                            page: "entity-details-api" 
+                        });
+                        return cachedData;
+                    }
                 }
             }
 
@@ -107,16 +124,53 @@ class EntityDetailsAPI {
             window.Logger.info(`📊 Entity data received:`, entityData, { page: "entity-details-api" });
             
             // טעינת פריטים מקושרים אם נדרש
+            console.log(`🔍 [ENTITY-DETAILS-API] Checking linked items option for ${entityType} ${entityId}:`, {
+                includeLinkedItems: options.includeLinkedItems,
+                includeLinkedItemsNotFalse: options.includeLinkedItems !== false,
+                willLoad: options.includeLinkedItems !== false
+            });
+            
+            if (window.Logger) {
+                window.Logger.info(`🔍 Checking linked items option for ${entityType} ${entityId}:`, {
+                    includeLinkedItems: options.includeLinkedItems,
+                    includeLinkedItemsNotFalse: options.includeLinkedItems !== false,
+                    willLoad: options.includeLinkedItems !== false,
+                    page: "entity-details-api"
+                });
+            }
+            
             if (options.includeLinkedItems !== false) {
                 try {
-                    window.Logger.info(`🔗 Loading linked items for ${entityType} ${entityId}...`, { page: "entity-details-api" });
+                    console.log(`🔗 [ENTITY-DETAILS-API] Loading linked items for ${entityType} ${entityId}...`);
+                    if (window.Logger) {
+                        window.Logger.info(`🔗 Loading linked items for ${entityType} ${entityId}...`, { page: "entity-details-api" });
+                    }
                     const linkedItems = await this.getLinkedItems(entityType, entityId);
-                    window.Logger.info(`🔗 Linked items received:`, linkedItems, { page: "entity-details-api" });
+                    console.log(`🔗 [ENTITY-DETAILS-API] Linked items received for ${entityType} ${entityId}:`, {
+                        count: linkedItems.length,
+                        items: linkedItems
+                    });
+                    if (window.Logger) {
+                        window.Logger.info(`🔗 Linked items received for ${entityType} ${entityId}:`, {
+                            count: linkedItems.length,
+                            items: linkedItems,
+                            page: "entity-details-api"
+                        });
+                    }
                     entityData.linked_items = linkedItems;
                 } catch (error) {
-                    window.Logger.warn(`Failed to load linked items for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });
+                    console.error(`❌ [ENTITY-DETAILS-API] Failed to load linked items for ${entityType} ${entityId}:`, error);
+                    if (window.Logger) {
+                        window.Logger.error(`❌ Failed to load linked items for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });
+                    }
                     entityData.linked_items = [];
                 }
+            } else {
+                console.log(`⏭️ [ENTITY-DETAILS-API] Skipping linked items load for ${entityType} ${entityId} (includeLinkedItems=false)`);
+                if (window.Logger) {
+                    window.Logger.info(`⏭️ Skipping linked items load for ${entityType} ${entityId} (includeLinkedItems=false)`, { page: "entity-details-api" });
+                }
+                entityData.linked_items = [];
             }
             
             // טעינת נתוני שוק אם נדרש (לטיקרים)
@@ -512,15 +566,42 @@ class EntityDetailsAPI {
     /**
      * Get linked items for entity - קבלת פריטים מקושרים לישות
      * 
+     * מעודכן להשתמש ב-UnifiedCacheManager עם TTL של 5 דקות
+     * 
      * @param {string} entityType - סוג הישות
      * @param {number|string} entityId - מזהה הישות
+     * @param {Object} options - אפשרויות (forceRefresh)
      * @returns {Promise<Array>} - Promise עם מערך פריטים מקושרים
      * @public
      */
-    async getLinkedItems(entityType, entityId) {
-        try {
+    async getLinkedItems(entityType, entityId, options = {}) {
+        const cacheKey = `linked-items-${entityType}-${entityId}`;
+        
+            try {
+                // בדיקה במטמון אם לא forceRefresh
+                if (!options.forceRefresh && window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                    const cachedData = await window.UnifiedCacheManager.get(cacheKey, {
+                        layer: 'memory',
+                        fallback: null
+                    });
+                    
+                    if (cachedData !== null && Array.isArray(cachedData)) {
+                        if (window.Logger) {
+                            window.Logger.debug(`✅ Linked items retrieved from cache for ${entityType} ${entityId}`, {
+                                count: cachedData.length,
+                                page: "entity-details-api"
+                            });
+                        }
+                        return cachedData;
+                    }
+                }
+            
+            // אם לא במטמון - טעינה מה-API
             const url = `/api/linked-items/${entityType}/${entityId}`;
-            window.Logger.info(`🔗 Fetching linked items from: ${url}`, { page: "entity-details-api" });
+            console.log(`🔗 [ENTITY-DETAILS-API] Fetching linked items from: ${url}`);
+            if (window.Logger) {
+                window.Logger.info(`🔗 Fetching linked items from: ${url}`, { page: "entity-details-api" });
+            }
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -530,39 +611,102 @@ class EntityDetailsAPI {
                 }
             });
             
-            window.Logger.info(`🔗 Response status: ${response.status}`, { page: "entity-details-api" });
+            console.log(`🔗 [ENTITY-DETAILS-API] Response status: ${response.status}`);
+            if (window.Logger) {
+                window.Logger.info(`🔗 Response status: ${response.status}`, { page: "entity-details-api" });
+            }
 
             if (!response.ok) {
                 if (response.status === 404) {
                     window.Logger.debug(`No linked items found for ${entityType} ${entityId}`, { page: "entity-details-api" });
-                    return [];
+                        // שמירת מערך ריק במטמון גם במקרה של 404 (כדי לא לטעון שוב)
+                        const emptyArray = [];
+                        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                            await window.UnifiedCacheManager.save(cacheKey, emptyArray, {
+                                layer: 'memory',
+                                ttl: 300000 // 5 דקות
+                            });
+                        }
+                    return emptyArray;
                 }
                 throw new Error(`שגיאת שרת בקבלת פריטים מקושרים: ${response.status}`);
             }
 
             const data = await response.json();
-            window.Logger.info(`🔗 Raw linked items data:`, data, { page: "entity-details-api" });
-            
-            if (data && data.child_entities) {
-                window.Logger.info(`🔗 Processing linked items data:`, data.child_entities, { page: "entity-details-api" });
-                
-                // המרת הנתונים לפורמט הרצוי
-                const linkedItems = data.child_entities.map(item => ({
-                    id: item.id,
-                    type: item.type,
-                    title: item.title || `${item.type} ${item.id}`,
-                    description: item.description || '',
-                    status: item.status,
-                    created_at: item.created_at,
-                    updated_at: item.updated_at
-                }));
-                
-                window.Logger.info(`🔗 Final linked items:`, linkedItems, { page: "entity-details-api" });
-                return linkedItems;
-            } else {
-                window.Logger.info(`🔗 No linked items data found`, { page: "entity-details-api" });
-                return [];
+            console.log(`🔗 [ENTITY-DETAILS-API] Raw linked items data:`, data);
+            if (window.Logger) {
+                window.Logger.info(`🔗 Raw linked items data:`, data, { page: "entity-details-api" });
             }
+            
+            // איחוד child_entities ו-parent_entities למערך אחד
+            const allLinkedItems = [];
+            
+            // הוספת child_entities
+            if (data && data.child_entities && Array.isArray(data.child_entities)) {
+                console.log(`🔗 [ENTITY-DETAILS-API] Processing child entities:`, data.child_entities);
+                if (window.Logger) {
+                    window.Logger.info(`🔗 Processing child entities:`, data.child_entities, { page: "entity-details-api" });
+                }
+                data.child_entities.forEach(item => {
+                    allLinkedItems.push({
+                        id: item.id,
+                        type: item.type,
+                        title: item.title || `${item.type} ${item.id}`,
+                        description: item.description || '',
+                        status: item.status,
+                        created_at: item.created_at,
+                        updated_at: item.updated_at
+                    });
+                });
+            }
+            
+            // הוספת parent_entities (חשוב! זה כולל trade_plan עבור trade)
+            if (data && data.parent_entities && Array.isArray(data.parent_entities)) {
+                console.log(`🔗 [ENTITY-DETAILS-API] Processing parent entities:`, data.parent_entities);
+                if (window.Logger) {
+                    window.Logger.info(`🔗 Processing parent entities:`, data.parent_entities, { page: "entity-details-api" });
+                }
+                data.parent_entities.forEach(item => {
+                    allLinkedItems.push({
+                        id: item.id,
+                        type: item.type,
+                        title: item.title || `${item.type} ${item.id}`,
+                        description: item.description || '',
+                        status: item.status,
+                        created_at: item.created_at,
+                        updated_at: item.updated_at
+                    });
+                });
+            }
+            
+                // שמירה במטמון עם TTL של 5 דקות
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                    await window.UnifiedCacheManager.save(cacheKey, allLinkedItems, {
+                        layer: 'memory',
+                        ttl: 300000 // 5 דקות
+                    });
+                    
+                    if (window.Logger) {
+                        window.Logger.debug(`✅ Linked items saved to cache for ${entityType} ${entityId}`, {
+                            count: allLinkedItems.length,
+                            page: "entity-details-api"
+                        });
+                    }
+                }
+            
+            console.log(`🔗 [ENTITY-DETAILS-API] Final linked items (${allLinkedItems.length} total):`, {
+                allLinkedItems,
+                childCount: data?.child_entities?.length || 0,
+                parentCount: data?.parent_entities?.length || 0
+            });
+            if (window.Logger) {
+                window.Logger.info(`🔗 Final linked items (${allLinkedItems.length} total):`, allLinkedItems, { 
+                    childCount: data?.child_entities?.length || 0,
+                    parentCount: data?.parent_entities?.length || 0,
+                    page: "entity-details-api" 
+                });
+            }
+            return allLinkedItems;
 
         } catch (error) {
             window.Logger.error(`Error getting linked items for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });

@@ -54,7 +54,7 @@ def get_execution(execution_id: int):
 
 @executions_bp.route('/', methods=['POST'])
 @handle_database_session(auto_commit=True, auto_close=True)
-@invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after creating execution
+@invalidate_cache(['executions', 'trades', 'dashboard', 'account-activity-*'])  # Invalidate cache after creating execution
 def create_execution():
     """Create new execution"""
     try:
@@ -104,7 +104,7 @@ def create_execution():
 
 @executions_bp.route('/<int:execution_id>', methods=['PUT'])
 @handle_database_session(auto_commit=True, auto_close=True)
-@invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after updating execution
+@invalidate_cache(['executions', 'trades', 'dashboard', 'account-activity-*'])  # Invalidate cache after updating execution
 def update_execution(execution_id: int):
     """Update execution"""
     try:
@@ -158,7 +158,7 @@ def update_execution(execution_id: int):
 
 @executions_bp.route('/<int:execution_id>', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)
-@invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after deleting execution
+@invalidate_cache(['executions', 'trades', 'dashboard', 'account-activity-*'])  # Invalidate cache after deleting execution
 def delete_execution(execution_id: int):
     """Delete execution"""
     try:

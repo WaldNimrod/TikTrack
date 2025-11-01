@@ -21,8 +21,14 @@ class InfoSummarySystem {
     this.formatters = this.initializeFormatters();
     this.initialized = true;
     
-    if (window.Logger) {
-      window.Logger.info('Info Summary System initialized', { page: 'info-summary-system' });
+    // Use console.log instead of Logger to avoid potential circular dependencies
+    // Logger may depend on InfoSummarySystem through toggleSection
+    const DEBUG_MODE = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.search.includes('debug=true');
+    
+    if (DEBUG_MODE) {
+      console.debug('Info Summary System initialized');
     }
   }
 
@@ -282,9 +288,13 @@ class InfoSummarySystem {
     
     container.innerHTML = html;
     
-    if (window.Logger) {
-      window.Logger.info(`Info summary rendered for container '${containerId}'`, { 
-        page: 'info-summary-system',
+    // Use console.log instead of Logger to avoid potential circular dependencies
+    const DEBUG_MODE = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.search.includes('debug=true');
+    
+    if (DEBUG_MODE) {
+      console.debug(`Info summary rendered for container '${containerId}'`, { 
         statsCount: config.stats.length,
         containerId 
       });

@@ -227,7 +227,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(tickerData.linked_items || [], tickerColor)}
+                        ${this.renderLinkedItems(tickerData.linked_items || [], tickerColor, 'ticker', tickerData.id)}
                     </div>
                 </div>
             </div>
@@ -245,8 +245,19 @@ class EntityDetailsRenderer {
     renderTrade(tradeData, options = {}) {
         const entityColor = this.entityColors.trade || '#007bff';
         
+        // סטטוס למעלה - שימוש במערכת הרינדור הכללית
+        const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+            ? window.FieldRendererService.renderStatus(tradeData.status, 'trade')
+            : '';
+        
         return `
             <div class="entity-details-container trade-details">
+                
+                <!-- סטטוס למעלה -->
+                ${statusDisplay ? `<div class="mb-3 d-flex justify-content-start align-items-center gap-2">
+                    <strong>סטטוס:</strong>
+                    ${statusDisplay}
+                </div>` : ''}
                 
                 <div class="row">
                     <div class="col-md-6">
@@ -259,7 +270,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(tradeData.linked_items || [])}
+                        ${this.renderLinkedItems(tradeData.linked_items || [], this.entityColors.trade || '#007bff', 'trade', tradeData.id)}
                     </div>
                 </div>
                 
@@ -331,8 +342,8 @@ class EntityDetailsRenderer {
         `;
         
         firstColumnFields.forEach(field => {
-            const value = entityData[field.key] || 'לא זמין';
-            const displayValue = this.formatFieldValue(value, field.type, entityColor);
+            const value = entityData[field.key];
+            const displayValue = this.formatFieldValue(value, field.type, entityColor, field.key, entityData);
             
             html += `
                 <div class="row mb-2">
@@ -366,8 +377,8 @@ class EntityDetailsRenderer {
         `;
         
         secondColumnFields.forEach(field => {
-            const value = entityData[field.key] || 'לא זמין';
-            const displayValue = this.formatFieldValue(value, field.type, entityColor);
+            const value = entityData[field.key];
+            const displayValue = this.formatFieldValue(value, field.type, entityColor, field.key, entityData);
             
             html += `
                 <div class="row mb-2">
@@ -572,40 +583,43 @@ class EntityDetailsRenderer {
 
     /**
      * Render linked items - רנדור פריטים מקושרים
+     * 
+     * מעודכן להשתמש ב-LinkedItemsService ללוגיקה משותפת
      */
-    renderLinkedItems(linkedItems, entityColor = '#019193') {
-        window.Logger.info(`🔗 Rendering linked items:`, linkedItems, { page: "entity-details-renderer" });
+    renderLinkedItems(linkedItems, entityColor = '#019193', entityType = null, entityId = null) {
+        window.Logger.info(`🔗 Rendering linked items:`, {
+            linkedItems,
+            isArray: Array.isArray(linkedItems),
+            length: linkedItems?.length || 0,
+            page: "entity-details-renderer"
+        });
+        
         // בדיקה אם יש פריטים מקושרים
-        const hasLinkedItems = linkedItems && linkedItems.length > 0;
-        window.Logger.info(`🔗 Has linked items:`, hasLinkedItems, { page: "entity-details-renderer" });
+        const hasLinkedItems = linkedItems && Array.isArray(linkedItems) && linkedItems.length > 0;
+        window.Logger.info(`🔗 Has linked items: ${hasLinkedItems}`, {
+            linkedItems,
+            hasLinkedItems,
+            page: "entity-details-renderer"
+        });
         
-        // מיון הפריטים המקושרים: פתוח ראשון, ואז לפי תאריך
-        if (hasLinkedItems) {
-            linkedItems.sort((a, b) => {
-                // מיון לפי סטטוס - פתוח ראשון
-                const statusOrder = { 'open': 0, 'closed': 1, 'cancelled': 2 };
-                const aStatusOrder = statusOrder[a.status] ?? 3;
-                const bStatusOrder = statusOrder[b.status] ?? 3;
-                
-                if (aStatusOrder !== bStatusOrder) {
-                    return aStatusOrder - bStatusOrder;
-                }
-                
-                // אם אותו סטטוס - מיון לפי תאריך (החדש ביותר ראשון)
-                const aDate = new Date(a.created_at || a.updated_at || 0);
-                const bDate = new Date(b.created_at || b.updated_at || 0);
-                return bDate - aDate;
-            });
-        }
-        
+        // אם אין פריטים - שימוש ב-LinkedItemsService
         if (!hasLinkedItems) {
+            // ניסיון לקבל entityType ו-entityId מה-context אם לא סופקו
+            const currentEntityType = entityType || window.currentEntityType || 'ticker';
+            const currentEntityId = entityId || window.currentEntityId || 'null';
+            
+            if (window.LinkedItemsService && window.LinkedItemsService.renderEmptyLinkedItems) {
+                return window.LinkedItemsService.renderEmptyLinkedItems(currentEntityType, currentEntityId, entityColor);
+            }
+            
+            // Fallback אם Service לא זמין
             return `
                 <div class="entity-linked-items">
                     <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">פריטים מקושרים</h6>
                     <div class="text-muted text-center py-4">
                         <i class="fas fa-link fa-2x mb-3"></i>
                         <p>אין פריטים מקושרים</p>
-                        <button class="btn btn-outline-primary btn-sm mt-2" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
+                        <button class="btn btn-outline-primary btn-sm mt-2" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], '${currentEntityType}', ${currentEntityId})">
                             <i class="fas fa-search me-1"></i>חפש פריטים מקושרים
                         </button>
                     </div>
@@ -613,54 +627,57 @@ class EntityDetailsRenderer {
             `;
         }
 
+        // מיון הפריטים המקושרים באמצעות LinkedItemsService
+        const sortedItems = (window.LinkedItemsService && window.LinkedItemsService.sortLinkedItems)
+            ? window.LinkedItemsService.sortLinkedItems(linkedItems)
+            : linkedItems; // Fallback אם Service לא זמין
+
         // יצירת טבלה מינימלית של פריטים מקושרים
         let html = `
             <div class="entity-linked-items">
-                <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">פריטים מקושרים (${linkedItems.length})</h6>
+                <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">פריטים מקושרים (${sortedItems.length})</h6>
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover">
+                    <table class="table table-sm table-hover entity-linked-items-table">
                         <thead style="background-color: ${entityColor}50 !important;">
                             <tr>
-                                <th>סוג</th>
-                                <th>שם</th>
-                                <th>סטטוס</th>
-                                <th>פעולות</th>
+                                <th style="width: 25%;">סוג</th>
+                                <th style="width: 35%;">שם</th>
+                                <th style="width: 15%; text-align: center;">סטטוס</th>
+                                <th style="width: 25%; text-align: center;">פעולות</th>
                             </tr>
                         </thead>
                         <tbody>
         `;
 
-        linkedItems.forEach(item => {
-            // עמודה "סוג" - איקון + שם הישות (strong)
-            const iconPath = this.getEntityIcon(item.type);
-            const entityColor = this.entityColors[item.type] || '#6c757d';
-            // שם הישות בעברית
-            const entityLabel = (window.getEntityLabel && typeof window.getEntityLabel === 'function') 
-                ? window.getEntityLabel(item.type) 
-                : item.type;
+        sortedItems.forEach(item => {
+            // עמודה "סוג" - איקון + שם הישות (strong) - שימוש ב-LinkedItemsService
+            const iconPath = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemIcon)
+                ? window.LinkedItemsService.getLinkedItemIcon(item.type)
+                : this.getEntityIcon(item.type); // Fallback
+            
+            const itemEntityColor = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemColor)
+                ? window.LinkedItemsService.getLinkedItemColor(item.type, { entityColors: this.entityColors })
+                : (this.entityColors[item.type] || '#6c757d'); // Fallback
+            
+            // שם הישות בעברית - שימוש ב-LinkedItemsService
+            const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
+                ? window.LinkedItemsService.getEntityLabel(item.type)
+                : ((window.getEntityLabel && typeof window.getEntityLabel === 'function')
+                    ? window.getEntityLabel(item.type)
+                    : item.type); // Fallback
+            
             // צביעת האיקון בצבע הישות באמצעות CSS mask - איקון כפול בגודל (48px)
             const typeDisplay = `
                 <span class="d-inline-flex align-items-center gap-2">
-                    <img src="${iconPath}" alt="${item.type}" class="linked-item-type-icon" style="width: 48px; height: 48px; mask-image: url('${iconPath}'); mask-repeat: no-repeat; mask-position: center; mask-size: contain; -webkit-mask-image: url('${iconPath}'); -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; background-color: ${entityColor}; display: inline-block;" />
+                    <img src="${iconPath}" alt="${item.type}" class="linked-item-type-icon" style="width: 48px; height: 48px; mask-image: url('${iconPath}'); mask-repeat: no-repeat; mask-position: center; mask-size: contain; -webkit-mask-image: url('${iconPath}'); -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; background-color: ${itemEntityColor}; display: inline-block;" />
                     <strong>${entityLabel}</strong>
                 </span>
             `;
             
-            // עמודה "שם" - שם נקי ללא "טרייד:" בהתחלה, עם תאריך - שורה אחת בלבד
-            let cleanName = this.getCleanEntityName(item);
-            // הסרת "טרייד" כמילה ראשונה אם קיימת (כולל עם נקודתיים)
-            if (cleanName.startsWith('טרייד ')) {
-                cleanName = cleanName.substring(6).trim();
-            } else if (cleanName.startsWith('טרייד:')) {
-                cleanName = cleanName.substring(7).trim();
-            }
-            // הסרת שם הישות מהתחלה גם אם הוא מופיע שוב
-            const entityLabelLower = entityLabel.toLowerCase();
-            if (cleanName.toLowerCase().startsWith(entityLabelLower + ' ')) {
-                cleanName = cleanName.substring(entityLabelLower.length + 1).trim();
-            } else if (cleanName.toLowerCase().startsWith(entityLabelLower + ':')) {
-                cleanName = cleanName.substring(entityLabelLower.length + 1).trim();
-            }
+            // עמודה "שם" - שם נקי עם תאריך - שימוש ב-LinkedItemsService
+            const cleanName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
+                ? window.LinkedItemsService.formatLinkedItemName(item)
+                : this.getCleanEntityName(item); // Fallback
             
             const itemDate = this.formatDateTime(item.created_at || item.updated_at);
             // שורה אחת בלבד: שם + תאריך
@@ -671,45 +688,38 @@ class EntityDetailsRenderer {
                 ? window.FieldRendererService.renderStatus(item.status, item.type)
                 : this.getStatusBadge(item.status);
             
-            // עמודה "פעולות" - כפתורים פרוסים (לא תפריט) - רוחב מקסימלי זהה לגובה
-            let actionsHtml = '<div class="btn-group btn-group-sm linked-items-actions" role="group">';
+            // עמודה "פעולות" - שימוש ב-LinkedItemsService ליצירת כפתורים
+            // העברת מידע על המקור (entity-details modal) ל-LinkedItemsService
+            const sourceInfo = {
+                sourceModal: 'entity-details',
+                sourceType: entityType || this.currentEntityType,
+                sourceId: entityId || this.currentEntityId
+            };
             
-            // כפתור VIEW
-            actionsHtml += `<button data-button-type="VIEW" data-variant="small" data-onclick="window.showEntityDetails('${item.type}', ${item.id}, { mode: 'view' })" data-text="" title="צפה בפרטים"></button>`;
-            
-            // כפתור LINK
-            const linkFunction = this.getLinkedItemsFunctionForType(item.type, item.id);
-            if (linkFunction) {
-                actionsHtml += `<button data-button-type="LINK" data-variant="small" data-onclick="${linkFunction}" data-text="" title="פריטים מקושרים"></button>`;
+            if (window.Logger) {
+                window.Logger.debug('🔗 [EntityDetailsRenderer] Generating linked item actions with sourceInfo', {
+                    itemType: item.type,
+                    itemId: item.id,
+                    sourceInfo: sourceInfo,
+                    entityType: entityType || this.currentEntityType,
+                    entityId: entityId || this.currentEntityId,
+                    page: "entity-details-renderer"
+                });
             }
             
-            // כפתור EDIT
-            const editFunction = this.getEditFunctionForType(item.type, item.id);
-            if (editFunction) {
-                actionsHtml += `<button data-button-type="EDIT" data-variant="small" data-onclick="${editFunction}" data-text="" title="ערוך"></button>`;
-            }
-            
-            // כפתור CANCEL/REACTIVATE או DELETE
-            const cancelFunction = this.getCancelFunctionForType(item.type, item.id, item.status);
-            if (cancelFunction) {
-                const cancelType = item.status === 'cancelled' || item.status === 'canceled' ? 'REACTIVATE' : 'CANCEL';
-                const cancelTitle = item.status === 'cancelled' || item.status === 'canceled' ? 'הפעל מחדש' : 'בטל';
-                actionsHtml += `<button data-button-type="${cancelType}" data-variant="small" data-onclick="${cancelFunction}" data-text="" title="${cancelTitle}"></button>`;
-            } else {
-                const deleteFunction = this.getDeleteFunctionForType(item.type, item.id);
-                if (deleteFunction) {
-                    actionsHtml += `<button data-button-type="DELETE" data-variant="small" data-onclick="${deleteFunction}" data-text="" title="מחק"></button>`;
-                }
-            }
-            
-            actionsHtml += '</div>';
+            const actionsHtml = (window.LinkedItemsService && window.LinkedItemsService.generateLinkedItemActions)
+                ? window.LinkedItemsService.generateLinkedItemActions(item, 'table', { 
+                    entityColors: this.entityColors,
+                    sourceInfo: sourceInfo
+                })
+                : this._generateLinkedItemActionsFallback(item); // Fallback אם Service לא זמין
             
             html += `
                 <tr>
                     <td>${typeDisplay}</td>
                     <td>${nameDisplay}</td>
-                    <td style="text-align: center; padding-inline-start: 1.5rem;">${statusDisplay}</td>
-                    <td>${actionsHtml}</td>
+                    <td style="text-align: center; padding-inline-end: 1rem;">${statusDisplay}</td>
+                    <td style="text-align: center;">${actionsHtml}</td>
                 </tr>
             `;
         });
@@ -721,6 +731,48 @@ class EntityDetailsRenderer {
             </div>
         `;
         return html;
+    }
+    
+    /**
+     * Fallback method for generating linked item actions if LinkedItemsService is not available
+     * 
+     * @private
+     * @param {Object} item - פריט מקושר
+     * @returns {string} - HTML של כפתורים
+     */
+    _generateLinkedItemActionsFallback(item) {
+        let actionsHtml = '<div class="btn-group btn-group-sm linked-items-actions" role="group">';
+        
+        // כפתור VIEW
+        actionsHtml += `<button data-button-type="VIEW" data-variant="small" data-onclick="window.showEntityDetails('${item.type}', ${item.id}, { mode: 'view' })" data-text="" title="צפה בפרטים"></button>`;
+        
+        // כפתור LINK
+        const linkFunction = this.getLinkedItemsFunctionForType(item.type, item.id);
+        if (linkFunction) {
+            actionsHtml += `<button data-button-type="LINK" data-variant="small" data-onclick="${linkFunction}" data-text="" title="פריטים מקושרים"></button>`;
+        }
+        
+        // כפתור EDIT
+        const editFunction = this.getEditFunctionForType(item.type, item.id);
+        if (editFunction) {
+            actionsHtml += `<button data-button-type="EDIT" data-variant="small" data-onclick="${editFunction}" data-text="" title="ערוך"></button>`;
+        }
+        
+        // כפתור CANCEL/REACTIVATE או DELETE
+        const cancelFunction = this.getCancelFunctionForType(item.type, item.id, item.status);
+        if (cancelFunction) {
+            const cancelType = item.status === 'cancelled' || item.status === 'canceled' ? 'REACTIVATE' : 'CANCEL';
+            const cancelTitle = item.status === 'cancelled' || item.status === 'canceled' ? 'הפעל מחדש' : 'בטל';
+            actionsHtml += `<button data-button-type="${cancelType}" data-variant="small" data-onclick="${cancelFunction}" data-text="" title="${cancelTitle}"></button>`;
+        } else {
+            const deleteFunction = this.getDeleteFunctionForType(item.type, item.id);
+            if (deleteFunction) {
+                actionsHtml += `<button data-button-type="DELETE" data-variant="small" data-onclick="${deleteFunction}" data-text="" title="מחק"></button>`;
+            }
+        }
+        
+        actionsHtml += '</div>';
+        return actionsHtml;
     }
 
     // Helper methods
@@ -1072,7 +1124,7 @@ class EntityDetailsRenderer {
                 { key: 'ticker_symbol', label: 'טיקר', type: 'text' },
                 { key: 'side', label: 'צד', type: 'text' },
                 { key: 'investment_type', label: 'סוג השקעה', type: 'text' },
-                { key: 'status', label: 'סטטוס', type: 'status' },
+                // סטטוס מוצג למעלה - לא כאן
                 { key: 'target_price', label: 'מחיר יעד', type: 'currency' },
                 { key: 'stop_loss', label: 'סטופ לוס', type: 'currency' },
                 { key: 'notes', label: 'הערות', type: 'text' },
@@ -1281,14 +1333,73 @@ class EntityDetailsRenderer {
         return html;
     }
 
-    formatFieldValue(value, type, entityColor = '#019193') {
-        if (value === null || value === undefined || value === '') return 'לא זמין';
+    formatFieldValue(value, type, entityColor = '#019193', fieldKey = null, entityData = null) {
+        if (value === null || value === undefined || value === '') {
+            // טיקר - אין תכנון בלי טיקר, אז לא להציג "לא זמין"
+            if (fieldKey === 'ticker_symbol') return '-';
+            return 'לא זמין';
+        }
+        
+        // קבלת סמל מטבע מהנתונים
+        const getCurrencySymbol = () => {
+            if (!entityData) return '$';
+            
+            // ניסיון לקבל מהטיקר
+            if (entityData.ticker && entityData.ticker.currency_symbol) {
+                return entityData.ticker.currency_symbol;
+            }
+            if (entityData.ticker && entityData.ticker.currency && entityData.ticker.currency.symbol) {
+                const symbol = entityData.ticker.currency.symbol;
+                // המרה מסמל ISO לסמל תצוגה
+                if (symbol === 'USD') return '$';
+                if (symbol === 'ILS') return '₪';
+                if (symbol === 'EUR') return '€';
+                if (symbol === 'GBP') return '£';
+                return symbol;
+            }
+            
+            // ניסיון לקבל מה-currency_id דרך currenciesData
+            if (entityData.ticker && entityData.ticker.currency_id && window.currenciesData && window.currenciesData.length > 0) {
+                const currency = window.currenciesData.find(c => c.id === entityData.ticker.currency_id);
+                if (currency && currency.symbol) {
+                    const symbol = currency.symbol;
+                    if (symbol === 'USD') return '$';
+                    if (symbol === 'ILS') return '₪';
+                    if (symbol === 'EUR') return '€';
+                    if (symbol === 'GBP') return '£';
+                    return symbol;
+                }
+            }
+            
+            // ברירת מחדל
+            return '$';
+        };
+        
+        // טיפול מיוחד בשדות ספציפיים לפי fieldKey
+        if (fieldKey === 'side' && window.FieldRendererService && window.FieldRendererService.renderSide) {
+            return window.FieldRendererService.renderSide(value);
+        }
+        if (fieldKey === 'investment_type' && window.FieldRendererService && window.FieldRendererService.renderType) {
+            return window.FieldRendererService.renderType(value);
+        }
+        if ((fieldKey === 'target_price' || fieldKey === 'stop_loss') && window.FieldRendererService && window.FieldRendererService.renderAmount) {
+            const currencySymbol = getCurrencySymbol();
+            return window.FieldRendererService.renderAmount(parseFloat(value), currencySymbol, 2);
+        }
+        
         switch (type) {
             case 'datetime': return this.formatDateTime(value);
             case 'price': return this.formatPrice(value);
             case 'status': return this.formatStatus(value, entityColor);
             case 'boolean': return value ? 'כן' : 'לא';
             case 'number': return typeof value === 'number' ? value.toLocaleString('he-IL') : String(value);
+            case 'currency': 
+                // אם זה currency, נשתמש ב-renderAmount אם אפשר
+                if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+                    const currencySymbol = getCurrencySymbol();
+                    return window.FieldRendererService.renderAmount(parseFloat(value), currencySymbol, 2);
+                }
+                return typeof value === 'number' ? value.toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : String(value);
             case 'text': return String(value);
             case 'trades_summary': return this.formatTradesSummary(value);
             case 'trade_plans_summary': return this.formatTradePlansSummary(value);
@@ -1315,8 +1426,19 @@ class EntityDetailsRenderer {
         // קבלת צבע התוכנית מההעדפות
         const planColor = this.entityColors.trade_plan || '#6f42c1';
         
+        // סטטוס למעלה - שימוש במערכת הרינדור הכללית
+        const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+            ? window.FieldRendererService.renderStatus(tradePlanData.status, 'trade_plan')
+            : '';
+        
         return `
             <div class="entity-details-container trade-plan-details">
+                
+                <!-- סטטוס למעלה -->
+                ${statusDisplay ? `<div class="mb-3 d-flex justify-content-start align-items-center gap-2">
+                    <strong>סטטוס:</strong>
+                    ${statusDisplay}
+                </div>` : ''}
                 
                 <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
@@ -1330,7 +1452,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(tradePlanData.linked_items || [], planColor)}
+                        ${this.renderLinkedItems(tradePlanData.linked_items || [], planColor, 'trade_plan', tradePlanData.id)}
                     </div>
                 </div>
             </div>
@@ -1351,8 +1473,19 @@ class EntityDetailsRenderer {
         // קבלת צבע הביצוע מההעדפות
         const executionColor = this.entityColors.execution || '#17a2b8';
         
+        // סטטוס למעלה - שימוש במערכת הרינדור הכללית
+        const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+            ? window.FieldRendererService.renderStatus(executionData.status, 'execution')
+            : '';
+        
         return `
             <div class="entity-details-container execution-details">
+                
+                <!-- סטטוס למעלה -->
+                ${statusDisplay ? `<div class="mb-3 d-flex justify-content-start align-items-center gap-2">
+                    <strong>סטטוס:</strong>
+                    ${statusDisplay}
+                </div>` : ''}
                 
                 <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
@@ -1366,7 +1499,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(executionData.linked_items || [], executionColor)}
+                        ${this.renderLinkedItems(executionData.linked_items || [], executionColor, 'execution', executionData.id)}
                     </div>
                 </div>
             </div>
@@ -1379,8 +1512,19 @@ class EntityDetailsRenderer {
         // קבלת צבע החשבון מסחר מההעדפות
         const accountColor = this.entityColors.account || '#28a745';
         
+        // סטטוס למעלה - שימוש במערכת הרינדור הכללית
+        const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+            ? window.FieldRendererService.renderStatus(accountData.status, 'account')
+            : '';
+        
         return `
             <div class="entity-details-container account-details">
+                
+                <!-- סטטוס למעלה -->
+                ${statusDisplay ? `<div class="mb-3 d-flex justify-content-start align-items-center gap-2">
+                    <strong>סטטוס:</strong>
+                    ${statusDisplay}
+                </div>` : ''}
                 
                 <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
@@ -1394,7 +1538,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(accountData.linked_items || [], accountColor)}
+                        ${this.renderLinkedItems(accountData.linked_items || [], accountColor, 'account', accountData.id)}
                     </div>
                 </div>
             </div>
@@ -1403,6 +1547,11 @@ class EntityDetailsRenderer {
     renderAlert(alertData, options) {
         try {
             window.Logger.info('🎨 Rendering alert data:', alertData, { page: "entity-details-renderer" });
+            
+            // סטטוס למעלה - שימוש במערכת הרינדור הכללית
+            const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+                ? window.FieldRendererService.renderStatus(alertData.status, 'alert')
+                : '';
             
             // יצירת כותרת המודול
             
@@ -1416,7 +1565,7 @@ class EntityDetailsRenderer {
             const alertCondition = this.renderAlertCondition(alertData);
             
             // יצירת פריטים מקושרים
-            const linkedItems = this.renderLinkedItems(alertData.linked_items || []);
+            const linkedItems = this.renderLinkedItems(alertData.linked_items || [], this.entityColors.alert || '#ffc107', 'alert', alertData.id);
             
             // יצירת כפתורי פעולה
             const actionButtons = this.renderActionButtons('alert', alertData.id);
@@ -1424,6 +1573,12 @@ class EntityDetailsRenderer {
             return `
                 <div class="entity-details-content">
                     <div class="entity-details-body">
+                        <!-- סטטוס למעלה -->
+                        ${statusDisplay ? `<div class="mb-3 d-flex justify-content-start align-items-center gap-2">
+                            <strong>סטטוס:</strong>
+                            ${statusDisplay}
+                        </div>` : ''}
+                        
                         ${basicInfo}
                         ${alertSpecific}
                         ${alertCondition}
@@ -1597,8 +1752,19 @@ class EntityDetailsRenderer {
     renderCashFlow(cashFlowData, options = {}) {
         const entityColor = this.entityColors.cash_flow || '#fd7e14';
         
+        // סטטוס למעלה - שימוש במערכת הרינדור הכללית
+        const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+            ? window.FieldRendererService.renderStatus(cashFlowData.status || 'active', 'cash_flow')
+            : '';
+        
         return `
             <div class="entity-details-container cash-flow-details">
+                
+                <!-- סטטוס למעלה -->
+                ${statusDisplay ? `<div class="mb-3 d-flex justify-content-start align-items-center gap-2">
+                    <strong>סטטוס:</strong>
+                    ${statusDisplay}
+                </div>` : ''}
                 
                 <div class="row">
                     <div class="col-md-6">
@@ -1790,8 +1956,19 @@ class EntityDetailsRenderer {
         // קבלת צבע ההערה מההעדפות
         const noteColor = this.entityColors.note || '#6c757d';
         
+        // סטטוס למעלה - שימוש במערכת הרינדור הכללית
+        const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+            ? window.FieldRendererService.renderStatus(noteData.status || 'active', 'note')
+            : '';
+        
         return `
             <div class="entity-details-container note-details">
+                
+                <!-- סטטוס למעלה -->
+                ${statusDisplay ? `<div class="mb-3 d-flex justify-content-start align-items-center gap-2">
+                    <strong>סטטוס:</strong>
+                    ${statusDisplay}
+                </div>` : ''}
                 
                 <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
@@ -1805,7 +1982,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(noteData.linked_items || [], noteColor)}
+                        ${this.renderLinkedItems(noteData.linked_items || [], noteColor, 'note', noteData.id)}
                     </div>
                 </div>
             </div>

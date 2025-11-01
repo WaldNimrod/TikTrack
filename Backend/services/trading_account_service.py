@@ -1,5 +1,8 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from models.trading_account import TradingAccount
+from models.cash_flow import CashFlow
+from models.execution import Execution
 from services.validation_service import ValidationService
 from typing import List, Optional, Dict, Any
 import logging
@@ -161,7 +164,6 @@ class TradingAccountService:
         logger.info(f"Updated trading_account values for: {trading_account.name}")
         return True
     
-
     
     @staticmethod
     def get_open_trades(db: Session, trading_account_id: int) -> List[Dict[str, Any]]:

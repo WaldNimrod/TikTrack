@@ -162,6 +162,15 @@
   - `showInfoNotification()`
   - `showDetailsModal()` ⭐ **חדש**
 
+### **Logger Service** 🔔 **חבילת ניטור ולוגים** 🟢 **חבילת בסיס**
+- **קובץ:** `logger-service.js`
+- **תיאור:** מערכת לוגים מאוחדת עם רמות לוג, ניטור ביצועים, ומעקב שגיאות
+- **דוקומנטציה:** [logger-service.md](../03-API_REFERENCE/logger-service.md), [UNIFIED_LOG_SYSTEM_GUIDE.md](UNIFIED_LOG_SYSTEM_GUIDE.md)
+- **פונקציות עיקריות:**
+  - `window.Logger.info()`, `warn()`, `error()`, `debug()`
+  - `generateDetailedLog()` - דוח מפורט על מצב המערכת
+  - תמיכה ב-logging מובנה עם קטגוריות וניטור
+
 ### **Warning System** 🔔 **חבילת התראות מתקדמות**
 - **קובץ:** `warning-system.js`
 - **תיאור:** מערכת התראות אזהרה ואישור
@@ -206,6 +215,96 @@
   - `window.ModalManagerV2.showEditModal(modalId, entityType, entityId)` ✅ **יש להשתמש במקום פונקציות מקומיות `showEdit*Modal`**
   - תמיכה מלאה ב-CRUD operations, validation, ועוד
 
+### **Data Collection Service** 🔵 **חבילת CRUD** ✅ **חדש! ינואר 2025**
+- **קובץ:** `services/data-collection-service.js`
+- **תיאור:** מערכת מרכזית לאיסוף נתונים מטפסים והמרות טיפוס - מחליפה 3,131 קריאות ידניות ל-getElementById
+- **דוקומנטציה:** [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md), [SERVICES_INTEGRATION_COMPLETION_REPORT.md](SERVICES_INTEGRATION_COMPLETION_REPORT.md)
+- **פונקציות עיקריות:**
+  - `DataCollectionService.collectFormData(fieldMap)` ✅ **יש להשתמש במקום getElementById ידני**
+  - `DataCollectionService.setFormData(fieldMap, values)` - הגדרת ערכים בטופס
+  - `DataCollectionService.resetForm(formId)` - ניקוי טפסים
+  - המרות טיפוס אוטומטיות (int, float, date, bool)
+
+### **CRUD Response Handler** 🔵 **חבילת CRUD** ✅ **חדש! ינואר 2025**
+- **קובץ:** `services/crud-response-handler.js`
+- **תיאור:** מערכת מרכזית לטיפול בתגובות API של פעולות CRUD - מחליפה לוגיקה זהה ב-18 פונקציות save/update/delete
+- **דוקומנטציה:** [CRUD_RESPONSE_HANDLER.md](../02-ARCHITECTURE/FRONTEND/CRUD_RESPONSE_HANDLER.md), [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+- **פונקציות עיקריות:**
+  - `CRUDResponseHandler.handleSaveResponse(response, options)` ✅ **יש להשתמש במקום לוגיקה ידנית**
+  - `CRUDResponseHandler.handleUpdateResponse(response, options)`
+  - `CRUDResponseHandler.handleDeleteResponse(response, options)`
+  - `CRUDResponseHandler.handleLoadResponse(response, options)` ⭐ **v2.0.0 - טיפול בשגיאות טעינה עם Retry + Copy Error Log**
+  - הפרדה אוטומטית בין שגיאות ולידציה (400) לשגיאות מערכת (500)
+  - סגירת modal אוטומטית ורענון טבלה
+
+### **Linked Items Service** 🔵 **חבילת CRUD** ✅ **חדש!**
+- **קובץ:** `services/linked-items-service.js`
+- **תיאור:** מערכת מרכזית לניהול וצגת פריטים מקושרים (trades, plans, executions, alerts, וכו')
+- **דוקומנטציה:** [LINKED_ITEMS_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/LINKED_ITEMS_SYSTEM.md), [LINKED_ITEMS_SYSTEM.md](LINKED_ITEMS_SYSTEM.md)
+- **פונקציות עיקריות:**
+  - `LinkedItemsService.sortLinkedItems(items)` - מיון פריטים מקושרים
+  - `LinkedItemsService.getLinkedItemIcon(itemType)` - קבלת אייקון לפי סוג ישות
+  - `LinkedItemsService.formatLinkedItemName(item)` - עיצוב שם פריט
+  - `LinkedItemsService.generateLinkedItemActions(item, context)` - יצירת כפתורי פעולות
+
+### **Select Populator Service** 🔵 **חבילת CRUD** ✅ **חדש! ינואר 2025**
+- **קובץ:** `services/select-populator-service.js`
+- **תיאור:** מערכת מרכזית למילוי select boxes מ-API - מחליפה קוד חוזר ב-16 מקומות
+- **דוקומנטציה:** [SELECT_POPULATOR_SERVICE.md](../02-ARCHITECTURE/FRONTEND/SELECT_POPULATOR_SERVICE.md), [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+- **פונקציות עיקריות:**
+  - `SelectPopulatorService.populateTickersSelect(selectId, options)` ✅ **יש להשתמש במקום קוד ידני**
+  - `SelectPopulatorService.populateAccountsSelect(selectId, options)`
+  - `SelectPopulatorService.populateCurrenciesSelect(selectId, options)`
+  - `SelectPopulatorService.populateTradePlansSelect(selectId, options)`
+  - `SelectPopulatorService.populateGenericSelect(selectId, endpoint, config)` - כללי לכל endpoint
+  - cache של נתונים ושימוש בהעדפות משתמש
+
+### **Default Value Setter** 🔵 **חבילת CRUD** ✅ **חדש! ינואר 2025**
+- **קובץ:** `services/default-value-setter.js`
+- **תיאור:** מערכת מרכזית להגדרת ברירות מחדל בטפסים - מחליפה קוד זהה ב-16 פונקציות showAddModal
+- **דוקומנטציה:** [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+- **פונקציות עיקריות:**
+  - `DefaultValueSetter.setCurrentDate(fieldId)` - הגדרת תאריך נוכחי
+  - `DefaultValueSetter.setCurrentDateTime(fieldId)` - הגדרת תאריך ושעה נוכחיים
+  - `DefaultValueSetter.setPreferenceValue(fieldId, preferenceName)` - טעינת ברירות מחדל מהעדפות
+  - `DefaultValueSetter.setAllDefaults(config)` - הגדרה מרובה בקריאה אחת
+
+### **Alert Condition Renderer** 🔔 **חבילת התראות מתקדמות** ✅ **חדש!**
+- **קובץ:** `services/alert-condition-renderer.js`
+- **תיאור:** מערכת מרכזית לעיצוב והצגת תנאי התראות
+- **דוקומנטציה:** חלק מ-[ALERT_CONDITION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/ALERT_CONDITION_SYSTEM.md)
+- **פונקציות עיקריות:**
+  - `AlertConditionRenderer.render(condition)` - רינדור תנאי התראה
+  - תמיכה בכל סוגי התנאים (price, volume, time, וכו')
+
+### **Actions Menu System** 🎨 **חבילת ממשק משתמש מתקדם** ✅ **חדש!**
+- **קובץ:** `modules/actions-menu-system.js`
+- **תיאור:** מערכת ניהול תפריטי פעולות (hover-based popup menus) בטבלאות
+- **דוקומנטציה:** מוזכר ב-[button-system.md](../02-ARCHITECTURE/FRONTEND/button-system.md)
+- **תכונות:**
+  - Pure CSS hover (ללא JavaScript delays)
+  - Auto-positioning (RTL aware)
+  - Material Design
+  - תמיכה ב-2-5 כפתורים דינמית
+
+### **Button System Init** 🎨 **חבילת ממשק משתמש מתקדם** ✅ **חדש!**
+- **קובץ:** `button-system-init.js`
+- **תיאור:** מערכת אתחול כפתורים מתקדמת עם logging, caching, וניטור ביצועים
+- **דוקומנטציה:** [button-system.md](../02-ARCHITECTURE/FRONTEND/button-system.md)
+- **תכונות:**
+  - אוטומציה מלאה ליצירת כפתורים
+  - תמיכה ב-data-onclick לאירועים מרוכזים
+  - ניטור ביצועים ו-caching
+
+### **Event Handler Manager** 🔧 **מערכות ליבה קריטיות** ✅ **חדש!**
+- **קובץ:** `event-handler-manager.js`
+- **תיאור:** מערכת ניהול אירועים מרכזית למניעת כפילויות ושיפור ביצועים
+- **דוקומנטציה:** [EVENT_HANDLER_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md)
+- **פונקציות עיקריות:**
+  - `EventHandlerManager.init()` - אתחול מערכת
+  - `setupGlobalDelegation()` - הגדרת event delegation גלובלי
+  - ניהול listeners מרכזי למניעת duplicates
+
 ### **Info Summary System** 📊 **חבילת גרפים ותצוגה**
 - **קובץ:** `services/statistics-calculator.js` (InfoSummarySystem)
 - **תיאור:** מערכת סיכום נתונים מאוחדת לכל עמודי המשתמש
@@ -224,6 +323,20 @@
   - `window.showFieldSuccess(field)`
   - `window.clearFieldError(field)`
   - `window.validateEntityForm(formId, rules)`
+
+### **Field Renderer Service** 🔵 **חבילת CRUD** ✅ **חדש! ינואר 2025**
+- **קובץ:** `services/field-renderer-service.js`
+- **תיאור:** מערכת מרכזית לעיצוב והצגת שדות בטבלאות (status badges, amounts, dates, וכו') - מחליפה 138 מקומות עם HTML ידני
+- **דוקומנטציה:** [field-renderer-service.md](../03-API_REFERENCE/field-renderer-service.md), [SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+- **פונקציות עיקריות:**
+  - `FieldRendererService.renderStatus(status, entityType)` ✅ **יש להשתמש במקום קוד HTML ידני**
+  - `FieldRendererService.renderSide(side)`
+  - `FieldRendererService.renderAmount(value, currencySymbol, decimals)`
+  - `FieldRendererService.renderType(type, amountForColor)`
+  - `FieldRendererService.renderDate(date, includeTime)`
+  - `FieldRendererService.renderTickerInfo(ticker, cssClass)` ⭐ **חדש - תצוגת מחיר טיקר**
+  - `FieldRendererService.renderNumericValue(value, suffix, showPrefix)` - ערך מספרי כללי
+  - `FieldRendererService.renderPosition(quantity, averagePrice, currencySymbol)` - מיקום מסחר
 
 ### **Header System** 🎨 **חבילת ממשק משתמש מתקדם** 🔍 **חבילת פילטרים**
 - **קובץ:** `header-system.js`
@@ -252,6 +365,44 @@
   - `sortTableData()`
   - `sortTable()`
 
+### **Entity Services** 🔵 **חבילת CRUD** ✅ **חדש!**
+מערכות שירות ספציפיות לישויות - ניהול נתונים ופעולות CRUD:
+
+#### **Alert Service** 🔔 **חבילת התראות מתקדמות**
+- **קובץ:** `alert-service.js`
+- **תיאור:** שירות מרכזי לניהול התראות - state management, validation, ופעולות utility
+- **דוקומנטציה:** [ALERT_SERVICE_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/ALERT_SERVICE_SYSTEM.md) (מוזכר בקוד)
+- **פונקציות עיקריות:**
+  - `getAlertState(status, isTriggered)` - קביעת מצב תצוגה של התראה
+  - `formatAlertCondition(condition)` / `parseAlertCondition(condition)` - עיבוד תנאים
+  - `cancelAlert()`, `deleteAlert()`, `updateAlertStatus()` - פעולות CRUD
+
+#### **Ticker Service**
+- **קובץ:** `ticker-service.js`
+- **תיאור:** שירות מתקדם לניהול טיקרים עם caching וסינון
+- **דוקומנטציה:** [TICKER_SERVICE_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/TICKER_SERVICE_SYSTEM.md) (מוזכר בקוד)
+- **פונקציות עיקריות:**
+  - `getTickers()`, `getTickersWithTrades()`, `getTickersWithPlans()`
+  - `getTickersByStatus()`, `getTickersByType()` - סינון מתקדם
+  - `updateTickerSelect()` - עדכון select box
+
+#### **Trade Plan Service**
+- **קובץ:** `trade-plan-service.js`
+- **תיאור:** שירות לניהול תוכניות מסחר
+- **דוקומנטציה:** מוזכר ב-[SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+- **פונקציות עיקריות:**
+  - `getTradePlans()`, `getTradePlansByStatus()`, `getTradePlansByInvestmentType()`
+  - `filterTradePlans(filters)` - סינון מתקדם
+  - `formatTradePlanStatus()` / `parseTradePlanStatus()` - עיבוד סטטוס
+
+#### **Account Service**
+- **קובץ:** `account-service.js`
+- **תיאור:** שירות לניהול חשבונות מסחר
+- **דוקומנטציה:** מוזכר ב-[SERVICES_ARCHITECTURE.md](SERVICES_ARCHITECTURE.md)
+- **פונקציות עיקריות:**
+  - `getAccounts()`, `getActiveAccounts()`, `getAccountsByStatus()`
+  - `cancelAccount()`, `reactivateAccount()` - ניהול סטטוס
+
 ### **Table Mapping System** 🔵 **חבילת CRUD** 🔍 **חבילת פילטרים**
 - **קובץ:** `table-mapping.js`
 - **תיאור:** מערכת מיפוי טבלאות
@@ -279,6 +430,15 @@
 - **פונקציות עיקריות:**
   - `getPreference()`
   - `savePreference()`
+
+### **Preferences Group Manager** ⚙️ **חבילת העדפות והגדרות** ✅ **חדש!**
+- **קובץ:** `preferences-group-manager.js`
+- **תיאור:** מנהל קבוצות העדפות - אקורדיון ייחודי + lazy loading (רק section אחד פתוח בכל זמן)
+- **דוקומנטציה:** חלק מ-[PREFERENCES_SYSTEM.md](../features/preferences/PREFERENCES_SYSTEM.md)
+- **פונקציות עיקריות:**
+  - `PreferencesGroupManager.openSection(sectionId)` - פתיחת section (סוגר אחרים אוטומטית)
+  - `PreferencesGroupManager.closeSection(sectionId)` - סגירת section
+  - טעינת העדפות רק כשפותחים section + שמירת העדפות לפי קבוצה
 
 ---
 
@@ -393,6 +553,30 @@
   - `closeModal()`
   - `closeModalGlobal()`
 
+### **Modal Navigation System** 🎨 **חבילת ממשק משתמש מתקדם**
+- **קובץ:** `modal-navigation-manager.js`
+- **תיאור:** מערכת ניווט מודולים מקוננים עם היסטוריית ניווט, backdrop גלובלי, ו-breadcrumb
+- **דוקומנטציה:** [MODAL_NAVIGATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/MODAL_NAVIGATION_SYSTEM.md)
+- **פונקציות עיקריות:**
+  - `pushModal()` - הוספת מודול ל-stack
+  - `popModal()` - הסרת מודול אחרון
+  - `goBack()` - חזרה למודול הקודם
+  - `getBreadcrumb()` - יצירת breadcrumb trail
+  - `updateModalNavigation()` - עדכון UI של הניווט
+  - `manageBackdrop()` - ניהול backdrop גלובלי
+
+### **Entity Details System** 🔵 **חבילת CRUD** ✅ **חדש!**
+- **קובץ:** `entity-details-modal.js`, `entity-details-renderer.js`, `entity-details-api.js`
+- **תיאור:** מערכת מאוחדת להצגת פרטי ישויות (tickers, trades, plans, executions, וכו') במודל
+- **דוקומנטציה:** [README.md](../features/entity-details-system/README.md), [LINKED_ITEMS_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/LINKED_ITEMS_SYSTEM.md)
+- **רכיבי המערכת:**
+  - **EntityDetailsModal** - מודל להצגת פרטי ישות
+  - **EntityDetailsRenderer** - רינדור נתוני ישות בפורמט אחיד
+  - **EntityDetailsAPI** - API integration עם retry logic ו-caching
+- **פונקציות עיקריות:**
+  - `window.entityDetailsAPI.getEntityDetails(entityType, entityId, apiOptions)`
+  - תמיכה ב-linked items, external data integration, ועיצוב אחיד
+
 ---
 
 ## 🔄 **מערכות החלפת פונקציות מובנות**
@@ -438,18 +622,18 @@
 ## 📋 **סיכום**
 
 ### **סטטוס כללי:**
-- **סה"כ מערכות:** 35+ מערכות כלליות
+- **סה"כ מערכות:** 50+ מערכות כלליות (עודכן!)
 - **חבילת בסיס:** 10 מערכות חיוניות לכל עמוד
 - **דוקומנטציה:** 100% מפורטת
-- **יישום:** 95/95 מערכות מיושמות במלואן
+- **יישום:** כל המערכות מיושמות במלואן
 - **בדיקה:** כל המערכות נבדקו ועובדות
 
-### **קטגוריות עיקריות:**
+### **קטגוריות עיקריות (עודכן):**
 1. **מערכות אתחול** - 3 מערכות
-2. **מערכות התראות** - 5 מערכות
-3. **מערכות ממשק משתמש** - 4 מערכות
-4. **מערכות נתונים** - 3 מערכות
-5. **מערכות העדפות** - 1 מערכת
+2. **מערכות התראות והודעות** - 7 מערכות (נוספו: Logger, Alert Condition Renderer, Alert Service)
+3. **מערכות ממשק משתמש** - 8 מערכות (נוספו: Actions Menu, Button System, Event Handler)
+4. **מערכות נתונים וטבלאות** - 8 מערכות (נוספו: DataCollection, CRUDResponse, SelectPopulator, DefaultValueSetter, LinkedItems, Entity Services, Entity Details)
+5. **מערכות העדפות** - 2 מערכות (נוסף: Preferences Group Manager)
 6. **מערכות רענון** - 1 מערכת (2 נוספות בחבילת בסיס)
 7. **מערכות קבצים** - 2 מערכות
 8. **מערכות גרפים** - 2 מערכות
@@ -457,15 +641,30 @@
 10. **מערכות ניהול מצב עמודים** - 1 מערכת
 11. **מערכות תרגום** - 1 מערכת
 12. **מערכות זיהוי וקטגוריות** - 1 מערכת
-13. **מערכות ניהול מודולים** - 1 מערכת
+13. **מערכות ניהול מודולים** - 2 מערכות (נוסף: Entity Details System)
 14. **מערכות החלפת פונקציות** - 1 מערכת
 15. **מערכות ניהול מצב סקשנים** - 1 מערכת
-16. **מערכות ליבה** - 1 מערכת
+16. **מערכות ליבה** - 2 מערכות (נוסף: Event Handler Manager)
+
+### **מערכות חדשות שנוספו (עדכון נובמבר 2025):**
+✅ **DataCollectionService** - איסוף נתונים מטפסים (חוסך 3,131 קריאות ל-getElementById)  
+✅ **CRUDResponseHandler** - טיפול בתגובות CRUD (חוסך ~550 שורות קוד)  
+✅ **SelectPopulatorService** - מילוי select boxes (חוסך 18 מיקומים)  
+✅ **DefaultValueSetter** - ברירות מחדל בטפסים (חוסך ~35 שורות)  
+✅ **LinkedItemsService** - ניהול פריטים מקושרים  
+✅ **AlertConditionRenderer** - עיצוב תנאי התראות  
+✅ **ActionsMenuSystem** - תפריטי פעולות בטבלאות  
+✅ **ButtonSystemInit** - אתחול כפתורים מתקדם  
+✅ **EventHandlerManager** - ניהול אירועים מרכזי  
+✅ **EntityDetailsSystem** - מערכת פרטי ישויות (Modal + Renderer + API)  
+✅ **LoggerService** - מערכת לוגים מאוחדת  
+✅ **PreferencesGroupManager** - ניהול קבוצות העדפות  
+✅ **Entity Services** - AlertService, TickerService, TradePlanService, AccountService
 
 ### **עדכון אחרון:**
-- **תאריך:** 26 בספטמבר 2025
-- **שינוי:** הוספת מערכות רענון ומטמון לחבילת הבסיס
-- **סטטוס:** מעודכן ומתועד
+- **תאריך:** 1 בנובמבר 2025
+- **שינוי:** עדכון מקיף - הוספת 15+ מערכות חדשות שנוספו מאז יצירת הרשימה המקורית
+- **סטטוס:** מעודכן ומתועד במלואן
 
 ---
 

@@ -86,7 +86,7 @@
  * - reactivateTrade() - reactivateTrade function
  * - refreshTrades() - refreshTrades function
  * - generateDetailedLog() - generateDetailedLog function
- * - generateDetailedLogForTrades() - generateDetailedLogForTrades function
+ * - generateDetailedLogForTrades() - REMOVED: not used
  * 
  * ==========================================
  */
@@ -3089,33 +3089,33 @@ function generateDetailedLog() {
 // window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local  function for trades page
-async function generateDetailedLogForTrades() {
-    try {
-        const detailedLog = await generateDetailedLog();
-        if (detailedLog) {
-            await navigator.clipboard.writeText(detailedLog);
-            if (window.showSuccessNotification) {
-                window.showSuccessNotification('לוג מפורט הועתק ללוח');
-            } else {
-                alert('לוג מפורט הועתק ללוח!');
-            }
-        } else {
-            if (window.showWarningNotification) {
-                window.showWarningNotification('אין לוג להעתקה');
-            } else {
-                alert('אין לוג להעתקה');
-            }
-        }
-    } catch (err) {
-        window.Logger.error('שגיאה בהעתקה:', err, { page: "trades" });
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה בהעתקת הלוג');
-        } else {
-            alert('שגיאה בהעתקת הלוג');
-        }
-    }
-}
+// REMOVED: generateDetailedLogForTrades - not used anywhere, use generateDetailedLog() directly if needed
+// async function _REMOVED_generateDetailedLogForTrades() {
+//     try {
+//         const detailedLog = await generateDetailedLog();
+//         if (detailedLog) {
+//             await navigator.clipboard.writeText(detailedLog);
+//             if (window.showSuccessNotification) {
+//                 window.showSuccessNotification('לוג מפורט הועתק ללוח');
+//             } else {
+//                 alert('לוג מפורט הועתק ללוח!');
+//             }
+//         } else {
+//             if (window.showWarningNotification) {
+//                 window.showWarningNotification('אין לוג להעתקה');
+//             } else {
+//                 alert('אין לוג להעתקה');
+//             }
+//         }
+//     } catch (err) {
+//         window.Logger.error('שגיאה בהעתקה:', err, { page: "trades" });
+//         if (window.showErrorNotification) {
+//             window.showErrorNotification('שגיאה בהעתקת הלוג');
+//         } else {
+//             alert('שגיאה בהעתקת הלוג');
+//         }
+//     }
+// }
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
 // Modal management using ModalManagerV2

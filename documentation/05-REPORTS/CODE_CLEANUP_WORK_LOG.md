@@ -199,6 +199,8 @@
 | resetEditExecutionForm | executions.js | 1 (שורה 262) | - | שורות 262-264 | 1.11.2025 | הוסר - wrapper שלא בשימוש |
 | fillEditExecutionForm | executions.js | 1 (שורה 299) | - | שורות 299-538 | 1.11.2025 | הוסר - לא בשימוש, ModalManagerV2 משתמש ב-populateForm |
 | updateExecutionWrapper | executions.js | 1 (שורה 581) | - | שורות 581-736 | 1.11.2025 | הוסר - לא בשימוש, ModalManagerV2 משתמש ב-handlers שלו |
+| populateEditRelatedObjects | alerts.js | 1 (שורה 1159) | - | שורות 1159-1192 | 1.11.2025 | הוסר - לא בשימוש, ModalManagerV2 משתמש ב-populateSelects |
+| toggleAlert | alerts.js | 1 (שורה 2099) | - | שורות 2099-2143 | 1.11.2025 | הוסר - לא בשימוש |
 
 ---
 

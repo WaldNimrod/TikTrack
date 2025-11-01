@@ -159,6 +159,64 @@ class EntityDetailsService:
             # Convert to dictionary with only specified fields
             entity_dict = EntityDetailsService._entity_to_dict(entity, entity_type)
             
+            # Add ticker object with market data for trade and trade_plan
+            if entity_type in ['trade', 'trade_plan']:
+                # Add ticker object if ticker relationship is loaded
+                if hasattr(entity, 'ticker') and entity.ticker:
+                    # Create ticker object in entity_dict if not exists
+                    if 'ticker' not in entity_dict:
+                        entity_dict['ticker'] = {
+                            'id': entity.ticker.id,
+                            'symbol': entity.ticker.symbol,
+                            'name': entity.ticker.name
+                        }
+                    
+                    # Add market data to ticker object
+                    from models.external_data import MarketDataQuote
+                    latest_quote = db.query(MarketDataQuote).filter(
+                        MarketDataQuote.ticker_id == entity.ticker.id
+                    ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                    
+                    if latest_quote:
+                        # Add market data to ticker object
+                        entity_dict['ticker']['current_price'] = latest_quote.price
+                        entity_dict['ticker']['change_percent'] = latest_quote.change_pct_day
+                        entity_dict['ticker']['change_amount'] = latest_quote.change_amount_day
+                        entity_dict['ticker']['daily_change'] = latest_quote.change_amount_day  # For frontend compatibility
+                        entity_dict['ticker']['daily_change_percent'] = latest_quote.change_pct_day  # For frontend compatibility
+                        entity_dict['ticker']['volume'] = latest_quote.volume
+                        entity_dict['ticker']['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
+                        entity_dict['ticker']['data_source'] = latest_quote.source
+                        logger.debug(f"Added market data to ticker {entity.ticker.id} for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%")
+                    else:
+                        logger.debug(f"No market data found for ticker {entity.ticker.id} in {entity_type} {entity_id}")
+                elif hasattr(entity, 'ticker_id') and entity.ticker_id:
+                    # Ticker relationship not loaded - fetch ticker and add basic info
+                    from models.ticker import Ticker
+                    ticker = db.query(Ticker).filter(Ticker.id == entity.ticker_id).first()
+                    if ticker:
+                        entity_dict['ticker'] = {
+                            'id': ticker.id,
+                            'symbol': ticker.symbol,
+                            'name': ticker.name
+                        }
+                        # Try to add market data
+                        from models.external_data import MarketDataQuote
+                        latest_quote = db.query(MarketDataQuote).filter(
+                            MarketDataQuote.ticker_id == ticker.id
+                        ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                        
+                        if latest_quote:
+                            entity_dict['ticker']['current_price'] = latest_quote.price
+                            entity_dict['ticker']['change_percent'] = latest_quote.change_pct_day
+                            entity_dict['ticker']['change_amount'] = latest_quote.change_amount_day
+                            entity_dict['ticker']['daily_change'] = latest_quote.change_amount_day
+                            entity_dict['ticker']['daily_change_percent'] = latest_quote.change_pct_day
+                            entity_dict['ticker']['volume'] = latest_quote.volume
+                            entity_dict['ticker']['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
+                            entity_dict['ticker']['data_source'] = latest_quote.source
+                            logger.debug(f"Added market data to ticker {ticker.id} (fetched) for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%")
+            
             # Add linked items count (not full data to avoid circular references)
             entity_dict['linked_items_count'] = EntityDetailsService.get_linked_items_count(db, entity_type, entity_id)
             

@@ -428,18 +428,18 @@ class EntityDetailsModal {
                 sourceInfo: options.source || null
             });
             
-            // לוג מיוחד עבור trade_plan - בודק את ticker_symbol
-            if (entityType === 'trade_plan') {
+            // לוג מיוחד עבור trade_plan ו-trade - בודק את ticker_symbol
+            if (entityType === 'trade_plan' || entityType === 'trade') {
                 // Fallback: אם ticker_symbol לא מוגדר אבל יש tickerObject, נחלץ אותו
                 if (!entityData.ticker_symbol && entityData.ticker?.symbol) {
                     entityData.ticker_symbol = entityData.ticker.symbol;
-                    console.log('✅ [ENTITY-DETAILS-MODAL] Fixed ticker_symbol from tickerObject:', {
+                    console.log(`✅ [ENTITY-DETAILS-MODAL] Fixed ticker_symbol from tickerObject for ${entityType}:`, {
                         ticker_symbol: entityData.ticker_symbol,
                         tickerObject: entityData.ticker
                     });
                 }
                 
-                console.log('🔍🔍🔍 [ENTITY-DETAILS-MODAL] trade_plan ticker debug:', {
+                console.log(`🔍🔍🔍 [ENTITY-DETAILS-MODAL] ${entityType} ticker debug:`, {
                     entityId: entityId,
                     ticker_symbol: entityData.ticker_symbol,
                     ticker_id: entityData.ticker_id,

@@ -257,19 +257,109 @@ class EntityDetailsRenderer {
     renderTrade(tradeData, options = {}) {
         const entityColor = this.entityColors.trade || '#007bff';
         
-        // סטטוס למעלה - שימוש במערכת הרינדור הכללית
+        // סטטוס - שימוש במערכת הרינדור הכללית
         const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
             ? window.FieldRendererService.renderStatus(tradeData.status, 'trade')
             : '';
         
+        // טיקר - נחלץ מה-tickerObject או מה-ticker_symbol
+        const tickerSymbol = tradeData.ticker_symbol || 
+                            (tradeData.ticker?.symbol) || 
+                            (tradeData.ticker_id ? `טיקר #${tradeData.ticker_id}` : 'לא מוגדר');
+        
+        // נתוני טיקר עדכניים - ננסה לקבל מה-ticker object
+        // Backend מחזיר: ticker object עם current_price, daily_change, daily_change_percent, volume
+        let tickerInfoHTML = '';
+        
+        console.log('🔍🔍🔍 [renderTrade] Checking ticker data:', {
+            hasTicker: !!tradeData.ticker,
+            tickerObject: tradeData.ticker,
+            tickerObjectFull: tradeData.ticker ? JSON.stringify(tradeData.ticker, null, 2) : null,
+            hasFieldRendererService: !!window.FieldRendererService,
+            hasRenderTickerInfo: !!(window.FieldRendererService && window.FieldRendererService.renderTickerInfo),
+            tickerObjectKeys: tradeData.ticker ? Object.keys(tradeData.ticker) : [],
+            tickerObjectValues: tradeData.ticker ? Object.entries(tradeData.ticker).map(([key, value]) => ({key, value, type: typeof value})) : []
+        });
+        
+        if (tradeData.ticker && window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
+            // יצירת אובייקט ticker עם הנתונים העדכניים לפי המבנה מה-backend
+            const tickerData = {
+                symbol: tradeData.ticker.symbol || tickerSymbol,
+                name: tradeData.ticker.name || '',
+                current_price: tradeData.ticker.current_price || 0,
+                daily_change: tradeData.ticker.daily_change || 
+                            tradeData.ticker.change_amount || 
+                            0,
+                daily_change_percent: tradeData.ticker.daily_change_percent || 
+                                    tradeData.ticker.change_percent || 
+                                    0,
+                volume: tradeData.ticker.volume || 0,
+                currency_symbol: tradeData.ticker.currency_symbol || 
+                               (tradeData.ticker.currency?.symbol) || 
+                               '$'
+            };
+            
+            console.log('🔍🔍🔍 [renderTrade] tickerData created:', {
+                tickerData,
+                current_price: tickerData.current_price,
+                daily_change: tickerData.daily_change,
+                daily_change_percent: tickerData.daily_change_percent,
+                volume: tickerData.volume,
+                conditionCheck: {
+                    current_price_gt_0: tickerData.current_price > 0,
+                    daily_change_not_0: tickerData.daily_change !== 0,
+                    volume_gt_0: tickerData.volume > 0,
+                    conditionResult: (tickerData.current_price > 0 || tickerData.daily_change !== 0 || tickerData.volume > 0)
+                }
+            });
+            
+            // רק אם יש לפחות מחיר או שינוי - נציג את המידע
+            if (tickerData.current_price > 0 || tickerData.daily_change !== 0 || tickerData.volume > 0) {
+                console.log('🔍🔍🔍 [renderTrade] Calling renderTickerInfo...');
+                tickerInfoHTML = window.FieldRendererService.renderTickerInfo(tickerData, 'mb-2');
+                console.log('🔍🔍🔍 [renderTrade] renderTickerInfo returned:', {
+                    tickerInfoHTMLLength: tickerInfoHTML.length,
+                    tickerInfoHTML: tickerInfoHTML.substring(0, 200)
+                });
+            } else {
+                console.log('⚠️ [renderTrade] Condition not met - not calling renderTickerInfo');
+            }
+        } else {
+            console.log('⚠️ [renderTrade] Missing requirements for ticker info:', {
+                hasTicker: !!tradeData.ticker,
+                hasFieldRendererService: !!window.FieldRendererService,
+                hasRenderTickerInfo: !!(window.FieldRendererService && window.FieldRendererService.renderTickerInfo)
+            });
+        }
+        
+        console.log('🔍🔍🔍 [renderTrade] Final tickerInfoHTML:', {
+            tickerInfoHTMLLength: tickerInfoHTML.length,
+            tickerInfoHTML: tickerInfoHTML
+        });
+        
+        // אם אין נתונים - לא נציג כלום (בלי fallback, בלי הודעת "לא זמין")
+        
         return `
             <div class="entity-details-container trade-details">
                 
-                <!-- סטטוס למעלה -->
-                ${statusDisplay ? `<div class="mb-3 d-flex justify-content-start align-items-center gap-2">
-                    <strong>סטטוס:</strong>
-                    ${statusDisplay}
-                </div>` : ''}
+                <!-- שורה ראשונה: טיקר | נתוני טיקר | סטטוס (משמאל) -->
+                <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom: 1px solid #e0e0e0; padding-bottom: 0.75rem;">
+                    <!-- טיקר -->
+                    <div class="d-flex align-items-center gap-2" style="min-width: 120px;">
+                        <strong>טיקר:</strong>
+                        <span class="fw-bold">${tickerSymbol}</span>
+                    </div>
+                    
+                    <!-- נתוני טיקר עדכניים - במרכז -->
+                    <div class="flex-grow-1" style="text-align: center;">
+                        ${tickerInfoHTML || ''}
+                    </div>
+                    
+                    <!-- סטטוס משמאל -->
+                    <div class="d-flex align-items-center gap-2" style="min-width: 150px; justify-content: flex-end;">
+                        ${statusDisplay ? `<strong>סטטוס:</strong> ${statusDisplay}` : '<span class="text-muted">לא מוגדר</span>'}
+                    </div>
+                </div>
                 
                 <div class="row">
                     <div class="col-md-6">
@@ -1299,9 +1389,9 @@ class EntityDetailsRenderer {
             ],
             trade: [
                 { key: 'id', label: 'מזהה', type: 'number' },
-                { key: 'ticker_symbol', label: 'טיקר', type: 'text' },
+                // ticker_symbol לא כאן - מוצג בשורה הראשונה עם נתוני טיקר
                 { key: 'account_name', label: 'חשבון מסחר', type: 'text' },
-                { key: 'status', label: 'סטטוס', type: 'status' },
+                // סטטוס מוצג בשורה הראשונה - לא כאן
                 { key: 'investment_type', label: 'סוג השקעה', type: 'text' },
                 { key: 'side', label: 'צד', type: 'text' },
                 { key: 'opened_at', label: 'נפתח ב', type: 'datetime' },

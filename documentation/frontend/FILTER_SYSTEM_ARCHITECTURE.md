@@ -62,7 +62,7 @@ After all these tables work correctly, implement filters for auxiliary tables an
 ```javascript
 const SUPPORTED_CONTAINERS = [
   'tradesContainer',
-  'tradePlansContainer', 
+  'trade_plansContainer',  // Note: underscore in actual implementation
   'accountsContainer',
   'alertsContainer',
   'cashFlowsContainer',
@@ -79,18 +79,24 @@ const FILTER_COLUMNS = {
   'search': null // Special case - searches all columns
 };
 
-const TYPE_FILTER_TABLES = ['tradesContainer', 'tradePlansContainer'];
+const TYPE_FILTER_TABLES = ['tradesContainer', 'trade_plansContainer'];
 ```
 
 ## Supported Tables
 - `tradesContainer`
-- `tradePlansContainer`
+- `trade_plansContainer` - **Note:** Uses underscore (not camelCase)
 - `accountsContainer`
 - `alertsContainer`
 - `cashFlowsContainer`
 - `executionsContainer`
 - `notesContainer`
 - `tickersContainer`
+
+## Implementation Status (Updated: January 2025)
+- ✅ All 8 containers are supported
+- ✅ Multiple tables per page supported
+- ✅ Automatic detection of additional containers
+- ✅ Graceful handling when table fields are missing (shows all rows)
 
 ## Filter Types
 1. **status** → `Status` column

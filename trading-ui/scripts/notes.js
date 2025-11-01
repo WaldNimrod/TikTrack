@@ -902,6 +902,7 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
 }
 
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
+// REMOVED: validateEditNoteForm - deprecated wrapper, use window.validateEntityForm() instead
 /**
  * Validate edit note form
  * @param {string} content - Note content
@@ -910,7 +911,7 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
  * @param {File} attachment - Attachment file
  * @returns {boolean} Whether the form is valid
  */
-function validateEditNoteForm(content, relationType, relatedId, attachment) {
+function _REMOVED_validateEditNoteForm(content, relationType, relatedId, attachment) {
   try {
     let isValid = true;
 

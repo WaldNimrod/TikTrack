@@ -200,68 +200,8 @@ function editExecution(id) {
 // פונקציות מודלים
 // ========================================
 
-/**
- * ניקוי והשבתת שדות בטופס עסקה (הוספה או עריכה)
- * @param {string} formType - 'add' או 'edit'
- */
-function resetExecutionForm(formType) {
-  try {
-    const isEdit = formType === 'edit';
-    const formPrefix = isEdit ? 'editExecution' : 'execution';
-    const formId = `${formPrefix}Form`;
-    
-  // ניקוי הטופס
-    const form = document.getElementById(formId);
-  if (form) {
-    form.reset();
-  }
-  
-  // Use general validation system
-  if (typeof window.clearValidation === 'function') {
-    window.clearValidation(formId);
-  }
-
-  // השבתת כל השדות חוץ מטיקר
-  const fieldsToDisable = [
-      `${formPrefix}TradeId`,
-      `${formPrefix}Type`,
-      `${formPrefix}Quantity`,
-      `${formPrefix}Price`,
-      `${formPrefix}Commission`,
-      `${formPrefix}Date`,
-      `${formPrefix}Notes`,
-  ];
-
-  fieldsToDisable.forEach(fieldId => {
-    const element = document.getElementById(fieldId);
-    if (element) {
-      element.disabled = true;
-    }
-  });
-
-  // הסתרת כפתור קישור לטרייד
-    const tradeLinkButton = document.getElementById(`${formPrefix}TradeLink`);
-  if (tradeLinkButton) {
-    tradeLinkButton.style.display = 'none';
-  }
-
-  } catch (error) {
-    const action = formType === 'edit' ? 'עריכת' : 'הוספת';
-    window.Logger.error(`שגיאה באיפוס טופס ${action} ביצוע:`, error, { page: "executions" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification(`שגיאה באיפוס טופס ${action} ביצוע`, error.message);
-    }
-  }
-}
-
-// Wrapper functions for backward compatibility
-function resetAddExecutionForm() {
-  return resetExecutionForm('add');
-}
-
-function resetEditExecutionForm() {
-  return resetExecutionForm('edit');
-}
+// REMOVED: resetExecutionForm, resetAddExecutionForm, resetEditExecutionForm - not used
+// ModalManagerV2 handles form reset automatically
 
 // showAddExecutionModal הועבר למערכת הכללית
 
@@ -293,10 +233,11 @@ function updateRealizedPLField(mode = 'add') {
 
 // NOTE: showEditExecutionModal is defined later in the file (line ~3995)
 
+// REMOVED: fillEditExecutionForm - not used, ModalManagerV2 uses populateForm instead
 /**
  * מילוי טופס עריכת עסקה
  */
-async function fillEditExecutionForm(execution, linkedObject, tickerId) {
+async function _REMOVED_fillEditExecutionForm(execution, linkedObject, tickerId) {
   try {
     // עדכון שדה הטיקר
     if (tickerId) {
@@ -575,12 +516,14 @@ async function fillEditExecutionForm(execution, linkedObject, tickerId) {
 
 // REMOVED: saveExecution - unused function, replaced by general CRUD system
 
+// REMOVED: updateExecutionWrapper - not used, ModalManagerV2 uses its own save handlers
 /**
  * עדכון עסקה קיימת
  */
-async function updateExecutionWrapper() {
+async function _REMOVED_updateExecutionWrapper() {
   
-  // ניקוי מטמון לפני פעולת CRUD - עריכה  const id = document.getElementById('editExecutionId').value;
+  // ניקוי מטמון לפני פעולת CRUD - עריכה
+  const id = document.getElementById('editExecutionId').value;
   const tradeIdValue = document.getElementById('editExecutionTradeId').value;
   const type = document.getElementById('editExecutionType').value;
   const quantity = document.getElementById('editExecutionQuantity').value;
@@ -2109,8 +2052,7 @@ window.loadTickersWithOpenOrClosedTradesAndPlans = loadTickersWithOpenOrClosedTr
 window.loadActiveTradesForTicker = loadActiveTradesForTicker;
 window.enableAllFields = enableAllFields;
 // window.toggleExternalIdField = toggleExternalIdField; // פונקציה לא קיימת
-window.resetAddExecutionForm = resetAddExecutionForm;
-window.resetEditExecutionForm = resetEditExecutionForm;
+// REMOVED: window.resetAddExecutionForm, window.resetEditExecutionForm - functions removed
 window.updateTradesOnCheckboxChange = updateTradesOnCheckboxChange;
 window.updateTradesOnTickerChange = updateTradesOnTickerChange;
 window.goToTickerPage = goToTickerPage;

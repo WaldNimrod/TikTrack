@@ -148,15 +148,30 @@
     color: white;
 }
 
+/* כפתורי TOGGLE - תמיד בגוון הכהה של הישות */
 .btn[data-button-type="TOGGLE"] {
-    border-color: var(--color-action-toggle);
-    color: var(--color-action-toggle);
-    --current-button-color: var(--color-action-toggle);
-    --current-button-hover: var(--warning-hover, #e67e22);
+    border-color: var(--current-entity-color-dark);
+    color: var(--current-entity-color-dark);
+    background: transparent;
+    --current-button-color: var(--current-entity-color-dark);
 }
 .btn[data-button-type="TOGGLE"]:hover {
-    background-color: var(--color-action-toggle);
+    background-color: var(--current-entity-color-dark);
     color: white;
+    border-color: var(--current-entity-color-dark);
+}
+
+/* כפתורי TOGGLE בסקשנים - גוון כהה של הישות */
+.section-header .btn[data-button-type="TOGGLE"] {
+    border-color: var(--current-entity-color-dark);
+    color: var(--current-entity-color-dark);
+    background: transparent;
+}
+
+.section-header .btn[data-button-type="TOGGLE"]:hover {
+    background-color: var(--current-entity-color-dark);
+    color: white;
+    border-color: var(--current-entity-color-dark);
 }
 
 .btn[data-button-type="COPY"] {
@@ -330,17 +345,29 @@
 }
 
 /* כפתורים נגטיביים - רקע ספציפי שגובר על ברירת המחדל */
-.btn[data-button-type="REMOVE"],
-.btn[data-button-type="CLOSE"] {
-    background-color: #dc3545 !important; /* רקע אדום לכפתורים נגטיביים */
+.btn[data-button-type="REMOVE"] {
+    background-color: #dc3545 !important;
     color: white !important;
     border-color: #dc3545 !important;
 }
 
-.btn[data-button-type="REMOVE"]:hover,
-.btn[data-button-type="CLOSE"]:hover {
-    background-color: #c82333 !important; /* רקע אדום כהה יותר ב-hover */
+.btn[data-button-type="REMOVE"]:hover {
+    background-color: #c82333 !important;
     border-color: #c82333 !important;
+    color: white !important;
+}
+
+/* ===== כפתור CLOSE - מצב רגיל, לא נגטיב ===== */
+/* גוון כהה של הישות - לא אדום */
+.btn[data-button-type="CLOSE"] {
+    background-color: transparent !important;
+    color: var(--current-entity-color-dark, var(--color-action-close)) !important;
+    border-color: var(--current-entity-color-dark, var(--color-action-close)) !important;
+}
+
+.btn[data-button-type="CLOSE"]:hover {
+    background-color: var(--current-entity-color-dark, var(--color-action-close)) !important;
+    border-color: var(--current-entity-color-dark, var(--color-action-close)) !important;
     color: white !important;
 }
 

@@ -26,3 +26,5 @@ Successfully standardized delete modals across all pages:
 
 Module: Entity Details Display (הצגת פרטי ישות)
 
+
+

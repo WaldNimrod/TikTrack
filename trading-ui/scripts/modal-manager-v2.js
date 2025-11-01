@@ -141,9 +141,9 @@ class ModalManagerV2 {
                  data-bs-backdrop="true" data-bs-keyboard="true">
                 <div class="modal-dialog modal-${config.size || 'lg'}">
                     <div class="modal-content">
-                        <div class="modal-header modal-header-dynamic" 
-                             style="background-color: var(--current-entity-color-light); border-bottom: 2px solid var(--current-entity-color)">
-                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark)">${config.title.add || 'הוספת ישות'}</h5>
+                        <div class="modal-header modal-header-colored" 
+                             style="background-color: var(--current-entity-color-light) !important; border-bottom: 2px solid var(--current-entity-color-dark)">
+                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark) !important">${config.title.add || 'הוספת ישות'}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" 
                                     aria-label="סגור"></button>
                         </div>
@@ -859,22 +859,24 @@ class ModalManagerV2 {
     applyUserColors(modalElement, entityType) {
         if (!entityType) return;
         
-        // הוספת data attribute למודל לזיהוי סוג הישות
+        // הוספת data attribute למודל לזיהוי סוג הישות - CSS ידאג לצבעים!
         modalElement.setAttribute('data-entity-type', entityType);
         
-        // קבלת צבעי הישות מהמערכת הדינמית
-        const entityColors = window.ENTITY_COLORS || {};
-        const entityBackgroundColors = window.ENTITY_BACKGROUND_COLORS || {};
-        const entityTextColors = window.ENTITY_TEXT_COLORS || {};
+        // הוספת class גם לכותרת המודל (אם יש)
+        const headerElement = modalElement.querySelector('.modal-header');
+        if (headerElement) {
+            // הסרת כל המחלקות הישנות
+            const validEntityTypes = ['trade', 'ticker', 'account', 'alert', 'cash_flow', 'cash-flow', 'note', 'trade_plan', 'trade-plan', 'execution', 'preference', 'research', 'design', 'constraint', 'development'];
+            validEntityTypes.forEach(type => {
+                headerElement.classList.remove(`entity-${type}`);
+            });
+            
+            // הוספת מחלקת ישות חדשה - CSS ידאג לצבעים מההעדפות!
+            const normalizedType = entityType.replace('_', '-').toLowerCase();
+            headerElement.classList.add(`entity-${normalizedType}`);
+        }
         
-        const entityColor = entityColors[entityType] || '#26baac';
-        const backgroundColor = entityBackgroundColors[entityType] || 'rgba(38, 186, 172, 0.1)';
-        const textColor = entityTextColors[entityType] || '#1a9d7a';
-
-        // הזרקת משתני CSS דינמיים למודל (ITCSS compliant)
-        modalElement.style.setProperty('--modal-entity-color', entityColor);
-        modalElement.style.setProperty('--modal-entity-bg', backgroundColor);
-        modalElement.style.setProperty('--modal-entity-text', textColor);
+        // כל הצבעים עכשיו מגיעים מההעדפות דרך CSS - אין צורך ב-CSS variables או inline styles!
     }
 
     /**

@@ -209,16 +209,10 @@ class EntityDetailsRenderer {
         
         return `
             <div class="entity-details-container ticker-details">
+                
                 <!-- נתוני שוק למעלה -->
                 <div class="mb-4">
                     ${this.renderMarketData(tickerData, tickerColor)}
-                </div>
-                
-                <!-- כותרת מידע בסיסי -->
-                <div class="row">
-                    <div class="col-12">
-                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${tickerColor} !important;">מידע בסיסי</h6>
-                    </div>
                 </div>
                 
                 <!-- מידע בסיסי בשתי עמודות -->
@@ -253,7 +247,6 @@ class EntityDetailsRenderer {
         
         return `
             <div class="entity-details-container trade-details">
-                ${this.renderEntityHeader('טרייד', tradeData.symbol || tradeData.id, entityColor)}
                 
                 <div class="row">
                     <div class="col-md-6">
@@ -285,42 +278,44 @@ class EntityDetailsRenderer {
      * Get entity icon - קבלת אייקון לסוג ישות
      * 
      * @param {string} entityType - סוג ישות
-     * @returns {string} - מחלקת אייקון FontAwesome
+     * @returns {string} - נתיב לאייקון SVG
      * @private
      */
     getEntityIcon(entityType) {
         const iconMappings = {
-            ticker: 'fa-chart-line',
-            trade: 'fa-exchange-alt',
-            trade_plan: 'fa-strategy',
-            execution: 'fa-check-circle',
-            account: 'fa-university',
-            alert: 'fa-bell',
-            cash_flow: 'fa-money-bill-wave',
-            note: 'fa-sticky-note'
+            ticker: '/trading-ui/images/icons/tickers.svg',
+            trade: '/trading-ui/images/icons/trades.svg',
+            trade_plan: '/trading-ui/images/icons/trade_plans.svg',
+            execution: '/trading-ui/images/icons/executions.svg',
+            account: '/trading-ui/images/icons/trading_accounts.svg',
+            alert: '/trading-ui/images/icons/alerts.svg',
+            cash_flow: '/trading-ui/images/icons/cash_flows.svg',
+            note: '/trading-ui/images/icons/notes.svg'
         };
 
-        return iconMappings[entityType] || 'fa-cube';
+        return iconMappings[entityType] || '/trading-ui/images/icons/home.svg';
     }
 
     /**
-     * Render entity header - רנדור כותרת ישות
+     * Convert hex color to light background color - המרת צבע hex לרקע בהיר
+     * 
+     * @param {string} hex - צבע hex
+     * @returns {string} - צבע רקע בהיר כ-RGBA
+     * @private
      */
-    renderEntityHeader(entityTypeName, entityIdentifier, color) {
-        return `
-            <div class="entity-details-header mb-4">
-                <div class="d-flex align-items-center">
-                    <div class="entity-icon-circle me-3" style="background-color: ${color};">
-                        <i class="fas ${this.getEntityIcon(entityTypeName)} text-white"></i>
-                    </div>
-                    <div>
-                        <h4 class="mb-1" style="color: ${color};">${entityTypeName}</h4>
-                        <p class="text-muted mb-0">${entityIdentifier}</p>
-                    </div>
-                </div>
-            </div>
-        `;
+    _hexToLightBg(hex) {
+        // הסרת # אם קיים
+        hex = hex.replace('#', '');
+        
+        // המרה ל-RGB
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        
+        // החזרת RGBA עם alpha נמוך לרקע בהיר
+        return `rgba(${r}, ${g}, ${b}, 0.15)`;
     }
+
 
     /**
      * Render basic info - רנדור מידע בסיסי
@@ -629,7 +624,6 @@ class EntityDetailsRenderer {
                                 <th>סוג</th>
                                 <th>שם</th>
                                 <th>סטטוס</th>
-                                <th>תאריך</th>
                                 <th>פעולות</th>
                             </tr>
                         </thead>
@@ -637,28 +631,85 @@ class EntityDetailsRenderer {
         `;
 
         linkedItems.forEach(item => {
-            const itemEntityColor = this.entityColors[item.type] || '#6c757d';
-            const statusBadge = this.getStatusBadge(item.status);
-            const typeBadge = this.getTypeBadge(item.type, itemEntityColor);
+            // עמודה "סוג" - איקון + שם הישות (strong)
+            const iconPath = this.getEntityIcon(item.type);
+            const entityColor = this.entityColors[item.type] || '#6c757d';
+            // שם הישות בעברית
+            const entityLabel = (window.getEntityLabel && typeof window.getEntityLabel === 'function') 
+                ? window.getEntityLabel(item.type) 
+                : item.type;
+            // צביעת האיקון בצבע הישות באמצעות CSS mask
+            const typeDisplay = `
+                <span class="d-inline-flex align-items-center gap-2">
+                    <img src="${iconPath}" alt="${item.type}" class="linked-item-type-icon" style="width: 24px; height: 24px; mask-image: url('${iconPath}'); mask-repeat: no-repeat; mask-position: center; mask-size: contain; -webkit-mask-image: url('${iconPath}'); -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; background-color: ${entityColor}; display: inline-block;" />
+                    <strong>${entityLabel}</strong>
+                </span>
+            `;
+            
+            // עמודה "שם" - שם נקי ללא "טרייד:" בהתחלה, עם תאריך - שורה אחת בלבד
+            let cleanName = this.getCleanEntityName(item);
+            // הסרת "טרייד" כמילה ראשונה אם קיימת (כולל עם נקודתיים)
+            if (cleanName.startsWith('טרייד ')) {
+                cleanName = cleanName.substring(6).trim();
+            } else if (cleanName.startsWith('טרייד:')) {
+                cleanName = cleanName.substring(7).trim();
+            }
+            // הסרת שם הישות מהתחלה גם אם הוא מופיע שוב
+            const entityLabelLower = entityLabel.toLowerCase();
+            if (cleanName.toLowerCase().startsWith(entityLabelLower + ' ')) {
+                cleanName = cleanName.substring(entityLabelLower.length + 1).trim();
+            } else if (cleanName.toLowerCase().startsWith(entityLabelLower + ':')) {
+                cleanName = cleanName.substring(entityLabelLower.length + 1).trim();
+            }
+            
+            const itemDate = this.formatDateTime(item.created_at || item.updated_at);
+            // שורה אחת בלבד: שם + תאריך
+            const nameDisplay = `${cleanName}${itemDate ? ` - ${itemDate}` : ''}`;
+            
+            // עמודה "סטטוס" - שימוש במערכת הרינדור המרכזית
+            const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+                ? window.FieldRendererService.renderStatus(item.status, item.type)
+                : this.getStatusBadge(item.status);
+            
+            // עמודה "פעולות" - כפתורים פרוסים (לא תפריט) - רוחב מקסימלי זהה לגובה
+            let actionsHtml = '<div class="btn-group btn-group-sm linked-items-actions" role="group">';
+            
+            // כפתור VIEW
+            actionsHtml += `<button data-button-type="VIEW" data-variant="small" data-onclick="window.showEntityDetails('${item.type}', ${item.id}, { mode: 'view' })" data-text="" title="צפה בפרטים"></button>`;
+            
+            // כפתור LINK
+            const linkFunction = this.getLinkedItemsFunctionForType(item.type, item.id);
+            if (linkFunction) {
+                actionsHtml += `<button data-button-type="LINK" data-variant="small" data-onclick="${linkFunction}" data-text="" title="פריטים מקושרים"></button>`;
+            }
+            
+            // כפתור EDIT
+            const editFunction = this.getEditFunctionForType(item.type, item.id);
+            if (editFunction) {
+                actionsHtml += `<button data-button-type="EDIT" data-variant="small" data-onclick="${editFunction}" data-text="" title="ערוך"></button>`;
+            }
+            
+            // כפתור CANCEL/REACTIVATE או DELETE
+            const cancelFunction = this.getCancelFunctionForType(item.type, item.id, item.status);
+            if (cancelFunction) {
+                const cancelType = item.status === 'cancelled' || item.status === 'canceled' ? 'REACTIVATE' : 'CANCEL';
+                const cancelTitle = item.status === 'cancelled' || item.status === 'canceled' ? 'הפעל מחדש' : 'בטל';
+                actionsHtml += `<button data-button-type="${cancelType}" data-variant="small" data-onclick="${cancelFunction}" data-text="" title="${cancelTitle}"></button>`;
+            } else {
+                const deleteFunction = this.getDeleteFunctionForType(item.type, item.id);
+                if (deleteFunction) {
+                    actionsHtml += `<button data-button-type="DELETE" data-variant="small" data-onclick="${deleteFunction}" data-text="" title="מחק"></button>`;
+                }
+            }
+            
+            actionsHtml += '</div>';
             
             html += `
                 <tr>
-                    <td>${typeBadge}</td>
-                    <td>
-                        <strong>${this.getCleanEntityName(item)}</strong>
-                        ${item.type === 'alert' && item.condition ? 
-                            `<br><small class="text-muted">תנאי: ${item.condition}</small>` : 
-                            (item.description ? `<br><small class="text-muted">${item.description}</small>` : '')}
-                    </td>
-                    <td>${statusBadge}</td>
-                    <td><small>${this.formatDateTime(item.created_at || item.updated_at)}</small></td>
-                    <td>
-                        ${window.createLinkButton ? window.createLinkButton(`window.showEntityDetails('${item.type}', ${item.id})`) : 
-                            `<button class="btn btn-sm btn-info" onclick="window.showEntityDetails('${item.type}', ${item.id})" title="צפה בפרטים"><i class="fas fa-eye"></i></button>`}
-                        ${window.createEditButton ? window.createEditButton(`window.editTicker(${item.id})`) : 
-                            `<button class="btn btn-sm btn-secondary" onclick="window.editTicker(${item.id})" title="ערוך"><i class="fas fa-edit"></i></button>`}
-                        ${this.getActionButtonForType(item.type, item.id, item.status)}
-                    </td>
+                    <td>${typeDisplay}</td>
+                    <td>${nameDisplay}</td>
+                    <td>${statusDisplay}</td>
+                    <td>${actionsHtml}</td>
                 </tr>
             `;
         });
@@ -666,11 +717,6 @@ class EntityDetailsRenderer {
         html += `
                         </tbody>
                     </table>
-                </div>
-                <div class="text-center mt-3">
-                    <button class="btn btn-outline-primary" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'ticker', window.currentEntityId || 'null')">
-                        <i class="fas fa-search me-1"></i>פריטים מקושרים מלאים
-                    </button>
                 </div>
             </div>
         `;
@@ -798,7 +844,9 @@ class EntityDetailsRenderer {
      * Get clean entity name without type prefix - קבלת שם ישות נקי ללא סוג הישות
      */
     getCleanEntityName(item) {
-        let name = item.title || item.name || item.symbol || `#${item.id}`;
+        // שימוש ב-description אם קיים (מכיל את הפורמט הנכון מהשרת: "טרייד Long על TSLA")
+        // אחרת נופל ל-title או name
+        let name = item.description || item.title || item.name || item.symbol || `#${item.id}`;
         
         // הסרת סוג הישות מהשם אם הוא קיים
         const typePrefixes = {
@@ -824,7 +872,90 @@ class EntityDetailsRenderer {
     }
 
     /**
-     * Get action button for entity type - כפתור פעולה לפי סוג ישות
+     * Get linked items function for entity type - פונקציה לפריטים מקושרים לפי סוג ישות
+     */
+    getLinkedItemsFunctionForType(type, id) {
+        const functions = {
+            'trade': `viewLinkedItemsForTrade(${id})`,
+            'trade_plan': `viewLinkedItemsForTradePlan(${id})`,
+            'ticker': `viewLinkedItemsForTicker(${id})`,
+            'account': `viewLinkedItemsForAccount(${id})`,
+            'alert': `viewLinkedItemsForAlert(${id})`,
+            'cash_flow': `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${id})`,
+            'execution': `viewLinkedItemsForExecution(${id})`,
+            'note': `viewLinkedItemsForNote(${id})`
+        };
+        
+        // Dynamic function name
+        if (functions[type]) {
+            return functions[type];
+        }
+        
+        // Fallback - generic function
+        return `window.showLinkedItemsModal && window.showLinkedItemsModal([], '${type}', ${id})`;
+    }
+    
+    /**
+     * Get edit function for entity type - פונקציה לעריכה לפי סוג ישות
+     */
+    getEditFunctionForType(type, id) {
+        const functions = {
+            'trade': `editTradeRecord('${id}')`,
+            'trade_plan': `editTradePlan('${id}')`,
+            'ticker': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${id})`,
+            'account': `editAccount('${id}')`,
+            'alert': `editAlert(${id})`,
+            'cash_flow': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${id})`,
+            'execution': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('executionsModal', 'execution', ${id})`,
+            'note': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('notesModal', 'note', ${id})`
+        };
+        
+        return functions[type] || '';
+    }
+    
+    /**
+     * Get cancel/reactivate function for entity type - פונקציה לביטול/הפעלה מחדש לפי סוג ישות
+     */
+    getCancelFunctionForType(type, id, status) {
+        const isCancelled = status === 'cancelled' || status === 'canceled';
+        
+        if (isCancelled) {
+            // Reactivate functions
+            const reactivateFunctions = {
+                'trade': `window.reactivateTrade && window.reactivateTrade(${id})`,
+                'trade_plan': `window.reactivateTradePlan && window.reactivateTradePlan(${id})`,
+                'account': `window.reactivateAccount && window.reactivateAccount(${id})`,
+                'alert': `window.reactivateAlert && window.reactivateAlert(${id})`
+            };
+            return reactivateFunctions[type] || null;
+        } else {
+            // Cancel functions
+            const cancelFunctions = {
+                'trade': `cancelTradeRecord('${id}')`,
+                'trade_plan': `window.openCancelTradePlanModal && window.openCancelTradePlanModal(${id})`,
+                'account': `window.cancelAccount && window.cancelAccount(${id})`,
+                'alert': `window.cancelAlert && window.cancelAlert(${id})`
+            };
+            return cancelFunctions[type] || null;
+        }
+    }
+    
+    /**
+     * Get delete function for entity type - פונקציה למחיקה לפי סוג ישות
+     */
+    getDeleteFunctionForType(type, id) {
+        const functions = {
+            'ticker': `performTickerCancellation(${id})`,
+            'execution': `deleteExecution(${id})`,
+            'cash_flow': `deleteCashFlow(${id})`,
+            'note': `deleteNote(${id})`
+        };
+        
+        return functions[type] || null;
+    }
+    
+    /**
+     * Get action button for entity type - כפתור פעולה לפי סוג ישות (deprecated - use getLinkedItemsFunctionForType, getEditFunctionForType, etc.)
      */
     getActionButtonForType(type, id, status) {
         // ישויות עם כפתור ביטול/שיחזור
@@ -901,7 +1032,7 @@ class EntityDetailsRenderer {
             } else if (window.createDeleteButton) {
                 return window.createDeleteButton(`if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }`);
             } else {
-                return createDeleteButton(`if (typeof showNotification === 'function') { showNotification('מחיקה לא זמינה', 'warning'); } else { alert('מחיקה לא זמינה'); }`);
+                return '<button class="btn btn-danger btn-sm">מחק</button>';
             }
         }
     }
@@ -1177,7 +1308,7 @@ class EntityDetailsRenderer {
         return names[entityType] || entityType;
     }
 
-    renderTradeSpecific(tradeData) { return '<div>פרטי טרייד</div>'; }
+    renderTradeSpecific(tradeData) { return ''; }
     renderTradePlan(tradePlanData, options = {}) {
         window.Logger.info(`🎨 Rendering trade plan data:`, tradePlanData, { page: "entity-details-renderer" });
         
@@ -1186,12 +1317,6 @@ class EntityDetailsRenderer {
         
         return `
             <div class="entity-details-container trade-plan-details">
-                <!-- כותרת מידע בסיסי -->
-                <div class="row">
-                    <div class="col-12">
-                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${planColor} !important;">מידע בסיסי</h6>
-                    </div>
-                </div>
                 
                 <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
@@ -1228,12 +1353,6 @@ class EntityDetailsRenderer {
         
         return `
             <div class="entity-details-container execution-details">
-                <!-- כותרת מידע בסיסי -->
-                <div class="row">
-                    <div class="col-12">
-                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${executionColor} !important;">מידע בסיסי</h6>
-                    </div>
-                </div>
                 
                 <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
@@ -1262,12 +1381,6 @@ class EntityDetailsRenderer {
         
         return `
             <div class="entity-details-container account-details">
-                <!-- כותרת מידע בסיסי -->
-                <div class="row">
-                    <div class="col-12">
-                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${accountColor} !important;">מידע בסיסי</h6>
-                    </div>
-                </div>
                 
                 <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
@@ -1292,7 +1405,6 @@ class EntityDetailsRenderer {
             window.Logger.info('🎨 Rendering alert data:', alertData, { page: "entity-details-renderer" });
             
             // יצירת כותרת המודול
-            const header = this.renderEntityHeader('התראה', alertData.id || 'לא זמין', this.entityColors.alert);
             
             // יצירת מידע בסיסי
             const basicInfo = this.renderBasicInfo(alertData, 'alert');
@@ -1311,7 +1423,6 @@ class EntityDetailsRenderer {
             
             return `
                 <div class="entity-details-content">
-                    ${header}
                     <div class="entity-details-body">
                         ${basicInfo}
                         ${alertSpecific}
@@ -1485,11 +1596,9 @@ class EntityDetailsRenderer {
     }
     renderCashFlow(cashFlowData, options = {}) {
         const entityColor = this.entityColors.cash_flow || '#fd7e14';
-        const headerTitle = `${cashFlowData.currency_symbol || '$'}${Math.abs(parseFloat(cashFlowData.amount || 0)).toFixed(2)}`;
         
         return `
             <div class="entity-details-container cash-flow-details">
-                ${this.renderEntityHeader('תזרים מזומנים', headerTitle, entityColor)}
                 
                 <div class="row">
                     <div class="col-md-6">
@@ -1683,12 +1792,6 @@ class EntityDetailsRenderer {
         
         return `
             <div class="entity-details-container note-details">
-                <!-- כותרת מידע בסיסי -->
-                <div class="row">
-                    <div class="col-12">
-                        <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${noteColor} !important;">מידע בסיסי</h6>
-                    </div>
-                </div>
                 
                 <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">

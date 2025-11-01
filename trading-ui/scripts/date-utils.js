@@ -573,10 +573,8 @@ window.daysDifference = daysDifference;
 window.addDays = addDays;
 window.addMonths = addMonths;
 
-// אתחול Date Utils
-// function initializeDateUtils() {
-//   // Date Utils loaded successfully
-// }
+// _REMOVED_initializeDateUtils - Function was commented out and is no longer in use
+// Original implementation was removed as part of code cleanup
 
 // ייצוא המודול עצמו
 window.dateUtils = {

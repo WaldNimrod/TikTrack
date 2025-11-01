@@ -141,30 +141,57 @@
 /* ===== סגנונות קונטיינרים מהמערכת הישנה ===== */
 
 /* כותרת סקשן */
+/* ===== סגנונות אחידים לכותרות סקשנים ===== */
+/* Unified styles for section headers - used across ALL pages */
+
 .section-header {
+  /* Layout */
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
+  /* Spacing */
   margin-bottom: 1.5rem;
   padding: 1rem;
-  border-bottom: 1px solid var(--current-entity-color-dark, #e9ecef);
+  min-height: 48px;
+  
+  /* Borders */
+  border-bottom: 2px solid var(--current-entity-color-dark, #e9ecef);
   border-inline-start: 3px solid var(--current-entity-color-dark, #e9ecef);
   border-radius: 8px;
+  
+  /* Background */
   background: var(--current-entity-color-light, #ffffff);
+  
+  /* Effects */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  
+  /* Typography - אחיד לגמרי */
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--current-entity-color-dark, #333333);
 }
 
 
-/* יישור כל האלמנטים לימין - תחילת השורה */
+/* ===== כותרות בתוך section-header - אחידות ===== */
 .section-header h1,
 .section-header h2,
 .section-header h3 {
+  /* Layout */
   margin: 0;
   flex: 1;
-  text-align: right; /* יישור לימין - תחילת השורה */
-  direction: rtl; /* RTL לכותרת */
-  color: var(--current-entity-color-dark, #333333); /* טקסט כהה של הישות */
+  
+  /* Text alignment */
+  text-align: right;
+  direction: rtl;
+  
+  /* Typography - אחיד לגמרי */
+  font-size: 1.125rem; /* 18px - זהה ל-section-header */
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--current-entity-color-dark, #333333);
 }
 
 
@@ -173,15 +200,180 @@
   align-self: center;
 }
 
-/* כותרות מודלים - צבעים דינמיים */
+/* ===== כותרות מודולים - צבעים דינמיים אחידים ===== */
+/* Unified modal header styles - same color scheme as section headers */
+
 .modal-header {
-  background: var(--current-entity-color-light, #ffffff);
-  color: var(--current-entity-color-dark, #333333);
-  border-bottom: 1px solid var(--current-entity-color-dark, #e9ecef);
+  /* Layout - flexbox עם space-between */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  /* Background - צבע ישות בהיר */
+  background: var(--current-entity-color-light, rgba(0, 123, 255, 0.1));
+  color: var(--current-entity-color-dark); /* טקסט כהה */
+  
+  /* Borders - צבע ישות כהה */
+  border-bottom: 2px solid var(--current-entity-color-dark, var(--current-entity-color));
+  
+  /* Typography - אחיד */
+  font-size: 1.125rem; /* 18px - זהה ל-section-header */
+  font-weight: 600;
+  line-height: 1.5;
+  
+  /* Spacing - אחיד */
+  padding: 1rem;
+  min-height: 48px; /* זהה ל-section-header */
 }
 
 .modal-header .modal-title {
-  color: var(--current-entity-color-dark, #333333);
+  color: var(--current-entity-color-dark); /* צבע כהה של הישות */
+  font-size: 1.125rem; /* 18px - אחיד */
+  font-weight: 600;
+  margin: 0;
+  flex: 1; /* תופס את כל המקום הנותר */
+  text-align: right; /* ימין ב-RTL */
+  order: 1; /* ראשון - ימין ב-RTL */
+}
+
+/* כפתורים אחרים בכותרת - בין הכותרת לכפתור סגירה */
+.modal-header #quickActionButtons,
+.modal-header .btn-group {
+  order: 2; /* באמצע */
+  margin-inline-start: 0.5rem;
+  margin-inline-end: 0.5rem;
+}
+
+/* מודולים עם data-entity-type - רקע בהיר, גבול וטקסט כהה */
+.modal[data-entity-type] .modal-header {
+  background: var(--entity-color-light, var(--entity-color-bg));
+  border-bottom: 2px solid var(--entity-color-dark, var(--entity-color));
+}
+
+.modal[data-entity-type] .modal-title {
+  color: var(--entity-color-dark, var(--entity-color));
+}
+
+/* כל הישויות - רקע בהיר, גבול וטקסט כהה */
+.modal[data-entity-type="trade"] .modal-header {
+  background: var(--entity-trade-bg, var(--entity-trade-color-light));
+  border-bottom: 2px solid var(--entity-trade-color-dark, var(--entity-trade-color));
+}
+
+.modal[data-entity-type="trade"] .modal-title {
+  color: var(--entity-trade-color-dark, var(--entity-trade-color));
+}
+
+.modal[data-entity-type="ticker"] .modal-header {
+  background: var(--entity-ticker-bg, var(--entity-ticker-color-light));
+  border-bottom: 2px solid var(--entity-ticker-color-dark, var(--entity-ticker-color));
+}
+
+.modal[data-entity-type="ticker"] .modal-title {
+  color: var(--entity-ticker-color-dark, var(--entity-ticker-color));
+}
+
+.modal[data-entity-type="account"] .modal-header {
+  background: var(--entity-account-bg, var(--entity-account-color-light));
+  border-bottom: 2px solid var(--entity-account-color-dark, var(--entity-account-color));
+}
+
+.modal[data-entity-type="account"] .modal-title {
+  color: var(--entity-account-color-dark, var(--entity-account-color));
+}
+
+.modal[data-entity-type="alert"] .modal-header {
+  background: var(--entity-alert-bg, var(--entity-alert-color-light));
+  border-bottom: 2px solid var(--entity-alert-color-dark, var(--entity-alert-color));
+}
+
+.modal[data-entity-type="alert"] .modal-title {
+  color: var(--entity-alert-color-dark, var(--entity-alert-color));
+}
+
+.modal[data-entity-type="cash_flow"] .modal-header,
+.modal[data-entity-type="cash-flow"] .modal-header {
+  background: var(--entity-cash-flow-bg, var(--entity-cash-flow-color-light));
+  border-bottom: 2px solid var(--entity-cash-flow-color-dark, var(--entity-cash-flow-color));
+}
+
+.modal[data-entity-type="cash_flow"] .modal-title,
+.modal[data-entity-type="cash-flow"] .modal-title {
+  color: var(--entity-cash-flow-color-dark, var(--entity-cash-flow-color));
+}
+
+.modal[data-entity-type="note"] .modal-header {
+  background: var(--entity-note-bg, var(--entity-note-color-light));
+  border-bottom: 2px solid var(--entity-note-color-dark, var(--entity-note-color));
+}
+
+.modal[data-entity-type="note"] .modal-title {
+  color: var(--entity-note-color-dark, var(--entity-note-color));
+}
+
+.modal[data-entity-type="trade_plan"] .modal-header,
+.modal[data-entity-type="trade-plan"] .modal-header {
+  background: var(--entity-trade-plan-bg, var(--entity-trade-plan-color-light));
+  border-bottom: 2px solid var(--entity-trade-plan-color-dark, var(--entity-trade-plan-color));
+}
+
+.modal[data-entity-type="trade_plan"] .modal-title,
+.modal[data-entity-type="trade-plan"] .modal-title {
+  color: var(--entity-trade-plan-color-dark, var(--entity-trade-plan-color));
+}
+
+.modal[data-entity-type="execution"] .modal-header {
+  background: var(--entity-execution-bg, var(--entity-execution-color-light));
+  border-bottom: 2px solid var(--entity-execution-color-dark, var(--entity-execution-color));
+}
+
+.modal[data-entity-type="execution"] .modal-title {
+  color: var(--entity-execution-color-dark, var(--entity-execution-color));
+}
+
+.modal[data-entity-type="preference"] .modal-header {
+  background: var(--entity-preference-bg, var(--entity-preference-color-light));
+  border-bottom: 2px solid var(--entity-preference-color-dark, var(--entity-preference-color));
+}
+
+.modal[data-entity-type="preference"] .modal-title {
+  color: var(--entity-preference-color-dark, var(--entity-preference-color));
+}
+
+.modal[data-entity-type="research"] .modal-header {
+  background: var(--entity-research-bg, var(--entity-research-color-light));
+  border-bottom: 2px solid var(--entity-research-color-dark, var(--entity-research-color));
+}
+
+.modal[data-entity-type="research"] .modal-title {
+  color: var(--entity-research-color-dark, var(--entity-research-color));
+}
+
+.modal[data-entity-type="design"] .modal-header {
+  background: var(--entity-design-bg, var(--entity-design-color-light));
+  border-bottom: 2px solid var(--entity-design-color-dark, var(--entity-design-color));
+}
+
+.modal[data-entity-type="design"] .modal-title {
+  color: var(--entity-design-color-dark, var(--entity-design-color));
+}
+
+.modal[data-entity-type="constraint"] .modal-header {
+  background: var(--entity-constraint-bg, var(--entity-constraint-color-light));
+  border-bottom: 2px solid var(--entity-constraint-color-dark, var(--entity-constraint-color));
+}
+
+.modal[data-entity-type="constraint"] .modal-title {
+  color: var(--entity-constraint-color-dark, var(--entity-constraint-color));
+}
+
+.modal[data-entity-type="development"] .modal-header {
+  background: var(--entity-development-bg, var(--entity-development-color-light));
+  border-bottom: 2px solid var(--entity-development-color-dark, var(--entity-development-color));
+}
+
+.modal[data-entity-type="development"] .modal-title {
+  color: var(--entity-development-color-dark, var(--entity-development-color));
 }
 
 /* כותרות טבלאות - צבעים דינמיים */
@@ -196,9 +388,9 @@
   color: var(--current-entity-color-dark, #333333);
 }
 
-/* כותרות טבלאות - צבעים דינמיים */
+/* כותרות טבלאות - ללא רקע, רק טקסט */
 .table-title {
-  background: var(--current-entity-color-light, #ffffff);
+  background: transparent; /* אין רקע */
   color: var(--current-entity-color-dark, #333333);
 }
 
@@ -251,6 +443,25 @@
   align-self: center;
   color: var(--current-entity-color-dark, #333333); /* טקסט כהה של הישות */
   border-color: var(--current-entity-color-dark, #333333); /* גבול כהה של הישות */
+}
+
+/* כפתורי toggle בסקשנים - תמיד בגוון הכהה של הישות */
+.section-header button[onclick*="toggleSection"],
+.section-header [data-button-type="TOGGLE"],
+.section-header .btn-outline-warning[onclick*="toggleSection"],
+.section-header .btn[onclick*="toggleSection"] {
+  color: var(--current-entity-color-dark);
+  border-color: var(--current-entity-color-dark);
+  background: transparent;
+}
+
+.section-header button[onclick*="toggleSection"]:hover,
+.section-header [data-button-type="TOGGLE"]:hover,
+.section-header .btn-outline-warning[onclick*="toggleSection"]:hover,
+.section-header .btn[onclick*="toggleSection"]:hover {
+  background: var(--current-entity-color-dark);
+  color: white;
+  border-color: var(--current-entity-color-dark);
 }
 
 /* כפתורים דינמיים - צבעים לפי ישות */
@@ -418,9 +629,21 @@
   }
 }
 
+/* ===== כותרת סקשן בראש העמוד ===== */
 .top-section .section-header {
   margin-bottom: 2rem;
   padding: 1rem;
+  /* כל הסגנונות האחרים זהים ל-.section-header */
+}
+
+/* ===== כותרת משנה (sub-header) ===== */
+.section-header.sub-header,
+.entity-test-sub-header {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  min-height: 40px;
+  font-size: 1rem; /* 16px - קצת קטן יותר */
+  font-weight: 500;
 }
 
 .top-section .content-section {
@@ -492,13 +715,13 @@
   border-color: var(--apple-border);
 }
 
-/* כפתור פילטר */
+/* ===== כפתור פילטר/toggle - בגוון הכהה של הישות ===== */
 .filter-toggle-btn {
-  background: white;
-  border: 1px solid var(--secondary-color, #6c757d);
+  background: transparent;
+  border: 1px solid var(--current-entity-color-dark);
   border-radius: 50%;
   padding: 0;
-  color: var(--secondary-color, #6c757d);
+  color: var(--current-entity-color-dark);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -515,10 +738,9 @@
 }
 
 .filter-toggle-btn:hover {
-  background: white;
-  border-color: var(--secondary-color, #6c757d);
-  transform: none;
-  box-shadow: none;
+  background: var(--current-entity-color-dark);
+  border-color: var(--current-entity-color-dark);
+  color: white;
 }
 
 /* איקון פעולה */
@@ -538,11 +760,11 @@
   transform: scale(1.1);
 }
 
-/* Section Toggle Icon */
+/* ===== Section Toggle Icon - אחיד, בגוון הכהה של הישות ===== */
 .section-toggle-icon {
   transition: transform 0.3s ease;
   font-size: 0.8rem;
-  color: var(--secondary-color, #6c757d);
+  color: var(--current-entity-color-dark); /* תמיד בגוון הכהה של הישות */
   font-weight: bold;
   border: none;
   border-radius: 0;
@@ -554,7 +776,14 @@
 }
 
 .filter-toggle-btn:hover .section-toggle-icon {
-  color: var(--secondary-color, #6c757d);
+  color: white; /* לבן על רקע כהה ב-hover */
+}
+
+/* איקון toggle בכפתורי סקשנים */
+.section-header button[onclick*="toggleSection"]:hover .section-toggle-icon,
+.section-header [data-button-type="TOGGLE"]:hover .section-toggle-icon,
+.section-header .btn-outline-warning[onclick*="toggleSection"]:hover .section-toggle-icon {
+  color: white; /* לבן על רקע כהה */
 }
 
 .filter-toggle-btn.collapsed .section-toggle-icon {

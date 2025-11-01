@@ -2,28 +2,18 @@
 /* ================================== */
 
 /* Section Headers - Standardized */
-.section-header {
-    background: var(--apple-bg-elevated);
-    border-bottom: 1px solid var(--apple-border-light);
-    padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
-    margin-bottom: var(--spacing-md, 16px);
-    border-radius: var(--border-radius-md, 8px) var(--border-radius-md, 8px) 0 0;
-    font-weight: 600;
-    color: var(--apple-text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 48px;
-}
+/* ⚠️ NOTE: Main section-header styles are now in _layout.css for consistency */
+/* These utility classes extend the base styles */
 
+/* Sub-header variant - smaller version */
+.section-header.sub-header,
 .section-header.entity-test-sub-header {
-    background: var(--apple-bg-secondary);
-    border-bottom: 1px solid var(--apple-border-medium);
-    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
-    margin-bottom: var(--spacing-sm, 8px);
-    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    min-height: 40px;
+    font-size: 1rem; /* 16px */
     font-weight: 500;
-    min-height: 36px;
+    /* All other styles inherited from base .section-header */
 }
 
 /* Card Bodies - Standardized */

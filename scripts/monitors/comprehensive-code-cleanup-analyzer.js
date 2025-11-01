@@ -238,6 +238,30 @@ class ComprehensiveCodeCleanupAnalyzer {
                         continue; // דילוג על פונקציות שהוסרו
                     }
                     
+                    // ⚠️ שיפור: התעלמות מפונקציות שהוערהו לחלוטין (// function name)
+                    const beforeMatch = content.substring(Math.max(0, matchIndex - 20), matchIndex);
+                    if (beforeMatch.trim().endsWith('//') || beforeMatch.trim().endsWith('// ')) {
+                        continue; // פונקציה שהוערהה לחלוטין
+                    }
+                    
+                    // ⚠️ שיפור: התעלמות מ-IIFE patterns (const name = (() => { ... })())
+                    // בודקים אם זה IIFE - pattern: const name = (() => { ... })()
+                    if (pattern.type === 'arrow') {
+                        const afterMatch = content.substring(matchIndex, Math.min(content.length, matchIndex + 200));
+                        // אם יש ()() אחרי ההגדרה - זה IIFE
+                        const iifePattern = new RegExp(`const\\s+${functionName}\\s*=\\s*\\([^)]*\\)\\s*=>\\s*\\{[^}]*\\}\\(\\);`);
+                        if (iifePattern.test(afterMatch)) {
+                            // זה IIFE - בודקים אם יש שימוש בתוצאה
+                            const usagePattern = new RegExp(`\\b${functionName}\\b`);
+                            const usageAfter = content.substring(matchIndex + 50, Math.min(content.length, matchIndex + 200));
+                            if (usagePattern.test(usageAfter)) {
+                                // יש שימוש - לא נדלג
+                            } else {
+                                // אין שימוש - נדלג (אבל למעשה IIFE נקרא מיד, אז נמשיך)
+                            }
+                        }
+                    }
+                    
                     // התעלמות מ-JSDoc @function
                     if (jsdocFunctions.has(functionName)) {
                         // בדיקה אם זה באמת הגדרת פונקציה או רק JSDoc

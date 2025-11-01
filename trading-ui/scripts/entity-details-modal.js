@@ -104,7 +104,16 @@ class EntityDetailsModal {
                             <div id="quickActionButtons" class="btn-group btn-group-sm" role="group">
                                 <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
                             </div>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <!-- כפתור סגירה בצד שמאל - משתמש במערכת הכפתורים - בסוף השורה -->
+                            <button type="button" 
+                                    data-button-type="CLOSE" 
+                                    data-variant="small" 
+                                    data-bs-dismiss="modal" 
+                                    data-text="" 
+                                    title="סגור"
+                                    class="modal-close-btn"
+                                    style="order: 999;">
+                            </button>
                         </div>
                         <div class="modal-body entity-details-body" id="entityDetailsContent">
                             <div class="entity-details-loading">
@@ -323,7 +332,37 @@ class EntityDetailsModal {
     }
 
     /**
+     * Get entity icon path - קבלת נתיב איקון לישות
+     * 
+     * @param {string} entityType - סוג הישות
+     * @returns {string} - נתיב לאיקון SVG
+     * @private
+     */
+    getEntityIcon(entityType) {
+        const iconMappings = {
+            ticker: '/trading-ui/images/icons/tickers.svg',
+            trade: '/trading-ui/images/icons/trades.svg',
+            trade_plan: '/trading-ui/images/icons/trade_plans.svg',
+            execution: '/trading-ui/images/icons/executions.svg',
+            account: '/trading-ui/images/icons/trading_accounts.svg',
+            alert: '/trading-ui/images/icons/alerts.svg',
+            cash_flow: '/trading-ui/images/icons/cash_flows.svg',
+            note: '/trading-ui/images/icons/notes.svg',
+            preference: '/trading-ui/images/icons/preferences.svg',
+            research: '/trading-ui/images/icons/research.svg',
+            design: '/trading-ui/images/icons/design.svg',
+            constraint: '/trading-ui/images/icons/constraint.svg',
+            development: '/trading-ui/images/icons/development.svg',
+            info: '/trading-ui/images/icons/info.svg'
+        };
+
+        return iconMappings[entityType] || '/trading-ui/images/icons/home.svg';
+    }
+
+    /**
      * Update modal title - עדכון כותרת המודל
+     * 
+     * פורמט חדש: [איקון] פרטי [סוג ישות] מספר [מזהה]
      * 
      * @param {string} entityType - סוג הישות
      * @param {Object} entityData - נתוני הישות
@@ -345,20 +384,32 @@ class EntityDetailsModal {
             return;
         }
 
-        let title = 'פרטי ישות';
+        // קבלת שם ישות בעברית
+        const entityLabel = (window.getEntityLabel && typeof window.getEntityLabel === 'function') 
+            ? window.getEntityLabel(entityType) 
+            : entityType;
         
-        if (entityType === 'ticker' && entityData.symbol) {
-            title = `פרטי טיקר: ${entityData.symbol}`;
-        } else if (entityType === 'trade' && entityData.symbol) {
-            title = `פרטי טרייד: ${entityData.symbol}`;
-        } else if (entityType === 'trade_plan' && entityData.symbol) {
-            title = `פרטי תכנית: ${entityData.symbol}`;
-        } else if (entityType === 'alert' && entityData.symbol) {
-            title = `פרטי התראה: ${entityData.symbol}`;
-        }
+        // קבלת מזהה הישות
+        const entityId = entityData?.id || '';
+        
+        // קבלת נתיב איקון
+        const iconPath = this.getEntityIcon(entityType);
+        
+        // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
+        // האיקון עם רקע לבן עגול - מחלקה entity-icon-circle - צבעים מקוריים
+        const titleHTML = `
+            <span class="d-inline-flex align-items-center gap-2">
+                <div class="entity-icon-circle" style="background-color: white;">
+                    <img src="${iconPath}" 
+                         alt="${entityLabel}" 
+                         style="width: 30px; height: 30px;" />
+                </div>
+                <span>פרטי ${entityLabel}${entityId ? ` מספר ${entityId}` : ''}</span>
+            </span>
+        `;
 
-        window.Logger.info('🎯 Setting title to:', title, { page: "entity-details-modal" });
-        titleElement.textContent = title;
+        window.Logger.info('🎯 Setting title to:', { entityLabel, entityId, iconPath }, { page: "entity-details-modal" });
+        titleElement.innerHTML = titleHTML;
         
         // עדכון צבע כותרת המודל לפי סוג הישות
         this.updateModalHeaderColor(entityType);
@@ -375,36 +426,29 @@ class EntityDetailsModal {
      */
     updateModalHeaderColor(entityType) {
         const headerElement = this.modal?.querySelector('.modal-header');
-        if (!headerElement) return;
+        const modalElement = this.modal;
+        if (!headerElement || !modalElement) return;
 
-        // קבלת צבע הישות מהמערכת הגלובלית
-        let entityColor = '#019193'; // ברירת מחדל
+        // הסרת כל המחלקות הישנות של ישויות
+        const validEntityTypes = ['trade', 'ticker', 'account', 'alert', 'cash_flow', 'cash-flow', 'note', 'trade_plan', 'trade-plan', 'execution', 'preference', 'research', 'design', 'constraint', 'development'];
+        validEntityTypes.forEach(type => {
+            headerElement.classList.remove(`entity-${type}`);
+        });
         
-        window.Logger.info('🎨 Modal header color debug:', { page: "entity-details-modal" });
-        window.Logger.info('🔍 entityType:', entityType, { page: "entity-details-modal" });
-        window.Logger.info('🔍 window.entityDetailsRenderer?.entityColors:', window.entityDetailsRenderer?.entityColors, { page: "entity-details-modal" });
-        window.Logger.info('🔍 window.ENTITY_COLORS:', window.ENTITY_COLORS, { page: "entity-details-modal" });
-        window.Logger.info('🔍 window.currentPreferences?.entityColors:', window.currentPreferences?.entityColors, { page: "entity-details-modal" });
-        
-        if (window.entityDetailsRenderer && window.entityDetailsRenderer.entityColors) {
-            entityColor = window.entityDetailsRenderer.entityColors[entityType] || entityColor;
-            window.Logger.info('✅ Using entityDetailsRenderer color:', entityColor, { page: "entity-details-modal" });
-        } else if (window.ENTITY_COLORS && window.ENTITY_COLORS[entityType]) {
-            entityColor = window.ENTITY_COLORS[entityType];
-            window.Logger.info('✅ Using ENTITY_COLORS color:', entityColor, { page: "entity-details-modal" });
-        } else if (window.currentPreferences && window.currentPreferences.entityColors && window.currentPreferences.entityColors[entityType]) {
-            entityColor = window.currentPreferences.entityColors[entityType];
-            window.Logger.info('✅ Using currentPreferences color:', entityColor, { page: "entity-details-modal" });
-        } else {
-            window.Logger.info('⚠️ Using default color:', entityColor, { page: "entity-details-modal" });
+        // הוספת מחלקת ישות חדשה - CSS ידאג לצבעים מההעדפות!
+        if (entityType) {
+            const normalizedType = entityType.replace('_', '-').toLowerCase();
+            headerElement.classList.add(`entity-${normalizedType}`);
+            
+            // הוספת data-entity-type למודול (אם לא קיים)
+            if (!modalElement.hasAttribute('data-entity-type')) {
+                modalElement.setAttribute('data-entity-type', entityType);
+            }
+            
+            if (window.Logger) {
+                window.Logger.info(`🎨 Applied entity class to modal header: entity-${normalizedType}`, { page: "entity-details-modal" });
+            }
         }
-
-        // עדכון צבע הרקע של הכותרת
-        headerElement.style.backgroundColor = entityColor;
-        headerElement.style.color = 'white';
-        headerElement.style.borderBottom = `2px solid ${entityColor}`;
-        
-        window.Logger.info('🎨 Applied color to modal header:', entityColor, { page: "entity-details-modal" });
     }
 
     /**

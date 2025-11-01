@@ -11,19 +11,34 @@
 /* ===== סגנונות ישויות ===== */
 
 /* איקונים בכותרת סקשן */
+/* ===== איקונים בכותרות סקשנים - אחידים לגמרי ===== */
 .section-icon {
-  width: 36px;
-  height: 36px;
+  /* Size - אחיד לגמרי בכל העמודים */
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  
+  /* Spacing - אחיד */
   margin-inline-end: 8px;
+  margin-inline-start: 0;
+  
+  /* Display */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Visual */
+  flex-shrink: 0;
   vertical-align: middle;
-  display: inline-block;
 }
 
 /* איקונים בכותרת טבלה */
+/* .table-title .section-icon - שימוש באותו גודל כמו .section-icon */
 .table-title .section-icon {
   width: 24px;
   height: 24px;
-  margin-inline-end: 6px;
+  margin-inline-end: 8px; /* אחיד ל-.section-icon */
 }
 
 /* איקונים בכפתור הוסף */
@@ -38,6 +53,57 @@
   width: 20px;
   height: 20px;
   font-size: 20px;
+}
+
+/* ===== איקון ישות עם רקע לבן עגול ===== */
+.entity-icon-circle {
+  /* רקע לבן מדויק */
+  background-color: white;
+  
+  /* עיגול */
+  border-radius: 50%;
+  
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Spacing */
+  padding: 0.5rem;
+  
+  /* איקון פנימי - 30px (50% יותר מ-20px) */
+}
+
+.entity-icon-circle img {
+  width: 30px;
+  height: 30px;
+  /* איקון עם צבעים מקוריים - ללא שינוי צבע */
+  /* display: block; */
+}
+
+/* איקון בכותרת מודול - שימוש ב-entity-icon-circle */
+.modal-header .entity-icon-circle {
+  margin-inline-end: 0.5rem;
+  margin-inline-start: 0;
+}
+
+/* ===== כפתורי פעולות בטבלת פריטים מקושרים ===== */
+/* כפתורים ריבועיים - רוחב מקסימלי זהה לגובה */
+.entity-linked-items .linked-items-actions .btn-group-sm > button,
+.entity-linked-items .linked-items-actions button[data-button-type],
+.linked-items-actions .btn-group-sm > button,
+.linked-items-actions button[data-button-type] {
+  /* רוחב מקסימלי זהה לגובה - ריבוע */
+  max-width: 100%;
+  aspect-ratio: 1;
+  width: auto;
+  min-width: 0;
+  /* התאמה לגובה של btn-sm עם data-variant="small" */
+  height: 28px; /* גובה של data-variant="small" */
+  padding: 4px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* כפתור הוסף - רקע לבן, טקסט ומסגרת צבע ראשי */

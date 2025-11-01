@@ -1184,19 +1184,8 @@ function clearNoteValidationErrors() {
   }
 }
 
-// function getFieldByErrorId(errorId) {
-//   switch (errorId) {
-//   case 'contentError':
-//     return document.getElementById('noteContent');
-//   case 'editContentError':
-//     return document.getElementById('editNoteContent');
-//   case 'relationTypeError':
-//     return document.querySelector('input[name="noteRelationType"]:checked')?.closest('.col-md-6');
-//   case 'editRelationTypeError':
-//     return document.querySelector('input[name="editNoteRelationType"]:checked')?.closest('.col-md-6');
-//   case 'relatedObjectError':
-//     return document.getElementById('noteRelatedObjectSelect');
-//   case 'editRelatedObjectError':
+// _REMOVED_getFieldByErrorId - Function was commented out and is no longer in use
+// Original implementation was removed as part of code cleanup
 //     return document.getElementById('editNoteRelatedObjectSelect');
 //   default:
 //     return null;

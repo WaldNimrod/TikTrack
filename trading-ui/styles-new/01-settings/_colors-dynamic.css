@@ -115,4 +115,40 @@
   --entity-note-bg: rgba(111, 66, 193, 0.1);
   --entity-note-text: #5a32a3;
   --entity-note-border: rgba(111, 66, 193, 0.3);
+  
+  /* העדפות - Preference */
+  --entity-preference-color: #adb5bd;
+  --entity-preference-bg: rgba(173, 181, 189, 0.1);
+  --entity-preference-text: #6c757d;
+  --entity-preference-border: rgba(173, 181, 189, 0.3);
+  
+  /* מחקר - Research */
+  --entity-research-color: #17a2b8;
+  --entity-research-bg: rgba(23, 162, 184, 0.1);
+  --entity-research-text: #117a8b;
+  --entity-research-border: rgba(23, 162, 184, 0.3);
+  
+  /* עיצובים - Design */
+  --entity-design-color: #6f42c1;
+  --entity-design-bg: rgba(111, 66, 193, 0.1);
+  --entity-design-text: #59359a;
+  --entity-design-border: rgba(111, 66, 193, 0.3);
+  
+  /* אילוצים - Constraint */
+  --entity-constraint-color: #e83e8c;
+  --entity-constraint-bg: rgba(232, 62, 140, 0.1);
+  --entity-constraint-text: #d91a72;
+  --entity-constraint-border: rgba(232, 62, 140, 0.3);
+  
+  /* פיתוח - Development */
+  --entity-development-color: #6c757d;
+  --entity-development-bg: rgba(108, 117, 125, 0.1);
+  --entity-development-text: #495057;
+  --entity-development-border: rgba(108, 117, 125, 0.3);
+  
+  /* מידע - Info */
+  --entity-info-color: #17a2b8;
+  --entity-info-bg: rgba(23, 162, 184, 0.1);
+  --entity-info-text: #117a8b;
+  --entity-info-border: rgba(23, 162, 184, 0.3);
 }

@@ -1621,6 +1621,74 @@ function viewLinkedItemsForTradePlan(tradePlanId) {
 }
 
 /**
+ * Helper function to update prices from percentages
+ * Used by both setupPriceCalculation and setupEditPriceCalculation
+ * @param {HTMLElement} priceInput - Price input element
+ * @param {HTMLElement} sideInput - Side input element
+ * @param {HTMLElement} stopPriceInput - Stop price input element
+ * @param {HTMLElement} stopPercentageInput - Stop percentage input element
+ * @param {HTMLElement} targetPriceInput - Target price input element
+ * @param {HTMLElement} targetPercentageInput - Target percentage input element
+ */
+function updatePricesFromPercentages(
+  priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+  targetPriceInput, targetPercentageInput
+) {
+  const currentPrice = parseFloat(priceInput.value) || 0;
+  const side = sideInput.value || 'Long';
+  
+  if (currentPrice > 0 && stopPercentageInput && stopPriceInput) {
+    const stopPercentage = parseFloat(stopPercentageInput.value) || 0;
+    if (stopPercentage > 0 && typeof window.calculateStopPrice === 'function') {
+      const stopPrice = window.calculateStopPrice(currentPrice, stopPercentage, side);
+      stopPriceInput.value = stopPrice.toFixed(2);
+    }
+  }
+  
+  if (currentPrice > 0 && targetPercentageInput && targetPriceInput) {
+    const targetPercentage = parseFloat(targetPercentageInput.value) || 0;
+    if (targetPercentage > 0 && typeof window.calculateTargetPrice === 'function') {
+      const targetPrice = window.calculateTargetPrice(currentPrice, targetPercentage, side);
+      targetPriceInput.value = targetPrice.toFixed(2);
+    }
+  }
+}
+
+/**
+ * Helper function to update percentages from prices
+ * Used by both setupPriceCalculation and setupEditPriceCalculation
+ * @param {HTMLElement} priceInput - Price input element
+ * @param {HTMLElement} sideInput - Side input element
+ * @param {HTMLElement} stopPriceInput - Stop price input element
+ * @param {HTMLElement} stopPercentageInput - Stop percentage input element
+ * @param {HTMLElement} targetPriceInput - Target price input element
+ * @param {HTMLElement} targetPercentageInput - Target percentage input element
+ */
+function updatePercentagesFromPrices(
+  priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+  targetPriceInput, targetPercentageInput
+) {
+  const currentPrice = parseFloat(priceInput.value) || 0;
+  const side = sideInput.value || 'Long';
+  
+  if (currentPrice > 0 && stopPriceInput && stopPercentageInput) {
+    const stopPrice = parseFloat(stopPriceInput.value) || 0;
+    if (stopPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
+      const stopPercentage = window.calculatePercentageFromPrice(currentPrice, stopPrice, side);
+      stopPercentageInput.value = stopPercentage.toFixed(2);
+    }
+  }
+  
+  if (currentPrice > 0 && targetPriceInput && targetPercentageInput) {
+    const targetPrice = parseFloat(targetPriceInput.value) || 0;
+    if (targetPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
+      const targetPercentage = window.calculatePercentageFromPrice(currentPrice, targetPrice, side);
+      targetPercentageInput.value = targetPercentage.toFixed(2);
+    }
+  }
+}
+
+/**
  * Setup price calculation event listeners for add modal
  * Sets up automatic price/percentage calculations when form fields change
  */
@@ -1638,49 +1706,15 @@ function setupPriceCalculation() {
       return; // Required fields not found
     }
 
-    // Function to update prices from percentages
-    const updatePricesFromPercentages = () => {
-      const currentPrice = parseFloat(priceInput.value) || 0;
-      const side = sideInput.value || 'Long';
-      
-      if (currentPrice > 0 && stopPercentageInput && stopPriceInput) {
-        const stopPercentage = parseFloat(stopPercentageInput.value) || 0;
-        if (stopPercentage > 0 && typeof window.calculateStopPrice === 'function') {
-          const stopPrice = window.calculateStopPrice(currentPrice, stopPercentage, side);
-          stopPriceInput.value = stopPrice.toFixed(2);
-        }
-      }
-      
-      if (currentPrice > 0 && targetPercentageInput && targetPriceInput) {
-        const targetPercentage = parseFloat(targetPercentageInput.value) || 0;
-        if (targetPercentage > 0 && typeof window.calculateTargetPrice === 'function') {
-          const targetPrice = window.calculateTargetPrice(currentPrice, targetPercentage, side);
-          targetPriceInput.value = targetPrice.toFixed(2);
-        }
-      }
-    };
-
-    // Function to update percentages from prices
-    const updatePercentagesFromPrices = () => {
-      const currentPrice = parseFloat(priceInput.value) || 0;
-      const side = sideInput.value || 'Long';
-      
-      if (currentPrice > 0 && stopPriceInput && stopPercentageInput) {
-        const stopPrice = parseFloat(stopPriceInput.value) || 0;
-        if (stopPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
-          const stopPercentage = window.calculatePercentageFromPrice(currentPrice, stopPrice, side);
-          stopPercentageInput.value = stopPercentage.toFixed(2);
-        }
-      }
-      
-      if (currentPrice > 0 && targetPriceInput && targetPercentageInput) {
-        const targetPrice = parseFloat(targetPriceInput.value) || 0;
-        if (targetPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
-          const targetPercentage = window.calculatePercentageFromPrice(currentPrice, targetPrice, side);
-          targetPercentageInput.value = targetPercentage.toFixed(2);
-        }
-      }
-    };
+    // Create bound functions using the shared helper functions
+    const updatePrices = () => updatePricesFromPercentages(
+      priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+      targetPriceInput, targetPercentageInput
+    );
+    const updatePercentages = () => updatePercentagesFromPrices(
+      priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+      targetPriceInput, targetPercentageInput
+    );
 
     // Remove existing listeners if any
     const newPriceInput = priceInput.cloneNode(true);
@@ -1688,24 +1722,24 @@ function setupPriceCalculation() {
     
     // Setup event listeners
     if (newPriceInput && sideInput) {
-      newPriceInput.addEventListener('input', updatePricesFromPercentages);
-      sideInput.addEventListener('change', updatePricesFromPercentages);
+      newPriceInput.addEventListener('input', updatePrices);
+      sideInput.addEventListener('change', updatePrices);
     }
     
     if (stopPercentageInput) {
-      stopPercentageInput.addEventListener('input', updatePricesFromPercentages);
+      stopPercentageInput.addEventListener('input', updatePrices);
     }
     
     if (targetPercentageInput) {
-      targetPercentageInput.addEventListener('input', updatePricesFromPercentages);
+      targetPercentageInput.addEventListener('input', updatePrices);
     }
     
     if (stopPriceInput) {
-      stopPriceInput.addEventListener('input', updatePercentagesFromPrices);
+      stopPriceInput.addEventListener('input', updatePercentages);
     }
     
     if (targetPriceInput) {
-      targetPriceInput.addEventListener('input', updatePercentagesFromPrices);
+      targetPriceInput.addEventListener('input', updatePercentages);
     }
     
     window.Logger?.debug('Price calculation event listeners setup completed', { page: "trade_plans" });
@@ -1732,49 +1766,15 @@ function setupEditPriceCalculation() {
       return; // Required fields not found
     }
 
-    // Function to update prices from percentages
-    const updatePricesFromPercentages = () => {
-      const currentPrice = parseFloat(priceInput.value) || 0;
-      const side = sideInput.value || 'Long';
-      
-      if (currentPrice > 0 && stopPercentageInput && stopPriceInput) {
-        const stopPercentage = parseFloat(stopPercentageInput.value) || 0;
-        if (stopPercentage > 0 && typeof window.calculateStopPrice === 'function') {
-          const stopPrice = window.calculateStopPrice(currentPrice, stopPercentage, side);
-          stopPriceInput.value = stopPrice.toFixed(2);
-        }
-      }
-      
-      if (currentPrice > 0 && targetPercentageInput && targetPriceInput) {
-        const targetPercentage = parseFloat(targetPercentageInput.value) || 0;
-        if (targetPercentage > 0 && typeof window.calculateTargetPrice === 'function') {
-          const targetPrice = window.calculateTargetPrice(currentPrice, targetPercentage, side);
-          targetPriceInput.value = targetPrice.toFixed(2);
-        }
-      }
-    };
-
-    // Function to update percentages from prices
-    const updatePercentagesFromPrices = () => {
-      const currentPrice = parseFloat(priceInput.value) || 0;
-      const side = sideInput.value || 'Long';
-      
-      if (currentPrice > 0 && stopPriceInput && stopPercentageInput) {
-        const stopPrice = parseFloat(stopPriceInput.value) || 0;
-        if (stopPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
-          const stopPercentage = window.calculatePercentageFromPrice(currentPrice, stopPrice, side);
-          stopPercentageInput.value = stopPercentage.toFixed(2);
-        }
-      }
-      
-      if (currentPrice > 0 && targetPriceInput && targetPercentageInput) {
-        const targetPrice = parseFloat(targetPriceInput.value) || 0;
-        if (targetPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
-          const targetPercentage = window.calculatePercentageFromPrice(currentPrice, targetPrice, side);
-          targetPercentageInput.value = targetPercentage.toFixed(2);
-        }
-      }
-    };
+    // Create bound functions using the shared helper functions
+    const updatePrices = () => updatePricesFromPercentages(
+      priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+      targetPriceInput, targetPercentageInput
+    );
+    const updatePercentages = () => updatePercentagesFromPrices(
+      priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+      targetPriceInput, targetPercentageInput
+    );
 
     // Remove existing listeners if any
     const newPriceInput = priceInput.cloneNode(true);
@@ -1782,24 +1782,24 @@ function setupEditPriceCalculation() {
     
     // Setup event listeners
     if (newPriceInput && sideInput) {
-      newPriceInput.addEventListener('input', updatePricesFromPercentages);
-      sideInput.addEventListener('change', updatePricesFromPercentages);
+      newPriceInput.addEventListener('input', updatePrices);
+      sideInput.addEventListener('change', updatePrices);
     }
     
     if (stopPercentageInput) {
-      stopPercentageInput.addEventListener('input', updatePricesFromPercentages);
+      stopPercentageInput.addEventListener('input', updatePrices);
     }
     
     if (targetPercentageInput) {
-      targetPercentageInput.addEventListener('input', updatePricesFromPercentages);
+      targetPercentageInput.addEventListener('input', updatePrices);
     }
     
     if (stopPriceInput) {
-      stopPriceInput.addEventListener('input', updatePercentagesFromPrices);
+      stopPriceInput.addEventListener('input', updatePercentages);
     }
     
     if (targetPriceInput) {
-      targetPriceInput.addEventListener('input', updatePercentagesFromPrices);
+      targetPriceInput.addEventListener('input', updatePercentages);
     }
     
     window.Logger?.debug('Edit price calculation event listeners setup completed', { page: "trade_plans" });

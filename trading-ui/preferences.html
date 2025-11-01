@@ -565,81 +565,69 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- UI Content Section 5 End -->
+                <!-- UI Content Section 5 End -->
 
-        <!-- UI Content Section 6 Start-->
-        <div class="content-section" id="section6" data-group="colors_unified">
-            <div class="section-header">
-                <h2>🎨 צבעים</h2>
-                <div style="display: flex; gap: 5px;">
-                    <button type="button" class="btn btn-success btn-sm" onclick="window.savePreferenceGroup('colors_unified')">
-                        <i class="bi bi-save"></i> שמור
-                    </button>
-                    <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
+                <!-- UI Content Section 6 Start-->
+                <div class="content-section" id="section6" data-group="colors_unified">
+                    <div class="section-header">
+                    <h2>🎨 צבעים</h2>
+                    <button class="btn btn-outline-warning" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
                         <span class="section-toggle-icon">▼</span>
                     </button>
-                </div>
-            </div>
-            <div class="section-body" style="display:none;">
-                <!-- Basic System Colors -->
-                <div class="row">
-                    <div class="col-12">
-                        <h5>צבעי מערכת בסיסיים</h5>
-                        <small class="text-muted">צבעי הממשק הכלליים</small>
                     </div>
-                </div>
+                <div class="section-body" style="display:none;">
+                <!-- Basic System Colors -->
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">צבע ראשי:</label>
                             <input type="color" id="primaryColor" class="form-control form-control-color color-picker" data-color-key="primaryColor">
-                </div>
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">צבע משני:</label>
                             <input type="color" id="secondaryColor" class="form-control form-control-color color-picker" data-color-key="secondaryColor">
-                  </div>
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">הצלחה:</label>
                             <input type="color" id="successColor" class="form-control form-control-color color-picker" data-color-key="successColor">
-                </div>
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">רקע:</label>
                             <input type="color" id="backgroundColor" class="form-control form-control-color color-picker" data-color-key="backgroundColor">
-                </div>
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">טקסט:</label>
                             <input type="color" id="textColor" class="form-control form-control-color color-picker" data-color-key="textColor">
-                </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">אזהרה:</label>
                             <input type="color" id="warningColor" class="form-control form-control-color color-picker" data-color-key="warningColor">
-                  </div>
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">סכנה:</label>
                             <input type="color" id="dangerColor" class="form-control form-control-color color-picker" data-color-key="dangerColor">
-                  </div>
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">מידע:</label>
                             <input type="color" id="infoColor" class="form-control form-control-color color-picker" data-color-key="infoColor">
-                </div>
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">גבול:</label>
                             <input type="color" id="borderColor" class="form-control form-control-color color-picker" data-color-key="borderColor">
-                </div>
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">הדגשה:</label>
                             <input type="color" id="highlightColor" class="form-control form-control-color color-picker" data-color-key="highlightColor">
-                </div>
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">צל:</label>
                             <input type="color" id="shadowColor" class="form-control form-control-color color-picker" data-color-key="shadowColor">
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
                 <div class="section-divider"></div>
                 
@@ -649,11 +637,11 @@
                         <h5>צבעי ישויות</h5>
                         <small class="text-muted">כל ישות כוללת 3 וריאנטים: רגיל, בהיר (רקע), כהה (טקסט)</small>
                     </div>
-                  </div>
-                            <div class="row">
-                                <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
                         <!-- Trade Plans -->
-                                    <div class="mb-3">
+                        <div class="mb-3">
                             <label class="form-label">תכנוני טריידים:</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <label class="form-label mb-0">רגיל:</label>
@@ -662,10 +650,10 @@
                                 <input type="color" id="entityTradePlanColorLight" class="form-control form-control-color color-picker" data-color-key="entityTradePlanColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityTradePlanColorDark" class="form-control form-control-color color-picker" data-color-key="entityTradePlanColorDark">
-            </div>
-        </div>
+                            </div>
+                        </div>
                         <!-- Trades -->
-                                    <div class="mb-3">
+                        <div class="mb-3">
                             <label class="form-label">טריידים:</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <label class="form-label mb-0">רגיל:</label>
@@ -674,8 +662,8 @@
                                 <input type="color" id="entityTradeColorLight" class="form-control form-control-color color-picker" data-color-key="entityTradeColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityTradeColorDark" class="form-control form-control-color color-picker" data-color-key="entityTradeColorDark">
-                                    </div>
-              </div>
+                            </div>
+                        </div>
                         <!-- Alerts -->
                         <div class="mb-3">
                             <label class="form-label">התראות:</label>
@@ -686,8 +674,8 @@
                                 <input type="color" id="entityAlertColorLight" class="form-control form-control-color color-picker" data-color-key="entityAlertColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityAlertColorDark" class="form-control form-control-color color-picker" data-color-key="entityAlertColorDark">
-                  </div>
-              </div>
+                            </div>
+                        </div>
                         <!-- Notes -->
                         <div class="mb-3">
                             <label class="form-label">הערות:</label>
@@ -698,12 +686,12 @@
                                 <input type="color" id="entityNoteColorLight" class="form-control form-control-color color-picker" data-color-key="entityNoteColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityNoteColorDark" class="form-control form-control-color color-picker" data-color-key="entityNoteColorDark">
-            </div>
-              </div>
-        </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-6">
                         <!-- Accounts -->
-          <div class="mb-3">
+                        <div class="mb-3">
                             <label class="form-label">חשבונות מסחר:</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <label class="form-label mb-0">רגיל:</label>
@@ -712,10 +700,10 @@
                                 <input type="color" id="entityTradingAccountColorLight" class="form-control form-control-color color-picker" data-color-key="entityTradingAccountColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityTradingAccountColorDark" class="form-control form-control-color color-picker" data-color-key="entityTradingAccountColorDark">
-            </div>
-          </div>
+                            </div>
+                        </div>
                         <!-- Tickers -->
-          <div class="mb-3">
+                        <div class="mb-3">
                             <label class="form-label">טיקרים:</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <label class="form-label mb-0">רגיל:</label>
@@ -724,10 +712,10 @@
                                 <input type="color" id="entityTickerColorLight" class="form-control form-control-color color-picker" data-color-key="entityTickerColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityTickerColorDark" class="form-control form-control-color color-picker" data-color-key="entityTickerColorDark">
-      </div>
-          </div>
+                            </div>
+                        </div>
                         <!-- Executions -->
-          <div class="mb-3">
+                        <div class="mb-3">
                             <label class="form-label">ביצועים:</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <label class="form-label mb-0">רגיל:</label>
@@ -736,10 +724,10 @@
                                 <input type="color" id="entityExecutionColorLight" class="form-control form-control-color color-picker" data-color-key="entityExecutionColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityExecutionColorDark" class="form-control form-control-color color-picker" data-color-key="entityExecutionColorDark">
-      </div>
-        </div>
+                            </div>
+                        </div>
                         <!-- Cash Flows -->
-          <div class="mb-3">
+                        <div class="mb-3">
                             <label class="form-label">תזרימי מזומנים:</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <label class="form-label mb-0">רגיל:</label>
@@ -748,10 +736,10 @@
                                 <input type="color" id="entityCashFlowColorLight" class="form-control form-control-color color-picker" data-color-key="entityCashFlowColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityCashFlowColorDark" class="form-control form-control-color color-picker" data-color-key="entityCashFlowColorDark">
-              </div>
-                  </div>
+                            </div>
+                        </div>
                         <!-- Info -->
-          <div class="mb-3">
+                        <div class="mb-3">
                             <label class="form-label">מידע:</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <label class="form-label mb-0">רגיל:</label>
@@ -760,10 +748,10 @@
                                 <input type="color" id="entityInfoColorLight" class="form-control form-control-color color-picker" data-color-key="entityInfoColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityInfoColorDark" class="form-control form-control-color color-picker" data-color-key="entityInfoColorDark">
-              </div>
-                  </div>
+                            </div>
+                        </div>
                         <!-- Preferences -->
-          <div class="mb-3">
+                        <div class="mb-3">
                             <label class="form-label">העדפות:</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <label class="form-label mb-0">רגיל:</label>
@@ -772,10 +760,10 @@
                                 <input type="color" id="entityPreferencesColorLight" class="form-control form-control-color color-picker" data-color-key="entityPreferencesColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityPreferencesColorDark" class="form-control form-control-color color-picker" data-color-key="entityPreferencesColorDark">
-              </div>
-                  </div>
+                            </div>
+                        </div>
                         <!-- Research -->
-          <div class="mb-3">
+                        <div class="mb-3">
                             <label class="form-label">מחקר:</label>
                             <div class="d-flex gap-2 align-items-center">
                                 <label class="form-label mb-0">רגיל:</label>
@@ -784,10 +772,10 @@
                                 <input type="color" id="entityResearchColorLight" class="form-control form-control-color color-picker" data-color-key="entityResearchColorLight">
                                 <label class="form-label mb-0">כהה:</label>
                                 <input type="color" id="entityResearchColorDark" class="form-control form-control-color color-picker" data-color-key="entityResearchColorDark">
-              </div>
-                  </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
+                </div>
 
 
 
@@ -885,10 +873,7 @@
 
 
 
-                  </div>
-                  </div>
-        
-       
+            
         <!-- UI Content Section 6 End--> 
       
         <!-- UI Content Section 7 Start-->

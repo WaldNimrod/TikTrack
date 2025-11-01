@@ -719,29 +719,7 @@ function detectPageInfo() {
     
     console.log('🔍 Page detection:', { path, filename, pageName });
     
-    // Helper functions for page detection
-    const determinePageType = (page) => {
-        if (['trades', 'executions', 'trade_plans'].includes(page)) return 'trading';
-        if (['alerts', 'notes'].includes(page)) return 'management';
-        return 'general';
-    };
-    
-    const requiresFilters = (page) => {
-        return ['trades', 'executions', 'alerts', 'notes'].includes(page);
-    };
-    
-    const requiresValidation = (page) => {
-        return ['trades', 'trade_plans', 'alerts'].includes(page);
-    };
-    
-    const requiresTables = (page) => {
-        return ['trades', 'executions', 'alerts', 'notes', 'trade_plans'].includes(page);
-    };
-    
-    const requiresCharts = (page) => {
-        return ['trades', 'executions'].includes(page);
-    };
-    
+    // Use global helper functions (defined below) instead of local duplicates
     const pageInfo = {
         name: pageName,
         path: path,

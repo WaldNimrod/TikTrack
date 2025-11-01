@@ -179,6 +179,11 @@
 | onSuccess callbacks | tickers.js | 3 (שורה 1014, 1322, 1371) | שלושתן | - | 1.11.2025 | False Positive - כל אחת עושה משהו אחר (cancel, restore, delete) |
 | "if" statements | trades.js | 3 (שורה 368, 481, 2114) | - | - | 1.11.2025 | False Positive - statements רגילים, לא פונקציות |
 | "if" statements | alerts.js | 3 (שורה 718, 2355, 3106) | - | - | 1.11.2025 | False Positive - statements רגילים, לא פונקציות |
+| determinePageType | core-systems.js | 2 (שורה 723 arrow, 801 function) | שורה 801 | שורות 723-727 | 1.11.2025 | Arrow function מקומי הוסר - משתמש בפונקציה הגלובלית |
+| requiresFilters | core-systems.js | 2 (שורה 729 arrow, 812 function) | שורה 812 | שורות 729-731 | 1.11.2025 | Arrow function מקומי הוסר - משתמש בפונקציה הגלובלית |
+| requiresValidation | core-systems.js | 2 (שורה 733 arrow, 823 function) | שורה 823 | שורות 733-735 | 1.11.2025 | Arrow function מקומי הוסר - משתמש בפונקציה הגלובלית |
+| requiresTables | core-systems.js | 2 (שורה 737 arrow, 834 function) | שורה 834 | שורות 737-739 | 1.11.2025 | Arrow function מקומי הוסר - משתמש בפונקציה הגלובלית |
+| requiresCharts | core-systems.js | 2 (שורה 741 arrow, 846 function) | שורה 846 | שורות 741-743 | 1.11.2025 | Arrow function מקומי הוסר - משתמש בפונקציה הגלובלית |
 
 ---
 

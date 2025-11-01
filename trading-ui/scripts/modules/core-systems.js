@@ -1502,8 +1502,12 @@ function hideNotification(notification) {
  * @param {string} category - Category of notification (default: 'system')
  */
 async function showSimpleErrorNotification(title, message, duration = 6000, category = null) {
-  // Use the original simple notification system
-  await showNotification(message, 'error', title, duration, category);
+  // Use the global notification system from notification-system.js
+  if (typeof window.showNotification === 'function') {
+    await window.showNotification(message, 'error', title, duration, category);
+  } else {
+    console.error('showNotification not available');
+  }
 }
 
 /**

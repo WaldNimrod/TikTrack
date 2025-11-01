@@ -201,6 +201,17 @@
 | updateExecutionWrapper | executions.js | 1 (שורה 581) | - | שורות 581-736 | 1.11.2025 | הוסר - לא בשימוש, ModalManagerV2 משתמש ב-handlers שלו |
 | populateEditRelatedObjects | alerts.js | 1 (שורה 1159) | - | שורות 1159-1192 | 1.11.2025 | הוסר - לא בשימוש, ModalManagerV2 משתמש ב-populateSelects |
 | toggleAlert | alerts.js | 1 (שורה 2099) | - | שורות 2099-2143 | 1.11.2025 | הוסר - לא בשימוש |
+| copyTradePlan | trade_plans.js | 1 (שורה 179) | - | שורות 179-243 | 1.11.2025 | הוסר - לא בשימוש |
+| loadTickerInfo | trade_plans.js | 1 (שורה 449) | - | שורות 449-482 | 1.11.2025 | הוסר - יש loadTradePlanTickerInfo אחר |
+| displayTickerInfo | trade_plans.js | 1 (שורה 514) | - | שורות 514-542 | 1.11.2025 | הוסר - יש displayTradePlanTickerInfo אחר |
+| updateFormFieldsWithTickerData | trade_plans.js | 1 (שורה 788) | - | שורות 788-864 | 1.11.2025 | הוסר - לא בשימוש |
+| loadEditTickerInfo | trade_plans.js | 1 (שורה 866) | - | שורות 866-899 | 1.11.2025 | הוסר - לא בשימוש |
+| displayEditTickerInfo | trade_plans.js | 1 (שורה 901) | - | שורות 901-929 | 1.11.2025 | הוסר - לא בשימוש |
+| updateEditFormFieldsWithTickerData | trade_plans.js | 1 (שורה 952) | - | שורות 952-1031 | 1.11.2025 | הוסר - לא בשימוש |
+| saveEditTradePlan | trade_plans.js | 1 (שורה 1284) | - | שורות 1284-1359 | 1.11.2025 | הוסר - deprecated wrapper |
+| saveNewTradePlan | trade_plans.js | 1 (שורה 2735) | - | שורות 2735-2737 | 1.11.2025 | הוסר - deprecated wrapper |
+| updateDesignsTable | trade_plans.js | 1 (שורה 1930) | - | שורות 1930-1939 | 1.11.2025 | הוסר - alias לא בשימוש |
+| filterTradePlansData | trade_plans.js | 1 (שורה 1945) | - | שורות 1945-1984 | 1.11.2025 | הוסר - לא בשימוש |
 
 ---
 

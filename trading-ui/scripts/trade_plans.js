@@ -171,12 +171,13 @@ function executeTradePlan(planId) {
   }
 }
 
+// REMOVED: copyTradePlan - not used
 /**
  * העתקת תוכנית מסחר
  * יוצר עותק של תוכנית מסחר קיימת
  * @param {number} planId - מזהה התוכנית
  */
-function copyTradePlan(planId) {
+function _REMOVED_copyTradePlan(planId) {
   try {
     window.Logger.info('📋 מעתיק תוכנית מסחר:', planId, { page: "trade_plans" });
     
@@ -445,8 +446,9 @@ function disableEditFields() {
   }
 }
 
+// REMOVED: loadTickerInfo, displayTickerInfo, updateFormFieldsWithTickerData - not used, use loadTradePlanTickerInfo/displayTradePlanTickerInfo instead
 // Ticker info functions
-async function loadTickerInfo(tickerId) {
+async function _REMOVED_loadTickerInfo(tickerId) {
   try {
     window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "trade_plans" });
     
@@ -511,7 +513,7 @@ async function loadTradePlanTickerInfo(tickerId) {
   }
 }
 
-async function displayTickerInfo(ticker) {
+async function _REMOVED_displayTickerInfo(ticker) {
   const tickerInfo = document.getElementById('tickerInfo');
   const tickerPrice = document.getElementById('tickerPrice');
   const tickerChange = document.getElementById('tickerChange');
@@ -785,7 +787,7 @@ function updateAmountFromShares() {
 /**
  * Update form fields with calculated values based on ticker data and user preferences
  */
-async function updateFormFieldsWithTickerData(ticker, currentPrice) {
+async function _REMOVED_updateFormFieldsWithTickerData(ticker, currentPrice) {
   try {
     window.Logger.info('🔄 Updating form fields with ticker data:', ticker.symbol, 'Price:', currentPrice, { page: "trade_plans" });
     
@@ -862,8 +864,9 @@ async function updateFormFieldsWithTickerData(ticker, currentPrice) {
   }
 }
 
+// REMOVED: loadEditTickerInfo, displayEditTickerInfo, updateEditFormFieldsWithTickerData - not used
 // Edit modal ticker info functions
-async function loadEditTickerInfo(tickerId) {
+async function _REMOVED_loadEditTickerInfo(tickerId) {
   try {
     window.Logger.info('🔄 Loading edit ticker info for ID:', tickerId, { page: "trade_plans" });
     
@@ -898,7 +901,7 @@ async function loadEditTickerInfo(tickerId) {
   }
 }
 
-async function displayEditTickerInfo(ticker) {
+async function _REMOVED_displayEditTickerInfo(ticker) {
   const tickerInfo = document.getElementById('editTickerInfo');
   const tickerPrice = document.getElementById('editTickerPrice');
   const tickerChange = document.getElementById('editTickerChange');
@@ -949,7 +952,7 @@ function hideEditTickerInfo() {
 /**
  * Update edit form fields with calculated values based on ticker data and user preferences
  */
-async function updateEditFormFieldsWithTickerData(ticker, currentPrice) {
+async function _REMOVED_updateEditFormFieldsWithTickerData(ticker, currentPrice) {
   try {
     window.Logger.info('🔄 Updating edit form fields with ticker data:', ticker.symbol, 'Price:', currentPrice, { page: "trade_plans" });
     
@@ -1278,10 +1281,11 @@ function updateEditAmountFromShares() {
   }
 }
 
+// REMOVED: saveEditTradePlan - deprecated wrapper, use saveTradePlanData('edit') directly
 /**
  * שמירת עריכת תכנון
  */
-async function saveEditTradePlan() {
+async function _REMOVED_saveEditTradePlan() {
   try {
     // שימוש ב-DataCollectionService לאיסוף נתונים
     const tradePlanData = DataCollectionService.collectFormData({
@@ -1924,10 +1928,11 @@ async function loadTradePlansData() {
   }
 }
 
+// REMOVED: updateDesignsTable - alias not used
 /**
  * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
  */
-function updateDesignsTable(trade_plans) {
+function _REMOVED_updateDesignsTable(trade_plans) {
   try {
     return updateTradePlansTable(trade_plans);
   } catch (error) {
@@ -1939,10 +1944,11 @@ function updateDesignsTable(trade_plans) {
 }
 
 
+// REMOVED: filterTradePlansData - not used
 /**
  * פילטור נתוני תכנונים
  */
-function filterTradePlansData(filters) {
+function _REMOVED_filterTradePlansData(filters) {
   try {
     // Use trade-plan-service for filtering
     if (typeof window.tradePlanService?.filterTradePlans === 'function') {
@@ -2728,11 +2734,12 @@ async function saveTradePlanData(mode) {
 // REMOVED: saveEditTradePlan deprecated wrapper - using saveTradePlanData('edit') directly
 // Original wrapper at line 2654 has been removed - function is now defined at line 1207 with full implementation
 
+// REMOVED: saveNewTradePlan - deprecated wrapper
 /**
  * שמירת תכנון חדש
  * @deprecated Use saveTradePlanData('add') instead
  */
-async function saveNewTradePlan() {
+async function _REMOVED_saveNewTradePlan() {
   await saveTradePlanData('add');
 }
 // ===== GLOBAL EXPORTS =====

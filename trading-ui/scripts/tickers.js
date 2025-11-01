@@ -120,8 +120,9 @@ function viewTickerDetails(tickerId) {
   }
 }
 
+// REMOVED: viewTickerDetailsOld - not used, replaced by viewTickerDetails
 // Keep old function for backward compatibility
-function viewTickerDetailsOld(tickerId) {
+function _REMOVED_viewTickerDetailsOld(tickerId) {
   try {
     window.Logger.info('👁️ מציג פרטי טיקר:', tickerId, { page: "tickers" });
     
@@ -176,12 +177,13 @@ function viewTickerDetailsOld(tickerId) {
   }
 }
 
+// REMOVED: refreshTickerData - not used
 /**
  * רענון נתוני טיקר
  * טוען מחדש את נתוני הטיקר מהשרת
  * @param {number} tickerId - מזהה הטיקר
  */
-function refreshTickerData(tickerId) {
+function _REMOVED_refreshTickerData(tickerId) {
   try {
     window.Logger.info('🔄 מרענן נתוני טיקר:', tickerId, { page: "tickers" });
     

@@ -314,13 +314,39 @@ def get_single_preference() -> Any:
             use_cache=use_cache
         )
         
+        # אם העדפה לא נמצאה (value is None), נסה לקבל default value
+        if value is None:
+            try:
+                default_value = preferences_service.get_default_preference(preference_name)
+                if default_value is not None:
+                    value = default_value
+                    logger.info(f"Using default value for preference '{preference_name}': {default_value}")
+                else:
+                    # גם default לא קיים - החזר 404
+                    return jsonify({
+                        "success": False,
+                        "error": f"Preference '{preference_name}' not found",
+                        "data": {
+                            "user_id": user_id,
+                            "preference_name": preference_name,
+                            "value": None,
+                            "profile_id": profile_id,
+                            "is_default": False
+                        },
+                        "timestamp": datetime.now().isoformat()
+                    }), 404
+            except Exception as default_error:
+                logger.warning(f"Could not get default value for '{preference_name}': {default_error}")
+                # המשך עם None
+        
         return jsonify({
             "success": True,
             "data": {
                 "user_id": user_id,
                 "preference_name": preference_name,
                 "value": value,
-                "profile_id": profile_id
+                "profile_id": profile_id,
+                "is_default": value is not None
             },
             "timestamp": datetime.now().isoformat()
         }), 200

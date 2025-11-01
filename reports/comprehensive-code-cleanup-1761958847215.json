@@ -1,0 +1,247 @@
+{
+  "timestamp": "2025-11-01T01:00:47.215Z",
+  "summary": {
+    "totalFiles": 61,
+    "totalFunctions": 826,
+    "unusedCount": 1,
+    "duplicateCount": 4,
+    "localAlternativeCount": 10
+  },
+  "unusedFunctions": [
+    {
+      "functionName": "hasActiveFilters",
+      "file": "trade_plans.js",
+      "filePath": "trading-ui/scripts/trade_plans.js",
+      "lineNumber": 2059,
+      "type": "arrow",
+      "severity": "MEDIUM"
+    }
+  ],
+  "duplicateFunctions": [
+    {
+      "functionName": "if",
+      "file": "trades.js",
+      "filePath": "trading-ui/scripts/trades.js",
+      "occurrences": [
+        {
+          "lineNumber": 368,
+          "type": "function"
+        },
+        {
+          "lineNumber": 481,
+          "type": "function"
+        },
+        {
+          "lineNumber": 2114,
+          "type": "function"
+        }
+      ],
+      "count": 3,
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "if",
+      "file": "alerts.js",
+      "filePath": "trading-ui/scripts/alerts.js",
+      "occurrences": [
+        {
+          "lineNumber": 718,
+          "type": "function"
+        },
+        {
+          "lineNumber": 2356,
+          "type": "function"
+        },
+        {
+          "lineNumber": 3107,
+          "type": "function"
+        }
+      ],
+      "count": 3,
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "if",
+      "file": "trade_plans.js",
+      "filePath": "trading-ui/scripts/trade_plans.js",
+      "occurrences": [
+        {
+          "lineNumber": 583,
+          "type": "function"
+        },
+        {
+          "lineNumber": 1863,
+          "type": "function"
+        }
+      ],
+      "count": 2,
+      "severity": "HIGH"
+    },
+    {
+      "functionName": "onSuccess",
+      "file": "tickers.js",
+      "filePath": "trading-ui/scripts/tickers.js",
+      "occurrences": [
+        {
+          "lineNumber": 1016,
+          "type": "arrow-method"
+        },
+        {
+          "lineNumber": 1324,
+          "type": "arrow-method"
+        },
+        {
+          "lineNumber": 1373,
+          "type": "arrow-method"
+        }
+      ],
+      "count": 3,
+      "severity": "HIGH"
+    }
+  ],
+  "localWithGlobalAlternative": [
+    {
+      "localFunction": "shouldShowNotification",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1310,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.22727272727272727,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showSimpleErrorNotification",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1504,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.18518518518518517,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showFinalSuccessNotification",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1586,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.14285714285714285,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showCriticalErrorNotification",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1653,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.13793103448275862,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showFinalSuccessModal",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1896,
+      "globalAlternative": "showSuccessNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.21739130434782608,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showFinalSuccessNotificationWithReload",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 1975,
+      "globalAlternative": "showNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.10526315789473684,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showFinalSuccessModalWithReload",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 2027,
+      "globalAlternative": "showSuccessNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.16129032258064516,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showCriticalErrorModal",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 2141,
+      "globalAlternative": "showErrorNotification",
+      "globalSystem": "notification-system.js",
+      "category": "NOTIFICATION",
+      "similarity": 0.22727272727272727,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "showDetailsModal",
+      "localFile": "core-systems.js",
+      "localFilePath": "trading-ui/scripts/modules/core-systems.js",
+      "localLineNumber": 2342,
+      "globalAlternative": "showModal",
+      "globalSystem": "modal-manager-v2.js",
+      "category": "UI_MANAGEMENT",
+      "similarity": 0.3125,
+      "severity": "LOW"
+    },
+    {
+      "localFunction": "clearUserPreferencesCache",
+      "localFile": "data-advanced.js",
+      "localFilePath": "trading-ui/scripts/modules/data-advanced.js",
+      "localLineNumber": 460,
+      "globalAlternative": "clearAllCache",
+      "globalSystem": "unified-cache-manager.js",
+      "category": "CACHE",
+      "similarity": 0.2,
+      "severity": "LOW"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "issue": "Unused functions found",
+      "count": 1,
+      "action": "Review and remove unused functions to reduce code complexity",
+      "files": [
+        "trade_plans.js"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "issue": "Duplicate functions found within files",
+      "count": 4,
+      "action": "Consolidate duplicate functions into single implementation",
+      "files": [
+        "trades.js",
+        "alerts.js",
+        "trade_plans.js",
+        "tickers.js"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "issue": "Local functions with global alternatives found",
+      "count": 10,
+      "action": "Replace local functions with global system functions for consistency",
+      "files": [
+        "core-systems.js",
+        "data-advanced.js"
+      ]
+    }
+  ]
+}

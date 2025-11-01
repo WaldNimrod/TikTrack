@@ -662,17 +662,6 @@ class Logger {
 // יצירת instance גלובלי
 window.Logger = new Logger();
 
-// Fallback למקרה ש-Logger לא זמין
-if (!window.Logger) {
-    window.Logger = {
-        info: () => {},
-        error: () => {},
-        warn: () => {},
-        debug: () => {},
-        critical: () => {}
-    };
-}
-
 // ===== DETAILED LOG GENERATION FUNCTIONS =====
 // These functions are used across multiple pages for detailed logging
 
@@ -735,8 +724,9 @@ function generateDetailedLog(pageName, pageSpecificStats = {}) {
             functions: {
                 showAddModal: typeof window[`showAdd${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Modal`] === 'function' ? 'זמין' : 'לא זמין',
                 editFunction: typeof window[`edit${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`] === 'function' ? 'זמין' : 'לא זמין',
-                deleteFunction: typeof window[`delete${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`] === 'function' ? 'זמין' : 'לא זמין',
-                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין'
+                deleteFunction: typeof window[`delete${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`] === 'function' ? 'זמין' : 'לא זמין'
+                // toggleSection removed to break circular dependency with Logger
+                // toggleSection checks are done directly in ui-utils.js without Logger dependency
             },
             errors: window.Logger ? window.Logger.getErrors() : [],
             warnings: window.Logger ? window.Logger.getWarnings() : []

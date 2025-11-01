@@ -1270,15 +1270,21 @@ Tables must be wrapped in containers with specific IDs:
 </div>
 ```
 
-**Supported Container IDs (UPDATED):**
+**Supported Container IDs (UPDATED - January 2025):**
 - `tradesContainer` - Trades table
-- `tradePlansContainer` - Trade plans table
+- `trade_plansContainer` - Trade plans table (**Note:** Uses underscore, not camelCase)
 - `alertsContainer` - Alerts table
 - `executionsContainer` - Executions table
 - `accountsContainer` - Accounts table
 - `tickersContainer` - Tickers table
 - `cashFlowsContainer` - Cash flows table
 - `notesContainer` - Notes table
+
+**Implementation Features:**
+- ✅ Supports all 8 main pages
+- ✅ Handles multiple tables per page automatically
+- ✅ Automatically detects additional containers (future-proof)
+- ✅ Gracefully handles missing table fields (shows all rows when field not present)
 
 #### Column Header Requirements
 Filters work by matching column headers:

@@ -307,8 +307,9 @@ function updateTradesTable(trades) {
 ```
 
 ### 3. ניהול מודלים
-- **הוספה:** `showAddTradeModal()`
-- **עריכה:** `showEditTradeModal(id)`
+- **הוספה:** `window.ModalManagerV2.showModal('tradesModal', 'add')` ✅ **מערכת כללית**
+- **עריכה:** `window.ModalManagerV2.showEditModal('tradesModal', 'trade', id)` ✅ **מערכת כללית**
+- ⚠️ **Deprecated:** `showAddTradeModal()`, `showEditTradeModal()` - הוסרו, יש להשתמש ב-ModalManagerV2
 - **מחיקה:** `deleteTradeRecord(id)`
 
 ### 4. מערכת התנאים (חדש בגרסה 3.0.0)

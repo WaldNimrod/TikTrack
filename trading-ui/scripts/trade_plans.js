@@ -1,3 +1,80 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 52
+ * 
+ * PAGE INITIALIZATION (4)
+ * - setupPriceCalculation() - * View linked items for trade plan
+ * - setupEditPriceCalculation() - setupEditPriceCalculation function
+ * - initializeTradePlanConditionsSystem() - initializeTradePlanConditionsSystem function
+ * - setupSortableHeadersLocal() - setupSortableHeadersLocal function
+ * 
+ * DATA LOADING (4)
+ * - loadTickerInfo() - * Disable edit form fields
+ * - loadTradePlanTickerInfo() - loadTradePlanTickerInfo function
+ * - loadEditTickerInfo() - loadEditTickerInfo function
+ * - loadTradePlansData() - loadTradePlansData function
+ * 
+ * DATA MANIPULATION (23)
+ * - updateTickerInfo() - * Hide ticker information display
+ * - updateSharesFromAmount() - updateSharesFromAmount function
+ * - updateAmountFromShares() - updateAmountFromShares function
+ * - updateFormFieldsWithTickerData() - updateFormFieldsWithTickerData function
+ * - updateEditFormFieldsWithTickerData() - * Hide edit ticker information section
+ * - updateEditTickerInfo() - updateEditTickerInfo function
+ * - updateEditSharesFromAmount() - updateEditSharesFromAmount function
+ * - updateEditAmountFromShares() - updateEditAmountFromShares function
+ * - saveEditTradePlan() - * עדכון סכום מתוכנן ממספר מניות במודל העריכה
+ * - addEditCondition() - addEditCondition function
+ * - addEditReason() - * Add condition to edit modal
+ * - addEditImportantNote() - * Add edit reason functionality (placeholder)
+ * - addEditReminder() - * Add edit important note functionality (placeholder)
+ * - addImportantNote() - * Add edit reminder functionality (placeholder)
+ * - addReminder() - * Add important note functionality (placeholder for add modal)
+ * - updateDesignsTable() - updateDesignsTable function
+ * - updateTradePlansTable() - updateTradePlansTable function
+ * - updateTradePlansPageSummaryStats() - updateTradePlansPageSummaryStats function
+ * - saveTradePlanData() - saveTradePlanData function
+ * - saveNewTradePlan() - saveNewTradePlan function
+ * - showAddTradePlanModal() - showAddTradePlanModal function
+ * - saveTradePlan() - * Show add trade plan modal
+ * - deleteTradePlan() - deleteTradePlan function
+ * 
+ * EVENT HANDLING (2)
+ * - restorePlanningSectionState() - * Setup sortable headers for trade plans table
+ * - performTradePlanDeletion() - performTradePlanDeletion function
+ * 
+ * UI UPDATES (6)
+ * - displayTickerInfo() - * טעינת מידע על הטיקר (למודל החדש)
+ * - displayTradePlanTickerInfo() - displayTradePlanTickerInfo function
+ * - hideTickerInfo() - hideTickerInfo function
+ * - displayEditTickerInfo() - displayEditTickerInfo function
+ * - hideEditTickerInfo() - hideEditTickerInfo function
+ * - showEditTradePlanModal() - * Show add trade plan modal
+ * 
+ * VALIDATION (1)
+ * - checkLinkedItemsBeforeCancel() - checkLinkedItemsBeforeCancel function
+ * 
+ * OTHER (12)
+ * - executeTradePlan() - executeTradePlan function
+ * - copyTradePlan() - copyTradePlan function
+ * - enableFormFields() - enableFormFields function
+ * - disableFormFields() - * פתיחת מודל הוספת תכנון חדש
+ * - enableEditFieldsWrapper() - * Disable form fields for trade plan creation
+ * - disableEditFields() - * Enable edit form fields wrapper
+ * - reactivateTradePlan() - * בדיקת פריטים מקושרים לפני ביטול תכנון
+ * - openCancelTradePlanModal() - * Add reminder functionality (placeholder for add modal)
+ * - cancelTradePlan() - cancelTradePlan function
+ * - viewLinkedItemsForTradePlan() - viewLinkedItemsForTradePlan function
+ * - filterTradePlansData() - * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
+ * - filterTradePlansByType() - filterTradePlansByType function
+ * 
+ * ==========================================
+ */
 /**
  * Trade Plans Page - Comprehensive Function Index
  * ================================================
@@ -14,6 +91,9 @@
  * Version: 2.0
  * Last Updated: 2025-01-27
  */
+
+// Note: We'll capture the global function reference when updatePageSummaryStats is first called
+// This avoids issues with function hoisting and ensures we get the true global function
 
 /**
  * ========================================
@@ -91,12 +171,13 @@ function executeTradePlan(planId) {
   }
 }
 
+// REMOVED: copyTradePlan - not used
 /**
  * העתקת תוכנית מסחר
  * יוצר עותק של תוכנית מסחר קיימת
  * @param {number} planId - מזהה התוכנית
  */
-function copyTradePlan(planId) {
+function _REMOVED_copyTradePlan(planId) {
   try {
     window.Logger.info('📋 מעתיק תוכנית מסחר:', planId, { page: "trade_plans" });
     
@@ -365,8 +446,9 @@ function disableEditFields() {
   }
 }
 
+// REMOVED: loadTickerInfo, displayTickerInfo, updateFormFieldsWithTickerData - not used, use loadTradePlanTickerInfo/displayTradePlanTickerInfo instead
 // Ticker info functions
-async function loadTickerInfo(tickerId) {
+async function _REMOVED_loadTickerInfo(tickerId) {
   try {
     window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "trade_plans" });
     
@@ -401,7 +483,37 @@ async function loadTickerInfo(tickerId) {
   }
 }
 
-async function displayTickerInfo(ticker) {
+/**
+ * טעינת מידע על הטיקר (למודל החדש)
+ */
+async function loadTradePlanTickerInfo(tickerId) {
+  try {
+    window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "trade_plans" });
+    
+    // Get ticker data from API
+    const response = await fetch(`/api/tickers/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const tickers = data.data || data;
+    
+    // Find the specific ticker
+    const ticker = tickers.find(t => t.id == tickerId);
+    if (!ticker) {
+      throw new Error('Ticker not found');
+    }
+    
+    // Display ticker info
+    displayTradePlanTickerInfo(ticker);
+    
+  } catch (error) {
+    window.Logger.error('❌ Error loading ticker info:', error, { page: "trade_plans" });
+  }
+}
+
+async function _REMOVED_displayTickerInfo(ticker) {
   const tickerInfo = document.getElementById('tickerInfo');
   const tickerPrice = document.getElementById('tickerPrice');
   const tickerChange = document.getElementById('tickerChange');
@@ -431,6 +543,80 @@ async function displayTickerInfo(ticker) {
   }
 }
 
+/**
+ * הצגת מידע על הטיקר (למודל החדש)
+ */
+function displayTradePlanTickerInfo(ticker) {
+  // Create or update ticker info display
+  let tickerInfoDiv = document.getElementById('tradePlanTickerInfo');
+  if (!tickerInfoDiv) {
+    // Create a new row for ticker info spanning full width
+    const tickerInfoRow = document.createElement('div');
+    tickerInfoRow.className = 'row';
+    tickerInfoRow.id = 'tradePlanTickerInfoRow';
+    
+    // Create column for ticker info - full width
+    const tickerInfoCol = document.createElement('div');
+    tickerInfoCol.className = 'col-12';
+    
+    tickerInfoDiv = document.createElement('div');
+    tickerInfoDiv.id = 'tradePlanTickerInfo';
+    tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
+    
+    tickerInfoCol.appendChild(tickerInfoDiv);
+    tickerInfoRow.appendChild(tickerInfoCol);
+    
+    // Insert after the ticker/account row
+    const tickerSelect = document.getElementById('tradePlanTicker');
+    if (tickerSelect) {
+      const tickerField = tickerSelect.closest('.mb-3');
+      if (tickerField && tickerField.parentNode) {
+        // Find the row containing the ticker field
+        const row = tickerField.closest('.row');
+        if (row && row.parentNode) {
+          row.parentNode.insertBefore(tickerInfoRow, row.nextSibling);
+        }
+      }
+    }
+  }
+  
+  // Use the new global renderTickerInfo function
+  if (window.renderTickerInfo) {
+    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+  } else {
+    // Fallback if renderTickerInfo not available
+    tickerInfoDiv.innerHTML = `
+      <div class="ticker-info-display">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}
+          </div>
+          <div class="col-md-6 text-end">
+            <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
+            <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+              ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </span>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12">
+            <small class="text-muted">
+              נפח: ${(ticker.volume || 0).toLocaleString()} | 
+              שינוי יומי: ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </small>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Set default entry price to current price if field exists
+  const entryPriceField = document.getElementById('tradePlanEntryPrice');
+  if (entryPriceField && ticker.current_price) {
+    entryPriceField.value = ticker.current_price;
+  }
+}
+
 // ===== UI MANAGEMENT FUNCTIONS =====
 // UI interactions, ticker info display, and form calculations
 
@@ -456,9 +642,152 @@ function hideTickerInfo() {
 }
 
 /**
+ * Update ticker info in add modal
+ * Updates display elements and form fields when ticker is selected in add modal
+ */
+async function updateTickerInfo() {
+  try {
+    const tickerSelect = document.getElementById('ticker');
+    const tickerDisplay = document.getElementById('selectedTickerDisplay');
+    const priceDisplay = document.getElementById('currentPriceDisplay');
+    const changeDisplay = document.getElementById('dailyChangeDisplay');
+    const tickerId = tickerSelect ? tickerSelect.value : null;
+
+    if (!tickerId) {
+      if (tickerDisplay) tickerDisplay.textContent = 'לא נבחר';
+      if (priceDisplay) priceDisplay.textContent = '-';
+      if (changeDisplay) {
+        changeDisplay.textContent = '-';
+        changeDisplay.style.color = '#6c757d';
+      }
+      // Hide ticker info section
+      hideTickerInfo();
+      return;
+    }
+
+    // Load ticker data
+    await loadTickerInfo(tickerId);
+
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון מידע טיקר:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון מידע טיקר', error.message);
+    }
+  }
+}
+
+/**
+ * Update shares from planned amount in add modal
+ * Calculates number of shares based on planned amount and current price
+ * 
+ * @function updateSharesFromAmount
+ * @returns {void}
+ */
+function updateSharesFromAmount() {
+  try {
+    const amountInput = document.getElementById('plannedAmount');
+    const sharesInput = document.getElementById('shares');
+    const priceDisplay = document.getElementById('currentPriceDisplay');
+    
+    // Fallback to alternative field names
+    if (!amountInput) {
+      const altAmountInput = document.getElementById('addTradePlanPlannedAmount');
+      if (altAmountInput) amountInput = altAmountInput;
+    }
+    if (!sharesInput) {
+      const altSharesInput = document.getElementById('addTradePlanShares');
+      if (altSharesInput) sharesInput = altSharesInput;
+    }
+
+    if (!amountInput || !sharesInput || !priceDisplay) {
+      return;
+    }
+
+    const amount = parseFloat(amountInput.value) || 0;
+    const priceText = priceDisplay.textContent;
+    const price = parseFloat(priceText.replace('$', '')) || 0;
+
+    if (price > 0) {
+      // Try to use global function first
+      if (typeof window.convertAmountToShares === 'function') {
+        const result = window.convertAmountToShares(amount, price);
+        sharesInput.value = result.shares || result;
+      } else if (typeof convertAmountToShares === 'function') {
+        // Fallback to local function if exists
+        const result = convertAmountToShares(amount, price);
+        sharesInput.value = result.shares || result;
+      } else {
+        // Simple calculation fallback
+        sharesInput.value = Math.floor(amount / price);
+      }
+    }
+    
+  } catch (error) {
+    window.Logger?.error('שגיאה בעדכון מניות מסכום:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון מניות מסכום', error.message);
+    }
+  }
+}
+
+/**
+ * Update amount from shares in add modal
+ * Calculates planned amount based on number of shares and current price
+ * 
+ * @function updateAmountFromShares
+ * @returns {void}
+ */
+function updateAmountFromShares() {
+  try {
+    const amountInput = document.getElementById('plannedAmount');
+    const sharesInput = document.getElementById('shares');
+    const priceDisplay = document.getElementById('currentPriceDisplay');
+    
+    // Fallback to alternative field names
+    if (!amountInput) {
+      const altAmountInput = document.getElementById('addTradePlanPlannedAmount');
+      if (altAmountInput) amountInput = altAmountInput;
+    }
+    if (!sharesInput) {
+      const altSharesInput = document.getElementById('addTradePlanShares');
+      if (altSharesInput) sharesInput = altSharesInput;
+    }
+
+    if (!amountInput || !sharesInput || !priceDisplay) {
+      return;
+    }
+
+    const shares = parseFloat(sharesInput.value) || 0;
+    const priceText = priceDisplay.textContent;
+    const price = parseFloat(priceText.replace('$', '')) || 0;
+
+    if (price > 0) {
+      // Try to use global function first
+      if (typeof window.convertSharesToAmount === 'function') {
+        const amount = window.convertSharesToAmount(shares, price);
+        amountInput.value = amount;
+      } else if (typeof convertSharesToAmount === 'function') {
+        // Fallback to local function if exists
+        const amount = convertSharesToAmount(shares, price);
+        amountInput.value = amount;
+      } else {
+        // Simple calculation fallback
+        amountInput.value = (shares * price).toFixed(2);
+      }
+    }
+    
+  } catch (error) {
+    window.Logger?.error('שגיאה בעדכון סכום ממניות:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון סכום ממניות', error.message);
+    }
+  }
+}
+
+/**
  * Update form fields with calculated values based on ticker data and user preferences
  */
-async function updateFormFieldsWithTickerData(ticker, currentPrice) {
+async function _REMOVED_updateFormFieldsWithTickerData(ticker, currentPrice) {
   try {
     window.Logger.info('🔄 Updating form fields with ticker data:', ticker.symbol, 'Price:', currentPrice, { page: "trade_plans" });
     
@@ -535,8 +864,9 @@ async function updateFormFieldsWithTickerData(ticker, currentPrice) {
   }
 }
 
+// REMOVED: loadEditTickerInfo, displayEditTickerInfo, updateEditFormFieldsWithTickerData - not used
 // Edit modal ticker info functions
-async function loadEditTickerInfo(tickerId) {
+async function _REMOVED_loadEditTickerInfo(tickerId) {
   try {
     window.Logger.info('🔄 Loading edit ticker info for ID:', tickerId, { page: "trade_plans" });
     
@@ -571,7 +901,7 @@ async function loadEditTickerInfo(tickerId) {
   }
 }
 
-async function displayEditTickerInfo(ticker) {
+async function _REMOVED_displayEditTickerInfo(ticker) {
   const tickerInfo = document.getElementById('editTickerInfo');
   const tickerPrice = document.getElementById('editTickerPrice');
   const tickerChange = document.getElementById('editTickerChange');
@@ -622,7 +952,7 @@ function hideEditTickerInfo() {
 /**
  * Update edit form fields with calculated values based on ticker data and user preferences
  */
-async function updateEditFormFieldsWithTickerData(ticker, currentPrice) {
+async function _REMOVED_updateEditFormFieldsWithTickerData(ticker, currentPrice) {
   try {
     window.Logger.info('🔄 Updating edit form fields with ticker data:', ticker.symbol, 'Price:', currentPrice, { page: "trade_plans" });
     
@@ -951,10 +1281,11 @@ function updateEditAmountFromShares() {
   }
 }
 
+// REMOVED: saveEditTradePlan - deprecated wrapper, use saveTradePlanData('edit') directly
 /**
  * שמירת עריכת תכנון
  */
-async function saveEditTradePlan() {
+async function _REMOVED_saveEditTradePlan() {
   try {
     // שימוש ב-DataCollectionService לאיסוף נתונים
     const tradePlanData = DataCollectionService.collectFormData({
@@ -1180,6 +1511,40 @@ function addEditReminder() {
 }
 
 /**
+ * Add important note functionality (placeholder for add modal)
+ * @returns {void}
+ */
+function addImportantNote() {
+  try {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('המודול יאפשר בקרוב לייצר הערות עשירות לתוכנית', 'info');
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהוספת הערה חשובה:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת הערה חשובה', error.message);
+    }
+  }
+}
+
+/**
+ * Add reminder functionality (placeholder for add modal)
+ * @returns {void}
+ */
+function addReminder() {
+  try {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('המודול יאפשר בקרוב לייצר התראות לתוכנית', 'info');
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בהוספת תזכורת:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת תזכורת', error.message);
+    }
+  }
+}
+
+/**
  * פתיחת מודל ביטול תכנון
  */
 function openCancelTradePlanModal(tradePlanId) {
@@ -1212,12 +1577,241 @@ function openCancelTradePlanModal(tradePlanId) {
 }
 
 /**
- * פתיחת מודל מחיקת תכנון
+ * ביטול תכנון מסחר
+ * Uses global cancelItem function from ui-utils.js
+ * @param {number} tradePlanId - Trade plan ID
  */
-window.confirmDeleteTradePlan = confirmDeleteTradePlan;
+async function cancelTradePlan(tradePlanId) {
+  try {
+    // Use global cancelItem function if available
+    if (typeof window.cancelItem === 'function') {
+      const tradePlan = window.tradePlansData?.find(tp => tp.id === tradePlanId);
+      const tradePlanName = tradePlan?.name || `תכנון ${tradePlanId}`;
+      await window.cancelItem('trade_plan', tradePlanId, tradePlanName);
+      // Reload data after cancellation
+      if (typeof loadTradePlansData === 'function') {
+        await loadTradePlansData();
+      }
+    } else {
+      // Fallback to opening modal if global function not available
+      openCancelTradePlanModal(tradePlanId);
+    }
+  } catch (error) {
+    window.Logger.error('שגיאה בביטול תכנון:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בביטול תכנון', error.message);
+    }
+  }
+}
+
+// Using global deleteTradePlan function - no need for confirmDeleteTradePlan wrapper
+// The deleteTradePlan function already handles confirmation via checkLinkedItemsBeforeAction
+
+/**
+ * View linked items for trade plan
+ * Uses global viewLinkedItems function from linked-items.js
+ * @param {number} tradePlanId - Trade plan ID
+ */
+function viewLinkedItemsForTradePlan(tradePlanId) {
+  if (typeof window.viewLinkedItems === 'function') {
+    return window.viewLinkedItems(tradePlanId, 'trade_plan');
+  } else {
+    window.Logger?.warn('viewLinkedItems global function not available', { page: "trade_plans" });
+  }
+}
+
+/**
+ * Helper function to update prices from percentages
+ * Used by both setupPriceCalculation and setupEditPriceCalculation
+ * @param {HTMLElement} priceInput - Price input element
+ * @param {HTMLElement} sideInput - Side input element
+ * @param {HTMLElement} stopPriceInput - Stop price input element
+ * @param {HTMLElement} stopPercentageInput - Stop percentage input element
+ * @param {HTMLElement} targetPriceInput - Target price input element
+ * @param {HTMLElement} targetPercentageInput - Target percentage input element
+ */
+function updatePricesFromPercentages(
+  priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+  targetPriceInput, targetPercentageInput
+) {
+  const currentPrice = parseFloat(priceInput.value) || 0;
+  const side = sideInput.value || 'Long';
+  
+  if (currentPrice > 0 && stopPercentageInput && stopPriceInput) {
+    const stopPercentage = parseFloat(stopPercentageInput.value) || 0;
+    if (stopPercentage > 0 && typeof window.calculateStopPrice === 'function') {
+      const stopPrice = window.calculateStopPrice(currentPrice, stopPercentage, side);
+      stopPriceInput.value = stopPrice.toFixed(2);
+    }
+  }
+  
+  if (currentPrice > 0 && targetPercentageInput && targetPriceInput) {
+    const targetPercentage = parseFloat(targetPercentageInput.value) || 0;
+    if (targetPercentage > 0 && typeof window.calculateTargetPrice === 'function') {
+      const targetPrice = window.calculateTargetPrice(currentPrice, targetPercentage, side);
+      targetPriceInput.value = targetPrice.toFixed(2);
+    }
+  }
+}
+
+/**
+ * Helper function to update percentages from prices
+ * Used by both setupPriceCalculation and setupEditPriceCalculation
+ * @param {HTMLElement} priceInput - Price input element
+ * @param {HTMLElement} sideInput - Side input element
+ * @param {HTMLElement} stopPriceInput - Stop price input element
+ * @param {HTMLElement} stopPercentageInput - Stop percentage input element
+ * @param {HTMLElement} targetPriceInput - Target price input element
+ * @param {HTMLElement} targetPercentageInput - Target percentage input element
+ */
+function updatePercentagesFromPrices(
+  priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+  targetPriceInput, targetPercentageInput
+) {
+  const currentPrice = parseFloat(priceInput.value) || 0;
+  const side = sideInput.value || 'Long';
+  
+  if (currentPrice > 0 && stopPriceInput && stopPercentageInput) {
+    const stopPrice = parseFloat(stopPriceInput.value) || 0;
+    if (stopPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
+      const stopPercentage = window.calculatePercentageFromPrice(currentPrice, stopPrice, side);
+      stopPercentageInput.value = stopPercentage.toFixed(2);
+    }
+  }
+  
+  if (currentPrice > 0 && targetPriceInput && targetPercentageInput) {
+    const targetPrice = parseFloat(targetPriceInput.value) || 0;
+    if (targetPrice > 0 && typeof window.calculatePercentageFromPrice === 'function') {
+      const targetPercentage = window.calculatePercentageFromPrice(currentPrice, targetPrice, side);
+      targetPercentageInput.value = targetPercentage.toFixed(2);
+    }
+  }
+}
+
+/**
+ * Setup price calculation event listeners for add modal
+ * Sets up automatic price/percentage calculations when form fields change
+ */
+function setupPriceCalculation() {
+  try {
+    // Get form elements
+    const priceInput = document.getElementById('price');
+    const sideInput = document.getElementById('side');
+    const stopPriceInput = document.getElementById('stopPrice');
+    const stopPercentageInput = document.getElementById('stopPercentage');
+    const targetPriceInput = document.getElementById('targetPrice');
+    const targetPercentageInput = document.getElementById('targetPercentage');
+
+    if (!priceInput || !sideInput) {
+      return; // Required fields not found
+    }
+
+    // Create bound functions using the shared helper functions
+    const updatePrices = () => updatePricesFromPercentages(
+      priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+      targetPriceInput, targetPercentageInput
+    );
+    const updatePercentages = () => updatePercentagesFromPrices(
+      priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+      targetPriceInput, targetPercentageInput
+    );
+
+    // Remove existing listeners if any
+    const newPriceInput = priceInput.cloneNode(true);
+    priceInput.parentNode.replaceChild(newPriceInput, priceInput);
+    
+    // Setup event listeners
+    if (newPriceInput && sideInput) {
+      newPriceInput.addEventListener('input', updatePrices);
+      sideInput.addEventListener('change', updatePrices);
+    }
+    
+    if (stopPercentageInput) {
+      stopPercentageInput.addEventListener('input', updatePrices);
+    }
+    
+    if (targetPercentageInput) {
+      targetPercentageInput.addEventListener('input', updatePrices);
+    }
+    
+    if (stopPriceInput) {
+      stopPriceInput.addEventListener('input', updatePercentages);
+    }
+    
+    if (targetPriceInput) {
+      targetPriceInput.addEventListener('input', updatePercentages);
+    }
+    
+    window.Logger?.debug('Price calculation event listeners setup completed', { page: "trade_plans" });
+  } catch (error) {
+    window.Logger?.error('Error setting up price calculation:', error, { page: "trade_plans" });
+  }
+}
+
+/**
+ * Setup price calculation event listeners for edit modal
+ * Sets up automatic price/percentage calculations when edit form fields change
+ */
+function setupEditPriceCalculation() {
+  try {
+    // Get edit form elements
+    const priceInput = document.getElementById('editPrice');
+    const sideInput = document.getElementById('editSide');
+    const stopPriceInput = document.getElementById('editStopPrice');
+    const stopPercentageInput = document.getElementById('editStopPercentage');
+    const targetPriceInput = document.getElementById('editTargetPrice');
+    const targetPercentageInput = document.getElementById('editTargetPercentage');
+
+    if (!priceInput || !sideInput) {
+      return; // Required fields not found
+    }
+
+    // Create bound functions using the shared helper functions
+    const updatePrices = () => updatePricesFromPercentages(
+      priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+      targetPriceInput, targetPercentageInput
+    );
+    const updatePercentages = () => updatePercentagesFromPrices(
+      priceInput, sideInput, stopPriceInput, stopPercentageInput, 
+      targetPriceInput, targetPercentageInput
+    );
+
+    // Remove existing listeners if any
+    const newPriceInput = priceInput.cloneNode(true);
+    priceInput.parentNode.replaceChild(newPriceInput, priceInput);
+    
+    // Setup event listeners
+    if (newPriceInput && sideInput) {
+      newPriceInput.addEventListener('input', updatePrices);
+      sideInput.addEventListener('change', updatePrices);
+    }
+    
+    if (stopPercentageInput) {
+      stopPercentageInput.addEventListener('input', updatePrices);
+    }
+    
+    if (targetPercentageInput) {
+      targetPercentageInput.addEventListener('input', updatePrices);
+    }
+    
+    if (stopPriceInput) {
+      stopPriceInput.addEventListener('input', updatePercentages);
+    }
+    
+    if (targetPriceInput) {
+      targetPriceInput.addEventListener('input', updatePercentages);
+    }
+    
+    window.Logger?.debug('Edit price calculation event listeners setup completed', { page: "trade_plans" });
+  } catch (error) {
+    window.Logger?.error('Error setting up edit price calculation:', error, { page: "trade_plans" });
+  }
+}
+
 window.checkLinkedItemsBeforeCancel = checkLinkedItemsBeforeCancel;
 window.cancelTradePlan = cancelTradePlan;
 window.deleteTradePlan = deleteTradePlan;
+window.performTradePlanDeletion = performTradePlanDeletion;
 window.viewLinkedItemsForTradePlan = viewLinkedItemsForTradePlan;
 window.reactivateTradePlan = reactivateTradePlan;
 window.setupPriceCalculation = setupPriceCalculation;
@@ -1334,10 +1928,11 @@ async function loadTradePlansData() {
   }
 }
 
+// REMOVED: updateDesignsTable - alias not used
 /**
  * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
  */
-function updateDesignsTable(trade_plans) {
+function _REMOVED_updateDesignsTable(trade_plans) {
   try {
     return updateTradePlansTable(trade_plans);
   } catch (error) {
@@ -1349,10 +1944,11 @@ function updateDesignsTable(trade_plans) {
 }
 
 
+// REMOVED: filterTradePlansData - not used
 /**
  * פילטור נתוני תכנונים
  */
-function filterTradePlansData(filters) {
+function _REMOVED_filterTradePlansData(filters) {
   try {
     // Use trade-plan-service for filtering
     if (typeof window.tradePlanService?.filterTradePlans === 'function') {
@@ -1385,7 +1981,7 @@ function filterTradePlansData(filters) {
   // פילטור לפי חשבון מסחר
   if (filters.accounts && filters.accounts.length > 0) {
     filteredData = filteredData.filter(plan =>
-      filters.accounts.includes(plan.account_id),
+      filters.accounts.includes(plan.account?.id || plan.trading_account_id),
     );
   }
 
@@ -1422,6 +2018,9 @@ function filterTradePlansData(filters) {
     }
   }
 }
+
+// Note: Using global FieldRendererService for status and type rendering
+// No local functions needed - use window.FieldRendererService.renderStatus() and renderType()
 
 /**
  * עדכון טבלת תכנונים
@@ -1513,8 +2112,8 @@ function updateTradePlansTable(trade_plans) {
       countElement.textContent = '0 תכנונים';
     }
 
-    // Updating statistics
-    updatePageSummaryStats();
+    // Updating statistics - use the non-recursive function
+    updateTradePlansPageSummaryStats();
     return;
   }
 
@@ -1523,15 +2122,12 @@ function updateTradePlansTable(trade_plans) {
     try {
       // Safeguarding against invalid data
       if (!design || typeof design !== 'object') {
-        if (typeof window.showNotification === 'function') {
-          window.showNotification('Invalid design data in table', 'warning');
-        }
+        window.Logger?.warn('Invalid design data in table', { design: design, page: "trade_plans" });
         return '';
       }
 
 
-    const statusClass = getStatusClass(design.status);
-    const typeClass = getTypeClass(design.investment_type);
+    // Using global FieldRendererService for rendering - no need for local CSS classes
 
     // Date correction - converting to Hebrew format
     let dateDisplay = 'לא מוגדר';
@@ -1595,7 +2191,9 @@ function updateTradePlansTable(trade_plans) {
           return `<span class="date-text">-</span>`;
         })()}</td>
         <td class="type-cell" data-type="${typeForFilter}">
-          ${window.renderType ? window.renderType(design.investment_type) : `<span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${typeDisplay}</span>`}
+          ${(window.FieldRendererService && window.FieldRendererService.renderType) 
+            ? window.FieldRendererService.renderType(design.investment_type) 
+            : (window.renderType ? window.renderType(design.investment_type) : `<span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${typeDisplay}</span>`)}
         </td>
         <td class="side-cell" data-side="${design.side}">
           ${window.renderSide ? window.renderSide(design.side) : `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${sideDisplay}</span>`}
@@ -1632,7 +2230,9 @@ function updateTradePlansTable(trade_plans) {
           })()}
         </td>
         <td class="status-cell" data-status="${statusForFilter}">
-          ${window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${statusDisplay}</span>`}
+          ${(window.FieldRendererService && window.FieldRendererService.renderStatus) 
+            ? window.FieldRendererService.renderStatus(design.status, 'trade_plan') 
+            : (window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${statusDisplay}</span>`)}
         </td>
         <td class="reward-cell">
           ${(() => {
@@ -1709,7 +2309,7 @@ function updateTradePlansTable(trade_plans) {
               const result = window.createActionsMenu([
                 { type: 'VIEW', onclick: `window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })`, title: 'צפה בפרטי תכנון' },
                 { type: 'LINK', onclick: `if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }`, title: 'קישור' },
-                { type: 'EDIT', onclick: `if (typeof window.showEditTradePlanModal === 'function') { window.showEditTradePlanModal(${design.id}); }`, title: 'ערוך' },
+                { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', ${design.id})`, title: 'ערוך' },
                 { type: 'CANCEL', onclick: `if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }`, title: 'בטל' },
                 { type: 'DELETE', onclick: `if (typeof window.deleteTradePlan === 'function') { window.deleteTradePlan(${design.id}); }`, title: 'מחק' }
               ]);
@@ -1745,8 +2345,8 @@ function updateTradePlansTable(trade_plans) {
       countElement.textContent = `${trade_plans.length} תכנונים`;
     }
 
-    // Updating statistics
-    updatePageSummaryStats();
+    // Updating statistics - use the non-recursive function
+    updateTradePlansPageSummaryStats();
     
     // יישום צבעי ישויות על כותרות
     if (window.applyEntityColorsToHeaders) {
@@ -1765,128 +2365,60 @@ function updateTradePlansTable(trade_plans) {
 // Data loading, filtering, and statistics
 
 /**
- * Update page summary statistics
- * Calculates and displays trade plan statistics
+ * Update page summary statistics for trade plans
  * 
- * @function updatePageSummaryStats
+ * IMPORTANT: This function uses a DIFFERENT name to avoid recursion with global function.
+ * The global function is window.updatePageSummaryStats(pageName, data, countElementId).
+ * We call it directly without creating a local override.
+ * 
+ * @function updateTradePlansPageSummaryStats
  * @returns {void}
  */
-function updatePageSummaryStats() {
-  // Use unified function from ui-utils.js
-  window.updatePageSummaryStats('trade_plans', window.tradePlansData, 'designsCount');
-}
-
-/**
- * הצגת מודל הוספת תכנון
- */
-async function showAddTradePlanModal() {
-  window.Logger.info('🚀 showAddTradePlanModal: Starting modal preparation...', { page: "trade_plans" });
-  window.Logger.info('🔍 showAddTradePlanModal: Checking if modal is already open...', { page: "trade_plans" });
-  
-  // Check if modal is already open
-  const existingModal = document.querySelector('#addTradePlanModal.show');
-  if (existingModal) {
-    window.Logger.info('⚠️ showAddTradePlanModal: Modal already open, closing first...', { page: "trade_plans" });
-    const modal = bootstrap.Modal.getInstance(existingModal);
-    if (modal) modal.hide();
-  }
-  
-  // Clearing the form completely
-  const form = document.getElementById('addTradePlanForm');
-  if (form) {
-    window.Logger.info('✅ showAddTradePlanModal: Form found, starting reset...', { page: "trade_plans" });
-    form.reset();
-
-    // Clear all form fields manually to ensure complete reset
-    const allInputs = form.querySelectorAll('input, select, textarea');
-    window.Logger.info(`🔧 showAddTradePlanModal: Clearing ${allInputs.length} form inputs...`, { page: "trade_plans" });
-    allInputs.forEach(input => {
-      // Clear all inputs except date (which will be set later)
-      if (input.type !== 'date') {
-        window.Logger.info(`🔧 Clearing input: ${input.id || input.name || input.type} (old value: "${input.value}", { page: "trade_plans" })`);
-        input.value = '';
+function updateTradePlansPageSummaryStats() {
+  try {
+    // Call global function directly - it's in ui-utils.js
+    if (typeof window.updatePageSummaryStats === 'function') {
+      // Store reference to verify it's not our local function (by checking if it accepts 3 params)
+      const fnString = window.updatePageSummaryStats.toString();
+      if (fnString.includes('pageName') && fnString.includes('countElementId')) {
+        // This is the global function from ui-utils.js - call it
+        window.updatePageSummaryStats('trade_plans', window.tradePlansData, 'designsCount');
+      } else {
+        // Fallback: Use InfoSummarySystem directly
+        if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+          const config = window.INFO_SUMMARY_CONFIGS['trade_plans'];
+          if (config) {
+            const dataToUse = window.filteredTradePlansData || window.tradePlansData || [];
+            window.InfoSummarySystem.calculateAndRender(dataToUse, config);
+            const countElement = document.getElementById('designsCount');
+            if (countElement && dataToUse) {
+              countElement.textContent = `${dataToUse.length} תכנונים`;
+            }
+          }
+        }
       }
-      // Remove validation classes
-      input.classList.remove('is-valid', 'is-invalid');
-      // Remove any disabled state
-      input.disabled = false;
-      // Remove any required attribute that was added
-      input.removeAttribute('required');
-    });
-
-    // Clear any validation messages
-    const validationMessages = form.querySelectorAll('.invalid-feedback');
-    validationMessages.forEach(msg => msg.remove());
-
-    // Clear any ticker display information
-    const tickerDisplay = document.getElementById('selectedTickerDisplay');
-    const priceDisplay = document.getElementById('currentPriceDisplay');
-    const changeDisplay = document.getElementById('dailyChangeDisplay');
-    
-    if (tickerDisplay) tickerDisplay.textContent = 'לא נבחר';
-    if (priceDisplay) priceDisplay.textContent = '-';
-    if (changeDisplay) {
-      changeDisplay.textContent = '-';
-      changeDisplay.style.color = '#6c757d';
+    } else if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+      // Fallback: Use InfoSummarySystem directly if global function not available
+      const config = window.INFO_SUMMARY_CONFIGS['trade_plans'];
+      if (config) {
+        const dataToUse = window.filteredTradePlansData || window.tradePlansData || [];
+        window.InfoSummarySystem.calculateAndRender(dataToUse, config);
+        const countElement = document.getElementById('designsCount');
+        if (countElement && dataToUse) {
+          countElement.textContent = `${dataToUse.length} תכנונים`;
+        }
+      }
     }
-  }
-
-  // Set default values for required fields AFTER clearing
-  const investmentTypeSelect = document.getElementById('type');
-  if (investmentTypeSelect) {
-    investmentTypeSelect.value = 'swing'; // Default investment type
-  }
-
-  const sideSelect = document.getElementById('side');
-  if (sideSelect) {
-    sideSelect.value = 'Long'; // Default side
-  }
-
-  const plannedAmountInput = document.getElementById('quantity');
-  if (plannedAmountInput) {
-    plannedAmountInput.value = '1000'; // Default planned amount
-  }
-
-  // Set default date to today (for display)
-  const todayDate = new Date();
-  const todayDisplay = todayDate.toLocaleDateString('he-IL');
-  const planDateDisplay = document.getElementById('planDateDisplay');
-  if (planDateDisplay) {
-    planDateDisplay.textContent = todayDisplay;
-  }
-
-  // Loading tickers with default from preferences
-  window.Logger.info('🔄 showAddTradePlanModal: Loading tickers with SelectPopulatorService...', { page: "trade_plans" });
-  await SelectPopulatorService.populateTickersSelect('ticker', {
-    includeEmpty: true,
-    emptyText: 'בחר טיקר',
-    defaultFromPreferences: true,
-    filterFn: (ticker) => ticker.status === 'open' || ticker.status === 'closed'
-  });
-  window.Logger.info('✅ showAddTradePlanModal: Tickers loaded with SelectPopulatorService', { page: "trade_plans" });
-
-
-  // Clear any existing validation errors
-  if (typeof window.clearValidation === 'function') {
-    window.clearValidation('addTradePlanForm');
-  }
-
-  // Ensure ticker select is reset to default AFTER loading tickers
-  window.Logger.info('🔄 showAddTradePlanModal: Resetting ticker select...', { page: "trade_plans" });
-  const tickerSelect = document.getElementById('ticker');
-  if (tickerSelect) {
-    window.Logger.info(`🔧 showAddTradePlanModal: Ticker select found, current value: "${tickerSelect.value}"`, { page: "trade_plans" });
-    
-    // Add event listener for ticker selection
-    tickerSelect.addEventListener('change', function() {
-      window.Logger.info('🎯 Ticker selected:', this.value, { page: "trade_plans" });
-      if (this.value) {
-        // Enable all form fields
-        enableFormFields();
-      }
-    });
+  } catch (error) {
+    window.Logger?.error('Error updating page summary stats:', error, { page: "trade_plans" });
   }
 }
+
+// NO LOCAL updatePageSummaryStats function - it causes recursion!
+// We use updateTradePlansPageSummaryStats() directly in the code
+// This avoids the recursion issue with the global function
+
+// REMOVED: Old showAddTradePlanModal - replaced by ModalManagerV2 version below
 
 // Validation rules for trade plans
 const tradePlanValidationRules = {
@@ -1965,15 +2497,35 @@ const tradePlanValidationRules = {
       },
     };
 
-    try {
-      window.initializeValidation('addTradePlanForm', validationRules);
-    } catch (error) {
-      handleSystemError(error, 'אתחול ולידציה');
-    }
+    // Initialize validation with deferred check (validation-utils.js may not be loaded yet)
+    const initializeFormValidation = () => {
+      if (typeof window.initializeValidation === 'function') {
+        try {
+          window.initializeValidation('addTradePlanForm', validationRules);
+          window.Logger?.debug('Form validation initialized successfully', { page: "trade_plans" });
+          return true;
+        } catch (error) {
+          window.Logger?.error('Error initializing validation:', error, { page: "trade_plans" });
+          return false;
+        }
+      }
+      return false;
+    };
 
-  if (typeof window.showNotification === 'function') {
-    window.showNotification('window.initializeValidation not available', 'warning');
-  }
+    // Try immediate initialization
+    if (!initializeFormValidation()) {
+      // If not available, try with delay (validation package may still be loading)
+      setTimeout(() => {
+        if (!initializeFormValidation()) {
+          // Final retry after additional delay
+          setTimeout(() => {
+            if (!initializeFormValidation()) {
+              window.Logger?.debug('Validation system not available after retries - will be initialized when available', { page: "trade_plans" });
+            }
+          }, 300);
+        }
+      }, 100);
+    }
 
   // השבתת כל השדות עד לבחירת טיקר
   const fieldsToDisable = [
@@ -2013,9 +2565,7 @@ const tradePlanValidationRules = {
   if (typeof window.tickerService?.loadTickersForTradePlan === 'function') {
     window.tickerService.loadTickersForTradePlan();
   } else {
-    if (typeof window.showNotification === 'function') {
-      window.showNotification('tickerService.loadTickersForTradePlan not available', 'warning');
-    }
+    window.Logger?.debug('tickerService.loadTickersForTradePlan not available - using fallback', { page: "trade_plans" });
   }
 
   // Displaying the modal
@@ -2128,8 +2678,9 @@ async function saveTradePlanData(mode) {
     } else {
       const form = document.getElementById('addTradePlanForm');
       if (!form) {
-        if (typeof window.showNotification === 'function') {
-          window.showNotification('Form element not found - skipping save operation', 'warning');
+        window.Logger?.warn('Form element not found - skipping save operation', { page: "trade_plans" });
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('שגיאה', 'הטופס לא נמצא. יש לרענן את העמוד.');
         }
         return;
       }
@@ -2180,19 +2731,15 @@ async function saveTradePlanData(mode) {
   }
 }
 
-/**
- * שמירת תכנון בעריכה
- * @deprecated Use saveTradePlanData('edit') instead
- */
-async function saveEditTradePlan() {
-  await saveTradePlanData('edit');
-}
+// REMOVED: saveEditTradePlan deprecated wrapper - using saveTradePlanData('edit') directly
+// Original wrapper at line 2654 has been removed - function is now defined at line 1207 with full implementation
 
+// REMOVED: saveNewTradePlan - deprecated wrapper
 /**
  * שמירת תכנון חדש
  * @deprecated Use saveTradePlanData('add') instead
  */
-async function saveNewTradePlan() {
+async function _REMOVED_saveNewTradePlan() {
   await saveTradePlanData('add');
 }
 // ===== GLOBAL EXPORTS =====
@@ -2200,10 +2747,8 @@ async function saveNewTradePlan() {
 
 // Export all necessary functions to global scope
 window.executeTradePlan = executeTradePlan;
-window.addTradePlan = addTradePlan;
-window.editTradePlan = editTradePlan;
+// REMOVED: addTradePlan, editTradePlan, updateTradePlan - deprecated wrappers, using saveTradePlanData and ModalManagerV2
 window.deleteTradePlan = deleteTradePlan;
-window.updateTradePlan = updateTradePlan;
 window.enableFormFields = enableFormFields;
 window.disableFormFields = disableFormFields;
 window.enableEditFieldsWrapper = enableEditFieldsWrapper;
@@ -2215,12 +2760,92 @@ window.updateEditAmountFromShares = updateEditAmountFromShares;
 window.addEditCondition = addEditCondition;
 window.addEditReason = addEditReason;
 window.addEditImportantNote = addEditImportantNote;
+/**
+ * Initialize conditions system for trade plans
+ * Uses global ConditionsInitializer from conditions package
+ */
+function initializeTradePlanConditionsSystem() {
+  try {
+    // First check if conditionsSystem is already available (most reliable check)
+    if (window.conditionsSystem && window.conditionsSystem.initializer) {
+      window.Logger?.info('✅ Conditions system already initialized for trade plans', { page: "trade_plans" });
+      return true;
+    }
+    
+    // Try to initialize using ConditionsInitializer class
+    if (typeof window.ConditionsInitializer !== 'undefined') {
+      try {
+        const initializer = new window.ConditionsInitializer();
+        if (initializer && typeof initializer.initialize === 'function') {
+          initializer.initialize().then(() => {
+            window.Logger?.info('✅ Trade plans conditions system initialized successfully', { page: "trade_plans" });
+          }).catch(error => {
+            window.Logger?.error('Error initializing trade plans conditions system:', error, { page: "trade_plans" });
+          });
+          return true;
+        }
+      } catch (error) {
+        window.Logger?.warn('Error creating ConditionsInitializer instance:', error, { page: "trade_plans" });
+      }
+    }
+    
+    // If not available immediately, try deferred check
+    setTimeout(() => {
+      if (window.conditionsSystem && window.conditionsSystem.initializer) {
+        window.Logger?.info('✅ Conditions system initialized for trade plans (deferred check)', { page: "trade_plans" });
+        return true;
+      } else {
+        window.Logger?.warn('⚠️ ConditionsInitializer not available - conditions package may not be loaded', { page: "trade_plans" });
+      }
+    }, 500);
+    
+    return false;
+  } catch (error) {
+    window.Logger?.error('Error in initializeTradePlanConditionsSystem:', error, { page: "trade_plans" });
+    return false;
+  }
+}
+
+/**
+ * Setup sortable headers for trade plans table
+ * Uses global setupSortableHeaders function from page-utils.js
+ */
+function setupSortableHeadersLocal() {
+  try {
+    if (typeof window.setupSortableHeaders === 'function') {
+      window.setupSortableHeaders('trade_plans');
+      window.Logger?.debug('Sortable headers setup completed for trade plans', { page: "trade_plans" });
+    } else {
+      window.Logger?.warn('Global setupSortableHeaders not available', { page: "trade_plans" });
+    }
+  } catch (error) {
+    window.Logger?.error('Error setting up sortable headers:', error, { page: "trade_plans" });
+  }
+}
+
 window.addEditReminder = addEditReminder;
 window.updatePageSummaryStats = updatePageSummaryStats;
 window.restoreSortState = restoreSortState;
 window.initializeTradePlanConditionsSystem = initializeTradePlanConditionsSystem;
 window.setupPriceCalculation = setupPriceCalculation;
 window.setupEditPriceCalculation = setupEditPriceCalculation;
+/**
+ * Restore planning section state for trade plans
+ * Uses global restoreAllSectionStates function from ui-utils.js
+ */
+function restorePlanningSectionState() {
+  try {
+    if (typeof window.restoreAllSectionStates === 'function') {
+      window.restoreAllSectionStates('trade_plans');
+      window.Logger?.debug('Planning section state restored for trade plans', { page: "trade_plans" });
+    } else {
+      window.Logger?.warn('Global restoreAllSectionStates not available', { page: "trade_plans" });
+    }
+  } catch (error) {
+    window.Logger?.error('Error restoring planning section state:', error, { page: "trade_plans" });
+  }
+}
+
 window.setupSortableHeadersLocal = setupSortableHeadersLocal;
 window.toggleSection = toggleSection;
 window.restorePlanningSectionState = restorePlanningSectionState;
@@ -2229,9 +2854,98 @@ window.addReminder = addReminder;
 window.updateTickerInfo = updateTickerInfo;
 window.updateSharesFromAmount = updateSharesFromAmount;
 window.updateAmountFromShares = updateAmountFromShares;
-window.showAddTradePlanModal = showAddTradePlanModal;
-window.showEditTradePlanModal = showEditTradePlanModal;
+
+/**
+ * Show add trade plan modal (wrapper for ModalManagerV2)
+ * Maintains backward compatibility with HTML onclick handlers
+ * @function showAddTradePlanModal
+ */
+window.showAddTradePlanModal = function() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        window.ModalManagerV2.showModal('tradePlansModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
+/**
+ * Show edit trade plan modal (wrapper for ModalManagerV2)
+ * Maintains backward compatibility with HTML onclick handlers
+ * @function showEditTradePlanModal
+ * @param {number|string} tradePlanId - ID of trade plan to edit
+ */
+window.showEditTradePlanModal = function(tradePlanId) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', tradePlanId);
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
 window.saveTradePlanData = saveTradePlanData;
+/**
+ * Filter trade plans by investment type
+ * Filters the trade plans table by investment type (swing, investment, passive, or all)
+ * 
+ * @function filterTradePlansByType
+ * @param {string} type - Investment type to filter by ('all', 'swing', 'investment', 'passive')
+ * @returns {void}
+ */
+function filterTradePlansByType(type) {
+  try {
+    if (!window.tradePlansData || !Array.isArray(window.tradePlansData)) {
+      window.Logger?.warn('Trade plans data not available for filtering', { page: "trade_plans" });
+      return;
+    }
+
+    let filteredData;
+    
+    if (type === 'all') {
+      // Show all trade plans
+      filteredData = [...window.tradePlansData];
+    } else {
+      // Filter by investment type
+      filteredData = window.tradePlansData.filter(plan => {
+        // Handle both investment_type and type fields
+        const planType = plan.investment_type || plan.type;
+        return planType === type;
+      });
+    }
+
+    // Update the table with filtered data
+    if (typeof updateTradePlansTable === 'function') {
+      updateTradePlansTable(filteredData);
+    } else if (typeof window.updateTradePlansTable === 'function') {
+      window.updateTradePlansTable(filteredData);
+    }
+
+    // Update active button state
+    const filterButtons = document.querySelectorAll('.filter-icon-btn, .btn[onclick*="filterTradePlansByType"]');
+    filterButtons.forEach(btn => {
+      const btnType = btn.getAttribute('data-type') || btn.getAttribute('onclick')?.match(/filterTradePlansByType\(['"](.*?)['"]\)/)?.[1];
+      if (btnType === type) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    window.Logger?.info(`Trade plans filtered by type: ${type}`, { count: filteredData.length, page: "trade_plans" });
+    
+  } catch (error) {
+    window.Logger?.error('Error filtering trade plans by type:', error, { page: "trade_plans" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בפילטור תכנונים לפי סוג', error.message);
+    }
+  }
+}
+
 window.filterTradePlansByType = filterTradePlansByType;
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
@@ -2244,29 +2958,13 @@ window.filterTradePlansByType = filterTradePlansByType;
  * @function showAddTradePlanModal
  * @returns {void}
  */
-function showAddTradePlanModal() {
-    window.Logger.debug('showAddTradePlanModal called', { page: 'trade_plans' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showModal('tradePlansModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showAddTradePlanModal - use window.ModalManagerV2.showModal('tradePlansModal', 'add') directly
 
 /**
  * הצגת מודל עריכת תוכנית מסחר
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showEditTradePlanModal(tradePlanId) {
-    window.Logger.debug('showEditTradePlanModal called', { tradePlanId, page: 'trade_plans' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', tradePlanId);
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showEditTradePlanModal - use window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', tradePlanId) directly
 
 /**
  * שמירת תוכנית מסחר
@@ -2283,9 +2981,10 @@ async function saveTradePlan() {
         }
         
         const tradePlanData = DataCollectionService.collectFormData({
+            trading_account_id: { id: 'tradePlanAccount', type: 'int' }, // Backend expects trading_account_id
             ticker_id: { id: 'tradePlanTicker', type: 'int' },
             name: { id: 'tradePlanName', type: 'text' },
-            type: { id: 'tradePlanType', type: 'text' },
+            investment_type: { id: 'tradePlanType', type: 'text' }, // Map tradePlanType field to investment_type column
             quantity: { id: 'tradePlanQuantity', type: 'int' },
             entry_price: { id: 'tradePlanEntryPrice', type: 'float', default: null },
             stop_loss: { id: 'tradePlanStopLoss', type: 'float', default: null },
@@ -2297,6 +2996,13 @@ async function saveTradePlan() {
         
         // ולידציה מפורטת
         let hasErrors = false;
+        if (!tradePlanData.trading_account_id) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('tradePlanAccount', 'חשבון מסחר הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
         if (!tradePlanData.ticker_id) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanTicker', 'טיקר הוא שדה חובה');
@@ -2311,7 +3017,7 @@ async function saveTradePlan() {
             hasErrors = true;
         }
         
-        if (!tradePlanData.type) {
+        if (!tradePlanData.investment_type) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanType', 'סוג השקעה הוא שדה חובה');
             }
@@ -2387,21 +3093,46 @@ async function saveTradePlan() {
  * Includes linked items check
  */
 async function deleteTradePlan(tradePlanId) {
-    window.Logger.debug('deleteTradePlan called', { tradePlanId, page: 'trade_plans' });
+    window.Logger.info(`🗑️ deleteTradePlan called for trade plan ${tradePlanId}`, { tradePlanId, page: 'trade_plans' });
     
     try {
-        // Check linked items first
-        if (window.checkLinkedItemsBeforeAction) {
-            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade_plan', tradePlanId, 'delete');
-            if (hasLinkedItems) {
-                window.Logger.info('Trade Plan has linked items, deletion cancelled', { tradePlanId, page: 'trade_plans' });
-                return;
-            }
+        // Get trade plan details for confirmation message
+        let tradePlanDetails = `תוכנית מסחר #${tradePlanId}`;
+        const tradePlan = window.tradePlansData?.find(tp => tp.id === tradePlanId || tp.id === parseInt(tradePlanId));
+        
+        if (tradePlan) {
+            const ticker = tradePlan.ticker_symbol || tradePlan.symbol || 'לא מוגדר';
+            const sideText = tradePlan.side === 'buy' ? 'קנייה' : 
+                           tradePlan.side === 'sell' ? 'מכירה' : 
+                           tradePlan.side === 'Long' ? 'קנייה' :
+                           tradePlan.side === 'Short' ? 'מכירה' : tradePlan.side || 'לא מוגדר';
+            const typeText = tradePlan.investment_type || tradePlan.type || 'לא מוגדר';
+            const statusText = tradePlan.status === 'open' ? 'פתוח' :
+                             tradePlan.status === 'closed' ? 'סגור' :
+                             tradePlan.status === 'cancelled' ? 'מבוטל' : tradePlan.status || 'לא מוגדר';
+            const amount = tradePlan.planned_amount ? `$${tradePlan.planned_amount}` : 'לא מוגדר';
+            const date = tradePlan.created_at ? new Date(tradePlan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+            
+            tradePlanDetails = `${ticker} - ${sideText} ${typeText}, סטטוס: ${statusText}, סכום: ${amount}, תאריך: ${date}`;
         }
         
-        // Use warning system for confirmation
+        // Check linked items first (Trades, Notes)
+        window.Logger.info('🔍 Checking for linked items before deletion', { tradePlanId, page: 'trade_plans' });
+        if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+            window.Logger.info('✅ checkLinkedItemsBeforeAction function exists', { tradePlanId, page: 'trade_plans' });
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade_plan', tradePlanId, 'delete');
+            window.Logger.info(`🔍 Linked items check result: hasLinkedItems=${hasLinkedItems}`, { tradePlanId, page: 'trade_plans' });
+            if (hasLinkedItems) {
+                window.Logger.info('🚫 Trade Plan has linked items, deletion cancelled', { tradePlanId, page: 'trade_plans' });
+                return;
+            }
+        } else {
+            window.Logger.warn('⚠️ checkLinkedItemsBeforeAction function not available', { tradePlanId, page: 'trade_plans' });
+        }
+        
+        // Use warning system for confirmation with detailed information
         if (window.showDeleteWarning) {
-            window.showDeleteWarning('trade_plan', tradePlanId, 'תוכנית מסחר',
+            window.showDeleteWarning('trade_plan', tradePlanDetails, 'תוכנית מסחר',
                 async () => await performTradePlanDeletion(tradePlanId),
                 () => {}
             );
@@ -2414,6 +3145,7 @@ async function deleteTradePlan(tradePlanId) {
         }
         
     } catch (error) {
+        window.Logger.error('Error deleting trade plan:', error, { tradePlanId, page: 'trade_plans' });
         CRUDResponseHandler.handleError(error, 'מחיקת תוכנית מסחר');
     }
 }
@@ -2440,3 +3172,5 @@ async function performTradePlanDeletion(tradePlanId) {
 
 // Export functions to window for global access
 // Note: saveTradePlan already exported above
+window.loadTradePlanTickerInfo = loadTradePlanTickerInfo;
+window.displayTradePlanTickerInfo = displayTradePlanTickerInfo;

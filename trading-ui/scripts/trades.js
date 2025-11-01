@@ -5,56 +5,88 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 35
+ * Total Functions: 67
  * 
- * PAGE INITIALIZATION (1)
- * - setupSortEventListeners() - * Add important note to edit modal
+ * PAGE INITIALIZATION (4)
+ * - initializeTradesPage() - * Load modal data (placeholder - ModalManagerV2 handles this automatically)
+ * - setupDateValidation() - setupDateValidation function
+ * - initializeTradeConditionsSystem() - * Add buy/sell transaction to trade (placeholder - in development)
+ * - setupSortEventListeners() - setupSortEventListeners function
  * 
- * DATA LOADING (3)
+ * DATA LOADING (6)
  * - getInvestmentTypeColor() - * עיצוב שינוי יומי עם צבעים לפי העדפות
- * - loadTradesData() - * קביעת צבע לפי סוג השקעה
+ * - loadTradesData() - loadTradesData function
+ * - loadTradeTickerInfo() - loadTradeTickerInfo function
  * - loadTickerDataForTrades() - loadTickerDataForTrades function
+ * - loadTradePlanDates() - loadTradePlanDates function
+ * - loadModalData() - loadModalData function
  * 
- * DATA MANIPULATION (11)
+ * DATA MANIPULATION (18)
  * - updateTradesTable() - updateTradesTable function
- * - deleteTradeRecord() - deleteTradeRecord function
- * - addEditImportantNote() - addEditImportantNote function
+ * - deleteTradeRecord() - * ביצוע הביטול בפועל
+ * - addEditImportantNote() - * ביצוע המחיקה בפועל
  * - addEditReminder() - * Add important note to edit modal
+ * - addTrade() - * Add edit reminder functionality (placeholder)
+ * - hideAddTradeModal() - hideAddTradeModal function
+ * - updateRadioButtons() - * Hide edit trade modal
+ * - addImportantNote() - * Clear date validation messages
+ * - addReminder() - * Add important note (alias for addEditImportantNote)
+ * - updateTableStats() - updateTableStats function
+ * - addEditBuySell() - * Update table statistics
  * - updateEditTradeTickerFromPlan() - updateEditTradeTickerFromPlan function
  * - updateEditTradePriceFromTicker() - updateEditTradePriceFromTicker function
  * - updateTrade() - updateTrade function
  * - confirmDeleteTrade() - confirmDeleteTrade function
  * - showAddTradeModal() - showAddTradeModal function
- * - saveTrade() - * Show add trade modal
+ * - saveTrade() - * הצגת מודל עריכת טרייד
  * - deleteTrade() - deleteTrade function
  * 
- * EVENT HANDLING (7)
+ * EVENT HANDLING (16)
  * - formatDailyChange() - formatDailyChange function
  * - performTradeCancellation() - * בדיקת מקושרים וביצוע ביטול
  * - performTradeDeletion() - performTradeDeletion function
+ * - clearTradeValidation() - * Edit trade function - wrapper for showEditTradeModal
+ * - onRelationTypeChange() - onRelationTypeChange function
+ * - onRelatedObjectChange() - * Handle relation type change
+ * - enableConditionFields() - * Handle related object change
+ * - disableConditionFields() - * Enable condition fields for trade modal
+ * - refreshPositions() - * Initialize trades page - called from page-initialization-configs.js
+ * - showDateValidationError() - showDateValidationError function
+ * - clearDateValidationMessages() - * Show date validation error message
+ * - onShowClosedTradesChange() - * Add important note (alias for addEditImportantNote)
  * - validateTradePlanChange() - validateTradePlanChange function
  * - validateTradeChanges() - validateTradeChanges function
  * - validateTickerChange() - validateTickerChange function
  * - showTickerChangeConfirmation() - showTickerChangeConfirmation function
  * 
- * UI UPDATES (1)
+ * UI UPDATES (3)
+ * - displayTradeTickerInfo() - * טעינת מידע על הטיקר (למודל החדש)
+ * - hideEditTradeModal() - * Hide add trade modal
  * - showEditTradeModal() - * Show add trade modal
  * 
- * VALIDATION (2)
+ * VALIDATION (4)
  * - checkLinkedItemsAndCancel() - checkLinkedItemsAndCancel function
+ * - validateTradeForm() - * Clear trade form validation
+ * - validateDateFields() - validateDateFields function
  * - validateTradePlanDate() - validateTradePlanDate function
  * 
- * OTHER (10)
+ * OTHER (16)
  * - viewTickerDetails() - viewTickerDetails function
- * - viewAccountDetails() - viewAccountDetails function
- * - viewTradePlanDetails() - viewTradePlanDetails function
- * - editTradeRecord() - editTradeRecord function
- * - cancelTradeRecord() - cancelTradeRecord function
+ * - viewAccountDetails() - * View ticker details for a specific ticker ID
+ * - viewTradePlanDetails() - * View account details for a specific account ID
+ * - editTradeRecord() - * View trade plan details for a specific trade plan ID
+ * - cancelTradeRecord() - * Edit trade record for a specific trade ID
+ * - editTrade() - * פונקציה להצגת מודל עריכת טרייד
+ * - populateSelect() - populateSelect function
+ * - populateRelatedObjects() - * Disable condition fields for trade modal
+ * - restoreSortState() - restoreSortState function
+ * - enableTradeFormFields() - * Restore sort state wrapper
+ * - disableTradeFormFields() - disableTradeFormFields function
  * - applyStatusFilterToTrades() - applyStatusFilterToTrades function
  * - reactivateTrade() - reactivateTrade function
  * - refreshTrades() - refreshTrades function
  * - generateDetailedLog() - generateDetailedLog function
- * - generateDetailedLogForTrades() - generateDetailedLogForTrades function
+ * - generateDetailedLogForTrades() - REMOVED: not used
  * 
  * ==========================================
  */
@@ -278,19 +310,33 @@ async function loadTradesData() {
     }
 
     const responseData = await response.json();
-    window.Logger.info('📊 loadTradesData: Received data:', responseData?.data?.length || 0, 'trades', { page: "trades" });
+    window.Logger.info('📊 loadTradesData: Received response:', { 
+      status: responseData?.status, 
+      dataLength: responseData?.data?.length || 0,
+      hasData: !!responseData?.data,
+      responseKeys: Object.keys(responseData || {})
+    }, { page: "trades" });
 
     if (responseData.status !== 'success') {
+      window.Logger.error('❌ API returned error status:', responseData, { page: "trades" });
       throw new Error(`API error: ${responseData.message || 'Unknown error'}`);
     }
 
     // בדיקה שהנתונים בפורמט הנכון
     const apiData = responseData.data || responseData;
+    
+    if (!apiData || !Array.isArray(apiData)) {
+      window.Logger.warn('⚠️ API data is not an array:', { apiData, responseData }, { page: "trades" });
+      // אם אין נתונים, נגדיר מערך ריק
+      window.tradesData = [];
+      updateTradesTable([]);
+      return;
+    }
 
     // עדכון הנתונים המקומיים - שימוש בשמות אחידים מה-API
     const localTradesData = apiData.map(trade => ({
       id: trade.id,
-      account_id: trade.account_id,
+      trading_account_id: trade.trading_account_id, // Backend uses trading_account_id
       account_name: trade.account_name,
       ticker_id: trade.ticker_id,
       ticker_symbol: trade.ticker_symbol,
@@ -319,7 +365,12 @@ async function loadTradesData() {
     await updateTradesTable(localTradesData);
 
     // עדכון סטטיסטיקות
-    updateTableStats();
+    // Update table statistics using local wrapper that delegates to global function
+    if (typeof updateTableStats === 'function') {
+      updateTableStats();
+    } else if (typeof window.updatePageSummaryStats === 'function') {
+      window.updatePageSummaryStats('trades', window.tradesData);
+    }
 
   } catch (error) {
     if (typeof handleDataLoadError === 'function') {
@@ -360,6 +411,110 @@ async function loadTradesData() {
  * - Action buttons for edit, cancel, and delete operations
  * - Automatic row count updates
  */
+/**
+ * טעינת מידע על הטיקר (למודל החדש)
+ */
+async function loadTradeTickerInfo(tickerId) {
+  try {
+    window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "trades" });
+    
+    // Get ticker data from API
+    const response = await fetch(`/api/tickers/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const tickers = data.data || data;
+    
+    // Find the specific ticker
+    const ticker = tickers.find(t => t.id == tickerId);
+    if (!ticker) {
+      throw new Error('Ticker not found');
+    }
+    
+    // Display ticker info
+    displayTradeTickerInfo(ticker);
+    
+  } catch (error) {
+    window.Logger.error('❌ Error loading ticker info:', error, { page: "trades" });
+  }
+}
+
+/**
+ * הצגת מידע על הטיקר (למודל החדש)
+ */
+function displayTradeTickerInfo(ticker) {
+  // Create or update ticker info display
+  let tickerInfoDiv = document.getElementById('tradeTickerInfo');
+  if (!tickerInfoDiv) {
+    // Create a new row for ticker info spanning full width
+    const tickerInfoRow = document.createElement('div');
+    tickerInfoRow.className = 'row';
+    tickerInfoRow.id = 'tradeTickerInfoRow';
+    
+    // Create column for ticker info - full width
+    const tickerInfoCol = document.createElement('div');
+    tickerInfoCol.className = 'col-12';
+    
+    tickerInfoDiv = document.createElement('div');
+    tickerInfoDiv.id = 'tradeTickerInfo';
+    tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
+    
+    tickerInfoCol.appendChild(tickerInfoDiv);
+    tickerInfoRow.appendChild(tickerInfoCol);
+    
+    // Insert after the ticker/account row
+    const tickerSelect = document.getElementById('tradeTicker');
+    if (tickerSelect) {
+      const tickerField = tickerSelect.closest('.mb-3');
+      if (tickerField && tickerField.parentNode) {
+        // Find the row containing the ticker field
+        const row = tickerField.closest('.row');
+        if (row && row.parentNode) {
+          row.parentNode.insertBefore(tickerInfoRow, row.nextSibling);
+        }
+      }
+    }
+  }
+  
+  // Use the new global renderTickerInfo function
+  if (window.renderTickerInfo) {
+    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+  } else {
+    // Fallback if renderTickerInfo not available
+    tickerInfoDiv.innerHTML = `
+      <div class="ticker-info-display">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}
+          </div>
+          <div class="col-md-6 text-end">
+            <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
+            <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+              ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </span>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12">
+            <small class="text-muted">
+              נפח: ${(ticker.volume || 0).toLocaleString()} | 
+              שינוי יומי: ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </small>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Set default entry price to current price if field exists
+  const entryPriceField = document.getElementById('tradeEntryPrice');
+  if (entryPriceField && ticker.current_price) {
+    entryPriceField.value = ticker.current_price;
+  }
+}
+
 /**
  * טעינת נתוני טיקר עדכניים
  * Load current ticker data for trades
@@ -549,7 +704,7 @@ async function updateTradesTable(trades) {
         window.Logger.info('🔍 trades.js RESULT:', result, { page: "trades" });
         return result;
       })() : `<span class="text-danger">❌ FieldRendererService לא זמין</span>`) : '-'}</td>
-      <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון מסחר לא ידוע'}</a></strong></td>
+      <td><strong><a href="#" onclick="viewAccountDetails('${trade.trading_account_id}')" class="account-link">${trade.account_name || trade.trading_account_id || 'חשבון מסחר לא ידוע'}</a></strong></td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : ''}</td>
       <td class="actions-cell">
@@ -583,8 +738,65 @@ async function updateTradesTable(trades) {
     }
   }
 
-  // טעינת תאריכי יצירה של תוכניות
-  loadTradePlanDates();
+  // טעינת תאריכי יצירה של תוכניות (רק אם יש קישורים לתוכניות)
+  const planLinks = document.querySelectorAll('.plan-link[data-plan-id]');
+  if (planLinks.length > 0) {
+    if (typeof loadTradePlanDates === 'function') {
+      loadTradePlanDates();
+    } else if (typeof window.loadTradePlanDates === 'function') {
+      window.loadTradePlanDates();
+    } else {
+      window.Logger?.debug('loadTradePlanDates not available', { page: "trades" });
+    }
+  }
+}
+
+/**
+ * Load trade plan dates for plan links in the trades table
+ * This function updates plan link text with the actual creation date
+ * 
+ * @function loadTradePlanDates
+ * @returns {Promise<void>}
+ */
+async function loadTradePlanDates() {
+  try {
+    const planLinks = document.querySelectorAll('.plan-link[data-plan-id]');
+    if (planLinks.length === 0) {
+      return; // No plan links to update
+    }
+    
+    window.Logger?.debug(`Loading dates for ${planLinks.length} trade plan links`, { page: "trades" });
+    
+    for (const link of planLinks) {
+      const planId = link.getAttribute('data-plan-id');
+      if (!planId) continue;
+      
+      try {
+        const response = await fetch(`/api/trade_plans/${planId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'success' && data.data) {
+            const plan = data.data;
+            const createdDate = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL', { 
+              day: '2-digit', 
+              month: '2-digit', 
+              year: '2-digit' 
+            }) : 'תאריך לא ידוע';
+            link.textContent = createdDate;
+          } else {
+            link.textContent = 'תוכנית קיימת';
+          }
+        } else {
+          link.textContent = 'תוכנית קיימת';
+        }
+      } catch (error) {
+        window.Logger?.warn('Error loading trade plan date', { planId, error }, { page: "trades" });
+        link.textContent = 'תוכנית קיימת';
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error in loadTradePlanDates', error, { page: "trades" });
+  }
 }
 
 // פונקציות נוספות
@@ -669,7 +881,12 @@ function editTradeRecord(tradeId) {
   // מציאת הטרייד במערך
   const trade = tradesData.find(t => t.id === tradeId);
   if (trade) {
-    showEditTradeModal(trade);
+    // Use ModalManagerV2 directly
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+      window.ModalManagerV2.showEditModal('tradesModal', 'trade', trade.id);
+    } else {
+      window.Logger?.error('ModalManagerV2 לא זמין', { page: "trades" });
+    }
   } else {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('trade', 'CRITICAL');
@@ -824,27 +1041,66 @@ async function performTradeCancellation(tradeId) {
  */
 async function deleteTradeRecord(tradeId) {
   try {
-    // בדיקה אם יש פריטים מקושרים לפני מחיקה
-    if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
-      const hasLinkedItems = await window.checkLinkedItemsBeforeDelete(tradeId);
-      if (hasLinkedItems) {
-        return; // הפונקציה תטפל בהצגת המודול
+    window.Logger.info(`🗑️ deleteTradeRecord called for trade ${tradeId}`, { tradeId, page: 'trades' });
+    
+    // Get trade details for confirmation message
+    let tradeDetails = `עסקה #${tradeId}`;
+    const trade = window.tradesData?.find(t => t.id === tradeId || t.id === parseInt(tradeId));
+    
+    if (trade) {
+      // Build detailed trade info
+      const ticker = trade.ticker_symbol || trade.symbol || 'לא מוגדר';
+      const sideText = trade.side === 'buy' ? 'קנייה' : 
+                     trade.side === 'sell' ? 'מכירה' : 
+                     trade.side === 'Long' ? 'קנייה' :
+                     trade.side === 'Short' ? 'מכירה' : trade.side || 'לא מוגדר';
+      
+      // Get quantity from trade or position
+      let quantity = trade.quantity;
+      if (!quantity && trade.position && trade.position.quantity) {
+        quantity = trade.position.quantity;
       }
+      quantity = quantity || '0';
+      
+      // Get entry price from trade or position
+      let entryPrice = trade.entry_price;
+      if (!entryPrice && trade.position && trade.position.average_price) {
+        entryPrice = trade.position.average_price;
+      }
+      entryPrice = entryPrice ? `$${entryPrice}` : 'לא מוגדר';
+      
+      const date = trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      
+      tradeDetails = `${ticker} - ${sideText}, ${quantity} יחידות ב-${entryPrice}, תאריך פתיחה: ${date}`;
+    }
+    
+    // Check linked items first (Executions, Notes, Alerts)
+    window.Logger.info('🔍 Checking for linked items before deletion', { tradeId, page: 'trades' });
+    if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+      window.Logger.info('✅ checkLinkedItemsBeforeAction function exists', { tradeId, page: 'trades' });
+      const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade', tradeId, 'delete');
+      window.Logger.info(`🔍 Linked items check result: hasLinkedItems=${hasLinkedItems}`, { tradeId, page: 'trades' });
+      if (hasLinkedItems) {
+        window.Logger.info('🚫 Trade has linked items, deletion cancelled', { tradeId, page: 'trades' });
+        return;
+      }
+    } else {
+      window.Logger.warn('⚠️ checkLinkedItemsBeforeAction function not available', { tradeId, page: 'trades' });
     }
 
-    // אישור מהמשתמש באמצעות המערכת הגלובלית
+    // Show delete warning with detailed information
     if (typeof window.showDeleteWarning === 'function') {
-      window.showDeleteWarning('trade', tradeId, 'טרייד',
+      window.showDeleteWarning('trade', tradeDetails, 'עסקה',
         async () => {
-          // המשתמש אישר - ביצוע המחיקה
+          // User confirmed - perform deletion
           await performTradeDeletion(tradeId);
         },
         () => {
-          // המשתמש ביטל - לא עושים כלום
+          // User cancelled - do nothing
         },
       );
     } else {
-      // Fallback למקרה שהמערכת הגלובלית לא זמינה
+      // Fallback in case global system not available
       if (typeof window.showConfirmationDialog === 'function') {
         const confirmed = await new Promise(resolve => {
           window.showConfirmationDialog(
@@ -961,45 +1217,983 @@ function addEditReminder() {
 window.loadTradesData = loadTradesData;
 window.updateTradesTable = updateTradesTable;
 window.updatePageSummaryStats = updatePageSummaryStats;
+
+/**
+ * Add trade function - wrapper for showAddTradeModal
+ * Maintains backward compatibility with old function name
+ * 
+ * @function addTrade
+ * @returns {void}
+ */
+function addTrade() {
+  if (typeof showAddTradeModal === 'function') {
+    // Use ModalManagerV2 directly
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('tradesModal', 'add');
+    }
+  } else {
+    window.Logger?.error('showAddTradeModal not available', { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'לא ניתן לפתוח מודל הוספת טרייד');
+    }
+  }
+}
+
 window.addTrade = addTrade;
+
+/**
+ * Edit trade function - wrapper for showEditTradeModal
+ * Maintains backward compatibility with old function name
+ * 
+ * @function editTrade
+ * @param {number} tradeId - Trade ID to edit
+ * @returns {void}
+ */
+function editTrade(tradeId) {
+  // Use ModalManagerV2 directly
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+    window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
+  } else {
+    window.Logger?.error('showEditTradeModal not available', { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'לא ניתן לפתוח מודל עריכת טרייד');
+    }
+  }
+}
+
 window.editTrade = editTrade;
 window.deleteTrade = deleteTrade;
 window.updateTrade = updateTrade;
+window.loadTradeTickerInfo = loadTradeTickerInfo;
+window.displayTradeTickerInfo = displayTradeTickerInfo;
+
+/**
+ * Clear trade form validation
+ * Wrapper for global clearValidation function
+ * 
+ * @function clearTradeValidation
+ * @param {string} formId - Form ID to clear validation for (optional, defaults to 'addTradeForm')
+ * @returns {void}
+ */
+function clearTradeValidation(formId = 'addTradeForm') {
+  if (typeof window.clearValidation === 'function') {
+    window.clearValidation(formId);
+  } else if (typeof window.clearValidationErrors === 'function') {
+    window.clearValidationErrors(formId);
+  } else {
+    window.Logger?.debug('Validation clearing functions not available', { formId, page: "trades" });
+  }
+}
+
+/**
+ * Validate trade form
+ * Wrapper for global validation system
+ * 
+ * @function validateTradeForm
+ * @param {string} formId - Form ID to validate (optional, defaults to 'addTradeForm')
+ * @returns {boolean} - True if form is valid, false otherwise
+ */
+function validateTradeForm(formId = 'addTradeForm') {
+  const form = document.getElementById(formId);
+  if (!form) {
+    window.Logger?.warn('Form not found for validation', { formId, page: "trades" });
+    return false;
+  }
+  
+  // Use global validation system if available
+  if (typeof window.validateForm === 'function') {
+    const result = window.validateForm(formId);
+    // Handle both boolean and object results
+    return typeof result === 'boolean' ? result : (result?.isValid !== false);
+  }
+  
+  // Fallback: check required fields
+  const requiredFields = form.querySelectorAll('[required]');
+  let isValid = true;
+  
+  requiredFields.forEach(field => {
+    if (!field.value.trim()) {
+      isValid = false;
+      field.classList.add('is-invalid');
+    } else {
+      field.classList.remove('is-invalid');
+    }
+  });
+  
+  return isValid;
+}
+
 window.clearTradeValidation = clearTradeValidation;
 window.validateTradeForm = validateTradeForm;
-window.showAddTradeModal = showAddTradeModal;
+// REMOVED: window.showAddTradeModal - use window.ModalManagerV2.showModal('tradesModal', 'add') directly
+
+/**
+ * Hide add trade modal
+ * Wrapper for ModalManagerV2 hideModal
+ * 
+ * @function hideAddTradeModal
+ * @returns {void}
+ */
+function hideAddTradeModal() {
+  try {
+    if (window.ModalManagerV2) {
+      window.ModalManagerV2.hideModal('tradesModal');
+    } else {
+      // Fallback to Bootstrap modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('tradesModal'));
+      if (modal) {
+        modal.hide();
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error in hideAddTradeModal', error, { page: "trades" });
+  }
+}
+
 window.hideAddTradeModal = hideAddTradeModal;
-window.showEditTradeModal = showEditTradeModal;
+// REMOVED: window.showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', id) directly
+
+/**
+ * Hide edit trade modal
+ * Wrapper for ModalManagerV2 hideModal
+ * 
+ * @function hideEditTradeModal
+ * @returns {void}
+ */
+function hideEditTradeModal() {
+  try {
+    if (window.ModalManagerV2) {
+      window.ModalManagerV2.hideModal('tradesModal');
+    } else {
+      // Fallback to Bootstrap modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('tradesModal'));
+      if (modal) {
+        modal.hide();
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error in hideEditTradeModal', error, { page: "trades" });
+  }
+}
+
 window.hideEditTradeModal = hideEditTradeModal;
+
+/**
+ * Update radio buttons for relation type selection
+ * Sets up event listeners for relation type radio buttons
+ * 
+ * @function updateRadioButtons
+ * @param {Array} accounts - Array of account objects
+ * @param {Array} trades - Array of trade objects
+ * @param {Array} tradePlans - Array of trade plan objects
+ * @param {Array} tickers - Array of ticker objects
+ * @returns {void}
+ */
+function updateRadioButtons(accounts, trades, tradePlans, tickers) {
+  try {
+    // Update account radio button
+    const accountRadio = document.getElementById('tradeRelationAccount');
+    const editAccountRadio = document.getElementById('editTradeRelationAccount');
+
+    if (accountRadio) {
+      accountRadio.addEventListener('change', () => {
+        populateSelect('tradeRelatedObjectSelect', accounts, 'name', 'חשבון מסחר');
+      });
+    }
+
+    if (editAccountRadio) {
+      editAccountRadio.addEventListener('change', () => {
+        populateSelect('editTradeRelatedObjectSelect', accounts, 'name', 'חשבון מסחר');
+      });
+    }
+
+    // Update trade radio button
+    const tradeRadio = document.getElementById('tradeRelationTrade');
+    const editTradeRadio = document.getElementById('editTradeRelationTrade');
+
+    if (tradeRadio) {
+      tradeRadio.addEventListener('change', () => {
+        populateSelect('tradeRelatedObjectSelect', trades, 'id', 'טרייד');
+      });
+    }
+
+    if (editTradeRadio) {
+      editTradeRadio.addEventListener('change', () => {
+        populateSelect('editTradeRelatedObjectSelect', trades, 'id', 'טרייד');
+      });
+    }
+
+    // Update trade plan radio button
+    const planRadio = document.getElementById('tradeRelationTradePlan');
+    const editPlanRadio = document.getElementById('editTradeRelationTradePlan');
+
+    if (planRadio) {
+      planRadio.addEventListener('change', () => {
+        populateSelect('tradeRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+      });
+    }
+
+    if (editPlanRadio) {
+      editPlanRadio.addEventListener('change', () => {
+        populateSelect('editTradeRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+      });
+    }
+
+    // Update ticker radio button
+    const tickerRadio = document.getElementById('tradeRelationTicker');
+    const editTickerRadio = document.getElementById('editTradeRelationTicker');
+
+    if (tickerRadio) {
+      tickerRadio.addEventListener('change', () => {
+        populateSelect('tradeRelatedObjectSelect', tickers, 'symbol', '');
+      });
+    }
+
+    if (editTickerRadio) {
+      editTickerRadio.addEventListener('change', () => {
+        populateSelect('editTradeRelatedObjectSelect', tickers, 'symbol', '');
+      });
+    }
+    
+  } catch (error) {
+    window.Logger?.error('שגיאה בעדכון רדיו באטונים:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בעדכון רדיו באטונים');
+    }
+  }
+}
+
 window.updateRadioButtons = updateRadioButtons;
+
+/**
+ * Populate select element with data
+ * 
+ * @function populateSelect
+ * @param {string} selectId - ID of the select element
+ * @param {Array} data - Array of data objects
+ * @param {string} field - Field name to use as value
+ * @param {string} prefix - Optional prefix for option text
+ * @returns {void}
+ */
+function populateSelect(selectId, data, field, prefix = '') {
+  try {
+    const select = document.getElementById(selectId);
+    if (!select) {
+      window.Logger?.debug('Select element not found', { selectId, page: "trades" });
+      return;
+    }
+
+    select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+    if (!data || data.length === 0) {
+      window.Logger?.debug('No data available for select', { selectId, page: "trades" });
+      return;
+    }
+
+    data.forEach(item => {
+      const option = document.createElement('option');
+      const value = item[field] || item.id || item.name || '';
+      const text = prefix ? `${prefix}: ${value}` : value;
+      
+      option.value = value;
+      option.textContent = text;
+      select.appendChild(option);
+    });
+    
+  } catch (error) {
+    window.Logger?.error('Error in populateSelect', error, { selectId, page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה במילוי select');
+    }
+  }
+}
+
 window.populateSelect = populateSelect;
+
+/**
+ * Handle relation type change
+ * Called when radio button for relation type changes
+ * 
+ * @function onRelationTypeChange
+ * @param {HTMLInputElement} radioElement - The radio button element that was selected
+ * @returns {void}
+ */
+function onRelationTypeChange(radioElement) {
+  try {
+    if (!radioElement || !radioElement.value) {
+      return;
+    }
+
+    // Enable the related object select field
+    const relatedObjectSelect = document.getElementById('tradeRelatedObjectSelect');
+    if (relatedObjectSelect) {
+      relatedObjectSelect.disabled = false;
+      relatedObjectSelect.classList.remove('disabled-field');
+    }
+
+    // Populate related objects based on selected type
+    populateRelatedObjects(parseInt(radioElement.value));
+    
+  } catch (error) {
+    window.Logger?.error('שגיאה בשינוי סוג שיוך:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בשינוי סוג שיוך');
+    }
+  }
+}
+
+/**
+ * Handle related object change
+ * Called when select element for related object changes
+ * 
+ * @function onRelatedObjectChange
+ * @param {HTMLSelectElement} selectElement - The select element that was changed
+ * @returns {void}
+ */
+function onRelatedObjectChange(selectElement) {
+  try {
+    if (!selectElement) {
+      return;
+    }
+
+    if (selectElement.value) {
+      // Enable condition fields when object is selected
+      enableConditionFields();
+    } else {
+      // Disable condition fields when no object is selected
+      disableConditionFields();
+    }
+  } catch (error) {
+    window.Logger?.error('שגיאה בבחירת אובייקט:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בבחירת אובייקט');
+    }
+  }
+}
+
+/**
+ * Enable condition fields for trade modal
+ * 
+ * @function enableConditionFields
+ * @returns {void}
+ */
+function enableConditionFields() {
+  try {
+    const fields = [
+      'tradeConditionAttribute',
+      'tradeConditionOperator',
+      'tradeConditionNumber',
+      'tradeConditionMessage'
+    ];
+
+    fields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = false;
+        field.classList.remove('disabled-field');
+      }
+    });
+  } catch (error) {
+    window.Logger?.error('שגיאה בהפעלת שדות תנאי:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Disable condition fields for trade modal
+ * 
+ * @function disableConditionFields
+ * @returns {void}
+ */
+function disableConditionFields() {
+  try {
+    const fields = [
+      'tradeConditionAttribute',
+      'tradeConditionOperator',
+      'tradeConditionNumber',
+      'tradeConditionMessage'
+    ];
+
+    fields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = true;
+        field.classList.add('disabled-field');
+        field.value = '';
+      }
+    });
+  } catch (error) {
+    window.Logger?.error('שגיאה בהשבתת שדות תנאי:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Populate related objects select based on relation type
+ * 
+ * @function populateRelatedObjects
+ * @param {number} relationTypeId - The relation type ID (1=account, 2=trade, 3=trade_plan, 4=ticker)
+ * @returns {void}
+ */
+function populateRelatedObjects(relationTypeId) {
+  try {
+    const selectId = 'tradeRelatedObjectSelect';
+    const select = document.getElementById(selectId);
+    if (!select) {
+      window.Logger?.debug('Select element not found for populateRelatedObjects', { selectId, page: "trades" });
+      return;
+    }
+
+    select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+
+    switch (relationTypeId) {
+      case 1: // Account
+        populateSelect(selectId, window.accountsData || [], 'name', 'חשבון מסחר');
+        break;
+      case 2: // Trade
+        populateSelect(selectId, window.tradesData || [], 'id', 'טרייד');
+        break;
+      case 3: // Trade Plan
+        populateSelect(selectId, window.tradePlansData || [], 'id', 'תכנון');
+        break;
+      case 4: // Ticker
+        populateSelect(selectId, window.tickersData || [], 'symbol', '');
+        break;
+      default:
+        window.Logger?.debug('Unknown relation type', { relationTypeId, page: "trades" });
+    }
+  } catch (error) {
+    window.Logger?.error('שגיאה במילוי אובייקטים קשורים:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה במילוי אובייקטים קשורים');
+    }
+  }
+}
+
 window.onRelationTypeChange = onRelationTypeChange;
 window.onRelatedObjectChange = onRelatedObjectChange;
 window.enableConditionFields = enableConditionFields;
 window.disableConditionFields = disableConditionFields;
 window.populateRelatedObjects = populateRelatedObjects;
-window.filterTradesLocally = filterTradesLocally;
-window.getDemoTradesData = getDemoTradesData;
+// Note: filterTradesLocally and filterTradesData removed - use unified filter system from header-system.js
+// The unified filter system handles all filtering through applyFilter() and related functions
+// Note: getDemoTradesData removed - we don't use demo data in the system. If no data is available, show clear message to user
+/**
+ * Restore sort state wrapper
+ * Uses global restoreSortState from page-utils.js
+ * 
+ * @function restoreSortState
+ * @returns {void}
+ */
+function restoreSortState() {
+  try {
+    if (typeof window.pageUtils?.restoreSortState === 'function') {
+      window.pageUtils.restoreSortState('trades', null);
+    } else if (typeof window.restoreSortState === 'function') {
+      window.restoreSortState('trades', null);
+    } else {
+      window.Logger?.debug('restoreSortState not available - using setupSortableHeaders instead', { page: "trades" });
+      // Fallback - setup sortable headers will restore state automatically
+      if (typeof window.setupSortableHeaders === 'function') {
+        window.setupSortableHeaders('trades');
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error restoring sort state:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Enable trade form fields
+ * Activates form fields in the add/edit modals
+ * 
+ * @function enableTradeFormFields
+ * @returns {void}
+ */
+function enableTradeFormFields() {
+  try {
+    const fieldsToEnable = [
+      'addTradeType',
+      'addTradeSide',
+      'addTradeAccountId',
+      'addTradeOpenedAt',
+      'addTradeNotes',
+    ];
+
+    fieldsToEnable.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = false;
+        field.classList.remove('disabled');
+      }
+    });
+    
+    // Also enable edit modal fields
+    const editFieldsToEnable = [
+      'editTradeType',
+      'editTradeSide',
+      'editTradeAccountId',
+      'editTradeOpenedAt',
+      'editTradeNotes',
+    ];
+    
+    editFieldsToEnable.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = false;
+        field.classList.remove('disabled');
+      }
+    });
+  } catch (error) {
+    window.Logger?.error('Error enabling trade form fields:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Disable trade form fields
+ * Deactivates form fields in the add/edit modals
+ * 
+ * @function disableTradeFormFields
+ * @returns {void}
+ */
+function disableTradeFormFields() {
+  try {
+    const fieldsToDisable = [
+      'addTradeType',
+      'addTradeSide',
+      'addTradeAccountId',
+      'addTradeOpenedAt',
+      'addTradeNotes',
+    ];
+
+    fieldsToDisable.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = true;
+        field.classList.add('disabled');
+      }
+    });
+    
+    // Also disable edit modal fields
+    const editFieldsToDisable = [
+      'editTradeType',
+      'editTradeSide',
+      'editTradeAccountId',
+      'editTradeOpenedAt',
+      'editTradeNotes',
+    ];
+    
+    editFieldsToDisable.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.disabled = true;
+        field.classList.add('disabled');
+      }
+    });
+  } catch (error) {
+    window.Logger?.error('Error disabling trade form fields:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Load modal data (placeholder - ModalManagerV2 handles this automatically)
+ * 
+ * @function loadModalData
+ * @returns {void}
+ */
+function loadModalData() {
+  try {
+    // ModalManagerV2 handles modal data loading automatically
+    // This function is kept for backward compatibility but doesn't need to do anything
+    window.Logger?.debug('loadModalData called - ModalManagerV2 handles data loading automatically', { page: "trades" });
+  } catch (error) {
+    window.Logger?.error('Error in loadModalData:', error, { page: "trades" });
+  }
+}
+
 window.restoreSortState = restoreSortState;
-window.setupModalConfigurations = setupModalConfigurations;
+// Note: setupModalConfigurations removed - ModalManagerV2 handles modal configurations automatically via modal-configs/trades-config.js
 window.addEditImportantNote = addEditImportantNote;
 window.addEditReminder = addEditReminder;
 window.enableTradeFormFields = enableTradeFormFields;
 window.disableTradeFormFields = disableTradeFormFields;
 window.loadModalData = loadModalData;
-window.initializeTradesPage = window.initializeTradesPage;
+/**
+ * Initialize trades page - called from page-initialization-configs.js
+ * 
+ * @function initializeTradesPage
+ * @returns {Promise<void>}
+ */
+async function initializeTradesPage() {
+  try {
+    window.Logger?.info('📈 Initializing Trades page...', { page: "trades" });
+    
+    // Load trades data
+    if (typeof loadTradesData === 'function') {
+      await loadTradesData();
+    } else if (typeof window.loadTradesData === 'function') {
+      await window.loadTradesData();
+    } else {
+      window.Logger?.warn('⚠️ loadTradesData not available', { page: "trades" });
+    }
+    
+    window.Logger?.info('✅ Trades page initialized successfully', { page: "trades" });
+  } catch (error) {
+    window.Logger?.error('❌ Error initializing Trades page:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה באתחול עמוד טריידים');
+    }
+  }
+}
+
+/**
+ * רענון נתוני פוזיציות
+ * מרענן את נתוני הטריידים והפוזיציות מהשרת
+ * 
+ * @function refreshPositions
+ * @returns {Promise<void>}
+ */
+async function refreshPositions() {
+  try {
+    window.Logger?.info('🔄 Refreshing positions data...', { page: "trades" });
+    
+    // Invalidate cache if UnifiedCacheManager is available
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+      try {
+        await window.UnifiedCacheManager.remove('trade-positions');
+        window.Logger?.debug('Cache invalidated for trade-positions', { page: "trades" });
+      } catch (cacheError) {
+        window.Logger?.warn('Failed to invalidate cache:', cacheError, { page: "trades" });
+      }
+    }
+    
+    // Show notification
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('מרענן פוזיציות...', 'מעדכן נתוני פוזיציה מהשרת');
+    }
+    
+    // Reload data
+    if (typeof loadTradesData === 'function') {
+      await loadTradesData();
+    } else if (typeof window.loadTradesData === 'function') {
+      await window.loadTradesData();
+    } else {
+      window.Logger?.error('loadTradesData not available', { page: "trades" });
+      throw new Error('loadTradesData not available');
+    }
+    
+    // Show success notification
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('פוזיציות עודכנו', 'נתוני הפוזיציה עודכנו בהצלחה', 3000);
+    }
+    
+    window.Logger?.info('✅ Positions refreshed successfully', { page: "trades" });
+  } catch (error) {
+    window.Logger?.error('❌ Error refreshing positions:', error, { page: "trades" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה ברענון נתוני פוזיציות', 5000);
+    }
+  }
+}
+
+/**
+ * Setup date validation for trade forms
+ * Sets up event listeners for date field validation (openedAt/closedAt)
+ * 
+ * @function setupDateValidation
+ * @returns {void}
+ */
+function setupDateValidation() {
+  try {
+    const openedAtField = document.getElementById('editTradeOpenedAt');
+    const closedAtField = document.getElementById('editTradeClosedAt');
+
+    if (openedAtField && closedAtField) {
+      // ולידציה בעת שינוי תאריך יצירה
+      openedAtField.addEventListener('change', function () {
+        validateDateFields();
+      });
+
+      // ולידציה בעת שינוי תאריך סגירה
+      closedAtField.addEventListener('change', function () {
+        validateDateFields();
+      });
+    }
+    
+    // Also setup for add modal
+    const addOpenedAtField = document.getElementById('addTradeOpenedAt');
+    const addClosedAtField = document.getElementById('addTradeClosedAt');
+    
+    if (addOpenedAtField && addClosedAtField) {
+      addOpenedAtField.addEventListener('change', function () {
+        validateDateFields();
+      });
+      
+      addClosedAtField.addEventListener('change', function () {
+        validateDateFields();
+      });
+    }
+  } catch (error) {
+    window.Logger?.error('Error setting up date validation:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Validate date fields (openedAt must be before closedAt)
+ * 
+ * @function validateDateFields
+ * @returns {void}
+ */
+function validateDateFields() {
+  try {
+    // Check edit modal first
+    const openedAtField = document.getElementById('editTradeOpenedAt');
+    const closedAtField = document.getElementById('editTradeClosedAt');
+
+    if (openedAtField && closedAtField) {
+      const openedAt = openedAtField.value;
+      const closedAt = closedAtField.value;
+
+      // הסרת הודעות שגיאה קודמות
+      clearDateValidationMessages();
+
+      if (openedAt && closedAt) {
+        const openedDate = new Date(openedAt);
+        const closedDate = new Date(closedAt);
+
+        if (closedDate < openedDate) {
+          if (typeof window.showFieldError === 'function') {
+            window.showFieldError(closedAtField, 'תאריך סגירה לא יכול להיות לפני תאריך יצירה');
+          }
+          closedAtField.classList.add('is-invalid');
+        } else {
+          closedAtField.classList.remove('is-invalid');
+          closedAtField.classList.add('is-valid');
+        }
+      }
+    }
+    
+    // Also validate add modal
+    const addOpenedAtField = document.getElementById('addTradeOpenedAt');
+    const addClosedAtField = document.getElementById('addTradeClosedAt');
+    
+    if (addOpenedAtField && addClosedAtField) {
+      const addOpenedAt = addOpenedAtField.value;
+      const addClosedAt = addClosedAtField.value;
+      
+      if (addOpenedAt && addClosedAt) {
+        const addOpenedDate = new Date(addOpenedAt);
+        const addClosedDate = new Date(addClosedAt);
+        
+        if (addClosedDate < addOpenedDate) {
+          if (typeof window.showFieldError === 'function') {
+            window.showFieldError(addClosedAtField, 'תאריך סגירה לא יכול להיות לפני תאריך יצירה');
+          }
+          addClosedAtField.classList.add('is-invalid');
+        } else {
+          addClosedAtField.classList.remove('is-invalid');
+          addClosedAtField.classList.add('is-valid');
+        }
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error validating date fields:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Show date validation error message
+ * 
+ * @function showDateValidationError
+ * @param {string} message - Error message to display
+ * @param {HTMLElement} field - Field to attach error to
+ * @returns {void}
+ */
+// REMOVED: showDateValidationError - use window.showFieldError(field, message) from validation-utils.js directly
+
+/**
+ * Clear date validation messages
+ * 
+ * @function clearDateValidationMessages
+ * @returns {void}
+ */
+function clearDateValidationMessages() {
+  try {
+    // Clear edit modal
+    const closedAtField = document.getElementById('editTradeClosedAt');
+    if (closedAtField) {
+      const existingError = closedAtField.parentNode?.querySelector('.invalid-feedback');
+      if (existingError) {
+        existingError.remove();
+      }
+      closedAtField.classList.remove('is-invalid', 'is-valid');
+    }
+    
+    // Clear add modal
+    const addClosedAtField = document.getElementById('addTradeClosedAt');
+    if (addClosedAtField) {
+      const existingError = addClosedAtField.parentNode?.querySelector('.invalid-feedback');
+      if (existingError) {
+        existingError.remove();
+      }
+      addClosedAtField.classList.remove('is-invalid', 'is-valid');
+    }
+  } catch (error) {
+    window.Logger?.error('Error clearing date validation messages:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Add important note (alias for addEditImportantNote)
+ * Placeholder for future note functionality
+ * 
+ * @function addImportantNote
+ * @returns {void}
+ */
+function addImportantNote() {
+  return addEditImportantNote();
+}
+
+/**
+ * Add reminder (alias for addEditReminder)
+ * Placeholder for future reminder functionality
+ * 
+ * @function addReminder
+ * @returns {void}
+ */
+function addReminder() {
+  return addEditReminder();
+}
+
+/**
+ * Handle change in "Show Closed Trades" checkbox
+ * Reloads modal data to update the trades list
+ * 
+ * @function onShowClosedTradesChange
+ * @param {Event} event - Change event from checkbox
+ * @returns {void}
+ */
+function onShowClosedTradesChange(event) {
+  try {
+    const showClosed = event?.target?.checked || false;
+    window.Logger?.debug('Show closed trades changed:', showClosed, { page: "trades" });
+    
+    // Reload modal data to update the trades list
+    // This will refresh the trade plan selection dropdown based on the filter
+    if (typeof loadModalData === 'function') {
+      loadModalData();
+    } else {
+      window.Logger?.warn('loadModalData not available', { page: "trades" });
+    }
+  } catch (error) {
+    window.Logger?.error('Error in onShowClosedTradesChange:', error, { page: "trades" });
+  }
+}
+
+window.initializeTradesPage = initializeTradesPage;
 window.setupDateValidation = setupDateValidation;
 window.validateDateFields = validateDateFields;
 window.clearDateValidationMessages = clearDateValidationMessages;
 window.addImportantNote = addImportantNote;
 window.addReminder = addReminder;
 window.setupSortEventListeners = setupSortEventListeners;
-window.filterTradesData = filterTradesData;
+// Note: filterTradesData removed - use unified filter system from header-system.js
 window.onShowClosedTradesChange = onShowClosedTradesChange;
 window.refreshPositions = refreshPositions;
+
+/**
+ * Update table statistics
+ * Wrapper that delegates to global updatePageSummaryStats from ui-utils.js
+ * 
+ * IMPORTANT: We use updatePageSummaryStats directly (not updateTableStats) to avoid recursion
+ * since we're exporting a function with the same name.
+ * 
+ * @function updateTableStats
+ * @returns {void}
+ */
+function updateTableStats() {
+  try {
+    // Use updatePageSummaryStats directly - it's the unified system function
+    if (typeof window.updatePageSummaryStats === 'function') {
+      window.updatePageSummaryStats('trades', window.tradesData);
+    } else {
+      window.Logger?.warn('updatePageSummaryStats not available', { page: "trades" });
+    }
+  } catch (error) {
+    window.Logger?.error('Error updating table stats:', error, { page: "trades" });
+  }
+}
+
+/**
+ * Add buy/sell transaction to trade (placeholder - in development)
+ * 
+ * @function addEditBuySell
+ * @returns {void}
+ */
+function addEditBuySell() {
+  try {
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('בפיתוח', 'הפונקציונליות להוספת עסקת קניה/מכירה לטרייד נמצאת כרגע בפיתוח');
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('בפיתוח', 'info');
+    }
+    window.Logger?.debug('addEditBuySell called - feature in development', { page: "trades" });
+  } catch (error) {
+    window.Logger?.error('Error in addEditBuySell:', error, { page: "trades" });
+  }
+}
+
+// Export - safe because we only call updatePageSummaryStats, not updateTableStats
 window.updateTableStats = updateTableStats;
 window.loadTradePlanDates = loadTradePlanDates;
 window.addEditBuySell = addEditBuySell;
+
+/**
+ * Initialize conditions system for trades
+ * Uses global ConditionsInitializer from conditions package
+ */
+function initializeTradeConditionsSystem() {
+  try {
+    // First check if conditionsSystem is already available (most reliable check)
+    if (window.conditionsSystem && window.conditionsSystem.initializer) {
+      window.Logger?.info('✅ Conditions system already initialized for trades', { page: "trades" });
+      return true;
+    }
+    
+    // Try to initialize using ConditionsInitializer class
+    if (typeof window.ConditionsInitializer !== 'undefined') {
+      try {
+        const initializer = new window.ConditionsInitializer();
+        if (initializer && typeof initializer.initialize === 'function') {
+          initializer.initialize().then(() => {
+            window.Logger?.info('✅ Trades conditions system initialized successfully', { page: "trades" });
+          }).catch(error => {
+            window.Logger?.error('Error initializing trades conditions system:', error, { page: "trades" });
+          });
+          return true;
+        }
+      } catch (error) {
+        window.Logger?.warn('Error creating ConditionsInitializer instance:', error, { page: "trades" });
+      }
+    }
+    
+    // If not available immediately, try deferred check
+    setTimeout(() => {
+      if (window.conditionsSystem && window.conditionsSystem.initializer) {
+        window.Logger?.info('✅ Conditions system initialized for trades (deferred check)', { page: "trades" });
+        return true;
+      } else {
+        // Only log debug level - conditions system is optional
+        window.Logger?.debug('ConditionsInitializer not available after deferred check - conditions package may not be loaded', { page: "trades" });
+      }
+    }, 500);
+    
+    return false;
+  } catch (error) {
+    window.Logger?.error('Error in initializeTradeConditionsSystem:', error, { page: "trades" });
+    return false;
+  }
+}
+
+window.initializeTradeConditionsSystem = initializeTradeConditionsSystem;
 
 // ===== SORTING AND FILTERING FUNCTIONS =====
 // Table sorting, filtering, and state management
@@ -1808,7 +3002,7 @@ function generateDetailedLog() {
                 linkedItemsModal: document.getElementById('linkedItemsModal') ? 'זמין' : 'לא זמין'
             },
             functions: {
-                showAddTradeModal: typeof window.showAddTradeModal === 'function' ? 'זמין' : 'לא זמין',
+                showAddTradeModal: typeof window.ModalManagerV2?.showModal === 'function' ? 'זמין (ModalManagerV2)' : 'לא זמין',
                 editTradeRecord: typeof window.editTradeRecord === 'function' ? 'זמין' : 'לא זמין',
                 deleteTradeRecord: typeof window.deleteTradeRecord === 'function' ? 'זמין' : 'לא זמין',
                 toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
@@ -1895,33 +3089,33 @@ function generateDetailedLog() {
 // window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
-// Local  function for trades page
-async function generateDetailedLogForTrades() {
-    try {
-        const detailedLog = await generateDetailedLog();
-        if (detailedLog) {
-            await navigator.clipboard.writeText(detailedLog);
-            if (window.showSuccessNotification) {
-                window.showSuccessNotification('לוג מפורט הועתק ללוח');
-            } else {
-                alert('לוג מפורט הועתק ללוח!');
-            }
-        } else {
-            if (window.showWarningNotification) {
-                window.showWarningNotification('אין לוג להעתקה');
-            } else {
-                alert('אין לוג להעתקה');
-            }
-        }
-    } catch (err) {
-        window.Logger.error('שגיאה בהעתקה:', err, { page: "trades" });
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה בהעתקת הלוג');
-        } else {
-            alert('שגיאה בהעתקת הלוג');
-        }
-    }
-}
+// REMOVED: generateDetailedLogForTrades - not used anywhere, use generateDetailedLog() directly if needed
+// async function _REMOVED_generateDetailedLogForTrades() {
+//     try {
+//         const detailedLog = await generateDetailedLog();
+//         if (detailedLog) {
+//             await navigator.clipboard.writeText(detailedLog);
+//             if (window.showSuccessNotification) {
+//                 window.showSuccessNotification('לוג מפורט הועתק ללוח');
+//             } else {
+//                 alert('לוג מפורט הועתק ללוח!');
+//             }
+//         } else {
+//             if (window.showWarningNotification) {
+//                 window.showWarningNotification('אין לוג להעתקה');
+//             } else {
+//                 alert('אין לוג להעתקה');
+//             }
+//         }
+//     } catch (err) {
+//         window.Logger.error('שגיאה בהעתקה:', err, { page: "trades" });
+//         if (window.showErrorNotification) {
+//             window.showErrorNotification('שגיאה בהעתקת הלוג');
+//         } else {
+//             alert('שגיאה בהעתקת הלוג');
+//         }
+//     }
+// }
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
 // Modal management using ModalManagerV2
@@ -1933,49 +3127,13 @@ async function generateDetailedLogForTrades() {
  * @function showAddTradeModal
  * @returns {void}
  */
-function showAddTradeModal() {
-    try {
-        window.Logger.debug('showAddTradeModal called', { page: 'trades' });
-        
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.showModal('tradesModal', 'add');
-        } else {
-            console.error('ModalManagerV2 not available');
-            if (window.showErrorNotification) {
-                window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה');
-            }
-        }
-    } catch (error) {
-        window.Logger.error('Error in showAddTradeModal:', error, { page: 'trades' });
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל הוספת טרייד');
-        }
-    }
-}
+// REMOVED: showAddTradeModal - use window.ModalManagerV2.showModal('tradesModal', 'add') directly
 
 /**
  * הצגת מודל עריכת טרייד
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showEditTradeModal(tradeId) {
-    try {
-        window.Logger.debug('showEditTradeModal called', { tradeId, page: 'trades' });
-        
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
-        } else {
-            console.error('ModalManagerV2 not available');
-            if (window.showErrorNotification) {
-                window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה');
-            }
-        }
-    } catch (error) {
-        window.Logger.error('Error in showEditTradeModal:', error, { tradeId, page: 'trades' });
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל עריכת טרייד');
-        }
-    }
-}
+// REMOVED: showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId) directly
 
 /**
  * שמירת טרייד
@@ -1993,7 +3151,7 @@ async function saveTrade() {
         
         const tradeData = DataCollectionService.collectFormData({
             ticker_id: { id: 'tradeTicker', type: 'int' },
-            account_id: { id: 'tradeAccount', type: 'int' },
+            trading_account_id: { id: 'tradeAccount', type: 'int' }, // Backend expects trading_account_id
             name: { id: 'tradeName', type: 'text' },
             type: { id: 'tradeType', type: 'text' },
             quantity: { id: 'tradeQuantity', type: 'int' },
@@ -2081,60 +3239,47 @@ async function saveTrade() {
 }
 
 /**
- * מחיקת טרייד
- * Includes linked items check
+ * מחיקת טרייד - alias ל-deleteTradeRecord
  */
 async function deleteTrade(tradeId) {
-    window.Logger.debug('deleteTrade called', { tradeId, page: 'trades' });
-    
-    try {
-        // Check linked items first
-        if (window.checkLinkedItemsBeforeAction) {
-            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trade', tradeId, 'delete');
-            if (hasLinkedItems) {
-                window.Logger.info('Trade has linked items, deletion cancelled', { tradeId, page: 'trades' });
-                return;
-            }
-        }
-        
-        // Confirm deletion
-        if (!confirm('האם אתה בטוח שברצונך למחוק את הטרייד?')) {
-            return;
-        }
-        
-        // Send delete request
-        const response = await fetch(`/api/trades/${tradeId}`, {
-            method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        // Handle success
-        if (window.showNotification) {
-            window.showNotification('טרייד נמחק בהצלחה', 'success', 'business');
-        }
-        
-        // Refresh data
-        if (window.loadTradesData) {
-            window.loadTradesData();
-        }
-        
-        window.Logger.info('Trade deleted successfully', { tradeId, page: 'trades' });
-        
-    } catch (error) {
-        window.Logger.error('Error deleting trade', { error: error.message, tradeId, page: 'trades' });
-        
-        if (window.showNotification) {
-            window.showNotification('שגיאה במחיקת הטרייד', 'error', 'system');
-        }
-    }
+    return await deleteTradeRecord(tradeId);
 }
 
+/**
+ * Show add trade modal (wrapper for ModalManagerV2)
+ * Maintains backward compatibility with HTML onclick handlers
+ * @function showAddTradeModal
+ */
+window.showAddTradeModal = function() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        window.ModalManagerV2.showModal('tradesModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
+/**
+ * Show edit trade modal (wrapper for ModalManagerV2)
+ * Maintains backward compatibility with HTML onclick handlers
+ * @function showEditTradeModal
+ * @param {number|string} tradeId - ID of trade to edit
+ */
+window.showEditTradeModal = function(tradeId) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
 // Export functions to window for global access
-window.showAddTradeModal = showAddTradeModal;
-window.showEditTradeModal = showEditTradeModal;
 window.saveTrade = saveTrade;
 window.deleteTrade = deleteTrade;
+window.performTradeDeletion = performTradeDeletion;
 

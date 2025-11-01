@@ -48,23 +48,37 @@ def get_tickers():
         # Convert tickers to dict with market data
         tickers_data = []
         for ticker in tickers:
-            ticker_dict = ticker.to_dict()
-            
-            # Add market data fields if they exist (dynamically added by TickerService)
-            if hasattr(ticker, 'current_price'):
-                ticker_dict['current_price'] = ticker.current_price
-            if hasattr(ticker, 'change_percent'):
-                ticker_dict['change_percent'] = ticker.change_percent
-            if hasattr(ticker, 'change_amount'):
-                ticker_dict['change_amount'] = ticker.change_amount
-            if hasattr(ticker, 'volume'):
-                ticker_dict['volume'] = ticker.volume
-            if hasattr(ticker, 'yahoo_updated_at'):
-                ticker_dict['yahoo_updated_at'] = ticker.yahoo_updated_at.isoformat() if ticker.yahoo_updated_at else None
-            if hasattr(ticker, 'data_source'):
-                ticker_dict['data_source'] = ticker.data_source
+            try:
+                ticker_dict = ticker.to_dict()
                 
-            tickers_data.append(ticker_dict)
+                # Add market data fields if they exist (dynamically added by TickerService)
+                try:
+                    if hasattr(ticker, 'current_price'):
+                        ticker_dict['current_price'] = ticker.current_price
+                    if hasattr(ticker, 'change_percent'):
+                        ticker_dict['change_percent'] = ticker.change_percent
+                    if hasattr(ticker, 'change_amount'):
+                        ticker_dict['change_amount'] = ticker.change_amount
+                    if hasattr(ticker, 'volume'):
+                        ticker_dict['volume'] = ticker.volume
+                    if hasattr(ticker, 'yahoo_updated_at'):
+                        ticker_dict['yahoo_updated_at'] = ticker.yahoo_updated_at.isoformat() if ticker.yahoo_updated_at else None
+                    if hasattr(ticker, 'data_source'):
+                        ticker_dict['data_source'] = ticker.data_source
+                except Exception as market_attr_error:
+                    # Handle errors when accessing market data attributes
+                    logger.warning(f"Error accessing market data attributes for ticker {ticker.id}: {str(market_attr_error)}")
+                    
+                tickers_data.append(ticker_dict)
+            except Exception as ticker_error:
+                # Handle errors when converting ticker to dict
+                logger.warning(f"Error converting ticker {ticker.id if hasattr(ticker, 'id') else 'unknown'} to dict: {str(ticker_error)}")
+                # Add minimal ticker data to prevent complete failure
+                try:
+                    minimal_dict = {'id': ticker.id if hasattr(ticker, 'id') else None}
+                    tickers_data.append(minimal_dict)
+                except:
+                    pass  # Skip this ticker if we can't even get its ID
         
         return jsonify({
             "status": "success",
@@ -73,10 +87,12 @@ def get_tickers():
             "version": "1.0"
         })
     except Exception as e:
-        logger.error(f"Error getting tickers: {str(e)}")
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error getting tickers: {str(e)}\nTraceback:\n{error_trace}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve tickers"},
+            "error": {"message": f"Failed to retrieve tickers: {str(e)}"},
             "version": "1.0"
         }), 500
 

@@ -81,16 +81,47 @@ const notesModalConfig = {
     onSave: 'saveNote'
 };
 
-// יצירת המודל אם ModalManagerV2 זמין
-if (window.ModalManagerV2) {
-    try {
-        window.ModalManagerV2.createCRUDModal(notesModalConfig);
-        console.log('✅ Notes modal created successfully');
-    } catch (error) {
-        console.error('❌ Error creating Notes modal:', error);
+// יצירת המודל אם ModalManagerV2 זמין - Deferred initialization
+function initializeNotesModal() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
+        try {
+            window.ModalManagerV2.createCRUDModal(notesModalConfig);
+            console.log('✅ Notes modal created successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Error creating Notes modal:', error);
+            return false;
+        }
     }
+    return false;
+}
+
+if (window.ModalManagerV2) {
+    initializeNotesModal();
 } else {
-    console.warn('⚠️ ModalManagerV2 not available for Notes modal');
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (!initializeNotesModal()) {
+                    setTimeout(() => {
+                        if (!initializeNotesModal()) {
+                            console.warn('⚠️ ModalManagerV2 not available for Notes modal after retries');
+                        }
+                    }, 500);
+                }
+            }, 100);
+        });
+    } else {
+        setTimeout(() => {
+            if (!initializeNotesModal()) {
+                setTimeout(() => {
+                    if (!initializeNotesModal()) {
+                        console.warn('⚠️ ModalManagerV2 not available for Notes modal after retries');
+                    }
+                }, 500);
+            }
+        }, 100);
+    }
 }
 
 // ייצוא לקונסול (לצורך debug)

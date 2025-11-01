@@ -20,15 +20,15 @@
     -->
     
     <!-- TikTrack ITCSS Master Styles -->
-    <link rel="stylesheet" href="styles-new/master.css?v=05b6de6f_20251025_005449">
+    <link rel="stylesheet" href="styles-new/master.css?v=46bd8173_20251031_164748">
     
     
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=05b6de6f_20251025_005449">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=05b6de6f_20251025_005449">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=46bd8173_20251031_164748">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=46bd8173_20251031_164748">
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=05b6de6f_20251025_005449">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=46bd8173_20251031_164748">
 </head>
 
 <body class="trading-accounts-page">
@@ -76,7 +76,7 @@
                         </div>
                         <div class="table-count" id="accountsCount">טוען...</div>
                         <div class="table-actions">
-                            <button data-button-type="ADD" data-entity-type="account" data-variant="full" data-onclick="showAddTradingAccountModal()" data-text="הוסף חשבון מסחר" title="הוסף חשבון מסחר חדש"></button>
+                            <button data-button-type="ADD" data-entity-type="account" data-variant="full" data-onclick="window.ModalManagerV2 && window.ModalManagerV2.showModal('tradingAccountsModal', 'add')" data-text="הוסף חשבון מסחר" title="הוסף חשבון מסחר חדש"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
                     </div>
@@ -99,11 +99,14 @@
                                         <th class="col-balance">
                                             <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">יתרה <span class="sort-icon">↕</span></button>
                                         </th>
+                                        <th class="col-total-pl">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">רווח/הפסד <span class="sort-icon">↕</span></button>
+                                        </th>
                                         <th class="col-status">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">סטטוס <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">סטטוס <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">נוצר ב <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }">נוצר ב <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-items">
                                         </th>
@@ -111,13 +114,68 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="7" class="loading">טוען חשבונות...</td>
+                                        <td colspan="8" class="loading">טוען חשבונות...</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>
+                </div> <!-- End content-section -->
+                
+                <!-- Account Activity area - content-section -->
+                <div class="content-section" data-section="account-activity">
+                    <!-- Account Activity header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/trading_accounts.svg" alt="תנועות חשבון" class="section-icon">
+                            תנועות חשבון
+                        </div>
+                        <div class="table-count" id="accountActivityCount">בחר חשבון...</div>
+                        <div class="table-actions">
+                            <!-- Account selector -->
+                            <select id="accountActivitySelector" class="form-select form-select-sm" style="margin-inline-end: 0.5rem; min-width: 200px;">
+                                <option value="">בחר חשבון...</option>
+                            </select>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('account-activity')" data-text="הצג/הסתר"></button>
+                        </div>
+                    </div>
+
+                    <!-- Account Activity body -->
+                    <div class="section-body" style="display: none;">
+                        <!-- Activity table container -->
+                        <div class="table-responsive" id="accountActivityContainer">
+                            <table class="table" id="accountActivityTable" data-table-type="account_activity">
+                                <thead>
+                                    <tr>
+                                        <th class="col-date">תאריך</th>
+                                        <th class="col-type">סוג</th>
+                                        <th class="col-subtype">תת-סוג</th>
+                                        <th class="col-ticker">טיקר</th>
+                                        <th class="col-amount">סכום</th>
+                                        <th class="col-currency">מטבע</th>
+                                        <th class="col-balance">יתרה שוטפת</th>
+                                        <th class="col-actions actions-cell actions-1-item">פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="8" class="loading">בחר חשבון להצגת תנועות...</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot id="accountActivityFooter" style="display: none;">
+                                    <tr class="summary-row">
+                                        <td colspan="4" class="text-end"><strong>סה"כ לפי מטבע:</strong></td>
+                                        <td colspan="4" id="currencyBalancesSummary"></td>
+                                    </tr>
+                                    <tr class="summary-row">
+                                        <td colspan="4" class="text-end"><strong>סה"כ במטבע בסיס:</strong></td>
+                                        <td colspan="4" id="baseCurrencyTotal"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- End content-section -->
             </div>
         </div>
 
@@ -133,7 +191,7 @@
     </div>
     
     <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=05b6de6f_20251025_005449"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=46bd8173_20251031_164748"></script>
     
     <!-- ===== SCRIPT LOADING ORDER - GENERATED BY PageTemplateGenerator ===== -->
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
@@ -144,88 +202,92 @@
     <!-- מערכות ליבה חובה לכל עמוד -->
     <!-- Dependencies: none -->
     <!-- Critical: YES | Version: 2.0.0 -->
-    <script src="scripts/global-favicon.js?v=05b6de6f_20251025_005449"></script> <!-- ניהול favicon -->
-    <script src="scripts/notification-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת התראות -->
-    <script src="scripts/ui-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לממשק משתמש -->
-    <script src="scripts/warning-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת אזהרות -->
-    <script src="scripts/error-handlers.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת טיפול בשגיאות -->
-    <script src="scripts/unified-cache-manager.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/logger-service.js?v=05b6de6f_20251025_005449"></script> <!-- שירות לוגים מתקדם --> <!-- מנהל מטמון מאוחד -->
-    <script src="scripts/cache-sync-manager.js?v=05b6de6f_20251025_005449"></script> <!-- מנהל סנכרון מטמון -->
-    <script src="scripts/header-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת כותרת -->
-    <script src="scripts/page-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לעמודים -->
-    <script src="scripts/translation-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לתרגום -->
-    <script src="scripts/button-icons.js?v=05b6de6f_20251025_005449"></script> <!-- אייקונים לכפתורים -->
-    <script src="scripts/event-handler-manager.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת ניהול אירועים מרכזית -->
-    <script src="scripts/button-system-init.js?v=05b6de6f_20251025_005449"></script> <!-- אתחול מערכת כפתורים -->
-    <script src="scripts/color-scheme-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת צבעים דינמית -->
+    <script src="scripts/global-favicon.js?v=46bd8173_20251031_164748"></script> <!-- ניהול favicon -->
+    <script src="scripts/notification-system.js?v=46bd8173_20251031_164748"></script> <!-- מערכת התראות -->
+    <script src="scripts/ui-utils.js?v=46bd8173_20251031_164748"></script> <!-- כלי עזר לממשק משתמש -->
+    <script src="scripts/warning-system.js?v=46bd8173_20251031_164748"></script> <!-- מערכת אזהרות -->
+    <script src="scripts/error-handlers.js?v=46bd8173_20251031_164748"></script> <!-- מערכת טיפול בשגיאות -->
+    <script src="scripts/unified-cache-manager.js?v=46bd8173_20251031_164748"></script>
+    <script src="scripts/logger-service.js?v=46bd8173_20251031_164748"></script> <!-- שירות לוגים מתקדם --> <!-- מנהל מטמון מאוחד -->
+    <script src="scripts/cache-sync-manager.js?v=46bd8173_20251031_164748"></script> <!-- מנהל סנכרון מטמון -->
+    <script src="scripts/header-system.js?v=46bd8173_20251031_164748"></script> <!-- מערכת כותרת -->
+    <script src="scripts/page-utils.js?v=46bd8173_20251031_164748"></script> <!-- כלי עזר לעמודים -->
+    <script src="scripts/translation-utils.js?v=46bd8173_20251031_164748"></script> <!-- כלי עזר לתרגום -->
+    <script src="scripts/button-icons.js?v=46bd8173_20251031_164748"></script> <!-- אייקונים לכפתורים -->
+    <script src="scripts/event-handler-manager.js?v=46bd8173_20251031_164748"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <script src="scripts/button-system-init.js?v=46bd8173_20251031_164748"></script> <!-- אתחול מערכת כפתורים -->
+    <script src="scripts/color-scheme-system.js?v=46bd8173_20251031_164748"></script> <!-- מערכת צבעים דינמית -->
 
     <!-- ===== SERVICES PACKAGE (loadOrder: 2) ===== -->
     <!-- שירותים כלליים -->
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
-    <script src="scripts/services/data-collection-service.js?v=05b6de6f_20251025_005449"></script> <!-- שירות איסוף נתונים -->
-    <script src="scripts/services/field-renderer-service.js?v=05b6de6f_20251025_005449"></script> <!-- שירות רינדור שדות -->
-    <script src="scripts/services/select-populator-service.js?v=05b6de6f_20251025_005449"></script> <!-- שירות מילוי select -->
-    <script src="scripts/services/statistics-calculator.js?v=05b6de6f_20251025_005449"></script> <!-- מחשבון מסחר סטטיסטיקות -->
-    <script src="scripts/services/crud-response-handler.js?v=05b6de6f_20251025_005449"></script> <!-- מטפל בתגובות CRUD -->
-    <script src="scripts/services/default-value-setter.js?v=05b6de6f_20251025_005449"></script> <!-- קובע ערכי ברירת מחדל -->
+    <script src="scripts/services/data-collection-service.js?v=46bd8173_20251031_164748"></script> <!-- שירות איסוף נתונים -->
+    <script src="scripts/services/field-renderer-service.js?v=46bd8173_20251031_164748"></script> <!-- שירות רינדור שדות -->
+    <script src="scripts/services/select-populator-service.js?v=46bd8173_20251031_164748"></script> <!-- שירות מילוי select -->
+    <script src="scripts/services/statistics-calculator.js?v=46bd8173_20251031_164748"></script> <!-- מחשבון מסחר סטטיסטיקות -->
+    <script src="scripts/services/crud-response-handler.js?v=46bd8173_20251031_164748"></script> <!-- מטפל בתגובות CRUD -->
+    <script src="scripts/services/default-value-setter.js?v=46bd8173_20251031_164748"></script> <!-- קובע ערכי ברירת מחדל -->
 
     <!-- ===== UI-ADVANCED PACKAGE (loadOrder: 3) ===== -->
     <!-- ממשק משתמש מתקדם -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
-    <script src="scripts/pagination-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת עמודים -->
-    <script src="scripts/modules/actions-menu-system.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת תפריט פעולות -->
+    <script src="scripts/pagination-system.js?v=46bd8173_20251031_164748"></script> <!-- מערכת עמודים -->
+    <script src="scripts/modules/actions-menu-system.js?v=46bd8173_20251031_164748"></script> <!-- מערכת תפריט פעולות -->
 
     <!-- ===== CRUD PACKAGE (loadOrder: 4) ===== -->
     <!-- מערכות לניהול נתונים וטבלאות -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
-    <script src="scripts/date-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לתאריכים -->
-    <script src="scripts/data-utils.js?v=05b6de6f_20251025_005449"></script> <!-- כלי עזר לנתונים -->
-    <script src="scripts/tables.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת טבלאות -->
+    <script src="scripts/date-utils.js?v=46bd8173_20251031_164748"></script> <!-- כלי עזר לתאריכים -->
+    <script src="scripts/data-utils.js?v=46bd8173_20251031_164748"></script> <!-- כלי עזר לנתונים -->
+    <script src="scripts/tables.js?v=46bd8173_20251031_164748"></script> <!-- מערכת טבלאות -->
 
     <!-- ===== PREFERENCES PACKAGE (loadOrder: 5) ===== -->
     <!-- מערכת העדפות משתמש -->
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
-    <script src="scripts/preferences-core-new.js?v=05b6de6f_20251025_005449"></script> <!-- ליבת העדפות -->
-    <script src="scripts/preferences-colors.js?v=05b6de6f_20251025_005449"></script> <!-- מערכת צבעים -->
-    <script src="scripts/preferences-lazy-loader.js?v=05b6de6f_20251025_005449"></script> <!-- lazy loading -->
-    <script src="scripts/preferences-validation.js?v=05b6de6f_20251025_005449"></script> <!-- validation -->
-    <script src="scripts/preferences-ui.js?v=05b6de6f_20251025_005449"></script> <!-- ממשק משתמש -->
+    <script src="scripts/preferences-core-new.js?v=46bd8173_20251031_164748"></script> <!-- ליבת העדפות -->
+    <script src="scripts/preferences-colors.js?v=46bd8173_20251031_164748"></script> <!-- מערכת צבעים -->
+    <script src="scripts/preferences-lazy-loader.js?v=46bd8173_20251031_164748"></script> <!-- lazy loading -->
+    <script src="scripts/preferences-validation.js?v=46bd8173_20251031_164748"></script> <!-- validation -->
+    <script src="scripts/preferences-ui.js?v=46bd8173_20251031_164748"></script> <!-- ממשק משתמש -->
 
     <!-- ===== ENTITY DETAILS SYSTEMS (Depend on Header) ===== -->
-    <script src="scripts/entity-details-api.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/entity-details-renderer.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/entity-details-modal.js?v=05b6de6f_20251025_005449"></script>
+    <!-- ===== MODAL NAVIGATION MANAGER (Must load before entity-details-modal) ===== -->
+    <script src="scripts/modal-navigation-manager.js?v=46bd8173_20251031_164748"></script>
+    
+    <script src="scripts/entity-details-api.js?v=46bd8173_20251031_164748"></script>
+    <script src="scripts/entity-details-renderer.js?v=46bd8173_20251031_164748"></script>
+    <script src="scripts/entity-details-modal.js?v=46bd8173_20251031_164748"></script>
     
     <!-- ===== INIT-SYSTEM PACKAGE (loadOrder: 18) ===== -->
     <!-- מערכות אתחול וניטור -->
     <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-details -->
     <!-- Critical: NO | Version: 2.0.0 -->
-    <script src="scripts/init-system/package-manifest.js?v=05b6de6f_20251025_005449"></script> <!-- מניפסט חבילות -->
-    <script src="scripts/page-initialization-configs.js?v=05b6de6f_20251025_005449"></script> <!-- קונפיגורציות עמודים -->
-    <script src="scripts/unified-app-initializer.js?v=05b6de6f_20251025_005449"></script> <!-- אתחול מאוחד -->
+    <script src="scripts/init-system/package-manifest.js?v=46bd8173_20251031_164748"></script> <!-- מניפסט חבילות -->
+    <script src="scripts/page-initialization-configs.js?v=46bd8173_20251031_164748"></script> <!-- קונפיגורציות עמודים -->
+    <script src="scripts/unified-app-initializer.js?v=46bd8173_20251031_164748"></script> <!-- אתחול מאוחד -->
     
     <!-- Modal System V2 -->
-    <script src="scripts/modal-manager-v2.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/modal-configs/trading-accounts-config.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/modal-manager-v2.js?v=46bd8173_20251031_164748"></script>
+    <script src="scripts/modal-configs/trading-accounts-config.js?v=46bd8173_20251031_164748"></script>
     
     <!-- Page-specific Scripts -->
-    <script src="scripts/trading_accounts.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/trading_accounts.js?v=46bd8173_20251031_164748"></script>
+    <script src="scripts/account-activity.js?v=46bd8173_20251031_164748"></script>
     
     <!-- 14. Init System Check (Available on all pages) -->
-    <script src="scripts/init-system-check.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/init-system-check.js?v=46bd8173_20251031_164748"></script>
     
     <!-- 15. Monitoring Functions (Required for page checks) -->
-    <script src="scripts/monitoring-functions.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/monitoring-functions.js?v=46bd8173_20251031_164748"></script>
     
     <!-- ===== INFO SUMMARY SYSTEM ===== -->
     <!-- מערכת סיכום נתונים מאוחדת -->
-    <script src="scripts/info-summary-system.js?v=05b6de6f_20251025_005449"></script>
-    <script src="scripts/info-summary-configs.js?v=05b6de6f_20251025_005449"></script>
+    <script src="scripts/info-summary-system.js?v=46bd8173_20251031_164748"></script>
+    <script src="scripts/info-summary-configs.js?v=46bd8173_20251031_164748"></script>
     
     <!-- Page-specific functions are now handled by the unified initialization system -->
     

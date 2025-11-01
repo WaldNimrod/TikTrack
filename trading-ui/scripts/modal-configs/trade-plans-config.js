@@ -37,16 +37,15 @@ const tradePlansModalConfig = {
         {
             type: 'select',
             id: 'tradePlanType',
-            label: 'סוג תוכנית',
+            label: 'סוג השקעה',
             required: true,
+            fieldName: 'investment_type', // Map to database column name
             options: [
-                { value: 'long', label: 'קנייה ארוכת טווח' },
-                { value: 'short', label: 'מכירה בחסר' },
-                { value: 'swing', label: 'מסחר תנודות' },
-                { value: 'scalp', label: 'סקלפינג' },
-                { value: 'position', label: 'פוזיציה' }
+                { value: 'swing', label: 'סווינג - מסחר לטווח קצר עד בינוני' },
+                { value: 'investment', label: 'השקעה - השקעה ארוכת טווח' },
+                { value: 'passive', label: 'פאסיבי - השקעה פאסיבית ללא פעילות מסחרית' }
             ],
-            defaultValue: 'long'
+            defaultValue: 'swing'
         },
         {
             type: 'number',
@@ -157,16 +156,55 @@ const tradePlansModalConfig = {
     onSave: 'saveTradePlan'
 };
 
-// יצירת המודל אם ModalManagerV2 זמין
-if (window.ModalManagerV2) {
-    try {
-        window.ModalManagerV2.createCRUDModal(tradePlansModalConfig);
-        console.log('✅ Trade Plans modal created successfully');
-    } catch (error) {
-        console.error('❌ Error creating Trade Plans modal:', error);
+// יצירת המודל אם ModalManagerV2 זמין - Deferred initialization
+// This function will be called when ModalManagerV2 is ready
+function initializeTradePlansModal() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
+        try {
+            window.ModalManagerV2.createCRUDModal(tradePlansModalConfig);
+            console.log('✅ Trade Plans modal created successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Error creating Trade Plans modal:', error);
+            return false;
+        }
     }
+    return false;
+}
+
+// Try immediate initialization if ModalManagerV2 is already available
+if (window.ModalManagerV2) {
+    initializeTradePlansModal();
 } else {
-    console.warn('⚠️ ModalManagerV2 not available for Trade Plans modal');
+    // Deferred initialization - wait for ModalManagerV2 to be available
+    // Check if DOM is already loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Retry with delay to allow ModalManagerV2 initialization
+            setTimeout(() => {
+                if (!initializeTradePlansModal()) {
+                    console.warn('⚠️ ModalManagerV2 not available after DOMContentLoaded - will retry');
+                    // Final retry after additional delay
+                    setTimeout(() => {
+                        if (!initializeTradePlansModal()) {
+                            console.warn('⚠️ ModalManagerV2 not available for Trade Plans modal after retries');
+                        }
+                    }, 500);
+                }
+            }, 100);
+        });
+    } else {
+        // DOM already loaded - use setTimeout with retry
+        setTimeout(() => {
+            if (!initializeTradePlansModal()) {
+                setTimeout(() => {
+                    if (!initializeTradePlansModal()) {
+                        console.warn('⚠️ ModalManagerV2 not available for Trade Plans modal after retries');
+                    }
+                }, 500);
+            }
+        }, 100);
+    }
 }
 
 // ייצוא לקונסול (לצורך debug)

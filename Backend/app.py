@@ -97,6 +97,7 @@ from utils.rate_limiter import rate_limiter, rate_limit_api
 
 # Import blueprints from unified API package
 from routes.api import (
+    account_activity_bp,
     trading_accounts_bp,
     tickers_bp,
     trades_bp,
@@ -204,6 +205,7 @@ except Exception as e:
 logger.info("✅ Server initialization completed")
 
 # Register blueprints
+app.register_blueprint(account_activity_bp)
 app.register_blueprint(trading_accounts_bp)
 app.register_blueprint(tickers_bp)
 app.register_blueprint(trades_bp)

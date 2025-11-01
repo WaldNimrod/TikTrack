@@ -5,41 +5,36 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 45
+ * Total Functions: 40
  * 
  * PAGE INITIALIZATION (1)
  * - setupNoteValidationEvents() - setupNoteValidationEvents function
  * 
- * DATA LOADING (7)
- * - uploadFile() - * Add new note
+ * DATA LOADING (5)
  * - downloadFile() - downloadFile function
- * - loadNotesData() - loadNotesData function
  * - getEditorContent() - * ניקוי עיצוב בעורך
  * - getTypeDisplayName() - getTypeDisplayName function
  * - loadNoteForViewing() - * View a note
  * - getNoteRelatedDisplay() - getNoteRelatedDisplay function
  * 
- * DATA MANIPULATION (13)
- * - addNote() - addNote function
+ * DATA MANIPULATION (11)
  * - deleteNote() - * Open note details modal
  * - updateNotesTable() - updateNotesTable function
  * - updateNotesSummary() - updateNotesSummary function
  * - updateGridFromComponent() - updateGridFromComponent function
+ * - updateRadioButtons() - updateRadioButtons function
  * - saveNote() - saveNote function
  * - updateNoteFromModal() - updateNoteFromModal function
  * - confirmDeleteNote() - confirmDeleteNote function
  * - deleteNoteFromServer() - deleteNoteFromServer function
  * - removeCurrentAttachment() - removeCurrentAttachment function
  * - showAddNoteModal() - * Replace current attachment
- * - saveNote() - * הצגת מודל הוספת הערה
- * - deleteNote() - deleteNote function
  * 
- * EVENT HANDLING (5)
+ * EVENT HANDLING (4)
  * - restoreNotesSectionState() - restoreNotesSectionState function
  * - onNoteRelationTypeChange() - onNoteRelationTypeChange function
  * - clearNoteValidationErrors() - clearNoteValidationErrors function
  * - setEditorContent() - * קבלת תוכן מעורך הטקסט
- * - toggleSection() - * Replace current attachment
  * 
  * UI UPDATES (3)
  * - showTickerPage() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
@@ -63,7 +58,7 @@
  * - clearSelectedFile() - clearSelectedFile function
  * - restoreSortState() - restoreSortState function
  * - filterNotesData() - filterNotesData function
- * - filterNotesByType() - filterNotesByType function
+ * - filterNotesByType() - * Filter notes data by search term
  * - viewNote() - * Get display name for type
  * - editCurrentNote() - editCurrentNote function
  * - replaceCurrentAttachment() - replaceCurrentAttachment function
@@ -97,7 +92,7 @@ window.loadNotesData = window.loadNotesData || function() {
 
 // הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
 window.loadNotesData = async function() {
-  window.Logger.info('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀', { page: "notes" });
+  window.Logger.info('🔵🔵🔵 window.loadNotesData נקראה (שורה 99) 🔵🔵🔵', { page: "notes" });
 
   try {
     // קריאה לשרת לקבלת נתוני הערות
@@ -116,7 +111,7 @@ window.loadNotesData = async function() {
 
     // עדכון הטבלה
     if (typeof window.updateNotesTable === 'function') {
-      window.Logger.info('📊 מעדכן את טבלת הערות', { page: "notes" });
+      window.Logger.info('📊 קורא ל-window.updateNotesTable מהפונקציה window.loadNotesData (שורה 99)', { page: "notes" });
       window.updateNotesTable(window.notesData);
     } else {
       window.Logger.warn('⚠️ updateNotesTable לא זמין', { page: "notes" });
@@ -152,95 +147,9 @@ window.loadNotesData = async function() {
   }
 };
 
-/**
- * Add new note
- * @function addNote
- * @returns {void}
- */
-function addNote() {
-  try {
-    window.Logger.info('➕ מוסיף הערה חדשה', { page: "notes" });
-    
-    // פתיחת מודל הוספת הערה
-    showAddNoteModal();
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בהוספת הערה:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהוספת הערה', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בהוספת הערה');
-    }
-  }
-}
+// REMOVED: addNote - deprecated wrapper, use showAddNoteModal() directly
 
-/**
- * Upload file for note
- * @function uploadFile
- * @param {string} noteId - Note ID
- * @returns {void}
- */
-function uploadFile(noteId) {
-  try {
-    window.Logger.info('📤 מעלה קובץ להערה:', noteId, { page: "notes" });
-    
-    // יצירת input file
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '*/*';
-    
-    fileInput.onchange = function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      // יצירת FormData
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('note_id', noteId);
-      
-      // שליחה לשרת
-      fetch('/api/notes/' + noteId + '/upload', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('שגיאה בהעלאת קובץ');
-        }
-        return response.json();
-      })
-      .then(data => {
-        window.Logger.info('✅ קובץ הועלה:', data, { page: "notes" });
-        
-        // הודעת הצלחה
-        if (typeof window.showSuccessNotification === 'function') {
-          window.showSuccessNotification('קובץ הועלה בהצלחה', '', 4000, 'business');
-        } else if (typeof window.showNotification === 'function') {
-          window.showSuccessNotification('קובץ הועלה בהצלחה', '', 4000, 'business');
-        }
-      })
-      .catch(error => {
-        window.Logger.error('שגיאה בהעלאת קובץ:', error, { page: "notes" });
-        if (typeof window.showErrorNotification === 'function') {
-          window.showErrorNotification('שגיאה בהעלאת קובץ', error.message);
-        } else if (typeof window.showNotification === 'function') {
-          window.showErrorNotification('שגיאה בהעלאת קובץ');
-        }
-      });
-    };
-    
-    // הפעלת בחירת הקובץ
-    fileInput.click();
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בהעלאת קובץ:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהעלאת קובץ', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בהעלאת קובץ');
-    }
-  }
-}
+// REMOVED: uploadFile - unused function
 
 /**
  * Download file from note
@@ -284,51 +193,7 @@ function downloadFile(noteId, fileName) {
   }
 }
 
-/**
- * View linked items for note
- * @function viewLinkedItems
- * @param {string} noteId - Note ID
- * @returns {void}
- */
-function viewLinkedItems(noteId) {
-  try {
-    window.Logger.info('🔗 מציג פריטים מקושרים להערה:', noteId, { page: "notes" });
-    
-    // חיפוש ההערה בנתונים
-    const note = window.notesData.find(n => n.id === noteId);
-    if (!note) {
-      throw new Error('הערה לא נמצאה');
-    }
-    
-    // הצגת מודל פריטים מקושרים
-    if (typeof window.showLinkedItemsModal === 'function') {
-      window.showLinkedItemsModal('notes', noteId, note.title || 'הערה');
-    } else if (typeof window.showModalNotification === 'function') {
-      const content = `
-        <div class="linked-items">
-          <h5>פריטים מקושרים</h5>
-          <p>הערה: ${note.title || 'ללא כותרת'}</p>
-          <p>תוכן: ${note.content || 'ללא תוכן'}</p>
-          <p><em>פונקציונליות מקושרים זמינה במערכת הגלובלית</em></p>
-        </div>
-      `;
-      window.showModalNotification('פריטים מקושרים', content, 'info');
-    } else {
-      alert(`פריטים מקושרים להערה:\n\n` +
-        `כותרת: ${note.title || 'ללא כותרת'}\n` +
-        `תוכן: ${note.content || 'ללא תוכן'}\n\n` +
-        `פונקציונליות מקושרים זמינה במערכת הגלובלית`);
-    }
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בהצגת פריטים מקושרים:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהצגת פריטים מקושרים', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showErrorNotification('שגיאה בהצגת פריטים מקושרים');
-    }
-  }
-}
+// REMOVED: viewLinkedItems - use window.viewLinkedItems(noteId, 'note') or window.viewLinkedItemsForNote(noteId) from linked-items.js instead
 /*
  * Notes.js - Notes Page Management
  * =================================
@@ -358,7 +223,12 @@ function viewLinkedItems(noteId) {
  */
 function openNoteDetails(_id) {
   try {
-    showAddNoteModal();
+    // Use ModalManagerV2 directly
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('notesModal', 'add');
+    } else {
+      window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
+    }
   } catch (error) {
     window.Logger.error('שגיאה בפתיחת פרטי הערה:', error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {
@@ -374,7 +244,12 @@ function openNoteDetails(_id) {
  * @returns {void}
  */
 function editNote(_id) {
-  showEditNoteModal(_id);
+  // Use ModalManagerV2 directly
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+    window.ModalManagerV2.showEditModal('notesModal', 'note', _id);
+  } else {
+    window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
+  }
 }
 
 /**
@@ -384,48 +259,40 @@ function editNote(_id) {
  * @returns {void}
  */
 function deleteNote(id) {
-  // שימוש במערכת הגלובלית למחיקה
-  if (typeof window.showDeleteWarning === 'function') {
-    window.showDeleteWarning('notes', id, 'הערה', async () => {
-      // קריאה לפונקציה המקומית לאחר אישור
-      await confirmDeleteNote(id);
-    }, null);
-  } else {
-    // גיבוי למקרה שהמערכת הגלובלית לא זמינה
-    if (typeof window.showConfirmationDialog === 'function') {
-      window.showConfirmationDialog(
-        'מחיקת הערה',
-        'האם אתה בטוח שברצונך למחוק הערה זו?\n\nפעולה זו אינה ניתנת לביטול.',
-        async () => {
-          await confirmDeleteNote(id);
-        },
-        () => {
-        },
+  try {
+    // Get note details for confirmation message
+    let noteDetails = `הערה #${id}`;
+    const note = window.notesData?.find(n => n.id === id || n.id === parseInt(id));
+    
+    if (note) {
+      // Build detailed note info
+      const relatedDisplay = getNoteRelatedDisplay(note);
+      const contentPreview = note.content ? 
+        note.content.replace(/<[^>]*>/g, '').substring(0, 100) + (note.content.length > 100 ? '...' : '') :
+        'ללא תוכן';
+      const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const attachment = note.attachment ? `📎 ${note.attachment}` : 'ללא קובץ מצורף';
+      
+      noteDetails = `${relatedDisplay} - תוכן: ${contentPreview}, תאריך: ${date}, ${attachment}`;
+    }
+    
+    // Show delete warning with detailed information
+    if (window.showDeleteWarning) {
+      window.showDeleteWarning('note', noteDetails, 'הערה',
+        async () => await confirmDeleteNote(id),
+        () => {}
       );
     } else {
-      // fallback אחרון - confirm רגיל
-      if (typeof window.showConfirmationDialog === 'function') {
-        window.showConfirmationDialog(
-          'מחיקת הערה',
-          'האם אתה בטוח שברצונך למחוק הערה זו?',
-          () => confirmDeleteNote(id),
-        );
-      } else {
-        if (typeof window.showConfirmationDialog === 'function') {
-          window.showConfirmationDialog(
-            'מחיקת הערה',
-            'האם אתה בטוח שברצונך למחוק הערה זו?',
-            () => confirmDeleteNote(id),
-          );
-        } else {
-          // Fallback למקרה שמערכת התראות לא זמינה
-          const confirmed = window.window.showConfirmationDialog('אישור', 'האם אתה בטוח שברצונך למחוק הערה זו?');
-          if (confirmed) {
-            confirmDeleteNote(id);
-          }
-        }
+      // Fallback to simple confirm
+      if (!confirm('האם אתה בטוח שברצונך למחוק את ההערה?')) {
+        return;
       }
+      confirmDeleteNote(id);
     }
+    
+  } catch (error) {
+    window.Logger.error('שגיאה במחיקת הערה:', error, { page: 'notes' });
+    CRUDResponseHandler.handleError(error, 'מחיקת הערה');
   }
 }
 
@@ -494,130 +361,8 @@ window.deleteNote = deleteNote;
 window.restoreNotesSectionState = restoreNotesSectionState;
 
 // פונקציה לטעינת נתונים
-/**
- * Load notes data from server
- * @function loadNotesData
- * @async
- * @returns {Promise<void>}
- */
-async function loadNotesData() {
-  window.Logger.info('Loading notes data (bypass cache)', { page: "notes" });
-
-  try {
-    // קריאה ישירה לשרת עם timestamp למניעת cache
-    const response = await fetch(`/api/notes/?_t=${Date.now()}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      }
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const responseData = await response.json();
-    const notes = responseData.data || responseData;
-    window.Logger.info('✅ נתונים התקבלו מהשרת:', notes ? notes.length : 0, 'הערות', { page: "notes" });
-
-    // בדיקה אם הנתונים ריקים או לא תקינים
-    if (!notes || notes.length === 0) {
-      // window.Logger.warn('⚠️ לא נמצאו הערות בשרת', { page: "notes" });
-      const tbody = document.querySelector('#notesTable tbody');
-      if (tbody) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" class="text-center text-muted">
-              <div style="padding: 20px;">
-                <h5>📝 אין הערות</h5>
-                <p>לא נמצאו הערות במערכת</p>
-                <button data-button-type="ADD" data-onclick="openNoteDetails()" data-classes="btn-sm"></button>
-              </div>
-            </td>
-          </tr>
-        `;
-        
-        // 🔘 עדכון כפתורים דינמיים
-        if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
-          window.ButtonSystem.initializeButtons();
-        }
-      }
-      return;
-    }
-
-    // טעינת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים)
-
-    // פונקציה לטעינת נתונים עם טיפול בשגיאות
-    const loadDataSafely = async (url, _dataName) => {
-      try {
-        const innerResponse = await fetch(url);
-        if (!innerResponse.ok) {
-          // window.Logger.warn(`⚠️ שגיאה בטעינת ${_dataName}: ${innerResponse.status}`, { page: "notes" });
-          return [];
-        }
-        const data = await innerResponse.json();
-        if (data.status === 'error') {
-          // window.Logger.warn(`⚠️ שגיאה ב-API ${_dataName}: ${data.error?.message || 'שגיאה לא ידועה'}`, { page: "notes" });
-          return [];
-        }
-        return Array.isArray(data.data) ? data.data : [];
-      } catch {
-        // window.Logger.warn(`⚠️ שגיאה בטעינת ${_dataName}:`, { page: "notes" });
-        return [];
-      }
-    };
-
-    const [accounts, trades, tradePlans, tickers] = await Promise.all([
-      loadDataSafely('/api/accounts/', 'חשבונות'),
-      loadDataSafely('/api/trades/', 'טריידים'),
-      loadDataSafely('/api/trade_plans/', 'תוכניות'),
-      loadDataSafely('/api/tickers/', 'טיקרים'),
-    ]);
-
-    // שמירת הנתונים ב-window לסינון
-    window.notesData = notes;
-    window.accountsData = accounts;
-    window.tradesData = trades;
-    window.tradePlansData = tradePlans;
-    window.tickersData = tickers;
-
-    // עדכון הטבלה עם הנתונים הנוספים
-    // עדכון הטבלה עם הערות
-    updateNotesTable(notes, accounts, trades, tradePlans, tickers);
-    // loadNotesData הושלם בהצלחה
-
-  } catch (error) {
-    handleApiError(error, 'טעינת נתונים');
-
-    // הצגת הודעת שגיאה בטבלה
-    const tbody = document.querySelector('#notesTable tbody');
-    if (tbody) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" class="text-center text-danger">
-            <div style="padding: 20px;">
-              <h5>❌ שגיאה בטעינת נתונים</h5>
-              <p>לא ניתן לטעון נתונים מהשרת</p>
-              <p class="small text-muted">${error.message}</p>
-              <button class="btn btn-sm" onclick="loadNotesData()">נסה שוב</button>
-            </div>
-          </td>
-        </tr>
-      `;
-      
-      // 🔘 עדכון כפתורים דינמיים
-      if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
-        window.ButtonSystem.initializeButtons();
-      }
-    }
-
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים מהשרת: ' + error.message);
-    } else {
-      handleApiError(error, 'טעינת נתונים מהשרת');
-    }
-  }
-}
+// הפונקציה loadNotesData מוגדרת כבר בשורה 99 כ-window.loadNotesData
+// הפונקציה הכפולה הזו הוסרה - משתמשים רק ב-window.loadNotesData שקורא ל-updateNotesTable(notes) בלבד
 
 /**
  * Update notes table display
@@ -629,41 +374,93 @@ async function loadNotesData() {
  * @param {Array} tickers - Tickers array
  * @returns {void}
  */
-function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], tickers = []) {
+function updateNotesTable(notes) {
   try {
-    window.Logger.info('🚀🚀🚀 updateNotesTable התחיל עם', notes ? notes.length : 0, 'הערות 🚀🚀🚀', { page: "notes" });
+    window.Logger.info('🟢🟢🟢 updateNotesTable נקראה (פונקציה רגילה) עם', notes ? notes.length : 0, 'הערות', { page: "notes" });
+    window.Logger.info('🔍🔍🔵 Stack trace:', new Error().stack, { page: "notes" });
     
     const tbody = document.querySelector('#notesTable tbody');
-  if (!tbody) {
-    window.Logger.error('❌ לא נמצא tbody בטבלה', { page: "notes" });
-    handleElementNotFound('updateNotesTable', 'לא נמצא tbody בטבלה');
-    return;
-  }
-  
-  window.Logger.info('✅ tbody נמצא:', tbody, { page: "notes" });
-
-  if (!notes || notes.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" class="text-center text-muted">
-          <div style="padding: 20px;">
-            <h5>📝 אין הערות</h5>
-            <p>לא נמצאו הערות במערכת</p>
-            <button class="btn btn-sm" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
-          </div>
-        </td>
-      </tr>
-    `;
-    
-    // 🔘 עדכון כפתורים דינמיים
-    if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
-      window.ButtonSystem.initializeButtons();
+    if (!tbody) {
+      window.Logger.warn('⚠️ לא נמצא tbody בטבלה', { page: "notes" });
+      // No notes table found on this page - skipping table update
+      return;
     }
-    return;
-  }
 
-  // בניית שורות הטבלה
-  const rows = notes.map(note => {
+    // טעינת נתונים נוספים לצורך הצגת אובייקטים מקושרים
+    let accounts = [];
+    let trades = [];
+    let tradePlans = [];
+    let tickers = [];
+
+    // פונקציה לטעינת נתונים נוספים
+    const loadAdditionalData = async () => {
+      try {
+        window.Logger.info('📡 טוען נתונים נוספים עבור הערות...', { page: "notes" });
+        const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
+          fetch('/api/trading-accounts/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
+          fetch('/api/trades/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
+          fetch('/api/trade_plans/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
+          fetch('/api/tickers/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
+        ]);
+
+        // ודא שהתשובות הן מערכים - גם אם ה-API מחזיר שגיאה
+        const accountsData = Array.isArray(accountsResponse) ? accountsResponse : (Array.isArray(accountsResponse?.data) ? accountsResponse.data : []);
+        const tradesData = Array.isArray(tradesResponse) ? tradesResponse : (Array.isArray(tradesResponse?.data) ? tradesResponse.data : []);
+        const tradePlansData = Array.isArray(tradePlansResponse) ? tradePlansResponse : (Array.isArray(tradePlansResponse?.data) ? tradePlansResponse.data : []);
+        const tickersData = Array.isArray(tickersResponse) ? tickersResponse : (Array.isArray(tickersResponse?.data) ? tickersResponse.data : []);
+
+        accounts = accountsData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+        trades = tradesData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+        tradePlans = tradePlansData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+        tickers = tickersData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+        
+        window.Logger.info('✅ נתונים נוספים נטענו:', {
+          accounts: accounts.length,
+          trades: trades.length,
+          tradePlans: tradePlans.length,
+          tickers: tickers.length
+        }, { page: "notes" });
+      } catch (error) {
+        window.Logger.error('❌ שגיאה בטעינת נתונים נוספים:', error, { page: "notes" });
+        // המשך עם מערכים ריקים
+        accounts = [];
+        trades = [];
+        tradePlans = [];
+        tickers = [];
+      }
+    };
+
+    // טעינת נתונים ועדכון הטבלה
+    loadAdditionalData().then(() => {
+      // בדיקה שהנתונים קיימים
+      if (!notes || !Array.isArray(notes)) {
+        window.Logger.warn('⚠️ notes parameter is not available or not an array', { page: "notes" });
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין הערות להצגה</td></tr>';
+        return;
+      }
+
+      if (notes.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center text-muted">
+            <div style="padding: 20px;">
+              <h5>📝 אין הערות</h5>
+              <p>לא נמצאו הערות במערכת</p>
+              <button class="btn btn-sm" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
+            </div>
+          </td>
+        </tr>
+      `;
+      
+        // 🔘 עדכון כפתורים דינמיים
+        if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+          window.ButtonSystem.initializeButtons();
+        }
+        return;
+      }
+
+      // בניית שורות הטבלה
+      const rows = notes.map(note => {
     const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
 
     // הצגת תוכן כטקסט פשוט בלבד
@@ -700,104 +497,83 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
       attachmentDisplay = `${fileIcon} ${shortName}`;
     }
 
-    // קביעת סימבול ואובייקט מקושר באמצעות המערכת הכללית
-    const dataSources = {
-      accounts: accounts,
-      trades: trades,
-      tradePlans: tradePlans,
-      tickers: tickers
-    };
+      // קביעת האובייקט המקושר באמצעות המערכת הכללית
+      const dataSources = {
+        accounts: accounts,
+        trades: trades,
+        tradePlans: tradePlans,
+        tickers: tickers
+      };
 
-    const relatedObjectInfo = window.getRelatedObjectDisplay ? 
-      window.getRelatedObjectDisplay(note, dataSources, { showLink: false, format: 'simple' }) :
-      { display: 'כללי', icon: '🌐', class: 'related-general', color: '', bgColor: '', type: 'general', id: null };
+      // לוגים לבדיקת מבנה הנתונים
+      window.Logger.info('🔍 Note data for related object:', {
+        noteId: note.id,
+        related_type_id: note.related_type_id,
+        related_id: note.related_id,
+        dataSourcesCounts: {
+          accounts: accounts.length,
+          trades: trades.length,
+          tradePlans: tradePlans.length,
+          tickers: tickers.length
+        }
+      }, { page: "notes" });
 
-    const relatedDisplay = relatedObjectInfo.display;
-    const relatedClass = relatedObjectInfo.class;
+      const relatedObjectInfo = window.getRelatedObjectDisplay ? 
+        window.getRelatedObjectDisplay(note, dataSources, { showLink: true, format: 'full' }) :
+        { display: 'כללי', icon: '🌐', class: 'related-general', color: '', bgColor: '', type: 'general', id: null };
 
-    // קביעת סימבול באמצעות המערכת הכללית
-    const symbolDisplay = window.getRelatedObjectSymbol ? 
-      window.getRelatedObjectSymbol(note, dataSources) : '-';
+      window.Logger.info('🔍 Related object info result:', {
+        display: relatedObjectInfo.display,
+        class: relatedObjectInfo.class,
+        type: relatedObjectInfo.type,
+        id: relatedObjectInfo.id
+      }, { page: "notes" });
 
-    // קביעת סוג לפילטר באמצעות המערכת הכללית
-    let typeForFilter = 'כללי';
-    if (note.related_type_id && window.getRelatedObjectTypeNameHebrew) {
-      typeForFilter = window.getRelatedObjectTypeNameHebrew(note.related_type_id);
-    } else if (note.related_type_id) {
-      // Fallback למערכת הישנה
-      switch (note.related_type_id) {
-      case 1: typeForFilter = 'חשבון מסחר'; break;
-      case 2: typeForFilter = 'טרייד'; break;
-      case 3: typeForFilter = 'תוכנית'; break;
-      case 4: typeForFilter = 'טיקר'; break;
-      default: typeForFilter = 'כללי';
-      }
-    }
+      const relatedDisplay = relatedObjectInfo.display;
+      const relatedClass = relatedObjectInfo.class;
+      const relatedColor = relatedObjectInfo.color;
+      const relatedBgColor = relatedObjectInfo.bgColor;
 
-    // יצירת קישור לסימבול (אם יש סימבול)
-    let symbolLink = symbolDisplay;
-    if (note.related_type_id === 1) {
-      // עבור חשבונות - הצג רק אייקון קישור
-      symbolLink = `<a href='#' onclick='viewLinkedItemsForNote(${note.id})' ` +
-        'class=\'symbol-link\' title=\'עבור לדף החשבון מסחר\'>🔗</a>';
-    } else if (symbolDisplay && symbolDisplay !== '-' && symbolDisplay !== '') {
-      // עבור טיקרים, טריידים ותוכניות - הצג אייקון קישור + סימבול
-      symbolLink = `<a href='#' onclick='showTickerPage("${symbolDisplay}")' ` +
-        `class='symbol-link' title='עבור לדף הטיקר'>🔗</a> ${symbolDisplay}`;
-    }
-
-    return `
-      <tr onclick='viewNote(${note.id})' style='cursor: pointer;'>
-        <td class='ticker-cell'><span class='symbol-text'>${symbolDisplay || '-'}</span></td>
-        <td>${contentDisplay}</td>
-        <td style='padding: 0;' data-type='${typeForFilter}'>
-          <div class='related-object-cell ${relatedClass}' 
-            style='justify-content: flex-start; text-align: right; min-width: 150px;'>
-            ${relatedDisplay}
-          </div>
-        </td>
+      return `
+        <tr style='cursor: pointer;'>
+          <td class="related-cell">
+            <div class="related-object-cell ${relatedClass}" 
+             style="${relatedColor ? `color: ${relatedColor};` : ''} ${relatedBgColor ? `background-color: ${relatedBgColor};` : ''}"
+             title="${relatedObjectInfo.type || 'כללי'}">
+              ${relatedDisplay}
+            </div>
+          </td>
+          <td>${contentDisplay}</td>
         <td data-date='${note.created_at}'>${date}</td>
         <td>${attachmentDisplay}</td>
-        <td class='actions-cell' onclick='event.stopPropagation();'>
-          ${window.createActionsMenu ? window.createActionsMenu([
-            { type: 'VIEW', onclick: `window.showEntityDetails('note', ${note.id}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
-            { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})`, title: 'צפה בפריטים מקושרים' },
-            { type: 'EDIT', onclick: `editNote("${note.id}")`, title: 'ערוך הערה' },
-            { type: 'DELETE', onclick: `deleteNote("${note.id}")`, title: 'מחק הערה' }
-          ]) : `
-          <button data-button-type="VIEW" data-variant="small" 
-            data-onclick='window.showEntityDetails("note", ${note.id}, { mode: "view" })' 
-            data-text="" title='צפה בפרטי הערה'>
-          </button>
-          <button data-button-type="LINK" data-variant="small" 
-            data-onclick='window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})' 
-            data-text="" title='צפה בפריטים מקושרים'>
-          </button>
-          <button data-button-type="EDIT" data-variant="small" 
-            data-onclick='editNote("${note.id}")' 
-            data-text="" title='ערוך הערה'>
-          </button>
-          <button data-button-type="DELETE" data-variant="small" 
-            data-onclick='deleteNote("${note.id}")' 
-            data-text="" title='מחק הערה'>
-          </button>
-          `}
+        <td class='actions-cell'>
+          ${(() => {
+            if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+            const result = window.createActionsMenu([
+              { type: 'VIEW', onclick: `window.showEntityDetails('note', ${note.id}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
+              { type: 'LINK', onclick: `viewLinkedItemsForNote(${note.id})`, title: 'צפה בפריטים מקושרים' },
+              { type: 'EDIT', onclick: `editNote(${note.id})`, title: 'ערוך הערה' },
+              { type: 'DELETE', onclick: `deleteNote(${note.id})`, title: 'מחק הערה' }
+            ]);
+            return result || '';
+          })()}
         </td>
       </tr>
     `;
-  }).join('');
+      }).join('');
 
-  tbody.innerHTML = rows;
-  window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes" });
-  window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
-  
-  // עדכון table-count ו-info-summary
-  updateNotesSummary(notes);
-  
-  // 🔘 עדכון כפתורים דינמיים
-  if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
-    window.ButtonSystem.initializeButtons();
-  }
+      tbody.innerHTML = rows;
+      window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes" });
+      window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
+      
+      // עדכון table-count ו-info-summary
+      updateNotesSummary(notes);
+      
+      // 🔘 עדכון כפתורים דינמיים
+      if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+        window.ButtonSystem.initializeButtons();
+      }
+    });
   
   } catch (error) {
     window.Logger.error('שגיאה בעדכון טבלת הערות:', error, { page: "notes" });
@@ -941,6 +717,91 @@ function populateSelect(selectId, data, field, prefix = '') {
 }
 
 /**
+ * Update radio buttons for note relation types
+ * Sets up event listeners for relation type radio buttons
+ * 
+ * @function updateRadioButtons
+ * @param {Array} accounts - Accounts array
+ * @param {Array} trades - Trades array
+ * @param {Array} tradePlans - Trade plans array
+ * @param {Array} tickers - Tickers array
+ * @returns {void}
+ */
+function updateRadioButtons(accounts = [], trades = [], tradePlans = [], tickers = []) {
+  try {
+    // עדכון רדיו באטון לחשבונות
+    const accountRadio = document.getElementById('noteRelationAccount');
+    const editAccountRadio = document.getElementById('editNoteRelationAccount');
+
+    if (accountRadio) {
+      accountRadio.addEventListener('change', () => {
+        populateSelect('noteRelatedObjectSelect', accounts, 'name', 'חשבון מסחר');
+      });
+    }
+
+    if (editAccountRadio) {
+      editAccountRadio.addEventListener('change', () => {
+        populateSelect('editNoteRelatedObjectSelect', accounts, 'name', 'חשבון מסחר');
+      });
+    }
+
+    // עדכון רדיו באטון לטריידים
+    const tradeRadio = document.getElementById('noteRelationTrade');
+    const editTradeRadio = document.getElementById('editNoteRelationTrade');
+
+    if (tradeRadio) {
+      tradeRadio.addEventListener('change', () => {
+        populateSelect('noteRelatedObjectSelect', trades, 'id', 'טרייד');
+      });
+    }
+
+    if (editTradeRadio) {
+      editTradeRadio.addEventListener('change', () => {
+        populateSelect('editNoteRelatedObjectSelect', trades, 'id', 'טרייד');
+      });
+    }
+
+    // עדכון רדיו באטון לתכנונים
+    const planRadio = document.getElementById('noteRelationTradePlan');
+    const editPlanRadio = document.getElementById('editNoteRelationTradePlan');
+
+    if (planRadio) {
+      planRadio.addEventListener('change', () => {
+        populateSelect('noteRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+      });
+    }
+
+    if (editPlanRadio) {
+      editPlanRadio.addEventListener('change', () => {
+        populateSelect('editNoteRelatedObjectSelect', tradePlans, 'id', 'תכנון');
+      });
+    }
+
+    // עדכון רדיו באטון לטיקרים
+    const tickerRadio = document.getElementById('noteRelationTicker');
+    const editTickerRadio = document.getElementById('editNoteRelationTicker');
+
+    if (tickerRadio) {
+      tickerRadio.addEventListener('change', () => {
+        populateSelect('noteRelatedObjectSelect', tickers, 'symbol', '');
+      });
+    }
+
+    if (editTickerRadio) {
+      editTickerRadio.addEventListener('change', () => {
+        populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
+      });
+    }
+    
+  } catch (error) {
+    window.Logger?.error('שגיאה בעדכון רדיו באטונים:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון רדיו באטונים', error.message);
+    }
+  }
+}
+
+/**
  * Handle note relation type change
  * Called when radio button for relation type changes
  */
@@ -1041,6 +902,7 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
 }
 
 // ולידציה - משתמש במערכת הכללית window.validateEntityForm
+// REMOVED: validateEditNoteForm - deprecated wrapper, use window.validateEntityForm() instead
 /**
  * Validate edit note form
  * @param {string} content - Note content
@@ -1049,7 +911,7 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
  * @param {File} attachment - Attachment file
  * @returns {boolean} Whether the form is valid
  */
-function validateEditNoteForm(content, relationType, relatedId, attachment) {
+function _REMOVED_validateEditNoteForm(content, relationType, relatedId, attachment) {
   try {
     let isValid = true;
 
@@ -1322,19 +1184,8 @@ function clearNoteValidationErrors() {
   }
 }
 
-// function getFieldByErrorId(errorId) {
-//   switch (errorId) {
-//   case 'contentError':
-//     return document.getElementById('noteContent');
-//   case 'editContentError':
-//     return document.getElementById('editNoteContent');
-//   case 'relationTypeError':
-//     return document.querySelector('input[name="noteRelationType"]:checked')?.closest('.col-md-6');
-//   case 'editRelationTypeError':
-//     return document.querySelector('input[name="editNoteRelationType"]:checked')?.closest('.col-md-6');
-//   case 'relatedObjectError':
-//     return document.getElementById('noteRelatedObjectSelect');
-//   case 'editRelatedObjectError':
+// _REMOVED_getFieldByErrorId - Function was commented out and is no longer in use
+// Original implementation was removed as part of code cleanup
 //     return document.getElementById('editNoteRelatedObjectSelect');
 //   default:
 //     return null;
@@ -1342,11 +1193,11 @@ function clearNoteValidationErrors() {
 // }
 
 // window.loadNotesData כבר מוגדר בתחילת הקובץ
-window.updateNotesTable = updateNotesTable;
+// window.updateNotesTable יוצא בשורה 2241
 window.updateNotesSummary = updateNotesSummary;
 window.updateGridFromComponent = updateGridFromComponent;
-window.showAddNoteModal = showAddNoteModal;
-window.showEditNoteModal = showEditNoteModal;
+// REMOVED: window.showAddNoteModal - use window.ModalManagerV2.showModal('notesModal', 'add') directly
+// REMOVED: window.showEditNoteModal - use window.ModalManagerV2.showEditModal('notesModal', 'note', id) directly
 window.saveNote = saveNote;
 window.updateNoteFromModal = updateNoteFromModal;
 window.deleteNoteFromServer = deleteNoteFromServer;
@@ -1811,13 +1662,9 @@ function filterNotesData(searchTerm) {
     return content.includes(searchLower) || relatedDisplay.includes(searchLower);
   });
 
-  updateNotesTable(
-    filteredNotes,
-    window.accountsData || [],
-    window.tradesData || [],
-    window.tradePlansData || [],
-    window.tickersData || [],
-  );
+  if (typeof window.updateNotesTable === 'function') {
+    window.updateNotesTable(filteredNotes);
+  }
   
   } catch (error) {
     window.Logger.error('שגיאה בסינון נתוני הערות:', error, { page: "notes" });
@@ -1885,13 +1732,9 @@ function filterNotesByType(type) {
     }
   }
 
-  updateNotesTable(
-    filteredNotes,
-    window.accountsData || [],
-    window.tradesData || [],
-    window.tradePlansData || [],
-    window.tickersData || [],
-  );
+  if (typeof window.updateNotesTable === 'function') {
+    window.updateNotesTable(filteredNotes);
+  }
   
   } catch (error) {
     window.Logger.error('שגיאה בסינון הערות לפי סוג:', error, { page: "notes" });
@@ -2070,7 +1913,12 @@ function editCurrentNote() {
       viewModal.hide();
 
     // פתיחת מודל העריכה
-    showEditNoteModal(noteId);
+    // Use ModalManagerV2 directly
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+      window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
+    } else {
+      window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
+    }
   }
   
   } catch (error) {
@@ -2210,29 +2058,13 @@ function replaceCurrentAttachment() {
  * הצגת מודל הוספת הערה
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showAddNoteModal() {
-    window.Logger.debug('showAddNoteModal called', { page: 'notes' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showModal('notesModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showAddNoteModal - use window.ModalManagerV2.showModal('notesModal', 'add') directly
 
 /**
  * הצגת מודל עריכת הערה
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showEditNoteModal(noteId) {
-    window.Logger.debug('showEditNoteModal called', { noteId, page: 'notes' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showEditNoteModal - use window.ModalManagerV2.showEditModal('notesModal', 'note', noteId) directly
 
 /**
  * שמירת הערה
@@ -2247,15 +2079,47 @@ function showEditNoteModal(noteId) {
 // REMOVED: Duplicate deleteNote function - using confirmDeleteNote instead
 
 // ===== GLOBAL EXPORTS =====
-window.loadNotesData = loadNotesData;
-window.addNote = addNote;
+// window.loadNotesData כבר מוגדר בשורה 99
+// REMOVED: window exports for removed functions
 window.editNote = editNote;
 // Note: deleteNote and saveNote removed - using ModalManagerV2 and confirmDeleteNote instead
-window.uploadFile = uploadFile;
-window.downloadFile = downloadFile;
-window.viewLinkedItems = viewLinkedItems;
+// REMOVED: window.viewLinkedItems - use window.viewLinkedItems or window.viewLinkedItemsForNote from linked-items.js instead
+window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (שורה 2240)', { page: "notes" });
+// ייצוא ישיר של הפונקציה המקורית - ללא wrapper כדי למנוע רקורסיה
 window.updateNotesTable = updateNotesTable;
-window.showAddNoteModal = showAddNoteModal;
-window.showEditNoteModal = showEditNoteModal;
+
+/**
+ * Show add note modal (wrapper for ModalManagerV2)
+ * Maintains backward compatibility with HTML onclick handlers
+ * @function showAddNoteModal
+ */
+window.showAddNoteModal = function() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        window.ModalManagerV2.showModal('notesModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
+/**
+ * Show edit note modal (wrapper for ModalManagerV2)
+ * Maintains backward compatibility with HTML onclick handlers
+ * @function showEditNoteModal
+ * @param {number|string} noteId - ID of note to edit
+ */
+window.showEditNoteModal = function(noteId) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
 window.restoreNotesSectionState = restoreNotesSectionState;
 

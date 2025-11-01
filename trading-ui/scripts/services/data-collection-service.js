@@ -53,7 +53,7 @@ class DataCollectionService {
             let value = element.value;
             
             // טיפול בשדות ריקים
-            if (!value || value.trim() === '') {
+            if (!value || (typeof value === 'string' && value.trim() === '')) {
                 // אם יש ברירת מחדל, השתמש בה
                 if (config.hasOwnProperty('default')) {
                     data[key] = config.default;
@@ -110,8 +110,10 @@ class DataCollectionService {
                     
                 case 'text':
                 case 'string':
-                default:
                     value = value.trim();
+                    break;
+                default:
+                    // For other types (like datetime-local, number, etc.), keep as-is
                     break;
             }
             

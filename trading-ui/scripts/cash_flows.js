@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 36
+ * Total Functions: 35
  * 
  * PAGE INITIALIZATION (3)
  * - initializeCashFlowsPage() - initializeCashFlowsPage function
@@ -16,29 +16,28 @@
  * - loadCashFlowsData() - loadCashFlowsData function
  * - getAccountNameById() - getAccountNameById function
  * - ensureTradingAccountsLoaded() - ensureTradingAccountsLoaded function
- * - loadCashFlows() - loadCashFlows function
+ * - loadCashFlows() - * טעינת נתוני חשבונות מסחר אם הם לא נטענו
  * - loadAccountsForCashFlow() - loadAccountsForCashFlow function
  * - loadCurrenciesForCashFlow() - loadCurrenciesForCashFlow function
  * - getCashFlowTypeWithColor() - * Format amount
  * - getCashFlowTypeText() - getCashFlowTypeText function
- * - loadTradesForCashFlow() - * Show edit cash flow modal
+ * - loadTradesForCashFlow() - * Edit cash flow
  * - loadTradePlansForCashFlow() - loadTradePlansForCashFlow function
  * 
- * DATA MANIPULATION (5)
+ * DATA MANIPULATION (6)
  * - deleteCashFlow() - deleteCashFlow function
- * - updatePageSummaryStats() - updatePageSummaryStats function
+ * - updatePageSummaryStats() - Uses InfoSummarySystem from services/statistics-calculator.js
  * - updateCashFlowsTable() - * Format USD rate
+ * - updateCashFlow() - updateCashFlow function
+ * - saveCashFlow() - saveCashFlow function
  * - confirmDeleteCashFlow() - confirmDeleteCashFlow function
- * - showAddCashFlowModal() - * הצגת שגיאה לשדה בודד
  * 
- * EVENT HANDLING (2)
- * - toggleCashFlowsSection() - * טעינת נתוני חשבונות מסחר אם הם לא נטענו
- * - restoreCashFlowsSectionState() - restoreCashFlowsSectionState function
+ * EVENT HANDLING (1)
+ * - performCashFlowDeletion() - performCashFlowDeletion function
  * 
- * UI UPDATES (3)
+ * UI UPDATES (2)
  * - renderCashFlowsTable() - * טעינת רשימת מטבעות למודולי cash flow
  * - showCashFlowDetails() - * Format USD rate
- * - showEditCashFlowModal() - * Initialize external ID fields
  * 
  * VALIDATION (2)
  * - validateCashFlowForm() - validateCashFlowForm function
@@ -55,7 +54,7 @@
  * - applyDynamicColors() - * Start auto refresh
  * - applyUserPreferences() - applyUserPreferences function
  * - manageExternalIdField() - * Confirm delete cash flow
- * - editCashFlow() - * Show add cash flow modal
+ * - editCashFlow() - editCashFlow function
  * - generateDetailedLog() - generateDetailedLog function
  * - generateDetailedLogForCashFlows() - generateDetailedLogForCashFlows function
  * 
@@ -306,103 +305,11 @@ async function ensureTradingAccountsLoaded() {
  * פונקציה לפתיחה/סגירה של סקשן עליון (התראות וסיכום)
  */
 
-/**
- * Toggle cash flows section
- * @function toggleCashFlowsSection
- * @returns {void}
- */
-function toggleCashFlowsSection() {
-  try {
-    // toggleCashFlowsSection נקראה
+// REMOVED: toggleCashFlowsSection - use window.toggleSection('main') from ui-utils.js instead
+// The HTML already uses toggleSection('main') and toggleSection('top')
 
-    const cashFlowsSection = document.querySelector('.cash-flows-section');
-    if (!cashFlowsSection) {
-      handleElementNotFound('toggleCashFlowsSection', 'סקשן תזרימי מזומנים לא נמצא');
-      return;
-  }
-
-  const sectionBody = cashFlowsSection.querySelector('.section-body');
-  if (!sectionBody) {
-    handleElementNotFound('toggleCashFlowsSection', 'גוף הסקשן לא נמצא');
-    return;
-  }
-
-  const toggleBtn = cashFlowsSection.querySelector('button[onclick="toggleCashFlowsSection()"]');
-  if (!toggleBtn) {
-    handleElementNotFound('toggleCashFlowsSection', 'כפתור הפתיחה/סגירה לא נמצא');
-    return;
-  }
-
-  const isVisible = sectionBody.style.display !== 'none';
-
-  if (isVisible) {
-    // סגירת הסקשן
-    sectionBody.style.display = 'none';
-    toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> הצג תזרימי מזומנים';
-    toggleBtn.title = 'הצג תזרימי מזומנים';
-    // סקשן תזרימי מזומנים נסגר
-  } else {
-    // פתיחת הסקשן
-    sectionBody.style.display = 'block';
-    toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> הסתר תזרימי מזומנים';
-    toggleBtn.title = 'הסתר תזרימי מזומנים';
-    // סקשן תזרימי מזומנים נפתח
-  }
-
-  // שמירת המצב
-  window.unifiedCacheManager?.save('cashFlowsSectionState', isVisible ? 'closed' : 'open');
-  localStorage.setItem('cashFlowsSectionState', isVisible ? 'closed' : 'open');
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בהחלפת סקציית תזרימי מזומנים:', error, { page: "cash_flows" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהחלפת סקציית תזרימי מזומנים', error.message);
-    }
-  }
-}
-
-// פונקציות לשחזור מצב הסגירה
-async function restoreCashFlowsSectionState() {
-  // restoreCashFlowsSectionState נקראה
-
-  const savedState = await window.unifiedCacheManager?.get('cashFlowsSectionState') || localStorage.getItem('cashFlowsSectionState');
-  if (!savedState) {
-    // אין מצב שמור לסקשן תזרימי מזומנים
-    return;
-  }
-
-  const cashFlowsSection = document.querySelector('.cash-flows-section');
-  if (!cashFlowsSection) {
-    handleElementNotFound('restoreCashFlowsSectionState', 'סקשן תזרימי מזומנים לא נמצא');
-    return;
-  }
-
-  const sectionBody = cashFlowsSection.querySelector('.section-body');
-  if (!sectionBody) {
-    handleElementNotFound('restoreCashFlowsSectionState', 'גוף הסקשן לא נמצא');
-    return;
-  }
-
-  const toggleBtn = cashFlowsSection.querySelector('button[onclick="toggleCashFlowsSection()"]');
-  if (!toggleBtn) {
-    handleElementNotFound('restoreCashFlowsSectionState', 'כפתור הפתיחה/סגירה לא נמצא');
-    return;
-  }
-
-  if (savedState === 'closed') {
-    // שחזור מצב סגור
-    sectionBody.style.display = 'none';
-    toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> הצג תזרימי מזומנים';
-    toggleBtn.title = 'הצג תזרימי מזומנים';
-    // שחזור מצב סגור לסקשן תזרימי מזומנים
-  } else {
-    // שחזור מצב פתוח
-    sectionBody.style.display = 'block';
-    toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> הסתר תזרימי מזומנים';
-    toggleBtn.title = 'הסתר תזרימי מזומנים';
-    // שחזור מצב פתוח לסקשן תזרימי מזומנים
-  }
-}
+// REMOVED: restoreCashFlowsSectionState - use window.restoreSectionStates() from ui-utils.js instead
+// The global function handles section state restoration for all pages
 
 // פונקציות נוספות
 // resetAllFiltersAndReloadData() - לא בשימוש, הוסרה
@@ -421,10 +328,11 @@ async function restoreCashFlowsSectionState() {
 // פונקציות API
 // ========================================
 
+// REMOVED: loadCashFlows - replaced by loadCashFlowsData
 /**
  * טעינת תזרימי מזומנים מהשרת
  */
-async function loadCashFlows() {
+async function _REMOVED_loadCashFlows() {
   try {
 
     const response = await fetch('http://127.0.0.1:8080/api/cash_flows/');
@@ -462,6 +370,36 @@ async function loadCashFlows() {
 }
 
 /**
+ * Helper validation function for cash flow amount
+ * @param {string|number} value - Amount value to validate
+ * @returns {string|boolean} Error message or true if valid
+ */
+function validateCashFlowAmount(value) {
+  const amount = parseFloat(value);
+  if (isNaN(amount)) return 'יש להזין סכום תקין';
+  if (amount === 0) return 'סכום לא יכול להיות 0';
+  if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
+  return true;
+}
+
+/**
+ * Helper validation function for cash flow date
+ * @param {string} value - Date value to validate
+ * @returns {string|boolean} Error message or true if valid
+ */
+function validateCashFlowDate(value) {
+  if (!value) return 'יש להזין תאריך';
+  const date = new Date(value);
+  const today = new Date();
+  const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+  const minDate = new Date(2000, 0, 1);
+  
+  if (date > maxDate) return 'תאריך לא יכול להיות יותר משנה קדימה';
+  if (date < minDate) return 'תאריך לא יכול להיות לפני שנת 2000';
+  return true;
+}
+
+/**
  * Validate cash flow form
  * @function validateCashFlowForm
  * @returns {boolean} Is valid
@@ -473,28 +411,12 @@ function validateCashFlowForm() {
       { 
         id: 'cashFlowAmount', 
         name: 'סכום',
-        validation: (value) => {
-          const amount = parseFloat(value);
-          if (isNaN(amount)) return 'יש להזין סכום תקין';
-          if (amount === 0) return 'סכום לא יכול להיות 0';
-          if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
-        return true;
-      }
+        validation: validateCashFlowAmount
     },
     { 
       id: 'cashFlowDate', 
       name: 'תאריך',
-      validation: (value) => {
-        if (!value) return 'יש להזין תאריך';
-        const date = new Date(value);
-        const today = new Date();
-        const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-        const minDate = new Date(2000, 0, 1);
-        
-        if (date > maxDate) return 'תאריך לא יכול להיות יותר משנה קדימה';
-        if (date < minDate) return 'תאריך לא יכול להיות לפני שנת 2000';
-        return true;
-      }
+      validation: validateCashFlowDate
     },
     { id: 'cashFlowAccount', name: 'חשבון מסחר מסחר' },
     { id: 'cashFlowCurrency', name: 'מטבע' },
@@ -529,28 +451,12 @@ function validateEditCashFlowForm() {
       { 
         id: 'editCashFlowAmount', 
         name: 'סכום',
-        validation: (value) => {
-          const amount = parseFloat(value);
-          if (isNaN(amount)) return 'יש להזין סכום תקין';
-          if (amount === 0) return 'סכום לא יכול להיות 0';
-          if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
-          return true;
-        }
+        validation: validateCashFlowAmount
       },
     { 
       id: 'editCashFlowDate', 
       name: 'תאריך',
-      validation: (value) => {
-        if (!value) return 'יש להזין תאריך';
-        const date = new Date(value);
-        const today = new Date();
-        const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-        const minDate = new Date(2000, 0, 1);
-        
-        if (date > maxDate) return 'תאריך לא יכול להיות יותר משנה קדימה';
-        if (date < minDate) return 'תאריך לא יכול להיות לפני שנת 2000';
-        return true;
-      }
+      validation: validateCashFlowDate
     },
     { id: 'editCashFlowAccount', name: 'חשבון מסחר מסחר' },
     { id: 'editCashFlowCurrency', name: 'מטבע' },
@@ -578,7 +484,8 @@ function validateEditCashFlowForm() {
  */
 async function deleteCashFlow(id) {
   try {
-    // מציאת התזרים
+    // Get cash flow details for confirmation message
+    let cashFlowDetails = `תזרים מזומנים #${id}`;
     const cashFlow = window.cashFlowsData ? window.cashFlowsData.find(cf => cf.id === id) : null;
     
     if (!cashFlow) {
@@ -586,34 +493,45 @@ async function deleteCashFlow(id) {
       return;
     }
 
-    // הצגת חלון אישור מפורט
-    const confirmMessage = `האם אתה בטוח שברצונך למחוק את תזרים המזומנים הבא?
+    // Build detailed cash flow info
+    const accountName = getAccountNameById(cashFlow.trading_account_id) || 'לא מוגדר';
+    const type = getCashFlowTypeText(cashFlow.type);
+    const amount = cashFlow.amount;
+    const currency = cashFlow.currency_symbol || '';
+    const date = formatDate(cashFlow.date);
+    const description = cashFlow.description || 'ללא תיאור';
+    
+    cashFlowDetails = `${accountName} - ${type}, ${amount}${currency}, תאריך: ${date}, תיאור: ${description}`;
 
-חשבון מסחר: ${getAccountNameById(cashFlow.trading_account_id) || 'לא מוגדר'}
-סוג: ${getCashFlowTypeText(cashFlow.type)}
-סכום: ${cashFlow.amount} ${cashFlow.currency_symbol || ''}
-תאריך: ${formatDate(cashFlow.date)}
-תיאור: ${cashFlow.description || 'ללא תיאור'}
-
-⚠️  פעולה זו אינה הפיכה!`;
-
-    // אישור מהמשתמש
-    if (typeof window.showConfirmationDialog === 'function') {
-      const confirmed = await new Promise(resolve => {
-        window.showConfirmationDialog(
-          'מחיקת תזרים מזומנים',
-          confirmMessage,
-          () => resolve(true),
-          () => resolve(false)
-        );
-      });
-      
-      if (!confirmed) return;
+    // Show delete warning with detailed information
+    if (window.showDeleteWarning) {
+      window.showDeleteWarning('cash_flow', cashFlowDetails, 'תזרים מזומנים',
+        async () => await performCashFlowDeletion(id),
+        () => {}
+      );
     } else {
-      // Fallback למקרה שמערכת התראות לא זמינה
-      if (!window.confirm(confirmMessage)) return;
+      // Fallback to simple confirm
+      if (!confirm('האם אתה בטוח שברצונך למחוק את תזרים המזומנים?')) {
+        return;
+      }
+      await performCashFlowDeletion(id);
     }
+    
+  } catch (error) {
+    console.error('❌ deleteCashFlow: Error occurred:', error);
+    CRUDResponseHandler.handleError(error, 'מחיקת תזרים מזומנים');
+  }
+}
 
+/**
+ * Perform cash flow deletion
+ * @function performCashFlowDeletion
+ * @async
+ * @param {number} id - Cash flow ID
+ * @returns {Promise<void>}
+ */
+async function performCashFlowDeletion(id) {
+  try {
     // שליחת בקשת מחיקה
     const response = await fetch(`/api/cash_flows/${id}`, {
       method: 'DELETE',
@@ -622,13 +540,12 @@ async function deleteCashFlow(id) {
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'תזרים המזומנים נמחק בהצלחה!',
-      apiUrl: '/api/cash_flows/',
       entityName: 'תזרים מזומנים',
       reloadFn: window.loadCashFlowsData,
       requiresHardReload: false
     });
   } catch (error) {
-    console.error('❌ deleteCashFlow: Error occurred:', error);
+    console.error('❌ performCashFlowDeletion: Error occurred:', error);
     CRUDResponseHandler.handleError(error, 'מחיקת תזרים מזומנים');
   }
 }
@@ -830,22 +747,16 @@ async function renderCashFlowsTable() {
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
             <td class="col-actions actions-cell actions-4-items">
-              ${window.createActionsMenu ? window.createActionsMenu([
-                { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, text: 'פרטים', title: 'הצג פרטי תזרים' },
-                { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, text: 'פריטים מקושרים', title: 'צפה בפריטים מקושרים' },
-                { type: 'EDIT', onclick: `showEditCashFlowModal(${cashFlow.id})`, text: 'ערוך', title: 'ערוך תזרים' },
-                { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, text: 'מחק', title: 'מחק תזרים' }
-              ]) : `
-              <div class="actions-menu-wrapper">
-                <button class="btn actions-trigger" title="פעולות">⚙️</button>
-                <div class="actions-menu-popup">
-                  <button class="btn" data-variant="small" data-button-type="VIEW" data-onclick="showCashFlowDetails(${cashFlow.id})" title="הצג פרטי תזרים">👁️</button>
-                  <button class="btn" data-variant="small" data-button-type="LINK" data-onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})" title="צפה בפריטים מקושרים">🔗</button>
-                  <button class="btn" data-variant="small" data-button-type="EDIT" data-onclick="showEditCashFlowModal(${cashFlow.id})" title="ערוך תזרים">✏️</button>
-                  <button class="btn" data-variant="small" data-button-type="DELETE" data-onclick="deleteCashFlow(${cashFlow.id})" title="מחק תזרים">🗑️</button>
-                </div>
-              </div>
-              `}
+              ${(() => {
+                if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                const result = window.createActionsMenu([
+                  { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, title: 'הצג פרטי תזרים' },
+                  { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, title: 'צפה בפריטים מקושרים' },
+                  { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${cashFlow.id})`, title: 'ערוך תזרים' },
+                  { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, title: 'מחק תזרים' }
+                ]);
+                return result || '';
+              })()}
             </td>
         `;
     tbody.appendChild(row);
@@ -862,27 +773,33 @@ async function renderCashFlowsTable() {
  * Update page summary statistics
  * @function updatePageSummaryStats
  * @returns {void}
+ * Uses InfoSummarySystem from services/statistics-calculator.js
  */
 function updatePageSummaryStats() {
-  // Simple local implementation - no dependency on global function
   try {
-    // Update record count if element exists
-    const countElement = document.getElementById('cashFlowsCount');
-    if (countElement && cashFlowsData) {
-      countElement.textContent = cashFlowsData.length;
+    // Use global InfoSummarySystem if available
+    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS.cash_flows) {
+      const config = window.INFO_SUMMARY_CONFIGS.cash_flows;
+      window.InfoSummarySystem.calculateAndRender(cashFlowsData || [], config);
+      window.Logger.debug('Page summary stats updated via InfoSummarySystem', { 
+        count: cashFlowsData?.length || 0, 
+        page: 'cash_flows' 
+      });
+    } else {
+      // Fallback to local implementation if global system not available
+      const countElement = document.getElementById('cashFlowsCount');
+      if (countElement && cashFlowsData) {
+        countElement.textContent = cashFlowsData.length;
+      }
+      
+      const summaryElement = document.getElementById('cashFlowsSummary');
+      if (summaryElement && cashFlowsData) {
+        const totalAmount = cashFlowsData.reduce((sum, cf) => sum + (cf.amount || 0), 0);
+        summaryElement.textContent = `סה"כ: ${cashFlowsData.length} תזרימים, ${totalAmount.toFixed(2)} ₪`;
+      }
+      
+      window.Logger.warn('InfoSummarySystem not available - using fallback', { page: 'cash_flows' });
     }
-    
-    // Update summary stats if element exists
-    const summaryElement = document.getElementById('cashFlowsSummary');
-    if (summaryElement && cashFlowsData) {
-      const totalAmount = cashFlowsData.reduce((sum, cf) => sum + (cf.amount || 0), 0);
-      summaryElement.textContent = `סה"כ: ${cashFlowsData.length} תזרימים, ${totalAmount.toFixed(2)} ₪`;
-    }
-    
-    window.Logger.debug('Page summary stats updated locally', { 
-      count: cashFlowsData?.length || 0, 
-      page: 'cash_flows' 
-    });
   } catch (error) {
     window.Logger.warn('Error updating page summary stats', { 
       error: error.message, 
@@ -1272,7 +1189,7 @@ async function initializeCashFlowsPage() {
     await window.loadCurrenciesFromServer();
 
     // טעינת נתונים
-    await loadCashFlows();
+    await loadCashFlowsData();
 
     // שחזור מצב הסגירה
     if (typeof window.restoreSectionStates === 'function') {
@@ -1345,9 +1262,9 @@ async function updateCashFlow(id) {
     }
 }
 
-// ייצוא פונקציות גלובליות
-window.toggleCashFlowsSection = toggleCashFlowsSection;
-window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
+// REMOVED: window exports for removed functions
+// Use window.toggleSection('main') instead of toggleCashFlowsSection
+// Use window.restoreSectionStates() instead of restoreCashFlowsSectionState
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
 
 /**
@@ -1621,36 +1538,11 @@ function initializeExternalIdFields() {
 }
 
 // פונקציות מודל חדשות - מערכת ModalManagerV2
-/**
- * Show add cash flow modal
- * @function showAddCashFlowModal
- * @returns {void}
- */
-function showAddCashFlowModal() {
-    window.Logger.debug('showAddCashFlowModal called', { page: 'cash_flows' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showModal('cashFlowModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showAddCashFlowModal - use window.ModalManagerV2.showModal('cashFlowModal', 'add') directly
+// Wrapper function removed - call ModalManagerV2 directly from HTML or code
 
-/**
- * Show edit cash flow modal
- * @function showEditCashFlowModal
- * @param {string} cashFlowId - Cash flow ID
- * @returns {void}
- */
-function showEditCashFlowModal(cashFlowId) {
-    window.Logger.debug('showEditCashFlowModal called', { cashFlowId, page: 'cash_flows' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', cashFlowId);
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showEditCashFlowModal - use window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', cashFlowId) directly
+// Wrapper function removed - call ModalManagerV2 directly from HTML or code
 
 // ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
 
@@ -1674,11 +1566,12 @@ function editCashFlow(id) {
 
 // ===== TRADE AND TRADE PLAN LOADING FUNCTIONS =====
 
+// REMOVED: loadTradesForCashFlow - not used, ModalManagerV2 uses SelectPopulatorService
 /**
  * Load trades for cash flow modals
  * @param {string} selectId - ID של ה-select element
  */
-async function loadTradesForCashFlow(selectId) {
+async function _REMOVED_loadTradesForCashFlow(selectId) {
   try {
     const response = await fetch('/api/trades/');
     if (!response.ok) {
@@ -1715,11 +1608,12 @@ async function loadTradesForCashFlow(selectId) {
   }
 }
 
+// REMOVED: loadTradePlansForCashFlow - not used, ModalManagerV2 uses SelectPopulatorService
 /**
  * Load trade plans for cash flow modals
  * @param {string} selectId - ID של ה-select element
  */
-async function loadTradePlansForCashFlow(selectId) {
+async function _REMOVED_loadTradePlansForCashFlow(selectId) {
   try {
     const response = await fetch('/api/trade_plans/');
     if (!response.ok) {
@@ -1763,8 +1657,10 @@ window.manageExternalIdField = manageExternalIdField;
 window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.deleteCashFlow = deleteCashFlow;
-window.showAddCashFlowModal = showAddCashFlowModal;
-window.showEditCashFlowModal = showEditCashFlowModal;
+window.performCashFlowDeletion = performCashFlowDeletion;
+// REMOVED: window exports for removed modal wrapper functions
+// Use window.ModalManagerV2.showModal('cashFlowModal', 'add') directly
+// Use window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', cashFlowId) directly
 // window.toggleSection removed - using global version from ui-utils.js
 window.editCashFlow = editCashFlow;
 window.loadCashFlowsData = loadCashFlowsData;
@@ -2000,8 +1896,9 @@ function generateDetailedLog() {
     return log.join('\n');
 }
 
+// REMOVED: generateDetailedLogForCashFlows - not used, use global generateDetailedLog from logger-service.js
 // Local  function for cash_flows page
-async function generateDetailedLogForCashFlows() {
+async function _REMOVED_generateDetailedLogForCashFlows() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
@@ -2032,7 +1929,7 @@ async function generateDetailedLogForCashFlows() {
 window.loadCashFlowsData = loadCashFlowsData;
 window.calculateBalance = calculateBalance;
 window.getAccountNameById = getAccountNameById;
-window.toggleCashFlowsSection = toggleCashFlowsSection;
+// REMOVED: window.toggleCashFlowsSection - use window.toggleSection('main') instead
 window.validateCashFlowForm = validateCashFlowForm;
 window.validateEditCashFlowForm = validateEditCashFlowForm;
 window.updatePageSummaryStats = updatePageSummaryStats;
@@ -2049,8 +1946,9 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
 window.manageExternalIdField = manageExternalIdField;
 window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
-window.showAddCashFlowModal = showAddCashFlowModal;
-window.showEditCashFlowModal = showEditCashFlowModal;
+// REMOVED: window exports for removed modal wrapper functions
+// Use window.ModalManagerV2.showModal('cashFlowModal', 'add') directly
+// Use window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', cashFlowId) directly
 window.editCashFlow = editCashFlow;
 window.generateDetailedLog = generateDetailedLog;
 window.editCashFlow = editCashFlow;
@@ -2073,8 +1971,9 @@ window.formatCashFlowAmount = formatCashFlowAmount;
 window.formatUsdRate = formatUsdRate;
 
 // פונקציות מודלים
-window.showAddCashFlowModal = showAddCashFlowModal;
-window.showEditCashFlowModal = showEditCashFlowModal;
+// REMOVED: window exports for removed modal wrapper functions
+// Use window.ModalManagerV2.showModal('cashFlowModal', 'add') directly
+// Use window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', cashFlowId) directly
 window.confirmDeleteCashFlow = confirmDeleteCashFlow;
 
 // פונקציות לוג וניפוי שגיאות

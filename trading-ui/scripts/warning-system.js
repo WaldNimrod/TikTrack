@@ -109,11 +109,6 @@ function showValidationWarning(fieldId, message, duration = 6000) {
  * @param {string} color - Bootstrap color class for the dialog (default: danger)
  */
 function showConfirmationDialog(title, message, onConfirm = null, onCancel = null, color = 'danger') {
-  console.log('🔥🔥🔥 showConfirmationDialog CALLED with:', { title, message, onConfirm: !!onConfirm, onCancel: !!onCancel, color });
-  
-  // showConfirmationDialog נקראה
-  // bootstrap קיים
-
   // יצירת מודל אישור דינמי
   const modalId = 'confirmationModal';
 
@@ -153,8 +148,6 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
   // הגדרת אירועי כפתורים
   const confirmBtn = modal.querySelector('.confirm-btn');
   const cancelBtn = modal.querySelector('button[data-button-type="CANCEL"]');
-  
-  console.log('🔥 showConfirmationDialog - confirmBtn:', confirmBtn, 'cancelBtn:', cancelBtn);
 
   // פונקציה לסגירת המודל
   const closeModal = () => {
@@ -175,22 +168,15 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
 
   // פונקציה לזימון callbacks רק פעם אחת
   const invokeCallbacks = (isConfirm) => {
-    console.log('🔥 showConfirmationDialog - invokeCallbacks called with isConfirm:', isConfirm, 'callbacksInvoked:', callbacksInvoked);
-    
     if (callbacksInvoked) {
-      console.log('🔥 showConfirmationDialog - Callbacks already invoked, skipping');
       return;
     }
     callbacksInvoked = true;
     
     if (isConfirm && typeof onConfirm === 'function') {
-      console.log('🔥 showConfirmationDialog - Invoking onConfirm callback');
       onConfirm();
     } else if (!isConfirm && typeof onCancel === 'function') {
-      console.log('🔥 showConfirmationDialog - Invoking onCancel callback');
       onCancel();
-    } else {
-      console.log('🔥 showConfirmationDialog - No callback to invoke, isConfirm:', isConfirm, 'onConfirm:', !!onConfirm, 'onCancel:', !!onCancel);
     }
   };
 
@@ -205,37 +191,24 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
 
   // אירוע אישור
   if (confirmBtn) {
-    console.log('🔥 showConfirmationDialog - Setting up confirm button click handler');
     confirmBtn.onclick = () => {
-      console.log('🔥 showConfirmationDialog - Confirm button clicked');
       modal.dataset.confirmed = 'true';
       invokeCallbacks(true);
       closeModal();
     };
-  } else {
-    console.log('❌ showConfirmationDialog - Confirm button not found!');
   }
 
   // אירוע ביטול
   if (cancelBtn) {
-    console.log('🔥 showConfirmationDialog - Setting up cancel button click handler');
     cancelBtn.onclick = () => {
-      console.log('🔥 showConfirmationDialog - Cancel button clicked');
       modal.dataset.cancelled = 'true';
       invokeCallbacks(false);
       closeModal();
     };
-  } else {
-    console.log('❌ showConfirmationDialog - Cancel button not found!');
   }
 
   // אירוע סגירה על ידי לחיצה מחוץ למודל או ESC
   modal.addEventListener('hidden.bs.modal', () => {
-    console.log('🔥 showConfirmationDialog - hidden.bs.modal event fired');
-    console.log('🔥 showConfirmationDialog - modal.dataset.confirmed:', modal.dataset.confirmed);
-    console.log('🔥 showConfirmationDialog - modal.dataset.cancelled:', modal.dataset.cancelled);
-    console.log('🔥 showConfirmationDialog - callbacksInvoked:', callbacksInvoked);
-    
     // רק אם לא זומנו callbacks (כדי למנוע כפילות)
     invokeCallbacks(false);
     // הסרת המודל מהדף
@@ -247,13 +220,9 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
   });
 
   // הצגת המודל
-  // מציג את המודל עם bootstrap
-  console.log('🔥 showConfirmationDialog - Attempting to show modal');
   try {
     const bootstrapModal = new bootstrap.Modal(modal);
     bootstrapModal.show();
-    console.log('✅ showConfirmationDialog - Modal shown successfully');
-    // המודל הוצג בהצלחה
   } catch (error) {
     console.error('❌ showConfirmationDialog - Bootstrap Modal Error:', error);
     // fallback ל-confirm רגיל
@@ -279,14 +248,11 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
  * @param {Function} onCancel - Callback for cancel action
  */
 function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null, onCancel = null) {
-  // showDeleteWarning נקראה עם
-  // showConfirmationDialog קיים
-
   const title = `מחיקת ${itemTypeDisplay}`;
   const message = `האם אתה בטוח שברצונך למחוק את ${itemTypeDisplay} "${itemName}"?\n\nפעולה זו אינה ניתנת לביטול.`;
 
-  // קורא ל-showConfirmationDialog עם צבע אדום למחיקה
-  showConfirmationDialog(title, message, onConfirm, onCancel, 'danger');
+  // קורא ל-showConfirmationDialog עם צבע לבן למחיקה
+  showConfirmationDialog(title, message, onConfirm, onCancel, 'warning');
 }
 
 // ===== GLOBAL CONFIRM REPLACEMENT =====
@@ -342,8 +308,6 @@ function overrideNativeConfirm() {
     // The actual logic will be handled by the dialog callbacks
     return false;
   };
-  
-  console.log('🔄 Native confirm() function overridden with custom dialog system');
 }
 
 /**
@@ -367,11 +331,9 @@ function smartConfirmReplacement() {
         () => {
           // User confirmed - we need to continue the original execution
           // This is tricky because we need to resume the calling function
-          console.log('✅ User confirmed:', message);
         },
         () => {
           // User cancelled
-          console.log('❌ User cancelled:', message);
         },
         'warning'
       );
@@ -380,8 +342,6 @@ function smartConfirmReplacement() {
       return false;
     }
   });
-  
-  console.log('🔄 Smart confirm replacement initialized');
 }
 
 // ===== EXPORT TO GLOBAL SCOPE =====

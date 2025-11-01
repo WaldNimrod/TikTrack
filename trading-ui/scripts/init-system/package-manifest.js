@@ -64,7 +64,7 @@
  * ============================================
  *
  * 1. BASE (13 scripts) - חובה לכל עמוד
- * 2. SERVICES (5 scripts) - שירותים כלליים
+ * 2. SERVICES (6 scripts) - שירותים כלליים
  * 3. UI-ADVANCED (3 scripts) - ממשק מתקדם
  * 4. CRUD (6 scripts) - עמודים עם טבלאות
  * 5. PREFERENCES (3 scripts) - העדפות
@@ -259,7 +259,15 @@ const PACKAGE_MANIFEST = {
         file: 'services/alert-condition-renderer.js',
         globalCheck: 'window.AlertConditionRenderer',
         description: 'מציג תנאי התראות',
-        required: false
+        required: false,
+        loadOrder: 8
+      },
+      {
+        file: 'services/linked-items-service.js',
+        globalCheck: 'window.LinkedItemsService',
+        description: 'שירות לוגיקה משותפת לפריטים מקושרים',
+        required: true,
+        loadOrder: 7
       }
     ],
     estimatedSize: '~120KB',
@@ -313,74 +321,99 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services'],
     scripts: [
       {
-        file: 'modules/business-module.js',
-        globalCheck: 'window.BusinessModule',
-        description: 'מודול עסקי',
-        required: true
-      },
-      {
-        file: 'modules/cache-module.js',
-        globalCheck: 'window.CacheModule',
-        description: 'מודול מטמון',
-        required: true
-      },
-      {
-        file: 'modules/communication-module.js',
-        globalCheck: 'window.CommunicationModule',
-        description: 'מודול תקשורת',
-        required: true
-      },
-      {
         file: 'modules/core-systems.js',
         globalCheck: 'window.CoreSystems',
         description: 'מערכות ליבה',
-        required: true
-      },
-      {
-        file: 'modules/data-advanced.js',
-        globalCheck: 'window.DataAdvanced',
-        description: 'נתונים מתקדמים',
-        required: true
+        required: true,
+        loadOrder: 3
       },
       {
         file: 'modules/data-basic.js',
         globalCheck: 'window.DataBasic',
         description: 'נתונים בסיסיים',
-        required: true
-      },
-      {
-        file: 'modules/dynamic-loader-config.js',
-        globalCheck: 'window.DynamicLoaderConfig',
-        description: 'תצורת טעינה דינמית',
-        required: true
-      },
-      {
-        file: 'modules/localstorage-sync.js',
-        globalCheck: 'window.LocalStorageSync',
-        description: 'סנכרון localStorage',
-        required: true
-      },
-      {
-        file: 'modules/polling-manager.js',
-        globalCheck: 'window.PollingManager',
-        description: 'מנהל סקר',
-        required: true
-      },
-      {
-        file: 'modules/ui-advanced.js',
-        globalCheck: 'window.UIAdvanced',
-        description: 'ממשק מתקדם',
-        required: true
+        required: true,
+        loadOrder: 4
       },
       {
         file: 'modules/ui-basic.js',
         globalCheck: 'window.UIBasic',
         description: 'ממשק בסיסי',
-        required: true
+        required: true,
+        loadOrder: 5
+      },
+      {
+        file: 'modules/cache-module.js',
+        globalCheck: 'window.CacheModule',
+        description: 'מודול מטמון',
+        required: true,
+        loadOrder: 6
+      },
+      {
+        file: 'modules/data-advanced.js',
+        globalCheck: 'window.DataAdvanced',
+        description: 'נתונים מתקדמים',
+        required: true,
+        loadOrder: 7
+      },
+      {
+        file: 'modules/ui-advanced.js',
+        globalCheck: 'window.UIAdvanced',
+        description: 'ממשק מתקדם',
+        required: true,
+        loadOrder: 8
+      },
+      {
+        file: 'modules/communication-module.js',
+        globalCheck: 'window.CommunicationModule',
+        description: 'מודול תקשורת',
+        required: true,
+        loadOrder: 9
+      },
+      {
+        file: 'modules/business-module.js',
+        globalCheck: 'window.BusinessModule',
+        description: 'מודול עסקי',
+        required: true,
+        loadOrder: 10
+      },
+      {
+        file: 'modules/localstorage-sync.js',
+        globalCheck: 'window.LocalStorageSync',
+        description: 'סנכרון localStorage',
+        required: true,
+        loadOrder: 11
+      },
+      {
+        file: 'modules/polling-manager.js',
+        globalCheck: 'window.PollingManager',
+        description: 'מנהל סקר',
+        required: true,
+        loadOrder: 12
+      },
+      {
+        file: 'modules/dynamic-loader-config.js',
+        globalCheck: 'window.DynamicLoaderConfig',
+        description: 'תצורת טעינה דינמית',
+        required: true,
+        loadOrder: 13
+      },
+      {
+        file: 'modal-navigation-manager.js',
+        globalCheck: 'window.modalNavigationManager',
+        description: 'מערכת ניווט מודולים מקוננים',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'modal-manager-v2.js',
+        globalCheck: 'window.ModalManagerV2',
+        description: 'מנהל מודלים V2',
+        required: true,
+        loadOrder: 2
       }
     ],
-    estimatedSize: '~200KB',
-    initTime: '~120ms'
+    estimatedSize: '~250KB',
+    initTime: '~140ms'
   },
 
   // 4. CRUD PACKAGE - עמודים עם טבלאות
@@ -515,40 +548,46 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'validation'],
     scripts: [
       {
-        file: 'conditions/condition-builder.js',
-        globalCheck: 'window.ConditionBuilder',
-        description: 'בונה תנאים',
-        required: true
-      },
-      {
-        file: 'conditions/conditions-crud-manager.js',
-        globalCheck: 'window.ConditionsCrudManager',
-        description: 'מנהל CRUD תנאים',
-        required: true
-      },
-      {
-        file: 'conditions/conditions-form-generator.js',
-        globalCheck: 'window.ConditionsFormGenerator',
-        description: 'מחולל טפסי תנאים',
-        required: true
-      },
-      {
-        file: 'conditions/conditions-initializer.js',
-        globalCheck: 'window.ConditionsInitializer',
-        description: 'מאתחל תנאים',
-        required: true
-      },
-      {
         file: 'conditions/conditions-translations.js',
         globalCheck: 'window.ConditionsTranslations',
         description: 'תרגומי תנאים',
-        required: true
+        required: true,
+        loadOrder: 1
       },
       {
         file: 'conditions/conditions-validator.js',
         globalCheck: 'window.ConditionsValidator',
         description: 'ולידטור תנאים',
-        required: true
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'conditions/condition-builder.js',
+        globalCheck: 'window.ConditionBuilder',
+        description: 'בונה תנאים',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'conditions/conditions-form-generator.js',
+        globalCheck: 'window.ConditionsFormGenerator',
+        description: 'מחולל טפסי תנאים',
+        required: true,
+        loadOrder: 4
+      },
+      {
+        file: 'conditions/conditions-crud-manager.js',
+        globalCheck: 'window.ConditionsCrudManager',
+        description: 'מנהל CRUD תנאים',
+        required: true,
+        loadOrder: 5
+      },
+      {
+        file: 'conditions/conditions-initializer.js',
+        globalCheck: 'window.ConditionsInitializer',
+        description: 'מאתחל תנאים',
+        required: true,
+        loadOrder: 6
       }
     ],
     estimatedSize: '~150KB',
@@ -605,46 +644,53 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services'],
     scripts: [
       {
-        file: 'charts/chart-export.js',
-        globalCheck: 'window.ChartExport',
-        description: 'ייצוא גרפים',
-        required: true
-      },
-      {
-        file: 'charts/chart-loader.js',
-        globalCheck: 'window.ChartLoader',
-        description: 'טוען גרפים',
-        required: true
+        file: 'charts/chart-theme.js',
+        globalCheck: 'window.ChartTheme',
+        description: 'ערכת גרפים',
+        required: true,
+        loadOrder: 1
       },
       {
         file: 'charts/chart-system.js',
         globalCheck: 'window.ChartSystem',
         description: 'מערכת גרפים',
-        required: true
+        required: true,
+        loadOrder: 2
       },
       {
-        file: 'charts/chart-theme.js',
-        globalCheck: 'window.ChartTheme',
-        description: 'ערכת גרפים',
-        required: true
+        file: 'charts/chart-loader.js',
+        globalCheck: 'window.ChartLoader',
+        description: 'טוען גרפים',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'charts/chart-export.js',
+        globalCheck: 'window.ChartExport',
+        description: 'ייצוא גרפים',
+        required: true,
+        loadOrder: 4
       },
       {
         file: 'charts/adapters/linter-adapter.js',
         globalCheck: 'window.LinterAdapter',
         description: 'מתאם לינטר',
-        required: true
+        required: true,
+        loadOrder: 5
       },
       {
         file: 'charts/adapters/performance-adapter.js',
         globalCheck: 'window.PerformanceAdapter',
         description: 'מתאם ביצועים',
-        required: true
+        required: true,
+        loadOrder: 6
       },
       {
         file: 'charts/adapters/trades-adapter.js',
         globalCheck: 'window.TradesAdapter',
         description: 'מתאם עסקאות',
-        required: true
+        required: true,
+        loadOrder: 7
       }
     ],
     estimatedSize: '~300KB',
@@ -665,25 +711,29 @@ const PACKAGE_MANIFEST = {
         file: 'unified-log-api.js',
         globalCheck: 'window.UnifiedLogAPI',
         description: 'API לוגים מאוחד',
-        required: true
-      },
-      {
-        file: 'unified-log-display.js',
-        globalCheck: 'window.UnifiedLogDisplay',
-        description: 'תצוגת לוגים מאוחדת',
-        required: true
+        required: true,
+        loadOrder: 1
       },
       {
         file: 'unified-log-manager.js',
         globalCheck: 'window.UnifiedLogManager',
         description: 'מנהל לוגים מאוחד',
-        required: true
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'unified-log-display.js',
+        globalCheck: 'window.UnifiedLogDisplay',
+        description: 'תצוגת לוגים מאוחדת',
+        required: true,
+        loadOrder: 3
       },
       {
         file: 'table-mappings.js',
         globalCheck: 'window.TABLE_COLUMN_MAPPINGS',
         description: 'מיפוי טבלאות',
-        required: true
+        required: true,
+        loadOrder: 4
       }
     ],
     estimatedSize: '~80KB',
@@ -701,16 +751,18 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services'],
     scripts: [
       {
-        file: 'cache-management.js',
-        globalCheck: 'window.cacheManagementPage',
-        description: 'ניהול מטמון',
-        required: true
-      },
-      {
         file: 'cache-policy-manager.js',
         globalCheck: 'window.CachePolicyManager',
         description: 'מנהל מדיניות מטמון',
-        required: true
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'cache-management.js',
+        globalCheck: 'window.cacheManagementPage',
+        description: 'ניהול מטמון',
+        required: true,
+        loadOrder: 2
       }
     ],
     estimatedSize: '~40KB',
@@ -731,59 +783,75 @@ const PACKAGE_MANIFEST = {
         file: 'account-service.js',
         globalCheck: 'window.getAccounts',
         description: 'שירות חשבונות',
-        required: true
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'services/account-balance-service.js',
+        globalCheck: 'window.AccountBalanceService',
+        description: 'שירות יתרות חשבונות',
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'alert-service.js',
         globalCheck: 'window.getAlertState',
         description: 'שירות התראות',
-        required: true
+        required: true,
+        loadOrder: 3
       },
       {
         file: 'ticker-service.js',
         globalCheck: 'window.tickerService',
         description: 'שירות טיקרים',
-        required: true
+        required: true,
+        loadOrder: 4
       },
       {
         file: 'trade-plan-service.js',
         globalCheck: 'window.getTradePlans',
         description: 'שירות תכניות מסחר',
-        required: true
+        required: true,
+        loadOrder: 5
       },
       {
         file: 'active-alerts-component.js',
         globalCheck: 'window.updateActiveAlertsComponent',
         description: 'רכיב התראות פעילות',
-        required: true
+        required: true,
+        loadOrder: 6
       },
       {
         file: 'condition-translator.js',
         globalCheck: 'window.conditionTranslator',
         description: 'מתרגם תנאים',
-        required: true
+        required: true,
+        loadOrder: 7
       },
       {
         file: 'constraints.js',
         globalCheck: 'window.toggleLayer',
         description: 'מערכת אילוצים',
-        required: true
+        required: true,
+        loadOrder: 8
       },
       {
         file: 'linked-items.js',
         globalCheck: 'window.viewLinkedItems',
         description: 'פריטים מקושרים',
-        required: true
+        required: true,
+        loadOrder: 9
       },
       {
         file: 'related-object-filters.js',
         globalCheck: 'window.filterByRelatedObjectType',
         description: 'פילטרים של אובייקטים קשורים',
-        required: true
+        required: true,
+        loadOrder: 10
       }
     ],
-    estimatedSize: '~150KB',
-    initTime: '~100ms'
+    estimatedSize: '~180KB',
+    initTime: '~110ms'
   },
 
   // 11. HELPER PACKAGE - עזר
@@ -800,29 +868,26 @@ const PACKAGE_MANIFEST = {
         file: 'currencies.js',
         globalCheck: 'window.openCurrencyDetails',
         description: 'מערכת מטבעות',
-        required: true
+        required: true,
+        loadOrder: 1
       },
       {
         file: 'designs.js',
         globalCheck: 'window.generateDetailedLog',
         description: 'מערכת עיצובים',
-        required: true
-      },
-      {
-        file: 'notes.js',
-        globalCheck: 'window.loadNotesData',
-        description: 'מערכת הערות',
-        required: true
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'research.js',
         globalCheck: 'window.initializeResearchPage',
         description: 'מערכת מחקר',
-        required: true
+        required: true,
+        loadOrder: 3
       }
     ],
-    estimatedSize: '~60KB',
-    initTime: '~40ms'
+    estimatedSize: '~45KB',
+    initTime: '~30ms'
   },
 
   // 12. SYSTEM-MANAGEMENT PACKAGE - ניהול מערכת
@@ -929,34 +994,39 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services'],
     scripts: [
       {
+        file: 'auth.js',
+        globalCheck: 'window.login',
+        description: 'מערכת אימות',
+        required: true,
+        loadOrder: 1
+      },
+      {
         file: 'server-monitor.js',
         globalCheck: 'window.ServerMonitor',
         description: 'ניטור שרת',
-        required: true
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'background-tasks.js',
         globalCheck: 'window.BackgroundTasksManager',
         description: 'משימות רקע',
-        required: true
-      },
-      {
-        file: 'auth.js',
-        globalCheck: 'window.login',
-        description: 'מערכת אימות',
-        required: true
-      },
-      {
-        file: 'system-management.js',
-        globalCheck: 'window.generateDetailedLog',
-        description: 'ניהול מערכת כללי',
-        required: true
+        required: true,
+        loadOrder: 3
       },
       {
         file: 'constraint-manager.js',
         globalCheck: 'window.addEnumValue',
         description: 'מנהל אילוצים',
-        required: true
+        required: true,
+        loadOrder: 4
+      },
+      {
+        file: 'system-management.js',
+        globalCheck: 'window.generateDetailedLog',
+        description: 'ניהול מערכת כללי',
+        required: true,
+        loadOrder: 5
       }
     ],
     estimatedSize: '~200KB',
@@ -1045,26 +1115,6 @@ const PACKAGE_MANIFEST = {
     initTime: '~35ms'
   },
 
-  // 17. CASH-FLOWS PACKAGE - תזרימי מזומנים
-  'cash-flows': {
-    id: 'cash-flows',
-    name: 'Cash Flows Package',
-    description: 'מערכת תזרימי מזומנים',
-    version: '2.0.0',
-    critical: false,
-    loadOrder: 17,
-    dependencies: ['base', 'crud', 'services'],
-    scripts: [
-      {
-        file: 'cash_flows.js',
-        globalCheck: 'window.loadCashFlowsData',
-        description: 'מערכת תזרימי מזומנים',
-        required: true
-      }
-    ],
-    estimatedSize: '~30KB',
-    initTime: '~20ms'
-  },
 
   // 17. ENTITY DETAILS PACKAGE - פרטי ישויות
   'entity-details': {
@@ -1131,6 +1181,28 @@ const PACKAGE_MANIFEST = {
     initTime: '~15ms'
   },
 
+  // 18. IMPORT PACKAGE - ייבוא נתונים
+  'import': {
+    id: 'import',
+    name: 'Import Package',
+    description: 'מערכת ייבוא נתוני משתמש (CSV)',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 18,
+    dependencies: ['base', 'services', 'crud', 'entity-services'],
+    scripts: [
+      {
+        file: 'import-user-data.js',
+        globalCheck: 'window.initializeImportUserDataModal',
+        description: 'מערכת ייבוא נתוני משתמש',
+        required: true,
+        loadOrder: 1
+      }
+    ],
+    estimatedSize: '~80KB',
+    initTime: '~50ms'
+  },
+
   // 19. INIT PACKAGE - אתחול
   'init-system': {
     id: 'init-system',
@@ -1139,7 +1211,7 @@ const PACKAGE_MANIFEST = {
     version: '2.0.0',
     critical: false,
     loadOrder: 19,
-    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'filters', 'advanced-notifications', 'cash-flows', 'entity-details', 'info-summary'],
+    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'filters', 'advanced-notifications', 'entity-details', 'info-summary', 'import'],
     scripts: [
       {
         file: 'init-system/package-manifest.js',
@@ -1156,11 +1228,25 @@ const PACKAGE_MANIFEST = {
         loadOrder: 2
       },
       {
+        file: 'init-system-check.js',
+        globalCheck: 'window.initSystemCheck',
+        description: 'בדיקת מערכת איתחול',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'monitoring-functions.js',
+        globalCheck: 'window.runDetailedPageScan',
+        description: 'פונקציות ניטור עמודים',
+        required: true,
+        loadOrder: 4
+      },
+      {
         file: 'unified-app-initializer.js',
         globalCheck: 'window.UnifiedAppInitializer',
         description: 'מאתחל אפליקציה מאוחד',
         required: true,
-        loadOrder: 3
+        loadOrder: 5
       },
     ],
     estimatedSize: '~45KB',

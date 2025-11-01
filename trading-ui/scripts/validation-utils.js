@@ -16,6 +16,7 @@
 // ===== CONSTANTS =====
 
 // כללי ולידציה ברירת מחדל
+if (typeof window.DEFAULT_VALIDATION_RULES === 'undefined') {
 const DEFAULT_VALIDATION_RULES = {
   text: {
     required: false,
@@ -47,6 +48,8 @@ const DEFAULT_VALIDATION_RULES = {
     customValidation: null,
   },
 };
+  window.DEFAULT_VALIDATION_RULES = DEFAULT_VALIDATION_RULES;
+}
 
 // ===== HELPER FUNCTIONS =====
 

@@ -5,20 +5,19 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 5
+ * Total Functions: 4
  * 
  * PAGE INITIALIZATION (1)
  * - initializePreferencesPage() - initializePreferencesPage function
  * 
  * DATA LOADING (1)
- * - loadAccountsForPreferences() - Loads trading accounts for default account preference
+ * - loadAccountsForPreferences() - loadAccountsForPreferences function
  * 
  * DATA MANIPULATION (1)
  * - createNewProfile() - createNewProfile function
  * 
- * OTHER (2)
+ * OTHER (1)
  * - switchActiveProfile() - switchActiveProfile function
- * - copyDetailedLogLocal() - copyDetailedLogLocal function
  * 
  * ==========================================
  */

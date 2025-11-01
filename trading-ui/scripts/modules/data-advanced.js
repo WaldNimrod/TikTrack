@@ -21,15 +21,14 @@
  * @param {*} value - הערך לבדיקה
  * @returns {boolean} true אם הערך הוא מספרי
  */
-function isNumeric(value) {
+// REMOVED: isNumeric - use window.isNumeric from data-utils.js directly
+// ייצוא פונקציה גלובלית - משתמש בגרסה הגלובלית
+window.isNumeric = window.isNumeric || function(value) {
   if (value === null || value === undefined || value === '') {
     return false;
   }
   return !isNaN(parseFloat(value)) && isFinite(value);
-}
-
-// ייצוא פונקציה גלובלית
-window.isNumeric = isNumeric;
+};
 
 // ===== Currency Management =====
 

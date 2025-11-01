@@ -17,7 +17,7 @@
   const ENDPOINT = '/api/system-settings/external-data';
 
   /**
-   * Handle API response
+   * Handle API response - helper for saveSettings
    * @function handleResponse
    * @async
    * @param {Response} response - Fetch response object
@@ -39,17 +39,7 @@
     return body;
   }
 
-  /**
-   * Get external data settings
-   * @function getSettings
-   * @async
-   * @returns {Promise<Object|null>} Settings object
-   * @throws {Error} HTTP error message
-   */
-  async function getSettings() {
-    const resp = await fetch(ENDPOINT, { method: 'GET' });
-    return handleResponse(resp);
-  }
+  // REMOVED: getSettings - not used anywhere
 
   /**
    * Save external data settings
@@ -70,7 +60,7 @@
 
   // ===== GLOBAL EXPORTS =====
   window.ExternalDataSettingsService = {
-    getSettings,
+    // getSettings - removed: not used
     saveSettings,
   };
 })();

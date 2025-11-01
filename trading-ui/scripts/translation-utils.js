@@ -236,22 +236,7 @@ function translateCashFlowSource(source) {
 
 // ===== תרגום קטגוריות =====
 
-/**
- * תרגום שם קטגורית בדיקה לעברית
- * @param {string} category - הקטגוריה באנגלית
- * @returns {string} הקטגוריה בעברית
- */
-function translateTestCategory(category) {
-  const categoryNames = {
-    'unit_tests': 'יחידה',
-    'integration_tests': 'אינטגרציה',
-    'e2e_tests': 'End-to-End',
-    'performance_tests': 'ביצועים',
-    'security_tests': 'אבטחה',
-    'load_tests': 'עומס',
-  };
-  return categoryNames[category] || category;
-}
+// REMOVED: translateTestCategory - not used anywhere
 
 // ===== LANGUAGE MANAGEMENT =====
 
@@ -477,7 +462,7 @@ window.convertAlertStatusToHebrew = translateAlertStatus;
 window.convertIsTriggeredToHebrew = translateIsTriggered;
 window.getTypeDisplay = translateTradeType; // trades.js
 window.getTypeDisplayName = translateCashFlowType; // cash_flows.js
-window.getCategoryDisplayName = translateTestCategory; // preferences-new.js
+// window.getCategoryDisplayName - removed: translateTestCategory not used
 
 // ===== פונקציות פורמט מספרים =====
 
@@ -607,7 +592,7 @@ window.translationUtils = {
   translateTradePlanType,
   translateCashFlowType,
   translateCashFlowSource,
-  translateTestCategory,
+  // translateTestCategory - removed: not used
   translateExecutionAction,
   // Formatting functions
   formatNumberWithCommas,
@@ -620,7 +605,7 @@ window.translationUtils = {
 };
 
 // Alert Condition Translation Functions
-window.translateAlertCondition = translateAlertConditionById;
+// window.translateAlertCondition = translateAlertConditionById; // REMOVED: translateAlertConditionById removed
 window.translateConditionFields = translateConditionFields;
 window.translateLegacyCondition = translateLegacyCondition;
 window.findAlertById = findAlertById;
@@ -737,34 +722,30 @@ function getCashFlowCurrencyDisplay(cashFlow) {
 
 // ===== פונקציות תרגום תנאי התראות =====
 
-/**
- * תרגום תנאי התראה לפי מזהה
- * @param {number} alertId - מזהה ההתראה
- * @returns {string} - מחרוזת מתורגמת לעברית
- */
-function translateAlertConditionById(alertId) {
-  // חיפוש ההתראה בדאטהבייס או בזכרון
-  const alert = findAlertById(alertId);
-  if (!alert) {
-    return 'תנאי לא ידוע';
-  }
-
-  // אם יש שדות חדשים, השתמש בהם
-  if (alert.condition_attribute && alert.condition_operator && alert.condition_number !== undefined) {
-    return translateConditionFields(
-      alert.condition_attribute,
-      alert.condition_operator,
-      alert.condition_number,
-    );
-  }
-
-  // אחרת, השתמש בפורמט הישן
-  if (alert.condition) {
-    return translateLegacyCondition(alert.condition);
-  }
-
-  return 'תנאי לא ידוע';
-}
+// REMOVED: translateAlertConditionById - exported but not used, translateAlertCondition is used instead
+// function _REMOVED_translateAlertConditionById(alertId) {
+//   // חיפוש ההתראה בדאטהבייס או בזכרון
+//   const alert = findAlertById(alertId);
+//   if (!alert) {
+//     return 'תנאי לא ידוע';
+//   }
+//
+//   // אם יש שדות חדשים, השתמש בהם
+//   if (alert.condition_attribute && alert.condition_operator && alert.condition_number !== undefined) {
+//     return translateConditionFields(
+//       alert.condition_attribute,
+//       alert.condition_operator,
+//       alert.condition_number,
+//     );
+//   }
+//
+//   // אחרת, השתמש בפורמט הישן
+//   if (alert.condition) {
+//     return translateLegacyCondition(alert.condition);
+//   }
+//
+//   return 'תנאי לא ידוע';
+// }
 
 /**
  * תרגום תנאי לפי שלושת השדות החדשים

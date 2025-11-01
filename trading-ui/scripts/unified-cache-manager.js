@@ -1,4 +1,19 @@
 /**
+ * Unified Cache Manager - Comprehensive Function Index
+ * ==========================================
+ * 
+ * This file contains the unified cache management system with 4 layers:
+ * Memory, localStorage, IndexedDB, and Backend Cache.
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_CACHE_SYSTEM.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0
+ * Last Updated: 2025-01-27
+ */
+
+/**
  * ========================================
  * Unified Cache Manager - TikTrack
  * ========================================
@@ -152,7 +167,10 @@ class UnifiedCacheManager {
             'market-data': { layer: 'backend', ttl: 30000, compress: false },
             'trade-data': { layer: 'backend', ttl: 30000, compress: false },
             'dashboard-data': { layer: 'backend', ttl: 300000, compress: false },
-            'trade-positions': { layer: 'memory', ttl: 300000, compress: false, maxSize: 500 * 1024, validate: true, syncToBackend: false }
+            'trade-positions': { layer: 'memory', ttl: 300000, compress: false, maxSize: 500 * 1024, validate: true, syncToBackend: false },
+            'account-activity-data': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
+            'account-activity-*': { layer: 'backend', ttl: 60000, compress: false },
+            'account-balance-*': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] }
         };
         
         // ממשקי שכבות מטמון
@@ -198,7 +216,11 @@ class UnifiedCacheManager {
                 this.layers.indexedDB = new IndexedDBLayer();
                 await this.layers.indexedDB.initialize();
             } else {
-                window.Logger.warn('⚠️ IndexedDB not available, using localStorage fallback', { page: "unified-cache-manager" });
+                if (typeof window.Logger !== 'undefined' && window.Logger.warn) {
+                    window.Logger.warn('⚠️ IndexedDB not available, using localStorage fallback', { page: "unified-cache-manager" });
+                } else {
+                    console.warn('⚠️ IndexedDB not available, using localStorage fallback');
+                }
                 this.layers.indexedDB = new LocalStorageLayer();
             }
             
@@ -331,7 +353,7 @@ class UnifiedCacheManager {
             
             // אם לא נמצא, נסה fallback
             if (options.fallback) {
-                window.Logger.info(`⚠️ Key ${key} not found, using fallback`, { page: "unified-cache-manager" });
+                window.Logger.debug(`⚠️ Key ${key} not found, using fallback`, { page: "unified-cache-manager" });
                 const fallbackData = await options.fallback();
                 
                 // שמור את הנתונים מהשירות למטמון
@@ -345,7 +367,7 @@ class UnifiedCacheManager {
             const responseTime = performance.now() - startTime;
             this.updatePerformanceStats(responseTime, false);
             
-            window.Logger.info(`❌ Key ${key} not found in any layer`, { page: "unified-cache-manager" });
+            window.Logger.debug(`❌ Key ${key} not found in any layer`, { page: "unified-cache-manager" });
             return null;
             
         } catch (error) {
@@ -509,7 +531,7 @@ class UnifiedCacheManager {
             if (removed) {
                 window.Logger.info(`✅ Removed ${key} from cache`, { page: "unified-cache-manager" });
             } else {
-                window.Logger.info(`⚠️ Key ${key} not found for removal`, { page: "unified-cache-manager" });
+                window.Logger.debug(`⚠️ Key ${key} not found for removal`, { page: "unified-cache-manager" });
             }
             
             return removed;
@@ -1025,7 +1047,14 @@ class LocalStorageLayer {
         try {
             const fullKey = this.prefix + key;
             const value = localStorage.getItem(fullKey);
-            return value ? JSON.parse(value) : null;
+            if (value === null || value === undefined) {
+                return null;
+            }
+            // Handle "undefined" string that was stored incorrectly
+            if (value === 'undefined' || value === 'null') {
+                return null;
+            }
+            return JSON.parse(value);
         } catch (error) {
             window.Logger.error('❌ LocalStorage get failed:', error, { page: "unified-cache-manager" });
             return null;
@@ -1519,6 +1548,13 @@ if (window.UnifiedInitializationSystem) {
  * @param {Object} options - Options for clearing
  * @returns {Promise<Object>} Result with success status and details
  */
+/**
+ * Clear all cache layers
+ * @function clearAllCache
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
     try {
         window.Logger.info('🔄 Starting complete cache clearing process...', { page: "unified-cache-manager" });
@@ -1549,16 +1585,19 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             errors.push(`Unified Cache: ${error.message}`);
         }
         
-        // 1.5. Clear Preferences Cache Manager
+        // 1.5. Clear Preferences Cache (PreferencesCore uses UnifiedCacheManager, so already cleared above)
+        // PreferencesCore no longer has its own cacheManager - it uses UnifiedCacheManager directly
+        // All preference cache keys are prefixed with 'preference_' and are already cleared in step 1
+        // No need to clear PreferencesCore.cacheManager because it doesn't exist anymore
         try {
-            if (window.PreferencesCore && window.PreferencesCore.cacheManager) {
-                window.PreferencesCore.cacheManager.clear();
-                clearedLayers.push('Preferences Cache Manager');
-                window.Logger.info('✅ Preferences Cache Manager cleared successfully', { page: "unified-cache-manager" });
+            // Just log that preferences cache is cleared via UnifiedCacheManager
+            if (window.PreferencesCore) {
+                clearedLayers.push('Preferences Cache (via UnifiedCacheManager)');
+                window.Logger.info('✅ Preferences cache cleared via UnifiedCacheManager', { page: "unified-cache-manager" });
             }
         } catch (error) {
-            window.Logger.error('❌ Error clearing Preferences Cache Manager:', error, { page: "unified-cache-manager" });
-            errors.push(`Preferences Cache Manager: ${error.message}`);
+            window.Logger.error('❌ Error logging preferences cache clear:', error, { page: "unified-cache-manager" });
+            // Don't add to errors - this is just logging
         }
         
         // 2. Clear localStorage (only our keys)
@@ -1578,9 +1617,30 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 if (key.startsWith('tiktrack_all_preferences_')) return true;
                 if (key.startsWith('tiktrack_preference_group_')) return true;
                 
-                // User preferences
+                // User preferences - legacy keys
                 if (key === 'user-preferences') return true;
                 if (key === 'tiktrack_user-preferences') return true;
+                if (key === 'tikTrack_preferences') return true; // Legacy fallback key
+                if (key === 'tt:preferences') return true; // Cross-tab sync key
+                
+                // Orphan Keys - State Management
+                if (key === 'cashFlowsSectionState') return true;
+                if (key === 'executionsTopSectionCollapsed') return true;
+                if (key.startsWith('sortState_')) return true;
+                if (key.startsWith('section-visibility-')) return true;
+                if (key.startsWith('top-section-collapsed-')) return true;
+                
+                // Orphan Keys - User Preferences
+                if (key === 'colorScheme') return true;
+                if (key === 'customColorScheme') return true;
+                if (key === 'headerFilters') return true;
+                if (key === 'consoleSettings') return true;
+                
+                // Orphan Keys - Testing/Debug
+                if (key === 'crud_test_results') return true;
+                if (key === 'linterLogs') return true;
+                if (key === 'css-duplicates-results') return true;
+                if (key === 'serverMonitorSettings') return true;
                 
                 return false;
             });
@@ -1610,9 +1670,30 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 if (key.startsWith('tiktrack_all_preferences_')) return true;
                 if (key.startsWith('tiktrack_preference_group_')) return true;
                 
-                // User preferences
+                // User preferences - legacy keys
                 if (key === 'user-preferences') return true;
                 if (key === 'tiktrack_user-preferences') return true;
+                if (key === 'tikTrack_preferences') return true; // Legacy fallback key
+                if (key === 'tt:preferences') return true; // Cross-tab sync key
+                
+                // Orphan Keys - State Management
+                if (key === 'cashFlowsSectionState') return true;
+                if (key === 'executionsTopSectionCollapsed') return true;
+                if (key.startsWith('sortState_')) return true;
+                if (key.startsWith('section-visibility-')) return true;
+                if (key.startsWith('top-section-collapsed-')) return true;
+                
+                // Orphan Keys - User Preferences
+                if (key === 'colorScheme') return true;
+                if (key === 'customColorScheme') return true;
+                if (key === 'headerFilters') return true;
+                if (key === 'consoleSettings') return true;
+                
+                // Orphan Keys - Testing/Debug
+                if (key === 'crud_test_results') return true;
+                if (key === 'linterLogs') return true;
+                if (key === 'css-duplicates-results') return true;
+                if (key === 'serverMonitorSettings') return true;
                 
                 return false;
             });
@@ -1704,14 +1785,15 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                     window.Logger.info('✅ Service Worker unregistered', { page: "unified-cache-manager" });
                 }
                 if (registrations.length > 0) {
-                    clearedLayers.push(`Service Worker (${registrations.length} workers)`);
+                    clearedLayers.push(`Service Worker (${registrations.length} registrations)`);
                 }
             } catch (error) {
                 window.Logger.warn('⚠️ Error unregistering Service Worker:', error, { page: "unified-cache-manager" });
+                errors.push(`Service Worker: ${error.message}`);
             }
         }
-
-        // 5.5. Clear Cache API (if exists)
+        
+        // 5.5. Clear Cache API (Browser Cache)
         if ('caches' in window) {
             try {
                 const cacheNames = await caches.keys();
@@ -1728,11 +1810,11 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             }
         }
         
-        // 6. Clear specific cache keys
+        // 6. Clear specific cache keys and global variables
         const cacheKeys = [
             'user-preferences', 'ui-state', 'filter-state', 'notifications-history',
             'file-mappings', 'linter-results', 'js-analysis', 'market-data',
-            'trade-data', 'dashboard-data'
+            'trade-data', 'dashboard-data', 'tikTrack_preferences'
         ];
         
         try {
@@ -1745,6 +1827,241 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
         } catch (error) {
             window.Logger.error('❌ Error clearing specific cache keys:', error, { page: "unified-cache-manager" });
             errors.push(`Cache Keys: ${error.message}`);
+        }
+        
+        // 6.5. Clear Window Variables (page data objects)
+        try {
+            const windowVars = [
+                'tradePlansData', 'tradePlansLoaded',
+                'trading_accountsData', 'allTradingAccountsData',
+                'trading_accountsLoaded', 'currenciesData', 'currenciesLoaded',
+                'colorPreferencesLoaded', 'alertsData', 'alertsLoaded',
+                'tradesData', 'tradesLoaded', 'tickersData', 'tickersLoaded',
+                'executionsData', 'executionsLoaded', 'notesData', 'notesLoaded',
+                'cashFlowsData', 'cashFlowsLoaded', 'researchData', 'researchLoaded'
+            ];
+            
+            let clearedCount = 0;
+            windowVars.forEach(varName => {
+                if (window.hasOwnProperty(varName)) {
+                    delete window[varName];
+                    clearedCount++;
+                }
+            });
+            
+            if (clearedCount > 0) {
+                clearedLayers.push(`Window Variables (${clearedCount} variables)`);
+                window.Logger.info(`✅ Window variables cleared successfully (${clearedCount} variables)`, { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing window variables:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.6. Clear global preference variables
+        try {
+            window.__latestPrefs = null;
+            window.currentPreferences = null;
+            clearedLayers.push('Global Preference Variables');
+            window.Logger.info('✅ Global preference variables cleared successfully', { page: "unified-cache-manager" });
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing global variables:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.7. Clear Service Caches
+        try {
+            const servicesToClear = [
+                'EntityDetailsAPI', 'entityDetailsAPI', 'ExternalDataService', 
+                'externalDataService', 'YahooFinanceService', 'yahooFinanceService',
+                'TradesAdapter', 'LinterAdapter', 'PerformanceAdapter',
+                'AccountService', 'accountService', 'TickerService', 'tickerService'
+            ];
+            
+            const clearedServices = [];
+            servicesToClear.forEach(serviceName => {
+                const service = window[serviceName];
+                if (service && service.cache && typeof service.cache.clear === 'function') {
+                    service.cache.clear();
+                    clearedServices.push(serviceName);
+                }
+                // Special case: YahooFinanceService has loadingPromises too
+                if ((serviceName === 'YahooFinanceService' || serviceName === 'yahooFinanceService') && 
+                    service?.loadingPromises?.clear) {
+                    service.loadingPromises.clear();
+                }
+            });
+            
+            // Dynamic scan for any remaining cache objects
+            for (const key in window) {
+                if (window[key] && 
+                    typeof window[key] === 'object' && 
+                    window[key].cache instanceof Map) {
+                    window[key].cache.clear();
+                    if (!clearedServices.includes(key)) {
+                        clearedServices.push(key);
+                    }
+                }
+            }
+            
+            if (clearedServices.length > 0) {
+                clearedLayers.push(`Service Caches (${clearedServices.length} services)`);
+                window.Logger.info(`✅ Service caches cleared: ${clearedServices.join(', ')}`, { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing service caches:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.8. Clear Preferences Cache Objects
+        try {
+            const preferencesObjects = [
+                'PreferenceValidator', 'PreferencesUI', 
+                'PreferencesLazyLoader', 'PreferencesColors', 'PreferencesCore'
+            ];
+            
+            const clearedObjects = [];
+            preferencesObjects.forEach(objName => {
+                const obj = window[objName];
+                if (obj) {
+                    // Clear all Map and Set properties
+                    Object.keys(obj).forEach(key => {
+                        try {
+                            const value = obj[key];
+                            if (value instanceof Map || value instanceof Set) {
+                                value.clear();
+                                clearedObjects.push(`${objName}.${key}`);
+                            }
+                        } catch (e) {
+                            // Skip if property is not accessible
+                        }
+                    });
+                }
+            });
+            
+            // Also check PreferencesCore instance
+            if (window.PreferencesCore) {
+                ['existenceCache', 'validators', 'timestamps', 'constraints'].forEach(prop => {
+                    if (window.PreferencesCore.validationManager && 
+                        window.PreferencesCore.validationManager[prop]?.clear) {
+                        window.PreferencesCore.validationManager[prop].clear();
+                        clearedObjects.push(`PreferencesCore.validationManager.${prop}`);
+                    }
+                });
+            }
+            
+            if (clearedObjects.length > 0) {
+                clearedLayers.push(`Preferences Cache Objects (${clearedObjects.length} objects)`);
+                window.Logger.info(`✅ Preferences cache objects cleared: ${clearedObjects.length} objects`, { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing preferences cache objects:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.9. Clear CSS Management Cache
+        try {
+            let cssCleared = false;
+            if (typeof mergedDuplicates !== 'undefined' && mergedDuplicates?.clear) {
+                mergedDuplicates.clear();
+                cssCleared = true;
+            }
+            if (typeof removedDuplicates !== 'undefined' && removedDuplicates?.clear) {
+                removedDuplicates.clear();
+                cssCleared = true;
+            }
+            
+            if (cssCleared) {
+                clearedLayers.push('CSS Management Cache');
+                window.Logger.info('✅ CSS Management cache cleared successfully', { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing CSS management cache:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.10. Clear Dynamic Window Variables (catch-all for any remaining data variables)
+        try {
+            const dynamicPatterns = [
+                /Data$/,           // e.g., alertsData, tradesData
+                /Loaded$/,        // e.g., alertsLoaded, tradesLoaded
+                /Cache$/,         // e.g., preferencesCache
+                /State$/,          // e.g., uiState, formState
+                /Config$/,        // e.g., modalConfig
+                /ModalConfig$/    // e.g., tradePlansModalConfig
+            ];
+            
+            let dynamicCleared = 0;
+            for (const key in window) {
+                // Skip standard window properties and functions
+                if (key.startsWith('webkit') || key.startsWith('moz') || 
+                    key.startsWith('ms') || key === 'console' || 
+                    key === 'localStorage' || key === 'sessionStorage' ||
+                    key === 'indexedDB' || key === 'document' || key === 'navigator' ||
+                    typeof window[key] === 'function' || key.startsWith('on') ||
+                    key === 'location' || key === 'history' || key === 'screen') {
+                    continue;
+                }
+                
+                // Check if variable matches data patterns
+                const matchesPattern = dynamicPatterns.some(pattern => pattern.test(key));
+                if (matchesPattern && window.hasOwnProperty(key)) {
+                    try {
+                        delete window[key];
+                        dynamicCleared++;
+                    } catch (e) {
+                        // Skip if cannot delete (e.g., read-only property)
+                    }
+                }
+            }
+            
+            if (dynamicCleared > 0) {
+                clearedLayers.push(`Dynamic Window Variables (${dynamicCleared} variables)`);
+                window.Logger.info(`✅ Dynamic window variables cleared successfully (${dynamicCleared} variables)`, { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing dynamic window variables:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.11. Clear Cookies (if any TikTrack cookies exist)
+        try {
+            if (document.cookie) {
+                const cookies = document.cookie.split(';');
+                let cookiesCleared = 0;
+                cookies.forEach(cookie => {
+                    const cookieName = cookie.split('=')[0].trim();
+                    // Only clear cookies that look like TikTrack cookies
+                    if (cookieName.toLowerCase().includes('tiktrack') || 
+                        cookieName.toLowerCase().includes('tt_') ||
+                        cookieName.toLowerCase().includes('cache')) {
+                        // Clear cookie by setting expiration to past
+                        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+                        cookiesCleared++;
+                    }
+                });
+                
+                if (cookiesCleared > 0) {
+                    clearedLayers.push(`Cookies (${cookiesCleared} cookies)`);
+                    window.Logger.info(`✅ Cookies cleared successfully (${cookiesCleared} cookies)`, { page: "unified-cache-manager" });
+                }
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing cookies:', error, { page: "unified-cache-manager" });
+        }
+        
+        // 6.12. Clear DOM Cache (data attributes that might be used as cache)
+        try {
+            // Clear any data-cache attributes on elements
+            const elementsWithCache = document.querySelectorAll('[data-cache], [data-cached]');
+            let domCacheCleared = 0;
+            elementsWithCache.forEach(el => {
+                el.removeAttribute('data-cache');
+                el.removeAttribute('data-cached');
+                domCacheCleared++;
+            });
+            
+            if (domCacheCleared > 0) {
+                clearedLayers.push(`DOM Cache (${domCacheCleared} elements)`);
+                window.Logger.info(`✅ DOM cache attributes cleared successfully (${domCacheCleared} elements)`, { page: "unified-cache-manager" });
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing DOM cache:', error, { page: "unified-cache-manager" });
         }
         
         // 7. Garbage Collection
@@ -1780,7 +2097,29 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             }
         }
         
-        // 10. Refresh data from backend database
+        // 10. Clear Backend Cache (Server-side cache)
+        try {
+            window.Logger.info('🔄 Clearing backend server cache...', { page: "unified-cache-manager" });
+            const response = await fetch('/api/cache/clear', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                clearedLayers.push(`Backend Cache (${result.data?.preferences_cache || 'cleared'})`);
+                window.Logger.info('✅ Backend cache cleared successfully', { page: "unified-cache-manager" });
+            } else {
+                throw new Error(`Backend cache clear failed: ${response.status}`);
+            }
+        } catch (error) {
+            window.Logger.warn('⚠️ Failed to clear backend cache:', error, { page: "unified-cache-manager" });
+            errors.push(`Backend Cache: ${error.message}`);
+        }
+        
+        // 11. Refresh data from backend database
         try {
             window.Logger.info('🔄 Refreshing data from backend database...', { page: "unified-cache-manager" });
             await this.refreshDataFromBackend();
@@ -1808,6 +2147,13 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
  * @param {Object} options - Options for clearing
  * @returns {Promise<Object>} Result with success status
  */
+/**
+ * Clear all cache quickly with auto-refresh
+ * @function clearAllCacheQuick
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) {
     try {
         window.Logger.info('🧹 Quick cache clearing for development...', { page: "unified-cache-manager" });
@@ -1826,11 +2172,38 @@ UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) 
                 );
             }
             
-            // Auto-refresh after 1.5 seconds
+            // Auto-refresh after 1.5 seconds with confirmation dialog
             if (options.autoRefresh !== false) {
+                console.log('🔄 clearAllCacheQuick: Setting up auto-refresh in 1.5 seconds...');
                 setTimeout(() => {
-                    window.location.reload(true);
+                    console.log('🔄 clearAllCacheQuick: Showing confirmation dialog before reload...');
+                    
+                    // Show confirmation dialog before reload
+                    if (typeof window.showConfirmationDialog === 'function') {
+                        window.showConfirmationDialog(
+                            'טעינה מחדש של העמוד',
+                            'המטמון נוקה בהצלחה. האם להמשיך לטעינה מחדש של העמוד?',
+                            () => {
+                                console.log('✅ User confirmed page reload - executing now...');
+                                window.location.reload(true);
+                            },
+                            () => {
+                                console.log('❌ User cancelled page reload - staying on current page');
+                            },
+                            'success'
+                        );
+                    } else {
+                        // Fallback to simple confirm
+                        if (confirm('המטמון נוקה בהצלחה. האם להמשיך לטעינה מחדש של העמוד?')) {
+                            console.log('✅ User confirmed page reload - executing now...');
+                            window.location.reload(true);
+                        } else {
+                            console.log('❌ User cancelled page reload - staying on current page');
+                        }
+                    }
                 }, 1500);
+            } else {
+                console.log('ℹ️ clearAllCacheQuick: autoRefresh disabled, skipping page reload');
             }
             
             window.Logger.info('✅ Quick cache clearing completed - auto-refresh in 1.5 seconds', { page: "unified-cache-manager" });
@@ -1859,6 +2232,13 @@ UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) 
  * Detailed cache clearing with comprehensive feedback
  * @param {Object} options - Options for clearing
  * @returns {Promise<Object>} Result with success status and detailed feedback
+ */
+/**
+ * Clear all cache with detailed logging
+ * @function clearAllCacheDetailed
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
  */
 UnifiedCacheManager.prototype.clearAllCacheDetailed = async function(options = {}) {
     try {
@@ -1924,6 +2304,13 @@ UnifiedCacheManager.prototype.clearAllCacheDetailed = async function(options = {
  * @param {Object} options - Options for the process
  * @returns {Promise<Object>} Complete verification report
  */
+/**
+ * Verify cache system functionality
+ * @function verifyCacheSystem
+ * @async
+ * @param {Object} options - Options for verification
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.verifyCacheSystem = async function(options = {}) {
     try {
         window.Logger.info('🔍 Starting complete cache verification process...', { page: "unified-cache-manager" });
@@ -1986,6 +2373,12 @@ UnifiedCacheManager.prototype.verifyCacheSystem = async function(options = {}) {
 /**
  * Scan all cache layers and return detailed information
  * @returns {Promise<Object>} Detailed scan results
+ */
+/**
+ * Scan all cache layers
+ * @function scanAllCacheLayers
+ * @async
+ * @returns {Promise<Object>} Scan results
  */
 UnifiedCacheManager.prototype.scanAllCacheLayers = async function() {
     const scanResults = {
@@ -2186,6 +2579,12 @@ UnifiedCacheManager.prototype.scanAllCacheLayers = async function() {
  * @param {Object} scanResults - Results from scanAllCacheLayers
  * @returns {number} Total key count
  */
+/**
+ * Count total keys in scan results
+ * @function countTotalKeys
+ * @param {Object} scanResults - Scan results object
+ * @returns {number} Total key count
+ */
 UnifiedCacheManager.prototype.countTotalKeys = function(scanResults) {
     return scanResults.memory.count +
            scanResults.localStorage.count +
@@ -2197,6 +2596,12 @@ UnifiedCacheManager.prototype.countTotalKeys = function(scanResults) {
 
 /**
  * Verify cache system functionality by testing read/write operations
+ * @returns {Promise<Object>} Verification results
+ */
+/**
+ * Verify cache functionality by testing read/write operations
+ * @function verifyCacheFunctionality
+ * @async
  * @returns {Promise<Object>} Verification results
  */
 UnifiedCacheManager.prototype.verifyCacheFunctionality = async function() {
@@ -2321,6 +2726,12 @@ UnifiedCacheManager.prototype.verifyCacheFunctionality = async function() {
  * Refresh data from backend database for all systems
  * @returns {Promise<Object>} Refresh results
  */
+/**
+ * Refresh data from backend
+ * @function refreshDataFromBackend
+ * @async
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
     const refreshResults = {
         success: true,
@@ -2401,6 +2812,12 @@ UnifiedCacheManager.prototype.refreshDataFromBackend = async function() {
 /**
  * Refresh trading data from backend
  */
+/**
+ * Refresh trading data
+ * @function refreshTradingData
+ * @async
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.refreshTradingData = async function() {
     try {
         // Clear trading-related cache keys
@@ -2429,6 +2846,12 @@ UnifiedCacheManager.prototype.refreshTradingData = async function() {
 
 /**
  * Refresh market data from backend
+ */
+/**
+ * Refresh market data
+ * @function refreshMarketData
+ * @async
+ * @returns {Promise<void>}
  */
 UnifiedCacheManager.prototype.refreshMarketData = async function() {
     try {
@@ -2461,6 +2884,12 @@ UnifiedCacheManager.prototype.refreshMarketData = async function() {
  * @param {string} key - Cache key
  * @returns {object} Policy configuration
  */
+/**
+ * Get key policy for cache layer decision
+ * @function getKeyPolicy
+ * @param {string} key - Cache key
+ * @returns {Object} Key policy
+ */
 UnifiedCacheManager.prototype.getKeyPolicy = function(key) {
     // Exact match
     if (this.defaultPolicies[key]) {
@@ -2484,32 +2913,125 @@ UnifiedCacheManager.prototype.getKeyPolicy = function(key) {
 /**
  * Refresh user preferences from backend
  */
-UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
+/**
+ * Refresh user preferences
+ * @function refreshUserPreferences
+ * @async
+ * @returns {Promise<void>}
+ */
+UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProfileId = null, groupName = null) {
+    console.log('🔍 DEBUG: refreshUserPreferences() called with targetProfileId:', targetProfileId, 'groupName:', groupName);
+    
     try {
-        // Clear all preferences cache keys
+        // Clear all preferences cache keys OR specific group keys
+        // NOTE: getAllKeys() returns keys WITH prefix (e.g., 'tiktrack_preference_...')
+        // But we also need to check localStorage directly for keys without prefix
+        console.log('🔍 DEBUG: Getting all keys from UnifiedCacheManager...');
         const keys = await this.getAllKeys();
-        const prefKeys = keys.filter(k => 
-            k.startsWith('preference_') || 
-            k.startsWith('all_preferences_') ||
-            k === 'user-preferences'
-        );
+        console.log('🔍 DEBUG: getAllKeys() returned:', keys.length, 'keys');
+        console.log('🔍 DEBUG: Sample keys from UnifiedCacheManager:', keys.slice(0, 5));
         
-        window.Logger.info(`🔄 Refreshing user preferences - clearing ${prefKeys.length} keys`, { page: "unified-cache-manager" });
+        console.log('🔍 DEBUG: Getting keys directly from localStorage...');
+        const localStorageKeys = Object.keys(localStorage);
+        console.log('🔍 DEBUG: localStorage has', localStorageKeys.length, 'total keys');
         
+        const prefKeys = [];
+        
+        // If groupName is specified, only clear that group's cache
+        if (groupName) {
+            const groupPattern = `preference_group_${groupName}_`;
+            console.log(`🔍 DEBUG: Filtering for specific group: ${groupPattern}`);
+            
+            // Add keys from UnifiedCacheManager (with prefix)
+            keys.forEach(key => {
+                if (key.includes(groupPattern)) {
+                    prefKeys.push(key);
+                }
+            });
+            
+            // Add keys directly from localStorage (without prefix)
+            localStorageKeys.forEach(key => {
+                if (key.includes(groupPattern)) {
+                    prefKeys.push(key);
+                }
+            });
+            
+            console.log('🔍 DEBUG: Found', prefKeys.length, `keys for group ${groupName}`);
+        } else {
+            // Clear all preferences cache keys
+            console.log('🔍 DEBUG: Filtering ALL preference keys...');
+            
+            // Add keys from UnifiedCacheManager (with prefix)
+            keys.forEach(key => {
+                if (key.startsWith('tiktrack_preference_') || 
+                    key.startsWith('tiktrack_all_preferences_') ||
+                    key.startsWith('tiktrack_preference_group_') ||
+                    key === 'tiktrack_user-preferences') {
+                    prefKeys.push(key);
+                }
+            });
+            console.log('🔍 DEBUG: Found', prefKeys.length, 'keys from UnifiedCacheManager');
+            
+            // Add keys directly from localStorage (without prefix)
+            localStorageKeys.forEach(key => {
+                if (key.startsWith('preference_') || 
+                    key.startsWith('all_preferences_') ||
+                    key.startsWith('preference_group_') ||
+                    key === 'user-preferences') {
+                    prefKeys.push(key);
+                }
+            });
+            console.log('🔍 DEBUG: Total preference keys to remove:', prefKeys.length);
+        }
+        
+        window.Logger.info(`🔄 Refreshing user preferences${groupName ? ` for group ${groupName}` : ''} - clearing ${prefKeys.length} keys`, { page: "unified-cache-manager" });
+        if (prefKeys.length > 0) {
+            window.Logger.info(`🔍 Preference keys found:`, prefKeys.slice(0, 10), { page: "unified-cache-manager" });
+        }
+        
+        let removedCount = 0;
         for (const key of prefKeys) {
-            await this.remove(key);
+            try {
+                console.log(`🗑️ DEBUG: Processing key: ${key}`);
+                
+                // Remove directly from localStorage (simplest and most reliable)
+                if (localStorage.getItem(key) !== null) {
+                    localStorage.removeItem(key);
+                    removedCount++;
+                    console.log(`✅ DEBUG: Removed ${key} from localStorage directly`);
+                    window.Logger.debug(`🗑️ Removed ${key} from localStorage`, { page: "unified-cache-manager" });
+                } else {
+                    console.log(`⚠️ DEBUG: Key ${key} not found in localStorage (already removed?)`);
+                }
+                
+                // Also try removing via UnifiedCacheManager (which will try all layers)
+                // This handles the key both with and without prefix
+                if (key.startsWith('tiktrack_')) {
+                    // Key has prefix, remove without prefix for UnifiedCacheManager
+                    const keyWithoutPrefix = key.replace('tiktrack_', '');
+                    console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${keyWithoutPrefix}")`);
+                    await this.remove(keyWithoutPrefix);
+                } else {
+                    // Key without prefix
+                    console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${key}")`);
+                    await this.remove(key);
+                }
+            } catch (removeError) {
+                console.error(`❌ DEBUG: Failed to remove key ${key}:`, removeError);
+                window.Logger.warn(`⚠️ Failed to remove key ${key}:`, removeError, { page: "unified-cache-manager" });
+            }
         }
         
-        // Reload preferences if PreferencesCore is available
-        if (window.PreferencesCore) {
-            await window.PreferencesCore.initializeWithLazyLoading(
-                window.PreferencesCore.currentUserId,
-                window.PreferencesCore.currentProfileId
-            );
-            window.Logger.info('✅ User preferences refreshed from backend', { page: "unified-cache-manager" });
-        }
+        console.log(`✅ DEBUG: Successfully removed ${removedCount} keys from localStorage`);
+        
+        // NOTE: We do NOT reload preferences here anymore
+        // The caller (PreferencesUI.saveAllPreferences) should handle reloading the form
+        // This prevents double-loading and rate limiting issues
+        
+        console.log('✅ DEBUG: Cache cleared successfully - preferences will be reloaded by caller');
         
     } catch (error) {
+        console.error('❌ DEBUG: Error in refreshUserPreferences:', error);
         window.Logger.warn('⚠️ Error refreshing user preferences:', error, { page: "unified-cache-manager" });
         throw error;
     }
@@ -2517,6 +3039,12 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function() {
 
 /**
  * Refresh UI state from backend
+ */
+/**
+ * Refresh UI state
+ * @function refreshUIState
+ * @async
+ * @returns {Promise<void>}
  */
 UnifiedCacheManager.prototype.refreshUIState = async function() {
     try {
@@ -2545,6 +3073,12 @@ UnifiedCacheManager.prototype.refreshUIState = async function() {
 /**
  * Refresh notifications from backend
  */
+/**
+ * Refresh notifications
+ * @function refreshNotifications
+ * @async
+ * @returns {Promise<void>}
+ */
 UnifiedCacheManager.prototype.refreshNotifications = async function() {
     try {
         // Clear notifications cache
@@ -2571,6 +3105,13 @@ UnifiedCacheManager.prototype.refreshNotifications = async function() {
 // ===== GLOBAL FUNCTION EXPORTS =====
 
 // Export functions to global scope for backward compatibility
+/**
+ * Clear all unified cache (global wrapper)
+ * @function clearAllUnifiedCache
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
+ */
 window.clearAllUnifiedCache = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.clearAllCacheDetailed(options);
@@ -2580,6 +3121,13 @@ window.clearAllUnifiedCache = async function(options = {}) {
     }
 };
 
+/**
+ * Clear all unified cache quickly (global wrapper)
+ * @function clearAllUnifiedCacheQuick
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
+ */
 window.clearAllUnifiedCacheQuick = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.clearAllCacheQuick(options);
@@ -2590,6 +3138,13 @@ window.clearAllUnifiedCacheQuick = async function(options = {}) {
 };
 
 // Alias for compatibility with existing code
+/**
+ * Clear all cache (global wrapper)
+ * @function clearAllCache
+ * @async
+ * @param {Object} options - Options for clearing cache
+ * @returns {Promise<void>}
+ */
 window.clearAllCache = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.clearAllCacheDetailed(options);
@@ -2599,6 +3154,13 @@ window.clearAllCache = async function(options = {}) {
     }
 };
 
+/**
+ * Verify cache system (global wrapper)
+ * @function verifyCacheSystem
+ * @async
+ * @param {Object} options - Options for verification
+ * @returns {Promise<void>}
+ */
 window.verifyCacheSystem = async function(options = {}) {
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         return await window.UnifiedCacheManager.verifyCacheSystem(options);
@@ -2615,16 +3177,26 @@ window.verifyCacheSystem = async function(options = {}) {
  * ניקוי מהיר לצרכי פיתוח - כפתור ראשי
  * Uses existing clearAllCacheQuick() method
  */
-window.clearCacheQuick = async function(event) {
+/**
+ * Clear cache quickly (global wrapper)
+ * @function clearCacheQuick
+ * @async
+ * @param {Event} event - Event object
+ * @returns {Promise<void>}
+ */
+window.clearCacheQuick = async function(event, options = {}) {
     if (event) {
         event.preventDefault();
     }
     
-    window.Logger.info('🧹 ניקוי מהיר לצרכי פיתוח...', { page: "unified-cache-manager" });
+    window.Logger.info('🧹 clearCacheQuick called - ניקוי מהיר לצרכי פיתוח...', { page: "unified-cache-manager" });
+    console.log('🔄 clearCacheQuick: Starting cache clearing process...');
+    console.log('🔄 clearCacheQuick: Options:', options);
     
     try {
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-            await window.UnifiedCacheManager.clearAllCacheQuick();
+            console.log('✅ clearCacheQuick: UnifiedCacheManager is initialized, calling clearAllCacheQuick...');
+            await window.UnifiedCacheManager.clearAllCacheQuick(options);
         } else {
             window.Logger.warn('⚠️ UnifiedCacheManager לא זמין', { page: "unified-cache-manager" });
         }
@@ -2637,6 +3209,14 @@ window.clearCacheQuick = async function(event) {
  * ניקוי שכבה ספציפית - תפריט משנה
  * Uses existing clearAllCache() method with layer filter
  * @param {string} layer - שם השכבה (memory, localStorage, indexedDB, backend)
+ */
+/**
+ * Clear specific cache layer (global wrapper)
+ * @function clearCacheLayer
+ * @async
+ * @param {string} layer - Cache layer to clear
+ * @param {Event} event - Event object
+ * @returns {Promise<void>}
  */
 window.clearCacheLayer = async function(layer, event) {
     if (event) {
@@ -2660,6 +3240,13 @@ window.clearCacheLayer = async function(layer, event) {
  * ניקוי כל שכבות המטמון (ללא רענון) - תפריט משנה
  * Uses existing clearAllCacheDetailed() method
  */
+/**
+ * Clear all cache advanced (global wrapper)
+ * @function clearAllCacheAdvanced
+ * @async
+ * @param {Event} event - Event object
+ * @returns {Promise<void>}
+ */
 window.clearAllCacheAdvanced = async function(event) {
     if (event) {
         event.preventDefault();
@@ -2681,6 +3268,13 @@ window.clearAllCacheAdvanced = async function(event) {
 /**
  * ניקוי מלא + רענון עמוד - תפריט משנה
  * Uses existing clearAllCacheDetailed() method + page reload
+ */
+/**
+ * Clear cache full (global wrapper)
+ * @function clearCacheFull
+ * @async
+ * @param {Event} event - Event object
+ * @returns {Promise<void>}
  */
 window.clearCacheFull = async function(event) {
     if (event) {
@@ -2707,28 +3301,124 @@ window.clearCacheFull = async function(event) {
 };
 
 /**
- * ניקוי מטמון לפני פעולות CRUD - פונקציה שמוזכרת במקומות רבים
- * @param {string} entity - שם הישות (trades, alerts, trading_accounts, etc.)
- * @param {string} operation - סוג הפעולה (add, edit, delete, cancel)
+ * REMOVED: clearCacheBeforeCRUD
+ * ==========================================
+ * This function was removed as it caused issues with the CRUD refresh flow.
+ * CRUDResponseHandler now handles all cache management automatically.
+ * 
+ * If cache clearing is needed, use CRUDResponseHandler's built-in mechanisms
+ * instead of this function.
+ * 
+ * Date removed: January 2025
+ * Reason: Simplified cache management flow
  */
-window.clearCacheBeforeCRUD = async function(entity, operation) {
-    window.Logger.info(`🧹 ניקוי מטמון לפני ${operation} של ${entity}...`, { page: "unified-cache-manager" });
+
+// ===== NEW SIMPLIFIED CACHE CLEARING FUNCTIONS FOR DEVELOPMENT =====
+// Simplified functions for the new cache architecture (localStorage only)
+
+/**
+ * Clear UI state for development (sorting, filters, etc.)
+ * @function clearUIState
+ * @param {Event} event - Event object
+ */
+window.clearUIState = async function(event) {
+    if (event) event.preventDefault();
     
     try {
-        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-            // ניקוי מהיר לפני פעולות CRUD
-            await window.UnifiedCacheManager.clearAllCacheQuick();
-        } else {
-            window.Logger.warn('⚠️ UnifiedCacheManager לא זמין - ניקוי בסיסי', { page: "unified-cache-manager" });
-            // fallback לניקוי בסיסי
-            localStorage.removeItem(`${entity}_cache`);
-            sessionStorage.removeItem(`${entity}_cache`);
+        window.Logger.info('🧹 Clearing UI state only...', { page: "unified-cache-manager" });
+        
+        const keys = Object.keys(localStorage);
+        let cleared = 0;
+        
+        keys.forEach(key => {
+            if (key.startsWith('ui_state_') || key.startsWith('filter_') || key.startsWith('sort_')) {
+                localStorage.removeItem(key);
+                cleared++;
+            }
+        });
+        
+        const message = `נקו ${cleared} פריטי העדפות UI`;
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('ניקוי UI', message);
         }
         
-        window.Logger.info(`✅ ניקוי מטמון לפני ${operation} של ${entity} הושלם`, { page: "unified-cache-manager" });
+        window.Logger.info(`✅ Cleared ${cleared} UI state items`, { page: "unified-cache-manager" });
+    } catch (error) {
+        window.Logger.error('❌ Error clearing UI state:', error, { page: "unified-cache-manager" });
+    }
+};
+
+/**
+ * Clear all localStorage for development testing
+ * @function clearAllCacheForDevelopment
+ * @param {Event} event - Event object
+ */
+window.clearAllCacheForDevelopment = async function(event) {
+    if (event) event.preventDefault();
+    
+    try {
+        window.Logger.info('🧹 Clearing all localStorage...', { page: "unified-cache-manager" });
+        
+        const itemCount = localStorage.length;
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        const message = `נוקה כל ה-localStorage (${itemCount} פריטים)`;
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('ניקוי מטמון', message);
+        }
+        
+        window.Logger.info(`✅ Cleared ${itemCount} localStorage items`, { page: "unified-cache-manager" });
+    } catch (error) {
+        window.Logger.error('❌ Error clearing localStorage:', error, { page: "unified-cache-manager" });
+    }
+};
+
+/**
+ * Hard reload of the page for development
+ * @function hardReload
+ * @param {Event} event - Event object
+ */
+window.hardReload = function(event) {
+    if (event) event.preventDefault();
+    
+    window.Logger.info('🔄 Performing hard reload...', { page: "unified-cache-manager" });
+    
+    // Hard reload - bypass cache
+    if (typeof window.location !== 'undefined') {
+        window.location.reload(true);
+    } else {
+        window.location.href = window.location.href;
+    }
+};
+
+/**
+ * Main cache clearing function for development (wrapper)
+ * @function clearCacheForDevelopment
+ * @param {Event} event - Event object
+ */
+window.clearCacheForDevelopment = async function(event) {
+    if (event) event.preventDefault();
+    
+    try {
+        // Clear localStorage
+        await window.clearAllCacheForDevelopment(event);
+        
+        // Show notification
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification(
+                'ניקוי מטמון לפיתוח',
+                'המטמון נוקה. רענון עמוד בעוד 2 שניות...'
+            );
+        }
+        
+        // Auto-reload after 2 seconds
+        setTimeout(() => {
+            window.hardReload(event);
+        }, 2000);
         
     } catch (error) {
-        window.Logger.error(`❌ שגיאה בניקוי מטמון לפני ${operation} של ${entity}:`, error, { page: "unified-cache-manager" });
+        window.Logger.error('❌ Error in clearCacheForDevelopment:', error, { page: "unified-cache-manager" });
     }
 };
 
@@ -2747,6 +3437,12 @@ window.clearCacheBeforeCRUD = async function(entity, operation) {
 })();
 
 // Export additional functions to window for easy access
+/**
+ * Invalidate cache by dependency (global wrapper)
+ * @function invalidateByDependency
+ * @param {string} changedKey - Changed key
+ * @returns {Promise<number>} Number of invalidated keys
+ */
 window.invalidateByDependency = function(changedKey) {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { changedKey, page: 'unified-cache-manager' });
@@ -2755,6 +3451,12 @@ window.invalidateByDependency = function(changedKey) {
     return window.unifiedCacheManager.invalidateByDependency(changedKey);
 };
 
+/**
+ * Invalidate cache by pattern (global wrapper)
+ * @function invalidateCache
+ * @param {string} pattern - Cache pattern
+ * @returns {Promise<number>} Number of invalidated keys
+ */
 window.invalidateCache = function(pattern) {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { pattern, page: 'unified-cache-manager' });
@@ -2763,6 +3465,12 @@ window.invalidateCache = function(pattern) {
     return window.unifiedCacheManager.invalidate(pattern);
 };
 
+/**
+ * Get multiple cache values (global wrapper)
+ * @function getMultipleCache
+ * @param {Array<string>} keys - Cache keys
+ * @returns {Promise<Object>} Cache values
+ */
 window.getMultipleCache = function(keys) {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { count: keys.length, page: 'unified-cache-manager' });
@@ -2771,6 +3479,13 @@ window.getMultipleCache = function(keys) {
     return window.unifiedCacheManager.getMultiple(keys);
 };
 
+/**
+ * Set multiple cache values (global wrapper)
+ * @function setMultipleCache
+ * @param {Object} data - Data to cache
+ * @param {string} ttl - Time to live
+ * @returns {Promise<void>}
+ */
 window.setMultipleCache = function(data, ttl = 'medium') {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { count: Object.keys(data).length, page: 'unified-cache-manager' });
@@ -2779,6 +3494,12 @@ window.setMultipleCache = function(data, ttl = 'medium') {
     return window.unifiedCacheManager.setMultiple(data, ttl);
 };
 
+/**
+ * Check if cache has key (global wrapper)
+ * @function hasCache
+ * @param {string} key - Cache key
+ * @returns {Promise<boolean>} Whether key exists
+ */
 window.hasCache = function(key) {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { key, page: 'unified-cache-manager' });
@@ -2787,6 +3508,11 @@ window.hasCache = function(key) {
     return window.unifiedCacheManager.has(key);
 };
 
+/**
+ * Get cache statistics (global wrapper)
+ * @function getCacheStats
+ * @returns {Promise<Object>} Cache statistics
+ */
 window.getCacheStats = function() {
     if (!window.unifiedCacheManager) {
         window.Logger.error('Cache Manager not initialized', { page: 'unified-cache-manager' });

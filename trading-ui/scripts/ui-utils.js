@@ -857,13 +857,22 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
  * @param {string} sectionId - The ID of the section to toggle
  */
 window.toggleSection = function (sectionId) {
-  if (window.Logger) { window.Logger.debug(`🚀 ===== toggleSection CALLED =====`, { page: "ui-utils" }); }
-  console.log(`📋 Function called at: ${new Date().toISOString()}`);
-  if (window.Logger) { window.Logger.debug(`📋 Section ID: "${sectionId}"`, { page: "ui-utils" }); }
-  if (window.Logger) { window.Logger.debug(`📋 Function type: ${typeof window.toggleSection}`, { page: "ui-utils" }); }
+  // Use console.log instead of Logger to break circular dependency
+  // Logger should not depend on toggleSection, and toggleSection should not depend on Logger
+  const DEBUG_MODE = window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1' ||
+                     window.location.search.includes('debug=true');
+  
+  if (DEBUG_MODE) {
+    console.debug(`🚀 ===== toggleSection CALLED =====`);
+    console.debug(`📋 Section ID: "${sectionId}"`);
+    console.debug(`📋 Function type: ${typeof window.toggleSection}`);
+  }
   
   try {
-    if (window.Logger) { window.Logger.debug(`🔧 toggleSection called with sectionId: "${sectionId}"`, { page: "ui-utils" }); }
+    if (DEBUG_MODE) {
+      console.debug(`🔧 toggleSection called with sectionId: "${sectionId}"`);
+    }
     
     const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
     console.log(`🔍 Section found:`, section ? 'YES' : 'NO', section ? `(ID: ${section.id || 'no-id'}, data-section: ${section.getAttribute('data-section') || 'no-data-section'})` : '');
@@ -873,22 +882,32 @@ window.toggleSection = function (sectionId) {
     const sectionsCount = document.querySelectorAll('.top-section, .content-section, [data-section]').length;
     if (isTopSection && sectionsCount >= 3 && typeof window.toggleAllSections === 'function') {
       window.toggleAllSections();
-      if (window.Logger) { window.Logger.debug(`🔁 Top section toggle: toggled ALL sections (count=${sectionsCount})`, { page: "ui-utils" }); }
+      if (DEBUG_MODE) {
+        console.debug(`🔁 Top section toggle: toggled ALL sections (count=${sectionsCount})`);
+      }
       return;
     }
 
     const sectionBody = section ? section.querySelector('.section-body') : null;
-    if (window.Logger) { window.Logger.debug(`🔍 Section body found:`, sectionBody ? 'YES' : 'NO', { page: "ui-utils" }); }
+    if (DEBUG_MODE) {
+      console.debug(`🔍 Section body found:`, sectionBody ? 'YES' : 'NO');
+    }
     
     const toggleBtn = section ? section.querySelector('button[onclick*="toggleSection"], button[data-onclick*="toggleSection"]') : null;
-    if (window.Logger) { window.Logger.debug(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO', { page: "ui-utils" }); }
+    if (DEBUG_MODE) {
+      console.debug(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO');
+    }
     
     const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
-    if (window.Logger) { window.Logger.debug(`🔍 Icon found:`, icon ? 'YES' : 'NO', { page: "ui-utils" }); }
+    if (DEBUG_MODE) {
+      console.debug(`🔍 Icon found:`, icon ? 'YES' : 'NO');
+    }
     
     if (sectionBody) {
       const isCollapsed = sectionBody.style.display === 'none';
-      if (window.Logger) { window.Logger.debug(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${sectionBody.style.display}"`, { page: "ui-utils" }); }
+      if (DEBUG_MODE) {
+        console.debug(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${sectionBody.style.display}"`);
+      }
 
       // Check if we're in accordion mode
       const pageName = getCurrentPageName();
@@ -899,8 +918,8 @@ window.toggleSection = function (sectionId) {
                           window.PAGE_CONFIGS[pageName] : null);
       const accordionMode = pageConfig?.accordionMode === true;
       
-      if (window.Logger && accordionMode) {
-        window.Logger.debug(`🎯 Accordion mode detected - checking for other open sections`, { page: "ui-utils" });
+      if (DEBUG_MODE && accordionMode) {
+        console.debug(`🎯 Accordion mode detected - checking for other open sections`);
       }
 
       if (isCollapsed) {
@@ -927,36 +946,51 @@ window.toggleSection = function (sectionId) {
         }
         
         sectionBody.style.display = 'block';
-        if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" EXPANDED`, { page: "ui-utils" }); }
+        if (DEBUG_MODE) {
+          console.debug(`✅ Section "${sectionId}" EXPANDED`);
+        }
       } else {
         // Closing section
         sectionBody.style.display = 'none';
-        if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" COLLAPSED`, { page: "ui-utils" }); }
+        if (DEBUG_MODE) {
+          console.debug(`✅ Section "${sectionId}" COLLAPSED`);
+        }
       }
 
       // Update icon
       if (icon) {
         const newIcon = sectionBody.style.display === 'none' ? '▼' : '▲';
         icon.textContent = newIcon;
-        if (window.Logger) { window.Logger.debug(`🎨 Icon updated to: "${newIcon}"`, { page: "ui-utils" }); }
+        if (DEBUG_MODE) {
+          console.debug(`🎨 Icon updated to: "${newIcon}"`);
+        }
       }
 
       // Save state with page-specific key
       const isHidden = sectionBody.style.display === 'none';
       const storageKey = `${pageName}_${sectionId}_SectionHidden`;
       localStorage.setItem(storageKey, isHidden.toString());
-      if (window.Logger) { window.Logger.debug(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`, { page: "ui-utils" }); }
+      if (DEBUG_MODE) {
+        console.debug(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`);
+      }
       
     } else {
-      if (window.Logger) { window.Logger.warn(`❌ Section ${sectionId} not found`, { page: "ui-utils" }); }
+      if (DEBUG_MODE) {
+        console.warn(`❌ Section ${sectionId} not found`);
+      }
     }
     
-    if (window.Logger) { window.Logger.debug(`✅ ===== toggleSection COMPLETED SUCCESSFULLY =====`, { page: "ui-utils" }); }
+    if (DEBUG_MODE) {
+      console.debug(`✅ ===== toggleSection COMPLETED SUCCESSFULLY =====`);
+    }
   } catch (error) {
-    if (window.Logger) { window.Logger.error(`❌ ===== toggleSection ERROR =====`, { page: "ui-utils" }); }
-    if (window.Logger) { window.Logger.error(`❌ Error in toggleSection:`, error, { page: "ui-utils" }); }
-    if (window.Logger) { window.Logger.error(`❌ Error stack:`, error.stack, { page: "ui-utils" }); }
-    if (window.Logger) { window.Logger.error(`❌ ===== END ERROR =====`, { page: "ui-utils" }); }
+    // Use console.error instead of Logger to avoid circular dependency
+    console.error(`❌ ===== toggleSection ERROR =====`);
+    console.error(`❌ Error in toggleSection:`, error);
+    if (error.stack) {
+      console.error(`❌ Error stack:`, error.stack);
+    }
+    // Logger removed to break circular dependency - using console.error instead
   }
 };
 
@@ -1385,7 +1419,7 @@ window.loadTableActionButtons = loadTableActionButtons;
 
 // Export demo functions for testing
 window.viewTickerDetails = viewTickerDetails;
-window.viewLinkedItems = viewLinkedItems;
+// REMOVED: window.viewLinkedItems demo - use window.viewLinkedItems from linked-items.js instead
 window.editTicker = editTicker;
 window.cancelTicker = cancelTicker;
 window.restoreTicker = restoreTicker;

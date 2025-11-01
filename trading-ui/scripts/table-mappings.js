@@ -60,7 +60,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'name',                  // 1 - Name
     'currency_id',           // 2 - Currency ID
     'status',                // 3 - Status
-    'cash_balance',          // 4 - Cash Balance
+    // 'cash_balance' removed - calculated in real-time via AccountActivityService
     'total_value',           // 5 - Total Value
     'total_pl',              // 6 - Total P&L
     'notes',                 // 7 - Notes
@@ -74,7 +74,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'name',                  // 1 - Name
     'currency_id',           // 2 - Currency ID
     'status',                // 3 - Status
-    'cash_balance',          // 4 - Cash Balance
+    // 'cash_balance' removed - calculated in real-time via AccountActivityService
     'total_value',           // 5 - Total Value
     'total_pl',              // 6 - Total P&L
     'notes',                 // 7 - Notes
@@ -220,7 +220,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'name',            // 0 - שם
     'currency',        // 1 - מטבע
     'status',          // 2 - סטטוס
-    'cash_balance',    // 3 - יתרה במזומן
+    // 'cash_balance' removed - calculated in real-time via AccountActivityService
     'total_value',     // 4 - ערך כולל
     'total_pl',        // 5 - רווח/הפסד כולל
     'notes',            // 6 - הערות
@@ -751,7 +751,7 @@ function getColumnDefinition(tableName, columnName) {
     'amount': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
     'fee': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
     'total_pl': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
-    'cash_balance': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    // 'cash_balance' removed - calculated in real-time via AccountActivityService
     'total_value': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
     'planned_amount': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
     'stop_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },

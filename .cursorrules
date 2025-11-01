@@ -1,5 +1,43 @@
 # Cursor Rules for TikTrack Project
 
+## Rule #1 - Use Existing General Systems - CRITICAL
+**לפני כל כתיבת פונקציה או קוד מקומי - חובה לבדוק היטב אם קיים קוד כללי במערכת.**
+
+### Requirements:
+1. **MUST CHECK FIRST**: Before writing any local function or implementation, search for existing general systems
+2. **General Systems Priority**: Most logic exists in general systems - always use them first
+3. **Documentation Reference**: 
+   - **Main List**: `documentation/frontend/GENERAL_SYSTEMS_LIST.md` - Complete list of all general systems
+   - **Package Manifest**: `trading-ui/scripts/init-system/package-manifest.js` - System loading packages
+   - **Documentation Index**: `documentation/INDEX.md` - Full documentation index
+4. **Only if Missing**: Write local code ONLY if no general system exists after thorough search
+
+### Examples of General Systems:
+- `FieldRendererService` - For rendering status, type, amount, side badges
+- `checkLinkedItemsBeforeAction()` - For checking linked items before delete/cancel
+- `updatePageSummaryStats()` - For updating page statistics (in ui-utils.js)
+- `ModalManagerV2` - For modal management
+- `CRUDResponseHandler` - For CRUD operations handling
+
+### Violation Example (WRONG):
+```javascript
+// ❌ DON'T: Writing local function without checking general systems
+function getStatusClassForTradePlan(status) {
+  switch (status) {
+    case 'open': return 'status-open';
+    // ...
+  }
+}
+```
+
+### Correct Approach (RIGHT):
+```javascript
+// ✅ DO: Use existing general system
+window.FieldRendererService.renderStatus(design.status, 'trade_plan')
+```
+
+This is a fundamental rule that ALL future chats must follow.
+
 ## Documentation Rule - CRITICAL
 **כל הדוקומנטציה שלנו נמצאת תחת תקיית documentation/ בלבד - אין ליצור קבצי דוקומנטציה מחוץ לה.**
 

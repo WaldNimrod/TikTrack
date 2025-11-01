@@ -58,7 +58,10 @@ class CacheSyncManager {
             'tickers-data': ['accounts-data'],
             'alerts-data': ['accounts-data'],
             'market-data': ['tickers-data'],
-            'dashboard-data': ['market-data', 'trades-data', 'executions-data']
+            'dashboard-data': ['market-data', 'trades-data', 'executions-data'],
+            'account-activity-data': ['accounts-data', 'cash-flows-data', 'executions-data'],
+            'account-activity-*': ['accounts-data', 'cash-flows-data', 'executions-data'],
+            'account-balance-*': ['accounts-data', 'cash-flows-data', 'executions-data']
         };
         
         // Cache invalidation patterns
@@ -74,9 +77,12 @@ class CacheSyncManager {
             'trade-created': ['trades-data', 'dashboard-data'],
             'trade-updated': ['trades-data', 'dashboard-data'],
             'trade-deleted': ['trades-data', 'dashboard-data'],
-            'execution-created': ['executions-data', 'dashboard-data'],
-            'execution-updated': ['executions-data', 'dashboard-data'],
-            'execution-deleted': ['executions-data', 'dashboard-data'],
+            'execution-created': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
+            'execution-updated': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
+            'execution-deleted': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
+            'cash-flow-created': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
+            'cash-flow-updated': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
+            'cash-flow-deleted': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
             'ticker-updated': ['tickers-data', 'market-data'],
             'alert-created': ['alerts-data'],
             'alert-updated': ['alerts-data'],

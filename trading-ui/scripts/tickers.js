@@ -5,45 +5,43 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 45
+ * Total Functions: 43
  * 
  * DATA LOADING (11)
  * - loadCurrenciesData() - loadCurrenciesData function
  * - getCurrencySymbol() - * Load currencies data from server
- * - getTimeDuration() - * Load currencies data from server
- * - getTickerTypeStyle() - * קבלת סמל מטבע לפי מזהה
+ * - getTimeDuration() - * קבלת סמל מטבע לפי מזהה
+ * - getTickerTypeStyle() - * חישוב משך הזמן שעבר מתאריך נתון - פורמט אחיד מלא
  * - getTickerStatusStyle() - * קבלת עיצוב סוג טיקר
- * - getTickerStatusLabel() - * קבלת עיצוב סוג טיקר
+ * - getTickerStatusLabel() - * קבלת עיצוב סטטוס טיקר
  * - getTickerSymbol() - * בדיקת פריטים מקושרים לפני מחיקת טיקר
  * - loadTickersData() - * הצגת הודעה
  * - loadColorsAndApplyToHeaders() - loadColorsAndApplyToHeaders function
  * - tryLoadData() - tryLoadData function
  * - getTypeDisplayName() - getTypeDisplayName function
  * 
- * DATA MANIPULATION (15)
+ * DATA MANIPULATION (14)
  * - updateCurrencyOptions() - updateCurrencyOptions function
  * - updateActiveTradesField() - * פונקציה לעדכון אפשרויות מטבע בטופס
  * - updateTickerActiveTradesStatus() - updateTickerActiveTradesStatus function
  * - updateAllActiveTradesStatuses() - updateAllActiveTradesStatuses function
- * - saveTicker() - * Restore tickers section state
+ * - saveTicker() - saveTicker function
  * - updateTicker() - updateTicker function
  * - checkLinkedItemsBeforeDeleteTicker() - checkLinkedItemsBeforeDeleteTicker function
  * - updateAllTickerStatuses() - * בדיקת פריטים מקושרים לפני מחיקת טיקר
  * - checkLinkedItemsAndDeleteTicker() - checkLinkedItemsAndDeleteTicker function
+ * - deleteTicker() - deleteTicker function
  * - confirmDeleteTicker() - confirmDeleteTicker function
  * - updateTickersSummaryStats() - updateTickersSummaryStats function
  * - updateTickersTable() - * עדכון סטטיסטיקות סיכום טיקרים
- * - showAddTickerModal() - * Toggle section visibility
- * - saveTicker() - * Show add ticker modal
- * - deleteTicker() - deleteTicker function
+ * - showAddTickerModal() - showAddTickerModal function
  * 
- * EVENT HANDLING (6)
- * - generateTickerCurrencyOptions() - * קבלת עיצוב סטטוס טיקר
+ * EVENT HANDLING (5)
+ * - generateTickerCurrencyOptions() - * קבלת תווית סטטוס טיקר
  * - restoreTickersSectionState() - restoreTickersSectionState function
  * - performTickerCancellation() - * בדיקת מקושרים וביצוע ביטול טיקר
  * - performTickerDeletion() - * בדיקת מקושרים וביצוע מחיקת טיקר
- * - toggleSection() - toggleSection function
- * - toggleTickersSection() - * Toggle section visibility
+ * - toggleTickersSection() - toggleTickersSection function
  * 
  * UI UPDATES (1)
  * - showEditTickerModal() - * Show add ticker modal
@@ -53,13 +51,13 @@
  * - checkLinkedItemsBeforeCancelTicker() - * בדיקת פריטים מקושרים לפני מחיקת טיקר
  * 
  * OTHER (10)
- * - editTicker() - editTicker function
- * - viewTickerDetails() - * Edit existing ticker
+ * - viewTickerDetails() - viewTickerDetails function
+ * - viewTickerDetailsOld() - * צפייה בפרטי טיקר
  * - refreshTickerData() - refreshTickerData function
  * - cancelTicker() - cancelTicker function
  * - performCancelTicker() - performCancelTicker function
  * - reactivateTicker() - reactivateTicker function
- * - clearTickersCache() - * אישור מחיקת טיקר (לשמירה על תאימות לאחור)
+ * - clearTickersCache() - clearTickersCache function
  * - refreshYahooFinanceData() - refreshYahooFinanceData function
  * - refreshYahooFinanceDataSilently() - refreshYahooFinanceDataSilently function
  * - filterTickersByType() - filterTickersByType function
@@ -122,8 +120,9 @@ function viewTickerDetails(tickerId) {
   }
 }
 
+// REMOVED: viewTickerDetailsOld - not used, replaced by viewTickerDetails
 // Keep old function for backward compatibility
-function viewTickerDetailsOld(tickerId) {
+function _REMOVED_viewTickerDetailsOld(tickerId) {
   try {
     window.Logger.info('👁️ מציג פרטי טיקר:', tickerId, { page: "tickers" });
     
@@ -178,12 +177,13 @@ function viewTickerDetailsOld(tickerId) {
   }
 }
 
+// REMOVED: refreshTickerData - not used
 /**
  * רענון נתוני טיקר
  * טוען מחדש את נתוני הטיקר מהשרת
  * @param {number} tickerId - מזהה הטיקר
  */
-function refreshTickerData(tickerId) {
+function _REMOVED_refreshTickerData(tickerId) {
   try {
     window.Logger.info('🔄 מרענן נתוני טיקר:', tickerId, { page: "tickers" });
     
@@ -205,11 +205,11 @@ function refreshTickerData(tickerId) {
       }
       return response.json();
     })
-    .then(data => {
+    .then(async data => {
       window.Logger.info('✅ נתוני טיקר רוענו:', data, { page: "tickers" });
       
       // רענון הטבלה
-      loadTickersData();
+      await loadTickersData();
       
       // הודעת הצלחה
       if (typeof window.showSuccessNotification === 'function') {
@@ -1203,9 +1203,14 @@ async function performCancelTicker(id) {
       if (typeof loadTickersData === 'function') {
         // אנחנו בעמוד tickers
         // ניקוי מטמון לפני רענון
-        if (typeof window.clearTickersCache === 'function') {
-          window.clearTickersCache();
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearAllCache === 'function') {
+          await window.UnifiedCacheManager.clearAllCache('Light');
+        } else if (typeof window.clearAllCache === 'function') {
+          window.clearAllCache();
         }
+        // Clear local tickers data
+        window.tickersData = [];
+        tickersData = [];
         await loadTickersData();
         // עדכון שדה active_trades רק בעמוד tickers
         await updateActiveTradesField();
@@ -1229,9 +1234,14 @@ async function performCancelTicker(id) {
       // רענון הנתונים כמו במקרה של הצלחה
       if (typeof loadTickersData === 'function') {
         // ניקוי מטמון לפני רענון
-        if (typeof window.clearTickersCache === 'function') {
-          window.clearTickersCache();
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearAllCache === 'function') {
+          await window.UnifiedCacheManager.clearAllCache('Light');
+        } else if (typeof window.clearAllCache === 'function') {
+          window.clearAllCache();
         }
+        // Clear local tickers data
+        window.tickersData = [];
+        tickersData = [];
         await loadTickersData();
         await updateActiveTradesField();
       } else {
@@ -1422,7 +1432,65 @@ async function performTickerDeletion(tickerId) {
 }
 
 /**
+ * מחיקת טיקר
+ * Includes linked items check
+ */
+async function deleteTicker(tickerId) {
+    window.Logger.info(`🗑️ deleteTicker called for ticker ${tickerId}`, { tickerId, page: 'tickers' });
+    
+    try {
+        // Get ticker details for confirmation message
+        let tickerDetails = `טיקר #${tickerId}`;
+        const ticker = window.tickersData?.find(t => t.id === tickerId || t.id === parseInt(tickerId));
+        
+        if (ticker) {
+            const symbol = ticker.symbol || 'לא מוגדר';
+            const name = ticker.name || 'לא מוגדר';
+            const statusText = ticker.status === 'open' ? 'פתוח' :
+                             ticker.status === 'closed' ? 'סגור' :
+                             ticker.status === 'cancelled' ? 'מבוטל' : ticker.status || 'לא מוגדר';
+            const typeText = ticker.type || 'לא מוגדר';
+            
+            tickerDetails = `${symbol} - ${name}, סטטוס: ${statusText}, סוג: ${typeText}`;
+        }
+        
+        // Check linked items first (Trades, Trade Plans, Alerts, Notes)
+        window.Logger.info('🔍 Checking for linked items before deletion', { tickerId, page: 'tickers' });
+        if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+            window.Logger.info('✅ checkLinkedItemsBeforeAction function exists', { tickerId, page: 'tickers' });
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('ticker', tickerId, 'delete');
+            window.Logger.info(`🔍 Linked items check result: hasLinkedItems=${hasLinkedItems}`, { tickerId, page: 'tickers' });
+            if (hasLinkedItems) {
+                window.Logger.info('🚫 Ticker has linked items, deletion cancelled', { tickerId, page: 'tickers' });
+                return;
+            }
+        } else {
+            window.Logger.warn('⚠️ checkLinkedItemsBeforeAction function not available', { tickerId, page: 'tickers' });
+        }
+        
+        // Use warning system for confirmation with detailed information
+        if (window.showDeleteWarning) {
+            window.showDeleteWarning('ticker', tickerDetails, 'טיקר',
+                async () => await performTickerDeletion(tickerId),
+                () => {}
+            );
+        } else {
+            // Fallback to simple confirm
+            if (!confirm('האם אתה בטוח שברצונך למחוק את הטיקר?')) {
+                return;
+            }
+            await performTickerDeletion(tickerId);
+        }
+        
+    } catch (error) {
+        window.Logger.error('Error deleting ticker:', error, { tickerId, page: 'tickers' });
+        CRUDResponseHandler.handleError(error, 'מחיקת טיקר');
+    }
+}
+
+/**
  * אישור מחיקת טיקר (לשמירה על תאימות לאחור)
+ * @deprecated Use deleteTicker instead
  */
 async function confirmDeleteTicker(id) {
   
@@ -1466,22 +1534,7 @@ async function confirmDeleteTicker(id) {
 // ===== DATA MANAGEMENT FUNCTIONS =====
 // Data loading, caching, and table management
 
-/**
- * Clear tickers cache
- * Clears cached ticker data
- * 
- * @function clearTickersCache
- * @returns {void}
- */
-function clearTickersCache() {
-  try {
-    window.tickersData = [];
-    tickersData = [];
-    window.Logger.debug('🗑️ מטמון הטיקרים נוקה', { page: "tickers" });
-  } catch (error) {
-    console.error('clearTickersCache failed:', error);
-  }
-}
+// REMOVED: clearTickersCache - use window.UnifiedCacheManager.clearAllCache() or window.clearAllCache() from unified-cache-manager.js instead
 
 /**
  * טעינת נתוני טיקרים - גרסה פשוטה
@@ -1491,7 +1544,14 @@ async function loadTickersData() {
     window.Logger.info('Loading tickers data (bypass cache)', { page: "tickers" });
     
     // ניקוי מטמון לפני טעינה
-    clearTickersCache();
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearAllCache === 'function') {
+      await window.UnifiedCacheManager.clearAllCache('Light');
+    } else if (typeof window.clearAllCache === 'function') {
+      window.clearAllCache();
+    }
+    // Clear local tickers data
+    window.tickersData = [];
+    tickersData = [];
     
     // טעינת מטבעות אם עוד לא נטענו
     if (!window.currenciesLoaded) {
@@ -1674,12 +1734,18 @@ function updateTickersTable(tickers) {
                         ${ticker.yahoo_updated_at ? (window.formatShortDate ? window.formatShortDate(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleDateString('he-IL')) + ' ' + (window.formatTimeOnly ? window.formatTimeOnly(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleTimeString('he-IL', {hour: '2-digit', minute: '2-digit'})) : 'N/A'}
                     </td>
                     <td class="actions-cell">
-                        ${window.createActionsMenu ? window.createActionsMenu([
-                          { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
-                          { type: 'LINK', onclick: `window.viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
-                          { type: 'EDIT', onclick: `showEditTickerModal(${ticker.id})`, title: 'ערוך' },
-                          { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' }
-                        ]) : `
+                        ${(() => {
+                          if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                          const result = window.createActionsMenu([
+                            { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
+                            { type: 'LINK', onclick: `window.viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
+                            { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})`, title: 'ערוך' },
+                            { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' },
+                            { type: 'DELETE', onclick: `deleteTicker(${ticker.id})`, title: 'מחק' }
+                          ]);
+                          return result || '';
+                        })()}
+                        ${!window.createActionsMenu ? `
                         <div class="btn-group btn-group-sm" role="group">
                             <button data-button-type="VIEW" data-variant="small" 
                                     data-onclick="window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })" 
@@ -1688,18 +1754,17 @@ function updateTickersTable(tickers) {
                                     data-onclick="window.viewLinkedItemsForTicker(${ticker.id})" 
                                     data-text="" title="פריטים מקושרים"></button>
                             <button data-button-type="EDIT" data-variant="small" 
-                                    data-onclick="showEditTickerModal(${ticker.id})" 
+                                    data-onclick="window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})" 
                                     data-text="" title="ערוך"></button>
                             ${ticker.status === 'cancelled' ?
-    `<button data-button-type="REACTIVATE" data-variant="small" 
-             data-onclick="reactivateTicker(${ticker.id})" 
-             data-text="" title="הפעל מחדש טיקר"></button>` :
-    `<button data-button-type="CANCEL" data-variant="small" 
-             data-onclick="performTickerCancellation(${ticker.id})" 
-             data-text="" title="בטל טיקר"></button>`
-                            }
+                            `<button data-button-type="REACTIVATE" data-variant="small" 
+                                     data-onclick="reactivateTicker(${ticker.id})" 
+                                     data-text="" title="הפעל מחדש טיקר"></button>` :
+                            `<button data-button-type="CANCEL" data-variant="small" 
+                                     data-onclick="performTickerCancellation(${ticker.id})" 
+                                     data-text="" title="בטל טיקר"></button>`}
                         </div>
-                        `}
+                        ` : ''}
                     </td>
                 </tr>
             `;
@@ -1744,17 +1809,57 @@ window.cancelTicker = cancelTicker;
 window.performCancelTicker = performCancelTicker;
 window.updateAllTickerStatuses = updateAllTickerStatuses;
 // window.toggleSection removed - using global version from ui-utils.js
-window.toggleTickersSection = toggleTickersSection;
+// Wrapper function for backward compatibility - uses global toggleSection
+window.toggleTickersSection = function() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('tickers');
+    } else {
+        console.error('toggleSection not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת הסתרת סקשנים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
 window.restoreTickersSectionState = restoreTickersSectionState;
-window.clearTickersCache = clearTickersCache;
+// Wrapper function for backward compatibility - uses UnifiedCacheManager
+window.clearTickersCache = async function() {
+    // Clear tickers data from memory
+    if (window.tickersData) {
+        window.tickersData = [];
+    }
+    
+    // Use UnifiedCacheManager if available
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clear === 'function') {
+        try {
+            // Clear cache related to tickers
+            await window.UnifiedCacheManager.clear('all', { 
+                pattern: /ticker|tickers/i 
+            });
+            if (window.Logger) {
+                window.Logger.info('✅ Tickers cache cleared via UnifiedCacheManager', { page: "tickers" });
+            }
+        } catch (error) {
+            console.warn('Failed to clear cache via UnifiedCacheManager:', error);
+            // Fallback to window.clearAllCache if available
+            if (typeof window.clearAllCache === 'function') {
+                await window.clearAllCache();
+            }
+        }
+    } else if (typeof window.clearAllCache === 'function') {
+        // Fallback to global clearAllCache
+        await window.clearAllCache();
+    } else {
+        console.warn('No cache clearing system available');
+    }
+};
 
 // פונקציות נתונים חיצוניים
 window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
 
 // פונקציות מודלים
-window.showAddTickerModal = showAddTickerModal;
-window.showEditTickerModal = showEditTickerModal;
+// REMOVED: window.showAddTickerModal - use window.ModalManagerV2.showModal('tickersModal', 'add') directly
+// REMOVED: window.showEditTickerModal - use window.ModalManagerV2.showEditModal('tickersModal', 'ticker', id) directly
 // Note: showDeleteTickerModal removed - not needed (using confirmDeleteTicker directly)
 window.saveTicker = saveTicker;
 window.updateTicker = updateTicker;
@@ -1817,15 +1922,15 @@ window.updateActiveTradesField = updateActiveTradesField;
 window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
 window.restoreTickersSectionState = restoreTickersSectionState;
 // Note: saveTicker already exported above
-window.clearTickersCache = clearTickersCache;
+// REMOVED: window.clearTickersCache - use window.UnifiedCacheManager.clearAllCache() or window.clearAllCache() directly
 window.loadTickersData = loadTickersData;
 window.loadColorsAndApplyToHeaders = loadColorsAndApplyToHeaders;
 window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
 window.toggleSection = toggleSection;
-window.toggleTickersSection = toggleTickersSection;
-window.showAddTickerModal = showAddTickerModal;
-window.showEditTickerModal = showEditTickerModal;
+// REMOVED: window.toggleTickersSection - use window.toggleSection('tickers') directly
+// REMOVED: window.showAddTickerModal - use window.ModalManagerV2.showModal('tickersModal', 'add') directly
+// REMOVED: window.showEditTickerModal - use window.ModalManagerV2.showEditModal('tickersModal', 'ticker', id) directly
 // Note: saveTickerData removed - not needed (using saveTicker directly)
 window.performTickerCancellation = performTickerCancellation;
 window.checkLinkedItemsBeforeCancelTicker = checkLinkedItemsBeforeCancelTicker;
@@ -1906,7 +2011,9 @@ async function loadColorsAndApplyToHeaders() {
   restoreSortState();
 
   // טעינת נתוני טיקרים
-  loadTickersData();
+  (async () => {
+    await loadTickersData();
+  })();
 // });
 
 // אתחול נוסף כשהדף נטען לחלוטין
@@ -1935,14 +2042,18 @@ window.addEventListener('load', function () {
     if (tbody) {
       // נמצא tbody, טוען נתונים
       // קורא ל-loadTickersData
-      loadTickersData();
+      (async () => {
+        await loadTickersData();
+      })();
     } else if (attempts < maxAttempts) {
       attempts++;
       setTimeout(tryLoadData, 500);
     } else {
       handleElementNotFound('tryLoadData', 'לא הצלחתי למצוא את הטבלה אחרי 10 ניסיונות');
       // מנסה לטעון נתונים בכל מקרה
-      loadTickersData();
+      (async () => {
+        await loadTickersData();
+      })();
     }
   }
 
@@ -2128,61 +2239,14 @@ function getTypeDisplayName(type) {
 
 // toggleSection function removed - using global version from ui-basic.js
 
-function toggleTickersSection() {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection('tickers');
-    } else {
-        window.Logger.warn('toggleSection function not found', { page: "tickers" });
-    }
-}
+// REMOVED: toggleTickersSection - use window.toggleSection('tickers') from ui-utils.js directly
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
 // Modal management using ModalManagerV2
 
-/**
- * Show add ticker modal
- * Uses ModalManagerV2 for consistent modal experience
- * 
- * @function showAddTickerModal
- * @returns {void}
- */
-function showAddTickerModal() {
-    try {
-        window.Logger.debug('showAddTickerModal called', { page: 'tickers' });
-        
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.showModal('tickersModal', 'add');
-        } else {
-            console.error('ModalManagerV2 not available');
-        }
-    } catch (error) {
-        console.error('showAddTickerModal failed:', error);
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל הוספת טיקר');
-        }
-    }
-}
+// REMOVED: showAddTickerModal - use window.ModalManagerV2.showModal('tickersModal', 'add') directly
 
-/**
- * הצגת מודל עריכת טיקר
- * Uses ModalManagerV2 for consistent modal experience
- */
-function showEditTickerModal(tickerId) {
-    try {
-        window.Logger.debug('showEditTickerModal called', { tickerId, page: 'tickers' });
-        
-        if (window.ModalManagerV2) {
-            window.ModalManagerV2.showEditModal('tickersModal', 'ticker', tickerId);
-        } else {
-            console.error('ModalManagerV2 not available');
-        }
-    } catch (error) {
-        console.error('showEditTickerModal failed:', error);
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל עריכת טיקר');
-        }
-    }
-}
+// REMOVED: showEditTickerModal - use window.ModalManagerV2.showEditModal('tickersModal', 'ticker', tickerId) directly
 
 /**
  * שמירת טיקר
@@ -2197,7 +2261,7 @@ function showEditTickerModal(tickerId) {
 // REMOVED: Duplicate deleteTicker function - using confirmDeleteTicker instead
 
 // Export functions to window for global access
-window.showAddTickerModal = showAddTickerModal;
-window.showEditTickerModal = showEditTickerModal;
+// REMOVED: window.showAddTickerModal - use window.ModalManagerV2.showModal('tickersModal', 'add') directly
+// REMOVED: window.showEditTickerModal - use window.ModalManagerV2.showEditModal('tickersModal', 'ticker', id) directly
 // Note: saveTicker and deleteTicker removed - using ModalManagerV2 and confirmDeleteTicker instead
 

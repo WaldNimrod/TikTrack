@@ -16965,3 +16965,35 @@
 2025-10-30 17:55:17,536 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
 2025-10-30 17:55:17,537 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
 2025-10-30 17:55:17,540 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-01 00:15:43,474 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-01 00:15:43,475 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-01 00:15:43,476 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-01 00:15:43,476 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-01 00:15:43,476 - root - INFO - 🗄️ Initializing database...
+2025-11-01 00:15:43,476 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-01 00:15:43,478 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-11-01 00:15:43,479 - root - INFO - ✅ Database initialized successfully
+2025-11-01 00:15:44,484 - utils.performance_monitor - INFO - System metrics: CPU: 27.5%, Memory: 58.7%, Disk: 4.1%
+2025-11-01 00:15:44,485 - root - INFO - ✅ Database initialized successfully
+2025-11-01 00:15:44,485 - root - INFO - ✅ Server initialization completed
+2025-11-01 00:15:44,544 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-01 00:15:44,544 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-01 00:15:44,544 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-01 00:15:44,544 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-01 00:15:44,544 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-01 00:15:44,544 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-01 00:15:44,544 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-01 00:15:44,545 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-01 00:15:44,545 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-01 00:15:44,545 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-01 00:15:44,545 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-01 00:15:44,545 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-01 00:15:44,545 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-01 00:15:44,545 - services.background_tasks - INFO - Background task scheduler started
+2025-11-01 00:15:44,545 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-01 00:15:44,582 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:08a08b1b25b0889b2ed886b6e83a40b2
+2025-11-01 00:15:44,582 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:08a08b1b25b0889b2ed886b6e83a40b2
+2025-11-01 00:15:44,582 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-01 00:15:44,583 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-01 00:15:44,584 - root - INFO - ✅ External data refresh scheduler started successfully

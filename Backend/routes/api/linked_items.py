@@ -166,7 +166,9 @@ def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
         logger.info(f"Found {len(child_entities)} child entities")
         
         # Get parent entities (entities that this entity references)
+        logger.info(f"Calling get_parent_entities for {entity_type} {entity_id}")
         parent_entities = get_parent_entities(cursor, entity_type, entity_id)
+        logger.info(f"Found {len(parent_entities)} parent entities: {parent_entities}")
         
         # Get entity details for display
         entity_details = get_entity_details(cursor, entity_type, entity_id)
@@ -273,8 +275,9 @@ def get_entity_details(cursor, entity_type: str, entity_id: int) -> Dict[str, An
                 }
         elif entity_type == 'trade':
             cursor.execute("""
-                SELECT t.id, t.created_at, t.symbol
+                SELECT t.id, t.created_at, tk.symbol as ticker_symbol
                 FROM trades t
+                LEFT JOIN tickers tk ON t.ticker_id = tk.id
                 WHERE t.id = ?
             """, (entity_id,))
             row = cursor.fetchone()
@@ -282,7 +285,7 @@ def get_entity_details(cursor, entity_type: str, entity_id: int) -> Dict[str, An
                 return {
                     'id': row['id'],
                     'created_at': row['created_at'],
-                    'symbol': row['symbol']
+                    'ticker_symbol': row['ticker_symbol']
                 }
         elif entity_type == 'ticker':
             cursor.execute("""
@@ -347,8 +350,8 @@ def get_trade_child_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     # Get executions
     cursor.execute("""
         SELECT id, 'execution' as type, 'ביצוע' as title, 
-               CONCAT('ביצוע ', action, ' ', quantity, ' יחידות') as description,
-               created_at, status
+               'ביצוע ' || action || ' ' || quantity || ' יחידות' as description,
+               created_at, 'active' as status
         FROM executions 
         WHERE trade_id = ?
     """, (trade_id,))
@@ -411,7 +414,7 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
     # Get trades
     cursor.execute("""
         SELECT id, 'trade' as type, 'טרייד' as title, 
-               CONCAT('טרייד ', side, ' על ', ticker_symbol) as description,
+               'טרייד ' || side || ' על ' || ticker_symbol as description,
                created_at, status
         FROM trades t
         JOIN tickers tk ON t.ticker_id = tk.id
@@ -431,7 +434,7 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
     # Get cash flows
     cursor.execute("""
         SELECT id, 'cash_flow' as type, 'תזרים מזומנים' as title, 
-               CONCAT(type, ': ', amount, ' ', currency) as description,
+               type || ': ' || amount || ' ' || currency as description,
                date, 'active' as status
         FROM cash_flows 
         WHERE trading_account_id = ?
@@ -557,69 +560,98 @@ def get_trade_parent_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     """Get parent entities for a trade"""
     parents = []
     
-    # Get account
-    cursor.execute("""
-        SELECT a.id, 'account' as type, 'חשבון' as title, 
-               a.name as description,
-               a.created_at, a.status
-        FROM trades t
-        JOIN trading_accounts a ON t.trading_trading_account_id = a.id
-        WHERE t.id = ?
-    """, (trade_id,))
+    logger.info(f"get_trade_parent_entities called for trade_id={trade_id}")
     
-    row = cursor.fetchone()
-    if row:
-        parents.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3],
-            'created_at': row[4],
-            'status': row[5]
-        })
+    # Get account
+    try:
+        cursor.execute("""
+            SELECT a.id, 'account' as type, 'חשבון' as title, 
+                   a.name as description,
+                   a.created_at, a.status
+            FROM trades t
+            JOIN trading_accounts a ON t.trading_account_id = a.id
+            WHERE t.id = ?
+        """, (trade_id,))
+        
+        row = cursor.fetchone()
+        if row:
+            parents.append({
+                'id': row[0],
+                'type': row[1],
+                'title': row[2],
+                'description': row[3],
+                'created_at': row[4],
+                'status': row[5]
+            })
+            logger.info(f"Found account parent: {parents[-1]}")
+    except Exception as e:
+        logger.error(f"Error getting account parent for trade {trade_id}: {e}")
     
     # Get ticker
-    cursor.execute("""
-        SELECT tk.id, 'ticker' as type, 'טיקר' as title, 
-               CONCAT(tk.symbol, ' - ', tk.name) as description,
-               tk.created_at, 'active' as status
-        FROM trades t
-        JOIN tickers tk ON t.ticker_id = tk.id
-        WHERE t.id = ?
-    """, (trade_id,))
-    
-    row = cursor.fetchone()
-    if row:
-        parents.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3],
-            'created_at': row[4],
-            'status': row[5]
-        })
+    try:
+        cursor.execute("""
+            SELECT tk.id, 'ticker' as type, 'טיקר' as title, 
+                   tk.symbol || ' - ' || tk.name as description,
+                   tk.created_at, 'active' as status
+            FROM trades t
+            JOIN tickers tk ON t.ticker_id = tk.id
+            WHERE t.id = ?
+        """, (trade_id,))
+        
+        row = cursor.fetchone()
+        if row:
+            parents.append({
+                'id': row[0],
+                'type': row[1],
+                'title': row[2],
+                'description': row[3],
+                'created_at': row[4],
+                'status': row[5]
+            })
+            logger.info(f"Found ticker parent: {parents[-1]}")
+    except Exception as e:
+        logger.error(f"Error getting ticker parent for trade {trade_id}: {e}")
     
     # Get trade plan
-    cursor.execute("""
-        SELECT tp.id, 'trade_plan' as type, 'תוכנית טרייד' as title, 
-               CONCAT('תוכנית ', tp.side, ' - ', tp.investment_type) as description,
-               tp.created_at, tp.status
-        FROM trades t
-        JOIN trade_plans tp ON t.trade_plan_id = tp.id
-        WHERE t.id = ?
-    """, (trade_id,))
+    try:
+        logger.info(f"Executing trade_plan query for trade_id={trade_id}")
+        cursor.execute("""
+            SELECT tp.id, 'trade_plan' as type, 'תוכנית טרייד' as title, 
+                   'תוכנית ' || tp.side || ' - ' || tp.investment_type as description,
+                   tp.created_at, tp.status
+            FROM trades t
+            JOIN trade_plans tp ON t.trade_plan_id = tp.id
+            WHERE t.id = ?
+        """, (trade_id,))
+        
+        row = cursor.fetchone()
+        logger.info(f"Query result for trade_plan: row={row}")
+        if row:
+            trade_plan_parent = {
+                'id': row[0],
+                'type': row[1],
+                'title': row[2],
+                'description': row[3],
+                'created_at': row[4],
+                'status': row[5]
+            }
+            parents.append(trade_plan_parent)
+            logger.info(f"Found trade_plan parent: {trade_plan_parent}")
+        else:
+            logger.warning(f"No trade_plan found for trade_id={trade_id}")
+            # בואו נבדוק אם יש trade_plan_id בכלל
+            cursor.execute("SELECT trade_plan_id FROM trades WHERE id = ?", (trade_id,))
+            check_row = cursor.fetchone()
+            if check_row:
+                logger.info(f"Trade {trade_id} has trade_plan_id={check_row[0]}")
+            else:
+                logger.warning(f"Trade {trade_id} not found in database")
+    except Exception as e:
+        logger.error(f"Error getting trade_plan parent for trade {trade_id}: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
     
-    row = cursor.fetchone()
-    if row:
-        parents.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3],
-            'created_at': row[4],
-            'status': row[5]
-        })
-    
+    logger.info(f"get_trade_parent_entities returning {len(parents)} parents: {parents}")
     return parents
 
 # Execution parent entities
@@ -630,7 +662,7 @@ def get_execution_parent_entities(cursor, execution_id: int) -> List[Dict[str, A
     # Get trade
     cursor.execute("""
         SELECT t.id, 'trade' as type, 'טרייד' as title, 
-               CONCAT('טרייד ', t.side, ' על ', tk.symbol) as description,
+               'טרייד ' || t.side || ' על ' || tk.symbol as description,
                t.created_at, t.status
         FROM executions e
         JOIN trades t ON e.trade_id = t.id
@@ -792,7 +824,7 @@ def get_trade_plan_child_entities(cursor, trade_plan_id: int) -> List[Dict[str, 
     # Get trades
     cursor.execute("""
         SELECT t.id, 'trade' as type, 'טרייד' as title, 
-               CONCAT('טרייד ', t.side, ' על ', tk.symbol) as description,
+               'טרייד ' || t.side || ' על ' || tk.symbol as description,
                t.created_at, t.status
         FROM trades t
         JOIN tickers tk ON t.ticker_id = tk.id

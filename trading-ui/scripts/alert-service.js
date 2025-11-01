@@ -237,6 +237,7 @@ window.formatAlertCondition = formatAlertCondition;
 window.parseAlertCondition = parseAlertCondition;
 window.cancelAlert = cancelAlert;
 window.deleteAlert = deleteAlert;
+window.performAlertDeletion = performAlertDeletion;
 
 // ===== ALERT CONDITION FUNCTIONS =====
 
@@ -360,7 +361,8 @@ function parseAlertCondition(condition) {
  */
 async function cancelAlert(alertId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - ביטול    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - ביטול
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -375,14 +377,13 @@ async function cancelAlert(alertId) {
 
     if (response.ok) {
       // התראה בוטלה בהצלחה
-        if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'התראה בוטלה בהצלחה!');
-        }
-        
-        // רענון הטבלה
-        if (window.loadAlertsData) {
-          await window.loadAlertsData();
-        }
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification('הצלחה', 'התראה בוטלה בהצלחה!');
+      }
+      
+      // רענון הטבלה
+      if (window.loadAlertsData) {
+        await window.loadAlertsData();
       }
       
       return true;
@@ -411,58 +412,72 @@ async function cancelAlert(alertId) {
  * @function deleteAlert
  * @async
  * @param {number} alertId - Alert ID
- * @returns {Promise<boolean>} Success status
+ * @returns {Promise<void>}
  */
 async function deleteAlert(alertId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה    const response = await fetch(`/api/alerts/${alertId}`, {
+    // Get alert details for confirmation message
+    let alertDetails = `התראה #${alertId}`;
+    const alert = window.alertsData?.find(a => a.id === alertId || a.id === parseInt(alertId));
+    
+    if (alert) {
+      // Build detailed alert info
+      const ticker = alert.ticker_symbol || alert.symbol || 'לא מוגדר';
+      const condition = alert.condition_attribute && alert.condition_operator && alert.condition_value ?
+        `${alert.condition_attribute} ${alert.condition_operator} ${alert.condition_value}` :
+        'לא מוגדר';
+      const statusText = alert.status === 'open' ? 'פתוח' : 
+                        alert.status === 'closed' ? 'סגור' : 
+                        alert.status === 'cancelled' ? 'מבוטל' : alert.status;
+      const triggeredText = alert.is_triggered === 'true' ? 'כן' :
+                           alert.is_triggered === 'false' ? 'לא' :
+                           alert.is_triggered === 'new' ? 'חדש' : 'לא מוגדר';
+      const date = alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      
+      alertDetails = `${ticker} - תנאי: ${condition}, סטטוס: ${statusText}, הופעל: ${triggeredText}, תאריך: ${date}`;
+    }
+    
+    // Show delete warning with detailed information
+    if (window.showDeleteWarning) {
+      window.showDeleteWarning('alert', alertDetails, 'התראה',
+        async () => await performAlertDeletion(alertId),
+        () => {}
+      );
+    } else {
+      // Fallback to simple confirm
+      if (!confirm('האם אתה בטוח שברצונך למחוק את ההתראה?')) {
+        return;
+      }
+      await performAlertDeletion(alertId);
+    }
+    
+  } catch (error) {
+    CRUDResponseHandler.handleError(error, 'מחיקת התראה');
+  }
+}
+
+/**
+ * Perform alert deletion
+ * @function performAlertDeletion
+ * @async
+ * @param {number} alertId - Alert ID
+ * @returns {Promise<void>}
+ */
+async function performAlertDeletion(alertId) {
+  try {
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });
 
-    const result = await response.json();
-
-    if (response.ok && result.status === 'success') {
-      // התראה נמחקה בהצלחה
-        if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
-        }
-        
-        // רענון הטבלה
-        if (window.loadAlertsData) {
-          await window.loadAlertsData();
-        }
-      }
-      
-      return true;
-    } else {
-      // שגיאה במחיקת התראה
-
-      // טיפול בשגיאות מהשרת
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        if (serverMessage.includes('has linked items')) {
-          if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק התראה זו - יש פריטים מקושרים אליה');
-          }
-        } else {
-          if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה במחיקה', serverMessage);
-          }
-        }
-      } else {
-        if (window.showErrorNotification) {
-          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת התראה - בדוק את הנתונים');
-        }
-      }
-      return false;
-    }
-  } catch {
-    // שגיאה במחיקת התראה
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'שגיאה במחיקת התראה - בדוק את חיבור השרת');
-    }
-    return false;
+    // Use CRUDResponseHandler for consistent response handling
+    await CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: 'התראה נמחקה בהצלחה!',
+      entityName: 'התראה',
+      reloadFn: window.loadAlertsData,
+      requiresHardReload: false
+    });
+  } catch (error) {
+    CRUDResponseHandler.handleError(error, 'מחיקת התראה');
   }
 }
 

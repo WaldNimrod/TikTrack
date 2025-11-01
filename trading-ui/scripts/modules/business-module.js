@@ -416,7 +416,7 @@ function updateTradesTable(trades) {
       <td class="pl-cell">${window.colorAmountByValue(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
-      <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
+      <td data-account="${trade.account_id || trade.account_name || ''}"><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
@@ -487,7 +487,12 @@ function editTradeRecord(tradeId) {
   // מציאת הטרייד במערך
   const trade = tradesData.find(t => t.id === tradeId);
   if (trade) {
-    showEditTradeModal(trade);
+    // Use ModalManagerV2 directly
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+      window.ModalManagerV2.showEditModal('tradesModal', 'trade', trade.id);
+    } else {
+      window.Logger?.error('ModalManagerV2 לא זמין', { page: "business-module" });
+    }
   } else {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('trade', 'CRITICAL');
@@ -628,10 +633,9 @@ async function performTradeCancellation(tradeId) {
     }
 
     // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה!', 4000, 'business');
-      // רענון הטבלה
-      await loadTradesData();
-    }
+    window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה!', 4000, 'business');
+    // רענון הטבלה
+    await loadTradesData();
 
   } catch (error) {
     if (typeof handleSaveError === 'function') {
@@ -727,10 +731,9 @@ async function performTradeDeletion(tradeId) {
     }
 
     // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה!', 4000, 'business');
-      // רענון הטבלה
-      await loadTradesData();
-    }
+    window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה!', 4000, 'business');
+    // רענון הטבלה
+    await loadTradesData();
 
   } catch (error) {
     if (typeof handleDeleteError === 'function') {
@@ -760,76 +763,14 @@ function addEditReminder() {
 /**
  * פונקציה להצגת מודל עריכת טרייד
  */
-async function showEditTradeModal(trade) {
+// REMOVED: showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId) directly
+// Note: This function had complex logic for loading modal data - if needed, implement as modal hooks in ModalManagerV2
 
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('editTradeForm');
-  }
-
-  // ניקוי סימונים
-  const tradePlanSelect = document.getElementById('editTradeTradePlanId');
-  if (tradePlanSelect) {
-    tradePlanSelect.removeAttribute('data-restored');
-    tradePlanSelect.removeAttribute('data-cleared');
-  }
-
-  // טעינת נתונים למודל עריכת טרייד
-  await loadEditTradeModalData(trade);
-
-  // טעינת נתוני העסקאות
-  if (typeof window.loadTradeExecutions === 'function') {
-    try {
-      window.loadTradeExecutions(trade.id);
-    } catch {
-      if (typeof handleFunctionNotFound === 'function') {
-        handleFunctionNotFound('loadTradeExecutions');
-      } else {
-        // console.warn('loadTradeExecutions function not found');
-      }
-    }
-  } else {
-    if (typeof handleFunctionNotFound === 'function') {
-      handleFunctionNotFound('loadTradeExecutions');
-    } else {
-      // console.warn('loadTradeExecutions function not found');
-    }
-  }
-
-  // שמירת הטרייד המקורי לבדיקות
-  window.currentEditTrade = trade;
-
-  // הגדרת ולידציה של שדות תאריך - מושבת זמנית
-  // setTimeout(() => {
-  //   setupDateValidation();
-  // }, 100);
-
-  // שמירת הטרייד המקורי לבדיקות
-  window.currentEditTrade = trade;
-
-  // הגדרת ולידציה של שדות תאריך - מושבת זמנית
-  // setTimeout(() => {
-  //   setupDateValidation();
-  // }, 100);
-
-  // Show the modal
-  const modalElement = document.getElementById('editTradeModal');
-  if (modalElement) {
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
-  } else {
-    if (typeof handleElementNotFound === 'function') {
-      handleElementNotFound('editTradeModal', 'CRITICAL');
-    } else {
-      // console.error('editTradeModal element not found');
-    }
-  }
-}
-
+// REMOVED: loadEditTradeModalData - not used, ModalManagerV2 uses populateSelects and populateForm
 /**
  * טעינת נתונים למודל עריכת טרייד
  */
-async function loadEditTradeModalData(trade) {
+async function _REMOVED_loadEditTradeModalData(trade) {
   try {
     // טעינת חשבונות, תוכניות טרייד וטיקרים
     const [accountsResponse, tradePlansResponse, tickersResponse] = await Promise.all([
@@ -1085,10 +1026,11 @@ async function loadEditTradeModalData(trade) {
   }
 }
 
+// REMOVED: saveEditTradeData - not used, ModalManagerV2 uses its own save handlers
 /**
  * שמירת עריכת טרייד - גרסה פשוטה
  */
-async function saveEditTradeData() {
+async function _REMOVED_saveEditTradeData() {
   try {
     // ניקוי מטמון לפני פעולת CRUD - עריכה    // איסוף נתונים מהטופס
     const formData = {
@@ -1193,10 +1135,9 @@ async function saveEditTradeData() {
     }
 
     // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד עודכן בהצלחה!', 4000, 'business');
-      // רענון הטבלה
-      await loadTradesData();
-    }
+    window.showSuccessNotification('הצלחה', 'טרייד עודכן בהצלחה!', 4000, 'business');
+    // רענון הטבלה
+    await loadTradesData();
 
     // סגירת המודל
     bootstrap.Modal.getInstance(document.getElementById('editTradeModal')).hide();
@@ -1226,61 +1167,8 @@ async function saveEditTradeData() {
  * - loadModalData() - טעינת נתונים למודל
  * - Bootstrap Modal
  */
-function showAddTradeModal() {
-  // טעינת נתונים למודל
-  loadModalData();
-
-  // ניקוי הטופס
-  const form = document.getElementById('addTradeForm');
-  if (form) {
-    form.reset();
-  }
-
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('addTradeForm');
-  }
-
-  // ניטרול כל השדות חוץ מתוכנית טרייד
-  disableTradeFormFields();
-
-  // הגדרת תאריך נוכחי
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const hh = String(today.getHours()).padStart(2, '0');
-  const min = String(today.getMinutes()).padStart(2, '0');
-  const todayStr = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
-
-  const dateInput = document.getElementById('addTradeOpenedAt');
-  if (dateInput) {dateInput.value = todayStr;}
-
-  // הצגת המודל
-  const modalElement = document.getElementById('addTradeModal');
-  if (modalElement) {
-    if (typeof bootstrap !== 'undefined') {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    } else {
-      if (typeof handleSystemError === 'function') {
-        handleSystemError(new Error('Bootstrap is not loaded'), 'מערכת מודלים');
-      } else {
-        // console.error('Bootstrap is not loaded');
-      }
-      // נסיון חלופי להצגת המודל
-      modalElement.style.display = 'block';
-      modalElement.classList.add('show');
-      document.body.classList.add('modal-open');
-    }
-  } else {
-    if (typeof handleElementNotFound === 'function') {
-      handleElementNotFound('addTradeModal', 'CRITICAL');
-    } else {
-      // console.error('addTradeModal element not found');
-    }
-  }
-}
+// REMOVED: showAddTradeModal - use window.ModalManagerV2.showModal('tradesModal', 'add') directly
+// Note: This function had complex logic for loading modal data and setting dates - if needed, implement as modal hooks in ModalManagerV2
 
 /**
  * ניטרול שדות הטופס (חוץ מתוכנית טרייד)
@@ -1480,9 +1368,8 @@ async function saveNewTradeRecord() {
       await response.json(); // newTrade not used
       
       window.showSuccessNotification('הצלחה', 'טרייד נשמר בהצלחה!', 4000, 'business');
-        // רענון הטבלה
-        loadTradesData();
-      }
+      // רענון הטבלה
+      loadTradesData();
 
       // סגירת המודל
       const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
@@ -2027,11 +1914,11 @@ window.checkLinkedItemsAndCancel = checkLinkedItemsAndCancel;  // בדיקת מ�
 window.performTradeCancellation = performTradeCancellation;  // ביצוע ביטול
 
 // פונקציות מודלים:
-window.showAddTradeModal = showAddTradeModal;              // הצגת מודל הוספה
-window.showEditTradeModal = showEditTradeModal;            // הצגת מודל עריכה
+// REMOVED: window.showAddTradeModal - use window.ModalManagerV2.showModal('tradesModal', 'add') directly
+// REMOVED: window.showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', id) directly
 window.disableTradeFormFields = disableTradeFormFields;    // ניטרול שדות טופס
 window.enableTradeFormFields = enableTradeFormFields;      // הפעלת שדות טופס
-window.saveEditTrade = saveEditTradeData;                      // שמירת עריכת טרייד
+// REMOVED: window.saveEditTrade = saveEditTradeData - saveEditTradeData removed, ModalManagerV2 handles saving
 window.saveNewTradeRecord = saveNewTradeRecord;            // שמירת טרייד חדש
 
 // פונקציות ולידציה:
@@ -2040,7 +1927,7 @@ window.validateTradeForm = validateTradeForm;              // ולידציה ש�
 
 // פונקציות עזר:
 window.loadModalData = loadModalData;                      // טעינת נתונים למודל
-window.loadEditModalData = loadEditTradeModalData;              // טעינת נתונים למודל עריכה
+// REMOVED: window.loadEditModalData = loadEditTradeModalData - loadEditTradeModalData removed, ModalManagerV2 handles modal data loading
 window.updateTickerFromTradePlan = updateTickerFromTradePlan; // עדכון טיקר מתוכנית
 window.updateTickersListForClosedTrades = updateTickersListForClosedTrades; // עדכון רשימת טיקרים
 // window.updateTickersForClosedTradesFilter = window.updateTickersForClosedTradesFilter;
@@ -2061,7 +1948,7 @@ window.validateTickerChange = validateTickerChange;        // בדיקת שינ�
 // window.setupDateValidation = setupDateValidation;          // הגדרת ולידציה של תאריכים - מושבת זמנית
 window.validateDateFields = validateDateFields;            // בדיקת ולידציה של שדות תאריך
 window.setupDateValidation = setupDateValidation;          // הגדרת ולידציה של תאריכים
-window.showDateValidationError = showDateValidationError;  // הצגת הודעת שגיאה לולידציה
+// REMOVED: window.showDateValidationError - use window.showFieldError from validation-utils.js or window.showErrorNotification from notification-system.js directly
 window.clearDateValidationMessages = clearDateValidationMessages; // ניקוי הודעות ולידציה
 
 // פונקציות סידור - משתמשות בפונקציות הגלובליות מ-tables.js
@@ -2107,7 +1994,12 @@ function validateDateFields() {
     const closedDate = new Date(closedAt);
 
     if (closedDate < openedDate) {
-      showDateValidationError('תאריך סגירה לא יכול להיות לפני תאריך יצירה');
+      const closedAtField = document.getElementById('editTradeClosedAt');
+      if (closedAtField && typeof window.showFieldError === 'function') {
+        window.showFieldError(closedAtField, 'תאריך סגירה לא יכול להיות לפני תאריך יצירה');
+      } else if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('תאריך סגירה לא יכול להיות לפני תאריך יצירה');
+      }
       closedAtField.classList.add('is-invalid');
     } else {
       closedAtField.classList.remove('is-invalid');
@@ -2119,22 +2011,7 @@ function validateDateFields() {
 /**
  * הצגת הודעת שגיאה לולידציה
  */
-function showDateValidationError(message) {
-  const closedAtField = document.getElementById('editTradeClosedAt');
-  if (!closedAtField) {return;}
-
-  // הסרת הודעות קודמות
-  const existingError = closedAtField.parentNode.querySelector('.invalid-feedback');
-  if (existingError) {
-    existingError.remove();
-  }
-
-  // הוספת הודעת שגיאה
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'invalid-feedback';
-  errorDiv.textContent = message;
-  closedAtField.parentNode.appendChild(errorDiv);
-}
+// REMOVED: showDateValidationError - use window.showFieldError(fieldId, message) from validation-utils.js or window.showErrorNotification from notification-system.js directly
 
 /**
  * ניקוי הודעות ולידציה
@@ -2794,11 +2671,10 @@ async function reactivateTrade(tradeId) {
     }
 
     // הצגת הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
-      } else if (typeof window.showNotification === 'function') {
-        window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
-      }
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
+    } else if (typeof window.showNotification === 'function') {
+      window.showSuccessNotification('טרייד הופעל מחדש בהצלחה!');
     }
 
     // רענון הטבלה
@@ -3051,8 +2927,9 @@ function generateDetailedLog() {
 // window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
+// REMOVED: copyDetailedLog - not used, use global generateDetailedLog from logger-service.js
 // Local copyDetailedLog function for trades page
-async function copyDetailedLog() {
+async function _REMOVED_copyDetailedLog() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

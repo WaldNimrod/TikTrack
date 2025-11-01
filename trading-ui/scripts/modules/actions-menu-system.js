@@ -252,7 +252,8 @@ class ActionsMenuSystem {
         
         this.initAccessibility();
         this.attachLinkedItemsDebugLogger();
-        this.attachZIndexDebugLogger();
+        // Disabled JavaScript hover delay - using CSS-only hover instead
+        // this.attachZIndexDebugLogger();
     }
 
     /**
@@ -261,9 +262,14 @@ class ActionsMenuSystem {
      * @returns {string} - HTML for the dropdown menu
      */
     createActionsMenu(buttons) {
-        if (!buttons || buttons.length === 0) return '';
+        console.log('🔧 [ActionsMenuSystem] createActionsMenu called with buttons:', buttons);
+        if (!buttons || buttons.length === 0) {
+            console.warn('⚠️ [ActionsMenuSystem] No buttons provided');
+            return '';
+        }
         
-        const menuButtons = buttons.map(button => {
+        const menuButtons = buttons.map((button, index) => {
+            console.log(`🔧 [ActionsMenuSystem] Processing button ${index + 1}:`, button);
             // Handle both DOM elements and objects
             let buttonType, variant, onclick, text, title;
             
@@ -300,10 +306,26 @@ class ActionsMenuSystem {
                 default: icon = '⚙️'; break;
             }
             
-            return `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick="${onclick}" title="${title}" style="margin-right: 4px;">${icon}</button>`;
+            // Escape onclick for HTML attribute - escape single quotes since we use single quotes for the attribute
+            let escapedOnclick = onclick || '';
+            if (escapedOnclick) {
+                // Escape single quotes (since we use single quotes for the attribute wrapper)
+                escapedOnclick = escapedOnclick.replace(/'/g, '&#39;');
+                // Double quotes are OK inside single-quoted attribute
+            }
+            
+            // Use single quotes for the data-onclick attribute value - allows double quotes inside without escaping
+            const buttonHTML = `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${escapedOnclick}' title="${title || ''}" style="margin-right: 4px;">${icon}</button>`;
+            console.log(`✅ [ActionsMenuSystem] Created button ${index + 1}:`, {
+                type: buttonType,
+                onclick: onclick,
+                escapedOnclick: escapedOnclick,
+                html: buttonHTML.substring(0, 100) + '...'
+            });
+            return buttonHTML;
         }).join('');
         
-        return `
+        const fullHTML = `
             <div class="actions-menu-wrapper">
                 <button class="btn actions-trigger" title="פעולות">⚙️</button>
                 <div class="actions-menu-popup">
@@ -311,6 +333,8 @@ class ActionsMenuSystem {
                 </div>
             </div>
         `;
+        console.log('✅ [ActionsMenuSystem] Full menu HTML created:', fullHTML.substring(0, 200) + '...');
+        return fullHTML;
     }
     
     /**
@@ -547,12 +571,63 @@ class ActionsMenuSystem {
 
 // פונקציה גלובלית ליצירת תפריט פעולות
 window.createActionsMenu = function(buttons) {
+    console.log('🔧 [window.createActionsMenu] Called with:', buttons);
+    console.log('🔧 [window.createActionsMenu] window.actionsMenuSystem exists?', !!window.actionsMenuSystem);
+    console.log('🔧 [window.createActionsMenu] ActionsMenuSystem class exists?', typeof ActionsMenuSystem);
+    
+    // Try to use instance first
     if (window.actionsMenuSystem) {
+        console.log('✅ [window.createActionsMenu] Using existing instance');
         return window.actionsMenuSystem.createActionsMenu(buttons);
-    } else {
-        console.warn('ActionsMenuSystem not yet initialized');
-        return null;
     }
+    
+    // Fallback: create instance on-the-fly if ActionsMenuSystem class is available
+    if (typeof ActionsMenuSystem !== 'undefined') {
+        console.log('⚠️ [window.createActionsMenu] Creating new instance on-the-fly');
+        if (!window.actionsMenuSystem) {
+            window.actionsMenuSystem = new ActionsMenuSystem();
+        }
+        return window.actionsMenuSystem.createActionsMenu(buttons);
+    }
+    
+    // Final fallback: create HTML directly (same as fallback in pages)
+    console.warn('⚠️ [window.createActionsMenu] Using direct HTML fallback');
+    if (!buttons || buttons.length === 0) return '';
+    
+    const menuButtons = buttons.map(button => {
+        const buttonType = button.type || 'BUTTON';
+        const onclick = button.onclick || '';
+        const title = button.title || '';
+        
+        // Get icon
+        let icon = '';
+        switch(buttonType) {
+            case 'LINK': icon = '🔗'; break;
+            case 'EDIT': icon = '✏️'; break;
+            case 'DELETE': icon = '🗑️'; break;
+            case 'VIEW': icon = '👁️'; break;
+            default: icon = '⚙️'; break;
+        }
+        
+        // Escape onclick for HTML attribute - escape single quotes since we use single quotes for the attribute
+        let escapedOnclick = onclick || '';
+        if (escapedOnclick) {
+            escapedOnclick = escapedOnclick.replace(/'/g, '&#39;');
+        }
+        console.log(`🔧 [window.createActionsMenu fallback] Button ${buttonType}:`, { onclick, escapedOnclick });
+        return `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${escapedOnclick}' title="${title || ''}" style="margin-right: 4px;">${icon}</button>`;
+    }).join('');
+    
+    const fallbackHTML = `
+        <div class="actions-menu-wrapper">
+            <button class="btn actions-trigger" title="פעולות">⚙️</button>
+            <div class="actions-menu-popup">
+                ${menuButtons}
+            </div>
+        </div>
+    `;
+    console.log('✅ [window.createActionsMenu fallback] Generated HTML:', fallbackHTML.substring(0, 200) + '...');
+    return fallbackHTML;
 };
 
 // Initialize דרך UnifiedAppInitializer - כלל 43

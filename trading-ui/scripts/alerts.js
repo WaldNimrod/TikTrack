@@ -5,19 +5,17 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 66
+ * Total Functions: 58
  * 
  * PAGE INITIALIZATION (2)
  * - initializeAlertModalTabs() - initializeAlertModalTabs function
  * - initializeAlertConditionBuilder() - * עדכון סטטיסטיקות הערכת תנאים
  * 
- * DATA LOADING (13)
+ * DATA LOADING (12)
  * - getDemoAlertsData() - getDemoAlertsData function
  * - loadAlertsData() - loadAlertsData function
  * - loadModalData() - loadModalData function
  * - getAlertState() - * עריכת התראה
- * - getStatusClass() - * אישור מחיקת התראה
- * - getRelatedClass() - * פונקציה לסידור טבלת התראות
  * - loadAlerts() - loadAlerts function
  * - loadConditionsFromSource() - loadConditionsFromSource function
  * - loadTradePlansForConditions() - * Load conditions from source type (trade_plan or trade)
@@ -25,6 +23,7 @@
  * - loadConditionsFromItem() - * Load trades for conditions selection
  * - showEvaluationLoading() - showEvaluationLoading function
  * - getMethodIdFromCondition() - getMethodIdFromCondition function
+ * - loadAlertTickerInfo() - * הצגת מודל הוספת התראה
  * 
  * DATA MANIPULATION (15)
  * - updatePageSummaryStats() - updatePageSummaryStats function
@@ -35,16 +34,15 @@
  * - deleteAlertInternal() - deleteAlertInternal function
  * - confirmDeleteAlert() - * מחיקת התראה
  * - updateAlertStatus() - updateAlertStatus function
+ * - updateEvaluationStats() - updateEvaluationStats function
+ * - saveAlertData() - * Update evaluation statistics
  * - updateAlertsSummary() - updateAlertsSummary function
  * - createAlertFromCondition() - * Select condition for alert creation
  * - updateModalButtons() - * Initialize tab management for add alert modal
  * - updateEvaluationSummary() - updateEvaluationSummary function
  * - showAddAlertModal() - * ניקוי הממשק המתקדם
- * - saveAlert() - * הצגת מודל הוספת התראה
- * - deleteAlert() - deleteAlert function
  * 
- * EVENT HANDLING (23)
- * - clearAlertValidation() - * עדכון סטטיסטיקות סיכום
+ * EVENT HANDLING (16)
  * - onRelationTypeChange() - onRelationTypeChange function
  * - onRelatedObjectChange() - * טיפול בשינוי סוג שיוך
  * - toggleConditionFields() - * טיפול בבחירת אובייקט
@@ -52,15 +50,9 @@
  * - disableConditionFields() - * Enable condition fields for add modal
  * - enableEditConditionFields() - * Enable condition fields for add modal
  * - disableEditConditionFields() - * Enable condition fields for add modal
- * - onEditRelationTypeChange() - onEditRelationTypeChange function
- * - onEditRelatedObjectChange() - * טיפול בשינוי סוג שיוך במודל העריכה
- * - enableEditConditionFields() - * טיפול בבחירת אובייקט במודל העריכה
- * - disableEditConditionFields() - * טיפול בבחירת אובייקט במודל העריכה
- * - buildAlertCondition() - buildAlertCondition function
- * - parseAlertCondition() - * בניית מחרוזת תנאי התראה
+ * - parseAlertCondition() - parseAlertCondition function
  * - validateAlertStatusCombination() - validateAlertStatusCombination function
- * - restoreAlertsSectionState() - * קבלת מחלקת סטטוס
- * - checkAlertCondition() - checkAlertCondition function
+ * - restoreAlertsSectionState() - * אישור מחיקת התראה
  * - displayAvailableConditions() - displayAvailableConditions function
  * - selectConditionForAlert() - selectConditionForAlert function
  * - evaluateAllConditions() - evaluateAllConditions function
@@ -68,20 +60,20 @@
  * - displayEvaluationResults() - * הצגת אינדיקטור טעינה להערכת תנאים
  * - cleanupAlertConditionBuilder() - * קבלת מזהה שיטה מתנאי קיים
  * 
- * UI UPDATES (1)
+ * UI UPDATES (2)
  * - showEditAlertModal() - * ניקוי הממשק המתקדם
+ * - displayAlertTickerInfo() - * מחיקת התראה
  * 
- * VALIDATION (2)
- * - checkAlertVariable() - * הפעלת שדות התנאי במודל העריכה
- * - checkAlertOperator() - checkAlertOperator function
+ * VALIDATION (1)
+ * - validateAlertForm() - validateAlertForm function
  * 
  * OTHER (10)
- * - filterAlertsLocally() - filterAlertsLocally function
  * - populateSelect() - populateSelect function
  * - populateRelatedObjects() - * Enable condition fields for add modal
  * - populateEditRelatedObjects() - populateEditRelatedObjects function
  * - editAlert() - editAlert function
  * - filterAlertsByRelatedObjectTypeWrapper() - filterAlertsByRelatedObjectTypeWrapper function
+ * - filterAlertsByRelatedObjectType() - filterAlertsByRelatedObjectType function
  * - reactivateAlert() - reactivateAlert function
  * - toggleAlert() - toggleAlert function
  * - generateDetailedLog() - generateDetailedLog function
@@ -108,6 +100,11 @@
  */
 
 // alerts.js loaded successfully - removed debug log
+
+// Save global function reference BEFORE we export our own function
+// We'll capture it when the function is first called, not at module load time
+// This ensures we get the actual global function even if it loads after this file
+let globalUpdatePageSummaryStats = null;
 
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
 window.loadAlertsData = window.loadAlertsData || function() {
@@ -441,148 +438,7 @@ async function loadAlertsData() {
   }
 }
 
-/**
- * פילטור מקומי להתראות
- */
-function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
-  try {
-    let filteredAlerts = [...alerts];
-
-    // Extracting start and end dates
-    let startDate = null;
-    let endDate = null;
-
-  if (selectedDateRange && selectedDateRange !== 'כל זמן') {
-    const dateRange = window.translateDateRangeToDates
-      ? window.translateDateRangeToDates(selectedDateRange)
-      : { startDate: null, endDate: null };
-    startDate = dateRange.startDate;
-    endDate = dateRange.endDate;
-  }
-
-  // Filtering by status
-  if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
-    filteredAlerts = filteredAlerts.filter(alert => {
-      // המרת הערכים הנבחרים לאנגלית
-      const statusTranslations = {
-        'פתוח': 'open',
-        'סגור': 'closed',
-        'מבוטל': 'cancelled',
-      };
-
-      const translatedSelectedStatuses = selectedStatuses.map(status =>
-        statusTranslations[status] || status,
-      );
-
-      const isMatch = translatedSelectedStatuses.includes(alert.status);
-      return isMatch;
-    });
-  }
-
-  // Filtering by type
-  if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
-    filteredAlerts = filteredAlerts.filter(() => {
-      // הסרת פילטור לפי סוג התראה - השדה type הוסר
-      const isMatch = true;
-      return isMatch;
-    });
-  }
-
-  // Filtering by dates
-  if (startDate && endDate) {
-    filteredAlerts = filteredAlerts.filter(alert => {
-      if (!alert.created_at) {return false;}
-
-      const alertDate = new Date(alert.created_at);
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-
-      // Setting time to start of day for start date and end of day for end date
-      start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999);
-
-      const isInRange = alertDate >= start && alertDate <= end;
-      return isInRange;
-    });
-  }
-
-  // Filtering by search term
-  if (searchTerm && searchTerm.trim() !== '') {
-    const searchLower = searchTerm.toLowerCase();
-
-    // Bi-directional search term translations
-    const searchTranslations = {
-      // Status translations
-      'פתוח': 'open',
-      'סגור': 'closed',
-      'מבוטל': 'cancelled',
-      'open': 'open',
-      'closed': 'closed',
-      'cancelled': 'cancelled',
-
-      // Alert type translations
-      'התראה על מחיר': 'price_alert',
-      'סטופ לוס': 'stop_loss',
-      'התראה על נפח': 'volume_alert',
-      'התראה מותאמת': 'custom_alert',
-      'price_alert': 'price_alert',
-      'stop_loss': 'stop_loss',
-      'volume_alert': 'volume_alert',
-      'custom_alert': 'custom_alert',
-    };
-
-    // Creating an array of search terms including translations
-    const searchTerms = [searchLower];
-
-    // Adding exact translation
-    if (searchTranslations[searchLower]) {
-      searchTerms.push(searchTranslations[searchLower]);
-    }
-
-    // Adding partial search - if user searches for part of a word
-    Object.keys(searchTranslations).forEach(hebrewTerm => {
-      if (hebrewTerm.includes(searchLower) && !searchTerms.includes(searchTranslations[hebrewTerm])) {
-        searchTerms.push(searchTranslations[hebrewTerm]);
-      }
-    });
-
-    filteredAlerts = filteredAlerts.filter(alert => {
-      // Searching in all relevant fields
-      const titleMatch = alert.title && searchTerms.some(term =>
-        alert.title.toLowerCase().includes(term),
-      );
-
-      // הסרת חיפוש לפי סוג התראה - השדה type הוסר
-      const typeMatch = false;
-
-      const statusMatch = alert.status && searchTerms.some(term =>
-        alert.status.toLowerCase().includes(term),
-      );
-
-      const conditionMatch = alert.condition && searchTerms.some(term =>
-        alert.condition.toLowerCase().includes(term),
-      );
-
-      const messageMatch = alert.message && searchTerms.some(term =>
-        alert.message.toLowerCase().includes(term),
-      );
-
-      const isMatch = titleMatch || typeMatch || statusMatch || conditionMatch || messageMatch;
-
-      return isMatch;
-    });
-  }
-
-  return filteredAlerts;
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בפילטור מקומי של התראות:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בפילטור מקומי של התראות', error.message);
-    }
-    return alerts; // החזרת הנתונים המקוריים במקרה של שגיאה
-  }
-}
+// REMOVED: filterAlertsLocally - unused function
 
 /**
  * עדכון טבלת התראות
@@ -642,10 +498,10 @@ function updateAlertsTable(alerts) {
         fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
       ]);
 
-      accounts = (accountsResponse.data || accountsResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-      trades = (tradesResponse.data || tradesResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-      tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-      tickers = (tickersResponse.data || tickersResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
+      accounts = (accountsResponse.data || accountsResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+      trades = (tradesResponse.data || tradesResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+      tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+      tickers = (tickersResponse.data || tickersResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
     } catch {
       // // window.Logger.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error, { page: "alerts" });
       // המשך עם מערכים ריקים
@@ -669,8 +525,8 @@ function updateAlertsTable(alerts) {
       // לוג לבדיקת מבנה הנתונים
       // window.Logger.info('🔍 Alert data structure:', alert, { page: "alerts" });
       
-      // קבלת צבעי סטטוס דינמיים
-      const statusClass = getStatusClass(alert.status);
+      // קבלת צבעי סטטוס דינמיים - שימוש במערכת הכללית
+      // Note: statusClass removed - use window.renderStatus or FieldRendererService.renderStatus instead
       const statusColor = window.getStatusColor ? window.getStatusColor(alert.status, 'medium') : '#6c757d';
       const statusBgColor = window.getStatusBackgroundColor ? window.getStatusBackgroundColor(alert.status) : 'rgba(108, 117, 125, 0.1)';
       
@@ -780,7 +636,8 @@ function updateAlertsTable(alerts) {
   })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}">
             ${window.renderStatus ? window.renderStatus(alert.status, 'alert') : 
-              `<span class="status-badge ${statusClass}">${statusDisplay}</span>`}
+              (window.FieldRendererService ? window.FieldRendererService.renderStatus(alert.status, 'alert') : 
+                `<span class="status-badge" data-status-category="unknown">${statusDisplay}</span>`)}
           </td>
           <td>
             ${window.renderBoolean ? window.renderBoolean(alert.is_triggered) : 
@@ -792,31 +649,17 @@ function updateAlertsTable(alerts) {
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
-            ${window.createActionsMenu ? window.createActionsMenu([
-              { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
-              { type: 'LINK', onclick: `viewLinkedItemsForAlert(${alert.id})`, title: 'צפה בפריטים מקושרים' },
-              { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
-              { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
-              { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
-            ]) : `
-            <div class="btn-group btn-group-sm actions-btn-group" role="group">
-              <button class="btn btn-sm" onclick="window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })" title="צפה בפרטי התראה">
-                👁️
-              </button>
-              <button class="btn btn-sm" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה בפריטים מקושרים">
-                🔗
-              </button>
-              <button class="btn btn-sm" onclick="editAlert(${alert.id})" title="ערוך התראה">
-                ✏️
-              </button>
-              <button class="btn btn-sm" onclick="window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})" title="${alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}">
-                ${alert.status === 'cancelled' ? '🔄' : '⏸️'}
-              </button>
-              <button class="btn btn-sm" onclick="deleteAlert(${alert.id})" title="מחק התראה">
-                🗑️
-              </button>
-            </div>
-            `}
+            ${(() => {
+              if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+              const result = window.createActionsMenu([
+                { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
+                { type: 'LINK', onclick: `viewLinkedItemsForAlert(${alert.id})`, title: 'צפה בפריטים מקושרים' },
+                { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
+                { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
+                { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
+              ]);
+              return result || '';
+            })()}
           </td>
         </tr>
       `;
@@ -831,7 +674,16 @@ function updateAlertsTable(alerts) {
     }
 
     // עדכון סטטיסטיקות
-    updatePageSummaryStats();
+    // Use InfoSummarySystem directly
+    if (window.InfoSummarySystem && typeof window.InfoSummarySystem.calculateAndRender === 'function') {
+      const config = {
+        entityType: 'alert',
+        summaryContainerId: 'alertsSummaryStats'
+      };
+      window.InfoSummarySystem.calculateAndRender(alertsData || [], config);
+    } else if (typeof updatePageSummaryStats_LEGACY === 'function') {
+      updatePageSummaryStats_LEGACY();
+    }
     
     window.Logger.info('✅ טבלת התראות עודכנה בהצלחה עם', alerts.length, 'התראות', { page: "alerts" });
     
@@ -847,11 +699,41 @@ function updateAlertsTable(alerts) {
 }
 
 /**
- * עדכון סטטיסטיקות סיכום
+ * Update page summary statistics wrapper
+ * Uses global updatePageSummaryStats from ui-utils.js
+ * 
+ * IMPORTANT: We saved the global function reference at the top of the file before export
+ * to avoid infinite recursion.
+ * 
+ * @function updatePageSummaryStats
+ * @returns {void}
  */
-function updatePageSummaryStats() {
-  // Use unified function from ui-utils.js
-  window.updatePageSummaryStats('alerts', alertsData);
+// REMOVED: updatePageSummaryStats - use window.InfoSummarySystem.calculateAndRender from services/statistics-calculator.js directly
+async function updatePageSummaryStats_LEGACY() {
+  try {
+    // Get alerts data from global scope
+    const dataToUse = window.alertsData || alertsData || [];
+    
+    // Capture global function reference on first call if not already captured
+    if (!globalUpdatePageSummaryStats) {
+      // Check if global function exists and it's different from our local function
+      if (typeof window.updatePageSummaryStats === 'function' && 
+          window.updatePageSummaryStats !== updatePageSummaryStats) {
+        globalUpdatePageSummaryStats = window.updatePageSummaryStats;
+      } else {
+        // Global function not available or it's already us - skip to prevent recursion
+        window.Logger?.warn('Global updatePageSummaryStats not available or recursion detected', { page: "alerts" });
+        return;
+      }
+    }
+    
+    // Use the captured global function reference
+    if (globalUpdatePageSummaryStats) {
+      globalUpdatePageSummaryStats('alerts', dataToUse);
+    }
+  } catch (error) {
+    window.Logger?.error('Error updating page summary stats:', error, { page: "alerts" });
+  }
 }
 
 
@@ -861,55 +743,7 @@ function updatePageSummaryStats() {
  * @param {number} [alertId] - מזהה ההתראה (נדרש רק בעריכה)
  */
 
-/**
- * ניקוי ולידציה של טפסי התראות
- */
-function clearAlertValidation() {
-  try {
-    // ניקוי ולידציה למודל הוספה
-    const addFormFields = [
-      'alertRelationType',
-      'alertRelatedObjectSelect',
-      'conditionAttribute',
-      'conditionOperator',
-      'conditionNumber',
-      'alertMessage',
-    ];
-
-    addFormFields.forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        field.classList.remove('is-invalid');
-        field.style.borderColor = '';
-        field.style.boxShadow = '';
-      }
-    });
-
-    // ניקוי ולידציה למודל עריכה
-    const editFormFields = [
-      'editAlertRelationType',
-      'editAlertRelatedObjectSelect',
-      'editConditionAttribute',
-      'editConditionOperator',
-      'editConditionNumber',
-      'editAlertMessage',
-    ];
-
-    editFormFields.forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        field.classList.remove('is-invalid');
-        field.style.borderColor = '';
-        field.style.boxShadow = '';
-      }
-    });
-  } catch (error) {
-    window.Logger.error('שגיאה בניקוי ולידציה של התראות:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בניקוי ולידציה של התראות', error.message);
-    }
-  }
-}
+// REMOVED: clearAlertValidation - unused function
 
 // ===== DATA MANAGEMENT FUNCTIONS =====
 // Data loading, saving, and modal data management
@@ -1319,11 +1153,12 @@ function populateRelatedObjects(relationTypeId) {
   }
 }
 
+// REMOVED: populateEditRelatedObjects - not used, ModalManagerV2 uses populateSelects instead
 /**
  * מילוי רשימת אובייקטים למודל העריכה
  * @param {number} relationTypeId - מזהה סוג השיוך
  */
-function populateEditRelatedObjects(relationTypeId) {
+function _REMOVED_populateEditRelatedObjects(relationTypeId) {
   try {
     const selectElement = document.getElementById('editAlertRelatedObjectSelect');
     if (!selectElement) {return;}
@@ -1358,154 +1193,10 @@ function populateEditRelatedObjects(relationTypeId) {
   }
 }
 
-/**
- * טיפול בשינוי סוג שיוך במודל העריכה
- * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
- */
-function onEditRelationTypeChange(radioElement) {
-  try {
-    // window.Logger.info('🔧 Edit relation type changed:', radioElement.value, { page: "alerts" });
+// REMOVED: onEditRelationTypeChange, onEditRelatedObjectChange - unused functions
+// REMOVED: enableEditConditionFields, disableEditConditionFields (second occurrence) - deprecated wrappers
 
-    // מילוי רשימת האובייקטים לפי הסוג שנבחר
-    populateEditRelatedObjects(parseInt(radioElement.value));
-  } catch (error) {
-    window.Logger.error('שגיאה בשינוי סוג שיוך בעריכה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בשינוי סוג שיוך בעריכה', error.message);
-    }
-  }
-}
-
-/**
- * טיפול בבחירת אובייקט במודל העריכה
- * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
- */
-function onEditRelatedObjectChange(selectElement) {
-  try {
-    // window.Logger.info('🔧 Edit related object changed:', selectElement.value, { page: "alerts" });
-
-    if (selectElement.value) {
-      // הפעלת שדות התנאי ישירות
-      enableEditConditionFields();
-    } else {
-      // השבתת שדות התנאי
-      disableEditConditionFields();
-    }
-  } catch (error) {
-    window.Logger.error('שגיאה בבחירת אובייקט בעריכה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בבחירת אובייקט בעריכה', error.message);
-    }
-  }
-}
-
-/**
- * הפעלת שדות התנאי במודל העריכה
- * @deprecated Use toggleConditionFields(true, 'edit') instead
- */
-function enableEditConditionFields() {
-  toggleConditionFields(true, 'edit');
-}
-
-/**
- * השבתת שדות התנאי במודל העריכה
- * @deprecated Use toggleConditionFields(false, 'edit') instead
- */
-function disableEditConditionFields() {
-  toggleConditionFields(false, 'edit');
-}
-
-/**
- * בדיקת משתנה התראה
- *
- * פונקציה זו בודקת אם המשתנה שנבחר נתמך
- * כרגע נתמך רק 'price' (מחיר)
- *
- * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
- * @returns {boolean} true אם נתמך, false אם לא
- */
-function checkAlertVariable(selectElement) {
-  try {
-    // window.Logger.info('🔍 === CHECK ALERT VARIABLE ===', { page: "alerts" });
-    // window.Logger.info('🔍 Element:', selectElement, { page: "alerts" });
-    // window.Logger.info('🔍 Selected value:', selectElement.value, { page: "alerts" });
-
-    // כרגע מאפשרים את כל התכונות
-    const selectedValue = selectElement.value;
-
-    if (!selectedValue) {
-      // window.Logger.info('❌ No variable selected', { page: "alerts" });
-      return false;
-    }
-
-    // window.Logger.info('✅ Variable accepted:', selectedValue, { page: "alerts" });
-    return true;
-  } catch (error) {
-    window.Logger.error('שגיאה בבדיקת משתנה התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בבדיקת משתנה התראה', error.message);
-    }
-    return false;
-  }
-}
-
-/**
- * בדיקת אופרטור התראה
- *
- * פונקציה זו בודקת אם האופרטור שנבחר נתמך
- * כרגע נתמכים רק 'greater_than' ו-'less_than'
- *
- * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
- * @returns {boolean} true אם נתמך, false אם לא
- */
-function checkAlertOperator(selectElement) {
-  try {
-    // window.Logger.info('🔍 === CHECK ALERT OPERATOR ===', { page: "alerts" });
-    // window.Logger.info('🔍 Element:', selectElement, { page: "alerts" });
-    // window.Logger.info('🔍 Selected value:', selectElement.value, { page: "alerts" });
-
-    // כרגע מאפשרים את כל האופרטורים
-    const selectedValue = selectElement.value;
-
-  if (!selectedValue) {
-    // window.Logger.info('❌ No operator selected', { page: "alerts" });
-    return false;
-  }
-
-  // window.Logger.info('✅ Operator accepted:', selectedValue, { page: "alerts" });
-  return true;
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בבדיקת אופרטור התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בבדיקת אופרטור התראה', error.message);
-    }
-    return false;
-  }
-}
-
-/**
- * בניית מחרוזת תנאי התראה
- *
- * פונקציה זו בונה מחרוזת תנאי מהמשתנה, האופרטור והערך
- * המחרוזת נשמרת בפורמט: "variable|operator|value"
- *
- * @param {string} variable - המשתנה (price, daily_change, etc.)
- * @param {string} operator - האופרטור (greater_than, less_than, etc.)
- * @param {string} value - הערך
- * @returns {string} מחרוזת התנאי
- */
-function buildAlertCondition(variable, operator, value) {
-  try {
-    return `${variable} | ${operator} | ${value}`;
-  } catch (error) {
-    window.Logger.error('שגיאה בבניית תנאי התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בבניית תנאי התראה', error.message);
-    }
-    return '';
-  }
-}
+// REMOVED: checkAlertVariable, checkAlertOperator, buildAlertCondition - unused functions
 
 /**
  * פירוק מחרוזת תנאי התראה
@@ -1550,7 +1241,8 @@ function parseAlertCondition(condition) {
 async function saveAlert() {
   window.Logger.info('🔧 saveAlert function called', { page: "alerts" });
   
-  // ניקוי מטמון לפני פעולת CRUD - הוספה  const form = document.getElementById('addAlertForm');
+  // ניקוי מטמון לפני פעולת CRUD - הוספה
+  const form = document.getElementById('addAlertForm');
   if (!form) {
     window.Logger.warn('⚠️ Form element not found - skipping save operation', { page: "alerts" });
     return;
@@ -2051,7 +1743,8 @@ async function confirmDeleteAlert(alertId) {
   // window.Logger.info('🔄 confirmDeleteAlert נקראה עבור ID:', alertId, { page: "alerts" });
 
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה    const response = await fetch(`/api/alerts/${alertId}`, {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });
 
@@ -2085,37 +1778,10 @@ async function confirmDeleteAlert(alertId) {
  * @requires updateAlertsTable - פונקציה לעדכון הטבלה
  */
 
-/**
- * קבלת מחלקת סטטוס
- */
-function getStatusClass(status) {
-  switch (status) {
-  case 'open': return 'status-open';
-  case 'closed': return 'status-closed';
-  case 'cancelled': return 'status-cancelled';
-  default: return 'status-cancelled';
-  }
-}
+// REMOVED: getStatusClass - use window.getStatusClass or FieldRendererService.renderStatus instead
 
 
-/**
- * קבלת מחלקת CSS לאובייקט מקושר
- *
- * פונקציה זו מחזירה את שם המחלקה CSS המתאימה לסוג האובייקט המקושר
- * משמשת לעיצוב התאים בטבלה
- *
- * @param {number} relatedType - מזהה סוג האובייקט (1=חשבון מסחר, 2=טרייד, 3=תכנון, 4=טיקר)
- * @returns {string} שם המחלקה CSS
- */
-function getRelatedClass(relatedType) {
-  switch (relatedType) {
-  case 4: return 'related-ticker'; // ticker
-  case 2: return 'related-trade'; // trade
-  case 3: return 'related-plan'; // trade_plan
-  case 1: return 'related-account'; // account
-  default: return 'related-other';
-  }
-}
+// REMOVED: getRelatedClass - unused function
 
 
 // ===== UI STATE MANAGEMENT FUNCTIONS =====
@@ -2202,7 +1868,7 @@ if (window.location.pathname.includes('/alerts')) {
 // window.loadAlertsData כבר מוגדר בתחילת הקובץ
 window.updateAlertsTable = updateAlertsTable;
 window.updateAlertsSummary = updateAlertsSummary;
-window.filterAlertsLocally = filterAlertsLocally;
+// REMOVED: window.filterAlertsLocally - function removed
 
 /**
  * פילטר התראות לפי סוג אובייקט מקושר
@@ -2264,8 +1930,41 @@ function filterAlertsByRelatedObjectTypeWrapper(type) {
   // window.Logger.info(`✅ Filtered alerts by type '${type}': ${filteredAlerts.length} alerts found`, { page: "alerts" });
 }
 
+/**
+ * Filter alerts by related object type
+ * Wrapper that uses global function from related-object-filters.js or local wrapper
+ * 
+ * @function filterAlertsByRelatedObjectType
+ * @param {string} type - Object type to filter by
+ * @returns {void}
+ */
+function filterAlertsByRelatedObjectType(type) {
+  try {
+    // First try global function from related-object-filters.js (if loaded)
+    // Check if global exists and it's not our local function (will be set later)
+    const globalFilterFn = typeof window.filterAlertsByRelatedObjectType === 'function' 
+      ? window.filterAlertsByRelatedObjectType 
+      : null;
+    
+    // If global exists and it's different from our local (before we export), use it
+    if (globalFilterFn && globalFilterFn !== filterAlertsByRelatedObjectType) {
+      globalFilterFn(type);
+      return;
+    }
+    
+    // Fallback to local wrapper
+    if (typeof filterAlertsByRelatedObjectTypeWrapper === 'function') {
+      filterAlertsByRelatedObjectTypeWrapper(type);
+    } else {
+      window.Logger?.warn('filterAlertsByRelatedObjectTypeWrapper not available', { page: "alerts" });
+    }
+  } catch (error) {
+    window.Logger?.error('Error filtering alerts by related object type:', error, { page: "alerts" });
+  }
+}
+
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
-window.showAddAlertModal = showAddAlertModal;
+// REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
 window.editAlert = editAlert;
 // window.deleteAlert - הועבר ל-alert-service.js
 window.saveAlert = saveAlert;
@@ -2278,13 +1977,8 @@ window.validateAlertStatusCombination = validateAlertStatusCombination;
 
 window.onRelationTypeChange = onRelationTypeChange;
 window.onRelatedObjectChange = onRelatedObjectChange;
-window.onEditRelationTypeChange = onEditRelationTypeChange;
-window.onEditRelatedObjectChange = onEditRelatedObjectChange;
-window.checkAlertVariable = checkAlertVariable;
-window.checkAlertOperator = checkAlertOperator;
-window.buildAlertCondition = buildAlertCondition;
+// REMOVED: window exports for removed functions (onEditRelationTypeChange, onEditRelatedObjectChange, checkAlertVariable, checkAlertOperator, buildAlertCondition, clearAlertValidation)
 window.parseAlertCondition = parseAlertCondition;
-window.clearAlertValidation = clearAlertValidation;
 
 // פונקציה לטעינת התראות (alias ל-loadAlertsData)
 function loadAlerts() {
@@ -2397,71 +2091,15 @@ window.reactivateAlert = reactivateAlert;
 // window.Logger.info('- parseAlertCondition:', typeof window.parseAlertCondition, { page: "alerts" });
 // window.Logger.info('- clearAlertValidation:', typeof window.clearAlertValidation, { page: "alerts" });
 
-/**
- * בדיקת תנאי התראה
- * בודק אם תנאי התראה מתקיים עבור טיקר מסוים
- * @param {Object} alert - אובייקט ההתראה
- * @param {Object} tickerData - נתוני הטיקר הנוכחיים
- */
-function checkAlertCondition(alert, tickerData) {
-  try {
-    window.Logger.info('🔍 בודק תנאי התראה:', alert.id, tickerData, { page: "alerts" });
-    
-    if (!alert || !tickerData) {
-      throw new Error('נתונים חסרים לבדיקת תנאי התראה');
-    }
-    
-    // פרסור תנאי ההתראה
-    const condition = alert.condition || '';
-    const targetValue = parseFloat(alert.target_value) || 0;
-    const currentPrice = parseFloat(tickerData.price) || 0;
-    
-    let conditionMet = false;
-    let message = '';
-    
-    // בדיקת תנאים שונים
-    if (condition.includes('>') && condition.includes('price')) {
-      conditionMet = currentPrice > targetValue;
-      message = `מחיר ${tickerData.symbol} (${currentPrice}) גבוה מ-${targetValue}`;
-    } else if (condition.includes('<') && condition.includes('price')) {
-      conditionMet = currentPrice < targetValue;
-      message = `מחיר ${tickerData.symbol} (${currentPrice}) נמוך מ-${targetValue}`;
-    } else if (condition.includes('=') && condition.includes('price')) {
-      conditionMet = Math.abs(currentPrice - targetValue) < 0.01;
-      message = `מחיר ${tickerData.symbol} (${currentPrice}) שווה ל-${targetValue}`;
-    }
-    
-    // אם התנאי מתקיים, הצגת התראה
-    if (conditionMet) {
-      if (typeof window.showWarningNotification === 'function') {
-        window.showWarningNotification('התראה פעילה!', message);
-      } else if (typeof window.showNotification === 'function') {
-        window.showNotification(`התראה: ${message}`, 'warning');
-      }
-      
-      // עדכון סטטוס ההתראה
-      updateAlertStatus(alert.id, 'triggered');
-    }
-    
-    return conditionMet;
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בבדיקת תנאי התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בבדיקת תנאי התראה', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בבדיקת תנאי התראה', 'error');
-    }
-    return false;
-  }
-}
+// REMOVED: checkAlertCondition - unused function
 
+// REMOVED: toggleAlert - not used
 /**
  * הפעלה/כיבוי התראה
  * מחליף את מצב ההפעלה של התראה
  * @param {number} alertId - מזהה ההתראה
  */
-function toggleAlert(alertId) {
+function _REMOVED_toggleAlert(alertId) {
   try {
     window.Logger.info('🔄 מחליף מצב התראה:', alertId, { page: "alerts" });
     
@@ -2623,12 +2261,42 @@ document.addEventListener("DOMContentLoaded", () => {
 // Export all necessary functions to global scope
 window.loadAlertsData = window.loadAlertsData;
 window.updateAlertsTable = updateAlertsTable;
-window.updatePageSummaryStats = updatePageSummaryStats;
-window.showAddAlertModal = showAddAlertModal;
-window.hideAddAlertModal = hideAddAlertModal;
-window.showEditAlertModal = showEditAlertModal;
-window.hideEditAlertModal = hideEditAlertModal;
-window.clearAlertValidation = clearAlertValidation;
+// REMOVED: window.updatePageSummaryStats - use window.InfoSummarySystem.calculateAndRender from services/statistics-calculator.js directly
+// REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
+// REMOVED: hideAddAlertModal, hideEditAlertModal - use ModalManagerV2.hideModal directly
+
+/**
+ * Validate alert form wrapper
+ * Uses global validateForm from validation-utils.js
+ * 
+ * @function validateAlertForm
+ * @returns {boolean} true if form is valid
+ */
+function validateAlertForm() {
+  try {
+    const formId = 'alertsModalForm';
+    if (typeof window.validateForm === 'function') {
+      return window.validateForm(formId);
+    } else if (typeof window.validateEntityForm === 'function') {
+      return window.validateEntityForm('alert', formId);
+    } else {
+      window.Logger?.warn('validateForm not available - using basic validation', { page: "alerts" });
+      // Basic validation fallback
+      const form = document.getElementById(formId);
+      if (!form) {
+        window.Logger?.warn('Alert form not found', { page: "alerts" });
+        return false;
+      }
+      return form.checkValidity();
+    }
+  } catch (error) {
+    window.Logger?.error('Error validating alert form:', error, { page: "alerts" });
+    return false;
+  }
+}
+
+// REMOVED: window exports for removed functions
+// REMOVED: window.showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', id) directly
 window.validateAlertForm = validateAlertForm;
 window.updateRadioButtons = updateRadioButtons;
 window.populateSelect = populateSelect;
@@ -2638,7 +2306,7 @@ window.enableConditionFields = enableConditionFields;
 window.disableConditionFields = disableConditionFields;
 window.populateRelatedObjects = populateRelatedObjects;
 window.getDemoAlertsData = getDemoAlertsData;
-window.filterAlertsLocally = filterAlertsLocally;
+// REMOVED: window.filterAlertsLocally - function removed
 // Note: saveAlert already exported above
 window.updateStatusAndTriggered = updateStatusAndTriggered;
 window.restoreAlertsSectionState = restoreAlertsSectionState;
@@ -2646,12 +2314,69 @@ window.loadConditionsFromSource = loadConditionsFromSource;
 window.loadTradePlansForConditions = loadTradePlansForConditions;
 window.loadTradesForConditions = loadTradesForConditions;
 window.loadConditionsFromItem = loadConditionsFromItem;
+/**
+ * Update evaluation statistics
+ * Updates statistics display after condition evaluation
+ * 
+ * @function updateEvaluationStats
+ * @param {Object} data - Evaluation results data
+ * @returns {void}
+ */
+function updateEvaluationStats(data) {
+  try {
+    if (!data || typeof data !== 'object') {
+      window.Logger?.warn('Invalid data for updateEvaluationStats', { page: "alerts" });
+      return;
+    }
+    
+    // Update evaluation summary if function exists
+    if (typeof updateEvaluationSummary === 'function') {
+      updateEvaluationSummary(data);
+    } else {
+      window.Logger?.debug('updateEvaluationSummary not available', { page: "alerts" });
+    }
+    
+    // Update display if results container exists
+    if (typeof displayEvaluationResults === 'function') {
+      displayEvaluationResults(data);
+    }
+  } catch (error) {
+    window.Logger?.error('Error updating evaluation stats:', error, { page: "alerts" });
+  }
+}
+
+/**
+ * Save alert data wrapper
+ * Wrapper for saveAlert that handles ModalManagerV2 integration
+ * 
+ * @function saveAlertData
+ * @returns {Promise<void>}
+ */
+async function saveAlertData() {
+  try {
+    // Use existing saveAlert function
+    if (typeof saveAlert === 'function') {
+      await saveAlert();
+    } else {
+      window.Logger?.error('saveAlert function not available', { page: "alerts" });
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'פונקציית שמירת התראה לא זמינה');
+      }
+    }
+  } catch (error) {
+    window.Logger?.error('Error in saveAlertData:', error, { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בשמירת התראה');
+    }
+  }
+}
+
 window.evaluateAllConditions = evaluateAllConditions;
 window.updateEvaluationStats = updateEvaluationStats;
 window.initializeAlertConditionBuilder = initializeAlertConditionBuilder;
 window.cleanupAlertConditionBuilder = cleanupAlertConditionBuilder;
-window.showAddAlertModal = showAddAlertModal;
-window.showEditAlertModal = showEditAlertModal;
+// REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
+// REMOVED: window.showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', id) directly
 window.saveAlertData = saveAlertData;
 window.generateDetailedLog = generateDetailedLog;
 window.generateDetailedLogForAlerts = generateDetailedLogForAlerts;
@@ -2736,7 +2461,7 @@ function updateAlertsSummary(alerts) {
     week: weekAlerts
   }, { page: "alerts" });
 }
-window.showAddAlertModal = showAddAlertModal;
+// REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
 window.editAlert = editAlert;
 // window.deleteAlert לא מוגדר - צריך ליצור את הפונקציה
 // window. export removed - using global version from system-management.js
@@ -3293,29 +3018,13 @@ function cleanupAlertConditionBuilder() {
  * הצגת מודל הוספת התראה
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showAddAlertModal() {
-    window.Logger.debug('showAddAlertModal called', { page: 'alerts' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showModal('alertsModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
 
 /**
  * הצגת מודל עריכת התראה
  * Uses ModalManagerV2 for consistent modal experience
  */
-function showEditAlertModal(alertId) {
-    window.Logger.debug('showEditAlertModal called', { alertId, page: 'alerts' });
-    
-    if (window.ModalManagerV2) {
-        window.ModalManagerV2.showEditModal('alertsModal', 'alert', alertId);
-    } else {
-        console.error('ModalManagerV2 not available');
-    }
-}
+// REMOVED: showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', alertId) directly
 
 /**
  * שמירת התראה
@@ -3329,7 +3038,107 @@ function showEditAlertModal(alertId) {
  */
 // REMOVED: Duplicate deleteAlert function - using confirmDeleteAlert instead
 
+/**
+ * טעינת מידע על הטיקר (למודל החדש)
+ */
+async function loadAlertTickerInfo(tickerId) {
+  try {
+    window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "alerts" });
+    
+    // Get ticker data from API
+    const response = await fetch(`/api/tickers/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const tickers = data.data || data;
+    
+    // Find the specific ticker
+    const ticker = tickers.find(t => t.id == tickerId);
+    if (!ticker) {
+      throw new Error('Ticker not found');
+    }
+    
+    // Display ticker info
+    displayAlertTickerInfo(ticker);
+    
+  } catch (error) {
+    window.Logger.error('❌ Error loading ticker info:', error, { page: "alerts" });
+  }
+}
+
+/**
+ * הצגת מידע על הטיקר (למודל החדש)
+ */
+function displayAlertTickerInfo(ticker) {
+  // Create or update ticker info display
+  let tickerInfoDiv = document.getElementById('alertTickerInfo');
+  if (!tickerInfoDiv) {
+    // Create a new row for ticker info spanning full width
+    const tickerInfoRow = document.createElement('div');
+    tickerInfoRow.className = 'row';
+    tickerInfoRow.id = 'alertTickerInfoRow';
+    
+    // Create column for ticker info - full width
+    const tickerInfoCol = document.createElement('div');
+    tickerInfoCol.className = 'col-12';
+    
+    tickerInfoDiv = document.createElement('div');
+    tickerInfoDiv.id = 'alertTickerInfo';
+    tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
+    
+    tickerInfoCol.appendChild(tickerInfoDiv);
+    tickerInfoRow.appendChild(tickerInfoCol);
+    
+    // Insert after the ticker field
+    const tickerSelect = document.getElementById('alertTicker');
+    if (tickerSelect) {
+      const tickerField = tickerSelect.closest('.mb-3');
+      if (tickerField && tickerField.parentNode) {
+        // Find the row containing the ticker field
+        const row = tickerField.closest('.row');
+        if (row && row.parentNode) {
+          row.parentNode.insertBefore(tickerInfoRow, row.nextSibling);
+        }
+      }
+    }
+  }
+  
+  // Use the new global renderTickerInfo function
+  if (window.renderTickerInfo) {
+    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+  } else {
+    // Fallback if renderTickerInfo not available
+    tickerInfoDiv.innerHTML = `
+      <div class="ticker-info-display">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}
+          </div>
+          <div class="col-md-6 text-end">
+            <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
+            <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+              ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </span>
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12">
+            <small class="text-muted">
+              נפח: ${(ticker.volume || 0).toLocaleString()} | 
+              שינוי יומי: ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+            </small>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
 // Export functions to window for global access
-window.showAddAlertModal = showAddAlertModal;
-window.showEditAlertModal = showEditAlertModal;
+// REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
+// REMOVED: window.showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', id) directly
+window.loadAlertTickerInfo = loadAlertTickerInfo;
+window.displayAlertTickerInfo = displayAlertTickerInfo;
 // Note: saveAlert and deleteAlert removed - using ModalManagerV2 and confirmDeleteAlert instead

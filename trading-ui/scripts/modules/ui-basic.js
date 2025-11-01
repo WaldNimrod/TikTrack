@@ -232,26 +232,7 @@ function formatPrice(price) {
  * @param {string} modalId - מזהה המודל
  * @param {Object} options - אפשרויות נוספות
  */
-function showModal(modalId, options = {}) {
-  const modal = document.getElementById(modalId);
-  if (!modal) {
-    handleElementNotFound('showModal', `Modal ${modalId} not found`);
-    return;
-  }
-
-  // הגדרת אפשרויות ברירת מחדל
-  const defaultOptions = {
-    backdrop: true,
-    keyboard: true,
-    focus: true,
-  };
-
-  const modalOptions = { ...defaultOptions, ...options };
-
-  // הצגת המודל
-  const bootstrapModal = new bootstrap.Modal(modal, modalOptions);
-  bootstrapModal.show();
-}
+// REMOVED: showModal - use window.ModalManagerV2.showModal() for new modals or bootstrap.Modal directly for legacy modals
 
 /**
  * הצגת הודעת אישור שנייה
@@ -635,17 +616,7 @@ function initializeModalBackdrop() {
  * @param {string} message - הודעת האישור
  * @param {Function} onConfirm - פונקציה לביצוע אם אושר
  */
-function showSecondConfirmationModal(message, onConfirm) {
-  if (window.showConfirmationDialog) {
-    window.showConfirmationDialog('אישור', message, onConfirm, () => {});
-  } else {
-    // Fallback למקרה שמערכת התראות לא זמינה
-    const confirmed = window.confirm(message);
-    if (confirmed) {
-      onConfirm();
-    }
-  }
-}
+// REMOVED: showSecondConfirmationModal - use window.showConfirmationDialog from warning-system.js directly
 
 // פונקציה createWarningModal כבר מוגדרת בשורה 1041
 
@@ -656,122 +627,11 @@ function showSecondConfirmationModal(message, onConfirm) {
  * מטפלת ברענון טבלאות אחרי פעולות CRUD עם שיפורי ביצועים
  */
 
-/**
- * רענון טבלה משופר עם כפיית DOM reflow
- * @param {Function} loadDataFunction - פונקציית טעינת הנתונים
- * @param {Function} updateActiveFieldsFunction - פונקציית עדכון שדות פעילים (אופציונלי)
- * @param {string} operationName - שם הפעולה לצורך לוגים
- * @param {number} delay - עיכוב במילישניות לפני הרענון (ברירת מחדל: 100)
- */
-async function enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName = 'פעולה', delay = 100) {
-  try {
-    // עיכוב קטן לוודא שהשרת עדכן את הנתונים
-    if (delay > 0) {
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-    
-    
-    // טעינת נתונים חדשים
-    if (typeof loadDataFunction === 'function') {
-      await loadDataFunction();
-    }
-    
-    // עדכון שדות פעילים אם קיים
-    if (typeof updateActiveFieldsFunction === 'function') {
-      await updateActiveFieldsFunction();
-    }
-    
-    
-    return true;
-  } catch (error) {
-    console.error(`❌ שגיאה ברענון טבלה אחרי ${operationName}:`, error);
-    return false;
-  }
-}
+// REMOVED: enhancedTableRefresh - use window.enhancedTableRefresh from ui-utils.js instead
+// The global function provides the same functionality with improved logging
 
-/**
- * טיפול משופר בתגובות API עם רענון טבלה אוטומטי
- * @param {Response} response - תגובת ה-API
- * @param {Object} options - אפשרויות הטיפול
- * @param {Function} options.loadDataFunction - פונקציית טעינת נתונים
- * @param {Function} options.updateActiveFieldsFunction - פונקציית עדכון שדות פעילים
- * @param {string} options.operationName - שם הפעולה
- * @param {string} options.itemName - שם הפריט (טיקר, עסקה וכו')
- * @param {string} options.successMessage - הודעת הצלחה מותאמת אישית
- * @param {Function} options.onSuccess - פונקציה נוספת לביצוע בהצלחה
- * @param {Function} options.onNotFound - פונקציה מותאמת אישית ל-404
- */
-async function handleApiResponseWithRefresh(response, options = {}) {
-  const {
-    loadDataFunction,
-    updateActiveFieldsFunction,
-    operationName = 'פעולה',
-    itemName = 'פריט',
-    successMessage,
-    onSuccess,
-    onNotFound
-  } = options;
-
-  if (response.ok) {
-    // פעולה הצליחה
-    const defaultMessage = `${itemName} ${operationName === 'מחיקה' ? 'נמחק' : 
-                                      operationName === 'עדכון' ? 'עודכן' : 
-                                      operationName === 'הוספה' ? 'נוסף' : 
-                                      operationName === 'ביטול' ? 'בוטל' : 
-                                      operationName === 'שיחזור' ? 'שוחזר' : 'עובד'} בהצלחה`;
-    
-    if (window.showSuccessNotification) {
-      window.showSuccessNotification('הצלחה', successMessage || defaultMessage);
-    }
-
-    // ביצוע פונקציה נוספת אם קיימת
-    if (typeof onSuccess === 'function') {
-      await onSuccess();
-    }
-
-    // רענון טבלה
-    await enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName);
-    
-    return true;
-
-  } else if (response.status === 404) {
-    // פריט לא קיים - טיפול ב-404
-    console.warn(`${itemName} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
-    
-    if (typeof onNotFound === 'function') {
-      await onNotFound();
-    } else {
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('מידע', `${itemName} כבר לא קיים במערכת - מרענן נתונים`);
-      }
-    }
-
-    // רענון טבלה גם במקרה של 404
-    await enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, `זיהוי 404 ב${operationName}`);
-    
-    return true;
-
-  } else {
-    // שגיאה אחרת
-    const errorResponse = await response.text();
-    console.error(`שגיאה ב${operationName}:`, errorResponse);
-    
-    try {
-      const errorData = JSON.parse(errorResponse);
-      const errorMessage = errorData.error?.message || errorResponse;
-      
-      if (window.showErrorNotification) {
-        window.showErrorNotification(`שגיאה ב${operationName}`, errorMessage);
-      }
-    } catch {
-      if (window.showErrorNotification) {
-        window.showErrorNotification(`שגיאה ב${operationName}`, 'שגיאה לא מזוהה');
-      }
-    }
-    
-    return false;
-  }
-}
+// REMOVED: handleApiResponseWithRefresh - use window.handleApiResponseWithRefresh from ui-utils.js instead
+// The global function provides the same functionality with improved error handling
 
 /**
  * פונקציית עזר לזיהוי אוטומטי של פונקציות טעינת נתונים לפי עמוד נוכחי
@@ -825,7 +685,7 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
   const { loadData, updateActive } = getPageDataFunctions();
   
   if (loadData) {
-    await enhancedTableRefresh(loadData, updateActive, operationName);
+    await window.enhancedTableRefresh(loadData, updateActive, operationName);
   } else {
     console.warn('לא נמצאה פונקציית טעינת נתונים לעמוד הנוכחי');
     location.reload(); // fallback
@@ -888,7 +748,7 @@ window.toggleSection = async function (sectionId) {
               const otherSectionId = otherSection.getAttribute('data-section') || otherSection.id;
               if (otherSectionId) {
                 const otherStorageKey = `${pageName}_${otherSectionId}_SectionHidden`;
-                if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+                if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
                   window.UnifiedCacheManager.save(otherStorageKey, true, {
                     layer: 'localStorage',
                     ttl: null,
@@ -919,7 +779,7 @@ window.toggleSection = async function (sectionId) {
     const isHidden = sectionBody.style.display === 'none';
     const storageKey = `${pageName}_${sectionId}_SectionHidden`;
     
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         await window.UnifiedCacheManager.save(storageKey, isHidden, {
             layer: 'localStorage',
             ttl: null, // persistent
@@ -997,7 +857,7 @@ window.restoreAllSectionStates = async function () {
       let isHidden = false;
       let cachedState = null;
       
-      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         cachedState = await window.UnifiedCacheManager.get(storageKey);
         isHidden = cachedState === true;
         console.log(`💾 Retrieved state from Unified Cache for "${sectionId}" on page "${pageName}": hidden=${isHidden}`);
@@ -1113,7 +973,7 @@ window.restoreSectionStates = async function () {
   
   let topSectionHidden = false;
   
-  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+  if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
     const cachedState = await window.UnifiedCacheManager.get(`${pageName}_top-section_collapsed`);
     topSectionHidden = cachedState === true;
     console.log(`💾 Retrieved top section state from Unified Cache for page "${pageName}": collapsed=${topSectionHidden}`);
@@ -1151,7 +1011,7 @@ window.restoreSectionStates = async function () {
     if (sectionId) {
       let sectionHidden = false;
       
-      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         const cachedState = await window.UnifiedCacheManager.get(`${pageName}_${sectionId}_SectionHidden`);
         sectionHidden = cachedState === true;
         console.log(`💾 Retrieved state from Unified Cache for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`);
@@ -1271,9 +1131,7 @@ function viewTickerDetails(entityType, id) {
     window.showInfoNotification(`🔍 פונקציה: viewTickerDetails - פרמטרים: entityType='${entityType}', id=${id}`);
 }
 
-function viewLinkedItems(entityType, id) {
-    window.showInfoNotification(`🔗 פונקציה: viewLinkedItems - פרמטרים: entityType='${entityType}', id=${id}`);
-}
+// REMOVED: viewLinkedItems demo function - use window.viewLinkedItems from linked-items.js directly
 
 function editTicker(entityType, id) {
     window.showInfoNotification(`✏️ פונקציה: editTicker - פרמטרים: entityType='${entityType}', id=${id}`);
@@ -1294,13 +1152,12 @@ function deleteTicker(entityType, id) {
 // ===== EXPORTS =====
 
 // Export table refresh system functions
-window.enhancedTableRefresh = enhancedTableRefresh;
-window.handleApiResponseWithRefresh = handleApiResponseWithRefresh;
+// REMOVED: window exports - use window.enhancedTableRefresh and window.handleApiResponseWithRefresh from ui-utils.js instead
 window.getPageDataFunctions = getPageDataFunctions;
 window.autoRefreshCurrentPage = autoRefreshCurrentPage;
 
 // Export account utility functions
-window.showSecondConfirmationModal = showSecondConfirmationModal;
+// REMOVED: window.showSecondConfirmationModal - use window.showConfirmationDialog directly
 
 // Export section toggle system functions
 // toggleSection removed - use toggleSection('top') instead
@@ -1384,7 +1241,7 @@ window.loadTableActionButtons = loadTableActionButtons;
 
 // Export demo functions for testing
 window.viewTickerDetails = viewTickerDetails;
-window.viewLinkedItems = viewLinkedItems;
+// REMOVED: window.viewLinkedItems - use window.viewLinkedItems from linked-items.js directly
 window.editTicker = editTicker;
 window.cancelTicker = cancelTicker;
 window.restoreTicker = restoreTicker;
@@ -1396,76 +1253,8 @@ window.deleteTicker = deleteTicker;
 // ===== SECTION TOGGLE FUNCTIONS =====
 // These functions handle opening/closing sections across all pages
 
-/**
- * Toggle top section visibility
- * Used for the main top section of each page
- */
-async function toggleTopSection(sectionId = 'top-section') {
-  const section = document.getElementById(sectionId);
-  if (!section) {
-    console.warn(`⚠️ Section ${sectionId} not found`);
-    return;
-  }
-  
-  // Handle special cases for development sections
-  if (section.classList.contains('development-section')) {
-    if (typeof window.toggleDevelopmentSection === 'function') {
-      window.toggleDevelopmentSection(sectionId);
-      return;
-    }
-  }
-  
-  // Find the toggle button and icon
-  const toggleBtn = document.querySelector(`[onclick*="${sectionId}"]`);
-  const toggleIcon = section.querySelector('.section-toggle-icon') || 
-                    (toggleBtn ? toggleBtn.querySelector('.section-toggle-icon') : null);
-  
-  // Find the content area to toggle
-  const sectionBody = section.querySelector('.section-body') ||
-                     section.querySelector('.section-content') ||
-                     section.querySelector('.content');
-  
-  if (!sectionBody) {
-    console.warn(`⚠️ No content area found in section ${sectionId}`);
-    return;
-  }
-  
-  // Determine current state
-  const isCollapsed = sectionBody.style.display === 'none' || 
-                     section.classList.contains('collapsed');
-  
-  // Toggle visibility
-  if (isCollapsed) {
-    // Expand
-    sectionBody.style.display = 'block';
-    section.classList.remove('collapsed');
-    section.classList.add('expanded');
-    if (toggleIcon) toggleIcon.textContent = '▼';
-    console.log(`📂 Expanded section: ${sectionId}`);
-  } else {
-    // Collapse
-    sectionBody.style.display = 'none';
-    section.classList.add('collapsed');
-    section.classList.remove('expanded');
-    if (toggleIcon) toggleIcon.textContent = '▶';
-    console.log(`📁 Collapsed section: ${sectionId}`);
-  }
-  
-  // Save state to localStorage with page-specific key
-  const pageName = getCurrentPageName();
-  const storageKey = `${pageName}_${sectionId}_collapsed`;
-  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
-    await window.UnifiedCacheManager.save(storageKey, !isCollapsed, {
-      layer: 'localStorage',
-      ttl: null, // persistent
-      syncToBackend: false
-    });
-    console.log(`💾 Top section state saved to Unified Cache: ${storageKey} = "${!isCollapsed}"`);
-  } else {
-    // UnifiedCacheManager לא זמין - כלל 44 violation prevented
-    console.error(`UnifiedCacheManager לא זמין - לא ניתן לשמור מצב Top Section (כלל 44 violation prevented): ${storageKey}`);
-  }
-}
+// REMOVED: toggleTopSection - use window.toggleSection(sectionId) from ui-utils.js instead
+// The global function handles section toggling with improved state management
 
 // toggleSection function removed - use toggleSection('main') instead
 
@@ -1501,7 +1290,7 @@ window.debugSectionStates = async function() {
   const topSectionKey = `${pageName}_top-section_collapsed`;
   let topSectionState = null;
   
-  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+  if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
     topSectionState = await window.UnifiedCacheManager.get(topSectionKey);
     console.log(`📍 Top Section from Unified Cache: ${topSectionKey} = "${topSectionState}"`);
   } else {
@@ -1520,7 +1309,7 @@ window.debugSectionStates = async function() {
       const sectionKey = `${pageName}_${sectionId}_SectionHidden`;
       let sectionState = null;
       
-      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         sectionState = await window.UnifiedCacheManager.get(sectionKey);
         console.log(`📍 Section ${index + 1} from Unified Cache: ${sectionKey} = "${sectionState}"`);
       } else {
@@ -1535,100 +1324,8 @@ window.debugSectionStates = async function() {
   console.log('=====================================');
 };
 
-/**
- * Toggle all sections on the page
- * Generic function that toggles all collapsible sections
- * UPDATED: Now uses page-specific localStorage keys
- */
-async function toggleAllSections() {
-  
-  // Find all possible section types
-  const contentSections = document.querySelectorAll('.content-section, .top-section');
-  const sectionContents = document.querySelectorAll('.section-content');
-  
-  // Combine all sections
-  const allSections = [...contentSections, ...sectionContents];
-  
-  if (!allSections.length) {
-    console.warn('⚠️ No sections found to toggle');
-    return;
-  }
-  
-  
-  // Check if all sections are collapsed
-  // Filter out sections without section-body first
-  const sectionsWithBody = allSections.filter(section => {
-    const sectionBody = section.querySelector('.section-body, .section-content');
-    return sectionBody !== null;
-  });
-  
-  
-  const allCollapsed = sectionsWithBody.every(section => {
-    const sectionBody = section.querySelector('.section-body, .section-content');
-    return sectionBody.style.display === 'none' || section.classList.contains('collapsed');
-  });
-  
-  
-  const pageName = getCurrentPageName();
-  
-  // Toggle all sections
-  for (let index = 0; index < allSections.length; index++) {
-    const section = allSections[index];
-    const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
-    const sectionBody = section.querySelector('.section-body, .section-content');
-    const toggleBtn = section.querySelector('.filter-toggle-btn, [onclick*="toggle"]');
-    const icon = section.querySelector('.section-toggle-icon, .filter-icon');
-    
-    
-    if (sectionBody) {
-      if (allCollapsed) {
-        // Expand all
-        sectionBody.style.display = 'block';
-        section.classList.remove('collapsed');
-        section.classList.add('expanded');
-        if (icon) icon.textContent = '▼';
-        // console.log(`✅ Section "${sectionId}" EXPANDED`);
-      } else {
-        // Collapse all
-        sectionBody.style.display = 'none';
-        section.classList.add('collapsed');
-        section.classList.remove('expanded');
-        if (icon) icon.textContent = '▶';
-        // console.log(`✅ Section "${sectionId}" COLLAPSED`);
-      }
-      
-      // Save state with page-specific key
-      const isHidden = sectionBody.style.display === 'none';
-      const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-      if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
-        await window.UnifiedCacheManager.save(storageKey, isHidden, {
-          layer: 'localStorage',
-          ttl: null, // persistent
-          syncToBackend: false
-        });
-        console.log(`💾 State saved to Unified Cache: ${storageKey} = "${isHidden}"`);
-      } else {
-        // UnifiedCacheManager לא זמין - כלל 44 violation prevented
-        console.error(`UnifiedCacheManager לא זמין - לא ניתן לשמור מצב Section (כלל 44 violation prevented): ${storageKey}`);
-        console.log(`💾 State saved to localStorage (fallback): ${storageKey} = "${isHidden}"`);
-      }
-    } else {
-      console.log(`⚠️ No section body found for section "${sectionId}"`);
-    }
-  }
-  
-  // Update the global toggle button icon (toggleAllBtn)
-  const toggleAllBtn = document.getElementById('toggleAllBtn');
-  if (toggleAllBtn) {
-    const toggleAllIcon = toggleAllBtn.querySelector('.filter-icon, .section-toggle-icon');
-    if (toggleAllIcon) {
-      // If we just collapsed all, show ▶ (closed), if we expanded all, show ▼ (open)
-      toggleAllIcon.textContent = allCollapsed ? '▼' : '▶';
-    }
-  }
-  
-  console.log(`📂 All sections ${allCollapsed ? 'expanded' : 'collapsed'}`);
-}
+// REMOVED: toggleAllSections - use window.toggleAllSections from ui-utils.js instead
+// The global function provides the same functionality
 
 /**
  * Load section states from localStorage
@@ -1649,7 +1346,7 @@ async function loadSectionStates() {
     const storageKey = `${pageName}_${sectionId}_SectionHidden`;
     let isCollapsed = false;
     
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
       const cachedState = await window.UnifiedCacheManager.get(storageKey);
       isCollapsed = cachedState === true;
       console.log(`💾 Retrieved state from Unified Cache for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`);
@@ -1683,10 +1380,10 @@ async function loadSectionStates() {
 // Export functions to global scope
 // toggleSection removed - use toggleSection('top') instead
 // window.toggleSection export removed - using global version from ui-utils.js
-window.toggleAllSections = toggleAllSections;
+// REMOVED: window.toggleAllSections - use window.toggleAllSections from ui-utils.js instead
 window.toggleSectionGlobal = window.toggleSection;
 window.toggleAllSectionsGlobal = window.toggleAllSections;
-window.toggleTopSection = toggleTopSection;
+// REMOVED: window.toggleTopSection - use window.toggleSection(sectionId) instead
 window.loadSectionStates = loadSectionStates;
 
 // Load section states when DOM is ready - הוסר כדי למנוע כפילות עם core-systems.js
@@ -1800,59 +1497,11 @@ function isValidPhone(phone) {
 
 // ===== פונקציות ויזואליות =====
 
-/**
- * הצגת שגיאה בשדה
- */
-function showFieldError(input, message) {
-  // אם input הוא מחרוזת (ID), נקבל את האלמנט
-  const element = typeof input === 'string' ? document.getElementById(input) : input;
+// REMOVED: showFieldError - use window.showFieldError from validation-utils.js instead
+// These are validation functions for form fields, NOT notification functions
 
-  // בדיקה שהאלמנט קיים
-  if (!element) {
-    // showFieldError: Element not found for input
-    return;
-  }
-
-  // הסרת סימון קודם
-  element.classList.remove('is-valid');
-  element.classList.add('is-invalid');
-
-  // הסרת הודעת שגיאה קודמת
-  const existingError = element.parentNode.querySelector('.invalid-feedback');
-  if (existingError) {
-    existingError.remove();
-  }
-
-  // הוספת הודעת שגיאה חדשה
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'invalid-feedback';
-  errorDiv.textContent = message;
-  element.parentNode.appendChild(errorDiv);
-}
-
-/**
- * הצגת הצלחה בשדה
- */
-function showFieldSuccess(input) {
-  // אם input הוא מחרוזת (ID), נקבל את האלמנט
-  const element = typeof input === 'string' ? document.getElementById(input) : input;
-
-  // בדיקה שהאלמנט קיים
-  if (!element) {
-    // showFieldSuccess: Element not found for input
-    return;
-  }
-
-  // הסרת סימון קודם
-  element.classList.remove('is-invalid');
-  element.classList.add('is-valid');
-
-  // הסרת הודעת שגיאה
-  const existingError = element.parentNode.querySelector('.invalid-feedback');
-  if (existingError) {
-    existingError.remove();
-  }
-}
+// REMOVED: showFieldSuccess - use window.showFieldSuccess from validation-utils.js instead
+// These are validation functions for form fields, NOT notification functions
 
 /**
  * ניקוי שגיאה משדה
@@ -2049,27 +1698,47 @@ window.isValidDate = isValidDate;
 window.isValidEmail = isValidEmail;
 window.isValidPhone = isValidPhone;
 
-// ייצוא פונקציות ויזואליות
-window.showFieldError = showFieldError;
-window.showFieldSuccess = showFieldSuccess;
+// REMOVED: window.showFieldError/window.showFieldSuccess - use window.showFieldError/window.showFieldSuccess from validation-utils.js instead
 window.clearFieldError = clearFieldError;
 window.clearFieldValidation = clearFieldValidation;
 window.clearValidationErrors = clearValidationErrors;
 
-// ייצוא פונקציות ולידציה
-window.validateForm = validateForm;
-window.validateField = validateField;
-window.validateTextField = validateTextField;
-window.validateNumberField = validateNumberField;
-window.validateEmailField = validateEmailField;
-window.validateDateField = validateDateField;
-window.validateSelectField = validateSelectField;
-window.setupFieldValidation = setupFieldValidation;
+// ייצוא פונקציות ולידציה (רק אם לא מוגדרות כבר ב-validation-utils.js)
+if (typeof window.validateForm === 'undefined' && typeof validateForm !== 'undefined') {
+  window.validateForm = validateForm;
+}
+if (typeof window.validateField === 'undefined' && typeof validateField !== 'undefined') {
+  window.validateField = validateField;
+}
+if (typeof window.validateTextField === 'undefined' && typeof validateTextField !== 'undefined') {
+  window.validateTextField = validateTextField;
+}
+if (typeof window.validateNumberField === 'undefined' && typeof validateNumberField !== 'undefined') {
+  window.validateNumberField = validateNumberField;
+}
+if (typeof window.validateEmailField === 'undefined' && typeof validateEmailField !== 'undefined') {
+  window.validateEmailField = validateEmailField;
+}
+if (typeof window.validateDateField === 'undefined' && typeof validateDateField !== 'undefined') {
+  window.validateDateField = validateDateField;
+}
+if (typeof window.validateSelectField === 'undefined' && typeof validateSelectField !== 'undefined') {
+  window.validateSelectField = validateSelectField;
+}
+if (typeof window.setupFieldValidation === 'undefined' && typeof setupFieldValidation !== 'undefined') {
+  window.setupFieldValidation = setupFieldValidation;
+}
 
 // ייצוא פונקציות ולידציה מותאמות
-window.validateCurrencySymbol = validateCurrencySymbol;
-window.validateCurrencyRate = validateCurrencyRate;
-window.validateTickerSymbol = validateTickerSymbol;
+if (typeof window.validateCurrencySymbol === 'undefined' && typeof validateCurrencySymbol !== 'undefined') {
+  window.validateCurrencySymbol = validateCurrencySymbol;
+}
+if (typeof window.validateCurrencyRate === 'undefined' && typeof validateCurrencyRate !== 'undefined') {
+  window.validateCurrencyRate = validateCurrencyRate;
+}
+if (typeof window.validateTickerSymbol === 'undefined' && typeof validateTickerSymbol !== 'undefined') {
+  window.validateTickerSymbol = validateTickerSymbol;
+}
 
 // ייצוא פונקציות אתחול
 window.initializeValidation = initializeValidation;
@@ -2096,8 +1765,7 @@ window.clearValidation = clearValidation;
 window.validationUtils = {
   // פונקציות ולידציה הועברו ל-validation-utils.js
   // validateForm, validateEntityForm, validateField, etc. - בשימוש מ-validation-utils.js
-  showFieldError,
-  showFieldSuccess,
+  // REMOVED: showFieldError, showFieldSuccess - use window.showFieldError/window.showFieldSuccess from validation-utils.js
   clearFieldError,
   clearFieldValidation,
   clearValidationErrors,

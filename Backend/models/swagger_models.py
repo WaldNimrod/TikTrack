@@ -102,9 +102,9 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
             'usd_rate': fields.Float(example=1.0)
         })),
         'status': fields.String(example='open'),
-        'cash_balance': fields.Float(example=10000.0),
+        # cash_balance removed - calculated in real-time via AccountActivityService
         'total_value': fields.Float(example=15000.0),
-        'total_pl': fields.Float(example=5000.0),
+        'total_pl': fields.Float(example=5000.0),  # Not updated - shows "בפיתוח" in UI
         'notes': fields.String(example='Primary trading account'),
         'created_at': fields.String(example='2025-01-15T10:30:00Z')
     })
@@ -113,7 +113,7 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
         'name': fields.String(required=True, example='Main Trading Account'),
         'currency_id': fields.Integer(required=True, example=1),
         'status': fields.String(example='open'),
-        'cash_balance': fields.Float(example=10000.0),
+        # cash_balance removed - calculated in real-time via AccountActivityService
         'notes': fields.String(example='Primary trading account')
     })
     

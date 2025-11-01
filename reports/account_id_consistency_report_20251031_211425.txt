@@ -1,0 +1,20 @@
+================================================================================
+ACCOUNT ID CONSISTENCY CHECK REPORT
+================================================================================
+Generated: 2025-10-31 21:14:25
+Root Directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+
+📊 SUMMARY
+--------------------------------------------------------------------------------
+Total files scanned: 325
+Directories searched: 8
+Problematic matches found: 0
+Allowed matches found: 2
+Files with issues: 0
+
+✅ STATUS: PASS - No problematic account_id references found!
+   The codebase is consistent with trading_account_id usage.
+
+================================================================================
+END OF REPORT
+================================================================================

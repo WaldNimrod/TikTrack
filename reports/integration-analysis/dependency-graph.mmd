@@ -1,0 +1,152 @@
+graph TD
+    AlertConditionRenderer[AlertConditionRenderer]
+    classDef service fill:#e1f5fe,stroke:#333,stroke-width:2px
+    CRUDResponseHandler[CRUDResponseHandler]
+    classDef service fill:#e1f5fe,stroke:#333,stroke-width:2px
+    DataCollectionService[DataCollectionService]
+    classDef service fill:#e1f5fe,stroke:#333,stroke-width:2px
+    DefaultValueSetter[DefaultValueSetter]
+    classDef service fill:#e1f5fe,stroke:#333,stroke-width:2px
+    FieldRendererService[FieldRendererService]
+    classDef service fill:#e1f5fe,stroke:#333,stroke-width:2px
+    LinkedItemsService[LinkedItemsService]
+    classDef service fill:#e1f5fe,stroke:#333,stroke-width:2px
+    SelectPopulatorService[SelectPopulatorService]
+    classDef service fill:#e1f5fe,stroke:#333,stroke-width:2px
+    StatisticsCalculator[StatisticsCalculator]
+    classDef service fill:#e1f5fe,stroke:#333,stroke-width:2px
+    ActionsMenuSystem[ActionsMenuSystem]
+    classDef system fill:#e8f5e9,stroke:#333,stroke-width:2px
+    loadTableData[loadTableData]
+    classDef function fill:#e3f2fd,stroke:#333,stroke-width:2px
+    UnifiedAppInitializer[UnifiedAppInitializer]
+    classDef system fill:#e8f5e9,stroke:#333,stroke-width:2px
+    ModalManagerV2[ModalManagerV2]
+    classDef manager fill:#f3e5f5,stroke:#333,stroke-width:2px
+    UnifiedCacheManager[UnifiedCacheManager]
+    classDef manager fill:#f3e5f5,stroke:#333,stroke-width:2px
+    CacheSyncManager[CacheSyncManager]
+    classDef manager fill:#f3e5f5,stroke:#333,stroke-width:2px
+    CachePolicyManager[CachePolicyManager]
+    classDef manager fill:#f3e5f5,stroke:#333,stroke-width:2px
+    ModalNavigationManager[ModalNavigationManager]
+    classDef manager fill:#f3e5f5,stroke:#333,stroke-width:2px
+    EventHandlerManager[EventHandlerManager]
+    classDef manager fill:#f3e5f5,stroke:#333,stroke-width:2px
+    NotificationSystem[NotificationSystem]
+    classDef system fill:#e8f5e9,stroke:#333,stroke-width:2px
+    Logger[Logger]
+    classDef system fill:#e8f5e9,stroke:#333,stroke-width:2px
+    HeaderSystem[HeaderSystem]
+    classDef system fill:#e8f5e9,stroke:#333,stroke-width:2px
+    ButtonSystem[ButtonSystem]
+    classDef system fill:#e8f5e9,stroke:#333,stroke-width:2px
+    ColorSchemeSystem[ColorSchemeSystem]
+    classDef system fill:#e8f5e9,stroke:#333,stroke-width:2px
+    InfoSummarySystem[InfoSummarySystem]
+    classDef system fill:#e8f5e9,stroke:#333,stroke-width:2px
+    AlertService[AlertService]
+    classDef entity fill:#fff3e0,stroke:#333,stroke-width:2px
+    TickerService[TickerService]
+    classDef entity fill:#fff3e0,stroke:#333,stroke-width:2px
+    TradePlanService[TradePlanService]
+    classDef entity fill:#fff3e0,stroke:#333,stroke-width:2px
+    AccountService[AccountService]
+    classDef entity fill:#fff3e0,stroke:#333,stroke-width:2px
+    PreferencesGroupManager[PreferencesGroupManager]
+    classDef manager fill:#f3e5f5,stroke:#333,stroke-width:2px
+    EntityDetailsModal[EntityDetailsModal]
+    classDef modal fill:#fce4ec,stroke:#333,stroke-width:2px
+    EntityDetailsRenderer[EntityDetailsRenderer]
+    classDef renderer fill:#e0f2f1,stroke:#333,stroke-width:2px
+    EntityDetailsAPI[EntityDetailsAPI]
+    classDef api fill:#fff9c4,stroke:#333,stroke-width:2px
+    toggleSection[toggleSection]
+    classDef utility fill:#f1f8e9,stroke:#333,stroke-width:2px
+    PreferencesCore[PreferencesCore]
+    classDef system fill:#e8f5e9,stroke:#333,stroke-width:2px
+    showFieldError[showFieldError]
+    classDef function fill:#e3f2fd,stroke:#333,stroke-width:2px
+    CRUDResponseHandler-->UnifiedCacheManager
+    LinkedItemsService-->ModalManagerV2
+    SelectPopulatorService-->PreferencesCore
+    SelectPopulatorService-->PreferencesSystem
+    loadTableData-->CRUDResponseHandler
+    loadTableData-->ModalManagerV2
+    loadTableData-->toggleSection
+    UnifiedAppInitializer-->UnifiedCacheManager
+    UnifiedAppInitializer-->PreferencesSystem
+    UnifiedAppInitializer-->Logger
+    UnifiedAppInitializer-->NotificationSystem
+    UnifiedAppInitializer-->ActionsMenuSystem
+    UnifiedAppInitializer-->HeaderSystem
+    UnifiedAppInitializer-->toggleSection
+    ModalManagerV2-->PreferencesSystem
+    ModalManagerV2-->SelectPopulatorService
+    UnifiedCacheManager-->Logger
+    UnifiedCacheManager-->CacheSyncManager
+    UnifiedCacheManager-->PreferencesCore
+    CacheSyncManager-->Logger
+    ModalNavigationManager-->Logger
+    ModalNavigationManager-->UnifiedCacheManager
+    ModalNavigationManager-->ButtonSystem
+    EventHandlerManager-->Logger
+    EventHandlerManager-->ModalManagerV2
+    EventHandlerManager-->toggleSection
+    NotificationSystem-->Logger
+    NotificationSystem-->UnifiedCacheManager
+    Logger-->toggleSection
+    HeaderSystem-->Logger
+    HeaderSystem-->UnifiedCacheManager
+    ButtonSystem-->Logger
+    ColorSchemeSystem-->Logger
+    InfoSummarySystem-->Logger
+    AlertService-->Logger
+    TickerService-->Logger
+    PreferencesGroupManager-->PreferencesCore
+    PreferencesGroupManager-->UnifiedCacheManager
+    EntityDetailsModal-->Logger
+    EntityDetailsRenderer-->Logger
+    EntityDetailsRenderer-->FieldRendererService
+    EntityDetailsRenderer-->LinkedItemsService
+    EntityDetailsRenderer-->ModalManagerV2
+    EntityDetailsAPI-->Logger
+    EntityDetailsAPI-->UnifiedCacheManager
+    toggleSection-->Logger
+    toggleSection-->InfoSummarySystem
+    PreferencesCore-->Logger
+    PreferencesCore-->UnifiedCacheManager
+    class AlertConditionRenderer service
+    class CRUDResponseHandler service
+    class DataCollectionService service
+    class DefaultValueSetter service
+    class FieldRendererService service
+    class LinkedItemsService service
+    class SelectPopulatorService service
+    class StatisticsCalculator service
+    class ActionsMenuSystem system
+    class loadTableData function
+    class UnifiedAppInitializer system
+    class ModalManagerV2 manager
+    class UnifiedCacheManager manager
+    class CacheSyncManager manager
+    class CachePolicyManager manager
+    class ModalNavigationManager manager
+    class EventHandlerManager manager
+    class NotificationSystem system
+    class Logger system
+    class HeaderSystem system
+    class ButtonSystem system
+    class ColorSchemeSystem system
+    class InfoSummarySystem system
+    class AlertService entity
+    class TickerService entity
+    class TradePlanService entity
+    class AccountService entity
+    class PreferencesGroupManager manager
+    class EntityDetailsModal modal
+    class EntityDetailsRenderer renderer
+    class EntityDetailsAPI api
+    class toggleSection utility
+    class PreferencesCore system
+    class showFieldError function

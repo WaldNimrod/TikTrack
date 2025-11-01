@@ -177,6 +177,7 @@
 
 // ===== PAGE CONFIGURATIONS =====
 
+if (typeof window.PAGE_CONFIGS === 'undefined') {
 const PAGE_CONFIGS = {
     // Main Pages
     'index': {
@@ -317,12 +318,13 @@ const PAGE_CONFIGS = {
         // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
         // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
         // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'modules': מודולים כלליים (modal-manager-v2)
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'validation': מערכת ולידציה מאוחדת
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'validation', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -330,7 +332,8 @@ const PAGE_CONFIGS = {
             'DataUtils',
             'window.Logger',
             'window.CacheSyncManager',
-            'window.loadTradesData'
+            'window.loadTradesData',
+            'window.checkLinkedItemsBeforeAction'
         ],
         
         // ← NEW: מטאדאטה
@@ -454,9 +457,10 @@ const PAGE_CONFIGS = {
         // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'modules': מודולים כלליים (כולל ModalManagerV2)
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'modules', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -701,11 +705,15 @@ const PAGE_CONFIGS = {
         // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
         // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
         // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+        // - 'modules': מודולים כלליים (modal-manager-v2, business-module, etc.)
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'validation': מערכות ולידציה
+        // - 'entity-services': שירותי ישויות (account-service, ticker-service, etc.)
+        // - 'entity-details': מערכות פרטי ישות
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -719,10 +727,51 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
-                window.Logger.info('📝 Initializing Notes...', { page: "page-initialization-configs" });
+                console.log('📝 [page-initialization-configs] Notes customInitializer started');
                 
-                if (typeof window.loadNotesData === 'function') {
-                    await window.loadNotesData();
+                // Use general system getPageDataFunctions() instead of local code
+                if (typeof window.getPageDataFunctions === 'function') {
+                    console.log('✅ [page-initialization-configs] getPageDataFunctions found');
+                    const { loadData } = window.getPageDataFunctions();
+                    console.log('🔍 [page-initialization-configs] loadData type:', typeof loadData);
+                    
+                    if (loadData && typeof loadData === 'function') {
+                        console.log('📝 [page-initialization-configs] Initializing Notes via general system...');
+                        try {
+                            await loadData();
+                            console.log('✅ [page-initialization-configs] Notes data loaded successfully');
+                        } catch (error) {
+                            console.error('❌ [page-initialization-configs] Error loading notes data:', error);
+                        }
+                    } else {
+                        console.warn('⚠️ [page-initialization-configs] loadData is not a function, trying fallback...');
+                        // Fallback to direct function call if general system doesn't have it
+                        if (typeof window.loadNotesData === 'function') {
+                            console.log('📝 [page-initialization-configs] Initializing Notes (fallback to loadNotesData)...');
+                            try {
+                                await window.loadNotesData();
+                                console.log('✅ [page-initialization-configs] Notes data loaded successfully (fallback)');
+                            } catch (error) {
+                                console.error('❌ [page-initialization-configs] Error in loadNotesData:', error);
+                            }
+                        } else {
+                            console.error('❌ [page-initialization-configs] loadNotesData function not available');
+                        }
+                    }
+                } else {
+                    console.warn('⚠️ [page-initialization-configs] getPageDataFunctions not found, trying direct loadNotesData...');
+                    // Fallback if getPageDataFunctions doesn't exist
+                    if (typeof window.loadNotesData === 'function') {
+                        console.log('📝 [page-initialization-configs] Initializing Notes (direct loadNotesData)...');
+                        try {
+                            await window.loadNotesData();
+                            console.log('✅ [page-initialization-configs] Notes data loaded successfully (direct)');
+                        } catch (error) {
+                            console.error('❌ [page-initialization-configs] Error in loadNotesData:', error);
+                        }
+                    } else {
+                        console.error('❌ [page-initialization-configs] loadNotesData function not available');
+                    }
                 }
             }
         ]
@@ -1688,4 +1737,10 @@ Object.assign(PAGE_CONFIGS, ADDITIONAL_PAGE_CONFIGS);
 
 window.PAGE_CONFIGS = PAGE_CONFIGS;
 window.pageInitializationConfigs = PAGE_CONFIGS;
+} else {
+  // אם PAGE_CONFIGS כבר הוגדר, נמזג רק את הקונפיגים החדשים
+  if (typeof PAGE_CONFIGS !== 'undefined') {
+    Object.assign(window.PAGE_CONFIGS, PAGE_CONFIGS);
+  }
+}
 

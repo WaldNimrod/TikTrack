@@ -10,6 +10,7 @@
 
 // ===== UNIFIED APP INITIALIZER =====
 
+if (typeof window.UnifiedAppInitializer === 'undefined') {
 class UnifiedAppInitializer {
     constructor() {
         this.initialized = false;
@@ -378,7 +379,7 @@ class UnifiedAppInitializer {
             await this.executeInitialization(config);
             
             // Stage 4: Finalize
-            await this.finalizeInitialization();
+            await this.finalizeInitialization(config);
             
             this.performanceMetrics.endTime = Date.now();
             this.performanceMetrics.totalTime = this.performanceMetrics.endTime - this.performanceMetrics.startTime;
@@ -462,69 +463,191 @@ class UnifiedAppInitializer {
     }
 
     /**
+     * Validate required dependencies before initialization
+     * בדיקת תלויות נדרשות לפני אתחול
+     * @private
+     * @returns {Object} Validation result with missing dependencies
+     */
+    _validateRequiredDependencies() {
+        const required = {
+            UnifiedCacheManager: {
+                available: typeof window.UnifiedCacheManager !== 'undefined' && window.UnifiedCacheManager !== null,
+                initialized: window.UnifiedCacheManager?.initialized === true,
+                optional: false
+            },
+            PreferencesSystem: {
+                available: typeof window.PreferencesSystem !== 'undefined' && window.PreferencesSystem !== null,
+                initialized: window.PreferencesSystem?.initialized === true,
+                optional: false
+            },
+            Logger: {
+                available: typeof window.Logger !== 'undefined' && window.Logger !== null,
+                initialized: window.Logger?.initialized !== false, // Logger usually doesn't have explicit initialized flag
+                optional: false
+            },
+            NotificationSystem: {
+                available: typeof window.NotificationSystem !== 'undefined' && window.NotificationSystem !== null,
+                initialized: window.NotificationSystem?.initialized !== false,
+                optional: false
+            },
+            ActionsMenuSystem: {
+                available: typeof window.ActionsMenuSystem !== 'undefined' && window.ActionsMenuSystem !== null,
+                initialized: true, // ActionsMenuSystem doesn't have explicit initialized flag
+                optional: false
+            },
+            HeaderSystem: {
+                available: typeof window.HeaderSystem !== 'undefined' && window.HeaderSystem !== null,
+                initialized: true, // HeaderSystem doesn't have explicit initialized flag
+                optional: false
+            },
+            toggleSection: {
+                available: typeof window.toggleSection === 'function',
+                initialized: true, // toggleSection is a function, not a system
+                optional: true // Indirect dependency, can work without it
+            }
+        };
+        
+        const missing = [];
+        const notInitialized = [];
+        
+        for (const [name, dep] of Object.entries(required)) {
+            if (!dep.optional) {
+                if (!dep.available) {
+                    missing.push(name);
+                } else if (!dep.initialized) {
+                    notInitialized.push(name);
+                }
+            }
+        }
+        
+        return {
+            allAvailable: missing.length === 0,
+            allInitialized: notInitialized.length === 0,
+            missing,
+            notInitialized,
+            details: required
+        };
+    }
+    
+    /**
      * Stage 3: Execute initialization
      */
     async executeInitialization(config) {
         console.log('🚀 Stage 3: Executing initialization...');
         const stageStart = Date.now();
         
-        // Static loading - all modules already loaded
-        console.log('✅ Static loading - all modules already loaded');
-        
-        // Initialize IndexedDB first (blocking) to prevent race conditions
-        await this.initializeCacheSystem();
-        
-        // Minimal delay for IndexedDB stability (reduced from 500ms for performance)
-        await new Promise(resolve => setTimeout(resolve, 50));
-        
-        // Verify cache system is ready
-        console.log('🔍 Verifying cache system readiness...');
-        console.log('UnifiedCacheManager available:', !!window.UnifiedCacheManager);
-        
-        if (window.UnifiedCacheManager) {
-            console.log('UnifiedCacheManager initialized:', window.UnifiedCacheManager.initialized);
-        }
-        
-        // Set global flag for other systems
-        window.cacheSystemReady = window.UnifiedCacheManager && window.UnifiedCacheManager.initialized;
-        
-        if (window.cacheSystemReady) {
-            console.log('✅ Cache system ready (4-layer architecture)');
-        } else {
-            console.log('⚠️ Cache system not ready, using localStorage fallback');
-        }
-
-        // Initialize Preferences System globally (once) before services/UI that rely on getPreference
         try {
-            if (window.PreferencesSystem && !window.PreferencesSystem.initialized) {
-                console.log('🔧 Initializing PreferencesSystem (global)...');
-                await window.PreferencesSystem.initialize();
-                // Expose current preferences for consumers expecting window.currentPreferences
-                if (window.PreferencesSystem.manager?.currentPreferences) {
-                    window.currentPreferences = window.PreferencesSystem.manager.currentPreferences;
-                }
-                // Notify listeners that preferences are ready
-                window.dispatchEvent(new CustomEvent('preferences:loaded', {
-                    detail: { source: 'unified-initializer', profileId: window.PreferencesSystem.manager?.currentProfile }
-                }));
-                console.log('✅ PreferencesSystem initialized (global)');
+            // Log package loading if packages are defined
+            if (config.packages && config.packages.length > 0) {
+                this.logPackageLoading(config.packages);
             }
-        } catch (err) {
-            console.warn('⚠️ PreferencesSystem global initialization failed or unavailable:', err);
+            
+            // Static loading - all modules already loaded
+            console.log('✅ Static loading - all modules already loaded');
+            
+            // Validate required dependencies BEFORE initialization
+            console.log('🔍 Validating required dependencies...');
+            const dependencyCheck = this._validateRequiredDependencies();
+            
+            if (!dependencyCheck.allAvailable) {
+                const errorMsg = `❌ Missing required dependencies: ${dependencyCheck.missing.join(', ')}`;
+                console.error(errorMsg);
+                if (typeof window.Logger !== 'undefined' && window.Logger.error) {
+                    window.Logger.error(errorMsg, { missing: dependencyCheck.missing }, { page: "core-systems" });
+                }
+                // Continue with fallback - don't throw, but log warning
+                console.warn('⚠️ Continuing with missing dependencies - some features may not work');
+            } else {
+                console.log('✅ All required dependencies available');
+            }
+            
+            if (!dependencyCheck.allInitialized && dependencyCheck.notInitialized.length > 0) {
+                console.warn(`⚠️ Some dependencies not initialized: ${dependencyCheck.notInitialized.join(', ')}`);
+                console.warn('⚠️ Will attempt to initialize them or use fallbacks');
+            }
+            
+            // Initialize IndexedDB first (blocking) to prevent race conditions
+            await this.initializeCacheSystem();
+            
+            // Minimal delay for IndexedDB stability (reduced from 500ms for performance)
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            // Verify cache system is ready
+            console.log('🔍 Verifying cache system readiness...');
+            console.log('UnifiedCacheManager available:', !!window.UnifiedCacheManager);
+            
+            if (window.UnifiedCacheManager) {
+                console.log('UnifiedCacheManager initialized:', window.UnifiedCacheManager.initialized);
+            } else if (!dependencyCheck.details.UnifiedCacheManager.optional) {
+                console.error('❌ UnifiedCacheManager is required but not available - using localStorage fallback');
+            }
+            
+            // Set global flag for other systems
+            window.cacheSystemReady = window.UnifiedCacheManager && window.UnifiedCacheManager.initialized;
+            
+            if (window.cacheSystemReady) {
+                console.log('✅ Cache system ready (4-layer architecture)');
+            } else {
+                console.log('⚠️ Cache system not ready, using localStorage fallback');
+            }
+
+            // Initialize Preferences System globally (once) before services/UI that rely on getPreference
+            try {
+                if (window.PreferencesSystem && !window.PreferencesSystem.initialized) {
+                    console.log('🔧 Initializing PreferencesSystem (global)...');
+                    await window.PreferencesSystem.initialize();
+                    // Expose current preferences for consumers expecting window.currentPreferences
+                    if (window.PreferencesSystem.manager?.currentPreferences) {
+                        window.currentPreferences = window.PreferencesSystem.manager.currentPreferences;
+                    }
+                    // Notify listeners that preferences are ready
+                    window.dispatchEvent(new CustomEvent('preferences:loaded', {
+                        detail: { source: 'unified-initializer', profileId: window.PreferencesSystem.manager?.currentProfile }
+                    }));
+                    console.log('✅ PreferencesSystem initialized (global)');
+                }
+            } catch (err) {
+                console.warn('⚠️ PreferencesSystem global initialization failed or unavailable:', err);
+            }
+            
+            // Use the application initializer if available
+            if (typeof window.initializeApplication === 'function') {
+                console.log('🔧 Using application initializer with config:', config);
+                await window.initializeApplication(config);
+            } else {
+                console.log('⚠️ Application initializer not found, using manual initialization');
+                // Fallback to manual initialization
+                await this.manualInitialization(config);
+            }
+        } catch (error) {
+            if (typeof window.Logger !== 'undefined' && window.Logger.error) {
+                window.Logger.error('❌ Error in executeInitialization:', error, { page: "core-systems" });
+            } else {
+                console.error('❌ Error in executeInitialization:', error);
+            }
+            throw error;
+        } finally {
+            this.performanceMetrics.stageTimes.execute = Date.now() - stageStart;
+            console.log('✅ Stage 3 Complete');
         }
+    }
+
+    /**
+     * Log package loading
+     */
+    logPackageLoading(packages) {
+        if (!packages || packages.length === 0) return;
         
-        // Use the application initializer if available
-        if (typeof window.initializeApplication === 'function') {
-            console.log('🔧 Using application initializer with config:', config);
-            await window.initializeApplication(config);
-        } else {
-            console.log('⚠️ Application initializer not found, using manual initialization');
-            // Fallback to manual initialization
-            await this.manualInitialization(config);
-        }
-        
-        this.performanceMetrics.stageTimes.execute = Date.now() - stageStart;
-        console.log('✅ Stage 3 Complete');
+        console.group('📦 טוען חבילות:');
+        packages.forEach(pkgName => {
+            const pkg = window.PACKAGE_MANIFEST?.[pkgName];
+            if (pkg) {
+                console.log(`  ✓ ${pkg.name} (${pkg.scripts.length} סקריפטים, ~${pkg.initTime})`);
+            } else {
+                console.warn(`  ⚠️ ${pkgName} (לא מוגדר)`);
+            }
+        });
+        console.groupEnd();
     }
 
     /**
@@ -595,7 +718,7 @@ class UnifiedAppInitializer {
     /**
      * Stage 4: Finalize initialization
      */
-    async finalizeInitialization() {
+    async finalizeInitialization(config) {
         console.log('🎯 Stage 4: Finalizing...');
         const stageStart = Date.now();
         
@@ -604,10 +727,21 @@ class UnifiedAppInitializer {
             await window.loadPageState();
         }
         
-        // Execute custom finalizers with double initialization prevention
-        if (window.DEBUG_MODE) {
-            console.log('🔧 Executing custom initializers:', this.customInitializers.length);
+        // Initialize globalInitializationState if not exists
+        if (!window.globalInitializationState) {
+            window.globalInitializationState = {
+                unifiedAppInitialized: false,
+                unifiedAppInitializing: false,
+                pageInitializers: new Map(),
+                customInitializers: new Map()
+            };
         }
+        if (!window.globalInitializationState.customInitializers) {
+            window.globalInitializationState.customInitializers = new Map();
+        }
+        
+        // Execute custom finalizers with double initialization prevention
+        console.log('🔧 Executing custom initializers:', this.customInitializers.length);
         for (let i = 0; i < this.customInitializers.length; i++) {
             const initializer = this.customInitializers[i];
             const initializerKey = `${this.pageInfo.name}_${i}`;
@@ -618,23 +752,23 @@ class UnifiedAppInitializer {
                 continue;
             }
             
-            if (window.DEBUG_MODE) {
-                console.log(`🔧 Executing custom initializer ${i + 1}/${this.customInitializers.length}:`, typeof initializer);
-            }
+            console.log(`🔧 Executing custom initializer ${i + 1}/${this.customInitializers.length}:`, typeof initializer);
             if (typeof initializer === 'function') {
                 try {
-                    await initializer();
+                    // Pass config to initializer (as in unified-app-initializer.js)
+                    await initializer(config || {});
                     // Mark as executed to prevent double execution
                     window.globalInitializationState.customInitializers.set(initializerKey, {
                         executed: true,
                         timestamp: Date.now(),
                         page: this.pageInfo.name
                     });
-                    // if (window.DEBUG_MODE) {
-                    //     console.log(`✅ Custom initializer ${i + 1} completed successfully`);
-                    // }
+                    console.log(`✅ Custom initializer ${i + 1} completed successfully`);
                 } catch (error) {
                     console.error(`❌ Custom initializer ${i + 1} failed:`, error);
+                    if (typeof window.Logger !== 'undefined' && window.Logger.error) {
+                        window.Logger.error(`❌ Custom initializer ${i + 1} failed:`, error, { page: "core-systems" });
+                    }
                 }
             } else {
                 console.warn(`⚠️ Custom initializer ${i + 1} is not a function:`, typeof initializer);
@@ -750,7 +884,6 @@ class UnifiedAppInitializer {
         // UI Systems
         if (typeof window.toggleSection === 'function') systems.add('uiUtils');
         if (typeof window.showNotification === 'function') systems.add('notifications');
-        if (typeof window.ActionsMenuSystem !== 'undefined') systems.add('actionsMenu');
         
         return systems;
     }
@@ -768,7 +901,7 @@ class UnifiedAppInitializer {
      */
     determinePageType(pageName) {
         if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
-        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-management'].includes(pageName)) return 'development';
+        if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor'].includes(pageName)) return 'development';
         if (['preferences'].includes(pageName)) return 'preferences';
         if (['index'].includes(pageName)) return 'dashboard';
         return 'general';
@@ -780,7 +913,7 @@ class UnifiedAppInitializer {
     requiresFilters(pageName) {
         const filterPages = [
             'index', 'trades', 'executions', 'alerts', 'trading_accounts',
-            'cash_flows', 'tickers', 'research'
+            'cash_flows', 'tickers', 'research', 'notes'
         ];
         return filterPages.includes(pageName) || document.querySelectorAll('.filter-section, .header-filters').length > 0;
     }
@@ -790,10 +923,10 @@ class UnifiedAppInitializer {
      */
     requiresValidation(pageName) {
         const validationPages = [
-            'preferences', 'trades', 'alerts', 'trading_accounts', 'notes',
-            'crud-testing-dashboard'
+            'trades', 'executions', 'alerts', 'trading_accounts',
+            'cash_flows', 'tickers', 'notes'
         ];
-        return validationPages.includes(pageName) || document.querySelectorAll('form').length > 0;
+        return validationPages.includes(pageName) || document.querySelectorAll('form[id]').length > 0;
     }
 
     /**
@@ -802,17 +935,17 @@ class UnifiedAppInitializer {
     requiresTables(pageName) {
         const tablePages = [
             'index', 'trades', 'executions', 'alerts', 'trading_accounts',
-            'cash_flows', 'tickers', 'db_display', 'crud-testing-dashboard',
-            'external-data-dashboard'
+            'cash_flows', 'tickers', 'research', 'notes'
         ];
-        return tablePages.includes(pageName) || document.querySelectorAll('table').length > 0;
+        return tablePages.includes(pageName) || document.querySelectorAll('table[id]').length > 0;
     }
 
     /**
      * Check if page requires charts
      */
     requiresCharts(pageName) {
-        return pageName === 'index' || document.querySelectorAll('canvas, .chart-container').length > 0;
+        const chartPages = ['index'];
+        return chartPages.includes(pageName) || document.querySelectorAll('canvas[id], .chart-container').length > 0;
     }
 
     /**
@@ -821,105 +954,62 @@ class UnifiedAppInitializer {
     async initializeCacheSystem() {
         console.log('🔧 Initializing Unified Cache System...');
         
-        // Initialize UnifiedCacheManager with timeout - only if not already initialized
-        if (typeof window.UnifiedCacheManager !== 'undefined' && !window.UnifiedCacheManager.initialized) {
+        // Initialize UnifiedCacheManager with timeout
+        if (typeof window.UnifiedCacheManager !== 'undefined') {
             try {
-                console.log('🔧 Initializing UnifiedCacheManager...');
-                
-                // Add timeout to prevent hanging
-                const initPromise = window.UnifiedCacheManager.initialize();
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 10000)
-                );
-                
-                const initResult = await Promise.race([initPromise, timeoutPromise]);
-                if (initResult) {
-                    console.log('✅ UnifiedCacheManager initialized successfully');
+                if (!window.UnifiedCacheManager.initialized) {
+                    console.log('🔧 Initializing UnifiedCacheManager...');
+                    
+                    // Add timeout to prevent hanging
+                    const initPromise = window.UnifiedCacheManager.initialize();
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 10000)
+                    );
+                    
+                    const initResult = await Promise.race([initPromise, timeoutPromise]);
+                    if (initResult) {
+                        console.log('✅ UnifiedCacheManager initialized successfully');
+                    } else {
+                        throw new Error('UnifiedCacheManager initialization returned false');
+                    }
                 } else {
-                    throw new Error('UnifiedCacheManager initialization returned false');
+                    console.log('✅ UnifiedCacheManager already initialized');
                 }
             } catch (error) {
-                console.error('❌ UnifiedCacheManager initialization failed:', error);
-                console.log('⚠️ Using localStorage fallback');
+                if (typeof window.Logger !== 'undefined' && window.Logger.error) {
+                    window.Logger.error('❌ UnifiedCacheManager initialization failed:', error, { page: "core-systems" });
+                } else {
+                    console.error('❌ UnifiedCacheManager initialization failed:', error);
+                }
+                console.warn('⚠️ Using localStorage fallback');
                 // Set a flag to indicate cache system is not available
                 window.UnifiedCacheManager = null;
             }
-        } else if (window.UnifiedCacheManager?.initialized) {
-            console.log('✅ UnifiedCacheManager already initialized');
         } else {
-            console.log('⚠️ UnifiedCacheManager not available, using localStorage fallback');
+            console.warn('⚠️ UnifiedCacheManager not available, using localStorage fallback');
         }
-
-        // Advanced cache systems (CacheSyncManager, CachePolicyManager, MemoryOptimizer)
-        // are optional and not currently loaded in the standard loading system.
-        // UnifiedCacheManager provides all necessary functionality for now.
-        
-        // Initialize registered core systems - only if not already initialized
-        if (window.UnifiedInitializationSystem && !window.coreSystemsInitialized) {
-            await window.UnifiedInitializationSystem.initializeCoreSystems();
-            window.coreSystemsInitialized = true;
-        } else if (window.coreSystemsInitialized) {
-            console.log('✅ Core systems already initialized, skipping...');
-        }
-        
-        // Final verification and reporting
-        this.reportCacheSystemStatus();
-    }
-    
-    /**
-     * Report cache system status
-     */
-    reportCacheSystemStatus() {
-        console.log('📊 Cache System Status:');
-        console.log('================================');
-        
-        if (window.UnifiedCacheManager) {
-            const status = window.UnifiedCacheManager.initialized ? '✅ Ready' : '⚠️ Not Initialized';
-            console.log(`UnifiedCacheManager: ${status}`);
-        } else {
-            console.log('UnifiedCacheManager: ❌ Not Available');
-        }
-        
-        console.log('================================');
-        
-        // Cache system is ready if UnifiedCacheManager is initialized
-        window.cacheSystemReady = window.UnifiedCacheManager?.initialized || false;
-        
-        if (window.cacheSystemReady) {
-            console.log('✅ Cache system ready (4-layer architecture)');
-        } else {
-            console.log('⚠️ Cache system not ready - using localStorage fallback');
-        }
-    }
-
-    // REMOVED: Duplicate manualInitialization - see line 532 for the unified version
-
-    /**
-     * Add custom initializer
-     */
-    addCustomInitializer(initializer) {
-        this.customInitializers.push(initializer);
-    }
-
-    /**
-     * Add error handler
-     */
-    addErrorHandler(handler) {
-        this.errorHandlers.push(handler);
     }
 
     /**
      * Handle errors
      */
     handleError(error) {
-        console.error('❌ Unified App Initialization Error:', error);
+        if (typeof window.Logger !== 'undefined' && window.Logger.error) {
+            window.Logger.error('❌ Unified App Initialization Error:', error, { page: "core-systems" });
+        } else {
+            console.error('❌ Unified App Initialization Error:', error);
+        }
         
         // Execute error handlers
         for (const handler of this.errorHandlers) {
             try {
                 handler(error);
             } catch (handlerError) {
-                console.error('❌ Error handler failed:', handlerError);
+                if (typeof window.Logger !== 'undefined' && window.Logger.error) {
+                    window.Logger.error('❌ Error handler failed:', handlerError, { page: "core-systems" });
+                } else {
+                    console.error('❌ Error handler failed:', handlerError);
+                }
             }
         }
         
@@ -933,18 +1023,10 @@ class UnifiedAppInitializer {
      * Log success
      */
     logSuccess() {
-        console.log('🎉 Unified App Initialization Success!', {
-            page: this.pageInfo.name,
-            type: this.pageInfo.type,
-            systems: this.availableSystems.size,
-            totalTime: `${this.performanceMetrics.totalTime}ms`,
-            stages: this.performanceMetrics.stageTimes
-        });
-        
-        // Show success notification
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('✅ המערכת אותחלה בהצלחה', 'success');
-        }
+        // Success notification is optional and can be disabled for cleaner console
+        // if (typeof window.showNotification === 'function') {
+        //     window.showNotification('✅ Application initialized successfully', 'success', 'business');
+        // }
     }
 
     /**
@@ -980,6 +1062,187 @@ class UnifiedAppInitializer {
         this.customInitializers = [];
     }
 }
+
+window.UnifiedAppInitializer = UnifiedAppInitializer;
+} // End of UnifiedAppInitializer class definition
+
+// Methods outside class (legacy support) - should be inside class
+// These methods were moved outside for backward compatibility
+// They are now part of the UnifiedAppInitializer class above
+
+/**
+ * Detect page information (Legacy - moved inside class)
+ */
+function detectPageInfo() {
+    const path = window.location.pathname;
+    const filename = path.split('/').pop() || 'index';
+    const pageName = filename.replace('.html', '');
+    
+    console.log('🔍 Page detection:', { path, filename, pageName });
+    
+    // Use global helper functions (defined below) instead of local duplicates
+    const pageInfo = {
+        name: pageName,
+        path: path,
+        filename: filename,
+        type: determinePageType(pageName),
+        requirements: {
+            filters: requiresFilters(pageName),
+            validation: requiresValidation(pageName),
+            tables: requiresTables(pageName),
+            charts: requiresCharts(pageName)
+        }
+    };
+    
+    console.log('📊 Detected page info:', pageInfo);
+    return pageInfo;
+}
+
+/**
+ * Detect available systems (Legacy - moved outside class)
+ */
+function detectAvailableSystems() {
+        const systems = new Set();
+        
+        // Core Systems
+        if (typeof window.NotificationSystem !== 'undefined') systems.add('notification');
+        if (typeof window.HeaderSystem !== 'undefined') systems.add('header');
+        if (typeof window.FilterSystem !== 'undefined') systems.add('filter');
+        
+        // Page Systems
+        if (typeof window.initializePageFilters === 'function') systems.add('pageFilters');
+        if (typeof window.initializeValidation === 'function') systems.add('validation');
+        if (typeof window.setupSortableHeaders === 'function') systems.add('tables');
+        
+        // Preferences & Storage
+        if (typeof window.preferencesCache !== 'undefined') systems.add('preferences');
+        if (typeof window.IndexedDB !== 'undefined') systems.add('indexeddb');
+        
+        // UI Systems
+        if (typeof window.toggleSection === 'function') systems.add('uiUtils');
+        if (typeof window.showNotification === 'function') systems.add('notifications');
+        if (typeof window.ActionsMenuSystem !== 'undefined') systems.add('actionsMenu');
+        
+    return systems;
+}
+
+/**
+ * Analyze page requirements (Legacy - moved outside class)
+ */
+function analyzePageRequirements() {
+    // This is already done in detectPageInfo, but can be extended
+    console.log('📊 Page requirements analyzed');
+}
+
+/**
+ * Determine page type (Legacy - moved outside class)
+ */
+function determinePageType(pageName) {
+    if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
+    if (['system-management', 'crud-testing-dashboard', 'linter-realtime-monitor', 'cache-management'].includes(pageName)) return 'development';
+    if (['preferences'].includes(pageName)) return 'preferences';
+    if (['index'].includes(pageName)) return 'dashboard';
+    return 'general';
+}
+
+/**
+ * Check if page requires filters (Legacy - moved outside class)
+ */
+function requiresFilters(pageName) {
+    const filterPages = [
+        'index', 'trades', 'executions', 'alerts', 'trading_accounts',
+        'cash_flows', 'tickers', 'research'
+    ];
+    return filterPages.includes(pageName) || document.querySelectorAll('.filter-section, .header-filters').length > 0;
+}
+
+/**
+ * Check if page requires validation (Legacy - moved outside class)
+ */
+function requiresValidation(pageName) {
+    const validationPages = [
+        'preferences', 'trades', 'alerts', 'trading_accounts', 'notes',
+        'crud-testing-dashboard'
+    ];
+    return validationPages.includes(pageName) || document.querySelectorAll('form').length > 0;
+}
+
+/**
+ * Check if page requires tables (Legacy - moved outside class)
+ */
+function requiresTables(pageName) {
+    const tablePages = [
+        'index', 'trades', 'executions', 'alerts', 'trading_accounts',
+        'cash_flows', 'tickers', 'db_display', 'crud-testing-dashboard',
+        'external-data-dashboard'
+    ];
+    return tablePages.includes(pageName) || document.querySelectorAll('table').length > 0;
+}
+
+/**
+ * Check if page requires charts (Legacy - moved outside class)
+ */
+function requiresCharts(pageName) {
+    return pageName === 'index' || document.querySelectorAll('canvas, .chart-container').length > 0;
+}
+
+/**
+ * Initialize Unified Cache System (Legacy - moved outside class)
+ */
+async function initializeCacheSystem() {
+    console.log('🔧 Initializing Unified Cache System...');
+    
+    // Initialize UnifiedCacheManager with timeout - only if not already initialized
+    if (typeof window.UnifiedCacheManager !== 'undefined' && !window.UnifiedCacheManager.initialized) {
+        try {
+            console.log('🔧 Initializing UnifiedCacheManager...');
+            
+            // Add timeout to prevent hanging
+            const initPromise = window.UnifiedCacheManager.initialize();
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 10000)
+            );
+            
+            const initResult = await Promise.race([initPromise, timeoutPromise]);
+            if (initResult) {
+                console.log('✅ UnifiedCacheManager initialized successfully');
+            } else {
+                throw new Error('UnifiedCacheManager initialization returned false');
+            }
+        } catch (error) {
+            console.error('❌ UnifiedCacheManager initialization failed:', error);
+            console.log('⚠️ Using localStorage fallback');
+            // Set a flag to indicate cache system is not available
+            window.UnifiedCacheManager = null;
+        }
+    } else if (window.UnifiedCacheManager?.initialized) {
+        console.log('✅ UnifiedCacheManager already initialized');
+    } else {
+        console.log('⚠️ UnifiedCacheManager not available, using localStorage fallback');
+    }
+
+    // Advanced cache systems (CacheSyncManager, CachePolicyManager, MemoryOptimizer)
+    // are optional and not currently loaded in the standard loading system.
+    // UnifiedCacheManager provides all necessary functionality for now.
+    
+    // Initialize registered core systems - only if not already initialized
+    if (window.UnifiedInitializationSystem && !window.coreSystemsInitialized) {
+        await window.UnifiedInitializationSystem.initializeCoreSystems();
+        window.coreSystemsInitialized = true;
+    } else if (window.coreSystemsInitialized) {
+        console.log('✅ Core systems already initialized, skipping...');
+    }
+    
+    // Final verification and reporting - removed reportCacheSystemStatus call (not available as standalone function)
+}
+
+// REMOVED: Orphaned methods - these are already part of UnifiedAppInitializer class (lines 14-703)
+// - addCustomInitializer (part of UnifiedAppInitializer class)
+// - addErrorHandler (part of UnifiedAppInitializer class)
+// - handleError (part of UnifiedAppInitializer class)
+// - logSuccess (part of UnifiedAppInitializer class)
+// - getStatus (part of UnifiedAppInitializer class)
+// - reset (part of UnifiedAppInitializer class)
 
 // ===== GLOBAL INSTANCE =====
 
@@ -1390,290 +1653,19 @@ function getLogEmoji(level) {
 }
 
 /**
- * Show a notification message
- * NOTIFICATION SYSTEM - Displays system notification to user
- *
- * @param {string} message - Message to display
- * @param {string} type - Type of notification (success, error, warning, info)
- * @param {string} title - Optional title for the notification
- * @param {number} duration - Optional duration in milliseconds (default: 5000)
- * @param {string} category - Category of notification (development, system, business, performance, ui)
+ * _REMOVED_showNotification - Function removed as duplicate
+ * NOTIFICATION SYSTEM - This function was a duplicate of showNotification in notification-system.js
+ * 
+ * The global showNotification from notification-system.js is more advanced and contains:
+ * - Same category detection logic
+ * - Additional options parameter
+ * - Better logging with window.Logger
+ * - User-initiated action tracking
+ * 
+ * All calls should use window.showNotification from notification-system.js instead.
+ * 
+ * This local version has been removed to eliminate code duplication.
  */
-async function showNotification(message, type = 'info', title = 'מערכת', duration = 5000, category = null) {
-  // Auto-detect category if not provided
-  if (!category && typeof window.detectNotificationCategory === 'function') {
-    try {
-      category = window.detectNotificationCategory(message, type, title, {
-        fileName: window.location.pathname,
-        functionName: 'showNotification',
-        stackTrace: ''
-      });
-      // console.log(`🔍 Auto-detected category: ${category} for type: ${type}`);
-    } catch (error) {
-      console.warn('Failed to detect category, using default:', error);
-      category = 'general';
-    }
-  } else if (!category) {
-    // Fallback to type-based category
-    switch (type) {
-      case 'success': category = 'business'; break;
-      case 'error': category = 'system'; break;
-      case 'warning': category = 'system'; break;
-      case 'info': category = 'ui'; break;
-      default: category = 'general';
-    }
-  }
-  
-  // Check if notification should be shown based on category preferences
-  console.log(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}`);
-  
-  if (category) {
-    try {
-      const shouldShow = await shouldShowNotification(category);
-      if (window.DEBUG_MODE) {
-      console.log(`🔍 Category ${category} enabled:`, shouldShow);
-    }
-      if (!shouldShow) {
-        console.log(`❌ Notification blocked for category: ${category}`);
-        return; // Don't show notification if category is disabled
-      }
-    } catch (error) {
-      console.warn('Failed to check notification category, showing anyway:', error);
-      // Continue to show notification if category check fails
-    }
-  } else {
-    console.log(`✅ Showing notification (category: ${category})`);
-  }
-  
-  // Get dynamic colors from color scheme system
-  const getNotificationColor = (type) => {
-    if (typeof window.getEntityColor === 'function') {
-      switch (type) {
-        case 'success': return window.getEntityColor('account') || '#28a745';
-        case 'error': return window.getEntityColor('ticker') || '#dc3545';
-        case 'warning': return window.getEntityColor('alert') || '#ffc107';
-        case 'info': return window.getEntityColor('execution') || '#17a2b8';
-        default: return '#6c757d';
-      }
-    }
-    // Fallback to default colors
-    switch (type) {
-      case 'success': return '#28a745';
-      case 'error': return '#dc3545';
-      case 'warning': return '#ffc107';
-      case 'info': return '#17a2b8';
-      default: return '#6c757d';
-    }
-  };
-
-  const notificationColor = getNotificationColor(type);
-  
-  // Debug: Log dynamic color
-  // console.log(`🎨 Dynamic notification color for ${type}:`, notificationColor);
-  // console.log(`🎨 getEntityColor function available:`, typeof window.getEntityColor);
-
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.className = `notification notification-${type}`;
-  notification.style.borderLeft = `4px solid ${notificationColor}`;
-  notification.innerHTML = `
-    <div class="notification-icon" style="color: ${notificationColor}">
-      <i class="fas ${getNotificationIcon(type)}"></i>
-    </div>
-    <div class="notification-content">
-      <div class="notification-title">${title}</div>
-      <div class="notification-message">${message}</div>
-    </div>
-    <button class="notification-close" onclick="this.parentElement.remove()">
-      <i class="fas fa-times"></i>
-    </button>
-  `;
-
-  // Debug: Log notification element details
-  // console.log('🔍 DEBUG: Notification element created:', {
-  //   element: notification,
-  //   className: notification.className,
-  //   type: type,
-  //   innerHTML: notification.innerHTML.substring(0, 200) + '...'
-  // });
-
-  // Debug: Check computed styles
-  setTimeout(() => {
-    const computedStyle = window.getComputedStyle(notification);
-    const titleElement = notification.querySelector('.notification-title');
-    const messageElement = notification.querySelector('.notification-message');
-    const iconElement = notification.querySelector('.notification-icon');
-    
-    // console.log('🔍 DEBUG: Computed styles after creation:', {
-    //   notification: {
-    //     backgroundColor: computedStyle.backgroundColor,
-    //     color: computedStyle.color,
-    //     borderColor: computedStyle.borderColor,
-    //     display: computedStyle.display,
-    //     opacity: computedStyle.opacity
-    //   },
-    //   title: titleElement ? {
-    //     color: window.getComputedStyle(titleElement).color,
-    //     fontSize: window.getComputedStyle(titleElement).fontSize,
-    //     fontWeight: window.getComputedStyle(titleElement).fontWeight
-    //   } : 'No title element',
-    //   message: messageElement ? {
-    //     color: window.getComputedStyle(messageElement).color,
-    //     fontSize: window.getComputedStyle(messageElement).fontSize
-    //   } : 'No message element',
-    //   icon: iconElement ? {
-    //     color: window.getComputedStyle(iconElement).color,
-    //     fontSize: window.getComputedStyle(iconElement).fontSize
-    //   } : 'No icon element'
-    // });
-    
-    // Debug: Check if CSS file is loaded - DISABLED FOR PERFORMANCE
-    // const stylesheets = Array.from(document.styleSheets);
-    // const notificationCSS = stylesheets.find(sheet => {
-    //   try {
-    //     return sheet.href && sheet.href.includes('_notifications.css');
-    //   } catch (e) {
-    //     return false;
-    //   }
-    // });
-    // console.log('🔍 DEBUG: CSS file check:', {
-    //   totalStylesheets: stylesheets.length,
-    //   notificationCSSLoaded: !!notificationCSS,
-    //   notificationCSSUrl: notificationCSS ? notificationCSS.href : 'Not found'
-    // });
-    
-    // Debug: Check CSS rules - DISABLED FOR PERFORMANCE
-    // if (notificationCSS) {
-    //   try {
-    //     const rules = Array.from(notificationCSS.cssRules || notificationCSS.rules || []);
-    //     const notificationRules = rules.filter(rule => 
-    //       rule.selectorText && rule.selectorText.includes('.notification')
-    //     );
-    //     console.log('🔍 DEBUG: CSS rules check:', {
-    //       totalRules: rules.length,
-    //       notificationRules: notificationRules.length,
-    //       notificationSelectors: notificationRules.map(rule => rule.selectorText)
-    //     });
-        
-        // Debug: Check specific rules - DISABLED FOR PERFORMANCE
-        // const titleRulesDebug = rules.filter(rule => 
-        //   rule.selectorText && rule.selectorText.includes('.notification-title')
-        // );
-        // const messageRulesDebug = rules.filter(rule => 
-        //   rule.selectorText && rule.selectorText.includes('.notification-message')
-        // );
-        // console.log('🔍 DEBUG: Specific rules check:', {
-        //   titleRules: titleRulesDebug.length,
-        //   messageRules: messageRulesDebug.length,
-        //   titleSelectors: titleRulesDebug.map(rule => rule.selectorText),
-        //   messageSelectors: messageRulesDebug.map(rule => rule.selectorText)
-        // });
-        
-        // Debug: Check if !important rules are loaded - DISABLED FOR PERFORMANCE
-        // const importantRules = rules.filter(rule => 
-        //   rule.cssText && rule.cssText.includes('!important')
-        // );
-        // console.log('🔍 DEBUG: Important rules check:', {
-        //   importantRulesCount: importantRules.length,
-        //   importantRules: importantRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
-        // });
-        
-        // Debug: Check specific color rules - DISABLED FOR PERFORMANCE
-        // const colorRules = rules.filter(rule => 
-        //   rule.cssText && (rule.cssText.includes('color:') || rule.cssText.includes('color :'))
-        // );
-        // console.log('🔍 DEBUG: Color rules check:', {
-        //   colorRulesCount: colorRules.length,
-        //   colorRules: colorRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150))
-        // });
-        
-        // Debug: Check if our specific rules are loaded - DISABLED FOR PERFORMANCE
-        // const ourRules = rules.filter(rule => 
-        //   rule.cssText && (rule.cssText.includes('#1a1a1a') || rule.cssText.includes('#666'))
-        // );
-        // console.log('🔍 DEBUG: Our specific rules check:', {
-        //   ourRulesCount: ourRules.length,
-        //   ourRules: ourRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150))
-        // });
-        
-        // Debug: Check the actual computed colors - DISABLED FOR PERFORMANCE
-        // console.log('🔍 DEBUG: Actual computed colors:', {
-        //   titleColor: titleElement ? window.getComputedStyle(titleElement).color : 'No title',
-        //   messageColor: messageElement ? window.getComputedStyle(messageElement).color : 'No message',
-        //   iconColor: iconElement ? window.getComputedStyle(iconElement).color : 'No icon'
-        // });
-        
-        // Debug: Check specific CSS rules for our selectors - DISABLED FOR PERFORMANCE
-        // const titleRulesDetailed = rules.filter(rule => 
-        //   rule.selectorText && rule.selectorText.includes('.notification-title')
-        // );
-        // const messageRulesDetailed = rules.filter(rule => 
-        //   rule.selectorText && rule.selectorText.includes('.notification-message')
-        // );
-        // console.log('🔍 DEBUG: Detailed CSS rules:', {
-        //   titleRules: titleRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText),
-        //   messageRules: messageRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText)
-        // });
-        
-        // Debug: Check if Bootstrap is overriding our styles - DISABLED FOR PERFORMANCE
-        // const bootstrapRules = rules.filter(rule => 
-        //   rule.selectorText && (rule.selectorText.includes('.text-') || rule.selectorText.includes('.text-') || rule.selectorText.includes('body') || rule.selectorText.includes('*'))
-        // );
-        // console.log('🔍 DEBUG: Bootstrap/Global rules that might override:', {
-        //   bootstrapRulesCount: bootstrapRules.length,
-        //   bootstrapRules: bootstrapRules.slice(0, 5).map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
-        // });
-      // } catch (e) {
-      //   console.log('🔍 DEBUG: Cannot access CSS rules:', e.message);
-      // }
-    // }
-  }, 100);
-
-  // Add to page
-  let container = document.getElementById('notification-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'notification-container';
-    container.className = 'notification-container';
-    document.body.appendChild(container);
-    // console.log('🔍 DEBUG: Created notification container:', container);
-  }
-  
-  container.appendChild(notification);
-  // console.log('🔍 DEBUG: Notification added to container:', {
-  //   container: container,
-  //   notification: notification,
-  //   containerChildren: container.children.length
-  // });
-
-  // Trigger animation
-  setTimeout(() => {
-    notification.classList.add('show');
-    // console.log('🔍 DEBUG: Animation triggered, notification classes:', notification.className);
-  }, 10);
-
-  // Auto remove after duration
-  setTimeout(() => {
-    if (notification.parentElement) {
-      // console.log('🔍 DEBUG: Starting notification removal, classes:', notification.className);
-      notification.classList.add('hide');
-      setTimeout(() => {
-        if (notification.parentElement) {
-          // console.log('🔍 DEBUG: Removing notification from DOM');
-          notification.remove();
-        }
-      }, 300); // Wait for animation
-    }
-  }, duration);
-
-  // Save to global history
-  saveNotificationToGlobalHistory(type, title, message, category).catch(error => {
-    console.warn('Failed to save notification to global history:', error);
-  });
-
-  // Console log for debugging
-  console.log(`🔔 ${type.toUpperCase()}: ${title} - ${message}`);
-}
 
 /**
  * Get notification icon based on type
@@ -1747,60 +1739,12 @@ function hideNotification(notification) {
 // ===== SPECIFIC NOTIFICATION FUNCTIONS =====
 // These are convenience functions for different notification types
 
-/**
- * Show success notification
- * NOTIFICATION SYSTEM - Displays success message to user
- *
- * @param {string} title - Success notification title
- * @param {string} message - Success notification message
- * @param {number} duration - Display duration in milliseconds (default: 4000)
- * @param {string} category - Category of notification (default: 'system')
- */
-async function showSuccessNotification(title, message, duration = 4000, category = null) {
-  // Ensure title and message are provided
-  const finalTitle = title || 'הצלחה';
-  const finalMessage = message || 'הפעולה הושלמה בהצלחה';
-
-  // showSuccessNotification calling showNotification with category
-  await showNotification(finalMessage, 'success', finalTitle, duration, category);
-}
+// REMOVED: showSuccessNotification - use window.showSuccessNotification from notification-system.js
 
 
-/**
- * Show error notification
- * NOTIFICATION SYSTEM - Displays error message to user
- *
- * @param {string} title - Error notification title
- * @param {string} message - Error notification message
- * @param {number} duration - Display duration in milliseconds (default: 6000)
- * @param {string} category - Category of notification (default: 'system')
- */
-async function showErrorNotification(title, message, duration = 6000, category = null) {
-  // Use the new critical error system for all error notifications
-  console.log('🚨 Error notification converted to critical error system:', { title, message, category });
-  
-  // Get current function name from stack trace
-  const stack = new Error().stack;
-  const stackLines = stack.split('\n');
-  const callerLine = stackLines[2] || stackLines[1] || '';
-  
-  // Extract function name and line number
-  const functionMatch = callerLine.match(/at\s+(\w+)/);
-  const lineMatch = callerLine.match(/:(\d+):/);
-  
-  const errorDetails = {
-    source: 'error-notification',
-    function: functionMatch ? functionMatch[1] : 'unknown',
-    line: lineMatch ? lineMatch[1] : 'unknown',
-    stack: stack,
-    originalDuration: duration,
-    originalCategory: category,
-    convertedAt: new Date().toISOString()
-  };
-  
-  // Show critical error notification instead of regular notification
-  await showCriticalErrorNotification(title, message, errorDetails, category || 'system');
-}
+// REMOVED: showErrorNotification - use window.showErrorNotification from notification-system.js
+// Note: The global version is simpler and calls showNotification directly
+// If critical error handling is needed, use window.showCriticalErrorNotification directly
 
 /**
  * Show simple error notification (legacy mode)
@@ -1812,8 +1756,12 @@ async function showErrorNotification(title, message, duration = 6000, category =
  * @param {string} category - Category of notification (default: 'system')
  */
 async function showSimpleErrorNotification(title, message, duration = 6000, category = null) {
-  // Use the original simple notification system
-  await showNotification(message, 'error', title, duration, category);
+  // Use the global notification system from notification-system.js
+  if (typeof window.showNotification === 'function') {
+    await window.showNotification(message, 'error', title, duration, category);
+  } else {
+    console.error('showNotification not available');
+  }
 }
 
 /**
@@ -2110,7 +2058,7 @@ window.showClearCacheConfirmation = async function(level, currentStats) {
             <div class="modal fade" id="clearCacheConfirmationModal" tabindex="-1" data-bs-backdrop="static">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <div class="modal-header text-white" style="background-color: ${config.color}; direction: rtl;">
+                        <div class="modal-header text-white" data-entity-type="${config.entityType || ''}" style="direction: rtl;">
                             <h4 class="modal-title">
                                 ${config.emoji} ${config.name}
                             </h4>
@@ -2633,33 +2581,9 @@ function withCriticalErrorHandling(func, errorTitle = 'שגיאה קריטית',
   };
 }
 
-/**
- * Show warning notification
- * NOTIFICATION SYSTEM - Displays warning message to user
- *
- * @param {string} title - Warning notification title
- * @param {string} message - Warning notification message
- * @param {number} duration - Display duration in milliseconds (default: 5000)
- * @param {string} category - Category of notification (default: 'system')
- */
-async function showWarningNotification(title, message, duration = 5000, category = null) {
-  // showWarningNotification calling showNotification with category
-  await showNotification(message, 'warning', title, duration, category);
-}
+// REMOVED: showWarningNotification - use window.showWarningNotification from notification-system.js
 
-/**
- * Show info notification
- * NOTIFICATION SYSTEM - Displays info message to user
- *
- * @param {string} title - Info notification title
- * @param {string} message - Info notification message
- * @param {number} duration - Display duration in milliseconds (default: 4000)
- * @param {string} category - Category of notification (default: 'system')
- */
-async function showInfoNotification(title, message, duration = 4000, category = null) {
-  // showInfoNotification calling showNotification with category
-  await showNotification(message, 'info', title, duration, category);
-}
+// REMOVED: showInfoNotification - use window.showInfoNotification from notification-system.js
 
 /**
  * Show details modal
@@ -2824,7 +2748,7 @@ function copyToClipboard(textContent, title) {
     // Try modern clipboard API first
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(formattedContent).then(() => {
-        showSuccessNotification('התוכן הועתק ללוח בהצלחה', 'העתקה');
+        window.showSuccessNotification('התוכן הועתק ללוח בהצלחה', 'העתקה');
         console.log('✅ Content copied to clipboard via Clipboard API');
       }).catch(err => {
         console.warn('Clipboard API failed, trying fallback:', err);
@@ -2864,7 +2788,7 @@ function fallbackCopyToClipboard(text) {
     }
   } catch (error) {
     console.error('❌ Fallback copy failed:', error);
-    showErrorNotification('שגיאה בהעתקה ללוח', 'שגיאה');
+    window.showErrorNotification('שגיאה בהעתקה ללוח', 'שגיאה');
   }
 }
 
@@ -2877,18 +2801,11 @@ function fallbackCopyToClipboard(text) {
 // ===== LEGACY SUPPORT =====
 // These functions provide backward compatibility
 
-/**
- * Legacy support function for old notification calls
- * NOTIFICATION SYSTEM - Handles old notification format for backward compatibility
- *
- * @param {string} message - Message (can be title + message)
- * @param {string} type - Notification type
- * @param {number} duration - Display duration
- */
-function showNotificationLegacy(message, type = 'info', duration = 4000) {
-  // Direct console log to avoid recursion
-  console.log(`🔔 ${type.toUpperCase()}: ${message}`);
-}
+// REMOVED: showNotificationLegacy - legacy function not used, only console.log
+// function _REMOVED_showNotificationLegacy(message, type = 'info', duration = 4000) {
+//   // Direct console log to avoid recursion
+//   console.log(`🔔 ${type.toUpperCase()}: ${message}`);
+// }
 
 // ===== GLOBAL NOTIFICATION HISTORY SYSTEM =====
 /**
@@ -2934,7 +2851,7 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
     // Fallback דרך UnifiedCacheManager - כלל 44
     try {
       let globalHistory = [];
-      if (window.UnifiedCacheManager?.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         try {
           const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
             layer: 'localStorage'
@@ -2997,7 +2914,7 @@ async function updateGlobalNotificationStats() {
     // Fallback ל-localStorage
     if (history.length === 0) {
       try {
-        if (window.UnifiedCacheManager?.isInitialized()) {
+        if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
           const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
             layer: 'localStorage'
           });
@@ -3040,7 +2957,7 @@ async function updateGlobalNotificationStats() {
 
     // Fallback דרך UnifiedCacheManager - כלל 44
     try {
-      if (window.UnifiedCacheManager?.isInitialized()) {
+      if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
         await window.UnifiedCacheManager.save('tiktrack_global_notifications_stats', stats, {
           layer: 'localStorage',
           ttl: 24 * 60 * 60 * 1000 // 24 hours
@@ -3197,10 +3114,10 @@ window.copySuccessDetails = function() {
     navigator.clipboard.writeText(successText).then(() => {
       console.log('Success details copied to clipboard');
       // Show simple success notification to avoid recursion
-      showSuccessNotification('פרטי ההצלחה הועתקו ללוח', 'הפרטים הועתקו בהצלחה');
+      window.showSuccessNotification('פרטי ההצלחה הועתקו ללוח', 'הפרטים הועתקו בהצלחה');
     }).catch(err => {
       console.error('Failed to copy success details:', err);
-      showSimpleErrorNotification('שגיאה בהעתקה', 'לא ניתן להעתיק את פרטי ההצלחה');
+      window.showErrorNotification('שגיאה בהעתקה', 'לא ניתן להעתיק את פרטי ההצלחה');
     });
   }
 };
@@ -3215,17 +3132,21 @@ window.markAlertAsRead = markAlertAsRead;
 
 
 // Export NOTIFICATION SYSTEM functions to global scope
-window.showNotification = showNotification;
-window.showSuccessNotification = showSuccessNotification;
+// Export NOTIFICATION SYSTEM functions to global scope
+// Note: showSuccessNotification, showErrorNotification, showWarningNotification, showInfoNotification
+// are exported from notification-system.js - removed local duplicates
+// Note: showNotification is also exported from notification-system.js - removed local duplicate
+// Use window.showNotification from notification-system.js (more advanced version with options parameter)
 window.showFinalSuccessNotification = showFinalSuccessNotification;
 window.showFinalSuccessNotificationWithReload = showFinalSuccessNotificationWithReload;
-window.showErrorNotification = showErrorNotification;
+// window.showSuccessNotification - use global from notification-system.js
+// window.showErrorNotification - use global from notification-system.js
 window.showSimpleErrorNotification = showSimpleErrorNotification;
 window.showCriticalErrorNotification = showCriticalErrorNotification;
 window.createCriticalError = createCriticalError;
 window.withCriticalErrorHandling = withCriticalErrorHandling;
-window.showWarningNotification = showWarningNotification;
-window.showInfoNotification = showInfoNotification;
+// window.showWarningNotification - use global from notification-system.js
+// window.showInfoNotification - use global from notification-system.js
 window.showDetailsModal = showDetailsModal;
 
 // Export NOTIFICATION CATEGORIES SYSTEM functions to global scope
@@ -3256,16 +3177,14 @@ window.notificationSystem = {
 
 
   // NOTIFICATION SYSTEM functions
-  showNotification,
-  showSuccessNotification,
+  // Note: showSuccessNotification, showWarningNotification, showInfoNotification use global functions from notification-system.js
+  showNotification, // Keep local - has complex logic
   showFinalSuccessNotification,
-  showErrorNotification,
+  // showErrorNotification - use global from notification-system.js
   showSimpleErrorNotification,
   showCriticalErrorNotification,
   createCriticalError,
   withCriticalErrorHandling,
-  showWarningNotification,
-  showInfoNotification,
   createNotificationContainer,
   hideNotification,
   getNotificationIcon,
@@ -3286,15 +3205,15 @@ window.notificationSystem = {
 // Global NotificationSystem object for compatibility
 window.NotificationSystem = {
     show: window.showNotification,
-    showSuccess: window.showSuccessNotification,
+    showSuccess: window.showSuccessNotification, // From notification-system.js
     showFinalSuccess: window.showFinalSuccessNotification,
-    showError: window.showErrorNotification,
+    showError: window.showErrorNotification, // From notification-system.js
     showSimpleError: window.showSimpleErrorNotification,
     showCriticalError: window.showCriticalErrorNotification,
     createCriticalError: window.createCriticalError,
     withCriticalErrorHandling: window.withCriticalErrorHandling,
-    showWarning: window.showWarningNotification,
-    showInfo: window.showInfoNotification,
+    showWarning: window.showWarningNotification, // From notification-system.js
+    showInfo: window.showInfoNotification, // From notification-system.js
     showDetails: window.showDetailsModal,
     shouldShow: window.shouldShowNotification,
     logWithCategory: window.logWithCategory,
@@ -3464,6 +3383,7 @@ console.log('✅ Core Systems module loaded successfully (Static Loading)');
 // Unified page configurations - previously in page-initialization-configs.js
 // Moved here as part of loading system standardization (October 2025)
 
+if (typeof window.PAGE_CONFIGS === 'undefined') {
 const PAGE_CONFIGS = {
 
     // Main Pages
@@ -3637,10 +3557,44 @@ const PAGE_CONFIGS = {
         requiresTables: false,
         customInitializers: [
             async (pageConfig) => {
-                console.log('📝 Initializing Notes...');
-                
-                if (typeof window.initializeNotesPage === 'function') {
-                    window.initializeNotesPage();
+                // Use general system getPageDataFunctions() instead of local code
+                if (typeof window.getPageDataFunctions === 'function') {
+                    const { loadData } = window.getPageDataFunctions();
+                    if (loadData && typeof loadData === 'function') {
+                        console.log('📝 Initializing Notes via general system...');
+                        try {
+                            await loadData();
+                            console.log('✅ Notes data loaded successfully');
+                        } catch (error) {
+                            console.error('❌ Error loading notes data:', error);
+                        }
+                    } else {
+                        // Fallback to direct function call
+                        if (typeof window.loadNotesData === 'function') {
+                            console.log('📝 Initializing Notes (fallback)...');
+                            try {
+                                await window.loadNotesData();
+                                console.log('✅ Notes data loaded successfully');
+                            } catch (error) {
+                                console.error('❌ Error in loadNotesData:', error);
+                            }
+                        } else {
+                            console.warn('⚠️ loadNotesData function not available');
+                        }
+                    }
+                } else {
+                    // Fallback if getPageDataFunctions doesn't exist
+                    if (typeof window.loadNotesData === 'function') {
+                        console.log('📝 Initializing Notes (direct)...');
+                        try {
+                            await window.loadNotesData();
+                            console.log('✅ Notes data loaded successfully');
+                        } catch (error) {
+                            console.error('❌ Error in loadNotesData:', error);
+                        }
+                    } else {
+                        console.warn('⚠️ loadNotesData function not available');
+                    }
                 }
             }
         ]
@@ -4339,3 +4293,4 @@ window.getPageInitSummary = function(pageName) {
 
 window.PAGE_CONFIGS = PAGE_CONFIGS;
 window.pageInitializationConfigs = PAGE_CONFIGS;
+}

@@ -50,6 +50,24 @@ class ModalManagerV2 {
     }
 
     /**
+     * Check if required dependencies are available
+     * בדיקת תלויות נדרשות
+     * @private
+     * @returns {Object} Dependency status
+     */
+    _checkDependencies() {
+        return {
+            preferencesSystem: {
+                available: typeof window.PreferencesSystem !== 'undefined' && window.PreferencesSystem !== null,
+                initialized: window.PreferencesSystem?.initialized === true
+            },
+            selectPopulatorService: {
+                available: typeof window.SelectPopulatorService !== 'undefined' && window.SelectPopulatorService !== null
+            }
+        };
+    }
+    
+    /**
      * Setup event listeners - הגדרת מאזיני אירועים
      * 
      * @private
@@ -65,14 +83,75 @@ class ModalManagerV2 {
             this.handleModalShown(event.target);
         });
         
-        // מאזין לשינוי העדפות משתמש
-        if (window.PreferencesSystem) {
-            window.PreferencesSystem.onPreferencesChanged(() => {
-                this.updateAllModalColors();
-            });
+        // מאזין לשינוי העדפות משתמש - עם validation
+        const deps = this._checkDependencies();
+        if (deps.preferencesSystem.available && deps.preferencesSystem.initialized) {
+            try {
+                if (typeof window.PreferencesSystem.onPreferencesChanged === 'function') {
+                    window.PreferencesSystem.onPreferencesChanged(() => {
+                        this.updateAllModalColors();
+                    });
+                    console.log('✅ PreferencesSystem listener registered');
+                }
+            } catch (e) {
+                console.warn('⚠️ Failed to register PreferencesSystem listener:', e);
+            }
+        } else {
+            // Try to register listener later when PreferencesSystem is ready
+            this._tryRegisterPreferencesListener();
+            
+            // Only show warning in debug mode to reduce console noise
+            const DEBUG_MODE = window.location.hostname === 'localhost' || 
+                              window.location.hostname === '127.0.0.1' ||
+                              window.location.search.includes('debug=true');
+            if (DEBUG_MODE) {
+                console.debug('⚠️ PreferencesSystem not yet available - will retry registration later');
+            }
         }
     }
 
+    /**
+     * Try to register PreferencesSystem listener (called when PreferencesSystem becomes available)
+     * @private
+     */
+    _tryRegisterPreferencesListener() {
+        // Retry registration after a short delay
+        setTimeout(() => {
+            const deps = this._checkDependencies();
+            if (deps.preferencesSystem.available && deps.preferencesSystem.initialized) {
+                try {
+                    if (typeof window.PreferencesSystem.onPreferencesChanged === 'function') {
+                        window.PreferencesSystem.onPreferencesChanged(() => {
+                            this.updateAllModalColors();
+                        });
+                        console.log('✅ PreferencesSystem listener registered (delayed)');
+                    }
+                } catch (e) {
+                    // Silently fail - PreferencesSystem might not support this feature
+                }
+            }
+        }, 2000); // Retry after 2 seconds
+        
+        // Also listen for preferences:loaded event
+        if (typeof window.addEventListener === 'function') {
+            window.addEventListener('preferences:loaded', () => {
+                const deps = this._checkDependencies();
+                if (deps.preferencesSystem.available && deps.preferencesSystem.initialized) {
+                    try {
+                        if (typeof window.PreferencesSystem.onPreferencesChanged === 'function') {
+                            window.PreferencesSystem.onPreferencesChanged(() => {
+                                this.updateAllModalColors();
+                            });
+                            console.log('✅ PreferencesSystem listener registered (via event)');
+                        }
+                    } catch (e) {
+                        // Silently fail
+                    }
+                }
+            }, { once: true });
+        }
+    }
+    
     /**
      * Load default configurations - טעינת קונפיגורציות ברירת מחדל
      * 
@@ -138,14 +217,34 @@ class ModalManagerV2 {
         return `
             <div class="modal fade" id="${config.id}" tabindex="-1" 
                  aria-labelledby="${config.id}Label" aria-hidden="true"
-                 data-bs-backdrop="true" data-bs-keyboard="true">
+                 data-bs-backdrop="false" data-bs-keyboard="true"
+                 data-entity-type="${config.entityType || ''}">
                 <div class="modal-dialog modal-${config.size || 'lg'}">
                     <div class="modal-content">
-                        <div class="modal-header modal-header-dynamic" 
-                             style="background-color: var(--current-entity-color-light); border-bottom: 2px solid var(--current-entity-color)">
-                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark)">${config.title.add || 'הוספת ישות'}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" 
-                                    aria-label="סגור"></button>
+                        <div class="modal-header modal-header-colored" 
+                             style="background-color: var(--current-entity-color-light) !important; border-bottom: 2px solid var(--current-entity-color-dark)">
+                            <!-- Breadcrumb navigation -->
+                            <div class="modal-navigation-breadcrumb" style="order: 0; width: 100%; margin-bottom: 0.5rem;"></div>
+                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark) !important; order: 1;">${config.title.add || 'הוספת ישות'}</h5>
+                            <!-- Back button - uses the button system -->
+                            <button type="button" 
+                                    data-button-type="BACK" 
+                                    data-variant="small" 
+                                    data-text="" 
+                                    title="חזור למודול הקודם"
+                                    class="modal-back-btn"
+                                    style="order: 998; display: none;">
+                            </button>
+                            <!-- Close button -->
+                            <button type="button" 
+                                    data-button-type="CLOSE" 
+                                    data-variant="small" 
+                                    data-bs-dismiss="modal" 
+                                    data-text="" 
+                                    title="סגור"
+                                    class="modal-close-btn"
+                                    style="order: 999;">
+                            </button>
                         </div>
                         <div class="modal-body">
                             <form id="${config.id}Form">
@@ -250,6 +349,12 @@ class ModalManagerV2 {
                 
             case 'date':
             case 'datetime-local':
+                // Handle 'today' special value for datetime-local
+                let dateValue = field.defaultValue || '';
+                if (dateValue === 'today') {
+                    const today = new Date();
+                    dateValue = today.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
+                }
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
@@ -260,7 +365,7 @@ class ModalManagerV2 {
                                id="${field.id}" 
                                name="${field.id}"
                                ${requiredAttr}
-                               value="${field.defaultValue || ''}">
+                               value="${dateValue}">
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
@@ -308,6 +413,28 @@ class ModalManagerV2 {
                                   ${requiredAttr}
                                   rows="${field.rows || 4}"
                                   placeholder="${field.placeholder || ''}">${field.defaultValue || ''}</textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
+            case 'checkbox':
+                const checkedAttr = field.defaultValue === true || field.defaultValue === 'true' ? 'checked' : '';
+                return `
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" 
+                                   class="form-check-input" 
+                                   id="${field.id}" 
+                                   name="${field.id}"
+                                   value="true"
+                                   ${checkedAttr}
+                                   ${requiredAttr}
+                                   ${disabledAttr}>
+                            <label for="${field.id}" class="form-check-label">
+                                ${field.label} ${requiredStar}
+                            </label>
+                        </div>
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
@@ -362,9 +489,23 @@ class ModalManagerV2 {
             // In add mode, defaults are applied by populateSelects for fields with defaultFromPreferences
             // Additional defaults (date, source) are handled below after modal shows
             
-            // הצגת המודל
-            const modal = new bootstrap.Modal(modalElement);
+            // הצגת המודל - ללא backdrop (ננהל אותו מרכזית)
+            const modal = new bootstrap.Modal(modalElement, {
+                backdrop: false, // ננהל backdrop מרכזית
+                keyboard: true
+            });
             modal.show();
+            
+            // הוספה למערכת ניהול הניווט
+            if (window.modalNavigationManager) {
+                const modalNavInfo = {
+                    type: 'crud-modal',
+                    entityType: modalInfo.config.entityType,
+                    entityId: mode === 'edit' && entityData ? entityData.id : null,
+                    title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || ''
+                };
+                window.modalNavigationManager.pushModal(modalElement, modalNavInfo);
+            }
             
             // Apply remaining defaults after modal shows (date, source, etc.)
             if (mode === 'add') {
@@ -374,6 +515,11 @@ class ModalManagerV2 {
             // עדכון מצב
             modalInfo.isActive = true;
             this.activeModal = modalId;
+            
+            // עדכון navigation UI
+            if (window.modalNavigationManager) {
+                window.modalNavigationManager.updateModalNavigation(modalElement);
+            }
             
         } catch (error) {
             console.error(`Error showing modal ${modalId}:`, error);
@@ -576,16 +722,17 @@ class ModalManagerV2 {
                 'industry': 'tickerIndustry'
             },
             'trade': {
-                'account_id': 'tradeAccount',
+                'trading_account_id': 'tradeAccount',
                 'ticker_id': 'tradeTicker',
                 'side': 'tradeSide',
                 'status': 'tradeStatus',
                 'notes': 'tradeNotes'
             },
             'trade_plan': {
+                'trading_account_id': 'tradePlanAccount',
                 'ticker_id': 'planTicker',
-                'account_id': 'planAccount',
                 'side': 'planSide',
+                'investment_type': 'tradePlanType', // Map investment_type to tradePlanType field
                 'planned_amount': 'planAmount',
                 'stop_loss': 'planStopLoss',
                 'target_price': 'planTargetPrice'
@@ -661,9 +808,15 @@ class ModalManagerV2 {
                     }
                     
                     // Apply defaultValue for other select fields (e.g., source)
+                    // Handle 'today' special value for datetime-local fields
                     if (field.defaultValue !== undefined && field.defaultValue !== null) {
-                        fieldElement.value = field.defaultValue;
-                        console.log(`Applied default value for ${field.id}:`, field.defaultValue);
+                        if (field.type === 'datetime-local' && field.defaultValue === 'today') {
+                            const today = new Date();
+                            fieldElement.value = today.toISOString().slice(0, 16);
+                        } else {
+                            fieldElement.value = field.defaultValue;
+                        }
+                        console.log(`Applied default value for ${field.id}:`, fieldElement.value);
                         continue;
                     }
                     continue;
@@ -756,10 +909,12 @@ class ModalManagerV2 {
     _applyPreferenceDefault(field, fieldElement, preferences) {
         // Map field IDs to preference names
         const preferenceMap = {
-            'cashFlowAccount': 'defaultTradingAccount',
-            'cashFlowCurrency': 'defaultCurrency',
-            'tradingAccount': 'defaultTradingAccount',
-            'currency': 'defaultCurrency'
+            'cashFlowAccount': 'default_trading_account',
+            'cashFlowCurrency': 'primaryCurrency',
+            'executionAccount': 'default_trading_account',
+            'executionCommission': 'defaultCommission',
+            'tradingAccount': 'default_trading_account',
+            'currency': 'primaryCurrency'
         };
         
         // Try to find matching preference
@@ -823,22 +978,24 @@ class ModalManagerV2 {
     applyUserColors(modalElement, entityType) {
         if (!entityType) return;
         
-        // הוספת data attribute למודל לזיהוי סוג הישות
+        // הוספת data attribute למודל לזיהוי סוג הישות - CSS ידאג לצבעים!
         modalElement.setAttribute('data-entity-type', entityType);
         
-        // קבלת צבעי הישות מהמערכת הדינמית
-        const entityColors = window.ENTITY_COLORS || {};
-        const entityBackgroundColors = window.ENTITY_BACKGROUND_COLORS || {};
-        const entityTextColors = window.ENTITY_TEXT_COLORS || {};
+        // הוספת class גם לכותרת המודל (אם יש)
+        const headerElement = modalElement.querySelector('.modal-header');
+        if (headerElement) {
+            // הסרת כל המחלקות הישנות
+            const validEntityTypes = ['trade', 'ticker', 'account', 'alert', 'cash_flow', 'cash-flow', 'note', 'trade_plan', 'trade-plan', 'execution', 'preference', 'research', 'design', 'constraint', 'development'];
+            validEntityTypes.forEach(type => {
+                headerElement.classList.remove(`entity-${type}`);
+            });
+            
+            // הוספת מחלקת ישות חדשה - CSS ידאג לצבעים מההעדפות!
+            const normalizedType = entityType.replace('_', '-').toLowerCase();
+            headerElement.classList.add(`entity-${normalizedType}`);
+        }
         
-        const entityColor = entityColors[entityType] || '#26baac';
-        const backgroundColor = entityBackgroundColors[entityType] || 'rgba(38, 186, 172, 0.1)';
-        const textColor = entityTextColors[entityType] || '#1a9d7a';
-
-        // הזרקת משתני CSS דינמיים למודל (ITCSS compliant)
-        modalElement.style.setProperty('--modal-entity-color', entityColor);
-        modalElement.style.setProperty('--modal-entity-bg', backgroundColor);
-        modalElement.style.setProperty('--modal-entity-text', textColor);
+        // כל הצבעים עכשיו מגיעים מההעדפות דרך CSS - אין צורך ב-CSS variables או inline styles!
     }
 
     /**
@@ -849,8 +1006,13 @@ class ModalManagerV2 {
      * @private
      */
     async populateSelects(modalElement, config) {
-        if (!window.SelectPopulatorService) {
-            console.log('⚠️ SelectPopulatorService not available');
+        // Check dependencies with validation
+        const deps = this._checkDependencies();
+        
+        if (!deps.selectPopulatorService.available) {
+            console.warn('⚠️ SelectPopulatorService not available - select fields may not be populated correctly');
+            console.warn('⚠️ Make sure SelectPopulatorService is loaded before ModalManagerV2');
+            // Continue without populating - let the form work without defaults
             return;
         }
         
@@ -866,29 +1028,24 @@ class ModalManagerV2 {
                 const fieldConfig = config.fields.find(f => f.id === selectId);
                 if (fieldConfig && fieldConfig.defaultFromPreferences) {
                     shouldUseDefaultFromPrefs = true;
-                    console.log(`🔍 Field ${selectId} has defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
                 }
             }
             
             try {
                 // מילוי לפי סוג השדה
                 if (selectId.includes('Account') || selectId.includes('account')) {
-                    console.log(`📋 Populating accounts select: ${selectId} with defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
                     await window.SelectPopulatorService.populateAccountsSelect(selectId, {
                         defaultFromPreferences: shouldUseDefaultFromPrefs
                     });
                 } else if (selectId.includes('Ticker') || selectId.includes('ticker')) {
-                    console.log(`📋 Populating tickers select: ${selectId}`);
                     await window.SelectPopulatorService.populateTickersSelect(selectId, {
                         includeEmpty: true
                     });
                 } else if (selectId.includes('Currency') || selectId.includes('currency')) {
-                    console.log(`📋 Populating currencies select: ${selectId} with defaultFromPreferences: ${shouldUseDefaultFromPrefs}`);
                     await window.SelectPopulatorService.populateCurrenciesSelect(selectId, {
                         defaultFromPreferences: shouldUseDefaultFromPrefs
                     });
                 } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
-                    console.log(`📋 Populating trade plans select: ${selectId}`);
                     await window.SelectPopulatorService.populateTradePlansSelect(selectId, {
                         includeEmpty: true
                     });
@@ -918,6 +1075,90 @@ class ModalManagerV2 {
         const firstInput = modalElement.querySelector('input:not([readonly]), select, textarea');
         if (firstInput) {
             setTimeout(() => firstInput.focus(), 100);
+        }
+        
+        // Initialize special handlers for specific modals
+        this.initializeSpecialHandlers(modalElement);
+    }
+    
+    /**
+     * Initialize special handlers for specific modals
+     * @param {HTMLElement} modalElement - The modal element
+     * @private
+     */
+    initializeSpecialHandlers(modalElement) {
+        const modalId = modalElement.id;
+        
+        // For Executions modal - handle ticker selection
+        if (modalId === 'executionsModal') {
+            const tickerSelect = modalElement.querySelector('#executionTicker');
+            if (tickerSelect) {
+                // Remove existing listeners
+                const newTickerSelect = tickerSelect.cloneNode(true);
+                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Add change listener
+                newTickerSelect.addEventListener('change', async (e) => {
+                    const tickerId = e.target.value;
+                    if (tickerId && window.loadExecutionTickerInfo) {
+                        await window.loadExecutionTickerInfo(tickerId);
+                    }
+                });
+            }
+        }
+        
+        // For Trade Plans modal - handle ticker selection
+        if (modalId === 'tradePlansModal') {
+            const tickerSelect = modalElement.querySelector('#tradePlanTicker');
+            if (tickerSelect) {
+                // Remove existing listeners
+                const newTickerSelect = tickerSelect.cloneNode(true);
+                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Add change listener
+                newTickerSelect.addEventListener('change', async (e) => {
+                    const tickerId = e.target.value;
+                    if (tickerId && window.loadTradePlanTickerInfo) {
+                        await window.loadTradePlanTickerInfo(tickerId);
+                    }
+                });
+            }
+        }
+        
+        // For Trades modal - handle ticker selection
+        if (modalId === 'tradesModal') {
+            const tickerSelect = modalElement.querySelector('#tradeTicker');
+            if (tickerSelect) {
+                // Remove existing listeners
+                const newTickerSelect = tickerSelect.cloneNode(true);
+                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Add change listener
+                newTickerSelect.addEventListener('change', async (e) => {
+                    const tickerId = e.target.value;
+                    if (tickerId && window.loadTradeTickerInfo) {
+                        await window.loadTradeTickerInfo(tickerId);
+                    }
+                });
+            }
+        }
+        
+        // For Alerts modal - handle ticker selection
+        if (modalId === 'alertsModal') {
+            const tickerSelect = modalElement.querySelector('#alertTicker');
+            if (tickerSelect) {
+                // Remove existing listeners
+                const newTickerSelect = tickerSelect.cloneNode(true);
+                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Add change listener
+                newTickerSelect.addEventListener('change', async (e) => {
+                    const tickerId = e.target.value;
+                    if (tickerId && window.loadAlertTickerInfo) {
+                        await window.loadAlertTickerInfo(tickerId);
+                    }
+                });
+            }
         }
     }
 
@@ -1026,6 +1267,17 @@ class ModalManagerV2 {
             `${mode === 'add' ? 'הוספת' : mode === 'edit' ? 'עריכת' : 'צפייה ב'}${config.entityType}`;
         
         titleElement.textContent = title;
+        
+        // עדכון navigation UI אחרי עדכון הכותרת
+        if (window.modalNavigationManager) {
+            // עדכון המידע במודול הנוכחי
+            const currentIndex = window.modalNavigationManager.modalHistory.findIndex(item => item.element === modalElement);
+            if (currentIndex >= 0) {
+                window.modalNavigationManager.modalHistory[currentIndex].info.title = title;
+            }
+            // עדכון UI
+            window.modalNavigationManager.updateModalNavigation(modalElement);
+        }
     }
 
     /**

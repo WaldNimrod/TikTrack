@@ -76,15 +76,75 @@
 .linked-items-container .linked-item-row.trade_plan { border-inline-start: 4px solid var(--entity-trade-plan-color); }
 .linked-items-container .linked-item-row.execution { border-inline-start: 4px solid var(--entity-execution); }
 
-/* Modal header colored by entity type */
-.modal-header.entity-trade { background-color: var(--entity-trade-bg); color: var(--entity-trade-text); }
-.modal-header.entity-ticker { background-color: var(--entity-ticker-bg); color: var(--entity-ticker-text); }
-.modal-header.entity-account { background-color: var(--entity-account-bg); color: var(--entity-account-text); }
-.modal-header.entity-alert { background-color: var(--entity-alert-bg); color: var(--entity-alert-text); }
-.modal-header.entity-cash_flow, .modal-header.entity-cash-flow { background-color: var(--entity-cash-flow-bg); color: var(--entity-cash-flow-text); }
-.modal-header.entity-note { background-color: var(--entity-note-bg); color: var(--entity-note-text); }
-.modal-header.entity-trade_plan, .modal-header.entity-trade-plan { background-color: var(--entity-trade-plan-bg); color: var(--entity-trade-plan-text); }
-.modal-header.entity-execution { background-color: var(--entity-execution-bg); color: var(--entity-execution-text); }
+/* ===== Modal headers colored by entity type - אחידים ===== */
+/* כל הצבעים מהעדפות בלבד - צבע רקע מלא כמו כותרות סקשנים */
+.modal-header.entity-trade { 
+  background-color: var(--entity-trade-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-trade-color);
+}
+.modal-header.entity-ticker { 
+  background-color: var(--entity-ticker-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-ticker-color);
+}
+.modal-header.entity-account { 
+  background-color: var(--entity-account-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-account-color);
+}
+.modal-header.entity-alert { 
+  background-color: var(--entity-alert-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-alert-color);
+}
+.modal-header.entity-cash_flow, 
+.modal-header.entity-cash-flow { 
+  background-color: var(--entity-cash-flow-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-cash-flow-color);
+}
+.modal-header.entity-note { 
+  background-color: var(--entity-note-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-note-color);
+}
+.modal-header.entity-trade_plan, 
+.modal-header.entity-trade-plan { 
+  background-color: var(--entity-trade-plan-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-trade-plan-color);
+}
+.modal-header.entity-execution { 
+  background-color: var(--entity-execution-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-execution-color);
+}
+.modal-header.entity-preference { 
+  background-color: var(--entity-preference-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-preference-color);
+}
+.modal-header.entity-research { 
+  background-color: var(--entity-research-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-research-color);
+}
+.modal-header.entity-design { 
+  background-color: var(--entity-design-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-design-color);
+}
+.modal-header.entity-constraint { 
+  background-color: var(--entity-constraint-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-constraint-color);
+}
+.modal-header.entity-development { 
+  background-color: var(--entity-development-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-development-color);
+}
 
 /* Header actions (export/close) inherit entity text color */
 #linkedItemsModal .modal-header .export-btn {

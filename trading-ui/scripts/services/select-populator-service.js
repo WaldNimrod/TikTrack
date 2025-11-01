@@ -20,59 +20,123 @@
 // ===== SELECT POPULATOR SERVICE =====
 
 class SelectPopulatorService {
+    /**
+     * בדיקה האם תלויות נדרשות זמינות ומאותחלות
+     * @private
+     * @returns {Object} Object with availability flags
+     */
+    static _checkDependencies() {
+        const deps = {
+            preferencesCore: false,
+            preferencesSystem: false,
+            unifiedCacheManager: false
+        };
+        
+        // בדיקת PreferencesCore - צריך להיות קיים וגם מאותחל
+        if (typeof window.PreferencesCore !== 'undefined' && window.PreferencesCore) {
+            try {
+                // בדיקה שהמערכת זמינה לשימוש
+                if (typeof window.PreferencesCore.currentUserId !== 'undefined') {
+                    deps.preferencesCore = true;
+                }
+            } catch (e) {
+                // PreferencesCore קיים אבל לא מאותחל
+            }
+        }
+        
+        // בדיקת PreferencesSystem - אופציונלי, לא נדרש
+        if (typeof window.PreferencesSystem !== 'undefined' && window.PreferencesSystem) {
+            try {
+                if (window.PreferencesSystem.manager && 
+                    typeof window.PreferencesSystem.manager.currentPreferences !== 'undefined') {
+                    deps.preferencesSystem = true;
+                }
+            } catch (e) {
+                // PreferencesSystem לא זמין - זה בסדר, זה אופציונלי
+            }
+        }
+        
+        // בדיקת UnifiedCacheManager - אופציונלי
+        if (typeof window.UnifiedCacheManager !== 'undefined' && window.UnifiedCacheManager) {
+            try {
+                // בדיקה שהמערכת מאותחלת
+                if (window.UnifiedCacheManager.initialized !== false) {
+                    deps.unifiedCacheManager = true;
+                }
+            } catch (e) {
+                // UnifiedCacheManager לא זמין - זה בסדר, יש fallback
+            }
+        }
+        
+        return deps;
+    }
+    
     static async _getPreferenceFromMemory(preferenceName, aliases = []) {
         console.log(`🔍 _getPreferenceFromMemory called for: ${preferenceName} with aliases:`, aliases);
+        
         try {
+            // בדיקת תלויות עם validation
+            const deps = this._checkDependencies();
+            
             // First, try PreferencesCore (synchronous check with cached data)
-            if (window.PreferencesCore && window.UnifiedCacheManager) {
-                // Build cache key like PreferencesCore does
-                const userId = window.PreferencesCore.currentUserId || 1;
-                const profileId = window.PreferencesCore.currentProfileId !== null ? window.PreferencesCore.currentProfileId : 0;
-                
-                console.log(`🔍 Looking for preference ${preferenceName} with userId=${userId}, profileId=${profileId}`);
-                
-                // Try multiple profile IDs in case preferences are saved for different profiles
-                const profileIdsToTry = profileId !== 0 ? [profileId, 0] : [0];
-                
-                for (const tryProfileId of profileIdsToTry) {
-                    const cacheKey = `preference_${preferenceName}_${userId}_${tryProfileId}`;
-                    console.log(`🔍 Trying cache key: tiktrack_${cacheKey}`);
+            if (deps.preferencesCore && deps.unifiedCacheManager) {
+                try {
+                    // Build cache key like PreferencesCore does
+                    const userId = window.PreferencesCore.currentUserId || 1;
+                    const profileId = window.PreferencesCore.currentProfileId !== null ? window.PreferencesCore.currentProfileId : 0;
                     
-                    // Try to get from cache synchronously - check both tiktrack_ prefix and without it
-                    try {
-                        // Try tiktrack_ prefix first
-                        let cached = localStorage.getItem(`tiktrack_${cacheKey}`);
-                        if (cached) {
-                            const parsed = JSON.parse(cached);
-                            console.log(`✅ Found preference ${preferenceName} in UnifiedCache (profileId=${tryProfileId}):`, parsed);
-                            return parsed;
-                        }
+                    console.log(`🔍 Looking for preference ${preferenceName} with userId=${userId}, profileId=${profileId}`);
+                    
+                    // Try multiple profile IDs in case preferences are saved for different profiles
+                    const profileIdsToTry = profileId !== 0 ? [profileId, 0] : [0];
+                    
+                    for (const tryProfileId of profileIdsToTry) {
+                        const cacheKey = `preference_${preferenceName}_${userId}_${tryProfileId}`;
+                        console.log(`🔍 Trying cache key: tiktrack_${cacheKey}`);
                         
-                        // Try without prefix
-                        cached = localStorage.getItem(cacheKey);
-                        if (cached) {
-                            const parsed = JSON.parse(cached);
-                            console.log(`✅ Found preference ${preferenceName} in UnifiedCache (no prefix, profileId=${tryProfileId}):`, parsed);
-                            return parsed;
+                        // Try to get from cache synchronously - check both tiktrack_ prefix and without it
+                        try {
+                            // Try tiktrack_ prefix first
+                            let cached = localStorage.getItem(`tiktrack_${cacheKey}`);
+                            if (cached) {
+                                const parsed = JSON.parse(cached);
+                                console.log(`✅ Found preference ${preferenceName} in UnifiedCache (profileId=${tryProfileId}):`, parsed);
+                                return parsed;
+                            }
+                            
+                            // Try without prefix
+                            cached = localStorage.getItem(cacheKey);
+                            if (cached) {
+                                const parsed = JSON.parse(cached);
+                                console.log(`✅ Found preference ${preferenceName} in UnifiedCache (no prefix, profileId=${tryProfileId}):`, parsed);
+                                return parsed;
+                            }
+                        } catch (e) {
+                            console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName} (profileId=${tryProfileId}):`, e);
                         }
-                    } catch (e) {
-                        console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName} (profileId=${tryProfileId}):`, e);
                     }
+                    
+                    console.log(`⚠️ Preference ${preferenceName} not found in localStorage for any profile`);
+                } catch (e) {
+                    console.warn(`⚠️ Error accessing PreferencesCore/UnifiedCacheManager:`, e);
+                    // Continue to fallback methods
                 }
-                
-                console.log(`⚠️ Preference ${preferenceName} not found in localStorage for any profile`);
+            } else if (!deps.preferencesCore) {
+                console.log(`⚠️ PreferencesCore not available or not initialized - using fallback methods`);
+            } else if (!deps.unifiedCacheManager) {
+                console.log(`⚠️ UnifiedCacheManager not available or not initialized - using fallback methods`);
             }
             
-            // Try window.currentPreferences
+            // Try window.currentPreferences (fallback)
             let prefs = {};
-            if (window.currentPreferences) {
+            if (window.currentPreferences && typeof window.currentPreferences === 'object') {
                 prefs = window.currentPreferences;
                 console.log(`✅ Using window.currentPreferences, found ${Object.keys(prefs).length} preferences`);
-            } else if (window.PreferencesSystem?.manager?.currentPreferences) {
+            } else if (deps.preferencesSystem && window.PreferencesSystem?.manager?.currentPreferences) {
                 prefs = window.PreferencesSystem.manager.currentPreferences;
                 console.log(`✅ Using PreferencesSystem.currentPreferences, found ${Object.keys(prefs).length} preferences`);
             } else {
-                console.log(`⚠️ window.currentPreferences not available, trying localStorage`);
+                console.log(`⚠️ window.currentPreferences not available, trying localStorage fallback`);
                 // Fallback to localStorage
                 try {
                     const stored = localStorage.getItem('tikTrack_preferences');
@@ -178,8 +242,6 @@ class SelectPopulatorService {
             return;
         }
         
-        console.log(`🔍 populateAccountsSelect called for ${selectId}`, { options });
-        
         try {
             // טעינת חשבונות מ-API
             const response = await fetch('/api/trading-accounts/');
@@ -199,7 +261,7 @@ class SelectPopulatorService {
             let defaultValue = options.defaultValue;
             if (options.defaultFromPreferences) {
                 try {
-                    const prefValue = this._getPreferenceFromMemory('default_trading_account', ['defaultAccountFilter', 'defaultTradingAccount', 'trading_account_id']);
+                    const prefValue = await this._getPreferenceFromMemory('default_trading_account');
                     if (prefValue) {
                         // Try to parse as integer ID first
                         const parsed = parseInt(prefValue);
@@ -221,6 +283,8 @@ class SelectPopulatorService {
                 defaultValue: defaultValue,
                 defaultText: options.defaultText
             });
+            
+            console.log(`✅ נטענו ${accounts.length} חשבונות ל-${selectId}`);
             
         } catch (error) {
             console.error('❌ שגיאה בטעינת חשבונות:', error);
@@ -266,14 +330,14 @@ class SelectPopulatorService {
             if (options.defaultFromPreferences) {
                 try {
                     // 1) מזהה ישיר
-                    let prefValue = this._getPreferenceFromMemory('default_currency', ['defaultCurrencyId', 'currency_id']);
+                    let prefValue = await this._getPreferenceFromMemory('default_currency', ['defaultCurrencyId', 'currency_id']);
                     if (prefValue) {
                         defaultValue = parseInt(prefValue);
                     }
 
                     // 2) אם עדיין אין, ננסה לפי אליאסים טקסטואליים (כולל "CODE - NAME" ו-"NAME (CODE)")
                     if (!defaultValue) {
-                        const raw = this._getPreferenceFromMemory('primaryCurrency', ['default_currency_code', 'default_currency_symbol', 'defaultCurrency']);
+                        const raw = await this._getPreferenceFromMemory('primaryCurrency', ['default_currency_code', 'default_currency_symbol', 'defaultCurrency']);
                         if (raw) {
                             const s = String(raw).trim();
                             const candidates = new Set();

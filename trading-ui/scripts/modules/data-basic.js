@@ -92,7 +92,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'name',                  // 1 - Name
     'currency_id',           // 2 - Currency ID
     'status',                // 3 - Status
-    'cash_balance',          // 4 - Cash Balance
+    // 'cash_balance' removed - calculated in real-time via AccountActivityService
     'total_value',           // 5 - Total Value
     'total_pl',              // 6 - Total P&L
     'notes',                 // 7 - Notes
@@ -106,7 +106,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'name',                  // 1 - Name
     'currency_id',           // 2 - Currency ID
     'status',                // 3 - Status
-    'cash_balance',          // 4 - Cash Balance
+    // 'cash_balance' removed - calculated in real-time via AccountActivityService
     'total_value',           // 5 - Total Value
     'total_pl',              // 6 - Total P&L
     'notes',                 // 7 - Notes
@@ -248,7 +248,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'name',            // 0 - שם
     'currency',        // 1 - מטבע
     'status',          // 2 - סטטוס
-    'cash_balance',    // 3 - יתרה במזומן
+    // 'cash_balance' removed - calculated in real-time via AccountActivityService
     'total_value',     // 4 - ערך כולל
     'total_pl',        // 5 - רווח/הפסד כולל
     'notes',            // 6 - הערות
@@ -1489,10 +1489,7 @@ window.tableMappings = {
  * @param {string} tableType - סוג הטבלה
  * @param {Function} updateFunction - פונקציה לעדכון הטבלה
  */
-function sortTable(columnIndex, data, tableType, updateFunction) {
-  // Call the global sortTableData function directly
-  window.sortTableData(columnIndex, data, tableType, updateFunction);
-}
+// REMOVED: sortTable - use window.sortTableData from tables.js directly
 
 /**
  * Global function for sorting tables
@@ -2097,18 +2094,20 @@ window.closeModal = function (modalId) {
  *
  * @returns {Array} Array of default column definitions
  */
-const getDefaultColumnDefs = () => [
-  { field: 'id', headerName: 'ID', width: 80, sortable: true },
-  { field: 'name', headerName: 'Name', width: 200, sortable: true },
-  { field: 'status', headerName: 'Status', width: 120, sortable: true },
-  { field: 'created_at', headerName: 'Created', width: 150, sortable: true },
-  { field: 'updated_at', headerName: 'Updated', width: 150, sortable: true },
-];
+if (typeof window.getDefaultColumnDefs === 'undefined') {
+  const getDefaultColumnDefs = () => [
+    { field: 'id', headerName: 'ID', width: 80, sortable: true },
+    { field: 'name', headerName: 'Name', width: 200, sortable: true },
+    { field: 'status', headerName: 'Status', width: 120, sortable: true },
+    { field: 'created_at', headerName: 'Created', width: 150, sortable: true },
+    { field: 'updated_at', headerName: 'Updated', width: 150, sortable: true },
+  ];
 
-/**
- * Export default column definitions to global scope
- */
-window.getDefaultColumnDefs = getDefaultColumnDefs;
+  /**
+   * Export default column definitions to global scope
+   */
+  window.getDefaultColumnDefs = getDefaultColumnDefs;
+}
 
 // ייצוא המודול עצמו
 window.tables = {

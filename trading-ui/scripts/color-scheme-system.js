@@ -22,7 +22,8 @@
 
     const VALID_ENTITY_TYPES = [
   'trade', 'trade_plan', 'execution', 'account', 'cash_flow',
-  'ticker', 'alert', 'note', 'constraint', 'design', 'research', 'preference'
+  'ticker', 'alert', 'note', 'constraint', 'design', 'research', 'preference',
+  'development', 'info'
 ];
 
 // ===== COLOR DEFINITIONS =====
@@ -38,7 +39,7 @@ const ENTITY_COLORS = {
   constraint: '#e83e8c',
   design: '#6f42c1',
   research: '#17a2b8',
-  preference: '#28a745'
+  preference: '#adb5bd'
 };
 
 const ENTITY_BACKGROUND_COLORS = {
@@ -53,7 +54,7 @@ const ENTITY_BACKGROUND_COLORS = {
   constraint: 'rgba(232, 62, 140, 0.1)',
   design: 'rgba(111, 66, 193, 0.1)',
   research: 'rgba(23, 162, 184, 0.1)',
-  preference: 'rgba(40, 167, 69, 0.1)'
+  preference: 'rgba(173, 181, 189, 0.1)'
 };
 
 const ENTITY_TEXT_COLORS = {
@@ -68,7 +69,7 @@ const ENTITY_TEXT_COLORS = {
   constraint: '#d91a72',
   design: '#59359a',
   research: '#117a8b',
-  preference: '#1e7e34'
+  preference: '#6c757d'
 };
 
 const ENTITY_BORDER_COLORS = {
@@ -83,7 +84,7 @@ const ENTITY_BORDER_COLORS = {
   constraint: 'rgba(232, 62, 140, 0.3)',
   design: 'rgba(111, 66, 193, 0.3)',
   research: 'rgba(23, 162, 184, 0.3)',
-  preference: 'rgba(40, 167, 69, 0.3)'
+  preference: 'rgba(173, 181, 189, 0.3)'
 };
 
 const ENTITY_LIGHT_COLORS = {
@@ -98,7 +99,7 @@ const ENTITY_LIGHT_COLORS = {
   constraint: '#f8d7da',
   design: '#e2d9f3',
   research: '#bee5eb',
-  preference: '#c3e6cb'
+  preference: 'rgba(173, 181, 189, 0.1)'
 };
 
 const ENTITY_DARK_COLORS = {
@@ -113,7 +114,7 @@ const ENTITY_DARK_COLORS = {
   constraint: '#b02a37',
   design: '#383d41',
   research: '#0c5460',
-  preference: '#155724'
+  preference: '#6c757d'
 };
 
 const STATUS_COLORS = {
@@ -192,15 +193,46 @@ function lightenColor(hex, percent) {
 
 // ===== ENTITY COLOR FUNCTIONS =====
 function getEntityColor(entityType) {
-  return ENTITY_COLORS[entityType] || ENTITY_COLORS.trade;
+  // NO hardcoded fallback! Get from preferences or CSS variables only
+  if (ENTITY_COLORS[entityType]) {
+    return ENTITY_COLORS[entityType];
+  }
+  // Try CSS variable (should be set from preferences)
+  const cssVar = getComputedStyle(document.documentElement).getPropertyValue(`--entity-${entityType.replace('_', '-')}-color`).trim();
+  if (cssVar) {
+    return cssVar;
+  }
+  // Last resort: empty string - force system to load from preferences
+  if (window.Logger) { window.Logger.warn(`⚠️ No color found for entity ${entityType} - should load from preferences`, { page: "color-scheme" }); }
+  return '';
 }
 
 function getEntityBackgroundColor(entityType) {
-  return ENTITY_BACKGROUND_COLORS[entityType] || ENTITY_BACKGROUND_COLORS.trade;
+  // NO hardcoded fallback! Get from preferences or CSS variables only
+  if (ENTITY_BACKGROUND_COLORS[entityType]) {
+    return ENTITY_BACKGROUND_COLORS[entityType];
+  }
+  // Try CSS variable (should be set from preferences)
+  const cssVar = getComputedStyle(document.documentElement).getPropertyValue(`--entity-${entityType.replace('_', '-')}-bg`).trim();
+  if (cssVar) {
+    return cssVar;
+  }
+  // Last resort: empty string - force system to load from preferences
+  return '';
 }
 
 function getEntityTextColor(entityType) {
-  return ENTITY_TEXT_COLORS[entityType] || ENTITY_TEXT_COLORS.trade;
+  // NO hardcoded fallback! Get from preferences or CSS variables only
+  if (ENTITY_TEXT_COLORS[entityType]) {
+    return ENTITY_TEXT_COLORS[entityType];
+  }
+  // Try CSS variable (should be set from preferences)
+  const cssVar = getComputedStyle(document.documentElement).getPropertyValue(`--entity-${entityType.replace('_', '-')}-text`).trim();
+  if (cssVar) {
+    return cssVar;
+  }
+  // Last resort: empty string - force system to load from preferences
+  return '';
 }
 
 function getEntityBorderColor(entityType) {
@@ -324,6 +356,154 @@ function generateEntityCSS() {
     `;
   });
   return css;
+}
+
+// ===== HEADER STYLING FUNCTIONS =====
+// פונקציות לעיצוב כותרות
+
+/**
+ * יישום צבעי ישות על כותרות עמוד
+ * Apply entity colors to page headers
+ *
+ * @param {string} entityType - סוג הישות
+ * @param {boolean} excludeWarningModals - האם להחריג מודולי אזהרה
+ */
+function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
+  try {
+    const color = getEntityColor(entityType);
+    if (!color) {
+      console.warn(`⚠️ לא נמצא צבע לישות: ${entityType}`);
+      return;
+    }
+
+    // כותרת ראשית - תחת top-section
+    const mainHeaders = document.querySelectorAll('.top-section .section-header');
+    mainHeaders.forEach(header => {
+      if (excludeWarningModals && isWarningModal(header)) {
+        return; // דלג על מודולי אזהרה
+      }
+      
+      // דלג על כותרות מודלים - הן מנוהלות על ידי ההגדרות הכלליות
+      if (header.closest('.modal')) {
+        return;
+      }
+      
+      // הסרת כל המחלקות הישנות של ישויות
+      VALID_ENTITY_TYPES.forEach(type => {
+        header.classList.remove(`entity-${type}-main-header`);
+        header.classList.remove(`entity-${type}-sub-header`);
+      });
+      
+      header.classList.add(`entity-${entityType}-main-header`);
+    });
+
+    // כותרות משניות - תחת content-section
+    const subHeaders = document.querySelectorAll('.content-section .section-header');
+    subHeaders.forEach(header => {
+      if (excludeWarningModals && isWarningModal(header)) {
+        return; // דלג על מודולי אזהרה
+      }
+      
+      // דלג על כותרות מודלים - הן מנוהלות על ידי ההגדרות הכלליות
+      if (header.closest('.modal')) {
+        return;
+      }
+      
+      // הסרת כל המחלקות הישנות של ישויות
+      VALID_ENTITY_TYPES.forEach(type => {
+        header.classList.remove(`entity-${type}-main-header`);
+        header.classList.remove(`entity-${type}-sub-header`);
+      });
+      
+      header.classList.add(`entity-${entityType}-sub-header`);
+    });
+
+    // כותרות מודלים מנוהלות על ידי ההגדרות הכלליות ב-styles.css
+    
+  } catch (error) {
+    console.error(`❌ שגיאה ביישום צבעי ישות ${entityType}:`, error);
+  }
+}
+
+/**
+ * בדיקה אם אלמנט הוא מודל אזהרה
+ * Check if element is a warning modal
+ *
+ * @param {Element} element - האלמנט לבדיקה
+ * @returns {boolean} האם מודל אזהרה
+ */
+function isWarningModal(element) {
+  if (!element) return false;
+  
+  // בדיקת ID של מודלים
+  const warningModalIds = [
+    'deleteExecutionModal',
+    'deleteTradeModal', 
+    'deleteAccountModal',
+    'deleteTickerModal',
+    'deleteAlertModal',
+    'confirmDeleteModal',
+    'warningModal'
+  ];
+  
+  // בדיקת ID ישיר
+  if (element.id && warningModalIds.includes(element.id)) {
+    return true;
+  }
+  
+  // בדיקת מודל הורה
+  const modal = element.closest('.modal');
+  if (modal && modal.id && warningModalIds.includes(modal.id)) {
+    return true;
+  }
+  
+  // בדיקת טקסט אזהרה
+  const text = element.textContent?.toLowerCase() || '';
+  const warningKeywords = ['מחיקה', 'ביטול', 'אזהרה', 'delete', 'cancel', 'warning'];
+  
+  return warningKeywords.some(keyword => text.includes(keyword));
+}
+
+/**
+ * קבלת שקיפות כותרת ראשית כ-hex
+ * Get main header opacity as hex
+ */
+function getMainHeaderOpacityHex() {
+  try {
+    // ניסיון לקבל מהעדפות
+    if (window.currentPreferences && window.currentPreferences.headerOpacity && window.currentPreferences.headerOpacity.main) {
+      const opacity = window.currentPreferences.headerOpacity.main;
+      return Math.round(opacity * 255 / 100).toString(16).padStart(2, '0');
+    }
+    
+    // ברירת מחדל: 100%
+    return 'FF'; // 100% of 255 = 255 = FF in hex
+    
+  } catch (error) {
+    console.error('❌ שגיאה בקבלת שקיפות כותרת ראשית:', error);
+    return 'FF'; // ברירת מחדל 100%
+  }
+}
+
+/**
+ * קבלת שקיפות כותרת משנית כ-hex
+ * Get sub header opacity as hex
+ */
+function getSubHeaderOpacityHex() {
+  try {
+    // ניסיון לקבל מהעדפות
+    if (window.currentPreferences && window.currentPreferences.headerOpacity && window.currentPreferences.headerOpacity.sub) {
+      const opacity = window.currentPreferences.headerOpacity.sub;
+      return Math.round(opacity * 255 / 100).toString(16).padStart(2, '0');
+    }
+    
+    // ברירת מחדל: 30%
+    return '4D'; // 30% of 255 = 77 = 4D in hex
+    
+  } catch (error) {
+    console.error('❌ שגיאה בקבלת שקיפות כותרת משנית:', error);
+    return '4D'; // ברירת מחדל
+  }
 }
 
 function generateStatusCSS() {
@@ -517,24 +697,46 @@ async function setCurrentEntityColorFromPage() {
       // Use mapping to get correct entity type
       const entityType = PAGE_TO_ENTITY_MAPPING[pageClass];
       if (entityType && isValidEntityType(entityType)) {
+        // Load preferences first - ALL colors must come from preferences
         await getEntityColorFromPreferences(entityType);
         
-        // Set current entity color and variants
-        const entityColor = ENTITY_COLORS[entityType] || ENTITY_COLORS.trade;
-        const lightColor = window.ENTITY_LIGHT_COLORS ? (window.ENTITY_LIGHT_COLORS[entityType] || lightenColor(entityColor, 10)) : lightenColor(entityColor, 10);
-        const darkColor = window.ENTITY_DARK_COLORS ? (window.ENTITY_DARK_COLORS[entityType] || darkenColor(entityColor, 20)) : darkenColor(entityColor, 20);
+        // Get colors from preferences - use CSS variables as fallback only
+        const getEntityColorPref = (entity, variant) => {
+          // Try preferences first
+          const prefKey = `entity${entity.charAt(0).toUpperCase() + entity.slice(1).replace('_', '')}Color${variant === 'light' ? 'Light' : variant === 'dark' ? 'Dark' : ''}`;
+          if (window.currentPreferences && window.currentPreferences[prefKey]) {
+            return window.currentPreferences[prefKey];
+          }
+          // Fallback to CSS variable (which should already be set from preferences)
+          const cssVar = variant === 'light' ? '--entity-' + entity.replace('_', '-') + '-bg' :
+                        variant === 'dark' ? '--entity-' + entity.replace('_', '-') + '-text' :
+                        '--entity-' + entity.replace('_', '-') + '-color';
+          return getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
+        };
         
-        document.documentElement.style.setProperty('--current-entity-color', entityColor);
-        document.documentElement.style.setProperty('--current-entity-color-light', lightColor);
-        document.documentElement.style.setProperty('--current-entity-color-dark', darkColor);
+        const entityColor = getEntityColorPref(entityType, 'primary') || 
+                           getComputedStyle(document.documentElement).getPropertyValue(`--entity-${entityType.replace('_', '-')}-color`).trim();
+        const lightColor = getEntityColorPref(entityType, 'light') || 
+                          getComputedStyle(document.documentElement).getPropertyValue(`--entity-${entityType.replace('_', '-')}-bg`).trim() ||
+                          (entityColor ? lightenColor(entityColor, 10) : 'rgba(173, 181, 189, 0.1)');
+        const darkColor = getEntityColorPref(entityType, 'dark') || 
+                         getComputedStyle(document.documentElement).getPropertyValue(`--entity-${entityType.replace('_', '-')}-text`).trim() ||
+                         (entityColor ? darkenColor(entityColor, 20) : '#6c757d');
         
-        if (window.Logger) {
-          window.Logger.info(`🎨 Set current entity color for ${entityType} (from ${pageClass}):`, { 
-            page: 'color-scheme',
-            primary: entityColor,
-            light: lightColor,
-            dark: darkColor
-          });
+        if (entityColor) {
+          document.documentElement.style.setProperty('--current-entity-color', entityColor);
+          document.documentElement.style.setProperty('--current-entity-color', entityColor);
+          document.documentElement.style.setProperty('--current-entity-color-light', lightColor);
+          document.documentElement.style.setProperty('--current-entity-color-dark', darkColor);
+          
+          if (window.Logger) {
+            window.Logger.info(`🎨 Set current entity color for ${entityType} (from ${pageClass}):`, { 
+              page: 'color-scheme',
+              primary: entityColor,
+              light: lightColor,
+              dark: darkColor
+            });
+          }
         }
       } else {
         if (window.Logger) { window.Logger.warn(`⚠️ No mapping found for page class: ${pageClass}`, { page: "color-scheme" }); }
@@ -552,22 +754,43 @@ function findPageClass(body) {
 
 // Page class to entity type mapping
 const PAGE_TO_ENTITY_MAPPING = {
+  // עמודי משתמש
   'index-page': 'trade', // Dashboard shows trades overview
   'tickers-page': 'ticker',
   'trading-accounts-page': 'account', // Trading accounts page
+  'accounts-page': 'account', // Alias
   'trades-page': 'trade',
-  'accounts-page': 'account',
+  'tracking-page': 'trade', // Alias
   'alerts-page': 'alert',
   'cash-flows-page': 'cash_flow',
   'notes-page': 'note',
   'executions-page': 'execution',
   'trade-plans-page': 'trade_plan',
-  'constraints-page': 'constraint',
-  'designs-page': 'design',
-  'research-page': 'research',
+  'planning-page': 'trade_plan', // Alias
   'preferences-page': 'preference',
-  'db-display-page': 'design', // Database display page uses design colors
-  'db-extradata-page': 'design' // Database extra data page uses design colors
+  'research-page': 'research',
+  'designs-page': 'design',
+  'constraints-page': 'constraint',
+  'db-display-page': null, // Uses fixed gray color
+  'db-extradata-page': null, // Uses fixed gray color
+  'extra-data-page': null, // Alias
+  
+  // עמודי כלי פיתוח - כולם מקבלים צבע development
+  'development-page': 'development',
+  'linter-realtime-monitor-page': 'development',
+  'init-system-page': 'development',
+  'system-management-page': 'development',
+  'server-monitor-page': 'development',
+  'notifications-center-page': 'development',
+  'external-data-dashboard-page': 'development',
+  'crud-testing-dashboard-page': 'development',
+  'code-quality-dashboard-page': 'development',
+  'duplicate-detector-page': 'development',
+  'page-scripts-matrix-page': 'development',
+  'css-management-page': 'development',
+  'chart-management-page': 'development',
+  'cache-management-page': 'development',
+  'background-tasks-page': 'development'
 };
 
 async function getEntityColorFromPreferences(entityType, variant = 'primary') {
@@ -612,84 +835,158 @@ function loadEntityColorsFromPreferences(preferences) {
     // Set global preferences for easy access
     window.currentPreferences = preferences;
     
-    // עדכון צבעי executions
+    // עדכון צבעי executions - רק מהעדפות!
     if (preferences.entityExecutionColor) {
       ENTITY_COLORS.execution = preferences.entityExecutionColor;
-      ENTITY_BACKGROUND_COLORS.execution = preferences.entityExecutionColorLight || `rgba(${hexToRgb(preferences.entityExecutionColor)?.r || 253}, ${hexToRgb(preferences.entityExecutionColor)?.g || 126}, ${hexToRgb(preferences.entityExecutionColor)?.b || 20}, 0.1)`;
-      ENTITY_TEXT_COLORS.execution = preferences.entityExecutionColorDark || darkenColor(preferences.entityExecutionColor, 20);
-      ENTITY_BORDER_COLORS.execution = `rgba(${hexToRgb(preferences.entityExecutionColor)?.r || 253}, ${hexToRgb(preferences.entityExecutionColor)?.g || 126}, ${hexToRgb(preferences.entityExecutionColor)?.b || 20}, 0.3)`;
-      ENTITY_LIGHT_COLORS.execution = preferences.entityExecutionColorLight || lightenColor(preferences.entityExecutionColor, 10);
-      ENTITY_DARK_COLORS.execution = preferences.entityExecutionColorDark || darkenColor(preferences.entityExecutionColor, 20);
+      const execRgb = hexToRgb(preferences.entityExecutionColor);
+      ENTITY_BACKGROUND_COLORS.execution = preferences.entityExecutionColorLight || (execRgb ? `rgba(${execRgb.r}, ${execRgb.g}, ${execRgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.execution = preferences.entityExecutionColorDark || (execRgb ? darkenColor(preferences.entityExecutionColor, 20) : '');
+      ENTITY_BORDER_COLORS.execution = execRgb ? `rgba(${execRgb.r}, ${execRgb.g}, ${execRgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.execution = preferences.entityExecutionColorLight || (execRgb ? lightenColor(preferences.entityExecutionColor, 10) : '');
+      ENTITY_DARK_COLORS.execution = preferences.entityExecutionColorDark || (execRgb ? darkenColor(preferences.entityExecutionColor, 20) : '');
     }
     
-    // עדכון צבעי trades
+    // עדכון צבעי trades - רק מהעדפות!
     if (preferences.entityTradeColor) {
       ENTITY_COLORS.trade = preferences.entityTradeColor;
-      ENTITY_BACKGROUND_COLORS.trade = preferences.entityTradeColorLight || `rgba(${hexToRgb(preferences.entityTradeColor)?.r || 40}, ${hexToRgb(preferences.entityTradeColor)?.g || 167}, ${hexToRgb(preferences.entityTradeColor)?.b || 69}, 0.1)`;
-      ENTITY_TEXT_COLORS.trade = preferences.entityTradeColorDark || darkenColor(preferences.entityTradeColor, 20);
-      ENTITY_BORDER_COLORS.trade = `rgba(${hexToRgb(preferences.entityTradeColor)?.r || 40}, ${hexToRgb(preferences.entityTradeColor)?.g || 167}, ${hexToRgb(preferences.entityTradeColor)?.b || 69}, 0.3)`;
-      ENTITY_LIGHT_COLORS.trade = preferences.entityTradeColorLight || lightenColor(preferences.entityTradeColor, 10);
-      ENTITY_DARK_COLORS.trade = preferences.entityTradeColorDark || darkenColor(preferences.entityTradeColor, 20);
+      const tradeRgb = hexToRgb(preferences.entityTradeColor);
+      ENTITY_BACKGROUND_COLORS.trade = preferences.entityTradeColorLight || (tradeRgb ? `rgba(${tradeRgb.r}, ${tradeRgb.g}, ${tradeRgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.trade = preferences.entityTradeColorDark || (tradeRgb ? darkenColor(preferences.entityTradeColor, 20) : '');
+      ENTITY_BORDER_COLORS.trade = tradeRgb ? `rgba(${tradeRgb.r}, ${tradeRgb.g}, ${tradeRgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.trade = preferences.entityTradeColorLight || (tradeRgb ? lightenColor(preferences.entityTradeColor, 10) : '');
+      ENTITY_DARK_COLORS.trade = preferences.entityTradeColorDark || (tradeRgb ? darkenColor(preferences.entityTradeColor, 20) : '');
     }
     
-    // עדכון צבעי trading accounts
+    // עדכון צבעי trading accounts - רק מהעדפות!
     if (preferences.entityTradingAccountColor) {
       ENTITY_COLORS.account = preferences.entityTradingAccountColor;
-      ENTITY_BACKGROUND_COLORS.account = preferences.entityTradingAccountColorLight || `rgba(${hexToRgb(preferences.entityTradingAccountColor)?.r || 23}, ${hexToRgb(preferences.entityTradingAccountColor)?.g || 162}, ${hexToRgb(preferences.entityTradingAccountColor)?.b || 184}, 0.1)`;
-      ENTITY_TEXT_COLORS.account = preferences.entityTradingAccountColorDark || darkenColor(preferences.entityTradingAccountColor, 20);
-      ENTITY_BORDER_COLORS.account = `rgba(${hexToRgb(preferences.entityTradingAccountColor)?.r || 23}, ${hexToRgb(preferences.entityTradingAccountColor)?.g || 162}, ${hexToRgb(preferences.entityTradingAccountColor)?.b || 184}, 0.3)`;
-      ENTITY_LIGHT_COLORS.account = preferences.entityTradingAccountColorLight || lightenColor(preferences.entityTradingAccountColor, 10);
-      ENTITY_DARK_COLORS.account = preferences.entityTradingAccountColorDark || darkenColor(preferences.entityTradingAccountColor, 20);
+      const accountRgb = hexToRgb(preferences.entityTradingAccountColor);
+      ENTITY_BACKGROUND_COLORS.account = preferences.entityTradingAccountColorLight || (accountRgb ? `rgba(${accountRgb.r}, ${accountRgb.g}, ${accountRgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.account = preferences.entityTradingAccountColorDark || (accountRgb ? darkenColor(preferences.entityTradingAccountColor, 20) : '');
+      ENTITY_BORDER_COLORS.account = accountRgb ? `rgba(${accountRgb.r}, ${accountRgb.g}, ${accountRgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.account = preferences.entityTradingAccountColorLight || (accountRgb ? lightenColor(preferences.entityTradingAccountColor, 10) : '');
+      ENTITY_DARK_COLORS.account = preferences.entityTradingAccountColorDark || (accountRgb ? darkenColor(preferences.entityTradingAccountColor, 20) : '');
     }
     
-    // עדכון צבעי alerts
+    // עדכון צבעי alerts - רק מהעדפות!
     if (preferences.entityAlertColor) {
       ENTITY_COLORS.alert = preferences.entityAlertColor;
-      ENTITY_BACKGROUND_COLORS.alert = preferences.entityAlertColorLight || `rgba(${hexToRgb(preferences.entityAlertColor)?.r || 255}, ${hexToRgb(preferences.entityAlertColor)?.g || 193}, ${hexToRgb(preferences.entityAlertColor)?.b || 7}, 0.1)`;
-      ENTITY_TEXT_COLORS.alert = preferences.entityAlertColorDark || darkenColor(preferences.entityAlertColor, 20);
-      ENTITY_BORDER_COLORS.alert = `rgba(${hexToRgb(preferences.entityAlertColor)?.r || 255}, ${hexToRgb(preferences.entityAlertColor)?.g || 193}, ${hexToRgb(preferences.entityAlertColor)?.b || 7}, 0.3)`;
-      ENTITY_LIGHT_COLORS.alert = preferences.entityAlertColorLight || lightenColor(preferences.entityAlertColor, 10);
-      ENTITY_DARK_COLORS.alert = preferences.entityAlertColorDark || darkenColor(preferences.entityAlertColor, 20);
+      const alertRgb = hexToRgb(preferences.entityAlertColor);
+      ENTITY_BACKGROUND_COLORS.alert = preferences.entityAlertColorLight || (alertRgb ? `rgba(${alertRgb.r}, ${alertRgb.g}, ${alertRgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.alert = preferences.entityAlertColorDark || (alertRgb ? darkenColor(preferences.entityAlertColor, 20) : '');
+      ENTITY_BORDER_COLORS.alert = alertRgb ? `rgba(${alertRgb.r}, ${alertRgb.g}, ${alertRgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.alert = preferences.entityAlertColorLight || (alertRgb ? lightenColor(preferences.entityAlertColor, 10) : '');
+      ENTITY_DARK_COLORS.alert = preferences.entityAlertColorDark || (alertRgb ? darkenColor(preferences.entityAlertColor, 20) : '');
     }
     
-    // עדכון צבעי tickers
+    // עדכון צבעי tickers - רק מהעדפות!
     if (preferences.entityTickerColor) {
       ENTITY_COLORS.ticker = preferences.entityTickerColor;
-      ENTITY_BACKGROUND_COLORS.ticker = preferences.entityTickerColorLight || `rgba(${hexToRgb(preferences.entityTickerColor)?.r || 111}, ${hexToRgb(preferences.entityTickerColor)?.g || 66}, ${hexToRgb(preferences.entityTickerColor)?.b || 193}, 0.1)`;
-      ENTITY_TEXT_COLORS.ticker = preferences.entityTickerColorDark || darkenColor(preferences.entityTickerColor, 20);
-      ENTITY_BORDER_COLORS.ticker = `rgba(${hexToRgb(preferences.entityTickerColor)?.r || 111}, ${hexToRgb(preferences.entityTickerColor)?.g || 66}, ${hexToRgb(preferences.entityTickerColor)?.b || 193}, 0.3)`;
-      ENTITY_LIGHT_COLORS.ticker = preferences.entityTickerColorLight || lightenColor(preferences.entityTickerColor, 10);
-      ENTITY_DARK_COLORS.ticker = preferences.entityTickerColorDark || darkenColor(preferences.entityTickerColor, 20);
+      const tickerRgb = hexToRgb(preferences.entityTickerColor);
+      ENTITY_BACKGROUND_COLORS.ticker = preferences.entityTickerColorLight || (tickerRgb ? `rgba(${tickerRgb.r}, ${tickerRgb.g}, ${tickerRgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.ticker = preferences.entityTickerColorDark || (tickerRgb ? darkenColor(preferences.entityTickerColor, 20) : '');
+      ENTITY_BORDER_COLORS.ticker = tickerRgb ? `rgba(${tickerRgb.r}, ${tickerRgb.g}, ${tickerRgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.ticker = preferences.entityTickerColorLight || (tickerRgb ? lightenColor(preferences.entityTickerColor, 10) : '');
+      ENTITY_DARK_COLORS.ticker = preferences.entityTickerColorDark || (tickerRgb ? darkenColor(preferences.entityTickerColor, 20) : '');
     }
     
-    // עדכון צבעי cash flows
+    // עדכון צבעי cash flows - רק מהעדפות!
     if (preferences.entityCashFlowColor) {
       ENTITY_COLORS['cash_flow'] = preferences.entityCashFlowColor;
-      ENTITY_BACKGROUND_COLORS['cash_flow'] = preferences.entityCashFlowColorLight || `rgba(${hexToRgb(preferences.entityCashFlowColor)?.r || 32}, ${hexToRgb(preferences.entityCashFlowColor)?.g || 201}, ${hexToRgb(preferences.entityCashFlowColor)?.b || 151}, 0.1)`;
-      ENTITY_TEXT_COLORS['cash_flow'] = preferences.entityCashFlowColorDark || darkenColor(preferences.entityCashFlowColor, 20);
-      ENTITY_BORDER_COLORS['cash_flow'] = `rgba(${hexToRgb(preferences.entityCashFlowColor)?.r || 32}, ${hexToRgb(preferences.entityCashFlowColor)?.g || 201}, ${hexToRgb(preferences.entityCashFlowColor)?.b || 151}, 0.3)`;
-      ENTITY_LIGHT_COLORS['cash_flow'] = preferences.entityCashFlowColorLight || lightenColor(preferences.entityCashFlowColor, 10);
-      ENTITY_DARK_COLORS['cash_flow'] = preferences.entityCashFlowColorDark || darkenColor(preferences.entityCashFlowColor, 20);
+      const cashFlowRgb = hexToRgb(preferences.entityCashFlowColor);
+      ENTITY_BACKGROUND_COLORS['cash_flow'] = preferences.entityCashFlowColorLight || (cashFlowRgb ? `rgba(${cashFlowRgb.r}, ${cashFlowRgb.g}, ${cashFlowRgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS['cash_flow'] = preferences.entityCashFlowColorDark || (cashFlowRgb ? darkenColor(preferences.entityCashFlowColor, 20) : '');
+      ENTITY_BORDER_COLORS['cash_flow'] = cashFlowRgb ? `rgba(${cashFlowRgb.r}, ${cashFlowRgb.g}, ${cashFlowRgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS['cash_flow'] = preferences.entityCashFlowColorLight || (cashFlowRgb ? lightenColor(preferences.entityCashFlowColor, 10) : '');
+      ENTITY_DARK_COLORS['cash_flow'] = preferences.entityCashFlowColorDark || (cashFlowRgb ? darkenColor(preferences.entityCashFlowColor, 20) : '');
     }
     
-    // עדכון צבעי notes
+    // עדכון צבעי notes - רק מהעדפות!
     if (preferences.entityNoteColor) {
       ENTITY_COLORS.note = preferences.entityNoteColor;
-      ENTITY_BACKGROUND_COLORS.note = preferences.entityNoteColorLight || `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 108}, ${hexToRgb(preferences.entityNoteColor)?.g || 117}, ${hexToRgb(preferences.entityNoteColor)?.b || 125}, 0.1)`;
-      ENTITY_TEXT_COLORS.note = preferences.entityNoteColorDark || darkenColor(preferences.entityNoteColor, 20);
-      ENTITY_BORDER_COLORS.note = `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 108}, ${hexToRgb(preferences.entityNoteColor)?.g || 117}, ${hexToRgb(preferences.entityNoteColor)?.b || 125}, 0.3)`;
-      ENTITY_LIGHT_COLORS.note = preferences.entityNoteColorLight || lightenColor(preferences.entityNoteColor, 10);
-      ENTITY_DARK_COLORS.note = preferences.entityNoteColorDark || darkenColor(preferences.entityNoteColor, 20);
+      const noteRgb = hexToRgb(preferences.entityNoteColor);
+      ENTITY_BACKGROUND_COLORS.note = preferences.entityNoteColorLight || (noteRgb ? `rgba(${noteRgb.r}, ${noteRgb.g}, ${noteRgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.note = preferences.entityNoteColorDark || (noteRgb ? darkenColor(preferences.entityNoteColor, 20) : '');
+      ENTITY_BORDER_COLORS.note = noteRgb ? `rgba(${noteRgb.r}, ${noteRgb.g}, ${noteRgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.note = preferences.entityNoteColorLight || (noteRgb ? lightenColor(preferences.entityNoteColor, 10) : '');
+      ENTITY_DARK_COLORS.note = preferences.entityNoteColorDark || (noteRgb ? darkenColor(preferences.entityNoteColor, 20) : '');
     }
     
-    // עדכון צבעי trade plans
+    // עדכון צבעי trade plans - רק מהעדפות!
     if (preferences.entityTradePlanColor) {
       ENTITY_COLORS['trade_plan'] = preferences.entityTradePlanColor;
-      ENTITY_BACKGROUND_COLORS['trade_plan'] = preferences.entityTradePlanColorLight || `rgba(${hexToRgb(preferences.entityTradePlanColor)?.r || 0}, ${hexToRgb(preferences.entityTradePlanColor)?.g || 123}, ${hexToRgb(preferences.entityTradePlanColor)?.b || 255}, 0.1)`;
-      ENTITY_TEXT_COLORS['trade_plan'] = preferences.entityTradePlanColorDark || darkenColor(preferences.entityTradePlanColor, 20);
-      ENTITY_BORDER_COLORS['trade_plan'] = `rgba(${hexToRgb(preferences.entityTradePlanColor)?.r || 0}, ${hexToRgb(preferences.entityTradePlanColor)?.g || 123}, ${hexToRgb(preferences.entityTradePlanColor)?.b || 255}, 0.3)`;
-      ENTITY_LIGHT_COLORS['trade_plan'] = preferences.entityTradePlanColorLight || lightenColor(preferences.entityTradePlanColor, 10);
-      ENTITY_DARK_COLORS['trade_plan'] = preferences.entityTradePlanColorDark || darkenColor(preferences.entityTradePlanColor, 20);
+      const tradePlanRgb = hexToRgb(preferences.entityTradePlanColor);
+      ENTITY_BACKGROUND_COLORS['trade_plan'] = preferences.entityTradePlanColorLight || (tradePlanRgb ? `rgba(${tradePlanRgb.r}, ${tradePlanRgb.g}, ${tradePlanRgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS['trade_plan'] = preferences.entityTradePlanColorDark || (tradePlanRgb ? darkenColor(preferences.entityTradePlanColor, 20) : '');
+      ENTITY_BORDER_COLORS['trade_plan'] = tradePlanRgb ? `rgba(${tradePlanRgb.r}, ${tradePlanRgb.g}, ${tradePlanRgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS['trade_plan'] = preferences.entityTradePlanColorLight || (tradePlanRgb ? lightenColor(preferences.entityTradePlanColor, 10) : '');
+      ENTITY_DARK_COLORS['trade_plan'] = preferences.entityTradePlanColorDark || (tradePlanRgb ? darkenColor(preferences.entityTradePlanColor, 20) : '');
+    }
+    
+    // עדכון צבעי preferences - רק מהעדפות!
+    if (preferences.entityPreferencesColor) {
+      ENTITY_COLORS.preference = preferences.entityPreferencesColor;
+      const prefRgb = hexToRgb(preferences.entityPreferencesColor);
+      ENTITY_BACKGROUND_COLORS.preference = preferences.entityPreferencesColorLight || (prefRgb ? `rgba(${prefRgb.r}, ${prefRgb.g}, ${prefRgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.preference = preferences.entityPreferencesColorDark || (prefRgb ? darkenColor(preferences.entityPreferencesColor, 20) : '');
+      ENTITY_BORDER_COLORS.preference = prefRgb ? `rgba(${prefRgb.r}, ${prefRgb.g}, ${prefRgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.preference = preferences.entityPreferencesColorLight || (prefRgb ? lightenColor(preferences.entityPreferencesColor, 10) : '');
+      ENTITY_DARK_COLORS.preference = preferences.entityPreferencesColorDark || (prefRgb ? darkenColor(preferences.entityPreferencesColor, 20) : '');
+    }
+    
+    // עדכון צבעי research - רק מהעדפות!
+    if (preferences.entityResearchColor) {
+      ENTITY_COLORS.research = preferences.entityResearchColor;
+      const rgb = hexToRgb(preferences.entityResearchColor);
+      ENTITY_BACKGROUND_COLORS.research = preferences.entityResearchColorLight || (rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.research = preferences.entityResearchColorDark || (rgb ? darkenColor(preferences.entityResearchColor, 20) : '');
+      ENTITY_BORDER_COLORS.research = rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.research = preferences.entityResearchColorLight || (rgb ? lightenColor(preferences.entityResearchColor, 10) : '');
+      ENTITY_DARK_COLORS.research = preferences.entityResearchColorDark || (rgb ? darkenColor(preferences.entityResearchColor, 20) : '');
+    }
+    
+    // עדכון צבעי design - רק מהעדפות!
+    if (preferences.entityDesignColor) {
+      ENTITY_COLORS.design = preferences.entityDesignColor;
+      const rgb = hexToRgb(preferences.entityDesignColor);
+      ENTITY_BACKGROUND_COLORS.design = preferences.entityDesignColorLight || (rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.design = preferences.entityDesignColorDark || (rgb ? darkenColor(preferences.entityDesignColor, 20) : '');
+      ENTITY_BORDER_COLORS.design = rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.design = preferences.entityDesignColorLight || (rgb ? lightenColor(preferences.entityDesignColor, 10) : '');
+      ENTITY_DARK_COLORS.design = preferences.entityDesignColorDark || (rgb ? darkenColor(preferences.entityDesignColor, 20) : '');
+    }
+    
+    // עדכון צבעי constraint - רק מהעדפות!
+    if (preferences.entityConstraintColor) {
+      ENTITY_COLORS.constraint = preferences.entityConstraintColor;
+      const rgb = hexToRgb(preferences.entityConstraintColor);
+      ENTITY_BACKGROUND_COLORS.constraint = preferences.entityConstraintColorLight || (rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.constraint = preferences.entityConstraintColorDark || (rgb ? darkenColor(preferences.entityConstraintColor, 20) : '');
+      ENTITY_BORDER_COLORS.constraint = rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.constraint = preferences.entityConstraintColorLight || (rgb ? lightenColor(preferences.entityConstraintColor, 10) : '');
+      ENTITY_DARK_COLORS.constraint = preferences.entityConstraintColorDark || (rgb ? darkenColor(preferences.entityConstraintColor, 20) : '');
+    }
+    
+    // עדכון צבעי development - רק מהעדפות!
+    if (preferences.entityDevelopmentColor) {
+      ENTITY_COLORS.development = preferences.entityDevelopmentColor;
+      const rgb = hexToRgb(preferences.entityDevelopmentColor);
+      ENTITY_BACKGROUND_COLORS.development = preferences.entityDevelopmentColorLight || (rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.development = preferences.entityDevelopmentColorDark || (rgb ? darkenColor(preferences.entityDevelopmentColor, 20) : '');
+      ENTITY_BORDER_COLORS.development = rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.development = preferences.entityDevelopmentColorLight || (rgb ? lightenColor(preferences.entityDevelopmentColor, 10) : '');
+      ENTITY_DARK_COLORS.development = preferences.entityDevelopmentColorDark || (rgb ? darkenColor(preferences.entityDevelopmentColor, 20) : '');
+    }
+    
+    // עדכון צבעי info - רק מהעדפות!
+    if (preferences.entityInfoColor) {
+      ENTITY_COLORS.info = preferences.entityInfoColor;
+      const rgb = hexToRgb(preferences.entityInfoColor);
+      ENTITY_BACKGROUND_COLORS.info = preferences.entityInfoColorLight || (rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.info = preferences.entityInfoColorDark || (rgb ? darkenColor(preferences.entityInfoColor, 20) : '');
+      ENTITY_BORDER_COLORS.info = rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.info = preferences.entityInfoColorLight || (rgb ? lightenColor(preferences.entityInfoColor, 10) : '');
+      ENTITY_DARK_COLORS.info = preferences.entityInfoColorDark || (rgb ? darkenColor(preferences.entityInfoColor, 20) : '');
     }
   }
   
@@ -723,29 +1020,132 @@ function generateAndApplyEntityCSS() {
 
 async function loadColorPreferences() {
   try {
-    // This would typically load from the preferences API
-    // For now, return default preferences
-    return {
-      colorScheme: {
-        entities: ENTITY_COLORS,
-        statuses: STATUS_COLORS,
-        investmentTypes: INVESTMENT_TYPE_COLORS,
-        numericValues: NUMERIC_VALUE_COLORS
+    // Load preferences from server - NO hardcoded colors!
+    // Use the global preferences loading system
+    if (window.loadUserPreferences && typeof window.loadUserPreferences === 'function') {
+      const loaded = await window.loadUserPreferences({ force: false });
+      if (loaded && window.currentPreferences) {
+        return window.currentPreferences;
       }
-    };
+    }
+    
+    // Fallback: try direct API call
+    try {
+      const response = await fetch('/api/preferences/user');
+      if (response.ok) {
+        const data = await response.json();
+        const preferences = data.data || data;
+        window.currentPreferences = preferences;
+        return preferences;
+      }
+    } catch (apiError) {
+      if (window.Logger) { window.Logger.warn('⚠️ Could not load preferences from API', { page: "color-scheme" }); }
+    }
+    
+    // Last resort: return empty object - NO hardcoded colors!
+    if (window.Logger) { window.Logger.warn('⚠️ No preferences loaded - colors will use CSS fallbacks only', { page: "color-scheme" }); }
+    return {};
   } catch (error) {
     if (window.Logger) { window.Logger.error('❌ Error loading color preferences:', error, { page: "color-scheme" }); }
-    return null;
+    return {};
   }
 }
 
 function updateEntityColors(preferences) {
   try {
-    if (preferences && preferences.colorScheme && preferences.colorScheme.entities) {
-      Object.assign(ENTITY_COLORS, preferences.colorScheme.entities);
+    // Clear existing colors first - ALL colors must come from preferences
+    if (preferences) {
+      // Update from colorScheme.entities if exists (new format)
+      if (preferences.colorScheme && preferences.colorScheme.entities) {
+        Object.assign(ENTITY_COLORS, preferences.colorScheme.entities);
+      }
+      
+      // Update from individual entity color preferences (preference format)
+      if (preferences.entityTradeColor) ENTITY_COLORS.trade = preferences.entityTradeColor;
+      if (preferences.entityTradingAccountColor) ENTITY_COLORS.account = preferences.entityTradingAccountColor;
+      if (preferences.entityTickerColor) ENTITY_COLORS.ticker = preferences.entityTickerColor;
+      if (preferences.entityAlertColor) ENTITY_COLORS.alert = preferences.entityAlertColor;
+      if (preferences.entityNoteColor) ENTITY_COLORS.note = preferences.entityNoteColor;
+      if (preferences.entityExecutionColor) ENTITY_COLORS.execution = preferences.entityExecutionColor;
+      if (preferences.entityCashFlowColor) ENTITY_COLORS.cash_flow = preferences.entityCashFlowColor;
+      if (preferences.entityTradePlanColor) ENTITY_COLORS.trade_plan = preferences.entityTradePlanColor;
+      if (preferences.entityPreferencesColor) ENTITY_COLORS.preference = preferences.entityPreferencesColor;
+      if (preferences.entityResearchColor) ENTITY_COLORS.research = preferences.entityResearchColor;
+      if (preferences.entityDesignColor) ENTITY_COLORS.design = preferences.entityDesignColor;
+      if (preferences.entityConstraintColor) ENTITY_COLORS.constraint = preferences.entityConstraintColor;
+      if (preferences.entityDevelopmentColor) ENTITY_COLORS.development = preferences.entityDevelopmentColor;
+      if (preferences.entityInfoColor) ENTITY_COLORS.info = preferences.entityInfoColor;
+      
+      // Update background colors
+      if (preferences.entityTradeColorLight) ENTITY_BACKGROUND_COLORS.trade = preferences.entityTradeColorLight;
+      if (preferences.entityTradingAccountColorLight) ENTITY_BACKGROUND_COLORS.account = preferences.entityTradingAccountColorLight;
+      if (preferences.entityTickerColorLight) ENTITY_BACKGROUND_COLORS.ticker = preferences.entityTickerColorLight;
+      if (preferences.entityAlertColorLight) ENTITY_BACKGROUND_COLORS.alert = preferences.entityAlertColorLight;
+      if (preferences.entityNoteColorLight) ENTITY_BACKGROUND_COLORS.note = preferences.entityNoteColorLight;
+      if (preferences.entityExecutionColorLight) ENTITY_BACKGROUND_COLORS.execution = preferences.entityExecutionColorLight;
+      if (preferences.entityCashFlowColorLight) ENTITY_BACKGROUND_COLORS.cash_flow = preferences.entityCashFlowColorLight;
+      if (preferences.entityTradePlanColorLight) ENTITY_BACKGROUND_COLORS.trade_plan = preferences.entityTradePlanColorLight;
+      if (preferences.entityPreferencesColorLight) ENTITY_BACKGROUND_COLORS.preference = preferences.entityPreferencesColorLight;
+      if (preferences.entityResearchColorLight) ENTITY_BACKGROUND_COLORS.research = preferences.entityResearchColorLight;
+      if (preferences.entityDesignColorLight) ENTITY_BACKGROUND_COLORS.design = preferences.entityDesignColorLight;
+      if (preferences.entityConstraintColorLight) ENTITY_BACKGROUND_COLORS.constraint = preferences.entityConstraintColorLight;
+      if (preferences.entityDevelopmentColorLight) ENTITY_BACKGROUND_COLORS.development = preferences.entityDevelopmentColorLight;
+      if (preferences.entityInfoColorLight) ENTITY_BACKGROUND_COLORS.info = preferences.entityInfoColorLight;
+      
+      // Update text colors
+      if (preferences.entityTradeColorDark) ENTITY_TEXT_COLORS.trade = preferences.entityTradeColorDark;
+      if (preferences.entityTradingAccountColorDark) ENTITY_TEXT_COLORS.account = preferences.entityTradingAccountColorDark;
+      if (preferences.entityTickerColorDark) ENTITY_TEXT_COLORS.ticker = preferences.entityTickerColorDark;
+      if (preferences.entityAlertColorDark) ENTITY_TEXT_COLORS.alert = preferences.entityAlertColorDark;
+      if (preferences.entityNoteColorDark) ENTITY_TEXT_COLORS.note = preferences.entityNoteColorDark;
+      if (preferences.entityExecutionColorDark) ENTITY_TEXT_COLORS.execution = preferences.entityExecutionColorDark;
+      if (preferences.entityCashFlowColorDark) ENTITY_TEXT_COLORS.cash_flow = preferences.entityCashFlowColorDark;
+      if (preferences.entityTradePlanColorDark) ENTITY_TEXT_COLORS.trade_plan = preferences.entityTradePlanColorDark;
+      if (preferences.entityPreferencesColorDark) ENTITY_TEXT_COLORS.preference = preferences.entityPreferencesColorDark;
+      if (preferences.entityResearchColorDark) ENTITY_TEXT_COLORS.research = preferences.entityResearchColorDark;
+      if (preferences.entityDesignColorDark) ENTITY_TEXT_COLORS.design = preferences.entityDesignColorDark;
+      if (preferences.entityConstraintColorDark) ENTITY_TEXT_COLORS.constraint = preferences.entityConstraintColorDark;
+      if (preferences.entityDevelopmentColorDark) ENTITY_TEXT_COLORS.development = preferences.entityDevelopmentColorDark;
+      if (preferences.entityInfoColorDark) ENTITY_TEXT_COLORS.info = preferences.entityInfoColorDark;
     }
   } catch (error) {
     if (window.Logger) { window.Logger.error('❌ Error updating entity colors:', error, { page: "color-scheme" }); }
+  }
+}
+
+function updateCSSVariablesFromPreferences(preferences) {
+  try {
+    if (preferences && preferences.colorScheme) {
+      // Update CSS variables based on preferences
+      if (preferences.colorScheme.entities) {
+        Object.entries(preferences.colorScheme.entities).forEach(([entityType, color]) => {
+          document.documentElement.style.setProperty(`--entity-${entityType}-color`, color);
+          
+          // Add light and dark variants
+          const lightColor = lightenColor(color, 10);
+          const darkColor = darkenColor(color, 20);
+          
+          document.documentElement.style.setProperty(`--entity-${entityType}-color-light`, lightColor);
+          document.documentElement.style.setProperty(`--entity-${entityType}-color-dark`, darkColor);
+        });
+      }
+
+      // Update status colors from preferences
+      if (preferences.colorScheme.status) {
+        Object.entries(preferences.colorScheme.status).forEach(([statusType, color]) => {
+          document.documentElement.style.setProperty(`--user-status-${statusType}-color`, color);
+          
+          // Add background and border variants
+          const bgColor = lightenColor(color, 10);
+          const borderColor = color;
+          
+          document.documentElement.style.setProperty(`--user-status-${statusType}-bg`, bgColor);
+          document.documentElement.style.setProperty(`--user-status-${statusType}-border`, borderColor);
+        });
+      }
+    }
+  } catch (error) {
+    if (window.Logger) { window.Logger.error('❌ Error updating CSS variables from preferences:', error, { page: "color-scheme" }); }
   }
 }
 
@@ -850,6 +1250,17 @@ window.loadDynamicColors = loadDynamicColors;
 window.setCurrentEntityColorFromPage = setCurrentEntityColorFromPage;
 window.getEntityColorFromPreferences = getEntityColorFromPreferences;
 window.getAllEntityColorVariantsFromPreferences = getAllEntityColorVariantsFromPreferences;
+
+// Export preference integration functions
+window.loadEntityColorsFromPreferences = loadEntityColorsFromPreferences;
+window.generateAndApplyEntityCSS = generateAndApplyEntityCSS;
+window.updateCSSVariablesFromPreferences = updateCSSVariablesFromPreferences;
+
+// Export header styling functions
+window.applyEntityColorsToHeaders = applyEntityColorsToHeaders;
+window.isWarningModal = isWarningModal;
+window.getMainHeaderOpacityHex = getMainHeaderOpacityHex;
+window.getSubHeaderOpacityHex = getSubHeaderOpacityHex;
 
 // ===== TABLE COLORS FUNCTIONS =====
 

@@ -29,10 +29,11 @@ const tradesModalConfig = {
         {
             type: 'select',
             id: 'tradeAccount',
-            label: 'חשבון מסחר מסחר',
+            label: 'חשבון מסחר',
             required: true,
             options: [], // יטען דינמית מ-API
-            placeholder: 'בחר חשבון מסחר...'
+            placeholder: 'בחר חשבון מסחר...',
+            defaultFromPreferences: true // ברירת מחדל מהעדפות
         },
         {
             type: 'text',
@@ -105,8 +106,7 @@ const tradesModalConfig = {
             type: 'datetime-local',
             id: 'tradeEntryDate',
             label: 'תאריך כניסה',
-            required: true,
-            defaultValue: 'today'
+            required: true
         },
         {
             type: 'datetime-local',
@@ -189,16 +189,47 @@ const tradesModalConfig = {
     onSave: 'saveTrade'
 };
 
-// יצירת המודל אם ModalManagerV2 זמין
-if (window.ModalManagerV2) {
-    try {
-        window.ModalManagerV2.createCRUDModal(tradesModalConfig);
-        console.log('✅ Trades modal created successfully');
-    } catch (error) {
-        console.error('❌ Error creating Trades modal:', error);
+// יצירת המודל אם ModalManagerV2 זמין - Deferred initialization
+function initializeTradesModal() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
+        try {
+            window.ModalManagerV2.createCRUDModal(tradesModalConfig);
+            console.log('✅ Trades modal created successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Error creating Trades modal:', error);
+            return false;
+        }
     }
+    return false;
+}
+
+if (window.ModalManagerV2) {
+    initializeTradesModal();
 } else {
-    console.warn('⚠️ ModalManagerV2 not available for Trades modal');
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (!initializeTradesModal()) {
+                    setTimeout(() => {
+                        if (!initializeTradesModal()) {
+                            console.warn('⚠️ ModalManagerV2 not available for Trades modal after retries');
+                        }
+                    }, 500);
+                }
+            }, 100);
+        });
+    } else {
+        setTimeout(() => {
+            if (!initializeTradesModal()) {
+                setTimeout(() => {
+                    if (!initializeTradesModal()) {
+                        console.warn('⚠️ ModalManagerV2 not available for Trades modal after retries');
+                    }
+                }, 500);
+            }
+        }, 100);
+    }
 }
 
 // ייצוא לקונסול (לצורך debug)

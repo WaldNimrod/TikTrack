@@ -225,6 +225,14 @@ class HeaderSystem {
                         <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">⚡</span>
                       </a>
                     </li>
+
+                    <li class="tiktrack-nav-item">
+                      <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
+                         data-onclick="initSystemCheck?.runPageCheck(event)"
+                         title="בדיקת מערכת איתחול">
+                        <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
+                      </a>
+                    </li>
                   </ul>
                 </nav>
               </div>
@@ -1228,14 +1236,66 @@ class HeaderSystem {
         // הפעלת פילטרים על כל הטבלאות
         applyAllFilters() {
           window.Logger.info('🔧 applyAllFilters called', { page: "header-system" });
-          this.applyFiltersToTable('tickersTable');
-          this.applyFiltersToTable('tradePlansTable');
+          
+          // רשימה של containers מתועדים
+          const knownContainers = [
+            'tradesContainer',
+            'trade_plansContainer',  // תיקון: tradePlansContainer → trade_plansContainer
+            'tickersContainer',
+            'alertsContainer',
+            'executionsContainer',
+            'accountsContainer',
+            'accountActivityContainer',  // טבלת תנועות חשבון (בעמוד חשבונות)
+            'cashFlowsContainer',
+            'notesContainer'
+          ];
+          
+          let processedTables = [];
+          
+          // עיבוד containers ידועים
+          knownContainers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+              const table = container.querySelector('table');
+              if (table) {
+                const tableId = table.id || containerId.replace('Container', 'Table');
+                this.applyFiltersToTable(tableId);
+                processedTables.push(tableId);
+                window.Logger.info(`✅ Processed known container: ${containerId} → ${tableId}`, { page: "header-system" });
+              } else {
+                window.Logger.debug(`⚠️ No table found in container: ${containerId}`, { page: "header-system" });
+              }
+            }
+          });
+          
+          // עיבוד containers נוספים (לעתיד) - חיפוש כל ה-containers
+          // זה מטפל גם ב-variations בשמות (כמו tradePlansContainer vs trade_plansContainer)
+          const allContainers = document.querySelectorAll('[id$="Container"]');
+          allContainers.forEach(container => {
+            const containerId = container.id;
+            // דילוג אם כבר עיבדנו אותו
+            if (!knownContainers.includes(containerId)) {
+              const table = container.querySelector('table');
+              if (table) {
+                // משתמש ב-ID של הטבלה אם קיים, אחרת fallback ל-container ID
+                const tableId = table.id || containerId.replace('Container', 'Table');
+                this.applyFiltersToTable(tableId);
+                processedTables.push(tableId);
+                window.Logger.info(`✅ Processed additional container: ${containerId} → ${tableId}`, { page: "header-system" });
+              }
+            }
+          });
+          
+          window.Logger.info(`✅ Filter applied to ${processedTables.length} table(s): ${processedTables.join(', ')}`, { page: "header-system" });
         },
         
         // הפעלת פילטרים על טבלה ספציפית
         applyFiltersToTable(tableId) {
           const table = document.getElementById(tableId);
-          if (!table) return;
+          if (!table) {
+            window.Logger.debug(`⚠️ Table not found: ${tableId}`, { page: "header-system" });
+            return;
+          }
           
           const rows = table.querySelectorAll('tbody tr');
           let visibleCount = 0;
@@ -1250,11 +1310,15 @@ class HeaderSystem {
                 const rowStatus = statusCell.getAttribute('data-status');
                 // תרגום סטטוס מאנגלית לעברית כדי להתאים לפילטר
                 const translatedRowStatus = rowStatus && (
+                  window.translateAccountStatus && window.translateAccountStatus(rowStatus) ||
                   window.translateTickerStatus && window.translateTickerStatus(rowStatus) ||
                   window.translateTradePlanStatus && window.translateTradePlanStatus(rowStatus) ||
                   rowStatus
                 );
                 shouldShow = shouldShow && this.currentFilters.status.includes(translatedRowStatus);
+              } else {
+                // אין שדה סטטוס - התעלם מהפילטר (הצג הכל)
+                window.Logger.debug(`ℹ️ No status cell found in row, ignoring status filter`, { page: "header-system" });
               }
             }
             
@@ -1289,7 +1353,8 @@ class HeaderSystem {
                 
                 shouldShow = shouldShow && typeMatches;
               } else {
-                console.log('✅ No type cell - showing all rows');
+                // אין שדה סוג - התעלם מהפילטר (הצג הכל)
+                window.Logger.debug(`ℹ️ No type cell found in row, ignoring type filter`, { page: "header-system" });
               }
               // אם אין שדה סוג - תמיד הצג (לא מסנן)
             }
@@ -1300,6 +1365,9 @@ class HeaderSystem {
               if (accountCell) {
                 const rowAccount = accountCell.getAttribute('data-account');
                 shouldShow = shouldShow && this.currentFilters.account.includes(rowAccount);
+              } else {
+                // אין שדה חשבון - התעלם מהפילטר (הצג הכל)
+                window.Logger.debug(`ℹ️ No account cell found in row, ignoring account filter`, { page: "header-system" });
               }
             }
             
@@ -1310,6 +1378,9 @@ class HeaderSystem {
                 const rowDate = dateCell.getAttribute('data-date');
                 const isInRange = this.isDateInRange(rowDate, this.currentFilters.dateRange);
                 shouldShow = shouldShow && isInRange;
+              } else {
+                // אין שדה תאריך - התעלם מהפילטר (הצג הכל)
+                window.Logger.debug(`ℹ️ No date cell found in row, ignoring date filter`, { page: "header-system" });
               }
             }
             

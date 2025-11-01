@@ -225,6 +225,14 @@ class HeaderSystem {
                         <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">⚡</span>
                       </a>
                     </li>
+
+                    <li class="tiktrack-nav-item">
+                      <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
+                         data-onclick="initSystemCheck?.runPageCheck(event)"
+                         title="בדיקת מערכת איתחול">
+                        <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
+                      </a>
+                    </li>
                   </ul>
                 </nav>
               </div>
@@ -1301,6 +1309,7 @@ class HeaderSystem {
                 const rowStatus = statusCell.getAttribute('data-status');
                 // תרגום סטטוס מאנגלית לעברית כדי להתאים לפילטר
                 const translatedRowStatus = rowStatus && (
+                  window.translateAccountStatus && window.translateAccountStatus(rowStatus) ||
                   window.translateTickerStatus && window.translateTickerStatus(rowStatus) ||
                   window.translateTradePlanStatus && window.translateTradePlanStatus(rowStatus) ||
                   rowStatus

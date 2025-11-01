@@ -29,12 +29,12 @@ window.accountActivityState = {
 /**
  * Initialize account activity system
  */
-window.initAccountActivity = function() {
+window.initAccountActivity = function(autoSelectDefault = false) {
     window.Logger.info('🔧 אתחול מערכת תנועות חשבון', { page: "trading_accounts" });
     
     // Populate account selector when accounts are loaded
     if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
-        populateAccountSelector();
+        populateAccountSelector(autoSelectDefault);
     }
     
     // Setup event listeners
@@ -45,14 +45,18 @@ window.initAccountActivity = function() {
     
     // Listen for account data updates
     if (window.addEventListener) {
-        window.addEventListener('accountsLoaded', populateAccountSelector);
+        window.addEventListener('accountsLoaded', async () => {
+            // On accounts loaded event, auto-select default account from preferences
+            await populateAccountSelector(true);
+        });
     }
 };
 
 /**
  * Populate account selector dropdown
+ * @param {boolean} autoSelectDefault - If true, automatically select default account from preferences after populating
  */
-function populateAccountSelector() {
+async function populateAccountSelector(autoSelectDefault = false) {
     const selector = document.getElementById('accountActivitySelector');
     if (!selector) return;
     
@@ -72,6 +76,57 @@ function populateAccountSelector() {
     }
     
     window.Logger.info(`✅ Account selector populated with ${selector.options.length - 1} accounts`, { page: "trading_accounts" });
+    
+    // Auto-select default account from preferences if requested and no account is currently selected
+    if (autoSelectDefault && selector.options.length > 1) {
+        const currentValue = selector.value;
+        if (!currentValue || currentValue === '') {
+            try {
+                // Get default account from preferences
+                let defaultAccountId = null;
+                
+                if (typeof window.getPreference === 'function') {
+                    const prefValue = await window.getPreference('default_trading_account');
+                    
+                    if (prefValue) {
+                        // Try to parse as integer ID first
+                        const parsed = parseInt(prefValue);
+                        if (!isNaN(parsed)) {
+                            defaultAccountId = parsed;
+                        } else {
+                            // Try to find account by name
+                            const account = window.trading_accountsData.find(acc => acc.name === prefValue);
+                            if (account) {
+                                defaultAccountId = account.id;
+                            }
+                        }
+                    }
+                }
+                
+                // If no preference found or invalid, fallback to first account
+                if (!defaultAccountId || !selector.querySelector(`option[value="${defaultAccountId}"]`)) {
+                    defaultAccountId = selector.options[1].value;
+                    window.Logger.info(`ℹ️ No valid default account in preferences, using first account (ID: ${defaultAccountId})`, { page: "trading_accounts" });
+                } else {
+                    window.Logger.info(`🔄 Auto-selecting default account from preferences (ID: ${defaultAccountId})`, { page: "trading_accounts" });
+                }
+                
+                // Select the account
+                selector.value = defaultAccountId;
+                
+                // Trigger selection change to load activity data
+                handleAccountSelection({ target: selector });
+            } catch (error) {
+                window.Logger.error('❌ Error getting default account from preferences:', error, { page: "trading_accounts" });
+                // Fallback to first account
+                const firstAccountId = selector.options[1].value;
+                selector.value = firstAccountId;
+                handleAccountSelection({ target: selector });
+            }
+        } else {
+            window.Logger.info(`ℹ️ Account already selected (ID: ${currentValue}), skipping auto-selection`, { page: "trading_accounts" });
+        }
+    }
 }
 
 /**
@@ -237,6 +292,7 @@ function renderMovementRow(movement, runningBalance) {
     // Date - using FieldRendererService.renderDate
     const dateCell = document.createElement('td');
     dateCell.className = 'col-date';
+    dateCell.setAttribute('data-date', movement.date || '');
     if (window.FieldRendererService && window.FieldRendererService.renderDate) {
         dateCell.innerHTML = window.FieldRendererService.renderDate(movement.date);
     } else {
@@ -247,12 +303,17 @@ function renderMovementRow(movement, runningBalance) {
     // Type
     const typeCell = document.createElement('td');
     typeCell.className = 'col-type';
+    // שמירת סוג באנגלית לפילטר
+    typeCell.setAttribute('data-type', movement.type || '');
     typeCell.textContent = movement.type === 'cash_flow' ? 'תזרים מזומנים' : 'ביצוע';
     row.appendChild(typeCell);
     
     // Sub-type - using FieldRendererService.renderType for cash flows or renderAction for executions
     const subtypeCell = document.createElement('td');
     subtypeCell.className = 'col-subtype';
+    // שמירת תת-סוג באנגלית לפילטר (יכול להיות רלוונטי לפילטר סוג)
+    const subTypeValue = movement.sub_type || movement.subtype || movement.action || '';
+    subtypeCell.setAttribute('data-type', subTypeValue);
     if (movement.type === 'cash_flow') {
         // Use renderType for cash flow subtypes (deposit, withdrawal, fee, etc.)
         if (window.FieldRendererService && window.FieldRendererService.renderType) {
@@ -270,16 +331,39 @@ function renderMovementRow(movement, runningBalance) {
     }
     row.appendChild(subtypeCell);
     
-    // Ticker (only for executions)
+    // Ticker - show only symbol for executions, '-' for cash flows
     const tickerCell = document.createElement('td');
     tickerCell.className = 'col-ticker';
-    tickerCell.textContent = movement.ticker_symbol || '-';
+    
+    if (movement.type === 'execution' && movement.ticker_symbol) {
+        // Show only the ticker symbol (clickable link to details)
+        const symbol = movement.ticker_symbol.trim();
+        if (symbol && window.showEntityDetails && movement.ticker_id) {
+            tickerCell.innerHTML = `<span style="cursor: pointer; color: var(--primary-color, #26baac); text-decoration: underline;" onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${movement.ticker_id}); return false; }" title="לחץ לצפייה בפרטי הטיקר">${symbol}</span>`;
+        } else {
+            tickerCell.textContent = symbol;
+        }
+    } else {
+        // Cash flow - no ticker
+        tickerCell.textContent = '-';
+    }
     row.appendChild(tickerCell);
     
     // Amount - using FieldRendererService.renderAmount
     const amountCell = document.createElement('td');
     amountCell.className = 'col-amount';
-    const currencySymbol = movement.currency_symbol || 'USD';
+    // Convert currency code to symbol (USD -> $, ILS -> ₪, etc.)
+    let currencySymbol = movement.currency_symbol || 'USD';
+    if (currencySymbol && currencySymbol.length > 1) {
+      switch (currencySymbol.toUpperCase()) {
+        case 'USD': currencySymbol = '$'; break;
+        case 'ILS': currencySymbol = '₪'; break;
+        case 'EUR': currencySymbol = '€'; break;
+        case 'GBP': currencySymbol = '£'; break;
+        case 'JPY': currencySymbol = '¥'; break;
+        default: currencySymbol = currencySymbol; // If already a symbol, keep as is
+      }
+    }
     if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
         amountCell.innerHTML = window.FieldRendererService.renderAmount(movement.amount, currencySymbol, 2);
     } else {
@@ -309,11 +393,11 @@ function renderMovementRow(movement, runningBalance) {
     }
     row.appendChild(balanceCell);
     
-    // Actions - simple details button (no dropdown menu)
+    // Actions - simple details button (square button: width equals height)
     const actionsCell = document.createElement('td');
     actionsCell.className = 'col-actions actions-cell';
     actionsCell.innerHTML = `
-        <button class="btn btn-sm" onclick="openMovementDetails(${movement.id}, '${movement.type}')" title="פרטים">
+        <button class="btn btn-sm" onclick="openMovementDetails(${movement.id}, '${movement.type}')" title="פרטים" style="width: 2.5em; height: 2.5em; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
             👁️
         </button>
     `;
@@ -345,10 +429,23 @@ function updateCurrencyBalancesFooter(data) {
     
     if (!footer || !summaryCell || !baseTotalCell) return;
     
+    // Helper function to convert currency code to symbol
+    const getCurrencySymbol = (currencyCode) => {
+        if (!currencyCode || currencyCode.length <= 1) return currencyCode || '$';
+        switch (currencyCode.toUpperCase()) {
+            case 'USD': return '$';
+            case 'ILS': return '₪';
+            case 'EUR': return '€';
+            case 'GBP': return '£';
+            case 'JPY': return '¥';
+            default: return currencyCode; // If already a symbol, return as is
+        }
+    };
+    
     // Build currency balances summary using FieldRendererService
     let summaryHTML = '';
     data.currencies.forEach(currency => {
-        const symbol = currency.currency_symbol || 'USD';
+        const symbol = getCurrencySymbol(currency.currency_symbol || 'USD');
         const balance = currency.balance || 0;
         if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
             summaryHTML += `<div><strong>${symbol}:</strong> ${window.FieldRendererService.renderAmount(balance, symbol, 2)}</div>`;
@@ -359,7 +456,7 @@ function updateCurrencyBalancesFooter(data) {
     summaryCell.innerHTML = summaryHTML;
     
     // Base currency total using FieldRendererService
-    const baseSymbol = data.base_currency || 'USD';
+    const baseSymbol = getCurrencySymbol(data.base_currency || 'USD');
     if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
         baseTotalCell.innerHTML = `<strong>${window.FieldRendererService.renderAmount(data.base_currency_total || 0, baseSymbol, 2)}</strong>`;
     } else {

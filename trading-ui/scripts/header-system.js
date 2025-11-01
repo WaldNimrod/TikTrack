@@ -1245,6 +1245,7 @@ class HeaderSystem {
             'alertsContainer',
             'executionsContainer',
             'accountsContainer',
+            'accountActivityContainer',  // טבלת תנועות חשבון (בעמוד חשבונות)
             'cashFlowsContainer',
             'notesContainer'
           ];

@@ -212,6 +212,8 @@
 | saveNewTradePlan | trade_plans.js | 1 (שורה 2735) | - | שורות 2735-2737 | 1.11.2025 | הוסר - deprecated wrapper |
 | updateDesignsTable | trade_plans.js | 1 (שורה 1930) | - | שורות 1930-1939 | 1.11.2025 | הוסר - alias לא בשימוש |
 | filterTradePlansData | trade_plans.js | 1 (שורה 1945) | - | שורות 1945-1984 | 1.11.2025 | הוסר - לא בשימוש |
+| validateNoteForm | notes.js | 1 (שורה 886) | - | שורות 886-902 | 1.11.2025 | הוסר - deprecated wrapper, use window.validateEntityForm() |
+| validateEditNoteForm | notes.js | 1 (שורה 913) | - | שורות 913-971 | 1.11.2025 | הוסר - deprecated wrapper, use window.validateEntityForm() |
 
 ---
 

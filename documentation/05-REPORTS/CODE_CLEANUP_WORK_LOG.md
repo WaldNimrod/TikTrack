@@ -214,6 +214,8 @@
 | filterTradePlansData | trade_plans.js | 1 (שורה 1945) | - | שורות 1945-1984 | 1.11.2025 | הוסר - לא בשימוש |
 | validateNoteForm | notes.js | 1 (שורה 886) | - | שורות 886-902 | 1.11.2025 | הוסר - deprecated wrapper, use window.validateEntityForm() |
 | validateEditNoteForm | notes.js | 1 (שורה 913) | - | שורות 913-971 | 1.11.2025 | הוסר - deprecated wrapper, use window.validateEntityForm() |
+| viewTickerDetailsOld | tickers.js | 1 (שורה 124) | - | שורות 124-177 | 1.11.2025 | הוסר - לא בשימוש, הוחלף ב-viewTickerDetails |
+| refreshTickerData | tickers.js | 1 (שורה 184) | - | שורות 184-236 | 1.11.2025 | הוסר - לא בשימוש |
 
 ---
 

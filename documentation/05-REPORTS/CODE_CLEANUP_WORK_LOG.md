@@ -222,6 +222,7 @@
 | generateDetailedLogForCashFlows | cash_flows.js | 1 (שורה 1897) | - | שורות 1897-1919 | 1.11.2025 | הוסר - יש generateDetailedLog גלובלי מ-logger-service.js |
 | isUserInitiatedAction | notification-system.js | 1 (שורה 131) | - | שורות 131-163 | 1.11.2025 | הוסר - לא בשימוש, userInitiated מועבר ישירות כפרמטר |
 | updateSortIconsLocal | tables.js | 1 (שורה 267) | - | שורות 267-301 | 1.11.2025 | הוסר - כפילות של window.updateSortIcons מ-data-basic.js |
+| generateDetailedLogForTrades | trades.js | 1 (שורה 3093) | - | שורות 3093-3118 | 1.11.2025 | הוסר - לא בשימוש, יש generateDetailedLog() גלובלי |
 
 ---
 

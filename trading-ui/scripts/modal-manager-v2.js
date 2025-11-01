@@ -138,14 +138,34 @@ class ModalManagerV2 {
         return `
             <div class="modal fade" id="${config.id}" tabindex="-1" 
                  aria-labelledby="${config.id}Label" aria-hidden="true"
-                 data-bs-backdrop="true" data-bs-keyboard="true">
+                 data-bs-backdrop="false" data-bs-keyboard="true"
+                 data-entity-type="${config.entityType || ''}">
                 <div class="modal-dialog modal-${config.size || 'lg'}">
                     <div class="modal-content">
                         <div class="modal-header modal-header-colored" 
                              style="background-color: var(--current-entity-color-light) !important; border-bottom: 2px solid var(--current-entity-color-dark)">
-                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark) !important">${config.title.add || 'הוספת ישות'}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" 
-                                    aria-label="סגור"></button>
+                            <!-- Breadcrumb navigation -->
+                            <div class="modal-navigation-breadcrumb" style="order: 0; width: 100%; margin-bottom: 0.5rem;"></div>
+                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark) !important; order: 1;">${config.title.add || 'הוספת ישות'}</h5>
+                            <!-- Back button - uses the button system -->
+                            <button type="button" 
+                                    data-button-type="BACK" 
+                                    data-variant="small" 
+                                    data-text="" 
+                                    title="חזור למודול הקודם"
+                                    class="modal-back-btn"
+                                    style="order: 998; display: none;">
+                            </button>
+                            <!-- Close button -->
+                            <button type="button" 
+                                    data-button-type="CLOSE" 
+                                    data-variant="small" 
+                                    data-bs-dismiss="modal" 
+                                    data-text="" 
+                                    title="סגור"
+                                    class="modal-close-btn"
+                                    style="order: 999;">
+                            </button>
                         </div>
                         <div class="modal-body">
                             <form id="${config.id}Form">
@@ -390,9 +410,23 @@ class ModalManagerV2 {
             // In add mode, defaults are applied by populateSelects for fields with defaultFromPreferences
             // Additional defaults (date, source) are handled below after modal shows
             
-            // הצגת המודל
-            const modal = new bootstrap.Modal(modalElement);
+            // הצגת המודל - ללא backdrop (ננהל אותו מרכזית)
+            const modal = new bootstrap.Modal(modalElement, {
+                backdrop: false, // ננהל backdrop מרכזית
+                keyboard: true
+            });
             modal.show();
+            
+            // הוספה למערכת ניהול הניווט
+            if (window.modalNavigationManager) {
+                const modalNavInfo = {
+                    type: 'crud-modal',
+                    entityType: modalInfo.config.entityType,
+                    entityId: mode === 'edit' && entityData ? entityData.id : null,
+                    title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || ''
+                };
+                window.modalNavigationManager.pushModal(modalElement, modalNavInfo);
+            }
             
             // Apply remaining defaults after modal shows (date, source, etc.)
             if (mode === 'add') {
@@ -402,6 +436,11 @@ class ModalManagerV2 {
             // עדכון מצב
             modalInfo.isActive = true;
             this.activeModal = modalId;
+            
+            // עדכון navigation UI
+            if (window.modalNavigationManager) {
+                window.modalNavigationManager.updateModalNavigation(modalElement);
+            }
             
         } catch (error) {
             console.error(`Error showing modal ${modalId}:`, error);
@@ -614,6 +653,7 @@ class ModalManagerV2 {
                 'trading_account_id': 'tradePlanAccount',
                 'ticker_id': 'planTicker',
                 'side': 'planSide',
+                'investment_type': 'tradePlanType', // Map investment_type to tradePlanType field
                 'planned_amount': 'planAmount',
                 'stop_loss': 'planStopLoss',
                 'target_price': 'planTargetPrice'
@@ -1143,6 +1183,17 @@ class ModalManagerV2 {
             `${mode === 'add' ? 'הוספת' : mode === 'edit' ? 'עריכת' : 'צפייה ב'}${config.entityType}`;
         
         titleElement.textContent = title;
+        
+        // עדכון navigation UI אחרי עדכון הכותרת
+        if (window.modalNavigationManager) {
+            // עדכון המידע במודול הנוכחי
+            const currentIndex = window.modalNavigationManager.modalHistory.findIndex(item => item.element === modalElement);
+            if (currentIndex >= 0) {
+                window.modalNavigationManager.modalHistory[currentIndex].info.title = title;
+            }
+            // עדכון UI
+            window.modalNavigationManager.updateModalNavigation(modalElement);
+        }
     }
 
     /**

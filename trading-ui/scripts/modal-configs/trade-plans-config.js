@@ -37,16 +37,15 @@ const tradePlansModalConfig = {
         {
             type: 'select',
             id: 'tradePlanType',
-            label: 'סוג תוכנית',
+            label: 'סוג השקעה',
             required: true,
+            fieldName: 'investment_type', // Map to database column name
             options: [
-                { value: 'long', label: 'קנייה ארוכת טווח' },
-                { value: 'short', label: 'מכירה בחסר' },
-                { value: 'swing', label: 'מסחר תנודות' },
-                { value: 'scalp', label: 'סקלפינג' },
-                { value: 'position', label: 'פוזיציה' }
+                { value: 'swing', label: 'סווינג - מסחר לטווח קצר עד בינוני' },
+                { value: 'investment', label: 'השקעה - השקעה ארוכת טווח' },
+                { value: 'passive', label: 'פאסיבי - השקעה פאסיבית ללא פעילות מסחרית' }
             ],
-            defaultValue: 'long'
+            defaultValue: 'swing'
         },
         {
             type: 'number',

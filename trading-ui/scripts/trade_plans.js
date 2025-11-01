@@ -2984,7 +2984,7 @@ async function saveTradePlan() {
             trading_account_id: { id: 'tradePlanAccount', type: 'int' }, // Backend expects trading_account_id
             ticker_id: { id: 'tradePlanTicker', type: 'int' },
             name: { id: 'tradePlanName', type: 'text' },
-            type: { id: 'tradePlanType', type: 'text' },
+            investment_type: { id: 'tradePlanType', type: 'text' }, // Map tradePlanType field to investment_type column
             quantity: { id: 'tradePlanQuantity', type: 'int' },
             entry_price: { id: 'tradePlanEntryPrice', type: 'float', default: null },
             stop_loss: { id: 'tradePlanStopLoss', type: 'float', default: null },
@@ -3017,7 +3017,7 @@ async function saveTradePlan() {
             hasErrors = true;
         }
         
-        if (!tradePlanData.type) {
+        if (!tradePlanData.investment_type) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanType', 'סוג השקעה הוא שדה חובה');
             }

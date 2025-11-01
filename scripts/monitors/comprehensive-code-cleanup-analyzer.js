@@ -493,25 +493,26 @@ class ComprehensiveCodeCleanupAnalyzer {
                     }
                 }
                 
-                // ⚠️ שיפור נוסף: בדיקת exports מאוחרים יותר בקובץ (לפעמים exports מופיעים בסוף הקובץ)
-                // קריאת תוכן הקובץ לבדיקת exports נוספים
+                // ⚠️ שיפור נוסף: בדיקת exports בכל מקום בקובץ (לפני או אחרי ההגדרה)
+                // לפעמים exports מופיעים לפני ההגדרה (forward declarations) או אחרי (end of file)
                 try {
                     const fileContent = fs.readFileSync(filePath, 'utf8');
-                    // חיפוש exports נוספים (window.functionName = functionName)
-                    const lateExportPatterns = [
+                    // חיפוש exports (window.functionName = functionName) - לפני או אחרי ההגדרה
+                    const exportPatterns = [
                         new RegExp(`window\\.${func.name}\\s*=\\s*${func.name}\\b`, 'g'),
                         new RegExp(`window\\.\\w+\\.${func.name}\\s*=`, 'g'),
                         new RegExp(`window\\[['"]${func.name}['"]\\]\\s*=`, 'g'),
                         new RegExp(`\\{\\s*${func.name}\\s*:\\s*${func.name}\\s*[,}]`, 'g')
                     ];
                     
-                    for (const pattern of lateExportPatterns) {
+                    for (const pattern of exportPatterns) {
                         pattern.lastIndex = 0;
                         let match;
                         while ((match = pattern.exec(fileContent)) !== null) {
                             const exportIndex = match.index;
-                            // בדיקה שהמיקום הוא אחרי ההגדרה של הפונקציה (לא לפני)
-                            if (exportIndex > func.startIndex) {
+                            // בדיקה שהמיקום הוא לא בתוך הערה או string
+                            const beforeExport = fileContent.substring(Math.max(0, exportIndex - 10), exportIndex);
+                            if (!beforeExport.includes('//') && !beforeExport.includes('/*') && !beforeExport.match(/['"`]$/)) {
                                 const functionCallsSet = this.functionCalls.get(func.name);
                                 if (functionCallsSet) {
                                     functionCallsSet.add(filePath);

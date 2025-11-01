@@ -251,12 +251,15 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   }
 
   // Update sort icons
-  updateSortIconsLocal(tableType, columnIndex, newDirection);
+  if (typeof window.updateSortIcons === 'function') {
+    window.updateSortIcons(tableType, columnIndex, newDirection);
+  }
 
   // Table sorted by column
   return sortedData;
 };
 
+// REMOVED: updateSortIconsLocal - duplicate, use window.updateSortIcons from data-basic.js instead
 /**
  * Update sort icons in table headers
  *
@@ -264,7 +267,7 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
  * @param {number} columnIndex - Column index
  * @param {string} direction - Sort direction (asc/desc)
  */
-function updateSortIconsLocal(tableType, columnIndex, direction) {
+function _REMOVED_updateSortIconsLocal(tableType, columnIndex, direction) {
   try {
     // Find the table by data-table-type attribute
     const table = document.querySelector(`table[data-table-type="${tableType}"]`);

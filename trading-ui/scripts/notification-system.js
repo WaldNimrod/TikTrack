@@ -119,6 +119,7 @@ function isPrimarySeverity(category, type) {
   }
 }
 
+// REMOVED: isUserInitiatedAction - not used, userInitiated is passed directly as parameter
 /**
  * בדוק אם הודעה נחשבת לפעולה שהמשתמש הפעיל
  * NOTIFICATION MODES - בודק אם הודעה צריכה להיות מוצגת במצב WORK
@@ -128,7 +129,7 @@ function isPrimarySeverity(category, type) {
  * @param {string} functionName - שם הפונקציה שהפעילה את ההודעה
  * @returns {boolean} - האם ההודעה נחשבת לפעולת משתמש
  */
-function isUserInitiatedAction(message, title, functionName) {
+function _REMOVED_isUserInitiatedAction(message, title, functionName) {
   try {
     const text = `${message} ${title} ${functionName}`.toLowerCase();
     

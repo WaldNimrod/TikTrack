@@ -1260,17 +1260,19 @@ class HeaderSystem {
           });
           
           // עיבוד containers נוספים (לעתיד) - חיפוש כל ה-containers
+          // זה מטפל גם ב-variations בשמות (כמו tradePlansContainer vs trade_plansContainer)
           const allContainers = document.querySelectorAll('[id$="Container"]');
           allContainers.forEach(container => {
             const containerId = container.id;
-            // דילוג אם כבר עיבדנו אותו או שהוא לא container רלוונטי
+            // דילוג אם כבר עיבדנו אותו
             if (!knownContainers.includes(containerId)) {
               const table = container.querySelector('table');
-              if (table && table.id) {
-                // רק אם יש ID מפורש לטבלה
-                this.applyFiltersToTable(table.id);
-                processedTables.push(table.id);
-                window.Logger.info(`✅ Processed additional container: ${containerId} → ${table.id}`, { page: "header-system" });
+              if (table) {
+                // משתמש ב-ID של הטבלה אם קיים, אחרת fallback ל-container ID
+                const tableId = table.id || containerId.replace('Container', 'Table');
+                this.applyFiltersToTable(tableId);
+                processedTables.push(tableId);
+                window.Logger.info(`✅ Processed additional container: ${containerId} → ${tableId}`, { page: "header-system" });
               }
             }
           });

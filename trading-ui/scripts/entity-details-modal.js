@@ -99,26 +99,23 @@ class EntityDetailsModal {
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
                     <div class="modal-content entity-details-modal">
                         <div class="modal-header modal-header-colored">
-                            <!-- Breadcrumb navigation -->
-                            <div class="modal-navigation-breadcrumb" id="entityDetailsBreadcrumb" style="order: 0; width: 100%; margin-bottom: 0.5rem;"></div>
                             <h5 class="modal-title" id="${this.modalId}Label" style="order: 1;">
                                 פרטי ישות
                             </h5>
-                            <div id="quickActionButtons" class="btn-group btn-group-sm" role="group" style="order: 2;">
-                                <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
-                            </div>
-                            <!-- Back button - uses the button system -->
-                            <!-- הכפתור מוסתר כברירת מחדל - JavaScript יציג אותו כשיש יותר ממודול אחד -->
+                            <!-- Breadcrumb navigation - מתחת לכותרת -->
+                            <div class="modal-navigation-breadcrumb" id="entityDetailsBreadcrumb" style="order: 2; width: 100%; margin-top: 0.5rem;"></div>
+                            <!-- Back button - uses the button system - ראשון (מימין ב-RTL) -->
+                            <!-- הכפתור יקבל data-onclick מ-modal-navigation-manager -->
                             <button type="button" 
                                     data-button-type="BACK" 
-                                    data-variant="small" 
+                                    data-variant="full" 
                                     data-text="" 
                                     title="חזור למודול הקודם"
                                     id="entityDetailsBackBtn"
                                     class="modal-back-btn"
-                                    style="order: 998;">
+                                    style="order: 3; border-radius: 6px;">
                             </button>
-                            <!-- Close button on the left - uses the button system - at the end of the line -->
+                            <!-- Close button - uses the button system - שני (משמאל ל-חזרה ב-RTL) -->
                             <button type="button" 
                                     data-button-type="CLOSE" 
                                     data-variant="small" 
@@ -126,8 +123,11 @@ class EntityDetailsModal {
                                     data-text="" 
                                     title="סגור"
                                     class="modal-close-btn"
-                                    style="order: 999;">
+                                    style="order: 4; border-radius: 6px;">
                             </button>
+                            <div id="quickActionButtons" class="btn-group btn-group-sm" role="group" style="order: 5;">
+                                <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
+                            </div>
                         </div>
                         <div class="modal-body entity-details-body" id="entityDetailsContent">
                             <div class="entity-details-loading">
@@ -220,32 +220,80 @@ class EntityDetailsModal {
             if (options.source) {
                 this.sourceInfo = options.source;
                 if (window.Logger) {
-                    window.Logger.debug('✅ [EntityDetailsModal] SourceInfo saved', {
+                    window.Logger.info('✅ [1.2 EntityDetailsModal.show] SourceInfo saved after assignment', {
                         sourceInfo: this.sourceInfo,
+                        sourceInfoString: JSON.stringify(this.sourceInfo),
                         entityType: entityType,
                         entityId: entityId,
                         page: "entity-details-modal"
                     });
                 }
             } else {
+                this.sourceInfo = null;
                 if (window.Logger) {
-                    window.Logger.debug('⚠️ [EntityDetailsModal] No sourceInfo provided', {
+                    window.Logger.info('⚠️ [1.2 EntityDetailsModal.show] No sourceInfo provided', {
                         entityType: entityType,
                         entityId: entityId,
                         options: options,
+                        thisSourceInfo: this.sourceInfo,
                         page: "entity-details-modal"
                     });
                 }
             }
             
-            // הצגת מצב טעינה
-            this.showLoadingState();
+            // בדיקה אם המודול כבר בהיסטוריה עם תוכן שמור
+            let shouldLoadData = true;
+            if (window.modalNavigationManager && this.modal) {
+                const historyItem = window.modalNavigationManager.modalHistory.find(
+                    item => item.element === this.modal &&
+                           item.info?.entityType === entityType &&
+                           item.info?.entityId === entityId &&
+                           item.content
+                );
+                
+                if (historyItem && historyItem.content) {
+                    // המודול כבר בהיסטוריה עם תוכן שמור - נשתמש בו
+                    const contentElement = document.getElementById('entityDetailsContent');
+                    if (contentElement) {
+                        contentElement.innerHTML = historyItem.content;
+                        shouldLoadData = false;
+                        
+                        if (window.Logger) {
+                            window.Logger.info('✅ Using saved content from history (skipping loadEntityData)', {
+                                entityType,
+                                entityId,
+                                contentLength: historyItem.content.length,
+                                page: "entity-details-modal"
+                            });
+                        }
+                        
+                        // עדכון sourceInfo אם קיים
+                        if (historyItem.info?.sourceInfo) {
+                            this.sourceInfo = historyItem.info.sourceInfo;
+                        }
+                        
+                        // עדכון כותרת וניווט
+                        this.updateModalTitle(entityType, null); // יעודכן מה-content
+                        if (window.modalNavigationManager && window.modalNavigationManager.isInitialized) {
+                            window.modalNavigationManager.updateModalNavigation(this.modal);
+                        }
+                    }
+                }
+            }
+            
+            if (shouldLoadData) {
+                // הצגת מצב טעינה
+                this.showLoadingState();
 
-            // הצגת המודל
-            await this.showModal();
+                // הצגת המודל
+                await this.showModal();
 
-            // טעינת הנתונים
-            await this.loadEntityData(entityType, entityId, options);
+                // טעינת הנתונים
+                await this.loadEntityData(entityType, entityId, options);
+            } else {
+                // רק הצגת המודל (התוכן כבר שחזרנו)
+                await this.showModal();
+            }
 
         } catch (error) {
             window.Logger.error('Error showing entity details modal:', error, { page: "entity-details-modal" });
@@ -295,7 +343,7 @@ class EntityDetailsModal {
      * Update modal title - עדכון כותרת המודל
      * 
      * @param {string} entityType - סוג הישות
-     * @param {number|string} entityId - מזהה הישות  
+     * @param {Object|number|string} entityDataOrId - נתוני הישות (Object) או מזהה הישות (number|string)
      * @private
      */
 
@@ -380,6 +428,31 @@ class EntityDetailsModal {
                 sourceInfo: options.source || null
             });
             
+            // לוג מיוחד עבור trade_plan - בודק את ticker_symbol
+            if (entityType === 'trade_plan') {
+                // Fallback: אם ticker_symbol לא מוגדר אבל יש tickerObject, נחלץ אותו
+                if (!entityData.ticker_symbol && entityData.ticker?.symbol) {
+                    entityData.ticker_symbol = entityData.ticker.symbol;
+                    console.log('✅ [ENTITY-DETAILS-MODAL] Fixed ticker_symbol from tickerObject:', {
+                        ticker_symbol: entityData.ticker_symbol,
+                        tickerObject: entityData.ticker
+                    });
+                }
+                
+                console.log('🔍🔍🔍 [ENTITY-DETAILS-MODAL] trade_plan ticker debug:', {
+                    entityId: entityId,
+                    ticker_symbol: entityData.ticker_symbol,
+                    ticker_id: entityData.ticker_id,
+                    hasTickerObject: !!entityData.ticker,
+                    tickerObject: entityData.ticker,
+                    tickerObjectFull: entityData.ticker ? JSON.stringify(entityData.ticker, null, 2) : null,
+                    tickerObjectKeys: entityData.ticker ? Object.keys(entityData.ticker) : [],
+                    tickerObjectValues: entityData.ticker ? Object.entries(entityData.ticker).map(([key, value]) => ({key, value, type: typeof value})) : [],
+                    allKeys: Object.keys(entityData),
+                    entityDataSnapshot: JSON.parse(JSON.stringify(entityData)) // Deep copy for inspection
+                });
+            }
+            
             if (window.Logger) {
                 window.Logger.info(`📊 Entity data loaded:`, {
                     entityType,
@@ -423,15 +496,33 @@ class EntityDetailsModal {
                 sourceInfo: this.sourceInfo || null // הוספת sourceInfo אם קיים
             };
             // עדכון המידע במודול הנוכחי
+            // אם יש sourceInfo (מודול מקונן), תמיד נוסיף מודול חדש להיסטוריה
+            // גם אם זה אותו DOM element - זה מאפשר לשמור את ההיסטוריה ולאפשר חזרה
             const currentIndex = window.modalNavigationManager.modalHistory.findIndex(item => item.element === this.modal);
-            if (currentIndex >= 0) {
+            const hasSourceInfo = !!(this.sourceInfo || modalInfo.sourceInfo);
+            
+            if (hasSourceInfo) {
+                // מודול מקונן - תמיד נוסיף להיסטוריה (גם אם אותו element כבר קיים)
+                // pushModal יטפל בלוגיקה של הוספה נכונה
+                if (window.Logger) {
+                    window.Logger.info('🔄 Adding nested modal to history (has sourceInfo):', {
+                        entityType,
+                        entityId,
+                        sourceInfo: this.sourceInfo || modalInfo.sourceInfo,
+                        existingIndex: currentIndex,
+                        page: "entity-details-modal"
+                    });
+                }
+                await window.modalNavigationManager.pushModal(this.modal, modalInfo);
+            } else if (currentIndex >= 0) {
+                // מודול קיים ללא sourceInfo - רק עדכון מידע (לא מודול מקונן)
                 window.modalNavigationManager.modalHistory[currentIndex].info = modalInfo;
                 // שמירה למטמון לאחר עדכון
                 if (window.modalNavigationManager.saveHistoryToCache) {
                     await window.modalNavigationManager.saveHistoryToCache();
                 }
             } else {
-                // אם המודול לא בהיסטוריה, נוסיף אותו
+                // מודול חדש שלא נמצא בהיסטוריה - נוסיף אותו
                 await window.modalNavigationManager.pushModal(this.modal, modalInfo);
             }
             // עדכון UI של הניווט - עם delay קצר כדי לוודא שהכותרת עודכנה
@@ -490,11 +581,137 @@ class EntityDetailsModal {
             }, 300);
         }
 
-        // רנדור הנתונים
-        const renderedContent = window.entityDetailsRenderer.render(entityType, entityData, options);
+        // רנדור הנתונים - העברת sourceInfo ל-renderer דרך options
+        const renderOptions = {
+            ...options,
+            sourceInfo: this.sourceInfo || null // העברת sourceInfo ל-renderer
+        };
+        
+        console.log('📦📦📦 [loadEntityData] renderOptions created', {
+            entityType,
+            entityId,
+            hasSourceInfo: !!this.sourceInfo,
+            thisSourceInfo: this.sourceInfo,
+            thisSourceInfoString: this.sourceInfo ? JSON.stringify(this.sourceInfo) : null,
+            renderOptionsSourceInfo: renderOptions.sourceInfo,
+            renderOptionsSourceInfoString: renderOptions.sourceInfo ? JSON.stringify(renderOptions.sourceInfo) : null,
+            allRenderOptions: renderOptions
+        });
+        
+        if (window.Logger) {
+            window.Logger.info('✅ [1.3 loadEntityData] renderOptions created with sourceInfo', {
+                entityType,
+                entityId,
+                hasSourceInfo: !!this.sourceInfo,
+                thisSourceInfo: this.sourceInfo,
+                thisSourceInfoString: this.sourceInfo ? JSON.stringify(this.sourceInfo) : null,
+                renderOptionsSourceInfo: renderOptions.sourceInfo,
+                renderOptionsSourceInfoString: renderOptions.sourceInfo ? JSON.stringify(renderOptions.sourceInfo) : null,
+                allRenderOptions: renderOptions,
+                page: "entity-details-modal"
+            });
+        }
+        
+        const renderedContent = window.entityDetailsRenderer.render(entityType, entityData, renderOptions);
 
         // הצגת התוכן ברנדור
         this.showRenderedContent(renderedContent);
+        
+        // שמירת התוכן ב-history אחרי שהוטען (חשוב לשמור אחרי שהוצג)
+        // זה מבטיח שהתוכן המלא נשמר, גם אחרי שכל הנתונים נטענו
+        if (window.modalNavigationManager && this.modal) {
+            const contentElement = document.getElementById('entityDetailsContent');
+            if (contentElement && contentElement.innerHTML && contentElement.innerHTML.trim().length > 0) {
+                // עדכון התוכן ב-history item הנוכחי
+                // נחפש את המודול האחרון בהיסטוריה (יכול להיות שהוא עדיין לא נשמר)
+                const currentHistoryIndex = window.modalNavigationManager.modalHistory.findIndex(
+                    item => item.element === this.modal &&
+                           item.info?.entityType === entityType &&
+                           item.info?.entityId === entityId
+                );
+                
+                if (currentHistoryIndex >= 0) {
+                    // שמירת התוכן - תמיד נעדכן את התוכן אם הוא קיים
+                    window.modalNavigationManager.modalHistory[currentHistoryIndex].content = contentElement.innerHTML;
+                    if (window.Logger) {
+                        window.Logger.debug('✅ Saved modal content to history after loading', {
+                            entityType,
+                            entityId,
+                            contentLength: contentElement.innerHTML.length,
+                            historyIndex: currentHistoryIndex,
+                            hadPreviousContent: !!window.modalNavigationManager.modalHistory[currentHistoryIndex].content,
+                            page: "entity-details-modal"
+                        });
+                    }
+                } else {
+                    // המודול לא נמצא בהיסטוריה - אולי הוא עדיין לא נוסף?
+                    // נחפש רק לפי element (אולי entityType/Id שונים)
+                    const modalHistoryIndex = window.modalNavigationManager.modalHistory.findIndex(
+                        item => item.element === this.modal
+                    );
+                    
+                    if (modalHistoryIndex >= 0) {
+                        // עדכון התוכן גם אם entityType/Id שונים (מקרה נדיר)
+                        window.modalNavigationManager.modalHistory[modalHistoryIndex].content = contentElement.innerHTML;
+                        if (window.Logger) {
+                            window.Logger.debug('✅ Saved modal content to history (by element only)', {
+                                entityType,
+                                entityId,
+                                contentLength: contentElement.innerHTML.length,
+                                historyIndex: modalHistoryIndex,
+                                historyEntityType: window.modalNavigationManager.modalHistory[modalHistoryIndex].info?.entityType,
+                                historyEntityId: window.modalNavigationManager.modalHistory[modalHistoryIndex].info?.entityId,
+                                page: "entity-details-modal"
+                            });
+                        }
+                    } else {
+                        // המודול לא נמצא בהיסטוריה - יכול להיות שהוא עוד לא נוסף או שהוא נמחק
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ Cannot save content - modal not found in history', {
+                                entityType,
+                                entityId,
+                                modalExists: !!this.modal,
+                                modalId: this.modal?.id,
+                                historyLength: window.modalNavigationManager.modalHistory.length,
+                                page: "entity-details-modal"
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        
+        // בדיקת DOM לאחר render - שלב 2.2
+        if (window.Logger) {
+            setTimeout(() => {
+                try {
+                    // חיפוש כפתור VIEW בפריט מקושר
+                    const viewButton = this.modal?.querySelector('button[data-button-type="VIEW"]');
+                    if (viewButton) {
+                        const dataOnclick = viewButton.getAttribute('data-onclick');
+                        window.Logger.info('✅ [2.2 loadEntityData] DOM check after showRenderedContent', {
+                            foundViewButton: true,
+                            dataOnclick: dataOnclick,
+                            dataOnclickLength: dataOnclick?.length || 0,
+                            hasSourceInOnclick: dataOnclick?.includes('source:') || false,
+                            expectedSourceInfo: this.sourceInfo,
+                            page: "entity-details-modal"
+                        });
+                    } else {
+                        window.Logger.info('⚠️ [2.2 loadEntityData] No VIEW button found in DOM', {
+                            foundViewButton: false,
+                            modalExists: !!this.modal,
+                            page: "entity-details-modal"
+                        });
+                    }
+                } catch (error) {
+                    window.Logger.warn('⚠️ [2.2 loadEntityData] Error checking DOM', {
+                        error: error.message,
+                        page: "entity-details-modal"
+                    });
+                }
+            }, 500); // המתנה קצרה כדי לתת ל-DOM להתעדכן
+        }
 
         } catch (error) {
             window.Logger.error('Error loading entity data:', error, { page: "entity-details-modal" });
@@ -539,11 +756,62 @@ class EntityDetailsModal {
      * @param {Object} entityData - נתוני הישות
      * @private
      */
-    updateModalTitle(entityType, entityData) {
+    updateModalTitle(entityType, entityDataOrId) {
         const titleElement = document.getElementById(`${this.modalId}Label`);
         const headerElement = this.modal?.querySelector('.modal-header');
         
-        window.Logger.info('🎯 updateModalTitle called:', { entityType, entityData, titleElement, headerElement }, { page: "entity-details-modal" });
+        // טיפול ב-entityDataOrId - יכול להיות Object (entityData) או number/string (entityId)
+        let entityId = '';
+        let entityData = null;
+        if (entityDataOrId && typeof entityDataOrId === 'object') {
+            entityData = entityDataOrId;
+            entityId = entityData?.id || '';
+        } else if (entityDataOrId !== null && entityDataOrId !== undefined) {
+            entityId = entityDataOrId.toString();
+        }
+        
+        // אם לא קיבלנו entityType או entityId, נשתמש בערכים הנוכחיים
+        // (זה יכול לקרות כשקוראים מההיסטוריה)
+        const finalEntityType = entityType || this.currentEntityType;
+        const finalEntityId = entityId || (this.currentEntityId !== null ? this.currentEntityId.toString() : '');
+        
+        console.log('🔍🔍🔍 [updateModalTitle] START', {
+            receivedEntityType: entityType,
+            receivedEntityDataOrId: entityDataOrId,
+            thisCurrentEntityType: this.currentEntityType,
+            thisCurrentEntityId: this.currentEntityId,
+            thisSourceInfo: this.sourceInfo,
+            finalEntityType,
+            finalEntityId,
+            titleElementBefore: titleElement?.innerHTML?.substring(0, 100),
+            isNestedModal: !!this.sourceInfo
+        });
+        
+        // עדכון currentEntityType/Id כדי לוודא שהם מעודכנים
+        if (finalEntityType) {
+            this.currentEntityType = finalEntityType;
+        }
+        if (finalEntityId) {
+            this.currentEntityId = finalEntityId;
+        }
+        
+        console.log('🔍🔍🔍 [updateModalTitle] After updating currentEntityType/Id', {
+            finalEntityType,
+            finalEntityId,
+            thisCurrentEntityType: this.currentEntityType,
+            thisCurrentEntityId: this.currentEntityId
+        });
+        
+        window.Logger.info('🎯 updateModalTitle called:', { 
+            entityType: finalEntityType, 
+            entityId: finalEntityId, 
+            entityData, 
+            titleElement, 
+            headerElement,
+            currentEntityType: this.currentEntityType,
+            currentEntityId: this.currentEntityId,
+            sourceInfo: this.sourceInfo
+        }, { page: "entity-details-modal" });
         
         if (!titleElement) {
             window.Logger.warn('⚠️ Title element not found:', `${this.modalId}Label`, { page: "entity-details-modal" });
@@ -554,39 +822,100 @@ class EntityDetailsModal {
             window.Logger.warn('⚠️ Header element not found', { page: "entity-details-modal" });
             return;
         }
+        
+        // שמירת הברדקראמב לפני עדכון הכותרת (תיקון - הברדקראמב לא צריך להימחק)
+        const breadcrumbContainer = headerElement.querySelector('.modal-navigation-breadcrumb');
+        const breadcrumbHTML = breadcrumbContainer ? breadcrumbContainer.innerHTML : null;
 
-        // קבלת שם ישות בעברית
-        const entityLabel = (window.getEntityLabel && typeof window.getEntityLabel === 'function') 
-            ? window.getEntityLabel(entityType) 
-            : entityType;
+        // בדיקה אם זה מודול מקונן - אם כן, לא נעדכן את הכותרת (רק ברדקראמבס יציג)
+        const isNestedModal = !!this.sourceInfo;
         
-        // קבלת מזהה הישות
-        const entityId = entityData?.id || '';
-        
-        // קבלת נתיב איקון
-        const iconPath = this.getEntityIcon(entityType);
-        
-        // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
-        // האיקון עם רקע לבן עגול - מחלקה entity-icon-circle - צבעים מקוריים
-        const titleHTML = `
-            <span class="d-inline-flex align-items-center gap-2">
-                <div class="entity-icon-circle" style="background-color: white;">
-                    <img src="${iconPath}" 
-                         alt="${entityLabel}" 
-                         style="width: 30px; height: 30px;" />
-                </div>
-                <span>פרטי ${entityLabel}${entityId ? ` מספר ${entityId}` : ''}</span>
-            </span>
-        `;
+        if (isNestedModal) {
+            // מודול מקונן - הכותרת תישאר פשוטה, הברדקראמבס יציג את הפרטים
+            const entityLabel = (window.getEntityLabel && typeof window.getEntityLabel === 'function') 
+                ? window.getEntityLabel(finalEntityType) 
+                : finalEntityType;
+            
+            const iconPath = this.getEntityIcon(finalEntityType);
+            
+            // כותרת פשוטה ללא שם הרשומה
+            const titleHTML = `
+                <span class="d-inline-flex align-items-center gap-2">
+                    <div class="entity-icon-circle" style="background-color: white;">
+                        <img src="${iconPath}" 
+                             alt="${entityLabel}" 
+                             style="width: 30px; height: 30px;" />
+                    </div>
+                    <span>פרטי ${entityLabel}</span>
+                </span>
+            `;
+            
+            titleElement.innerHTML = titleHTML;
+            
+            if (window.Logger) {
+                window.Logger.info('🎯 Nested modal - simple title set', { entityLabel, iconPath, finalEntityType }, { page: "entity-details-modal" });
+            }
+        } else {
+            // מודול רגיל - עדכון מלא של הכותרת
+            const entityLabel = (window.getEntityLabel && typeof window.getEntityLabel === 'function') 
+                ? window.getEntityLabel(finalEntityType) 
+                : finalEntityType;
+            
+            const iconPath = this.getEntityIcon(finalEntityType);
+            
+            // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
+            const titleHTML = `
+                <span class="d-inline-flex align-items-center gap-2">
+                    <div class="entity-icon-circle" style="background-color: white;">
+                        <img src="${iconPath}" 
+                             alt="${entityLabel}" 
+                             style="width: 30px; height: 30px;" />
+                    </div>
+                    <span>פרטי ${entityLabel}${finalEntityId ? ` מספר ${finalEntityId}` : ''}</span>
+                </span>
+            `;
 
-        window.Logger.info('🎯 Setting title to:', { entityLabel, entityId, iconPath }, { page: "entity-details-modal" });
-        titleElement.innerHTML = titleHTML;
+            console.log('🔍🔍🔍 [updateModalTitle] About to set titleHTML', {
+                entityLabel,
+                entityId: finalEntityId,
+                iconPath,
+                finalEntityType,
+                titleHTML,
+                titleHTMLLength: titleHTML.length,
+                titleElementBefore: titleElement?.innerHTML?.substring(0, 100)
+            });
+            
+            window.Logger.info('🎯 Setting title to:', { entityLabel, entityId: finalEntityId, iconPath, finalEntityType }, { page: "entity-details-modal" });
+            titleElement.innerHTML = titleHTML;
+            
+            console.log('🔍🔍🔍 [updateModalTitle] After setting titleHTML', {
+                titleElementAfter: titleElement?.innerHTML?.substring(0, 100),
+                titleElementInnerHTMLLength: titleElement?.innerHTML?.length
+            });
+        }
+        
+        // החזרת הברדקראמב אם הוא נשמר (תיקון - הברדקראמב לא צריך להימחק)
+        if (breadcrumbContainer && breadcrumbHTML) {
+            breadcrumbContainer.innerHTML = breadcrumbHTML;
+            if (window.Logger) {
+                window.Logger.debug('✅ Restored breadcrumb after title update', { page: "entity-details-modal" });
+            }
+        }
         
         // עדכון צבע כותרת המודל לפי סוג הישות
-        this.updateModalHeaderColor(entityType);
+        this.updateModalHeaderColor(finalEntityType);
         
         // עדכון כפתורי פעולות מהירות
-        this.updateQuickActionButtons(entityType, entityData);
+        this.updateQuickActionButtons(finalEntityType, entityData);
+        
+        console.log('🔍🔍🔍 [updateModalTitle] END', {
+            finalEntityType,
+            finalEntityId,
+            titleElementFinal: titleElement?.innerHTML?.substring(0, 100),
+            breadcrumbRestored: !!(breadcrumbContainer && breadcrumbHTML),
+            thisCurrentEntityType: this.currentEntityType,
+            thisCurrentEntityId: this.currentEntityId
+        });
         
         // עדכון navigation UI אחרי עדכון הכותרת
         if (window.Logger) {
@@ -819,10 +1148,40 @@ class EntityDetailsModal {
         this.currentEntityType = null;
         this.currentEntityId = null;
         
-        // ניקוי תוכן המודל
-        const contentElement = document.getElementById('entityDetailsContent');
-        if (contentElement) {
-            contentElement.innerHTML = '';
+        // ניקוי תוכן המודל - רק אם המודול לא בהיסטוריה
+        // (אם המודול בהיסטוריה, התוכן נשמר שם ולא צריך למחוק אותו)
+        if (window.modalNavigationManager) {
+            const isInHistory = window.modalNavigationManager.modalHistory.some(
+                item => item.element === this.modal
+            );
+            
+            if (!isInHistory) {
+                // המודול לא בהיסטוריה - אפשר למחוק את התוכן
+                const contentElement = document.getElementById('entityDetailsContent');
+                if (contentElement) {
+                    contentElement.innerHTML = '';
+                    if (window.Logger) {
+                        window.Logger.debug('✅ Cleared modal content (not in history)', {
+                            modalId: this.modal?.id,
+                            page: "entity-details-modal"
+                        });
+                    }
+                }
+            } else {
+                // המודול בהיסטוריה - התוכן כבר נשמר, לא צריך למחוק
+                if (window.Logger) {
+                    window.Logger.debug('ℹ️ Modal content preserved (in history)', {
+                        modalId: this.modal?.id,
+                        page: "entity-details-modal"
+                    });
+                }
+            }
+        } else {
+            // אין modalNavigationManager - מוחקים את התוכן (fallback)
+            const contentElement = document.getElementById('entityDetailsContent');
+            if (contentElement) {
+                contentElement.innerHTML = '';
+            }
         }
     }
 
@@ -1046,12 +1405,13 @@ function showEntityDetails(entityType, entityId, options = {}) {
         window.currentEntityType = entityType;
         
         if (window.Logger) {
-            window.Logger.debug('🔍 [showEntityDetails] Called with', {
+            window.Logger.info('🔍 [1.1 showEntityDetails] Called with', {
                 entityType: entityType,
                 entityId: entityId,
                 options: options,
                 hasSource: !!options.source,
                 source: options.source,
+                sourceInfo: options.source,
                 page: "entity-details-modal"
             });
         }

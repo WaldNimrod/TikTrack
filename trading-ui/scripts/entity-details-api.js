@@ -297,12 +297,18 @@ class EntityDetailsAPI {
      * @private
      */
     async fetchEntityFromAPI(entityType, entityId) {
-        // השתמש ישירות ב-endpoints הקיימים (endpoint החדש לא עובד)
+        // נסה קודם את ה-endpoint החדש (מחזיר ticker object עם נתוני שוק)
         try {
-            return await this.fetchFromExistingEndpoints(entityType, entityId);
+            return await this.fetchFromNewEndpoint(entityType, entityId);
         } catch (error) {
-            window.Logger.error(`Failed to fetch ${entityType} ${entityId}:`, error.message, { page: "entity-details-api" });
-            throw error;
+            // אם נכשל, נסה את ה-endpoints הישנים כגיבוי
+            window.Logger.warn(`New endpoint failed for ${entityType} ${entityId}, trying old endpoint:`, error.message, { page: "entity-details-api" });
+            try {
+                return await this.fetchFromExistingEndpoints(entityType, entityId);
+            } catch (fallbackError) {
+                window.Logger.error(`Failed to fetch ${entityType} ${entityId} from both endpoints:`, fallbackError.message, { page: "entity-details-api" });
+                throw fallbackError;
+            }
         }
     }
 
@@ -338,7 +344,18 @@ class EntityDetailsAPI {
             throw new Error(data.message || 'שגיאה לא ידועה מהשרת');
         }
 
-        return data.data;
+        const entityData = data.data;
+        
+        // לוג לבדיקה - מה מגיע מה-endpoint החדש
+        if (entityType === 'trade_plan' && entityData) {
+            console.log('🔍🔍🔍 [fetchFromNewEndpoint] trade_plan data received:', {
+                hasTicker: !!entityData.ticker,
+                tickerKeys: entityData.ticker ? Object.keys(entityData.ticker) : [],
+                tickerData: entityData.ticker ? JSON.stringify(entityData.ticker, null, 2) : null
+            });
+        }
+
+        return entityData;
     }
 
     /**

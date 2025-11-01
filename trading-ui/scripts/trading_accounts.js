@@ -1049,107 +1049,8 @@ async function cancelTradingAccount(tradingAccountId, tradingAccountName) {
   }
 }
 
-/**
- * מחיקת חשבון מסחר
- * @param {number} tradingAccountId - מזהה החשבון מסחר המסחר
- * @param {string} accountName - שם החשבון מסחר
- */
-async function deleteTradingAccount(tradingAccountId, tradingAccountName) {
-  // ניקוי מטמון לפני פעולת CRUD - מחיקה  // בדיקת פריטים מקושרים לפני מחיקה
-  if (typeof window.checkLinkedItemsBeforeDeleteTradingAccount === 'function') {
-    const hasLinkedItems = await window.checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId);
-    if (hasLinkedItems) {
-      return; // הפונקציה תטפל בהצגת המודול
-    }
-  }
-
-  // אישור מהמשתמש
-  if (typeof window.showDeleteWarning === 'function') {
-    const confirmed = await new Promise(resolve => {
-      window.showDeleteWarning('tradingAccount', tradingAccountId, 'חשבון מסחר',
-        () => resolve(true),
-        () => resolve(false),
-      );
-    });
-    if (!confirmed) {return;}
-  } else {
-    // Fallback למערכת הישנה
-    if (typeof window.showConfirmationDialog === 'function') {
-      const confirmed = await new Promise(resolve => {
-        window.showConfirmationDialog(
-          'מחיקת חשבון מסחר',
-          `האם אתה בטוח שברצונך למחוק את החשבון מסחר "${accountName}"?\n\nפעולה זו אינה הפיכה.`,
-          () => resolve(true),
-          () => resolve(false),
-        );
-      });
-      if (!confirmed) {return;}
-    } else {
-      if (typeof window.showConfirmationDialog === 'function') {
-        const confirmed = await new Promise(resolve => {
-          window.showConfirmationDialog(
-            'מחיקת חשבון מסחר',
-            `האם אתה בטוח שברצונך למחוק את החשבון מסחר "${accountName}"?\n\nפעולה זו אינה הפיכה.`,
-            () => resolve(true),
-            () => resolve(false),
-          );
-        });
-        if (!confirmed) {return;}
-      } else {
-        if (window.showConfirmationDialog) {
-          const confirmed = await new Promise(resolve => {
-            window.showConfirmationDialog(
-              'מחיקת חשבון מסחר',
-              `האם אתה בטוח שברצונך למחוק את החשבון מסחר "${accountName}"?\n\nפעולה זו אינה הפיכה.`,
-              () => resolve(true),
-              () => resolve(false)
-            );
-          });
-          if (!confirmed) return;
-        } else if (!window.confirm(`האם אתה בטוח שברצונך למחוק את החשבון מסחר "${accountName}"?`)) {
-          return;
-        }
-      }
-    }
-  }
-
-  try {
-    const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (response.ok) {
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('חשבון מסחר נמחק בהצלחה!');
-      }
-
-      // רענון הטבלה
-      if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
-        await window.loadTradingAccountsDataForTradingAccountsPage();
-      } else if (typeof window.loadTradingAccountsData === 'function') {
-        const trading_accounts = await window.loadTradingAccountsData();
-        if (typeof window.updateTradingAccountsTable === 'function') {
-          window.updateTradingAccountsTable(trading_accounts);
-        }
-      }
-    } else {
-      const data = await response.json();
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification(data.message || 'שגיאה במחיקת חשבון מסחר');
-      }
-    }
-  } catch (error) {
-    handleDeleteError(error, 'מחיקת חשבון מסחר');
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה במחיקת חשבון מסחר');
-    }
-  }
-}
-
-// הפונקציה הועברה למטה - גרסה מפורטת יותר
+// REMOVED: Old deleteTradingAccount implementation (lines 1052-1150)
+// Replaced by newer implementation at line 2359 with CRUDResponseHandler
 
 // REMOVED: showSuccessMessage - use window.showSuccessNotification from notification-system.js directly
 
@@ -1161,11 +1062,12 @@ async function deleteTradingAccount(tradingAccountId, tradingAccountName) {
  * Confirm delete trading account
  * @function confirmDeleteTradingAccount
  * @param {string} tradingAccountId - Trading account ID
- * @param {string} tradingAccountName - Trading account name
+ * @param {string} tradingAccountName - Trading account name (optional, for backward compatibility)
  * @returns {void}
  */
 function confirmDeleteTradingAccount(tradingAccountId, tradingAccountName) {
-  deleteTradingAccount(tradingAccountId, tradingAccountName);
+  // Use the newer implementation that fetches account details itself
+  deleteTradingAccount(tradingAccountId);
 }
 
 // function checkLinkedItems(tradingAccountId) { // הוסר - הוחלף ב-checkLinkedItemsBeforeDelete
@@ -1854,76 +1756,8 @@ async function checkLinkedItemsAndDeleteTradingAccount(tradingAccountId) {
   await window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'delete', performTradingAccountDeletion);
 }
 
-/**
- * ביצוע המחיקה בפועל
- */
-async function performTradingAccountDeletion(tradingAccountId) {
-  try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה    // שליחה לשרת
-    const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
-      method: 'DELETE',
-    });
-
-    if (response.ok) {
-      await response.json(); // result not used
-
-      // הצגת הודעת הצלחה
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'החשבון מסחר נמחק בהצלחה', 4000, 'business');
-      }
-
-      // רענון הנתונים
-      if (typeof loadTradingAccountsDataForTradingAccountsPage === 'function') {
-        await loadTradingAccountsDataForTradingAccountsPage();
-      } else if (typeof window.loadTradingAccountsData === 'function') {
-        const trading_accounts = await window.loadTradingAccountsData();
-        if (typeof window.updateTradingAccountsTable === 'function') {
-          window.updateTradingAccountsTable(trading_accounts);
-        }
-      }
-    } else {
-      const errorResponse = await response.text();
-
-      try {
-        const errorData = JSON.parse(errorResponse);
-
-        // בדיקה אם השגיאה קשורה לפריטים מקושרים
-        if (errorData.error && errorData.error.message &&
-                    (errorData.error.message.includes('linked items') ||
-                        errorData.error.message.includes('Cannot delete account with linked items'))) {
-
-          // הצגת אזהרת פריטים מקושרים
-          if (window.showLinkedItemsWarning) {
-            window.showLinkedItemsWarning('tradingAccount', tradingAccountId);
-          } else {
-            if (window.showErrorNotification) {
-              window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק חשבון מסחר זה - יש פריטים מקושרים אליו');
-            }
-          }
-          return;
-        }
-
-        // שגיאה אחרת
-        handleApiError('שגיאה במחיקת חשבון מסחר', errorResponse);
-        if (window.showErrorNotification) {
-          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת החשבון מסחר: ' + errorData.error.message);
-        }
-
-      } catch {
-        handleApiError('שגיאה במחיקת חשבון מסחר', errorResponse);
-        if (window.showErrorNotification) {
-          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת החשבון מסחר');
-        }
-      }
-    }
-
-  } catch (error) {
-    handleSystemError(error, 'ביצוע מחיקת חשבון מסחר');
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת החשבון מסחר');
-    }
-  }
-}
+// REMOVED: Old performTradingAccountDeletion implementation (lines 1857-1927)
+// Replaced by newer implementation at line 2414 with CRUDResponseHandler
 
 /**
  * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר

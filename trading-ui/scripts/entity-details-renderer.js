@@ -638,10 +638,10 @@ class EntityDetailsRenderer {
             const entityLabel = (window.getEntityLabel && typeof window.getEntityLabel === 'function') 
                 ? window.getEntityLabel(item.type) 
                 : item.type;
-            // צביעת האיקון בצבע הישות באמצעות CSS mask
+            // צביעת האיקון בצבע הישות באמצעות CSS mask - איקון כפול בגודל (48px)
             const typeDisplay = `
                 <span class="d-inline-flex align-items-center gap-2">
-                    <img src="${iconPath}" alt="${item.type}" class="linked-item-type-icon" style="width: 24px; height: 24px; mask-image: url('${iconPath}'); mask-repeat: no-repeat; mask-position: center; mask-size: contain; -webkit-mask-image: url('${iconPath}'); -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; background-color: ${entityColor}; display: inline-block;" />
+                    <img src="${iconPath}" alt="${item.type}" class="linked-item-type-icon" style="width: 48px; height: 48px; mask-image: url('${iconPath}'); mask-repeat: no-repeat; mask-position: center; mask-size: contain; -webkit-mask-image: url('${iconPath}'); -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; background-color: ${entityColor}; display: inline-block;" />
                     <strong>${entityLabel}</strong>
                 </span>
             `;
@@ -666,7 +666,7 @@ class EntityDetailsRenderer {
             // שורה אחת בלבד: שם + תאריך
             const nameDisplay = `${cleanName}${itemDate ? ` - ${itemDate}` : ''}`;
             
-            // עמודה "סטטוס" - שימוש במערכת הרינדור המרכזית
+            // עמודה "סטטוס" - שימוש במערכת הרינדור המרכזית - מיושר למרכז עם רווח
             const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
                 ? window.FieldRendererService.renderStatus(item.status, item.type)
                 : this.getStatusBadge(item.status);
@@ -708,7 +708,7 @@ class EntityDetailsRenderer {
                 <tr>
                     <td>${typeDisplay}</td>
                     <td>${nameDisplay}</td>
-                    <td>${statusDisplay}</td>
+                    <td style="text-align: center; padding-inline-start: 1.5rem;">${statusDisplay}</td>
                     <td>${actionsHtml}</td>
                 </tr>
             `;

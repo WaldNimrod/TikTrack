@@ -17507,3 +17507,286 @@
 2025-11-01 03:00:21,595 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:00:21] "GET /trading-ui/images/icons/trade_plans.svg HTTP/1.1" 200 -
 2025-11-01 03:00:21,596 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:00:21] "GET /trading-ui/images/icons/trades.svg HTTP/1.1" 200 -
 2025-11-01 03:00:21,596 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:00:21] "GET /trading-ui/images/icons/notes.svg HTTP/1.1" 200 -
+2025-11-01 03:02:01,600 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /trade_plans HTTP/1.1" 200 -
+2025-11-01 03:02:01,616 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/master.css?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,619 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/header-styles.css?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,620 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/global-favicon.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,622 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /images/icons/trade_plans.svg HTTP/1.1" 200 -
+2025-11-01 03:02:01,623 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/notification-system.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,626 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/ui-utils.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,628 - utils.error_handlers - ERROR - Error occurred: {'timestamp': '2025-11-01T03:02:01.627639', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-11-01 03:02:01,631 - error_handler - ERROR - Detailed error: {'timestamp': '2025-11-01T03:02:01.627639', 'error_type': 'NotFound', 'error_message': '404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.', 'request_method': 'GET', 'request_url': 'http://127.0.0.1:8080/.well-known/appspecific/com.chrome.devtools.json', 'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'ip_address': '127.0.0.1', 'context': {'error_category': 'http'}, 'traceback': 'Traceback (most recent call last):\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1484, in full_dispatch_request\n    rv = self.dispatch_request()\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/app.py", line 1469, in dispatch_request\n    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)\n  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/pages.py", line 222, in static_files\n    return send_from_directory(UI_DIR, filename)\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/flask/helpers.py", line 557, in send_from_directory\n    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]\n  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/werkzeug/utils.py", line 574, in send_from_directory\n    raise NotFound()\nwerkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n'}
+2025-11-01 03:02:01,634 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_color-variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,634 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_colors-dynamic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,636 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-11-01 03:02:01,636 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_colors-semantic.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,637 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_variables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,637 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_spacing.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,641 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_typography.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,642 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_rtl-logical.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,643 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_breakpoints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,643 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/02-tools/_mixins.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,645 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/02-tools/_functions.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,646 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/03-generic/_base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,646 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/02-tools/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,646 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/03-generic/_reset.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,647 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/04-elements/_headings.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,648 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/04-elements/_links.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,650 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/04-elements/_buttons-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,650 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/04-elements/_forms-base.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,652 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/05-objects/_grid.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,652 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/05-objects/_layout.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,654 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_bootstrap-overrides.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,654 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_buttons-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,655 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_tables.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,657 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_actions-menu.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,657 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_cards.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,658 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_modals.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,659 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_import-system.css?v=2.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,660 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_notifications.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,660 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_navigation.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,661 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_forms-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,662 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_badges-status.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,663 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_entity-colors.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,664 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_page-headers.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,665 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_info-summary.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,665 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_pagination-system.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,667 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_background-tasks.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,668 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,669 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_constraints.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,670 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_crud-testing-dashboard.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,670 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_linter-realtime-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,671 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_monitoring-enhanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,673 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_server-monitor.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,673 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/07-trumps/chart-management.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,673 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_unified-log-display.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,674 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/07-trumps/index-hero-section.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,675 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/07-trumps/js-map-advanced.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,676 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,677 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/08-themes/_light.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,679 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/09-utilities/_utilities.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,679 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/main.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,680 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/08-themes/_high-contrast.css?v=1.0.0 HTTP/1.1" 200 -
+2025-11-01 03:02:01,680 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/warning-system.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,684 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/unified-cache-manager.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,685 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/error-handlers.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,687 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_variables.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,688 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_colors-semantic.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,688 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/cache-sync-manager.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,689 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/logger-service.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,689 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_colors-dynamic.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,691 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_spacing.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,691 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_typography.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,693 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_breakpoints.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,694 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/01-settings/_rtl-logical.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,697 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/02-tools/_functions.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,697 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/02-tools/_mixins.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,698 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/03-generic/_reset.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,699 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/03-generic/_base.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,700 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/04-elements/_headings.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,701 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/04-elements/_links.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,704 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/05-objects/_layout.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,704 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/04-elements/_forms-base.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,704 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/04-elements/_buttons-base.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,706 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/05-objects/_grid.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,706 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_bootstrap-overrides.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,708 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_buttons-advanced.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,710 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_modals.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,710 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_tables.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,711 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_cards.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,713 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_navigation.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,713 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_notifications.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,713 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_forms-advanced.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,715 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_badges-status.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,716 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_page-headers.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,718 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_info-summary.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,718 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_entity-colors.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,719 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_constraints.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,720 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/06-components/_chart-management.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,722 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/07-trumps/page-scripts-matrix.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,723 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/07-trumps/chart-management.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,725 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/08-themes/_light.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,726 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /styles-new/09-utilities/_utilities.css HTTP/1.1" 200 -
+2025-11-01 03:02:01,728 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/header-system.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,729 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/page-utils.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,730 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/translation-utils.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,731 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/button-icons.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,733 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/event-handler-manager.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,735 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/button-system-init.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,736 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/color-scheme-system.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,737 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/services/data-collection-service.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,738 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/services/field-renderer-service.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,741 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/services/select-populator-service.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,742 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/services/statistics-calculator.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,745 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/services/crud-response-handler.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,746 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/services/default-value-setter.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,747 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/pagination-system.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,749 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/modules/actions-menu-system.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,750 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/date-utils.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,753 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/preferences-core-new.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,754 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/data-utils.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,754 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/tables.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,755 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/preferences-colors.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,759 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/preferences-validation.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,760 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/preferences-ui.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,761 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/preferences-lazy-loader.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,762 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/entity-details-renderer.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,762 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/entity-details-api.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,765 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/init-system/package-manifest.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,766 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/entity-details-modal.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,772 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/page-initialization-configs.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,773 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/unified-app-initializer.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,773 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/conditions/conditions-translations.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,774 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/conditions/conditions-validator.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,776 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/conditions/conditions-crud-manager.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,777 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/conditions/conditions-form-generator.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,782 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/conditions/condition-builder.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,783 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/conditions/conditions-initializer.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,784 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/modal-manager-v2.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,785 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/modal-configs/trade-plans-config.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,786 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/trade_plans.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,787 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/init-system-check.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,790 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/monitoring-functions.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,792 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/info-summary-system.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,793 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /scripts/info-summary-configs.js?v=46bd8173_20251031_164748 HTTP/1.1" 200 -
+2025-11-01 03:02:01,823 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /images/icons/home.svg HTTP/1.1" 200 -
+2025-11-01 03:02:01,824 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /images/logo.svg HTTP/1.1" 200 -
+2025-11-01 03:02:01,826 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /api/preferences/user HTTP/1.1" 200 -
+2025-11-01 03:02:01,836 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /api/preferences/user HTTP/1.1" 200 -
+2025-11-01 03:02:01,922 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping get_trading_accounts, auto_commit=True
+2025-11-01 03:02:01,922 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-01 03:02:01,922 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling get_trading_accounts
+2025-11-01 03:02:01,922 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-11-01 03:02:01,924 - root - INFO - 🟢 HANDLE_DB_SESSION: get_trading_accounts completed
+2025-11-01 03:02:01,924 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-01 03:02:01,924 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-01 03:02:01,924 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:01] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-11-01 03:02:02,145 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:02] "GET /favicon.ico HTTP/1.1" 200 -
+2025-11-01 03:02:03,329 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping get_trade_plans, auto_commit=True
+2025-11-01 03:02:03,330 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-01 03:02:03,330 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling get_trade_plans
+2025-11-01 03:02:03,330 - routes.api.base_entity.trade_plans - INFO - Getting all trade_plans records
+2025-11-01 03:02:03,330 - services.trade_plan_service - INFO - Loading trade plans with joinedload for ticker and account
+2025-11-01 03:02:03,332 - services.trade_plan_service - INFO - Loaded 18 trade plans
+2025-11-01 03:02:03,332 - services.trade_plan_service - INFO - First plan ticker: <Ticker(symbol='TSLA', name='Tesla Inc.', type='stock')>
+2025-11-01 03:02:03,333 - services.trade_plan_service - INFO - First plan account: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-11-01 03:02:03,333 - models.trade_plan - INFO - Trade plan 1: Using loaded ticker relationship
+2025-11-01 03:02:03,334 - models.trade_plan - INFO - Trade plan 1: Using loaded account relationship
+2025-11-01 03:02:03,334 - models.trade_plan - INFO - Trade plan 2: Using loaded ticker relationship
+2025-11-01 03:02:03,334 - models.trade_plan - INFO - Trade plan 2: Using loaded account relationship
+2025-11-01 03:02:03,334 - models.trade_plan - INFO - Trade plan 3: Using loaded ticker relationship
+2025-11-01 03:02:03,334 - models.trade_plan - INFO - Trade plan 3: Using loaded account relationship
+2025-11-01 03:02:03,335 - models.trade_plan - INFO - Trade plan 4: Using loaded ticker relationship
+2025-11-01 03:02:03,335 - models.trade_plan - INFO - Trade plan 4: Using loaded account relationship
+2025-11-01 03:02:03,335 - models.trade_plan - INFO - Trade plan 5: Using loaded ticker relationship
+2025-11-01 03:02:03,335 - models.trade_plan - INFO - Trade plan 5: Using loaded account relationship
+2025-11-01 03:02:03,335 - models.trade_plan - INFO - Trade plan 6: Using loaded ticker relationship
+2025-11-01 03:02:03,336 - models.trade_plan - INFO - Trade plan 6: Using loaded account relationship
+2025-11-01 03:02:03,336 - models.trade_plan - INFO - Trade plan 7: Using loaded ticker relationship
+2025-11-01 03:02:03,336 - models.trade_plan - INFO - Trade plan 7: Using loaded account relationship
+2025-11-01 03:02:03,336 - models.trade_plan - INFO - Trade plan 8: Using loaded ticker relationship
+2025-11-01 03:02:03,336 - models.trade_plan - INFO - Trade plan 8: Using loaded account relationship
+2025-11-01 03:02:03,337 - models.trade_plan - INFO - Trade plan 9: Using loaded ticker relationship
+2025-11-01 03:02:03,337 - models.trade_plan - INFO - Trade plan 9: Using loaded account relationship
+2025-11-01 03:02:03,337 - models.trade_plan - INFO - Trade plan 10: Using loaded ticker relationship
+2025-11-01 03:02:03,337 - models.trade_plan - INFO - Trade plan 10: Using loaded account relationship
+2025-11-01 03:02:03,337 - models.trade_plan - INFO - Trade plan 11: Using loaded ticker relationship
+2025-11-01 03:02:03,337 - models.trade_plan - INFO - Trade plan 11: Using loaded account relationship
+2025-11-01 03:02:03,338 - models.trade_plan - INFO - Trade plan 12: Using loaded ticker relationship
+2025-11-01 03:02:03,338 - models.trade_plan - INFO - Trade plan 12: Using loaded account relationship
+2025-11-01 03:02:03,338 - models.trade_plan - INFO - Trade plan 14: Using loaded ticker relationship
+2025-11-01 03:02:03,338 - models.trade_plan - INFO - Trade plan 14: Using loaded account relationship
+2025-11-01 03:02:03,338 - models.trade_plan - INFO - Trade plan 15: Using loaded ticker relationship
+2025-11-01 03:02:03,338 - models.trade_plan - INFO - Trade plan 15: Using loaded account relationship
+2025-11-01 03:02:03,339 - models.trade_plan - INFO - Trade plan 20: Using loaded ticker relationship
+2025-11-01 03:02:03,339 - models.trade_plan - INFO - Trade plan 20: Using loaded account relationship
+2025-11-01 03:02:03,339 - models.trade_plan - INFO - Trade plan 21: Using loaded ticker relationship
+2025-11-01 03:02:03,339 - models.trade_plan - INFO - Trade plan 21: Using loaded account relationship
+2025-11-01 03:02:03,339 - models.trade_plan - INFO - Trade plan 22: Using loaded ticker relationship
+2025-11-01 03:02:03,339 - models.trade_plan - INFO - Trade plan 22: Using loaded account relationship
+2025-11-01 03:02:03,339 - models.trade_plan - INFO - Trade plan 23: Using loaded ticker relationship
+2025-11-01 03:02:03,340 - models.trade_plan - INFO - Trade plan 23: Using loaded account relationship
+2025-11-01 03:02:03,340 - root - INFO - 🟢 HANDLE_DB_SESSION: get_trade_plans completed
+2025-11-01 03:02:03,341 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-01 03:02:03,341 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-01 03:02:03,341 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:03] "GET /api/trade_plans/?_t=1761958923327 HTTP/1.1" 200 -
+2025-11-01 03:02:03,358 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping get_trade_plans, auto_commit=True
+2025-11-01 03:02:03,359 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-01 03:02:03,359 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling get_trade_plans
+2025-11-01 03:02:03,359 - routes.api.base_entity.trade_plans - INFO - Getting all trade_plans records
+2025-11-01 03:02:03,359 - services.trade_plan_service - INFO - Loading trade plans with joinedload for ticker and account
+2025-11-01 03:02:03,361 - services.trade_plan_service - INFO - Loaded 18 trade plans
+2025-11-01 03:02:03,362 - services.trade_plan_service - INFO - First plan ticker: <Ticker(symbol='TSLA', name='Tesla Inc.', type='stock')>
+2025-11-01 03:02:03,363 - services.trade_plan_service - INFO - First plan account: <TradingAccount(name='חשבון מעודכן', currency_id='1', status='open')>
+2025-11-01 03:02:03,363 - models.trade_plan - INFO - Trade plan 1: Using loaded ticker relationship
+2025-11-01 03:02:03,363 - models.trade_plan - INFO - Trade plan 1: Using loaded account relationship
+2025-11-01 03:02:03,363 - models.trade_plan - INFO - Trade plan 2: Using loaded ticker relationship
+2025-11-01 03:02:03,363 - models.trade_plan - INFO - Trade plan 2: Using loaded account relationship
+2025-11-01 03:02:03,363 - models.trade_plan - INFO - Trade plan 3: Using loaded ticker relationship
+2025-11-01 03:02:03,364 - models.trade_plan - INFO - Trade plan 3: Using loaded account relationship
+2025-11-01 03:02:03,364 - models.trade_plan - INFO - Trade plan 4: Using loaded ticker relationship
+2025-11-01 03:02:03,364 - models.trade_plan - INFO - Trade plan 4: Using loaded account relationship
+2025-11-01 03:02:03,364 - models.trade_plan - INFO - Trade plan 5: Using loaded ticker relationship
+2025-11-01 03:02:03,365 - models.trade_plan - INFO - Trade plan 5: Using loaded account relationship
+2025-11-01 03:02:03,365 - models.trade_plan - INFO - Trade plan 6: Using loaded ticker relationship
+2025-11-01 03:02:03,365 - models.trade_plan - INFO - Trade plan 6: Using loaded account relationship
+2025-11-01 03:02:03,365 - models.trade_plan - INFO - Trade plan 7: Using loaded ticker relationship
+2025-11-01 03:02:03,365 - models.trade_plan - INFO - Trade plan 7: Using loaded account relationship
+2025-11-01 03:02:03,365 - models.trade_plan - INFO - Trade plan 8: Using loaded ticker relationship
+2025-11-01 03:02:03,365 - models.trade_plan - INFO - Trade plan 8: Using loaded account relationship
+2025-11-01 03:02:03,365 - models.trade_plan - INFO - Trade plan 9: Using loaded ticker relationship
+2025-11-01 03:02:03,366 - models.trade_plan - INFO - Trade plan 9: Using loaded account relationship
+2025-11-01 03:02:03,366 - models.trade_plan - INFO - Trade plan 10: Using loaded ticker relationship
+2025-11-01 03:02:03,366 - models.trade_plan - INFO - Trade plan 10: Using loaded account relationship
+2025-11-01 03:02:03,366 - models.trade_plan - INFO - Trade plan 11: Using loaded ticker relationship
+2025-11-01 03:02:03,366 - models.trade_plan - INFO - Trade plan 11: Using loaded account relationship
+2025-11-01 03:02:03,367 - models.trade_plan - INFO - Trade plan 12: Using loaded ticker relationship
+2025-11-01 03:02:03,367 - models.trade_plan - INFO - Trade plan 12: Using loaded account relationship
+2025-11-01 03:02:03,367 - models.trade_plan - INFO - Trade plan 14: Using loaded ticker relationship
+2025-11-01 03:02:03,367 - models.trade_plan - INFO - Trade plan 14: Using loaded account relationship
+2025-11-01 03:02:03,367 - models.trade_plan - INFO - Trade plan 15: Using loaded ticker relationship
+2025-11-01 03:02:03,367 - models.trade_plan - INFO - Trade plan 15: Using loaded account relationship
+2025-11-01 03:02:03,368 - models.trade_plan - INFO - Trade plan 20: Using loaded ticker relationship
+2025-11-01 03:02:03,368 - models.trade_plan - INFO - Trade plan 20: Using loaded account relationship
+2025-11-01 03:02:03,368 - models.trade_plan - INFO - Trade plan 21: Using loaded ticker relationship
+2025-11-01 03:02:03,368 - models.trade_plan - INFO - Trade plan 21: Using loaded account relationship
+2025-11-01 03:02:03,368 - models.trade_plan - INFO - Trade plan 22: Using loaded ticker relationship
+2025-11-01 03:02:03,368 - models.trade_plan - INFO - Trade plan 22: Using loaded account relationship
+2025-11-01 03:02:03,369 - models.trade_plan - INFO - Trade plan 23: Using loaded ticker relationship
+2025-11-01 03:02:03,369 - models.trade_plan - INFO - Trade plan 23: Using loaded account relationship
+2025-11-01 03:02:03,369 - root - INFO - 🟢 HANDLE_DB_SESSION: get_trade_plans completed
+2025-11-01 03:02:03,370 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-01 03:02:03,370 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-01 03:02:03,370 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:03] "GET /api/trade_plans/?_t=1761958923357 HTTP/1.1" 200 -
+2025-11-01 03:02:03,428 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping get_trading_accounts, auto_commit=True
+2025-11-01 03:02:03,429 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-01 03:02:03,429 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling get_trading_accounts
+2025-11-01 03:02:03,429 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
+2025-11-01 03:02:03,433 - root - INFO - 🟢 HANDLE_DB_SESSION: get_trading_accounts completed
+2025-11-01 03:02:03,433 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-01 03:02:03,433 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-01 03:02:03,434 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:03] "GET /api/trading-accounts/ HTTP/1.1" 200 -
+2025-11-01 03:02:07,158 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping get_trade_plan, auto_commit=True
+2025-11-01 03:02:07,159 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-01 03:02:07,159 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling get_trade_plan
+2025-11-01 03:02:07,159 - routes.api.base_entity.trade_plans - INFO - Getting trade_plans record with ID: 1
+2025-11-01 03:02:07,161 - models.trade_plan - INFO - Trade plan 1: Using loaded ticker relationship
+2025-11-01 03:02:07,161 - models.trade_plan - INFO - Trade plan 1: Using loaded account relationship
+2025-11-01 03:02:07,163 - root - INFO - 🟢 HANDLE_DB_SESSION: get_trade_plan completed
+2025-11-01 03:02:07,164 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-01 03:02:07,164 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-01 03:02:07,165 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:07] "GET /api/trade_plans/1 HTTP/1.1" 200 -
+2025-11-01 03:02:07,167 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping get_linked_items, auto_commit=True
+2025-11-01 03:02:07,167 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-01 03:02:07,167 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling get_linked_items
+2025-11-01 03:02:07,167 - routes.api.linked_items - INFO - Getting linked items for trade_plan 1
+2025-11-01 03:02:07,168 - routes.api.linked_items - INFO - Calling get_child_entities for trade_plan 1
+2025-11-01 03:02:07,169 - routes.api.linked_items - INFO - Found 3 child entities
+2025-11-01 03:02:07,169 - routes.api.linked_items - INFO - Found 3 child entities and 0 parent entities
+2025-11-01 03:02:07,169 - root - INFO - 🟢 HANDLE_DB_SESSION: get_linked_items completed
+2025-11-01 03:02:07,169 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-01 03:02:07,170 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-01 03:02:07,170 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:07] "GET /api/linked-items/trade_plan/1 HTTP/1.1" 200 -
+2025-11-01 03:02:07,175 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:07] "GET /trading-ui/images/icons/trade_plans.svg HTTP/1.1" 200 -
+2025-11-01 03:02:07,175 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:07] "GET /trading-ui/images/icons/notes.svg HTTP/1.1" 200 -
+2025-11-01 03:02:07,175 - werkzeug - INFO - 127.0.0.1 - - [01/Nov/2025 03:02:07] "GET /trading-ui/images/icons/trades.svg HTTP/1.1" 200 -

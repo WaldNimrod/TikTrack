@@ -88,18 +88,17 @@
 }
 
 /* ===== כפתורי פעולות בטבלת פריטים מקושרים ===== */
-/* כפתורים ריבועיים - רוחב מקסימלי זהה לגובה */
+/* כפתורים ריבועיים - רוחב זהה לגובה (28px x 28px) */
 .entity-linked-items .linked-items-actions .btn-group-sm > button,
 .entity-linked-items .linked-items-actions button[data-button-type],
 .linked-items-actions .btn-group-sm > button,
 .linked-items-actions button[data-button-type] {
-  /* רוחב מקסימלי זהה לגובה - ריבוע */
-  max-width: 100%;
-  aspect-ratio: 1;
-  width: auto;
-  min-width: 0;
-  /* התאמה לגובה של btn-sm עם data-variant="small" */
+  /* ריבוע - רוחב זהה לגובה */
+  width: 28px; /* זהה לגובה */
   height: 28px; /* גובה של data-variant="small" */
+  min-width: 28px;
+  max-width: 28px;
+  aspect-ratio: 1;
   padding: 4px !important;
   display: flex;
   align-items: center;

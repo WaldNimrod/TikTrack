@@ -223,6 +223,11 @@
 | isUserInitiatedAction | notification-system.js | 1 (שורה 131) | - | שורות 131-163 | 1.11.2025 | הוסר - לא בשימוש, userInitiated מועבר ישירות כפרמטר |
 | updateSortIconsLocal | tables.js | 1 (שורה 267) | - | שורות 267-301 | 1.11.2025 | הוסר - כפילות של window.updateSortIcons מ-data-basic.js |
 | generateDetailedLogForTrades | trades.js | 1 (שורה 3093) | - | שורות 3093-3118 | 1.11.2025 | הוסר - לא בשימוש, יש generateDetailedLog() גלובלי |
+| loadStatusColorsFromPreferences | ui-advanced.js | 1 (שורה 310) | - | שורות 310-313 | 1.11.2025 | הוסר - DEPRECATED, פונקציה ריקה |
+| loadInvestmentTypeColorsFromPreferences | ui-advanced.js | 1 (שורה 324) | - | שורות 324-327 | 1.11.2025 | הוסר - DEPRECATED, פונקציה ריקה |
+| updateNumericValueColors | ui-advanced.js | 1 (שורה 1230) | - | שורות 1230-1246 | 1.11.2025 | הוסר - לא מיוצא, לא בשימוש |
+| showNotificationLegacy | core-systems.js | 1 (שורה 2825) | - | שורות 2825-2827 | 1.11.2025 | הוסר - legacy function, רק console.log |
+| translateAlertConditionById | translation-utils.js | 1 (שורה 730) | - | שורות 730-748 | 1.11.2025 | הוסר - מיוצא אבל לא בשימוש, translateAlertCondition משמש במקום |
 
 ---
 

@@ -2854,8 +2854,40 @@ window.addReminder = addReminder;
 window.updateTickerInfo = updateTickerInfo;
 window.updateSharesFromAmount = updateSharesFromAmount;
 window.updateAmountFromShares = updateAmountFromShares;
-// REMOVED: window.showAddTradePlanModal - use window.ModalManagerV2.showModal('tradePlansModal', 'add') directly
-// REMOVED: window.showEditTradePlanModal - use window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', id) directly
+
+/**
+ * Show add trade plan modal (wrapper for ModalManagerV2)
+ * Maintains backward compatibility with HTML onclick handlers
+ * @function showAddTradePlanModal
+ */
+window.showAddTradePlanModal = function() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        window.ModalManagerV2.showModal('tradePlansModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
+/**
+ * Show edit trade plan modal (wrapper for ModalManagerV2)
+ * Maintains backward compatibility with HTML onclick handlers
+ * @function showEditTradePlanModal
+ * @param {number|string} tradePlanId - ID of trade plan to edit
+ */
+window.showEditTradePlanModal = function(tradePlanId) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', tradePlanId);
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
 window.saveTradePlanData = saveTradePlanData;
 /**
  * Filter trade plans by investment type

@@ -1152,11 +1152,12 @@ function populateRelatedObjects(relationTypeId) {
   }
 }
 
+// REMOVED: populateEditRelatedObjects - not used, ModalManagerV2 uses populateSelects instead
 /**
  * מילוי רשימת אובייקטים למודל העריכה
  * @param {number} relationTypeId - מזהה סוג השיוך
  */
-function populateEditRelatedObjects(relationTypeId) {
+function _REMOVED_populateEditRelatedObjects(relationTypeId) {
   try {
     const selectElement = document.getElementById('editAlertRelatedObjectSelect');
     if (!selectElement) {return;}
@@ -2091,12 +2092,13 @@ window.reactivateAlert = reactivateAlert;
 
 // REMOVED: checkAlertCondition - unused function
 
+// REMOVED: toggleAlert - not used
 /**
  * הפעלה/כיבוי התראה
  * מחליף את מצב ההפעלה של התראה
  * @param {number} alertId - מזהה ההתראה
  */
-function toggleAlert(alertId) {
+function _REMOVED_toggleAlert(alertId) {
   try {
     window.Logger.info('🔄 מחליף מצב התראה:', alertId, { page: "alerts" });
     

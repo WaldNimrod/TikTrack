@@ -403,6 +403,23 @@
   - `getAccounts()`, `getActiveAccounts()`, `getAccountsByStatus()`
   - `cancelAccount()`, `reactivateAccount()` - ניהול סטטוס
 
+#### **Account Balance Service** ✅ **חדש! נובמבר 2025**
+- **קובץ:** `services/account-balance-service.js`
+- **תיאור:** שירות מרכזי לטעינת יתרות חשבונות מסחר
+- **דוקומנטציה:** [ACCOUNT_BALANCE_SERVICE.md](../04-FEATURES/CORE/ACCOUNTS/ACCOUNT_BALANCE_SERVICE.md)
+- **פונקציות עיקריות:**
+  - `getBalance(accountId, options)` - טעינת יתרה עבור חשבון בודד
+  - `getBalances(accountIds, options)` - טעינת יתרות עבור מספר חשבונות (batch)
+  - `refreshBalance(accountId)` - רענון יתרה (נקיית cache וטעינה מחדש)
+  - `refreshBalances(accountIds)` - רענון מספר יתרות
+  - `clearCache(accountId)` - נקיית cache עבור חשבון ספציפי
+  - `clearCaches(accountIds)` - נקיית cache עבור מספר חשבונות
+- **תכונות:**
+  - Cache אוטומטי דרך UnifiedCacheManager (TTL: 60 שניות)
+  - Batch loading יעיל (Promise.all)
+  - Cache invalidation אוטומטי דרך CacheSyncManager
+  - API פשוט ונוח לשימוש בכל המערכת
+
 ### **Table Mapping System** 🔵 **חבילת CRUD** 🔍 **חבילת פילטרים**
 - **קובץ:** `table-mapping.js`
 - **תיאור:** מערכת מיפוי טבלאות
@@ -660,6 +677,7 @@
 ✅ **LoggerService** - מערכת לוגים מאוחדת  
 ✅ **PreferencesGroupManager** - ניהול קבוצות העדפות  
 ✅ **Entity Services** - AlertService, TickerService, TradePlanService, AccountService
+✅ **Account Balance Service** - שירות מרכזי לטעינת יתרות חשבונות ✅ **חדש! נובמבר 2025**
 
 ### **עדכון אחרון:**
 - **תאריך:** 1 בנובמבר 2025

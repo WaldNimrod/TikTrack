@@ -124,15 +124,19 @@ class ModalNavigationManager {
             // הוספה לאובייקט הגלובלי
             window.modalNavigationManager = this;
             
-            if (window.Logger) {
+            if (typeof window.Logger !== 'undefined' && window.Logger.info) {
                 window.Logger.info('ModalNavigationManager initialized successfully', { 
                     historyLoaded: this.modalHistory.length,
                     page: "modal-navigation-manager" 
                 });
+            } else {
+                console.log('ModalNavigationManager initialized successfully', { historyLoaded: this.modalHistory.length });
             }
         } catch (error) {
-            if (window.Logger) {
+            if (typeof window.Logger !== 'undefined' && window.Logger.error) {
                 window.Logger.error('Error initializing ModalNavigationManager:', error, { page: "modal-navigation-manager" });
+            } else {
+                console.error('Error initializing ModalNavigationManager:', error);
             }
         }
     }
@@ -145,7 +149,10 @@ class ModalNavigationManager {
      */
     async loadHistoryFromCache() {
         try {
-            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            // Check UnifiedCacheManager availability with proper validation
+            if (typeof window.UnifiedCacheManager !== 'undefined' && 
+                window.UnifiedCacheManager !== null &&
+                window.UnifiedCacheManager.initialized === true) {
                 const cachedHistory = await window.UnifiedCacheManager.get('modal-navigation-history', {
                     layer: 'localStorage',
                     fallback: () => []
@@ -801,7 +808,8 @@ class ModalNavigationManager {
             
             // עדכון breadcrumb
             const breadcrumbHTML = this.getBreadcrumb(modalElement);
-            const shouldShowBreadcrumb = this.modalHistory.length > 1;
+            // DEBUG: תמיד נציג ברדקראמבס (אפילו אם historyLength <= 1)
+            const shouldShowBreadcrumb = true; // DEBUG: this.modalHistory.length > 1;
             
             if (window.Logger) {
                 window.Logger.debug('🍞 Breadcrumb update:', { 
@@ -816,23 +824,16 @@ class ModalNavigationManager {
                 });
             }
             
-            breadcrumbContainer.innerHTML = breadcrumbHTML;
+            // DEBUG: אם אין ברדקראמבס, ניצור אחד לדוגמה
+            const displayBreadcrumbHTML = breadcrumbHTML || '<div class="modal-breadcrumb-trail"><span class="breadcrumb-item">DEBUG: Breadcrumb (historyLength=' + this.modalHistory.length + ')</span></div>';
+            breadcrumbContainer.innerHTML = displayBreadcrumbHTML;
             
             // הצגה/הסתרה של breadcrumb container
-            if (shouldShowBreadcrumb && breadcrumbHTML) {
-                breadcrumbContainer.style.display = 'block';
-                breadcrumbContainer.style.visibility = 'visible';
-                if (window.Logger) {
-                    window.Logger.debug('✅ Breadcrumb shown', { page: "modal-navigation-manager" });
-                }
-            } else {
-                breadcrumbContainer.style.display = 'none';
-                if (window.Logger) {
-                    window.Logger.debug('❌ Breadcrumb hidden', { 
-                        reason: !shouldShowBreadcrumb ? 'historyLength <= 1' : 'breadcrumbHTML is empty',
-                        page: "modal-navigation-manager" 
-                    });
-                }
+            // DEBUG: תמיד נציג את הברדקראמבס
+            breadcrumbContainer.style.display = 'block';
+            breadcrumbContainer.style.visibility = 'visible';
+            if (window.Logger) {
+                window.Logger.debug('✅ DEBUG: Breadcrumb always shown', { page: "modal-navigation-manager" });
             }
             
             // חיפוש או יצירת כפתור חזור
@@ -843,6 +844,9 @@ class ModalNavigationManager {
                 || document.getElementById('entityDetailsBackBtn');
             
             const canGoBack = this.canGoBack();
+            
+            // DEBUG: תמיד נציג את הכפתור כדי לבדוק אם הוא מופיע
+            // TODO: להחזיר את התנאי canGoBack אחרי הבדיקה
             
             // לוג מפורט לבדיקת המצב
             if (window.Logger) {
@@ -879,11 +883,14 @@ class ModalNavigationManager {
                 });
             }
             
-            if (canGoBack) {
+            // DEBUG: תמיד נציג את הכפתור (ללא קשר ל-canGoBack)
+            // נציג את הכפתור תמיד - לא משנה מה הערך של canGoBack
+            if (true) { // DEBUG: canGoBack - שונה ל-true כדי תמיד להציג
                 if (window.Logger) {
-                    window.Logger.info('✅ canGoBack() === true - Should show back button', {
+                    window.Logger.info('✅ DEBUG MODE - Always showing back button (regardless of canGoBack)', {
                         modalId: modalElement.id,
                         historyLength: this.modalHistory.length,
+                        canGoBack: canGoBack,
                         page: "modal-navigation-manager"
                     });
                 }
@@ -948,13 +955,17 @@ class ModalNavigationManager {
                             || headerElement.querySelector('#entityDetailsBackBtn')
                             || document.getElementById('entityDetailsBackBtn');
                         
-                        if (retryButton && this.canGoBack()) {
+                        if (retryButton && true) { // this.canGoBack() - שונה ל-true לבדיקה
                             // הסרת styles ישנים והגדרת חדשים בלי !important
                             retryButton.style.removeProperty('display');
                             retryButton.style.removeProperty('visibility');
+                            // וידוא שה-variant הוא 'full'
+                            if (!retryButton.getAttribute('data-variant') || retryButton.getAttribute('data-variant') !== 'full') {
+                                retryButton.setAttribute('data-variant', 'full');
+                            }
                             retryButton.style.display = 'flex';
                             retryButton.style.visibility = 'visible';
-                            retryButton.style.order = '998';
+                            retryButton.style.order = '997'; // לפני כפתור סגירה (997 < 998)
                             if (!retryButton.hasAttribute('data-navigation-listener')) {
                                 retryButton.setAttribute('data-navigation-listener', 'true');
                                 retryButton.addEventListener('click', (e) => {
@@ -978,11 +989,11 @@ class ModalNavigationManager {
                     backButton = document.createElement('button');
                     backButton.type = 'button';
                     backButton.setAttribute('data-button-type', 'BACK');
-                    backButton.setAttribute('data-variant', 'small');
-                    backButton.setAttribute('data-text', '');
+                    backButton.setAttribute('data-variant', 'full'); // מצב מלא - איקון + טקסט
+                    backButton.setAttribute('data-text', ''); // המערכת תמלא את הטקסט מאוטומטית
                     backButton.title = 'חזור למודול הקודם';
                     backButton.className = 'modal-back-btn';
-                    backButton.style.order = '998'; // לפני כפתור סגירה
+                    backButton.style.order = '997'; // לפני כפתור סגירה (997 < 998)
                     // הגדרת styles בלי !important - ITCSS יעבוד
                     backButton.style.display = 'flex';
                     backButton.style.visibility = 'visible';
@@ -1063,7 +1074,11 @@ class ModalNavigationManager {
                     // נוודא שהכפתור פעיל ומוצג
                     backButton.disabled = false;
                     backButton.style.pointerEvents = 'auto';
-                    backButton.style.order = '998'; // לפני כפתור סגירה
+                    // וידוא שה-variant הוא 'full' (איקון + טקסט)
+                    if (!backButton.getAttribute('data-variant') || backButton.getAttribute('data-variant') !== 'full') {
+                        backButton.setAttribute('data-variant', 'full');
+                    }
+                    backButton.style.order = '997'; // לפני כפתור סגירה (997 < 998)
                     // וידוא שהכפתור מוצג (בלי !important - ITCSS יעבוד)
                     if (window.getComputedStyle(backButton).display === 'none') {
                         backButton.style.display = 'flex';
@@ -1089,27 +1104,86 @@ class ModalNavigationManager {
                     }
                 }
             } else {
-                // הסתרת כפתור חזור אם לא ניתן לחזור
+                // DEBUG: לא מסתירים את הכפתור במוד DEBUG
                 if (window.Logger) {
-                    window.Logger.warn('❌ canGoBack() === false - Hiding back button', {
+                    window.Logger.info('⚠️ DEBUG MODE - Not hiding back button (normally would hide when canGoBack=false)', {
                         modalId: modalElement.id,
                         historyLength: this.modalHistory.length,
+                        canGoBack: canGoBack,
                         reason: this.modalHistory.length <= 1 ? 'historyLength <= 1' : 'unknown',
                         backButtonExists: !!backButton,
                         page: "modal-navigation-manager"
                     });
                 }
                 
-                if (backButton) {
-                    // הסתרת הכפתור בלי !important - ITCSS יעבוד
-                    backButton.style.display = 'none';
-                    if (window.Logger) {
-                        window.Logger.debug('✅ Back button hidden', { 
-                            modalId: modalElement.id,
-                            computedDisplay: window.getComputedStyle(backButton).display,
-                            page: "modal-navigation-manager" 
-                        });
+                // DEBUG: במקום להסתיר, נציג את הכפתור
+                // אם אין כפתור, ניצור אותו (בדיקה)
+                if (!backButton) {
+                    // חיפוש מקיף
+                    const allBackButtons = headerElement.querySelectorAll('[data-button-type="BACK"], .modal-back-btn, #entityDetailsBackBtn');
+                    if (allBackButtons.length > 0) {
+                        backButton = allBackButtons[0];
                     }
+                }
+                
+                if (!backButton) {
+                    // יצירת כפתור חזור (בדיקה)
+                    backButton = document.createElement('button');
+                    backButton.type = 'button';
+                    backButton.setAttribute('data-button-type', 'BACK');
+                    backButton.setAttribute('data-variant', 'full'); // מצב מלא - איקון + טקסט
+                    backButton.setAttribute('data-text', ''); // המערכת תמלא את הטקסט מאוטומטית
+                    backButton.title = 'חזור למודול הקודם';
+                    backButton.className = 'modal-back-btn';
+                    backButton.style.order = '997'; // לפני כפתור סגירה (997 < 998)
+                    backButton.style.display = 'flex';
+                    backButton.style.visibility = 'visible';
+                    
+                    backButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (window.Logger) {
+                            window.Logger.debug('🔙 DEBUG: Back button clicked', { page: "modal-navigation-manager" });
+                        }
+                        if (this.canGoBack()) {
+                            this.goBack();
+                        }
+                    });
+                    
+                    const closeButton = headerElement.querySelector('[data-button-type="CLOSE"]');
+                    if (closeButton) {
+                        headerElement.insertBefore(backButton, closeButton);
+                    } else {
+                        headerElement.appendChild(backButton);
+                    }
+                    
+                    if (window.ButtonSystem && typeof window.ButtonSystem.processButton === 'function') {
+                        window.ButtonSystem.processButton(backButton);
+                    }
+                } else {
+                    // הצגת הכפתור גם כש-canGoBack הוא false (בדיקה)
+                    // וידוא שה-variant הוא 'full' (איקון + טקסט)
+                    if (!backButton.getAttribute('data-variant') || backButton.getAttribute('data-variant') !== 'full') {
+                        backButton.setAttribute('data-variant', 'full');
+                    }
+                    backButton.style.order = '997'; // לפני כפתור סגירה (997 < 998)
+                    backButton.style.removeProperty('display');
+                    backButton.style.display = 'flex';
+                    backButton.style.visibility = 'visible';
+                    
+                    // הפעלת מערכת הכפתורים כדי לעדכן את הכפתור עם האיקון והטקסט
+                    if (window.ButtonSystem && typeof window.ButtonSystem.processButton === 'function') {
+                        window.ButtonSystem.processButton(backButton);
+                    }
+                }
+                
+                if (window.Logger) {
+                    window.Logger.debug('✅ DEBUG: Back button shown/created even though canGoBack=false', { 
+                        modalId: modalElement.id,
+                        backButtonExists: !!backButton,
+                        computedDisplay: backButton ? window.getComputedStyle(backButton).display : 'N/A',
+                        page: "modal-navigation-manager" 
+                    });
                 }
             }
             

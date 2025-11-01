@@ -114,7 +114,11 @@ function isPrimarySeverity(category, type) {
     // בדוק אם הסוג נמצא ברשימת הודעות מרכזיות
     return severity.primary.includes(type);
   } catch (error) {
-    window.Logger.warn('Error checking primary severity:', error, { page: "notification-system" });
+    if (typeof window.Logger !== 'undefined' && window.Logger.warn) {
+        window.Logger.warn('Error checking primary severity:', error, { page: "notification-system" });
+    } else {
+        console.warn('Error checking primary severity:', error);
+    }
     return type === 'error'; // ברירת מחדל: רק שגיאות
   }
 }
@@ -158,7 +162,11 @@ function _REMOVED_isUserInitiatedAction(message, title, functionName) {
     
     return hasUserKeywords || hasUserFunction;
   } catch (error) {
-    window.Logger.warn('Error checking user initiated action:', error, { page: "notification-system" });
+    if (typeof window.Logger !== 'undefined' && window.Logger.warn) {
+        window.Logger.warn('Error checking user initiated action:', error, { page: "notification-system" });
+    } else {
+        console.warn('Error checking user initiated action:', error);
+    }
     return false;
   }
 }
@@ -199,7 +207,11 @@ function shouldShowInMode(mode, category, type, userInitiated = false) {
         return userInitiated || type === 'error';
     }
   } catch (error) {
-    window.Logger.warn('Error in shouldShowInMode:', error, { page: "notification-system" });
+    if (typeof window.Logger !== 'undefined' && window.Logger.warn) {
+        window.Logger.warn('Error in shouldShowInMode:', error, { page: "notification-system" });
+    } else {
+        console.warn('Error in shouldShowInMode:', error);
+    }
     // במקרה של שגיאה, הצג רק שגיאות
     return type === 'error';
   }

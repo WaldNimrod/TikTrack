@@ -97,10 +97,61 @@ class ModalManagerV2 {
                 console.warn('⚠️ Failed to register PreferencesSystem listener:', e);
             }
         } else {
-            console.warn('⚠️ PreferencesSystem not available or not initialized - preferences changes won\'t update modal colors');
+            // Try to register listener later when PreferencesSystem is ready
+            this._tryRegisterPreferencesListener();
+            
+            // Only show warning in debug mode to reduce console noise
+            const DEBUG_MODE = window.location.hostname === 'localhost' || 
+                              window.location.hostname === '127.0.0.1' ||
+                              window.location.search.includes('debug=true');
+            if (DEBUG_MODE) {
+                console.debug('⚠️ PreferencesSystem not yet available - will retry registration later');
+            }
         }
     }
 
+    /**
+     * Try to register PreferencesSystem listener (called when PreferencesSystem becomes available)
+     * @private
+     */
+    _tryRegisterPreferencesListener() {
+        // Retry registration after a short delay
+        setTimeout(() => {
+            const deps = this._checkDependencies();
+            if (deps.preferencesSystem.available && deps.preferencesSystem.initialized) {
+                try {
+                    if (typeof window.PreferencesSystem.onPreferencesChanged === 'function') {
+                        window.PreferencesSystem.onPreferencesChanged(() => {
+                            this.updateAllModalColors();
+                        });
+                        console.log('✅ PreferencesSystem listener registered (delayed)');
+                    }
+                } catch (e) {
+                    // Silently fail - PreferencesSystem might not support this feature
+                }
+            }
+        }, 2000); // Retry after 2 seconds
+        
+        // Also listen for preferences:loaded event
+        if (typeof window.addEventListener === 'function') {
+            window.addEventListener('preferences:loaded', () => {
+                const deps = this._checkDependencies();
+                if (deps.preferencesSystem.available && deps.preferencesSystem.initialized) {
+                    try {
+                        if (typeof window.PreferencesSystem.onPreferencesChanged === 'function') {
+                            window.PreferencesSystem.onPreferencesChanged(() => {
+                                this.updateAllModalColors();
+                            });
+                            console.log('✅ PreferencesSystem listener registered (via event)');
+                        }
+                    } catch (e) {
+                        // Silently fail
+                    }
+                }
+            }, { once: true });
+        }
+    }
+    
     /**
      * Load default configurations - טעינת קונפיגורציות ברירת מחדל
      * 

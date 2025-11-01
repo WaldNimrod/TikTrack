@@ -215,7 +215,11 @@ class UnifiedCacheManager {
                 this.layers.indexedDB = new IndexedDBLayer();
                 await this.layers.indexedDB.initialize();
             } else {
-                window.Logger.warn('⚠️ IndexedDB not available, using localStorage fallback', { page: "unified-cache-manager" });
+                if (typeof window.Logger !== 'undefined' && window.Logger.warn) {
+                    window.Logger.warn('⚠️ IndexedDB not available, using localStorage fallback', { page: "unified-cache-manager" });
+                } else {
+                    console.warn('⚠️ IndexedDB not available, using localStorage fallback');
+                }
                 this.layers.indexedDB = new LocalStorageLayer();
             }
             

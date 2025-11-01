@@ -628,14 +628,25 @@ class CRUDResponseHandler {
     }
 
     /**
+     * בדיקת זמינות UnifiedCacheManager
+     * @private
+     * @returns {boolean} האם UnifiedCacheManager זמין ומאותחל
+     */
+    static _isUnifiedCacheManagerAvailable() {
+        return typeof window.UnifiedCacheManager !== 'undefined' && 
+               window.UnifiedCacheManager !== null &&
+               window.UnifiedCacheManager.initialized === true;
+    }
+    
+    /**
      * ניקוי מטמון ממוקד עבור ישות ספציפית
      * @param {string} entityType - סוג הישות (trades, alerts, etc.)
      */
     static async clearEntityCache(entityType) {
         console.log(`🔥 clearEntityCache called for entityType: ${entityType}`);
         
-        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
-            console.log(`⚠️ UnifiedCacheManager not available or not initialized`);
+        if (!this._isUnifiedCacheManagerAvailable()) {
+            console.debug(`⚠️ UnifiedCacheManager not available or not initialized - skipping cache clear for ${entityType}`);
             return;
         }
         
@@ -695,7 +706,7 @@ class CRUDResponseHandler {
     static async refreshEntityTables(entityType) {
         try {
             // ניקוי מטמון עבור הישות - שימוש נכון ב-UnifiedCacheManager
-            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            if (this._isUnifiedCacheManagerAvailable()) {
                 // ניקוי ממוקד לפי entity type
                 const keys = await window.UnifiedCacheManager.getAllKeys();
                 const entityKeys = keys.filter(k => 
@@ -708,6 +719,8 @@ class CRUDResponseHandler {
                     await window.UnifiedCacheManager.remove(key);
                 }
                 console.log(`🔄 נוקה מטמון עבור ${entityType} (${entityKeys.length} מפתחות)`);
+            } else {
+                console.debug(`⚠️ UnifiedCacheManager not available - skipping cache clear for ${entityType}`);
             }
 
             // איפוס דגלי טעינה קיימים אם יש גישה אליהם

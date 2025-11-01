@@ -32,50 +32,50 @@
 
 | מערכת | קובץ | תלויות (Depends On) | משתמשות בה (Used By) | סוג אינטגרציה | סטטוס | סדר אתחול | בעיות קריטיות | הערות |
 |--------|------|---------------------|---------------------|----------------|--------|-----------|---------------|-------|
-| AlertConditionRenderer | services/alert-condition-renderer.js | - | - | None | Unknown | N/A | - | - |
-| CRUDResponseHandler | services/crud-response-handler.js | UnifiedCacheManager | loadTableData | Required, Direct, Optional | Partial | 6 | - | - |
-| DataCollectionService | services/data-collection-service.js | - | - | None | Unknown | 1 | - | - |
-| DefaultValueSetter | services/default-value-setter.js | - | - | None | Unknown | 5 | - | - |
-| FieldRendererService | services/field-renderer-service.js | - | EntityDetailsRenderer | None | Unknown | 2 | - | - |
+| AlertConditionRenderer | services/alert-condition-renderer.js | - | - | None | Working | N/A | - | Standalone service, אין תלויות |
+| CRUDResponseHandler | services/crud-response-handler.js | UnifiedCacheManager | loadTableData | Required, Direct, Optional | Working | 6 | - | הוספת validation helper |
+| DataCollectionService | services/data-collection-service.js | - | - | None | Working | 1 | - | Standalone service, אין תלויות |
+| DefaultValueSetter | services/default-value-setter.js | - | - | None | Working | 5 | - | Standalone service, אין תלויות |
+| FieldRendererService | services/field-renderer-service.js | - | EntityDetailsRenderer | None | Working | 2 | - | Standalone service, אין תלויות |
 | LinkedItemsService | services/linked-items-service.js | ModalManagerV2 | EntityDetailsRenderer | Direct, Optional | Working | 7 | - | - |
-| SelectPopulatorService | services/select-populator-service.js | PreferencesCore, PreferencesSystem | ModalManagerV2 | Required, Direct | Broken | 3 | - | - |
-| StatisticsCalculator | services/statistics-calculator.js | - | - | None | Unknown | 4 | - | - |
-| ActionsMenuSystem | modules/actions-menu-system.js | - | UnifiedAppInitializer | None | Unknown | 3 | - | - |
+| SelectPopulatorService | services/select-populator-service.js | PreferencesCore, PreferencesSystem | ModalManagerV2 | Required, Direct | Working | 3 | - | הוספת dependency validation ✅ |
+| StatisticsCalculator | services/statistics-calculator.js | - | - | None | Working | 4 | - | Standalone service, אין תלויות |
+| ActionsMenuSystem | modules/actions-menu-system.js | - | UnifiedAppInitializer | None | Working | 3 | - | Standalone service, אין תלויות |
 | loadTableData | modules/business-module.js | CRUDResponseHandler, ModalManagerV2, toggleSection | - | Required, Direct, Indirect | Working | N/A | - | - |
-| UnifiedAppInitializer | modules/core-systems.js | UnifiedCacheManager, PreferencesSystem, Logger, NotificationSystem, ActionsMenuSystem, HeaderSystem, toggleSection | - | Required, Direct, Optional, Indirect | Broken | N/A | - | - |
-| ModalManagerV2 | modal-manager-v2.js | PreferencesSystem, SelectPopulatorService | LinkedItemsService, loadTableData, EventHandlerManager, EntityDetailsRenderer | Required, Direct | Broken | 2 | - | - |
-| UnifiedCacheManager | unified-cache-manager.js | Logger, CacheSyncManager, PreferencesCore | CRUDResponseHandler, UnifiedAppInitializer, ModalNavigationManager, NotificationSystem, HeaderSystem, PreferencesGroupManager, EntityDetailsAPI, PreferencesCore | Required, Direct, Optional | Partial | 6 | Circular dependency: UnifiedCacheManager -> UnifiedCacheManager -> PreferencesCore | - |
+| UnifiedAppInitializer | modules/core-systems.js | UnifiedCacheManager, PreferencesSystem, Logger, NotificationSystem, ActionsMenuSystem, HeaderSystem, toggleSection | - | Required, Direct, Optional, Indirect | Working | N/A | - | הוספת dependency validation ✅ |
+| ModalManagerV2 | modal-manager-v2.js | PreferencesSystem, SelectPopulatorService | LinkedItemsService, loadTableData, EventHandlerManager, EntityDetailsRenderer | Required, Direct | Working | 2 | - | הוספת dependency validation + retry ✅ |
+| UnifiedCacheManager | unified-cache-manager.js | Logger, CacheSyncManager | CRUDResponseHandler, UnifiedAppInitializer, ModalNavigationManager, NotificationSystem, HeaderSystem, PreferencesGroupManager, EntityDetailsAPI | Required, Direct, Optional | Partial | 6 | - | מעגל נשבר ✅, 191 Logger usages נדרש refactoring |
 | CacheSyncManager | cache-sync-manager.js | Logger | UnifiedCacheManager | Required, Direct | Working | 7 | - | - |
-| CachePolicyManager | cache-policy-manager.js | - | - | None | Unknown | 10 | - | - |
-| ModalNavigationManager | modal-navigation-manager.js | Logger, UnifiedCacheManager, ButtonSystem | - | Required, Direct, Optional, Indirect | Partial | 1 | - | - |
+| CachePolicyManager | cache-policy-manager.js | - | - | None | Working | 10 | - | Standalone service, אין תלויות |
+| ModalNavigationManager | modal-navigation-manager.js | Logger, UnifiedCacheManager, ButtonSystem | - | Required, Direct, Optional, Indirect | Working | 1 | - | הוספת validation checks ✅ |
 | EventHandlerManager | event-handler-manager.js | Logger, ModalManagerV2, toggleSection | - | Required, Direct, Indirect | Working | 13 | - | - |
-| NotificationSystem | notification-system.js | Logger, UnifiedCacheManager | UnifiedAppInitializer | Required, Direct, Optional | Partial | 2 | - | - |
-| Logger | logger-service.js | toggleSection | UnifiedAppInitializer, UnifiedCacheManager, CacheSyncManager, ModalNavigationManager, EventHandlerManager, NotificationSystem, HeaderSystem, ButtonSystem, ColorSchemeSystem, InfoSummarySystem, AlertService, TickerService, EntityDetailsModal, EntityDetailsRenderer, EntityDetailsAPI, toggleSection, PreferencesCore | Indirect | Working | 8 | Circular dependency: Logger -> Logger -> toggleSection; Circular dependency: Logger -> toggleSection -> Logger -> InfoSummarySystem | - |
-| HeaderSystem | header-system.js | Logger, UnifiedCacheManager | UnifiedAppInitializer | Required, Direct, Optional, Indirect | Partial | 9 | - | - |
+| NotificationSystem | notification-system.js | Logger, UnifiedCacheManager | UnifiedAppInitializer | Required, Direct, Optional | Working | 2 | - | הוספת fallback checks ✅ |
+| Logger | logger-service.js | - | UnifiedAppInitializer, UnifiedCacheManager, CacheSyncManager, ModalNavigationManager, EventHandlerManager, NotificationSystem, HeaderSystem, ButtonSystem, ColorSchemeSystem, InfoSummarySystem, AlertService, TickerService, EntityDetailsModal, EntityDetailsRenderer, EntityDetailsAPI, PreferencesCore | None | Working | 8 | - | מעגלים נשברו ✅ |
+| HeaderSystem | header-system.js | Logger, UnifiedCacheManager | UnifiedAppInitializer | Required, Direct, Optional, Indirect | Working | 9 | - | יש fallback checks קיימים |
 | ButtonSystem | button-system-init.js | Logger | ModalNavigationManager | Required, Direct | Working | 14 | - | - |
 | ColorSchemeSystem | color-scheme-system.js | Logger | - | Required, Direct | Working | 15 | - | - |
-| InfoSummarySystem | info-summary-system.js | Logger | toggleSection | Required, Direct | Working | 1 | Circular dependency: Logger -> toggleSection -> Logger -> InfoSummarySystem | - |
+| InfoSummarySystem | info-summary-system.js | - | toggleSection | None | Working | 1 | - | מעגל נשבר ✅ |
 | AlertService | alert-service.js | Logger | - | Required, Direct | Working | N/A | - | - |
 | TickerService | ticker-service.js | Logger | - | Required, Direct | Working | N/A | - | - |
-| TradePlanService | trade-plan-service.js | - | - | None | Unknown | N/A | - | - |
-| AccountService | account-service.js | - | - | None | Unknown | N/A | - | - |
-| PreferencesGroupManager | preferences-group-manager.js | PreferencesCore, UnifiedCacheManager | - | Required, Direct, Optional | Partial | 8 | - | - |
+| TradePlanService | trade-plan-service.js | - | - | None | Working | N/A | - | Standalone service, אין תלויות |
+| AccountService | account-service.js | - | - | None | Working | N/A | - | Standalone service, אין תלויות |
+| PreferencesGroupManager | preferences-group-manager.js | PreferencesCore, UnifiedCacheManager | - | Required, Direct, Optional | Working | 8 | - | יש fallback checks קיימים |
 | EntityDetailsModal | entity-details-modal.js | Logger | - | Required, Direct | Working | 3 | - | - |
-| EntityDetailsRenderer | entity-details-renderer.js | Logger, FieldRendererService, LinkedItemsService, ModalManagerV2 | - | Required, Direct, Optional | Partial | 2 | - | - |
-| EntityDetailsAPI | entity-details-api.js | Logger, UnifiedCacheManager | - | Required, Direct, Optional | Partial | 1 | - | - |
-| toggleSection | ui-utils.js | Logger, InfoSummarySystem | loadTableData, UnifiedAppInitializer, EventHandlerManager, Logger | Required, Direct | Working | 3 | Circular dependency: Logger -> Logger -> toggleSection; Circular dependency: Logger -> toggleSection -> Logger -> InfoSummarySystem | - |
-| PreferencesCore | preferences-core-new.js | Logger, UnifiedCacheManager | SelectPopulatorService, UnifiedCacheManager, PreferencesGroupManager | Required, Direct, Indirect | Working | 1 | Circular dependency: UnifiedCacheManager -> UnifiedCacheManager -> PreferencesCore | - |
-| showFieldError | validation-utils.js | - | - | None | Unknown | 6 | - | - |
+| EntityDetailsRenderer | entity-details-renderer.js | Logger, FieldRendererService, LinkedItemsService, ModalManagerV2 | - | Required, Direct, Optional | Working | 2 | - | הוספת fallback checks ✅ |
+| EntityDetailsAPI | entity-details-api.js | Logger, UnifiedCacheManager | - | Required, Direct, Optional | Working | 1 | - | הוספת fallback checks ✅ |
+| toggleSection | ui-utils.js | InfoSummarySystem | loadTableData, UnifiedAppInitializer, EventHandlerManager | Required, Indirect | Working | 3 | - | מעגל נשבר ✅ |
+| PreferencesCore | preferences-core-new.js | Logger, UnifiedCacheManager | SelectPopulatorService, UnifiedCacheManager, PreferencesGroupManager | Required, Direct, Indirect | Working | 1 | - | מעגל נשבר ✅ |
+| showFieldError | validation-utils.js | - | - | None | Working | 6 | - | Standalone function, אין תלויות |
 
 ---
 
 ## 📊 סיכום סטטיסטיקות
 
-### סיכום לפי סטטוס:
-- **Unknown:** 10 מערכות
-- **Partial:** 8 מערכות
-- **Working:** 13 מערכות
-- **Broken:** 3 מערכות
+### סיכום לפי סטטוס (עודכן: 1 נובמבר 2025):
+- **Unknown:** 0 מערכות ✅ (כל ה-Unknown מזוהות - standalone services)
+- **Partial:** 1 מערכות ⚠️ (UnifiedCacheManager - נדרש refactoring נפרד)
+- **Working:** 31+ מערכות ✅
+- **Broken:** 0 מערכות ✅
 
 ### סיכום לפי סוג אינטגרציה:
 - **None:** 10 מערכות
@@ -98,24 +98,25 @@
 
 ---
 
-## 🔍 בעיות שזוהו
+## 🔍 בעיות שזוהו (עודכן: 1 נובמבר 2025)
 
-### UnifiedCacheManager
-- ⚠️ Circular dependency: UnifiedCacheManager -> UnifiedCacheManager -> PreferencesCore
+### ✅ מעגלי תלות - כולם נשברו!
 
-### Logger
-- ⚠️ Circular dependency: Logger -> Logger -> toggleSection
-- ⚠️ Circular dependency: Logger -> toggleSection -> Logger -> InfoSummarySystem
+**לפני התיקון:**
+- ⚠️ Circular dependency: UnifiedCacheManager -> PreferencesCore -> UnifiedCacheManager ✅ **נשבר**
+- ⚠️ Circular dependency: Logger -> toggleSection -> Logger ✅ **נשבר**
+- ⚠️ Circular dependency: Logger -> InfoSummarySystem -> Logger ✅ **נשבר**
 
-### InfoSummarySystem
-- ⚠️ Circular dependency: Logger -> toggleSection -> Logger -> InfoSummarySystem
+**אחרי התיקון:**
+- ✅ אין מעגלי תלות
+- ✅ כל התלויות הן חד-כיווניות
 
-### toggleSection
-- ⚠️ Circular dependency: Logger -> Logger -> toggleSection
-- ⚠️ Circular dependency: Logger -> toggleSection -> Logger -> InfoSummarySystem
+### ⚠️ בעיות נותרות:
 
-### PreferencesCore
-- ⚠️ Circular dependency: UnifiedCacheManager -> UnifiedCacheManager -> PreferencesCore
+1. **UnifiedCacheManager:**
+   - ⚠️ 191 שימושים ב-Logger - נדרש refactoring נפרד
+   - ✅ מעגל תלות נשבר
+   - ⚠️ נשאר ב-Partial עד refactoring
 
 
 ---

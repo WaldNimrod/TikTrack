@@ -174,6 +174,8 @@
 | "if" statements | trade_plans.js | 2 (שורה 581, 1859) | - | - | 1.11.2025 | False Positive - statements רגילים, לא פונקציות |
 | updatePricesFromPercentages | trade_plans.js | 2 (שורה 1638, 1732) | שתיהן | - | 1.11.2025 | Arrow functions מקומיים בשתי פונקציות שונות (add/edit) - לא כפילות אמיתית |
 | updatePercentagesFromPrices | trade_plans.js | 2 (שורה 1660, 1754) | שתיהן | - | 1.11.2025 | Arrow functions מקומיים בשתי פונקציות שונות (add/edit) - לא כפילות אמיתית |
+| validation (amount) | cash_flows.js | 2 (שורה 383, 439) | validateCashFlowAmount | inline (שורות 383-389, 439-445) | 1.11.2025 | אוחד לפונקציה helper נפרדת |
+| validation (date) | cash_flows.js | 2 (שורה 394, 450) | validateCashFlowDate | inline (שורות 394-404, 450-460) | 1.11.2025 | אוחד לפונקציה helper נפרדת |
 
 ---
 

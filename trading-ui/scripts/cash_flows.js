@@ -369,6 +369,36 @@ async function loadCashFlows() {
 }
 
 /**
+ * Helper validation function for cash flow amount
+ * @param {string|number} value - Amount value to validate
+ * @returns {string|boolean} Error message or true if valid
+ */
+function validateCashFlowAmount(value) {
+  const amount = parseFloat(value);
+  if (isNaN(amount)) return 'יש להזין סכום תקין';
+  if (amount === 0) return 'סכום לא יכול להיות 0';
+  if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
+  return true;
+}
+
+/**
+ * Helper validation function for cash flow date
+ * @param {string} value - Date value to validate
+ * @returns {string|boolean} Error message or true if valid
+ */
+function validateCashFlowDate(value) {
+  if (!value) return 'יש להזין תאריך';
+  const date = new Date(value);
+  const today = new Date();
+  const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+  const minDate = new Date(2000, 0, 1);
+  
+  if (date > maxDate) return 'תאריך לא יכול להיות יותר משנה קדימה';
+  if (date < minDate) return 'תאריך לא יכול להיות לפני שנת 2000';
+  return true;
+}
+
+/**
  * Validate cash flow form
  * @function validateCashFlowForm
  * @returns {boolean} Is valid
@@ -380,28 +410,12 @@ function validateCashFlowForm() {
       { 
         id: 'cashFlowAmount', 
         name: 'סכום',
-        validation: (value) => {
-          const amount = parseFloat(value);
-          if (isNaN(amount)) return 'יש להזין סכום תקין';
-          if (amount === 0) return 'סכום לא יכול להיות 0';
-          if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
-        return true;
-      }
+        validation: validateCashFlowAmount
     },
     { 
       id: 'cashFlowDate', 
       name: 'תאריך',
-      validation: (value) => {
-        if (!value) return 'יש להזין תאריך';
-        const date = new Date(value);
-        const today = new Date();
-        const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-        const minDate = new Date(2000, 0, 1);
-        
-        if (date > maxDate) return 'תאריך לא יכול להיות יותר משנה קדימה';
-        if (date < minDate) return 'תאריך לא יכול להיות לפני שנת 2000';
-        return true;
-      }
+      validation: validateCashFlowDate
     },
     { id: 'cashFlowAccount', name: 'חשבון מסחר מסחר' },
     { id: 'cashFlowCurrency', name: 'מטבע' },
@@ -436,28 +450,12 @@ function validateEditCashFlowForm() {
       { 
         id: 'editCashFlowAmount', 
         name: 'סכום',
-        validation: (value) => {
-          const amount = parseFloat(value);
-          if (isNaN(amount)) return 'יש להזין סכום תקין';
-          if (amount === 0) return 'סכום לא יכול להיות 0';
-          if (Math.abs(amount) > 10000000) return 'סכום גבוה מדי (מקסימום 10,000,000)';
-          return true;
-        }
+        validation: validateCashFlowAmount
       },
     { 
       id: 'editCashFlowDate', 
       name: 'תאריך',
-      validation: (value) => {
-        if (!value) return 'יש להזין תאריך';
-        const date = new Date(value);
-        const today = new Date();
-        const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-        const minDate = new Date(2000, 0, 1);
-        
-        if (date > maxDate) return 'תאריך לא יכול להיות יותר משנה קדימה';
-        if (date < minDate) return 'תאריך לא יכול להיות לפני שנת 2000';
-        return true;
-      }
+      validation: validateCashFlowDate
     },
     { id: 'editCashFlowAccount', name: 'חשבון מסחר מסחר' },
     { id: 'editCashFlowCurrency', name: 'מטבע' },

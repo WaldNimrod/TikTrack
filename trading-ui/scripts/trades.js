@@ -1230,7 +1230,7 @@ function addTrade() {
     // Use ModalManagerV2 directly
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
       window.ModalManagerV2.showModal('tradesModal', 'add');
-    } else {
+    }
   } else {
     window.Logger?.error('showAddTradeModal not available', { page: "trades" });
     if (typeof window.showErrorNotification === 'function') {
@@ -1253,7 +1253,6 @@ function editTrade(tradeId) {
   // Use ModalManagerV2 directly
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
     window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
-  } else {
   } else {
     window.Logger?.error('showEditTradeModal not available', { page: "trades" });
     if (typeof window.showErrorNotification === 'function') {

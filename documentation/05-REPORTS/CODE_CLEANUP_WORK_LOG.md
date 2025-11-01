@@ -177,6 +177,7 @@
 | validation (amount) | cash_flows.js | 2 (שורה 383, 439) | validateCashFlowAmount | inline (שורות 383-389, 439-445) | 1.11.2025 | אוחד לפונקציה helper נפרדת |
 | validation (date) | cash_flows.js | 2 (שורה 394, 450) | validateCashFlowDate | inline (שורות 394-404, 450-460) | 1.11.2025 | אוחד לפונקציה helper נפרדת |
 | onSuccess callbacks | tickers.js | 3 (שורה 1014, 1322, 1371) | שלושתן | - | 1.11.2025 | False Positive - כל אחת עושה משהו אחר (cancel, restore, delete) |
+| "if" statements | trades.js | 3 (שורה 368, 481, 2114) | - | - | 1.11.2025 | False Positive - statements רגילים, לא פונקציות |
 
 ---
 

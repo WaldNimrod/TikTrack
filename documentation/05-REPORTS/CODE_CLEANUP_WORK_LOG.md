@@ -190,6 +190,15 @@
 | showInfoNotification | core-systems.js | 1 (שורה 2668) | window.showInfoNotification | שורות 2631 | 1.11.2025 | הוסר - משתמש במערכת הכללית מ-notification-system.js |
 | createMixedChartData | index.js | 1 (שורה 314) | - | שורות 314-376 | 1.11.2025 | הוסר - לא בשימוש, createMixedChart משתמש ב-chartData.mixed |
 | translateTestCategory | translation-utils.js | 1 (שורה 244) | - | שורות 237-254 | 1.11.2025 | הוסר - לא בשימוש למרות שהיה מיוצא |
+| getSettings | external-data-settings-service.js | 1 (שורה 49) | - | שורות 42-52 | 1.11.2025 | הוסר - לא בשימוש למרות שהיה מיוצא |
+| loadEditTradeModalData | business-module.js | 1 (שורה 772) | - | שורות 772-1026 | 1.11.2025 | הוסר - לא בשימוש, ModalManagerV2 משתמש ב-populateSelects |
+| saveEditTradeData | business-module.js | 1 (שורה 1031) | - | שורות 1031-1151 | 1.11.2025 | הוסר - לא בשימוש, ModalManagerV2 משתמש ב-handlers שלו |
+| copyDetailedLog | business-module.js | 1 (שורה 2929) | - | שורות 2929-2954 | 1.11.2025 | הוסר - לא בשימוש, יש פונקציה כללית generateDetailedLog |
+| resetExecutionForm | executions.js | 1 (שורה 207) | - | שורות 207-255 | 1.11.2025 | הוסר - לא בשימוש, ModalManagerV2 מטפל באיפוס |
+| resetAddExecutionForm | executions.js | 1 (שורה 258) | - | שורות 258-260 | 1.11.2025 | הוסר - wrapper שלא בשימוש |
+| resetEditExecutionForm | executions.js | 1 (שורה 262) | - | שורות 262-264 | 1.11.2025 | הוסר - wrapper שלא בשימוש |
+| fillEditExecutionForm | executions.js | 1 (שורה 299) | - | שורות 299-538 | 1.11.2025 | הוסר - לא בשימוש, ModalManagerV2 משתמש ב-populateForm |
+| updateExecutionWrapper | executions.js | 1 (שורה 581) | - | שורות 581-736 | 1.11.2025 | הוסר - לא בשימוש, ModalManagerV2 משתמש ב-handlers שלו |
 
 ---
 

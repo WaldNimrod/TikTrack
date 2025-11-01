@@ -3245,9 +3245,40 @@ async function deleteTrade(tradeId) {
     return await deleteTradeRecord(tradeId);
 }
 
+/**
+ * Show add trade modal (wrapper for ModalManagerV2)
+ * Maintains backward compatibility with HTML onclick handlers
+ * @function showAddTradeModal
+ */
+window.showAddTradeModal = function() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        window.ModalManagerV2.showModal('tradesModal', 'add');
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
+/**
+ * Show edit trade modal (wrapper for ModalManagerV2)
+ * Maintains backward compatibility with HTML onclick handlers
+ * @function showEditTradeModal
+ * @param {number|string} tradeId - ID of trade to edit
+ */
+window.showEditTradeModal = function(tradeId) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
+    } else {
+        console.error('ModalManagerV2 not available');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
+    }
+};
+
 // Export functions to window for global access
-// REMOVED: window.showAddTradeModal - use window.ModalManagerV2.showModal('tradesModal', 'add') directly
-// REMOVED: window.showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', id) directly
 window.saveTrade = saveTrade;
 window.deleteTrade = deleteTrade;
 window.performTradeDeletion = performTradeDeletion;

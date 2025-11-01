@@ -188,6 +188,8 @@
 | showErrorNotification | core-systems.js | 1 (שורה 1787) | window.showErrorNotification | שורות 1762-1796 | 1.11.2025 | הוסר - משתמש במערכת הכללית מ-notification-system.js |
 | showWarningNotification | core-systems.js | 1 (שורה 2654) | window.showWarningNotification | שורות 2629 | 1.11.2025 | הוסר - משתמש במערכת הכללית מ-notification-system.js |
 | showInfoNotification | core-systems.js | 1 (שורה 2668) | window.showInfoNotification | שורות 2631 | 1.11.2025 | הוסר - משתמש במערכת הכללית מ-notification-system.js |
+| createMixedChartData | index.js | 1 (שורה 314) | - | שורות 314-376 | 1.11.2025 | הוסר - לא בשימוש, createMixedChart משתמש ב-chartData.mixed |
+| translateTestCategory | translation-utils.js | 1 (שורה 244) | - | שורות 237-254 | 1.11.2025 | הוסר - לא בשימוש למרות שהיה מיוצא |
 
 ---
 

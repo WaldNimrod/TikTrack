@@ -766,10 +766,11 @@ function addEditReminder() {
 // REMOVED: showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId) directly
 // Note: This function had complex logic for loading modal data - if needed, implement as modal hooks in ModalManagerV2
 
+// REMOVED: loadEditTradeModalData - not used, ModalManagerV2 uses populateSelects and populateForm
 /**
  * טעינת נתונים למודל עריכת טרייד
  */
-async function loadEditTradeModalData(trade) {
+async function _REMOVED_loadEditTradeModalData(trade) {
   try {
     // טעינת חשבונות, תוכניות טרייד וטיקרים
     const [accountsResponse, tradePlansResponse, tickersResponse] = await Promise.all([
@@ -1025,10 +1026,11 @@ async function loadEditTradeModalData(trade) {
   }
 }
 
+// REMOVED: saveEditTradeData - not used, ModalManagerV2 uses its own save handlers
 /**
  * שמירת עריכת טרייד - גרסה פשוטה
  */
-async function saveEditTradeData() {
+async function _REMOVED_saveEditTradeData() {
   try {
     // ניקוי מטמון לפני פעולת CRUD - עריכה    // איסוף נתונים מהטופס
     const formData = {
@@ -2925,8 +2927,9 @@ function generateDetailedLog() {
 // window. export removed - using global version from system-management.js
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
+// REMOVED: copyDetailedLog - not used, use global generateDetailedLog from logger-service.js
 // Local copyDetailedLog function for trades page
-async function copyDetailedLog() {
+async function _REMOVED_copyDetailedLog() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

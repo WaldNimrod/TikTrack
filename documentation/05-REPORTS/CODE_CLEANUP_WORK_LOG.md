@@ -216,6 +216,12 @@
 | validateEditNoteForm | notes.js | 1 (שורה 913) | - | שורות 913-971 | 1.11.2025 | הוסר - deprecated wrapper, use window.validateEntityForm() |
 | viewTickerDetailsOld | tickers.js | 1 (שורה 124) | - | שורות 124-177 | 1.11.2025 | הוסר - לא בשימוש, הוחלף ב-viewTickerDetails |
 | refreshTickerData | tickers.js | 1 (שורה 184) | - | שורות 184-236 | 1.11.2025 | הוסר - לא בשימוש |
+| loadCashFlows | cash_flows.js | 1 (שורה 334) | - | שורות 334-369 | 1.11.2025 | הוסר - הוחלף ב-loadCashFlowsData |
+| loadTradesForCashFlow | cash_flows.js | 1 (שורה 1572) | - | שורות 1572-1607 | 1.11.2025 | הוסר - ModalManagerV2 משתמש ב-SelectPopulatorService |
+| loadTradePlansForCashFlow | cash_flows.js | 1 (שורה 1613) | - | שורות 1613-1649 | 1.11.2025 | הוסר - ModalManagerV2 משתמש ב-SelectPopulatorService |
+| generateDetailedLogForCashFlows | cash_flows.js | 1 (שורה 1897) | - | שורות 1897-1919 | 1.11.2025 | הוסר - יש generateDetailedLog גלובלי מ-logger-service.js |
+| isUserInitiatedAction | notification-system.js | 1 (שורה 131) | - | שורות 131-163 | 1.11.2025 | הוסר - לא בשימוש, userInitiated מועבר ישירות כפרמטר |
+| updateSortIconsLocal | tables.js | 1 (שורה 267) | - | שורות 267-301 | 1.11.2025 | הוסר - כפילות של window.updateSortIcons מ-data-basic.js |
 
 ---
 

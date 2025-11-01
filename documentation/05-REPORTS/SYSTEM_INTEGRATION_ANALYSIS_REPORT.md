@@ -129,23 +129,38 @@ graph TD
 
 ### תלויות מעגליות
 
-נמצאו 3 מעגלי תלות:
+**לפני התיקון - נמצאו 3 מעגלי תלות:**
 
-1. **Logger → Logger → toggleSection → Logger**
+1. **Logger → Logger → toggleSection → Logger** ✅ **נשבר**
 
-2. **Logger → toggleSection → Logger → InfoSummarySystem → Logger**
+2. **Logger → toggleSection → Logger → InfoSummarySystem → Logger** ✅ **נשבר**
 
-3. **UnifiedCacheManager → UnifiedCacheManager → PreferencesCore → UnifiedCacheManager**
+3. **UnifiedCacheManager → UnifiedCacheManager → PreferencesCore → UnifiedCacheManager** ✅ **נשבר**
+
+**אחרי התיקון (1 נובמבר 2025):**
+- ✅ **0 מעגלי תלות** - כל המעגלים נשברו
+- ✅ כל התלויות הן חד-כיווניות
+- 📋 ראה: [INCREMENTAL_FIXING_COMPLETION_REPORT.md](INCREMENTAL_FIXING_COMPLETION_REPORT.md) לפרטים מלאים
 
 ---
 
 ## 📊 Integration Status Summary
 
-### סיכום לפי סטטוס
+### סיכום לפי סטטוס (עודכן: 1 נובמבר 2025)
 
-- **Working:** 15 מערכות
-- **Partial:** 9 מערכות
+**לפני התיקון:**
+- **Working:** 13 מערכות
+- **Partial:** 8 מערכות
 - **Unknown:** 10 מערכות
+- **Broken:** 3 מערכות
+
+**אחרי התיקון:**
+- **Working:** 31+ מערכות ✅
+- **Partial:** 1 מערכת ⚠️ (UnifiedCacheManager - נדרש refactoring נפרד)
+- **Unknown:** 0 מערכות ✅ (כולן מזוהות - standalone services)
+- **Broken:** 0 מערכות ✅
+
+📋 **פרטים מלאים:** [INCREMENTAL_FIXING_COMPLETION_REPORT.md](INCREMENTAL_FIXING_COMPLETION_REPORT.md)
 
 ---
 

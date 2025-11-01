@@ -2071,7 +2071,7 @@ window.showClearCacheConfirmation = async function(level, currentStats) {
             <div class="modal fade" id="clearCacheConfirmationModal" tabindex="-1" data-bs-backdrop="static">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <div class="modal-header text-white" style="background-color: ${config.color}; direction: rtl;">
+                        <div class="modal-header text-white" data-entity-type="${config.entityType || ''}" style="direction: rtl;">
                             <h4 class="modal-title">
                                 ${config.emoji} ${config.name}
                             </h4>
@@ -2814,18 +2814,11 @@ function fallbackCopyToClipboard(text) {
 // ===== LEGACY SUPPORT =====
 // These functions provide backward compatibility
 
-/**
- * Legacy support function for old notification calls
- * NOTIFICATION SYSTEM - Handles old notification format for backward compatibility
- *
- * @param {string} message - Message (can be title + message)
- * @param {string} type - Notification type
- * @param {number} duration - Display duration
- */
-function showNotificationLegacy(message, type = 'info', duration = 4000) {
-  // Direct console log to avoid recursion
-  console.log(`🔔 ${type.toUpperCase()}: ${message}`);
-}
+// REMOVED: showNotificationLegacy - legacy function not used, only console.log
+// function _REMOVED_showNotificationLegacy(message, type = 'info', duration = 4000) {
+//   // Direct console log to avoid recursion
+//   console.log(`🔔 ${type.toUpperCase()}: ${message}`);
+// }
 
 // ===== GLOBAL NOTIFICATION HISTORY SYSTEM =====
 /**

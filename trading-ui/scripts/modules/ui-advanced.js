@@ -307,24 +307,17 @@ function generateAndApplyStatusCSS() {
  * 
  * @param {Object} preferences - העדפות המשתמש
  */
-function loadStatusColorsFromPreferences(preferences) {
-  // הסרנו את preferences.statusColors כי הוא לא קיים במערכת ההעדפות
-  // במקום זה משתמשים במשתנים ספציפיים
-}
+// REMOVED: loadStatusColorsFromPreferences - DEPRECATED, empty function, use color-scheme-system.js instead
+// function _REMOVED_loadStatusColorsFromPreferences(preferences) {
+//   // הסרנו את preferences.statusColors כי הוא לא קיים במערכת ההעדפות
+//   // במקום זה משתמשים במשתנים ספציפיים
+// }
 
-/**
- * טעינת צבעי סוגי השקעה מההעדפות
- * Load investment type colors from preferences
- * 
- * ⚠️ DEPRECATED: This function is kept for backward compatibility only
- * Real implementation is in color-scheme-system.js
- * 
- * @param {Object} preferences - העדפות המשתמש
- */
-function loadInvestmentTypeColorsFromPreferences(preferences) {
-  // הסרנו את preferences.investmentTypeColors כי הוא לא קיים במערכת ההעדפות
-  // במקום זה משתמשים במשתנים ספציפיים
-}
+// REMOVED: loadInvestmentTypeColorsFromPreferences - DEPRECATED, empty function, use color-scheme-system.js instead
+// function _REMOVED_loadInvestmentTypeColorsFromPreferences(preferences) {
+//   // הסרנו את preferences.investmentTypeColors כי הוא לא קיים במערכת ההעדפות
+//   // במקום זה משתמשים במשתנים ספציפיים
+// }
 
 /**
  * טעינת כל הצבעים מההעדפות
@@ -374,11 +367,13 @@ function hexToRgb(hex) {
  */
 function getEntityColor(entityType) {
   if (!entityType) {
-    return '#6c757d'; // אפור לנתונים חסרים
+    // רק מהעדפות - בלי fallbacks קבועים!
+    return '';
   }
 
   const normalizedType = entityType.toLowerCase().trim();
-  return ENTITY_COLORS[normalizedType] || '#6c757d';
+  // רק מהעדפות - בלי fallbacks קבועים!
+  return ENTITY_COLORS[normalizedType] || '';
 }
 
 /**
@@ -391,11 +386,13 @@ function getEntityColor(entityType) {
  */
 function getStatusColor(status, intensity = 'medium') {
   if (!status) {
-    return STATUS_COLORS['closed']?.[intensity] || '#6c757d';
+    // רק מהעדפות - בלי fallbacks קבועים!
+    return STATUS_COLORS['closed']?.[intensity] || '';
   }
 
   const normalizedStatus = status.toLowerCase().trim();
-  return STATUS_COLORS[normalizedStatus]?.[intensity] || STATUS_COLORS['closed']?.[intensity] || '#6c757d';
+  // רק מהעדפות - בלי fallbacks קבועים!
+  return STATUS_COLORS[normalizedStatus]?.[intensity] || STATUS_COLORS['closed']?.[intensity] || '';
 }
 
 /**
@@ -440,11 +437,13 @@ function getStatusBorderColor(status) {
  */
 function getEntityBackgroundColor(entityType) {
   if (!entityType) {
-    return 'rgba(108, 117, 125, 0.1)'; // אפור שקוף לנתונים חסרים
+    // רק מהעדפות - בלי fallbacks קבועים!
+    return '';
   }
 
   const normalizedType = entityType.toLowerCase().trim();
-  return ENTITY_BACKGROUND_COLORS[normalizedType] || 'rgba(108, 117, 125, 0.1)';
+  // רק מהעדפות - בלי fallbacks קבועים!
+  return ENTITY_BACKGROUND_COLORS[normalizedType] || '';
 }
 
 /**
@@ -456,11 +455,13 @@ function getEntityBackgroundColor(entityType) {
  */
 function getEntityTextColor(entityType) {
   if (!entityType) {
-    return '#495057'; // אפור כהה לנתונים חסרים
+    // רק מהעדפות - בלי fallbacks קבועים!
+    return '';
   }
 
   const normalizedType = entityType.toLowerCase().trim();
-  return ENTITY_TEXT_COLORS[normalizedType] || '#495057';
+  // רק מהעדפות - בלי fallbacks קבועים!
+  return ENTITY_TEXT_COLORS[normalizedType] || '';
 }
 
 /**
@@ -472,11 +473,13 @@ function getEntityTextColor(entityType) {
  */
 function getEntityBorderColor(entityType) {
   if (!entityType) {
-    return 'rgba(108, 117, 125, 0.3)'; // אפור שקוף לנתונים חסרים
+    // רק מהעדפות - בלי fallbacks קבועים!
+    return '';
   }
 
   const normalizedType = entityType.toLowerCase().trim();
-  return ENTITY_BORDER_COLORS[normalizedType] || 'rgba(108, 117, 125, 0.3)';
+  // רק מהעדפות - בלי fallbacks קבועים!
+  return ENTITY_BORDER_COLORS[normalizedType] || '';
 }
 
 /**
@@ -541,11 +544,13 @@ function getEntityLabel(entityType) {
  */
 function getInvestmentTypeColor(investmentType, intensity = 'medium') {
   if (!investmentType) {
-    return INVESTMENT_TYPE_COLORS['swing'][intensity] || '#007bff';
+    // רק מהעדפות - בלי fallbacks קבועים!
+    return INVESTMENT_TYPE_COLORS['swing']?.[intensity] || '';
   }
 
   const normalizedType = investmentType.toLowerCase().trim();
-  return INVESTMENT_TYPE_COLORS[normalizedType]?.[intensity] || INVESTMENT_TYPE_COLORS['swing'][intensity] || '#007bff';
+  // רק מהעדפות - בלי fallbacks קבועים!
+  return INVESTMENT_TYPE_COLORS[normalizedType]?.[intensity] || INVESTMENT_TYPE_COLORS['swing']?.[intensity] || '';
 }
 
 /**
@@ -1211,27 +1216,24 @@ function generateNumericValueCSS() {
   return css;
 }
 
-/**
- * עדכון צבעים לערכים מספריים
- * @param {Object} newColors - צבעים חדשים
- */
-function updateNumericValueColors(newColors) {
-  // עדכון הצבעים הגלובליים
-  Object.assign(NUMERIC_VALUE_COLORS, newColors);
-
-  // יצירת CSS חדש
-  const newCSS = generateNumericValueCSS();
-
-  // עדכון או יצירת style element
-  let styleElement = document.getElementById('numeric-value-colors');
-  if (!styleElement) {
-    styleElement = document.createElement('style');
-    styleElement.id = 'numeric-value-colors';
-    document.head.appendChild(styleElement);
-  }
-
-  styleElement.textContent = newCSS;
-}
+// REMOVED: updateNumericValueColors - not used, not exported to window
+// function _REMOVED_updateNumericValueColors(newColors) {
+//   // עדכון הצבעים הגלובליים
+//   Object.assign(NUMERIC_VALUE_COLORS, newColors);
+//
+//   // יצירת CSS חדש
+//   const newCSS = generateNumericValueCSS();
+//
+//   // עדכון או יצירת style element
+//   let styleElement = document.getElementById('numeric-value-colors');
+//   if (!styleElement) {
+//     styleElement = document.createElement('style');
+//     styleElement.id = 'numeric-value-colors';
+//     document.head.appendChild(styleElement);
+//   }
+//
+//   styleElement.textContent = newCSS;
+// }
 
 // ========================================
 // 📤 ייצוא פונקציות לערכים מספריים
@@ -1872,11 +1874,48 @@ function updateCSSVariablesFromPreferences(preferences) {
       document.documentElement.style.setProperty('--entity-note-text', preferences.entityNoteColorDark || '#89840a');
       document.documentElement.style.setProperty('--entity-note-border', `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 196}, ${hexToRgb(preferences.entityNoteColor)?.g || 188}, ${hexToRgb(preferences.entityNoteColor)?.b || 0}, 0.3)`);
     }
+    // כל הצבעים רק מהעדפות - בלי fallbacks קבועים!
     if (preferences.entityPreferencesColor) {
+      const prefRgb = hexToRgb(preferences.entityPreferencesColor);
       document.documentElement.style.setProperty('--entity-preference-color', preferences.entityPreferencesColor);
-      document.documentElement.style.setProperty('--entity-preference-bg', preferences.entityPreferencesColorLight || 'rgba(173, 181, 189, 0.1)');
-      document.documentElement.style.setProperty('--entity-preference-text', preferences.entityPreferencesColorDark || '#6c757d');
-      document.documentElement.style.setProperty('--entity-preference-border', `rgba(${hexToRgb(preferences.entityPreferencesColor)?.r || 173}, ${hexToRgb(preferences.entityPreferencesColor)?.g || 181}, ${hexToRgb(preferences.entityPreferencesColor)?.b || 189}, 0.3)`);
+      document.documentElement.style.setProperty('--entity-preference-bg', preferences.entityPreferencesColorLight || (prefRgb ? `rgba(${prefRgb.r}, ${prefRgb.g}, ${prefRgb.b}, 0.1)` : ''));
+      document.documentElement.style.setProperty('--entity-preference-text', preferences.entityPreferencesColorDark || (prefRgb ? darkenColor(preferences.entityPreferencesColor, 20) : ''));
+      document.documentElement.style.setProperty('--entity-preference-border', prefRgb ? `rgba(${prefRgb.r}, ${prefRgb.g}, ${prefRgb.b}, 0.3)` : '');
+    }
+    if (preferences.entityResearchColor) {
+      const rgb = hexToRgb(preferences.entityResearchColor);
+      document.documentElement.style.setProperty('--entity-research-color', preferences.entityResearchColor);
+      document.documentElement.style.setProperty('--entity-research-bg', preferences.entityResearchColorLight || (rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)` : ''));
+      document.documentElement.style.setProperty('--entity-research-text', preferences.entityResearchColorDark || (rgb ? darkenColor(preferences.entityResearchColor, 20) : ''));
+      document.documentElement.style.setProperty('--entity-research-border', rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` : '');
+    }
+    if (preferences.entityDesignColor) {
+      const rgb = hexToRgb(preferences.entityDesignColor);
+      document.documentElement.style.setProperty('--entity-design-color', preferences.entityDesignColor);
+      document.documentElement.style.setProperty('--entity-design-bg', preferences.entityDesignColorLight || (rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)` : ''));
+      document.documentElement.style.setProperty('--entity-design-text', preferences.entityDesignColorDark || (rgb ? darkenColor(preferences.entityDesignColor, 20) : ''));
+      document.documentElement.style.setProperty('--entity-design-border', rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` : '');
+    }
+    if (preferences.entityConstraintColor) {
+      const rgb = hexToRgb(preferences.entityConstraintColor);
+      document.documentElement.style.setProperty('--entity-constraint-color', preferences.entityConstraintColor);
+      document.documentElement.style.setProperty('--entity-constraint-bg', preferences.entityConstraintColorLight || (rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)` : ''));
+      document.documentElement.style.setProperty('--entity-constraint-text', preferences.entityConstraintColorDark || (rgb ? darkenColor(preferences.entityConstraintColor, 20) : ''));
+      document.documentElement.style.setProperty('--entity-constraint-border', rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` : '');
+    }
+    if (preferences.entityDevelopmentColor) {
+      const rgb = hexToRgb(preferences.entityDevelopmentColor);
+      document.documentElement.style.setProperty('--entity-development-color', preferences.entityDevelopmentColor);
+      document.documentElement.style.setProperty('--entity-development-bg', preferences.entityDevelopmentColorLight || (rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)` : ''));
+      document.documentElement.style.setProperty('--entity-development-text', preferences.entityDevelopmentColorDark || (rgb ? darkenColor(preferences.entityDevelopmentColor, 20) : ''));
+      document.documentElement.style.setProperty('--entity-development-border', rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` : '');
+    }
+    if (preferences.entityInfoColor) {
+      const rgb = hexToRgb(preferences.entityInfoColor);
+      document.documentElement.style.setProperty('--entity-info-color', preferences.entityInfoColor);
+      document.documentElement.style.setProperty('--entity-info-bg', preferences.entityInfoColorLight || (rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)` : ''));
+      document.documentElement.style.setProperty('--entity-info-text', preferences.entityInfoColorDark || (rgb ? darkenColor(preferences.entityInfoColor, 20) : ''));
+      document.documentElement.style.setProperty('--entity-info-border', rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` : '');
     }
 
     // console.log('🎨 צבעים מעודכנים:', {
@@ -2122,16 +2161,28 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
         docStyle.setProperty('--numeric-zero-border', `rgba(${zRgb.r}, ${zRgb.g}, ${zRgb.b}, 0.3)`);
 
         // 3) Entity aliases expected by some CSS (e.g. --entity-trade)
+        // NO hardcoded fallbacks - all colors must come from preferences!
+        const getEntityColorFromPrefs = (prefKey, cssVarName) => {
+          if (prefs[prefKey]) return prefs[prefKey];
+          const cssValue = getComputedStyle(document.documentElement).getPropertyValue(cssVarName).trim();
+          return cssValue || '';
+        };
+        
         const entityMap = {
-          trade: prefs.entityTradeColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-color') || '#26baac',
-          trade_plan: prefs.entityTradePlanColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-plan-color') || '#8e44ad',
-          execution: prefs.entityExecutionColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-execution-color') || '#2c3e50',
-          account: prefs.entityTradingAccountColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-account-color') || '#5499c7',
-          cash_flow: prefs.entityCashFlowColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-cash-flow-color') || '#d4a574',
-          ticker: prefs.entityTickerColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color') || '#229954',
-          alert: prefs.entityAlertColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-alert-color') || '#e67e22',
-          note: prefs.entityNoteColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-note-color') || '#a29bfe',
-          preference: prefs.entityPreferencesColor || getComputedStyle(document.documentElement).getPropertyValue('--entity-preference-color') || '#adb5bd'
+          trade: getEntityColorFromPrefs('entityTradeColor', '--entity-trade-color'),
+          trade_plan: getEntityColorFromPrefs('entityTradePlanColor', '--entity-trade-plan-color'),
+          execution: getEntityColorFromPrefs('entityExecutionColor', '--entity-execution-color'),
+          account: getEntityColorFromPrefs('entityTradingAccountColor', '--entity-account-color'),
+          cash_flow: getEntityColorFromPrefs('entityCashFlowColor', '--entity-cash-flow-color'),
+          ticker: getEntityColorFromPrefs('entityTickerColor', '--entity-ticker-color'),
+          alert: getEntityColorFromPrefs('entityAlertColor', '--entity-alert-color'),
+          note: getEntityColorFromPrefs('entityNoteColor', '--entity-note-color'),
+          preference: getEntityColorFromPrefs('entityPreferencesColor', '--entity-preference-color'),
+          research: getEntityColorFromPrefs('entityResearchColor', '--entity-research-color'),
+          design: getEntityColorFromPrefs('entityDesignColor', '--entity-design-color'),
+          constraint: getEntityColorFromPrefs('entityConstraintColor', '--entity-constraint-color'),
+          development: getEntityColorFromPrefs('entityDevelopmentColor', '--entity-development-color'),
+          info: getEntityColorFromPrefs('entityInfoColor', '--entity-info-color')
         };
         Object.entries(entityMap).forEach(([k, v]) => {
           const val = String(v).trim();
@@ -2509,12 +2560,12 @@ window.colorSchemeSystem = {
   // isWarningModal,
   // getMainHeaderOpacityHex,
   // getSubHeaderOpacityHex,
-  updateNumericValueColors,
+  // updateNumericValueColors - REMOVED: not used
 
   // Dynamic color loading functions - MOVED TO color-scheme-system.js
   // loadEntityColorsFromPreferences,
-  // loadStatusColorsFromPreferences,
-  // loadInvestmentTypeColorsFromPreferences,
+  // loadStatusColorsFromPreferences - REMOVED: DEPRECATED
+  // loadInvestmentTypeColorsFromPreferences - REMOVED: DEPRECATED
   // loadAllColorsFromPreferences,
   // generateAndApplyEntityCSS,
   // updateCSSVariablesFromPreferences,

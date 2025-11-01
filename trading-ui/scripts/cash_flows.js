@@ -482,40 +482,18 @@ function validateEditCashFlowForm() {
 /**
  * מחיקת תזרים מזומנים
  */
+/**
+ * בדיקת מקושרים לפני מחיקת תזרים מזומנים
+ * @param {number|string} id - מזהה תזרים המזומנים
+ */
+async function checkLinkedItemsAndDeleteCashFlow(id) {
+  await window.checkLinkedItemsAndPerformAction('cash_flow', id, 'delete', performCashFlowDeletion);
+}
+
 async function deleteCashFlow(id) {
   try {
-    // Get cash flow details for confirmation message
-    let cashFlowDetails = `תזרים מזומנים #${id}`;
-    const cashFlow = window.cashFlowsData ? window.cashFlowsData.find(cf => cf.id === id) : null;
-    
-    if (!cashFlow) {
-      window.showErrorNotification('שגיאה', 'תזרים המזומנים לא נמצא', 6000, 'system');
-      return;
-    }
-
-    // Build detailed cash flow info
-    const accountName = getAccountNameById(cashFlow.trading_account_id) || 'לא מוגדר';
-    const type = getCashFlowTypeText(cashFlow.type);
-    const amount = cashFlow.amount;
-    const currency = cashFlow.currency_symbol || '';
-    const date = formatDate(cashFlow.date);
-    const description = cashFlow.description || 'ללא תיאור';
-    
-    cashFlowDetails = `${accountName} - ${type}, ${amount}${currency}, תאריך: ${date}, תיאור: ${description}`;
-
-    // Show delete warning with detailed information
-    if (window.showDeleteWarning) {
-      window.showDeleteWarning('cash_flow', cashFlowDetails, 'תזרים מזומנים',
-        async () => await performCashFlowDeletion(id),
-        () => {}
-      );
-    } else {
-      // Fallback to simple confirm
-      if (!confirm('האם אתה בטוח שברצונך למחוק את תזרים המזומנים?')) {
-        return;
-      }
-      await performCashFlowDeletion(id);
-    }
+    // Use unified deletion process with linked items check
+    await checkLinkedItemsAndDeleteCashFlow(id);
     
   } catch (error) {
     console.error('❌ deleteCashFlow: Error occurred:', error);
@@ -532,6 +510,14 @@ async function deleteCashFlow(id) {
  */
 async function performCashFlowDeletion(id) {
   try {
+    // Clear cache before deletion to ensure fresh data after reload
+    if (window.unifiedCacheManager) {
+      await window.unifiedCacheManager.clearByPattern('cash-flows-data');
+      await window.unifiedCacheManager.clearByPattern('account-activity-data');
+      await window.unifiedCacheManager.clearByPattern('account-activity-*');
+      await window.unifiedCacheManager.clearByPattern('account-balance-*');
+    }
+
     // שליחת בקשת מחיקה
     const response = await fetch(`/api/cash_flows/${id}`, {
       method: 'DELETE',
@@ -1658,6 +1644,7 @@ window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.deleteCashFlow = deleteCashFlow;
 window.performCashFlowDeletion = performCashFlowDeletion;
+window.checkLinkedItemsAndDeleteCashFlow = checkLinkedItemsAndDeleteCashFlow;
 // REMOVED: window exports for removed modal wrapper functions
 // Use window.ModalManagerV2.showModal('cashFlowModal', 'add') directly
 // Use window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', cashFlowId) directly

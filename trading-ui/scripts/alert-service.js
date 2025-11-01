@@ -238,6 +238,7 @@ window.parseAlertCondition = parseAlertCondition;
 window.cancelAlert = cancelAlert;
 window.deleteAlert = deleteAlert;
 window.performAlertDeletion = performAlertDeletion;
+window.checkLinkedItemsAndDeleteAlert = checkLinkedItemsAndDeleteAlert;
 
 // ===== ALERT CONDITION FUNCTIONS =====
 
@@ -463,8 +464,21 @@ async function deleteAlert(alertId) {
  * @param {number} alertId - Alert ID
  * @returns {Promise<void>}
  */
+/**
+ * בדיקת מקושרים לפני מחיקת התראה
+ * @param {number|string} alertId - מזהה ההתראה
+ */
+async function checkLinkedItemsAndDeleteAlert(alertId) {
+  await window.checkLinkedItemsAndPerformAction('alert', alertId, 'delete', performAlertDeletion);
+}
+
 async function performAlertDeletion(alertId) {
   try {
+    // Clear cache before deletion to ensure fresh data after reload
+    if (window.unifiedCacheManager) {
+      await window.unifiedCacheManager.clearByPattern('alerts-data');
+    }
+
     const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });

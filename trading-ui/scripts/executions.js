@@ -3290,47 +3290,18 @@ window.updateTickersList = updateTickersList;
  * מחיקת ביצוע
  * Includes linked items check and detailed execution information
  */
+/**
+ * בדיקת מקושרים לפני מחיקת ביצוע
+ * @param {number|string} executionId - מזהה הביצוע
+ */
+async function checkLinkedItemsAndDeleteExecution(executionId) {
+    await window.checkLinkedItemsAndPerformAction('execution', executionId, 'delete', performExecutionDeletion);
+}
+
 async function deleteExecution(executionId) {
     try {
-        // Get execution details for confirmation message
-        let executionDetails = `ביצוע #${executionId}`;
-        const execution = window.executionsData?.find(exec => exec.id === executionId || exec.id === parseInt(executionId));
-        
-        if (execution) {
-            const ticker = execution.ticker_symbol || execution.symbol || 'לא מוגדר';
-            const actionText = window.renderAction ? 
-                               window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
-                               ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
-            const quantity = execution.quantity || '0';
-            const price = execution.price ? `$${execution.price}` : '$0';
-            const date = execution.date || execution.execution_date ? 
-                         new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : 
-                         'לא מוגדר';
-            executionDetails = `${ticker} - ${actionText}, ${quantity} יחידות ב-${price}, תאריך: ${date}`;
-        }
-        
-        // Check linked items first
-        if (window.checkLinkedItemsBeforeAction) {
-            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('execution', executionId, 'delete');
-            if (hasLinkedItems) {
-                window.Logger.info('Execution has linked items, deletion cancelled', { executionId, page: 'executions' });
-                return;
-            }
-        }
-        
-        // Use warning system for confirmation with detailed information
-        if (window.showDeleteWarning) {
-            window.showDeleteWarning('execution', executionDetails, 'ביצוע',
-                async () => await performExecutionDeletion(executionId),
-                () => {}
-            );
-        } else {
-            // Fallback to simple confirm
-            if (!confirm('האם אתה בטוח שברצונך למחוק את הביצוע?')) {
-                return;
-            }
-            await performExecutionDeletion(executionId);
-        }
+        // Use unified deletion process with linked items check
+        await checkLinkedItemsAndDeleteExecution(executionId);
         
     } catch (error) {
         CRUDResponseHandler.handleError(error, 'מחיקת ביצוע');
@@ -3339,7 +3310,16 @@ async function deleteExecution(executionId) {
 
 async function performExecutionDeletion(executionId) {
     try {
-        // ניקוי מטמון לפני פעולת CRUD - מחיקה        // Send delete request
+        // Clear cache before deletion to ensure fresh data after reload
+        if (window.unifiedCacheManager) {
+            await window.unifiedCacheManager.clearByPattern('executions-data');
+            await window.unifiedCacheManager.clearByPattern('dashboard-data');
+            await window.unifiedCacheManager.clearByPattern('account-activity-data');
+            await window.unifiedCacheManager.clearByPattern('account-activity-*');
+            await window.unifiedCacheManager.clearByPattern('account-balance-*');
+        }
+        
+        // Send delete request
         const response = await fetch(`/api/executions/${executionId}`, {
             method: 'DELETE'
         });

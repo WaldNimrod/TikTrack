@@ -1743,20 +1743,15 @@ async function confirmDeleteAlert(alertId) {
   // window.Logger.info('🔄 confirmDeleteAlert נקראה עבור ID:', alertId, { page: "alerts" });
 
   try {
-    // ניקוי מטמון לפני פעולת CRUD - מחיקה
-    const response = await fetch(`/api/alerts/${alertId}`, {
-      method: 'DELETE',
-    });
-
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleDeleteResponse(response, {
-      successMessage: 'התראה נמחקה בהצלחה!',
-      apiUrl: '/api/alerts/',
-      entityName: 'התראה',
-      reloadFn: window.loadAlertsData,
-      requiresHardReload: false
-    });
-
+    // Use unified deletion process with linked items check
+    if (window.checkLinkedItemsAndDeleteAlert) {
+      await window.checkLinkedItemsAndDeleteAlert(alertId);
+    } else if (window.performAlertDeletion) {
+      // Fallback if checkLinkedItemsAndDeleteAlert not available
+      await window.performAlertDeletion(alertId);
+    } else {
+      CRUDResponseHandler.handleError(new Error('Deletion functions not available'), 'מחיקת התראה');
+    }
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'מחיקת התראה');
   }

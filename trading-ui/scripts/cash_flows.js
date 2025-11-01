@@ -328,10 +328,11 @@ async function ensureTradingAccountsLoaded() {
 // פונקציות API
 // ========================================
 
+// REMOVED: loadCashFlows - replaced by loadCashFlowsData
 /**
  * טעינת תזרימי מזומנים מהשרת
  */
-async function loadCashFlows() {
+async function _REMOVED_loadCashFlows() {
   try {
 
     const response = await fetch('http://127.0.0.1:8080/api/cash_flows/');
@@ -1188,7 +1189,7 @@ async function initializeCashFlowsPage() {
     await window.loadCurrenciesFromServer();
 
     // טעינת נתונים
-    await loadCashFlows();
+    await loadCashFlowsData();
 
     // שחזור מצב הסגירה
     if (typeof window.restoreSectionStates === 'function') {
@@ -1565,11 +1566,12 @@ function editCashFlow(id) {
 
 // ===== TRADE AND TRADE PLAN LOADING FUNCTIONS =====
 
+// REMOVED: loadTradesForCashFlow - not used, ModalManagerV2 uses SelectPopulatorService
 /**
  * Load trades for cash flow modals
  * @param {string} selectId - ID של ה-select element
  */
-async function loadTradesForCashFlow(selectId) {
+async function _REMOVED_loadTradesForCashFlow(selectId) {
   try {
     const response = await fetch('/api/trades/');
     if (!response.ok) {
@@ -1606,11 +1608,12 @@ async function loadTradesForCashFlow(selectId) {
   }
 }
 
+// REMOVED: loadTradePlansForCashFlow - not used, ModalManagerV2 uses SelectPopulatorService
 /**
  * Load trade plans for cash flow modals
  * @param {string} selectId - ID של ה-select element
  */
-async function loadTradePlansForCashFlow(selectId) {
+async function _REMOVED_loadTradePlansForCashFlow(selectId) {
   try {
     const response = await fetch('/api/trade_plans/');
     if (!response.ok) {
@@ -1893,8 +1896,9 @@ function generateDetailedLog() {
     return log.join('\n');
 }
 
+// REMOVED: generateDetailedLogForCashFlows - not used, use global generateDetailedLog from logger-service.js
 // Local  function for cash_flows page
-async function generateDetailedLogForCashFlows() {
+async function _REMOVED_generateDetailedLogForCashFlows() {
     try {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {

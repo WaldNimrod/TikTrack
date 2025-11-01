@@ -351,5 +351,23 @@ const translatedRowStatus = rowStatus && (
 
 ---
 
-**סיום ניתוח ותיקונים**
+---
+
+## עדכון: טבלת תנועות חשבון (Account Activity Table)
+
+**תגלית:** בעמוד חשבונות מסחר יש שתי טבלאות:
+1. ✅ `accountsTable` - טבלת חשבונות (תוקן)
+2. ❌ `accountActivityTable` - טבלת תנועות חשבון (לא היה מוכן)
+
+### תיקונים לטבלת תנועות:
+
+1. ✅ הוספת `data-date` לתאריך
+2. ✅ הוספת `data-type` לסוג ותת-סוג
+3. ✅ הוספת `accountActivityContainer` לרשימה הידועה
+
+**פירוט מלא:** `ACCOUNT_ACTIVITY_TABLE_FILTER_FIX.md`
+
+---
+
+**סיום ניתוח ותיקונים - שתי הטבלאות מוכנות לפילטר**
 

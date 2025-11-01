@@ -12,7 +12,7 @@
  * - createPerformanceChart() - createPerformanceChart function
  * - createAccountChart() - createAccountChart function
  * - createMixedChart() - createMixedChart function
- * - createMixedChartData() - createMixedChartData function
+ * - createMixedChartData() - REMOVED: not used
  * 
  * EVENT HANDLING (1)
  * - quickAction() - * Refresh overview data on the index page
@@ -311,69 +311,7 @@ async function createMixedChart() {
     }
 }
 
-function createMixedChartData(rawData, stats) {
-    if (!rawData.data || !Array.isArray(rawData.data)) {
-        return { labels: [], datasets: [] };
-    }
-    
-    const trades = rawData.data;
-    const colorPalette = window.getChartColorPalette ? window.getChartColorPalette() : [
-        '#1e40af', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6c757d', '#6f42c1', '#20c997'
-    ];
-    
-    const labels = [
-        'טריידים פתוחים', 'טריידים סגורים', 'טריידים מבוטלים',
-        'חשבונות פעילים', 'ביצועים חיוביים', 'ביצועים שליליים',
-        'סה"כ עסקאות', 'ממוצע P/L'
-    ];
-    
-    const datasets = [
-        {
-            label: 'טריידים לפי סטטוס',
-            data: [
-                trades.filter(t => t.status === 'open').length,
-                trades.filter(t => t.status === 'closed').length,
-                trades.filter(t => t.status === 'cancelled').length,
-                0, 0, 0, 0, 0
-            ],
-            borderColor: colorPalette[0] || '#1e40af',
-            backgroundColor: window.getChartColorWithOpacity ? 
-                window.getChartColorWithOpacity('primary', 0.2) : 'rgba(30, 64, 175, 0.2)',
-            tension: 0.1,
-            fill: false
-        },
-        {
-            label: 'חשבונות ופעילות',
-            data: [
-                0, 0, 0,
-                new Set(trades.map(t => t.account_id)).size,
-                trades.filter(t => t.pnl && parseFloat(t.pnl) > 0).length,
-                trades.filter(t => t.pnl && parseFloat(t.pnl) < 0).length,
-                0, 0
-            ],
-            borderColor: colorPalette[1] || '#28a745',
-            backgroundColor: window.getChartColorWithOpacity ? 
-                window.getChartColorWithOpacity('success', 0.2) : 'rgba(40, 167, 69, 0.2)',
-            tension: 0.1,
-            fill: false
-        },
-        {
-            label: 'סטטיסטיקות כלליות',
-            data: [
-                0, 0, 0, 0, 0, 0,
-                stats.totalTrades,
-                Math.round(stats.averagePL * 100) / 100
-            ],
-            borderColor: colorPalette[2] || '#ffc107',
-            backgroundColor: window.getChartColorWithOpacity ? 
-                window.getChartColorWithOpacity('warning', 0.2) : 'rgba(255, 193, 7, 0.2)',
-            tension: 0.1,
-            fill: false
-        }
-    ];
-    
-    return { labels: labels, datasets: datasets };
-}
+// REMOVED: createMixedChartData - not used, createMixedChart uses chartData.mixed from tradesAdapter.formatData()
 
 // Chart Management Functions
 async function refreshAllCharts() {

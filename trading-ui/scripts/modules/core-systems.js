@@ -1756,60 +1756,12 @@ function hideNotification(notification) {
 // ===== SPECIFIC NOTIFICATION FUNCTIONS =====
 // These are convenience functions for different notification types
 
-/**
- * Show success notification
- * NOTIFICATION SYSTEM - Displays success message to user
- *
- * @param {string} title - Success notification title
- * @param {string} message - Success notification message
- * @param {number} duration - Display duration in milliseconds (default: 4000)
- * @param {string} category - Category of notification (default: 'system')
- */
-async function showSuccessNotification(title, message, duration = 4000, category = null) {
-  // Ensure title and message are provided
-  const finalTitle = title || 'הצלחה';
-  const finalMessage = message || 'הפעולה הושלמה בהצלחה';
-
-  // showSuccessNotification calling showNotification with category
-  await showNotification(finalMessage, 'success', finalTitle, duration, category);
-}
+// REMOVED: showSuccessNotification - use window.showSuccessNotification from notification-system.js
 
 
-/**
- * Show error notification
- * NOTIFICATION SYSTEM - Displays error message to user
- *
- * @param {string} title - Error notification title
- * @param {string} message - Error notification message
- * @param {number} duration - Display duration in milliseconds (default: 6000)
- * @param {string} category - Category of notification (default: 'system')
- */
-async function showErrorNotification(title, message, duration = 6000, category = null) {
-  // Use the new critical error system for all error notifications
-  console.log('🚨 Error notification converted to critical error system:', { title, message, category });
-  
-  // Get current function name from stack trace
-  const stack = new Error().stack;
-  const stackLines = stack.split('\n');
-  const callerLine = stackLines[2] || stackLines[1] || '';
-  
-  // Extract function name and line number
-  const functionMatch = callerLine.match(/at\s+(\w+)/);
-  const lineMatch = callerLine.match(/:(\d+):/);
-  
-  const errorDetails = {
-    source: 'error-notification',
-    function: functionMatch ? functionMatch[1] : 'unknown',
-    line: lineMatch ? lineMatch[1] : 'unknown',
-    stack: stack,
-    originalDuration: duration,
-    originalCategory: category,
-    convertedAt: new Date().toISOString()
-  };
-  
-  // Show critical error notification instead of regular notification
-  await showCriticalErrorNotification(title, message, errorDetails, category || 'system');
-}
+// REMOVED: showErrorNotification - use window.showErrorNotification from notification-system.js
+// Note: The global version is simpler and calls showNotification directly
+// If critical error handling is needed, use window.showCriticalErrorNotification directly
 
 /**
  * Show simple error notification (legacy mode)
@@ -2642,33 +2594,9 @@ function withCriticalErrorHandling(func, errorTitle = 'שגיאה קריטית',
   };
 }
 
-/**
- * Show warning notification
- * NOTIFICATION SYSTEM - Displays warning message to user
- *
- * @param {string} title - Warning notification title
- * @param {string} message - Warning notification message
- * @param {number} duration - Display duration in milliseconds (default: 5000)
- * @param {string} category - Category of notification (default: 'system')
- */
-async function showWarningNotification(title, message, duration = 5000, category = null) {
-  // showWarningNotification calling showNotification with category
-  await showNotification(message, 'warning', title, duration, category);
-}
+// REMOVED: showWarningNotification - use window.showWarningNotification from notification-system.js
 
-/**
- * Show info notification
- * NOTIFICATION SYSTEM - Displays info message to user
- *
- * @param {string} title - Info notification title
- * @param {string} message - Info notification message
- * @param {number} duration - Display duration in milliseconds (default: 4000)
- * @param {string} category - Category of notification (default: 'system')
- */
-async function showInfoNotification(title, message, duration = 4000, category = null) {
-  // showInfoNotification calling showNotification with category
-  await showNotification(message, 'info', title, duration, category);
-}
+// REMOVED: showInfoNotification - use window.showInfoNotification from notification-system.js
 
 /**
  * Show details modal
@@ -2833,7 +2761,7 @@ function copyToClipboard(textContent, title) {
     // Try modern clipboard API first
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(formattedContent).then(() => {
-        showSuccessNotification('התוכן הועתק ללוח בהצלחה', 'העתקה');
+        window.showSuccessNotification('התוכן הועתק ללוח בהצלחה', 'העתקה');
         console.log('✅ Content copied to clipboard via Clipboard API');
       }).catch(err => {
         console.warn('Clipboard API failed, trying fallback:', err);
@@ -2873,7 +2801,7 @@ function fallbackCopyToClipboard(text) {
     }
   } catch (error) {
     console.error('❌ Fallback copy failed:', error);
-    showErrorNotification('שגיאה בהעתקה ללוח', 'שגיאה');
+    window.showErrorNotification('שגיאה בהעתקה ללוח', 'שגיאה');
   }
 }
 
@@ -3206,10 +3134,10 @@ window.copySuccessDetails = function() {
     navigator.clipboard.writeText(successText).then(() => {
       console.log('Success details copied to clipboard');
       // Show simple success notification to avoid recursion
-      showSuccessNotification('פרטי ההצלחה הועתקו ללוח', 'הפרטים הועתקו בהצלחה');
+      window.showSuccessNotification('פרטי ההצלחה הועתקו ללוח', 'הפרטים הועתקו בהצלחה');
     }).catch(err => {
       console.error('Failed to copy success details:', err);
-      showSimpleErrorNotification('שגיאה בהעתקה', 'לא ניתן להעתיק את פרטי ההצלחה');
+      window.showErrorNotification('שגיאה בהעתקה', 'לא ניתן להעתיק את פרטי ההצלחה');
     });
   }
 };
@@ -3224,17 +3152,20 @@ window.markAlertAsRead = markAlertAsRead;
 
 
 // Export NOTIFICATION SYSTEM functions to global scope
-window.showNotification = showNotification;
-window.showSuccessNotification = showSuccessNotification;
+// Export NOTIFICATION SYSTEM functions to global scope
+// Note: showSuccessNotification, showErrorNotification, showWarningNotification, showInfoNotification
+// are exported from notification-system.js - removed local duplicates
+window.showNotification = showNotification; // Keep local - has complex category detection logic
 window.showFinalSuccessNotification = showFinalSuccessNotification;
 window.showFinalSuccessNotificationWithReload = showFinalSuccessNotificationWithReload;
-window.showErrorNotification = showErrorNotification;
+// window.showSuccessNotification - use global from notification-system.js
+// window.showErrorNotification - use global from notification-system.js
 window.showSimpleErrorNotification = showSimpleErrorNotification;
 window.showCriticalErrorNotification = showCriticalErrorNotification;
 window.createCriticalError = createCriticalError;
 window.withCriticalErrorHandling = withCriticalErrorHandling;
-window.showWarningNotification = showWarningNotification;
-window.showInfoNotification = showInfoNotification;
+// window.showWarningNotification - use global from notification-system.js
+// window.showInfoNotification - use global from notification-system.js
 window.showDetailsModal = showDetailsModal;
 
 // Export NOTIFICATION CATEGORIES SYSTEM functions to global scope
@@ -3265,16 +3196,14 @@ window.notificationSystem = {
 
 
   // NOTIFICATION SYSTEM functions
-  showNotification,
-  showSuccessNotification,
+  // Note: showSuccessNotification, showWarningNotification, showInfoNotification use global functions from notification-system.js
+  showNotification, // Keep local - has complex logic
   showFinalSuccessNotification,
-  showErrorNotification,
+  // showErrorNotification - use global from notification-system.js
   showSimpleErrorNotification,
   showCriticalErrorNotification,
   createCriticalError,
   withCriticalErrorHandling,
-  showWarningNotification,
-  showInfoNotification,
   createNotificationContainer,
   hideNotification,
   getNotificationIcon,
@@ -3295,15 +3224,15 @@ window.notificationSystem = {
 // Global NotificationSystem object for compatibility
 window.NotificationSystem = {
     show: window.showNotification,
-    showSuccess: window.showSuccessNotification,
+    showSuccess: window.showSuccessNotification, // From notification-system.js
     showFinalSuccess: window.showFinalSuccessNotification,
-    showError: window.showErrorNotification,
+    showError: window.showErrorNotification, // From notification-system.js
     showSimpleError: window.showSimpleErrorNotification,
     showCriticalError: window.showCriticalErrorNotification,
     createCriticalError: window.createCriticalError,
     withCriticalErrorHandling: window.withCriticalErrorHandling,
-    showWarning: window.showWarningNotification,
-    showInfo: window.showInfoNotification,
+    showWarning: window.showWarningNotification, // From notification-system.js
+    showInfo: window.showInfoNotification, // From notification-system.js
     showDetails: window.showDetailsModal,
     shouldShow: window.shouldShowNotification,
     logWithCategory: window.logWithCategory,

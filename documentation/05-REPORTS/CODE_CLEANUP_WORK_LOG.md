@@ -184,6 +184,10 @@
 | requiresValidation | core-systems.js | 2 (שורה 733 arrow, 823 function) | שורה 823 | שורות 733-735 | 1.11.2025 | Arrow function מקומי הוסר - משתמש בפונקציה הגלובלית |
 | requiresTables | core-systems.js | 2 (שורה 737 arrow, 834 function) | שורה 834 | שורות 737-739 | 1.11.2025 | Arrow function מקומי הוסר - משתמש בפונקציה הגלובלית |
 | requiresCharts | core-systems.js | 2 (שורה 741 arrow, 846 function) | שורה 846 | שורות 741-743 | 1.11.2025 | Arrow function מקומי הוסר - משתמש בפונקציה הגלובלית |
+| showSuccessNotification | core-systems.js | 1 (שורה 1768) | window.showSuccessNotification | שורות 1759-1775 | 1.11.2025 | הוסר - משתמש במערכת הכללית מ-notification-system.js |
+| showErrorNotification | core-systems.js | 1 (שורה 1787) | window.showErrorNotification | שורות 1762-1796 | 1.11.2025 | הוסר - משתמש במערכת הכללית מ-notification-system.js |
+| showWarningNotification | core-systems.js | 1 (שורה 2654) | window.showWarningNotification | שורות 2629 | 1.11.2025 | הוסר - משתמש במערכת הכללית מ-notification-system.js |
+| showInfoNotification | core-systems.js | 1 (שורה 2668) | window.showInfoNotification | שורות 2631 | 1.11.2025 | הוסר - משתמש במערכת הכללית מ-notification-system.js |
 
 ---
 

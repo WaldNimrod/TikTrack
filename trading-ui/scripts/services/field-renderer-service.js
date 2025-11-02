@@ -230,7 +230,11 @@ class FieldRendererService {
             'transfer_out': 'העברה החוצה',
             'other_positive': 'אחר חיובי',
             'other_negative': 'אחר שלילי',
-            'other': 'אחר'
+            'other': 'אחר',
+            // Execution actions (buy/sell)
+            'buy': 'קנייה',
+            'sell': 'מכירה',
+            'sale': 'מכירה'
         };
         
         const typeLower = type.toLowerCase();
@@ -249,20 +253,31 @@ class FieldRendererService {
      * רנדור action badge (פעולה: קנייה/מכירה)
      * 
      * @param {string} action - פעולה (buy, sale, sell)
-     * @returns {string} - HTML של ה-badge
+     * @param {number|null} amountForColor - סכום לקביעת צבע (חיובי/שלילי), אופציונלי
+     * @returns {string} - HTML של ה-badge (עיצוב זהה ל-renderType)
      * 
      * @example
      * const html = FieldRendererService.renderAction('buy');
+     * const htmlColored = FieldRendererService.renderAction('sell', -100); // שלילי
      */
-    static renderAction(action) {
+    static renderAction(action, amountForColor = null) {
         if (!action) return '<span class="badge badge-secondary">-</span>';
         
         const actionLower = action.toLowerCase();
         const isBuy = actionLower === 'buy' || actionLower === 'קנייה';
         const actionHebrew = isBuy ? 'קנייה' : 'מכירה';
-        const actionClass = isBuy ? 'action-buy' : 'action-sell';
         
-        return `<span class="badge ${actionClass}">${actionHebrew}</span>`;
+        // קביעת צבע לפי amount אם סופק, אחרת לפי סוג פעולה (buy = שלילי בדרך כלל, sell = חיובי)
+        let colorClass = '';
+        if (amountForColor !== null && amountForColor !== undefined) {
+            colorClass = amountForColor >= 0 ? ' text-success' : ' text-danger';
+        } else {
+            // ברירת מחדל: buy = שלילי (יוצא כסף), sell = חיובי (נכנס כסף)
+            colorClass = isBuy ? ' text-danger' : ' text-success';
+        }
+        
+        // שימוש באותו עיצוב כמו renderType - badge-type badge-capsule
+        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${actionLower}">${actionHebrew}</span>`;
     }
 
     /**
@@ -769,7 +784,7 @@ window.renderPnL = (value, currency) => FieldRendererService.renderPnL(value, cu
 window.renderCurrency = (id, name, symbol) => FieldRendererService.renderCurrency(id, name, symbol);
 window.renderAmount = (value, currencySymbol, decimals, showSign) => FieldRendererService.renderAmount(value, currencySymbol, decimals, showSign);
 window.renderType = (type, amountForColor) => FieldRendererService.renderType(type, amountForColor);
-window.renderAction = (action) => FieldRendererService.renderAction(action);
+window.renderAction = (action, amountForColor) => FieldRendererService.renderAction(action, amountForColor);
 window.renderPriority = (priority) => FieldRendererService.renderPriority(priority);
 window.renderDate = (date, includeTime) => FieldRendererService.renderDate(date, includeTime);
 window.renderShares = (shares, cssClass) => FieldRendererService.renderShares(shares, cssClass);

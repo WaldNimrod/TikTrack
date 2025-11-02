@@ -166,9 +166,13 @@ async function loadAccountActivity(accountId) {
     try {
         window.Logger.info(`📡 טעינת תנועות חשבון ${accountId}`, { page: "trading_accounts" });
         
-        // Check cache first
+        // Check cache first - BUT bypass cache to ensure fresh data with executions
         const cacheKey = `account-activity-${accountId}`;
-        if (window.UnifiedCacheManager) {
+        // TEMPORARY: Bypass cache to ensure executions are loaded
+        // TODO: Remove this after confirming executions are loaded correctly
+        const BYPASS_CACHE = true;
+        
+        if (window.UnifiedCacheManager && !BYPASS_CACHE) {
             const cached = await window.UnifiedCacheManager.get(cacheKey);
             if (cached) {
                 window.Logger.info('✅ נתונים מהמטמון', { page: "trading_accounts" });
@@ -177,6 +181,12 @@ async function loadAccountActivity(accountId) {
                 updateActivitySummary(cached);
                 window.accountActivityState.isLoading = false;
                 return;
+            }
+        } else if (BYPASS_CACHE) {
+            window.Logger.info('🔄 Bypassing cache - loading fresh data from API', { page: "trading_accounts" });
+            // Clear cache for this account to ensure fresh data
+            if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+                await window.UnifiedCacheManager.remove(cacheKey);
             }
         }
         
@@ -191,6 +201,59 @@ async function loadAccountActivity(accountId) {
         
         if (result.status === 'success' && result.data) {
             window.accountActivityState.activityData = result.data;
+            
+            // Detailed debugging of received data
+            window.Logger.info(`🔍 DEBUG: Raw API response structure:`, { page: "trading_accounts" });
+            window.Logger.info(`  - Has data: ${!!result.data}`, { page: "trading_accounts" });
+            window.Logger.info(`  - Has currencies: ${!!result.data?.currencies}`, { page: "trading_accounts" });
+            window.Logger.info(`  - Currencies count: ${result.data?.currencies?.length || 0}`, { page: "trading_accounts" });
+            
+            if (result.data?.currencies) {
+                result.data.currencies.forEach((currency, idx) => {
+                    window.Logger.info(`  Currency ${idx}: ${currency.currency_symbol}, movements count: ${currency.movements?.length || 0}`, { page: "trading_accounts" });
+                    if (currency.movements && currency.movements.length > 0) {
+                        const types = currency.movements.map(m => m.type || 'unknown');
+                        window.Logger.info(`    Movement types: ${types.join(', ')}`, { page: "trading_accounts" });
+                        currency.movements.forEach((mov, movIdx) => {
+                            if (mov.type === 'execution') {
+                                window.Logger.info(`    ✅ Execution ${movIdx}: id=${mov.id}, action=${mov.action || mov.sub_type || mov.subtype}, ticker_id=${mov.ticker_id}, ticker_symbol=${mov.ticker_symbol}, amount=${mov.amount}`, { page: "trading_accounts" });
+                            }
+                        });
+                    } else {
+                        window.Logger.warn(`    ⚠️ No movements for currency ${currency.currency_symbol}`, { page: "trading_accounts" });
+                    }
+                });
+            }
+            
+            // Debug: Log received data structure
+            const totalMovements = result.data.currencies?.reduce((sum, curr) => sum + (curr.movements?.length || 0), 0) || 0;
+            const cashFlowCount = result.data.currencies?.reduce((sum, curr) => {
+                return sum + (curr.movements?.filter(m => m.type === 'cash_flow').length || 0);
+            }, 0) || 0;
+            const executionCount = result.data.currencies?.reduce((sum, curr) => {
+                return sum + (curr.movements?.filter(m => m.type === 'execution').length || 0);
+            }, 0) || 0;
+            
+            window.Logger.info(`📥 Received from API: ${totalMovements} total movements (${cashFlowCount} cash flows, ${executionCount} executions)`, { page: "trading_accounts" });
+            
+            // Log first few movements by type
+            result.data.currencies?.forEach(currency => {
+                const execs = currency.movements?.filter(m => m.type === 'execution') || [];
+                const cfs = currency.movements?.filter(m => m.type === 'cash_flow') || [];
+                window.Logger.info(`  Currency ${currency.currency_symbol}: ${currency.movements?.length || 0} total movements (${cfs.length} cash flows, ${execs.length} executions)`, { page: "trading_accounts" });
+                if (execs.length > 0) {
+                    execs.slice(0, 3).forEach(ex => {
+                        window.Logger.info(`    ✅ Execution ${ex.id}: ${ex.ticker_symbol || 'No ticker'}, action=${ex.sub_type || ex.action || ex.subtype || 'unknown'}, amount=${ex.amount}`, { page: "trading_accounts" });
+                    });
+                } else {
+                    window.Logger.warn(`    ⚠️ No executions found for currency ${currency.currency_symbol}`, { page: "trading_accounts" });
+                }
+            });
+            
+            if (executionCount === 0 && totalMovements > 0) {
+                window.Logger.error(`❌ PROBLEM: Received ${totalMovements} movements but 0 executions! All movements are cash flows.`, { page: "trading_accounts" });
+                window.Logger.error(`   This means executions are not being returned from the backend API.`, { page: "trading_accounts" });
+            }
             
             // Cache the data
             if (window.UnifiedCacheManager) {
@@ -237,6 +300,9 @@ function populateAccountActivityTable(data) {
     
     // Sort all movements chronologically (newest first, then calculate balances oldest to newest)
     const allMovements = [];
+    let cashFlowCount = 0;
+    let executionCount = 0;
+    
     data.currencies.forEach(currency => {
         currency.movements.forEach(movement => {
             allMovements.push({
@@ -244,9 +310,18 @@ function populateAccountActivityTable(data) {
                 currency_id: currency.currency_id,
                 currency_symbol: currency.currency_symbol
             });
+            
+            // Count movements by type
+            if (movement.type === 'cash_flow') {
+                cashFlowCount++;
+            } else if (movement.type === 'execution') {
+                executionCount++;
+            }
         });
         runningBalances[currency.currency_id] = currency.balance || 0;
     });
+    
+    window.Logger.info(`📊 Total movements: ${allMovements.length} (${cashFlowCount} cash flows, ${executionCount} executions)`, { page: "trading_accounts" });
     
     // Sort by date (oldest first for balance calculation)
     allMovements.sort((a, b) => {
@@ -322,9 +397,12 @@ function renderMovementRow(movement, runningBalance) {
             subtypeCell.textContent = getSubtypeDisplay(movement.sub_type || movement.subtype);
         }
     } else {
-        // Use renderAction for execution actions (buy/sell)
+        // Use renderAction for execution actions (buy/sell) - with amount for color
         if (window.FieldRendererService && window.FieldRendererService.renderAction) {
-            subtypeCell.innerHTML = window.FieldRendererService.renderAction(movement.sub_type || movement.subtype || movement.action);
+            subtypeCell.innerHTML = window.FieldRendererService.renderAction(
+                movement.sub_type || movement.subtype || movement.action,
+                movement.amount // Pass amount for color determination
+            );
         } else {
             subtypeCell.textContent = getSubtypeDisplay(movement.sub_type || movement.subtype || movement.action);
         }

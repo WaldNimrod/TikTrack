@@ -74,17 +74,74 @@ class AccountActivityService:
             cash_flows = cash_flows_query.order_by(CashFlow.date.desc(), CashFlow.created_at.desc()).all()
             
             # Get all executions for this account
+            # IMPORTANT: trading_account_id is REQUIRED for all executions - direct link only
+            # CRITICAL: Use Execution.trading_account_id (NOT account_id, NOT account.account_id, NOT trading_trading_account_id)
+            logger.info(f"🔍 STARTING EXECUTION QUERY for account {account_id}")
+            logger.info(f"🔍 Using filter: Execution.trading_account_id == {account_id}")
+            logger.info(f"🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)")
+            
             executions_query = db.query(Execution).options(
-                joinedload(Execution.ticker),
+                joinedload(Execution.ticker).joinedload(Ticker.currency),
                 joinedload(Execution.trading_account)
             ).filter(Execution.trading_account_id == account_id)
             
+            logger.debug(f"🔍 Querying executions directly linked to account {account_id} (via trading_account_id only)")
+            logger.debug(f"🔍 Filter: Execution.trading_account_id == {account_id} (NOT account_id, NOT account.account_id)")
+            
             if start_date:
+                logger.info(f"🔍 Adding start_date filter: {start_date}")
                 executions_query = executions_query.filter(Execution.date >= datetime.combine(start_date, datetime.min.time()))
             if end_date:
+                logger.info(f"🔍 Adding end_date filter: {end_date}")
                 executions_query = executions_query.filter(Execution.date <= datetime.combine(end_date, datetime.max.time()))
             
+            # Log query before executing
+            logger.info(f"🔍 About to execute query: Execution.trading_account_id == {account_id}")
+            
             executions = executions_query.order_by(Execution.date.desc(), Execution.created_at.desc()).all()
+            
+            logger.info(f"📊 Loaded {len(executions)} executions for account {account_id}")
+            logger.info(f"📊 Loaded {len(cash_flows)} cash flows for account {account_id}")
+            
+            # EXTENSIVE LOGGING for debugging
+            if len(executions) == 0:
+                logger.warning(f"⚠️ NO EXECUTIONS FOUND for account {account_id}!")
+                logger.warning(f"⚠️ Check: Is Execution.trading_account_id correct?")
+                logger.warning(f"⚠️ Check: Are there executions in DB with trading_account_id={account_id}?")
+                # Direct query to verify
+                direct_check = db.query(Execution).filter(Execution.trading_account_id == account_id).count()
+                logger.warning(f"⚠️ Direct query count (no joins): {direct_check}")
+            else:
+                logger.info(f"✅ Found {len(executions)} executions - first execution ID: {executions[0].id if executions else 'N/A'}")
+            
+            # IMPORTANT: All executions MUST be linked directly to account (trading_account_id is required)
+            # We only care about direct link via trading_account_id - trade_id is irrelevant for this query
+            executions_without_account = [e for e in executions if e.trading_account_id is None]
+            if len(executions_without_account) > 0:
+                logger.warning(f"⚠️ Found {len(executions_without_account)} executions WITHOUT trading_account_id (this should not happen!)")
+                for ex in executions_without_account[:3]:
+                    logger.warning(f"  Execution {ex.id}: ticker_id={ex.ticker_id}")
+            
+            logger.info(f"🔗 Loaded {len(executions)} executions directly linked to account {account_id} (via trading_account_id)")
+            
+            # Detailed logging for executions debugging
+            if len(executions) > 0:
+                logger.info(f"🔍 First 3 executions for account {account_id}:")
+                for i, ex in enumerate(executions[:3]):
+                    logger.info(f"  Execution {i+1}: id={ex.id}, action={ex.action}, ticker_id={ex.ticker_id}, date={ex.date}, price={ex.price}, quantity={ex.quantity}")
+                    if ex.ticker:
+                        logger.info(f"    Ticker: symbol={ex.ticker.symbol}, currency_id={ex.ticker.currency_id if hasattr(ex.ticker, 'currency_id') else 'N/A'}")
+                        if hasattr(ex.ticker, 'currency') and ex.ticker.currency:
+                            logger.info(f"    Currency: symbol={ex.ticker.currency.symbol}, id={ex.ticker.currency.id}")
+                    else:
+                        logger.warning(f"    ⚠️ Ticker is None for execution {ex.id}")
+            else:
+                logger.warning(f"⚠️ No executions found for account {account_id} - checking database directly...")
+                # Direct database query for debugging
+                direct_executions = db.query(Execution).filter(Execution.trading_account_id == account_id).all()
+                logger.info(f"🔍 Direct query found {len(direct_executions)} executions for account {account_id}")
+                if len(direct_executions) > 0:
+                    logger.info(f"  First execution: id={direct_executions[0].id}, action={direct_executions[0].action}, ticker_id={direct_executions[0].ticker_id}")
             
             # Group by currency
             currencies_dict = {}
@@ -125,11 +182,19 @@ class AccountActivityService:
                 # Transfer handled separately if needed
             
             # Process executions
-            for ex in executions:
+            logger.info(f"🔄 Processing {len(executions)} executions...")
+            for idx, ex in enumerate(executions):
+                logger.debug(f"  Processing execution {idx+1}/{len(executions)}: id={ex.id}, action={ex.action}, ticker_id={ex.ticker_id}")
+                
                 # Get currency from ticker or account base currency
+                # IMPORTANT: Currency is loaded via joinedload(Execution.ticker).joinedload(Ticker.currency)
                 if ex.ticker and ex.ticker.currency_id:
                     currency_id = ex.ticker.currency_id
-                    currency = ex.ticker.currency
+                    # Currency is loaded via joinedload, so we can access it directly
+                    currency = ex.ticker.currency if hasattr(ex.ticker, 'currency') else None
+                    if not currency:
+                        # Fallback: query currency from database
+                        currency = db.query(Currency).filter(Currency.id == currency_id).first()
                 elif account.currency_id:
                     currency_id = account.currency_id
                     currency = account.currency
@@ -148,17 +213,29 @@ class AccountActivityService:
                         'balance': 0.0
                     }
                 
-                # Calculate execution amount (negative for buy, positive for sell)
-                execution_amount = -float(ex.price * ex.quantity + (ex.fee or 0)) if ex.action == 'buy' else float(ex.price * ex.quantity - (ex.fee or 0))
+                # Calculate execution amount (negative for buy, positive for sell/sale)
+                # Support both 'sell' and 'sale' for backward compatibility
+                # Ensure action is not None - use 'buy' as default if missing
+                execution_action = ex.action if ex.action else 'buy'
+                logger.debug(f"    Execution {ex.id}: action={repr(ex.action)}, using={repr(execution_action)}")
+                
+                if execution_action == 'buy':
+                    execution_amount = -float(ex.price * ex.quantity + (ex.fee or 0))
+                else:  # 'sell' or 'sale'
+                    execution_amount = float(ex.price * ex.quantity - (ex.fee or 0))
                 
                 # Add execution as movement
+                
                 movement = {
                     'id': ex.id,
                     'type': 'execution',
-                    'sub_type': ex.action,
+                    'sub_type': execution_action,
+                    'subtype': execution_action,  # Alias for frontend compatibility
+                    'action': execution_action,  # Alias for frontend compatibility - ensure not None
                     'date': ex.date.isoformat() if ex.date else None,
                     'amount': execution_amount,
                     'description': ex.notes,
+                    'ticker_id': ex.ticker.id if ex.ticker else None,
                     'ticker_symbol': ex.ticker.symbol if ex.ticker else None,
                     'quantity': float(ex.quantity),
                     'price': float(ex.price),
@@ -167,16 +244,26 @@ class AccountActivityService:
                 }
                 
                 currencies_dict[currency_id]['movements'].append(movement)
+                logger.debug(f"    ✅ Added execution {ex.id} to currency {currency_symbol} (id={currency_id}), amount={execution_amount}")
                 
                 # Update balance
                 currencies_dict[currency_id]['balance'] += execution_amount
             
             # Sort movements by date (newest first)
+            logger.info(f"📊 Sorting movements by currency...")
             for currency_data in currencies_dict.values():
+                currency_symbol = currency_data['currency_symbol']
+                total_movements = len(currency_data['movements'])
+                execution_movements = len([m for m in currency_data['movements'] if m.get('type') == 'execution'])
+                cash_flow_movements = len([m for m in currency_data['movements'] if m.get('type') == 'cash_flow'])
+                
                 currency_data['movements'].sort(
                     key=lambda x: x['date'] or '',
                     reverse=True
                 )
+                
+                # Log movement counts per currency for debugging
+                logger.info(f"  Currency {currency_symbol}: {total_movements} total movements ({cash_flow_movements} cash flows, {execution_movements} executions)")
             
             # Convert to list and prepare response
             currencies_list = list(currencies_dict.values())
@@ -331,19 +418,27 @@ class AccountActivityService:
             currency_id = ex.ticker.currency_id if ex.ticker and ex.ticker.currency_id else (ex.trading_account.currency_id if ex.trading_account else 1)
             currency_symbol = ex.ticker.currency.symbol if ex.ticker and ex.ticker.currency else (ex.trading_account.currency.symbol if ex.trading_account and ex.trading_account.currency else 'USD')
             
-            execution_amount = -float(ex.price * ex.quantity + (ex.fee or 0)) if ex.action == 'buy' else float(ex.price * ex.quantity - (ex.fee or 0))
+            # Calculate execution amount (negative for buy, positive for sell/sale)
+            if ex.action == 'buy':
+                execution_amount = -float(ex.price * ex.quantity + (ex.fee or 0))
+            else:  # 'sell' or 'sale'
+                execution_amount = float(ex.price * ex.quantity - (ex.fee or 0))
             
             movements.append({
                 'id': ex.id,
                 'type': 'execution',
                 'sub_type': ex.action,
+                'subtype': ex.action,  # Alias for frontend compatibility
+                'action': ex.action,  # Alias for frontend compatibility
                 'date': ex.date.isoformat() if ex.date else None,
                 'amount': execution_amount,
                 'currency_id': currency_id,
                 'currency_symbol': currency_symbol,
+                'ticker_id': ex.ticker.id if ex.ticker else None,
                 'ticker_symbol': ex.ticker.symbol if ex.ticker else None,
                 'quantity': float(ex.quantity),
                 'price': float(ex.price),
+                'fee': float(ex.fee) if ex.fee else 0.0,
                 'description': ex.notes
             })
         

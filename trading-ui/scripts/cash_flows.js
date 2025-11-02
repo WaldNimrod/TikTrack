@@ -731,7 +731,7 @@ async function renderCashFlowsTable() {
     const rateDisplay = formatUsdRate(cashFlow.usd_rate);
 
             row.innerHTML = `
-            <td class="col-account ticker-cell">
+            <td class="col-account ticker-cell" data-account="${cashFlow.trading_account_id || accountName || ''}">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <button class="btn btn-sm" 
                       onclick="showEntityDetails('cash_flow', ${cashFlow.id})" 
@@ -745,11 +745,11 @@ async function renderCashFlowsTable() {
                     </span>
                 </div>
             </td>
-            <td class="col-type type-cell">${typeDisplay}</td>
+            <td class="col-type type-cell" data-type="${cashFlow.type || ''}">${typeDisplay}</td>
             <td class="col-amount" style="text-align: left; direction: ltr;">
                 ${amountDisplay}
             </td>
-            <td class="col-date" style="text-align: center;">${formatDate(cashFlow.date)}</td>
+            <td class="col-date" data-date="${cashFlow.date || ''}" style="text-align: center;">${formatDate(cashFlow.date)}</td>
             <td class="col-description">${cashFlow.description || '-'}</td>
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :

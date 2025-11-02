@@ -88,27 +88,6 @@ class ModalNavigationManager {
         this.globalBackdrop = null;
         
         /**
-         * MutationObserver לניטור יצירת backdrop על ידי Bootstrap
-         * @type {MutationObserver|null}
-         * @private
-         */
-        this.backdropObserver = null;
-        
-        /**
-         * Interval ID לניקוי תקופתי של backdrop
-         * @type {number|null}
-         * @private
-         */
-        this.backdropCleanupInterval = null;
-        
-        /**
-         * טיימרים פעילים לעדכון navigation - למניעת כפילות
-         * @type {Map<string, number>}
-         * @private
-         */
-        this.navigationUpdateTimers = new Map();
-        
-        /**
          * סטטוס אתחול
          * @type {boolean}
          * @private
@@ -130,34 +109,37 @@ class ModalNavigationManager {
             // טעינת היסטוריה ממטמון אם קיים
             await this.loadHistoryFromCache();
             
-            // מאזין לסגירת מודולים (לפני סגירה מוחלטת)
-            document.addEventListener('hide.bs.modal', (event) => {
-                // ניקוי backdrop גם בזמן שהמודול נסגר (לפני hidden.bs.modal)
-                this.manageBackdrop();
-            });
-            
-            // מאזין לסגירת מודולים (אחרי סגירה מוחלטת)
+            // מאזין לסגירת מודולים
             document.addEventListener('hidden.bs.modal', (event) => {
                 this.handleModalHidden(event.target);
             });
             
             // מאזין לפתיחת מודולים
+            console.log('🔵 [INIT] Adding shown.bs.modal event listener');
             document.addEventListener('shown.bs.modal', (event) => {
+                console.log('🔵 [INIT] shown.bs.modal event fired', {
+                    modalId: event.target?.id,
+                    timestamp: new Date().toISOString(),
+                    handlerExists: typeof this.handleModalShown === 'function'
+                });
                 this.handleModalShown(event.target);
-                // ניקוי backdrop מיד אחרי פתיחת מודול (Bootstrap יכול ליצור backdrop משלו)
-                this.manageBackdrop();
             });
             
-            // MutationObserver לניטור יצירת backdrop על ידי Bootstrap
-            this.setupBackdropObserver();
-            
-            // ניקוי תקופתי ל-backdrop (כל 2 שניות) - למקרים שבהם backdrop נוצרים אחרי ה-event handlers
-            this.setupPeriodicBackdropCleanup();
+            console.log('✅ [INIT] ModalNavigationManager initializing...', {
+                hasEventListener: true,
+                timestamp: new Date().toISOString()
+            });
             
             this.isInitialized = true;
             
             // הוספה לאובייקט הגלובלי
             window.modalNavigationManager = this;
+            
+            console.log('✅ [INIT] ModalNavigationManager initialized', {
+                isInitialized: this.isInitialized,
+                globalExists: !!window.modalNavigationManager,
+                timestamp: new Date().toISOString()
+            });
             
             if (typeof window.Logger !== 'undefined' && window.Logger.info) {
                 window.Logger.info('ModalNavigationManager initialized successfully', { 
@@ -212,29 +194,108 @@ class ModalNavigationManager {
                 }
                 
                 if (cachedHistory && Array.isArray(cachedHistory) && cachedHistory.length > 0) {
+                    // ✅ תיקון בעיית מטמון: בדיקה אם המטמון פגום (כל המועדים הם "פרטי טרייד")
+                    const allSameTitle = cachedHistory.every(item => 
+                        item.info?.title === 'פרטי טרייד' || 
+                        !item.info?.title || 
+                        item.info?.title.trim() === ''
+                    );
+                    const hasDuplicateEntities = cachedHistory.length > 1 && 
+                        cachedHistory.every(item => 
+                            item.info?.entityType === cachedHistory[0].info?.entityType &&
+                            item.info?.entityId === cachedHistory[0].info?.entityId
+                        );
+                    
+                    // אם המטמון פגום - מנקים אותו
+                    if (allSameTitle || hasDuplicateEntities) {
+                        console.warn('⚠️ [loadHistoryFromCache] Cache appears corrupted - clearing', {
+                            allSameTitle,
+                            hasDuplicateEntities,
+                            cachedHistoryLength: cachedHistory.length,
+                            cachedHistoryDetails: cachedHistory.map((item, idx) => ({
+                                index: idx,
+                                entityType: item.info?.entityType,
+                                entityId: item.info?.entityId,
+                                title: item.info?.title,
+                                hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source)
+                            }))
+                        });
+                        
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ [loadHistoryFromCache] Cache corrupted - clearing', {
+                                allSameTitle,
+                                hasDuplicateEntities,
+                                cachedHistoryLength: cachedHistory.length,
+                                page: "modal-navigation-manager"
+                            });
+                        }
+                        
+                        // ניקוי מטמון פגום
+                        await window.UnifiedCacheManager.remove('modal-navigation-history', {
+                            layer: 'localStorage'
+                        });
+                        
+                        // המשך ללא טעינת מטמון
+                        return;
+                    }
+                    
                     // ניקוי אלמנטים שלא קיימים יותר ב-DOM
+                    // חשוב: טעינת גם content מהמטמון (אם נשמר) כדי לאפשר שחזור מהיר
                     const validHistory = [];
                     for (const item of cachedHistory) {
                         // בדיקה אם המודול עדיין קיים (אם יש element reference)
-                        // במקרה של טעינה מחדש, ה-element לא יהיה קיים, אז נשמור רק את ה-info
-                        if (item.info) {
+                        // במקרה של טעינה מחדש, ה-element לא יהיה קיים, אז נשמור רק את ה-info וה-content
+                        if (item.info && item.info.entityType && item.info.entityId !== undefined) {
                             validHistory.push({
                                 element: null, // יוגדר מחדש כשהמודול יפתח
                                 info: item.info,
+                                content: item.content || null, // ✅ תיקון: טעינת content מהמטמון
                                 timestamp: item.timestamp || Date.now()
                             });
                         }
                     }
                     
-                    // שמירה רק אם יש פריטים תקפים (לא נטען היסטוריה מלאה אחרי רענון)
-                    // למניעת בעיות, נשמור רק את המבנה אבל לא את ה-elements
-                    // Elements יוגדרו מחדש כשהמודולים יפתחו
+                    // ✅ תיקון: שמירת ההיסטוריה תקפה - היא תיבנה מחדש כשהמודולים יפתחו
+                    // אבל נשמור את המידע ב-localStorage זמני כדי שנוכל לגשת אליו
+                    // (השימוש העיקרי הוא כשפותחים מודול - מחפשים אם יש תוכן שמור)
                     if (validHistory.length > 0) {
-                        // לא נטען את ההיסטוריה המלאה - רק נוודא שיש גישה אליה
-                        // ההיסטוריה תיבנה מחדש כשהמודולים יפתחו
                         if (window.Logger) {
                             window.Logger.debug('Modal history found in cache (will rebuild on modal open)', {
                                 cachedCount: validHistory.length,
+                                validHistoryDetails: validHistory.map((item, idx) => ({
+                                    index: idx,
+                                    entityType: item.info?.entityType,
+                                    entityId: item.info?.entityId,
+                                    hasTitle: !!item.info?.title,
+                                    title: item.info?.title,
+                                    hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source),
+                                    sourceInfo: item.info?.sourceInfo || item.info?.source || null,
+                                    hasContent: !!item.content,
+                                    contentLength: item.content?.length || 0
+                                })),
+                                page: "modal-navigation-manager"
+                            });
+                        }
+                        // ✅ תיקון: טעינת ההיסטוריה המלאה ל-modalHistory
+                        // ה-elements יוגדרו מחדש כשהמודולים יפתחו
+                        this.modalHistory = validHistory;
+                        
+                        if (window.Logger) {
+                            window.Logger.info('✅ [loadHistoryFromCache] History loaded to modalHistory', {
+                                historyLength: this.modalHistory.length,
+                                modalHistory: this.modalHistory.map((item, idx) => ({
+                                    index: idx,
+                                    entityType: item.info?.entityType,
+                                    entityId: item.info?.entityId,
+                                    title: item.info?.title || '(no title)',
+                                    hasTitle: !!item.info?.title,
+                                    hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source),
+                                    sourceInfo: item.info?.sourceInfo || item.info?.source || null,
+                                    hasElement: !!item.element,
+                                    hasContent: !!item.content,
+                                    contentLength: item.content?.length || 0,
+                                    fullInfoKeys: item.info ? Object.keys(item.info) : []
+                                })),
                                 page: "modal-navigation-manager"
                             });
                         }
@@ -257,9 +318,11 @@ class ModalNavigationManager {
     async saveHistoryToCache() {
         try {
             if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-                // שמירה רק של ה-info (לא ה-element references) למטמון
+                // שמירה של info, content, ו-timestamp למטמון (לא ה-element references)
+                // חשוב: שמירת content מאפשרת שחזור מהיר ללא טעינה מחדש מה-API
                 const historyToSave = this.modalHistory.map(item => ({
                     info: item.info,
+                    content: item.content,  // ✅ הוספה: שמירת תוכן למטמון
                     timestamp: item.timestamp
                 }));
                 
@@ -317,27 +380,151 @@ class ModalNavigationManager {
      */
     async handleModalShown(modalElement) {
         try {
-            if (window.Logger) {
-                window.Logger.info('✅ [2.4 handleModalShown] Bootstrap modal shown event triggered', {
+            // ✅ לוג ברור - תמיד נדפיס ל-console גם
+            console.log('🔵🔵🔵 [handleModalShown] CALLED', {
+                modalId: modalElement?.id,
+                modalElement: modalElement,
+                historyLength: this.modalHistory.length,
+                timestamp: new Date().toISOString()
+            });
+            
+            // ✅ בדיקה אם זה שחזור של מודול מהיסטוריה (מ-_showPreviousModal)
+            // אם המודול כבר קיים בהיסטוריה והתוכן שלו נשמר, זה כנראה שחזור
+            const isRestoration = this.modalHistory.some(item => 
+                item.element === modalElement && 
+                item.content && 
+                item.content.trim().length > 0
+            );
+            
+            if (isRestoration && window.Logger) {
+                window.Logger.debug('ℹ️ Modal shown event from restoration (likely from _showPreviousModal) - will check if update needed', {
                     modalId: modalElement?.id,
                     historyLength: this.modalHistory.length,
-                    timestamp: Date.now(),
                     page: "modal-navigation-manager"
                 });
             }
             
-            // בדיקה אם המודול כבר קיים בהיסטוריה
-            const existingIndex = this.modalHistory.findIndex(item => item.element === modalElement);
+            if (window.Logger) {
+                window.Logger.info('✅ [2.4 handleModalShown] Bootstrap modal shown event triggered', {
+                    modalId: modalElement?.id,
+                    historyLength: this.modalHistory.length,
+                    isRestoration,
+                    timestamp: Date.now(),
+                    page: "modal-navigation-manager"
+                });
+            } else {
+                // אם אין Logger, נדפיס ל-console
+                console.log('🔵 [handleModalShown] Logger not available, using console.log', {
+                    modalId: modalElement?.id,
+                    historyLength: this.modalHistory.length
+                });
+            }
             
             // זיהוי מידע על המודול (חשוב לעשות את זה לפני הבדיקה)
-            const modalInfo = this.detectModalInfo(modalElement);
+            // ✅ תיקון: וידוא ש-sourceInfo נשמר מה-EntityDetailsModal לפני detectModalInfo
+            // אם יש sourceInfo ב-EntityDetailsModal, נוסיף אותו ל-modalInfo אחרי detectModalInfo
+            let modalInfo = this.detectModalInfo(modalElement);
+            
+            // בדיקה נוספת: אם detectModalInfo לא מצא sourceInfo, אבל יש ב-EntityDetailsModal
+            // (זה יכול לקרות אם המודול עוד לא נטען או שהמידע עוד לא עודכן ב-DOM)
+            if (window.entityDetailsModal && window.entityDetailsModal.sourceInfo && 
+                !modalInfo.sourceInfo && !modalInfo.source) {
+                modalInfo.sourceInfo = window.entityDetailsModal.sourceInfo;
+                modalInfo.source = window.entityDetailsModal.sourceInfo;
+                
+                if (window.Logger) {
+                    window.Logger.info('✅ [handleModalShown] Added sourceInfo from EntityDetailsModal to modalInfo', {
+                        sourceInfo: window.entityDetailsModal.sourceInfo,
+                        modalInfo: modalInfo,
+                        page: "modal-navigation-manager"
+                    });
+                }
+            }
+            
             const hasSourceInfo = modalInfo && (modalInfo.sourceInfo || modalInfo.source);
+            
+            // ✅ בדיקה כפולה:
+            // 1. בדיקה אם אותו element קיים (existingIndex)
+            // 2. בדיקה אם אותו מודול (entityType + entityId + sourceInfo) קיים (existingSameModalIndex)
+            const existingIndex = this.modalHistory.findIndex(item => item.element === modalElement);
+            
+            // ✅ תיקון: בדיקה מדויקת אם יש מודול זהה בהיסטוריה (entityType + entityId + sourceInfo)
+            // חשוב: שני מודולים זהים רק אם גם entityType + entityId זהים וגם sourceInfo זהה
+            let existingSameModalIndex = -1;
+            if (modalInfo && modalInfo.entityType && modalInfo.entityId !== undefined) {
+                const modalKey = `${modalInfo.entityType}:${modalInfo.entityId}`;
+                const modalSourceInfoStr = JSON.stringify(modalInfo.sourceInfo || modalInfo.source || null);
+                
+                if (window.Logger) {
+                    window.Logger.debug('🔍 [existingSameModalIndex] Checking for existing modal', {
+                        modalKey,
+                        modalSourceInfoStr,
+                        modalSourceInfo: modalInfo.sourceInfo || modalInfo.source || null,
+                        historyLength: this.modalHistory.length,
+                        currentHistory: this.modalHistory.map((item, idx) => ({
+                            index: idx,
+                            entityType: item.info?.entityType,
+                            entityId: item.info?.entityId,
+                            itemKey: `${item.info?.entityType}:${item.info?.entityId}`,
+                            hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source),
+                            sourceInfoStr: JSON.stringify(item.info?.sourceInfo || item.info?.source || null)
+                        })),
+                        page: "modal-navigation-manager"
+                    });
+                }
+                
+                for (let i = 0; i < this.modalHistory.length; i++) {
+                    const item = this.modalHistory[i];
+                    const itemKey = `${item.info?.entityType}:${item.info?.entityId}`;
+                    const itemSourceInfoStr = JSON.stringify(item.info?.sourceInfo || item.info?.source || null);
+                    
+                    // ✅ בדיקה כפולה: גם המפתח וגם sourceInfo חייבים להיות זהים
+                    const keysMatch = modalKey === itemKey;
+                    const sourceInfoMatch = modalSourceInfoStr === itemSourceInfoStr;
+                    
+                    if (window.Logger && keysMatch) {
+                        window.Logger.debug(`🔍 [existingSameModalIndex] Found key match at index ${i}, checking sourceInfo`, {
+                            index: i,
+                            modalKey,
+                            itemKey,
+                            keysMatch,
+                            modalSourceInfoStr,
+                            itemSourceInfoStr,
+                            sourceInfoMatch,
+                            willMatch: keysMatch && sourceInfoMatch,
+                            itemInfo: {
+                                entityType: item.info?.entityType,
+                                entityId: item.info?.entityId,
+                                hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source)
+                            },
+                            page: "modal-navigation-manager"
+                        });
+                    }
+                    
+                    if (keysMatch && sourceInfoMatch) {
+                        existingSameModalIndex = i;
+                        break;
+                    }
+                }
+                
+                if (window.Logger) {
+                    window.Logger.debug('🔍 [existingSameModalIndex] Result', {
+                        existingSameModalIndex,
+                        modalKey,
+                        modalSourceInfo: modalInfo.sourceInfo || modalInfo.source || null,
+                        foundMatch: existingSameModalIndex >= 0,
+                        page: "modal-navigation-manager"
+                    });
+                }
+            }
             
             if (window.Logger) {
                 window.Logger.debug('🔍 Checking if modal exists in history', {
                     modalId: modalElement?.id,
                     existingIndex,
+                    existingSameModalIndex,
                     isNewModal: existingIndex === -1,
+                    isSameModal: existingSameModalIndex !== -1,
                     hasSourceInfo,
                     sourceInfo: modalInfo?.sourceInfo || modalInfo?.source,
                     historyLength: this.modalHistory.length,
@@ -351,99 +538,35 @@ class ModalNavigationManager {
                 });
             }
             
-            // בדיקה אם זה אותו מודול מקונן בדיוק (same entityType + entityId + sourceInfo)
-            // אם כן, לא צריך להוסיף שוב (כי זה כבר נוסף ב-showModal או loadEntityData)
-            const lastModal = this.modalHistory.length > 0 ? this.modalHistory[this.modalHistory.length - 1] : null;
-            const isLastModalSame = lastModal && 
-                                   lastModal.info?.entityType === modalInfo?.entityType &&
-                                   lastModal.info?.entityId === modalInfo?.entityId;
+            // ✅ תיקון כפילות: handleModalShown רק בודק ומחליט - pushModal הוא היחיד שמעדכן את המערך!
+            // כל העדכונים ייעשו דרך pushModal בלבד כדי למנוע כפילות
+            // רק pushModal יעדכן את modalHistory, saveHistoryToCache, ו-updateModalNavigation
             
-            // השוואת sourceInfo - צריך להשוות את התוכן, לא רק את הקיום
-            const lastModalSourceInfo = lastModal?.info?.sourceInfo || lastModal?.info?.source || null;
-            const currentModalSourceInfo = modalInfo?.sourceInfo || modalInfo?.source || null;
-            const isSameSourceInfo = JSON.stringify(lastModalSourceInfo) === JSON.stringify(currentModalSourceInfo);
-            const isExactSameNestedModal = isLastModalSame && isSameSourceInfo && hasSourceInfo;
-            
-            // אם המודול כבר נוסף עם sourceInfo זהה (למשל ב-showModal), לא צריך להוסיף שוב
-            if (isExactSameNestedModal) {
-                if (window.Logger) {
-                    window.Logger.debug('ℹ️ Modal already in history with same sourceInfo (likely added by showModal), skipping pushModal', {
-                        modalId: modalElement?.id,
-                        existingIndex,
-                        hasSourceInfo,
-                        isExactSameNestedModal,
-                        page: "modal-navigation-manager"
-                    });
-                }
-                // רק נעדכן את ה-info אם יש שינויים
-                // חשוב: לא נעדכן את המודול הראשון (index 0) - הוא חייב להישאר קבוע
-                if (modalInfo && existingIndex !== 0) {
-                    this.modalHistory[existingIndex].info = { ...this.modalHistory[existingIndex].info, ...modalInfo };
-                } else if (existingIndex === 0 && modalInfo) {
-                    if (window.Logger) {
-                        window.Logger.warn('⚠️ Attempted to update first modal info - prevented to maintain breadcrumb integrity', {
-                            existingFirstModal: {
-                                type: this.modalHistory[0].info?.entityType,
-                                id: this.modalHistory[0].info?.entityId
-                            },
-                            attemptedUpdate: {
-                                type: modalInfo?.entityType,
-                                id: modalInfo?.entityId
-                            },
-                            page: "modal-navigation-manager"
-                        });
-                    }
-                }
-            }
-            // אם המודול כבר קיים אבל יש sourceInfo שונה (מודול מקונן חדש)
-            // או שהמודול לא קיים - צריך להוסיף אותו
-            else if (existingIndex === -1 || (hasSourceInfo && this.modalHistory.length > 0 && !isExactSameNestedModal)) {                                      
-                if (window.Logger) {
-                    window.Logger.info('📥 Adding modal to history (from handleModalShown)', {                                                                  
-                        modalId: modalElement?.id,
-                        modalInfo,
-                        existingIndex,
-                        hasSourceInfo,
-                        isExactSameNestedModal,
-                        isLastModalSame,
-                        reason: existingIndex === -1 ? 'new modal' : 'nested modal with sourceInfo',                                                            
-                        page: "modal-navigation-manager"
-                    });
-                }
-                
-                // הוספה ל-stack - pushModal יטפל בלוגיקה הנכונה (הוספה לעומת עדכון)
-                await this.pushModal(modalElement, modalInfo);
-            } else {
-                if (window.Logger) {
-                    window.Logger.debug('ℹ️ Modal already in history without sourceInfo, skipping pushModal', {
-                        modalId: modalElement?.id,
-                        existingIndex,
-                        hasSourceInfo,
-                        page: "modal-navigation-manager"
-                    });
-                }
-            }
-            
-            // עדכון backdrop
-            this.manageBackdrop();
-            
-            // עדכון navigation UI - חשוב מאוד! זה מוסיף את breadcrumb וכפתור חזור
+            // ✅ כל המקרים מועברים ל-pushModal - הוא יטפל בכל הלוגיקה (עדכון או הוספה)
+            // pushModal בודק existingSameModalIndex ומחליט אם לעדכן או להוסיף
             if (window.Logger) {
-                window.Logger.info('📞 Scheduling updateModalNavigation from handleModalShown (100ms delay)', {
+                window.Logger.info('📥 Delegating to pushModal (from handleModalShown)', {
                     modalId: modalElement?.id,
+                    modalInfo,
+                    existingIndex,
+                    existingSameModalIndex,
+                    hasSourceInfo,
+                    willUpdate: existingSameModalIndex >= 0,
+                    willAdd: existingSameModalIndex < 0,
                     page: "modal-navigation-manager"
                 });
             }
             
+            // הוספה ל-stack - pushModal יטפל בכל הלוגיקה (עדכון או הוספה) - פעם אחת בלבד!
+            // pushModal גם יעדכן את navigation UI ושמירה למטמון - הכל במקום אחד!
+            await this.pushModal(modalElement, modalInfo);
+            
+            // עדכון backdrop - ניקוי כל ה-backdrops ויצירת חדש
+            // חשוב: Bootstrap עלול ליצור backdrop בזמן show(), אז נקרא לזה גם אחרי זמן קצר
+            this.manageBackdrop();
             setTimeout(() => {
-                if (window.Logger) {
-                    window.Logger.info('📞 Executing updateModalNavigation from handleModalShown (after delay)', {
-                        modalId: modalElement?.id,
-                        page: "modal-navigation-manager"
-                    });
-                }
-                this.updateModalNavigation(modalElement);
-            }, 100); // קצת delay כדי לוודא שהכותרת עודכנה
+                this.manageBackdrop(); // ניקוי נוסף אחרי ש-Bootstrap סיים את show()
+            }, 100);
         } catch (error) {
             if (window.Logger) {
                 window.Logger.error('Error handling modal shown:', error, { page: "modal-navigation-manager" });
@@ -460,47 +583,41 @@ class ModalNavigationManager {
      */
     async handleModalHidden(modalElement) {
         try {
-            // בדיקה אם זה המודול האחרון בהיסטוריה
+            // ✅ אם המודול נסגר מ-goBack(), לא צריך להוסיף pop נוסף
+            // goBack() כבר עושה pop() - רק צריך לנקות את ה-backdrop
             const lastIndex = this.modalHistory.length - 1;
             const isLastModal = lastIndex >= 0 && this.modalHistory[lastIndex].element === modalElement;
             
-            // הסרה מה-stack רק אם זה המודול האחרון
-            // חשוב: אם goBack() כבר ביצע pop(), המודול שנסגר כבר לא יהיה בהיסטוריה
-            // אז נבדוק אם המודול שנסגר עדיין בהיסטוריה לפני ביצוע pop()
+            // רק אם זה המודול האחרון ולא נקרא מ-goBack() (goBack עושה pop לפני hide)
+            // נבדוק אם המודול שנסגר עדיין האחרון (אם כן, זה סגירה רגילה, לא מ-goBack)
             if (isLastModal) {
-                await this.popModal();
-                
+                // אם המודול שנסגר הוא האחרון, זה אומר ש-goBack() כבר עשה pop() לפני hide()
+                // אז לא צריך לעשות pop נוסף - רק לנקות backdrop
                 if (window.Logger) {
-                    window.Logger.debug('📤 Popped modal from history (handleModalHidden)', {
+                    window.Logger.debug('Modal hidden - likely from goBack() (already popped), skipping popModal()', {
                         modalId: modalElement?.id,
-                        remainingHistory: this.modalHistory.length,
+                        historyLength: this.modalHistory.length,
                         page: "modal-navigation-manager"
                     });
                 }
             } else {
-                // המודול שנסגר לא היה האחרון בהיסטוריה
-                // זה יכול לקרות אם goBack() כבר ביצע pop() או שהסגירה נעשתה באופן אחר
+                // המודול שנסגר לא הוא האחרון - זה יכול להיות סגירה של מודול באמצע ההיסטוריה
+                // לא צריך לעשות pop - רק לנקות backdrop
                 if (window.Logger) {
-                    window.Logger.debug('ℹ️ Modal hidden but not last in history (likely already popped by goBack)', {
+                    window.Logger.debug('Modal hidden - not the last modal, skipping popModal()', {
                         modalId: modalElement?.id,
                         historyLength: this.modalHistory.length,
-                        lastModalId: lastIndex >= 0 ? this.modalHistory[lastIndex].element?.id : null,
                         page: "modal-navigation-manager"
                     });
                 }
             }
             
-            // עדכון backdrop - חשוב מאוד! רק אחרי שהמודול נסגר
-            // נוסיף timeout קטן כדי לוודא שהמודול באמת נסגר לפני הבדיקה
-            setTimeout(() => {
-                this.manageBackdrop();
-            }, 100);
+            // עדכון backdrop
+            this.manageBackdrop();
             
             // עדכון navigation UI של המודול הקודם (אם יש)
-            // רק אם זה לא היה חלק מ-goBack() (שכבר מעדכן את ה-navigation)
             const previousModal = this.getPreviousModal();
-            if (previousModal && !isLastModal) {
-                // עדכון רק אם זה לא המודול האחרון (כי goBack() כבר טיפל בזה)
+            if (previousModal) {
                 this.updateModalNavigation(previousModal.element);
             }
         } catch (error) {
@@ -546,291 +663,260 @@ class ModalNavigationManager {
                 });
             }
             
-            // בדיקה אם המודול כבר בהיסטוריה
+            // בדיקה אם המודול כבר בהיסטוריה (לפי element)
             const existingIndex = this.modalHistory.findIndex(item => item.element === modalElement);
             
             // בדיקה אם זה מודול מקונן (יש sourceInfo)
             const hasSourceInfo = modalInfo && (modalInfo.sourceInfo || modalInfo.source);
-            const isNestedModal = hasSourceInfo && this.modalHistory.length > 0;
             
-            // אם המודול כבר קיים והמיקום הוא המודול האחרון - רק נעדכן
-            // אבל אם זה מודול עם sourceInfo (מודול מקונן), נוסיף אותו שוב להיסטוריה
-            const isLastModal = existingIndex >= 0 && existingIndex === this.modalHistory.length - 1;
-            
-            if (window.Logger) {
-                window.Logger.info('🔍 pushModal DECISION POINT:', {
-                    existingIndex,
-                    hasSourceInfo,
-                    isNestedModal,
-                    isLastModal,
-                    modalHistoryLength: this.modalHistory.length,
-                    willAddNested: hasSourceInfo && this.modalHistory.length > 0,
-                    willUpdateLast: isLastModal && !hasSourceInfo,
-                    willAddNew: existingIndex === -1,
-                    page: "modal-navigation-manager"
-                });
-            }
-            
-            // אם יש sourceInfo - תמיד נוסיף מודול חדש להיסטוריה, גם אם אותו element כבר קיים
-            // זה חשוב כדי לשמור את ההיסטוריה המלאה ולאפשר חזרה נכונה
-            // בדיקה: אם המודול האחרון כבר זה אותו מודול עם sourceInfo זהה, זה מצב שבו showModal כבר הוסיף
-            // אבל אם זה מודול חדש עם sourceInfo (entityType/Id שונים או sourceInfo שונה), צריך להוסיף
-            const lastModal = this.modalHistory.length > 0 ? this.modalHistory[this.modalHistory.length - 1] : null;
-            const isSameModalAsLast = lastModal && 
-                                     lastModal.info?.entityType === modalInfo?.entityType &&
-                                     lastModal.info?.entityId === modalInfo?.entityId;
-            const lastModalSourceInfo = lastModal?.info?.sourceInfo || lastModal?.info?.source || null;
-            const currentModalSourceInfo = modalInfo?.sourceInfo || modalInfo?.source || null;
-            const isSameSourceInfo = JSON.stringify(lastModalSourceInfo) === JSON.stringify(currentModalSourceInfo);
-            const lastModalHasSourceInfo = lastModal && !!(lastModal.info?.sourceInfo || lastModal.info?.source);
-            
-            // בדיקה אם זה אותו מודול מקונן בדיוק (same entityType + entityId + sourceInfo זהה)
-            const isExactSameNestedModal = isSameModalAsLast && lastModalHasSourceInfo && hasSourceInfo && isSameSourceInfo;
-            
-            // הגנה קריטית: אם נמצא אותו element ב-index 0 (המודול הראשון), לעולם לא נעדכן אותו
-            // במקום זה תמיד נוסיף מודול חדש - זה מבטיח שהמודול הראשון יישאר קבוע
-            const isFirstModalInHistory = existingIndex === 0;
-            if (isFirstModalInHistory && hasSourceInfo) {
-                // זה המודול הראשון אבל יש sourceInfo - זה אומר שזה מודול מקונן חדש
-                // נוסיף מודול חדש במקום לעדכן את הראשון
+            // ✅ תיקון כפילות: בדיקה מדויקת אם כבר קיים מודול זהה (entityType + entityId + sourceInfo)
+            // גם למודולים מקוננים צריך לבדוק כדי למנוע כפילות!
+            // חשוב: sourceInfo חייב להיות זהה בדיוק (JSON.stringify של שני ה-sourceInfo)
+            let existingSameModalIndex = -1;
+            if (modalInfo && modalInfo.entityType && modalInfo.entityId !== undefined) {
+                const modalKey = `${modalInfo.entityType}:${modalInfo.entityId}`;
+                const modalSourceInfo = modalInfo.sourceInfo || modalInfo.source || null;
+                const modalSourceInfoStr = JSON.stringify(modalSourceInfo);
+                
                 if (window.Logger) {
-                    window.Logger.warn('⚠️⚠️⚠️ First modal found with sourceInfo - adding new modal instead of updating', {
-                        existingFirstModal: {
-                            type: this.modalHistory[0].info?.entityType,
-                            id: this.modalHistory[0].info?.entityId
-                        },
-                        newModalInfo: {
-                            type: modalInfo?.entityType,
-                            id: modalInfo?.entityId,
-                            hasSourceInfo: true
-                        },
+                    window.Logger.debug('🔍 [pushModal] Checking for existing same modal', {
+                        modalKey,
+                        modalSourceInfo,
+                        modalSourceInfoStr,
+                        historyLength: this.modalHistory.length,
+                        currentHistory: this.modalHistory.map((item, idx) => ({
+                            index: idx,
+                            entityType: item.info?.entityType,
+                            entityId: item.info?.entityId,
+                            itemKey: `${item.info?.entityType}:${item.info?.entityId}`,
+                            hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source),
+                            itemSourceInfo: item.info?.sourceInfo || item.info?.source || null,
+                            itemSourceInfoStr: JSON.stringify(item.info?.sourceInfo || item.info?.source || null)
+                        })),
                         page: "modal-navigation-manager"
                     });
                 }
                 
-                // נוסיף מודול חדש במקום לעדכן את הראשון
-                const contentElement = document.getElementById('entityDetailsContent');
-                const savedContent = contentElement ? contentElement.innerHTML : null;
-                
-                this.modalHistory.push({
-                    element: modalElement,
-                    info: modalInfo,
-                    content: savedContent,
-                    timestamp: Date.now()
-                });
+                for (let i = 0; i < this.modalHistory.length; i++) {
+                    const item = this.modalHistory[i];
+                    const itemKey = `${item.info?.entityType}:${item.info?.entityId}`;
+                    const itemSourceInfo = item.info?.sourceInfo || item.info?.source || null;
+                    const itemSourceInfoStr = JSON.stringify(itemSourceInfo);
+                    
+                    // ✅ בדיקה כפולה מדויקת: גם המפתח וגם sourceInfo חייבים להיות זהים
+                    const keysMatch = modalKey === itemKey;
+                    const sourceInfoMatch = modalSourceInfoStr === itemSourceInfoStr;
+                    
+                    if (window.Logger && keysMatch) {
+                        window.Logger.debug(`🔍 [pushModal] Found key match at index ${i}, checking sourceInfo`, {
+                            index: i,
+                            modalKey,
+                            itemKey,
+                            keysMatch,
+                            modalSourceInfo,
+                            itemSourceInfo,
+                            modalSourceInfoStr,
+                            itemSourceInfoStr,
+                            sourceInfoMatch,
+                            willMatch: keysMatch && sourceInfoMatch,
+                            itemInfo: {
+                                entityType: item.info?.entityType,
+                                entityId: item.info?.entityId,
+                                hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source)
+                            },
+                            page: "modal-navigation-manager"
+                        });
+                    }
+                    
+                    if (keysMatch && sourceInfoMatch) {
+                        existingSameModalIndex = i;
+                        break;
+                    }
+                }
                 
                 if (window.Logger) {
-                    window.Logger.info('✅ Added new modal instead of updating first modal (sourceInfo protection)', {
+                    window.Logger.debug('🔍 [pushModal] existingSameModalIndex result', {
+                        existingSameModalIndex,
+                        modalKey,
+                        modalSourceInfo,
+                        foundMatch: existingSameModalIndex >= 0,
+                        page: "modal-navigation-manager"
+                    });
+                }
+            }
+            
+            // ✅ תיקון כפילות: אם יש מודול זהה - נעדכן במקום להוסיף כפילות!
+            if (existingSameModalIndex >= 0) {
+                console.log('🟡 [pushModal] Found existing same modal - UPDATING instead of adding duplicate', {
+                    existingSameModalIndex,
+                    hasSourceInfo,
+                    historyLength: this.modalHistory.length,
+                    modalInfo: {
+                        entityType: modalInfo?.entityType,
+                        entityId: modalInfo?.entityId,
+                        sourceInfo: modalInfo?.sourceInfo || modalInfo?.source
+                    }
+                });
+                
+                // עדכון element אם השתנה
+                if (existingIndex === -1 || existingIndex !== existingSameModalIndex) {
+                    this.modalHistory[existingSameModalIndex].element = modalElement;
+                }
+                
+                // עדכון info
+                if (modalInfo) {
+                    this.modalHistory[existingSameModalIndex].info = { ...this.modalHistory[existingSameModalIndex].info, ...modalInfo };
+                }
+                
+                // עדכון timestamp
+                this.modalHistory[existingSameModalIndex].timestamp = Date.now();
+                
+                await this.saveHistoryToCache();
+                
+                if (window.Logger) {
+                    window.Logger.info('✅ Updated existing modal (prevented duplicate):', {
+                        existingSameModalIndex,
                         modalInfo,
                         historyLength: this.modalHistory.length,
                         page: "modal-navigation-manager"
                     });
                 }
-                return; // נצא מהפונקציה - לא נעדכן את המודול הראשון
+                
+                return; // לא להוסיף כפילות!
             }
             
-            if (hasSourceInfo && this.modalHistory.length > 0 && !isExactSameNestedModal) {
-                // מודול מקונן חדש (עם sourceInfo שונה או entityType/Id שונים) - תמיד נוסיף להיסטוריה
-                // זה מאפשר לשמור את המודול הקודם ולאפשר חזרה
-                
-                console.log('🔍🔍🔍 [pushModal] Adding nested modal:', {
-                    historyLengthBefore: this.modalHistory.length,
-                    newModalType: modalInfo?.entityType,
-                    newModalId: modalInfo?.entityId,
+            // ✅ אם אין מודול זהה ויש sourceInfo (מודול מקונן) - נוסיף מודול חדש
+            if (hasSourceInfo && this.modalHistory.length > 0) {
+                console.log('🔴 [pushModal] NESTED MODAL - Adding new modal (no duplicate found)', {
                     hasSourceInfo: true,
-                    lastModalInHistory: lastModal ? {
-                        entityType: lastModal.info?.entityType,
-                        entityId: lastModal.info?.entityId,
-                        hasContent: !!lastModal.content
-                    } : null
+                    existingIndex,
+                    existingSameModalIndex,
+                    historyLength: this.modalHistory.length,
+                    modalInfo: {
+                        entityType: modalInfo?.entityType,
+                        entityId: modalInfo?.entityId,
+                        sourceInfo: modalInfo?.sourceInfo || modalInfo?.source
+                    }
                 });
-                
-                // חשוב: שמירת תוכן המודול הקודם (lastModal) אם הוא עדיין לא נשמר
-                // אם המודול הקודם עדיין לא נשמר את התוכן שלו, ננסה לשמור אותו מה-DOM
-                // (זה יכול לקרות אם המודול הקודם עדיין לא נטען לגמרי או שהתוכן עוד לא נשמר)
+                // שמירת תוכן המודול הקודם
+                const lastModal = this.modalHistory[this.modalHistory.length - 1];
                 if (lastModal && !lastModal.content) {
                     const contentElement = document.getElementById('entityDetailsContent');
                     if (contentElement && contentElement.innerHTML && contentElement.innerHTML.trim().length > 0) {
-                        // שמירת התוכן של המודול הקודם אם הוא עדיין ב-DOM
-                        // (זה יכול לקרות אם המודול הקודם עדיין לא נסגר והתוכן שלו עדיין ב-DOM)
-                        const lastModalContent = contentElement.innerHTML;
-                        
-                        // עדכון התוכן של המודול הקודם ב-history
-                        // חשוב: לא נעדכן את המודול הראשון (index 0) - הוא חייב להישאר קבוע
-                        const lastModalIndex = this.modalHistory.length - 1;
-                        if (lastModalIndex !== 0) {
-                            this.modalHistory[lastModalIndex].content = lastModalContent;
+                        lastModal.content = contentElement.innerHTML;
+                    }
+                }
+                
+                // ✅ תיקון: וידוא ש-title נשמר - אם modalInfo לא כולל title, ננסה ליצור אותו
+                if (!modalInfo.title || modalInfo.title.trim() === '') {
+                    const titleElement = modalElement?.querySelector('.modal-title, [id$="Label"]');
+                    if (titleElement) {
+                        const titleText = titleElement.textContent || titleElement.innerText || '';
+                        if (titleText.trim()) {
+                            modalInfo.title = titleText.trim();
                         }
-                        
-                        if (window.Logger) {
-                            window.Logger.debug('✅ Saved previous modal content before adding nested modal', {
-                                previousModalType: lastModal.info?.entityType,
-                                previousModalId: lastModal.info?.entityId,
-                                contentLength: lastModalContent.length,
-                                page: "modal-navigation-manager"
-                            });
+                    }
+                    // אם עדיין אין title, ניצור אחד מ-entityType ו-entityId
+                    if (!modalInfo.title || modalInfo.title.trim() === '') {
+                        if (modalInfo.entityType && modalInfo.entityId !== undefined) {
+                            const entityLabel = this.getEntityLabel(modalInfo.entityType);
+                            modalInfo.title = `${entityLabel} ${modalInfo.entityId}`;
+                        } else {
+                            modalInfo.title = 'מודול';
                         }
                     }
                 }
                 
-                // המודול החדש עדיין לא נטען - התוכן יהיה null (יעודכן ב-loadEntityData אחרי הטעינה)
-                // זה חשוב כי כרגע התוכן ב-DOM הוא של המודול הקודם (אם הוא עדיין פתוח)
+                // הוספת מודול חדש - רק אם אין כפילות!
                 this.modalHistory.push({
                     element: modalElement,
                     info: modalInfo,
-                    content: null, // יעודכן ב-loadEntityData אחרי הטעינה
+                    content: null,
                     timestamp: Date.now()
                 });
                 
-                if (window.Logger) {
-                    window.Logger.info('✅ Pushed nested modal to stack (with sourceInfo):', {
-                        modalInfo,
-                        sourceInfo: modalInfo.sourceInfo || modalInfo.source,
-                        existingIndex,
-                        isSameModalAsLast,
-                        lastModalHasSourceInfo,
-                        isSameSourceInfo,
-                        isExactSameNestedModal,
-                        historyLengthBefore: this.modalHistory.length - 1,
-                        historyLengthAfter: this.modalHistory.length,
-                        previousModal: this.modalHistory.length > 1 ? {
-                            entityType: this.modalHistory[this.modalHistory.length - 2].info?.entityType,
-                            entityId: this.modalHistory[this.modalHistory.length - 2].info?.entityId
-                        } : null,
-                        page: "modal-navigation-manager"
-                    });
-                }
-                
-                console.log('🔍🔍🔍 [pushModal] After adding nested modal:', {
-                    historyLengthAfter: this.modalHistory.length,
-                    lastModalType: this.modalHistory[this.modalHistory.length - 1]?.info?.entityType,
-                    lastModalId: this.modalHistory[this.modalHistory.length - 1]?.info?.entityId,
-                    previousModalType: this.modalHistory.length > 1 ? this.modalHistory[this.modalHistory.length - 2]?.info?.entityType : null,
-                    previousModalId: this.modalHistory.length > 1 ? this.modalHistory[this.modalHistory.length - 2]?.info?.entityId : null
-                });
-            } else if (isExactSameNestedModal) {
-                // אותו מודול עם sourceInfo זהה כבר נוסף (למשל ב-showModal)
-                // רק נעדכן את המידע והתוכן
-                // חשוב: לא נעדכן את המודול הראשון (index 0) - הוא חייב להישאר קבוע
-                const lastIndex = this.modalHistory.length - 1;
-                if (lastIndex !== 0) {
-                    const contentElement = document.getElementById('entityDetailsContent');
-                    const savedContent = contentElement && contentElement.innerHTML ? contentElement.innerHTML : null;
-                    
-                    this.modalHistory[lastIndex].info = { ...this.modalHistory[lastIndex].info, ...modalInfo };
-                    // שמירת תוכן רק אם הוא קיים ב-DOM ויותר טוב מהתוכן הקיים (או אם אין תוכן קיים)
-                    const existingContent = this.modalHistory[lastIndex].content;
-                    if (savedContent && (!existingContent || savedContent.length > existingContent.length)) {
-                        // התוכן החדש עדיף - נשמור אותו
-                        this.modalHistory[lastIndex].content = savedContent;
-                    } else if (!existingContent && savedContent) {
-                        // אין תוכן קיים אבל יש תוכן חדש - נשמור אותו
-                        this.modalHistory[lastIndex].content = savedContent;
-                    }
-                    // אם יש תוכן קיים ואין תוכן חדש טוב יותר - נשאיר את הקיים
-                    this.modalHistory[lastIndex].timestamp = Date.now();
-                }
+                await this.saveHistoryToCache();
                 
                 if (window.Logger) {
-                    window.Logger.debug('Updated existing nested modal info (already in history):', {
+                    window.Logger.info('✅ Added nested modal (no duplicate found):', {
                         modalInfo,
                         historyLength: this.modalHistory.length,
                         page: "modal-navigation-manager"
                     });
                 }
-            } else if (isLastModal && !hasSourceInfo) {
-                // עדכון מודול אחרון ללא sourceInfo - רק עדכון (לא מודול מקונן)
-                // אבל - אם זה המודול הראשון (index 0), לא נעדכן אותו - זה חייב להיות המודול המקורי
-                // אם המודול הראשון מתעדכן, זה יכול לגרום לבעיות ב-breadcrumb
-                const isFirstModal = existingIndex === 0;
                 
-                if (isFirstModal) {
-                    // אם זה המודול הראשון והמידע שלו שונה - יש בעיה!
-                    // במקרה כזה, נוסיף מודול חדש במקום לעדכן את הראשון
-                    const existingInfo = this.modalHistory[0].info;
-                    const existingSourceInfo = existingInfo?.sourceInfo || existingInfo?.source || null;
-                    const newSourceInfo = modalInfo?.sourceInfo || modalInfo?.source || null;
-                    const existingSourceInfoStr = existingSourceInfo ? JSON.stringify(existingSourceInfo) : null;
-                    const newSourceInfoStr = newSourceInfo ? JSON.stringify(newSourceInfo) : null;
-                    
-                    // בדיקה מקיפה: entityType, entityId, ו-sourceInfo
-                    const infoChanged = existingInfo?.entityType !== modalInfo?.entityType || 
-                                      String(existingInfo?.entityId) !== String(modalInfo?.entityId) ||
-                                      existingSourceInfoStr !== newSourceInfoStr;
-                    
-                    if (infoChanged) {
-                        if (window.Logger) {
-                            window.Logger.warn('⚠️⚠️⚠️ Attempted to update FIRST modal with different info - adding new modal instead', {
-                                existingFirstModal: {
-                                    type: existingInfo?.entityType,
-                                    id: existingInfo?.entityId
-                                },
-                                newModalInfo: {
-                                    type: modalInfo?.entityType,
-                                    id: modalInfo?.entityId
-                                },
-                                historyLength: this.modalHistory.length,
-                                page: "modal-navigation-manager"
-                            });
-                        }
-                        
-                        // במקום לעדכן את המודול הראשון, נוסיף מודול חדש
-                        const contentElement = document.getElementById('entityDetailsContent');
-                        const savedContent = contentElement ? contentElement.innerHTML : null;
-                        
-                        this.modalHistory.push({
-                            element: modalElement,
-                            info: modalInfo,
-                            content: savedContent,
-                            timestamp: Date.now()
-                        });
-                        
-                        if (window.Logger) {
-                            window.Logger.info('✅ Added new modal instead of updating first modal', {
-                                modalInfo,
-                                historyLength: this.modalHistory.length,
-                                page: "modal-navigation-manager"
-                            });
-                        }
-                        return; // נצא מהפונקציה - לא נעדכן את המודול הראשון
+                return;
+            }
+            
+            // אם אין sourceInfo - נמשיך עם הלוגיקה הרגילה
+            // תיקון: ניהול אחיד - אין הגנות מיוחדות על הראשונה
+            const isLastModal = existingIndex >= 0 && existingIndex === this.modalHistory.length - 1;
+            
+            if (isLastModal && !hasSourceInfo) {
+                console.log('🟡 [pushModal] UPDATING last modal (no sourceInfo, same element)', {
+                    existingIndex,
+                    historyLength: this.modalHistory.length,
+                    modalInfo: {
+                        entityType: modalInfo?.entityType,
+                        entityId: modalInfo?.entityId
                     }
-                    // אם המידע לא השתנה, זה בסדר - נעדכן רק את התוכן
-                    // אבל לא נעדכן את .info - זה צריך להישאר כמו שהוא
-                }
+                });
                 
+                // עדכון מודול אחרון ללא sourceInfo - רק עדכון (לא מודול מקונן ולא הראשון)
                 const contentElement = document.getElementById('entityDetailsContent');
                 const savedContent = contentElement && contentElement.innerHTML ? contentElement.innerHTML : null;
                 
-                // אם זה המודול הראשון - לא נעדכן את .info (הוא חייב להישאר כמו שהוא)
-                // אם זה לא המודול הראשון - נעדכן את המידע
-                if (!isFirstModal) {
-                    this.modalHistory[existingIndex].info = modalInfo;
-                }
+                this.modalHistory[existingIndex].info = modalInfo;
                 // שמירת תוכן רק אם הוא קיים ב-DOM ויותר טוב מהתוכן הקיים (או אם אין תוכן קיים)
-                // חשוב: לא נעדכן את המודול הראשון (index 0) - גם לא את התוכן שלו
-                if (!isFirstModal) {
-                    const existingContent = this.modalHistory[existingIndex].content;
-                    if (savedContent && (!existingContent || savedContent.length > existingContent.length)) {
-                        // התוכן החדש עדיף - נשמור אותו
-                        this.modalHistory[existingIndex].content = savedContent;
-                    } else if (!existingContent && savedContent) {
-                        // אין תוכן קיים אבל יש תוכן חדש - נשמור אותו
-                        this.modalHistory[existingIndex].content = savedContent;
-                    }
-                    // אם יש תוכן קיים ואין תוכן חדש טוב יותר - נשאיר את הקיים
-                    this.modalHistory[existingIndex].timestamp = Date.now();
+                const existingContent = this.modalHistory[existingIndex].content;
+                if (savedContent && (!existingContent || savedContent.length > existingContent.length)) {
+                    // התוכן החדש עדיף - נשמור אותו
+                    this.modalHistory[existingIndex].content = savedContent;
+                } else if (!existingContent && savedContent) {
+                    // אין תוכן קיים אבל יש תוכן חדש - נשמור אותו
+                    this.modalHistory[existingIndex].content = savedContent;
                 }
+                // אם יש תוכן קיים ואין תוכן חדש טוב יותר - נשאיר את הקיים
+                this.modalHistory[existingIndex].timestamp = Date.now();
                 
                 if (window.Logger) {
                     window.Logger.debug('Updated last modal in history (same context, no nesting):', {
                         modalInfo,
-                        isFirstModal,
                         historyLength: this.modalHistory.length,
                         page: "modal-navigation-manager"
                     });
                 }
             } else {
                 // מודול חדש שלא נמצא בהיסטוריה - נוסיף להיסטוריה
+                console.log('🟢 [pushModal] ADDING new modal (not found in history)', {
+                    existingIndex,
+                    historyLength: this.modalHistory.length,
+                    modalInfo: {
+                        entityType: modalInfo?.entityType,
+                        entityId: modalInfo?.entityId,
+                        hasSourceInfo: !!(modalInfo?.sourceInfo || modalInfo?.source)
+                    }
+                });
+                
+                // ✅ תיקון: וידוא ש-title נשמר - אם modalInfo לא כולל title, ננסה ליצור אותו
+                if (!modalInfo.title || modalInfo.title.trim() === '') {
+                    const titleElement = modalElement?.querySelector('.modal-title, [id$="Label"]');
+                    if (titleElement) {
+                        const titleText = titleElement.textContent || titleElement.innerText || '';
+                        if (titleText.trim()) {
+                            modalInfo.title = titleText.trim();
+                        }
+                    }
+                    // אם עדיין אין title, ניצור אחד מ-entityType ו-entityId
+                    if (!modalInfo.title || modalInfo.title.trim() === '') {
+                        if (modalInfo.entityType && modalInfo.entityId !== undefined) {
+                            const entityLabel = this.getEntityLabel(modalInfo.entityType);
+                            modalInfo.title = `${entityLabel} ${modalInfo.entityId}`;
+                        } else {
+                            modalInfo.title = 'מודול';
+                        }
+                    }
+                }
                 
                 // שמירת תוכן המודול
                 const contentElement = document.getElementById('entityDetailsContent');
@@ -855,6 +941,12 @@ class ModalNavigationManager {
             
             // שמירה למטמון
             await this.saveHistoryToCache();
+            
+            // ✅ עדכון navigation UI - כל העדכונים במקום אחד!
+            // חשוב: נעדכן את ה-navigation רק אחרי שהמערך נשמר למטמון
+            setTimeout(() => {
+                this.updateModalNavigation(modalElement);
+            }, 100); // קצת delay כדי לוודא שהכותרת עודכנה
             
             if (window.Logger) {
                 window.Logger.info(`✅ Modal stack updated (${this.modalHistory.length} total)`, {
@@ -916,35 +1008,27 @@ class ModalNavigationManager {
      * @public
      * @returns {boolean} true אם חזרנו בהצלחה, false אחרת
      */
-    goBack() {
+    async goBack() {
         try {
-            // לוג מפורט ל-debug (גם console.log כדי שיהיה תמיד גלוי)
-            console.log('🔙 goBack() called', {
-                historyLength: this.modalHistory.length,
-                history: this.modalHistory.map((item, idx) => ({
-                    index: idx,
-                    entityType: item.info?.entityType,
-                    entityId: item.info?.entityId,
-                    hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source)
-                }))
-            });
-            
+            // ✅ לוג מפורט לפני כל פעולה
             if (window.Logger) {
-                window.Logger.debug('🔙 goBack() called', {
+                window.Logger.info('🔙 [goBack] START', {
                     historyLength: this.modalHistory.length,
-                    history: this.modalHistory.map((item, idx) => ({
+                    historyDetails: this.modalHistory.map((item, idx) => ({
                         index: idx,
                         entityType: item.info?.entityType,
-                        entityId: item.info?.entityId
+                        entityId: item.info?.entityId,
+                        hasContent: !!item.content,
+                        contentLength: item.content?.length || 0,
+                        hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source),
+                        sourceInfo: item.info?.sourceInfo || item.info?.source || null
                     })),
                     page: "modal-navigation-manager"
                 });
             }
             
+            // ✅ גרסה פשוטה - אם אין לאן לחזור, יציאה
             if (this.modalHistory.length <= 1) {
-                console.warn('⚠️ Cannot go back - only one or no modals in history', {
-                    historyLength: this.modalHistory.length
-                });
                 if (window.Logger) {
                     window.Logger.warn('⚠️ Cannot go back - only one or no modals in history', {
                         historyLength: this.modalHistory.length,
@@ -954,113 +1038,132 @@ class ModalNavigationManager {
                 return false;
             }
             
-            // שמירת תוכן המודול הנוכחי לפני הסרתו מה-history (אם הוא עדיין לא נשמר)
-            const currentModalInHistory = this.modalHistory[this.modalHistory.length - 1];
-            if (currentModalInHistory && !currentModalInHistory.content) {
-                // התוכן עדיין לא נשמר - ננסה לשמור אותו מה-DOM לפני שמסירים אותו
+            // שמירת תוכן המודול הנוכחי לפני הסרתו
+            const currentModal = this.modalHistory[this.modalHistory.length - 1];
+            if (window.Logger) {
+                window.Logger.debug('🔙 [goBack] Current modal before content save', {
+                    currentModalIndex: this.modalHistory.length - 1,
+                    currentModalInfo: {
+                        entityType: currentModal?.info?.entityType,
+                        entityId: currentModal?.info?.entityId,
+                        hasContent: !!currentModal?.content,
+                        contentLength: currentModal?.content?.length || 0
+                    },
+                    page: "modal-navigation-manager"
+                });
+            }
+            
+            if (currentModal && !currentModal.content) {
                 const contentElement = document.getElementById('entityDetailsContent');
                 if (contentElement && contentElement.innerHTML && contentElement.innerHTML.trim().length > 0) {
-                    currentModalInHistory.content = contentElement.innerHTML;
+                    currentModal.content = contentElement.innerHTML;
                     if (window.Logger) {
-                        window.Logger.debug('✅ Saved current modal content before going back', {
-                            entityType: currentModalInHistory.info?.entityType,
-                            entityId: currentModalInHistory.info?.entityId,
-                            contentLength: contentElement.innerHTML.length,
+                        window.Logger.debug('🔙 [goBack] Saved current modal content', {
+                            contentLength: currentModal.content.length,
                             page: "modal-navigation-manager"
                         });
                     }
                 }
             }
             
-            console.log('🔍🔍🔍 [goBack] Before pop:', {
-                historyLength: this.modalHistory.length,
-                historyBeforePop: this.modalHistory.map((item, idx) => ({
-                    index: idx,
-                    entityType: item.info?.entityType,
-                    entityId: item.info?.entityId,
-                    hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source)
-                })),
-                currentModalType: this.modalHistory[this.modalHistory.length - 1]?.info?.entityType,
-                currentModalId: this.modalHistory[this.modalHistory.length - 1]?.info?.entityId
-            });
-            
-            // הסרת המודול הנוכחי מההיסטוריה
-            const currentModal = this.modalHistory.pop();
-            
-            // שמירת הפניה למודול הקודם אחרי הסרת המודול הנוכחי
-            // (הערה: previousModal יצביע על המודול שיהיה האחרון אחרי ה-pop)
-            const previousModal = this.modalHistory.length > 0 ? this.modalHistory[this.modalHistory.length - 1] : null;
-            
-            console.log('🔍🔍🔍 [goBack] After pop:', {
-                historyLength: this.modalHistory.length,
-                historyAfterPop: this.modalHistory.map((item, idx) => ({
-                    index: idx,
-                    entityType: item.info?.entityType,
-                    entityId: item.info?.entityId,
-                    hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source)
-                })),
-                poppedModalType: currentModal?.info?.entityType,
-                poppedModalId: currentModal?.info?.entityId,
-                previousModalType: previousModal?.info?.entityType,
-                previousModalId: previousModal?.info?.entityId
-            });
+            // ✅ תיקון: שמירת המודול הקודם לפני pop() - אבל נוודא שזה המודול הנכון
+            // המודול הקודם הוא זה שלפני האחרון במערך (length - 2)
+            const previousModalIndex = this.modalHistory.length - 2;
+            const previousModal = previousModalIndex >= 0 ? this.modalHistory[previousModalIndex] : null;
             
             if (window.Logger) {
-                window.Logger.debug('📤 Popped current modal from history', {
-                    currentModal: {
-                        entityType: currentModal.info?.entityType,
-                        entityId: currentModal.info?.entityId,
-                        hasContent: !!currentModal.content,
-                        contentLength: currentModal.content ? currentModal.content.length : 0
-                    },
-                    remainingHistory: this.modalHistory.length,
-                    previousModal: previousModal ? {
+                window.Logger.info('🔙 [goBack] Previous modal identified BEFORE pop', {
+                    previousModalIndex,
+                    previousModalInfo: previousModal ? {
                         entityType: previousModal.info?.entityType,
-                        entityId: previousModal.info?.entityId
+                        entityId: previousModal.info?.entityId,
+                        hasContent: !!previousModal.content,
+                        contentLength: previousModal.content?.length || 0,
+                        hasSourceInfo: !!(previousModal.info?.sourceInfo || previousModal.info?.source),
+                        elementExists: !!previousModal.element,
+                        elementId: previousModal.element?.id
                     } : null,
+                    currentModalInfo: currentModal ? {
+                        entityType: currentModal.info?.entityType,
+                        entityId: currentModal.info?.entityId
+                    } : null,
+                    currentHistoryLength: this.modalHistory.length,
+                    historyDetails: this.modalHistory.map((item, idx) => ({
+                        index: idx,
+                        entityType: item.info?.entityType,
+                        entityId: item.info?.entityId,
+                        title: item.info?.title || '(no title)',
+                        hasTitle: !!item.info?.title,
+                        hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source),
+                        sourceInfo: item.info?.sourceInfo || item.info?.source || null,
+                        hasElement: !!item.element,
+                        isPreviousModal: idx === previousModalIndex,
+                        isCurrentModal: idx === this.modalHistory.length - 1
+                    })),
                     page: "modal-navigation-manager"
                 });
             }
             
-            // שמירת ההיסטוריה העדכנית
+            if (!previousModal) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ No previous modal found - cannot go back', { 
+                        historyLength: this.modalHistory.length,
+                        previousModalIndex,
+                        page: "modal-navigation-manager" 
+                    });
+                }
+                return false;
+            }
+            
+            // ✅ תיקון: הסרת המודול הנוכחי מההיסטוריה - אחרי ששמרנו את previousModal
+            this.modalHistory.pop();
+            
+            if (window.Logger) {
+                window.Logger.info('🔙 [goBack] After pop()', {
+                    newHistoryLength: this.modalHistory.length,
+                    poppedModal: {
+                        entityType: currentModal?.info?.entityType,
+                        entityId: currentModal?.info?.entityId
+                    },
+                    previousModalAfterPop: previousModal ? {
+                        entityType: previousModal.info?.entityType,
+                        entityId: previousModal.info?.entityId,
+                        stillInHistory: this.modalHistory.includes(previousModal),
+                        newIndex: this.modalHistory.indexOf(previousModal),
+                        isNowLast: this.modalHistory.indexOf(previousModal) === this.modalHistory.length - 1
+                    } : null,
+                    remainingHistory: this.modalHistory.map((item, idx) => ({
+                        index: idx,
+                        entityType: item.info?.entityType,
+                        entityId: item.info?.entityId,
+                        isPreviousModal: item === previousModal
+                    })),
+                    page: "modal-navigation-manager"
+                });
+            }
+            
+            // שמירת ההיסטוריה
             this.saveHistoryToCache();
             
-            // אם יש מודול קודם, נציג אותו אחרי שהמודול הנוכחי נסגר לגמרי
-            if (previousModal) {
-                
-                // סגירת המודול הנוכחי עם המתנה ל-hidden.bs.modal לפני הצגת המודול הקודם
-                if (currentModal && currentModal.element) {
-                    // עדכון aria-hidden לפני הסתרה (תיקון לפי המלצת הדוח)
-                    currentModal.element.setAttribute('aria-hidden', 'true');
-                    
-                    const bsModal = bootstrap.Modal.getInstance(currentModal.element);
-                    if (bsModal) {
-                        // המתנה ל-hidden.bs.modal לפני הצגת המודול הקודם (התיקון הנכון!)
-                        currentModal.element.addEventListener('hidden.bs.modal', () => {
-                            console.log('✅ [TEST 4] CURRENT: hidden.bs.modal fired - now showing previous modal');
-                            this._showPreviousModal(previousModal);
-                        }, { once: true });
-                        
-                        bsModal.hide();
-                        if (window.Logger) {
-                            window.Logger.debug('✅ Hidden current modal, waiting for hidden.bs.modal', { page: "modal-navigation-manager" });
-                        }
-                    } else {
-                        // Fallback - הסתרה ישירה + הצגת המודול הקודם מיד
-                        if (currentModal.element) {
-                            currentModal.element.classList.remove('show');
-                            currentModal.element.style.display = 'none';
-                            currentModal.element.setAttribute('aria-hidden', 'true');
-                        }
-                        // ניקוי backdrop דרך המערכת המרכזית
-                        this.manageBackdrop();
-                        // אם אין Bootstrap instance, נציג את המודול הקודם מיד
-                        this._showPreviousModal(previousModal);
-                    }
+            // סגירת המודול הנוכחי והצגת הקודם
+            if (currentModal && currentModal.element) {
+                const bsModal = bootstrap.Modal.getInstance(currentModal.element);
+                if (bsModal) {
+                    // סגירה והמתנה להצגת הקודם
+                    currentModal.element.addEventListener('hidden.bs.modal', async () => {
+                        await this._showPreviousModal(previousModal);
+                    }, { once: true });
+                    bsModal.hide();
                 } else {
-                    // אין מודול נוכחי - נציג את המודול הקודם מיד
-                    this._showPreviousModal(previousModal);
+                    // Fallback - סגירה ישירה
+                    currentModal.element.classList.remove('show');
+                    currentModal.element.style.display = 'none';
+                    currentModal.element.setAttribute('aria-hidden', 'true');
+                    await this._showPreviousModal(previousModal);
                 }
+            } else {
+                // אין element - הצגה ישירה של הקודם
+                await this._showPreviousModal(previousModal);
             }
             
             return true;
@@ -1079,7 +1182,7 @@ class ModalNavigationManager {
      * @param {Object} previousModal - המודול הקודם מהיסטוריה
      * @private
      */
-    _showPreviousModal(previousModal) {
+    async _showPreviousModal(previousModal) {
         if (!previousModal || !previousModal.element) {
             console.error('❌ Cannot show previous modal - missing modal or element');
             return;
@@ -1146,7 +1249,10 @@ class ModalNavigationManager {
         }
         
         // שחזור תוכן המודול אם הוא נשמר - אחרי עדכון הכותרת
-        if (previousModal.content) {
+        // אם יש תוכן שמור, נשתמש בו ולא נטען מחדש מה-API (זה מהיר יותר)
+        const hasSavedContent = previousModal.content && previousModal.content.trim().length > 0;
+        
+        if (hasSavedContent) {
             const contentElement = document.getElementById('entityDetailsContent');
             if (contentElement) {
                 console.log('🔍🔍🔍 [_showPreviousModal] About to restore content', {
@@ -1165,10 +1271,134 @@ class ModalNavigationManager {
                 });
                 
                 if (window.Logger) {
-                    window.Logger.debug('✅ Restored modal content from history', {
+                    window.Logger.debug('✅ Restored modal content from history (skipping API reload)', {
                         entityType: previousModal.info?.entityType,
                         entityId: previousModal.info?.entityId,
                         contentLength: previousModal.content.length,
+                        page: "modal-navigation-manager"
+                    });
+                }
+                
+                // ✅ אם יש תוכן שמור, לא נטען מחדש מה-API - נמשיך ישר להצגת המודול
+                // התוכן כבר משוחזר, הכותרת כבר עודכנה, רק צריך להציג את המודול
+            }
+        } else {
+            // ❌ אין תוכן שמור - נטען מחדש מה-API ישירות ללא יצירת מודול חדש
+            // המודול כבר קיים בהיסטוריה - רק נטען את התוכן שלו מחדש
+            if (window.Logger) {
+                window.Logger.info('🔄 No saved content - reloading from API (modal already in history)', {
+                    entityType: previousModal.info?.entityType,
+                    entityId: previousModal.info?.entityId,
+                    currentHistoryLength: this.modalHistory.length,
+                    previousModalIndex: this.modalHistory.indexOf(previousModal),
+                    page: "modal-navigation-manager"
+                });
+            }
+            
+            if (previousModal.info?.entityType && previousModal.info?.entityId !== undefined && window.entityDetailsModal && window.entityDetailsModal.loadEntityData) {
+                const entityType = previousModal.info.entityType;
+                const entityId = previousModal.info.entityId;
+                
+                // עדכון sourceInfo לפני טעינה
+                if (previousModal.info?.sourceInfo || previousModal.info?.source) {
+                    window.entityDetailsModal.sourceInfo = previousModal.info.sourceInfo || previousModal.info.source;
+                } else {
+                    window.entityDetailsModal.sourceInfo = null;
+                }
+                
+                // עדכון currentEntityType/Id לפני טעינה
+                window.entityDetailsModal.currentEntityType = entityType;
+                window.entityDetailsModal.currentEntityId = entityId;
+                
+                // הצגת המודול לפני טעינת הנתונים
+                const bsModal = bootstrap.Modal.getInstance(previousModal.element);
+                if (bsModal) {
+                    bsModal.show();
+                } else {
+                    // יצירת Bootstrap modal instance חדש אם אין
+                    const newBsModal = new bootstrap.Modal(previousModal.element, {
+                        backdrop: false // ניהול backdrop ידנית
+                    });
+                    newBsModal.show();
+                }
+                
+                // ✅ תיקון: טעינת הנתונים מה-API ישירות - בלי ליצור מודול חדש
+                // חשוב: נוודא שהמודול לא יתווסף מחדש ל-history בעת הטעינה
+                // על ידי עדכון currentEntityType/Id לפני הטעינה, detectModalInfo יזהה אותו נכון
+                const modalIndexBeforeReload = this.modalHistory.indexOf(previousModal);
+                const historyLengthBeforeReload = this.modalHistory.length;
+                
+                // ✅ תיקון: טעינה עם סימון שזה עדכון מודול קיים, לא מודול חדש
+                // נוסיף flag מיוחד כדי ש-loadEntityData לא יגרום ל-handleModalShown להוסיף מודול חדש
+                window._modalNavigationReloading = true;
+                
+                try {
+                    await window.entityDetailsModal.loadEntityData(entityType, entityId, {
+                        source: previousModal.info?.sourceInfo || previousModal.info?.source || null
+                    });
+                } finally {
+                    // הסרת ה-flag אחרי הטעינה
+                    delete window._modalNavigationReloading;
+                }
+                
+                // ✅ וידוא שהמודול לא נוסף מחדש - אם נוסף, נסיר את הכפילות
+                const modalIndexAfterReload = this.modalHistory.indexOf(previousModal);
+                const historyLengthAfterReload = this.modalHistory.length;
+                
+                if (modalIndexBeforeReload !== modalIndexAfterReload || historyLengthAfterReload > historyLengthBeforeReload) {
+                    // המודול הוזז או נוסף מודול חדש - כנראה נוסף מודול חדש בסוף
+                    // נסיר את המודול האחרון אם הוא זהה למודול הקודם
+                    const lastModal = this.modalHistory[this.modalHistory.length - 1];
+                    if (lastModal && lastModal !== previousModal &&
+                        lastModal.info?.entityType === previousModal.info?.entityType &&
+                        lastModal.info?.entityId === previousModal.info?.entityId) {
+                        this.modalHistory.pop();
+                        if (window.Logger) {
+                            window.Logger.debug('✅ Removed duplicate modal added during reload', {
+                                entityType,
+                                entityId,
+                                historyLengthBefore: historyLengthBeforeReload,
+                                historyLengthAfter: this.modalHistory.length,
+                                page: "modal-navigation-manager"
+                            });
+                        }
+                    }
+                }
+                
+                // עדכון התוכן ב-modalHistory אחרי הטעינה
+                const contentElement = document.getElementById('entityDetailsContent');
+                if (contentElement && contentElement.innerHTML) {
+                    previousModal.content = contentElement.innerHTML;
+                    await this.saveHistoryToCache();
+                }
+                
+                // עדכון navigation אחרי טעינת הנתונים
+                if (this.isInitialized && previousModal.element) {
+                    setTimeout(() => {
+                        this.updateModalNavigation(previousModal.element);
+                    }, 100);
+                }
+                
+                if (window.Logger) {
+                    window.Logger.info('✅ Modal content reloaded from API (using existing modal from history)', {
+                        entityType,
+                        entityId,
+                        historyLength: this.modalHistory.length,
+                        previousModalIndex: this.modalHistory.indexOf(previousModal),
+                        hasContentAfterReload: !!previousModal.content,
+                        contentLength: previousModal.content?.length || 0,
+                        page: "modal-navigation-manager"
+                    });
+                }
+                
+                return; // סיימנו - התוכן נטען והמודול מוצג
+            } else {
+                if (window.Logger) {
+                    window.Logger.error('❌ Cannot reload modal content - missing dependencies', {
+                        entityType: previousModal.info?.entityType,
+                        entityId: previousModal.info?.entityId,
+                        hasEntityDetailsModal: !!window.entityDetailsModal,
+                        hasLoadEntityData: !!window.entityDetailsModal?.loadEntityData,
                         page: "modal-navigation-manager"
                     });
                 }
@@ -1296,7 +1526,25 @@ class ModalNavigationManager {
         });
         
         if (prevBsModal) {
-            prevBsModal.show();
+            // וידוא שה-modal instance מוגדר עם backdrop: false
+            // אם לא, צריך ליצור instance חדש
+            const modalConfig = prevBsModal._config || {};
+            if (modalConfig.backdrop !== false) {
+                // Bootstrap instance קיים אבל לא מוגדר נכון - צריך ליצור חדש
+                const newInstance = new bootstrap.Modal(previousModal.element, {
+                    backdrop: false,
+                    keyboard: true
+                });
+                newInstance.show();
+            } else {
+                prevBsModal.show();
+            }
+            
+            // ניקוי backdrops אחרי show() - Bootstrap עלול ליצור backdrop
+            setTimeout(() => {
+                this.manageBackdrop();
+            }, 50);
+            
             console.log('✅ [TEST 3] Called prevBsModal.show()');
             if (window.Logger) {
                 window.Logger.debug('✅ Showing previous modal', {
@@ -1308,8 +1556,17 @@ class ModalNavigationManager {
         } else {
             console.warn('⚠️ [TEST 3] No Bootstrap Modal instance found - trying to create one');
             try {
-                const newInstance = new bootstrap.Modal(previousModal.element);
+                const newInstance = new bootstrap.Modal(previousModal.element, {
+                    backdrop: false, // ננהל backdrop מרכזית
+                    keyboard: true
+                });
                 newInstance.show();
+                
+                // ניקוי backdrops אחרי show()
+                setTimeout(() => {
+                    this.manageBackdrop();
+                }, 50);
+                
                 console.log('✅ [TEST 3] Created new Bootstrap Modal instance and called show()');
             } catch (error) {
                 console.error('❌ [TEST 3] Failed to create/show modal:', error);
@@ -1325,11 +1582,6 @@ class ModalNavigationManager {
             });
         }, 50);
         
-        // עדכון backdrop אחרי הצגת המודול הקודם (Bootstrap יכול ליצור backdrop משלו)
-        setTimeout(() => {
-            this.manageBackdrop();
-        }, 50);
-        
         // עדכון ממשק הניווט של המודול הקודם
         setTimeout(() => {
             this.updateModalNavigation(previousModal.element);
@@ -1338,13 +1590,23 @@ class ModalNavigationManager {
                 console.warn('⚠️ Previous modal still not showing after timeout - trying again');
                 const prevBsModal = bootstrap.Modal.getInstance(previousModal.element);
                 if (prevBsModal) {
-                    prevBsModal.show();
+                    // וידוא שה-modal instance מוגדר עם backdrop: false
+                    const newInstance = new bootstrap.Modal(previousModal.element, {
+                        backdrop: false,
+                        keyboard: true
+                    });
+                    newInstance.show();
+                    
+                    // ניקוי backdrops אחרי show()
+                    setTimeout(() => {
+                        this.manageBackdrop();
+                    }, 50);
                 }
             } else {
                 console.log('✅ Previous modal is showing correctly');
+                // ניקוי backdrops בכל מקרה (אם Bootstrap יצר backdrops)
+                this.manageBackdrop();
             }
-            // עדכון backdrop שוב אחרי updateModalNavigation
-            this.manageBackdrop();
         }, 100);
     }
     
@@ -1392,80 +1654,44 @@ class ModalNavigationManager {
      */
     manageBackdrop() {
         try {
-            // ספירת מודולים פתוחים בפועל (רק מודולים שפתוחים עכשיו, לא היסטוריה!)
-            // בדיקה מדויקת יותר - מודולים שהם גם עם class 'show' וגם visible
-            const allModals = document.querySelectorAll('.modal');
-            const actuallyOpenModals = Array.from(allModals).filter(modal => {
-                const style = window.getComputedStyle(modal);
-                const hasShowClass = modal.classList.contains('show');
-                const isDisplayBlock = style.display === 'block';
-                const isVisible = style.visibility !== 'hidden' && style.opacity !== '0';
-                const notAriaHidden = modal.getAttribute('aria-hidden') !== 'true';
-                
-                // מודול נחשב פתוח רק אם הוא באמת נראה ופתוח
-                return hasShowClass && isDisplayBlock && isVisible && notAriaHidden;
-            });
-            
-            // בדיקה גם אם יש מודולים עם Bootstrap instance פעיל
-            const bootstrapOpenModals = Array.from(allModals).filter(modal => {
-                try {
-                    const bsModal = bootstrap?.Modal?.getInstance(modal);
-                    // אם יש Bootstrap instance ו-modal לא aria-hidden, הוא פתוח
-                    return bsModal && modal.getAttribute('aria-hidden') !== 'true';
-                } catch (e) {
-                    return false;
-                }
-            });
-            
-            // איחוד של שתי הרשימות
-            const openModalsSet = new Set([...actuallyOpenModals, ...bootstrapOpenModals]);
-            const hasOpenModals = openModalsSet.size > 0;
+            // חשוב: הסרת כל ה-backdrops הקיימים - כולל הגלובלי שלנו!
+            // זה מבטיח שאף פעם לא יהיו backdrops כפולים
+            const allBackdrops = document.querySelectorAll('.modal-backdrop');
             
             if (window.Logger) {
-                window.Logger.debug('🔍 Checking backdrop status', {
-                    actuallyOpenCount: actuallyOpenModals.length,
-                    bootstrapOpenCount: bootstrapOpenModals.length,
-                    totalOpen: openModalsSet.size,
-                    hasOpenModals,
+                window.Logger.debug('🧹 Cleaning up all backdrops before managing', {
+                    backdropCount: allBackdrops.length,
+                    backdropIds: Array.from(allBackdrops).map(b => b.id || '(no id)'),
+                    hasGlobalBackdrop: !!this.globalBackdrop,
                     modalHistoryLength: this.modalHistory.length,
                     page: "modal-navigation-manager"
                 });
             }
             
-            // ראשית - הסרת כל ה-backdrops הקיימים (כולל של Bootstrap ו-handmade)
-            const allBackdrops = document.querySelectorAll('.modal-backdrop');
-            allBackdrops.forEach(backdrop => backdrop.remove());
+            // הסרת כל ה-backdrops כולל הגלובלי שלנו
+            allBackdrops.forEach(backdrop => {
+                backdrop.remove();
+            });
             
-            // איפוס הרפרנס ל-backdrop הגלובלי
+            // איפוס הרפרנס לגלובלי שלנו (כי מחקנו אותו)
             this.globalBackdrop = null;
             
-            // אם יש מודולים פתוחים בפועל - יצירת backdrop גלובלי חדש
-            if (hasOpenModals) {
+            // אם יש מודולים פתוחים - יצירת backdrop גלובלי חדש
+            if (this.modalHistory.length > 0) {
                 this.createGlobalBackdrop();
             } else {
-                // אם אין מודולים פתוחים - וידוא שהכל נקי
-                // ניקוי היסטוריה אם אין מודולים פתוחים (גם אם ההיסטוריה לא ריקה)
-                if (this.modalHistory.length > 0 && !hasOpenModals) {
-                    if (window.Logger) {
-                        window.Logger.debug('🧹 Clearing modal history - no modals actually open', {
-                            historyLength: this.modalHistory.length,
-                            page: "modal-navigation-manager"
-                        });
-                    }
-                    this.modalHistory = [];
+                // אם אין מודולים - וידוא שאין backdrops נוספים
+                const remainingBackdrops = document.querySelectorAll('.modal-backdrop');
+                if (remainingBackdrops.length > 0) {
+                    remainingBackdrops.forEach(backdrop => backdrop.remove());
                 }
                 
-                // הסרת modal-open מ-body
+                // הסרת modal-open מ-body אם אין מודולים
                 document.body.classList.remove('modal-open');
                 
-                // הסרת padding מהגוף (אם Bootstrap הוסיף)
-                document.body.style.paddingRight = '';
-                
                 if (window.Logger) {
-                    window.Logger.debug('✅ All modals closed, backdrop cleaned', { 
-                        modalHistoryLength: this.modalHistory.length,
-                        openModalsCount: openModalsSet.size,
-                        page: "modal-navigation-manager" 
+                    window.Logger.debug('✅ All backdrops removed - no modals open', {
+                        page: "modal-navigation-manager"
                     });
                 }
             }
@@ -1522,86 +1748,6 @@ class ModalNavigationManager {
     }
     
     /**
-     * Setup backdrop observer - הגדרת MutationObserver לניטור backdrop של Bootstrap
-     * 
-     * @private
-     * @returns {void}
-     */
-    setupBackdropObserver() {
-        try {
-            // MutationObserver לניטור יצירת backdrop על ידי Bootstrap
-            this.backdropObserver = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    mutation.addedNodes.forEach((node) => {
-                        if (node.nodeType === 1 && node.classList && node.classList.contains('modal-backdrop')) {
-                            // אם זה לא הגלובלי שלנו - מסיר אותו מיד
-                            if (node.id !== 'globalModalBackdrop') {
-                                if (window.Logger) {
-                                    window.Logger.debug('🚫 Removed Bootstrap backdrop (using global backdrop instead)', { page: "modal-navigation-manager" });
-                                }
-                                node.remove();
-                                // וידוא שהגלובלי שלנו קיים
-                                this.manageBackdrop();
-                            }
-                        }
-                    });
-                });
-            });
-            
-            // התחלת ניטור על body
-            this.backdropObserver.observe(document.body, {
-                childList: true,
-                subtree: false
-            });
-            
-            if (window.Logger) {
-                window.Logger.debug('Backdrop observer setup complete', { page: "modal-navigation-manager" });
-            }
-        } catch (error) {
-            if (window.Logger) {
-                window.Logger.error('Error setting up backdrop observer:', error, { page: "modal-navigation-manager" });
-            }
-        }
-    }
-    
-    /**
-     * Setup periodic backdrop cleanup - הגדרת ניקוי תקופתי של backdrop
-     * 
-     * @private
-     * @returns {void}
-     */
-    setupPeriodicBackdropCleanup() {
-        try {
-            // ניקוי כל 2 שניות - למקרים שבהם backdrop נוצרים אחרי ה-event handlers
-            this.backdropCleanupInterval = setInterval(() => {
-                // בדיקה אם יש backdrop נוספים פרט לגלובלי שלנו
-                const allBackdrops = document.querySelectorAll('.modal-backdrop');
-                const nonGlobalBackdrops = Array.from(allBackdrops).filter(b => b.id !== 'globalModalBackdrop');
-                
-                if (nonGlobalBackdrops.length > 0) {
-                    if (window.Logger) {
-                        window.Logger.debug('🔧 Periodic cleanup: Removing extra backdrops', {
-                            count: nonGlobalBackdrops.length,
-                            page: "modal-navigation-manager"
-                        });
-                    }
-                    nonGlobalBackdrops.forEach(backdrop => backdrop.remove());
-                    // וידוא שהגלובלי שלנו קיים אם צריך
-                    this.manageBackdrop();
-                }
-            }, 2000); // כל 2 שניות
-            
-            if (window.Logger) {
-                window.Logger.debug('Periodic backdrop cleanup setup complete', { page: "modal-navigation-manager" });
-            }
-        } catch (error) {
-            if (window.Logger) {
-                window.Logger.error('Error setting up periodic backdrop cleanup:', error, { page: "modal-navigation-manager" });
-            }
-        }
-    }
-    
-    /**
      * Remove global backdrop - הסרת backdrop גלובלי
      * 
      * @private
@@ -1609,6 +1755,7 @@ class ModalNavigationManager {
      */
     removeGlobalBackdrop() {
         try {
+            // הסרת הגלובלי שלנו אם קיים
             if (this.globalBackdrop) {
                 this.globalBackdrop.remove();
                 this.globalBackdrop = null;
@@ -1618,12 +1765,23 @@ class ModalNavigationManager {
                 }
             }
             
+            // הסרת כל ה-backdrops הנוספים (Bootstrap יוצר לפעמים backdrops נוספים)
+            const allBackdrops = document.querySelectorAll('.modal-backdrop');
+            if (allBackdrops.length > 0) {
+                allBackdrops.forEach(backdrop => backdrop.remove());
+                
+                if (window.Logger) {
+                    window.Logger.debug('Removed additional backdrops', {
+                        count: allBackdrops.length,
+                        page: "modal-navigation-manager"
+                    });
+                }
+            }
+            
             // הסרת modal-open מ-body אם אין מודולים נוספים
             const otherModals = document.querySelectorAll('.modal.show');
             if (otherModals.length === 0) {
                 document.body.classList.remove('modal-open');
-                // הסרת padding מהגוף (אם Bootstrap הוסיף)
-                document.body.style.paddingRight = '';
             }
         } catch (error) {
             if (window.Logger) {
@@ -1641,98 +1799,130 @@ class ModalNavigationManager {
      */
     getBreadcrumb(currentModal = null) {
         try {
-            // breadcrumb מוצג רק אם יש לפחות 2 מודולים
-            if (this.modalHistory.length < 2) {
-                return '';
+            // ✅ לוג מפורט לפני כל פעולה
+            if (window.Logger) {
+                window.Logger.info('🍞 [getBreadcrumb] START', {
+                    historyLength: this.modalHistory.length,
+                    historyDetails: this.modalHistory.map((item, idx) => ({
+                        index: idx,
+                        entityType: item.info?.entityType,
+                        entityId: item.info?.entityId,
+                        hasElement: !!item.element,
+                        elementId: item.element?.id,
+                        hasContent: !!item.content,
+                        contentLength: item.content?.length || 0
+                    })),
+                    page: "modal-navigation-manager"
+                });
             }
             
-            // פונקציה להמרת מספר לאות עברית
-            const numberToHebrewLetter = (num) => {
-                const hebrewLetters = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'יא', 'יב', 'יג', 'יד', 'טו', 'טז', 'יז', 'יח', 'יט', 'כ'];
-                return (num > 0 && num <= hebrewLetters.length) ? hebrewLetters[num - 1] : String(num);
-            };
+            // ✅ תיקון: תמיד נציג ברדקראמב - לפחות לצורך בדיקות
+            // אם יש רק מודול אחד, נציג אותו (בלי separator)
+            // אם יש יותר, נציג את כל ההיסטוריה חוץ מהאחרון (שהוא המודול הנוכחי)
+            const historyForBreadcrumb = this.modalHistory.length === 1 
+                ? this.modalHistory.slice() // כולל את המודול היחיד
+                : this.modalHistory.slice(0, -1); // בלי המודול הנוכחי
+            
+            if (window.Logger) {
+                window.Logger.debug('🍞 [getBreadcrumb] Creating breadcrumb from history', {
+                    historyForBreadcrumbLength: historyForBreadcrumb.length,
+                    historyForBreadcrumb: historyForBreadcrumb.map((item, idx) => ({
+                        index: idx,
+                        entityType: item.info?.entityType,
+                        entityId: item.info?.entityId,
+                        elementId: item.element?.id
+                    })),
+                    page: "modal-navigation-manager"
+                });
+            }
             
             let breadcrumb = '<div class="modal-breadcrumb-trail">';
             
-            // סינון כפילויות - נשמור רק מודולים ייחודיים לפי entityType + entityId
-            // אבל נשמור את הסדר המקורי - המודול הראשון תמיד יופיע
-            const uniqueHistory = [];
-            const seenKeys = new Set();
-            
-            for (let i = 0; i < this.modalHistory.length; i++) {
-                const item = this.modalHistory[i];
-                const entityType = item.info?.entityType || 'unknown';
-                const entityId = item.info?.entityId || '';
-                const key = `${entityType}:${entityId}`;
+            historyForBreadcrumb.forEach((item, index) => {
+                // ✅ תיקון: שימוש רק ב-item.info.title - לא ב-getModalTitle() 
+                // getModalTitle() יכול להחזיר את הכותרת של המודול הנוכחי אם המודול הראשון עוד לא נטען
+                let title = item.info?.title;
                 
-                // המודול הראשון תמיד יתווסף
-                // מודולים אחרים רק אם לא ראינו אותם לפני
-                if (i === 0 || !seenKeys.has(key)) {
-                    uniqueHistory.push({ item, originalIndex: i });
-                    if (i > 0) {
-                        seenKeys.add(key);
-                    }
+                // Fallback רק אם אין title בכלל - יצירת title מ-entityType ו-entityId
+                if (!title && item.info?.entityType && item.info?.entityId !== undefined) {
+                    const entityLabel = this.getEntityLabel(item.info.entityType);
+                    title = `${entityLabel} ${item.info.entityId}`;
                 }
-            }
-            
-            // יצירת breadcrumb מהרשימה הייחודית
-            uniqueHistory.forEach((entry, index) => {
-                const { item } = entry;
-                const entityType = item.info?.entityType || 'unknown';
-                const entityId = item.info?.entityId || '';
-                const entityLabel = this.getEntityLabel(entityType);
-                const hebrewLetter = numberToHebrewLetter(index + 1);
-                const shortTitle = `${hebrewLetter}. ${entityLabel} ${entityId}`;
                 
-                if (index < uniqueHistory.length - 1) {
-                    // כל הפריטים חוץ מהאחרון - קישור
-                    breadcrumb += `<a href="#" class="modal-breadcrumb-link" data-entity-type="${entityType}" data-entity-id="${entityId}" title="לחץ לחזרה ל-${shortTitle}">${shortTitle}</a>`;
-                    if (index < uniqueHistory.length - 2) {
-                        breadcrumb += ' / ';
-                    }
-                } else {
-                    // הפריט האחרון - טקסט בלבד
-                    breadcrumb += ` / <span class="modal-breadcrumb-current">${shortTitle}</span>`;
+                // אם עדיין אין title - fallback סופי
+                if (!title) {
+                    title = 'מודול';
                 }
+                
+                const separator = index < historyForBreadcrumb.length - 1 ? ' / ' : '';
+                
+                // ✅ שימוש ב-index המקורי מהמערך (לא מה-historyForBreadcrumb)
+                const originalIndex = this.modalHistory.indexOf(item);
+                
+                if (window.Logger) {
+                    window.Logger.debug(`🍞 [getBreadcrumb] Adding item ${index} to breadcrumb`, {
+                        index,
+                        originalIndex,
+                        title,
+                        entityType: item.info?.entityType,
+                        entityId: item.info?.entityId,
+                        hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source),
+                        sourceInfo: item.info?.sourceInfo || item.info?.source || null,
+                        separator,
+                        page: "modal-navigation-manager"
+                    });
+                }
+                
+                // ✅ שימוש ב-originalIndex כדי שהקישור יפנה למודול הנכון
+                breadcrumb += `<span class="breadcrumb-item" data-modal-index="${originalIndex}" data-entity-type="${item.info?.entityType || ''}" data-entity-id="${item.info?.entityId || ''}">${title}${separator}</span>`;
             });
             
             breadcrumb += '</div>';
+            
+            if (window.Logger) {
+                window.Logger.info('🍞 [getBreadcrumb] END - breadcrumb created', {
+                    breadcrumbLength: breadcrumb.length,
+                    breadcrumbHTML: breadcrumb, // ✅ תיקון: הצגת כל ה-HTML, לא רק preview
+                    breadcrumbHTMLPreview: breadcrumb.substring(0, 200), // preview קצר
+                    historyLength: this.modalHistory.length,
+                    itemsInBreadcrumb: historyForBreadcrumb.length,
+                    breadcrumbItems: historyForBreadcrumb.map((item, idx) => ({
+                        index: idx,
+                        originalIndex: this.modalHistory.indexOf(item),
+                        entityType: item.info?.entityType,
+                        entityId: item.info?.entityId,
+                        title: item.info?.title || `${this.getEntityLabel(item.info?.entityType)} ${item.info?.entityId}`,
+                        hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source),
+                        sourceInfo: item.info?.sourceInfo || item.info?.source || null,
+                        infoKeys: item.info ? Object.keys(item.info) : [],
+                        fullInfo: item.info || null // ✅ תיקון: הצגת כל ה-info כדי לראות מה יש
+                    })),
+                    page: "modal-navigation-manager"
+                });
+            }
+            
+            // ✅ הוספה: לוג נוסף ל-console גם
+            console.log('🍞 [getBreadcrumb] END - breadcrumb created:', {
+                breadcrumbLength: breadcrumb.length,
+                breadcrumbHTML: breadcrumb,
+                historyLength: this.modalHistory.length,
+                itemsInBreadcrumb: historyForBreadcrumb.length,
+                breadcrumbItems: historyForBreadcrumb.map((item, idx) => ({
+                    index: idx,
+                    originalIndex: this.modalHistory.indexOf(item),
+                    entityType: item.info?.entityType,
+                    entityId: item.info?.entityId,
+                    title: item.info?.title || `${this.getEntityLabel(item.info?.entityType)} ${item.info?.entityId}`,
+                    hasSourceInfo: !!(item.info?.sourceInfo || item.info?.source)
+                }))
+            });
+            
             return breadcrumb;
         } catch (error) {
             if (window.Logger) {
                 window.Logger.error('Error creating breadcrumb:', error, { page: "modal-navigation-manager" });
             }
             return '';
-        }
-    }
-    
-    /**
-     * Remove global backdrop - הסרת backdrop גלובלי
-     * 
-     * @private
-     * @returns {void}
-     */
-    removeGlobalBackdrop() {
-        try {
-            if (this.globalBackdrop) {
-                this.globalBackdrop.remove();
-                this.globalBackdrop = null;
-                
-                if (window.Logger) {
-                    window.Logger.debug('Global backdrop removed', { page: "modal-navigation-manager" });
-                }
-            }
-            
-            // הסרת modal-open מ-body אם אין מודולים נוספים
-            const otherModals = document.querySelectorAll('.modal.show');
-            if (otherModals.length === 0) {
-                document.body.classList.remove('modal-open');
-                document.body.style.paddingRight = '';
-            }
-        } catch (error) {
-            if (window.Logger) {
-                window.Logger.error('Error removing global backdrop:', error, { page: "modal-navigation-manager" });
-            }
         }
     }
     
@@ -1753,61 +1943,18 @@ class ModalNavigationManager {
      */
     updateModalNavigation(modalElement) {
         try {
-            if (!modalElement) {
-                if (window.Logger) {
-                    window.Logger.warn('⚠️ updateModalNavigation: modalElement is null/undefined', { page: "modal-navigation-manager" });
-                }
-                return;
-            }
-            
-            // Debounce - אם יש קריאה עדכנית לאותו מודול, נדחה את העדכון
-            const modalId = modalElement.id || 'unknown';
-            const existingTimer = this.navigationUpdateTimers.get(modalId);
-            if (existingTimer) {
-                clearTimeout(existingTimer);
-                this.navigationUpdateTimers.delete(modalId);
-                if (window.Logger) {
-                    window.Logger.debug('🔄 Debouncing navigation update - canceling previous timer', {
-                        modalId,
-                        page: "modal-navigation-manager"
-                    });
-                }
-            }
-            
-            // שמירת timer חדש - ביצוע העדכון אחרי 50ms
-            const timerId = setTimeout(() => {
-                this.navigationUpdateTimers.delete(modalId);
-                this._performNavigationUpdate(modalElement);
-            }, 50);
-            
-            this.navigationUpdateTimers.set(modalId, timerId);
-            
-            return; // נצא מהפונקציה - העדכון יעשה דרך _performNavigationUpdate
-        } catch (error) {
-            if (window.Logger) {
-                window.Logger.error('Error in updateModalNavigation:', error, { page: "modal-navigation-manager" });
-            }
-        }
-    }
-    
-    /**
-     * Perform actual navigation update - ביצוע עדכון הניווט בפועל
-     * 
-     * @param {HTMLElement} modalElement - אלמנט המודול לעדכון
-     * @private
-     * @returns {void}
-     */
-    _performNavigationUpdate(modalElement) {
-        try {
-            if (!modalElement) {
-                return;
-            }
-            
-            const modalId = modalElement.id || 'unknown';
+            // ✅ לוג ברור - תמיד נדפיס ל-console גם
+            console.log('🟢🟢🟢 [updateModalNavigation] CALLED', {
+                modalId: modalElement?.id,
+                modalElement: modalElement,
+                historyLength: this.modalHistory.length,
+                canGoBack: this.canGoBack(),
+                timestamp: new Date().toISOString()
+            });
             
             // לוג התחלתי מפורט
             if (window.Logger) {
-                window.Logger.info('🚀 _performNavigationUpdate STARTED', {
+                window.Logger.info('🚀 updateModalNavigation STARTED', {
                     modalElementExists: !!modalElement,
                     modalId: modalElement?.id,
                     modalHistoryLength: this.modalHistory.length,
@@ -1821,6 +1968,18 @@ class ModalNavigationManager {
                     })),
                     page: "modal-navigation-manager"
                 });
+            }
+            
+            // ✅ הוספת קוביית debug - תמיד נציג אותה
+            console.log('🟡 [updateModalNavigation] About to create debug box');
+            this.createDebugInfoBox(modalElement);
+            console.log('🟡 [updateModalNavigation] Debug box created');
+            
+            if (!modalElement) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ updateModalNavigation: modalElement is null/undefined', { page: "modal-navigation-manager" });
+                }
+                return;
             }
             
             const headerElement = modalElement.querySelector('.modal-header');
@@ -1854,31 +2013,16 @@ class ModalNavigationManager {
             breadcrumbContainer.style.order = '2';
             
             // עדכון breadcrumb
-            if (window.Logger) {
-                window.Logger.info('🍞 _performNavigationUpdate: About to call getBreadcrumb', {
-                    modalId: modalElement.id,
-                    historyLength: this.modalHistory.length,
-                    historyDetails: this.modalHistory.map((item, idx) => ({
-                        index: idx,
-                        entityType: item.info?.entityType || 'unknown',
-                        entityId: item.info?.entityId || ''
-                    })),
-                    page: "modal-navigation-manager"
-                });
-            }
-            
+            console.log('🟡 [updateModalNavigation] About to get breadcrumb', {
+                historyLength: this.modalHistory.length
+            });
             const breadcrumbHTML = this.getBreadcrumb(modalElement);
             const shouldShowBreadcrumb = this.modalHistory.length > 1 && breadcrumbHTML && breadcrumbHTML.trim().length > 0;
-            
-            if (window.Logger) {
-                window.Logger.info('🍞 _performNavigationUpdate: After getBreadcrumb call', {
-                    modalId: modalElement.id,
-                    breadcrumbHTMLLength: breadcrumbHTML?.length || 0,
-                    breadcrumbHTMLPreview: breadcrumbHTML?.substring(0, 150) || '(empty)',
-                    shouldShowBreadcrumb,
-                    page: "modal-navigation-manager"
-                });
-            }
+            console.log('🟡 [updateModalNavigation] Breadcrumb:', {
+                breadcrumbHTML: breadcrumbHTML?.substring(0, 100),
+                shouldShowBreadcrumb,
+                historyLength: this.modalHistory.length
+            });
             
             if (window.Logger) {
                 window.Logger.debug('🍞 Breadcrumb update:', { 
@@ -1893,250 +2037,196 @@ class ModalNavigationManager {
                 });
             }
             
-            // הצגת breadcrumb רק אם יש history וקיבלנו breadcrumb HTML
-            if (shouldShowBreadcrumb && breadcrumbHTML) {
-                // לוג לפני עדכון - כדי לראות מה היה לפני
-                const existingContent = breadcrumbContainer.innerHTML || '';
-                const existingFirstLink = breadcrumbContainer.querySelector('.breadcrumb-link');
+            // ✅ תמיד נציג את ה-breadcrumb - אבל נעשה אותו disabled אם אין history
+            // (בגרסה העובדת עשו השבטה במקום הסתרה - זה עבד יותר טוב)
+            if (breadcrumbHTML) {
+                breadcrumbContainer.innerHTML = breadcrumbHTML;
+                breadcrumbContainer.style.display = 'block';
+                breadcrumbContainer.style.visibility = 'visible';
+                breadcrumbContainer.style.opacity = shouldShowBreadcrumb ? '1' : '0.5';
+                breadcrumbContainer.style.pointerEvents = shouldShowBreadcrumb ? 'auto' : 'none';
                 
-                // קבלת המודול הראשון מההיסטוריה - זה הקישור הראשון שצריך להיות קבוע תמיד!
-                const firstModalInHistory = this.modalHistory[0];
-                const expectedFirstEntityType = firstModalInHistory?.info?.entityType;
-                const expectedFirstEntityId = String(firstModalInHistory?.info?.entityId);
+                // ✅ תיקון: לוג שמציג מה מוצג בפועל ב-DOM אחרי הטעינה
+                const actualBreadcrumbContent = breadcrumbContainer.innerHTML;
+                const actualBreadcrumbText = breadcrumbContainer.textContent || breadcrumbContainer.innerText || '';
+                const actualBreadcrumbItems = Array.from(breadcrumbContainer.querySelectorAll('.breadcrumb-item, .modal-breadcrumb-link')).map((el, idx) => {
+                    const modalIndexAttr = el.getAttribute('data-modal-index');
+                    const modalIndex = modalIndexAttr !== null ? parseInt(modalIndexAttr, 10) : null;
+                    const historyItem = modalIndex !== null && modalIndex >= 0 && modalIndex < this.modalHistory.length 
+                        ? this.modalHistory[modalIndex] 
+                        : null;
+                    
+                    return {
+                        index: idx,
+                        text: el.textContent?.trim() || '',
+                        entityType: el.getAttribute('data-entity-type') || '',
+                        entityId: el.getAttribute('data-entity-id') || '',
+                        modalIndex: modalIndexAttr || '',
+                        modalIndexParsed: modalIndex,
+                        historyItemMatch: historyItem ? {
+                            entityType: historyItem.info?.entityType,
+                            entityId: historyItem.info?.entityId,
+                            title: historyItem.info?.title,
+                            hasSourceInfo: !!(historyItem.info?.sourceInfo || historyItem.info?.source)
+                        } : null
+                    };
+                });
                 
-                // בדיקה: האם יש כבר קישור ראשון בברדקראמב?
-                const hasExistingFirstLink = existingFirstLink !== null;
-                const existingFirstLinkEntityType = existingFirstLink?.getAttribute('data-entity-type');
-                const existingFirstLinkEntityId = existingFirstLink?.getAttribute('data-entity-id');
-                
-                // בדיקה אם הקישור הראשון נכון (תואם למודול הראשון בהיסטוריה)
-                const firstLinkIsCorrect = hasExistingFirstLink && 
-                                         existingFirstLinkEntityType === expectedFirstEntityType && 
-                                         existingFirstLinkEntityId === expectedFirstEntityId;
+                console.log('🍞🍞🍞 [updateModalNavigation] BREADCRUMB DISPLAYED IN DOM:', {
+                    actualHTML: actualBreadcrumbContent.substring(0, 500), // preview
+                    actualText: actualBreadcrumbText,
+                    actualItems: actualBreadcrumbItems,
+                    itemsCount: actualBreadcrumbItems.length,
+                    containerId: breadcrumbContainer.id,
+                    containerDisplay: window.getComputedStyle(breadcrumbContainer).display,
+                    containerVisibility: window.getComputedStyle(breadcrumbContainer).visibility,
+                    containerOpacity: window.getComputedStyle(breadcrumbContainer).opacity,
+                    shouldShowBreadcrumb,
+                    historyLength: this.modalHistory.length,
+                    timestamp: new Date().toISOString()
+                });
                 
                 if (window.Logger) {
-                    window.Logger.info('🍞 _performNavigationUpdate: Checking breadcrumb state', {
-                        modalId: modalElement.id,
-                        existingContentLength: existingContent.length,
-                        hasExistingFirstLink,
-                        existingFirstLinkEntityType,
-                        existingFirstLinkEntityId,
-                        expectedFirstEntityType,
-                        expectedFirstEntityId,
-                        firstLinkIsCorrect,
-                        newBreadcrumbLength: breadcrumbHTML.length,
-                        newBreadcrumbPreview: breadcrumbHTML.substring(0, 150),
+                    window.Logger.info('🍞🍞🍞 [updateModalNavigation] BREADCRUMB DISPLAYED IN DOM', {
+                        actualHTML: actualBreadcrumbContent,
+                        actualText: actualBreadcrumbText,
+                        actualItems: actualBreadcrumbItems,
+                        itemsCount: actualBreadcrumbItems.length,
+                        containerId: breadcrumbContainer.id,
+                        containerDisplay: window.getComputedStyle(breadcrumbContainer).display,
+                        containerVisibility: window.getComputedStyle(breadcrumbContainer).visibility,
+                        containerOpacity: window.getComputedStyle(breadcrumbContainer).opacity,
+                        shouldShowBreadcrumb,
                         historyLength: this.modalHistory.length,
                         page: "modal-navigation-manager"
                     });
                 }
                 
-                // אם יש כבר קישור ראשון בברדקראמב - נשמור אותו ונעדכן רק את השאר
-                if (hasExistingFirstLink && existingContent.length > 0) {
-                    // אם הקישור הראשון נכון - נשמור אותו ונעדכן רק את השאר
-                    if (firstLinkIsCorrect) {
-                        if (window.Logger) {
-                            window.Logger.info('✅ _performNavigationUpdate: First link is correct - preserving it and updating only the rest', {
-                                modalId: modalElement.id,
-                                preservedFirstLink: {
-                                    type: existingFirstLinkEntityType,
-                                    id: existingFirstLinkEntityId
-                                },
-                                page: "modal-navigation-manager"
-                            });
-                        }
-                        
-                        // שמירת הקישור הראשון הקיים (לא נשנה אותו לעולם!)
-                        const preservedFirstLink = existingFirstLink.outerHTML;
-                        
-                        // בניית ברדקראמב חדש מהקישור הראשון השמור + שאר הקישורים מ-getBreadcrumb
-                        // אבל נחליף את הקישור הראשון בברדקראמב החדש בקישור השמור
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = breadcrumbHTML;
-                        
-                        // החלפת הקישור הראשון בברדקראמב החדש בקישור השמור
-                        const newFirstLink = tempDiv.querySelector('.breadcrumb-link');
-                        if (newFirstLink) {
-                            const preservedLinkElement = document.createElement('div');
-                            preservedLinkElement.innerHTML = preservedFirstLink;
-                            const preservedLink = preservedLinkElement.querySelector('.breadcrumb-link');
-                            if (preservedLink) {
-                                newFirstLink.replaceWith(preservedLink.cloneNode(true));
-                            }
-                        }
-                        
-                        // עדכון הברדקראמב עם הקישור הראשון השמור
-                        breadcrumbContainer.innerHTML = tempDiv.innerHTML;
-                        
-                        if (window.Logger) {
-                            window.Logger.info('✅ _performNavigationUpdate: Updated breadcrumb while preserving first link', {
-                                modalId: modalElement.id,
-                                page: "modal-navigation-manager"
-                            });
-                        }
-                    } else {
-                        // הקישור הראשון לא נכון - נשמור את הקישור הראשון מהיסטוריה ונעדכן את כל השאר
-                        if (window.Logger) {
-                            window.Logger.warn('⚠️ _performNavigationUpdate: First link is incorrect - fixing it', {
-                                modalId: modalElement.id,
-                                existingFirstLink: {
-                                    type: existingFirstLinkEntityType,
-                                    id: existingFirstLinkEntityId
-                                },
-                                expectedFirstLink: {
-                                    type: expectedFirstEntityType,
-                                    id: expectedFirstEntityId
-                                },
-                                page: "modal-navigation-manager"
-                            });
-                        }
-                        
-                        // בניית ברדקראמב חדש עם הקישור הראשון הנכון
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = breadcrumbHTML;
-                        const newFirstLink = tempDiv.querySelector('.breadcrumb-link');
-                        
-                        // החלפת הקישור הראשון בקישור נכון לפי המודול הראשון בהיסטוריה
-                        if (newFirstLink) {
-                            // פונקציה להמרת מספר לאות עברית (א. ב. ג. ...)
-                            const numberToHebrewLetter = (num) => {
-                                const hebrewLetters = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'יא', 'יב', 'יג', 'יד', 'טו', 'טז', 'יז', 'יח', 'יט', 'כ'];
-                                if (num > 0 && num <= hebrewLetters.length) {
-                                    return hebrewLetters[num - 1];
-                                }
-                                return String(num); // fallback למספר אם חרגנו מהטווח
-                            };
-                            
-                            const firstEntityLabel = this.getEntityLabel(expectedFirstEntityType);
-                            const firstHebrewLetter = numberToHebrewLetter(1); // המודול הראשון תמיד א.
-                            const firstShortTitle = `${firstHebrewLetter}. ${firstEntityLabel} ${expectedFirstEntityId}`;
-                            
-                            newFirstLink.setAttribute('data-entity-type', expectedFirstEntityType);
-                            newFirstLink.setAttribute('data-entity-id', expectedFirstEntityId);
-                            newFirstLink.setAttribute('data-modal-index', '0');
-                            newFirstLink.setAttribute('title', `לחץ לחזרה ל-${firstShortTitle}`);
-                            newFirstLink.textContent = firstShortTitle;
-                        }
-                        
-                        breadcrumbContainer.innerHTML = tempDiv.innerHTML;
-                        
-                        if (window.Logger) {
-                            window.Logger.info('✅ _performNavigationUpdate: Fixed first link and updated breadcrumb', {
-                                modalId: modalElement.id,
-                                fixedFirstLink: {
-                                    type: expectedFirstEntityType,
-                                    id: expectedFirstEntityId
-                                },
-                                page: "modal-navigation-manager"
-                            });
-                        }
-                    }
-                    
-                    // עדכון רק את האובייקט הנוכחי (currentModalItem) אם צריך
-                    const currentModalInHistory = this.modalHistory[this.modalHistory.length - 1];
-                    const currentEntityType = currentModalInHistory?.info?.entityType;
-                    const currentEntityId = currentModalInHistory?.info?.entityId;
-                    const currentBreadcrumbCurrent = breadcrumbContainer.querySelector('.breadcrumb-current');
-                    const currentBreadcrumbText = currentBreadcrumbCurrent?.textContent || '';
-                    
-                    // חישוב המספור הנכון של המודול הנוכחי (מספר הקישורים + 1)
-                    const breadcrumbLinks = breadcrumbContainer.querySelectorAll('.breadcrumb-link');
-                    const currentNumber = breadcrumbLinks.length + 1;
-                    
-                    // פונקציה להמרת מספר לאות עברית (א. ב. ג. ...)
-                    const numberToHebrewLetter = (num) => {
-                        const hebrewLetters = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'יא', 'יב', 'יג', 'יד', 'טו', 'טז', 'יז', 'יח', 'יט', 'כ'];
-                        if (num > 0 && num <= hebrewLetters.length) {
-                            return hebrewLetters[num - 1];
-                        }
-                        return String(num); // fallback למספר אם חרגנו מהטווח
-                    };
-                    
-                    const currentEntityLabel = this.getEntityLabel(currentEntityType);
-                    const currentHebrewLetter = numberToHebrewLetter(currentNumber);
-                    const expectedCurrentText = `${currentHebrewLetter}. ${currentEntityLabel} ${currentEntityId}`;
-                    
-                    // עדכון רק אם הטקסט של המודול הנוכחי שונה
-                    if (currentBreadcrumbCurrent && currentBreadcrumbText !== expectedCurrentText) {
-                        if (window.Logger) {
-                            window.Logger.info('🔄 _performNavigationUpdate: Updating current modal text in breadcrumb', {
-                                modalId: modalElement.id,
-                                oldText: currentBreadcrumbText,
-                                newText: expectedCurrentText,
-                                page: "modal-navigation-manager"
-                            });
-                        }
-                        currentBreadcrumbCurrent.textContent = expectedCurrentText;
-                    }
-                    
-                    return; // סיימנו - לא נעדכן את כל הברדקראמב מחדש
-                }
-                
-                // ניקוי מלא של התוכן הישן לפני הוספת חדש - למניעת כפילות
-                breadcrumbContainer.innerHTML = '';
-                breadcrumbContainer.style.display = 'flex';
-                breadcrumbContainer.style.visibility = 'visible';
-                
-                // הוספת התוכן החדש
-                breadcrumbContainer.innerHTML = breadcrumbHTML;
-                
-                // לוג אחרי עדכון - לוודא שהתוכן עודכן נכון
-                const finalContent = breadcrumbContainer.innerHTML || '';
-                if (window.Logger) {
-                    window.Logger.info('🍞 _performNavigationUpdate: Breadcrumb container updated', {
-                        modalId: modalElement.id,
-                        finalContentLength: finalContent.length,
-                        finalContentPreview: finalContent.substring(0, 150),
-                        matchesNewBreadcrumb: finalContent === breadcrumbHTML,
-                        page: "modal-navigation-manager"
-                    });
-                }
-                
                 // הוספת event listeners לקישורי breadcrumb
-                const breadcrumbLinks = breadcrumbContainer.querySelectorAll('.breadcrumb-link');
-                breadcrumbLinks.forEach((link, linkIndex) => {
+                const breadcrumbLinks = breadcrumbContainer.querySelectorAll('.modal-breadcrumb-link');
+                breadcrumbLinks.forEach((link) => {
                     // הסרת listeners קודמים אם יש (prevent duplicates)
                     const newLink = link.cloneNode(true);
                     link.parentNode.replaceChild(newLink, link);
                     
-                    newLink.addEventListener('click', (e) => {
+                    newLink.addEventListener('click', async (e) => {
                         e.preventDefault();
-                        const modalIndex = parseInt(newLink.getAttribute('data-modal-index') || linkIndex);
+                        e.stopPropagation();
                         
-                        // חישוב כמה מודולים לחזור אחורה
-                        // modalIndex הוא המיקום בהיסטוריה של המודול שעליו לחצנו
-                        // ההיסטוריה כוללת את המודול הנוכחי, אז צריך לחזור (currentLength - modalIndex - 1) שלבים
-                        const currentHistoryLength = this.modalHistory.length;
-                        const targetIndex = modalIndex; // מיקום המודול להיסטוריה
-                        const currentIndex = currentHistoryLength - 1; // מיקום המודול הנוכחי
-                        const stepsBack = currentIndex - targetIndex; // כמה שלבים לחזור
+                        const entityType = newLink.getAttribute('data-entity-type');
+                        const entityId = newLink.getAttribute('data-entity-id');
+                        const modalIndexAttr = newLink.getAttribute('data-modal-index');
+                        const modalIndex = modalIndexAttr !== null ? parseInt(modalIndexAttr, 10) : null;
                         
                         if (window.Logger) {
-                            window.Logger.debug('🔗 Breadcrumb link clicked', {
+                            window.Logger.info('🔗 Breadcrumb link clicked', {
+                                entityType,
+                                entityId,
                                 modalIndex,
-                                targetIndex,
-                                currentIndex,
-                                stepsBack,
-                                currentHistoryLength,
+                                historyLength: this.modalHistory.length,
                                 page: "modal-navigation-manager"
                             });
                         }
                         
-                        // חזרה אחורה מספר פעמים לפי המיקום
-                        // רק אם זה בתוך הטווח הנכון
-                        if (stepsBack > 0 && stepsBack <= currentIndex && targetIndex >= 0) {
-                            // ביצוע חזרה אסינכרונית - ממתינים שכל goBack יסתיים
-                            (async () => {
-                                for (let i = 0; i < stepsBack; i++) {
-                                    if (this.canGoBack()) {
-                                        await this.goBack();
-                                        // המתנה קצרה בין כל חזרה
-                                        await new Promise(resolve => setTimeout(resolve, 100));
-                                    } else {
-                                        break;
+                        // מציאת המודול היעד בהיסטוריה
+                        let targetModal = null;
+                        
+                        if (modalIndex !== null && modalIndex >= 0 && modalIndex < this.modalHistory.length) {
+                            // יש לנו index - נשתמש בו
+                            targetModal = this.modalHistory[modalIndex];
+                        } else if (entityType && entityId !== null) {
+                            // אין index תקף - נחפש לפי entityType + entityId
+                            for (let i = 0; i < this.modalHistory.length; i++) {
+                                const item = this.modalHistory[i];
+                                if (item.info?.entityType === entityType && 
+                                    String(item.info?.entityId) === String(entityId)) {
+                                    targetModal = item;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (targetModal && targetModal.info?.entityType && targetModal.info?.entityId) {
+                            // סגירת כל המודולים עד למודול היעד
+                            const currentHistoryLength = this.modalHistory.length;
+                            const targetIndex = this.modalHistory.indexOf(targetModal);
+                            
+                            if (targetIndex >= 0 && targetIndex < currentHistoryLength - 1) {
+                                // נסיר את כל המודולים אחרי היעד
+                                const modalsToClose = currentHistoryLength - 1 - targetIndex;
+                                
+                                // סגירת המודול הנוכחי ואז הצגת היעד
+                                const currentModal = this.modalHistory[this.modalHistory.length - 1];
+                                if (currentModal && currentModal.element) {
+                                    const bsModal = bootstrap.Modal.getInstance(currentModal.element);
+                                    if (bsModal) {
+                                        bsModal.hide();
                                     }
                                 }
-                            })();
+                                
+                                // הסרת המודולים מה-history עד ליעד (משאירים את היעד)
+                                while (this.modalHistory.length > targetIndex + 1) {
+                                    this.modalHistory.pop();
+                                }
+                                
+                                // שמירת ההיסטוריה
+                                this.saveHistoryToCache();
+                                
+                                // הצגת המודול היעד - אם יש תוכן שמור, נשתמש ב-_showPreviousModal
+                                // אחרת נטען מחדש מה-API
+                                const hasSavedContent = targetModal.content && targetModal.content.trim().length > 0;
+                                
+                                if (hasSavedContent) {
+                                    // ✅ יש תוכן שמור - נשתמש ב-_showPreviousModal שמשחזר תוכן מההיסטוריה
+                                    // זה מהיר יותר ולא דורש קריאה ל-API
+                                    await this._showPreviousModal(targetModal);
+                                } else {
+                                    // ❌ אין תוכן שמור - נטען מחדש מה-API באמצעות showEntityDetails
+                                    if (window.showEntityDetails) {
+                                        if (window.Logger) {
+                                            window.Logger.info('🔄 Breadcrumb navigation - reloading from API via showEntityDetails', {
+                                                entityType: targetModal.info.entityType,
+                                                entityId: targetModal.info.entityId,
+                                                currentHistoryLength: this.modalHistory.length,
+                                                currentHistory: this.modalHistory.map((item, idx) => ({
+                                                    index: idx,
+                                                    entityType: item.info?.entityType,
+                                                    entityId: item.info?.entityId,
+                                                    hasContent: !!item.content
+                                                })),
+                                                page: "modal-navigation-manager"
+                                            });
+                                        }
+                                        
+                                        const options = {
+                                            mode: 'view',
+                                            includeLinkedItems: true,
+                                            skipCachedContent: false
+                                        };
+                                        
+                                        if (targetModal.info.sourceInfo || targetModal.info.source) {
+                                            options.source = targetModal.info.sourceInfo || targetModal.info.source;
+                                        }
+                                        
+                                        await window.showEntityDetails(targetModal.info.entityType, targetModal.info.entityId, options);
+                                        
+                                        if (window.Logger) {
+                                            window.Logger.info('✅ Breadcrumb navigation - modal reloaded', {
+                                                entityType: targetModal.info.entityType,
+                                                entityId: targetModal.info.entityId,
+                                                newHistoryLength: this.modalHistory.length,
+                                                newHistory: this.modalHistory.map((item, idx) => ({
+                                                    index: idx,
+                                                    entityType: item.info?.entityType,
+                                                    entityId: item.info?.entityId,
+                                                    hasContent: !!item.content
+                                                })),
+                                                page: "modal-navigation-manager"
+                                            });
+                                        }
+                                    }
+                                }
+                            }
                         }
                     });
                 });
@@ -2155,9 +2245,14 @@ class ModalNavigationManager {
                 || document.getElementById('entityDetailsBackBtn');
             
             const canGoBack = this.canGoBack();
+            console.log('🟡 [updateModalNavigation] Back button logic START:', {
+                canGoBack,
+                historyLength: this.modalHistory.length,
+                modalId: modalElement?.id
+            });
             
-            // DEBUG: תמיד נציג את הכפתור כדי לבדוק אם הוא מופיע
-            // TODO: להחזיר את התנאי canGoBack אחרי הבדיקה
+            // ✅ תמיד נציג את הכפתור - אבל נשבט אותו אם אין אפשרות לחזור
+            // (בגרסה העובדת עשו השבטה במקום הסתרה - זה עבד יותר טוב)
             
             // לוג מפורט לבדיקת המצב
             if (window.Logger) {
@@ -2194,8 +2289,9 @@ class ModalNavigationManager {
                 });
             }
             
-            // הצגת כפתור חזור רק אם יש לאן לחזור
-            if (canGoBack) {
+            // ✅ תמיד נציג את הכפתור - אבל נשבט אותו אם אין אפשרות לחזור
+            // (בגרסה העובדת עשו השבטה במקום הסתרה - זה עבד יותר טוב)
+            if (true) { // תמיד נציג את הכפתור
                 if (window.Logger) {
                     window.Logger.debug('✅ Showing back button (canGoBack=true)', {
                         modalId: modalElement.id,
@@ -2203,6 +2299,17 @@ class ModalNavigationManager {
                         canGoBack: canGoBack,
                         page: "modal-navigation-manager"
                     });
+                }
+                
+                // ✅ תיקון: וידוא שכפתור הקיים מקבל data-onclick
+                if (backButton && !backButton.getAttribute('data-onclick')) {
+                    backButton.setAttribute('data-onclick', 'window.modalNavigationManager && window.modalNavigationManager.goBack()');
+                    if (window.Logger) {
+                        window.Logger.debug('✅ Added data-onclick to existing back button', {
+                            buttonId: backButton.id,
+                            page: "modal-navigation-manager"
+                        });
+                    }
                 }
                 
                 // ניסיון ראשון למצוא כפתור קיים - כולל כפתור עם display: none
@@ -2232,11 +2339,16 @@ class ModalNavigationManager {
                     
                     if (allBackButtons.length > 0) {
                         backButton = allBackButtons[0];
+                        // ✅ תיקון: וידוא שכפתור שנמצא מקבל data-onclick
+                        if (!backButton.getAttribute('data-onclick')) {
+                            backButton.setAttribute('data-onclick', 'window.modalNavigationManager && window.modalNavigationManager.goBack()');
+                        }
                         if (window.Logger) {
                             window.Logger.info('✅ Found hidden back button', {
                                 buttonId: backButton.id,
                                 computedDisplay: window.getComputedStyle(backButton).display,
                                 inlineDisplay: backButton.style.display,
+                                hasDataOnclick: !!backButton.getAttribute('data-onclick'),
                                 page: "modal-navigation-manager"
                             });
                         }
@@ -2277,9 +2389,28 @@ class ModalNavigationManager {
                             retryButton.style.visibility = 'visible';
                             retryButton.style.order = '3'; // לפני כפתור סגירה (3 < 4)
                             retryButton.style.borderRadius = '6px'; // מרובע רגיל, לא עגול
-                            // שימוש ב-data-onclick במקום event listener (המלצת הדוח)
-                            if (!retryButton.hasAttribute('data-onclick')) {
-                                retryButton.setAttribute('data-onclick', "if (window.modalNavigationManager) { console.log('🔍 Back button clicked (retry) - canGoBack:', window.modalNavigationManager.canGoBack(), 'historyLength:', window.modalNavigationManager.modalHistory.length); if (window.modalNavigationManager.canGoBack()) { console.log('✅ Calling goBack()'); window.modalNavigationManager.goBack(); } else { console.warn('⚠️ Cannot go back - historyLength:', window.modalNavigationManager.modalHistory.length); } }");
+                            // ✅ תיקון: הוספת data-onclick כך ש-EventHandlerManager יזהה את הכפתור
+                            if (!retryButton.getAttribute('data-onclick')) {
+                                retryButton.setAttribute('data-onclick', 'window.modalNavigationManager && window.modalNavigationManager.goBack()');
+                            }
+                            
+                            // הוספת event listener ישיר לכפתור חזרה (גיבוי למקרה ש-EventHandlerManager לא יטפל)
+                            const existingListeners = retryButton.getAttribute('data-has-back-listener');
+                            if (!existingListeners) {
+                                retryButton.addEventListener('click', (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    
+                                    console.log('🔍 Back button clicked (retry) - canGoBack:', this.canGoBack(), 'historyLength:', this.modalHistory.length);
+                                    
+                                    if (this.canGoBack()) {
+                                        console.log('✅ Calling goBack()');
+                                        this.goBack();
+                                    } else {
+                                        console.warn('⚠️ Cannot go back - historyLength:', this.modalHistory.length);
+                                    }
+                                });
+                                retryButton.setAttribute('data-has-back-listener', 'true');
                             }
                             if (window.ButtonSystem && typeof window.ButtonSystem.processButton === 'function') {
                                 window.ButtonSystem.processButton(retryButton);
@@ -2298,6 +2429,8 @@ class ModalNavigationManager {
                     backButton.setAttribute('data-button-type', 'BACK');
                     backButton.setAttribute('data-variant', 'full'); // מצב מלא - איקון + טקסט
                     backButton.setAttribute('data-text', ''); // המערכת תמלא את הטקסט מאוטומטית
+                    // ✅ תיקון: הוספת data-onclick כך ש-EventHandlerManager יזהה את הכפתור
+                    backButton.setAttribute('data-onclick', 'window.modalNavigationManager && window.modalNavigationManager.goBack()');
                     backButton.title = 'חזור למודול הקודם';
                     backButton.className = 'modal-back-btn';
                     backButton.style.order = '3'; // לפני כפתור סגירה (3 < 4)
@@ -2306,10 +2439,20 @@ class ModalNavigationManager {
                     backButton.style.display = 'flex';
                     backButton.style.visibility = 'visible';
                     
-                    // שימוש ב-data-onclick במקום event listener (המלצת הדוח)
-                    // זה מאפשר ל-EventHandlerManager לטפל בכפתור אוטומטית
-                    // הוספת לוגים לפני ואחרי קריאת goBack() כדי לבדוק מה קורה
-                    backButton.setAttribute('data-onclick', "if (window.modalNavigationManager) { console.log('🔍 Back button clicked - canGoBack:', window.modalNavigationManager.canGoBack(), 'historyLength:', window.modalNavigationManager.modalHistory.length); if (window.modalNavigationManager.canGoBack()) { console.log('✅ Calling goBack()'); window.modalNavigationManager.goBack(); } else { console.warn('⚠️ Cannot go back - historyLength:', window.modalNavigationManager.modalHistory.length); } }");
+                    // הוספת event listener ישיר לכפתור חזרה (גיבוי למקרה ש-EventHandlerManager לא יטפל)
+                    backButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log('🔍 Back button clicked - canGoBack:', this.canGoBack(), 'historyLength:', this.modalHistory.length);
+                        
+                        if (this.canGoBack()) {
+                            console.log('✅ Calling goBack()');
+                            this.goBack();
+                        } else {
+                            console.warn('⚠️ Cannot go back - historyLength:', this.modalHistory.length);
+                        }
+                    });
                     
                     // הוספה לכותרת (לפני כפתור סגירה)
                     const closeButton = headerElement.querySelector('[data-button-type="CLOSE"]');
@@ -2349,6 +2492,25 @@ class ModalNavigationManager {
                         backButton.style.display = 'flex';
                         backButton.style.visibility = 'visible';
                         
+                        // וידוא שיש event listener על הכפתור
+                        const hasBackListener = backButton.getAttribute('data-has-back-listener');
+                        if (!hasBackListener) {
+                            backButton.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                console.log('🔍 Back button clicked (existing) - canGoBack:', this.canGoBack(), 'historyLength:', this.modalHistory.length);
+                                
+                                if (this.canGoBack()) {
+                                    console.log('✅ Calling goBack()');
+                                    this.goBack();
+                                } else {
+                                    console.warn('⚠️ Cannot go back - historyLength:', this.modalHistory.length);
+                                }
+                            });
+                            backButton.setAttribute('data-has-back-listener', 'true');
+                        }
+                        
                         if (window.Logger) {
                             window.Logger.debug('✅ Removed display:none from back button', {
                                 modalId: modalElement.id,
@@ -2359,15 +2521,18 @@ class ModalNavigationManager {
                         }
                     }
                     
-                    // נוודא שיש data-onclick (אם הכפתור נוצר ב-HTML, אולי אין)
-                    // שימוש ב-data-onclick במקום event listener (המלצת הדוח)
-                    if (!backButton.hasAttribute('data-onclick')) {
-                        backButton.setAttribute('data-onclick', "if (window.modalNavigationManager) { console.log('🔍 Back button clicked - canGoBack:', window.modalNavigationManager.canGoBack(), 'historyLength:', window.modalNavigationManager.modalHistory.length); if (window.modalNavigationManager.canGoBack()) { console.log('✅ Calling goBack()'); window.modalNavigationManager.goBack(); } else { console.warn('⚠️ Cannot go back - historyLength:', window.modalNavigationManager.modalHistory.length); } }");
+                    // נוודא שהכפתור פעיל ומוצג - רק אם יש אפשרות לחזור
+                    backButton.disabled = !canGoBack;
+                    backButton.style.pointerEvents = canGoBack ? 'auto' : 'none';
+                    backButton.style.opacity = canGoBack ? '1' : '0.5';
+                    if (window.Logger) {
+                        window.Logger.debug('✅ Back button state:', {
+                            disabled: backButton.disabled,
+                            canGoBack,
+                            historyLength: this.modalHistory.length,
+                            page: "modal-navigation-manager"
+                        });
                     }
-                    
-                    // נוודא שהכפתור פעיל ומוצג
-                    backButton.disabled = false;
-                    backButton.style.pointerEvents = 'auto';
                     // וידוא שה-variant הוא 'full' (איקון + טקסט)
                     if (!backButton.getAttribute('data-variant') || backButton.getAttribute('data-variant') !== 'full') {
                         backButton.setAttribute('data-variant', 'full');
@@ -2399,17 +2564,40 @@ class ModalNavigationManager {
                     }
                 }
             } else {
-                // הסתרת כפתור חזור כשאין לאן לחזור
-                if (backButton) {
-                    backButton.style.display = 'none';
-                    if (window.Logger) {
-                        window.Logger.debug('⚠️ Hiding back button (canGoBack=false)', {
-                            modalId: modalElement.id,
-                            historyLength: this.modalHistory.length,
-                            canGoBack: canGoBack,
-                            page: "modal-navigation-manager"
-                        });
-                    }
+                // אין כפתור - ניצור אותו (תמיד נציג אותו, אבל disabled אם אין אפשרות)
+                // זה אמור לא לקרות כי הלוגיקה למעלה תמיד תריץ את ה-if, אבל נשאיר למקרה
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ No back button found but canGoBack=false - should not happen', {
+                        modalId: modalElement.id,
+                        historyLength: this.modalHistory.length,
+                        canGoBack: canGoBack,
+                        page: "modal-navigation-manager"
+                    });
+                }
+            }
+            
+            // עדכון מצב הכפתור (disabled/enabled) לפי canGoBack
+            // גם אם הכפתור כבר קיים, נעדכן את המצב שלו
+            const finalBackButton = headerElement.querySelector('[data-button-type="BACK"]') 
+                || headerElement.querySelector('.modal-back-btn') 
+                || headerElement.querySelector('#entityDetailsBackBtn')
+                || document.getElementById('entityDetailsBackBtn');
+            
+            if (finalBackButton) {
+                finalBackButton.disabled = !canGoBack;
+                finalBackButton.style.pointerEvents = canGoBack ? 'auto' : 'none';
+                finalBackButton.style.opacity = canGoBack ? '1' : '0.5';
+                finalBackButton.style.display = 'flex'; // תמיד נציג אותו
+                finalBackButton.style.visibility = 'visible';
+                
+                if (window.Logger) {
+                    window.Logger.debug('✅ Final back button state updated:', {
+                        disabled: finalBackButton.disabled,
+                        canGoBack,
+                        historyLength: this.modalHistory.length,
+                        opacity: finalBackButton.style.opacity,
+                        page: "modal-navigation-manager"
+                    });
                 }
             }
             
@@ -2480,6 +2668,107 @@ class ModalNavigationManager {
         }
         
         return canGo;
+    }
+    
+    /**
+     * Create debug info box - יצירת קוביית בדיקה
+     * 
+     * מציגה מידע על ההיסטוריה בכל שלב
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודול
+     * @private
+     */
+    createDebugInfoBox(modalElement) {
+        try {
+            console.log('🟣 [createDebugInfoBox] CALLED', {
+                modalElement: modalElement?.id,
+                historyLength: this.modalHistory.length
+            });
+            
+            if (!modalElement) {
+                console.warn('🟣 [createDebugInfoBox] No modalElement provided');
+                return;
+            }
+            
+            // חיפוש או יצירת קוביית debug
+            let debugBox = document.querySelector('.modal-debug-info-box');
+            console.log('🟣 [createDebugInfoBox] Debug box search:', {
+                found: !!debugBox,
+                debugBox: debugBox
+            });
+            if (!debugBox) {
+                debugBox = document.createElement('div');
+                debugBox.className = 'modal-debug-info-box';
+                debugBox.style.cssText = `
+                    position: fixed;
+                    top: 10px;
+                    right: 10px;
+                    background: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 10px;
+                    border-radius: 5px;
+                    font-size: 11px;
+                    z-index: 10000;
+                    max-width: 300px;
+                    font-family: monospace;
+                    direction: rtl;
+                `;
+                
+                // הוספה ל-body (כך תהיה תמיד גלויה)
+                document.body.appendChild(debugBox);
+            }
+            
+            // מציאת המודול הנוכחי
+            const currentIndex = this.modalHistory.findIndex(item => item.element === modalElement);
+            const currentModalNumber = currentIndex >= 0 ? currentIndex + 1 : this.modalHistory.length;
+            
+            // יצירת HTML של המידע - מפורט יותר
+            let html = '<div style="margin-bottom: 5px; padding: 5px; background: rgba(0, 100, 0, 0.3); border-radius: 3px;"><strong>🔍 מידע מערכת ניווט</strong></div>';
+            html += `<div style="margin-bottom: 3px;">📊 מספר מודולים במערך: <strong style="color: ${this.modalHistory.length > 1 ? 'lightgreen' : 'red'};">${this.modalHistory.length}</strong></div>`;
+            html += `<div style="margin-bottom: 3px;">📍 מודול נוכחי: <strong>${currentModalNumber} מתוך ${this.modalHistory.length}</strong></div>`;
+            html += `<div style="margin-bottom: 3px;">${this.canGoBack() ? '✅' : '❌'} ניתן לחזור: <strong style="color: ${this.canGoBack() ? 'lightgreen' : 'red'};">${this.canGoBack() ? 'כן' : 'לא'}</strong></div>`;
+            
+            // הוספת פרטי המודול הנוכחי
+            if (currentIndex >= 0 && this.modalHistory[currentIndex]) {
+                const current = this.modalHistory[currentIndex];
+                const currentSourceInfo = current.info?.sourceInfo || current.info?.source;
+                html += `<div style="margin-bottom: 3px; padding: 3px; background: rgba(255, 165, 0, 0.2); border-radius: 3px;">
+                    <strong>נוכחי:</strong> ${current.info?.entityType || '?'}:${current.info?.entityId || '?'}
+                    ${currentSourceInfo ? `<br><small style="color: cyan;">מקור: ${JSON.stringify(currentSourceInfo)}</small>` : ''}
+                </div>`;
+            }
+            
+            html += '<hr style="margin: 5px 0; border-color: #555;">';
+            html += '<div style="margin-bottom: 3px;"><strong>📋 רשימת מודולים:</strong></div>';
+            
+            if (this.modalHistory.length === 0) {
+                html += '<div style="color: red; padding: 5px;">⚠️ המערך ריק!</div>';
+            } else {
+                this.modalHistory.forEach((item, idx) => {
+                    const isCurrent = idx === currentIndex;
+                    const entityLabel = this.getEntityLabel(item.info?.entityType || 'unknown');
+                    const entityId = item.info?.entityId !== undefined ? item.info?.entityId : '?';
+                    const hasSourceInfo = !!(item.info?.sourceInfo || item.info?.source);
+                    const title = item.info?.title || `${entityLabel} ${entityId}`;
+                    const hasContent = !!item.content;
+                    const contentLength = item.content?.length || 0;
+                    const sourceInfo = item.info?.sourceInfo || item.info?.source;
+                    
+                    html += `<div style="margin-bottom: 2px; padding: 3px; background: ${isCurrent ? 'rgba(255, 165, 0, 0.3)' : 'transparent'}; border-left: 2px solid ${isCurrent ? 'orange' : 'transparent'};">
+                        <strong>${idx + 1}.</strong> ${title}
+                        ${isCurrent ? ' <span style="color: orange;">← כאן</span>' : ''}
+                        ${hasSourceInfo ? ` <span style="color: cyan;">[מקונן: ${JSON.stringify(sourceInfo).substring(0, 50)}...]</span>` : ' <span style="color: gray;">[ראשוני]</span>'}
+                        ${hasContent ? ` <span style="color: lightgreen;">[תוכן: ${Math.round(contentLength/100)}KB]</span>` : ' <span style="color: red;">[אין תוכן]</span>'}
+                    </div>`;
+                });
+            }
+            
+            debugBox.innerHTML = html;
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error creating debug info box:', error, { page: "modal-navigation-manager" });
+            }
+        }
     }
     
     /**
@@ -2662,14 +2951,44 @@ class ModalNavigationManager {
     'use strict';
     
     function initializeNavigationManager() {
+        if (window.Logger) {
+            window.Logger.info('🔧 [INIT] initializeNavigationManager called', {
+                modalNavigationManagerExists: !!window.modalNavigationManager,
+                modalNavigationManagerType: typeof window.modalNavigationManager,
+                documentReadyState: document.readyState,
+                page: "modal-navigation-manager"
+            });
+        }
+        
         if (!window.modalNavigationManager) {
-            window.modalNavigationManager = new ModalNavigationManager();
-            if (window.Logger) {
-                window.Logger.info('✅ ModalNavigationManager initialized', { page: "modal-navigation-manager" });
+            try {
+                window.modalNavigationManager = new ModalNavigationManager();
+                if (window.Logger) {
+                    window.Logger.info('✅ ModalNavigationManager initialized', { 
+                        instanceExists: !!window.modalNavigationManager,
+                        isInitialized: window.modalNavigationManager?.isInitialized,
+                        historyLength: window.modalNavigationManager?.modalHistory?.length || 0,
+                        page: "modal-navigation-manager" 
+                    });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('❌ Failed to initialize ModalNavigationManager', {
+                        error: error.message,
+                        stack: error.stack,
+                        page: "modal-navigation-manager"
+                    });
+                } else {
+                    console.error('❌ Failed to initialize ModalNavigationManager:', error);
+                }
             }
         } else {
             if (window.Logger) {
-                window.Logger.debug('ModalNavigationManager already exists', { page: "modal-navigation-manager" });
+                window.Logger.debug('ModalNavigationManager already exists', { 
+                    isInitialized: window.modalNavigationManager?.isInitialized,
+                    historyLength: window.modalNavigationManager?.modalHistory?.length || 0,
+                    page: "modal-navigation-manager" 
+                });
             }
         }
     }

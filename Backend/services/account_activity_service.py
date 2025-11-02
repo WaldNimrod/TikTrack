@@ -175,7 +175,11 @@ class AccountActivityService:
                 currencies_dict[currency_id]['movements'].append(movement)
                 
                 # Calculate balance (positive for deposits, negative for withdrawals)
-                if cf.type in ['deposit', 'dividend', 'interest']:
+                # Interest can be positive or negative - add/subtract based on actual amount sign
+                if cf.type == 'interest':
+                    # Interest can be positive or negative - use the amount as-is
+                    currencies_dict[currency_id]['balance'] += float(cf.amount)
+                elif cf.type in ['deposit', 'dividend']:
                     currencies_dict[currency_id]['balance'] += float(cf.amount)
                 elif cf.type in ['withdrawal', 'fee']:
                     currencies_dict[currency_id]['balance'] -= float(cf.amount)

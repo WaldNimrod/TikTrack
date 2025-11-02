@@ -518,6 +518,178 @@
   }
 }
 
+/* ===== ACCOUNT ACTIVITY STATISTICS CARD ===== */
+/* Statistics card for account activity section */
+#accountActivityStatisticsCard {
+  margin-bottom: 1.5rem;
+}
+
+#accountActivityStatisticsCard .two-column-grid {
+  gap: 2rem;
+}
+
+.statistics-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.statistics-header h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #495057);
+  border-bottom: 2px solid var(--apple-border-light, #e9ecef);
+  padding-bottom: 0.5rem;
+}
+
+.statistics-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.statistics-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.statistics-card-item {
+  padding: 0.75rem 1rem;
+  background: var(--apple-bg-subtle, #f8f9fa);
+  border-radius: 8px;
+  border: 1px solid var(--apple-border-light, #e9ecef);
+  margin-bottom: 0.5rem;
+}
+
+.statistics-card-content {
+  font-size: 0.95rem;
+  color: var(--color-text-primary, #495057);
+  line-height: 1.6;
+}
+
+.statistics-card-content strong {
+  font-weight: 600;
+  color: var(--color-text-primary, #495057);
+}
+
+.statistics-card-content strong.text-success {
+  color: var(--success-color, #28a745);
+}
+
+.statistics-card-content strong.text-danger {
+  color: var(--danger-color, #dc3545);
+}
+
+/* Two-column layout for statistics cards */
+.statistics-card-two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.statistics-card-col {
+  /* First column - starts at beginning */
+}
+
+.statistics-card-col-end {
+  text-align: right;
+  /* Second column - starts at center (50% mark) */
+}
+
+.statistics-breakdown {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--apple-border-light, #e9ecef);
+}
+
+.statistics-breakdown h5 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #6c757d);
+}
+
+.statistics-subtype-group {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--apple-bg-subtle, #f8f9fa);
+  border-radius: 8px;
+  border: 1px solid var(--apple-border-light, #e9ecef);
+}
+
+.statistics-subtype-group h6 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #495057);
+}
+
+.statistics-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-secondary, #6c757d);
+  font-style: italic;
+}
+
+/* Use existing stat-item styles for statistics */
+.statistics-summary .stat-item,
+.statistics-subtype-group .stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--apple-border-light, #f0f0f0);
+}
+
+.statistics-summary .stat-item:last-child,
+.statistics-subtype-group .stat-item:last-child {
+  border-bottom: none;
+}
+
+.statistics-summary .stat-label,
+.statistics-subtype-group .stat-label {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #6c757d);
+  font-weight: 500;
+}
+
+.statistics-summary .stat-value,
+.statistics-subtype-group .stat-value {
+  font-size: 0.95rem;
+  color: var(--color-text-primary, #495057);
+  font-weight: 600;
+  text-align: left;
+}
+
+.statistics-summary .stat-value.text-success,
+.statistics-subtype-group .stat-value.text-success {
+  color: var(--success-color, #28a745);
+}
+
+.statistics-summary .stat-value.text-danger,
+.statistics-subtype-group .stat-value.text-danger {
+  color: var(--danger-color, #dc3545);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #accountActivityStatisticsCard .two-column-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .statistics-column {
+    gap: 0.75rem;
+  }
+  
+  .statistics-subtype-group {
+    padding: 0.75rem;
+  }
+}
+
 /* ===== סגנונות אייקונים לפי צבעים דינאמיים ===== */
 
 .section-icon.success {

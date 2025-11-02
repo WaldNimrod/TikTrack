@@ -416,6 +416,14 @@ class AdvancedButtonSystem {
         }
 
         const buttonType = element.getAttribute('data-button-type');
+        
+        // Only process buttons with data-button-type
+        // Buttons without data-button-type should only have tooltips initialized via initializeTooltips
+        if (!buttonType) {
+            this.logger.debug('Skipping button without data-button-type', { elementId: element.id });
+            return;
+        }
+        
         const entityType = element.getAttribute('data-entity-type');
         const size = element.getAttribute('data-size');
         const style = element.getAttribute('data-style');
@@ -488,9 +496,11 @@ class AdvancedButtonSystem {
     createButtonFromData(type, onClick, classes, attributes, text, id,
                          entityType, size, style, variant, iconOverride = '', tooltipConfig = null) {
         if (window.BUTTON_ICONS && window.BUTTON_TEXTS && window.getButtonClass) {
-            const icon = iconOverride || window.BUTTON_ICONS[type.toUpperCase()] || '';
-            const buttonText = text || window.BUTTON_TEXTS[type.toUpperCase()] || '';
-            const buttonClass = window.getButtonClass(type);
+            // Handle null/undefined type (for custom buttons without data-button-type)
+            const typeUpper = type ? type.toUpperCase() : '';
+            const icon = iconOverride || (typeUpper ? window.BUTTON_ICONS[typeUpper] : '') || '';
+            const buttonText = text || (typeUpper ? window.BUTTON_TEXTS[typeUpper] : '') || '';
+            const buttonClass = type ? window.getButtonClass(type) : 'btn';
 
             // Set default variant to normal if not specified
             if (!variant || variant === 'default' || variant === '') {

@@ -3140,27 +3140,13 @@ class EntityDetailsRenderer {
             return;
         }
         
-        // Wait for DOM to be ready, then use button system to process buttons and initialize tooltips
+        // Wait for DOM to be ready, then use button system to initialize tooltips
         requestAnimationFrame(() => {
             setTimeout(() => {
-                // Use button system to process buttons and initialize tooltips
-                if (window.advancedButtonSystem) {
-                    // Process any unprocessed buttons first
-                    const unprocessedButtons = filterContainer.querySelectorAll('[data-tooltip]:not([data-button-processed])');
-                    if (unprocessedButtons.length > 0) {
-                        // Process buttons through button system
-                        unprocessedButtons.forEach(button => {
-                            // Button system will process and initialize tooltips automatically
-                            if (window.advancedButtonSystem.processButtonElement) {
-                                window.advancedButtonSystem.processButtonElement(button, 0);
-                            }
-                        });
-                    }
-                    
-                    // Initialize tooltips for all buttons with data-tooltip
-                    if (window.advancedButtonSystem.initializeTooltips) {
-                        window.advancedButtonSystem.initializeTooltips(filterContainer);
-                    }
+                // Use button system to initialize tooltips for buttons with data-tooltip
+                // Filter buttons don't have data-button-type, so we only initialize tooltips
+                if (window.advancedButtonSystem && window.advancedButtonSystem.initializeTooltips) {
+                    window.advancedButtonSystem.initializeTooltips(filterContainer);
                 }
             }, 100);
         });

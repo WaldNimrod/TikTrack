@@ -18,6 +18,8 @@
     position: relative;
     display: inline-block;
     transition: opacity 0.3s ease;
+    /* Ensure wrapper doesn't clip popup */
+    overflow: visible;
 }
 
 /* Keep wrapper hovered when popup is hovered */
@@ -40,15 +42,15 @@
 
 /* Actions Menu Popup */
 .actions-menu-popup {
-    position: absolute;
-    top: -5px;
-    right: 100%;
-    margin-right: 0;
+    position: fixed;
+    /* Position will be calculated by JavaScript */
+    top: 0;
+    right: 0;
     background: white;
     border: 1px solid #ddd;
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 1000;
+    z-index: 9999;
     min-width: 120px;
     padding: 8px;
     display: none;
@@ -76,6 +78,7 @@
     opacity: 1;
     pointer-events: auto;
     visibility: visible;
+    /* Position will be calculated by JavaScript when using position: fixed */
 }
 
 
@@ -126,11 +129,10 @@
 }
 
 /* RTL Support */
+/* Note: Positioning is handled by JavaScript with position: fixed */
+/* CSS positioning removed to allow JavaScript dynamic positioning */
 [dir="rtl"] .actions-menu-popup {
-    right: auto;
-    left: 100%;
-    margin-left: 0;
-    margin-right: 0;
+    /* Position handled by JavaScript - no CSS positioning needed */
 }
 
 /* Create bridge area to prevent hover gap between button and popup (RTL) */

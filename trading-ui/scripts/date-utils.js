@@ -573,6 +573,166 @@ window.daysDifference = daysDifference;
 window.addDays = addDays;
 window.addMonths = addMonths;
 
+// ===== DATE RANGE TRANSLATION =====
+/**
+ * Translate date range string to actual start and end dates
+ * 
+ * Supports calendar-based ranges (השבוע, החודש, השנה) and relative ranges (7 days, 30 days, etc.)
+ * All calendar ranges are calculated from the calendar start (Sunday for week, 1st for month, Jan 1 for year)
+ * 
+ * @param {string} dateRange - Date range string (e.g., "השבוע", "החודש", "שבוע", etc.)
+ * @returns {Object|null} Object with startDate and endDate (ISO strings) or null for invalid ranges
+ * 
+ * @example
+ * translateDateRangeToDates('השבוע') 
+ * // Returns: { startDate: '2025-01-05T00:00:00.000Z', endDate: '2025-01-11T23:59:59.999Z' }
+ */
+function translateDateRangeToDates(dateRange) {
+  if (!dateRange || dateRange === 'כל זמן') {
+    return null;
+  }
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayStr = today.toISOString();
+  
+  let startDate = null;
+  let endDate = null;
+  
+  switch (dateRange) {
+    case 'היום': {
+      startDate = new Date(today);
+      endDate = new Date(today);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    }
+    
+    case 'אתמול': {
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      startDate = new Date(yesterday);
+      endDate = new Date(yesterday);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    }
+    
+    // השבוע = מתחילת השבוע הקלנדארי (יום ראשון) עד היום
+    case 'השבוע': {
+      const startOfWeek = new Date(today);
+      const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+      startOfWeek.setDate(today.getDate() - dayOfWeek);
+      startOfWeek.setHours(0, 0, 0, 0);
+      startDate = startOfWeek;
+      endDate = new Date(today);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    }
+    
+    // שבוע = 7 ימים אחורה מהיום
+    case 'שבוע':
+    case '7 ימים': {
+      const weekAgo = new Date(today);
+      weekAgo.setDate(today.getDate() - 7);
+      startDate = weekAgo;
+      endDate = new Date(today);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    }
+    
+    // שבוע קודם = השבוע הקלנדארי הקודם (יום ראשון עד שבת של השבוע הקודם)
+    case 'שבוע קודם':
+    case 'שבוע שעבר': {
+      const dayOfWeek = today.getDay();
+      const lastWeekEnd = new Date(today);
+      lastWeekEnd.setDate(today.getDate() - dayOfWeek - 1); // Last Saturday
+      lastWeekEnd.setHours(23, 59, 59, 999);
+      const lastWeekStart = new Date(lastWeekEnd);
+      lastWeekStart.setDate(lastWeekEnd.getDate() - 6); // Previous Sunday
+      lastWeekStart.setHours(0, 0, 0, 0);
+      startDate = lastWeekStart;
+      endDate = lastWeekEnd;
+      break;
+    }
+    
+    // החודש = מתחילת החודש הקלנדארי (יום 1) עד היום
+    case 'החודש': {
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      startDate = startOfMonth;
+      endDate = new Date(today);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    }
+    
+    // חודש = 30 ימים אחורה מהיום
+    case 'חודש':
+    case '30 ימים': {
+      const monthAgo = new Date(today);
+      monthAgo.setDate(today.getDate() - 30);
+      startDate = monthAgo;
+      endDate = new Date(today);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    }
+    
+    // חודש קודם = החודש הקלנדארי הקודם (יום 1 עד היום האחרון של החודש הקודם)
+    case 'חודש קודם': {
+      const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      lastMonthStart.setHours(0, 0, 0, 0);
+      const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of previous month
+      lastMonthEnd.setHours(23, 59, 59, 999);
+      startDate = lastMonthStart;
+      endDate = lastMonthEnd;
+      break;
+    }
+    
+    // השנה = מתחילת השנה הקלנדארית (1 בינואר) עד היום
+    case 'השנה': {
+      const startOfYear = new Date(today.getFullYear(), 0, 1);
+      startOfYear.setHours(0, 0, 0, 0);
+      startDate = startOfYear;
+      endDate = new Date(today);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    }
+    
+    // שנה = 365 ימים אחורה מהיום
+    case 'שנה':
+    case '365 ימים': {
+      const yearAgo = new Date(today);
+      yearAgo.setDate(today.getDate() - 365);
+      startDate = yearAgo;
+      endDate = new Date(today);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    }
+    
+    // שנה קודמת = השנה הקלנדארית הקודמת (1 בינואר עד 31 בדצמבר של השנה הקודמת)
+    case 'שנה קודמת':
+    case 'שנה שעברה': {
+      const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
+      lastYearStart.setHours(0, 0, 0, 0);
+      const lastYearEnd = new Date(today.getFullYear() - 1, 11, 31);
+      lastYearEnd.setHours(23, 59, 59, 999);
+      startDate = lastYearStart;
+      endDate = lastYearEnd;
+      break;
+    }
+    
+    default:
+      return null;
+  }
+  
+  if (startDate && endDate) {
+    return {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString()
+    };
+  }
+  
+  return null;
+}
+
 // _REMOVED_initializeDateUtils - Function was commented out and is no longer in use
 // Original implementation was removed as part of code cleanup
 
@@ -594,3 +754,6 @@ window.dateUtils = {
   addDays,
   addMonths,
 };
+
+// Export translateDateRangeToDates to global scope
+window.translateDateRangeToDates = translateDateRangeToDates;

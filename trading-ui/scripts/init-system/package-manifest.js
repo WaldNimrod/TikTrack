@@ -392,11 +392,60 @@ const PACKAGE_MANIFEST = {
         loadOrder: 2
       },
       {
+        file: 'modal-configs/trading-accounts-config.js',
+        globalCheck: 'window.tradingAccountsModalConfig',
+        description: 'קונפיגורציית מודל חשבונות מסחר',
+        required: false,
+        loadOrder: 3
+      },
+      {
+        file: 'modal-configs/alerts-config.js',
+        globalCheck: 'window.alertsModalConfig',
+        description: 'קונפיגורציית מודל התראות',
+        required: false,
+        loadOrder: 4
+      },
+      {
+        file: 'modal-configs/trades-config.js',
+        globalCheck: 'window.tradesModalConfig',
+        description: 'קונפיגורציית מודל טריידים',
+        required: false,
+        loadOrder: 5
+      },
+      {
+        file: 'modal-configs/executions-config.js',
+        globalCheck: 'window.executionsModalConfig',
+        description: 'קונפיגורציית מודל ביצועים',
+        required: false,
+        loadOrder: 6
+      },
+      {
+        file: 'modal-configs/trade-plans-config.js',
+        globalCheck: 'window.tradePlansModalConfig',
+        description: 'קונפיגורציית מודל תוכניות מסחר',
+        required: false,
+        loadOrder: 7
+      },
+      {
+        file: 'modal-configs/tickers-config.js',
+        globalCheck: 'window.tickersModalConfig',
+        description: 'קונפיגורציית מודל טיקרים',
+        required: false,
+        loadOrder: 8
+      },
+      {
         file: 'modal-configs/cash-flows-config.js',
         globalCheck: 'window.CashFlowModalConfig',
         description: 'קונפיגורציית מודל תזרימי מזומנים',
         required: false,
-        loadOrder: 3
+        loadOrder: 9
+      },
+      {
+        file: 'modal-configs/notes-config.js',
+        globalCheck: 'window.notesModalConfig',
+        description: 'קונפיגורציית מודל הערות',
+        required: false,
+        loadOrder: 10
       }
     ],
     estimatedSize: '~250KB',
@@ -772,13 +821,6 @@ const PACKAGE_MANIFEST = {
         description: 'שירות חשבונות',
         required: true,
         loadOrder: 1
-      },
-      {
-        file: 'services/account-balance-service.js',
-        globalCheck: 'window.AccountBalanceService',
-        description: 'שירות יתרות חשבונות',
-        required: true,
-        loadOrder: 2
       },
       {
         file: 'alert-service.js',

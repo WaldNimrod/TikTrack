@@ -237,18 +237,13 @@ class ActionsMenuSystem {
         } else {
             console.log('✅ Actions Menu System initialized');
         }
-        (window.consoleCleanup?.debug || console.log)('   → CSS-based hover (no JavaScript delays)');
+        (window.consoleCleanup?.debug || console.log)('   → Fixed positioning to avoid table overflow clipping');
         (window.consoleCleanup?.debug || console.log)('   → RTL aware positioning');
         (window.consoleCleanup?.debug || console.log)('   → Supports 2-5 buttons dynamically');
         (window.consoleCleanup?.debug || console.log)('   → Integrated with new button system');
         
-        // מערכת פשוטה - הכל נעשה ב-CSS עם :hover
-        // ה-JavaScript רק למקרים מיוחדים (אם צריך positioning דינמי)
-        
-        // יכול להוסיף event listeners למקרים מיוחדים אם צריך:
-        // - מניעת סגירה בלחיצה על כפתור
-        // - keyboard navigation
-        // - touch events למובייל
+        // Set up hover event listeners to position popup dynamically
+        this.attachHoverPositioning();
         
         this.initAccessibility();
         this.attachLinkedItemsDebugLogger();
@@ -405,30 +400,57 @@ class ActionsMenuSystem {
 
     /**
      * מיקום התפריט הנפתח
+     * Uses position: fixed to avoid being clipped by table overflow
+     * RTL: תפריט נפתח מימין לכפתור (לפניו, לכיוון מרכז הטבלה)
      */
     positionPopup(wrapper) {
         const popup = wrapper.querySelector('.actions-menu-popup');
         const trigger = wrapper.querySelector('.actions-trigger');
         
-        // Debug logs removed - system working correctly
-        
         if (!popup || !trigger) {
-            console.log('❌ [Actions Menu Debug] Missing popup or trigger');
             return;
         }
         
+        // Get trigger position relative to viewport (for position: fixed)
         const triggerRect = trigger.getBoundingClientRect();
-        console.log('🔧 [Actions Menu Debug] Trigger rect:', triggerRect);
         
-        // מיקום התפריט מימין לכפתור (לכיוון מרכז הטבלה)
-        // מיקום קרוב מאוד לכפתור
-        popup.style.top = `${triggerRect.top - 4}px`; // 4px יותר גבוה
-        popup.style.left = `${triggerRect.right - 2}px`; // 2px חופף לכפתור (במקום 1px)
+        // RTL support: check document direction
+        const isRTL = document.documentElement.dir === 'rtl' || 
+                     getComputedStyle(document.body).direction === 'rtl';
         
-        console.log('🔧 [Actions Menu Debug] Popup positioned at:', {
-            top: popup.style.top,
-            left: popup.style.left
-        });
+        // Temporarily show popup to calculate its width
+        const wasVisible = popup.style.display !== 'none';
+        if (!wasVisible) {
+            popup.style.display = 'block';
+            popup.style.visibility = 'hidden'; // Hidden but takes space
+        }
+        
+        const popupWidth = popup.offsetWidth || 120; // Get actual width
+        const triggerWidth = trigger.offsetWidth || 32; // Get trigger button width
+        
+        if (!wasVisible) {
+            popup.style.display = 'none'; // Restore original state
+        }
+        
+        if (isRTL) {
+            // RTL: popup opens to the RIGHT of trigger (before it, towards center of table)
+            // In RTL (right-to-left): "right" of button = before it = towards center = leftward in screen coordinates
+            // The popup should START at trigger.right (where trigger ends) and extend LEFTWARD (towards center)
+            // Simple: popup.left = trigger.right, popup extends leftward naturally
+            popup.style.left = `${triggerRect.right}px`; // Start at trigger.right, extends leftward (towards center)
+            popup.style.right = 'auto';
+        } else {
+            // LTR: popup opens to the right of trigger
+            popup.style.left = `${triggerRect.right + 2}px`;
+            popup.style.right = 'auto';
+        }
+        
+        // Position vertically aligned with trigger
+        popup.style.top = `${triggerRect.top - 5}px`;
+        
+        // Ensure popup is visible
+        popup.style.position = 'fixed';
+        popup.style.zIndex = '9999';
     }
 
     /**
@@ -441,6 +463,85 @@ class ActionsMenuSystem {
         this.attachHoverDelay();
         
         console.log('✅ Actions Menu Debug Logger הותקן. הרץ debugActionsMenu() כדי לבדוק');
+    }
+
+    /**
+     * Attach hover event listeners to position popup dynamically
+     * This ensures popup is positioned correctly when using position: fixed
+     */
+    attachHoverPositioning() {
+        // Observe all action menu popups and reposition when they become visible
+        const observePopup = (popup) => {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        const style = window.getComputedStyle(popup);
+                        if (style.display !== 'none' && style.visibility !== 'hidden') {
+                            const wrapper = popup.closest('.actions-menu-wrapper');
+                            if (wrapper) {
+                                this.positionPopup(wrapper);
+                            }
+                        }
+                    }
+                });
+            });
+            observer.observe(popup, { attributes: true, attributeFilter: ['style'] });
+        };
+
+        // Observe existing popups
+        document.querySelectorAll('.actions-menu-popup').forEach(observePopup);
+
+        // Observe document for new popups added dynamically
+        const documentObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) { // Element node
+                        const popups = node.querySelectorAll ? node.querySelectorAll('.actions-menu-popup') : [];
+                        if (node.classList && node.classList.contains('actions-menu-popup')) {
+                            observePopup(node);
+                        }
+                        popups.forEach(observePopup);
+                    }
+                });
+            });
+        });
+        documentObserver.observe(document.body, { childList: true, subtree: true });
+
+        // Also position on mouseenter as fallback
+        document.addEventListener('mouseenter', (e) => {
+            if (e.target && typeof e.target.closest === 'function') {
+                const wrapper = e.target.closest('.actions-menu-wrapper');
+                if (wrapper) {
+                    const popup = wrapper.querySelector('.actions-menu-popup');
+                    if (popup) {
+                        // Small delay to ensure popup is visible before positioning
+                        setTimeout(() => {
+                            const style = window.getComputedStyle(popup);
+                            if (style.display !== 'none' && style.visibility !== 'hidden') {
+                                this.positionPopup(wrapper);
+                            }
+                        }, 10);
+                    }
+                }
+            }
+        }, true);
+        
+        // Reposition on scroll to keep popup aligned
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                document.querySelectorAll('.actions-menu-popup').forEach(popup => {
+                    const style = window.getComputedStyle(popup);
+                    if (style.display !== 'none' && style.visibility !== 'hidden') {
+                        const wrapper = popup.closest('.actions-menu-wrapper');
+                        if (wrapper) {
+                            this.positionPopup(wrapper);
+                        }
+                    }
+                });
+            }, 10);
+        }, true);
     }
 
     /**

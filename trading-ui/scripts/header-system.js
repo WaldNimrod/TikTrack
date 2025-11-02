@@ -352,8 +352,17 @@ class HeaderSystem {
                   <div class="date-range-filter-item" data-value="שבוע" onclick="selectDateRangeOption('שבוע')">
                     <span class="option-text">שבוע (7 ימים)</span>
                   </div>
+                  <div class="date-range-filter-item" data-value="שבוע קודם" onclick="selectDateRangeOption('שבוע קודם')">
+                    <span class="option-text">שבוע שעבר</span>
+                  </div>
                   <div class="date-range-filter-item" data-value="החודש" onclick="selectDateRangeOption('החודש')">
                     <span class="option-text">החודש</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="חודש" onclick="selectDateRangeOption('חודש')">
+                    <span class="option-text">חודש (30 יום)</span>
+                  </div>
+                  <div class="date-range-filter-item" data-value="חודש קודם" onclick="selectDateRangeOption('חודש קודם')">
+                    <span class="option-text">חודש קודם</span>
                   </div>
                   <div class="date-range-filter-item" data-value="השנה" onclick="selectDateRangeOption('השנה')">
                     <span class="option-text">השנה</span>
@@ -361,14 +370,8 @@ class HeaderSystem {
                   <div class="date-range-filter-item" data-value="שנה" onclick="selectDateRangeOption('שנה')">
                     <span class="option-text">שנה (365 ימים)</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="שבוע קודם" onclick="selectDateRangeOption('שבוע קודם')">
-                    <span class="option-text">שבוע קודם</span>
-                  </div>
-                  <div class="date-range-filter-item" data-value="חודש קודם" onclick="selectDateRangeOption('חודש קודם')">
-                    <span class="option-text">חודש קודם</span>
-                  </div>
                   <div class="date-range-filter-item" data-value="שנה קודמת" onclick="selectDateRangeOption('שנה קודמת')">
-                    <span class="option-text">שנה קודמת</span>
+                    <span class="option-text">שנה שעברה</span>
                   </div>
                 </div>
               </div>
@@ -1417,6 +1420,18 @@ class HeaderSystem {
           });
           
           window.Logger.info(`✅ ${tableId}: ${visibleCount}/${rows.length} rows visible`, { page: "header-system" });
+          
+          // Update selectedDateRangeForFilter for compatibility with account-activity.js
+          if (this.currentFilters.dateRange !== undefined) {
+            window.selectedDateRangeForFilter = this.currentFilters.dateRange;
+          }
+          
+          // If this is the account activity table, update the title date range
+          if (tableId === 'accountActivityTable' && typeof updateActivitySummary === 'function') {
+            setTimeout(() => {
+              updateActivitySummary(null);
+            }, 100);
+          }
         },
         
         // פונקציה לבדיקת תאריך בטווח
@@ -1438,51 +1453,96 @@ class HeaderSystem {
               yesterday.setDate(today.getDate() - 1);
               return date.toDateString() === yesterday.toDateString();
               
+            // השבוע = מתחילת השבוע הקלנדארי (יום ראשון) עד היום
             case 'השבוע': {
               const startOfWeek = new Date(today);
-              const dayOfWeek = today.getDay();
+              const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
               startOfWeek.setDate(today.getDate() - dayOfWeek);
+              startOfWeek.setHours(0, 0, 0, 0);
+              date.setHours(0, 0, 0, 0);
               return date >= startOfWeek && date <= today;
             }
               
+            // שבוע = 7 ימים אחורה מהיום
             case 'שבוע':
+            case '7 ימים': {
               const weekAgo = new Date(today);
               weekAgo.setDate(today.getDate() - 7);
+              weekAgo.setHours(0, 0, 0, 0);
+              date.setHours(0, 0, 0, 0);
               return date >= weekAgo && date <= today;
+            }
               
-            case 'החודש':
-              const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-              return date >= startOfMonth && date <= today;
-              
-            case 'השנה':
-              const startOfYear = new Date(today.getFullYear(), 0, 1);
-              return date >= startOfYear && date <= today;
-              
-            case 'שנה':
-              const yearAgo = new Date(today);
-              yearAgo.setFullYear(today.getFullYear() - 1);
-              return date >= yearAgo && date <= today;
-              
-            case 'שבוע קודם': {
-              const lastWeekStart = new Date(today);
+            // שבוע קודם = השבוע הקלנדארי הקודם (יום ראשון עד שבת של השבוע הקודם)
+            case 'שבוע קודם':
+            case 'שבוע שעבר': {
               const dayOfWeek = today.getDay();
-              lastWeekStart.setDate(today.getDate() - dayOfWeek - 7);
-              lastWeekStart.setHours(0, 0, 0, 0);
-              const lastWeekEnd = new Date(lastWeekStart);
-              lastWeekEnd.setDate(lastWeekStart.getDate() + 6);
+              const lastWeekEnd = new Date(today);
+              lastWeekEnd.setDate(today.getDate() - dayOfWeek - 1); // Last Saturday
               lastWeekEnd.setHours(23, 59, 59, 999);
+              const lastWeekStart = new Date(lastWeekEnd);
+              lastWeekStart.setDate(lastWeekEnd.getDate() - 6); // Previous Sunday
+              lastWeekStart.setHours(0, 0, 0, 0);
+              date.setHours(0, 0, 0, 0);
               return date >= lastWeekStart && date <= lastWeekEnd;
             }
               
-            case 'חודש קודם':
-              const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-              const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
-              return date >= lastMonth && date <= lastMonthEnd;
+            // החודש = מתחילת החודש הקלנדארי (יום 1) עד היום
+            case 'החודש': {
+              const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+              startOfMonth.setHours(0, 0, 0, 0);
+              date.setHours(0, 0, 0, 0);
+              return date >= startOfMonth && date <= today;
+            }
               
+            // חודש = 30 ימים אחורה מהיום
+            case 'חודש':
+            case '30 ימים': {
+              const monthAgo = new Date(today);
+              monthAgo.setDate(today.getDate() - 30);
+              monthAgo.setHours(0, 0, 0, 0);
+              date.setHours(0, 0, 0, 0);
+              return date >= monthAgo && date <= today;
+            }
+              
+            // חודש קודם = החודש הקלנדארי הקודם (יום 1 עד היום האחרון של החודש הקודם)
+            case 'חודש קודם': {
+              const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+              lastMonthStart.setHours(0, 0, 0, 0);
+              const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of previous month
+              lastMonthEnd.setHours(23, 59, 59, 999);
+              date.setHours(0, 0, 0, 0);
+              return date >= lastMonthStart && date <= lastMonthEnd;
+            }
+              
+            // השנה = מתחילת השנה הקלנדארית (1 בינואר) עד היום
+            case 'השנה': {
+              const startOfYear = new Date(today.getFullYear(), 0, 1);
+              startOfYear.setHours(0, 0, 0, 0);
+              date.setHours(0, 0, 0, 0);
+              return date >= startOfYear && date <= today;
+            }
+              
+            // שנה = 365 ימים אחורה מהיום
+            case 'שנה':
+            case '365 ימים': {
+              const yearAgo = new Date(today);
+              yearAgo.setDate(today.getDate() - 365);
+              yearAgo.setHours(0, 0, 0, 0);
+              date.setHours(0, 0, 0, 0);
+              return date >= yearAgo && date <= today;
+            }
+              
+            // שנה קודמת = השנה הקלנדארית הקודמת (1 בינואר עד 31 בדצמבר של השנה הקודמת)
             case 'שנה קודמת':
-              const lastYear = new Date(today.getFullYear() - 1, 0, 1);
+            case 'שנה שעברה': {
+              const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
+              lastYearStart.setHours(0, 0, 0, 0);
               const lastYearEnd = new Date(today.getFullYear() - 1, 11, 31);
-              return date >= lastYear && date <= lastYearEnd;
+              lastYearEnd.setHours(23, 59, 59, 999);
+              date.setHours(0, 0, 0, 0);
+              return date >= lastYearStart && date <= lastYearEnd;
+            }
               
             default:
               return true;

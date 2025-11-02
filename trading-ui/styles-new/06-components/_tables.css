@@ -430,14 +430,17 @@
   min-width: 50px !important; 
   max-width: 100px !important;
   box-sizing: border-box;
-  overflow: hidden;
+  /* Allow actions menu popup to overflow */
+  overflow: visible;
 }
 
 /* ===== Actions Menu System ===== */
 .actions-cell {
     position: relative;
-  text-align: center;
-  vertical-align: middle;
+    text-align: center;
+    vertical-align: middle;
+    /* Allow popup to overflow - don't clip it */
+    overflow: visible;
 }
 
 /* Actions Menu styles moved to _actions-menu.css */

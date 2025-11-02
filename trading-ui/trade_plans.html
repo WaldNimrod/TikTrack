@@ -59,7 +59,7 @@
 <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterTradePlansByType('investment')" type="button" data-type="investment" title="השקעות"><i class="fas fa-chart-bar filter-icon"></i></button>
 <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterTradePlansByType('passive')" type="button" data-type="passive" title="השקעות פאסיביות"><i class="fas fa-coins filter-icon"></i></button>
 </div>
-<button data-button-type="ADD" data-entity-type="trade_plan" data-variant="full" data-onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }" data-text="הוסף תכנון חדש" type="button" id="addTradePlanBtn" title="הוסף תכנון חדש"></button>
+<button data-button-type="ADD" data-entity-type="trade_plan" data-variant="full" data-onclick="window.showModalSafe('tradePlansModal','add')" data-text="הוסף תכנון חדש" type="button" id="addTradePlanBtn" title="הוסף תכנון חדש"></button>
 <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" type="button" title="הצג/הסתר אזור תכנון טריידים"></button>
 </div>
 </div>
@@ -295,24 +295,22 @@
     <!-- [45] Load Order: 45 -->
     <script src="scripts/account-service.js?v=0da3519a_20251102_104906"></script> <!-- שירות חשבונות -->
     <!-- [46] Load Order: 46 -->
-    <script src="scripts/services/account-balance-service.js?v=0da3519a_20251102_104906"></script> <!-- שירות יתרות חשבונות -->
-    <!-- [47] Load Order: 47 -->
     <script src="scripts/alert-service.js?v=0da3519a_20251102_104906"></script> <!-- שירות התראות -->
-    <!-- [48] Load Order: 48 -->
+    <!-- [47] Load Order: 47 -->
     <script src="scripts/ticker-service.js?v=0da3519a_20251102_104906"></script> <!-- שירות טיקרים -->
-    <!-- [49] Load Order: 49 -->
+    <!-- [48] Load Order: 48 -->
     <script src="scripts/trade-plan-service.js?v=0da3519a_20251102_104906"></script> <!-- שירות תכניות מסחר -->
-    <!-- [50] Load Order: 50 -->
+    <!-- [49] Load Order: 49 -->
     <script src="scripts/active-alerts-component.js?v=0da3519a_20251102_104906"></script> <!-- רכיב התראות פעילות -->
-    <!-- [51] Load Order: 51 -->
+    <!-- [50] Load Order: 50 -->
     <script src="scripts/condition-translator.js?v=0da3519a_20251102_104906"></script> <!-- מתרגם תנאים -->
-    <!-- [52] Load Order: 52 -->
+    <!-- [51] Load Order: 51 -->
     <script src="scripts/constraints.js?v=0da3519a_20251102_104906"></script> <!-- מערכת אילוצים -->
-    <!-- [53] Load Order: 53 -->
+    <!-- [52] Load Order: 52 -->
     <script src="scripts/services/linked-items-service.js?v=0da3519a_20251102_104906"></script> <!-- שירות לוגיקה משותפת לפריטים מקושרים -->
-    <!-- [54] Load Order: 54 -->
+    <!-- [53] Load Order: 53 -->
     <script src="scripts/linked-items.js?v=0da3519a_20251102_104906"></script> <!-- פריטים מקושרים -->
-    <!-- [55] Load Order: 55 -->
+    <!-- [54] Load Order: 54 -->
     <script src="scripts/related-object-filters.js?v=0da3519a_20251102_104906"></script> <!-- פילטרים של אובייקטים קשורים -->
 
     <!-- =============================================================== -->

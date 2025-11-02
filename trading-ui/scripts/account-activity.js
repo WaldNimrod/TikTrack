@@ -528,13 +528,83 @@ function renderMovementRow(movement, runningBalance) {
  * Update activity summary
  */
 function updateActivitySummary(data) {
+    // Always update date range in title first (works even if data is null)
+    const tableTitleDateRange = document.getElementById('accountActivityDateRange');
+    if (tableTitleDateRange) {
+        const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
+        let startDate = null;
+        let endDate = new Date(); // Today
+        
+        // Get account opening date for "כל זמן" case
+        let accountOpeningDate = null;
+        if (window.accountActivityState && window.accountActivityState.selectedAccountId && window.trading_accountsData) {
+            const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
+            if (account && account.created_at) {
+                accountOpeningDate = new Date(account.created_at);
+            }
+        }
+        
+        if (dateRange !== 'כל זמן' && typeof window.translateDateRangeToDates === 'function') {
+            const range = window.translateDateRangeToDates(dateRange);
+            if (range) {
+                startDate = range.startDate ? new Date(range.startDate) : null;
+                endDate = range.endDate ? new Date(range.endDate) : new Date();
+            }
+        } else if (dateRange === 'כל זמן' && accountOpeningDate) {
+            startDate = accountOpeningDate;
+        }
+        
+        // Format date range for title
+        let dateRangeDisplay = '';
+        if (startDate && endDate) {
+            const startDateFormatted = typeof window.formatDate === 'function' 
+                ? window.formatDate(startDate) 
+                : startDate.toLocaleDateString('he-IL', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit' 
+                });
+            const endDateFormatted = typeof window.formatDate === 'function' 
+                ? window.formatDate(endDate) 
+                : endDate.toLocaleDateString('he-IL', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit' 
+                }) === new Date().toLocaleDateString('he-IL', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit' 
+                })
+                    ? 'היום'
+                    : typeof window.formatDate === 'function' 
+                        ? window.formatDate(endDate) 
+                        : endDate.toLocaleDateString('he-IL', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit' 
+                        });
+            
+            dateRangeDisplay = `${startDateFormatted} - ${endDateFormatted}`;
+        } else if (dateRange !== 'כל זמן') {
+            dateRangeDisplay = dateRange;
+        } else {
+            dateRangeDisplay = 'כל הזמנים';
+        }
+        
+        tableTitleDateRange.textContent = `[${dateRangeDisplay}]`;
+    }
+    
+    // Update table count (always update, even if no data - show 0)
     const tableCount = document.getElementById('accountActivityCount');
     
     if (tableCount) {
-        const count = data.currencies.reduce((sum, curr) => sum + (curr.movements?.length || 0), 0);
-        const currencies = data.currencies?.length || 0;
+        // Get count and currencies (default to 0 if no data)
+        const count = (data && data.currencies) 
+            ? data.currencies.reduce((sum, curr) => sum + (curr.movements?.length || 0), 0)
+            : 0;
+        const currencies = (data && data.currencies) ? data.currencies.length : 0;
         
-        // Get date range information
+        // Get date range information (always calculate, even if no data)
         let dateRangeText = '';
         const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
         let startDate = null;
@@ -542,7 +612,7 @@ function updateActivitySummary(data) {
         
         // Get account opening date for "כל זמן" case
         let accountOpeningDate = null;
-        if (window.accountActivityState.selectedAccountId && window.trading_accountsData) {
+        if (window.accountActivityState && window.accountActivityState.selectedAccountId && window.trading_accountsData) {
             const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
             if (account && account.created_at) {
                 accountOpeningDate = new Date(account.created_at);
@@ -725,6 +795,7 @@ function getSubtypeDisplay(subtype) {
         // Cash flow subtypes
         'deposit': 'הפקדה',
         'withdrawal': 'משיכה',
+        'deposits_withdrawals': 'הפקדה ומשיכה',
         'fee': 'עמלה',
         'dividend': 'דיבידנד',
         'interest': 'ריבית',
@@ -963,9 +1034,29 @@ function calculateActivityStatistics() {
         const negativeCount = movements.filter(m => m.amount < 0).length;
         
         // Group by subtype
+        // IMPORTANT: Merge related subtypes into single groups:
+        // - 'deposit' and 'withdrawal' into 'deposits_withdrawals'
+        // - 'other_positive' and 'other_negative' into 'other'
+        // - 'transfer_in' and 'transfer_out' into 'transfer'
         const bySubtype = {};
         movements.forEach(m => {
-            const subtype = m.subtype || 'other';
+            let subtype = m.subtype || 'other';
+            
+            // Merge 'deposit' and 'withdrawal' into 'deposits_withdrawals'
+            if (subtype === 'deposit' || subtype === 'withdrawal') {
+                subtype = 'deposits_withdrawals';
+            }
+            
+            // Merge 'other_positive' and 'other_negative' into 'other'
+            if (subtype === 'other_positive' || subtype === 'other_negative') {
+                subtype = 'other';
+            }
+            
+            // Merge 'transfer_in' and 'transfer_out' into 'transfer'
+            if (subtype === 'transfer_in' || subtype === 'transfer_out') {
+                subtype = 'transfer';
+            }
+            
             if (!bySubtype[subtype]) {
                 bySubtype[subtype] = {
                     count: 0,
@@ -1119,22 +1210,253 @@ function updateActivityStatistics() {
     
     statsCard.style.display = 'block';
     
-    // Render cash flows statistics
-    const cashFlowsContent = document.getElementById('cashFlowsStatisticsContent');
-    if (cashFlowsContent) {
-        cashFlowsContent.innerHTML = renderStatisticsColumn(stats.cashFlows, 'תזרימי מזומנים');
+    // Calculate overall statistics (combining cash flows + executions)
+    const overallStats = combineStatistics(stats.cashFlows, stats.executions);
+    
+    // Render overall summary: main summary in two columns
+    // Column 1: מספר רשומות + סה"כ סכום (for all records)
+    // Column 2: ממוצע לפעולה + שנתי משוער (for all records with breakdown)
+    const overallContent = document.getElementById('overallStatisticsContent');
+    if (overallContent) {
+        overallContent.innerHTML = renderStatisticsSummaryColumn1(overallStats, 'סיכום כללי');
     }
     
-    // Render executions statistics
-    const executionsContent = document.getElementById('executionsStatisticsContent');
-    if (executionsContent) {
-        executionsContent.innerHTML = renderStatisticsColumn(stats.executions, 'ביצועים');
+    const overallContent2 = document.getElementById('overallStatisticsContent2');
+    if (overallContent2) {
+        overallContent2.innerHTML = renderStatisticsSummaryColumn2(overallStats, 'סיכום כללי');
+    }
+    
+    // Render cash flows: main summary - TWO cards, split content
+    // Column 1: מספר רשומות + סה"כ סכום
+    // Column 2: ממוצע לפעולה + שנתי משוער
+    const cashFlowsContent = document.getElementById('cashFlowsStatisticsContent');
+    if (cashFlowsContent) {
+        // Column 1: מספר רשומות + סה"כ סכום
+        cashFlowsContent.innerHTML = renderStatisticsSummaryColumn1(stats.cashFlows, 'תזרימי מזומנים');
+    }
+    
+    const cashFlowsContent2 = document.getElementById('cashFlowsStatisticsContent2');
+    if (cashFlowsContent2) {
+        // Column 2: ממוצע לפעולה + שנתי משוער
+        cashFlowsContent2.innerHTML = renderStatisticsSummaryColumn2(stats.cashFlows, 'תזרימי מזומנים');
+    }
+    
+    // Render cash flows breakdown by subtype in two columns
+    const cashFlowsBreakdown1 = document.getElementById('cashFlowsBreakdownContent1');
+    if (cashFlowsBreakdown1) {
+        const cashFlowsColumn1 = splitCashFlowsByColumn(stats.cashFlows, 1);
+        cashFlowsBreakdown1.innerHTML = renderBreakdownBySubtype(cashFlowsColumn1, 'תזרימי מזומנים', 1);
+    }
+    
+    const cashFlowsBreakdown2 = document.getElementById('cashFlowsBreakdownContent2');
+    if (cashFlowsBreakdown2) {
+        const cashFlowsColumn2 = splitCashFlowsByColumn(stats.cashFlows, 2);
+        cashFlowsBreakdown2.innerHTML = renderBreakdownBySubtype(cashFlowsColumn2, 'תזרימי מזומנים', 2);
+    }
+    
+    // Render executions: main summary - TWO cards, split content (same structure as cash flows)
+    // Column 1: מספר רשומות + סה"כ סכום (for all executions)
+    // Column 2: ממוצע לפעולה + שנתי משוער (for all executions with breakdown by buy/sell)
+    const executionsContentBuy = document.getElementById('executionsStatisticsContentBuy');
+    if (executionsContentBuy) {
+        // Column 1: מספר רשומות + סה"כ סכום (full stats)
+        executionsContentBuy.innerHTML = renderStatisticsSummaryColumn1(stats.executions, 'ביצועים');
+    }
+    
+    const executionsContentSell = document.getElementById('executionsStatisticsContentSell');
+    if (executionsContentSell) {
+        // Column 2: ממוצע לפעולה + שנתי משוער (full stats with breakdown)
+        executionsContentSell.innerHTML = renderStatisticsSummaryColumn2(stats.executions, 'ביצועים');
+    }
+    
+    // Render executions breakdown by subtype (buy/sell)
+    const executionsBreakdown1 = document.getElementById('executionsBreakdownContent1');
+    if (executionsBreakdown1) {
+        const executionsBuy = splitExecutionsByAction(stats.executions, 'buy');
+        executionsBreakdown1.innerHTML = renderBreakdownBySubtype(executionsBuy, 'ביצועים', 'buy');
+    }
+    
+    const executionsBreakdown2 = document.getElementById('executionsBreakdownContent2');
+    if (executionsBreakdown2) {
+        const executionsSell = splitExecutionsByAction(stats.executions, 'sell');
+        executionsBreakdown2.innerHTML = renderBreakdownBySubtype(executionsSell, 'ביצועים', 'sell');
     }
     
     // Update activity summary header (with date range)
+    // Always update summary even if data hasn't changed, to refresh date range display
     if (window.accountActivityState && window.accountActivityState.activityData) {
         updateActivitySummary(window.accountActivityState.activityData);
+    } else {
+        // If no data, still update the date range in title (it will show placeholder)
+        updateActivitySummary(null);
     }
+}
+
+/**
+ * Combine statistics from cash flows and executions into overall summary
+ * @param {Object} cashFlowsStats - Cash flows statistics
+ * @param {Object} executionsStats - Executions statistics
+ * @returns {Object} Combined statistics object
+ */
+function combineStatistics(cashFlowsStats, executionsStats) {
+    if (!cashFlowsStats || !executionsStats) {
+        return cashFlowsStats || executionsStats || {};
+    }
+    
+    // Combine totals
+    const totalCount = (cashFlowsStats.totalCount || 0) + (executionsStats.totalCount || 0);
+    const totalAmount = (cashFlowsStats.totalAmount || 0) + (executionsStats.totalAmount || 0);
+    const positiveAmount = (cashFlowsStats.positiveAmount || 0) + (executionsStats.positiveAmount || 0);
+    const negativeAmount = (cashFlowsStats.negativeAmount || 0) + (executionsStats.negativeAmount || 0);
+    const positiveCount = (cashFlowsStats.positiveCount || 0) + (executionsStats.positiveCount || 0);
+    const negativeCount = (cashFlowsStats.negativeCount || 0) + (executionsStats.negativeCount || 0);
+    
+    // Use the earliest first record and latest last record
+    let firstRecord = null;
+    let lastRecord = null;
+    
+    if (cashFlowsStats.firstRecord && executionsStats.firstRecord) {
+        const cashFlowDate = new Date(cashFlowsStats.firstRecord.date || 0);
+        const executionDate = new Date(executionsStats.firstRecord.date || 0);
+        firstRecord = cashFlowDate < executionDate ? cashFlowsStats.firstRecord : executionsStats.firstRecord;
+    } else {
+        firstRecord = cashFlowsStats.firstRecord || executionsStats.firstRecord;
+    }
+    
+    if (cashFlowsStats.lastRecord && executionsStats.lastRecord) {
+        const cashFlowDate = new Date(cashFlowsStats.lastRecord.date || 0);
+        const executionDate = new Date(executionsStats.lastRecord.date || 0);
+        lastRecord = cashFlowDate > executionDate ? cashFlowsStats.lastRecord : executionsStats.lastRecord;
+    } else {
+        lastRecord = cashFlowsStats.lastRecord || executionsStats.lastRecord;
+    }
+    
+    // Use the earliest date range start and latest date range end
+    let dateRangeStart = null;
+    let dateRangeEnd = null;
+    
+    if (cashFlowsStats.dateRange && executionsStats.dateRange) {
+        dateRangeStart = cashFlowsStats.dateRange.start && executionsStats.dateRange.start
+            ? new Date(Math.min(cashFlowsStats.dateRange.start, executionsStats.dateRange.start))
+            : (cashFlowsStats.dateRange.start || executionsStats.dateRange.start);
+        dateRangeEnd = cashFlowsStats.dateRange.end && executionsStats.dateRange.end
+            ? new Date(Math.max(cashFlowsStats.dateRange.end, executionsStats.dateRange.end))
+            : (cashFlowsStats.dateRange.end || executionsStats.dateRange.end);
+    } else {
+        dateRangeStart = cashFlowsStats.dateRange?.start || executionsStats.dateRange?.start;
+        dateRangeEnd = cashFlowsStats.dateRange?.end || executionsStats.dateRange?.end;
+    }
+    
+    // Determine currency (prefer cash flows, fallback to executions)
+    const currency = cashFlowsStats.currency || executionsStats.currency || 'USD';
+    
+    return {
+        totalCount: totalCount,
+        totalAmount: totalAmount,
+        positiveAmount: positiveAmount,
+        negativeAmount: negativeAmount,
+        positiveCount: positiveCount,
+        negativeCount: negativeCount,
+        firstRecord: firstRecord,
+        lastRecord: lastRecord,
+        dateRange: { start: dateRangeStart, end: dateRangeEnd },
+        currency: currency
+    };
+}
+
+/**
+ * Split cash flows statistics by column
+ * Column 1: deposits_withdrawals, fee, dividend
+ * Column 2: interest, transfer, other
+ * @param {Object} stats - Full cash flows statistics
+ * @param {number} column - Column number (1 or 2)
+ * @returns {Object} Filtered statistics object for the column
+ */
+function splitCashFlowsByColumn(stats, column) {
+    if (!stats || !stats.bySubtype) {
+        return stats;
+    }
+    
+    const column1Subtypes = ['deposits_withdrawals', 'fee', 'dividend'];
+    const column2Subtypes = ['transfer', 'interest', 'other'];
+    
+    const targetSubtypes = column === 1 ? column1Subtypes : column2Subtypes;
+    
+    // Filter bySubtype to only include subtypes for this column
+    const filteredBySubtype = {};
+    let totalCount = 0;
+    let totalAmount = 0;
+    let positiveAmount = 0;
+    let negativeAmount = 0;
+    let positiveCount = 0;
+    let negativeCount = 0;
+    
+    targetSubtypes.forEach(subtype => {
+        if (stats.bySubtype[subtype]) {
+            filteredBySubtype[subtype] = stats.bySubtype[subtype];
+            totalCount += stats.bySubtype[subtype].count || 0;
+            totalAmount += stats.bySubtype[subtype].totalAmount || 0;
+            positiveAmount += stats.bySubtype[subtype].positiveAmount || 0;
+            negativeAmount += stats.bySubtype[subtype].negativeAmount || 0;
+            positiveCount += stats.bySubtype[subtype].positiveCount || 0;
+            negativeCount += stats.bySubtype[subtype].negativeCount || 0;
+        }
+    });
+    
+    return {
+        ...stats,
+        bySubtype: filteredBySubtype,
+        totalCount: totalCount,
+        totalAmount: totalAmount,
+        positiveAmount: positiveAmount,
+        negativeAmount: negativeAmount,
+        positiveCount: positiveCount,
+        negativeCount: negativeCount
+    };
+}
+
+/**
+ * Split executions statistics by action (buy/sell)
+ * @param {Object} stats - Full executions statistics
+ * @param {string} action - Action type ('buy' or 'sell')
+ * @returns {Object} Filtered statistics object for the action
+ */
+function splitExecutionsByAction(stats, action) {
+    if (!stats || !stats.bySubtype) {
+        return stats;
+    }
+    
+    // Filter bySubtype to only include the requested action
+    const filteredBySubtype = {};
+    if (stats.bySubtype[action]) {
+        filteredBySubtype[action] = stats.bySubtype[action];
+    }
+    
+    const subtypeStats = stats.bySubtype[action];
+    if (!subtypeStats) {
+        // Return empty stats structure
+        return {
+            ...stats,
+            bySubtype: {},
+            totalCount: 0,
+            totalAmount: 0,
+            positiveAmount: 0,
+            negativeAmount: 0,
+            positiveCount: 0,
+            negativeCount: 0
+        };
+    }
+    
+    return {
+        ...stats,
+        bySubtype: filteredBySubtype,
+        totalCount: subtypeStats.count || 0,
+        totalAmount: subtypeStats.totalAmount || 0,
+        positiveAmount: subtypeStats.positiveAmount || 0,
+        negativeAmount: subtypeStats.negativeAmount || 0,
+        positiveCount: subtypeStats.positiveCount || 0,
+        negativeCount: subtypeStats.negativeCount || 0
+    };
 }
 
 /**
@@ -1166,8 +1488,8 @@ function renderStatisticsColumn(stats, typeName) {
     // Card 1: מספר רשומות + סה"כ סכום (unified) - two columns
     html += '<div class="statistics-card-item">';
     const totalAmountHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
-        ? window.FieldRendererService.renderAmount(stats.totalAmount, currencySymbol, 0, false)
-        : `<span>${stats.totalAmount.toFixed(0)}${currencySymbol}</span>`;
+        ? window.FieldRendererService.renderAmount(stats.totalAmount, currencySymbol, 0, true)
+        : `<span>${stats.totalAmount < 0 ? '-' : ''}${Math.abs(stats.totalAmount).toFixed(0)}${currencySymbol}</span>`;
     
     // Format records count with breakdown (always show if we have any breakdown)
     let recordsCountHtml = `${stats.totalCount}`;
@@ -1205,7 +1527,7 @@ function renderStatisticsColumn(stats, typeName) {
                     positiveAmountHtml = `<span class="text-success">${positiveAmount >= 0 ? '+' : ''}${positiveAmount.toFixed(0)}${currencySymbol}</span>`;
                 }
         
-        totalAmountWithBreakdown = `${totalAmountHtml} (${negativeAmountHtml}/${positiveAmountHtml})`;
+        totalAmountWithBreakdown = `${totalAmountHtml}<br>(${negativeAmountHtml}/${positiveAmountHtml})`;
     }
     
     html += '<div class="statistics-card-content statistics-card-two-columns">';
@@ -1411,18 +1733,407 @@ function renderStatisticsColumn(stats, typeName) {
     
     html += '</div>'; // End statistics-summary
     
-    // Breakdown by subtype
+    // Note: Breakdown is now rendered separately by renderBreakdownBySubtype
+    
+    return html;
+}
+
+/**
+ * Render statistics summary column 1: מספר רשומות + סה"כ סכום
+ * @param {Object} stats - Statistics object for one type
+ * @param {string} typeName - Name of the type (for display)
+ * @returns {string} HTML string
+ */
+function renderStatisticsSummaryColumn1(stats, typeName) {
+    if (!stats || stats.totalCount === 0) {
+        return '<div class="statistics-empty">אין נתונים להצגה</div>';
+    }
+    
+    const currency = stats.currency || 'USD';
+    let currencySymbol = currency;
+    if (currency && currency.length > 1) {
+        switch (currency.toUpperCase()) {
+            case 'USD': currencySymbol = '$'; break;
+            case 'ILS': currencySymbol = '₪'; break;
+            case 'EUR': currencySymbol = '€'; break;
+            case 'GBP': currencySymbol = '£'; break;
+            case 'JPY': currencySymbol = '¥'; break;
+            default: currencySymbol = currency;
+        }
+    }
+    
+    let html = '<div class="statistics-summary">';
+    
+    // Card: מספר רשומות + סה"כ סכום
+    html += '<div class="statistics-card-item">';
+    const totalAmountHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
+        ? window.FieldRendererService.renderAmount(stats.totalAmount, currencySymbol, 0, true)
+        : `<span>${stats.totalAmount < 0 ? '-' : ''}${Math.abs(stats.totalAmount).toFixed(0)}${currencySymbol}</span>`;
+    
+    // Format records count with breakdown
+    let recordsCountHtml = `${stats.totalCount}`;
+    if (stats.negativeCount > 0 || stats.positiveCount > 0) {
+        const negativeCountClass = (stats.negativeCount || 0) === 0 ? '' : 'text-danger';
+        const positiveCountClass = (stats.positiveCount || 0) === 0 ? '' : 'text-success';
+        recordsCountHtml = `${stats.totalCount} (<span class="${negativeCountClass}">${stats.negativeCount || 0}</span>/<span class="${positiveCountClass}">${stats.positiveCount || 0}</span>)`;
+    }
+    
+    // Format total amount with breakdown
+    let totalAmountWithBreakdown = totalAmountHtml;
+    if (stats.negativeAmount !== 0 || stats.positiveAmount !== 0) {
+        const negativeAmount = stats.negativeAmount || 0;
+        const positiveAmount = stats.positiveAmount || 0;
+        
+        let negativeAmountHtml;
+        if (negativeAmount === 0) {
+            negativeAmountHtml = `<span>${negativeAmount.toFixed(0)}${currencySymbol}</span>`;
+        } else if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+            negativeAmountHtml = window.FieldRendererService.renderAmount(negativeAmount, currencySymbol, 0, true);
+        } else {
+            negativeAmountHtml = `<span class="text-danger">${negativeAmount.toFixed(0)}${currencySymbol}</span>`;
+        }
+        
+        let positiveAmountHtml;
+        if (positiveAmount === 0) {
+            positiveAmountHtml = `<span>${positiveAmount.toFixed(0)}${currencySymbol}</span>`;
+        } else if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+            positiveAmountHtml = window.FieldRendererService.renderAmount(positiveAmount, currencySymbol, 0, true);
+        } else {
+            positiveAmountHtml = `<span class="text-success">${positiveAmount >= 0 ? '+' : ''}${positiveAmount.toFixed(0)}${currencySymbol}</span>`;
+        }
+        
+        totalAmountWithBreakdown = `${totalAmountHtml}<br>(${negativeAmountHtml}/${positiveAmountHtml})`;
+    }
+    
+    html += '<div class="statistics-card-content statistics-card-two-columns">';
+    html += `<div class="statistics-card-col">מספר רשומות: <strong>${recordsCountHtml}</strong></div>`;
+    html += `<div class="statistics-card-col statistics-card-col-end">סה"כ סכום: <strong>${totalAmountWithBreakdown}</strong></div>`;
+    html += '</div>';
+    html += '</div>';
+    html += '</div>'; // End statistics-summary
+    
+    return html;
+}
+
+/**
+ * Render statistics summary column 2: ממוצע לפעולה + שנתי משוער
+ * @param {Object} stats - Statistics object for one type
+ * @param {string} typeName - Name of the type (for display)
+ * @returns {string} HTML string
+ */
+function renderStatisticsSummaryColumn2(stats, typeName) {
+    if (!stats || stats.totalCount === 0) {
+        return '<div class="statistics-empty">אין נתונים להצגה</div>';
+    }
+    
+    const currency = stats.currency || 'USD';
+    let currencySymbol = currency;
+    if (currency && currency.length > 1) {
+        switch (currency.toUpperCase()) {
+            case 'USD': currencySymbol = '$'; break;
+            case 'ILS': currencySymbol = '₪'; break;
+            case 'EUR': currencySymbol = '€'; break;
+            case 'GBP': currencySymbol = '£'; break;
+            case 'JPY': currencySymbol = '¥'; break;
+            default: currencySymbol = currency;
+        }
+    }
+    
+    let html = '<div class="statistics-summary">';
+    
+    const isExecution = typeName === 'ביצועים' || typeName === 'execution';
+    
+    // Card: ממוצע לפעולה + שנתי משוער
+    html += '<div class="statistics-card-item">';
+    
+    if (isExecution && stats.totalCount > 0) {
+        // Executions: Calculate average using absolute values
+        let absoluteTotal = 0;
+        if (stats.bySubtype && Object.keys(stats.bySubtype).length > 0) {
+            Object.values(stats.bySubtype).forEach(subtype => {
+                if (subtype.movements && Array.isArray(subtype.movements)) {
+                    subtype.movements.forEach(m => {
+                        absoluteTotal += Math.abs(m.amount || 0);
+                    });
+                }
+            });
+        }
+        
+        if (absoluteTotal === 0) {
+            absoluteTotal = Math.abs(stats.positiveAmount || 0) + Math.abs(stats.negativeAmount || 0);
+        }
+        
+        const averagePerAction = stats.totalCount > 0 ? absoluteTotal / stats.totalCount : 0;
+        const formatted = Math.abs(averagePerAction).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        let averageHtml = `<span>${formatted}${currencySymbol}</span>`;
+        
+        // Check if we need to show breakdown by sides (both positive and negative exist)
+        const negativeAmount = stats.negativeAmount || 0;
+        const positiveAmount = stats.positiveAmount || 0;
+        const hasBothSides = negativeAmount !== 0 && positiveAmount !== 0;
+        
+        // If both sides exist, calculate and show breakdown for average per action
+        // Breakdown should be on a new line after the total
+        if (hasBothSides) {
+            const positiveCount = stats.positiveCount || 0;
+            const negativeCount = stats.negativeCount || 0;
+            
+            const positiveAverage = positiveCount > 0 ? Math.abs(positiveAmount) / positiveCount : 0;
+            const negativeAverage = negativeCount > 0 ? Math.abs(negativeAmount) / negativeCount : 0;
+            
+            let negativeAverageHtml;
+            if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+                negativeAverageHtml = window.FieldRendererService.renderAmount(-negativeAverage, currencySymbol, 0, true);
+            } else {
+                negativeAverageHtml = `<span class="text-danger">-${negativeAverage.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}${currencySymbol}</span>`;
+            }
+            
+            let positiveAverageHtml;
+            if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+                positiveAverageHtml = window.FieldRendererService.renderAmount(positiveAverage, currencySymbol, 0, true);
+            } else {
+                positiveAverageHtml = `<span class="text-success">+${positiveAverage.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}${currencySymbol}</span>`;
+            }
+            
+            averageHtml = `${averageHtml}<br>(${negativeAverageHtml}/${positiveAverageHtml})`;
+        }
+        
+        let daysForAnnual = 1;
+        if (stats.dateRange && stats.dateRange.start && stats.dateRange.end) {
+            daysForAnnual = Math.max(1, Math.ceil((stats.dateRange.end - stats.dateRange.start) / (1000 * 60 * 60 * 24)));
+        } else if (stats.lastRecord && stats.firstRecord && stats.firstRecord !== stats.lastRecord && stats.lastRecord.date && stats.firstRecord.date) {
+            daysForAnnual = Math.max(1, Math.ceil((new Date(stats.lastRecord.date) - new Date(stats.firstRecord.date)) / (1000 * 60 * 60 * 24)));
+        }
+        
+        const annualAmountChange = (stats.totalAmount / daysForAnnual) * 365;
+        let annualAmountChangeHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
+            ? window.FieldRendererService.renderAmount(annualAmountChange, currencySymbol, 0, true)
+            : `<span>${annualAmountChange >= 0 ? '+' : ''}${annualAmountChange.toFixed(0)}${currencySymbol}</span>`;
+        
+        // If both sides exist, show breakdown for annual estimate
+        if (hasBothSides) {
+            const positiveAnnual = (positiveAmount / daysForAnnual) * 365;
+            const negativeAnnual = (negativeAmount / daysForAnnual) * 365;
+            
+            let negativeAnnualHtml;
+            if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+                negativeAnnualHtml = window.FieldRendererService.renderAmount(negativeAnnual, currencySymbol, 0, true);
+            } else {
+                negativeAnnualHtml = `<span class="text-danger">${negativeAnnual.toFixed(0)}${currencySymbol}</span>`;
+            }
+            
+            let positiveAnnualHtml;
+            if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+                positiveAnnualHtml = window.FieldRendererService.renderAmount(positiveAnnual, currencySymbol, 0, true);
+            } else {
+                positiveAnnualHtml = `<span class="text-success">${positiveAnnual >= 0 ? '+' : ''}${positiveAnnual.toFixed(0)}${currencySymbol}</span>`;
+            }
+            
+            annualAmountChangeHtml = `${annualAmountChangeHtml}<br>(${negativeAnnualHtml}/${positiveAnnualHtml})`;
+        }
+        
+        const accountBalance = 0;
+        let percentageDisplay = '0%';
+        let annualPercentageDisplay = '0%';
+        let pctClass = '';
+        let annualPctClass = '';
+        
+        if (accountBalance > 0) {
+            const percentageChange = (stats.totalAmount / Math.abs(accountBalance)) * 100;
+            const annualPercentageChange = (annualAmountChange / Math.abs(accountBalance)) * 100;
+            
+            const pctNumber = Math.abs(percentageChange).toFixed(2);
+            const pctSign = percentageChange < 0 ? '-' : '';
+            percentageDisplay = `${pctNumber}%${pctSign}`;
+            
+            const annualPctNumber = Math.abs(annualPercentageChange).toFixed(2);
+            const annualPctSign = annualPercentageChange < 0 ? '-' : '';
+            annualPercentageDisplay = `${annualPctNumber}%${annualPctSign}`;
+            
+            pctClass = percentageChange >= 0 ? 'text-success' : (percentageChange < 0 ? 'text-danger' : '');
+            annualPctClass = annualPercentageChange >= 0 ? 'text-success' : (annualPercentageChange < 0 ? 'text-danger' : '');
+        } else {
+            percentageDisplay = '0% (עתידי)';
+            annualPercentageDisplay = '0% (עתידי)';
+        }
+        
+        html += '<div class="statistics-card-content statistics-card-two-columns">';
+        html += `<div class="statistics-card-col">ממוצע לפעולה: <strong>${averageHtml}</strong> | <strong class="${pctClass}">${percentageDisplay}</strong></div>`;
+        html += `<div class="statistics-card-col statistics-card-col-end">שנתי משוער: <strong>${annualAmountChangeHtml}</strong> | <strong class="${annualPctClass}">${annualPercentageDisplay}</strong></div>`;
+        html += '</div>';
+        html += '</div>';
+    } else if (!isExecution && stats.totalCount > 0) {
+        // Cash flows: Calculate average using absolute values
+        const absoluteTotal = Math.abs(stats.positiveAmount || 0) + Math.abs(stats.negativeAmount || 0);
+        const averagePerAction = stats.totalCount > 0 ? absoluteTotal / stats.totalCount : 0;
+        
+        const formatted = Math.abs(averagePerAction).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        let averageHtml = `<span>${formatted}${currencySymbol}</span>`;
+        
+        // Check if we need to show breakdown by sides (both positive and negative exist)
+        const negativeAmount = stats.negativeAmount || 0;
+        const positiveAmount = stats.positiveAmount || 0;
+        const hasBothSides = negativeAmount !== 0 && positiveAmount !== 0;
+        
+        // If both sides exist, calculate and show breakdown for average per action
+        // Breakdown should be on a new line after the total
+        if (hasBothSides) {
+            const positiveCount = stats.positiveCount || 0;
+            const negativeCount = stats.negativeCount || 0;
+            
+            const positiveAverage = positiveCount > 0 ? Math.abs(positiveAmount) / positiveCount : 0;
+            const negativeAverage = negativeCount > 0 ? Math.abs(negativeAmount) / negativeCount : 0;
+            
+            let negativeAverageHtml;
+            if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+                negativeAverageHtml = window.FieldRendererService.renderAmount(-negativeAverage, currencySymbol, 0, true);
+            } else {
+                negativeAverageHtml = `<span class="text-danger">-${negativeAverage.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}${currencySymbol}</span>`;
+            }
+            
+            let positiveAverageHtml;
+            if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+                positiveAverageHtml = window.FieldRendererService.renderAmount(positiveAverage, currencySymbol, 0, true);
+            } else {
+                positiveAverageHtml = `<span class="text-success">+${positiveAverage.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}${currencySymbol}</span>`;
+            }
+            
+            averageHtml = `${averageHtml}<br>(${negativeAverageHtml}/${positiveAverageHtml})`;
+        }
+        
+        let daysForAnnual = 1;
+        if (stats.dateRange && stats.dateRange.start && stats.dateRange.end) {
+            daysForAnnual = Math.max(1, Math.ceil((stats.dateRange.end - stats.dateRange.start) / (1000 * 60 * 60 * 24)));
+        } else if (stats.lastRecord && stats.firstRecord && stats.firstRecord !== stats.lastRecord && stats.lastRecord.date && stats.firstRecord.date) {
+            daysForAnnual = Math.max(1, Math.ceil((new Date(stats.lastRecord.date) - new Date(stats.firstRecord.date)) / (1000 * 60 * 60 * 24)));
+        }
+        
+        const annualAmountChange = (stats.totalAmount / daysForAnnual) * 365;
+        let annualAmountChangeHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
+            ? window.FieldRendererService.renderAmount(annualAmountChange, currencySymbol, 0, true)
+            : `<span>${annualAmountChange >= 0 ? '+' : ''}${annualAmountChange.toFixed(0)}${currencySymbol}</span>`;
+        
+        // If both sides exist, show breakdown for annual estimate
+        if (hasBothSides) {
+            const positiveAnnual = (positiveAmount / daysForAnnual) * 365;
+            const negativeAnnual = (negativeAmount / daysForAnnual) * 365;
+            
+            let negativeAnnualHtml;
+            if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+                negativeAnnualHtml = window.FieldRendererService.renderAmount(negativeAnnual, currencySymbol, 0, true);
+            } else {
+                negativeAnnualHtml = `<span class="text-danger">${negativeAnnual.toFixed(0)}${currencySymbol}</span>`;
+            }
+            
+            let positiveAnnualHtml;
+            if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+                positiveAnnualHtml = window.FieldRendererService.renderAmount(positiveAnnual, currencySymbol, 0, true);
+            } else {
+                positiveAnnualHtml = `<span class="text-success">${positiveAnnual >= 0 ? '+' : ''}${positiveAnnual.toFixed(0)}${currencySymbol}</span>`;
+            }
+            
+            annualAmountChangeHtml = `${annualAmountChangeHtml}<br>(${negativeAnnualHtml}/${positiveAnnualHtml})`;
+        }
+        
+        const accountBalance = 0;
+        let percentageDisplay = '0%';
+        let annualPercentageDisplay = '0%';
+        let pctClass = '';
+        let annualPctClass = '';
+        
+        if (accountBalance > 0) {
+            const percentageChange = (averagePerAction / Math.abs(accountBalance)) * 100;
+            const annualPercentageChange = (annualAmountChange / Math.abs(accountBalance)) * 100;
+            
+            const pctNumber = Math.abs(percentageChange).toFixed(2);
+            const pctSign = percentageChange < 0 ? '-' : '';
+            percentageDisplay = `${pctNumber}%${pctSign}`;
+            
+            const annualPctNumber = Math.abs(annualPercentageChange).toFixed(2);
+            const annualPctSign = annualPercentageChange < 0 ? '-' : '';
+            annualPercentageDisplay = `${annualPctNumber}%${annualPctSign}`;
+            
+            pctClass = percentageChange >= 0 ? 'text-success' : (percentageChange < 0 ? 'text-danger' : '');
+            annualPctClass = annualPercentageChange >= 0 ? 'text-success' : (annualPercentageChange < 0 ? 'text-danger' : '');
+        } else {
+            percentageDisplay = '0% (עתידי)';
+            annualPercentageDisplay = '0% (עתידי)';
+        }
+        
+        html += '<div class="statistics-card-content statistics-card-two-columns">';
+        html += `<div class="statistics-card-col">ממוצע לפעולה: <strong>${averageHtml}</strong> | <strong class="${pctClass}">${percentageDisplay}</strong></div>`;
+        html += `<div class="statistics-card-col statistics-card-col-end">שנתי משוער: <strong>${annualAmountChangeHtml}</strong> | <strong class="${annualPctClass}">${annualPercentageDisplay}</strong></div>`;
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    html += '</div>'; // End statistics-summary
+    
+    return html;
+}
+
+/**
+ * Render breakdown by subtype HTML (only the breakdown cards, without summary)
+ * @param {Object} stats - Statistics object for one type
+ * @param {string} typeName - Name of the type (for display)
+ * @param {number} column - Column number (1 or 2) for cash flows, or action ('buy'/'sell') for executions
+ * @returns {string} HTML string
+ */
+function renderBreakdownBySubtype(stats, typeName, column) {
+    if (!stats || !stats.bySubtype || Object.keys(stats.bySubtype).length === 0) {
+        return '';
+    }
+    
+    const currency = stats.currency || 'USD';
+    let currencySymbol = currency;
+    if (currency && currency.length > 1) {
+        switch (currency.toUpperCase()) {
+            case 'USD': currencySymbol = '$'; break;
+            case 'ILS': currencySymbol = '₪'; break;
+            case 'EUR': currencySymbol = '€'; break;
+            case 'GBP': currencySymbol = '£'; break;
+            case 'JPY': currencySymbol = '¥'; break;
+            default: currencySymbol = currency;
+        }
+    }
+    
+    let html = '';
+    const isExecution = typeName === 'ביצועים' || typeName === 'execution';
+    
+    // Breakdown by subtype (no title, no dividers - handled in HTML)
     if (stats.bySubtype && Object.keys(stats.bySubtype).length > 0) {
         html += '<div class="statistics-breakdown">';
-        // For executions: "לפי סוג", for cash flows: "לפי תת-סוג"
-        const breakdownTitle = isExecution ? 'לפי סוג' : 'לפי תת-סוג';
-        html += `<h5>${breakdownTitle}</h5>`;
         
-        // Sort subtypes: 'other' always last, others sorted alphabetically
+        // Sort subtypes in specific order for cash flows:
+        // 1. deposits_withdrawals (הפקדה ומשיכה)
+        // 2. fee (עמלה)
+        // 3. dividend (דיבידנד)
+        // 4. transfer (העברה)
+        // 5. interest (ריבית)
+        // 6. other (אחר)
+        // For executions: keep alphabetical order (buy/sell)
+        const subtypeOrder = ['deposits_withdrawals', 'fee', 'dividend', 'transfer', 'interest', 'other'];
         const subtypes = Object.keys(stats.bySubtype).sort((a, b) => {
-            if (a === 'other') return 1; // 'other' goes to end
-            if (b === 'other') return -1; // 'other' goes to end
-            return a.localeCompare(b); // Others sorted alphabetically
+            if (isExecution) {
+                // For executions: alphabetical order
+                return a.localeCompare(b);
+            }
+            
+            // For cash flows: use predefined order
+            const indexA = subtypeOrder.indexOf(a);
+            const indexB = subtypeOrder.indexOf(b);
+            
+            // If both found in order list, use their position
+            if (indexA !== -1 && indexB !== -1) {
+                return indexA - indexB;
+            }
+            
+            // If only one found, prioritize the one in list
+            if (indexA !== -1) return -1;
+            if (indexB !== -1) return 1;
+            
+            // If neither found, alphabetical order
+            return a.localeCompare(b);
         });
         
         subtypes.forEach(subtype => {
@@ -1476,7 +2187,7 @@ function renderStatisticsColumn(stats, typeName) {
                         subtypePositiveAmountHtml = `<span class="text-success">${subtypePositiveAmount >= 0 ? '+' : ''}${subtypePositiveAmount.toFixed(2)}${currencySymbol}</span>`;
                     }
                     
-                    subtypeAmountWithBreakdown = `${subtypeAmountHtml} (${subtypeNegativeAmountHtml}/${subtypePositiveAmountHtml})`;
+                    subtypeAmountWithBreakdown = `${subtypeAmountHtml}<br>(${subtypeNegativeAmountHtml}/${subtypePositiveAmountHtml})`;
                 }
             }
             
@@ -1599,7 +2310,7 @@ function renderStatisticsColumn(stats, typeName) {
                         subtypePositiveAverageHtml = `<span class="text-success">+${subtypePositiveAverageFormatted}${currencySymbol}</span>`;
                     }
                     
-                    subtypeAverageHtml = `${subtypeAverageHtml} (${subtypeNegativeAverageHtml}/${subtypePositiveAverageHtml})`;
+                    subtypeAverageHtml = `${subtypeAverageHtml}<br>(${subtypeNegativeAverageHtml}/${subtypePositiveAverageHtml})`;
                 }
                 
                 // Calculate annual amount estimate for subtype (use totalAmount, not amountChange)
@@ -1641,7 +2352,7 @@ function renderStatisticsColumn(stats, typeName) {
                         subtypePositiveAnnualHtml = `<span class="text-success">${subtypePositiveAnnual >= 0 ? '+' : ''}${subtypePositiveAnnual.toFixed(0)}${currencySymbol}</span>`;
                     }
                     
-                    subtypeAnnualAmountChangeHtml = `${subtypeAnnualAmountChangeHtml} (${subtypeNegativeAnnualHtml}/${subtypePositiveAnnualHtml})`;
+                    subtypeAnnualAmountChangeHtml = `${subtypeAnnualAmountChangeHtml}<br>(${subtypeNegativeAnnualHtml}/${subtypePositiveAnnualHtml})`;
                 }
                 
                 // TODO: Calculate percentage change as part of total account value (same as executions)
@@ -1712,6 +2423,12 @@ function setupStatisticsFilterHook() {
             if (window.updateActivityStatistics) {
                 window.updateActivityStatistics();
             }
+            // Also update activity summary to refresh date range in title
+            if (window.accountActivityState && window.accountActivityState.activityData) {
+                updateActivitySummary(window.accountActivityState.activityData);
+            } else {
+                updateActivitySummary(null);
+            }
         }, 300);
     });
     
@@ -1737,6 +2454,12 @@ function setupStatisticsFilterHook() {
                     setTimeout(() => {
                         if (window.updateActivityStatistics) {
                             window.updateActivityStatistics();
+                        }
+                        // Also update activity summary to refresh date range in title
+                        if (window.accountActivityState && window.accountActivityState.activityData) {
+                            updateActivitySummary(window.accountActivityState.activityData);
+                        } else {
+                            updateActivitySummary(null);
                         }
                     }, 100);
                 }

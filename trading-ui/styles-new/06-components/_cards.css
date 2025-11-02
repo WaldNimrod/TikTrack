@@ -588,6 +588,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   align-items: center;
+  height: 48px; /* Fixed height for two rows */
+  min-height: 48px;
 }
 
 .statistics-card-col {
@@ -596,13 +598,14 @@
 
 .statistics-card-col-end {
   text-align: right;
+  white-space: nowrap; /* Prevent line breaks */
   /* Second column - starts at center (50% mark) */
 }
 
 .statistics-breakdown {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--apple-border-light, #e9ecef);
+  /* border-top removed - no top border needed */
 }
 
 .statistics-breakdown h5 {

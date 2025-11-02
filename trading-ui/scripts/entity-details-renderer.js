@@ -10,6 +10,8 @@
  * - אינטגרציה עם מערכת הצבעים מ-preferences
  * - הצגת פריטים מקושרים ונתונים חיצוניים
  * - responsive design עם Apple Design System
+ * - מערכת פילטר מתקדמת לכל עמוד (ינואר 2025)
+ *   כל עמוד יכול להגדיר איזה כפתורי פילטר להציג/להסתיר
  *
  * קובץ: trading-ui/scripts/entity-details-renderer.js
  * גרסה: 1.0.0
@@ -29,6 +31,16 @@
 /**
  * EntityDetailsRenderer - מחלקה לרנדור תצוגות פרטי ישויות
  * 
+ * ✨ מערכת פילטר מתקדמת - ינואר 2025:
+ * כל עמוד יכול להגדיר איזה כפתורי פילטר להציג בטבלת הפריטים המקושרים
+ * על ידי הגדרת window.linkedItemsFilterConfig:
+ * 
+ * - Array: ['trade', 'account'] - לכל סוגי הישויות
+ * - Object: { 'ticker': ['trade', 'account'], 'all': [...] } - לפי סוג ישות
+ * - Function: (entityType) => ['trade', 'account'] - הגדרה דינמית
+ * 
+ * ראה: documentation/frontend/LINKED_ITEMS_SYSTEM.md
+ * 
  * @class EntityDetailsRenderer
  */
 class EntityDetailsRenderer {
@@ -43,10 +55,67 @@ class EntityDetailsRenderer {
         this.isInitialized = false;
         this.entityColors = {};
         
+        // Default filter configuration - which filter buttons to show for each entity type
+        // כל עמוד יכול לדרוס את ההגדרות הללו על ידי הגדרת window.linkedItemsFilterConfig
+        this.defaultFilterConfig = {
+            // All entity types - show all filter buttons by default
+            'all': ['account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
+            // Entity-specific configurations (can override default)
+            'ticker': ['account', 'trade', 'trade_plan', 'alert', 'execution', 'cash_flow', 'note'],
+            'trade': ['account', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
+            'account': ['trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
+            'alert': ['account', 'trade', 'trade_plan', 'ticker', 'execution', 'cash_flow', 'note'],
+            'execution': ['account', 'trade', 'trade_plan', 'ticker', 'alert', 'cash_flow', 'note'],
+            'cash_flow': ['account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'note'],
+            'note': ['account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow'],
+            'trade_plan': ['account', 'trade', 'ticker', 'alert', 'execution', 'cash_flow', 'note']
+        };
+        
         // אתחול async (לא-בלוקינג)
         this.init().catch(error => {
             window.Logger.error('❌ EntityDetailsRenderer initialization failed:', error, { page: "entity-details-renderer" });
         });
+    }
+    
+    /**
+     * Get filter configuration for entity type
+     * Returns which filter buttons should be displayed
+     * 
+     * @param {string} entityType - Entity type (ticker, trade, account, etc.)
+     * @returns {Array<string>} Array of entity types to show as filter buttons
+     * @private
+     */
+    _getFilterConfig(entityType) {
+        // Check if page has custom filter configuration
+        if (window.linkedItemsFilterConfig) {
+            // Page-specific configuration - can be:
+            // 1. Object with entityType keys: { 'ticker': ['trade', 'account'], ... }
+            // 2. Array for all entities: ['trade', 'account', ...]
+            // 3. Function that returns config: (entityType) => ['trade', 'account']
+            
+            if (typeof window.linkedItemsFilterConfig === 'function') {
+                // Function - call it with entityType
+                const config = window.linkedItemsFilterConfig(entityType);
+                if (Array.isArray(config)) {
+                    return config;
+                }
+            } else if (Array.isArray(window.linkedItemsFilterConfig)) {
+                // Array - use for all entity types
+                return window.linkedItemsFilterConfig;
+            } else if (typeof window.linkedItemsFilterConfig === 'object') {
+                // Object - check for entityType-specific config
+                if (window.linkedItemsFilterConfig[entityType]) {
+                    return window.linkedItemsFilterConfig[entityType];
+                }
+                // Fallback to 'all' key if exists
+                if (window.linkedItemsFilterConfig['all']) {
+                    return window.linkedItemsFilterConfig['all'];
+                }
+            }
+        }
+        
+        // Use default configuration
+        return this.defaultFilterConfig[entityType] || this.defaultFilterConfig['all'];
     }
 
     /**
@@ -181,10 +250,10 @@ class EntityDetailsRenderer {
      * @param {string} entityType - סוג הישות
      * @param {Object} entityData - נתוני הישות
      * @param {Object} options - אפשרויות רנדור
-     * @returns {string} - HTML מרונדר
+     * @returns {Promise<string>} - HTML מרונדר
      * @public
      */
-    render(entityType, entityData, options = {}) {
+    async render(entityType, entityData, options = {}) {
         try {
             if (!entityType || !entityData) {
                 return this.renderError('חסרים נתוני ישות');
@@ -217,7 +286,7 @@ class EntityDetailsRenderer {
                 case 'execution':
                     return this.renderExecution(entityData, options);
                 case 'account':
-                    return this.renderAccount(entityData, options);
+                    return await this.renderAccount(entityData, options);
                 case 'alert':
                     return this.renderAlert(entityData, options);
                 case 'cash_flow':
@@ -268,7 +337,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(tickerData.linked_items || [], tickerColor, 'ticker', tickerData.id, options?.sourceInfo || null)}
+                        ${this.renderLinkedItems(tickerData.linked_items || [], tickerColor, 'ticker', tickerData.id, options?.sourceInfo || null, options)}
                     </div>
                 </div>
             </div>
@@ -411,7 +480,7 @@ class EntityDetailsRenderer {
                                     page: "entity-details-renderer"
                                 });
                             }
-                            return this.renderLinkedItems(tradeData.linked_items || [], this.entityColors.trade || '#007bff', 'trade', tradeData.id, options?.sourceInfo || null);
+                            return this.renderLinkedItems(tradeData.linked_items || [], this.entityColors.trade || '#007bff', 'trade', tradeData.id, options?.sourceInfo || null, options);
                         })()}
                     </div>
                 </div>
@@ -489,7 +558,13 @@ class EntityDetailsRenderer {
         }
         
         // חלוקת השדות לשתי עמודות
-        const fieldsPerColumn = Math.ceil(fields.length / 2);
+        // עבור account - חלוקה מיוחדת 4:2 (id, is_default, created_at, last_transaction_date | currency_name, balances)
+        let fieldsPerColumn;
+        if (entityType === 'account') {
+            fieldsPerColumn = 4; // 4 שדות בעמודה ראשונה, 2 בעמודה שנייה
+        } else {
+            fieldsPerColumn = Math.ceil(fields.length / 2);
+        }
         const firstColumnFields = fields.slice(0, fieldsPerColumn);
         
         let html = `
@@ -520,7 +595,13 @@ class EntityDetailsRenderer {
     renderAdditionalInfo(entityData, entityType, entityColor = '#019193') {
         const fields = this.getBasicFields(entityType);
         // חלוקת השדות לשתי עמודות
-        const fieldsPerColumn = Math.ceil(fields.length / 2);
+        // עבור account - חלוקה מיוחדת 4:2 (id, is_default, created_at, last_transaction_date | currency_name, balances)
+        let fieldsPerColumn;
+        if (entityType === 'account') {
+            fieldsPerColumn = 4; // 4 שדות בעמודה ראשונה, 2 בעמודה שנייה
+        } else {
+            fieldsPerColumn = Math.ceil(fields.length / 2);
+        }
         const secondColumnFields = fields.slice(fieldsPerColumn);
         
         if (secondColumnFields.length === 0) {
@@ -741,7 +822,19 @@ class EntityDetailsRenderer {
      * 
      * מעודכן להשתמש ב-LinkedItemsService ללוגיקה משותפת
      */
-    renderLinkedItems(linkedItems, entityColor = '#019193', entityType = null, entityId = null, sourceInfo = null) {
+    /**
+     * Render linked items table with filter buttons
+     * 
+     * @param {Array} linkedItems - Array of linked items
+     * @param {string} entityColor - Color for entity type
+     * @param {string} entityType - Entity type (ticker, trade, account, etc.)
+     * @param {string|number} entityId - Entity ID
+     * @param {Object|null} sourceInfo - Source information for navigation
+     * @param {Object} options - Additional options
+     * @param {Array<string>} options.filterButtons - Override filter buttons to show (optional)
+     * @returns {string} HTML string
+     */
+    renderLinkedItems(linkedItems, entityColor = '#019193', entityType = null, entityId = null, sourceInfo = null, options = {}) {
         // בדיקת LinkedItemsService פעם אחת בתחילת הפונקציה
         if (!window.LinkedItemsService || !window.LinkedItemsService.generateLinkedItemActions) {
             // הצגת הודעה אחת בלבד בפעם הראשונה
@@ -854,27 +947,22 @@ class EntityDetailsRenderer {
         }
         window.linkedItemsTableData[tableId] = sortedItems;
         
+        // Get filter configuration - which buttons to show
+        const filterButtonsToShow = options.filterButtons || this._getFilterConfig(entityType);
+        
+        // Generate filter buttons HTML based on configuration
+        const filterButtonsHtml = this._generateFilterButtons(tableId, filterButtonsToShow);
+        
         // יצירת טבלה מינימלית של פריטים מקושרים
         let html = `
             <div class="entity-linked-items">
                 <h6 class="border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center" style="border-bottom-color: ${entityColor} !important;">
                     <span>פריטים מקושרים (${sortedItems.length})</span>
-                    <div class="filter-buttons-container button-row" id="linkedItemsFilter_${tableId}" style="display: inline-flex; gap: 4px;">
+                    <div class="filter-buttons-container button-row" id="linkedItemsFilter_${tableId}" style="display: inline-flex; gap: 4px; flex-wrap: wrap;">
                         <button class="btn btn-sm active" onclick="window.filterLinkedItemsByType('${tableId}', 'all')" data-type="all" title="הצג הכל">
                             הכל
                         </button>
-                        <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="window.filterLinkedItemsByType('${tableId}', 'account')" data-type="account" title="חשבונות">
-                            <img src="/trading-ui/images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="filter-icon">
-                        </button>
-                        <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="window.filterLinkedItemsByType('${tableId}', 'trade')" data-type="trade" title="טריידים">
-                            <img src="/trading-ui/images/icons/trades.svg" alt="טריידים" class="filter-icon">
-                        </button>
-                        <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="window.filterLinkedItemsByType('${tableId}', 'trade_plan')" data-type="trade_plan" title="תוכניות">
-                            <img src="/trading-ui/images/icons/trade_plans.svg" alt="תוכניות" class="filter-icon">
-                        </button>
-                        <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="window.filterLinkedItemsByType('${tableId}', 'ticker')" data-type="ticker" title="טיקרים">
-                            <img src="/trading-ui/images/icons/tickers.svg" alt="טיקרים" class="filter-icon">
-                        </button>
+                        ${filterButtonsHtml}
                     </div>
                 </h6>
                 <div class="table-responsive">
@@ -1047,6 +1135,11 @@ class EntityDetailsRenderer {
                 </div>
             </div>
         `;
+        
+        // Initialize tooltips for filter buttons after table is added to DOM
+        // This will be done in updateLinkedItemsTableBody if called dynamically
+        // For initial render, tooltips will be initialized when modal is shown
+        
         return html;
     }
     
@@ -1505,16 +1598,14 @@ class EntityDetailsRenderer {
                 { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' }
             ],
             account: [
+                // עמודה ראשונה
                 { key: 'id', label: 'מזהה', type: 'number' },
-                { key: 'name', label: 'שם חשבון מסחר', type: 'text' },
-                { key: 'number', label: 'מספר חשבון', type: 'text' },
-                { key: 'type', label: 'סוג', type: 'text' },
-                { key: 'status', label: 'סטטוס', type: 'status' },
-                { key: 'currency', label: 'מטבע', type: 'text' },
-                { key: 'balance', label: 'יתרה', type: 'currency' },
-                { key: 'notes', label: 'הערות', type: 'text' },
+                { key: 'is_default', label: 'ברירת מחדל', type: 'boolean' },
                 { key: 'created_at', label: 'תאריך יצירה', type: 'datetime' },
-                { key: 'updated_at', label: 'תאריך עדכון', type: 'datetime' }
+                { key: 'last_transaction_date', label: 'תאריך תנועה אחרונה', type: 'datetime' },
+                // עמודה שנייה
+                { key: 'currency_name', label: 'מטבע ראשי', type: 'text' },
+                { key: 'balances', label: 'יתרה', type: 'balances' }
             ],
             execution: [
                 { key: 'id', label: 'מזהה', type: 'number' },
@@ -1707,6 +1798,105 @@ class EntityDetailsRenderer {
         return html;
     }
 
+    /**
+     * Get currency display symbol - קבלת סמל מטבע לתצוגה
+     * המרת קוד מטבע (USD, EUR, ILS) לסמל מטבע ($, €, ₪)
+     * 
+     * @param {string} currencyCode - קוד מטבע (USD, EUR, ILS, etc.)
+     * @returns {string} - סמל מטבע ($, €, ₪, etc.)
+     * @private
+     */
+    getCurrencyDisplaySymbol(currencyCode) {
+        if (!currencyCode) {
+            return '';
+        }
+        
+        const code = currencyCode.toUpperCase().trim();
+        
+        // מיפוי קודי מטבעות לסמלים
+        const currencySymbols = {
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'ILS': '₪',
+            'NIS': '₪',
+            'JPY': '¥',
+            'CHF': 'Fr',
+            'CAD': 'C$',
+            'AUD': 'A$',
+            'CNY': '¥',
+            'INR': '₹',
+            'RUB': '₽',
+            'KRW': '₩',
+            'BTC': '₿',
+            'ETH': 'Ξ'
+        };
+        
+        return currencySymbols[code] || code;
+    }
+
+    formatBalances(balancesData, entityData) {
+        if (!balancesData || typeof balancesData !== 'object') {
+            return '<span class="text-muted">טוען יתרות...</span>';
+        }
+
+        // מבנה balancesData מצפוי: { balances_by_currency: [...], base_currency_total: ..., base_currency: ... }
+        const balances = balancesData.balances_by_currency || [];
+        const baseTotal = balancesData.base_currency_total;
+        const baseCurrency = balancesData.base_currency || 'USD';
+
+        if (balances.length === 0 && baseTotal === undefined) {
+            return '<span class="text-muted">אין יתרות</span>';
+        }
+
+        let html = '<div class="account-balances">';
+
+        // יתרות לפי מטבע - ראשונות
+        if (balances.length > 0) {
+            const exchangeRates = balancesData.exchange_rates_used || {};
+            const baseCurrencyCode = (balancesData.base_currency_symbol || baseCurrency).toUpperCase();
+            
+            html += '<div class="balances-by-currency">';
+            balances.forEach(balance => {
+                const currencyCode = balance.currency_symbol || '';
+                const currencyCodeUpper = currencyCode.toUpperCase();
+                
+                // קבלת סמל מטבע מהקוד (USD -> $, EUR -> €, etc.)
+                const currencyDisplaySymbol = this.getCurrencyDisplaySymbol(currencyCode);
+                
+                const formattedBalance = window.FieldRendererService && window.FieldRendererService.renderAmount
+                    ? window.FieldRendererService.renderAmount(parseFloat(balance.balance), currencyDisplaySymbol, 0)
+                    : `${Math.round(balance.balance).toLocaleString('he-IL')} ${currencyDisplaySymbol}`;
+                
+                // אם המטבע אינו המטבע הבסיס, נציג גם את שער החליפין
+                let exchangeRateDisplay = '';
+                if (currencyCodeUpper !== baseCurrencyCode && exchangeRates[currencyCode]) {
+                    const exchangeRate = parseFloat(exchangeRates[currencyCode]);
+                    exchangeRateDisplay = ` <span class="text-muted" style="font-size: 0.9em;">(שער: ${exchangeRate.toFixed(4)})</span>`;
+                }
+                
+                html += `<div class="mb-1"><strong>${currencyDisplaySymbol}:</strong> ${formattedBalance}${exchangeRateDisplay}</div>`;
+            });
+            html += '</div>';
+        }
+        
+        // יתרה כללית במטבע הבסיס - אחרונה
+        if (baseTotal !== undefined && baseTotal !== null) {
+            // קבלת סמל מטבע מהקוד (USD -> $, EUR -> €, etc.)
+            const baseCurrencyCode = balancesData.base_currency_symbol || baseCurrency;
+            const baseCurrencyDisplaySymbol = this.getCurrencyDisplaySymbol(baseCurrencyCode);
+            
+            const formattedTotal = window.FieldRendererService && window.FieldRendererService.renderAmount
+                ? window.FieldRendererService.renderAmount(parseFloat(baseTotal), baseCurrencyDisplaySymbol, 0)
+                : `${Math.round(baseTotal).toLocaleString('he-IL')} ${baseCurrencyDisplaySymbol}`;
+            
+            html += `<div class="mt-2 mb-2"><strong>סה"כ (${baseCurrencyDisplaySymbol}):</strong> ${formattedTotal}</div>`;
+        }
+
+        html += '</div>';
+        return html;
+    }
+
     formatFieldValue(value, type, entityColor = '#019193', fieldKey = null, entityData = null, fieldConfig = null) {
         // טיפול מיוחד בשדות עם showEmpty (כמו הערות)
         if (fieldConfig && fieldConfig.showEmpty) {
@@ -1803,7 +1993,11 @@ class EntityDetailsRenderer {
             case 'datetime': return this.formatDateTime(value);
             case 'price': return this.formatPrice(value);
             case 'status': return this.formatStatus(value, entityColor);
-            case 'boolean': return value ? 'כן' : 'לא';
+            case 'boolean': 
+                if (value === null || value === undefined) {
+                    return 'לא זמין';
+                }
+                return value ? 'כן' : 'לא';
             case 'number': return typeof value === 'number' ? value.toLocaleString('he-IL') : String(value);
             case 'currency': 
                 // אם זה currency, נשתמש ב-renderAmount אם אפשר
@@ -1820,6 +2014,7 @@ class EntityDetailsRenderer {
                 return String(value) + '%';
             case 'trades_summary': return this.formatTradesSummary(value);
             case 'trade_plans_summary': return this.formatTradePlansSummary(value);
+            case 'balances': return this.formatBalances(value, entityData);
             default: return String(value);
         }
     }
@@ -1969,7 +2164,7 @@ class EntityDetailsRenderer {
                                     page: "entity-details-renderer"
                                 });
                             }
-                            return this.renderLinkedItems(tradePlanData.linked_items || [], planColor, 'trade_plan', tradePlanData.id, options?.sourceInfo || null);
+                            return this.renderLinkedItems(tradePlanData.linked_items || [], planColor, 'trade_plan', tradePlanData.id, options?.sourceInfo || null, options);
                         })()}
                     </div>
                 </div>
@@ -2017,14 +2212,153 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(executionData.linked_items || [], executionColor, 'execution', executionData.id, options?.sourceInfo || null)}
+                        ${this.renderLinkedItems(executionData.linked_items || [], executionColor, 'execution', executionData.id, options?.sourceInfo || null, options)}
                     </div>
                 </div>
             </div>
         `;
     }
     
-    renderAccount(accountData, options = {}) {
+    /**
+     * Get default account preference value and name - קבלת ערך העדפה ושם חשבון ברירת מחדל
+     * מחזיר אובייקט עם הערך והשם (אם קיים) - גם אם הערך הוא "all"
+     * @returns {Promise<{value: string, accountName: string|null, profileId: number|null, displayText: string}>}
+     * @private
+     */
+    async getDefaultAccountInfo() {
+        try {
+            window.Logger.info(`🔍 [getDefaultAccountInfo] Starting to get default account info...`, { page: "entity-details-renderer" });
+            
+            let preferenceValue = null;
+            let profileId = null;
+            
+            // נסה לקבל את הערך מהעדפות דרך API - שם ההעדפה: default_trading_account
+            try {
+                const response = await fetch('/api/preferences/user/preference?name=default_trading_account');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data && result.data.value !== null && result.data.value !== undefined) {
+                        preferenceValue = result.data.value;
+                        profileId = result.data.profile_id;
+                        window.Logger.info(`✅ [getDefaultAccountInfo] Got preference from API:`, {
+                            value: preferenceValue,
+                            profileId: profileId,
+                            fullData: result.data,
+                            page: "entity-details-renderer"
+                        });
+                    }
+                }
+            } catch (apiError) {
+                window.Logger.warn('Error getting preference from API, trying other methods', apiError, { page: "entity-details-renderer" });
+            }
+            
+            // Fallback - נסה דרך הפונקציות הגלובליות
+            if (preferenceValue === null) {
+                if (typeof window.getPreference === 'function') {
+                    try {
+                        preferenceValue = await window.getPreference('default_trading_account');
+                        window.Logger.info(`✅ [getDefaultAccountInfo] Got preference from getPreference: ${preferenceValue}`, { page: "entity-details-renderer" });
+                    } catch (prefError) {
+                        window.Logger.debug('getPreference failed', prefError, { page: "entity-details-renderer" });
+                    }
+                }
+                
+                if (preferenceValue === null && typeof window.getCurrentPreference === 'function') {
+                    try {
+                        preferenceValue = await window.getCurrentPreference('default_trading_account');
+                        window.Logger.info(`✅ [getDefaultAccountInfo] Got preference from getCurrentPreference: ${preferenceValue}`, { page: "entity-details-renderer" });
+                    } catch (prefError) {
+                        window.Logger.debug('getCurrentPreference failed', prefError, { page: "entity-details-renderer" });
+                    }
+                }
+                
+                if (preferenceValue === null && window.currentPreferences) {
+                    if (window.currentPreferences.default_trading_account) {
+                        preferenceValue = window.currentPreferences.default_trading_account;
+                        window.Logger.info(`✅ [getDefaultAccountInfo] Got preference from currentPreferences.default_trading_account: ${preferenceValue}`, { page: "entity-details-renderer" });
+                    }
+                }
+            }
+            
+            // אם אין ערך בכלל, אין חשבון ברירת מחדל
+            if (preferenceValue === null || preferenceValue === undefined) {
+                window.Logger.info(`⚠️ [getDefaultAccountInfo] No preference found for default_trading_account`, { page: "entity-details-renderer" });
+                return {
+                    value: null,
+                    accountName: null,
+                    profileId: profileId,
+                    displayText: 'לא הוגדר חשבון ברירת מחדל'
+                };
+            }
+            
+            // אם הערך הוא "all" או לא תקין - אין חשבון ספציפי
+            if (preferenceValue === 'all' || preferenceValue === '' || preferenceValue === null || preferenceValue === undefined) {
+                window.Logger.info(`⚠️ [getDefaultAccountInfo] Preference value is 'all' or empty: ${preferenceValue}`, { page: "entity-details-renderer" });
+                return {
+                    value: preferenceValue || 'all',
+                    accountName: null,
+                    profileId: profileId,
+                    displayText: 'לא הוגדר חשבון ספציפי (all)'
+                };
+            }
+            
+            // אם הערך הוא מספר - נחפש את שם החשבון
+            const parsedId = parseInt(preferenceValue);
+            if (!isNaN(parsedId) && parsedId > 0) {
+                if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
+                    const account = window.trading_accountsData.find(acc => acc.id === parsedId);
+                    if (account && account.name) {
+                        window.Logger.info(`✅ [getDefaultAccountInfo] Found account name: "${account.name}" for ID ${parsedId}`, { page: "entity-details-renderer" });
+                        return {
+                            value: preferenceValue,
+                            accountId: parsedId,
+                            accountName: account.name,
+                            profileId: profileId,
+                            displayText: account.name
+                        };
+                    } else {
+                        window.Logger.warn(`⚠️ [getDefaultAccountInfo] Account ID ${parsedId} not found in trading_accountsData`, { page: "entity-details-renderer" });
+                        return {
+                            value: preferenceValue,
+                            accountId: parsedId,
+                            accountName: null,
+                            profileId: profileId,
+                            displayText: `חשבון #${parsedId} (לא נמצא)`
+                        };
+                    }
+                } else {
+                    window.Logger.warn(`⚠️ [getDefaultAccountInfo] trading_accountsData not available`, { page: "entity-details-renderer" });
+                    return {
+                        value: preferenceValue,
+                        accountId: parsedId,
+                        accountName: null,
+                        profileId: profileId,
+                        displayText: `חשבון #${parsedId} (נתונים לא זמינים)`
+                    };
+                }
+            }
+            
+            // אם הערך אינו מספר תקין - נציג אותו כפי שהוא
+            window.Logger.info(`⚠️ [getDefaultAccountInfo] Unknown preference value format: ${preferenceValue}`, { page: "entity-details-renderer" });
+            return {
+                value: preferenceValue,
+                accountName: null,
+                profileId: profileId,
+                displayText: `ערך לא תקין: ${preferenceValue}`
+            };
+            
+        } catch (error) {
+            window.Logger.error('Error getting default account info:', error, { page: "entity-details-renderer" });
+            return {
+                value: 'all',
+                accountName: null,
+                profileId: null,
+                displayText: 'שגיאה בטעינת העדפה'
+            };
+        }
+    }
+
+    async renderAccount(accountData, options = {}) {
         window.Logger.info(`🎨 Rendering account data:`, accountData, { page: "entity-details-renderer" });
         
         // קבלת צבע החשבון מסחר מההעדפות
@@ -2038,13 +2372,131 @@ class EntityDetailsRenderer {
         // שם חשבון - נחלץ מ-name
         const accountName = accountData.name || accountData.account_name || 'לא מוגדר';
         
-        // מספר חשבון - נחלץ מ-number
-        const accountNumber = accountData.number || accountData.account_number || 'לא מוגדר';
+        // קבלת מידע על חשבון ברירת מחדל מהעדפות
+        const defaultAccountInfo = await this.getDefaultAccountInfo();
+        window.Logger.info(`🔍 [renderAccount] Default account info from preferences:`, defaultAccountInfo, { page: "entity-details-renderer" });
+        
+        // יצירת קוביית בדיקה בולטת וברורה - מוצגת תמיד עם הערך בפועל
+        let defaultAccountLabel = '';
+        const displayValue = defaultAccountInfo.displayText || defaultAccountInfo.value || 'לא זמין';
+        const profileInfo = defaultAccountInfo.profileId ? ` (פרופיל: ${defaultAccountInfo.profileId})` : '';
+        
+        // אם יש שם חשבון ספציפי
+        if (defaultAccountInfo.accountName) {
+            defaultAccountLabel = `
+                <div class="mb-4 p-4 rounded" style="
+                    background: linear-gradient(135deg, ${accountColor}15 0%, ${accountColor}08 100%);
+                    border: 3px solid ${accountColor};
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    position: relative;
+                    overflow: hidden;
+                ">
+                    <!-- Background decoration -->
+                    <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: ${accountColor}20; border-radius: 50%;"></div>
+                    <div style="position: absolute; bottom: -30px; left: -30px; width: 80px; height: 80px; background: ${accountColor}15; border-radius: 50%;"></div>
+                    
+                    <!-- Content -->
+                    <div class="d-flex align-items-center gap-4" style="position: relative; z-index: 1;">
+                        <!-- Icon -->
+                        <div style="
+                            width: 60px; 
+                            height: 60px; 
+                            background: linear-gradient(135deg, ${accountColor} 0%, ${accountColor}dd 100%);
+                            border-radius: 50%; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            flex-shrink: 0;
+                            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                        ">
+                            <span style="color: white; font-size: 28px; font-weight: bold;">✓</span>
+                        </div>
+                        
+                        <!-- Text -->
+                        <div style="flex: 1;">
+                            <div style="font-size: 0.9em; color: #666; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                🧪 קוביית בדיקה - חשבון ברירת מחדל מהעדפות:
+                            </div>
+                            <div style="font-size: 1.5em; font-weight: bold; color: ${accountColor}; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                                ${displayValue}
+                            </div>
+                            ${profileInfo ? `<div style="font-size: 0.85em; color: #999; margin-top: 4px;">${profileInfo}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            // הערך הוא "all" או null - הצג את הערך בפועל מהבסיס נתונים
+            const hasValue = defaultAccountInfo.value !== null && defaultAccountInfo.value !== undefined;
+            const isAll = defaultAccountInfo.value === 'all';
+            const bgColor = isAll ? '#e7f3ff' : (hasValue ? '#fff3cd' : '#f8f9fa');
+            const borderColor = isAll ? '#2196F3' : (hasValue ? '#ffc107' : '#dee2e6');
+            const iconBg = isAll ? '#2196F3' : (hasValue ? '#ffc107' : '#6c757d');
+            const iconText = isAll ? 'ℹ' : (hasValue ? '⚠' : '?');
+            
+            defaultAccountLabel = `
+                <div class="mb-4 p-4 rounded" style="
+                    background: linear-gradient(135deg, ${bgColor} 0%, ${bgColor}dd 100%);
+                    border: 3px solid ${borderColor};
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    position: relative;
+                    overflow: hidden;
+                ">
+                    <!-- Background decoration -->
+                    <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: ${borderColor}30; border-radius: 50%;"></div>
+                    <div style="position: absolute; bottom: -30px; left: -30px; width: 80px; height: 80px; background: ${borderColor}20; border-radius: 50%;"></div>
+                    
+                    <!-- Content -->
+                    <div class="d-flex align-items-center gap-4" style="position: relative; z-index: 1;">
+                        <!-- Icon -->
+                        <div style="
+                            width: 60px; 
+                            height: 60px; 
+                            background: linear-gradient(135deg, ${iconBg} 0%, ${iconBg}dd 100%);
+                            border-radius: 50%; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            flex-shrink: 0;
+                            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                        ">
+                            <span style="color: white; font-size: 28px; font-weight: bold;">${iconText}</span>
+                        </div>
+                        
+                        <!-- Text -->
+                        <div style="flex: 1;">
+                            <div style="font-size: 0.9em; color: #666; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                🧪 קוביית בדיקה - חשבון מסחר ברירת מחדל מהעדפות:
+                            </div>
+                            <div style="font-size: 1.4em; font-weight: bold; color: ${borderColor}; margin-bottom: 4px;">
+                                ${displayValue}
+                            </div>
+                            ${profileInfo ? `<div style="font-size: 0.85em; color: #999; margin-bottom: 4px;">${profileInfo}</div>` : ''}
+                            <div style="font-size: 0.9em; color: #666; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.1);">
+                                <strong>ערך בפועל מהבסיס נתונים:</strong> <code style="background: rgba(0,0,0,0.08); padding: 3px 8px; border-radius: 4px; font-size: 1.1em; color: ${borderColor}; font-weight: bold;">${defaultAccountInfo.value || 'null'}</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        window.Logger.info(`🔍 [renderAccount] Default account label HTML: ${defaultAccountLabel ? 'Created' : 'Empty'}`, { page: "entity-details-renderer" });
+        
+        // הערות - להציג במרכז השורה הראשונה, ללא כותרת
+        const notesDisplay = accountData.notes && accountData.notes.trim() 
+            ? `<div class="text-center" style="flex: 1;">${this.formatFieldValue(accountData.notes, 'text', accountColor, 'notes', accountData)}</div>`
+            : '<div class="text-center" style="flex: 1;"></div>';
         
         return `
             <div class="entity-details-container account-details">
                 
-                <!-- שורה ראשונה: שם חשבון | מספר חשבון | סטטוס (משמאל) -->
+                <!-- חשבון ברירת מחדל -->
+                ${defaultAccountLabel}
+                
+                <!-- שורה ראשונה: שם חשבון | הערות (מרכז) | סטטוס (משמאל) -->
                 <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom: 1px solid #e0e0e0; padding-bottom: 0.75rem;">
                     <!-- שם חשבון -->
                     <div class="d-flex align-items-center gap-2" style="min-width: 150px;">
@@ -2052,11 +2504,8 @@ class EntityDetailsRenderer {
                         <span class="fw-bold">${accountName}</span>
                     </div>
                     
-                    <!-- מספר חשבון - במרכז -->
-                    <div class="flex-grow-1" style="text-align: center;">
-                        <strong>מספר חשבון:</strong>
-                        <span class="fw-bold">${accountNumber}</span>
-                    </div>
+                    <!-- הערות במרכז -->
+                    ${notesDisplay}
                     
                     <!-- סטטוס משמאל -->
                     <div class="d-flex align-items-center gap-2" style="min-width: 150px; justify-content: flex-end;">
@@ -2076,7 +2525,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(accountData.linked_items || [], accountColor, 'account', accountData.id, options?.sourceInfo || null)}
+                        ${this.renderLinkedItems(accountData.linked_items || [], accountColor, 'account', accountData.id, options?.sourceInfo || null, options)}
                     </div>
                 </div>
             </div>
@@ -2103,7 +2552,7 @@ class EntityDetailsRenderer {
             const alertCondition = this.renderAlertCondition(alertData);
             
             // יצירת פריטים מקושרים
-            const linkedItems = this.renderLinkedItems(alertData.linked_items || [], this.entityColors.alert || '#ffc107', 'alert', alertData.id, options?.sourceInfo || null);
+            const linkedItems = this.renderLinkedItems(alertData.linked_items || [], this.entityColors.alert || '#ffc107', 'alert', alertData.id, options?.sourceInfo || null, options);
             
             // יצירת כפתורי פעולה
             const actionButtons = this.renderActionButtons('alert', alertData.id);
@@ -2467,6 +2916,64 @@ class EntityDetailsRenderer {
     /**
      * Get entity label - קבלת תווית ישות
      */
+    /**
+     * Generate filter buttons HTML based on configuration
+     * @private
+     * @param {string} tableId - Table ID
+     * @param {Array<string>} entityTypes - Array of entity types to show as filter buttons
+     * @returns {string} HTML for all filter buttons
+     */
+    _generateFilterButtons(tableId, entityTypes) {
+        if (!Array.isArray(entityTypes) || entityTypes.length === 0) {
+            return '';
+        }
+        
+        return entityTypes.map(entityType => this._generateFilterButton(entityType, tableId)).join('');
+    }
+    
+    /**
+     * Generate filter button HTML with icon only using central button system
+     * Uses data-tooltip for tooltip support through button system
+     * @private
+     * @param {string} entityType - Entity type
+     * @param {string} tableId - Table ID
+     * @returns {string} HTML for filter button
+     */
+    _generateFilterButton(entityType, tableId) {
+        const iconPath = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemIcon)
+            ? window.LinkedItemsService.getLinkedItemIcon(entityType)
+            : '/trading-ui/images/icons/home.svg';
+        
+        const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
+            ? window.LinkedItemsService.getEntityLabel(entityType)
+            : ((window.getEntityLabel && typeof window.getEntityLabel === 'function')
+                ? window.getEntityLabel(entityType)
+                : entityType);
+        
+        // Create clear and descriptive tooltip text
+        const tooltipText = `סינון לפי ${entityLabel}`;
+        
+        // Generate unique ID for the button
+        const buttonId = `filterBtn_${tableId}_${entityType}`;
+        
+        // Create button with icon as img tag
+        // Use data-tooltip for tooltip support through button system
+        // Button system will process and initialize tooltip automatically
+        return `
+            <button 
+                class="btn btn-sm btn-outline-primary filter-icon-btn" 
+                id="${buttonId}"
+                data-type="${entityType}"
+                data-onclick="window.filterLinkedItemsByType('${tableId}', '${entityType}')"
+                data-tooltip="${tooltipText}"
+                data-tooltip-placement="top"
+                data-tooltip-trigger="hover"
+                style="padding: 4px 8px; display: inline-flex; align-items: center; justify-content: center; min-width: 32px;">
+                <img src="${iconPath}" alt="${entityLabel}" class="filter-icon" style="width: 20px; height: 20px; display: block;">
+            </button>
+        `;
+    }
+    
     getEntityLabel(entityType) {
         const labels = {
             'ticker': 'טיקר',
@@ -2520,7 +3027,7 @@ class EntityDetailsRenderer {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(noteData.linked_items || [], noteColor, 'note', noteData.id, options?.sourceInfo || null)}
+                        ${this.renderLinkedItems(noteData.linked_items || [], noteColor, 'note', noteData.id, options?.sourceInfo || null, options)}
                     </div>
                 </div>
             </div>
@@ -2614,6 +3121,49 @@ class EntityDetailsRenderer {
         if (window.updateSortIcons) {
             window.updateSortIcons('linked_items', null, null, table);
         }
+        
+        // Initialize tooltips for filter buttons
+        this._initializeFilterTooltips(tableId);
+    }
+    
+    /**
+     * Initialize tooltips for filter buttons using central button system
+     * @private
+     * @param {string} tableId - Table ID
+     */
+    _initializeFilterTooltips(tableId) {
+        const filterContainer = document.getElementById(`linkedItemsFilter_${tableId}`);
+        if (!filterContainer) {
+            if (window.Logger) {
+                window.Logger.debug('Filter container not found for tooltip initialization', { tableId, page: 'entity-details-renderer' });
+            }
+            return;
+        }
+        
+        // Wait for DOM to be ready, then use button system to process buttons and initialize tooltips
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                // Use button system to process buttons and initialize tooltips
+                if (window.advancedButtonSystem) {
+                    // Process any unprocessed buttons first
+                    const unprocessedButtons = filterContainer.querySelectorAll('[data-tooltip]:not([data-button-processed])');
+                    if (unprocessedButtons.length > 0) {
+                        // Process buttons through button system
+                        unprocessedButtons.forEach(button => {
+                            // Button system will process and initialize tooltips automatically
+                            if (window.advancedButtonSystem.processButtonElement) {
+                                window.advancedButtonSystem.processButtonElement(button, 0);
+                            }
+                        });
+                    }
+                    
+                    // Initialize tooltips for all buttons with data-tooltip
+                    if (window.advancedButtonSystem.initializeTooltips) {
+                        window.advancedButtonSystem.initializeTooltips(filterContainer);
+                    }
+                }
+            }, 100);
+        });
     }
 }
 
@@ -2624,7 +3174,7 @@ class EntityDetailsRenderer {
  * Filter linked items by entity type
  * 
  * @param {string} tableId - ID של הטבלה
- * @param {string} type - סוג הישות ('all', 'account', 'trade', 'trade_plan', 'ticker')
+ * @param {string} type - סוג הישות ('all', 'account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note')
  */
 window.filterLinkedItemsByType = function(tableId, type) {
     // עדכון מצב הכפתורים
@@ -2665,7 +3215,11 @@ window.filterLinkedItemsByType = function(tableId, type) {
             'account': ['account', 'trading_account'],
             'trade': ['trade'],
             'trade_plan': ['trade_plan'],
-            'ticker': ['ticker']
+            'ticker': ['ticker'],
+            'alert': ['alert'],
+            'execution': ['execution'],
+            'cash_flow': ['cash_flow'],
+            'note': ['note']
         };
         
         const allowedTypes = typeMapping[type] || [];
@@ -2702,6 +3256,12 @@ window.filterLinkedItemsByType = function(tableId, type) {
     // עדכון הטבלה עם הנתונים המסוננים
     if (window.entityDetailsRenderer && window.entityDetailsRenderer.updateLinkedItemsTableBody) {
         window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, filteredItems);
+        // Initialize tooltips after table update
+        if (window.entityDetailsRenderer._initializeFilterTooltips) {
+            setTimeout(() => {
+                window.entityDetailsRenderer._initializeFilterTooltips(tableId);
+            }, 100);
+        }
     } else {
         console.warn(`[filterLinkedItemsByType] EntityDetailsRenderer not available`);
     }

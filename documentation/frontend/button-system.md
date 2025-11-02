@@ -631,9 +631,109 @@ ${createNewButton(`newFunction(${item.id})`)}
 2. בדוק את המחלקות CSS
 3. בדוק את הפרמטר `additionalClasses`
 
+## תמיכה בטולטיפים
+
+מערכת הכפתורים תומכת מלאה בטולטיפים Bootstrap עם אפשרויות עיצוב מלאות. כל ההגדרות מתבצעות דרך data attributes ללא צורך בקוד JavaScript נוסף.
+
+### Data Attributes נתמכים
+
+- `data-tooltip` - טקסט הטולטיפ (חובה)
+- `data-tooltip-placement` - מיקום הטולטיפ (`top`, `bottom`, `left`, `right`) - ברירת מחדל: `top`
+- `data-tooltip-trigger` - אירוע להצגה (`hover`, `click`, `focus`) - ברירת מחדל: `hover`
+- `data-tooltip-delay` - עיכוב לפני הצגה (מילישניות) - ברירת מחדל: `0`
+- `data-tooltip-html` - האם לאפשר HTML בטולטיפ (`true`/`false`) - ברירת מחדל: `false`
+- `data-tooltip-class` - מחלקה מותאמת אישית לטולטיפ
+- `data-tooltip-offset` - offset במילימטרים (`X,Y`) - ברירת מחדל: `0,0`
+
+### דוגמאות שימוש
+
+#### טולטיפ בסיסי
+```html
+<button data-button-type="EDIT" data-tooltip="ערוך רשומה"></button>
+```
+
+#### טולטיפ עם אפשרויות עיצוב
+```html
+<button 
+    data-button-type="DELETE" 
+    data-tooltip="מחק רשומה זו"
+    data-tooltip-placement="bottom"
+    data-tooltip-trigger="hover"
+    data-tooltip-delay="500">
+</button>
+```
+
+#### טולטיפ עם HTML
+```html
+<button 
+    data-button-type="VIEW" 
+    data-tooltip="<strong>צפה</strong> בפרטים"
+    data-tooltip-html="true"
+    data-tooltip-placement="right">
+</button>
+```
+
+#### טולטיפ עם מחלקה מותאמת אישית
+```html
+<button 
+    data-button-type="ADD" 
+    data-tooltip="הוסף רשומה חדשה"
+    data-tooltip-class="custom-tooltip-style"
+    data-tooltip-offset="10,5">
+</button>
+```
+
+### כפתורים ללא data-button-type
+
+המערכת תומכת גם בכפתורים מותאמים אישית ללא `data-button-type`. פשוט הוסף `data-tooltip` וזמן את `window.advancedButtonSystem.initializeTooltips(container)`:
+
+```html
+<button 
+    class="btn btn-primary"
+    data-tooltip="כפתור מותאם אישית"
+    data-tooltip-placement="top">
+    לחץ כאן
+</button>
+```
+
+```javascript
+// אתחל טולטיפים במיכל ספציפי
+window.advancedButtonSystem.initializeTooltips(document.getElementById('myContainer'));
+```
+
+### אתחול אוטומטי
+
+הטולטיפים מאותחלים אוטומטית כאשר:
+- כפתורים נוצרים דרך מערכת הכפתורים (`data-button-type`)
+- כפתורים מעובדים דרך `processButtons()`
+- כפתורים נוצרים דינמית דרך `addButton()` או `updateButton()`
+
+### תאימות לאחור
+
+- כפתורים ללא `data-tooltip` ימשיכו לעבוד כרגיל
+- `title` attribute ימשיך לעבוד כגיבוי אם Bootstrap לא זמין
+- אין שינוי בהתנהגות של כפתורים קיימים
+
+### דוגמה: פילטר ישויות
+
+במערכת פילטר הישויות, הכפתורים משתמשים בטולטיפים כך:
+
+```javascript
+// הכפתור נוצר עם data-tooltip
+<button 
+    data-tooltip="סינון לפי טיקר"
+    data-tooltip-placement="top"
+    data-tooltip-trigger="hover">
+    <img src="icon.svg" alt="טיקר">
+</button>
+
+// הטולטיפ מאותחל אוטומטית דרך:
+window.advancedButtonSystem.initializeTooltips(filterContainer);
+```
+
 ## סיכום
 
-מערכת הכפתורים המרוכזת של TikTrack מספקת פתרון יעיל, עקבי וקל לתחזוקה לניהול כל כפתורי הפעולה במערכת. המערכת מבטיחה עקביות, ביצועים טובים ותחזוקה קלה.
+מערכת הכפתורים המרוכזת של TikTrack מספקת פתרון יעיל, עקבי וקל לתחזוקה לניהול כל כפתורי הפעולה במערכת. המערכת מבטיחה עקביות, ביצועים טובים ותחזוקה קלה, כולל תמיכה מלאה בטולטיפים Bootstrap.
 
 ## 🔄 היסטוריית עדכונים
 

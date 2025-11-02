@@ -384,11 +384,61 @@ const buttons = buttonSystem.generateActionButtons(actions, rowData);
 - `trading-ui/scripts/button-system-init.js` - Advanced button system
 - `trading-ui/scripts/actions-menu-system.js` - Actions menu system
 
+## Tooltip Support API
+
+### `initializeTooltips(container)`
+Initialize Bootstrap tooltips for buttons in a container.
+
+**Parameters:**
+- `container` (HTMLElement) - Container element to search for buttons with tooltips
+
+**Example:**
+```javascript
+// Initialize tooltips for all buttons with data-tooltip in a container
+window.advancedButtonSystem.initializeTooltips(document.getElementById('myContainer'));
+```
+
+### `_getTooltipConfig(element)` (Private)
+Extract tooltip configuration from element data attributes.
+
+**Parameters:**
+- `element` (HTMLElement) - Button element
+
+**Returns:**
+- `Object|null` - Tooltip configuration object or null
+
+**Configuration Object:**
+```javascript
+{
+    title: string,          // Tooltip text
+    placement: string,      // 'top' | 'bottom' | 'left' | 'right'
+    trigger: string,       // 'hover' | 'click' | 'focus'
+    delay: number,         // Delay in milliseconds
+    html: boolean,         // Allow HTML in tooltip
+    customClass: string,   // Custom CSS class
+    offset: string         // Offset as 'X,Y'
+}
+```
+
+### `_initializeTooltip(button, config)` (Private)
+Initialize Bootstrap tooltip for a button.
+
+**Parameters:**
+- `button` (HTMLElement) - Button element
+- `config` (Object) - Tooltip configuration object
+
+**Example:**
+```javascript
+// Tooltip is initialized automatically when button is created with data-tooltip
+<button data-button-type="EDIT" data-tooltip="ערוך"></button>
+```
+
 ## Version
-2.0 (Last updated: January 2025)
+2.1 (Last updated: January 2025)
 
 ## Usage Statistics
 - 30+ button types supported
 - Used across all 29 pages
 - 138+ locations with button code
 - 3 color variants per button type
+- Full Bootstrap tooltip support with customization options

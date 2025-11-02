@@ -1419,11 +1419,19 @@ async function saveAlert() {
  */
 /**
  * עריכת התראה
- * @param {number} alertId - מזהה ההתראה לעריכה
- * @deprecated Use showAlertModal('edit', alertId) instead
+ * @param {number|string} alertId - מזהה ההתראה לעריכה
+ * @returns {void}
  */
 function editAlert(alertId) {
-  showAlertModal('edit', alertId);
+  // Use ModalManagerV2 directly
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+    window.ModalManagerV2.showEditModal('alertsModal', 'alert', alertId);
+  } else {
+    window.Logger?.error('ModalManagerV2 לא זמין', { page: "alerts" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+    }
+  }
 }
 
 /**

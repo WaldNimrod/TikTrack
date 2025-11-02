@@ -65,6 +65,7 @@ class EntityDetailsService:
         'trade_plan': TradePlan,
         'execution': Execution,
         'account': TradingAccount,
+        'trading_account': TradingAccount,  # Alias for trading_account
         'alert': Alert,
         'cash_flow': CashFlow,
         'note': Note
@@ -85,6 +86,8 @@ class EntityDetailsService:
                      'commission', 'execution_date', 'status', 'created_at'],
         'account': ['id', 'name', 'account_number', 'account_type', 'bank_name', 'balance',
                    'currency_id', 'status', 'remarks', 'created_at', 'updated_at'],
+        'trading_account': ['id', 'name', 'account_number', 'account_type', 'bank_name', 'balance',
+                           'currency_id', 'status', 'remarks', 'created_at', 'updated_at'],  # Same as account
         'alert': ['id', 'title', 'ticker_id', 'alert_type', 'condition', 'target_value',
                  'is_active', 'status', 'triggered_at', 'created_at', 'updated_at'],
         'cash_flow': ['id', 'trading_account_id', 'flow_type', 'amount', 'flow_date', 'category',
@@ -295,6 +298,8 @@ class EntityDetailsService:
                 linked_items.extend(EntityDetailsService._get_trade_plan_linked_items(db, entity_id))
             elif entity_type == 'account':
                 linked_items.extend(EntityDetailsService._get_account_linked_items(db, entity_id))
+            elif entity_type == 'trading_account':
+                linked_items.extend(EntityDetailsService._get_account_linked_items(db, entity_id))  # Same as account
             elif entity_type == 'alert':
                 linked_items.extend(EntityDetailsService._get_alert_linked_items(db, entity_id))
             # Add other entity types as needed...

@@ -373,6 +373,7 @@ class EntityDetailsAPI {
             trade_plan: `/api/trade_plans/${entityId}`,
             execution: `/api/executions/${entityId}`,
             account: `/api/trading-accounts/${entityId}`,
+            trading_account: `/api/trading-accounts/${entityId}`, // Alias for trading_account
             alert: `/api/alerts/${entityId}`,
             cash_flow: `/api/cash_flows/${entityId}`,
             note: `/api/notes/${entityId}`

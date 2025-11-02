@@ -140,32 +140,47 @@ function initializeTradingAccountsModal() {
     return false;
 }
 
+// Attempt to initialize immediately if ModalManagerV2 is available
 if (window.ModalManagerV2) {
-    initializeTradingAccountsModal();
+    console.log('✅ ModalManagerV2 available, initializing Trading Accounts modal...');
+    if (initializeTradingAccountsModal()) {
+        console.log('✅ Trading Accounts modal initialized successfully');
+    } else {
+        console.warn('⚠️ Failed to initialize Trading Accounts modal');
+    }
 } else {
+    console.log('⚠️ ModalManagerV2 not yet available, waiting...');
+    // Wait for ModalManagerV2 to be available
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                if (!initializeTradingAccountsModal()) {
-                    setTimeout(() => {
-                        if (!initializeTradingAccountsModal()) {
-                            console.warn('⚠️ ModalManagerV2 not available for Trading Accounts modal after retries');
-                        }
-                    }, 500);
-                }
-            }, 100);
+            waitForModalManager();
         });
     } else {
-        setTimeout(() => {
-            if (!initializeTradingAccountsModal()) {
-                setTimeout(() => {
-                    if (!initializeTradingAccountsModal()) {
-                        console.warn('⚠️ ModalManagerV2 not available for Trading Accounts modal after retries');
-                    }
-                }, 500);
-            }
-        }, 100);
+        waitForModalManager();
     }
+}
+
+// Helper function to wait for ModalManagerV2
+function waitForModalManager() {
+    let attempts = 0;
+    const maxAttempts = 10;
+    const interval = 200; // 200ms between attempts
+    
+    const checkInterval = setInterval(() => {
+        attempts++;
+        if (window.ModalManagerV2) {
+            console.log(`✅ ModalManagerV2 available after ${attempts} attempts, initializing modal...`);
+            clearInterval(checkInterval);
+            if (initializeTradingAccountsModal()) {
+                console.log('✅ Trading Accounts modal initialized successfully');
+            } else {
+                console.warn('⚠️ Failed to initialize Trading Accounts modal');
+            }
+        } else if (attempts >= maxAttempts) {
+            console.warn(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts`);
+            clearInterval(checkInterval);
+        }
+    }, interval);
 }
 
 // ייצוא לקונסול (לצורך debug)

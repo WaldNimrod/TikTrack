@@ -97,6 +97,13 @@ const TABLE_COLUMN_MAPPINGS = {
     'currency_id',           // 10 - מזהה מטבע
   ],
 
+  // טבלת פריטים מקושרים (Linked Items) - Entity Details Modal
+  'linked_items': [
+    'linked_to',     // 0 - מקושר ל (משולב: type + name)
+    'status',         // 1 - סטטוס (Status)
+    'created_at',     // 2 - תאריך (Date)
+  ],
+
   // טבלת טיקרים חלקית (Tickers Summary) - Executions Page Structure
   'tickers_summary': [
     'symbol',                // 0 - סימבול

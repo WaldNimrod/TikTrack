@@ -157,24 +157,69 @@ const tickersModalConfig = {
 
 // יצירת המודל אם ModalManagerV2 זמין
 // יצירת המודל - מחכה ל-DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.ModalManagerV2) {
+// יצירת המודל אם ModalManagerV2 זמין - Deferred initialization
+function initializeTickersModal() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
         try {
             window.ModalManagerV2.createCRUDModal(tickersModalConfig);
+            console.log('✅ Tickers modal created successfully');
             if (window.Logger) {
                 window.Logger.debug('Tickers modal created successfully', { page: 'tickers' });
             }
+            return true;
         } catch (error) {
+            console.error('❌ Error creating Tickers modal:', error);
             if (window.Logger) {
                 window.Logger.error('Error creating Tickers modal', { error: error.message, page: 'tickers' });
             }
-        }
-    } else {
-        if (window.Logger) {
-            window.Logger.warn('ModalManagerV2 not available for Tickers modal', { page: 'tickers' });
+            return false;
         }
     }
-});
+    return false;
+}
+
+// Attempt to initialize immediately if ModalManagerV2 is available
+if (window.ModalManagerV2) {
+    console.log('✅ ModalManagerV2 available, initializing Tickers modal...');
+    if (initializeTickersModal()) {
+        console.log('✅ Tickers modal initialized successfully');
+    } else {
+        console.warn('⚠️ Failed to initialize Tickers modal');
+    }
+} else {
+    console.log('⚠️ ModalManagerV2 not yet available, waiting...');
+    // Wait for ModalManagerV2 to be available
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            waitForModalManager();
+        });
+    } else {
+        waitForModalManager();
+    }
+}
+
+// Helper function to wait for ModalManagerV2
+function waitForModalManager() {
+    let attempts = 0;
+    const maxAttempts = 10;
+    const interval = 200; // 200ms between attempts
+    
+    const checkInterval = setInterval(() => {
+        attempts++;
+        if (window.ModalManagerV2) {
+            console.log(`✅ ModalManagerV2 available after ${attempts} attempts, initializing Tickers modal...`);
+            clearInterval(checkInterval);
+            if (initializeTickersModal()) {
+                console.log('✅ Tickers modal initialized successfully');
+            } else {
+                console.warn('⚠️ Failed to initialize Tickers modal');
+            }
+        } else if (attempts >= maxAttempts) {
+            console.warn(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts`);
+            clearInterval(checkInterval);
+        }
+    }, interval);
+}
 
 // ייצוא לקונסול (לצורך debug)
 window.tickersModalConfig = tickersModalConfig;

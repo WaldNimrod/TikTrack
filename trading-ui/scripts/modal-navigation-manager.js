@@ -238,6 +238,23 @@ class ModalNavigationManager {
                 modalInfo = this.detectModalInfo(modalElement);
             }
             
+            // אם זה מודול CRUD רגיל (הוספה/עריכה) ללא sourceInfo - זה מודול ראשון, ניקוי היסטוריה
+            // מודולים מקוננים (עם sourceInfo) נשארים בהיסטוריה
+            const isNestedModal = modalInfo.sourceInfo && Object.keys(modalInfo.sourceInfo).length > 0;
+            const isAddOrEditModal = modalInfo.type === 'crud-modal' && !isNestedModal;
+            
+            if (isAddOrEditModal && this.modalHistory.length > 0) {
+                // זה מודול הוספה/עריכה חדש - ניקוי היסטוריה קודמת
+                if (window.Logger) {
+                    window.Logger.info('🧹 [pushModal] Clearing history for new add/edit modal', {
+                        modalId: this.generateModalId(modalInfo),
+                        previousHistoryLength: this.modalHistory.length,
+                        page: "modal-navigation-manager"
+                    });
+                }
+                this.modalHistory = [];
+            }
+            
             // יצירת מזהה ייחודי למודול
             const modalId = this.generateModalId(modalInfo);
             
@@ -655,10 +672,24 @@ class ModalNavigationManager {
                     breadcrumbContainer = document.createElement('div');
                     breadcrumbContainer.id = 'entityDetailsBreadcrumb';
                     breadcrumbContainer.className = 'modal-navigation-breadcrumb';
-                    headerElement.insertBefore(breadcrumbContainer, headerElement.firstChild);
+                    // הוספת breadcrumb אחרי הכותרת (לא לפני)
+                    const titleElement = headerElement.querySelector('.modal-title');
+                    if (titleElement && titleElement.nextSibling) {
+                        headerElement.insertBefore(breadcrumbContainer, titleElement.nextSibling);
+                    } else {
+                        // אם אין nextSibling, הוסף אחרי הכותרת
+                        headerElement.insertBefore(breadcrumbContainer, headerElement.querySelector('[data-button-type="CLOSE"]') || headerElement.lastChild);
+                    }
                 } else {
                     return;
                 }
+            }
+            
+            // הסתרת breadcrumb כאשר יש רק אובייקט אחד בהיסטוריה (מודול ראשון)
+            if (this.modalHistory.length <= 1) {
+                breadcrumbContainer.style.display = 'none';
+                breadcrumbContainer.style.visibility = 'hidden';
+                return;
             }
             
             // יצירת breadcrumb HTML
@@ -958,6 +989,13 @@ class ModalNavigationManager {
                 if (window.ButtonSystem && typeof window.ButtonSystem.processButton === 'function') {
                     window.ButtonSystem.processButton(backButton);
                 }
+            }
+            
+            // הסתרת כפתור חזרה כאשר יש רק אובייקט אחד בהיסטוריה (מודול ראשון)
+            if (this.modalHistory.length <= 1) {
+                backButton.style.display = 'none';
+                backButton.style.visibility = 'hidden';
+                return;
             }
             
             // עדכון מצב הכפתור

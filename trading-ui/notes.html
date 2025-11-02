@@ -28,6 +28,47 @@
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    
+    <!-- ===== CRITICAL: showModalSafe Helper - Must be loaded before any data-onclick attributes ===== -->
+    <script>
+        // Define showModalSafe immediately in head to ensure it's available before HTML is parsed
+        // This prevents "showModalSafe is not a function" errors when data-onclick attributes are processed
+        window.showModalSafe = async function(modalId, mode = 'add') {
+            try {
+                console.log(`🔍 [showModalSafe] Called with:`, { modalId, mode, ModalManagerV2Available: !!window.ModalManagerV2 });
+                
+                // If ModalManagerV2 is not available, wait for it (up to 2 seconds)
+                if (!window.ModalManagerV2) {
+                    console.warn('⚠️ [showModalSafe] ModalManagerV2 not available, waiting...');
+                    for (let i = 0; i < 20; i++) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        if (window.ModalManagerV2) {
+                            console.log(`✅ [showModalSafe] ModalManagerV2 became available after ${(i + 1) * 100}ms`);
+                            break;
+                        }
+                    }
+                }
+                
+                if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
+                    console.log(`✅ [showModalSafe] Calling ModalManagerV2.showModal`);
+                    await window.ModalManagerV2.showModal(modalId, mode);
+                    console.log(`✅ [showModalSafe] Modal shown successfully`);
+                } else {
+                    console.error('❌ [showModalSafe] ModalManagerV2 not available after wait');
+                    if (window.showErrorNotification) {
+                        window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+                    }
+                }
+            } catch (error) {
+                console.error('❌ [showModalSafe] Error showing modal:', error);
+                console.error('   Error stack:', error.stack);
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל: ${error.message}`);
+                }
+            }
+        };
+        console.log('✅ [showModalSafe] Helper function created in <head> - available immediately');
+    </script>
 </head>
 
 <body class="notes-page">
@@ -78,7 +119,7 @@
                         </div>
                         <div class="table-count" id="notesCount">טוען...</div>
                         <div class="table-actions">
-                            <button data-button-type="ADD" data-entity-type="note" data-variant="full" data-onclick="showAddNoteModal()" data-text="הוסף הערה" title="הוסף הערה חדשה"></button>
+                            <button data-button-type="ADD" data-entity-type="note" data-variant="full" data-onclick="window.showModalSafe('notesModal','add')" data-text="הוסף הערה" title="הוסף הערה חדשה"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
                     </div>
@@ -189,6 +230,7 @@
     <!-- polling-manager.js not loaded - exists only as .backup -->
     <script src="scripts/modules/ui-advanced.js?v=0da3519a_20251102_104906"></script> <!-- ממשק מתקדם -->
     <script src="scripts/modules/ui-basic.js?v=0da3519a_20251102_104906"></script> <!-- ממשק בסיסי -->
+    <script src="scripts/modal-configs/notes-config.js?v=0da3519a_20251102_104906"></script> <!-- קונפיגורציית מודל הערות - חובה לפני ModalManagerV2 -->
     <script src="scripts/modal-manager-v2.js?v=0da3519a_20251102_104906"></script> <!-- מנהל מודלים V2 -->
 
     <!-- ===== CRUD PACKAGE (loadOrder: 4) ===== -->

@@ -151,6 +151,31 @@ class EntityDetailsRenderer {
     }
 
     /**
+     * Normalize entity type - נירמול סוג ישות
+     * Converts various entity type names to canonical form
+     * 
+     * @param {string} entityType - סוג ישות
+     * @returns {string} - סוג ישות מנורמל
+     * @private
+     */
+    normalizeEntityType(entityType) {
+        if (!entityType || typeof entityType !== 'string') {
+            return entityType;
+        }
+        
+        const normalized = entityType.toLowerCase().trim();
+        
+        // מיפוי שמות שונים לאותו סוג ישות
+        const typeMapping = {
+            'trading_account': 'account',
+            'tradingaccount': 'account',
+            'trading-account': 'account'
+        };
+        
+        return typeMapping[normalized] || normalized;
+    }
+
+    /**
      * Main render function - פונקציית רנדור ראשית
      * 
      * @param {string} entityType - סוג הישות
@@ -165,9 +190,13 @@ class EntityDetailsRenderer {
                 return this.renderError('חסרים נתוני ישות');
             }
 
+            // נירמול סוג ישות - trading_account -> account
+            const normalizedEntityType = this.normalizeEntityType(entityType);
+
             if (window.Logger) {
                 window.Logger.info('✅ [1.4 EntityDetailsRenderer.render] Called with options.sourceInfo', {
                     entityType: entityType,
+                    normalizedEntityType: normalizedEntityType,
                     hasOptions: !!options,
                     hasSourceInfo: !!options?.sourceInfo,
                     sourceInfo: options?.sourceInfo,
@@ -178,7 +207,7 @@ class EntityDetailsRenderer {
             }
 
             // בחירת פונקציית רנדור לפי סוג הישות
-            switch (entityType) {
+            switch (normalizedEntityType) {
                 case 'ticker':
                     return this.renderTicker(entityData, options);
                 case 'trade':
@@ -804,23 +833,73 @@ class EntityDetailsRenderer {
             `;
         }
 
-        // מיון הפריטים המקושרים באמצעות LinkedItemsService
-        const sortedItems = (window.LinkedItemsService && window.LinkedItemsService.sortLinkedItems)
-            ? window.LinkedItemsService.sortLinkedItems(linkedItems)
-            : linkedItems; // Fallback אם Service לא זמין
-
+        // מיון הפריטים המקושרים לפי תאריך (החדש ביותר ראשון) כברירת מחדל
+        const sortedItems = [...linkedItems].sort((a, b) => {
+            const aDate = new Date(a.created_at || a.updated_at || 0);
+            const bDate = new Date(b.created_at || b.updated_at || 0);
+            return bDate - aDate; // desc - חדש לישן
+        });
+        
+        // חישוב מספר סוגי ישויות שונות
+        const uniqueTypes = new Set(sortedItems.map(item => item.type));
+        const uniqueTypesCount = uniqueTypes.size;
+        const typesLabel = uniqueTypesCount === 1 ? 'סוג אחד' : `${uniqueTypesCount} סוגים`;
+        
+        // יצירת ID ייחודי לטבלה
+        const tableId = `linkedItemsTable_${entityType}_${entityId}`;
+        
+        // שמירת הנתונים הגולמיים למיון (משתנה גלובלי זמני)
+        if (!window.linkedItemsTableData) {
+            window.linkedItemsTableData = {};
+        }
+        window.linkedItemsTableData[tableId] = sortedItems;
+        
         // יצירת טבלה מינימלית של פריטים מקושרים
         let html = `
             <div class="entity-linked-items">
-                <h6 class="border-bottom pb-2 mb-3" style="border-bottom-color: ${entityColor} !important;">פריטים מקושרים (${sortedItems.length})</h6>
+                <h6 class="border-bottom pb-2 mb-3 d-flex justify-content-between align-items-center" style="border-bottom-color: ${entityColor} !important;">
+                    <span>פריטים מקושרים (${sortedItems.length})</span>
+                    <div class="filter-buttons-container button-row" id="linkedItemsFilter_${tableId}" style="display: inline-flex; gap: 4px;">
+                        <button class="btn btn-sm active" onclick="window.filterLinkedItemsByType('${tableId}', 'all')" data-type="all" title="הצג הכל">
+                            הכל
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="window.filterLinkedItemsByType('${tableId}', 'account')" data-type="account" title="חשבונות">
+                            <img src="/trading-ui/images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="filter-icon">
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="window.filterLinkedItemsByType('${tableId}', 'trade')" data-type="trade" title="טריידים">
+                            <img src="/trading-ui/images/icons/trades.svg" alt="טריידים" class="filter-icon">
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="window.filterLinkedItemsByType('${tableId}', 'trade_plan')" data-type="trade_plan" title="תוכניות">
+                            <img src="/trading-ui/images/icons/trade_plans.svg" alt="תוכניות" class="filter-icon">
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="window.filterLinkedItemsByType('${tableId}', 'ticker')" data-type="ticker" title="טיקרים">
+                            <img src="/trading-ui/images/icons/tickers.svg" alt="טיקרים" class="filter-icon">
+                        </button>
+                    </div>
+                </h6>
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover entity-linked-items-table">
+                    <table class="table table-sm table-hover entity-linked-items-table" id="${tableId}" data-table-type="linked_items">
                         <thead style="background-color: ${entityColor}50 !important;">
                             <tr>
-                                <th style="width: 25%;">סוג</th>
-                                <th style="width: 35%;">שם</th>
-                                <th style="width: 15%; text-align: center;">סטטוס</th>
-                                <th style="width: 25%; text-align: center;">פעולות</th>
+                                <th style="width: 40%;">
+                                    <button class="btn btn-link sortable-header" style="border: none; background: none; padding: 0; margin: 0; color: inherit; text-decoration: none; width: 100%; text-align: right;" 
+                                            data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.linkedItemsTableData && window.linkedItemsTableData['${tableId}'], 'linked_items', window.updateLinkedItemsTable.bind(null, '${tableId}')); }">
+                                        מקושר ל <span class="sort-icon">↕</span>
+                                    </button>
+                                </th>
+                                <th style="width: 20%; text-align: center;">
+                                    <button class="btn btn-link sortable-header" style="border: none; background: none; padding: 0; margin: 0; color: inherit; text-decoration: none; width: 100%; text-align: center;" 
+                                            data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.linkedItemsTableData && window.linkedItemsTableData['${tableId}'], 'linked_items', window.updateLinkedItemsTable.bind(null, '${tableId}')); }">
+                                        סטטוס <span class="sort-icon">↕</span>
+                                    </button>
+                                </th>
+                                <th style="width: 20%; text-align: center;">
+                                    <button class="btn btn-link sortable-header" style="border: none; background: none; padding: 0; margin: 0; color: inherit; text-decoration: none; width: 100%; text-align: center;" 
+                                            data-onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.linkedItemsTableData && window.linkedItemsTableData['${tableId}'], 'linked_items', window.updateLinkedItemsTable.bind(null, '${tableId}')); }">
+                                        תאריך <span class="sort-icon">↕</span>
+                                    </button>
+                                </th>
+                                <th style="width: 20%; text-align: center;">פעולות</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -843,22 +922,26 @@ class EntityDetailsRenderer {
                     ? window.getEntityLabel(item.type)
                     : item.type); // Fallback
             
-            // צביעת האיקון בצבע הישות באמצעות CSS mask - איקון כפול בגודל (48px)
-            const typeDisplay = `
-                <span class="d-inline-flex align-items-center gap-2">
-                    <img src="${iconPath}" alt="${item.type}" class="linked-item-type-icon" style="width: 48px; height: 48px; mask-image: url('${iconPath}'); mask-repeat: no-repeat; mask-position: center; mask-size: contain; -webkit-mask-image: url('${iconPath}'); -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; background-color: ${itemEntityColor}; display: inline-block;" />
-                    <strong>${entityLabel}</strong>
-                </span>
-            `;
-            
-            // עמודה "שם" - שם נקי עם תאריך - שימוש ב-LinkedItemsService
+            // עמודה "מקושר ל" - איקון + [סוג] בשורה אחת, [שם] בשורה נפרדת
             const cleanName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
                 ? window.LinkedItemsService.formatLinkedItemName(item)
                 : this.getCleanEntityName(item); // Fallback
             
+            // מבנה: איקון | [סוג] בשורה אחת, [שם] בשורה נפרדת
+            const linkedToDisplay = `
+                <div class="d-flex align-items-start" style="gap: 12px;">
+                    <img src="${iconPath}" alt="${item.type}" class="linked-item-type-icon" style="width: 48px; height: 48px; mask-image: url('${iconPath}'); mask-repeat: no-repeat; mask-position: center; mask-size: contain; -webkit-mask-image: url('${iconPath}'); -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; background-color: ${itemEntityColor}; display: inline-block; flex-shrink: 0;" />
+                    <div class="d-flex flex-column">
+                        <strong>${entityLabel}</strong>
+                        <span>${cleanName}</span>
+                    </div>
+                </div>
+            `;
+            
+            // עמודה "תאריך" - תאריך נפרד למיון
             const itemDate = this.formatDateTime(item.created_at || item.updated_at);
-            // שורה אחת בלבד: שם + תאריך
-            const nameDisplay = `${cleanName}${itemDate ? ` - ${itemDate}` : ''}`;
+            const dateDisplay = itemDate || '';
+            const dateValue = item.created_at || item.updated_at || ''; // ערך גולמי למיון
             
             // עמודה "סטטוס" - שימוש במערכת הרינדור המרכזית - מיושר למרכז עם רווח
             const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
@@ -949,10 +1032,10 @@ class EntityDetailsRenderer {
             }
             
             html += `
-                <tr>
-                    <td>${typeDisplay}</td>
-                    <td>${nameDisplay}</td>
+                <tr data-item-type="${item.type}" data-item-name="${cleanName}" data-item-status="${item.status || ''}" data-item-date="${dateValue}">
+                    <td>${linkedToDisplay}</td>
                     <td style="text-align: center; padding-inline-end: 1rem;">${statusDisplay}</td>
+                    <td style="text-align: center;">${dateDisplay}</td>
                     <td style="text-align: center;">${actionsHtml}</td>
                 </tr>
             `;
@@ -1424,6 +1507,7 @@ class EntityDetailsRenderer {
             account: [
                 { key: 'id', label: 'מזהה', type: 'number' },
                 { key: 'name', label: 'שם חשבון מסחר', type: 'text' },
+                { key: 'number', label: 'מספר חשבון', type: 'text' },
                 { key: 'type', label: 'סוג', type: 'text' },
                 { key: 'status', label: 'סטטוס', type: 'status' },
                 { key: 'currency', label: 'מטבע', type: 'text' },
@@ -1951,14 +2035,34 @@ class EntityDetailsRenderer {
             ? window.FieldRendererService.renderStatus(accountData.status, 'account')
             : '';
         
+        // שם חשבון - נחלץ מ-name
+        const accountName = accountData.name || accountData.account_name || 'לא מוגדר';
+        
+        // מספר חשבון - נחלץ מ-number
+        const accountNumber = accountData.number || accountData.account_number || 'לא מוגדר';
+        
         return `
             <div class="entity-details-container account-details">
                 
-                <!-- סטטוס למעלה -->
-                ${statusDisplay ? `<div class="mb-3 d-flex justify-content-start align-items-center gap-2">
-                    <strong>סטטוס:</strong>
-                    ${statusDisplay}
-                </div>` : ''}
+                <!-- שורה ראשונה: שם חשבון | מספר חשבון | סטטוס (משמאל) -->
+                <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom: 1px solid #e0e0e0; padding-bottom: 0.75rem;">
+                    <!-- שם חשבון -->
+                    <div class="d-flex align-items-center gap-2" style="min-width: 150px;">
+                        <strong>שם:</strong>
+                        <span class="fw-bold">${accountName}</span>
+                    </div>
+                    
+                    <!-- מספר חשבון - במרכז -->
+                    <div class="flex-grow-1" style="text-align: center;">
+                        <strong>מספר חשבון:</strong>
+                        <span class="fw-bold">${accountNumber}</span>
+                    </div>
+                    
+                    <!-- סטטוס משמאל -->
+                    <div class="d-flex align-items-center gap-2" style="min-width: 150px; justify-content: flex-end;">
+                        ${statusDisplay ? `<strong>סטטוס:</strong> ${statusDisplay}` : '<span class="text-muted">לא מוגדר</span>'}
+                    </div>
+                </div>
                 
                 <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
@@ -2423,7 +2527,240 @@ class EntityDetailsRenderer {
         `;
     }
     renderGeneric(entityData, entityType, options) { return '<div>ישות כללית</div>'; }
+    
+    /**
+     * עדכון גוף הטבלה של פריטים מקושרים לאחר מיון
+     * Update linked items table body after sorting
+     * 
+     * @param {string} tableId - ID של הטבלה
+     * @param {Array} sortedData - נתונים ממוינים
+     * @private
+     */
+    updateLinkedItemsTableBody(tableId, sortedData) {
+        const table = document.getElementById(tableId);
+        if (!table || !sortedData) return;
+        
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+        
+        // ניקוי הטבלה
+        tbody.innerHTML = '';
+        
+        // יצירת שורות חדשות - אותו קוד כמו ב-renderLinkedItems
+        sortedData.forEach(item => {
+            const iconPath = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemIcon)
+                ? window.LinkedItemsService.getLinkedItemIcon(item.type)
+                : this.getEntityIcon(item.type);
+            
+            const itemEntityColor = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemColor)
+                ? window.LinkedItemsService.getLinkedItemColor(item.type, { entityColors: this.entityColors })
+                : (this.entityColors[item.type] || '#6c757d');
+            
+            const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
+                ? window.LinkedItemsService.getEntityLabel(item.type)
+                : item.type;
+            
+            // עמודה "מקושר ל" - איקון + [סוג] בשורה אחת, [שם] בשורה נפרדת
+            const cleanName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
+                ? window.LinkedItemsService.formatLinkedItemName(item)
+                : this.getCleanEntityName(item);
+            
+            // מבנה: איקון | [סוג] בשורה אחת, [שם] בשורה נפרדת
+            const linkedToDisplay = `
+                <div class="d-flex align-items-start" style="gap: 12px;">
+                    <img src="${iconPath}" alt="${item.type}" class="linked-item-type-icon" style="width: 48px; height: 48px; mask-image: url('${iconPath}'); mask-repeat: no-repeat; mask-position: center; mask-size: contain; -webkit-mask-image: url('${iconPath}'); -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; background-color: ${itemEntityColor}; display: inline-block; flex-shrink: 0;" />
+                    <div class="d-flex flex-column">
+                        <strong>${entityLabel}</strong>
+                        <span>${cleanName}</span>
+                    </div>
+                </div>
+            `;
+            
+            const itemDate = this.formatDateTime(item.created_at || item.updated_at);
+            const dateDisplay = itemDate || '';
+            
+            const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+                ? window.FieldRendererService.renderStatus(item.status, item.type)
+                : this.getStatusBadge(item.status);
+            
+            // קבלת sourceInfo מה-table
+            const entityTypeAttr = table.closest('.modal')?.querySelector('[data-entity-type]')?.getAttribute('data-entity-type');
+            const entityIdAttr = table.closest('.modal')?.querySelector('[data-entity-id]')?.getAttribute('data-entity-id');
+            
+            const itemSourceInfo = {
+                sourceModal: 'entity-details',
+                sourceType: entityTypeAttr || this.currentEntityType,
+                sourceId: entityIdAttr || this.currentEntityId
+            };
+            
+            const actionsHtml = (window.LinkedItemsService && window.LinkedItemsService.generateLinkedItemActions)
+                ? window.LinkedItemsService.generateLinkedItemActions(item, 'table', { 
+                    entityColors: this.entityColors,
+                    sourceInfo: itemSourceInfo
+                })
+                : '';
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${linkedToDisplay}</td>
+                <td style="text-align: center; padding-inline-end: 1rem;">${statusDisplay}</td>
+                <td style="text-align: center;">${dateDisplay}</td>
+                <td style="text-align: center;">${actionsHtml}</td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        // עדכון אייקוני המיון
+        if (window.updateSortIcons) {
+            window.updateSortIcons('linked_items', null, null, table);
+        }
+    }
 }
+
+// ===== GLOBAL FILTER FUNCTION FOR LINKED ITEMS TABLE =====
+
+/**
+ * פילטר פריטים מקושרים לפי סוג ישות
+ * Filter linked items by entity type
+ * 
+ * @param {string} tableId - ID של הטבלה
+ * @param {string} type - סוג הישות ('all', 'account', 'trade', 'trade_plan', 'ticker')
+ */
+window.filterLinkedItemsByType = function(tableId, type) {
+    // עדכון מצב הכפתורים
+    const filterContainer = document.getElementById(`linkedItemsFilter_${tableId}`);
+    if (filterContainer) {
+        const buttons = filterContainer.querySelectorAll('[data-type]');
+        buttons.forEach(btn => {
+            if (btn.getAttribute('data-type') === type) {
+                btn.classList.add('active');
+                btn.classList.remove('btn-outline-primary');
+                const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745' };
+                btn.style.backgroundColor = 'white';
+                btn.style.color = colors.positive || '#28a745';
+                btn.style.borderColor = colors.positive || '#28a745';
+            } else {
+                btn.classList.remove('active');
+                btn.classList.add('btn-outline-primary');
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                btn.style.borderColor = '';
+            }
+        });
+    }
+    
+    // קבלת הנתונים המקוריים
+    if (!window.linkedItemsTableData || !window.linkedItemsTableData[tableId]) {
+        console.warn(`[filterLinkedItemsByType] No data found for table:`, tableId);
+        return;
+    }
+    
+    const allItems = window.linkedItemsTableData[tableId];
+    
+    // פילטור הנתונים
+    let filteredItems = allItems;
+    if (type !== 'all') {
+        // מיפוי סוגים - account יכול להיות גם 'account' או 'trading_account'
+        const typeMapping = {
+            'account': ['account', 'trading_account'],
+            'trade': ['trade'],
+            'trade_plan': ['trade_plan'],
+            'ticker': ['ticker']
+        };
+        
+        const allowedTypes = typeMapping[type] || [];
+        if (allowedTypes.length > 0) {
+            filteredItems = allItems.filter(item => allowedTypes.includes(item.type));
+        }
+    }
+    
+    // עדכון הכותרת עם מספר הפריטים
+    const headerElement = document.querySelector(`#${tableId}`).closest('.entity-linked-items')?.querySelector('h6');
+    if (headerElement) {
+        // עדכון הטקסט של הכותרת (הצד הימני)
+        const titleSpan = headerElement.querySelector('span');
+        if (titleSpan) {
+            titleSpan.textContent = `פריטים מקושרים (${filteredItems.length})`;
+        } else {
+            // אם אין span, עדכון ישירות
+            const titleText = headerElement.childNodes[0];
+            if (titleText && titleText.nodeType === Node.TEXT_NODE) {
+                titleText.textContent = `פריטים מקושרים (${filteredItems.length})`;
+            } else {
+                // יצירת span חדש
+                const newSpan = document.createElement('span');
+                newSpan.textContent = `פריטים מקושרים (${filteredItems.length})`;
+                if (headerElement.firstChild) {
+                    headerElement.insertBefore(newSpan, headerElement.firstChild);
+                } else {
+                    headerElement.appendChild(newSpan);
+                }
+            }
+        }
+    }
+    
+    // עדכון הטבלה עם הנתונים המסוננים
+    if (window.entityDetailsRenderer && window.entityDetailsRenderer.updateLinkedItemsTableBody) {
+        window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, filteredItems);
+    } else {
+        console.warn(`[filterLinkedItemsByType] EntityDetailsRenderer not available`);
+    }
+    
+    if (window.Logger) {
+        window.Logger.info('✅ [filterLinkedItemsByType] Linked items filtered', {
+            tableId,
+            type,
+            totalItems: allItems.length,
+            filteredItems: filteredItems.length,
+            page: 'entity-details-renderer'
+        });
+    }
+};
+
+// ===== GLOBAL UPDATE FUNCTION FOR LINKED ITEMS TABLE =====
+
+/**
+ * עדכון טבלת פריטים מקושרים לאחר מיון
+ * Global function for updating linked items table after sorting
+ * 
+ * @param {string} tableId - ID של הטבלה
+ * @param {Array} sortedData - נתונים ממוינים
+ */
+window.updateLinkedItemsTable = function(tableId, sortedData) {
+    const table = document.getElementById(tableId);
+    if (!table || !sortedData) {
+        console.warn(`[updateLinkedItemsTable] Table or data not found:`, { tableId, hasTable: !!table, hasData: !!sortedData });
+        return;
+    }
+    
+    // עדכון הנתונים הגולמיים
+    if (!window.linkedItemsTableData) {
+        window.linkedItemsTableData = {};
+    }
+    window.linkedItemsTableData[tableId] = sortedData;
+    
+    // שמירת מצב הפילטר הנוכחי
+    const filterContainer = document.getElementById(`linkedItemsFilter_${tableId}`);
+    let currentFilterType = 'all';
+    if (filterContainer) {
+        const activeButton = filterContainer.querySelector('.active[data-type]');
+        if (activeButton) {
+            currentFilterType = activeButton.getAttribute('data-type') || 'all';
+        }
+    }
+    
+    // הפעלת הפילטר מחדש כדי לשמור את מצב הסינון
+    if (currentFilterType !== 'all') {
+        window.filterLinkedItemsByType(tableId, currentFilterType);
+    } else {
+        // אם אין סינון - עדכון רגיל
+        if (window.entityDetailsRenderer && window.entityDetailsRenderer.updateLinkedItemsTableBody) {
+            window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, sortedData);
+        } else {
+            console.warn(`[updateLinkedItemsTable] EntityDetailsRenderer not available`);
+        }
+    }
+};
 
 // ===== AUTO INITIALIZATION =====
 
@@ -2433,7 +2770,7 @@ class EntityDetailsRenderer {
 // document.addEventListener('DOMContentLoaded', () => {
 //     try {
 //         // אתחול מערכת הרנדור
-        new EntityDetailsRenderer();
+        window.entityDetailsRenderer = new EntityDetailsRenderer();
         
         window.Logger.info('Entity Details Renderer system loaded and ready', { page: "entity-details-renderer" });
         

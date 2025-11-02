@@ -455,13 +455,78 @@ class ModalManagerV2 {
      */
     async showModal(modalId, mode = 'add', entityData = null) {
         try {
-            // בדיקה שהמודל קיים
+            console.log(`🔍 [ModalManagerV2] showModal called:`, { modalId, mode, entityData, modalsCount: this.modals.size });
+            
+            // בדיקה שהמודל קיים - אם לא, ננסה ליצור אותו מהקונפיגורציה
             if (!this.modals.has(modalId)) {
-                throw new Error(`Modal ${modalId} not found`);
+                console.warn(`⚠️ [ModalManagerV2] Modal ${modalId} not found, attempting to create from configuration...`);
+                
+                // נסה למצוא את הקונפיגורציה וליצור את המודל
+                let config = null;
+                
+                if (this.configurations.has(modalId)) {
+                    config = this.configurations.get(modalId);
+                    console.log(`✅ Found config in configurations map for ${modalId}`);
+                } else {
+                    // נסה למצוא את הקונפיגורציה במשתנים הגלובליים
+                    // אפשרויות: modalIdConfig, modalIdModalConfig, או קונפיגורציות ספציפיות
+                    const possibleNames = [
+                        `${modalId}Config`,
+                        `${modalId.replace('Modal', '')}ModalConfig`,
+                        // Fallbacks ספציפיים לפי סוג המודל
+                        modalId === 'tradingAccountsModal' ? 'tradingAccountsModalConfig' : null,
+                        modalId === 'tickersModal' ? 'tickersModalConfig' : null,
+                        modalId === 'executionsModal' ? 'executionsModalConfig' : null,
+                        modalId === 'cashFlowModal' ? 'cashFlowModalConfig' : null
+                    ].filter(Boolean); // הסרת null values
+                    
+                    for (const name of possibleNames) {
+                        if (window[name]) {
+                            config = window[name];
+                            console.log(`✅ Found config in window.${name}`);
+                            break;
+                        }
+                    }
+                }
+                
+                if (config) {
+                    try {
+                        this.createCRUDModal(config);
+                        console.log(`✅ Modal ${modalId} created successfully`);
+                    } catch (createError) {
+                        console.error(`❌ Error creating modal ${modalId}:`, createError);
+                        throw createError;
+                    }
+                } else {
+                    console.error(`❌ [ModalManagerV2] Modal ${modalId} not found and no configuration available`);
+                    console.error(`   Checked: window.${modalId}Config, window.${modalId.replace('Modal', '')}ModalConfig`);
+                    console.error(`   Available window properties:`, Object.keys(window).filter(k => k.includes('Modal') || k.includes('Config')));
+                    if (window.showErrorNotification) {
+                        window.showErrorNotification('שגיאה', `מודל ${modalId} לא נמצא. אנא רענן את הדף.`);
+                    }
+                    throw new Error(`Modal ${modalId} not found and could not be created - no configuration found`);
+                }
+                
+                // בדיקה שוב שהמודל נוצר
+                if (!this.modals.has(modalId)) {
+                    console.error(`❌ Modal ${modalId} still not found after creation attempt`);
+                    throw new Error(`Modal ${modalId} could not be created`);
+                }
             }
             
             const modalInfo = this.modals.get(modalId);
+            if (!modalInfo) {
+                console.error(`❌ [ModalManagerV2] Modal info not found for ${modalId}`);
+                throw new Error(`Modal ${modalId} info not found`);
+            }
+            
             const modalElement = modalInfo.element;
+            if (!modalElement) {
+                console.error(`❌ [ModalManagerV2] Modal element not found for ${modalId}`);
+                throw new Error(`Modal ${modalId} element not found`);
+            }
+            
+            console.log(`✅ [ModalManagerV2] Modal found, proceeding to show:`, { modalId, mode });
             
             // עדכון כותרת לפי מצב
             this.updateModalTitle(modalElement, modalInfo.config, mode);
@@ -490,11 +555,47 @@ class ModalManagerV2 {
             // Additional defaults (date, source) are handled below after modal shows
             
             // הצגת המודל - ללא backdrop (ננהל אותו מרכזית)
+            if (!bootstrap || !bootstrap.Modal) {
+                console.error('❌ Bootstrap Modal not available');
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה', 'Bootstrap לא זמין. אנא רענן את הדף.');
+                }
+                throw new Error('Bootstrap Modal not available');
+            }
+            
+            // בדיקה שהאלמנט קיים ב-DOM
+            if (!document.body.contains(modalElement)) {
+                console.error('❌ Modal element not in DOM:', modalId);
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה', `מודל ${modalId} לא נמצא בדף.`);
+                }
+                throw new Error(`Modal element ${modalId} not in DOM`);
+            }
+            
             const modal = new bootstrap.Modal(modalElement, {
                 backdrop: false, // ננהל backdrop מרכזית
                 keyboard: true
             });
+            
+            // בדיקה שהמודל נוצר בהצלחה
+            if (!modal) {
+                console.error('❌ Failed to create Bootstrap modal instance');
+                throw new Error('Failed to create Bootstrap modal instance');
+            }
+            
             modal.show();
+            
+            // בדיקה שהמודל נפתח בהצלחה
+            console.log(`✅ Modal ${modalId} shown successfully`);
+            
+            // ניקוי backdrops שנוצרו על ידי Bootstrap - חשוב מאוד!
+            if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
+                // קריאה מיידית ואחת נוספת אחרי זמן קצר (למקרה ש-Bootstrap יוצר backdrop אחרי show())
+                window.modalNavigationManager.manageBackdrop();
+                setTimeout(() => {
+                    window.modalNavigationManager.manageBackdrop();
+                }, 100);
+            }
             
             // הוספה למערכת ניהול הניווט
             if (window.modalNavigationManager) {
@@ -1069,6 +1170,11 @@ class ModalManagerV2 {
             this.activeModal = modalId;
         }
         
+        // ניקוי backdrops כפולים - Bootstrap עלול ליצור backdrop גם אחרי shown event
+        if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
+            window.modalNavigationManager.manageBackdrop();
+        }
+        
         // פוקוס על השדה הראשון
         const firstInput = modalElement.querySelector('input:not([readonly]), select, textarea');
         if (firstInput) {
@@ -1181,6 +1287,11 @@ class ModalManagerV2 {
         const form = modalElement.querySelector('form');
         if (form) {
             this.clearValidationErrors(form);
+        }
+        
+        // ניקוי backdrop - חובה! זה מבטיח שה-backdrop תמיד יוסר כשהמודול נסגר
+        if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
+            window.modalNavigationManager.manageBackdrop();
         }
     }
 
@@ -1391,6 +1502,45 @@ class ModalManagerV2 {
         }
     }
 }
+
+// Helper function for easier onclick handlers - created IMMEDIATELY when script loads (before DOMContentLoaded)
+// This ensures it's available for onclick handlers in HTML
+window.showModalSafe = async function(modalId, mode = 'add') {
+    try {
+        console.log(`🔍 [showModalSafe] Called with:`, { modalId, mode, ModalManagerV2Available: !!window.ModalManagerV2 });
+        
+        // אם ModalManagerV2 לא זמין, ננסה לחכות קצת
+        if (!window.ModalManagerV2) {
+            console.warn('⚠️ [showModalSafe] ModalManagerV2 not available, waiting...');
+            // נחכה עד 2 שניות ל-ModalManagerV2
+            for (let i = 0; i < 20; i++) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                if (window.ModalManagerV2) {
+                    console.log(`✅ [showModalSafe] ModalManagerV2 became available after ${(i + 1) * 100}ms`);
+                    break;
+                }
+            }
+        }
+        
+        if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
+            console.log(`✅ [showModalSafe] Calling ModalManagerV2.showModal`);
+            await window.ModalManagerV2.showModal(modalId, mode);
+            console.log(`✅ [showModalSafe] Modal shown successfully`);
+        } else {
+            console.error('❌ [showModalSafe] ModalManagerV2 not available after wait');
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+            }
+        }
+    } catch (error) {
+        console.error('❌ [showModalSafe] Error showing modal:', error);
+        console.error('   Error stack:', error.stack);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל: ${error.message}`);
+        }
+    }
+};
+console.log('✅ [showModalSafe] Helper function created immediately');
 
 // אתחול אוטומטי כאשר הדף נטען
 document.addEventListener('DOMContentLoaded', () => {

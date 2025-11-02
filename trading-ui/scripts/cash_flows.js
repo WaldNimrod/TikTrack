@@ -1564,10 +1564,14 @@ function initializeExternalIdFields() {
  * @returns {void}
  */
 function editCashFlow(id) {
-    if (typeof window.editCashFlow === 'function') {
-        window.editCashFlow(id);
+    // Use ModalManagerV2 directly
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', id);
     } else {
-        window.Logger.warn('editCashFlow function not found', { page: 'cash_flows' });
+        window.Logger?.error('ModalManagerV2 לא זמין', { page: "cash_flows" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+        }
     }
 }
 

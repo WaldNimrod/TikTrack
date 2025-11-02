@@ -92,10 +92,20 @@
  * Opens modal for editing ticker
  * 
  * @function editTicker
- * @param {number} tickerId - ID of the ticker to edit
+ * @param {number|string} tickerId - ID of the ticker to edit
  * @returns {void}
  */
-// REMOVED: editTicker function - using showAddTickerModal directly
+function editTicker(tickerId) {
+  // Use ModalManagerV2 directly
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+    window.ModalManagerV2.showEditModal('tickersModal', 'ticker', tickerId);
+  } else {
+    window.Logger?.error('ModalManagerV2 לא זמין', { page: "tickers" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+    }
+  }
+}
 
 /**
  * צפייה בפרטי טיקר

@@ -166,31 +166,63 @@ const executionsModalConfig = {
 };
 
 // יצירת המודל אם ModalManagerV2 זמין
-function createExecutionsModal() {
-    if (window.ModalManagerV2) {
+// יצירת המודל אם ModalManagerV2 זמין - Deferred initialization
+function initializeExecutionsModal() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
         try {
             window.ModalManagerV2.createCRUDModal(executionsModalConfig);
             console.log('✅ Executions modal created successfully');
+            return true;
         } catch (error) {
             console.error('❌ Error creating Executions modal:', error);
+            return false;
         }
+    }
+    return false;
+}
+
+// Attempt to initialize immediately if ModalManagerV2 is available
+if (window.ModalManagerV2) {
+    console.log('✅ ModalManagerV2 available, initializing Executions modal...');
+    if (initializeExecutionsModal()) {
+        console.log('✅ Executions modal initialized successfully');
     } else {
-        console.warn('⚠️ ModalManagerV2 not available for Executions modal');
+        console.warn('⚠️ Failed to initialize Executions modal');
+    }
+} else {
+    console.log('⚠️ ModalManagerV2 not yet available, waiting...');
+    // Wait for ModalManagerV2 to be available
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            waitForModalManager();
+        });
+    } else {
+        waitForModalManager();
     }
 }
 
-// נסה ליצור את המודל אחרי שהדף נטען
-document.addEventListener('DOMContentLoaded', () => {
-    // המתן קצת כדי שכל הסקריפטים יטענו
-    setTimeout(() => {
-        createExecutionsModal();
-        
-        // אם ModalManagerV2 עדיין לא זמין, נסה שוב
-        if (!window.ModalManagerV2) {
-            setTimeout(createExecutionsModal, 500);
+// Helper function to wait for ModalManagerV2
+function waitForModalManager() {
+    let attempts = 0;
+    const maxAttempts = 10;
+    const interval = 200; // 200ms between attempts
+    
+    const checkInterval = setInterval(() => {
+        attempts++;
+        if (window.ModalManagerV2) {
+            console.log(`✅ ModalManagerV2 available after ${attempts} attempts, initializing Executions modal...`);
+            clearInterval(checkInterval);
+            if (initializeExecutionsModal()) {
+                console.log('✅ Executions modal initialized successfully');
+            } else {
+                console.warn('⚠️ Failed to initialize Executions modal');
+            }
+        } else if (attempts >= maxAttempts) {
+            console.warn(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts`);
+            clearInterval(checkInterval);
         }
-    }, 200);
-});
+    }, interval);
+}
 
 // ייצוא לקונסול (לצורך debug)
 window.executionsModalConfig = executionsModalConfig;

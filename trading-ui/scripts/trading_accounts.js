@@ -51,7 +51,6 @@
  * - cancelTradingAccount() - * הצגת מודל חשבון מסחר מסחר (הוספה או עריכה)
  * - filterTradingAccountsLocally() - filterTradingAccountsLocally function
  * - restoreTradingAccount() - restoreTradingAccount function
- * - viewTradingAccountDetails() - viewTradingAccountDetails function
  * - sortTable() - sortTable function
  * - generateDetailedLog() - * Sort table
  * 
@@ -2039,91 +2038,29 @@ function updateTradingAccount(tradingAccountId, tradingAccountData) {
 }
 
 /**
- * View trading account details
- * @function viewTradingAccountDetails
- * @param {string} tradingAccountId - Trading account ID
- * @returns {void}
- */
-function viewTradingAccountDetails(tradingAccountId) {
-  try {
-    window.Logger.info('👁️ מציג פרטי חשבון מסחר:', tradingAccountId, { page: "trading_accounts" });
-    
-    // חיפוש החשבון מסחר בנתונים
-    const tradingAccount = window.trading_accountsData.find(a => a.id === tradingAccountId);
-    if (!tradingAccount) {
-      throw new Error('חשבון מסחר לא נמצא');
-    }
-    
-    // יצירת תוכן פרטי החשבון מסחר
-    const detailsContent = `
-      <div class="trading-account-details">
-        <h5>פרטי חשבון מסחר</h5>
-        <div class="row">
-          <div class="col-md-6">
-            <p><strong>שם החשבון מסחר:</strong> ${tradingAccount.name || 'לא ידוע'}</p>
-            <p><strong>סוג:</strong> ${tradingAccount.type || 'לא ידוע'}</p>
-            <p><strong>מטבע:</strong> ${tradingAccount.currency || 'לא ידוע'}</p>
-          </div>
-          <div class="col-md-6">
-            <p><strong>יתרה:</strong> ${tradingAccount.balance || '0'}</p>
-            <p><strong>סטטוס:</strong> ${tradingAccount.status || 'פעיל'}</p>
-            <p><strong>תאריך יצירה:</strong> ${tradingAccount.created_at || 'לא ידוע'}</p>
-          </div>
-        </div>
-        ${tradingAccount.description ? `<p><strong>תיאור:</strong> ${tradingAccount.description}</p>` : ''}
-      </div>
-    `;
-    
-    // הצגת מודל עם הפרטים
-    if (typeof window.showModalNotification === 'function') {
-      window.showModalNotification('פרטי חשבון מסחר', detailsContent, 'info');
-    } else {
-      // fallback - הצגה בחלון alert
-      alert(`פרטי חשבון מסחר:\n\n` +
-        `שם: ${tradingAccount.name || 'לא ידוע'}\n` +
-        `סוג: ${tradingAccount.type || 'לא ידוע'}\n` +
-        `מטבע: ${tradingAccount.currency || 'לא ידוע'}\n` +
-        `יתרה: ${tradingAccount.balance || '0'}\n` +
-        `סטטוס: ${tradingAccount.status || 'פעיל'}\n` +
-        `תאריך יצירה: ${tradingAccount.created_at || 'לא ידוע'}` +
-        (tradingAccount.description ? `\nתיאור: ${tradingAccount.description}` : ''));
-    }
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בהצגת פרטי חשבון מסחר:', error, { page: "trading_accounts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהצגת פרטי חשבון מסחר', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהצגת פרטי חשבון מסחר', 'error', 'שגיאה', 6000, 'system');
-    }
-  }
-}
-
-/**
- * Show trading account details
+ * Show trading account details - uses global entity details system
  * @function showTradingAccountDetails
- * @param {string} tradingAccountId - Trading account ID
+ * @param {string|number} tradingAccountId - Trading account ID
  * @returns {void}
  */
 function showTradingAccountDetails(tradingAccountId) {
   try {
     window.Logger.info('👁️ מציג פרטי חשבון מסחר:', tradingAccountId, { page: "trading_accounts" });
     
-    // שימוש במודול פרטי ישות
+    // שימוש במערכת הכללית של פרטי ישויות (entity-details-modal)
     if (typeof window.showEntityDetails === 'function') {
       window.showEntityDetails('trading_account', tradingAccountId, { mode: 'view' });
     } else {
-      window.Logger.error('❌ showEntityDetails לא זמינה', { page: "trading_accounts" });
-      // fallback לפונקציה הקיימת
-      viewTradingAccountDetails(tradingAccountId);
+      window.Logger.error('❌ showEntityDetails לא זמינה - המערכת הכללית לא נטענה', { page: "trading_accounts" });
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'מערכת הצגת פרטי ישויות לא זמינה. אנא רענן את הדף.');
+      }
     }
     
   } catch (error) {
     window.Logger.error('❌ שגיאה בהצגת פרטי חשבון מסחר:', error, { page: "trading_accounts" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהצגת פרטי חשבון מסחר', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהצגת פרטי חשבון מסחר', 'error', 'שגיאה', 6000, 'system');
     }
   }
 }
@@ -2484,7 +2421,6 @@ window.filterTradingAccountsLocally = filterTradingAccountsLocally;
 window.updateTradingAccountFilterMenu = updateTradingAccountFilterMenu;
 window.getTradingAccountName = getTradingAccountName;
 window.updateTradingAccount = updateTradingAccount;
-window.viewTradingAccountDetails = viewTradingAccountDetails;
 window.showTradingAccountDetails = showTradingAccountDetails;
 // REMOVED: window.sortTable - use window.sortTableData from tables.js directly
 window.generateDetailedLog = generateDetailedLog;

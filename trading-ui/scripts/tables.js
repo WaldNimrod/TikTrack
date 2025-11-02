@@ -51,7 +51,47 @@ function sortTable(columnIndex, data, tableType, updateFunction) {
  * @returns {*} Column value
  */
 function getColumnValue(item, columnIndex, tableType) {
-  // Default column mappings for different table types
+  // Special handling for linked_items table
+  if (tableType === 'linked_items') {
+    switch (columnIndex) {
+      case 0: // linked_to - combine type label and name for sorting
+        const typeLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
+          ? window.LinkedItemsService.getEntityLabel(item.type) || item.type || ''
+          : item.type || '';
+        const formattedName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
+          ? window.LinkedItemsService.formatLinkedItemName(item) || ''
+          : item.description || item.title || '';
+        // Sort by type first, then by name
+        return `${typeLabel} ${formattedName}`;
+      case 1: // status
+        return item.status || '';
+      case 2: // created_at
+        return item.created_at || item.updated_at || '';
+      default:
+        return '';
+    }
+  }
+  
+  // Try to use TABLE_COLUMN_MAPPINGS from table-mappings.js first
+  if (window.TABLE_COLUMN_MAPPINGS && window.TABLE_COLUMN_MAPPINGS[tableType]) {
+    const mapping = window.TABLE_COLUMN_MAPPINGS[tableType];
+    const fieldName = mapping[columnIndex];
+    if (fieldName) {
+      // Handle nested properties
+      if (fieldName.includes('.')) {
+        const parts = fieldName.split('.');
+        let value = item;
+        for (const part of parts) {
+          value = value?.[part];
+          if (value === undefined) break;
+        }
+        return value || '';
+      }
+      return item[fieldName] || '';
+    }
+  }
+  
+  // Default column mappings for different table types (fallback)
   const columnMappings = {
     'alerts': [
       'id', 'title', 'status', 'related_type_id', 'condition', 'message', 'created_at', 'is_triggered',
@@ -81,6 +121,11 @@ function getColumnValue(item, columnIndex, tableType) {
     ],
     'notes': [
       'id', 'title', 'content', 'type', 'status', 'created_at',
+    ],
+    'linked_items': [
+      'linked_to',     // 0 - מקושר ל (משולב: type + name)
+      'status',         // 1 - סטטוס (Status)
+      'created_at',     // 2 - תאריך (Date)
     ],
   };
 

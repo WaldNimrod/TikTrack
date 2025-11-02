@@ -252,8 +252,36 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
   createModal(modalId, modalTitle, modalContent, mode);
 
   // Show the modal
-  const modal = new bootstrap.Modal(document.getElementById(modalId));
+  const modalElement = document.getElementById(modalId);
+  const modal = new bootstrap.Modal(modalElement);
+  
+  // Add event listener for backdrop cleanup when modal is hidden
+  modalElement.addEventListener('hidden.bs.modal', () => {
+    // ניקוי backdrop - חובה! זה מבטיח שה-backdrop תמיד יוסר כשהמודול נסגר
+    if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
+      window.modalNavigationManager.manageBackdrop();
+    }
+  });
+  
+  // ניקוי backdrops שנוצרו על ידי Bootstrap - חשוב מאוד!
+  modalElement.addEventListener('shown.bs.modal', () => {
+    if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
+      window.modalNavigationManager.manageBackdrop();
+      setTimeout(() => {
+        window.modalNavigationManager.manageBackdrop();
+      }, 100);
+    }
+  });
+  
   modal.show();
+  
+  // ניקוי מיידי אחרי show() - Bootstrap עלול ליצור backdrop גם אחרי show()
+  if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
+    window.modalNavigationManager.manageBackdrop();
+    setTimeout(() => {
+      window.modalNavigationManager.manageBackdrop();
+    }, 100);
+  }
 }
 
 /**

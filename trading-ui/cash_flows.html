@@ -33,6 +33,47 @@
     <!-- External Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
+    <!-- ===== CRITICAL: showModalSafe Helper - Must be loaded before any data-onclick attributes ===== -->
+    <script>
+        // Define showModalSafe immediately in head to ensure it's available before HTML is parsed
+        // This prevents "showModalSafe is not a function" errors when data-onclick attributes are processed
+        window.showModalSafe = async function(modalId, mode = 'add') {
+            try {
+                console.log(`🔍 [showModalSafe] Called with:`, { modalId, mode, ModalManagerV2Available: !!window.ModalManagerV2 });
+                
+                // If ModalManagerV2 is not available, wait for it (up to 2 seconds)
+                if (!window.ModalManagerV2) {
+                    console.warn('⚠️ [showModalSafe] ModalManagerV2 not available, waiting...');
+                    for (let i = 0; i < 20; i++) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        if (window.ModalManagerV2) {
+                            console.log(`✅ [showModalSafe] ModalManagerV2 became available after ${(i + 1) * 100}ms`);
+                            break;
+                        }
+                    }
+                }
+                
+                if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
+                    console.log(`✅ [showModalSafe] Calling ModalManagerV2.showModal`);
+                    await window.ModalManagerV2.showModal(modalId, mode);
+                    console.log(`✅ [showModalSafe] Modal shown successfully`);
+                } else {
+                    console.error('❌ [showModalSafe] ModalManagerV2 not available after wait');
+                    if (window.showErrorNotification) {
+                        window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+                    }
+                }
+            } catch (error) {
+                console.error('❌ [showModalSafe] Error showing modal:', error);
+                console.error('   Error stack:', error.stack);
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל: ${error.message}`);
+                }
+            }
+        };
+        console.log('✅ [showModalSafe] Helper function created in <head> - available immediately');
+    </script>
 </head>
 
 <body class="cash-flows-page">
@@ -80,7 +121,7 @@
                         </div>
                         <div class="table-count" id="cashFlowsCount">טוען...</div>
                         <div class="table-actions">
-                            <button data-button-type="ADD" data-entity-type="cash_flow" data-variant="full" data-onclick="window.ModalManagerV2 && window.ModalManagerV2.showModal('cashFlowModal', 'add')" data-text="הוסף תזרים מזומנים" title="הוסף תזרים מזומנים חדש"></button>
+                            <button data-button-type="ADD" data-entity-type="cash_flow" data-variant="full" data-onclick="window.showModalSafe('cashFlowModal','add')" data-text="הוסף תזרים מזומנים" title="הוסף תזרים מזומנים חדש"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
                     </div>
@@ -219,6 +260,20 @@
     <script src="scripts/pagination-system.js?v=0da3519a_20251102_104906"></script> <!-- מערכת עימוד -->
     <!-- [24] Load Order: 24 -->
     <script src="scripts/modules/actions-menu-system.js?v=0da3519a_20251102_104906"></script> <!-- מערכת תפריט פעולות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== MODULES PACKAGE (Early Load) ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3.5 | Description: מודולים כלליים - נטען מוקדם עבור showModalSafe -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [24.5] Load Order: 24.5 -->
+    <script src="scripts/modal-navigation-manager.js?v=0da3519a_20251102_104906"></script> <!-- מערכת ניווט מודולים מקוננים -->
+    <!-- [24.5.5] Load Order: 24.5.5 - CRITICAL: Must load before modal-manager-v2.js -->
+    <script src="scripts/modal-configs/cash-flows-config.js?v=0da3519a_20251102_104906"></script> <!-- קונפיגורציית מודל תזרימי מזומנים - חובה לפני ModalManagerV2 -->
+    <!-- [24.6] Load Order: 24.6 -->
+    <script src="scripts/modal-manager-v2.js?v=0da3519a_20251102_104906"></script> <!-- מנהל מודלים V2 - נטען מוקדם עבור showModalSafe -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 4/9: CRUD OPERATIONS PACKAGE ===== -->

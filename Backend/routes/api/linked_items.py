@@ -213,8 +213,8 @@ def get_child_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[st
             # Trades can have executions, notes, alerts
             child_entities.extend(get_trade_child_entities(cursor, entity_id))
             
-        elif entity_type == 'account':
-            # TradingAccounts can have trades, cash_flows, notes
+        elif entity_type == 'account' or entity_type == 'trading_account':
+            # TradingAccounts can have trades, trade_plans, cash_flows, executions, notes
             child_entities.extend(get_account_child_entities(cursor, entity_id))
             
         elif entity_type == 'ticker':
@@ -413,12 +413,12 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
     
     # Get trades
     cursor.execute("""
-        SELECT id, 'trade' as type, 'טרייד' as title, 
-               'טרייד ' || side || ' על ' || ticker_symbol as description,
-               created_at, status
+        SELECT t.id, 'trade' as type, 'טרייד' as title, 
+               'טרייד ' || t.side || ' על ' || tk.symbol as description,
+               t.created_at, t.status
         FROM trades t
         JOIN tickers tk ON t.ticker_id = tk.id
-        WHERE t.trading_trading_account_id = ?
+        WHERE t.trading_account_id = ?
     """, (trading_account_id,))
     
     for row in cursor.fetchall():
@@ -431,13 +431,14 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
             'status': row[5]
         })
     
-    # Get cash flows
+    # Get trade plans
     cursor.execute("""
-        SELECT id, 'cash_flow' as type, 'תזרים מזומנים' as title, 
-               type || ': ' || amount || ' ' || currency as description,
-               date, 'active' as status
-        FROM cash_flows 
-        WHERE trading_account_id = ?
+        SELECT tp.id, 'trade_plan' as type, 'תוכנית מסחר' as title, 
+               'תוכנית ' || tp.side || ' על ' || tk.symbol as description,
+               tp.created_at, tp.status
+        FROM trade_plans tp
+        JOIN tickers tk ON tp.ticker_id = tk.id
+        WHERE tp.trading_account_id = ?
     """, (trading_account_id,))
     
     for row in cursor.fetchall():
@@ -465,6 +466,25 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
             'type': row[1],
             'title': row[2],
             'description': row[3] + ('...' if len(row[3]) == 100 else ''),
+            'created_at': row[4],
+            'status': row[5]
+        })
+    
+    # Get alerts
+    cursor.execute("""
+        SELECT a.id, 'alert' as type, 'התראה' as title, 
+               'התראה: ' || a.message as description,
+               a.created_at, a.status
+        FROM alerts a
+        WHERE a.related_type_id = 1 AND a.related_id = ?
+    """, (trading_account_id,))
+    
+    for row in cursor.fetchall():
+        children.append({
+            'id': row[0],
+            'type': row[1],
+            'title': row[2],
+            'description': row[3],
             'created_at': row[4],
             'status': row[5]
         })

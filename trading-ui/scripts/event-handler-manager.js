@@ -131,8 +131,39 @@ class EventHandlerManager {
                     // Execute the onclick handler using eval (safe because it's controlled)
                     // Note: Following documentation spec - no preventDefault/stopPropagation
                     // to allow Bootstrap modals and other standard behaviors to work
-                    eval(onclickValue);
-                    console.log('✅ [EventHandlerManager] onclick executed successfully');
+                    const result = eval(onclickValue);
+                    
+                    // Handle async functions (Promises) - especially ModalManagerV2.showModal
+                    if (result && typeof result.then === 'function') {
+                        // This is a Promise - handle it properly
+                        result
+                            .then(() => {
+                                console.log('✅ [EventHandlerManager] Async onclick completed successfully');
+                            })
+                            .catch(error => {
+                                console.error('❌ [EventHandlerManager] Error in async onclick:', {
+                                    onclickValue: onclickValue,
+                                    error: error.message,
+                                    stack: error.stack
+                                });
+                                if (window.showErrorNotification) {
+                                    window.showErrorNotification('שגיאה', `שגיאה בביצוע פעולה: ${error.message}`);
+                                }
+                            });
+                        console.log('✅ [EventHandlerManager] Async onclick initiated successfully');
+                    } else if (result === undefined || result === null) {
+                        // אם התוצאה היא undefined/null, זה יכול להיות שהפונקציה היא async אבל לא החזירה Promise
+                        // נבדוק אם יש ModalManagerV2 בקוד
+                        if (onclickValue.includes('ModalManagerV2') && onclickValue.includes('showModal')) {
+                            console.warn('⚠️ [EventHandlerManager] ModalManagerV2.showModal returned undefined - might be async issue');
+                            console.warn('   onclickValue:', onclickValue);
+                            console.warn('   ModalManagerV2 available:', !!window.ModalManagerV2);
+                            console.warn('   showModal available:', !!(window.ModalManagerV2 && window.ModalManagerV2.showModal));
+                        }
+                        console.log('✅ [EventHandlerManager] onclick executed successfully (result:', result, ')');
+                    } else {
+                        console.log('✅ [EventHandlerManager] onclick executed successfully (result:', result, ')');
+                    }
                 } catch (error) {
                     console.error('❌ [EventHandlerManager] Error executing data-onclick:', {
                         onclickValue: onclickValue,

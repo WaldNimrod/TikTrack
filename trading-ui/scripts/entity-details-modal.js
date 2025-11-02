@@ -526,33 +526,14 @@ class EntityDetailsModal {
                 // חיפוש המודול בהיסטוריה - לפי element או לפי entityType + entityId + sourceInfo
                 let currentIndex = window.modalNavigationManager.modalHistory.findIndex(item => item.element === this.modal);
                 
-                // אם לא נמצא לפי element, נחפש לפי entityType + entityId + sourceInfo
-                if (currentIndex === -1 && modalInfo.entityType && modalInfo.entityId !== undefined) {
-                    const modalKey = `${modalInfo.entityType}:${modalInfo.entityId}`;
-                    const modalSourceInfoStr = JSON.stringify(modalInfo.sourceInfo || null);
-                    
-                    for (let i = 0; i < window.modalNavigationManager.modalHistory.length; i++) {
-                        const item = window.modalNavigationManager.modalHistory[i];
-                        const itemKey = `${item.info?.entityType}:${item.info?.entityId}`;
-                        const itemSourceInfoStr = JSON.stringify(item.info?.sourceInfo || item.info?.source || null);
-                        
-                        if (modalKey === itemKey && modalSourceInfoStr === modalSourceInfoStr) {
-                            currentIndex = i;
-                            // עדכון element אם השתנה
-                            if (item.element !== this.modal) {
-                                window.modalNavigationManager.modalHistory[i].element = this.modal;
-                            }
-                            break;
-                        }
-                    }
-                }
+                // ✅ תיקון: חיפוש לפי element בלבד - לא נעדכן את modalHistory ישירות!
+                // כל העדכונים נעשים דרך pushModal בלבד!
+                // אם לא נמצא לפי element, זה אומר שהמודול עדיין לא נוסף ל-history
+                // handleModalShown יוסיף אותו, ואז נוכל לעדכן את התוכן
                 
                 if (currentIndex >= 0) {
-                    // מודול קיים בהיסטוריה - נעדכן את ה-info והתוכן
-                    // חשוב: לא נעדכן את המודול הראשון (index 0) אם אין sourceInfo - הוא חייב להישאר קבוע
-                    // ✅ תיקון: ניהול אחיד - אין הגנות מיוחדות על הראשונה
-                    window.modalNavigationManager.modalHistory[currentIndex].info = modalInfo;
-                    // שמירת תוכן אם יש - תמיד עדכן את התוכן אם הוא קיים וטוב יותר
+                    // מודול קיים בהיסטוריה - נעדכן רק את התוכן (לא את ה-info!)
+                    // ה-info מתעדכן רק דרך pushModal!
                     if (savedContent) {
                         const existingContent = window.modalNavigationManager.modalHistory[currentIndex].content;
                         // עדכון התוכן אם הוא יותר טוב מהקיים (או אם אין תוכן קיים)
@@ -560,14 +541,10 @@ class EntityDetailsModal {
                             window.modalNavigationManager.modalHistory[currentIndex].content = savedContent;
                         }
                     }
-                    window.modalNavigationManager.modalHistory[currentIndex].timestamp = Date.now();
-                    // שמירה למטמון לאחר עדכון
-                    if (window.modalNavigationManager.saveHistoryToCache) {
-                        await window.modalNavigationManager.saveHistoryToCache();
-                    }
+                    // ✅ לא מעדכנים את ה-info או את ה-timestamp - זה נעשה רק דרך pushModal!
                 } else {
                     // המודול לא נמצא בהיסטוריה - handleModalShown אמור להוסיף אותו
-                    // אבל אם זה עדיין לא קרה (race condition), נוסיף הערה בלוג
+                    // נחכה קצת ונוסיף את התוכן אם המודול יתווסף מאוחר יותר
                     if (window.Logger) {
                         window.Logger.debug('ℹ️ Modal not found in history in loadEntityData - handleModalShown should add it soon', {
                             entityType,
@@ -582,9 +559,7 @@ class EntityDetailsModal {
                         const retryIndex = window.modalNavigationManager.modalHistory.findIndex(item => item.element === this.modal);
                         if (retryIndex >= 0 && savedContent) {
                             window.modalNavigationManager.modalHistory[retryIndex].content = savedContent;
-                            if (window.modalNavigationManager.saveHistoryToCache) {
-                                await window.modalNavigationManager.saveHistoryToCache();
-                            }
+                            // ✅ לא שומרים למטמון - הוסרנו את כל השימוש במטמון
                         }
                     }, 200);
                 }
@@ -656,10 +631,10 @@ class EntityDetailsModal {
                         if (titleText.trim()) {
                             window.modalNavigationManager.modalHistory[currentHistoryIndex].info.title = titleText.trim();
                             
-                            // ✅ שמירה למטמון אחרי עדכון title
-                            if (window.modalNavigationManager.saveHistoryToCache) {
-                                await window.modalNavigationManager.saveHistoryToCache();
-                            }
+                            // ✅ תיקון: לא שומרים למטמון - הוסרנו את כל השימוש במטמון
+                            // if (window.modalNavigationManager.saveHistoryToCache) {
+                            //     await window.modalNavigationManager.saveHistoryToCache();
+                            // }
                             
                             if (window.Logger) {
                                 window.Logger.debug('✅ Updated modal title in history', {
@@ -694,10 +669,10 @@ class EntityDetailsModal {
                         // ✅ תיקון: ניהול אחיד - אין הגנות מיוחדות על הראשונה
                         window.modalNavigationManager.modalHistory[modalHistoryIndex].content = contentElement.innerHTML;
                         
-                        // ✅ שמירה למטמון אחרי עדכון תוכן
-                        if (window.modalNavigationManager.saveHistoryToCache) {
-                            await window.modalNavigationManager.saveHistoryToCache();
-                        }
+                        // ✅ תיקון: לא שומרים למטמון - הוסרנו את כל השימוש במטמון
+                        // if (window.modalNavigationManager.saveHistoryToCache) {
+                        //     await window.modalNavigationManager.saveHistoryToCache();
+                        // }
                         if (window.Logger) {
                             window.Logger.debug('✅ Saved modal content to history (by element only)', {
                                 entityType,
@@ -1145,6 +1120,11 @@ class EntityDetailsModal {
         // ניקוי נתונים נוכחיים
         this.currentEntityType = null;
         this.currentEntityId = null;
+        
+        // ניקוי backdrop - חובה! זה מבטיח שה-backdrop תמיד יוסר כשהמודול נסגר
+        if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
+            window.modalNavigationManager.manageBackdrop();
+        }
         
         // ניקוי תוכן המודל - רק אם המודול לא בהיסטוריה
         // (אם המודול בהיסטוריה, התוכן נשמר שם ולא צריך למחוק אותו)

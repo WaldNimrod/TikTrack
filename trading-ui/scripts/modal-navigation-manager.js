@@ -488,7 +488,7 @@ class ModalNavigationManager {
             
             // שחזור תוכן המודול הקודם (אם נשמר)
             if (previousModal.content) {
-                this.restoreModalContent(previousModal.element, previousModal.content);
+                this.restoreModalContent(previousModal.element, previousModal.content, previousModal.info);
             }
             
             // עדכון כותרת המודול הקודם
@@ -866,7 +866,7 @@ class ModalNavigationManager {
             
             // שחזור תוכן המודול ה-target
             if (updatedTargetModal.content) {
-                this.restoreModalContent(updatedTargetModal.element, updatedTargetModal.content);
+                this.restoreModalContent(updatedTargetModal.element, updatedTargetModal.content, updatedTargetModal.info);
             }
             
             // עדכון כותרת
@@ -1404,11 +1404,24 @@ class ModalNavigationManager {
                 
                 // יצירת עותק חדש של המערך (immutable update)
                 this.modalHistory = this.modalHistory.filter((item, index) => index !== modalIndex);
-                
-                // אם אין יותר מודולים - ניקוי מלא
-                if (this.modalHistory.length === 0) {
-                    this.clearHistory();
+            }
+            
+            // בדיקה אם יש עוד מודולים פתוחים ב-DOM
+            // בודקים מודולים שפתוחים (עם class 'show' או display: block)
+            const openModals = document.querySelectorAll('.modal.show, .modal[style*="display: block"]');
+            const hasOpenModals = openModals.length > 0;
+            
+            // אם אין יותר מודולים פתוחים - ניקוי מלא של ההיסטוריה
+            if (!hasOpenModals) {
+                if (window.Logger) {
+                    window.Logger.info('🗑️ [handleModalHidden] No modals open - clearing history', {
+                        modalId: modalElement?.id,
+                        historyLengthBefore: this.modalHistory.length,
+                        openModalsCount: openModals.length,
+                        page: "modal-navigation-manager"
+                    });
                 }
+                this.clearHistory();
             }
             
             // ניהול backdrop (אם יש מודולים אחרים פתוחים)
@@ -1494,9 +1507,10 @@ class ModalNavigationManager {
      * 
      * @param {HTMLElement} modalElement - אלמנט המודול
      * @param {string} content - תוכן לשחזור
+     * @param {Object} modalInfo - מידע על המודול (entityType, entityId) - אופציונלי
      * @private
      */
-    restoreModalContent(modalElement, content) {
+    restoreModalContent(modalElement, content, modalInfo = null) {
         try {
             if (!content) {
                 return;
@@ -1507,6 +1521,42 @@ class ModalNavigationManager {
             
             if (contentElement) {
                 contentElement.innerHTML = content;
+                
+                // אם זה מודול של entity details, נטען מחדש את הפריטים המקושרים
+                // כדי לוודא שהם מעודכנים
+                if (modalInfo && modalInfo.entityType && modalInfo.entityId && 
+                    window.entityDetailsModal && window.entityDetailsModal.loadEntityData) {
+                    
+                    // מחכים קצת כדי שהתוכן יכנס ל-DOM
+                    setTimeout(async () => {
+                        try {
+                            if (window.Logger) {
+                                window.Logger.debug('🔄 [restoreModalContent] Reloading entity data for linked items', {
+                                    entityType: modalInfo.entityType,
+                                    entityId: modalInfo.entityId,
+                                    page: "modal-navigation-manager"
+                                });
+                            }
+                            
+                            // טעינה מחדש של הנתונים כולל הפריטים המקושרים
+                            await window.entityDetailsModal.loadEntityData(
+                                modalInfo.entityType,
+                                modalInfo.entityId,
+                                {
+                                    includeLinkedItems: true,
+                                    includeMarketData: true,
+                                    forceRefresh: false // לא להכריח רענון - נשתמש במטמון אם יש
+                                }
+                            );
+                        } catch (error) {
+                            if (window.Logger) {
+                                window.Logger.error('❌ Error reloading entity data after restore:', error, { 
+                                    page: "modal-navigation-manager" 
+                                });
+                            }
+                        }
+                    }, 100);
+                }
             }
         } catch (error) {
             if (window.Logger) {

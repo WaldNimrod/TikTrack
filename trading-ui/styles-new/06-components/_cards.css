@@ -440,7 +440,7 @@
 /* סגנונות למידע סיכום */
 .info-summary {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* יישור למרכז במקום space-between */
   align-items: center;
   margin: 1.5rem auto; /* מרווח אוטומטי למרכז */
   padding: 1.5rem;
@@ -455,12 +455,13 @@
 .info-summary div {
   font-size: 14px;
   color: #6c757d; /* טקסט אפון */
-  text-align: center;
+  text-align: center; /* יישור למרכז */
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  opacity: 0.8; /* שקיפות 0.8 */
 }
 
 .info-summary strong {
@@ -501,8 +502,9 @@
   }
   
   .info-summary div {
-    justify-content: flex-start;
-    text-align: right;
+    justify-content: center; /* יישור למרכז גם במובייל */
+    text-align: center; /* יישור למרכז */
+    opacity: 0.8; /* שקיפות 0.8 */
   }
   
   /* כרטיסים במובייל */

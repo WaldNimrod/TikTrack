@@ -75,9 +75,12 @@ class EntityDetailsService:
         'ticker': ['id', 'symbol', 'name', 'type', 'status', 'sector', 'currency_id', 
                   'remarks', 'created_at', 'updated_at', 'deleted_at'],
         'trade': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'quantity', 'entry_price',
-                 'exit_price', 'trade_type', 'status', 'profit_loss', 'created_at', 'updated_at'],
-        'trade_plan': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'target_price', 'stop_loss',
-                      'strategy', 'risk_level', 'status', 'plan_type', 'created_at', 'updated_at'],
+                 'exit_price', 'trade_type', 'status', 'profit_loss', 'total_pl', 'side', 'investment_type', 
+                 'closed_at', 'cancelled_at', 'cancel_reason', 'notes', 'created_at', 'updated_at'],
+        'trade_plan': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'investment_type', 'side', 
+                      'planned_amount', 'entry_conditions', 'target_price', 'stop_price', 
+                      'target_percentage', 'stop_percentage', 'status', 'cancelled_at', 
+                      'cancel_reason', 'created_at', 'updated_at'],
         'execution': ['id', 'trade_id', 'symbol', 'execution_type', 'quantity', 'price',
                      'commission', 'execution_date', 'status', 'created_at'],
         'account': ['id', 'name', 'account_number', 'account_type', 'bank_name', 'balance',
@@ -129,8 +132,18 @@ class EntityDetailsService:
             # Get the model class
             model_class = EntityDetailsService.ENTITY_MODELS[entity_type]
             
-            # Create optimized query
+            # Create optimized query with relationships
+            from sqlalchemy.orm import joinedload
+            
             base_query = db.query(model_class).filter(model_class.id == entity_id)
+            
+            # Eager load relationships for better performance
+            if entity_type == 'trade_plan':
+                base_query = base_query.options(joinedload(TradePlan.account), joinedload(TradePlan.ticker))
+            elif entity_type == 'trade':
+                base_query = base_query.options(joinedload(Trade.ticker), joinedload(Trade.trade_plan))
+            elif entity_type == 'ticker':
+                base_query = base_query.options(joinedload(Ticker.currency))
             
             # Optimize query using smart query optimizer
             optimization_result = optimize_query(
@@ -144,13 +157,14 @@ class EntityDetailsService:
             entity = optimization_result.optimized_query.first()
             execution_time = time.time() - start_time
             
-            # Profile the query for performance monitoring
-            profile_query(
-                base_query,
-                execution_time=execution_time,
-                operation_type='entity_details_fetch',
-                context=f'{entity_type}_details'
-            )
+            # Profile the query for performance monitoring (without unsupported parameters)
+            try:
+                profile_query(
+                    base_query,
+                    execution_time=execution_time
+                )
+            except Exception as e:
+                logger.debug(f"Query profiling skipped (non-critical): {str(e)}")
             
             if not entity:
                 logger.info(f"Entity not found: {entity_type} {entity_id}")
@@ -158,6 +172,22 @@ class EntityDetailsService:
             
             # Convert to dictionary with only specified fields
             entity_dict = EntityDetailsService._entity_to_dict(entity, entity_type)
+            
+            # Special handling for trade: opened_at is mapped from created_at
+            if entity_type == 'trade' and 'created_at' in entity_dict and 'opened_at' not in entity_dict:
+                entity_dict['opened_at'] = entity_dict['created_at']
+            
+            # Special handling for trade_plan: add account_name from relationship
+            if entity_type == 'trade_plan':
+                if hasattr(entity, 'account') and entity.account:
+                    entity_dict['account_name'] = entity.account.name
+                elif hasattr(entity, 'trading_account_id') and entity.trading_account_id:
+                    # Fallback: fetch account name if relationship not loaded
+                    account = db.query(TradingAccount).filter(TradingAccount.id == entity.trading_account_id).first()
+                    if account:
+                        entity_dict['account_name'] = account.name
+                    else:
+                        entity_dict['account_name'] = None
             
             # Add ticker object with market data for trade and trade_plan
             if entity_type in ['trade', 'trade_plan']:

@@ -273,9 +273,8 @@ const INFO_SUMMARY_CONFIGS = {
       {
         id: 'totalBalance',
         label: 'סה"כ יתרה',
-        calculator: 'sumField',
-        params: { field: 'balance' },
-        formatter: 'currency'
+        calculator: 'customTradingAccountsBalance',
+        formatter: 'currencyWithColor'
       }
     ]
   }
@@ -283,6 +282,7 @@ const INFO_SUMMARY_CONFIGS = {
 
 // Expose globally
 window.INFO_SUMMARY_CONFIGS = INFO_SUMMARY_CONFIGS;
+console.log('✅ INFO_SUMMARY_CONFIGS loaded, trading_accounts config:', INFO_SUMMARY_CONFIGS.trading_accounts);
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

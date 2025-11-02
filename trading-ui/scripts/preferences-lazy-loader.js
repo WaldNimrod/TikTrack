@@ -586,10 +586,16 @@ window.isPreferenceLoaded = function(preferenceName) {
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        window.Logger.info('📄 Lazy loading system ready', { page: "preferences-lazy-loader" });
+        if (window.Logger && window.Logger.info) {
+            window.Logger.info('📄 Lazy loading system ready', { page: "preferences-lazy-loader" });
+        }
     });
 } else {
-    window.Logger.info('📄 Lazy loading system ready', { page: "preferences-lazy-loader" });
+    if (window.Logger && window.Logger.info) {
+        window.Logger.info('📄 Lazy loading system ready', { page: "preferences-lazy-loader" });
+    }
 }
 
-window.Logger.info('✅ preferences-lazy-loader.js loaded successfully', { page: "preferences-lazy-loader" });
+if (window.Logger && window.Logger.info) {
+    window.Logger.info('✅ preferences-lazy-loader.js loaded successfully', { page: "preferences-lazy-loader" });
+}

@@ -25,7 +25,9 @@
  * - ValidationReporter: Error reporting and feedback
  */
 
-window.Logger.info('📄 Loading preferences-validation.js v1.0.0...', { page: "preferences-validation" });
+if (window.Logger && window.Logger.info) {
+    window.Logger.info('📄 Loading preferences-validation.js v1.0.0...', { page: "preferences-validation" });
+}
 
 // ============================================================================
 // VALIDATION ERROR CLASSES
@@ -688,4 +690,6 @@ if (document.readyState === 'loading') {
     window.Logger.info('📄 Preferences validation system ready', { page: "preferences-validation" });
 }
 
-window.Logger.info('✅ preferences-validation.js loaded successfully', { page: "preferences-validation" });
+if (window.Logger && window.Logger.info) {
+    window.Logger.info('✅ preferences-validation.js loaded successfully', { page: "preferences-validation" });
+}

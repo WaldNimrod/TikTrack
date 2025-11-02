@@ -421,9 +421,7 @@ class PreferencesCore {
         // Use UnifiedCacheManager with fallback to localStorage if not initialized
         if (window.UnifiedCacheManager) {
             // Check if UnifiedCacheManager is initialized
-            const isInitialized = window.UnifiedCacheManager.initialized === true || 
-                                  (typeof window.UnifiedCacheManager.isInitialized === 'function' && 
-                                   window.UnifiedCacheManager.isInitialized());
+            const isInitialized = window.UnifiedCacheManager.initialized === true;
             
             let cached = null;
             if (isInitialized) {
@@ -963,12 +961,18 @@ window.initializePreferencesWithLazyLoading = async function(userId = null, prof
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        window.Logger.info('📄 Preferences core system initialized', { page: "preferences-core-new" });
+        if (window.Logger && window.Logger.info) {
+            window.Logger.info('📄 Preferences core system initialized', { page: "preferences-core-new" });
+        }
     });
 } else {
-    window.Logger.info('📄 Preferences core system initialized', { page: "preferences-core-new" });
+    if (window.Logger && window.Logger.info) {
+        window.Logger.info('📄 Preferences core system initialized', { page: "preferences-core-new" });
+    }
 }
 
 // Event listener removed - UnifiedCacheManager handles preferences refresh directly
 
-window.Logger.info('✅ preferences-core.js loaded successfully', { page: "preferences-core-new" });
+if (window.Logger && window.Logger.info) {
+    window.Logger.info('✅ preferences-core.js loaded successfully', { page: "preferences-core-new" });
+}

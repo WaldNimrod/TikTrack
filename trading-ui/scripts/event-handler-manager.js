@@ -100,27 +100,29 @@ class EventHandlerManager {
             dataOnclick: target.getAttribute('data-onclick')
         });
         
-        // Handle buttons with data-onclick attribute (centralized button system)
+        // Handle buttons and links with data-onclick attribute (centralized button system)
         // This is the primary way to handle button clicks in TikTrack
         // Based on documentation: documentation/frontend/button-system.md
-        const buttonWithOnclick = target.closest('button[data-onclick]');
-        console.log('🔍 [EventHandlerManager] Closest button with data-onclick:', {
-            found: !!buttonWithOnclick,
-            element: buttonWithOnclick,
-            onclick: buttonWithOnclick?.getAttribute('data-onclick'),
-            disabled: buttonWithOnclick?.disabled,
-            hasDisabledAttr: buttonWithOnclick?.hasAttribute('disabled'),
-            className: buttonWithOnclick?.className
+        // Supports both <button> and <a> elements with data-onclick
+        const elementWithOnclick = target.closest('button[data-onclick], a[data-onclick]');
+        console.log('🔍 [EventHandlerManager] Closest element with data-onclick:', {
+            found: !!elementWithOnclick,
+            element: elementWithOnclick,
+            tagName: elementWithOnclick?.tagName,
+            onclick: elementWithOnclick?.getAttribute('data-onclick'),
+            disabled: elementWithOnclick?.disabled,
+            hasDisabledAttr: elementWithOnclick?.hasAttribute('disabled'),
+            className: elementWithOnclick?.className
         });
         
-        if (buttonWithOnclick) {
-            // Don't process if button is disabled
-            if (buttonWithOnclick.disabled || buttonWithOnclick.hasAttribute('disabled')) {
-                console.warn('⚠️ [EventHandlerManager] Button is disabled, skipping');
+        if (elementWithOnclick) {
+            // Don't process if element is disabled (for buttons)
+            if (elementWithOnclick.disabled || elementWithOnclick.hasAttribute('disabled')) {
+                console.warn('⚠️ [EventHandlerManager] Element is disabled, skipping');
                 return;
             }
             
-            const onclickValue = buttonWithOnclick.getAttribute('data-onclick');
+            const onclickValue = elementWithOnclick.getAttribute('data-onclick');
             console.log('✅ [EventHandlerManager] Found onclick value:', onclickValue);
             
             if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
@@ -149,9 +151,12 @@ class EventHandlerManager {
                 }
                 // Mark event as handled to avoid duplicate toggles from fallback handlers
                 event._ehmHandled = true;
-                // Don't stop propagation - let other systems work normally
-                // Only prevent default if it's a form submit or link click
-                if (event.target.tagName === 'BUTTON' && event.target.type === 'submit') {
+                // Prevent default for links to avoid navigation
+                if (elementWithOnclick.tagName === 'A') {
+                    event.preventDefault();
+                }
+                // Only prevent default if it's a form submit button
+                if (elementWithOnclick.tagName === 'BUTTON' && elementWithOnclick.type === 'submit') {
                     event.preventDefault();
                 }
                 return;
@@ -159,7 +164,7 @@ class EventHandlerManager {
                 console.warn('⚠️ [EventHandlerManager] onclick value is empty or null:', onclickValue);
             }
         } else {
-            console.log('ℹ️ [EventHandlerManager] No button with data-onclick found, checking other handlers...');
+            console.log('ℹ️ [EventHandlerManager] No element with data-onclick found, checking other handlers...');
         }
         
         // Handle TOGGLE buttons without data-onclick (auto-wire to nearest section)
@@ -236,7 +241,7 @@ class EventHandlerManager {
         // Note: We don't execute onclick handlers here to avoid double execution
         // The browser will handle onclick naturally, we just log for debugging
         const buttonWithOnclickLegacy = target.closest('button[onclick]:not([data-onclick])');
-        if (buttonWithOnclickLegacy && buttonWithOnclickLegacy !== buttonWithOnclick) {
+        if (buttonWithOnclickLegacy) {
             // Don't process if button is disabled
             if (buttonWithOnclickLegacy.disabled || buttonWithOnclickLegacy.hasAttribute('disabled')) {
                 return;
@@ -393,8 +398,8 @@ class EventHandlerManager {
      */
     handleSortableClick(element, event) {
         // If this click is already handled by data-onclick button system, skip to avoid double execution
-        const delegatedBtn = element.closest('button[data-onclick]');
-        if (delegatedBtn) {
+        const delegatedElement = element.closest('button[data-onclick], a[data-onclick]');
+        if (delegatedElement) {
             return;
         }
         const table = element.closest('table');

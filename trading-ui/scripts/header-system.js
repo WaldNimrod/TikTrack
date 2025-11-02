@@ -206,16 +206,19 @@ class HeaderSystem {
                          title="ניקוי מטמון לפיתוח">
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
                       </a>
-                      <ul class="submenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 200px; z-index: 1000; padding: 0; margin: 0; list-style: none;">
+                      <ul class="submenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 240px; z-index: 1000; padding: 0; margin: 0; list-style: none;">
+                        <li><a href="#" onclick="clearCacheComplete(event)" 
+                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee; font-weight: bold;"
+                               title="ניקוי מלא: כל שכבות המטמון + HTTP Cache + רענון אוטומטי">🧹 ניקוי מטמון מלא (מומלץ)</a></li>
                         <li><a href="#" onclick="clearUIState(event)" 
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
                                title="נקה העדפות UI בלבד">נקה העדפות UI</a></li>
                         <li><a href="#" onclick="clearAllCacheForDevelopment(event)" 
-                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
-                               title="נקה כל ה-localStorage">נקה כל localStorage</a></li>
+                               style="display: block; padding: 8px 12px; color: #666; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; font-style: italic;"
+                               title="ניקוי מהיר - שימושי לפיתוח">ניקוי מהיר (legacy)</a></li>
                         <li><a href="#" onclick="hardReload(event)" 
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px;"
-                               title="רענון קשיח של העמוד">רענון קשיח</a></li>
+                               title="רענון קשיח של העמוד (עוקף cache)">רענון קשיח</a></li>
                       </ul>
                     </li>
 
@@ -226,12 +229,16 @@ class HeaderSystem {
                       </a>
                     </li>
 
-                    <li class="tiktrack-nav-item">
-                      <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
-                         data-onclick="initSystemCheck?.runPageCheck(event)"
-                         title="בדיקת מערכת איתחול">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" id="initSystemCheckBtn" 
+                         title="ניטור מערכת איתחול">
                         <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="#" data-onclick="initSystemCheck?.runPageCheck(event)">בדיקת מערכת איתחול</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="#" data-onclick="initSystemCheck?.generateScriptLoadingCode(event)">ייצר קוד טעינה</a></li>
+                      </ul>
                     </li>
                   </ul>
                 </nav>

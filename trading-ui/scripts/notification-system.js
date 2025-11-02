@@ -1025,13 +1025,11 @@ async function showDetailsModal(title, content, options = {}) {
   // Show modal using simple system (no Bootstrap dependency)
   modal.style.display = 'block';
   modal.classList.add('show');
-  document.body.classList.add('modal-open');
   
-  // Create backdrop
-  const backdrop = document.createElement('div');
-  backdrop.className = 'modal-backdrop fade show';
-  backdrop.id = `${modalId}-backdrop`;
-  document.body.appendChild(backdrop);
+  // ניהול backdrop מרכזית דרך ModalNavigationManager
+  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
+    window.modalNavigationManager.manageBackdrop();
+  }
   
   // סגירה בלחיצה על הרקע
   modal.addEventListener('click', (e) => {
@@ -1075,12 +1073,16 @@ function hideModal(modalId) {
   if (modal) {
     modal.style.display = 'none';
     modal.classList.remove('show');
-    document.body.classList.remove('modal-open');
     modal.remove();
   }
   
   if (backdrop) {
     backdrop.remove();
+  }
+  
+  // ניהול backdrop מרכזית דרך ModalNavigationManager
+  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
+    window.modalNavigationManager.manageBackdrop();
   }
 }
 

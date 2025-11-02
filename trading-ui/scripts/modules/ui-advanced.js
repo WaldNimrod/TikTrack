@@ -2333,7 +2333,7 @@ async function saveColorScheme(schemeName, customColors = null) {
     console.log(`💾 Saving color scheme: ${schemeName}`);
     
     // Save scheme name using Unified Cache Manager
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       await window.UnifiedCacheManager.save('colorScheme', schemeName, {
         layer: 'localStorage',
         ttl: null, // persistent
@@ -2379,7 +2379,7 @@ async function saveColorScheme(schemeName, customColors = null) {
  */
 async function getCurrentColorScheme() {
   try {
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       const cachedScheme = await window.UnifiedCacheManager.get('colorScheme');
       return cachedScheme || 'light';
     } else {

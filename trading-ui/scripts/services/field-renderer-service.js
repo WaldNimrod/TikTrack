@@ -182,13 +182,25 @@ class FieldRendererService {
      * const html = FieldRendererService.renderAmount(1234.56, '$');
      * // Output RTL: '1,234.56$' (סימן משמאל למספר)
      */
-    static renderAmount(value, currencySymbol = '$', decimals = 0) {
+    static renderAmount(value, currencySymbol = '$', decimals = 0, showSign = true) {
         if (value === null || value === undefined) return '-';
-        const formatted = Math.abs(Number(value)).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-        const colorClass = value >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
-        const sign = value >= 0 ? '+' : '-';
-        // RTL: מספר קודם (ימין), אחר כך סימן מטבע (שמאל), אחר כך סימן +/- (אם יש)
-        return `<span class="${colorClass}">${formatted}${currencySymbol}${sign}</span>`;
+        const numValue = Number(value);
+        const formatted = Math.abs(numValue).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        const colorClass = numValue >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
+        // For negative values: show minus sign before the number (standard format)
+        // For positive values: show plus sign only if showSign=true and explicitly requested
+        // RTL format: sign (if negative), then number (right), then currency symbol (left)
+        let sign = '';
+        if (showSign) {
+            // Only show minus sign for negative values, no plus sign for positive
+            if (numValue < 0) {
+                sign = '-';
+                // RTL: minus sign at the end (left side)
+                return `<span class="${colorClass}">${formatted}${currencySymbol}${sign}</span>`;
+            }
+        }
+        // RTL: number (right), then currency symbol (left)
+        return `<span class="${colorClass}">${formatted}${currencySymbol}</span>`;
     }
 
     /**
@@ -646,7 +658,17 @@ class FieldRendererService {
      * });
      */
     static renderTickerInfo(ticker, cssClass = '') {
-        if (!ticker) return '<div class="text-muted">טיקר לא זמין</div>';
+        console.log('🔍🔍🔍 [renderTickerInfo] CALLED with:', {
+            ticker,
+            cssClass,
+            hasTicker: !!ticker,
+            tickerKeys: ticker ? Object.keys(ticker) : []
+        });
+        
+        if (!ticker) {
+            console.log('⚠️ [renderTickerInfo] No ticker provided, returning empty');
+            return '';
+        }
         
         const symbol = ticker.symbol || 'N/A';
         const name = ticker.name || 'N/A';
@@ -654,6 +676,15 @@ class FieldRendererService {
         const change = ticker.daily_change || 0;
         const changePercent = ticker.daily_change_percent || 0;
         const volume = ticker.volume || 0;
+        
+        console.log('🔍🔍🔍 [renderTickerInfo] Extracted values:', {
+            symbol,
+            name,
+            price,
+            change,
+            changePercent,
+            volume
+        });
         
         // סמל מטבע דינמי
         const currencySymbol = ticker.currency_symbol || '$';
@@ -665,29 +696,25 @@ class FieldRendererService {
         // פורמט נפח
         const formattedVolume = volume > 0 ? volume.toLocaleString('he-IL') : 'N/A';
         
-        return `
-            <div class="ticker-info-display ${cssClass}">
-                <div class="row">
-                    <div class="col-md-6">
-                        <strong>${symbol}</strong> - ${name}
-                    </div>
-                    <div class="col-md-6 text-end">
-                        <span class="fw-bold">${currencySymbol}${price.toFixed(2)}</span>
-                        <span class="${changeColor}">
-                            ${changeIcon} ${change.toFixed(2)} (${changePercent.toFixed(2)}%)
-                        </span>
-                    </div>
-                </div>
-                <div class="row mt-1">
-                    <div class="col-12">
-                        <small class="text-muted">
-                            נפח: ${formattedVolume} | 
-                            שינוי יומי: ${change.toFixed(2)} (${changePercent.toFixed(2)}%)
-                        </small>
-                    </div>
-                </div>
+        // תצוגה קומפקטית בשורה אחת (כפי שיצרנו עבור trade_plan ו-trade)
+        const compactDisplay = `
+            <div class="ticker-info-display-inline ${cssClass}" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: center;">
+                <span class="fw-bold">${currencySymbol}${price.toFixed(2)}</span>
+                <span class="${changeColor}">
+                    ${changeIcon} ${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)
+                </span>
+                <span class="text-muted small">
+                    נפח: ${formattedVolume}
+                </span>
             </div>
         `;
+        
+        console.log('🔍🔍🔍 [renderTickerInfo] Returning HTML:', {
+            htmlLength: compactDisplay.length,
+            htmlPreview: compactDisplay.substring(0, 200)
+        });
+        
+        return compactDisplay;
     }
 
     // ===== PRIVATE HELPER METHODS =====
@@ -740,7 +767,7 @@ window.renderSide = (side) => FieldRendererService.renderSide(side);
 window.renderNumericValue = (value, suffix, showPrefix) => FieldRendererService.renderNumericValue(value, suffix, showPrefix);
 window.renderPnL = (value, currency) => FieldRendererService.renderPnL(value, currency); // deprecated - use renderNumericValue
 window.renderCurrency = (id, name, symbol) => FieldRendererService.renderCurrency(id, name, symbol);
-window.renderAmount = (value, currencySymbol, decimals) => FieldRendererService.renderAmount(value, currencySymbol, decimals);
+window.renderAmount = (value, currencySymbol, decimals, showSign) => FieldRendererService.renderAmount(value, currencySymbol, decimals, showSign);
 window.renderType = (type, amountForColor) => FieldRendererService.renderType(type, amountForColor);
 window.renderAction = (action) => FieldRendererService.renderAction(action);
 window.renderPriority = (priority) => FieldRendererService.renderPriority(priority);

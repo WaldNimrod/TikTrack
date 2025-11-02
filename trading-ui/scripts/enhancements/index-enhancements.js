@@ -161,6 +161,18 @@ class IndexPageEnhancements {
      */
     async loadChart(chartId) {
         try {
+            // Check if chart already exists to prevent duplicate loading
+            if (window.ChartSystem && typeof window.ChartSystem.has === 'function') {
+                if (window.ChartSystem.has(chartId)) {
+                    window.Logger.info(`⏭️ Chart ${chartId} already exists, skipping lazy load`, { page: 'index-enhancements' });
+                    return;
+                }
+            } else if (window.homeCharts && window.homeCharts[chartId]) {
+                // Fallback check using homeCharts object
+                window.Logger.info(`⏭️ Chart ${chartId} already exists in homeCharts, skipping lazy load`, { page: 'index-enhancements' });
+                return;
+            }
+            
             window.Logger.info(`📊 Loading chart: ${chartId}`, { page: 'index-enhancements' });
             
             // Add loading indicator
@@ -250,6 +262,33 @@ class IndexPageEnhancements {
         
         // Setup data caching
         this.setupDataCaching();
+    }
+    
+    /**
+     * Setup cache optimization
+     */
+    setupCacheOptimization() {
+        if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
+            window.Logger.warn('⚠️ UnifiedCacheManager not available for cache optimization', { page: 'index-enhancements' });
+            return;
+        }
+        
+        try {
+            // Setup cache invalidation listeners
+            if (window.CacheSyncManager && typeof window.CacheSyncManager.on === 'function') {
+                window.CacheSyncManager.on('cache:invalidate', (keys) => {
+                    // Clear local data cache when unified cache is invalidated
+                    if (this.dataCache) {
+                        window.Logger.info('🔄 Clearing local data cache due to unified cache invalidation', { page: 'index-enhancements' });
+                        this.setupDataCaching(); // Reset cache
+                    }
+                });
+            }
+            
+            window.Logger.info('✅ Cache optimization setup completed', { page: 'index-enhancements' });
+        } catch (error) {
+            window.Logger.error('❌ Error setting up cache optimization:', error, { page: 'index-enhancements' });
+        }
     }
     
     /**

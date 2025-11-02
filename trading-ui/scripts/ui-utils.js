@@ -242,11 +242,11 @@ function showModal(modalId, options = {}) {
     return;
   }
 
-  // הגדרת אפשרויות ברירת מחדל
+  // הגדרת אפשרויות ברירת מחדל - ללא backdrop (ננהל אותו מרכזית)
   const defaultOptions = {
-    backdrop: true,
-    keyboard: true,
-    focus: true,
+    backdrop: false, // ננהל backdrop מרכזית דרך ModalNavigationManager
+    keyboard: options.keyboard !== false ? true : false,
+    focus: options.focus !== false ? true : false,
   };
 
   const modalOptions = { ...defaultOptions, ...options };
@@ -254,6 +254,11 @@ function showModal(modalId, options = {}) {
   // הצגת המודל
   const bootstrapModal = new bootstrap.Modal(modal, modalOptions);
   bootstrapModal.show();
+  
+  // ניהול backdrop מרכזית דרך ModalNavigationManager
+  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
+    window.modalNavigationManager.manageBackdrop();
+  }
 }
 
 /**
@@ -456,7 +461,7 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       break;
 
     case 'account':
-      response = await fetch(`${base}/api/accounts/${itemId}`, {
+      response = await fetch(`${base}/api/trading-accounts/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),

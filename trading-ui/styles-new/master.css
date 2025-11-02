@@ -58,7 +58,7 @@
 @import '06-components/_buttons-advanced.css?v=1.0.0';
 @import '06-components/_tables.css?v=1.0.0';
 @import '06-components/_actions-menu.css?v=1.0.0';
-@import '06-components/_cards.css?v=1.0.0';
+@import '06-components/_cards.css?v=1.0.1';
 @import '06-components/_modals.css?v=1.0.0';
 @import '06-components/_import-system.css?v=2.0.0';
 @import '06-components/_notifications.css?v=1.0.0';
@@ -67,7 +67,7 @@
 @import '06-components/_badges-status.css?v=1.0.0';
 @import '06-components/_entity-colors.css?v=1.0.0';
 @import '06-components/_page-headers.css?v=1.0.0';
-@import '06-components/_info-summary.css?v=1.0.0';
+@import '06-components/_info-summary.css?v=1.0.2';
 @import '06-components/_pagination-system.css?v=1.0.0';
 @import '06-components/_background-tasks.css?v=1.0.0';
 /* @import '06-components/_cache-test.css?v=1.0.0'; - File not found, commented out */

@@ -1802,7 +1802,7 @@ window.saveSortState = async function (tableType, columnIndex, direction) {
     direction,
     timestamp: Date.now(),
   };
-  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
     await window.UnifiedCacheManager.save(`sortState_${tableType}`, sortState, {
       layer: 'localStorage',
       ttl: 7 * 24 * 60 * 60 * 1000, // 7 days
@@ -1823,7 +1823,7 @@ window.saveSortState = async function (tableType, columnIndex, direction) {
  */
 window.getSortState = async function (tableType) {
   let savedState = null;
-  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
     savedState = await window.UnifiedCacheManager.get(`sortState_${tableType}`);
   } else {
     // UnifiedCacheManager לא זמין - כלל 44 violation prevented

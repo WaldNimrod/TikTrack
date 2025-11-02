@@ -248,9 +248,9 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'validation': מערכת ולידציה (validation-utils.js)
-        // - 'system-management': ניהול מערכת (constraint-manager.js)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'system-management', 'entity-details', 'init-system'],
+        // NOTE: constraint-manager.js נטען בנפרד כקובץ page-specific (לא דרך חבילת system-management)
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -382,13 +382,14 @@ const PAGE_CONFIGS = {
         // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
         // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
         // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
+        // - 'modules': מודולים כלליים (core-systems, ui-advanced עם loadUserPreferences)
         // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'entity-services': שירותי ישויות (טיקרים, חשבונות)
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -399,6 +400,7 @@ const PAGE_CONFIGS = {
             'window.loadExecutionsData',
             'window.SelectPopulatorService',
             'window.tickerService',
+            'window.loadUserPreferences', // From modules/ui-advanced.js (modules package)
             'window.openImportUserDataModal'
         ],
         
@@ -458,9 +460,12 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'modules': מודולים כלליים (כולל ModalManagerV2)
+        // - 'validation': מערכת ולידציה מאוחדת
+        // - 'entity-services': שירותי ישויות (LinkedItemsService, ticker-service, etc.)
+        // - 'entity-details': מערכות פרטי ישויות
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'modules', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'modules', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -476,14 +481,11 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 window.Logger.info('📋 Initializing Trade Plans...', { page: "page-initialization-configs" });
                 
-                // Use the new unified initialization function
-                if (typeof window.initializeTradePlansPage === 'function') {
-                    await window.initializeTradePlansPage();
+                // Load trade plans data directly
+                if (typeof window.loadTradePlansData === 'function') {
+                    await window.loadTradePlansData();
                 } else {
-                    // Fallback to old method
-                    if (typeof window.loadTradePlansData === 'function') {
-                        await window.loadTradePlansData();
-                    }
+                    window.Logger.warn('⚠️ loadTradePlansData function not available', { page: "page-initialization-configs" });
                 }
             },
             async (pageConfig) => {
@@ -594,20 +596,28 @@ const PAGE_CONFIGS = {
         requiresTables: true,
         customInitializers: [
             async (pageConfig) => {
+                console.log('🏦 Initializing Trading Accounts...');
+                console.log('🔍 Checking function availability:');
+                console.log('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage);
+                console.log('  - loadAccountsData:', typeof window.loadAccountsData);
                 window.Logger.info('🏦 Initializing Trading Accounts...', { page: "page-initialization-configs" });
                 window.Logger.info('🔍 Checking function availability:', { page: "page-initialization-configs" });
                 window.Logger.info('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage, { page: "page-initialization-configs" });
                 window.Logger.info('  - loadAccountsData:', typeof window.loadAccountsData, { page: "page-initialization-configs" });
                 
                 if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
+                    console.log('📡 Calling loadTradingAccountsDataForTradingAccountsPage...');
                     window.Logger.info('📡 Calling loadTradingAccountsDataForTradingAccountsPage...', { page: "page-initialization-configs" });
                     await window.loadTradingAccountsDataForTradingAccountsPage();
                 } else if (typeof window.loadAccountsData === 'function') {
+                    console.log('📡 Calling loadAccountsData...');
                     window.Logger.info('📡 Calling loadAccountsData...', { page: "page-initialization-configs" });
                     await window.loadAccountsData();
                 } else {
+                    console.warn('⚠️ No suitable function found for loading trading accounts data');
                     window.Logger.info('⚠️ No suitable function found for loading trading accounts data', { page: "page-initialization-configs" });
                 }
+                console.log('✅ Trading Accounts initialization completed');
             }
         ]
     },
@@ -620,6 +630,9 @@ const PAGE_CONFIGS = {
         // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'validation': מערכות ולידציה
+        // - 'modules': מודולים (modal-manager-v2, modal-navigation-manager)
+        // - 'entity-details': מערכות פרטי ישויות
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
         packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
@@ -1358,6 +1371,27 @@ window.getPageInitSummary = function(pageName) {
 // ===== ADDITIONAL PAGE CONFIGS =====
 
 const ADDITIONAL_PAGE_CONFIGS = {
+    // Test page for monitoring system
+    'test-monitoring': {
+        name: 'Test Monitoring Page',
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataCollectionService',
+            'UnifiedCacheManager',
+            'Logger'
+        ],
+        description: 'עמוד בדיקה למערכת הניטור וכלי יצירת קוד טעינה',
+        lastModified: '2025-01-31',
+        pageType: 'test',
+        preloadAssets: [],
+        cacheStrategy: 'none',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: []
+    },
+    
     // Missing pages from documentation
     'db_extradata': {
         name: 'Database Extra Data',
@@ -1737,6 +1771,7 @@ Object.assign(PAGE_CONFIGS, ADDITIONAL_PAGE_CONFIGS);
 
 window.PAGE_CONFIGS = PAGE_CONFIGS;
 window.pageInitializationConfigs = PAGE_CONFIGS;
+console.log('✅ PAGE_CONFIGS loaded, trading_accounts exists:', !!PAGE_CONFIGS.trading_accounts);
 } else {
   // אם PAGE_CONFIGS כבר הוגדר, נמזג רק את הקונפיגים החדשים
   if (typeof PAGE_CONFIGS !== 'undefined') {

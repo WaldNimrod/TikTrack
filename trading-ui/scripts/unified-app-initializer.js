@@ -203,14 +203,16 @@ class UnifiedAppInitializer {
      * Stage 1: Detect and analyze page and systems
      */
     async detectAndAnalyze() {
-        // window.Logger.info('🔍 Stage 1: Detecting and analyzing...', { page: "unified-app-initializer" });
+        console.log('🔍 Stage 1: Detecting and analyzing...');
         const stageStart = Date.now();
         
         // Detect page information
         this.pageInfo = this.detectPageInfo();
+        console.log('📄 Detected page info:', this.pageInfo);
         
         // Detect available systems
         this.availableSystems = this.detectAvailableSystems();
+        console.log('🔧 Detected available systems:', Array.from(this.availableSystems));
         
         // Analyze page requirements
         this.analyzePageRequirements();
@@ -227,28 +229,27 @@ class UnifiedAppInitializer {
      * Stage 2: Prepare optimal configuration
      */
     prepareConfiguration() {
-        // window.Logger.info('⚙️ Stage 2: Preparing configuration...', { page: "unified-app-initializer" });
+        console.log('⚙️ Stage 2: Preparing configuration...');
         const stageStart = Date.now();
         
         // Load page-specific configuration from page-initialization-configs.js
         let pageConfig = null;
-        // Debug info only in verbose mode
-        if (window.DEBUG_MODE) {
-            window.Logger.info('🔍 Checking pageInitializationConfigs:', typeof window.pageInitializationConfigs, { page: "unified-app-initializer" });
-            window.Logger.info('🔍 Available configs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs, { page: "unified-app-initializer" }) : 'undefined');
-            const pageName = this.pageInfo?.name || 'unknown';
-            window.Logger.info('🔍 Looking for config:', pageName, { page: "unified-app-initializer" });
-        }
+        const pageName = this.pageInfo?.name || 'unknown';
+        console.log('🔍 Looking for config:', pageName);
+        console.log('🔍 PAGE_CONFIGS exists:', typeof window.PAGE_CONFIGS !== 'undefined', 'Keys:', window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS).slice(0, 5) : 'none');
         
         if (typeof window.pageInitializationConfigs !== 'undefined' && 
             window.pageInitializationConfigs[this.pageInfo?.name]) {
             pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
+            console.log(`📋 Loaded page config for ${this.pageInfo.name} from pageInitializationConfigs`);
             window.Logger.info(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig, { page: "unified-app-initializer" });
         } else if (typeof window.PAGE_CONFIGS !== 'undefined' && 
                    window.PAGE_CONFIGS[this.pageInfo?.name]) {
             pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
+            console.log(`📋 Loaded page config for ${this.pageInfo.name} from PAGE_CONFIGS`);
             window.Logger.info(`📋 Loaded page config from PAGE_CONFIGS for ${this.pageInfo.name}:`, pageConfig, { page: "unified-app-initializer" });
         } else {
+            console.warn(`⚠️ No page config found for ${pageName}`);
             window.Logger.info(`⚠️ No page config found for ${this.pageInfo?.name || 'unknown'}`, { page: "unified-app-initializer" });
             window.Logger.info('🔍 Available configs in pageInitializationConfigs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs, { page: "unified-app-initializer" }) : 'undefined');
             window.Logger.info('🔍 Available configs in PAGE_CONFIGS:', window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS, { page: "unified-app-initializer" }) : 'undefined');
@@ -257,9 +258,12 @@ class UnifiedAppInitializer {
         // Store custom initializers from page config
         if (pageConfig?.customInitializers) {
             this.customInitializers = pageConfig.customInitializers;
+            console.log('🔧 Loaded custom initializers from page config:', this.customInitializers.length);
             if (window.DEBUG_MODE) {
                 window.Logger.info('🔧 Loaded custom initializers from page config:', this.customInitializers.length, { page: "unified-app-initializer" });
             }
+        } else {
+            console.warn('⚠️ No custom initializers found in page config');
         }
         
         const config = {
@@ -709,23 +713,30 @@ class UnifiedAppInitializer {
         }
         
         // Initialize page-specific custom initializers
+        console.log('🔍 Checking custom initializers for:', config.name, { hasInitializers: !!config.customInitializers, isArray: Array.isArray(config.customInitializers), count: config.customInitializers?.length });
         if (config.customInitializers && Array.isArray(config.customInitializers)) {
+            console.log(`🔧 Found ${config.customInitializers.length} custom initializers for ${config.name}`);
             window.Logger.info(`🔧 Found ${config.customInitializers.length} custom initializers for ${config.name}`, { page: "unified-app-initializer" });
             for (let i = 0; i < config.customInitializers.length; i++) {
                 const initializer = config.customInitializers[i];
+                console.log(`🔧 Executing custom initializer ${i + 1}/${config.customInitializers.length} for ${config.name}`);
                 window.Logger.info(`🔧 Executing custom initializer ${i + 1}/${config.customInitializers.length} for ${config.name}`, { page: "unified-app-initializer" });
                 if (typeof initializer === 'function') {
                     try {
                         await initializer(config);
+                        console.log(`✅ Custom initializer ${i + 1} completed`);
                         window.Logger.info(`✅ Custom initializer ${i + 1} completed`, { page: "unified-app-initializer" });
                     } catch (error) {
+                        console.error(`❌ Error in custom initializer ${i + 1}:`, error);
                         window.Logger.error(`❌ Error in custom initializer ${i + 1}:`, error, { page: "unified-app-initializer" });
                     }
                 } else {
+                    console.warn(`⚠️ Custom initializer ${i + 1} is not a function:`, typeof initializer);
                     window.Logger.warn(`⚠️ Custom initializer ${i + 1} is not a function:`, typeof initializer, { page: "unified-app-initializer" });
                 }
             }
         } else {
+            console.warn(`⚠️ No custom initializers found for ${config.name}`, { hasCustomInitializers: !!config.customInitializers, isArray: Array.isArray(config.customInitializers) });
             window.Logger.info(`⚠️ No custom initializers found for ${config.name}`, { 
                 hasCustomInitializers: !!config.customInitializers,
                 isArray: Array.isArray(config.customInitializers),
@@ -1381,6 +1392,7 @@ window.handlePageSpecificFunctions = handlePageSpecificFunctions;
 window.UnifiedAppInitializer = UnifiedAppInitializer;
 window.UnifiedAppInitializer = UnifiedAppInitializer;
 window.unifiedAppInit = new UnifiedAppInitializer();
+console.log('🔧 UnifiedAppInitializer created');
 }
 
 window.Logger.info('🔧 UnifiedAppInitializer created:', window.unifiedAppInit, { page: "unified-app-initializer" });
@@ -1400,15 +1412,20 @@ window.getUnifiedAppStatus = function() {
 
 // Single DOMContentLoaded listener - replaces all others
 document.addEventListener('DOMContentLoaded', async () => {
+        console.log('🎯 DOM Content Loaded - Starting Unified App Initialization');
         window.Logger.info('🎯 DOM Content Loaded - Starting Unified App Initialization', { page: "unified-app-initializer" });
+    console.log('🔍 Current URL:', window.location.href);
+    console.log('🔍 Current pathname:', window.location.pathname);
     window.Logger.info('🔍 Current URL:', window.location.href, { page: "unified-app-initializer" });
     window.Logger.info('🔍 Current pathname:', window.location.pathname, { page: "unified-app-initializer" });
     
     try {
         // Delay to ensure all scripts are loaded and initialized
         setTimeout(async () => {
+            console.log('🚀 About to call initializeUnifiedApp...');
             window.Logger.info('🚀 About to call initializeUnifiedApp...', { page: "unified-app-initializer" });
             await window.initializeUnifiedApp();
+            console.log('✅ initializeUnifiedApp completed');
             window.Logger.info('✅ initializeUnifiedApp completed', { page: "unified-app-initializer" });
             
             // Handle page-specific functions
@@ -1416,6 +1433,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 1000);
         
     } catch (error) {
+        console.error('❌ Unified App auto-initialization failed:', error);
         window.Logger.error('❌ Unified App auto-initialization failed:', error, { page: "unified-app-initializer" });
     }
 });

@@ -83,30 +83,44 @@
   cursor: default;
 }
 
-/* כפתור חזור בכותרת מודול */
-.modal-back-btn,
-button[data-button-type="BACK"] {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  flex-shrink: 0;
-  padding: 0;
-  display: none; /* יוצג רק אם יש היסטוריה */
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 1px solid var(--current-entity-color-dark, #6c757d);
-  background: transparent;
+/* קישורי Breadcrumb - ב-bold, שקיפות 0.8, לחיצה פעילה */
+.breadcrumb-link {
   color: var(--current-entity-color-dark, #6c757d);
-  transition: all 0.2s ease;
+  font-weight: bold;
+  opacity: 0.8;
+  text-decoration: none;
   cursor: pointer;
+  transition: opacity 0.2s ease;
 }
 
-.modal-back-btn:hover,
-button[data-button-type="BACK"]:hover {
-  background: var(--current-entity-color-dark, #6c757d);
-  color: white;
-  border-color: var(--current-entity-color-dark, #6c757d);
+.breadcrumb-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.breadcrumb-link:active {
+  opacity: 0.6;
+}
+
+/* המודול הנוכחי ב-breadcrumb - ב-bold, שקיפות 0.8, ללא קישור */
+.breadcrumb-current {
+  color: var(--current-entity-color-dark, #6c757d);
+  font-weight: bold;
+  opacity: 0.8;
+  cursor: default;
+}
+
+/* כפתור חזור בכותרת מודול */
+button[data-button-type="BACK"] {
+  display: none; /* מוסתר כברירת מחדל */
+  flex-shrink: 0;
+}
+
+button[data-button-type="BACK"][data-navigation-listener="true"] {
+  display: flex; /* מוצג כשיש היסטוריה - מנוהל על ידי modal-navigation-manager */
+  visibility: visible;
+  pointer-events: auto;
+  order: 997; /* מימין לכפתור סגירה - order נמוך יותר = מימין ב-RTL */
 }
 
 /* Modal header layout עם navigation */
@@ -115,6 +129,46 @@ button[data-button-type="BACK"]:hover {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
+  justify-content: space-between;
+  direction: rtl;
+}
+
+/* Entity Details Modal - כותרת מותאמת */
+.modal-header.modal-header-colored {
+  align-items: flex-start;
+}
+
+.modal-header-title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.modal-header-title-section .modal-title {
+  margin: 0;
+  text-align: start;
+}
+
+/* Breadcrumb - במרכז בין הכותרת לכפתורים */
+.modal-navigation-breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  margin: 0 1rem;
+  order: 1; /* בין הכותרת (order: 0) לכפתורים (order: 2) */
+}
+
+.modal-header-title-section {
+  order: 0; /* משמאל (הכי שמאלה ב-RTL) */
+}
+
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  order: 2; /* מימין (הכי ימינה ב-RTL) */
 }
 
 /* הודעות - וידוא שהן מופיעות מעל הכל */
@@ -345,136 +399,52 @@ button[data-button-type="BACK"]:hover {
   content: none;
 }
 
-/* ===== כפתור סגירה במערכת הכפתורים - בצד שמאל בכותרת ===== */
-/* מצב רגיל - גוון כהה של הישות - עם !important כדי לדרוס סגנונות נגטיביים */
+/* ===== כפתורי סגירה וחזרה - מנוהלים על ידי מערכת הכפתורים ===== */
 .modal-header button[data-button-type="CLOSE"],
-.modal-header .modal-close-btn {
-  /* מיקום - בסוף שורת הכותרת משמאל (RTL) */
-  margin-inline-start: 0;
-  margin-inline-end: 0;
-  order: 10; /* אחרון - שמאל ב-RTL (אחרי הכותרת והכפתורים האחרים) */
-  
-  /* גודל קטן */
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
+.modal-header button[data-button-type="BACK"] {
   flex-shrink: 0; /* לא יתכווץ */
-  padding: 0;
-  
-  /* צבע - גוון כהה של הישות (מצב רגיל) - עם !important */
-  color: var(--current-entity-color-dark) !important;
-  border-color: var(--current-entity-color-dark) !important;
-  background: transparent !important;
-  border: 1px solid var(--current-entity-color-dark) !important;
-  
-  /* איקון בלבד */
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  
-  /* עיגול */
-  border-radius: 50%;
-  
-  /* מעבר חלק */
-  transition: all 0.2s ease;
+  /* גובה אחיד לשני הכפתורים - 32px (override ל-variant="small" של CLOSE) */
+  height: 32px !important;
+  min-height: 32px;
+  max-height: 32px;
+  /* padding ו-font-size אחיד לשני הכפתורים - override ל-CLOSE variant="small" */
+  padding: 6px 12px !important;
+  font-size: 14px !important;
+  color: var(--current-entity-color-dark, #6c757d); /* צבע מינימליסטי - גוון כהה של הישות */
+  border: 1px solid var(--current-entity-color-dark, #6c757d);
+  background: transparent;
+  border-radius: 6px;
+  box-sizing: border-box;
 }
 
-/* כפתור סגירה - hover */
-.modal-header button[data-button-type="CLOSE"]:hover,
-.modal-header .modal-close-btn:hover {
-  background: var(--current-entity-color-dark);
-  color: white;
-  border-color: var(--current-entity-color-dark);
+.modal-header button[data-button-type="BACK"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
-/* כפתור סגירה במודולים עם ישות ספציפית */
-.modal[data-entity-type="trade"] .modal-header button[data-button-type="CLOSE"] {
-  color: var(--entity-trade-color-dark, var(--entity-trade-color));
-  border-color: var(--entity-trade-color-dark, var(--entity-trade-color));
+.modal-header button[data-button-type="CLOSE"] {
+  order: 998; /* משמאל (הכי שמאלה) - order גבוה יותר = משמאל ב-RTL */
 }
 
-.modal[data-entity-type="trade"] .modal-header button[data-button-type="CLOSE"]:hover {
-  background: var(--entity-trade-color-dark, var(--entity-trade-color));
-  color: white;
-}
-
-.modal[data-entity-type="ticker"] .modal-header button[data-button-type="CLOSE"] {
-  color: var(--entity-ticker-color-dark, var(--entity-ticker-color));
-  border-color: var(--entity-ticker-color-dark, var(--entity-ticker-color));
-}
-
-.modal[data-entity-type="ticker"] .modal-header button[data-button-type="CLOSE"]:hover {
-  background: var(--entity-ticker-color-dark, var(--entity-ticker-color));
-  color: white;
-}
-
-.modal[data-entity-type="account"] .modal-header button[data-button-type="CLOSE"] {
-  color: var(--entity-account-color-dark, var(--entity-account-color));
-  border-color: var(--entity-account-color-dark, var(--entity-account-color));
-}
-
-.modal[data-entity-type="account"] .modal-header button[data-button-type="CLOSE"]:hover {
-  background: var(--entity-account-color-dark, var(--entity-account-color));
-  color: white;
-}
-
-.modal[data-entity-type="alert"] .modal-header button[data-button-type="CLOSE"] {
-  color: var(--entity-alert-color-dark, var(--entity-alert-color));
-  border-color: var(--entity-alert-color-dark, var(--entity-alert-color));
-}
-
-.modal[data-entity-type="alert"] .modal-header button[data-button-type="CLOSE"]:hover {
-  background: var(--entity-alert-color-dark, var(--entity-alert-color));
-  color: white;
+.modal-header button[data-button-type="BACK"] {
+  order: 997; /* מימין לכפתור סגירה - order נמוך יותר = מימין ב-RTL */
 }
 
 .modal-header button[data-button-type="CLOSE"]:hover,
-.modal-header .modal-close-btn:hover {
-  background: var(--current-entity-color-dark);
+.modal-header button[data-button-type="BACK"]:hover:not(:disabled) {
+  background: var(--current-entity-color-dark, #6c757d);
   color: white;
-  border-color: var(--current-entity-color-dark);
+  border-color: var(--current-entity-color-dark, #6c757d);
 }
 
-/* כפתור סגירה במודולים עם ישות ספציפית */
-.modal[data-entity-type="trade"] .modal-header button[data-button-type="CLOSE"] {
-  color: var(--entity-trade-color-dark, var(--entity-trade-color));
-  border-color: var(--entity-trade-color-dark, var(--entity-trade-color));
-}
-
-.modal[data-entity-type="trade"] .modal-header button[data-button-type="CLOSE"]:hover {
-  background: var(--entity-trade-color-dark, var(--entity-trade-color));
-  color: white;
-}
-
-/* לכל הישויות - צבע כהה של הישות */
-.modal[data-entity-type="ticker"] .modal-header button[data-button-type="CLOSE"] {
-  color: var(--entity-ticker-color-dark, var(--entity-ticker-color));
-  border-color: var(--entity-ticker-color-dark, var(--entity-ticker-color));
-}
-
-.modal[data-entity-type="ticker"] .modal-header button[data-button-type="CLOSE"]:hover {
-  background: var(--entity-ticker-color-dark, var(--entity-ticker-color));
-  color: white;
-}
-
-.modal[data-entity-type="account"] .modal-header button[data-button-type="CLOSE"] {
-  color: var(--entity-account-color-dark, var(--entity-account-color));
-  border-color: var(--entity-account-color-dark, var(--entity-account-color));
-}
-
-.modal[data-entity-type="account"] .modal-header button[data-button-type="CLOSE"]:hover {
-  background: var(--entity-account-color-dark, var(--entity-account-color));
-  color: white;
-}
-
-.modal[data-entity-type="alert"] .modal-header button[data-button-type="CLOSE"] {
-  color: var(--entity-alert-color-dark, var(--entity-alert-color));
-  border-color: var(--entity-alert-color-dark, var(--entity-alert-color));
-}
-
-.modal[data-entity-type="alert"] .modal-header button[data-button-type="CLOSE"]:hover {
-  background: var(--entity-alert-color-dark, var(--entity-alert-color));
-  color: white;
+.modal-header button[data-button-type="BACK"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* כפתור סגירה בכותרת רגילה - צבע לבן (על רקע צבעוני) */
@@ -508,20 +478,7 @@ button[data-button-type="BACK"]:hover {
   filter: none;
 }
 
-/* כפתור סגירה בכותרת צבעונית - גוון כהה */
-.modal-header-colored button[data-button-type="CLOSE"],
-.modal-header-colored .modal-close-btn {
-  color: var(--current-entity-color-dark) !important;
-  border-color: var(--current-entity-color-dark) !important;
-  background: transparent !important;
-}
-
-.modal-header-colored button[data-button-type="CLOSE"]:hover,
-.modal-header-colored .modal-close-btn:hover {
-  background: var(--current-entity-color-dark) !important;
-  color: white !important;
-  border-color: var(--current-entity-color-dark) !important;
-}
+/* כפתור סגירה בכותרת צבעונית - מנוהל על ידי מערכת הכפתורים */
 
 /* כותרת מודל סכנה - רקע אדום */
 .modal-header-danger {
@@ -663,4 +620,15 @@ button[data-button-type="BACK"]:hover {
 .modal[data-entity-type="execution"] [data-button-type="SAVE"] {
   background-color: var(--entity-execution-color);
   border-color: var(--entity-execution-color);
+}
+
+/* ===== Entity Details Modal - Loading and Error States ===== */
+.entity-details-loading,
+.entity-details-error {
+  min-height: 300px;
+}
+
+.entity-details-loading .spinner-border {
+  width: 3rem;
+  height: 3rem;
 }

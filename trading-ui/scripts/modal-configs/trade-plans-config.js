@@ -114,45 +114,9 @@ const tradePlansModalConfig = {
             maxLength: 1000
         }
     ],
-    validation: {
-        tradePlanTicker: {
-            required: true
-        },
-        tradePlanName: {
-            required: true,
-            minLength: 2,
-            maxLength: 100
-        },
-        tradePlanType: {
-            required: true
-        },
-        tradePlanQuantity: {
-            required: true,
-            min: 1
-        },
-        tradePlanEntryPrice: {
-            required: false,
-            min: 0.01
-        },
-        tradePlanStopLoss: {
-            required: false,
-            min: 0.01
-        },
-        tradePlanTakeProfit: {
-            required: false,
-            min: 0.01
-        },
-        tradePlanEntryDate: {
-            required: false
-        },
-        tradePlanStatus: {
-            required: true
-        },
-        tradePlanNotes: {
-            required: false,
-            maxLength: 1000
-        }
-    },
+    // REMOVED: validation property - Validation is handled by centralized validation system (validation-utils.js)
+    // The system automatically validates fields based on HTML [required] attribute and input types
+    // Field required status is set via field.required property in the fields array above
     onSave: 'saveTradePlan'
 };
 

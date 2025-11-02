@@ -59,7 +59,8 @@ class Logger {
 
     constructor() {
         this.initialized = false;
-        this.currentLevel = Logger.LogLevel.WARN; // הפחתת רעש - רק WARN ומעלה
+        // במצב DEBUG - מציגים INFO ומעלה, במצב ייצור - רק WARN ומעלה
+        this.currentLevel = Logger.DEBUG_MODE ? Logger.LogLevel.INFO : Logger.LogLevel.WARN;
         this.pendingLogs = [];
         this.batchSize = 50; // הגדלת batch size להפחתת בקשות
         this.batchTimeout = 10000; // 10 seconds - הפחתת תדירות

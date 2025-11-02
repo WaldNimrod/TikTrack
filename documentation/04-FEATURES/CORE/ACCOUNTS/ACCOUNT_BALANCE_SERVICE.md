@@ -409,3 +409,5 @@ const balances = await AccountBalanceService.getBalances([1, 2, 3]);
 
 **עקרון השימוש:** כל עמוד שמציג יתרות חשבון צריך להשתמש ב-`AccountBalanceService` במקום לייצר קוד מקומי.
 
+
+

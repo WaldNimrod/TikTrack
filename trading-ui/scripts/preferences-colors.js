@@ -25,7 +25,9 @@
  * - ColorPreview: Live preview system
  */
 
-window.Logger.info('🎨 Loading preferences-colors.js v1.0.0...', { page: "preferences-colors" });
+if (window.Logger && window.Logger.info) {
+    window.Logger.info('🎨 Loading preferences-colors.js v1.0.0...', { page: "preferences-colors" });
+}
 
 // ============================================================================
 // COLOR MANAGER CLASS
@@ -602,4 +604,6 @@ if (document.readyState === 'loading') {
     window.Logger.info('🎨 Color preferences system initialized', { page: "preferences-colors" });
 }
 
-window.Logger.info('✅ preferences-colors.js loaded successfully', { page: "preferences-colors" });
+if (window.Logger && window.Logger.info) {
+    window.Logger.info('✅ preferences-colors.js loaded successfully', { page: "preferences-colors" });
+}

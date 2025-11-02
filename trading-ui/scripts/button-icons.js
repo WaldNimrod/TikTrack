@@ -39,7 +39,8 @@ const BUTTON_ICONS = {
   TOGGLE: '▼',
   SORT: '↕️',
   COPY: '📋',
-  MENU: '⚙️'
+  MENU: '⚙️',
+  BACK: '→' // חץ ימינה ל-RTL - מינימליסטי
 };
 
 const BUTTON_TEXTS = {
@@ -70,7 +71,8 @@ const BUTTON_TEXTS = {
   TOGGLE: 'הצג/הסתר',
   SORT: 'מיון',
   COPY: 'העתק',
-  MENU: 'תפריט'
+  MENU: 'תפריט',
+  BACK: 'חזור'
 };
 
 /**

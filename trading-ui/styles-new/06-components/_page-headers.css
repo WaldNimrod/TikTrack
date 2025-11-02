@@ -151,7 +151,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: 1;
+  flex: 0 0 auto; /* לא מתרחב - ברוחב התוכן בלבד */
+  width: auto; /* רוחב אוטומטי לפי התוכן */
   
   /* Typography - אחיד */
   font-size: 1.125rem; /* 18px - זהה ל-section-header */

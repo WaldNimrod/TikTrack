@@ -69,7 +69,8 @@ window.Logger.info('🏠 Index page JavaScript loaded', { page: "index" });
  */
 
 // ===== GLOBAL VARIABLES =====
-let homeCharts = {
+// Export homeCharts to global scope for enhancements system
+window.homeCharts = {
     tradesStatusChart: null,
     performanceChart: null,
     accountChart: null,
@@ -314,7 +315,17 @@ async function createMixedChart() {
 // REMOVED: createMixedChartData - not used, createMixedChart uses chartData.mixed from tradesAdapter.formatData()
 
 // Chart Management Functions
+// Flag to prevent duplicate chart refresh
+let chartsRefreshing = false;
+
 async function refreshAllCharts() {
+    // Prevent duplicate refresh
+    if (chartsRefreshing) {
+        window.Logger.info('⏭️ Charts refresh already in progress, skipping...', { page: "index" });
+        return;
+    }
+    
+    chartsRefreshing = true;
     // window.Logger.info('🔄 Refreshing all charts...', { page: "index" });
     
     try {
@@ -335,6 +346,8 @@ async function refreshAllCharts() {
         if (window.showNotification) {
             window.showNotification('שגיאה ברענון הגרפים', 'error', 'business');
         }
+    } finally {
+        chartsRefreshing = false;
     }
 }
 
@@ -423,7 +436,17 @@ async function exportAllCharts() {
 }
 
 // Initialize index page - integrated with unified system
+// Flag to prevent duplicate initialization
+let indexPageInitialized = false;
+
 window.initializeIndexPage = async function() {
+    // Prevent duplicate initialization
+    if (indexPageInitialized) {
+        window.Logger.info('⚠️ Index page already initialized, skipping...', { page: "index" });
+        return;
+    }
+    
+    indexPageInitialized = true;
     window.Logger.info('🏠 Index page initialized via unified system', { page: "index" });
     
     // Initialize overview data
@@ -441,19 +464,16 @@ window.initializeIndexPage = async function() {
     }
     
     // Initialize charts after a short delay to ensure all systems are loaded
+    // Note: This is called automatically by PAGE_CONFIGS.index.customInitializers
     setTimeout(async () => {
         // window.Logger.info('📊 Initializing home page charts...', { page: "index" });
         await refreshAllCharts();
     }, 1000);
 };
 
-// Fallback for direct access (backward compatibility)
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', window.initializeIndexPage);
-} else {
-    // DOM already loaded, initialize immediately
-    window.initializeIndexPage();
-}
+// Note: initializeIndexPage() is now called via PAGE_CONFIGS.index.customInitializers
+// in unified-app-initializer.js, so we don't need to call it directly here.
+// This prevents duplicate chart initialization.
 
 // Export functions to global scope
 window.switchTableTab = switchTableTab;

@@ -475,9 +475,9 @@ class UnifiedAppInitializer {
                 initialized: window.UnifiedCacheManager?.initialized === true,
                 optional: false
             },
-            PreferencesSystem: {
-                available: typeof window.PreferencesSystem !== 'undefined' && window.PreferencesSystem !== null,
-                initialized: window.PreferencesSystem?.initialized === true,
+            PreferencesCore: {
+                available: typeof window.PreferencesCore !== 'undefined' && window.PreferencesCore !== null,
+                initialized: window.PreferencesCore?.initialized === true || true, // PreferencesCore doesn't have explicit initialized flag
                 optional: false
             },
             Logger: {
@@ -1813,11 +1813,17 @@ window.createAndShowModal = function(modalHtml, modalId, options = {}) {
   // Start observing (will cover both show AND hide transitions)
   observer.observe(modalElement, { attributes: true, attributeFilter: ['aria-hidden', 'inert'] });
   
-  // Initialize Bootstrap modal
-  const modal = new bootstrap.Modal(modalElement, options);
+  // Initialize Bootstrap modal - ללא backdrop (ננהל אותו מרכזית)
+  const modalOptions = { ...options, backdrop: false };
+  const modal = new bootstrap.Modal(modalElement, modalOptions);
   
   // Show modal
   modal.show();
+  
+  // ניהול backdrop מרכזית דרך ModalNavigationManager
+  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
+    window.modalNavigationManager.manageBackdrop();
+  }
   
   // Stop observing only after modal is fully hidden (not after shown!)
   // This ensures we catch aria-hidden during close transition too
@@ -2470,13 +2476,11 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
   // Show modal using simple system (no Bootstrap dependency)
   modal.style.display = 'block';
   modal.classList.add('show');
-  document.body.classList.add('modal-open');
   
-  // Create backdrop
-  const backdrop = document.createElement('div');
-  backdrop.className = 'modal-backdrop fade show';
-  backdrop.id = `${modalId}-backdrop`;
-  document.body.appendChild(backdrop);
+  // ניהול backdrop מרכזית דרך ModalNavigationManager
+  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
+    window.modalNavigationManager.manageBackdrop();
+  }
   
   // Copy button in header
   const copyButton = modal.querySelector(`#${modalId}-copy-btn`);
@@ -2605,6 +2609,9 @@ async function showDetailsModal(title, content, options = {}) {
   // Extract text content for copying
   const textContent = extractTextFromHTML(content);
   
+  // Check if copy button should be included
+  const includeCopyButton = options.includeCopyButton || false;
+  
   // Create modal HTML
   const modalHTML = `
     <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label">
@@ -2613,6 +2620,9 @@ async function showDetailsModal(title, content, options = {}) {
           <div class="modal-header modal-header-info text-white d-flex justify-content-between align-items-center" style="direction: rtl;">
             <h4 class="modal-title fw-bold" id="${modalId}-label">${title}</h4>
             <div class="d-flex gap-2">
+              ${includeCopyButton ? `<button type="button" class="btn btn-sm btn-primary" id="${modalId}-copy-btn" title="העתק ללוח">
+                <i class="fas fa-copy"></i> העתק
+              </button>` : ''}
               <button type="button" class="btn btn-sm btn-secondary" id="${modalId}-close-btn" title="סגור">
                 X
               </button>
@@ -2665,7 +2675,25 @@ async function showDetailsModal(title, content, options = {}) {
   const copyButton = modal.querySelector(`#${modalId}-copy-btn`);
   if (copyButton) {
     copyButton.addEventListener('click', () => {
-      copyToClipboard(textContent, title);
+      // אם יש קוד שנוצר, השתמש בו; אחרת השתמש בתוכן הטקסט
+      const codeToCopy = window.lastGeneratedCode || textContent;
+      if (window.lastGeneratedCode) {
+        // העתקת קוד שנוצר
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(codeToCopy).then(() => {
+            if (typeof showNotification === 'function') {
+              showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
+            }
+          }).catch(err => {
+            console.error('Clipboard API failed:', err);
+            copyToClipboard(codeToCopy, title);
+          });
+        } else {
+          copyToClipboard(codeToCopy, title);
+        }
+      } else {
+        copyToClipboard(textContent, title);
+      }
     });
   }
   
@@ -2696,12 +2724,16 @@ function hideModal(modalId) {
   if (modal) {
     modal.style.display = 'none';
     modal.classList.remove('show');
-    document.body.classList.remove('modal-open');
     modal.remove();
   }
   
   if (backdrop) {
     backdrop.remove();
+  }
+  
+  // ניהול backdrop מרכזית דרך ModalNavigationManager
+  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
+    window.modalNavigationManager.manageBackdrop();
   }
 }
 
@@ -2993,7 +3025,7 @@ async function loadGlobalNotificationHistory() {
     }
     
     // Fallback דרך UnifiedCacheManager - כלל 44
-    if (window.UnifiedCacheManager?.isInitialized()) {
+    if (window.UnifiedCacheManager?.initialized) {
       try {
         const savedHistory = await window.UnifiedCacheManager.get('tiktrack_global_notifications_history', {
           layer: 'localStorage'
@@ -3033,7 +3065,7 @@ async function loadGlobalNotificationStats() {
     }
     
     // Fallback דרך UnifiedCacheManager - כלל 44
-    if (window.UnifiedCacheManager?.isInitialized()) {
+    if (window.UnifiedCacheManager?.initialized) {
       try {
         const savedStats = await window.UnifiedCacheManager.get('tiktrack_global_notifications_stats', {
           layer: 'localStorage'
@@ -3467,8 +3499,11 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 console.log('📋 Initializing Trade Plans...');
                 
-                if (typeof window.initializeTradePlansPage === 'function') {
-                    window.initializeTradePlansPage();
+                // Load trade plans data directly
+                if (typeof window.loadTradePlansData === 'function') {
+                    await window.loadTradePlansData();
+                } else {
+                    console.warn('⚠️ loadTradePlansData function not available');
                 }
             }
         ]

@@ -47,6 +47,12 @@ ModalNavigationManager
 ### `pushModal(modalElement, modalInfo)`
 הוספת מודול ל-stack והיסטוריה
 
+**לוגיקה:**
+- אם יש `sourceInfo` (מודול מקונן חדש) - תמיד מוסיף להיסטוריה, גם אם אותו element כבר קיים
+- שמירת תוכן המודול הקודם (אם עדיין לא נשמר) לפני הוספת מודול מקונן חדש
+- אם זה אותו מודול עם `sourceInfo` זהה - רק מעדכן את המידע והתוכן
+- אם זה מודול חדש ללא `sourceInfo` - מוסיף להיסטוריה
+
 **פרמטרים:**
 - `modalElement` (HTMLElement) - אלמנט המודול
 - `modalInfo` (Object) - מידע על המודול `{type, entityType, entityId, title}`
@@ -184,16 +190,29 @@ Backdrop גלובלי - תמיד רק אחד
 ### פתיחת מודול חדש
 1. המשתמש לוחץ על כפתור "פרטים" או "ערוך"
 2. `showModal()` נקרא ב-`EntityDetailsModal` או `ModalManagerV2`
-3. `ModalNavigationManager.pushModal()` נקרא עם מידע המודול
-4. `manageBackdrop()` יוצר/מעדכן backdrop גלובלי
-5. `updateModalNavigation()` מעדכן breadcrumb וכפתור חזור
+3. `ModalNavigationManager.pushModal()` נקרא עם מידע המודול (מ-`showModal()` או מ-`loadEntityData()`)
+   - אם יש `sourceInfo` (מודול מקונן), מוסיף אותו להיסטוריה גם אם אותו element כבר קיים
+   - שמירת תוכן המודול הקודם לפני הוספת מודול מקונן חדש
+4. Bootstrap Modal נפתח (`shown.bs.modal` event)
+5. `handleModalShown()` נקרא - בודק אם המודול כבר קיים בהיסטוריה
+   - בודק אם זה אותו מודול מקונן בדיוק (same entityType + entityId + sourceInfo) - אם כן, רק מעדכן
+   - אחרת, מוסיף מודול חדש להיסטוריה
+6. `manageBackdrop()` יוצר/מעדכן backdrop גלובלי
+7. `updateModalNavigation()` מעדכן breadcrumb וכפתור חזור
 
 ### חזרה למודול קודם
 1. המשתמש לוחץ על כפתור "חזור"
 2. `goBack()` נקרא
-3. המודול הנוכחי נסגר (`bootstrap.Modal.hide()`)
-4. `handleModalHidden()` מטפל בהסרה מה-stack
-5. `updateModalNavigation()` מעדכן את המודול הקודם
+3. שמירת תוכן המודול הנוכחי (אם עדיין לא נשמר)
+4. הסרת המודול הנוכחי מה-history (`pop()`)
+5. סגירת המודול הנוכחי (`bootstrap.Modal.hide()`)
+6. **המתנה ל-`hidden.bs.modal` event** - חשוב מאוד!
+7. אחרי שהמודול הנוכחי נסגר לחלוטין, `_showPreviousModal()` נקרא:
+   - עדכון כותרת המודול הקודם
+   - שחזור תוכן המודול הקודם (אם נשמר)
+   - הצגת המודול הקודם (`bootstrap.Modal.show()`)
+   - עדכון navigation UI (breadcrumb וכפתור חזור)
+8. `handleModalHidden()` מטפל בעדכון backdrop (אם יש מודולים אחרים פתוחים)
 
 ### סגירת מודול
 1. המשתמש לוחץ על כפתור "סגור"

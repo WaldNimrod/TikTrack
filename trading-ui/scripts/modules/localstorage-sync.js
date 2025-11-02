@@ -66,7 +66,7 @@ class LocalStorageSync {
             console.log(`🧹 Invalidating ${keys.length} cache keys from another tab...`);
             
             // Remove from UnifiedCacheManager
-            if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
                 for (const key of keys) {
                     await window.UnifiedCacheManager.remove(key);
                     console.log(`   ✅ Removed: ${key}`);

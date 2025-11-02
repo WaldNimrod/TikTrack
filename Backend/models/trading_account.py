@@ -37,7 +37,7 @@ class TradingAccount(BaseModel):
     name = Column(String(100), nullable=False)
     currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False)  # Foreign key to currencies table
     status = Column(String(20), default='open')
-    # cash_balance removed - calculated in real-time via AccountActivityService
+    cash_balance = Column(Float, default=0)  # Exists in DB - deprecated, use /api/account-activity/<account_id>/balances for real-time calculation
     total_value = Column(Float, default=0)
     total_pl = Column(Float, default=0)  # Not updated - shows "בפיתוח" in UI
     notes = Column(String(500))

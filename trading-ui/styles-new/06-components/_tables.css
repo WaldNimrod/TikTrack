@@ -256,9 +256,9 @@
 .trade-plans-table .col-status { width: 8%; min-width: 70px; }      /* 8. סטטוס */
 .trade-plans-table .col-risk-reward { width: 18%; min-width: 150px; } /* 9. סיכוי/סיכון */
 .trade-plans-table .col-actions { 
-  width: 5%; 
+  width: auto; 
   min-width: 50px; 
-  max-width: 50px; 
+  max-width: 100px; 
 }   /* 10. פעולות - Actions Menu Popup - תפריט נפתח בלבד */
 
 /* ===== עמודות ספציפיות לטבלאות שונות ===== */
@@ -424,9 +424,9 @@
 
 /* ===== עמודות פעולות ===== */
 .col-actions { 
-  width: 5%; 
+  width: auto; 
   min-width: 50px; 
-  max-width: 50px;
+  max-width: 100px;
 }
 
 /* ===== Actions Menu System ===== */
@@ -592,4 +592,76 @@
 
 .db-display-table .section-header {
     padding: 0.5rem 1rem;
+}
+
+/* ===== עמודות ספציפיות לעמוד Trading Accounts ===== */
+/* רוחבי עמודות לפי הסטנדרט המרכזי */
+.table[data-table-type="accounts"] .col-name,
+.data-table[data-table-type="accounts"] .col-name,
+.data-table[data-table-type="trading_accounts"] .col-name {
+    width: var(--col-name-width, 18%);
+    min-width: 100px;
+}
+
+.table[data-table-type="accounts"] .col-currency,
+.data-table[data-table-type="accounts"] .col-currency,
+.data-table[data-table-type="trading_accounts"] .col-currency {
+    width: 8%;
+    min-width: 70px;
+    text-align: center;
+}
+
+.table[data-table-type="accounts"] .col-balance,
+.data-table[data-table-type="accounts"] .col-balance,
+.data-table[data-table-type="trading_accounts"] .col-balance {
+    width: 12%;
+    min-width: 100px;
+}
+
+.table[data-table-type="accounts"] .col-positions,
+.data-table[data-table-type="accounts"] .col-positions,
+.data-table[data-table-type="trading_accounts"] .col-positions {
+    width: 8%;
+    min-width: 70px;
+    text-align: center;
+}
+
+.table[data-table-type="accounts"] .col-total-pl,
+.data-table[data-table-type="accounts"] .col-total-pl,
+.data-table[data-table-type="trading_accounts"] .col-total-pl {
+    width: 10%;
+    min-width: 90px;
+    text-align: center;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table[data-table-type="accounts"] .col-status,
+.data-table[data-table-type="accounts"] .col-status,
+.data-table[data-table-type="trading_accounts"] .col-status {
+    width: 8%;
+    min-width: 70px;
+}
+
+.table[data-table-type="accounts"] .col-actions,
+.data-table[data-table-type="accounts"] .col-actions,
+.data-table[data-table-type="trading_accounts"] .col-actions {
+    width: auto;
+    min-width: 50px;
+    max-width: 100px;
+}
+
+/* יישור תאים למרכז */
+.table[data-table-type="accounts"] td.col-currency,
+.data-table[data-table-type="accounts"] td.col-currency,
+.data-table[data-table-type="trading_accounts"] td.col-currency,
+.table[data-table-type="accounts"] td.col-positions,
+.data-table[data-table-type="accounts"] td.col-positions,
+.data-table[data-table-type="trading_accounts"] td.col-positions,
+.table[data-table-type="accounts"] td.col-total-pl,
+.data-table[data-table-type="accounts"] td.col-total-pl,
+.data-table[data-table-type="trading_accounts"] td.col-total-pl {
+    text-align: center;
 }

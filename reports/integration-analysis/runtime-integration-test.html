@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Runtime Integration Checker - TikTrack</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .system { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        .available { background-color: #d4edda; }
+        .missing { background-color: #f8d7da; }
+        .partial { background-color: #fff3cd; }
+        .summary { margin: 20px 0; padding: 15px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Runtime Integration Checker</h1>
+    <div id="results"></div>
+    
+    <script>
+        const systemsToCheck = ["DataCollectionService","CRUDResponseHandler","SelectPopulatorService","DefaultValueSetter","LinkedItemsService","FieldRendererService","StatisticsCalculator","AlertConditionRenderer","ModalManagerV2","UnifiedCacheManager","CacheSyncManager","CachePolicyManager","ModalNavigationManager","EventHandlerManager","PreferencesGroupManager","NotificationSystem","Logger","HeaderSystem","ButtonSystem","ActionsMenuSystem","InfoSummarySystem","ColorSchemeSystem","UnifiedAppInitializer","AlertService","TickerService","TradePlanService","AccountService","EntityDetailsModal","EntityDetailsRenderer","EntityDetailsAPI","PreferencesCore","PreferencesSystem","toggleSection","showSuccessNotification","showErrorNotification","showWarningNotification","showInfoNotification","showFieldError","clearValidation","loadTableData","getPageDataFunctions"];
+        const results = {
+            availability: {},
+            missing: [],
+            partial: []
+        };
+        
+        // Check each system
+        systemsToCheck.forEach(systemName => {
+            const isAvailable = typeof window[systemName] !== 'undefined';
+            const hasMethods = isAvailable ? Object.keys(window[systemName] || {}).length > 0 : false;
+            
+            results.availability[systemName] = {
+                available: isAvailable,
+                hasMethods: hasMethods,
+                type: typeof window[systemName],
+                methods: isAvailable && typeof window[systemName] === 'object' 
+                    ? Object.keys(window[systemName]).filter(k => typeof window[systemName][k] === 'function')
+                    : []
+            };
+            
+            if (!isAvailable) {
+                results.missing.push(systemName);
+            } else if (!hasMethods && typeof window[systemName] === 'object') {
+                results.partial.push(systemName);
+            }
+        });
+        
+        // Validate dependency chains
+        const dependencyChains = validateDependencyChains(results.availability);
+        
+        // Measure initialization times (if possible)
+        const initTimes = measureInitializationTimes();
+        
+        // Render results
+        renderResults(results, dependencyChains, initTimes);
+        
+        function validateDependencyChains(availability) {
+            const chains = [];
+            // Implementation would check if required dependencies are available
+            return chains;
+        }
+        
+        function measureInitializationTimes() {
+            const times = {};
+            // Implementation would measure actual init times
+            return times;
+        }
+        
+        function renderResults(results, chains, times) {
+            const container = document.getElementById('results');
+            let html = '<div class="summary">';
+            html += '<h2>Summary</h2>';
+            html += '<p>Available: ' + (systemsToCheck.length - results.missing.length) + '/' + systemsToCheck.length + '</p>';
+            html += '<p>Missing: ' + results.missing.length + '</p>';
+            html += '<p>Partial: ' + results.partial.length + '</p>';
+            html += '</div>';
+            
+            html += '<h2>System Availability</h2>';
+            Object.entries(results.availability).forEach(([name, info]) => {
+                const status = info.available ? (info.hasMethods ? 'available' : 'partial') : 'missing';
+                html += '<div class="system ' + status + '">';
+                html += '<strong>' + name + '</strong>: ';
+                html += info.available ? 'Available' : 'Missing';
+                if (info.available && info.methods.length > 0) {
+                    html += ' (' + info.methods.length + ' methods: ' + info.methods.join(', ') + ')';
+                }
+                html += '</div>';
+            });
+            
+            container.innerHTML = html;
+            
+            // Log to console for programmatic access
+            console.log('Runtime Integration Check Results:', {
+                results: results,
+                chains: chains,
+                times: times
+            });
+        }
+    </script>
+</body>
+</html>

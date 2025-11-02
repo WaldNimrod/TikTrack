@@ -940,21 +940,19 @@ class ModalManagerV2 {
      * @private
      */
     initializeValidation(modalElement, config) {
-        if (!window.initializeValidation || !config.validation) return;
+        if (!window.initializeValidation) return;
         
         const form = modalElement.querySelector('form');
         if (!form) return;
         
-        // יצירת כללי ולידציה
-        const validationRules = {};
-        config.fields.forEach(field => {
-            if (field.validation) {
-                validationRules[field.id] = field.validation;
-            }
-        });
-        
-        // אתחול ולידציה
-        window.initializeValidation(form.id, validationRules);
+        // אתחול מערכת הוולידציה המרכזית
+        // המערכת המרכזית (validation-utils.js) בודקת אוטומטית:
+        // 1. שדות עם [required] attribute
+        // 2. שדות תאריך (input[type="date"])
+        // 3. שדות מספר (input[type="number"])
+        // 4. ולידציה לפי סוגי שדות (text, email, etc.)
+        // אין צורך להעביר validationRules - המערכת המרכזית עובדת לפי HTML attributes
+        window.initializeValidation(form.id, {});
     }
 
     /**
@@ -1272,7 +1270,8 @@ class ModalManagerV2 {
         if (window.modalNavigationManager) {
             // עדכון המידע במודול הנוכחי
             const currentIndex = window.modalNavigationManager.modalHistory.findIndex(item => item.element === modalElement);
-            if (currentIndex >= 0) {
+            if (currentIndex >= 0 && currentIndex !== 0) {
+                // חשוב: לא נעדכן את המודול הראשון (index 0) - הוא חייב להישאר קבוע
                 window.modalNavigationManager.modalHistory[currentIndex].info.title = title;
             }
             // עדכון UI

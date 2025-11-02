@@ -146,7 +146,7 @@ const PACKAGE_MANIFEST = {
         file: 'logger-service.js',
         globalCheck: 'window.Logger',
         description: 'שירות לוגים מתקדם',
-        required: false,
+        required: true,
         loadOrder: 8
       },
       {
@@ -260,13 +260,6 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.AlertConditionRenderer',
         description: 'מציג תנאי התראות',
         required: false,
-        loadOrder: 8
-      },
-      {
-        file: 'services/linked-items-service.js',
-        globalCheck: 'window.LinkedItemsService',
-        description: 'שירות לוגיקה משותפת לפריטים מקושרים',
-        required: true,
         loadOrder: 7
       }
     ],
@@ -342,60 +335,47 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5
       },
       {
-        file: 'modules/cache-module.js',
-        globalCheck: 'window.CacheModule',
-        description: 'מודול מטמון',
-        required: true,
-        loadOrder: 6
-      },
-      {
         file: 'modules/data-advanced.js',
         globalCheck: 'window.DataAdvanced',
         description: 'נתונים מתקדמים',
         required: true,
-        loadOrder: 7
+        loadOrder: 6
       },
       {
         file: 'modules/ui-advanced.js',
         globalCheck: 'window.UIAdvanced',
         description: 'ממשק מתקדם',
         required: true,
-        loadOrder: 8
+        loadOrder: 7,
+        exports: ['window.loadUserPreferences'] // Explicitly document that this script exports loadUserPreferences
       },
       {
         file: 'modules/communication-module.js',
         globalCheck: 'window.CommunicationModule',
         description: 'מודול תקשורת',
         required: true,
-        loadOrder: 9
+        loadOrder: 8
       },
       {
         file: 'modules/business-module.js',
         globalCheck: 'window.BusinessModule',
         description: 'מודול עסקי',
         required: true,
-        loadOrder: 10
+        loadOrder: 9
       },
       {
         file: 'modules/localstorage-sync.js',
         globalCheck: 'window.LocalStorageSync',
         description: 'סנכרון localStorage',
         required: true,
-        loadOrder: 11
-      },
-      {
-        file: 'modules/polling-manager.js',
-        globalCheck: 'window.PollingManager',
-        description: 'מנהל סקר',
-        required: true,
-        loadOrder: 12
+        loadOrder: 10
       },
       {
         file: 'modules/dynamic-loader-config.js',
         globalCheck: 'window.DynamicLoaderConfig',
         description: 'תצורת טעינה דינמית',
         required: true,
-        loadOrder: 13
+        loadOrder: 11
       },
       {
         file: 'modal-navigation-manager.js',
@@ -410,6 +390,13 @@ const PACKAGE_MANIFEST = {
         description: 'מנהל מודלים V2',
         required: true,
         loadOrder: 2
+      },
+      {
+        file: 'modal-configs/cash-flows-config.js',
+        globalCheck: 'window.CashFlowModalConfig',
+        description: 'קונפיגורציית מודל תזרימי מזומנים',
+        required: false,
+        loadOrder: 3
       }
     ],
     estimatedSize: '~250KB',
@@ -512,8 +499,8 @@ const PACKAGE_MANIFEST = {
         loadOrder: 8
       }
     ],
-    estimatedSize: '~150KB',
-    initTime: '~85ms'
+    estimatedSize: '~160KB',
+    initTime: '~90ms'
   },
 
   // 6. VALIDATION PACKAGE - ולידציה
@@ -836,18 +823,25 @@ const PACKAGE_MANIFEST = {
         loadOrder: 8
       },
       {
+        file: 'services/linked-items-service.js',
+        globalCheck: 'window.LinkedItemsService',
+        description: 'שירות לוגיקה משותפת לפריטים מקושרים',
+        required: true,
+        loadOrder: 9
+      },
+      {
         file: 'linked-items.js',
         globalCheck: 'window.viewLinkedItems',
         description: 'פריטים מקושרים',
         required: true,
-        loadOrder: 9
+        loadOrder: 10
       },
       {
         file: 'related-object-filters.js',
         globalCheck: 'window.filterByRelatedObjectType',
         description: 'פילטרים של אובייקטים קשורים',
         required: true,
-        loadOrder: 10
+        loadOrder: 11
       }
     ],
     estimatedSize: '~180KB',
@@ -908,7 +902,7 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'system-management/core/sm-base.js',
-        globalCheck: 'window.SMBase',
+        globalCheck: 'window.SMBaseSection',
         description: 'בסיס ניהול מערכת',
         required: true
       },
@@ -1015,22 +1009,15 @@ const PACKAGE_MANIFEST = {
         loadOrder: 3
       },
       {
-        file: 'constraint-manager.js',
-        globalCheck: 'window.addEnumValue',
-        description: 'מנהל אילוצים',
-        required: true,
-        loadOrder: 4
-      },
-      {
         file: 'system-management.js',
         globalCheck: 'window.generateDetailedLog',
         description: 'ניהול מערכת כללי',
         required: true,
-        loadOrder: 5
+        loadOrder: 4
       }
     ],
-    estimatedSize: '~200KB',
-    initTime: '~120ms'
+    estimatedSize: '~150KB',
+    initTime: '~100ms'
   },
 
   // 14. DEV-TOOLS PACKAGE - כלי פיתוח

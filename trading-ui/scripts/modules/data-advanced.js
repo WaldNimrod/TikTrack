@@ -39,7 +39,7 @@ window.isNumeric = window.isNumeric || function(value) {
 async function loadCurrenciesFromServer() {
   try {
     let token = null;
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       token = await window.UnifiedCacheManager.get('authToken');
     } else {
       token = localStorage.getItem('authToken'); // fallback
@@ -162,7 +162,7 @@ function generateCurrencyOptions(account = null) {
  */
 async function apiCall(url, options = {}) {
   let token = null;
-  if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
     token = await window.UnifiedCacheManager.get('authToken');
   } else {
     token = localStorage.getItem('authToken'); // fallback
@@ -435,7 +435,7 @@ async function getUserPreference(key, defaultValue = null) {
     
     // Fallback ל-localStorage מקומי
     let preferences = {};
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.isInitialized()) {
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       try {
         preferences = await window.UnifiedCacheManager.get('tikTrack_preferences') || {};
       } catch (error) {

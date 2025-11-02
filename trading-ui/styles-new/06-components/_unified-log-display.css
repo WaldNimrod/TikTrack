@@ -491,7 +491,8 @@
 
 .actions-cell {
     white-space: nowrap;
-    min-width: 120px;
+    min-width: 50px;
+    max-width: 100px;
     
     .btn {
         margin-inline-start: var(--spacing-xs);

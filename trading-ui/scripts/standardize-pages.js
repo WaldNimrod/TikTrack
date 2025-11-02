@@ -85,6 +85,14 @@ class PageStandardizer {
     getScriptsForPage(pageName) {
         if (!window.PAGE_CONFIGS || !window.PAGE_CONFIGS[pageName]) {
             console.warn(`No config found for page: ${pageName}`);
+            // Fallback to base package from PACKAGE_MANIFEST or old packageScripts
+            if (window.PACKAGE_MANIFEST && window.PACKAGE_MANIFEST.base) {
+                const baseScripts = window.PACKAGE_MANIFEST.base.scripts
+                    .filter(s => s.required !== false)
+                    .sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0))
+                    .map(s => `scripts/${s.file}?v=1.0.0`);
+                return baseScripts.concat(this.coreScripts);
+            }
             return this.packageScripts.base.concat(this.coreScripts);
         }
         
@@ -93,12 +101,26 @@ class PageStandardizer {
         
         let scripts = [];
         
-        // Add scripts for each package
+        // Try to use PACKAGE_MANIFEST first, fallback to old packageScripts
         packages.forEach(pkg => {
-            if (this.packageScripts[pkg]) {
+            if (window.PACKAGE_MANIFEST && window.PACKAGE_MANIFEST[pkg]) {
+                // Use PACKAGE_MANIFEST
+                const pkgManifest = window.PACKAGE_MANIFEST[pkg];
+                if (pkgManifest.scripts && Array.isArray(pkgManifest.scripts)) {
+                    const pkgScripts = pkgManifest.scripts
+                        .filter(s => s.required !== false) // Only required scripts
+                        .sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0)) // Sort by loadOrder
+                        .map(s => `scripts/${s.file}?v=1.0.0`);
+                    scripts = scripts.concat(pkgScripts);
+                }
+            } else if (this.packageScripts[pkg]) {
+                // Fallback to old packageScripts
                 scripts = scripts.concat(this.packageScripts[pkg]);
             } else {
-                console.warn(`Package ${pkg} not found in packageScripts`);
+                // Only warn if PACKAGE_MANIFEST is available - otherwise it's expected
+                if (window.PACKAGE_MANIFEST) {
+                    console.warn(`Package ${pkg} not found in PACKAGE_MANIFEST or packageScripts`);
+                }
             }
         });
         

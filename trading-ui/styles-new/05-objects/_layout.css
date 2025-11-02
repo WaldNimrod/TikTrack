@@ -430,6 +430,11 @@
   color: var(--current-entity-color-dark, #333333);
 }
 
+.info-summary > div {
+  text-align: center; /* יישור למרכז */
+  opacity: 0.8; /* שקיפות 0.8 */
+}
+
 .info-summary strong {
   color: var(--current-entity-color-dark, #333333);
 }
@@ -788,6 +793,17 @@
 
 .filter-toggle-btn.collapsed .section-toggle-icon {
   transform: rotate(180deg);
+}
+
+/* ===== Table Count - יישור למרכז וצבע עדין ===== */
+.table-count {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--current-entity-color-dark, var(--entity-account-color-dark, #1e7e34));
+  opacity: 0.75;
+  font-style: italic;
+  margin: 0.5rem 0;
 }
 
 /* ===== תיקוני כפתורים ===== */

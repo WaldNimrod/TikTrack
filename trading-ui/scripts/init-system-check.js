@@ -66,15 +66,19 @@ class InitSystemCheck {
             return;
         }
 
-        // יצירת כפתור הבדיקה
+        // יצירת כפתור הבדיקה עם תפריט משנה
         const monitoringButton = document.createElement('li');
-        monitoringButton.className = 'tiktrack-nav-item';
+        monitoringButton.className = 'tiktrack-nav-item dropdown';
         monitoringButton.innerHTML = `
-            <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
-               onclick="initSystemCheck.runPageCheck(event)" 
-               title="בדיקת מערכת איתחול">
+            <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" id="initSystemCheckBtn" 
+               title="ניטור מערכת איתחול">
                 <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
+                <span class="tiktrack-dropdown-arrow">▼</span>
             </a>
+            <ul class="tiktrack-dropdown-menu">
+                <li><a class="tiktrack-dropdown-item" href="#" data-onclick="initSystemCheck?.runPageCheck(event)">בדיקת מערכת איתחול</a></li>
+                <li><a class="tiktrack-dropdown-item" href="#" data-onclick="initSystemCheck?.generateScriptLoadingCode(event)">ייצר קוד טעינה</a></li>
+            </ul>
         `;
 
         // הוספת הכפתור בסוף הרשימה
@@ -136,6 +140,181 @@ class InitSystemCheck {
         const path = window.location.pathname;
         const pageName = path.split('/').pop().replace('.html', '');
         return pageName || 'index';
+    }
+
+    /**
+     * ייצור קוד טעינת סקריפטים עבור העמוד הנוכחי
+     */
+    async generateScriptLoadingCode(event) {
+        if (event) {
+            event.preventDefault();
+        }
+
+        const currentPage = this.getCurrentPageName();
+        
+        if (window.Logger) { 
+            window.Logger.info(`📝 Generating script loading code for page: ${currentPage}`, { page: "init-check" }); 
+        }
+
+        // בדיקה אם הכלי זמין
+        if (!window.PageTemplateGenerator) {
+            const errorMsg = '❌ כלי יצירת הקוד לא זמין - נא לטעון את העמוד מחדש';
+            if (typeof showNotification === 'function') {
+                showNotification(errorMsg, 'error');
+            } else {
+                alert(errorMsg);
+            }
+            return;
+        }
+
+        try {
+            // יצירת הקוד
+            const generatedCode = window.PageTemplateGenerator.generateCompleteScriptSection(currentPage);
+            
+            if (!generatedCode) {
+                throw new Error('לא נוצר קוד - בדוק את הקונסולה לשגיאות');
+            }
+
+            // הצגת הקוד ב-modal עם כפתור העתקה
+            this.displayGeneratedCode(generatedCode, currentPage);
+            
+        } catch (error) {
+            if (window.Logger) { 
+                window.Logger.error('Error generating script loading code:', error, { page: "init-check" }); 
+            }
+            const errorMsg = `שגיאה בייצור הקוד: ${error.message}`;
+            if (typeof showNotification === 'function') {
+                showNotification(errorMsg, 'error');
+            } else {
+                alert(errorMsg);
+            }
+        }
+    }
+
+    /**
+     * הצגת קוד שנוצר ב-modal עם כפתור העתקה
+     */
+    displayGeneratedCode(generatedCode, pageName) {
+        // יצירת HTML להצגת הקוד
+        const contentHtml = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>קוד טעינת סקריפטים עבור: ${pageName}</strong>
+                <br>
+                <small>העתק את הקוד למטה והדבק אותו בעמוד במקום קוד הטעינה הישן</small>
+            </div>
+            
+            <div class="code-container" style="position: relative;">
+                <pre id="generated-code-content" style="background: #f5f5f5; padding: 15px; border-radius: 4px; max-height: 600px; overflow-y: auto; direction: ltr; text-align: left; font-family: 'Courier New', monospace; white-space: pre-wrap; word-wrap: break-word;">${this.escapeHtml(generatedCode)}</pre>
+                <button class="btn btn-primary btn-sm" id="copy-generated-code-btn" 
+                        style="position: absolute; top: 10px; left: 10px; z-index: 10;"
+                        onclick="initSystemCheck.copyGeneratedCode()">
+                    <i class="fas fa-copy"></i> העתק קוד
+                </button>
+            </div>
+            
+            <div class="alert alert-warning mt-3">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>הוראות:</strong>
+                <ol style="margin: 10px 0; padding-right: 20px;">
+                    <li>העתק את כל הקוד (לחץ על כפתור ההעתקה או בחר הכל והעתק)</li>
+                    <li>פתח את קובץ ${pageName}.html</li>
+                    <li>מצא את המקטע עם ההערה "Script loading code will be generated"</li>
+                    <li>החלף את כל התוכן בין ההערות בקוד החדש</li>
+                    <li>שמור את הקובץ</li>
+                </ol>
+            </div>
+        `;
+
+        // שמירת הקוד להעתקה
+        window.lastGeneratedCode = generatedCode;
+        window.lastGeneratedPageName = pageName;
+
+        // הצגת המודאל
+        if (typeof window.showDetailsModal === 'function') {
+            window.showDetailsModal(
+                `📝 קוד טעינת סקריפטים - ${pageName}`,
+                contentHtml,
+                { includeCopyButton: true }
+            );
+        } else {
+            // Fallback - הצגה ב-alert (לא מומלץ)
+            alert('קוד שנוצר:\n\n' + generatedCode.substring(0, 500) + '\n\n... (נראה בקונסולה)');
+            console.log('📝 Generated script loading code:', generatedCode);
+        }
+    }
+
+    /**
+     * העתקת הקוד שנוצר ללוח
+     */
+    copyGeneratedCode() {
+        const code = window.lastGeneratedCode;
+        if (!code) {
+            if (typeof showNotification === 'function') {
+                showNotification('אין קוד להעתקה', 'error');
+            }
+            return;
+        }
+
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(code).then(() => {
+                    if (typeof showNotification === 'function') {
+                        showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
+                    } else {
+                        alert('✅ הקוד הועתק ללוח בהצלחה!');
+                    }
+                }).catch(err => {
+                    console.error('Clipboard API failed:', err);
+                    this.fallbackCopyToClipboard(code);
+                });
+            } else {
+                this.fallbackCopyToClipboard(code);
+            }
+        } catch (error) {
+            console.error('Error copying code:', error);
+            this.fallbackCopyToClipboard(code);
+        }
+    }
+
+    /**
+     * Fallback העתקה ללוח (למקרה שהדפדפן לא תומך ב-Clipboard API)
+     */
+    fallbackCopyToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            if (typeof showNotification === 'function') {
+                showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
+            } else {
+                alert('✅ הקוד הועתק ללוח בהצלחה!');
+            }
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            if (typeof showNotification === 'function') {
+                showNotification('❌ שגיאה בהעתקה - נא להעתיק ידנית', 'error');
+            } else {
+                alert('❌ שגיאה בהעתקה - נא להעתיק ידנית מהקונסולה');
+            }
+            console.log('📝 Code to copy:', text);
+        } finally {
+            document.body.removeChild(textArea);
+        }
+    }
+
+    /**
+     * Escaping HTML לתוכן
+     */
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     /**

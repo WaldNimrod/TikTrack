@@ -1793,7 +1793,7 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             }
         }
         
-        // 5.5. Clear Cache API (Browser Cache)
+        // 5.5. Clear Cache API (Service Worker Cache)
         if ('caches' in window) {
             try {
                 const cacheNames = await caches.keys();
@@ -1801,13 +1801,42 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                     cacheNames.map(cacheName => caches.delete(cacheName))
                 );
                 if (cacheNames.length > 0) {
-                    clearedLayers.push(`Cache API (${cacheNames.length} caches)`);
+                    clearedLayers.push(`Cache API (Service Worker) (${cacheNames.length} caches)`);
                 }
-                window.Logger.info('✅ Cache API cleared successfully', { page: "unified-cache-manager" });
+                window.Logger.info('✅ Cache API (Service Worker) cleared successfully', { page: "unified-cache-manager" });
             } catch (error) {
                 window.Logger.error('❌ Error clearing Cache API:', error, { page: "unified-cache-manager" });
                 errors.push(`Cache API: ${error.message}`);
             }
+        }
+        
+        // 5.6. Clear Browser HTTP Cache (Static Resources - JS/CSS files)
+        // Note: This requires special handling for browser's HTTP cache
+        try {
+            // Clear fetch cache if available
+            if (typeof fetch !== 'undefined' && window.caches) {
+                // Try to clear any fetch-related caches
+                try {
+                    const fetchCacheNames = await caches.keys();
+                    for (const cacheName of fetchCacheNames) {
+                        // Clear all entries in each cache
+                        const cache = await caches.open(cacheName);
+                        const keys = await cache.keys();
+                        await Promise.all(keys.map(key => cache.delete(key)));
+                    }
+                } catch (e) {
+                    // Ignore errors for fetch cache
+                    window.Logger.debug('⚠️ Could not clear fetch cache (expected if empty)', { page: "unified-cache-manager" });
+                }
+            }
+            
+            // Note: Browser's HTTP cache cannot be cleared programmatically
+            // We rely on Cache-Control headers and version stamps (cache-buster.sh)
+            // Hard reload with cache bypass is handled separately
+            window.Logger.info('✅ HTTP Cache clearing attempted (requires hard reload for full effect)', { page: "unified-cache-manager" });
+        } catch (error) {
+            window.Logger.warn('⚠️ Error clearing HTTP cache:', error, { page: "unified-cache-manager" });
+            // Don't add to errors - HTTP cache clearing is best-effort
         }
         
         // 6. Clear specific cache keys and global variables
@@ -2185,7 +2214,11 @@ UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) 
                             'המטמון נוקה בהצלחה. האם להמשיך לטעינה מחדש של העמוד?',
                             () => {
                                 console.log('✅ User confirmed page reload - executing now...');
-                                window.location.reload(true);
+                                if (typeof window.hardReload === 'function') {
+                                    window.hardReload();
+                                } else {
+                                    window.location.reload();
+                                }
                             },
                             () => {
                                 console.log('❌ User cancelled page reload - staying on current page');
@@ -2196,7 +2229,11 @@ UnifiedCacheManager.prototype.clearAllCacheQuick = async function(options = {}) 
                         // Fallback to simple confirm
                         if (confirm('המטמון נוקה בהצלחה. האם להמשיך לטעינה מחדש של העמוד?')) {
                             console.log('✅ User confirmed page reload - executing now...');
-                            window.location.reload(true);
+                            if (typeof window.hardReload === 'function') {
+                                window.hardReload();
+                            } else {
+                                window.location.reload();
+                            }
                         } else {
                             console.log('❌ User cancelled page reload - staying on current page');
                         }
@@ -3349,46 +3386,70 @@ window.clearUIState = async function(event) {
 };
 
 /**
- * Clear all localStorage for development testing
+ * Clear all localStorage for development testing (legacy - use clearAllCacheQuick instead)
  * @function clearAllCacheForDevelopment
  * @param {Event} event - Event object
+ * @deprecated Use clearAllCacheQuick() or clearCacheFull() instead
  */
 window.clearAllCacheForDevelopment = async function(event) {
     if (event) event.preventDefault();
     
     try {
-        window.Logger.info('🧹 Clearing all localStorage...', { page: "unified-cache-manager" });
+        window.Logger.info('🧹 clearAllCacheForDevelopment called - redirecting to clearAllCacheQuick...', { page: "unified-cache-manager" });
         
-        const itemCount = localStorage.length;
-        localStorage.clear();
-        sessionStorage.clear();
-        
-        const message = `נוקה כל ה-localStorage (${itemCount} פריטים)`;
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('ניקוי מטמון', message);
+        // Use the full cache clearing system instead of just localStorage
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            await window.UnifiedCacheManager.clearAllCacheQuick({ autoRefresh: true });
+        } else {
+            // Fallback to simple localStorage clear if UnifiedCacheManager not available
+            const itemCount = localStorage.length;
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            const message = `נוקה כל ה-localStorage (${itemCount} פריטים)`;
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('ניקוי מטמון', message);
+            }
+            
+            window.Logger.info(`✅ Cleared ${itemCount} localStorage items (fallback)`, { page: "unified-cache-manager" });
         }
-        
-        window.Logger.info(`✅ Cleared ${itemCount} localStorage items`, { page: "unified-cache-manager" });
     } catch (error) {
-        window.Logger.error('❌ Error clearing localStorage:', error, { page: "unified-cache-manager" });
+        window.Logger.error('❌ Error clearing cache:', error, { page: "unified-cache-manager" });
     }
 };
 
 /**
- * Hard reload of the page for development
+ * Hard reload of the page for development - bypasses browser cache
  * @function hardReload
  * @param {Event} event - Event object
  */
 window.hardReload = function(event) {
     if (event) event.preventDefault();
     
-    window.Logger.info('🔄 Performing hard reload...', { page: "unified-cache-manager" });
+    window.Logger.info('🔄 Performing hard reload with cache bypass...', { page: "unified-cache-manager" });
     
-    // Hard reload - bypass cache
-    if (typeof window.location !== 'undefined') {
-        window.location.reload(true);
-    } else {
-        window.location.href = window.location.href;
+    // Modern approach: use location.reload() with cache bypass headers
+    // The deprecated location.reload(true) doesn't work in modern browsers
+    // Instead, we use a timestamp parameter to force cache bypass
+    try {
+        // Add timestamp to force cache bypass
+        const url = new URL(window.location.href);
+        url.searchParams.set('_nocache', Date.now().toString());
+        
+        // Navigate to new URL (forces cache bypass)
+        window.location.href = url.toString();
+    } catch (error) {
+        // Fallback for browsers that don't support URL API
+        window.Logger.warn('⚠️ URL API not supported, using reload() fallback', { page: "unified-cache-manager" });
+        if (typeof window.location !== 'undefined') {
+            // Try deprecated method as last resort
+            try {
+                window.location.reload(true);
+            } catch (e) {
+                // Final fallback
+                window.location.href = window.location.href;
+            }
+        }
     }
 };
 
@@ -3401,24 +3462,102 @@ window.clearCacheForDevelopment = async function(event) {
     if (event) event.preventDefault();
     
     try {
-        // Clear localStorage
-        await window.clearAllCacheForDevelopment(event);
+        // Use the complete cache clearing system
+        await window.clearCacheComplete(event);
         
-        // Show notification
+    } catch (error) {
+        window.Logger.error('❌ Error in clearCacheForDevelopment:', error, { page: "unified-cache-manager" });
+    }
+};
+
+/**
+ * Complete cache clearing - all layers + HTTP cache + hard reload
+ * This is the recommended function for clearing cache when code updates are made
+ * @function clearCacheComplete
+ * @async
+ * @param {Event} event - Event object
+ * @returns {Promise<void>}
+ */
+window.clearCacheComplete = async function(event) {
+    if (event) event.preventDefault();
+    
+    try {
+        window.Logger.info('🧹 Starting complete cache clearing (all layers + HTTP cache)...', { page: "unified-cache-manager" });
+        
+        // Show initial notification
         if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification(
-                'ניקוי מטמון לפיתוח',
-                'המטמון נוקה. רענון עמוד בעוד 2 שניות...'
+                'ניקוי מטמון מלא',
+                'מנקה את כל שכבות המטמון...'
             );
         }
         
-        // Auto-reload after 2 seconds
+        // Step 1: Clear all application cache layers
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            await window.UnifiedCacheManager.clearAllCache();
+            window.Logger.info('✅ Application cache cleared', { page: "unified-cache-manager" });
+        } else {
+            window.Logger.warn('⚠️ UnifiedCacheManager not available, clearing localStorage only', { page: "unified-cache-manager" });
+            localStorage.clear();
+            sessionStorage.clear();
+        }
+        
+        // Step 2: Clear Service Worker caches (if any)
+        if ('serviceWorker' in navigator) {
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const registration of registrations) {
+                    await registration.unregister();
+                }
+                if (registrations.length > 0) {
+                    window.Logger.info(`✅ Service Workers unregistered (${registrations.length})`, { page: "unified-cache-manager" });
+                }
+            } catch (error) {
+                window.Logger.warn('⚠️ Error unregistering Service Workers:', error, { page: "unified-cache-manager" });
+            }
+        }
+        
+        // Step 3: Clear Cache API (Service Worker cache storage)
+        if ('caches' in window) {
+            try {
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+                if (cacheNames.length > 0) {
+                    window.Logger.info(`✅ Cache API cleared (${cacheNames.length} caches)`, { page: "unified-cache-manager" });
+                }
+            } catch (error) {
+                window.Logger.warn('⚠️ Error clearing Cache API:', error, { page: "unified-cache-manager" });
+            }
+        }
+        
+        // Step 4: Show completion notification
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification(
+                'ניקוי מטמון הושלם',
+                'המטמון נוקה בהצלחה. טוען מחדש את העמוד בעוד 2 שניות...'
+            );
+        }
+        
+        window.Logger.info('✅ Complete cache clearing finished - reloading page in 2 seconds...', { page: "unified-cache-manager" });
+        
+        // Step 5: Hard reload after 2 seconds (gives time for notifications)
         setTimeout(() => {
+            window.Logger.info('🔄 Executing hard reload with cache bypass...', { page: "unified-cache-manager" });
             window.hardReload(event);
         }, 2000);
         
     } catch (error) {
-        window.Logger.error('❌ Error in clearCacheForDevelopment:', error, { page: "unified-cache-manager" });
+        window.Logger.error('❌ Error in complete cache clearing:', error, { page: "unified-cache-manager" });
+        
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(
+                `שגיאה בניקוי מטמון: ${error.message}`,
+                'error',
+                'שגיאה',
+                5000,
+                'system'
+            );
+        }
     }
 };
 

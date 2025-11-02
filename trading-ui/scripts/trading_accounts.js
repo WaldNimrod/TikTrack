@@ -107,6 +107,7 @@ window.loadTradingAccountsDataForTradingAccountsPage = window.loadTradingAccount
 
 // הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
 window.loadTradingAccountsDataForTradingAccountsPage = async function() {
+  console.log('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀');
   window.Logger.info('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀', { page: "trading_accounts" });
   window.Logger.info('🔍 בדיקת זמינות פונקציות:', { page: "trading_accounts" });
   window.Logger.info('  - apiCall:', typeof window.apiCall, { page: "trading_accounts" });
@@ -182,10 +183,14 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
     }
 
     // עדכון סטטיסטיקות (async)
+    console.log('🔍 Checking updateTradingAccountsSummary availability...', typeof window.updateTradingAccountsSummary);
     if (typeof window.updateTradingAccountsSummary === 'function') {
+      console.log('📈 Calling updateTradingAccountsSummary with', filteredTradingAccounts.length, 'accounts');
       window.Logger.info('📈 מעדכן את סטטיסטיקות החשבונות המסחר', { page: "trading_accounts" });
       await window.updateTradingAccountsSummary(filteredTradingAccounts);
+      console.log('✅ updateTradingAccountsSummary completed');
     } else {
+      console.warn('⚠️ updateTradingAccountsSummary לא זמין');
       window.Logger.warn('⚠️ updateTradingAccountsSummary לא זמין', { page: "trading_accounts" });
     }
 
@@ -679,18 +684,19 @@ async function updateTradingAccountsTable(trading_accounts) {
         </td>
         <td>${tradingAccount.currency_symbol || tradingAccount.currency || '-'}</td>
         <td>
-          ${window.renderAmount ? window.renderAmount(baseCurrencyBalance, baseCurrencySymbol) : 
+          ${window.renderAmount ? window.renderAmount(baseCurrencyBalance, baseCurrencySymbol, 2, true) : 
             `${baseCurrencyBalance.toFixed(2)} ${baseCurrencySymbol}`}
         </td>
         <td>
-          <span style="color: #999; font-style: italic;">בפיתוח</span>
+          <span class="text-muted fst-italic">בפיתוח</span>
+        </td>
+        <td>
+          <span class="text-muted fst-italic">בפיתוח</span>
         </td>
         <td class="status-cell" data-status="${tradingAccount.status || ''}">
           ${window.renderStatus ? window.renderStatus(tradingAccount.status, 'trading_account') : 
             `<span class="status-${tradingAccount.status}">${tradingAccount.status}</span>`}
         </td>
-        <td data-date="${tradingAccount.created_at}">${window.renderDate ? window.renderDate(tradingAccount.created_at) : 
-            new Date(tradingAccount.created_at).toLocaleDateString('he-IL')}</td>
       <td class="actions-cell">
         ${window.createActionsMenu ? window.createActionsMenu([
           { type: 'VIEW', onclick: `window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })`, title: 'צפה בפרטי חשבון מסחר' },
@@ -793,12 +799,15 @@ async function updateTradingAccountsTable(trading_accounts) {
  * @returns {void}
  */
 async function updateTradingAccountsSummary(trading_accounts) {
+  console.log('🔍 updateTradingAccountsSummary called with:', { count: trading_accounts?.length, hasSystem: !!window.InfoSummarySystem, hasConfigs: !!window.INFO_SUMMARY_CONFIGS });
   try {
     // מערכת מאוחדת לסיכום נתונים
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
       const config = window.INFO_SUMMARY_CONFIGS.trading_accounts;
+      console.log('✅ Using InfoSummarySystem with config:', config);
       await window.InfoSummarySystem.calculateAndRender(trading_accounts, config);
     } else {
+      console.warn('⚠️ InfoSummarySystem not available, using fallback');
       // מערכת סיכום נתונים לא זמינה - חישוב ידני
       const summaryStatsElement = document.getElementById('summaryStats');
       if (summaryStatsElement && trading_accounts) {
@@ -858,11 +867,11 @@ async function updateTradingAccountsSummary(trading_accounts) {
           <div>סה"כ חשבונות: <strong id="totalAccounts">${totalAccounts}</strong></div>
           <div>חשבונות פעילים: <strong id="activeAccounts">${activeAccounts}</strong></div>
           <div>חשבונות פתוחים: <strong id="openAccounts">${openAccounts}</strong></div>
-          <div>סה"כ יתרה: <strong id="totalBalance">${window.renderAmount ? window.renderAmount(totalBaseCurrencyBalance, baseCurrencySymbol) : `${totalBaseCurrencyBalance.toFixed(2)} ${baseCurrencySymbol}`}</strong></div>
+          <div>סה"כ יתרה: <strong id="totalBalance">${window.renderAmount ? window.renderAmount(totalBaseCurrencyBalance, baseCurrencySymbol, 2, false) : `${totalBaseCurrencyBalance.toFixed(2)} ${baseCurrencySymbol}`}</strong></div>
         `;
       } else if (summaryStatsElement) {
         summaryStatsElement.innerHTML = `
-          <div style="color: #dc3545; font-weight: bold;">
+          <div class="error-message">
             ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
           </div>
         `;
@@ -1872,10 +1881,10 @@ async function restoreTradingAccount(tradingAccountId, tradingAccountName) {
 
 /**
  * בדיקת מקושרים וביצוע ביטול חשבון מסחר מסחר
- * @deprecated Use window.checkLinkedItemsAndPerformAction('trading_account', tradingAccountId, 'cancel', performTradingAccountCancellation) instead
+ * @deprecated Use window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'cancel', performTradingAccountCancellation) instead
  */
 async function checkLinkedItemsAndCancelTradingAccount(tradingAccountId) {
-  await window.checkLinkedItemsAndPerformAction('trading_account', tradingAccountId, 'cancel', performTradingAccountCancellation);
+  await window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'cancel', performTradingAccountCancellation);
 }
 
 /**
@@ -1925,10 +1934,10 @@ async function performTradingAccountCancellation(tradingAccountId) {
 
 /**
  * בדיקת מקושרים וביצוע מחיקת חשבון מסחר מסחר
- * @deprecated Use window.checkLinkedItemsAndPerformAction('trading_account', tradingAccountId, 'delete', performTradingAccountDeletion) instead
+ * @deprecated Use window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'delete', performTradingAccountDeletion) instead
  */
 async function checkLinkedItemsAndDeleteTradingAccount(tradingAccountId) {
-  await window.checkLinkedItemsAndPerformAction('trading_account', tradingAccountId, 'delete', performTradingAccountDeletion);
+  await window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'delete', performTradingAccountDeletion);
 }
 
 // REMOVED: Old performTradingAccountDeletion implementation (lines 1857-1927)
@@ -1936,18 +1945,18 @@ async function checkLinkedItemsAndDeleteTradingAccount(tradingAccountId) {
 
 /**
  * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר
- * @deprecated Use window.checkLinkedItemsBeforeAction('trading_account', tradingAccountId, 'cancel') instead
+ * @deprecated Use window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'cancel') instead
  */
 async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
-  return await window.checkLinkedItemsBeforeAction('trading_account', tradingAccountId, 'cancel');
+  return await window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'cancel');
 }
 
 /**
  * בדיקת פריטים מקושרים לפני מחיקת חשבון מסחר מסחר
- * @deprecated Use window.checkLinkedItemsBeforeAction('trading_account', tradingAccountId, 'delete') instead
+ * @deprecated Use window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'delete') instead
  */
 async function checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId) {
-  return await window.checkLinkedItemsBeforeAction('trading_account', tradingAccountId, 'delete');
+  return await window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'delete');
 }
 
 /**
@@ -2386,7 +2395,7 @@ async function deleteTradingAccount(accountId) {
         window.Logger.info('🔍 Checking for linked items before deletion', { accountId, page: 'trading_accounts' });
         if (typeof window.checkLinkedItemsBeforeAction === 'function') {
             window.Logger.info('✅ checkLinkedItemsBeforeAction function exists', { accountId, page: 'trading_accounts' });
-            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trading_account', accountId, 'delete');
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('account', accountId, 'delete');
             window.Logger.info(`🔍 Linked items check result: hasLinkedItems=${hasLinkedItems}`, { accountId, page: 'trading_accounts' });
             if (hasLinkedItems) {
                 window.Logger.info('🚫 Trading Account has linked items, deletion cancelled', { accountId, page: 'trading_accounts' });
@@ -2418,8 +2427,15 @@ async function deleteTradingAccount(accountId) {
 
 async function performTradingAccountDeletion(accountId) {
     try {
-        // ניקוי מטמון לפני פעולת CRUD - מחיקה        // Send delete request
-        const response = await fetch(`/api/trading_accounts/${accountId}`, {
+        // Clear cache before deletion to ensure fresh data after reload
+        if (window.unifiedCacheManager) {
+            await window.unifiedCacheManager.clearByPattern('accounts-data');
+            await window.unifiedCacheManager.clearByPattern('account-balance-*');
+            await window.unifiedCacheManager.clearByPattern('account-activity-*');
+        }
+        
+        // Send delete request
+        const response = await fetch(`/api/trading-accounts/${accountId}`, {
             method: 'DELETE'
         });
         
@@ -2427,7 +2443,7 @@ async function performTradingAccountDeletion(accountId) {
         await CRUDResponseHandler.handleDeleteResponse(response, {
             successMessage: 'חשבון מסחר נמחק בהצלחה',
             entityName: 'חשבון מסחר',
-            reloadFn: window.loadTradingAccountsData,
+            reloadFn: window.loadTradingAccountsDataForTradingAccountsPage,
             requiresHardReload: false
         });
         

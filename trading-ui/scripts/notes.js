@@ -819,7 +819,7 @@ async function populateEditSelectByType(relationType, selectedId) {
 
     switch (parseInt(relationType)) {
     case 1: { // חשבון מסחר
-      const accountsResponse = await fetch('/api/accounts/');
+      const accountsResponse = await fetch('/api/trading-accounts/');
       const accountsData = await accountsResponse.json();
       data = Array.isArray(accountsData.data) ? accountsData.data : [];
       displayField = 'name';

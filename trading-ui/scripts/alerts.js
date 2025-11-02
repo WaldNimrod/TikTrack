@@ -762,7 +762,7 @@ async function loadModalData() {
     // טעינת נתונים במקביל
     // window.Logger.info('🔧 Loading modal data...', { page: "alerts" });
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/trading-accounts/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),

@@ -28,7 +28,9 @@
  * - PreferencesUI: Main coordinator
  */
 
-window.Logger.info('📄 Loading preferences-ui.js v1.0.0...', { page: "preferences-ui" });
+if (window.Logger && window.Logger.info) {
+    window.Logger.info('📄 Loading preferences-ui.js v1.0.0...', { page: "preferences-ui" });
+}
 
 // ============================================================================
 // FORM MANAGER CLASS
@@ -151,6 +153,33 @@ class FormManager {
                 const radioInput = form.querySelector(`[name="${mappedName}"][value="${value}"]`);
                 if (radioInput) {
                     radioInput.checked = true;
+                }
+            } else if (input.type === 'color') {
+                // Convert color values with alpha channel to RGB hex format (#rrggbb)
+                // Color inputs only accept #rrggbb format, not #rrggbbaa
+                if (value && typeof value === 'string') {
+                    // Check if it's an 8-digit hex with alpha
+                    if (/^#[0-9A-Fa-f]{8}$/i.test(value)) {
+                        // Strip the alpha channel (last 2 characters)
+                        input.value = value.substring(0, 7);
+                    } else if (/^#[0-9A-Fa-f]{6}$/i.test(value)) {
+                        // Already valid 6-digit hex
+                        input.value = value;
+                    } else {
+                        // Try to use ColorPickerManager converter if available
+                        if (window.ColorPickerManager && typeof window.ColorPickerManager.getInstance === 'function') {
+                            const colorManager = window.ColorPickerManager.getInstance();
+                            if (colorManager && typeof colorManager.convertToColorInputFormat === 'function') {
+                                input.value = colorManager.convertToColorInputFormat(value);
+                            } else {
+                                input.value = '#000000';
+                            }
+                        } else {
+                            input.value = '#000000';
+                        }
+                    }
+                } else {
+                    input.value = '#000000';
                 }
             } else {
                 input.value = value;
@@ -1590,4 +1619,6 @@ if (document.readyState === 'loading') {
     window.Logger.info('📄 Preferences UI system initialized', { page: "preferences-ui" });
 }
 
-window.Logger.info('✅ preferences-ui.js loaded successfully', { page: "preferences-ui" });
+if (window.Logger && window.Logger.info) {
+    window.Logger.info('✅ preferences-ui.js loaded successfully', { page: "preferences-ui" });
+}

@@ -125,6 +125,60 @@ class InfoSummarySystem {
         });
         
         return totalPL;
+      },
+      
+      // Custom total balance calculation for trading accounts (requires API calls)
+      customTradingAccountsBalance: async (data) => {
+        console.log('🔍 customTradingAccountsBalance called with', data?.length, 'accounts');
+        if (!data || !Array.isArray(data) || data.length === 0) {
+          console.log('⚠️ No accounts data, returning 0');
+          return { amount: 0, currency: 'USD' };
+        }
+        
+        try {
+          // Load balances for all accounts in batch
+          const accountIds = data.map(acc => acc.id);
+          console.log('📡 Loading balances for account IDs:', accountIds);
+          let balancesMap = new Map();
+          
+          if (typeof window.loadAccountBalancesBatch === 'function') {
+            console.log('✅ Calling window.loadAccountBalancesBatch...');
+            balancesMap = await window.loadAccountBalancesBatch(accountIds);
+            console.log('✅ Received balances map with', balancesMap.size, 'entries');
+          } else if (typeof loadAccountBalancesBatch === 'function') {
+            console.log('✅ Calling loadAccountBalancesBatch...');
+            balancesMap = await loadAccountBalancesBatch(accountIds);
+            console.log('✅ Received balances map with', balancesMap.size, 'entries');
+          } else {
+            console.warn('⚠️ loadAccountBalancesBatch not available');
+            return { amount: 0, currency: 'USD' };
+          }
+          
+          // Calculate total balance and get currency
+          let totalBalance = 0;
+          let baseCurrency = null; // Will be set from first account
+          
+          balancesMap.forEach((balanceData) => {
+            if (balanceData && balanceData.base_currency_total) {
+              totalBalance += parseFloat(balanceData.base_currency_total) || 0;
+              // Use the currency from the first account with balance
+              if (balanceData.base_currency && !baseCurrency) {
+                baseCurrency = balanceData.base_currency;
+              }
+            }
+          });
+          
+          // Default to USD if no currency found
+          if (!baseCurrency) {
+            baseCurrency = 'USD';
+          }
+          
+          console.log('✅ Total balance calculated:', { amount: totalBalance, currency: baseCurrency });
+          return { amount: totalBalance, currency: baseCurrency };
+        } catch (error) {
+          console.error('❌ Error calculating total balance:', error);
+          return { amount: 0, currency: 'USD' };
+        }
       }
     };
   }
@@ -142,21 +196,49 @@ class InfoSummarySystem {
       },
       
       // Currency formatting with color based on value
-      currencyWithColor: (value) => {
-        const num = parseFloat(value);
-        if (isNaN(num)) return '$0';
+      currencyWithColor: (value, params = {}) => {
+        // Support both number and object with amount/currency
+        let amount = 0;
+        let currency = '$';
         
-        const formattedValue = `$${num.toFixed(2)}`;
+        if (typeof value === 'object' && value !== null && value.amount !== undefined) {
+          // Object format: { amount: 1234.56, currency: 'USD' }
+          amount = parseFloat(value.amount) || 0;
+          const currencyCode = value.currency || 'USD';
+          
+          // Convert currency code to symbol
+          switch (currencyCode.toUpperCase()) {
+            case 'USD': currency = '$'; break;
+            case 'ILS': currency = '₪'; break;
+            case 'EUR': currency = '€'; break;
+            case 'GBP': currency = '£'; break;
+            case 'JPY': currency = '¥'; break;
+            default: currency = currencyCode; // If already a symbol, use as is
+          }
+        } else {
+          // Number format (backward compatibility)
+          amount = parseFloat(value);
+          if (isNaN(amount)) {
+            // Use renderAmount for consistency
+            if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+              return window.FieldRendererService.renderAmount(0, '$', 2, false); // showSign = false for zero
+            }
+            return '$0';
+          }
+          currency = '$'; // Default
+        }
         
-        // Get colors from global system
-        const colors = window.getTableColors ? window.getTableColors() : { 
-          positive: '#28a745', 
-          negative: '#dc3545' 
-        };
+        // Format balance like in table: number + currency symbol (RTL), with color based on value
+        // Show minus sign for negative values (showSign = true)
+        if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
+          return window.FieldRendererService.renderAmount(amount, currency, 2, true); // showSign = true (show minus for negative)
+        }
         
-        const color = num >= 0 ? colors.positive : colors.negative;
-        
-        return `<span style="color: ${color}; font-weight: bold;">${formattedValue}</span>`;
+        // Fallback if renderAmount not available
+        const formatted = Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const colorClass = amount >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
+        // RTL: מספר קודם (ימין), אחר כך סימן מטבע (שמאל)
+        return `<span class="${colorClass}">${formatted}${currency}</span>`;
       },
       
       // Number formatting with decimals
@@ -194,12 +276,13 @@ class InfoSummarySystem {
    * Calculate statistics from data array
    * @param {Array} data - The data array to calculate from
    * @param {Array} stats - Array of stat configurations
-   * @returns {Object} Calculated statistics
+   * @returns {Promise<Object>|Object} Calculated statistics (Promise if async calculators are used)
    */
-  calculateStatsFromData(data, stats) {
+  async calculateStatsFromData(data, stats) {
     const results = {};
+    const asyncCalculations = [];
     
-    stats.forEach(stat => {
+    stats.forEach((stat, index) => {
       try {
         const calculator = this.calculators[stat.calculator];
         if (!calculator) {
@@ -208,15 +291,34 @@ class InfoSummarySystem {
           return;
         }
         
-        const value = calculator(data, stat.params || {});
-        results[stat.id] = value;
+        // Check if calculator is async
+        const calculatorResult = calculator(data, stat.params || {});
+        if (calculatorResult instanceof Promise) {
+          // Store async calculation
+          asyncCalculations.push({
+            statId: stat.id,
+            promise: calculatorResult
+          });
+          results[stat.id] = null; // Will be filled after async completes
+        } else {
+          results[stat.id] = calculatorResult;
+        }
         
         // Handle sub-stats (like buy/sell breakdown)
         if (stat.subStats) {
           stat.subStats.forEach(subStat => {
             const subCalculator = this.calculators[subStat.calculator];
             if (subCalculator) {
-              results[subStat.id] = subCalculator(data, subStat.params || {});
+              const subResult = subCalculator(data, subStat.params || {});
+              if (subResult instanceof Promise) {
+                asyncCalculations.push({
+                  statId: subStat.id,
+                  promise: subResult
+                });
+                results[subStat.id] = null;
+              } else {
+                results[subStat.id] = subResult;
+              }
             }
           });
         }
@@ -225,6 +327,16 @@ class InfoSummarySystem {
         results[stat.id] = 0;
       }
     });
+    
+    // Wait for all async calculations to complete
+    if (asyncCalculations.length > 0) {
+      const asyncResults = await Promise.all(
+        asyncCalculations.map(item => item.promise)
+      );
+      asyncCalculations.forEach((item, index) => {
+        results[item.statId] = asyncResults[index];
+      });
+    }
     
     return results;
   }
@@ -286,7 +398,9 @@ class InfoSummarySystem {
       }
     });
     
+    console.log('📝 Setting innerHTML to:', html.substring(0, 300));
     container.innerHTML = html;
+    console.log('✅ innerHTML set. Current innerHTML:', container.innerHTML.substring(0, 300));
     
     // Use console.log instead of Logger to avoid potential circular dependencies
     const DEBUG_MODE = window.location.hostname === 'localhost' || 
@@ -305,8 +419,11 @@ class InfoSummarySystem {
    * Main method: Calculate and render summary statistics
    * @param {Array} data - The data array
    * @param {Object} config - Page configuration
+   * @returns {Promise<void>}
    */
-  calculateAndRender(data, config) {
+  async calculateAndRender(data, config) {
+    console.log('🔍 InfoSummarySystem.calculateAndRender called with:', { dataLength: data?.length, statsCount: config?.stats?.length, containerId: config?.containerId });
+    
     if (!data || !Array.isArray(data)) {
       console.warn('Invalid data provided to InfoSummarySystem');
       return;
@@ -318,11 +435,15 @@ class InfoSummarySystem {
     }
     
     try {
-      // Calculate statistics
-      const stats = this.calculateStatsFromData(data, config.stats);
+      // Calculate statistics (now async to support async calculators)
+      console.log('⚙️ Calculating stats from data...');
+      const stats = await this.calculateStatsFromData(data, config.stats);
+      console.log('✅ Stats calculated:', stats);
       
       // Render the summary
       this.renderInfoSummary(config.containerId, stats, config);
+      console.log('✅ Summary rendered to container:', config.containerId);
+      console.log('📄 HTML Content:', document.getElementById(config.containerId)?.innerHTML?.substring(0, 200));
       
     } catch (error) {
       console.error('Error in InfoSummarySystem.calculateAndRender:', error);
@@ -334,19 +455,20 @@ class InfoSummarySystem {
    * @param {Array} data - The new data array
    * @param {string} pageName - The page name (for config lookup)
    */
-  updateSummary(data, pageName) {
+  async updateSummary(data, pageName) {
     if (!window.INFO_SUMMARY_CONFIGS || !window.INFO_SUMMARY_CONFIGS[pageName]) {
       console.warn(`No config found for page '${pageName}'`);
       return;
     }
     
     const config = window.INFO_SUMMARY_CONFIGS[pageName];
-    this.calculateAndRender(data, config);
+    await this.calculateAndRender(data, config);
   }
 }
 
 // Initialize and expose globally
 window.InfoSummarySystem = new InfoSummarySystem();
+console.log('✅ InfoSummarySystem initialized with customTradingAccountsBalance calculator');
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

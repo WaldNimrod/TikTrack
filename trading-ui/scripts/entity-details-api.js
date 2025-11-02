@@ -372,7 +372,7 @@ class EntityDetailsAPI {
             trade: `/api/trades/${entityId}`,
             trade_plan: `/api/trade_plans/${entityId}`,
             execution: `/api/executions/${entityId}`,
-            account: `/api/accounts/${entityId}`,
+            account: `/api/trading-accounts/${entityId}`,
             alert: `/api/alerts/${entityId}`,
             cash_flow: `/api/cash_flows/${entityId}`,
             note: `/api/notes/${entityId}`

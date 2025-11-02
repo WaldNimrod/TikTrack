@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         await loadPagesMapping();
         await loadPerformanceReport();
         loadPackagesCheckboxes();
+        loadPagesForScriptGeneration(); // Load pages for script generation dropdown
         
         // Load advanced monitoring
         await loadAdvancedMonitoring();
@@ -44,7 +45,21 @@ async function loadSystemStatus() {
         const status = window.getUnifiedAppStatus ? window.getUnifiedAppStatus() : null;
         
         // Get package manifest stats
-        const packageStats = window.PackageManifest ? window.PackageManifest.getStats() : null;
+        let packageStats = null;
+        if (window.PackageManifest && typeof window.PackageManifest.getStats === 'function') {
+            packageStats = window.PackageManifest.getStats();
+        } else if (window.PACKAGE_MANIFEST) {
+            // Fallback: calculate stats manually if PackageManifest not loaded yet
+            const packages = Object.values(window.PACKAGE_MANIFEST);
+            const critical = packages.filter(pkg => pkg.critical).length;
+            const totalScripts = packages.reduce((sum, pkg) => sum + (pkg.scripts?.length || 0), 0);
+            packageStats = {
+                totalPackages: packages.length,
+                criticalPackages: critical,
+                totalScripts: totalScripts,
+                estimatedTotalSize: 'N/A'
+            };
+        }
         
         // Get current page info
         const pageName = window.location.pathname.split('/').pop().replace('.html', '');
@@ -1019,6 +1034,263 @@ function generateScriptTagsForPage() {
 function getSelectedPackages() {
     const checkboxes = document.querySelectorAll('#packagesCheckboxes input[type="checkbox"]:checked');
     return Array.from(checkboxes).map(cb => cb.value);
+}
+
+/**
+ * Load pages for script generation dropdown
+ */
+function loadPagesForScriptGeneration() {
+    const pageSelect = document.getElementById('pageSelectForScriptGen');
+    
+    if (!pageSelect) {
+        return;
+    }
+    
+    if (!window.PAGE_CONFIGS) {
+        pageSelect.innerHTML = '<option value="">PAGE_CONFIGS לא זמין</option>';
+        return;
+    }
+    
+    const pages = Object.entries(window.PAGE_CONFIGS)
+        .sort(([a], [b]) => {
+            const nameA = window.PAGE_CONFIGS[a]?.name || a;
+            const nameB = window.PAGE_CONFIGS[b]?.name || b;
+            return nameA.localeCompare(nameB, 'he');
+        });
+    
+    let optionsHTML = '<option value="">-- בחר עמוד --</option>';
+    
+    pages.forEach(([pageId, config]) => {
+        const pageName = config.name || pageId;
+        const packagesCount = config.packages?.length || 0;
+        optionsHTML += `<option value="${pageId}">${pageName} (${packagesCount} חבילות)</option>`;
+    });
+    
+    pageSelect.innerHTML = optionsHTML;
+}
+
+/**
+ * Handle page selection for script generation
+ */
+function onPageSelectedForScriptGen() {
+    const pageSelect = document.getElementById('pageSelectForScriptGen');
+    const generateBtn = document.getElementById('generateScriptBtn');
+    
+    if (pageSelect && generateBtn) {
+        generateBtn.disabled = !pageSelect.value;
+    }
+    
+    // Hide previous results if changing selection
+    const contentDiv = document.getElementById('generatedScriptContent');
+    const copyBtn = document.getElementById('copyGeneratedScriptBtn');
+    if (contentDiv) {
+        contentDiv.style.display = 'none';
+    }
+    if (copyBtn) {
+        copyBtn.style.display = 'none';
+    }
+}
+
+/**
+ * Generate script loading code for selected page
+ */
+function generateScriptLoadingCodeForSelectedPage() {
+    const pageSelect = document.getElementById('pageSelectForScriptGen');
+    const generateBtn = document.getElementById('generateScriptBtn');
+    const contentDiv = document.getElementById('generatedScriptContent');
+    const codeDisplay = document.getElementById('generatedScriptCodeDisplay');
+    const copyBtn = document.getElementById('copyGeneratedScriptBtn');
+    
+    if (!pageSelect || !pageSelect.value) {
+        showNotification('אנא בחר עמוד', 'warning');
+        return;
+    }
+    
+    const pageName = pageSelect.value;
+    const pageConfig = window.PAGE_CONFIGS?.[pageName];
+    
+    if (!pageConfig) {
+        showNotification(`לא נמצא קונפיגורציה לעמוד: ${pageName}`, 'error');
+        return;
+    }
+    
+    try {
+        // Disable button while generating
+        if (generateBtn) {
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מייצר...';
+        }
+        
+        // Check if PageTemplateGenerator is available
+        if (!window.PageTemplateGenerator && !pageTemplateGenerator) {
+            throw new Error('PageTemplateGenerator לא זמין - נא לטעון את העמוד מחדש');
+        }
+        
+        // Generate code using the available generator
+        // window.PageTemplateGenerator is the class, pageTemplateGenerator is an instance
+        let generator = pageTemplateGenerator;
+        if (!generator && window.PageTemplateGenerator) {
+            // Create a new instance if global instance is not available
+            generator = new window.PageTemplateGenerator();
+        }
+        
+        if (!generator) {
+            throw new Error('לא ניתן ליצור instance של PageTemplateGenerator');
+        }
+        
+        const generatedCode = generator.generateCompleteScriptSection(pageName);
+        
+        if (!generatedCode) {
+            throw new Error('לא נוצר קוד - בדוק את הקונסולה לשגיאות');
+        }
+        
+        // Store generated code globally for copying
+        window.lastGeneratedScriptCode = generatedCode;
+        window.lastGeneratedScriptPageName = pageName;
+        
+        // Display the code
+        if (codeDisplay) {
+            codeDisplay.textContent = generatedCode;
+        }
+        
+        if (contentDiv) {
+            contentDiv.style.display = 'block';
+        }
+        
+        if (copyBtn) {
+            copyBtn.style.display = 'inline-block';
+        }
+        
+        showNotification(`✅ קוד טעינה נוצר בהצלחה עבור: ${pageConfig.name || pageName}`, 'success');
+        
+    } catch (error) {
+        console.error('❌ Failed to generate script loading code:', error);
+        showNotification(`שגיאה בייצור הקוד: ${error.message}`, 'error');
+    } finally {
+        // Re-enable button
+        if (generateBtn) {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = '<i class="fas fa-magic"></i> ייצר קוד טעינה';
+        }
+    }
+}
+
+/**
+ * Show generated script code in modal
+ */
+function showScriptCodeInModal() {
+    const code = window.lastGeneratedScriptCode;
+    const pageName = window.lastGeneratedScriptPageName;
+    
+    if (!code) {
+        showNotification('אין קוד להצגה', 'warning');
+        return;
+    }
+    
+    const pageConfig = window.PAGE_CONFIGS?.[pageName];
+    const displayName = pageConfig?.name || pageName;
+    
+    // Create HTML content for modal
+    const contentHtml = `
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>קוד טעינת סקריפטים עבור: ${displayName}</strong>
+            <br>
+            <small>העתק את הקוד למטה והדבק אותו בעמוד במקום קוד הטעינה הישן</small>
+        </div>
+        
+        <div class="code-container" style="position: relative;">
+            <pre id="modal-generated-code-content" style="background: #f5f5f5; padding: 15px; border-radius: 4px; max-height: 600px; overflow-y: auto; direction: ltr; text-align: left; font-family: 'Courier New', monospace; white-space: pre-wrap; word-wrap: break-word; font-size: 12px;">${escapeHtmlForModal(code)}</pre>
+        </div>
+        
+        <div class="alert alert-warning mt-3">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>הוראות:</strong>
+            <ol style="margin: 10px 0; padding-right: 20px;">
+                <li>העתק את כל הקוד (לחץ על כפתור ההעתקה בכותרת המודאל או בחר הכל והעתק)</li>
+                <li>פתח את קובץ ${pageName}.html</li>
+                <li>מצא את המקטע עם ההערה "Script loading code will be generated"</li>
+                <li>החלף את כל התוכן בין ההערות בקוד החדש</li>
+                <li>שמור את הקובץ</li>
+            </ol>
+        </div>
+    `;
+    
+    // Show modal with copy button
+    if (typeof window.showDetailsModal === 'function') {
+        window.showDetailsModal(
+            `📝 קוד טעינת סקריפטים - ${displayName}`,
+            contentHtml,
+            { includeCopyButton: true }
+        );
+        
+        // Store code for modal copy button
+        window.lastGeneratedCode = code;
+    } else {
+        // Fallback - show in alert
+        alert('קוד שנוצר:\n\n' + code.substring(0, 500) + '\n\n... (נראה בקונסולה)');
+        console.log('📝 Generated script loading code:', code);
+    }
+}
+
+/**
+ * Copy generated script code to clipboard
+ */
+function copyGeneratedScriptCode() {
+    const code = window.lastGeneratedScriptCode;
+    
+    if (!code) {
+        showNotification('אין קוד להעתקה', 'warning');
+        return;
+    }
+    
+    try {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(code).then(() => {
+                showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
+            }).catch(err => {
+                console.error('Clipboard API failed:', err);
+                fallbackCopyScriptCode(code);
+            });
+        } else {
+            fallbackCopyScriptCode(code);
+        }
+    } catch (error) {
+        console.error('Error copying code:', error);
+        fallbackCopyScriptCode(code);
+    }
+}
+
+/**
+ * Fallback copy function for script code
+ */
+function fallbackCopyScriptCode(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+        showNotification('❌ שגיאה בהעתקה - נא להעתיק ידנית', 'error');
+        console.log('📝 Code to copy:', text);
+    } finally {
+        document.body.removeChild(textArea);
+    }
+}
+
+/**
+ * Escape HTML for modal display
+ */
+function escapeHtmlForModal(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 /**

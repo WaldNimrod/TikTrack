@@ -16997,3 +16997,68 @@
 2025-11-01 00:15:44,582 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
 2025-11-01 00:15:44,583 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
 2025-11-01 00:15:44,584 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-02 01:02:51,398 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-02 01:02:51,400 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-02 01:02:51,400 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-02 01:02:51,400 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-02 01:02:51,400 - root - INFO - 🗄️ Initializing database...
+2025-11-02 01:02:51,400 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-02 01:02:51,402 - utils.performance_monitor - ERROR - Failed operation: Database initialization - Duration: 0.002s - Error: (sqlite3.DatabaseError) database disk image is malformed
+[SQL: PRAGMA main.table_info("tickers")]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-11-02 01:02:51,402 - root - ERROR - ❌ Database initialization failed: (sqlite3.DatabaseError) database disk image is malformed
+[SQL: PRAGMA main.table_info("tickers")]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2025-11-02 01:02:51,402 - root - ERROR - 🔍 Full error details: DatabaseError
+2025-11-02 01:02:51,408 - root - ERROR - 📋 Traceback: Traceback (most recent call last):
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.DatabaseError: database disk image is malformed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/app.py", line 192, in <module>
+    init_db()
+  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/config/database.py", line 42, in init_db
+    Base.metadata.create_all(bind=engine)
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/sql/schema.py", line 5828, in create_all
+    bind._run_ddl_visitor(
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 3243, in _run_ddl_visitor
+    conn._run_ddl_visitor(visitorcallable, element, **kwargs)
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 2447, in _run_ddl_visitor
+    visitorcallable(self.dialect, self, **kwargs).traverse_single(element)
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/sql/visitors.py", line 671, in traverse_single
+    return meth(obj, **kw)
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/sql/ddl.py", line 898, in visit_metadata
+    [t for t in tables if self._can_create_table(t)]
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/sql/ddl.py", line 898, in <listcomp>
+    [t for t in tables if self._can_create_table(t)]
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/sql/ddl.py", line 863, in _can_create_table
+    return not self.checkfirst or not self.dialect.has_table(
+  File "<string>", line 2, in has_table
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/reflection.py", line 88, in cache
+    return fn(self, con, *args, **kw)
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/sqlite/base.py", line 2150, in has_table
+    info = self._get_table_pragma(
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/sqlite/base.py", line 2771, in _get_table_pragma
+    cursor = connection.exec_driver_sql(statement)
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1778, in exec_driver_sql
+    ret = self._execute_context(
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/nimrod/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.DatabaseError: (sqlite3.DatabaseError) database disk image is malformed
+[SQL: PRAGMA main.table_info("tickers")]
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+

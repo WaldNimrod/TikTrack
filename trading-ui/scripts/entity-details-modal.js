@@ -99,34 +99,33 @@ class EntityDetailsModal {
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
                     <div class="modal-content entity-details-modal">
                         <div class="modal-header modal-header-colored">
-                            <h5 class="modal-title" id="${this.modalId}Label" style="order: 1;">
-                                פרטי ישות
-                            </h5>
-                            <!-- Breadcrumb navigation - מתחת לכותרת -->
-                            <div class="modal-navigation-breadcrumb" id="entityDetailsBreadcrumb" style="order: 2; width: 100%; margin-top: 0.5rem;"></div>
-                            <!-- Back button - uses the button system - ראשון (מימין ב-RTL) -->
-                            <!-- הכפתור יקבל data-onclick מ-modal-navigation-manager -->
-                            <button type="button" 
-                                    data-button-type="BACK" 
-                                    data-variant="full" 
-                                    data-text="" 
-                                    title="חזור למודול הקודם"
-                                    id="entityDetailsBackBtn"
-                                    class="modal-back-btn"
-                                    style="order: 3; border-radius: 6px;">
-                            </button>
-                            <!-- Close button - uses the button system - שני (משמאל ל-חזרה ב-RTL) -->
-                            <button type="button" 
-                                    data-button-type="CLOSE" 
-                                    data-variant="small" 
-                                    data-bs-dismiss="modal" 
-                                    data-text="" 
-                                    title="סגור"
-                                    class="modal-close-btn"
-                                    style="order: 4; border-radius: 6px;">
-                            </button>
-                            <div id="quickActionButtons" class="btn-group btn-group-sm" role="group" style="order: 5;">
-                                <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
+                            <div class="modal-header-title-section">
+                                <h5 class="modal-title" id="${this.modalId}Label">
+                                    פרטי ישות
+                                </h5>
+                            </div>
+                            <!-- Breadcrumb navigation - במרכז בין הכותרת לכפתורים -->
+                            <div class="modal-navigation-breadcrumb" id="entityDetailsBreadcrumb"></div>
+                            <div class="modal-header-actions">
+                                <!-- Quick action buttons -->
+                                <div id="quickActionButtons" class="btn-group btn-group-sm" role="group">
+                                    <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
+                                </div>
+                                <!-- Back button - uses the button system - לפני כפתור סגירה (מימין לסגירה ב-RTL) -->
+                                <!-- הכפתור יקבל data-onclick מ-modal-navigation-manager -->
+                                <button type="button" 
+                                        data-button-type="BACK" 
+                                        data-variant="normal" 
+                                        title="חזור למודול הקודם"
+                                        id="entityDetailsBackBtn">
+                                </button>
+                                <!-- Close button - uses the button system - בסוף השורה משמאל (הכי שמאלה ב-RTL) - איקון בלבד -->
+                                <button type="button" 
+                                        data-button-type="CLOSE" 
+                                        data-variant="small" 
+                                        data-bs-dismiss="modal" 
+                                        title="סגור">
+                                </button>
                             </div>
                         </div>
                         <div class="modal-body entity-details-body" id="entityDetailsContent">
@@ -357,8 +356,8 @@ class EntityDetailsModal {
         if (!contentElement) return;
 
         contentElement.innerHTML = `
-            <div class="entity-details-loading d-flex flex-column align-items-center justify-content-center" style="min-height: 300px;">
-                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <div class="entity-details-loading d-flex flex-column align-items-center justify-content-center">
+                <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">טוען...</span>
                 </div>
                 <p class="mt-3 text-muted">טוען פרטי ישות...</p>
@@ -516,7 +515,16 @@ class EntityDetailsModal {
                 await window.modalNavigationManager.pushModal(this.modal, modalInfo);
             } else if (currentIndex >= 0) {
                 // מודול קיים ללא sourceInfo - רק עדכון מידע (לא מודול מקונן)
-                window.modalNavigationManager.modalHistory[currentIndex].info = modalInfo;
+                // חשוב: לא נעדכן את המודול הראשון (index 0) - הוא חייב להישאר קבוע
+                if (currentIndex !== 0) {
+                    window.modalNavigationManager.modalHistory[currentIndex].info = modalInfo;
+                } else if (window.Logger) {
+                    window.Logger.warn('⚠️ Attempted to update first modal info from entity-details-modal - prevented', {
+                        entityType,
+                        entityId,
+                        page: "entity-details-modal"
+                    });
+                }
                 // שמירה למטמון לאחר עדכון
                 if (window.modalNavigationManager.saveHistoryToCache) {
                     await window.modalNavigationManager.saveHistoryToCache();
@@ -632,7 +640,10 @@ class EntityDetailsModal {
                 
                 if (currentHistoryIndex >= 0) {
                     // שמירת התוכן - תמיד נעדכן את התוכן אם הוא קיים
-                    window.modalNavigationManager.modalHistory[currentHistoryIndex].content = contentElement.innerHTML;
+                    // חשוב: לא נעדכן את התוכן של המודול הראשון (index 0) - הוא חייב להישאר קבוע
+                    if (currentHistoryIndex !== 0) {
+                        window.modalNavigationManager.modalHistory[currentHistoryIndex].content = contentElement.innerHTML;
+                    }
                     if (window.Logger) {
                         window.Logger.debug('✅ Saved modal content to history after loading', {
                             entityType,
@@ -652,7 +663,10 @@ class EntityDetailsModal {
                     
                     if (modalHistoryIndex >= 0) {
                         // עדכון התוכן גם אם entityType/Id שונים (מקרה נדיר)
-                        window.modalNavigationManager.modalHistory[modalHistoryIndex].content = contentElement.innerHTML;
+                        // חשוב: לא נעדכן את התוכן של המודול הראשון (index 0) - הוא חייב להישאר קבוע
+                        if (modalHistoryIndex !== 0) {
+                            window.modalNavigationManager.modalHistory[modalHistoryIndex].content = contentElement.innerHTML;
+                        }
                         if (window.Logger) {
                             window.Logger.debug('✅ Saved modal content to history (by element only)', {
                                 entityType,
@@ -823,10 +837,6 @@ class EntityDetailsModal {
             return;
         }
         
-        // שמירת הברדקראמב לפני עדכון הכותרת (תיקון - הברדקראמב לא צריך להימחק)
-        const breadcrumbContainer = headerElement.querySelector('.modal-navigation-breadcrumb');
-        const breadcrumbHTML = breadcrumbContainer ? breadcrumbContainer.innerHTML : null;
-
         // בדיקה אם זה מודול מקונן - אם כן, לא נעדכן את הכותרת (רק ברדקראמבס יציג)
         const isNestedModal = !!this.sourceInfo;
         
@@ -841,10 +851,9 @@ class EntityDetailsModal {
             // כותרת פשוטה ללא שם הרשומה
             const titleHTML = `
                 <span class="d-inline-flex align-items-center gap-2">
-                    <div class="entity-icon-circle" style="background-color: white;">
+                    <div class="entity-icon-circle">
                         <img src="${iconPath}" 
-                             alt="${entityLabel}" 
-                             style="width: 30px; height: 30px;" />
+                             alt="${entityLabel}" />
                     </div>
                     <span>פרטי ${entityLabel}</span>
                 </span>
@@ -866,10 +875,9 @@ class EntityDetailsModal {
             // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
             const titleHTML = `
                 <span class="d-inline-flex align-items-center gap-2">
-                    <div class="entity-icon-circle" style="background-color: white;">
+                    <div class="entity-icon-circle">
                         <img src="${iconPath}" 
-                             alt="${entityLabel}" 
-                             style="width: 30px; height: 30px;" />
+                             alt="${entityLabel}" />
                     </div>
                     <span>פרטי ${entityLabel}${finalEntityId ? ` מספר ${finalEntityId}` : ''}</span>
                 </span>
@@ -894,13 +902,8 @@ class EntityDetailsModal {
             });
         }
         
-        // החזרת הברדקראמב אם הוא נשמר (תיקון - הברדקראמב לא צריך להימחק)
-        if (breadcrumbContainer && breadcrumbHTML) {
-            breadcrumbContainer.innerHTML = breadcrumbHTML;
-            if (window.Logger) {
-                window.Logger.debug('✅ Restored breadcrumb after title update', { page: "entity-details-modal" });
-            }
-        }
+        // לא צריך לשמור ולהחזיר את ה-breadcrumb - modal-navigation-manager מטפל בזה
+        // אם נשמור ונחזיר, זה יחליף את התוכן הנכון שנוצר ב-_performNavigationUpdate
         
         // עדכון צבע כותרת המודל לפי סוג הישות
         this.updateModalHeaderColor(finalEntityType);
@@ -912,7 +915,7 @@ class EntityDetailsModal {
             finalEntityType,
             finalEntityId,
             titleElementFinal: titleElement?.innerHTML?.substring(0, 100),
-            breadcrumbRestored: !!(breadcrumbContainer && breadcrumbHTML),
+            breadcrumbManaged: 'modal-navigation-manager handles breadcrumb',
             thisCurrentEntityType: this.currentEntityType,
             thisCurrentEntityId: this.currentEntityId
         });
@@ -1062,7 +1065,7 @@ class EntityDetailsModal {
         if (!contentElement) return;
 
         contentElement.innerHTML = `
-            <div class="entity-details-error d-flex flex-column align-items-center justify-content-center" style="min-height: 300px;">
+            <div class="entity-details-error d-flex flex-column align-items-center justify-content-center">
                 <div class="alert alert-danger text-center">
                     <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
                     <h6>שגיאה בטעינת פרטי הישות</h6>

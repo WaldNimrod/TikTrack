@@ -557,6 +557,36 @@ window.updateAllTickerStatuses = updateAllTickerStatuses;
 window.updateTickerFromTradePlan = updateTickerFromTradePlan;
 window.updateTickersListForClosedTrades = updateTickersListForClosedTrades;
 
+// ===== TICKER SERVICE OBJECT =====
+/**
+ * Ticker Service Object - Provides unified interface for ticker operations
+ * This object wraps all ticker-related functions for easier access
+ */
+window.tickerService = {
+    getTickers: getTickers,
+    getTrades: getTrades,
+    getTradePlans: getTradePlans,
+    loadCache: loadCache,
+    getTickersWithTrades: getTickersWithTrades,
+    getTickersWithPlans: getTickersWithPlans,
+    getRelevantTickers: getRelevantTickers,
+    getTickersWithOpenOrClosedTradesAndPlans: getTickersWithOpenOrClosedTradesAndPlans,
+    getTickersByType: getTickersByType,
+    getTickersByActivity: getTickersByActivity,
+    updateTickerSelect: updateTickerSelect,
+    loadTickersForTradePlan: loadTickersForTradePlan,
+    saveTicker: saveTicker,
+    updateTicker: updateTicker,
+    deleteTicker: deleteTicker,
+    updateTickerActiveTradesStatus: updateTickerActiveTradesStatus,
+    updateAllActiveTradesStatuses: updateAllActiveTradesStatuses,
+    updateAllTickerStatuses: updateAllTickerStatuses,
+    updateTickerFromTradePlan: updateTickerFromTradePlan,
+    updateTickersListForClosedTrades: updateTickersListForClosedTrades,
+    isCacheValid: isCacheValid,
+    clearCache: clearCache
+};
+
 // ===== CRUD OPERATIONS =====
 
 /**

@@ -3,7 +3,7 @@
 
 **File:** `trading-ui/scripts/related-object-filters.js`  
 **Version:** 3.2  
-**Last Updated:** 2025-11-05  
+**Last Updated:** 2025-11-05 (continued fixes)  
 **Author:** TikTrack Development Team
 
 ## Overview
@@ -447,7 +447,7 @@ debugFilterTooltips.getHistory()
 
 ## Changelog
 
-### Version 3.2 (2025-11-04)
+### Version 3.2 (2025-11-05)
 - ✅ Fixed alert editing modal - corrected field mapping for condition_attribute, condition_operator, condition_number, and status
 - ✅ Updated alerts-config.js options to match backend API values (price, change, ma, volume for alertType; more_than, less_than, etc. for alertCondition; open, closed, cancelled for alertStatus)
 - ✅ Fixed potential async issue in resetForm when calling applyDefaultValues
@@ -455,6 +455,9 @@ debugFilterTooltips.getHistory()
 - ✅ Fixed syntax error in linked-items-service.js by commenting out debug logs
 - ✅ Added early return in event-handler-manager.js for elements with onclick attributes
 - ✅ Fixed duplicate script loading in notes.html, alerts.html, and trades.html
+- ✅ **Fixed Alert model** - added missing `ticker_id` to `to_dict()` method response
+- ✅ **Fixed database** - removed invalid string values from alerts.ticker_id column (replaced with NULL)
+- ✅ Added detailed logging for SELECT field population to diagnose dropdown issues
 
 ### Version 3.1 (2025-11-03)
 - ✅ Added data-tooltip attributes to alerts page filter buttons

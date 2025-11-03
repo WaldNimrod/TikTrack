@@ -782,7 +782,14 @@ class ModalManagerV2 {
                     field.checked = Boolean(value);
                 } else if (field.tagName === 'SELECT') {
                     // For selects, set value directly
+                    console.log(`🎯 Setting SELECT field ${field.id}:`, {
+                        tryingToSet: value,
+                        currentValue: field.value,
+                        availableOptions: Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})),
+                        hasOption: Array.from(field.options).some(opt => opt.value === value)
+                    });
                     field.value = value || '';
+                    console.log(`🎯 After setting, field.value is: ${field.value}`);
                 } else if (field.type === 'datetime-local' && value) {
                     // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)
                     const dateStr = typeof value === 'string' ? value : value.toString();

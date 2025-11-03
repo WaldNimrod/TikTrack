@@ -452,6 +452,9 @@ debugFilterTooltips.getHistory()
 - ✅ Updated alerts-config.js options to match backend API values (price, change, ma, volume for alertType; more_than, less_than, etc. for alertCondition; open, closed, cancelled for alertStatus)
 - ✅ Fixed potential async issue in resetForm when calling applyDefaultValues
 - ✅ Updated version numbers in alerts.html to prevent cache issues
+- ✅ Fixed syntax error in linked-items-service.js by commenting out debug logs
+- ✅ Added early return in event-handler-manager.js for elements with onclick attributes
+- ✅ Fixed duplicate script loading in notes.html, alerts.html, and trades.html
 
 ### Version 3.1 (2025-11-03)
 - ✅ Added data-tooltip attributes to alerts page filter buttons

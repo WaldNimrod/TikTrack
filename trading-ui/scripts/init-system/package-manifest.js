@@ -1089,6 +1089,13 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.RuntimeValidator',
         description: 'ולידטור זמן ריצה',
         required: true
+      },
+      {
+        file: 'debug-filter-tooltips-comprehensive.js',
+        globalCheck: 'window.debugFilterTooltips',
+        description: 'כלי דיבאג לטולטיפים של פילטרים',
+        required: false,
+        loadOrder: 4
       }
     ],
     estimatedSize: '~100KB',

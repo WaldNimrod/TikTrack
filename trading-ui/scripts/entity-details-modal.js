@@ -423,6 +423,11 @@ class EntityDetailsModal {
             
             let entityData = await window.entityDetailsAPI.getEntityDetails(entityType, entityId, apiOptions);
             
+            // טעינת נתונים נוספים עבור trading_account
+            if (entityType === 'trading_account' || entityType === 'account') {
+                await this.loadAccountAdditionalData(entityData, entityId);
+            }
+            
             // שמירת מידע על המקור אם קיים (לניפוי בין מודולים מקוננים)
             if (options.source) {
                 if (window.Logger) {
@@ -600,7 +605,7 @@ class EntityDetailsModal {
             });
         }
         
-        const renderedContent = window.entityDetailsRenderer.render(entityType, entityData, renderOptions);
+        const renderedContent = await window.entityDetailsRenderer.render(entityType, entityData, renderOptions);
 
         // הצגת התוכן ברנדור
         this.showRenderedContent(renderedContent);
@@ -854,21 +859,29 @@ class EntityDetailsModal {
             
             const iconPath = this.getEntityIcon(finalEntityType);
             
-            // כותרת פשוטה ללא שם הרשומה
+            // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון
+            let titleText = '';
+            if ((finalEntityType === 'account' || finalEntityType === 'trading_account') && entityData && entityData.name) {
+                titleText = `פרטי חשבון: ${entityData.name}`;
+            } else {
+                // כותרת פשוטה ללא שם הרשומה
+                titleText = `פרטי ${entityLabel}`;
+            }
+            
             const titleHTML = `
                 <span class="d-inline-flex align-items-center gap-2">
                     <div class="entity-icon-circle">
                         <img src="${iconPath}" 
                              alt="${entityLabel}" />
                     </div>
-                    <span>פרטי ${entityLabel}</span>
+                    <span>${titleText}</span>
                 </span>
             `;
             
             titleElement.innerHTML = titleHTML;
             
             if (window.Logger) {
-                window.Logger.info('🎯 Nested modal - simple title set', { entityLabel, iconPath, finalEntityType }, { page: "entity-details-modal" });
+                window.Logger.info('🎯 Nested modal - simple title set', { entityLabel, iconPath, finalEntityType, titleText }, { page: "entity-details-modal" });
             }
         } else {
             // מודול רגיל - עדכון מלא של הכותרת
@@ -878,14 +891,22 @@ class EntityDetailsModal {
             
             const iconPath = this.getEntityIcon(finalEntityType);
             
-            // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
+            // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
+            let titleText = '';
+            if ((finalEntityType === 'account' || finalEntityType === 'trading_account') && entityData && entityData.name) {
+                titleText = `פרטי חשבון: ${entityData.name}`;
+            } else {
+                // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
+                titleText = `פרטי ${entityLabel}${finalEntityId ? ` מספר ${finalEntityId}` : ''}`;
+            }
+            
             const titleHTML = `
                 <span class="d-inline-flex align-items-center gap-2">
                     <div class="entity-icon-circle">
                         <img src="${iconPath}" 
                              alt="${entityLabel}" />
                     </div>
-                    <span>פרטי ${entityLabel}${finalEntityId ? ` מספר ${finalEntityId}` : ''}</span>
+                    <span>${titleText}</span>
                 </span>
             `;
 
@@ -894,12 +915,13 @@ class EntityDetailsModal {
                 entityId: finalEntityId,
                 iconPath,
                 finalEntityType,
+                titleText,
                 titleHTML,
                 titleHTMLLength: titleHTML.length,
                 titleElementBefore: titleElement?.innerHTML?.substring(0, 100)
             });
             
-            window.Logger.info('🎯 Setting title to:', { entityLabel, entityId: finalEntityId, iconPath, finalEntityType }, { page: "entity-details-modal" });
+            window.Logger.info('🎯 Setting title to:', { entityLabel, entityId: finalEntityId, iconPath, finalEntityType, titleText }, { page: "entity-details-modal" });
             titleElement.innerHTML = titleHTML;
             
             console.log('🔍🔍🔍 [updateModalTitle] After setting titleHTML', {
@@ -945,6 +967,11 @@ class EntityDetailsModal {
      * @returns {string} טקסט כותרת
      */
     getModalTitleText(entityType, entityData) {
+        // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
+        if ((entityType === 'account' || entityType === 'trading_account') && entityData && entityData.name) {
+            return `פרטי חשבון: ${entityData.name}`;
+        }
+        
         const entityLabel = (window.getEntityLabel && typeof window.getEntityLabel === 'function') 
             ? window.getEntityLabel(entityType) 
             : entityType;
@@ -1023,6 +1050,117 @@ class EntityDetailsModal {
         if (!contentElement) return;
 
         contentElement.innerHTML = renderedContent;
+        
+        // Initialize tooltips for linked items filter buttons after content is displayed
+        // Use multiple attempts to ensure tooltips are initialized even if systems load slowly
+        const initializeTooltips = (attempt = 1, maxAttempts = 5) => {
+            if (attempt > maxAttempts) {
+                console.warn(`🔍 [Tooltip Debug] Max attempts reached (${maxAttempts}), stopping tooltip initialization`);
+                return;
+            }
+            
+            // Find all filter containers for linked items in the rendered content
+            // Search in both contentElement and modal to catch all cases
+            const searchScope = this.modal || contentElement;
+            const filterContainers = searchScope.querySelectorAll('[id^="linkedItemsFilter_"]');
+            const filterButtonsContainers = searchScope.querySelectorAll('.filter-buttons-container[id^="linkedItemsFilter_"]');
+            
+            // Also search for buttons with data-tooltip directly
+            const buttonsWithTooltip = searchScope.querySelectorAll('.filter-buttons-container [data-tooltip]');
+            
+            console.log(`🔍 [Tooltip Debug] Attempt ${attempt}/${maxAttempts}:`, {
+                filterContainers: filterContainers.length,
+                filterButtonsContainers: filterButtonsContainers.length,
+                buttonsWithTooltip: buttonsWithTooltip.length,
+                searchScope: searchScope.id || searchScope.className || 'unknown'
+            });
+            
+            // If we found containers, initialize tooltips
+            if (filterContainers.length > 0 || filterButtonsContainers.length > 0) {
+                const containersToProcess = filterContainers.length > 0 ? filterContainers : filterButtonsContainers;
+                
+                containersToProcess.forEach(container => {
+                    // Extract tableId from container ID (linkedItemsFilter_linkedItemsTable_alert_2 -> linkedItemsTable_alert_2)
+                    const containerId = container.id;
+                    const tableId = containerId.replace('linkedItemsFilter_', '');
+                    console.log(`🔍 [Tooltip Debug] Initializing tooltips for tableId: ${tableId}`);
+                    
+                    if (window.entityDetailsRenderer && window.entityDetailsRenderer._initializeFilterTooltips) {
+                        window.entityDetailsRenderer._initializeFilterTooltips(tableId);
+                    } else {
+                        // Fallback: initialize tooltips directly if renderer method not available
+                        initializeTooltipsDirectly(container);
+                    }
+                });
+            } else if (buttonsWithTooltip.length > 0) {
+                // Fallback: if we found buttons but no containers, initialize directly
+                console.log(`🔍 [Tooltip Debug] Found ${buttonsWithTooltip.length} buttons with data-tooltip, initializing directly`);
+                const container = buttonsWithTooltip[0].closest('.filter-buttons-container');
+                if (container) {
+                    initializeTooltipsDirectly(container);
+                }
+            } else if (attempt < maxAttempts) {
+                // Retry after a delay if nothing found yet
+                setTimeout(() => initializeTooltips(attempt + 1, maxAttempts), 200);
+                return;
+            }
+            
+            // Also try finding tables directly as fallback
+            if ((filterContainers.length === 0 && filterButtonsContainers.length === 0) && attempt < maxAttempts) {
+                const linkedItemsTables = searchScope.querySelectorAll('[id^="linkedItemsTable_"]');
+                console.log(`🔍 [Tooltip Debug] Fallback: Found ${linkedItemsTables.length} linked items tables`);
+                linkedItemsTables.forEach(table => {
+                    const tableId = table.id;
+                    if (window.entityDetailsRenderer && window.entityDetailsRenderer._initializeFilterTooltips) {
+                        window.entityDetailsRenderer._initializeFilterTooltips(tableId);
+                    }
+                });
+            }
+        };
+        
+        // Helper function to initialize tooltips directly
+        const initializeTooltipsDirectly = (container) => {
+            const buttonsWithTooltip = container.querySelectorAll('[data-tooltip]');
+            if (buttonsWithTooltip.length === 0) return;
+            
+            console.log(`🔍 [Tooltip Debug] Direct initialization for ${buttonsWithTooltip.length} buttons`);
+            
+            // Check if Bootstrap is available
+            if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
+                console.warn('🔍 [Tooltip Debug] Bootstrap not available, skipping direct initialization');
+                return;
+            }
+            
+            buttonsWithTooltip.forEach((btn) => {
+                try {
+                    // Destroy existing tooltip if exists
+                    const existingTooltip = bootstrap.Tooltip.getInstance(btn);
+                    if (existingTooltip) {
+                        existingTooltip.dispose();
+                    }
+                    
+                    const tooltipText = btn.getAttribute('data-tooltip');
+                    const placement = btn.getAttribute('data-tooltip-placement') || 'top';
+                    const trigger = btn.getAttribute('data-tooltip-trigger') || 'hover';
+                    
+                    if (tooltipText) {
+                        new bootstrap.Tooltip(btn, {
+                            title: tooltipText,
+                            placement: placement,
+                            trigger: trigger
+                        });
+                        console.log(`✅ [Tooltip Debug] Directly initialized tooltip for button: ${btn.id || btn.getAttribute('data-type')}`);
+                    }
+                } catch (error) {
+                    console.error(`❌ [Tooltip Debug] Error initializing tooltip:`, error);
+                }
+            });
+        };
+        
+        // Start initialization with delay to ensure DOM is ready
+        setTimeout(() => {
+            initializeTooltips(1, 5);
+        }, 100);
     }
 
     /**
@@ -1362,6 +1500,244 @@ class EntityDetailsModal {
             if (window.showErrorNotification) {
                 window.showErrorNotification(`שגיאה בייצוא: ${error.message}`);
             }
+        }
+    }
+
+    /**
+     * Load additional data for trading account - טעינת נתונים נוספים עבור חשבון מסחר
+     * 
+     * @param {Object} entityData - נתוני החשבון
+     * @param {number|string} accountId - מזהה החשבון
+     * @private
+     */
+    async loadAccountAdditionalData(entityData, accountId) {
+        try {
+            // 1. טעינת יתרות
+            try {
+                const balancesResponse = await fetch(`/api/account-activity/${accountId}/balances`);
+                if (balancesResponse.ok) {
+                    const balancesData = await balancesResponse.json();
+                    if (balancesData.status === 'success' && balancesData.data) {
+                        entityData.balances = balancesData.data;
+                        
+                        // הוספת שם מטבע ראשי
+                        if (balancesData.data.base_currency_id && window.currenciesData) {
+                            const baseCurrency = window.currenciesData.find(c => c.id === balancesData.data.base_currency_id);
+                            if (baseCurrency) {
+                                entityData.currency_name = baseCurrency.name || baseCurrency.symbol;
+                                if (balancesData.data.base_currency_symbol) {
+                                    entityData.currency_symbol = balancesData.data.base_currency_symbol;
+                                }
+                            }
+                        } else if (entityData.currency_id && window.currenciesData) {
+                            const currency = window.currenciesData.find(c => c.id === entityData.currency_id);
+                            if (currency) {
+                                entityData.currency_name = currency.name || currency.symbol;
+                                entityData.currency_symbol = currency.symbol;
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                window.Logger.warn('Error loading account balances:', error, { page: "entity-details-modal" });
+            }
+
+            // 2. טעינת תאריך תנועה אחרונה
+            try {
+                // חיפוש התאריך האחרון מבין linked_items (אם קיימים)
+                let lastDate = null;
+                if (entityData.linked_items && Array.isArray(entityData.linked_items)) {
+                    entityData.linked_items.forEach(item => {
+                        if (item.created_at) {
+                            const itemDate = new Date(item.created_at);
+                            if (!lastDate || itemDate > new Date(lastDate)) {
+                                lastDate = item.created_at;
+                            }
+                        }
+                    });
+                }
+                
+                // אם לא מצאנו ב-linked_items, נטען מה-API
+                if (!lastDate) {
+                    const transactionResponse = await fetch(`/api/account-activity/${accountId}`);
+                    if (transactionResponse.ok) {
+                        const transactionData = await transactionResponse.json();
+                        if (transactionData.status === 'success' && transactionData.data) {
+                            // חיפוש התאריך האחרון מבין ביצועים ותזרימים
+                            if (transactionData.data.executions && transactionData.data.executions.length > 0) {
+                                const lastExecution = transactionData.data.executions
+                                    .sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at))[0];
+                                if (lastExecution) {
+                                    lastDate = lastExecution.date || lastExecution.created_at;
+                                }
+                            }
+                            if (transactionData.data.cash_flows && transactionData.data.cash_flows.length > 0) {
+                                const lastCashFlow = transactionData.data.cash_flows
+                                    .sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at))[0];
+                                if (lastCashFlow) {
+                                    const cashFlowDate = lastCashFlow.date || lastCashFlow.created_at;
+                                    if (!lastDate || new Date(cashFlowDate) > new Date(lastDate)) {
+                                        lastDate = cashFlowDate;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (lastDate) {
+                    entityData.last_transaction_date = lastDate;
+                }
+            } catch (error) {
+                window.Logger.warn('Error loading last transaction date:', error, { page: "entity-details-modal" });
+            }
+
+            // 3. בדיקת ברירת מחדל מההעדפות - בדיוק כמו בעמוד התנועות (account-activity.js)
+            try {
+                let isDefault = null;
+                let defaultAccountId = null;
+                
+                // בדיקה ראשונה - window.getPreference (כמו בעמוד התנועות)
+                if (typeof window.getPreference === 'function') {
+                    try {
+                        // נסה עם default_trading_account (כמו בעמוד התנועות)
+                        let prefValue = await window.getPreference('default_trading_account');
+                        if (!prefValue) {
+                            // נסה עם defaultAccountFilter
+                            prefValue = await window.getPreference('defaultAccountFilter');
+                        }
+                        
+                        if (prefValue && prefValue !== 'all' && prefValue !== null && prefValue !== undefined) {
+                            // Try to parse as integer ID first
+                            const parsed = parseInt(prefValue);
+                            if (!isNaN(parsed)) {
+                                defaultAccountId = parsed;
+                            } else {
+                                // Try to find account by name
+                                if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
+                                    const account = window.trading_accountsData.find(acc => acc.name === prefValue);
+                                    if (account) {
+                                        defaultAccountId = account.id;
+                                    }
+                                }
+                            }
+                            
+                            if (defaultAccountId) {
+                                isDefault = (defaultAccountId === parseInt(accountId));
+                                window.Logger.debug(`✅ Got default account from getPreference: ${prefValue} -> ${defaultAccountId}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                            }
+                        }
+                    } catch (prefError) {
+                        window.Logger.debug('window.getPreference failed, trying other methods', prefError, { page: "entity-details-modal" });
+                    }
+                }
+                
+                // בדיקה שנייה - getCurrentPreference (מטמון/API)
+                if (isDefault === null && typeof window.getCurrentPreference === 'function') {
+                    try {
+                        let defaultAccountFilter = await window.getCurrentPreference('default_trading_account');
+                        if (!defaultAccountFilter) {
+                            defaultAccountFilter = await window.getCurrentPreference('defaultAccountFilter');
+                        }
+                        if (defaultAccountFilter && defaultAccountFilter !== 'all' && defaultAccountFilter !== null && defaultAccountFilter !== undefined) {
+                            const parsed = parseInt(defaultAccountFilter);
+                            if (!isNaN(parsed)) {
+                                defaultAccountId = parsed;
+                                isDefault = (defaultAccountId === parseInt(accountId));
+                                window.Logger.debug(`✅ Got default account from getCurrentPreference: ${defaultAccountFilter}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                            }
+                        }
+                    } catch (prefError) {
+                        window.Logger.debug('getCurrentPreference failed, trying other methods', prefError, { page: "entity-details-modal" });
+                    }
+                }
+                
+                // בדיקה שלישית - PreferencesCore ישירות
+                if (isDefault === null && window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    try {
+                        let defaultAccountFilter = await window.PreferencesCore.getPreference('default_trading_account');
+                        if (!defaultAccountFilter || defaultAccountFilter === 'all') {
+                            defaultAccountFilter = await window.PreferencesCore.getPreference('defaultAccountFilter');
+                        }
+                        if (defaultAccountFilter && defaultAccountFilter !== 'all' && defaultAccountFilter !== null && defaultAccountFilter !== undefined) {
+                            const parsed = parseInt(defaultAccountFilter);
+                            if (!isNaN(parsed)) {
+                                defaultAccountId = parsed;
+                                isDefault = (defaultAccountId === parseInt(accountId));
+                                window.Logger.debug(`✅ Got default account from PreferencesCore: ${defaultAccountFilter}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                            }
+                        }
+                    } catch (coreError) {
+                        window.Logger.debug('PreferencesCore.getPreference failed', coreError, { page: "entity-details-modal" });
+                    }
+                }
+                
+                // בדיקה רביעית - currentPreferences
+                if (isDefault === null && window.currentPreferences) {
+                    if (window.currentPreferences.default_trading_account) {
+                        const parsed = parseInt(window.currentPreferences.default_trading_account);
+                        if (!isNaN(parsed)) {
+                            defaultAccountId = parsed;
+                            isDefault = (defaultAccountId === parseInt(accountId));
+                            window.Logger.debug(`✅ Got default_trading_account from currentPreferences: ${defaultAccountId}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                        }
+                    } else if (window.currentPreferences.defaultAccountFilter && window.currentPreferences.defaultAccountFilter !== 'all') {
+                        const parsed = parseInt(window.currentPreferences.defaultAccountFilter);
+                        if (!isNaN(parsed)) {
+                            defaultAccountId = parsed;
+                            isDefault = (defaultAccountId === parseInt(accountId));
+                            window.Logger.debug(`✅ Got defaultAccountFilter from currentPreferences: ${defaultAccountId}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                        }
+                    }
+                }
+                
+                // בדיקה חמישית - preferences.preferences.trading_settings
+                if (isDefault === null && window.preferences && window.preferences.preferences && window.preferences.preferences.trading_settings) {
+                    const defaultAccountFilter = window.preferences.preferences.trading_settings.defaultAccountFilter;
+                    if (defaultAccountFilter && defaultAccountFilter !== 'all') {
+                        const parsed = parseInt(defaultAccountFilter);
+                        if (!isNaN(parsed)) {
+                            defaultAccountId = parsed;
+                            isDefault = (defaultAccountId === parseInt(accountId));
+                            window.Logger.debug(`✅ Got defaultAccountFilter from preferences.trading_settings: ${defaultAccountFilter}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                        }
+                    }
+                }
+                
+                // בדיקה שישית - preferences.preferences ישירות
+                if (isDefault === null && window.preferences && window.preferences.preferences) {
+                    if (window.preferences.preferences.default_trading_account) {
+                        const parsed = parseInt(window.preferences.preferences.default_trading_account);
+                        if (!isNaN(parsed)) {
+                            defaultAccountId = parsed;
+                            isDefault = (defaultAccountId === parseInt(accountId));
+                            window.Logger.debug(`✅ Got default_trading_account from preferences: ${defaultAccountId}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                        }
+                    } else if (window.preferences.preferences.defaultAccountFilter && window.preferences.preferences.defaultAccountFilter !== 'all') {
+                        const defaultAccountFilter = window.preferences.preferences.defaultAccountFilter;
+                        const parsed = parseInt(defaultAccountFilter);
+                        if (!isNaN(parsed)) {
+                            defaultAccountId = parsed;
+                            isDefault = (defaultAccountId === parseInt(accountId));
+                            window.Logger.debug(`✅ Got defaultAccountFilter from preferences: ${defaultAccountFilter}, isDefault: ${isDefault}`, { page: "entity-details-modal" });
+                        }
+                    }
+                }
+                
+                // אם מצאנו תוצאה - נקבע אותה, אחרת נשאיר undefined כדי שיוצג "לא זמין"
+                entityData.is_default = isDefault !== null ? isDefault : undefined;
+                
+                if (isDefault === null) {
+                    window.Logger.debug(`⚠️ Could not determine default account. accountId: ${accountId}, defaultAccountId: ${defaultAccountId}`, { page: "entity-details-modal" });
+                } else {
+                    window.Logger.info(`✅ Default account check: accountId=${accountId}, defaultAccountId=${defaultAccountId}, isDefault=${isDefault}`, { page: "entity-details-modal" });
+                }
+            } catch (error) {
+                window.Logger.warn('Error checking default account:', error, { page: "entity-details-modal" });
+                entityData.is_default = undefined; // אם יש שגיאה - לא זמין
+            }
+        } catch (error) {
+            window.Logger.error('Error loading additional account data:', error, { page: "entity-details-modal" });
         }
     }
 }

@@ -165,7 +165,7 @@ class LinkedItemsService {
             'trade': '#007bff',
             'trade_plan': '#007bff',
             'execution': '#28a745',
-            'trading_account': '#28a745'
+            'trading_account': '#28a745',
             'ticker': '#17a2b8',
             'alert': '#ffc107',
             'cash_flow': '#6c757d',
@@ -200,7 +200,7 @@ class LinkedItemsService {
             'trade': 'טרייד',
             'trade_plan': 'תוכנית השקעה',
             'execution': 'ביצוע',
-            'trading_account': 'חשבון מסחר'
+            'trading_account': 'חשבון מסחר',
             'ticker': 'טיקר',
             'alert': 'התראה',
             'cash_flow': 'תזרים מזומנים',
@@ -402,7 +402,7 @@ class LinkedItemsService {
             'trade': `editTradeRecord('${id}')`,
             'trade_plan': `editTradePlan('${id}')`,
             'ticker': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${id})`,
-            'trading_account': `editAccount('${id}')`
+            'trading_account': `editAccount('${id}')`,
             'alert': `editAlert(${id})`,
             'cash_flow': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${id})`,
             'execution': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('executionsModal', 'execution', ${id})`,

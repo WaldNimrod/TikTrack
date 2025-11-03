@@ -100,6 +100,7 @@ class Alert(BaseModel):
         result: Dict[str, Any] = {
             'id': self.id,
             'message': self.message,
+            'ticker_id': self.ticker_id,
             'triggered_at': self.triggered_at.strftime('%Y-%m-%d %H:%M:%S') if self.triggered_at else None,
             'status': self.status,
             'is_triggered': self.is_triggered,

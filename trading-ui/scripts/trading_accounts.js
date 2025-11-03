@@ -1752,6 +1752,16 @@ async function cancelTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
  */
 async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accountName) {
   try {
+    // בדיקת פריטים מקושרים לפני חלון האישור
+    if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+      const hasLinkedItems = await window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'delete');
+      if (hasLinkedItems) {
+        // יש פריטים מקושרים - המודול כבר הוצג, לא נציג חלון אישור
+        return;
+      }
+    }
+    
+    // אין פריטים מקושרים - המשך עם חלון האישור
     // קבלת פרטי החשבון מסחר לצורך הודעת האישור
     let accountDetails = '';
     try {
@@ -1772,7 +1782,7 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
         'מחיקת חשבון מסחר',
         `האם אתה בטוח שברצונך למחוק חשבון מסחר זה?${accountDetails}`,
         async () => {
-          // המשתמש אישר - בדיקת מקושרים ואז ביצוע המחיקה
+          // המשתמש אישר - ביצוע המחיקה (ללא בדיקה נוספת - כבר בדקנו)
           await checkLinkedItemsAndDeleteTradingAccount(tradingAccountId);
         },
         () => {

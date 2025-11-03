@@ -18,12 +18,12 @@
   border-bottom: 2px solid var(--entity-trade-color);
 }
 
-/* עמוד חשבונות - ירוק */
+/* עמוד חשבונות מסחר - ירוק */
 .accounts-page .section-header,
 .accounts-page .top-section .section-header,
 .trading-accounts-page .section-header,
 .trading-accounts-page .top-section .section-header {
-  border-bottom: 2px solid var(--entity-account-color);
+  border-bottom: 2px solid var(--entity-trading-account-color);
 }
 
 /* עמוד תכנון טריידים - כחול כהה */
@@ -235,8 +235,18 @@
 }
 
 /* ===== סגנונות כותרות דינמיות ===== */
-.entity-account-main-header {
-  border-bottom: 2px solid var(--entity-account-color);
+/* הוסר - משתמשים ב-entity-trading_account-main-header */
+
+.entity-trading_account-main-header {
+  border-bottom: 2px solid var(--entity-trading-account-color);
+  background-color: var(--entity-trading-account-bg, rgba(40, 167, 69, 0.1));
+  border-left: 4px solid var(--entity-trading-account-color);
+}
+
+.entity-trading_account-sub-header {
+  border-bottom: 1px solid var(--entity-trading-account-color);
+  background-color: var(--entity-trading-account-bg, rgba(40, 167, 69, 0.05));
+  border-left: 3px solid var(--entity-trading-account-color);
 }
 
 .entity-trade-main-header {

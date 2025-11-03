@@ -273,13 +273,15 @@
   color: var(--entity-ticker-color-dark, var(--entity-ticker-color));
 }
 
-.modal[data-entity-type="account"] .modal-header {
-  background: var(--entity-account-bg, var(--entity-account-color-light));
-  border-bottom: 2px solid var(--entity-account-color-dark, var(--entity-account-color));
+.modal[data-entity-type="account"] .modal-header,
+.modal[data-entity-type="trading_account"] .modal-header {
+  background: var(--entity-trading-account-bg, var(--entity-trading-account-color-light, var(--entity-account-bg, var(--entity-account-color-light))));
+  border-bottom: 2px solid var(--entity-trading-account-color-dark, var(--entity-trading-account-color, var(--entity-account-color-dark, var(--entity-account-color))));
 }
 
-.modal[data-entity-type="account"] .modal-title {
-  color: var(--entity-account-color-dark, var(--entity-account-color));
+.modal[data-entity-type="account"] .modal-title,
+.modal[data-entity-type="trading_account"] .modal-title {
+  color: var(--entity-trading-account-color-dark, var(--entity-trading-account-color, var(--entity-account-color-dark, var(--entity-account-color))));
 }
 
 .modal[data-entity-type="alert"] .modal-header {
@@ -506,16 +508,18 @@
   border-color: var(--entity-trade-color, #007bff);
 }
 
-.btn[data-entity-type="account"] {
-  color: var(--entity-account-color-dark, #333333);
-  border-color: var(--entity-account-color-dark, #333333);
-  background: var(--entity-account-color-light, #ffffff);
+.btn[data-entity-type="account"],
+.btn[data-entity-type="trading_account"] {
+  color: var(--entity-trading-account-color-dark, var(--entity-trading-account-color, var(--entity-account-color-dark, #333333)));
+  border-color: var(--entity-trading-account-color-dark, var(--entity-trading-account-color, var(--entity-account-color-dark, #333333)));
+  background: var(--entity-trading-account-color-light, var(--entity-trading-account-bg, var(--entity-account-color-light, #ffffff)));
 }
 
-.btn[data-entity-type="account"]:hover {
-  background: var(--entity-account-color, #6f42c1);
+.btn[data-entity-type="account"]:hover,
+.btn[data-entity-type="trading_account"]:hover {
+  background: var(--entity-trading-account-color, var(--entity-account-color, #6f42c1));
   color: white;
-  border-color: var(--entity-account-color, #6f42c1);
+  border-color: var(--entity-trading-account-color, var(--entity-account-color, #6f42c1));
 }
 
 .btn[data-entity-type="alert"] {
@@ -800,7 +804,7 @@
   text-align: center;
   font-size: 0.9rem;
   font-weight: 400;
-  color: var(--current-entity-color-dark, var(--entity-account-color-dark, #1e7e34));
+  color: var(--current-entity-color-dark, var(--entity-trading-account-color-dark, var(--entity-trading-account-color, var(--entity-account-color-dark, #1e7e34))));
   opacity: 0.75;
   font-style: italic;
   margin: 0.5rem 0;

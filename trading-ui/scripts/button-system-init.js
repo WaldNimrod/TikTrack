@@ -332,8 +332,14 @@ class AdvancedButtonSystem {
     initializeTooltips(container) {
         if (!container) {
             this.logger.warn('initializeTooltips: No container provided');
+            console.warn('🔍 [Tooltip Debug] initializeTooltips: No container provided');
             return;
         }
+
+        console.log('🔍 [Tooltip Debug] initializeTooltips called', {
+            container: container.id || container.className || 'unknown',
+            containerTag: container.tagName
+        });
 
         // Wait a bit for DOM to be ready
         requestAnimationFrame(() => {
@@ -341,23 +347,45 @@ class AdvancedButtonSystem {
                 // Find all buttons with data-tooltip attribute (supports both button system buttons and custom buttons)
                 const buttonsWithTooltips = container.querySelectorAll('[data-tooltip]');
                 
+                console.log('🔍 [Tooltip Debug] Searching for buttons with data-tooltip', {
+                    container: container.id || container.className || 'unknown',
+                    found: buttonsWithTooltips.length
+                });
+                
                 if (buttonsWithTooltips.length === 0) {
+                    console.warn('🔍 [Tooltip Debug] No buttons with data-tooltip found in container');
                     return;
                 }
 
                 this.logger.debug(`initializeTooltips: Found ${buttonsWithTooltips.length} buttons with tooltips`);
+                console.log(`🔍 [Tooltip Debug] Found ${buttonsWithTooltips.length} buttons with tooltips`);
 
-                buttonsWithTooltips.forEach(button => {
+                buttonsWithTooltips.forEach((button, index) => {
                     // Get tooltip config from data attributes
                     const tooltipText = button.getAttribute('data-tooltip');
+                    const buttonId = button.id || `button-${index}`;
+                    
+                    console.log(`🔍 [Tooltip Debug] Processing button ${index + 1}/${buttonsWithTooltips.length}`, {
+                        buttonId: buttonId,
+                        tooltipText: tooltipText,
+                        hasDataBsToggle: button.hasAttribute('data-bs-toggle'),
+                        hasTitle: button.hasAttribute('title')
+                    });
+                    
                     if (!tooltipText) {
+                        console.warn(`🔍 [Tooltip Debug] Button ${buttonId} has data-tooltip attribute but no value`);
                         return;
                     }
 
                     // Get configuration from data attributes
                     const config = this._getTooltipConfig(button);
+                    console.log(`🔍 [Tooltip Debug] Config for button ${buttonId}:`, config);
+                    
                     if (config) {
+                        console.log(`🔍 [Tooltip Debug] Initializing tooltip for button ${buttonId}`);
                         this._initializeTooltip(button, config);
+                    } else {
+                        console.warn(`🔍 [Tooltip Debug] No config returned for button ${buttonId}`);
                     }
                 });
             }, 50);
@@ -572,8 +600,16 @@ class AdvancedButtonSystem {
      * @returns {Object|null} Tooltip configuration object or null
      */
     _getTooltipConfig(element) {
+        const elementId = element.id || 'unknown';
         const tooltipText = element.getAttribute('data-tooltip');
+        
+        console.log(`🔍 [Tooltip Debug] _getTooltipConfig called for element ${elementId}`, {
+            tooltipText: tooltipText,
+            hasDataTooltip: element.hasAttribute('data-tooltip')
+        });
+        
         if (!tooltipText) {
+            console.warn(`🔍 [Tooltip Debug] No tooltip text found for element ${elementId}`);
             return null;
         }
 
@@ -584,7 +620,7 @@ class AdvancedButtonSystem {
         const customClass = element.getAttribute('data-tooltip-class');
         const offset = element.getAttribute('data-tooltip-offset');
 
-        return {
+        const config = {
             title: tooltipText,
             placement: placement,
             trigger: trigger,
@@ -593,6 +629,10 @@ class AdvancedButtonSystem {
             customClass: customClass || '',
             offset: offset || '0,0'
         };
+        
+        console.log(`🔍 [Tooltip Debug] Config created for element ${elementId}:`, config);
+        
+        return config;
     }
 
     /**
@@ -602,15 +642,24 @@ class AdvancedButtonSystem {
      * @param {Object} config - Tooltip configuration
      */
     _initializeTooltip(button, config) {
+        const buttonId = button.id || 'unknown';
+        console.log(`🔍 [Tooltip Debug] _initializeTooltip called for button ${buttonId}`, {
+            config: config,
+            bootstrapAvailable: typeof bootstrap !== 'undefined',
+            TooltipAvailable: typeof bootstrap !== 'undefined' && !!bootstrap.Tooltip
+        });
+        
         // Check if Bootstrap is available
         if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
             this.logger.debug('Bootstrap Tooltip not available, using native title attribute');
+            console.warn(`🔍 [Tooltip Debug] Bootstrap Tooltip not available for button ${buttonId}`);
             return;
         }
 
         // Destroy existing tooltip if exists
         const existingTooltip = bootstrap.Tooltip.getInstance(button);
         if (existingTooltip) {
+            console.log(`🔍 [Tooltip Debug] Disposing existing tooltip for button ${buttonId}`);
             existingTooltip.dispose();
         }
 
@@ -636,8 +685,19 @@ class AdvancedButtonSystem {
                 tooltipOptions.offset = [x || 0, y || 0];
             }
 
+            console.log(`🔍 [Tooltip Debug] Creating Bootstrap Tooltip for button ${buttonId}`, {
+                options: tooltipOptions,
+                button: button
+            });
+
             // Initialize Bootstrap tooltip
-            new bootstrap.Tooltip(button, tooltipOptions);
+            const tooltipInstance = new bootstrap.Tooltip(button, tooltipOptions);
+            
+            console.log(`🔍 [Tooltip Debug] ✅ Tooltip created successfully for button ${buttonId}`, {
+                instance: tooltipInstance,
+                enabled: tooltipInstance._isEnabled,
+                config: tooltipInstance._config
+            });
 
             this.logger.debug('Tooltip initialized', {
                 buttonId: button.id,
@@ -648,6 +708,7 @@ class AdvancedButtonSystem {
                 error: error.message,
                 buttonId: button.id
             });
+            console.error(`🔍 [Tooltip Debug] ❌ Error initializing tooltip for button ${buttonId}:`, error);
         }
     }
 

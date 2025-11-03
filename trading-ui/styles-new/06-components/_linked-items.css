@@ -68,7 +68,8 @@
 
 /* Colored start-border per entity type using logical property */
 .linked-items-container .linked-item-row.trade { border-inline-start: 4px solid var(--entity-trade-color); }
-.linked-items-container .linked-item-row.account { border-inline-start: 4px solid var(--entity-account-color); }
+.linked-items-container .linked-item-row.account,
+.linked-items-container .linked-item-row.trading_account { border-inline-start: 4px solid var(--entity-trading-account-color); }
 .linked-items-container .linked-item-row.ticker { border-inline-start: 4px solid var(--entity-ticker-color); }
 .linked-items-container .linked-item-row.alert { border-inline-start: 4px solid var(--entity-alert); }
 .linked-items-container .linked-item-row.cash_flow { border-inline-start: 4px solid var(--entity-cash-flow-color); }
@@ -88,10 +89,11 @@
   color: white;
   border-bottom: 2px solid var(--entity-ticker-color);
 }
-.modal-header.entity-account { 
-  background-color: var(--entity-account-color); 
+.modal-header.entity-account,
+.modal-header.entity-trading_account { 
+  background-color: var(--entity-trading-account-color); 
   color: white;
-  border-bottom: 2px solid var(--entity-account-color);
+  border-bottom: 2px solid var(--entity-trading-account-color);
 }
 .modal-header.entity-alert { 
   background-color: var(--entity-alert-color); 
@@ -183,15 +185,18 @@
 .linked-object-badge .linked-object-center { display: inline-flex; flex-direction: column; align-items: flex-end; text-align: right; min-width: 60px; max-width: 60px; }
 .linked-object-badge .linked-object-symbol { font-size: 12px; color: #333; font-weight: 600; line-height: 1.1; }
 .linked-object-badge .linked-object-date { font-size: 11px; color: #666; line-height: 1.2; margin-top: 2px; }
-/* Account center: allow up to 2 lines for account name, no date */
-.linked-object-badge.entity-account .linked-object-center { align-items: flex-start; text-align: right; max-width: 60px; min-width: 60px; }
-.linked-object-badge.entity-account .linked-object-symbol { font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; white-space: normal; line-height: 1.2; }
+/* Trading Account center: allow up to 2 lines for account name, no date */
+.linked-object-badge.entity-account .linked-object-center,
+.linked-object-badge.entity-trading_account .linked-object-center { align-items: flex-start; text-align: right; max-width: 60px; min-width: 60px; }
+.linked-object-badge.entity-account .linked-object-symbol,
+.linked-object-badge.entity-trading_account .linked-object-symbol { font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; white-space: normal; line-height: 1.2; }
 .linked-object-badge .linked-object-status { margin-inline-start: 6px; justify-self: end; }
 
 /* Colors per entity (fallbacks; dynamic system may override via CSS vars) */
 /* Background + border tints per entity (keeps text legible) */
 .linked-object-badge.entity-trade       { background: rgba(0,123,255,0.08);  border-color: rgba(0,123,255,0.25); }
-.linked-object-badge.entity-account     { background: rgba(40,167,69,0.10);  border-color: rgba(40,167,69,0.28); }
+.linked-object-badge.entity-account,
+.linked-object-badge.entity-trading_account { background: rgba(40,167,69,0.10);  border-color: rgba(40,167,69,0.28); }
 .linked-object-badge.entity-ticker      { background: rgba(23,162,184,0.10); border-color: rgba(23,162,184,0.28); }
 .linked-object-badge.entity-alert       { background: rgba(252,90,6,0.10);   border-color: rgba(252,90,6,0.28); }
 .linked-object-badge.entity-cash_flow   { background: color-mix(in srgb, var(--entity-cash-flow-color) 12%, transparent); border-color: color-mix(in srgb, var(--entity-cash-flow-color) 30%, transparent); }

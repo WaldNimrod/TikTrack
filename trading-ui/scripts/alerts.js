@@ -261,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tradeColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-color');
   const tickerColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color');
   const tradePlanColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-plan-color');
-  const accountColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-account-color');
+  const accountColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trading-account-color') || getComputedStyle(document.documentElement).getPropertyValue('--entity-account-color');
   window.Logger.info('🎨 צבע טרייד:', tradeColor, { page: "alerts" });
   window.Logger.info('🎨 צבע טיקר:', tickerColor, { page: "alerts" });
   window.Logger.info('🎨 צבע תוכנית:', tradePlanColor, { page: "alerts" });
@@ -1715,6 +1715,16 @@ async function updateAlert() {
  * מחיקת התראה
  */
 async function deleteAlertInternal(alertId) {
+  // בדיקת פריטים מקושרים לפני חלון האישור
+  if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+    const hasLinkedItems = await window.checkLinkedItemsBeforeAction('alert', alertId, 'delete');
+    if (hasLinkedItems) {
+      // יש פריטים מקושרים - המודול כבר הוצג, לא נציג חלון אישור
+      return;
+    }
+  }
+  
+  // אין פריטים מקושרים - המשך עם חלון האישור
   // שימוש במערכת הגלובלית למחיקה
   if (typeof window.showDeleteWarning === 'function') {
     window.showDeleteWarning('alerts', alertId, 'התראה', async () => {
@@ -1911,7 +1921,8 @@ function filterAlertsByRelatedObjectTypeWrapper(type) {
   // מיפוי סוגים ל-ID
   const typeMapping = {
     'all': null,
-    'account': 1,
+    'account': 1, // תאימות לאחור
+    'trading_account': 1, // הישות הנכונה
     'trade': 2,
     'trade_plan': 3,
     'ticker': 4,

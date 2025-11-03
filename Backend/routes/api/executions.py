@@ -54,7 +54,7 @@ def get_execution(execution_id: int):
 
 @executions_bp.route('/', methods=['POST'])
 @handle_database_session(auto_commit=True, auto_close=True)
-@invalidate_cache(['executions', 'trades', 'dashboard', 'account-activity-*'])  # Invalidate cache after creating execution
+@invalidate_cache(['executions', 'trades', 'dashboard', 'account-activity-*', 'positions', 'portfolio'])  # Invalidate cache after creating execution
 def create_execution():
     """Create new execution"""
     try:

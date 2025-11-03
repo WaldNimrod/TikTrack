@@ -1084,7 +1084,7 @@ class ModalManagerV2 {
         const headerElement = modalElement.querySelector('.modal-header');
         if (headerElement) {
             // הסרת כל המחלקות הישנות
-            const validEntityTypes = ['trade', 'ticker', 'account', 'alert', 'cash_flow', 'cash-flow', 'note', 'trade_plan', 'trade-plan', 'execution', 'preference', 'research', 'design', 'constraint', 'development'];
+            const validEntityTypes = ['trade', 'ticker', 'account', 'trading_account', 'alert', 'cash_flow', 'cash-flow', 'note', 'trade_plan', 'trade-plan', 'execution', 'preference', 'research', 'design', 'constraint', 'development'];
             validEntityTypes.forEach(type => {
                 headerElement.classList.remove(`entity-${type}`);
             });

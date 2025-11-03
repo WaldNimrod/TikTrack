@@ -1099,7 +1099,7 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
     const isCancelled = status === 'בוטל' || status === 'סגור';
     const buttonClass = isCancelled ? 'btn-outline-success' : 'btn-outline-danger';
     const buttonTitle = isCancelled ? 'שיחזר' : 'בטל';
-    const buttonIcon = isCancelled ? '↻' : '❌';
+    const buttonIcon = isCancelled ? '✓' : '❌';
     const buttonFunction = isCancelled ? restoreFunction : cancelFunction;
 
     buttonsHtml += `

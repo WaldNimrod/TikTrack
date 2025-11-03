@@ -1,8 +1,190 @@
-# מערכת פריטים מקושרים - TikTrack (מעודכן - דצמבר 2025)
+# מערכת פריטים מקושרים - TikTrack (מעודכן - ינואר 2025)
 
 ## 📋 סקירה כללית
 
 מערכת הפריטים המקושרים (Linked Items System) היא מערכת גנרית לבדיקה והצגת אזהרות על פריטים מקושרים לפני ביצוע פעולות מסוכנות כמו מחיקה או ביטול. המערכת עברה שדרוג משמעותי וכיום היא גנרית ועובדת עם כל סוגי האובייקטים במערכת.
+
+## 🎛️ מערכת פילטר מתקדמת - ינואר 2025
+
+### הגדרת כפתורי פילטר לכל עמוד
+
+כל עמוד יכול להגדיר איזה כפתורי פילטר להציג או להסתיר בטבלת הפריטים המקושרים. המערכת תומכת בשלוש דרכים להגדרת הפילטרים:
+
+#### 1. הגדרה גלובלית לכל העמוד (Array)
+
+```javascript
+// בפתיחת העמוד, לפני טעינת הנתונים
+window.linkedItemsFilterConfig = ['trade', 'account', 'ticker'];
+// יציג רק כפתורי פילטר עבור: trade, account, ticker
+```
+
+#### 2. הגדרה ספציפית לפי סוג ישות (Object)
+
+```javascript
+// הגדרה שונה לכל סוג ישות
+window.linkedItemsFilterConfig = {
+    'ticker': ['trade', 'account', 'alert'],  // בטיקרים - רק trade, account, alert
+    'trade': ['account', 'ticker', 'execution'],  // בטריידים - רק account, ticker, execution
+    'all': ['trade', 'account', 'ticker', 'alert', 'execution', 'cash_flow', 'note']  // ברירת מחדל
+};
+```
+
+#### 3. הגדרה דינמית (Function)
+
+```javascript
+// פונקציה שמחזירה את הרשימה לפי סוג הישות
+window.linkedItemsFilterConfig = function(entityType) {
+    // לוגיקה מותאמת אישית
+    if (entityType === 'ticker') {
+        return ['trade', 'account', 'alert'];
+    } else if (entityType === 'trade') {
+        return ['account', 'ticker', 'execution'];
+    }
+    // ברירת מחדל
+    return ['trade', 'account', 'ticker', 'alert', 'execution', 'cash_flow', 'note'];
+};
+```
+
+#### 4. הגדרה דרך options ב-renderLinkedItems
+
+```javascript
+// בעת קריאה ישירה ל-renderLinkedItems
+window.entityDetailsRenderer.renderLinkedItems(
+    linkedItems,
+    entityColor,
+    entityType,
+    entityId,
+    sourceInfo,
+    {
+        filterButtons: ['trade', 'account']  // רק כפתורים אלה יוצגו
+    }
+);
+```
+
+### סוגי ישויות זמינים
+
+רשימת כל סוגי הישויות שניתן להשתמש בהם בפילטר:
+
+- `account` - חשבון מסחר
+- `trade` - טרייד
+- `trade_plan` - תוכנית השקעה
+- `ticker` - טיקר
+- `alert` - התראה
+- `execution` - ביצוע
+- `cash_flow` - תזרים מזומנים
+- `note` - הערה
+
+### הגדרות ברירת מחדל
+
+אם לא הוגדרה הגדרה מותאמת אישית, המערכת תשתמש בהגדרות ברירת מחדל:
+
+```javascript
+{
+    'all': ['account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
+    'ticker': ['account', 'trade', 'trade_plan', 'alert', 'execution', 'cash_flow', 'note'],
+    'trade': ['account', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
+    'account': ['trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
+    // ... וכך הלאה לכל סוג ישות
+}
+```
+
+### דוגמאות שימוש
+
+#### דוגמה 1: עמוד טיקרים - רק טריידים וחשבונות
+
+```javascript
+// בתחילת tickers.js או ב-HTML
+window.linkedItemsFilterConfig = {
+    'ticker': ['trade', 'account']
+};
+```
+
+#### דוגמה 2: עמוד התראות - רק טריידים וטיקרים
+
+```javascript
+// בתחילת alerts.js
+window.linkedItemsFilterConfig = function(entityType) {
+    if (entityType === 'alert') {
+        return ['trade', 'ticker'];
+    }
+    return ['trade', 'account', 'ticker', 'alert', 'execution', 'cash_flow', 'note'];
+};
+```
+
+#### דוגמה 3: הסתרת כל הכפתורים (רק כפתור "הכל")
+
+```javascript
+window.linkedItemsFilterConfig = [];
+// או
+window.linkedItemsFilterConfig = {
+    'all': []
+};
+```
+
+### API Reference
+
+#### `EntityDetailsRenderer._getFilterConfig(entityType)`
+
+מחזיר את רשימת סוגי הישויות להצגה ככפתורי פילטר.
+
+**Parameters:**
+- `entityType` (string) - סוג הישות
+
+**Returns:**
+- `Array<string>` - רשימת סוגי ישויות להצגה
+
+**Example:**
+```javascript
+const config = window.entityDetailsRenderer._getFilterConfig('ticker');
+// Returns: ['account', 'trade', 'trade_plan', 'alert', 'execution', 'cash_flow', 'note']
+```
+
+#### `renderLinkedItems(linkedItems, entityColor, entityType, entityId, sourceInfo, options)`
+
+רנדור טבלת פריטים מקושרים עם כפתורי פילטר.
+
+**Parameters:**
+- `linkedItems` (Array) - מערך פריטים מקושרים
+- `entityColor` (string) - צבע ישות
+- `entityType` (string) - סוג ישות
+- `entityId` (string|number) - מזהה ישות
+- `sourceInfo` (Object|null) - מידע מקור לניווט
+- `options` (Object) - אפשרויות נוספות
+  - `options.filterButtons` (Array<string>) - דריסת כפתורי פילטר להצגה
+
+**Returns:**
+- `string` - HTML string
+
+**Example:**
+```javascript
+const html = window.entityDetailsRenderer.renderLinkedItems(
+    linkedItems,
+    '#019193',
+    'ticker',
+    123,
+    null,
+    {
+        filterButtons: ['trade', 'account']
+    }
+);
+```
+
+### הערות חשובות
+
+1. **סדר העדיפויות:**
+   - `options.filterButtons` (הגבוה ביותר)
+   - `window.linkedItemsFilterConfig` (אם מוגדר)
+   - הגדרות ברירת מחדל
+
+2. **אתחול:**
+   - יש להגדיר את `window.linkedItemsFilterConfig` לפני טעינת הנתונים או לפני קריאה ל-`renderLinkedItems`.
+
+3. **תאימות לאחור:**
+   - אם לא הוגדרה הגדרה מותאמת אישית, המערכת תשתמש בהגדרות ברירת מחדל ואין צורך בשינוי קוד קיים.
+
+4. **טולטיפים:**
+   - כל כפתור פילטר מציג טולטיפ ברור בעת hover: "סינון לפי [שם ישות]".
+   - הטולטיפים מאותחלים אוטומטית לאחר יצירת הטבלה.
 
 ## 🆕 חידושים בדצמבר 2025 - מערכת אלמנטים מקושרים מאוחדת
 

@@ -59,16 +59,17 @@ class EntityDetailsRenderer {
         // כל עמוד יכול לדרוס את ההגדרות הללו על ידי הגדרת window.linkedItemsFilterConfig
         this.defaultFilterConfig = {
             // All entity types - show all filter buttons by default
-            'all': ['account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
+            'all': ['account', 'trading_account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
             // Entity-specific configurations (can override default)
-            'ticker': ['account', 'trade', 'trade_plan', 'alert', 'execution', 'cash_flow', 'note'],
-            'trade': ['account', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
-            'account': ['trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
-            'alert': ['account', 'trade', 'trade_plan', 'ticker', 'execution', 'cash_flow', 'note'],
-            'execution': ['account', 'trade', 'trade_plan', 'ticker', 'alert', 'cash_flow', 'note'],
-            'cash_flow': ['account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'note'],
-            'note': ['account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow'],
-            'trade_plan': ['account', 'trade', 'ticker', 'alert', 'execution', 'cash_flow', 'note']
+            'ticker': ['account', 'trading_account', 'trade', 'trade_plan', 'alert', 'execution', 'cash_flow', 'note'],
+            'trade': ['account', 'trading_account', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'],
+            'account': ['trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'], // תאימות לאחור
+            'trading_account': ['trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note'], // הישות הנכונה
+            'alert': ['account', 'trading_account', 'trade', 'trade_plan', 'ticker', 'execution', 'cash_flow', 'note'],
+            'execution': ['account', 'trading_account', 'trade', 'trade_plan', 'ticker', 'alert', 'cash_flow', 'note'],
+            'cash_flow': ['account', 'trading_account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'note'],
+            'note': ['account', 'trading_account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow'],
+            'trade_plan': ['account', 'trading_account', 'trade', 'ticker', 'alert', 'execution', 'cash_flow', 'note']
         };
         
         // אתחול async (לא-בלוקינג)
@@ -235,10 +236,11 @@ class EntityDetailsRenderer {
         const normalized = entityType.toLowerCase().trim();
         
         // מיפוי שמות שונים לאותו סוג ישות
+        // חשוב: trading_account הוא הישות הנכונה - אין למיפה ל-account!
         const typeMapping = {
-            'trading_account': 'account',
-            'tradingaccount': 'account',
-            'trading-account': 'account'
+            'account': 'trading_account', // account ישן -> trading_account החדש
+            'tradingaccount': 'trading_account',
+            'trading-account': 'trading_account'
         };
         
         return typeMapping[normalized] || normalized;
@@ -1137,8 +1139,8 @@ class EntityDetailsRenderer {
         `;
         
         // Initialize tooltips for filter buttons after table is added to DOM
-        // This will be done in updateLinkedItemsTableBody if called dynamically
-        // For initial render, tooltips will be initialized when modal is shown
+        // This will be done in entity-details-modal.js after content is inserted
+        // and in updateLinkedItemsTableBody if called dynamically
         
         return html;
     }
@@ -1288,7 +1290,12 @@ class EntityDetailsRenderer {
                 text: 'חשבון מסחר', 
                 icon: 'fas fa-university',
                 investmentType: 'investment'
-            },
+            }, // תאימות לאחור
+            'trading_account': { 
+                text: 'חשבון מסחר', 
+                icon: 'fas fa-university',
+                investmentType: 'investment'
+            }, // הישות הנכונה
             'alert': { 
                 text: 'התראה', 
                 icon: 'fas fa-bell',
@@ -1364,7 +1371,8 @@ class EntityDetailsRenderer {
             'trade': ['טרייד:', 'Trade:', 'trade:'],
             'trade_plan': ['תכנון:', 'תכנית:', 'Plan:', 'plan:'],
             'alert': ['התראה:', 'Alert:', 'alert:'],
-            'account': ['חשבון מסחר:', 'Account:', 'account:'],
+            'account': ['חשבון מסחר:', 'Account:', 'account:'], // תאימות לאחור
+            'trading_account': ['חשבון מסחר:', 'Account:', 'account:'], // הישות הנכונה
             'ticker': ['טיקר:', 'Ticker:', 'ticker:'],
             'execution': ['ביצוע:', 'Execution:', 'execution:'],
             'cash_flow': ['תזרים:', 'Cash Flow:', 'cash_flow:'],
@@ -1390,7 +1398,8 @@ class EntityDetailsRenderer {
             'trade': `viewLinkedItemsForTrade(${id})`,
             'trade_plan': `viewLinkedItemsForTradePlan(${id})`,
             'ticker': `viewLinkedItemsForTicker(${id})`,
-            'account': `viewLinkedItemsForAccount(${id})`,
+            'account': `viewLinkedItemsForAccount(${id})`, // תאימות לאחור
+            'trading_account': `viewLinkedItemsForAccount(${id})`, // הישות הנכונה
             'alert': `viewLinkedItemsForAlert(${id})`,
             'cash_flow': `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${id})`,
             'execution': `viewLinkedItemsForExecution(${id})`,
@@ -1414,7 +1423,8 @@ class EntityDetailsRenderer {
             'trade': `editTradeRecord('${id}')`,
             'trade_plan': `editTradePlan('${id}')`,
             'ticker': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${id})`,
-            'account': `editAccount('${id}')`,
+            'account': `editAccount('${id}')`, // תאימות לאחור
+            'trading_account': `editAccount('${id}')`, // הישות הנכונה
             'alert': `editAlert(${id})`,
             'cash_flow': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${id})`,
             'execution': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('executionsModal', 'execution', ${id})`,
@@ -1435,7 +1445,8 @@ class EntityDetailsRenderer {
             const reactivateFunctions = {
                 'trade': `window.reactivateTrade && window.reactivateTrade(${id})`,
                 'trade_plan': `window.reactivateTradePlan && window.reactivateTradePlan(${id})`,
-                'account': `window.reactivateAccount && window.reactivateAccount(${id})`,
+                'account': `window.reactivateAccount && window.reactivateAccount(${id})`, // תאימות לאחור
+                'trading_account': `window.reactivateAccount && window.reactivateAccount(${id})`, // הישות הנכונה
                 'alert': `window.reactivateAlert && window.reactivateAlert(${id})`
             };
             return reactivateFunctions[type] || null;
@@ -1444,7 +1455,8 @@ class EntityDetailsRenderer {
             const cancelFunctions = {
                 'trade': `cancelTradeRecord('${id}')`,
                 'trade_plan': `window.openCancelTradePlanModal && window.openCancelTradePlanModal(${id})`,
-                'account': `window.cancelAccount && window.cancelAccount(${id})`,
+                'account': `window.cancelAccount && window.cancelAccount(${id})`, // תאימות לאחור
+                'trading_account': `window.cancelAccount && window.cancelAccount(${id})`, // הישות הנכונה
                 'alert': `window.cancelAlert && window.cancelAlert(${id})`
             };
             return cancelFunctions[type] || null;
@@ -1470,7 +1482,7 @@ class EntityDetailsRenderer {
      */
     getActionButtonForType(type, id, status) {
         // ישויות עם כפתור ביטול/שיחזור
-        const cancelableTypes = ['trade', 'trade_plan', 'alert', 'account'];
+        const cancelableTypes = ['trade', 'trade_plan', 'alert', 'account', 'trading_account'];
         
         if (cancelableTypes.includes(type)) {
             // כפתור ביטול/שיחזור - שימוש בפונקציה הגלובלית בדיוק
@@ -1499,6 +1511,7 @@ class EntityDetailsRenderer {
                             onclick = `onclick="window.reactivateAlert && window.reactivateAlert(${id})"`;
                             break;
                         case 'account':
+                        case 'trading_account':
                             onclick = `onclick="window.reactivateAccount && window.reactivateAccount(${id})"`;
                             break;
                         default: {
@@ -1520,6 +1533,7 @@ class EntityDetailsRenderer {
                             onclick = `onclick="window.cancelAlert && window.cancelAlert(${id})"`;
                             break;
                         case 'account':
+                        case 'trading_account':
                             onclick = `onclick="window.cancelAccount && window.cancelAccount(${id})"`;
                             break;
                         default: {
@@ -2361,8 +2375,8 @@ class EntityDetailsRenderer {
     async renderAccount(accountData, options = {}) {
         window.Logger.info(`🎨 Rendering account data:`, accountData, { page: "entity-details-renderer" });
         
-        // קבלת צבע החשבון מסחר מההעדפות
-        const accountColor = this.entityColors.account || '#28a745';
+        // קבלת צבע החשבון מסחר מההעדפות - רק trading_account!
+        const accountColor = this.entityColors.trading_account || this.entityColors.account || '';
         
         // סטטוס למעלה - שימוש במערכת הרינדור הכללית
         const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
@@ -2980,7 +2994,8 @@ class EntityDetailsRenderer {
             'trade': 'טרייד',
             'trade_plan': 'תכנון',
             'execution': 'ביצוע',
-            'account': 'חשבון מסחר',
+            'account': 'חשבון מסחר', // תאימות לאחור
+            'trading_account': 'חשבון מסחר', // הישות הנכונה
             'alert': 'התראה',
             'cash_flow': 'תזרים',
             'note': 'הערה'
@@ -3137,17 +3152,75 @@ class EntityDetailsRenderer {
             if (window.Logger) {
                 window.Logger.debug('Filter container not found for tooltip initialization', { tableId, page: 'entity-details-renderer' });
             }
+            console.warn(`🔍 [Tooltip Debug] Filter container not found: linkedItemsFilter_${tableId}`);
+            return;
+        }
+        
+        console.log(`🔍 [Tooltip Debug] _initializeFilterTooltips called for tableId: ${tableId}`);
+        console.log(`🔍 [Tooltip Debug] Container found:`, filterContainer);
+        
+        // Count buttons with data-tooltip
+        const buttonsWithTooltip = filterContainer.querySelectorAll('[data-tooltip]');
+        console.log(`🔍 [Tooltip Debug] Buttons with data-tooltip: ${buttonsWithTooltip.length}`);
+        
+        if (buttonsWithTooltip.length === 0) {
+            console.warn(`🔍 [Tooltip Debug] No buttons with data-tooltip found in container`);
+            return;
+        }
+        
+        // Check if button system is available
+        const buttonSystemAvailable = window.advancedButtonSystem && window.advancedButtonSystem.initializeTooltips;
+        console.log(`🔍 [Tooltip Debug] Button system available:`, buttonSystemAvailable);
+        
+        if (!buttonSystemAvailable) {
+            console.warn(`🔍 [Tooltip Debug] Button system not available, attempting manual initialization`);
+            // Fallback: manual Bootstrap tooltip initialization
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                buttonsWithTooltip.forEach((btn) => {
+                    try {
+                        // Destroy existing tooltip if exists
+                        const existingTooltip = bootstrap.Tooltip.getInstance(btn);
+                        if (existingTooltip) {
+                            existingTooltip.dispose();
+                        }
+                        
+                        const tooltipText = btn.getAttribute('data-tooltip');
+                        const placement = btn.getAttribute('data-tooltip-placement') || 'top';
+                        const trigger = btn.getAttribute('data-tooltip-trigger') || 'hover';
+                        
+                        if (tooltipText) {
+                            new bootstrap.Tooltip(btn, {
+                                title: tooltipText,
+                                placement: placement,
+                                trigger: trigger
+                            });
+                            console.log(`🔍 [Tooltip Debug] Manually initialized tooltip for button: ${btn.id || btn.getAttribute('data-type')}`);
+                        }
+                    } catch (error) {
+                        console.error(`🔍 [Tooltip Debug] Error initializing tooltip:`, error);
+                    }
+                });
+            } else {
+                console.error(`🔍 [Tooltip Debug] Bootstrap Tooltip not available`);
+            }
             return;
         }
         
         // Wait for DOM to be ready, then use button system to initialize tooltips
         requestAnimationFrame(() => {
             setTimeout(() => {
+                console.log(`🔍 [Tooltip Debug] Calling initializeTooltips on container`);
                 // Use button system to initialize tooltips for buttons with data-tooltip
                 // Filter buttons don't have data-button-type, so we only initialize tooltips
-                if (window.advancedButtonSystem && window.advancedButtonSystem.initializeTooltips) {
-                    window.advancedButtonSystem.initializeTooltips(filterContainer);
-                }
+                window.advancedButtonSystem.initializeTooltips(filterContainer);
+                
+                // Verify tooltips were initialized
+                setTimeout(() => {
+                    const initializedCount = Array.from(buttonsWithTooltip).filter(btn => 
+                        bootstrap?.Tooltip?.getInstance(btn)
+                    ).length;
+                    console.log(`🔍 [Tooltip Debug] Tooltips initialized: ${initializedCount}/${buttonsWithTooltip.length}`);
+                }, 200);
             }, 100);
         });
     }

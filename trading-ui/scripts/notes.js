@@ -265,8 +265,18 @@ function editNote(_id) {
  * @param {string} id - Note ID
  * @returns {void}
  */
-function deleteNote(id) {
+async function deleteNote(id) {
   try {
+    // בדיקת פריטים מקושרים לפני חלון האישור
+    if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+      const hasLinkedItems = await window.checkLinkedItemsBeforeAction('note', id, 'delete');
+      if (hasLinkedItems) {
+        // יש פריטים מקושרים - המודול כבר הוצג, לא נציג חלון אישור
+        return;
+      }
+    }
+    
+    // אין פריטים מקושרים - המשך עם חלון האישור
     // Get note details for confirmation message
     let noteDetails = `הערה #${id}`;
     const note = window.notesData?.find(n => n.id === id || n.id === parseInt(id));

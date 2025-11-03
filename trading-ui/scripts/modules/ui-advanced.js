@@ -31,6 +31,7 @@ const VALID_ENTITY_TYPES = [
 
   // Financial
   'account',         // חשבונות
+  'trading_account', // חשבונות מסחר
   'cash_flow',       // תזרים מזומנים
 
   // Market Data
@@ -59,7 +60,8 @@ let ENTITY_COLORS = {
   'trade': '#26baac',
   'trade_plan': '#8e44ad',
   'execution': '#2c3e50',
-  'account': '#5499c7',
+  'account': '#5499c7', // שמירה לתאימות לאחור בלבד
+  'trading_account': '#5499c7', // הישות הנכונה
   'cash_flow': '#d4a574',
   'ticker': '#229954',
   'alert': '#e67e22',
@@ -79,7 +81,8 @@ let ENTITY_BACKGROUND_COLORS = {
   'trade': 'rgba(0, 123, 255, 0.1)',
   'trade_plan': 'rgba(0, 86, 179, 0.1)',
   'execution': 'rgba(23, 162, 184, 0.1)',
-  'account': 'rgba(27, 11, 117, 0.1)',
+  'account': 'rgba(27, 11, 117, 0.1)', // תאימות לאחור בלבד
+  'trading_account': 'rgba(27, 11, 117, 0.1)', // הישות הנכונה
   'cash_flow': 'rgba(32, 201, 151, 0.1)',
   'ticker': 'rgba(1, 145, 147, 0.1)',
   'alert': 'rgba(255, 156, 5, 0.1)',
@@ -1569,10 +1572,11 @@ function updateCSSVariablesFromPreferences(preferences) {
       }
       
       if (preferences.entityTradingAccountColor) {
-        document.documentElement.style.setProperty('--entity-account-color', preferences.entityTradingAccountColor);
-        document.documentElement.style.setProperty('--entity-account-bg', preferences.entityTradingAccountColorLight || '#e6f7f7');
-        document.documentElement.style.setProperty('--entity-account-text', preferences.entityTradingAccountColorDark || '#1e7e80');
-        document.documentElement.style.setProperty('--entity-account-border', preferences.entityTradingAccountColorDark || '#1e7e80');
+        // עדכון רק trading_account - אין עוד entity-account-color!
+        document.documentElement.style.setProperty('--entity-trading-account-color', preferences.entityTradingAccountColor);
+        document.documentElement.style.setProperty('--entity-trading-account-bg', preferences.entityTradingAccountColorLight || '#e6f7f7');
+        document.documentElement.style.setProperty('--entity-trading-account-text', preferences.entityTradingAccountColorDark || '#1e7e80');
+        document.documentElement.style.setProperty('--entity-trading-account-border', preferences.entityTradingAccountColorDark || '#1e7e80');
       }
       
       if (preferences.entityTickerColor) {
@@ -1980,7 +1984,7 @@ async function loadColorPreferences() {
           const bodyClass = document.body.className;
           if (bodyClass) {
             const entityType = bodyClass.split(' ').find(cls => 
-              ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
+              ['tickers-page', 'trades-page', 'accounts-page', 'trading-accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
             );
             
             if (entityType) {
@@ -1989,6 +1993,7 @@ async function loadColorPreferences() {
               if (entity === 'preferences') entity = 'preference';
               else if (entity === 'cash-flows') entity = 'cash_flow';
               else if (entity === 'trade-plans') entity = 'trade_plan';
+              else if (entity === 'trading-accounts' || entity === 'accounts') entity = 'trading_account';
               if (ENTITY_COLORS[entity]) {
                 applyEntityColorsToHeaders(entity);
               }
@@ -2025,7 +2030,7 @@ async function loadColorPreferences() {
       const bodyClass = document.body.className;
       if (bodyClass) {
         const entityType = bodyClass.split(' ').find(cls => 
-          ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
+          ['tickers-page', 'trades-page', 'accounts-page', 'trading-accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
         );
         
         if (entityType) {
@@ -2033,7 +2038,7 @@ async function loadColorPreferences() {
           // תיקון שמות ישויות לפורמט יחיד
           if (type === 'tickers') type = 'ticker';
           else if (type === 'trades') type = 'trade';
-          else if (type === 'accounts') type = 'account';
+          else if (type === 'accounts' || type === 'trading-accounts') type = 'trading_account';
           else if (type === 'alerts') type = 'alert';
           else if (type === 'cash-flows') type = 'cash_flow';
           else if (type === 'notes') type = 'note';
@@ -2110,6 +2115,16 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
     window.__latestPrefs = prefs;
     window.currentPreferences = prefs;
 
+    // Load entity colors from preferences - CRITICAL for dynamic colors
+    if (typeof window.loadEntityColorsFromPreferences === 'function') {
+      window.loadEntityColorsFromPreferences(prefs);
+    }
+    
+    // Generate and apply entity CSS after loading colors
+    if (typeof window.generateAndApplyEntityCSS === 'function') {
+      window.generateAndApplyEntityCSS();
+    }
+
     // ensure primary/secondary also mapped from common keys if present
     try {
       if (prefs.primaryColor) {
@@ -2172,7 +2187,8 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
           trade: getEntityColorFromPrefs('entityTradeColor', '--entity-trade-color'),
           trade_plan: getEntityColorFromPrefs('entityTradePlanColor', '--entity-trade-plan-color'),
           execution: getEntityColorFromPrefs('entityExecutionColor', '--entity-execution-color'),
-          account: getEntityColorFromPrefs('entityTradingAccountColor', '--entity-account-color'),
+          account: getEntityColorFromPrefs('entityTradingAccountColor', '--entity-trading-account-color'),
+          trading_account: getEntityColorFromPrefs('entityTradingAccountColor', '--entity-trading-account-color'),
           cash_flow: getEntityColorFromPrefs('entityCashFlowColor', '--entity-cash-flow-color'),
           ticker: getEntityColorFromPrefs('entityTickerColor', '--entity-ticker-color'),
           alert: getEntityColorFromPrefs('entityAlertColor', '--entity-alert-color'),
@@ -2204,7 +2220,7 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
         };
         // Map entity colors to page synonyms if missing
         ensureVar('--cash-flow-color', getVar('--entity-cash-flow-color') || getVar('--entity-cash-flow'));
-        ensureVar('--account-color', getVar('--entity-account-color') || getVar('--entity-account'));
+        ensureVar('--trading-account-color', getVar('--entity-trading-account-color') || getVar('--entity-trading-account'));
         // Income/Expense derive from numeric positive/negative mediums
         ensureVar('--income-color', getVar('--numeric-positive-medium'));
         ensureVar('--expense-color', getVar('--numeric-negative-medium'));

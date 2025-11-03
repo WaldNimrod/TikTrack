@@ -104,20 +104,20 @@
                         <div class="filter-buttons-container button-row">
                             <button data-button-type="ADD" data-entity-type="alert" data-variant="full" data-onclick="showAddAlertModal()" data-text="הוסף התראה" title="הוסף התראה חדשה"></button>
                             <div class="action-separator"></div>
-                            <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">
+                            <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" data-tooltip="הצג הכל" data-tooltip-placement="top" data-tooltip-trigger="hover" style="background-color: white; color: #28a745; border-color: #28a745;">
                                 הכל
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" style="width: 14px; height: 14px;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות" data-tooltip="סינון לפי חשבון מסחר" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="filter-icon" style="width: 14px; height: 14px;">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="images/icons/trades.svg" alt="טריידים" style="width: 14px; height: 14px;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים" data-tooltip="סינון לפי טרייד" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="images/icons/trades.svg" alt="טריידים" class="filter-icon" style="width: 14px; height: 14px;">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="images/icons/trade_plans.svg" alt="תוכניות" style="width: 14px; height: 14px;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" data-tooltip="סינון לפי תכנית השקעה" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="images/icons/trade_plans.svg" alt="תוכניות" class="filter-icon" style="width: 14px; height: 14px;">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="images/icons/tickers.svg" alt="טיקרים" style="width: 14px; height: 14px;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" data-tooltip="סינון לפי טיקר" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="images/icons/tickers.svg" alt="טיקרים" class="filter-icon" style="width: 14px; height: 14px;">
                             </button>
                             
                             <span style="margin: 0 10px; color: #666;">|</span>
@@ -510,6 +510,148 @@
     
     <!-- Header System Script - Must load before unified initializer -->
     <script src="scripts/header-system.js?v=0da3519a_20251102_104906"></script>
+    
+    <!-- DEV-TOOLS PACKAGE (loadOrder: 14) - Development Tools -->
+    <!-- Filter Tooltips Debug Script - Initialize debug object immediately -->
+    <script>
+        // Create the debug object immediately, before loading external script
+        if (!window.debugFilterTooltips) {
+            window.debugFilterTooltips = {
+                _loading: true,
+                _externalScriptLoaded: false
+            };
+        }
+    </script>
+    <script src="scripts/debug-filter-tooltips-comprehensive.js?v=0da3519a_20251102_104906" onerror="console.error('❌ Failed to load debug-filter-tooltips-comprehensive.js')"></script>
+    <!-- Verify debug script loaded and enhance with fallback functions if needed -->
+    <script>
+        // Wait for scripts to load, then verify and enhance
+        setTimeout(function() {
+            if (!window.debugFilterTooltips || window.debugFilterTooltips._loading) {
+                console.warn('⚠️ debugFilterTooltips external script did not load properly, creating enhanced fallback');
+                
+                // Create comprehensive fallback
+                window.debugFilterTooltips = {
+                    error: 'External script failed to load',
+                    _externalScriptLoaded: false,
+                    
+                    getReport: function() {
+                        console.log('=== Filter Tooltips Debug Report (Fallback) ===');
+                        const containers = document.querySelectorAll('.filter-buttons-container');
+                        const report = {
+                            timestamp: new Date().toISOString(),
+                            error: 'External script not loaded - using fallback',
+                            containers: containers.length,
+                            buttons: []
+                        };
+                        
+                        containers.forEach((container, idx) => {
+                            const buttons = container.querySelectorAll('button');
+                            report.buttons.push({
+                                containerIndex: idx + 1,
+                                containerId: container.id || '(no id)',
+                                totalButtons: buttons.length,
+                                buttonsWithTooltip: container.querySelectorAll('[data-tooltip]').length,
+                                buttons: Array.from(buttons).map(btn => ({
+                                    id: btn.id || '(no id)',
+                                    dataType: btn.getAttribute('data-type'),
+                                    hasDataTooltip: btn.hasAttribute('data-tooltip'),
+                                    dataTooltip: btn.getAttribute('data-tooltip'),
+                                    hasBootstrapInstance: !!(typeof bootstrap !== 'undefined' && bootstrap?.Tooltip?.getInstance(btn))
+                                }))
+                            });
+                        });
+                        
+                        console.table(report.buttons);
+                        console.log('Full Report:', report);
+                        return report;
+                    },
+                    
+                    monitorButtons: function() {
+                        console.log('=== Monitoring Filter Buttons (Fallback) ===');
+                        const containers = document.querySelectorAll('.filter-buttons-container');
+                        console.log(`Found ${containers.length} filter button containers`);
+                        
+                        containers.forEach((container, idx) => {
+                            console.log(`\nContainer ${idx + 1}:`, {
+                                id: container.id || '(no id)',
+                                className: container.className,
+                                buttons: container.querySelectorAll('button').length,
+                                buttonsWithTooltip: container.querySelectorAll('[data-tooltip]').length
+                            });
+                            
+                            const buttons = container.querySelectorAll('button');
+                            buttons.forEach((btn, btnIdx) => {
+                                console.log(`  Button ${btnIdx + 1}:`, {
+                                    id: btn.id || '(no id)',
+                                    dataType: btn.getAttribute('data-type'),
+                                    hasDataTooltip: btn.hasAttribute('data-tooltip'),
+                                    dataTooltip: btn.getAttribute('data-tooltip'),
+                                    hasBootstrapInstance: !!(typeof bootstrap !== 'undefined' && bootstrap?.Tooltip?.getInstance(btn))
+                                });
+                            });
+                        });
+                    },
+                    
+                    manualInit: function() {
+                        console.log('=== Manual Tooltip Initialization (Fallback) ===');
+                        if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
+                            console.error('❌ Bootstrap Tooltip not available');
+                            return;
+                        }
+                        
+                        const containers = document.querySelectorAll('.filter-buttons-container');
+                        let totalInitialized = 0;
+                        
+                        containers.forEach((container) => {
+                            const buttons = container.querySelectorAll('[data-tooltip]');
+                            buttons.forEach((button) => {
+                                try {
+                                    const existingTooltip = bootstrap.Tooltip.getInstance(button);
+                                    if (existingTooltip) {
+                                        existingTooltip.dispose();
+                                    }
+                                    
+                                    const tooltipText = button.getAttribute('data-tooltip');
+                                    const placement = button.getAttribute('data-tooltip-placement') || 'top';
+                                    const trigger = button.getAttribute('data-tooltip-trigger') || 'hover';
+                                    
+                                    if (tooltipText) {
+                                        new bootstrap.Tooltip(button, {
+                                            title: tooltipText,
+                                            placement: placement,
+                                            trigger: trigger
+                                        });
+                                        totalInitialized++;
+                                        console.log(`✅ Initialized tooltip for button: ${button.id || button.getAttribute('data-type')}`);
+                                    }
+                                } catch (error) {
+                                    console.error(`❌ Error initializing tooltip:`, error);
+                                }
+                            });
+                        });
+                        
+                        console.log(`✅ Manual initialization complete: ${totalInitialized} tooltips initialized`);
+                    },
+                    
+                    checkSource: function() {
+                        console.log('=== Checking Source HTML (Fallback) ===');
+                        const containers = document.querySelectorAll('.filter-buttons-container');
+                        containers.forEach((container, idx) => {
+                            console.log(`Container ${idx + 1} HTML:`, container.outerHTML.substring(0, 500) + '...');
+                        });
+                    },
+                    
+                    getHistory: function() {
+                        return [{ message: 'External script not loaded - using fallback', timestamp: new Date().toISOString() }];
+                    }
+                };
+            } else {
+                console.log('✅ debugFilterTooltips external script loaded successfully');
+                window.debugFilterTooltips._externalScriptLoaded = true;
+            }
+        }, 1000);
+    </script>
     
     <!-- Smart Initialization System -->
     <script src="scripts/init-package-registry.js?v=0da3519a_20251102_104906"></script>

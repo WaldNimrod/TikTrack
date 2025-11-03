@@ -28,7 +28,7 @@ const BUTTON_ICONS = {
   DUPLICATE: '📋',
   ARCHIVE: '📦',
   RESTORE: '📤',
-  REACTIVATE: '🔄',
+  REACTIVATE: '✓',
   APPROVE: '✅',
   REJECT: '❌',
   PAUSE: '⏸️',

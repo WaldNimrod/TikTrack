@@ -1038,6 +1038,15 @@ class ModalNavigationManager {
                 color: null
             };
             
+            // זיהוי סוג מודול לפי ID - מודולי CRUD (add/edit) לא מכילים "Details" ב-ID
+            const modalId = modalElement.id || '';
+            const isCRUDModal = modalId && !modalId.includes('Details') && 
+                                (modalId.includes('Modal') || modalId.endsWith('Modal'));
+            
+            if (isCRUDModal) {
+                info.type = 'crud-modal';
+            }
+            
             // זיהוי entityType ו-entityId מ-DOM
             const titleElement = modalElement.querySelector('.modal-title');
             if (titleElement) {
@@ -1051,25 +1060,51 @@ class ModalNavigationManager {
                 info.sourceInfo = window.entityDetailsModal.sourceInfo || null;
             }
             
-            // אם לא נמצא, ננסה לזהות מ-DOM
+            // אם לא נמצא, ננסה לזהות מ-DOM או מ-ID של המודול
             if (!info.entityType) {
-                // נחפש בו-DOM רמזים ל-entityType
-                const modalLabel = modalElement.querySelector('[id$="Label"]');
-                if (modalLabel) {
-                    const labelText = modalLabel.textContent || '';
-                    // ניסיון לזהות entityType מהטקסט
-                    if (labelText.includes('תכנון')) {
-                        info.entityType = 'trade_plan';
-                    } else if (labelText.includes('טרייד')) {
-                        info.entityType = 'trade';
-                    } else if (labelText.includes('ביצוע')) {
-                        info.entityType = 'execution';
-                    } else if (labelText.includes('חשבון')) {
-                        info.entityType = 'account';
-                    } else if (labelText.includes('התראה')) {
-                        info.entityType = 'alert';
-                    } else if (labelText.includes('הערה')) {
-                        info.entityType = 'note';
+                // ניסיון לזהות entityType מ-ID של המודול
+                if (modalId.includes('tradesModal') || modalId.includes('TradeModal')) {
+                    info.entityType = 'trade';
+                } else if (modalId.includes('tradePlansModal') || modalId.includes('TradePlanModal')) {
+                    info.entityType = 'trade_plan';
+                } else if (modalId.includes('executionsModal') || modalId.includes('ExecutionModal')) {
+                    info.entityType = 'execution';
+                } else if (modalId.includes('tradingAccountsModal') || modalId.includes('AccountModal')) {
+                    info.entityType = 'trading_account';
+                } else if (modalId.includes('alertsModal') || modalId.includes('AlertModal')) {
+                    info.entityType = 'alert';
+                } else if (modalId.includes('notesModal') || modalId.includes('NoteModal')) {
+                    info.entityType = 'note';
+                } else if (modalId.includes('tickersModal') || modalId.includes('TickerModal')) {
+                    info.entityType = 'ticker';
+                } else if (modalId.includes('cashFlowModal') || modalId.includes('CashFlowModal')) {
+                    info.entityType = 'cash_flow';
+                }
+                
+                // אם עדיין לא מצאנו, ננסה לזהות מ-DOM
+                if (!info.entityType) {
+                    // נחפש בו-DOM רמזים ל-entityType
+                    const modalLabel = modalElement.querySelector('[id$="Label"]');
+                    if (modalLabel) {
+                        const labelText = modalLabel.textContent || '';
+                        // ניסיון לזהות entityType מהטקסט
+                        if (labelText.includes('תכנון')) {
+                            info.entityType = 'trade_plan';
+                        } else if (labelText.includes('טרייד')) {
+                            info.entityType = 'trade';
+                        } else if (labelText.includes('ביצוע')) {
+                            info.entityType = 'execution';
+                        } else if (labelText.includes('חשבון')) {
+                            info.entityType = 'account';
+                        } else if (labelText.includes('התראה')) {
+                            info.entityType = 'alert';
+                        } else if (labelText.includes('הערה')) {
+                            info.entityType = 'note';
+                        } else if (labelText.includes('טיקר')) {
+                            info.entityType = 'ticker';
+                        } else if (labelText.includes('תזרים')) {
+                            info.entityType = 'cash_flow';
+                        }
                     }
                 }
             }

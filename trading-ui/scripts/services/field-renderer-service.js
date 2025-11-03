@@ -329,7 +329,8 @@ class FieldRendererService {
         // Select icon path by entity type (using existing icons set)
         const iconMap = {
             'trade': '/trading-ui/images/icons/trades.svg',
-            'account': '/trading-ui/images/icons/trading_accounts.svg',
+            'account': '/trading-ui/images/icons/trading_accounts.svg', // תאימות לאחור
+            'trading_account': '/trading-ui/images/icons/trading_accounts.svg', // הישות הנכונה
             'ticker': '/trading-ui/images/icons/tickers.svg',
             'alert': '/trading-ui/images/icons/alerts.svg',
             'cash_flow': '/trading-ui/images/icons/cash_flows.svg',
@@ -442,8 +443,8 @@ class FieldRendererService {
             const raw = relatedType.toString().toLowerCase().replace(/[-\s]/g, '_');
             // Normalize synonyms → canonical
             const map = {
-                'trading_account': 'account',
-                'account': 'account',
+                'trading_account': 'trading_account', // הישות הנכונה
+                'account': 'trading_account', // account ישן -> trading_account
                 'trade': 'trade',
                 'tradeplan': 'trade_plan',
                 'trade_plan': 'trade_plan',
@@ -473,7 +474,8 @@ class FieldRendererService {
     static _getEntityHebrewLabel(type) {
         const map = {
             'trade': 'טרייד',
-            'account': 'חשבון מסחר',
+            'account': 'חשבון מסחר', // תאימות לאחור
+            'trading_account': 'חשבון מסחר', // הישות הנכונה
             'ticker': 'טיקר',
             'alert': 'התראה',
             'cash_flow': 'תזרים מזומנים',
@@ -741,8 +743,8 @@ class FieldRendererService {
     static _translateStatus(status, entityType) {
         // מערכות תרגום לפי סוג ישות
         const translators = {
-            'account': window.translateAccountStatus,
-            'trading_account': window.translateAccountStatus,
+            'account': window.translateAccountStatus, // תאימות לאחור
+            'trading_account': window.translateAccountStatus, // הישות הנכונה
             'trade': window.translateTradeStatus,
             'alert': window.translateAlertStatus,
             'note': window.translateNoteStatus,

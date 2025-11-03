@@ -21,7 +21,7 @@
     }
 
     const VALID_ENTITY_TYPES = [
-  'trade', 'trade_plan', 'execution', 'account', 'cash_flow',
+  'trade', 'trade_plan', 'execution', 'account', 'trading_account', 'cash_flow',
   'ticker', 'alert', 'note', 'constraint', 'design', 'research', 'preference',
   'development', 'info'
 ];
@@ -32,6 +32,7 @@ const ENTITY_COLORS = {
   trade_plan: '#28a745',
   execution: '#17a2b8',
   account: '#6f42c1',
+  trading_account: '#28a745', // חשבון מסחר - מותאם לפי entityTradingAccountColor
   cash_flow: '#fd7e14',
   ticker: '#20c997',
   alert: '#dc3545',
@@ -47,6 +48,7 @@ const ENTITY_BACKGROUND_COLORS = {
   trade_plan: 'rgba(40, 167, 69, 0.1)',
   execution: 'rgba(23, 162, 184, 0.1)',
   account: 'rgba(111, 66, 193, 0.1)',
+  trading_account: 'rgba(40, 167, 69, 0.1)', // חשבון מסחר
   cash_flow: 'rgba(253, 126, 20, 0.1)',
   ticker: 'rgba(32, 201, 151, 0.1)',
   alert: 'rgba(220, 53, 69, 0.1)',
@@ -62,6 +64,7 @@ const ENTITY_TEXT_COLORS = {
   trade_plan: '#1e7e34',
   execution: '#117a8b',
   account: '#59359a',
+  trading_account: '#1e7e34', // חשבון מסחר
   cash_flow: '#e55100',
   ticker: '#1a9d7a',
   alert: '#c82333',
@@ -77,6 +80,7 @@ const ENTITY_BORDER_COLORS = {
   trade_plan: 'rgba(40, 167, 69, 0.3)',
   execution: 'rgba(23, 162, 184, 0.3)',
   account: 'rgba(111, 66, 193, 0.3)',
+  trading_account: 'rgba(40, 167, 69, 0.3)', // חשבון מסחר
   cash_flow: 'rgba(253, 126, 20, 0.3)',
   ticker: 'rgba(32, 201, 151, 0.3)',
   alert: 'rgba(220, 53, 69, 0.3)',
@@ -92,6 +96,7 @@ const ENTITY_LIGHT_COLORS = {
   trade_plan: '#c3e6cb',
   execution: '#bee5eb',
   account: '#e2d9f3',
+  trading_account: '#c3e6cb', // חשבון מסחר
   cash_flow: '#ffe5d3',
   ticker: '#c5f4ea',
   alert: '#f5c6cb',
@@ -107,6 +112,7 @@ const ENTITY_DARK_COLORS = {
   trade_plan: '#155724',
   execution: '#0c5460',
   account: '#383d41',
+  trading_account: '#155724', // חשבון מסחר
   cash_flow: '#842029',
   ticker: '#1e7e34',
   alert: '#b02a37',
@@ -729,6 +735,11 @@ async function setCurrentEntityColorFromPage() {
           document.documentElement.style.setProperty('--current-entity-color-light', lightColor);
           document.documentElement.style.setProperty('--current-entity-color-dark', darkColor);
           
+          // Apply colors to headers after setting CSS variables
+          if (typeof window.applyEntityColorsToHeaders === 'function') {
+            window.applyEntityColorsToHeaders(entityType);
+          }
+          
           if (window.Logger) {
             window.Logger.info(`🎨 Set current entity color for ${entityType} (from ${pageClass}):`, { 
               page: 'color-scheme',
@@ -757,8 +768,8 @@ const PAGE_TO_ENTITY_MAPPING = {
   // עמודי משתמש
   'index-page': 'trade', // Dashboard shows trades overview
   'tickers-page': 'ticker',
-  'trading-accounts-page': 'account', // Trading accounts page
-  'accounts-page': 'account', // Alias
+  'trading-accounts-page': 'trading_account', // Trading accounts page - חשבונות מסחר
+  'accounts-page': 'trading_account', // Alias - חשבונות מסחר
   'trades-page': 'trade',
   'tracking-page': 'trade', // Alias
   'alerts-page': 'alert',
@@ -859,13 +870,13 @@ function loadEntityColorsFromPreferences(preferences) {
     
     // עדכון צבעי trading accounts - רק מהעדפות!
     if (preferences.entityTradingAccountColor) {
-      ENTITY_COLORS.account = preferences.entityTradingAccountColor;
+      ENTITY_COLORS.trading_account = preferences.entityTradingAccountColor;
       const accountRgb = hexToRgb(preferences.entityTradingAccountColor);
-      ENTITY_BACKGROUND_COLORS.account = preferences.entityTradingAccountColorLight || (accountRgb ? `rgba(${accountRgb.r}, ${accountRgb.g}, ${accountRgb.b}, 0.1)` : '');
-      ENTITY_TEXT_COLORS.account = preferences.entityTradingAccountColorDark || (accountRgb ? darkenColor(preferences.entityTradingAccountColor, 20) : '');
-      ENTITY_BORDER_COLORS.account = accountRgb ? `rgba(${accountRgb.r}, ${accountRgb.g}, ${accountRgb.b}, 0.3)` : '';
-      ENTITY_LIGHT_COLORS.account = preferences.entityTradingAccountColorLight || (accountRgb ? lightenColor(preferences.entityTradingAccountColor, 10) : '');
-      ENTITY_DARK_COLORS.account = preferences.entityTradingAccountColorDark || (accountRgb ? darkenColor(preferences.entityTradingAccountColor, 20) : '');
+      ENTITY_BACKGROUND_COLORS.trading_account = preferences.entityTradingAccountColorLight || (accountRgb ? `rgba(${accountRgb.r}, ${accountRgb.g}, ${accountRgb.b}, 0.1)` : '');
+      ENTITY_TEXT_COLORS.trading_account = preferences.entityTradingAccountColorDark || (accountRgb ? darkenColor(preferences.entityTradingAccountColor, 20) : '');
+      ENTITY_BORDER_COLORS.trading_account = accountRgb ? `rgba(${accountRgb.r}, ${accountRgb.g}, ${accountRgb.b}, 0.3)` : '';
+      ENTITY_LIGHT_COLORS.trading_account = preferences.entityTradingAccountColorLight || (accountRgb ? lightenColor(preferences.entityTradingAccountColor, 10) : '');
+      ENTITY_DARK_COLORS.trading_account = preferences.entityTradingAccountColorDark || (accountRgb ? darkenColor(preferences.entityTradingAccountColor, 20) : '');
     }
     
     // עדכון צבעי alerts - רק מהעדפות!
@@ -1261,6 +1272,9 @@ window.applyEntityColorsToHeaders = applyEntityColorsToHeaders;
 window.isWarningModal = isWarningModal;
 window.getMainHeaderOpacityHex = getMainHeaderOpacityHex;
 window.getSubHeaderOpacityHex = getSubHeaderOpacityHex;
+
+// Export page-to-entity mapping
+window.PAGE_TO_ENTITY_MAPPING = PAGE_TO_ENTITY_MAPPING;
 
 // ===== TABLE COLORS FUNCTIONS =====
 

@@ -549,33 +549,81 @@ class ActionsMenuSystem {
      */
     attachHoverDelay() {
         let hoverTimeout;
+        let currentMouseX = 0;
+        let currentMouseY = 0;
+        
+        // Track mouse position for accurate hover detection
+        document.addEventListener('mousemove', (e) => {
+            currentMouseX = e.clientX;
+            currentMouseY = e.clientY;
+        }, true);
+        
+        // Clear timeout when mouse enters wrapper or popup
+        const clearHideTimeout = () => {
+            if (hoverTimeout) {
+                clearTimeout(hoverTimeout);
+                hoverTimeout = null;
+            }
+        };
         
         document.addEventListener('mouseenter', (e) => {
             if (e.target && typeof e.target.closest === 'function') {
                 const wrapper = e.target.closest('.actions-menu-wrapper');
-                if (wrapper) {
-                    clearTimeout(hoverTimeout);
-                    const popup = wrapper.querySelector('.actions-menu-popup');
-                    if (popup) {
-                        popup.style.display = 'block';
+                const popup = e.target.closest('.actions-menu-popup');
+                
+                if (wrapper || popup) {
+                    clearHideTimeout();
+                    const targetWrapper = wrapper || popup.closest('.actions-menu-wrapper');
+                    if (targetWrapper) {
+                        const targetPopup = targetWrapper.querySelector('.actions-menu-popup');
+                        if (targetPopup) {
+                            targetPopup.style.display = 'block';
+                            targetPopup.style.opacity = '1';
+                            targetPopup.style.visibility = 'visible';
+                        }
                     }
                 }
             }
         }, true);
         
-        document.addEventListener('mouseleave', (e) => {
+        // Handle mouseleave for both wrapper and popup
+        const handleMouseLeave = (e) => {
             if (e.target && typeof e.target.closest === 'function') {
                 const wrapper = e.target.closest('.actions-menu-wrapper');
-                if (wrapper) {
+                const popup = e.target.closest('.actions-menu-popup');
+                
+                // Find the relevant wrapper and popup
+                let targetWrapper = wrapper;
+                let targetPopup = null;
+                
+                if (popup && !wrapper) {
+                    // Mouse left popup but not wrapper yet
+                    targetWrapper = popup.closest('.actions-menu-wrapper');
+                    targetPopup = popup;
+                } else if (wrapper) {
+                    // Mouse left wrapper
+                    targetPopup = wrapper.querySelector('.actions-menu-popup');
+                }
+                
+                if (targetWrapper && targetPopup) {
+                    // Use a delay to allow mouse to move to popup or back to wrapper
                     hoverTimeout = setTimeout(() => {
-                        const popup = wrapper.querySelector('.actions-menu-popup');
-                        if (popup) {
-                            popup.style.display = 'none';
+                        // Check if mouse is still over wrapper or popup using current mouse position
+                        const hoveredElement = document.elementFromPoint(currentMouseX, currentMouseY);
+                        const isStillOverWrapper = hoveredElement?.closest('.actions-menu-wrapper') === targetWrapper;
+                        const isStillOverPopup = hoveredElement?.closest('.actions-menu-popup') === targetPopup;
+                        
+                        if (!isStillOverWrapper && !isStillOverPopup) {
+                            targetPopup.style.display = 'none';
+                            targetPopup.style.opacity = '0';
+                            targetPopup.style.visibility = 'hidden';
                         }
-                    }, 200);
+                    }, 400); // Increased delay from 200ms to 400ms for better UX
                 }
             }
-        }, true);
+        };
+        
+        document.addEventListener('mouseleave', handleMouseLeave, true);
         
         // קוד קונסולה לבדיקת z-index וחתיכה
         window.debugActionsMenuZIndex = () => {

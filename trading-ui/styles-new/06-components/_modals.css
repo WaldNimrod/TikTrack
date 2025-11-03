@@ -590,9 +590,10 @@ button[data-button-type="BACK"][data-navigation-listener="true"] {
   border-color: var(--entity-ticker-color);
 }
 
-.modal[data-entity-type="account"] [data-button-type="SAVE"] {
-  background-color: var(--entity-account-color);
-  border-color: var(--entity-account-color);
+.modal[data-entity-type="account"] [data-button-type="SAVE"],
+.modal[data-entity-type="trading_account"] [data-button-type="SAVE"] {
+  background-color: var(--entity-trading-account-color);
+  border-color: var(--entity-trading-account-color);
 }
 
 .modal[data-entity-type="alert"] [data-button-type="SAVE"] {

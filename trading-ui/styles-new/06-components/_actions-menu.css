@@ -54,9 +54,11 @@
     min-width: 120px;
     padding: 8px;
     display: none;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition-delay: 0s;
     pointer-events: auto;
     visibility: hidden;
+    opacity: 0;
 }
 
 /* Create bridge area to prevent hover gap between button and popup */
@@ -78,7 +80,13 @@
     opacity: 1;
     pointer-events: auto;
     visibility: visible;
+    transition-delay: 0s;
     /* Position will be calculated by JavaScript when using position: fixed */
+}
+
+/* Delay hiding when mouse leaves - prevent flickering */
+.actions-menu-wrapper:not(:hover) .actions-menu-popup {
+    transition-delay: 0.3s;
 }
 
 

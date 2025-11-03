@@ -484,6 +484,16 @@ function validateEditCashFlowForm() {
  */
 async function deleteCashFlow(id) {
   try {
+    // בדיקת פריטים מקושרים לפני חלון האישור
+    if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+      const hasLinkedItems = await window.checkLinkedItemsBeforeAction('cash_flow', id, 'delete');
+      if (hasLinkedItems) {
+        // יש פריטים מקושרים - המודול כבר הוצג, לא נציג חלון אישור
+        return;
+      }
+    }
+    
+    // אין פריטים מקושרים - המשך עם חלון האישור
     // Get cash flow details for confirmation message
     let cashFlowDetails = `תזרים מזומנים #${id}`;
     const cashFlow = window.cashFlowsData ? window.cashFlowsData.find(cf => cf.id === id) : null;
@@ -739,7 +749,7 @@ async function renderCashFlowsTable() {
                       style="background-color: white; font-size: 0.8em;">
                         🔗
                     </button>
-                    <span class="entity-account-badge" 
+                    <span class="entity-trading_account-badge entity-account-badge" 
                           style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
                         ${accountName}
                     </span>
@@ -892,7 +902,7 @@ function getCashFlowTypeWithColor(type) {
     cssClass = 'numeric-value-negative'; // משיכה - אדום
     break;
   case 'dividend':
-    cssClass = 'entity-account-badge'; // דיבידנד - צבע חשבון מסחר
+    cssClass = 'entity-trading_account-badge entity-account-badge'; // דיבידנד - צבע חשבון מסחר
     break;
   case 'fee':
     cssClass = 'numeric-value-zero'; // עמלה - אפור
@@ -1075,10 +1085,13 @@ async function applyDynamicColors() {
           document.documentElement.style.setProperty('--cash-flow-bg-color', entityColors.cash_flow + '20');
         }
         
-        // החלת צבעי חשבונות
-        if (entityColors.account) {
-          document.documentElement.style.setProperty('--account-color', entityColors.account);
-          document.documentElement.style.setProperty('--account-bg-color', entityColors.account + '20');
+        // החלת צבעי חשבונות מסחר
+        const tradingAccountColor = entityColors.trading_account || entityColors.account;
+        if (tradingAccountColor) {
+          document.documentElement.style.setProperty('--trading-account-color', tradingAccountColor);
+          document.documentElement.style.setProperty('--account-color', tradingAccountColor); // תאימות לאחור
+          document.documentElement.style.setProperty('--trading-account-bg-color', tradingAccountColor + '20');
+          document.documentElement.style.setProperty('--account-bg-color', tradingAccountColor + '20'); // תאימות לאחור
         }
         
         // החלת צבעי מטבעות

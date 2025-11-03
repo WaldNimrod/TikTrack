@@ -37,18 +37,15 @@ const alertsModalConfig = {
         {
             type: 'select',
             id: 'alertType',
-            label: 'סוג התראה',
+            label: 'מאפיין תנאי',
             required: true,
             options: [
-                { value: 'price_above', label: 'מחיר מעל' },
-                { value: 'price_below', label: 'מחיר מתחת' },
-                { value: 'volume_spike', label: 'עלייה חדה בנפח' },
-                { value: 'moving_average', label: 'ממוצע נע' },
-                { value: 'rsi', label: 'RSI' },
-                { value: 'macd', label: 'MACD' },
-                { value: 'custom', label: 'מותאם אישית' }
+                { value: 'price', label: 'מחיר' },
+                { value: 'change', label: 'שינוי' },
+                { value: 'ma', label: 'ממוצע נע' },
+                { value: 'volume', label: 'נפח' }
             ],
-            defaultValue: 'price_above'
+            defaultValue: 'price'
         },
         {
             type: 'number',
@@ -62,16 +59,20 @@ const alertsModalConfig = {
         {
             type: 'select',
             id: 'alertCondition',
-            label: 'תנאי',
+            label: 'אופרטור תנאי',
             required: true,
             options: [
-                { value: 'greater_than', label: 'גדול מ-' },
-                { value: 'less_than', label: 'קטן מ-' },
-                { value: 'equals', label: 'שווה ל-' },
-                { value: 'crosses_above', label: 'חוצה מעל' },
-                { value: 'crosses_below', label: 'חוצה מתחת' }
+                { value: 'more_than', label: 'יותר מ-' },
+                { value: 'less_than', label: 'פחות מ-' },
+                { value: 'cross', label: 'חוצה' },
+                { value: 'cross_up', label: 'חוצה למעלה' },
+                { value: 'cross_down', label: 'חוצה למטה' },
+                { value: 'change', label: 'שינוי' },
+                { value: 'change_up', label: 'שינוי למעלה' },
+                { value: 'change_down', label: 'שינוי למטה' },
+                { value: 'equals', label: 'שווה' }
             ],
-            defaultValue: 'greater_than'
+            defaultValue: 'more_than'
         },
         {
             type: 'datetime-local',
@@ -86,13 +87,11 @@ const alertsModalConfig = {
             label: 'סטטוס',
             required: true,
             options: [
-                { value: 'active', label: 'פעילה' },
-                { value: 'paused', label: 'מושהית' },
-                { value: 'triggered', label: 'הופעלה' },
-                { value: 'expired', label: 'פגה' },
-                { value: 'cancelled', label: 'מבוטלת' }
+                { value: 'open', label: 'פתוח' },
+                { value: 'closed', label: 'סגור' },
+                { value: 'cancelled', label: 'מבוטל' }
             ],
-            defaultValue: 'active'
+            defaultValue: 'open'
         },
         {
             type: 'checkbox',

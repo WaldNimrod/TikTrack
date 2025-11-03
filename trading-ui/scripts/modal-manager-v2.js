@@ -726,8 +726,9 @@ class ModalManagerV2 {
         // ניקוי שגיאות ולידציה
         this.clearValidationErrors(form);
         
-        // מילוי ברירות מחדל מהעדפות
-        this.applyDefaultValues(form);
+        // Note: applyDefaultValues is async but we don't await it here
+        // It will be applied after populateForm for edit mode anyway
+        this.applyDefaultValues(form).catch(err => console.warn('Error applying default values:', err));
     }
 
     /**
@@ -839,9 +840,15 @@ class ModalManagerV2 {
                 'target_price': 'planTargetPrice'
             },
             'alert': {
+                'message': 'alertName',
                 'ticker_id': 'alertTicker',
-                'condition': 'alertCondition',
-                'threshold': 'alertThreshold'
+                'condition_attribute': 'alertType',
+                'condition_operator': 'alertCondition',
+                'condition_number': 'alertValue',
+                'condition_display_text': 'alertNotes',
+                'status': 'alertStatus',
+                'trade_condition_id': 'alertTradeCondition',
+                'plan_condition_id': 'alertPlanCondition'
             },
             'execution': {
                 'trade_id': 'executionTrade',

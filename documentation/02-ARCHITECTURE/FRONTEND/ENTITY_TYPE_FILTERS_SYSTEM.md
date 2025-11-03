@@ -2,8 +2,8 @@
 # ========================================
 
 **File:** `trading-ui/scripts/related-object-filters.js`  
-**Version:** 3.0  
-**Last Updated:** 2025-01-27  
+**Version:** 3.2  
+**Last Updated:** 2025-11-04  
 **Author:** TikTrack Development Team
 
 ## Overview
@@ -446,6 +446,12 @@ debugFilterTooltips.getHistory()
 - `trading-ui/scripts/debug-filter-tooltips-comprehensive.js` - Debug script for tooltip monitoring
 
 ## Changelog
+
+### Version 3.2 (2025-11-04)
+- ✅ Fixed alert editing modal - corrected field mapping for condition_attribute, condition_operator, condition_number, and status
+- ✅ Updated alerts-config.js options to match backend API values (price, change, ma, volume for alertType; more_than, less_than, etc. for alertCondition; open, closed, cancelled for alertStatus)
+- ✅ Fixed potential async issue in resetForm when calling applyDefaultValues
+- ✅ Updated version numbers in alerts.html to prevent cache issues
 
 ### Version 3.1 (2025-11-03)
 - ✅ Added data-tooltip attributes to alerts page filter buttons

@@ -796,6 +796,7 @@ class ModalManagerV2 {
                     field.value = dateStr.includes('T') ? dateStr : `${dateStr}T00:00`;
                 } else {
                     field.value = value || '';
+                    console.log(`✏️ Set ${field.tagName}/${field.type || 'input'} field ${field.id} to: ${field.value}`);
                 }
             } else {
                 console.log(`❌ No field found for ${key} (value: ${value})`);

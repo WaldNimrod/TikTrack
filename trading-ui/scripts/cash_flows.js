@@ -1085,13 +1085,16 @@ async function applyDynamicColors() {
           document.documentElement.style.setProperty('--cash-flow-bg-color', entityColors.cash_flow + '20');
         }
         
-        // החלת צבעי חשבונות מסחר
-        const tradingAccountColor = entityColors.trading_account || entityColors.account;
-        if (tradingAccountColor) {
-          document.documentElement.style.setProperty('--trading-account-color', tradingAccountColor);
-          document.documentElement.style.setProperty('--account-color', tradingAccountColor); // תאימות לאחור
-          document.documentElement.style.setProperty('--trading-account-bg-color', tradingAccountColor + '20');
-          document.documentElement.style.setProperty('--account-bg-color', tradingAccountColor + '20'); // תאימות לאחור
+        // החלת צבעי חשבונות מסחר - רק trading_account!
+        if (entityColors.trading_account) {
+          document.documentElement.style.setProperty('--trading-account-color', entityColors.trading_account);
+          document.documentElement.style.setProperty('--trading-account-bg-color', entityColors.trading_account + '20');
+        } else if (entityColors.account) {
+          // DEPRECATED - should use trading_account!
+          const error = new Error(`❌ DEPRECATED: entityColors.account is no longer supported. Use entityColors.trading_account instead!`);
+          window.Logger.error('❌ DEPRECATED: entityColors.account used', { entityColors }, { page: "cash_flows" });
+          console.error(error);
+          throw error;
         }
         
         // החלת צבעי מטבעות

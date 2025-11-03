@@ -60,8 +60,7 @@ let ENTITY_COLORS = {
   'trade': '#26baac',
   'trade_plan': '#8e44ad',
   'execution': '#2c3e50',
-  'account': '#5499c7', // שמירה לתאימות לאחור בלבד
-  'trading_account': '#5499c7', // הישות הנכונה
+  'trading_account': '#5499c7',
   'cash_flow': '#d4a574',
   'ticker': '#229954',
   'alert': '#e67e22',
@@ -81,8 +80,7 @@ let ENTITY_BACKGROUND_COLORS = {
   'trade': 'rgba(0, 123, 255, 0.1)',
   'trade_plan': 'rgba(0, 86, 179, 0.1)',
   'execution': 'rgba(23, 162, 184, 0.1)',
-  'account': 'rgba(27, 11, 117, 0.1)', // תאימות לאחור בלבד
-  'trading_account': 'rgba(27, 11, 117, 0.1)', // הישות הנכונה
+  'trading_account': 'rgba(27, 11, 117, 0.1)',
   'cash_flow': 'rgba(32, 201, 151, 0.1)',
   'ticker': 'rgba(1, 145, 147, 0.1)',
   'alert': 'rgba(255, 156, 5, 0.1)',

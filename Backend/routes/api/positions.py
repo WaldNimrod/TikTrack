@@ -83,6 +83,7 @@ def get_portfolio():
     Get portfolio summary across all accounts
     
     Query Parameters:
+        account_id (optional): Filter by specific account ID (default: all accounts)
         include_closed (optional): Include closed positions (default: false)
         unify_accounts (optional): Unify positions with same ticker across accounts (default: false)
         side (optional): Filter by side - 'long', 'short', or omit for all
@@ -94,12 +95,15 @@ def get_portfolio():
         db: Session = g.db
         
         # Parse query parameters
+        account_id_filter = request.args.get('account_id')
+        account_id_filter = int(account_id_filter) if account_id_filter and account_id_filter.isdigit() else None
         include_closed = request.args.get('include_closed', 'false').lower() == 'true'
         unify_accounts = request.args.get('unify_accounts', 'false').lower() == 'true'
         side_filter = request.args.get('side')  # 'long', 'short', or None
         
         portfolio_data = PositionPortfolioService.calculate_portfolio_summary(
             db=db,
+            account_id_filter=account_id_filter,
             include_closed=include_closed,
             unify_accounts=unify_accounts,
             side_filter=side_filter
@@ -180,6 +184,7 @@ def get_portfolio_summary():
     
     Query Parameters:
         size (optional): 'minimal' or 'full' (default: 'full')
+        account_id (optional): Filter by specific account ID (default: all accounts)
         include_closed (optional): Include closed positions (default: false)
         unify_accounts (optional): Unify positions with same ticker (default: false)
         side (optional): Filter by side - 'long', 'short', or omit for all
@@ -192,12 +197,15 @@ def get_portfolio_summary():
         
         # Parse query parameters
         size = request.args.get('size', 'full')  # 'minimal' or 'full'
+        account_id_filter = request.args.get('account_id')
+        account_id_filter = int(account_id_filter) if account_id_filter and account_id_filter.isdigit() else None
         include_closed = request.args.get('include_closed', 'false').lower() == 'true'
         unify_accounts = request.args.get('unify_accounts', 'false').lower() == 'true'
         side_filter = request.args.get('side')
         
         portfolio_data = PositionPortfolioService.calculate_portfolio_summary(
             db=db,
+            account_id_filter=account_id_filter,
             include_closed=include_closed,
             unify_accounts=unify_accounts,
             side_filter=side_filter

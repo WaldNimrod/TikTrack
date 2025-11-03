@@ -21,6 +21,7 @@ from models.ticker import Ticker
 from models.trade import Trade
 from models.trade_plan import TradePlan
 from models.external_data import MarketDataQuote
+from services.account_activity_service import AccountActivityService
 
 logger = logging.getLogger(__name__)
 
@@ -292,6 +293,37 @@ class PositionPortfolioService:
                     if include_closed or position['quantity'] != 0:
                         positions.append(position)
             
+            # Calculate percent_of_account for each position
+            # Get account cash balance
+            try:
+                activity_data = AccountActivityService.get_account_activity(
+                    db=db,
+                    account_id=trading_account_id,
+                    start_date=None,
+                    end_date=None
+                )
+                cash_balance = activity_data.get('base_currency_total', 0.0) or 0.0
+            except Exception as e:
+                logger.warning(f"Error getting account balance for account {trading_account_id}: {str(e)}")
+                cash_balance = 0.0
+            
+            # Sum market value of all positions for this account
+            account_positions_value = sum(p.get('market_value', 0) or 0 for p in positions)
+            
+            # Total account value = cash balance + positions value
+            account_total_value = cash_balance + account_positions_value
+            
+            # Calculate percent_of_account for each position
+            # Use absolute value to handle negative balances
+            account_total_value_abs = abs(account_total_value)
+            for position in positions:
+                market_value = position.get('market_value', 0) or 0
+                if account_total_value_abs > 0:
+                    percent = (market_value / account_total_value_abs) * 100
+                    position['percent_of_account'] = percent
+                else:
+                    position['percent_of_account'] = 0.0
+            
             logger.info(f"Calculated {len(positions)} positions for account {trading_account_id}")
             return positions
             
@@ -302,6 +334,7 @@ class PositionPortfolioService:
     @staticmethod
     def calculate_portfolio_summary(
         db: Session,
+        account_id_filter: Optional[int] = None,
         include_closed: bool = False,
         unify_accounts: bool = False,
         side_filter: Optional[str] = None  # 'long', 'short', or None for all
@@ -311,6 +344,7 @@ class PositionPortfolioService:
         
         Args:
             db: Database session
+            account_id_filter: Optional filter by specific account ID (None = all accounts)
             include_closed: Whether to include closed positions
             unify_accounts: If True, merge positions with same ticker across accounts
             side_filter: Filter by side ('long', 'short', or None for all)
@@ -319,8 +353,11 @@ class PositionPortfolioService:
             Dict with portfolio summary and positions list
         """
         try:
-            # Get all accounts
-            accounts = db.query(TradingAccount).all()
+            # Get accounts (filtered or all)
+            if account_id_filter:
+                accounts = db.query(TradingAccount).filter(TradingAccount.id == account_id_filter).all()
+            else:
+                accounts = db.query(TradingAccount).all()
             
             all_positions = []
             positions_by_key = {} if unify_accounts else None
@@ -399,13 +436,34 @@ class PositionPortfolioService:
                 else:
                     position['percent_of_portfolio'] = 0.0
                 
-                # Percentage of account (need to recalculate for each account)
+                # Percentage of account
+                # Total account value = cash balance + market value of all positions
                 account_id = position['trading_account_id']
-                account_positions = [p for p in all_positions if p['trading_account_id'] == account_id]
-                account_total_value = sum(p.get('market_value', 0) or 0 for p in account_positions)
                 
-                if account_total_value > 0:
-                    position['percent_of_account'] = (market_value / account_total_value) * 100
+                # Get account cash balance (base currency total)
+                try:
+                    activity_data = AccountActivityService.get_account_activity(
+                        db=db,
+                        account_id=account_id,
+                        start_date=None,
+                        end_date=None
+                    )
+                    cash_balance = activity_data.get('base_currency_total', 0.0) or 0.0
+                except Exception as e:
+                    logger.warning(f"Error getting account balance for account {account_id}: {str(e)}")
+                    cash_balance = 0.0
+                
+                # Sum market value of all positions for this account
+                account_positions = [p for p in all_positions if p['trading_account_id'] == account_id]
+                account_positions_value = sum(p.get('market_value', 0) or 0 for p in account_positions)
+                
+                # Total account value = cash balance + positions value
+                account_total_value = cash_balance + account_positions_value
+                
+                # Use absolute value to handle negative balances
+                account_total_value_abs = abs(account_total_value)
+                if account_total_value_abs > 0:
+                    position['percent_of_account'] = (market_value / account_total_value_abs) * 100
                 else:
                     position['percent_of_account'] = 0.0
                 

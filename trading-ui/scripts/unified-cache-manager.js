@@ -170,7 +170,10 @@ class UnifiedCacheManager {
             'trade-positions': { layer: 'memory', ttl: 300000, compress: false, maxSize: 500 * 1024, validate: true, syncToBackend: false },
             'account-activity-data': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
             'account-activity-*': { layer: 'backend', ttl: 60000, compress: false },
-            'account-balance-*': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] }
+            'account-balance-*': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
+            'positions-account-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
+            'portfolio-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
+            'portfolio-summary-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] }
         };
         
         // ממשקי שכבות מטמון

@@ -749,3 +749,189 @@
 .data-table[data-table-type="account_activity"] td.col-currency {
     text-align: center;
 }
+
+/* ===== עמודות ספציפיות לטבלת פוזיציות (Positions) ===== */
+/* רוחבי עמודות: סימבול 8%, נוכחי 12%, כמות 8%, צד 7%, מחיר ממוצע 10%, שווי שוק 12%, P&L 14%, אחוז 8%, פעולות 100px */
+.table[data-table-type="positions"],
+.data-table[data-table-type="positions"] {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.table[data-table-type="positions"] .col-symbol,
+.data-table[data-table-type="positions"] .col-symbol {
+    width: 8%;
+    min-width: 70px;
+}
+
+.table[data-table-type="positions"] .col-ticker,
+.data-table[data-table-type="positions"] .col-ticker {
+    width: 12%;
+    min-width: 100px;
+}
+
+.table[data-table-type="positions"] .col-quantity,
+.data-table[data-table-type="positions"] .col-quantity {
+    width: 8%;
+    min-width: 70px;
+    text-align: center;
+}
+
+.table[data-table-type="positions"] .col-side,
+.data-table[data-table-type="positions"] .col-side {
+    width: 7%;
+    min-width: 60px;
+    text-align: center;
+}
+
+.table[data-table-type="positions"] .col-avg-price,
+.data-table[data-table-type="positions"] .col-avg-price {
+    width: 10%;
+    min-width: 90px;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table[data-table-type="positions"] .col-market-value,
+.data-table[data-table-type="positions"] .col-market-value {
+    width: 12%;
+    min-width: 100px;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table[data-table-type="positions"] .col-unrealized-pl,
+.data-table[data-table-type="positions"] .col-unrealized-pl {
+    width: 14%;
+    min-width: 120px;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table[data-table-type="positions"] .col-percent-account,
+.data-table[data-table-type="positions"] .col-percent-account {
+    width: 8%;
+    min-width: 70px;
+    text-align: center;
+}
+
+.table[data-table-type="positions"] .col-actions,
+.data-table[data-table-type="positions"] .col-actions {
+    width: 100px !important;
+    min-width: 50px !important;
+    max-width: 100px !important;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+/* יישור תאים למרכז */
+.table[data-table-type="positions"] td.col-quantity,
+.data-table[data-table-type="positions"] td.col-quantity,
+.table[data-table-type="positions"] td.col-side,
+.data-table[data-table-type="positions"] td.col-side,
+.table[data-table-type="positions"] td.col-percent-account,
+.data-table[data-table-type="positions"] td.col-percent-account {
+    text-align: center;
+}
+
+/* ===== עמודות ספציפיות לטבלת פורטפוליו (Portfolio) ===== */
+/* רוחבי עמודות: חשבון 10%, סימבול 8%, נוכחי 12%, כמות 8%, צד 7%, מחיר ממוצע 9%, שווי שוק 11%, P&L 13%, אחוז 7%, פעולות 100px */
+.table[data-table-type="portfolio"],
+.data-table[data-table-type="portfolio"] {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.table[data-table-type="portfolio"] .col-account,
+.data-table[data-table-type="portfolio"] .col-account {
+    width: 10%;
+    min-width: 90px;
+}
+
+.table[data-table-type="portfolio"] .col-symbol,
+.data-table[data-table-type="portfolio"] .col-symbol {
+    width: 8%;
+    min-width: 70px;
+}
+
+.table[data-table-type="portfolio"] .col-ticker,
+.data-table[data-table-type="portfolio"] .col-ticker {
+    width: 12%;
+    min-width: 100px;
+}
+
+.table[data-table-type="portfolio"] .col-quantity,
+.data-table[data-table-type="portfolio"] .col-quantity {
+    width: 8%;
+    min-width: 70px;
+    text-align: center;
+}
+
+.table[data-table-type="portfolio"] .col-side,
+.data-table[data-table-type="portfolio"] .col-side {
+    width: 7%;
+    min-width: 60px;
+    text-align: center;
+}
+
+.table[data-table-type="portfolio"] .col-avg-price,
+.data-table[data-table-type="portfolio"] .col-avg-price {
+    width: 9%;
+    min-width: 80px;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table[data-table-type="portfolio"] .col-market-value,
+.data-table[data-table-type="portfolio"] .col-market-value {
+    width: 11%;
+    min-width: 100px;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table[data-table-type="portfolio"] .col-unrealized-pl,
+.data-table[data-table-type="portfolio"] .col-unrealized-pl {
+    width: 13%;
+    min-width: 110px;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table[data-table-type="portfolio"] .col-percent-portfolio,
+.data-table[data-table-type="portfolio"] .col-percent-portfolio {
+    width: 7%;
+    min-width: 60px;
+    text-align: center;
+}
+
+.table[data-table-type="portfolio"] .col-actions,
+.data-table[data-table-type="portfolio"] .col-actions {
+    width: 100px !important;
+    min-width: 50px !important;
+    max-width: 100px !important;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+/* יישור תאים למרכז */
+.table[data-table-type="portfolio"] td.col-quantity,
+.data-table[data-table-type="portfolio"] td.col-quantity,
+.table[data-table-type="portfolio"] td.col-side,
+.data-table[data-table-type="portfolio"] td.col-side,
+.table[data-table-type="portfolio"] td.col-percent-portfolio,
+.data-table[data-table-type="portfolio"] td.col-percent-portfolio {
+    text-align: center;
+}

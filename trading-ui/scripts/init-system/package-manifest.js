@@ -884,6 +884,20 @@ const PACKAGE_MANIFEST = {
         description: 'פילטרים של אובייקטים קשורים',
         required: true,
         loadOrder: 11
+      },
+      {
+        file: 'account-activity.js',
+        globalCheck: 'window.initAccountActivity',
+        description: 'מערכת תנועות חשבון',
+        required: false,
+        loadOrder: 12
+      },
+      {
+        file: 'positions-portfolio.js',
+        globalCheck: 'window.initPositionsPortfolio',
+        description: 'מערכת פוזיציות ופורטפוליו',
+        required: false,
+        loadOrder: 13
       }
     ],
     estimatedSize: '~180KB',
@@ -1160,7 +1174,7 @@ const PACKAGE_MANIFEST = {
     version: '2.0.0',
     critical: false,
     loadOrder: 17,
-    dependencies: ['base', 'services', 'ui-advanced', 'crud', 'preferences'],
+    dependencies: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services'],
     scripts: [
       {
         file: 'entity-details-api.js',

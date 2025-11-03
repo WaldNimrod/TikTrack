@@ -61,7 +61,10 @@ class CacheSyncManager {
             'dashboard-data': ['market-data', 'trades-data', 'executions-data'],
             'account-activity-data': ['accounts-data', 'cash-flows-data', 'executions-data'],
             'account-activity-*': ['accounts-data', 'cash-flows-data', 'executions-data'],
-            'account-balance-*': ['accounts-data', 'cash-flows-data', 'executions-data']
+            'account-balance-*': ['accounts-data', 'cash-flows-data', 'executions-data'],
+            'positions-account-*': ['executions-data', 'market-data'],
+            'portfolio-*': ['executions-data', 'market-data'],
+            'portfolio-summary-*': ['executions-data', 'market-data']
         };
         
         // Cache invalidation patterns
@@ -77,9 +80,9 @@ class CacheSyncManager {
             'trade-created': ['trades-data', 'dashboard-data'],
             'trade-updated': ['trades-data', 'dashboard-data'],
             'trade-deleted': ['trades-data', 'dashboard-data'],
-            'execution-created': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
-            'execution-updated': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
-            'execution-deleted': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
+            'execution-created': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*'],
+            'execution-updated': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*'],
+            'execution-deleted': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*'],
             'cash-flow-created': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
             'cash-flow-updated': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],
             'cash-flow-deleted': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*'],

@@ -68,7 +68,7 @@ def get_entity_types():
     """Get all available entity types and their mappings"""
     try:
         entity_types = {
-            'account': {
+            'trading_account': {
                 'id': 1,
                 'name': 'TradingAccount',
                 'description': 'Trading accounts',
@@ -213,9 +213,12 @@ def get_child_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[st
             # Trades can have executions, notes, alerts
             child_entities.extend(get_trade_child_entities(cursor, entity_id))
             
-        elif entity_type == 'account' or entity_type == 'trading_account':
+        elif entity_type == 'trading_account':
             # TradingAccounts can have trades, trade_plans, cash_flows, executions, notes
             child_entities.extend(get_account_child_entities(cursor, entity_id))
+        elif entity_type == 'account':
+            # DEPRECATED - use trading_account instead!
+            raise ValueError(f"❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!")
             
         elif entity_type == 'ticker':
             # Tickers can have trades, trade_plans, alerts, notes
@@ -299,6 +302,24 @@ def get_entity_details(cursor, entity_type: str, entity_id: int) -> Dict[str, An
                     'id': row['id'],
                     'symbol': row['symbol']
                 }
+        elif entity_type == 'trading_account':
+            cursor.execute("""
+                SELECT id, name, currency_name, created_at
+                FROM trading_accounts
+                WHERE id = ?
+            """, (entity_id,))
+            row = cursor.fetchone()
+            if row:
+                return {
+                    'id': row['id'],
+                    'name': row['name'],
+                    'currency_name': row['currency_name'],
+                    'created_at': row['created_at'],
+                    'accountName': row['name']
+                }
+        elif entity_type == 'account':
+            # DEPRECATED - use trading_account instead!
+            raise ValueError(f"❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!")
         # Add more entity types as needed
         
     except Exception as e:
@@ -729,12 +750,12 @@ def get_note_parent_entities(cursor, note_id: int) -> List[Dict[str, Any]]:
                 JOIN tickers tk ON t.ticker_id = tk.id
                 WHERE t.id = ?
             """, (related_id,))
-        elif related_type_id == 1:  # account
+        elif related_type_id == 1:  # trading_account (was account)
             cursor.execute("""
-                SELECT id, 'account' as type, 'חשבון' as title, 
+                SELECT id, 'trading_account' as type, 'חשבון מסחר' as title, 
                        name as description,
                        created_at, status
-                FROM accounts
+                FROM trading_accounts
                 WHERE id = ?
             """, (related_id,))
         elif related_type_id == 4:  # ticker

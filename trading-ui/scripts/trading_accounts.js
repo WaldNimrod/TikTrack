@@ -1754,7 +1754,7 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
   try {
     // בדיקת פריטים מקושרים לפני חלון האישור
     if (typeof window.checkLinkedItemsBeforeAction === 'function') {
-      const hasLinkedItems = await window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'delete');
+      const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trading_account', tradingAccountId, 'delete');
       if (hasLinkedItems) {
         // יש פריטים מקושרים - המודול כבר הוצג, לא נציג חלון אישור
         return;
@@ -1957,7 +1957,7 @@ async function checkLinkedItemsAndDeleteTradingAccount(tradingAccountId) {
  * @deprecated Use window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'cancel') instead
  */
 async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
-  return await window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'cancel');
+  return await window.checkLinkedItemsBeforeAction('trading_account', tradingAccountId, 'cancel');
 }
 
 /**
@@ -1965,7 +1965,7 @@ async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
  * @deprecated Use window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'delete') instead
  */
 async function checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId) {
-  return await window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'delete');
+  return await window.checkLinkedItemsBeforeAction('trading_account', tradingAccountId, 'delete');
 }
 
 /**
@@ -2342,7 +2342,7 @@ async function deleteTradingAccount(accountId) {
         window.Logger.info('🔍 Checking for linked items before deletion', { accountId, page: 'trading_accounts' });
         if (typeof window.checkLinkedItemsBeforeAction === 'function') {
             window.Logger.info('✅ checkLinkedItemsBeforeAction function exists', { accountId, page: 'trading_accounts' });
-            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('account', accountId, 'delete');
+            const hasLinkedItems = await window.checkLinkedItemsBeforeAction('trading_account', accountId, 'delete');
             window.Logger.info(`🔍 Linked items check result: hasLinkedItems=${hasLinkedItems}`, { accountId, page: 'trading_accounts' });
             if (hasLinkedItems) {
                 window.Logger.info('🚫 Trading Account has linked items, deletion cancelled', { accountId, page: 'trading_accounts' });

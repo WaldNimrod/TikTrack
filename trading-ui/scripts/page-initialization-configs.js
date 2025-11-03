@@ -618,6 +618,16 @@ const PAGE_CONFIGS = {
                     console.warn('⚠️ No suitable function found for loading trading accounts data');
                     window.Logger.info('⚠️ No suitable function found for loading trading accounts data', { page: "page-initialization-configs" });
                 }
+                // Initialize account activity system
+                if (typeof window.initAccountActivity === 'function') {
+                    await window.initAccountActivity(true); // Auto-select default account
+                }
+                
+                // Initialize positions & portfolio system
+                if (typeof window.initPositionsPortfolio === 'function') {
+                    await window.initPositionsPortfolio(true); // Auto-select default account
+                }
+                
                 console.log('✅ Trading Accounts initialization completed');
             }
         ]

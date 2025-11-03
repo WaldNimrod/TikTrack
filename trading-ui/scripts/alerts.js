@@ -1921,12 +1921,19 @@ function filterAlertsByRelatedObjectTypeWrapper(type) {
   // מיפוי סוגים ל-ID
   const typeMapping = {
     'all': null,
-    'account': 1, // תאימות לאחור
-    'trading_account': 1, // הישות הנכונה
+    'trading_account': 1,
     'trade': 2,
     'trade_plan': 3,
     'ticker': 4,
   };
+
+  if (type === 'account') {
+    // DEPRECATED - use trading_account instead!
+    const error = new Error(`❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!`);
+    window.Logger.error('❌ DEPRECATED: account entity type used in alerts', { type }, { page: "alerts" });
+    console.error(error);
+    throw error;
+  }
 
   const targetTypeId = typeMapping[type];
 

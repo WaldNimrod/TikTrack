@@ -81,8 +81,7 @@ class LinkedItemsService {
             'trade': ['טרייד:', 'Trade:', 'trade:', 'טרייד '],
             'trade_plan': ['תכנון:', 'תכנית:', 'Plan:', 'plan:', 'תוכנית השקעה '],
             'alert': ['התראה:', 'Alert:', 'alert:'],
-            'account': ['חשבון מסחר:', 'Account:', 'account:'], // תאימות לאחור
-            'trading_account': ['חשבון מסחר:', 'Account:', 'account:'], // הישות הנכונה
+            'trading_account': ['חשבון מסחר:', 'Account:', 'account:'],
             'ticker': ['טיקר:', 'Ticker:', 'ticker:'],
             'execution': ['ביצוע:', 'Execution:', 'execution:'],
             'cash_flow': ['תזרים:', 'Cash Flow:', 'cash_flow:'],
@@ -166,8 +165,7 @@ class LinkedItemsService {
             'trade': '#007bff',
             'trade_plan': '#007bff',
             'execution': '#28a745',
-            'account': '#28a745', // תאימות לאחור
-            'trading_account': '#28a745', // הישות הנכונה
+            'trading_account': '#28a745'
             'ticker': '#17a2b8',
             'alert': '#ffc107',
             'cash_flow': '#6c757d',
@@ -202,8 +200,7 @@ class LinkedItemsService {
             'trade': 'טרייד',
             'trade_plan': 'תוכנית השקעה',
             'execution': 'ביצוע',
-            'account': 'חשבון מסחר', // תאימות לאחור
-            'trading_account': 'חשבון מסחר', // הישות הנכונה
+            'trading_account': 'חשבון מסחר'
             'ticker': 'טיקר',
             'alert': 'התראה',
             'cash_flow': 'תזרים מזומנים',
@@ -382,8 +379,7 @@ class LinkedItemsService {
             'trade': `viewLinkedItemsForTrade(${id})`,
             'trade_plan': `viewLinkedItemsForTradePlan(${id})`,
             'ticker': `viewLinkedItemsForTicker(${id})`,
-            'account': `viewLinkedItemsForAccount(${id})`, // תאימות לאחור
-            'trading_account': `viewLinkedItemsForAccount(${id})`, // הישות הנכונה
+            'trading_account': `viewLinkedItemsForAccount(${id})`,
             'alert': `viewLinkedItemsForAlert(${id})`,
             'cash_flow': `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${id})`,
             'execution': `viewLinkedItemsForExecution(${id})`,
@@ -406,8 +402,7 @@ class LinkedItemsService {
             'trade': `editTradeRecord('${id}')`,
             'trade_plan': `editTradePlan('${id}')`,
             'ticker': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${id})`,
-            'account': `editAccount('${id}')`, // תאימות לאחור
-            'trading_account': `editAccount('${id}')`, // הישות הנכונה
+            'trading_account': `editAccount('${id}')`
             'alert': `editAlert(${id})`,
             'cash_flow': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${id})`,
             'execution': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('executionsModal', 'execution', ${id})`,
@@ -434,8 +429,7 @@ class LinkedItemsService {
             const reactivateFunctions = {
                 'trade': `window.reactivateTrade && window.reactivateTrade(${id})`,
                 'trade_plan': `window.reactivateTradePlan && window.reactivateTradePlan(${id})`,
-                'account': `window.reactivateAccount && window.reactivateAccount(${id})`, // תאימות לאחור
-                'trading_account': `window.reactivateAccount && window.reactivateAccount(${id})`, // הישות הנכונה
+                'trading_account': `window.reactivateAccount && window.reactivateAccount(${id})`,
                 'alert': `window.reactivateAlert && window.reactivateAlert(${id})`
             };
             return reactivateFunctions[type] || null;
@@ -444,8 +438,7 @@ class LinkedItemsService {
             const cancelFunctions = {
                 'trade': `cancelTradeRecord('${id}')`,
                 'trade_plan': `window.openCancelTradePlanModal && window.openCancelTradePlanModal(${id})`,
-                'account': `window.cancelAccount && window.cancelAccount(${id})`, // תאימות לאחור
-                'trading_account': `window.cancelAccount && window.cancelAccount(${id})`, // הישות הנכונה
+                'trading_account': `window.cancelAccount && window.cancelAccount(${id})`,
                 'alert': `window.cancelAlert && window.cancelAlert(${id})`
             };
             return cancelFunctions[type] || null;

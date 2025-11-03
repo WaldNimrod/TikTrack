@@ -70,6 +70,9 @@ window.initPositionsPortfolio = async function(autoSelectDefault = false) {
         positionsSelector.addEventListener('change', handlePositionsAccountSelection);
     }
     
+    // Populate portfolio account selector
+    await populatePortfolioAccountSelector();
+    
     // Setup portfolio filters
     setupPortfolioFilters();
     
@@ -80,6 +83,7 @@ window.initPositionsPortfolio = async function(autoSelectDefault = false) {
     if (window.addEventListener) {
         window.addEventListener('accountsLoaded', async () => {
             await populatePositionsAccountSelector(true);
+            await populatePortfolioAccountSelector();
         });
     }
     
@@ -213,11 +217,58 @@ async function loadAccountPositions(accountId) {
         
         window.positionsPortfolioState.positionsData = data;
         
-        // Update count
-        const countElement = document.getElementById('positionsCount');
-        if (countElement) {
-            countElement.textContent = `${data.length} פוזיציות`;
+        // Calculate totals - sum of all market values
+        const totalPositionsValue = data.reduce((sum, p) => sum + (p.market_value || 0), 0);
+        
+        // Get account cash balance for total account value
+        let accountTotalValue = totalPositionsValue;
+        try {
+            const balanceResponse = await fetch(`/api/account-activity/${accountId}/balances`);
+            if (balanceResponse.ok) {
+                const balanceResult = await balanceResponse.json();
+                if (balanceResult.status === 'success' && balanceResult.data) {
+                    const cashBalance = balanceResult.data.base_currency_total || 0;
+                    accountTotalValue = cashBalance + totalPositionsValue;
+                }
+            }
+        } catch (e) {
+            window.Logger.warn('Error getting account balance:', e, { page: "trading_accounts" });
         }
+        
+        // Update count and totals
+        const countTextElement = document.getElementById('positionsCountText');
+        const separatorElement = document.getElementById('positionsSeparator');
+        const totalValueElement = document.getElementById('positionsTotalValue');
+        const totalValueAmountElement = document.getElementById('positionsTotalValueAmount');
+        const separator2Element = document.getElementById('positionsSeparator2');
+        const accountTotalElement = document.getElementById('positionsAccountTotalValue');
+        const accountTotalAmountElement = document.getElementById('positionsAccountTotalValueAmount');
+        
+        if (countTextElement) {
+            countTextElement.textContent = `${data.length} פוזיציות`;
+        }
+        
+        // Show/hide elements based on data availability
+        if (data.length > 0) {
+            if (separatorElement) separatorElement.style.display = 'inline';
+            if (totalValueElement) totalValueElement.style.display = 'inline';
+            if (totalValueAmountElement) {
+                totalValueAmountElement.textContent = formatCurrencyHebrew(totalPositionsValue, false, true);
+            }
+            if (separator2Element) separator2Element.style.display = 'inline';
+            if (accountTotalElement) accountTotalElement.style.display = 'inline';
+            if (accountTotalAmountElement) {
+                accountTotalAmountElement.textContent = formatCurrencyHebrew(accountTotalValue, false, true);
+            }
+        } else {
+            if (separatorElement) separatorElement.style.display = 'none';
+            if (totalValueElement) totalValueElement.style.display = 'none';
+            if (separator2Element) separator2Element.style.display = 'none';
+            if (accountTotalElement) accountTotalElement.style.display = 'none';
+        }
+        
+        // Store data in state for sorting
+        window.positionsPortfolioState.positionsData = data;
         
         // Render table
         renderPositionsTable(data);
@@ -236,6 +287,41 @@ async function loadAccountPositions(accountId) {
 }
 
 /**
+ * Format currency value for Hebrew display
+ * - No decimal places for market value and P/L
+ * - With commas for thousands
+ * - Sign (+/-) at the end for Hebrew RTL
+ * @param {number} value - The value to format
+ * @param {boolean} showSign - Whether to show + sign for positive values
+ * @param {boolean} noDecimals - Whether to round to whole numbers (default: false, use true for market value and P/L)
+ * @returns {string} Formatted string like "$1,234+" or "$-567"
+ */
+function formatCurrencyHebrew(value, showSign = false, noDecimals = false) {
+    if (value === null || value === undefined || isNaN(value)) {
+        return 'לא זמין';
+    }
+    
+    const numValue = parseFloat(value);
+    const rounded = noDecimals ? Math.round(numValue) : numValue;
+    const absValue = Math.abs(rounded);
+    
+    // Format with commas, no decimals for market value/P&L, 2 decimals for other amounts
+    const formatted = noDecimals 
+        ? absValue.toLocaleString('he-IL') 
+        : absValue.toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+    // Add sign at the end for RTL
+    let sign = '';
+    if (numValue > 0 && showSign) {
+        sign = '+';
+    } else if (numValue < 0) {
+        sign = '-';
+    }
+    
+    return `$${formatted}${sign}`;
+}
+
+/**
  * Render positions table
  * @param {Array} positions - Array of position objects
  */
@@ -243,8 +329,13 @@ function renderPositionsTable(positions) {
     const tableBody = document.querySelector('#positionsTable tbody');
     if (!tableBody) return;
     
+    // Update state with sorted data
+    if (positions && Array.isArray(positions)) {
+        window.positionsPortfolioState.positionsData = positions;
+    }
+    
     if (!positions || positions.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="8" class="empty">אין פוזיציות להצגה</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="9" class="empty">אין פוזיציות להצגה</td></tr>';
         return;
     }
     
@@ -291,6 +382,7 @@ function renderPositionsTable(positions) {
         
         html += `
             <tr data-position-id="${position.ticker_id}" data-account-id="${position.trading_account_id}">
+                <td class="col-symbol"><strong>${position.ticker_symbol || 'N/A'}</strong></td>
                 <td class="col-ticker">${tickerHtml}</td>
                 <td class="col-quantity">${Math.abs(quantity).toLocaleString()}</td>
                 <td class="col-side">${sideHtml}</td>
@@ -298,12 +390,12 @@ function renderPositionsTable(positions) {
                     ${position.average_price_net ? `$${position.average_price_net.toFixed(2)}` : 'N/A'}
                 </td>
                 <td class="col-market-value">
-                    ${marketValue ? `$${marketValue.toFixed(2)}` : 'לא זמין'}
+                    ${formatCurrencyHebrew(marketValue, false, true)}
                 </td>
                 <td class="col-unrealized-pl">
                     ${marketValue ? `
                         <span class="${unrealizedPl >= 0 ? 'text-success' : 'text-danger'}">
-                            ${unrealizedPl >= 0 ? '+' : ''}$${unrealizedPl.toFixed(2)} (${unrealizedPlPercent >= 0 ? '+' : ''}${unrealizedPlPercent.toFixed(2)}%)
+                            ${formatCurrencyHebrew(unrealizedPl, true, true)} (${unrealizedPlPercent.toFixed(2)}%${unrealizedPlPercent >= 0 ? '+' : '-'})
                         </span>
                     ` : 'לא זמין'}
                 </td>
@@ -323,12 +415,42 @@ function renderPositionsTable(positions) {
 }
 
 /**
+ * Populate portfolio account selector dropdown
+ */
+async function populatePortfolioAccountSelector() {
+    const selector = document.getElementById('portfolioAccountFilter');
+    if (!selector) return;
+    
+    // Clear existing options (except first)
+    while (selector.options.length > 1) {
+        selector.remove(1);
+    }
+    
+    // Add accounts - reuse logic from positions selector
+    if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
+        window.trading_accountsData.forEach(account => {
+            const option = document.createElement('option');
+            option.value = account.id;
+            option.textContent = account.name || `חשבון ${account.id}`;
+            selector.appendChild(option);
+        });
+    }
+    
+    window.Logger.info(`✅ Portfolio account selector populated with ${selector.options.length - 1} accounts`, { page: "trading_accounts" });
+}
+
+/**
  * Setup portfolio filters
  */
 function setupPortfolioFilters() {
+    const accountFilter = document.getElementById('portfolioAccountFilter');
     const sideFilter = document.getElementById('portfolioSideFilter');
     const includeClosed = document.getElementById('portfolioIncludeClosed');
     const unifyAccounts = document.getElementById('portfolioUnifyAccounts');
+    
+    if (accountFilter) {
+        accountFilter.addEventListener('change', () => loadPortfolio());
+    }
     
     if (sideFilter) {
         sideFilter.addEventListener('change', () => loadPortfolio());
@@ -353,16 +475,18 @@ async function loadPortfolio() {
     try {
         // Show loading state
         if (tableBody) {
-            tableBody.innerHTML = '<tr><td colspan="9" class="loading">טוען פורטפוליו...</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="10" class="loading">טוען פורטפוליו...</td></tr>';
         }
         
         // Get filter values
+        const accountFilter = document.getElementById('portfolioAccountFilter')?.value || '';
         const sideFilter = document.getElementById('portfolioSideFilter')?.value || '';
         const includeClosed = document.getElementById('portfolioIncludeClosed')?.checked || false;
         const unifyAccounts = document.getElementById('portfolioUnifyAccounts')?.checked || false;
         
         // Build query string
         const params = new URLSearchParams();
+        if (accountFilter) params.append('account_id', accountFilter);
         if (sideFilter) params.append('side', sideFilter);
         if (includeClosed) params.append('include_closed', 'true');
         if (unifyAccounts) params.append('unify_accounts', 'true');
@@ -401,7 +525,7 @@ async function loadPortfolio() {
     } catch (error) {
         window.Logger.error('❌ Error loading portfolio:', error, { page: "trading_accounts" });
         if (tableBody) {
-            tableBody.innerHTML = '<tr><td colspan="9" class="error">שגיאה בטעינת פורטפוליו</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="10" class="error">שגיאה בטעינת פורטפוליו</td></tr>';
         }
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', 'שגיאה בטעינת פורטפוליו. אנא נסה שוב.');
@@ -419,8 +543,16 @@ function renderPortfolioTable(positions) {
     const tableBody = document.querySelector('#portfolioTable tbody');
     if (!tableBody) return;
     
+    // Update state with sorted data
+    if (positions && Array.isArray(positions)) {
+        if (!window.positionsPortfolioState.portfolioData) {
+            window.positionsPortfolioState.portfolioData = {};
+        }
+        window.positionsPortfolioState.portfolioData.positions = positions;
+    }
+    
     if (!positions || positions.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="9" class="empty">אין פוזיציות להצגה</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="10" class="empty">אין פוזיציות להצגה</td></tr>';
         return;
     }
     
@@ -464,6 +596,7 @@ function renderPortfolioTable(positions) {
         html += `
             <tr data-position-id="${position.ticker_id}" data-account-id="${position.trading_account_id}">
                 <td class="col-account">${position.account_name || 'N/A'}</td>
+                <td class="col-symbol"><strong>${position.ticker_symbol || 'N/A'}</strong></td>
                 <td class="col-ticker">${tickerHtml}</td>
                 <td class="col-quantity">${Math.abs(quantity).toLocaleString()}</td>
                 <td class="col-side">${sideHtml}</td>
@@ -471,12 +604,12 @@ function renderPortfolioTable(positions) {
                     ${position.average_price_net ? `$${position.average_price_net.toFixed(2)}` : 'N/A'}
                 </td>
                 <td class="col-market-value">
-                    ${marketValue ? `$${marketValue.toFixed(2)}` : 'לא זמין'}
+                    ${formatCurrencyHebrew(marketValue, false, true)}
                 </td>
                 <td class="col-unrealized-pl">
                     ${marketValue ? `
                         <span class="${unrealizedPl >= 0 ? 'text-success' : 'text-danger'}">
-                            ${unrealizedPl >= 0 ? '+' : ''}$${unrealizedPl.toFixed(2)} (${unrealizedPlPercent >= 0 ? '+' : ''}${unrealizedPlPercent.toFixed(2)}%)
+                            ${formatCurrencyHebrew(unrealizedPl, true, true)} (${unrealizedPlPercent.toFixed(2)}%${unrealizedPlPercent >= 0 ? '+' : '-'})
                         </span>
                     ` : 'לא זמין'}
                 </td>
@@ -572,19 +705,19 @@ function renderPortfolioSummaryFallback(summary, size) {
     if (size === 'minimal') {
         summaryElement.innerHTML = `
             <div>סה"כ פוזיציות: <strong>${totalPositions}</strong></div>
-            <div>שווי שוק כולל: <strong>$${totalMarketValue.toFixed(2)}</strong></div>
-            <div>רווח/הפסד כולל: <strong class="${totalPl >= 0 ? 'text-success' : 'text-danger'}">${totalPl >= 0 ? '+' : ''}$${totalPl.toFixed(2)} (${totalPlPercent >= 0 ? '+' : ''}${totalPlPercent.toFixed(2)}%)</strong></div>
+            <div>שווי שוק כולל: <strong>${formatCurrencyHebrew(totalMarketValue, false, true)}</strong></div>
+            <div>רווח/הפסד כולל: <strong class="${totalPl >= 0 ? 'text-success' : 'text-danger'}">${formatCurrencyHebrew(totalPl, true, true)} (${totalPlPercent.toFixed(2)}%${totalPlPercent >= 0 ? '+' : '-'})</strong></div>
         `;
     } else {
         summaryElement.innerHTML = `
             <div class="info-summary-full">
                 <div>סה"כ פוזיציות: <strong>${totalPositions}</strong></div>
-                <div>שווי שוק כולל: <strong>$${totalMarketValue.toFixed(2)}</strong></div>
-                <div>עלות כוללת: <strong>$${totalCost.toFixed(2)}</strong></div>
-                <div>רווח/הפסד מוכר: <strong>$${(summary.total_realized_pl || 0).toFixed(2)}</strong></div>
-                <div>רווח/הפסד לא מוכר: <strong>$${(summary.total_unrealized_pl || 0).toFixed(2)}</strong></div>
-                <div>רווח/הפסד כולל: <strong class="${totalPl >= 0 ? 'text-success' : 'text-danger'}">${totalPl >= 0 ? '+' : ''}$${totalPl.toFixed(2)} (${totalPlPercent >= 0 ? '+' : ''}${totalPlPercent.toFixed(2)}%)</strong></div>
-                <div>סה"כ עמלות: <strong>$${(summary.total_fees || 0).toFixed(2)}</strong></div>
+                <div>שווי שוק כולל: <strong>${formatCurrencyHebrew(totalMarketValue, false, true)}</strong></div>
+                <div>עלות כוללת: <strong>${formatCurrencyHebrew(totalCost, false, false)}</strong></div>
+                <div>רווח/הפסד מוכר: <strong>${formatCurrencyHebrew(summary.total_realized_pl || 0, true, true)}</strong></div>
+                <div>רווח/הפסד לא מוכר: <strong>${formatCurrencyHebrew(summary.total_unrealized_pl || 0, true, true)}</strong></div>
+                <div>רווח/הפסד כולל: <strong class="${totalPl >= 0 ? 'text-success' : 'text-danger'}">${formatCurrencyHebrew(totalPl, true, true)} (${totalPlPercent.toFixed(2)}%${totalPlPercent >= 0 ? '+' : '-'})</strong></div>
+                <div>סה"כ עמלות: <strong>${formatCurrencyHebrew(summary.total_fees || 0, false, false)}</strong></div>
             </div>
         `;
     }
@@ -623,17 +756,18 @@ window.showPositionDetails = async function(accountId, tickerId) {
             return;
         }
         
-        // Use EntityDetailsModal if available (show ticker details as base)
-        if (window.entityDetailsModal && typeof window.entityDetailsModal.show === 'function') {
-            // Show ticker details first, then add position-specific info
-            await window.entityDetailsModal.show('ticker', tickerId, {
-                customTitle: `פרטי פוזיציה - ${positionData.ticker_symbol || tickerId}`,
-                additionalContent: renderPositionDetailsContent(positionData)
-            });
-        } else if (window.showDetailsModal) {
-            // Fallback to showDetailsModal
+        // Use ModalManagerV2 or showDetailsModal for position details (NOT ticker details)
+        if (window.showDetailsModal) {
+            // Use showDetailsModal for position-specific modal
             const content = renderPositionDetailsContent(positionData);
             await window.showDetailsModal(
+                `פרטי פוזיציה - ${positionData.ticker_symbol || tickerId}`,
+                content
+            );
+        } else if (window.ModalManagerV2 && typeof window.ModalManagerV2.showCustomModal === 'function') {
+            // Use ModalManagerV2 custom modal if available
+            const content = renderPositionDetailsContent(positionData);
+            window.ModalManagerV2.showCustomModal(
                 `פרטי פוזיציה - ${positionData.ticker_symbol || tickerId}`,
                 content
             );
@@ -799,12 +933,23 @@ function renderPositionDetailsContent(positionData) {
 function clearPositionsTable() {
     const tableBody = document.querySelector('#positionsTable tbody');
     if (tableBody) {
-        tableBody.innerHTML = '<tr><td colspan="8" class="loading">בחר חשבון להצגת פוזיציות...</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="9" class="loading">בחר חשבון להצגת פוזיציות...</td></tr>';
     }
-    const countElement = document.getElementById('positionsCount');
-    if (countElement) {
-        countElement.textContent = 'בחר חשבון...';
+    
+    // Reset count and totals display
+    const countTextElement = document.getElementById('positionsCountText');
+    const separatorElement = document.getElementById('positionsSeparator');
+    const totalValueElement = document.getElementById('positionsTotalValue');
+    const separator2Element = document.getElementById('positionsSeparator2');
+    const accountTotalElement = document.getElementById('positionsAccountTotalValue');
+    
+    if (countTextElement) {
+        countTextElement.textContent = 'בחר חשבון...';
     }
+    if (separatorElement) separatorElement.style.display = 'none';
+    if (totalValueElement) totalValueElement.style.display = 'none';
+    if (separator2Element) separator2Element.style.display = 'none';
+    if (accountTotalElement) accountTotalElement.style.display = 'none';
 }
 
 // Export for external use

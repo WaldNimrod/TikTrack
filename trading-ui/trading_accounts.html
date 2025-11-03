@@ -302,6 +302,176 @@
                         </div>
                     </div>
                 </div> <!-- End content-section -->
+                
+                <!-- Positions & Portfolio area - content-section -->
+                <div class="content-section" data-section="positions-portfolio">
+                    <!-- Positions header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/trading_accounts.svg" alt="פוזיציות לפי חשבון" class="section-icon">
+                            פוזיציות לפי חשבון
+                        </div>
+                        <div class="table-count" id="positionsCount">
+                            <span id="positionsCountText">בחר חשבון...</span>
+                            <span id="positionsSeparator" style="display: none; margin: 0 0.5rem;">|</span>
+                            <span id="positionsTotalValue" style="display: none;">סה"כ שווי פוזיציות: <strong id="positionsTotalValueAmount">-</strong></span>
+                            <span id="positionsSeparator2" style="display: none; margin: 0 0.5rem;">|</span>
+                            <span id="positionsAccountTotalValue" style="display: none;">סה"כ שווי חשבון: <strong id="positionsAccountTotalValueAmount">-</strong></span>
+                        </div>
+                        <div class="table-actions">
+                            <!-- Account selector -->
+                            <select id="positionsAccountSelector" class="form-select form-select-sm" style="margin-inline-end: 0.5rem; min-width: 200px;">
+                                <option value="">בחר חשבון...</option>
+                            </select>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('positions-portfolio')" data-text="הצג/הסתר"></button>
+                        </div>
+                    </div>
+
+                    <!-- Positions body -->
+                    <div class="section-body" style="display: none;">
+                        <div class="table-responsive" id="positionsContainer">
+                            <table class="table" id="positionsTable" data-table-type="positions">
+                                <thead>
+                                    <tr>
+                                        <th class="col-symbol">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">סימבול <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-ticker">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">נוכחי <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-quantity">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">כמות <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-side">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">צד <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-avg-price">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">מחיר ממוצע <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-market-value">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">שווי שוק <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-unrealized-pl">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">רווח/הפסד לא מוכר <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-percent-account">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">אחוז מהחשבון <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-actions actions-cell actions-1-item">פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="9" class="loading">בחר חשבון להצגת פוזיציות...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- End positions section -->
+                
+                <!-- Full Portfolio area - content-section -->
+                <div class="content-section" data-section="full-portfolio">
+                    <!-- Portfolio header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/trading_accounts.svg" alt="פורטפוליו מלא" class="section-icon">
+                            פורטפוליו מלא
+                        </div>
+                        <div class="table-count" id="portfolioCount">טוען...</div>
+                        <div class="table-actions">
+                            <!-- Filters -->
+                            <select id="portfolioAccountFilter" class="form-select form-select-sm" style="margin-inline-end: 0.5rem; min-width: 200px;">
+                                <option value="">כל החשבונות</option>
+                            </select>
+                            <select id="portfolioSideFilter" class="form-select form-select-sm" style="margin-inline-end: 0.5rem; min-width: 120px;">
+                                <option value="">הכל</option>
+                                <option value="long">לונג</option>
+                                <option value="short">שורט</option>
+                            </select>
+                            <label class="form-check-label" style="margin-inline-end: 0.5rem;">
+                                <input type="checkbox" id="portfolioIncludeClosed" class="form-check-input">
+                                הצג פוזיציות סגורות
+                            </label>
+                            <label class="form-check-label" style="margin-inline-end: 0.5rem;">
+                                <input type="checkbox" id="portfolioUnifyAccounts" class="form-check-input">
+                                אחד פוזיציות בין חשבונות
+                            </label>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('full-portfolio')" data-text="הצג/הסתר" style="order: 999;"></button>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio body -->
+                    <div class="section-body" style="display: none;">
+                        <div class="table-responsive" id="portfolioContainer">
+                            <table class="table" id="portfolioTable" data-table-type="portfolio">
+                                <thead>
+                                    <tr>
+                                        <th class="col-account">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">חשבון <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-symbol">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">סימבול <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-ticker">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">נוכחי <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-quantity">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">כמות <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-side">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">צד <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-avg-price">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">מחיר ממוצע <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-market-value">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">שווי שוק <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-unrealized-pl">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">רווח/הפסד לא מוכר <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-percent-portfolio">
+                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">אחוז מהפורטפוליו <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-actions actions-cell actions-1-item">פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="10" class="loading">טוען פורטפוליו...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- End portfolio section -->
+                
+                <!-- Portfolio Summary Wizard area - content-section -->
+                <div class="content-section" data-section="portfolio-summary">
+                    <!-- Summary header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/trading_accounts.svg" alt="סיכום פורטפוליו" class="section-icon">
+                            סיכום פורטפוליו
+                        </div>
+                        <div class="table-actions">
+                            <button id="portfolioSummaryToggleSize" class="btn btn-sm btn-outline-secondary" style="margin-inline-end: 0.5rem;">
+                                הצג מינימאלי
+                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('portfolio-summary')" data-text="הצג/הסתר"></button>
+                        </div>
+                    </div>
+
+                    <!-- Summary body -->
+                    <div class="section-body" style="display: none;">
+                        <div id="portfolioSummaryContent">
+                            <div class="info-summary" id="portfolioSummaryStats">
+                                <div>טוען סיכום...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- End summary section -->
             </div>
         </div>
 
@@ -515,11 +685,13 @@
     <script src="scripts/trading_accounts.js?v=0da3519a_20251102_104906"></script> <!-- Page-specific script for trading_accounts -->
     <!-- [45] Page-specific: account-activity (unique to this page) -->
     <script src="scripts/account-activity.js?v=1762105000"></script> <!-- Account activity tracking -->
+    <!-- [46] Page-specific: positions-portfolio (unique to this page) -->
+    <script src="scripts/positions-portfolio.js?v=1.0.0"></script> <!-- Positions & Portfolio system -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 45 | Unique Scripts Loaded: 45 -->
+    <!-- 📊 Total Scripts Processed: 46 | Unique Scripts Loaded: 46 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("trading_accounts") -->
     
     <!-- Page-specific functions are now handled by the unified initialization system -->

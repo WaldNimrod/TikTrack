@@ -306,6 +306,31 @@ const TABLE_COLUMN_MAPPINGS = {
     'created_at',      // 4 - נוצר ב
     'actions',          // 5 - פעולות
   ],
+
+  // טבלת פוזיציות (Positions) - Positions by Account Table
+  'positions': [
+    'ticker_symbol',           // 0 - סימבול
+    'ticker_name',             // 1 - נוכחי (שם הטיקר)
+    'quantity',                // 2 - כמות
+    'side',                     // 3 - צד
+    'average_price_net',        // 4 - מחיר ממוצע
+    'market_value',            // 5 - שווי שוק
+    'unrealized_pl',           // 6 - רווח/הפסד לא מוכר
+    'percent_of_account',      // 7 - אחוז מהחשבון
+  ],
+
+  // טבלת פורטפוליו (Portfolio) - Full Portfolio Table
+  'portfolio': [
+    'account_name',            // 0 - חשבון
+    'ticker_symbol',           // 1 - סימבול
+    'ticker_name',             // 2 - נוכחי (שם הטיקר)
+    'quantity',                // 3 - כמות
+    'side',                     // 4 - צד
+    'average_price_net',        // 5 - מחיר ממוצע
+    'market_value',            // 6 - שווי שוק
+    'unrealized_pl',           // 7 - רווח/הפסד לא מוכר
+    'percent_of_portfolio',    // 8 - אחוז מהפורטפוליו
+  ],
 };
 
 /**
@@ -332,7 +357,8 @@ function getColumnValue(item, columnIndex, tableType) {
   // Database Display Page - Direct field mapping
   if (tableType === 'trade_plans' || tableType === 'trades' || tableType === 'accounts' || tableType === 'trading_accounts' ||
         tableType === 'tickers' || tableType === 'notes' ||
-        tableType === 'executions' || tableType === 'cash_flows') {
+        tableType === 'executions' || tableType === 'cash_flows' ||
+        tableType === 'positions' || tableType === 'portfolio') {
 
     // Return the field value directly from the item
     return item[fieldName] || '';

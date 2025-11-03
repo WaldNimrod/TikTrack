@@ -34,3 +34,4 @@ Module: Entity Details Display (הצגת פרטי ישות)
 
 
 
+

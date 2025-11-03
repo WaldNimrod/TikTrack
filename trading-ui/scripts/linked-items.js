@@ -187,7 +187,7 @@ function viewLinkedItems(itemId, itemType = null) {
   let detectedItemType = itemType;
   if (!detectedItemType) {
     const currentPath = window.location.pathname;
-    if (currentPath.includes('/accounts')) {detectedItemType = 'account';}
+    if (currentPath.includes('/accounts') || currentPath.includes('/trading-accounts')) {detectedItemType = 'trading_account';}
     else if (currentPath.includes('/trades') || currentPath.includes('trades.html')) {detectedItemType = 'trade';}
     else if (currentPath.includes('/tickers')) {detectedItemType = 'ticker';}
     else if (currentPath.includes('/alerts')) {detectedItemType = 'alert';}
@@ -233,10 +233,16 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
     modalTitle = `פריטים מקושרים לטיקר ${tickerSymbol}`;
   } else if (itemType === 'trade_plan') {
     modalTitle = 'פריטים מקושרים לתוכנית השקעה';
-  } else if (itemType === 'account') {
+  } else if (itemType === 'trading_account') {
     // עבור חשבון מסחר - הוספת שם החשבון מסחר
     const accountName = data.accountName || `חשבון מסחר ${itemId}`;
     modalTitle = `פריטים מקושרים לחשבון מסחר ${accountName}`;
+  } else if (itemType === 'account') {
+    // DEPRECATED - use trading_account instead!
+    const error2 = new Error(`❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!`);
+    window.Logger.error('❌ DEPRECATED: account entity type used in showLinkedItemsModal', { itemType, itemId }, { page: "linked-items" });
+    console.error(error2);
+    throw error2;
   } else {
     modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
   }
@@ -322,10 +328,15 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
   let itemName = '';
 
   switch (itemType) {
-  case 'account':
   case 'trading_account':
     itemName = data.accountName || `חשבון מסחר ${itemId}`;
     break;
+  case 'account':
+    // DEPRECATED - use trading_account instead!
+    const error1 = new Error(`❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!`);
+    window.Logger.error('❌ DEPRECATED: account entity type used in createLinkedItemsModalContent', { itemType, itemId }, { page: "linked-items" });
+    console.error(error1);
+    throw error1;
   case 'trade':
     itemName = data.tradeSymbol || `טרייד ${itemId}`;
     break;
@@ -556,7 +567,7 @@ function getRulesExplanation(itemType, data) {
   const notes = allEntities.filter(entity => entity.type === 'note');
   const alerts = allEntities.filter(entity => entity.type === 'alert');
   const executions = allEntities.filter(entity => entity.type === 'execution');
-  const accounts = allEntities.filter(entity => entity.type === 'account');
+  const accounts = allEntities.filter(entity => entity.type === 'account' || entity.type === 'trading_account');
 
   if (trades.length > 0) {
     const openTrades = trades.filter(t => t.status === 'open');
@@ -683,7 +694,6 @@ function getRulesExplanation(itemType, data) {
     return explanation;
   }
 
-  case 'account':
   case 'trading_account': {
     const linkedTrades = childEntities.filter(entity => entity.type === 'trade');
     const linkedExecutions = childEntities.filter(entity => entity.type === 'execution');
@@ -816,7 +826,6 @@ function getItemTypeIcon(type) {
   // ברירת מחדל אם הפונקציה הגלובלית לא זמינה
   const icons = {
     'trade': '<img src="/images/icons/trades.svg" alt="טרייד" class="linked-item-icon-img" width="48" height="48">',
-    'account': '<img src="/images/icons/trading_accounts.svg" alt="חשבון מסחר" class="linked-item-icon-img" width="48" height="48">',
     'trading_account': '<img src="/images/icons/trading_accounts.svg" alt="חשבון מסחר" class="linked-item-icon-img" width="48" height="48">',
     'ticker': '<img src="/images/icons/tickers.svg" alt="טיקר" class="linked-item-icon-img" width="48" height="48">',
     'alert': '<img src="/images/icons/alerts.svg" alt="התראה" class="linked-item-icon-img" width="48" height="48">',
@@ -847,7 +856,6 @@ function getItemTypeDisplayName(type) {
   // Fallback אם Service לא זמין
   const names = {
     'trade': 'טרייד',
-    'account': 'חשבון מסחר',
     'trading_account': 'חשבון מסחר',
     'ticker': 'טיקר',
     'alert': 'התראה',
@@ -942,10 +950,15 @@ function createDetailedItemInfo(item) {
   case 'trade':
     details += createTradeDetails(item);
     break;
-  case 'account':
   case 'trading_account':
     details += createAccountDetails(item);
     break;
+  case 'account':
+    // DEPRECATED - use trading_account instead!
+    const error3 = new Error(`❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!`);
+    window.Logger.error('❌ DEPRECATED: account entity type used in createDetailedItemInfo', { item }, { page: "linked-items" });
+    console.error(error3);
+    throw error3;
   case 'ticker':
     details += createTickerDetails(item);
     break;
@@ -1415,7 +1428,7 @@ function viewLinkedItemsForTrade(tradeId) {
  * @param {number|string} accountId - ID of the account
  */
 function viewLinkedItemsForAccount(accountId) {
-  return viewLinkedItems(accountId, 'account');
+  return viewLinkedItems(accountId, 'trading_account');
 }
 
 /**
@@ -1481,7 +1494,6 @@ function viewLinkedItemsForExecution(executionId) {
 function getTypeBadgeClass(type) {
   const badgeClasses = {
     'trade': 'bg-primary',
-    'account': 'bg-success',
     'trading_account': 'bg-success',
     'ticker': 'bg-info',
     'alert': 'bg-warning',
@@ -1618,8 +1630,13 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
       }
       relatedIcon = '🏦';
       relatedClass = 'related-account entity-trading_account-badge';
-      relatedColor = window.getEntityColor ? (window.getEntityColor('trading_account') || window.getEntityColor('account')) : '';
-      relatedBgColor = window.getEntityBackgroundColor ? (window.getEntityBackgroundColor('trading_account') || window.getEntityBackgroundColor('account')) : '';
+      const tradingAccountColor = window.getEntityColor ? window.getEntityColor('trading_account') : '';
+      const tradingAccountBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trading_account') : '';
+      if (!tradingAccountColor) {
+        window.Logger.error('❌ trading_account color not found!', {}, { page: "linked-items" });
+      }
+      relatedColor = tradingAccountColor || '';
+      relatedBgColor = tradingAccountBgColor || '';
       break;
     }
     case 2: { // טרייד
@@ -1726,7 +1743,7 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
  */
 function getRelatedObjectTypeName(typeId) {
   const typeNames = {
-    1: 'account',
+    1: 'trading_account', // was 'account' - now deprecated
     2: 'trade', 
     3: 'trade_plan',
     4: 'ticker'

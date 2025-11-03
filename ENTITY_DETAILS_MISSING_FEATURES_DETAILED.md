@@ -418,3 +418,4 @@ describe('EntityDetailsModal UI', () => {
 
 
 
+

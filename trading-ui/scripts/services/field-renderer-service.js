@@ -329,8 +329,7 @@ class FieldRendererService {
         // Select icon path by entity type (using existing icons set)
         const iconMap = {
             'trade': '/trading-ui/images/icons/trades.svg',
-            'account': '/trading-ui/images/icons/trading_accounts.svg', // תאימות לאחור
-            'trading_account': '/trading-ui/images/icons/trading_accounts.svg', // הישות הנכונה
+            'trading_account': '/trading-ui/images/icons/trading_accounts.svg',
             'ticker': '/trading-ui/images/icons/tickers.svg',
             'alert': '/trading-ui/images/icons/alerts.svg',
             'cash_flow': '/trading-ui/images/icons/cash_flows.svg',
@@ -441,10 +440,21 @@ class FieldRendererService {
     static _resolveEntityType(relatedType) {
         if (typeof relatedType === 'string' && relatedType) {
             const raw = relatedType.toString().toLowerCase().replace(/[-\s]/g, '_');
+            
+            // אם מישהו משתמש ב-account ישן - שגיאה!
+            if (raw === 'account') {
+                const error = new Error(`❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!`);
+                window.Logger.error('❌ DEPRECATED: account entity type used in field-renderer-service', { 
+                    relatedType, 
+                    stack: error.stack 
+                }, { page: "field-renderer-service" });
+                console.error(error);
+                throw error;
+            }
+            
             // Normalize synonyms → canonical
             const map = {
-                'trading_account': 'trading_account', // הישות הנכונה
-                'account': 'trading_account', // account ישן -> trading_account
+                'trading_account': 'trading_account',
                 'trade': 'trade',
                 'tradeplan': 'trade_plan',
                 'trade_plan': 'trade_plan',
@@ -461,7 +471,7 @@ class FieldRendererService {
         }
         if (typeof relatedType === 'number') {
             switch (relatedType) {
-                case 1: return 'account';
+                case 1: return 'trading_account'; // was 'account' - now deprecated
                 case 2: return 'trade';
                 case 3: return 'trade_plan';
                 case 4: return 'ticker';
@@ -474,8 +484,7 @@ class FieldRendererService {
     static _getEntityHebrewLabel(type) {
         const map = {
             'trade': 'טרייד',
-            'account': 'חשבון מסחר', // תאימות לאחור
-            'trading_account': 'חשבון מסחר', // הישות הנכונה
+            'trading_account': 'חשבון מסחר',
             'ticker': 'טיקר',
             'alert': 'התראה',
             'cash_flow': 'תזרים מזומנים',
@@ -741,10 +750,17 @@ class FieldRendererService {
      * @private
      */
     static _translateStatus(status, entityType) {
+        // אם מישהו משתמש ב-account ישן - שגיאה!
+        if (entityType === 'account') {
+            const error = new Error(`❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!`);
+            window.Logger.error('❌ DEPRECATED: account entity type used in _translateStatus', { entityType, status }, { page: "field-renderer-service" });
+            console.error(error);
+            throw error;
+        }
+        
         // מערכות תרגום לפי סוג ישות
         const translators = {
-            'account': window.translateAccountStatus, // תאימות לאחור
-            'trading_account': window.translateAccountStatus, // הישות הנכונה
+            'trading_account': window.translateAccountStatus,
             'trade': window.translateTradeStatus,
             'alert': window.translateAlertStatus,
             'note': window.translateNoteStatus,

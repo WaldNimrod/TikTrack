@@ -255,16 +255,16 @@ class LinkedItemsService {
         const viewOptionsStr = buildObjectLiteral(viewOptions);
         
         if (window.Logger) {
-            window.Logger.debug('🔗 [LinkedItemsService] Generating action button with sourceInfo', {
-                itemType: item.type,
-                itemId: item.id,
-                hasSourceInfo: !!options.sourceInfo,
-                sourceInfo: options.sourceInfo,
-                viewOptions: viewOptions,
-                viewOptionsStr: viewOptionsStr,
-                onclickCode: `window.showEntityDetails('${item.type}', ${item.id}, ${viewOptionsStr})`,
-                page: "linked-items-service"
-            });
+            // window.Logger.debug('🔗 [LinkedItemsService] Generating action button with sourceInfo', {
+            //     itemType: item.type,
+            //     itemId: item.id,
+            //     hasSourceInfo: !!options.sourceInfo,
+            //     sourceInfo: options.sourceInfo,
+            //     viewOptions: viewOptions,
+            //     viewOptionsStr: viewOptionsStr,
+            //     onclickCode: `window.showEntityDetails('${item.type}', ${item.id}, ${viewOptionsStr})`,
+            //     page: "linked-items-service"
+            // });
         }
         
         // כפתור VIEW - עם העברת מידע על המקור

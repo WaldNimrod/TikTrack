@@ -849,13 +849,16 @@ class ModalManagerV2 {
         const fieldMapping = this.getFieldMapping(config?.entityType);
         console.log('📝 populateForm - field mapping:', fieldMapping);
         
-        // Fields to ignore (metadata/relationship fields)
-        const fieldsToIgnore = ['id', 'created_at', 'updated_at', 'account_name', 'currency_name', 'currency_symbol', 'usd_rate'];
+                // Fields to ignore (metadata/relationship fields)
+        const fieldsToIgnore = ['id', 'updated_at', 'account_name', 'currency_name', 'currency_symbol', 'usd_rate'];
+        
+        // Don't ignore created_at if it has a field mapping (e.g., alerts)
+        const ignoreCreatedAt = !fieldMapping || !fieldMapping['created_at'];
         
         // מילוי שדות רגילים
         Object.entries(data).forEach(([key, value]) => {
-            // Ignore metadata fields
-            if (fieldsToIgnore.includes(key)) {
+            // Ignore metadata fields (but allow created_at if mapped)
+            if (fieldsToIgnore.includes(key) || (key === 'created_at' && ignoreCreatedAt)) {
                 console.log(`⏭️ Skipping ${key} (metadata field)`);
                 return;
             }
@@ -868,24 +871,50 @@ class ModalManagerV2 {
                 field = form.querySelector(`#${fieldMapping[key]}, [name="${fieldMapping[key]}"]`);
             }
             
-            if (field) {
+                        if (field) {
                 console.log(`✅ Found field for ${key} (value: ${value})`);
-                if (field.type === 'checkbox' || field.type === 'radio') {
+                
+                // Check if this is a display field (div with id but not an input)
+                if (field.tagName === 'DIV' && field.id && field.classList.contains('form-control-plaintext')) {
+                    // Display field - set text content
+                    let displayText = value || '';
+                    if (key === 'created_at' || field.id === 'alertCreatedAt') {
+                        // Format date for display
+                        if (displayText) {
+                            try {
+                                const date = new Date(displayText);
+                                if (!isNaN(date.getTime())) {
+                                    displayText = date.toLocaleString('he-IL', {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    });
+                                }
+                            } catch (e) {
+                                // Keep original value if parsing fails
+                            }
+                        }
+                    }
+                    field.textContent = displayText;
+                    console.log(`📋 Set display field ${field.id} to: ${displayText}`);
+                } else if (field.type === 'checkbox' || field.type === 'radio') {
                     field.checked = Boolean(value);
                 } else if (field.tagName === 'SELECT') {
                     // For selects, set value directly
                     console.log(`🎯 Setting SELECT field ${field.id}:`, {
                         tryingToSet: value,
                         currentValue: field.value,
-                        availableOptions: Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})),
-                        hasOption: Array.from(field.options).some(opt => opt.value === value)
+                        availableOptions: Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})),                                           
+                        hasOption: Array.from(field.options).some(opt => opt.value === value)                                                                   
                     });
                     field.value = value || '';
-                    console.log(`🎯 After setting, field.value is: ${field.value}`);
+                    console.log(`🎯 After setting, field.value is: ${field.value}`);                                                                            
                 } else if (field.type === 'datetime-local' && value) {
-                    // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)
-                    const dateStr = typeof value === 'string' ? value : value.toString();
-                    field.value = dateStr.includes('T') ? dateStr : `${dateStr}T00:00`;
+                    // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)                                                                      
+                    const dateStr = typeof value === 'string' ? value : value.toString();                                                                       
+                    field.value = dateStr.includes('T') ? dateStr : `${dateStr}T00:00`;                                                                         
                 } else {
                     field.value = value || '';
                     console.log(`✏️ Set ${field.tagName}/${field.type || 'input'} field ${field.id} to: ${field.value}`);

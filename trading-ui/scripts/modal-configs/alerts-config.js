@@ -140,11 +140,10 @@ const alertsModalConfig = {
         },
         // שורה חמישית: תאריך יצירה + תאריך תפוגה
         {
-            type: 'datetime-local',
+            type: 'display',
             id: 'alertCreatedAt',
             label: 'תאריך יצירה',
             required: false,
-            readOnly: true,
             rowClass: 'row',
             colClass: 'col-md-6'
         },

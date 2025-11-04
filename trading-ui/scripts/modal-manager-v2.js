@@ -1013,7 +1013,7 @@ class ModalManagerV2 {
                 'stop_loss': 'planStopLoss',
                 'target_price': 'planTargetPrice'
             },
-            'alert': {
+                        'alert': {
                 'message': 'alertName',
                 // ticker_id is handled separately in populateSpecialSelects (not a direct field)
                 'related_type_id': 'alertRelatedType',
@@ -1021,7 +1021,7 @@ class ModalManagerV2 {
                 'condition_attribute': 'alertType',
                 'condition_operator': 'alertCondition',
                 'condition_number': 'alertValue',
-                'condition_display_text': 'alertNotes',
+                // condition_display_text is calculated field, not stored as separate field
                 'status': 'alertStatus',
                 'created_at': 'alertCreatedAt',
                 'trade_condition_id': 'alertTradeCondition',
@@ -1713,10 +1713,9 @@ class ModalManagerV2 {
                 const result = await response.json();
                 const ticker = result.data;
                 if (ticker) {
-                    // עדכון תצוגת הטיקר (שם וסימבול)
-                    const tickerName = ticker.name || 'לא מוגדר';
-                    const tickerSymbol = ticker.symbol || '';
-                    tickerDisplay.textContent = tickerSymbol ? `${tickerSymbol} - ${tickerName}` : tickerName;
+                    // עדכון תצוגת הטיקר (רק סימבול)
+                    const tickerSymbol = ticker.symbol || 'לא מוגדר';
+                    tickerDisplay.textContent = tickerSymbol;
                     
                     // עדכון פרטי מחיר
                     if (tickerInfoDiv) {

@@ -54,8 +54,7 @@ const alertsModalConfig = {
             label: 'טיקר',
             required: false,
             rowClass: 'row',
-            colClass: 'col-md-6',
-            description: 'מתעדכן אוטומטית לפי האובייקט המקושר'
+            colClass: 'col-md-6'
         },
         {
             type: 'display',
@@ -112,7 +111,17 @@ const alertsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-4'
         },
-        // שורה רביעית: סטטוס + הודעה
+        // שורה רביעית: הודעה (textarea גדול)
+        {
+            type: 'textarea',
+            id: 'alertName',
+            label: 'הודעה',
+            required: true,
+            placeholder: 'הכנס הודעת התראה',
+            rows: 3,
+            maxLength: 500
+        },
+        // שורה חמישית: סטטוס + תאריך יצירה + תאריך תפוגה
         {
             type: 'select',
             id: 'alertStatus',
@@ -125,26 +134,15 @@ const alertsModalConfig = {
             ],
             defaultValue: 'open',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-4'
         },
-        {
-            type: 'text',
-            id: 'alertName',
-            label: 'הודעה',
-            required: true,
-            placeholder: 'הכנס הודעת התראה',
-            maxLength: 100,
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        // שורה חמישית: תאריך יצירה + תאריך תפוגה
         {
             type: 'display',
             id: 'alertCreatedAt',
             label: 'תאריך יצירה',
             required: false,
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-4'
         },
         {
             type: 'datetime-local',
@@ -153,18 +151,9 @@ const alertsModalConfig = {
             required: false,
             description: 'השאר ריק להתראה ללא תפוגה',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-4'
         },
         // שדות נוספים (לא בשורות)
-        {
-            type: 'textarea',
-            id: 'alertNotes',
-            label: 'הערות',
-            required: false,
-            rows: 3,
-            placeholder: 'הכנס הערות נוספות על ההתראה...',
-            maxLength: 500
-        },
         {
             type: 'checkbox',
             id: 'alertEmail',

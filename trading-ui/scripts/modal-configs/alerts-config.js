@@ -18,25 +18,22 @@ const alertsModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
+        // שורה ראשונה: סוג אובייקט מקושר + אובייקט מקושר
         {
             type: 'select',
-            id: 'alertTicker',
-            label: 'טיקר',
-            required: false, // לא נדרש אם יש שיוך דרך related_type_id
-            options: [], // יטען דינמית מ-API
-            placeholder: 'בחר טיקר...'
-        },
-        {
-            type: 'radio',
             id: 'alertRelatedType',
-            label: 'שיוך לאובייקט',
+            label: 'סוג אובייקט מקושר',
             required: false,
             options: [
+                { value: '', label: 'ללא שיוך' },
                 { value: '1', label: 'חשבון מסחר' },
                 { value: '2', label: 'טרייד' },
                 { value: '3', label: 'תוכנית השקעה' },
                 { value: '4', label: 'טיקר' }
             ],
+            defaultValue: '',
+            rowClass: 'row',
+            colClass: 'col-md-6',
             description: 'אופציונלי - ניתן לשייך התראה לאובייקט ספציפי'
         },
         {
@@ -46,16 +43,30 @@ const alertsModalConfig = {
             required: false,
             options: [], // יטען דינמית לפי סוג השיוך שנבחר
             placeholder: 'בחר אובייקט...',
-            disabled: true
+            disabled: true,
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        // שורה שנייה: טיקר + פרטי מחיר עדכני
+        {
+            type: 'select',
+            id: 'alertTicker',
+            label: 'טיקר',
+            required: false, // לא נדרש אם יש שיוך דרך related_type_id
+            options: [], // יטען דינמית מ-API
+            placeholder: 'בחר טיקר...',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
-            type: 'text',
-            id: 'alertName',
-            label: 'שם ההתראה',
-            required: true,
-            placeholder: 'הכנס שם להתראה',
-            maxLength: 100
+            type: 'display',
+            id: 'alertTickerInfo',
+            label: 'פרטי מחיר עדכני',
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            renderFn: 'renderTickerInfo'
         },
+        // שורה שלישית: שלושת שדות התנאי
         {
             type: 'select',
             id: 'alertType',
@@ -67,16 +78,9 @@ const alertsModalConfig = {
                 { value: 'ma', label: 'ממוצע נע' },
                 { value: 'volume', label: 'נפח' }
             ],
-            defaultValue: 'price'
-        },
-        {
-            type: 'number',
-            id: 'alertValue',
-            label: 'ערך התראה',
-            required: true,
-            min: 0,
-            step: 0.01,
-            placeholder: 'הכנס ערך התראה...'
+            defaultValue: 'price',
+            rowClass: 'row',
+            colClass: 'col-md-4'
         },
         {
             type: 'select',
@@ -94,15 +98,22 @@ const alertsModalConfig = {
                 { value: 'change_down', label: 'שינוי למטה' },
                 { value: 'equals', label: 'שווה' }
             ],
-            defaultValue: 'more_than'
+            defaultValue: 'more_than',
+            rowClass: 'row',
+            colClass: 'col-md-4'
         },
         {
-            type: 'datetime-local',
-            id: 'alertExpiry',
-            label: 'תאריך תפוגה',
-            required: false,
-            description: 'השאר ריק להתראה ללא תפוגה'
+            type: 'number',
+            id: 'alertValue',
+            label: 'ערך התראה',
+            required: true,
+            min: 0,
+            step: 0.01,
+            placeholder: 'הכנס ערך התראה...',
+            rowClass: 'row',
+            colClass: 'col-md-4'
         },
+        // שורה רביעית: סטטוס + הודעה
         {
             type: 'select',
             id: 'alertStatus',
@@ -113,7 +124,48 @@ const alertsModalConfig = {
                 { value: 'closed', label: 'סגור' },
                 { value: 'cancelled', label: 'מבוטל' }
             ],
-            defaultValue: 'open'
+            defaultValue: 'open',
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        {
+            type: 'text',
+            id: 'alertName',
+            label: 'הודעה',
+            required: true,
+            placeholder: 'הכנס הודעת התראה',
+            maxLength: 100,
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        // שורה חמישית: תאריך יצירה + תאריך תפוגה
+        {
+            type: 'datetime-local',
+            id: 'alertCreatedAt',
+            label: 'תאריך יצירה',
+            required: false,
+            readOnly: true,
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        {
+            type: 'datetime-local',
+            id: 'alertExpiry',
+            label: 'תאריך תפוגה',
+            required: false,
+            description: 'השאר ריק להתראה ללא תפוגה',
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        // שדות נוספים (לא בשורות)
+        {
+            type: 'textarea',
+            id: 'alertNotes',
+            label: 'הערות',
+            required: false,
+            rows: 3,
+            placeholder: 'הכנס הערות נוספות על ההתראה...',
+            maxLength: 500
         },
         {
             type: 'checkbox',
@@ -128,15 +180,6 @@ const alertsModalConfig = {
             label: 'שלח התראה ב-SMS',
             required: false,
             defaultValue: false
-        },
-        {
-            type: 'textarea',
-            id: 'alertNotes',
-            label: 'הערות',
-            required: false,
-            rows: 3,
-            placeholder: 'הכנס הערות נוספות על ההתראה...',
-            maxLength: 500
         }
     ],
     validation: {

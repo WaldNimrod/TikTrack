@@ -275,25 +275,60 @@ class ModalManagerV2 {
             return '';
         }
         
-        // ארגון השדות בעמודות - 2-3 עמודות לפי הדגשי העיצוב
-        const fieldsPerRow = 2; // 2 עמודות כמו שביקשת
-        const rows = [];
+        let html = '';
+        let currentRow = null;
         
-        for (let i = 0; i < fields.length; i += fieldsPerRow) {
-            const rowFields = fields.slice(i, i + fieldsPerRow);
-            const rowHTML = `
-                <div class="row">
-                    ${rowFields.map(field => `
-                        <div class="col-md-6">
-                            ${this.renderField(field)}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            rows.push(rowHTML);
+        for (let i = 0; i < fields.length; i++) {
+            const field = fields[i];
+            
+            // אם יש rowClass או colClass - זה תחילת שורה חדשה
+            if (field.rowClass || field.colClass) {
+                // סגור שורה קודמת אם קיימת
+                if (currentRow !== null) {
+                    html += '</div>';
+                    currentRow = null;
+                }
+                
+                // פתח שורה חדשה
+                const rowClass = field.rowClass || 'row';
+                html += `<div class="${rowClass}">`;
+                currentRow = i;
+                
+                // הוסף את השדה עם colClass שלו
+                const colClass = field.colClass || 'col-md-6';
+                html += `<div class="${colClass}">`;
+                html += this.renderField(field);
+                html += '</div>';
+                
+                // בדוק אם השדה הבא באותה שורה (יש לו rowClass/colClass)
+                let nextIndex = i + 1;
+                while (nextIndex < fields.length && (fields[nextIndex].rowClass || fields[nextIndex].colClass)) {
+                    const nextField = fields[nextIndex];
+                    const nextColClass = nextField.colClass || 'col-md-6';
+                    html += `<div class="${nextColClass}">`;
+                    html += this.renderField(nextField);
+                    html += '</div>';
+                    nextIndex++;
+                }
+                
+                // סגור את השורה
+                html += '</div>';
+                i = nextIndex - 1; // המשך מהשדה הבא
+                currentRow = null;
+            } else {
+                // שדה רגיל - הוסף אותו בשורה חדשה
+                html += `<div class="row"><div class="col-12">`;
+                html += this.renderField(field);
+                html += '</div></div>';
+            }
         }
         
-        return rows.join('');
+        // סגור שורה אחרונה אם קיימת
+        if (currentRow !== null) {
+            html += '</div>';
+        }
+        
+        return html;
     }
 
     /**
@@ -303,12 +338,27 @@ class ModalManagerV2 {
      * @returns {string} HTML של השדה
      * @private
      */
-    renderField(field) {
+        renderField(field) {
         const requiredAttr = field.required ? 'required' : '';
-        const requiredStar = field.required ? '<span class="text-danger">*</span>' : '';
+        const requiredStar = field.required ? '<span class="text-danger">*</span>' : '';                                                                        
         const disabledAttr = field.disabled ? 'disabled' : '';
+        const readOnlyAttr = field.readOnly ? 'readonly' : '';
         
         switch (field.type) {
+            case 'display':
+                // שדה תצוגה בלבד - לא input
+                return `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <div id="${field.id}" class="form-control-plaintext" style="min-height: 38px; padding: 0.375rem 0.75rem;">
+                            <!-- יתמלא דינמית -->
+                        </div>
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
+                    </div>
+                `;
+                
             case 'text':
                 return `
                     <div class="mb-3">
@@ -321,13 +371,14 @@ class ModalManagerV2 {
                                name="${field.id}"
                                ${requiredAttr}
                                ${disabledAttr}
+                               ${readOnlyAttr}
                                placeholder="${field.placeholder || ''}"
                                value="${field.defaultValue || ''}">
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
                 
-            case 'number':
+                        case 'number':
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
@@ -339,6 +390,7 @@ class ModalManagerV2 {
                                name="${field.id}"
                                ${requiredAttr}
                                ${disabledAttr}
+                               ${readOnlyAttr}
                                ${field.min ? `min="${field.min}"` : ''}
                                ${field.max ? `max="${field.max}"` : ''}
                                ${field.step ? `step="${field.step}"` : ''}
@@ -353,18 +405,20 @@ class ModalManagerV2 {
                 let dateValue = field.defaultValue || '';
                 if (dateValue === 'today') {
                     const today = new Date();
-                    dateValue = today.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
+                    dateValue = today.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm                                                                   
                 }
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
                             ${field.label} ${requiredStar}
                         </label>
-                        <input type="${field.type === 'datetime-local' ? 'datetime-local' : (field.dateTime ? 'datetime-local' : 'date')}" 
+                        <input type="${field.type === 'datetime-local' ? 'datetime-local' : (field.dateTime ? 'datetime-local' : 'date')}"                      
                                class="form-control" 
                                id="${field.id}" 
                                name="${field.id}"
                                ${requiredAttr}
+                               ${disabledAttr}
+                               ${readOnlyAttr}
                                value="${dateValue}">
                         <div class="invalid-feedback"></div>
                     </div>
@@ -853,23 +907,62 @@ class ModalManagerV2 {
      * @private
      */
     attachSpecialEventListeners(form) {
-        // Event listener ל-alertRelatedType - מילוי alertRelatedObject
-        const alertRelatedTypeRadios = form.querySelectorAll('input[name="alertRelatedType"]');
-        if (alertRelatedTypeRadios.length > 0) {
-            alertRelatedTypeRadios.forEach(radio => {
-                radio.addEventListener('change', async (e) => {
-                    const relatedTypeId = e.target.value;
-                    const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
-                    if (alertRelatedObjectField) {
-                        if (relatedTypeId) {
-                            alertRelatedObjectField.disabled = false;
-                            await this.populateAlertRelatedObjects(form, relatedTypeId);
-                        } else {
-                            alertRelatedObjectField.disabled = true;
-                            alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+        // Event listener ל-alertRelatedType - מילוי alertRelatedObject (עכשיו select)
+        const alertRelatedTypeSelect = form.querySelector('#alertRelatedType');
+        if (alertRelatedTypeSelect) {
+            alertRelatedTypeSelect.addEventListener('change', async (e) => {
+                const relatedTypeId = e.target.value;
+                const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
+                if (alertRelatedObjectField) {
+                    if (relatedTypeId) {
+                        alertRelatedObjectField.disabled = false;
+                        await this.populateAlertRelatedObjects(form, relatedTypeId);
+                    } else {
+                        alertRelatedObjectField.disabled = true;
+                        alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                    }
+                }
+            });
+        }
+        
+        // Event listener ל-alertTicker - רנדור פרטי מחיר טיקר
+        const alertTickerSelect = form.querySelector('#alertTicker');
+        if (alertTickerSelect) {
+            alertTickerSelect.addEventListener('change', async (e) => {
+                const tickerId = e.target.value;
+                const tickerInfoDiv = form.querySelector('#alertTickerInfo');
+                if (tickerInfoDiv && tickerId) {
+                    try {
+                        const response = await fetch(`/api/tickers/${tickerId}`);
+                        if (response.ok) {
+                            const result = await response.json();
+                            const ticker = result.data;
+                            if (ticker && window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
+                                tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+                            } else if (ticker) {
+                                // Fallback אם renderTickerInfo לא זמין
+                                tickerInfoDiv.innerHTML = `
+                                    <div class="ticker-info-display">
+                                        <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}<br>
+                                        <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
+                                        <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+                                            ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} 
+                                            ${(ticker.daily_change || 0).toFixed(2)} 
+                                            (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+                                        </span>
+                                    </div>
+                                `;
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Error loading ticker info:', error);
+                        if (tickerInfoDiv) {
+                            tickerInfoDiv.innerHTML = '<small class="text-muted">לא ניתן לטעון פרטי טיקר</small>';
                         }
                     }
-                });
+                } else if (tickerInfoDiv && !tickerId) {
+                    tickerInfoDiv.innerHTML = '';
+                }
             });
         }
     }
@@ -924,6 +1017,7 @@ class ModalManagerV2 {
                 'condition_number': 'alertValue',
                 'condition_display_text': 'alertNotes',
                 'status': 'alertStatus',
+                'created_at': 'alertCreatedAt',
                 'trade_condition_id': 'alertTradeCondition',
                 'plan_condition_id': 'alertPlanCondition'
             },
@@ -1533,17 +1627,46 @@ class ModalManagerV2 {
         const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
         
         // מילוי related_type_id ו-related_id אם קיימים
-        if (data.related_type_id) {
-            // מציאת ה-radio button הנכון לפי name ו-value
-            const radioButton = form.querySelector(`input[name="alertRelatedType"][value="${data.related_type_id}"]`);
-            if (radioButton) {
-                radioButton.checked = true;
-                console.log(`✅ Set alertRelatedType to: ${data.related_type_id}`);
-                // הפעלת select האובייקטים המקושרים
-                if (alertRelatedObjectField) {
-                    alertRelatedObjectField.disabled = false;
-                    // טעינת האובייקטים לפי סוג השיוך
-                    await this.populateAlertRelatedObjects(form, data.related_type_id, data.related_id);
+        if (alertRelatedTypeField && data.related_type_id) {
+            // עכשיו זה select ולא radio
+            alertRelatedTypeField.value = data.related_type_id;
+            console.log(`✅ Set alertRelatedType to: ${data.related_type_id}`);
+            // הפעלת select האובייקטים המקושרים
+            if (alertRelatedObjectField) {
+                alertRelatedObjectField.disabled = false;
+                // טעינת האובייקטים לפי סוג השיוך
+                await this.populateAlertRelatedObjects(form, data.related_type_id, data.related_id);
+            }
+        }
+        
+        // טעינת פרטי מחיר טיקר אם יש ticker_id
+        if (alertTickerField && data.ticker_id) {
+            const tickerInfoDiv = form.querySelector('#alertTickerInfo');
+            if (tickerInfoDiv) {
+                try {
+                    const response = await fetch(`/api/tickers/${data.ticker_id}`);
+                    if (response.ok) {
+                        const result = await response.json();
+                        const ticker = result.data;
+                        if (ticker && window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
+                            tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+                        } else if (ticker) {
+                            // Fallback
+                            tickerInfoDiv.innerHTML = `
+                                <div class="ticker-info-display">
+                                    <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}<br>
+                                    <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
+                                    <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+                                        ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} 
+                                        ${(ticker.daily_change || 0).toFixed(2)} 
+                                        (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+                                    </span>
+                                </div>
+                            `;
+                        }
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Error loading ticker info in populateSpecialSelects:', error);
                 }
             }
         }

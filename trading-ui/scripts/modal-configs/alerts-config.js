@@ -18,7 +18,29 @@ const alertsModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
-        // שורה ראשונה: סוג אובייקט מקושר + אובייקט מקושר
+        // שורה ראשונה: טיקר + פרטי מחיר עדכני
+        {
+            type: 'display',
+            id: 'alertTicker',
+            label: 'טיקר',
+            required: false,
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        {
+            type: 'display',
+            id: 'alertTickerInfo',
+            label: 'פרטי מחיר עדכני',
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            renderFn: 'renderTickerInfo'
+        },
+        // קו מפריד
+        {
+            type: 'separator',
+            id: 'alertSeparator1'
+        },
+        // שורה שנייה: סוג אובייקט מקושר + אובייקט מקושר
         {
             type: 'select',
             id: 'alertRelatedType',
@@ -46,23 +68,6 @@ const alertsModalConfig = {
             disabled: true,
             rowClass: 'row',
             colClass: 'col-md-6'
-        },
-        // שורה שנייה: טיקר + פרטי מחיר עדכני
-        {
-            type: 'display',
-            id: 'alertTicker',
-            label: 'טיקר',
-            required: false,
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        {
-            type: 'display',
-            id: 'alertTickerInfo',
-            label: 'פרטי מחיר עדכני',
-            rowClass: 'row',
-            colClass: 'col-md-6',
-            renderFn: 'renderTickerInfo'
         },
         // שורה שלישית: שלושת שדות התנאי
         {

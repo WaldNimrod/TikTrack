@@ -281,6 +281,12 @@ class ModalManagerV2 {
         for (let i = 0; i < fields.length; i++) {
             const field = fields[i];
             
+            // separator לא צריך row/col - הוסף אותו ישירות
+            if (field.type === 'separator') {
+                html += this.renderField(field);
+                continue;
+            }
+            
             // אם יש rowClass או colClass - זה תחילת שורה חדשה
             if (field.rowClass || field.colClass) {
                 // סגור שורה קודמת אם קיימת
@@ -345,18 +351,24 @@ class ModalManagerV2 {
         const readOnlyAttr = field.readOnly ? 'readonly' : '';
         
         switch (field.type) {
-            case 'display':
+                        case 'display':
                 // שדה תצוגה בלבד - לא input
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
                             ${field.label} ${requiredStar}
                         </label>
-                        <div id="${field.id}" class="form-control-plaintext" style="min-height: 38px; padding: 0.375rem 0.75rem;">
+                        <div id="${field.id}" class="form-control-plaintext" style="min-height: 38px; padding: 0.375rem 0.75rem;">                              
                             <!-- יתמלא דינמית -->
                         </div>
-                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}                                          
                     </div>
+                `;
+                
+            case 'separator':
+                // קו מפריד
+                return `
+                    <hr class="my-4" style="border-top: 2px solid #dee2e6;">
                 `;
                 
             case 'text':

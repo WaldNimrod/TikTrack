@@ -116,7 +116,33 @@ const alertsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-4'
         },
-        // שורה רביעית: הודעה (textarea גדול)
+        // שורה רביעית: מצב משולב + תאריך יצירה
+        {
+            type: 'select',
+            id: 'alertStatusCombined',
+            name: 'alertStatusCombined',
+            label: 'מצב',
+            required: true,
+            options: [
+                { value: 'new', label: 'חדש' },  // open + false
+                { value: 'active', label: 'פעיל' },  // open + new
+                { value: 'unread', label: 'לא נקרא' },  // closed + new
+                { value: 'read', label: 'נקרא' },  // closed + true
+                { value: 'cancelled', label: 'מבוטל' }  // cancelled + false
+            ],
+            defaultValue: 'new',
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        {
+            type: 'display',
+            id: 'alertCreatedAt',
+            label: 'תאריך יצירה',
+            required: false,
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        // הודעה - בסוף אחרי סטטוס ותאריכים
         {
             type: 'textarea',
             id: 'alertName',
@@ -125,53 +151,6 @@ const alertsModalConfig = {
             placeholder: 'הכנס הודעת התראה',
             rows: 3,
             maxLength: 500
-        },
-        // שורה חמישית: סטטוס + מצב הפעלה + תאריך יצירה + תאריך תפוגה
-        {
-            type: 'select',
-            id: 'alertStatus',
-            label: 'סטטוס',
-            required: true,
-            options: [
-                { value: 'open', label: 'פתוח' },
-                { value: 'closed', label: 'סגור' },
-                { value: 'cancelled', label: 'מבוטל' }
-            ],
-            defaultValue: 'open',
-            rowClass: 'row',
-            colClass: 'col-md-3'
-        },
-        {
-            type: 'select',
-            id: 'alertIsTriggered',
-            name: 'is_triggered',
-            label: 'מצב הפעלה',
-            required: true,
-            options: [
-                { value: 'false', label: 'לא הופעל' },
-                { value: 'new', label: 'חדש' },
-                { value: 'true', label: 'הופעל' }
-            ],
-            defaultValue: 'false',
-            rowClass: 'row',
-            colClass: 'col-md-3'
-        },
-        {
-            type: 'display',
-            id: 'alertCreatedAt',
-            label: 'תאריך יצירה',
-            required: false,
-            rowClass: 'row',
-            colClass: 'col-md-3'
-        },
-        {
-            type: 'datetime-local',
-            id: 'alertExpiry',
-            label: 'תאריך תפוגה',
-            required: false,
-            description: 'השאר ריק להתראה ללא תפוגה',
-            rowClass: 'row',
-            colClass: 'col-md-3'
         },
         // שדות נוספים (לא בשורות)
         {
@@ -208,10 +187,7 @@ const alertsModalConfig = {
         alertCondition: {
             required: true
         },
-        alertExpiry: {
-            required: false
-        },
-        alertStatus: {
+        alertStatusCombined: {
             required: true
         },
         alertEmail: {

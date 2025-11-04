@@ -970,7 +970,7 @@ class ModalManagerV2 {
             });
         }
         
-        // Event listener ל-alertRelatedObject - עדכון טיקר אוטומטי
+                // Event listener ל-alertRelatedObject - עדכון טיקר אוטומטי
         const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
         if (alertRelatedObjectField) {
             alertRelatedObjectField.addEventListener('change', async (e) => {
@@ -984,53 +984,52 @@ class ModalManagerV2 {
             });
         }
         
-        // Event listeners לולידציה של status ו-is_triggered
-        const alertStatusField = form.querySelector('#alertStatus');
-        const alertIsTriggeredField = form.querySelector('#alertIsTriggered');
-        
-        if (alertStatusField && alertIsTriggeredField) {
-            // פונקציה לעדכון אפשרויות is_triggered לפי status
-            const updateIsTriggeredOptions = () => {
-                const status = alertStatusField.value;
-                const currentValue = alertIsTriggeredField.value;
-                
-                // קביעת אפשרויות תקינות לפי status
-                let validOptions = [];
-                if (status === 'open') {
-                    validOptions = [
-                        { value: 'false', label: 'לא הופעל' },
-                        { value: 'new', label: 'חדש' }
-                    ];
-                } else if (status === 'closed') {
-                    validOptions = [
-                        { value: 'new', label: 'חדש' },
-                        { value: 'true', label: 'הופעל' }
-                    ];
-                } else if (status === 'cancelled') {
-                    validOptions = [
-                        { value: 'false', label: 'לא הופעל' }
-                    ];
-                }
-                
-                // עדכון האפשרויות
-                alertIsTriggeredField.innerHTML = validOptions.map(opt => 
-                    `<option value="${opt.value}">${opt.label}</option>`
-                ).join('');
-                
-                // בדיקה אם הערך הנוכחי תקין, אם לא - בחירת הערך הראשון
-                if (validOptions.some(opt => opt.value === currentValue)) {
-                    alertIsTriggeredField.value = currentValue;
-                } else if (validOptions.length > 0) {
-                    alertIsTriggeredField.value = validOptions[0].value;
+        // Event listener ל-alertStatusCombined - פיצול ל-status ו-is_triggered
+        const alertStatusCombinedField = form.querySelector('#alertStatusCombined');
+        if (alertStatusCombinedField) {
+            // יצירת hidden fields אם לא קיימים
+            let statusHidden = form.querySelector('#alertStatus_hidden');
+            let isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden');
+            
+            if (!statusHidden) {
+                statusHidden = document.createElement('input');
+                statusHidden.type = 'hidden';
+                statusHidden.id = 'alertStatus_hidden';
+                statusHidden.name = 'status';
+                form.appendChild(statusHidden);
+            }
+            
+            if (!isTriggeredHidden) {
+                isTriggeredHidden = document.createElement('input');
+                isTriggeredHidden.type = 'hidden';
+                isTriggeredHidden.id = 'alertIsTriggered_hidden';
+                isTriggeredHidden.name = 'is_triggered';
+                form.appendChild(isTriggeredHidden);
+            }
+            
+                        // פונקציה לעדכון hidden fields
+            const updateHiddenFields = () => {
+                const combinedValue = alertStatusCombinedField.value;
+                if (combinedValue) {
+                    const parsed = this.parseCombinedAlertState(combinedValue);
+                    if (parsed) {
+                        statusHidden.value = parsed.status;
+                        isTriggeredHidden.value = parsed.is_triggered;
+                        console.log(`✅ Updated hidden fields: status=${parsed.status}, is_triggered=${parsed.is_triggered}`);                                                 
+                    } else {
+                        console.warn(`⚠️ Could not parse combined state: ${combinedValue}`);
+                    }
                 }
             };
             
-            // עדכון כשמשנים status
-            alertStatusField.addEventListener('change', updateIsTriggeredOptions);
+            // עדכון ראשוני
+            updateHiddenFields();
             
-            // עדכון ראשוני (במקרה של טעינת נתונים)
-            updateIsTriggeredOptions();
+            // עדכון כשמשנים את הערך
+            alertStatusCombinedField.addEventListener('change', updateHiddenFields);
         }
+        
+ 
     }
     
     /**
@@ -1082,8 +1081,7 @@ class ModalManagerV2 {
                 'condition_operator': 'alertCondition',
                 'condition_number': 'alertValue',
                 // condition_display_text is calculated field, not stored as separate field
-                'status': 'alertStatus',
-                'is_triggered': 'alertIsTriggered',
+                // status and is_triggered are handled via alertStatusCombined -> hidden fields
                 'created_at': 'alertCreatedAt',
                 'trade_condition_id': 'alertTradeCondition',
                 'plan_condition_id': 'alertPlanCondition'
@@ -1714,41 +1712,75 @@ class ModalManagerV2 {
             await this.updateAlertTickerDisplay(form, data.ticker_id);
         }
         
-        // עדכון אפשרויות is_triggered לפי status (אם יש)
-        const alertStatusField = form.querySelector('#alertStatus');
-        const alertIsTriggeredField = form.querySelector('#alertIsTriggered');
-        if (alertStatusField && alertIsTriggeredField && alertStatusField.value) {
-            const status = alertStatusField.value;
-            let validOptions = [];
-            if (status === 'open') {
-                validOptions = [
-                    { value: 'false', label: 'לא הופעל' },
-                    { value: 'new', label: 'חדש' }
-                ];
-            } else if (status === 'closed') {
-                validOptions = [
-                    { value: 'new', label: 'חדש' },
-                    { value: 'true', label: 'הופעל' }
-                ];
-            } else if (status === 'cancelled') {
-                validOptions = [
-                    { value: 'false', label: 'לא הופעל' }
-                ];
-            }
+                // עדכון שדה מצב משולב (status + is_triggered) אם יש
+        const alertStatusCombinedField = form.querySelector('#alertStatusCombined');                                                                            
+        if (alertStatusCombinedField && data.status !== undefined && data.is_triggered !== undefined) {                                                         
+            const status = data.status || 'open';
+            const isTriggered = data.is_triggered || 'false';
+            const combinedValue = this.getCombinedAlertState(status, isTriggered);
             
-            if (validOptions.length > 0) {
-                const currentValue = alertIsTriggeredField.value;
-                alertIsTriggeredField.innerHTML = validOptions.map(opt => 
-                    `<option value="${opt.value}">${opt.label}</option>`
-                ).join('');
-                // שמירה על הערך הנוכחי אם הוא תקין
-                if (validOptions.some(opt => opt.value === currentValue)) {
-                    alertIsTriggeredField.value = currentValue;
-                } else if (validOptions.length > 0) {
-                    alertIsTriggeredField.value = validOptions[0].value;
-                }
+            if (combinedValue) {
+                alertStatusCombinedField.value = combinedValue;
+                console.log(`✅ Set alertStatusCombined to: ${combinedValue} (status: ${status}, is_triggered: ${isTriggered})`);                               
+            } else {
+                console.warn(`⚠️ Could not determine combined state for status=${status}, is_triggered=${isTriggered}, using default`);
+                alertStatusCombinedField.value = 'new';
             }
         }
+    }
+    
+    /**
+     * Get combined alert state from status and is_triggered
+     * Maps status + is_triggered to combined state values
+     * @param {string} status - Alert status (open, closed, cancelled)
+     * @param {string} isTriggered - Triggered flag (false, new, true)
+     * @returns {string|null} Combined state or null if invalid
+     * @private
+     */
+    getCombinedAlertState(status, isTriggered) {
+        // Mapping according to getAlertState logic:
+        // open + false = 'new'
+        // open + new = 'active'
+        // closed + new = 'unread'
+        // closed + true = 'read'
+        // cancelled + false = 'cancelled'
+        
+        if (status === 'open' && isTriggered === 'false') {
+            return 'new';
+        }
+        if (status === 'open' && isTriggered === 'new') {
+            return 'active';
+        }
+        if (status === 'closed' && isTriggered === 'new') {
+            return 'unread';
+        }
+        if (status === 'closed' && isTriggered === 'true') {
+            return 'read';
+        }
+        if (status === 'cancelled' && isTriggered === 'false') {
+            return 'cancelled';
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Parse combined alert state to status and is_triggered
+     * Maps combined state values back to status + is_triggered
+     * @param {string} combinedState - Combined state (new, active, unread, read, cancelled)
+     * @returns {Object|null} {status, is_triggered} or null if invalid
+     * @private
+     */
+    parseCombinedAlertState(combinedState) {
+        const mapping = {
+            'new': { status: 'open', is_triggered: 'false' },
+            'active': { status: 'open', is_triggered: 'new' },
+            'unread': { status: 'closed', is_triggered: 'new' },
+            'read': { status: 'closed', is_triggered: 'true' },
+            'cancelled': { status: 'cancelled', is_triggered: 'false' }
+        };
+        
+        return mapping[combinedState] || null;
     }
     
     /**

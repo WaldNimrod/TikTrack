@@ -738,7 +738,7 @@ class ModalManagerV2 {
      * @param {Object} data - נתונים למילוי
      * @param {string} formId - מזהה הטופס (אופציונלי)
      */
-    populateForm(modalElement, data, formId = null) {
+    async populateForm(modalElement, data, formId = null) {
         const form = formId ? 
             modalElement.querySelector(`#${formId}`) : 
             modalElement.querySelector('form');
@@ -804,7 +804,7 @@ class ModalManagerV2 {
         });
         
         // מילוי selects מיוחדים
-        this.populateSpecialSelects(form, data);
+        await this.populateSpecialSelects(form, data);
     }
     
     /**
@@ -1454,9 +1454,40 @@ class ModalManagerV2 {
      * @param {Object} data - נתונים למילוי
      * @private
      */
-    populateSpecialSelects(form, data) {
+    async populateSpecialSelects(form, data) {
         // מילוי selects מיוחדים לפי הצורך
         // לדוגמה: trade, tradePlan, etc.
+        
+        // טיפול מיוחד בהתראות עם קישור דרך related_type_id
+        const alertTickerField = form.querySelector('#alertTicker');
+        if (alertTickerField && data.related_type_id && data.related_id && !data.ticker_id) {
+            try {
+                // אם ההתראה מקושרת לטרייד או תוכנית, נשלוף את ה-ticker_id מהאובייקט המקושר
+                if (data.related_type_id === 2) { // trade
+                    const response = await fetch(`/api/trades/${data.related_id}`);
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.data && result.data.ticker_id) {
+                            // עדכון alertTicker עם ה-ticker_id מהטרייד
+                            alertTickerField.value = result.data.ticker_id;
+                            console.log(`✅ Filled alertTicker from related trade: ${result.data.ticker_id}`);
+                        }
+                    }
+                } else if (data.related_type_id === 3) { // trade_plan
+                    const response = await fetch(`/api/trade_plans/${data.related_id}`);
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.data && result.data.ticker_id) {
+                            // עדכון alertTicker עם ה-ticker_id מהתוכנית
+                            alertTickerField.value = result.data.ticker_id;
+                            console.log(`✅ Filled alertTicker from related trade plan: ${result.data.ticker_id}`);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ Error populating alertTicker from related object:', error);
+            }
+        }
     }
 
     /**

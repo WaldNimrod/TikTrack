@@ -121,7 +121,7 @@ const alertsModalConfig = {
             rows: 3,
             maxLength: 500
         },
-        // שורה חמישית: סטטוס + תאריך יצירה + תאריך תפוגה
+        // שורה חמישית: סטטוס + מצב הפעלה + תאריך יצירה + תאריך תפוגה
         {
             type: 'select',
             id: 'alertStatus',
@@ -134,7 +134,22 @@ const alertsModalConfig = {
             ],
             defaultValue: 'open',
             rowClass: 'row',
-            colClass: 'col-md-4'
+            colClass: 'col-md-3'
+        },
+        {
+            type: 'select',
+            id: 'alertIsTriggered',
+            name: 'is_triggered',
+            label: 'מצב הפעלה',
+            required: true,
+            options: [
+                { value: 'false', label: 'לא הופעל' },
+                { value: 'new', label: 'חדש' },
+                { value: 'true', label: 'הופעל' }
+            ],
+            defaultValue: 'false',
+            rowClass: 'row',
+            colClass: 'col-md-3'
         },
         {
             type: 'display',
@@ -142,7 +157,7 @@ const alertsModalConfig = {
             label: 'תאריך יצירה',
             required: false,
             rowClass: 'row',
-            colClass: 'col-md-4'
+            colClass: 'col-md-3'
         },
         {
             type: 'datetime-local',
@@ -151,7 +166,7 @@ const alertsModalConfig = {
             required: false,
             description: 'השאר ריק להתראה ללא תפוגה',
             rowClass: 'row',
-            colClass: 'col-md-4'
+            colClass: 'col-md-3'
         },
         // שדות נוספים (לא בשורות)
         {

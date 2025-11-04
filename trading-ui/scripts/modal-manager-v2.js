@@ -368,7 +368,7 @@ class ModalManagerV2 {
                         <input type="text" 
                                class="form-control" 
                                id="${field.id}" 
-                               name="${field.id}"
+                               name="${field.name || field.id}"
                                ${requiredAttr}
                                ${disabledAttr}
                                ${readOnlyAttr}
@@ -387,7 +387,7 @@ class ModalManagerV2 {
                         <input type="number" 
                                class="form-control" 
                                id="${field.id}" 
-                               name="${field.id}"
+                               name="${field.name || field.id}"
                                ${requiredAttr}
                                ${disabledAttr}
                                ${readOnlyAttr}
@@ -415,7 +415,7 @@ class ModalManagerV2 {
                         <input type="${field.type === 'datetime-local' ? 'datetime-local' : (field.dateTime ? 'datetime-local' : 'date')}"                      
                                class="form-control" 
                                id="${field.id}" 
-                               name="${field.id}"
+                               name="${field.name || field.id}"
                                ${requiredAttr}
                                ${disabledAttr}
                                ${readOnlyAttr}
@@ -447,7 +447,7 @@ class ModalManagerV2 {
                         </label>
                         <select class="form-select" 
                                 id="${field.id}" 
-                                name="${field.id}"
+                                name="${field.name || field.id}"
                                 ${requiredAttr}>
                             ${optionsHTML}
                         </select>
@@ -463,7 +463,7 @@ class ModalManagerV2 {
                         </label>
                         <textarea class="form-control" 
                                   id="${field.id}" 
-                                  name="${field.id}"
+                                  name="${field.name || field.id}"
                                   ${requiredAttr}
                                   rows="${field.rows || 4}"
                                   placeholder="${field.placeholder || ''}">${field.defaultValue || ''}</textarea>
@@ -479,7 +479,7 @@ class ModalManagerV2 {
                             <input type="checkbox" 
                                    class="form-check-input" 
                                    id="${field.id}" 
-                                   name="${field.id}"
+                                   name="${field.name || field.id}"
                                    value="true"
                                    ${checkedAttr}
                                    ${requiredAttr}
@@ -506,7 +506,7 @@ class ModalManagerV2 {
                                 <input type="radio" 
                                        class="form-check-input" 
                                        id="${radioId}" 
-                                       name="${field.id}" 
+                                       name="${field.name || field.id}" 
                                        value="${value}"
                                        ${checked}
                                        ${requiredAttr}
@@ -971,6 +971,54 @@ class ModalManagerV2 {
                 }
             });
         }
+        
+        // Event listeners לולידציה של status ו-is_triggered
+        const alertStatusField = form.querySelector('#alertStatus');
+        const alertIsTriggeredField = form.querySelector('#alertIsTriggered');
+        
+        if (alertStatusField && alertIsTriggeredField) {
+            // פונקציה לעדכון אפשרויות is_triggered לפי status
+            const updateIsTriggeredOptions = () => {
+                const status = alertStatusField.value;
+                const currentValue = alertIsTriggeredField.value;
+                
+                // קביעת אפשרויות תקינות לפי status
+                let validOptions = [];
+                if (status === 'open') {
+                    validOptions = [
+                        { value: 'false', label: 'לא הופעל' },
+                        { value: 'new', label: 'חדש' }
+                    ];
+                } else if (status === 'closed') {
+                    validOptions = [
+                        { value: 'new', label: 'חדש' },
+                        { value: 'true', label: 'הופעל' }
+                    ];
+                } else if (status === 'cancelled') {
+                    validOptions = [
+                        { value: 'false', label: 'לא הופעל' }
+                    ];
+                }
+                
+                // עדכון האפשרויות
+                alertIsTriggeredField.innerHTML = validOptions.map(opt => 
+                    `<option value="${opt.value}">${opt.label}</option>`
+                ).join('');
+                
+                // בדיקה אם הערך הנוכחי תקין, אם לא - בחירת הערך הראשון
+                if (validOptions.some(opt => opt.value === currentValue)) {
+                    alertIsTriggeredField.value = currentValue;
+                } else if (validOptions.length > 0) {
+                    alertIsTriggeredField.value = validOptions[0].value;
+                }
+            };
+            
+            // עדכון כשמשנים status
+            alertStatusField.addEventListener('change', updateIsTriggeredOptions);
+            
+            // עדכון ראשוני (במקרה של טעינת נתונים)
+            updateIsTriggeredOptions();
+        }
     }
     
     /**
@@ -1023,6 +1071,7 @@ class ModalManagerV2 {
                 'condition_number': 'alertValue',
                 // condition_display_text is calculated field, not stored as separate field
                 'status': 'alertStatus',
+                'is_triggered': 'alertIsTriggered',
                 'created_at': 'alertCreatedAt',
                 'trade_condition_id': 'alertTradeCondition',
                 'plan_condition_id': 'alertPlanCondition'
@@ -1651,6 +1700,42 @@ class ModalManagerV2 {
         } else if (alertTickerField && data.ticker_id) {
             // אם יש ticker_id ישיר (ללא related object), עדיין נציג אותו
             await this.updateAlertTickerDisplay(form, data.ticker_id);
+        }
+        
+        // עדכון אפשרויות is_triggered לפי status (אם יש)
+        const alertStatusField = form.querySelector('#alertStatus');
+        const alertIsTriggeredField = form.querySelector('#alertIsTriggered');
+        if (alertStatusField && alertIsTriggeredField && alertStatusField.value) {
+            const status = alertStatusField.value;
+            let validOptions = [];
+            if (status === 'open') {
+                validOptions = [
+                    { value: 'false', label: 'לא הופעל' },
+                    { value: 'new', label: 'חדש' }
+                ];
+            } else if (status === 'closed') {
+                validOptions = [
+                    { value: 'new', label: 'חדש' },
+                    { value: 'true', label: 'הופעל' }
+                ];
+            } else if (status === 'cancelled') {
+                validOptions = [
+                    { value: 'false', label: 'לא הופעל' }
+                ];
+            }
+            
+            if (validOptions.length > 0) {
+                const currentValue = alertIsTriggeredField.value;
+                alertIsTriggeredField.innerHTML = validOptions.map(opt => 
+                    `<option value="${opt.value}">${opt.label}</option>`
+                ).join('');
+                // שמירה על הערך הנוכחי אם הוא תקין
+                if (validOptions.some(opt => opt.value === currentValue)) {
+                    alertIsTriggeredField.value = currentValue;
+                } else if (validOptions.length > 0) {
+                    alertIsTriggeredField.value = validOptions[0].value;
+                }
+            }
         }
     }
     

@@ -417,8 +417,8 @@ class ModalManagerV2 {
                     </div>
                 `;
                 
-            case 'checkbox':
-                const checkedAttr = field.defaultValue === true || field.defaultValue === 'true' ? 'checked' : '';
+                        case 'checkbox':
+                const checkedAttr = field.defaultValue === true || field.defaultValue === 'true' ? 'checked' : '';                                              
                 return `
                     <div class="mb-3">
                         <div class="form-check">
@@ -434,7 +434,45 @@ class ModalManagerV2 {
                                 ${field.label} ${requiredStar}
                             </label>
                         </div>
-                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}                                          
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
+            case 'radio':
+                let radioButtonsHTML = '';
+                if (field.options && Array.isArray(field.options)) {
+                    field.options.forEach((option, index) => {
+                        const value = option.value || option.id || option;
+                        const label = option.label || option.name || option;
+                        const radioId = `${field.id}_${index}`;
+                        const checked = field.defaultValue === value || field.defaultValue === String(value) ? 'checked' : '';
+                        radioButtonsHTML += `
+                            <div class="form-check">
+                                <input type="radio" 
+                                       class="form-check-input" 
+                                       id="${radioId}" 
+                                       name="${field.id}" 
+                                       value="${value}"
+                                       ${checked}
+                                       ${requiredAttr}
+                                       ${disabledAttr}>
+                                <label for="${radioId}" class="form-check-label">
+                                    ${label}
+                                </label>
+                            </div>
+                        `;
+                    });
+                }
+                return `
+                    <div class="mb-3">
+                        <label class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <div class="radio-group">
+                            ${radioButtonsHTML}
+                        </div>
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}                                          
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
@@ -805,6 +843,35 @@ class ModalManagerV2 {
         
         // מילוי selects מיוחדים
         await this.populateSpecialSelects(form, data);
+        
+        // הוספת event listeners לשדות מיוחדים
+        this.attachSpecialEventListeners(form);
+    }
+    
+    /**
+     * Attach special event listeners for form fields
+     * @private
+     */
+    attachSpecialEventListeners(form) {
+        // Event listener ל-alertRelatedType - מילוי alertRelatedObject
+        const alertRelatedTypeRadios = form.querySelectorAll('input[name="alertRelatedType"]');
+        if (alertRelatedTypeRadios.length > 0) {
+            alertRelatedTypeRadios.forEach(radio => {
+                radio.addEventListener('change', async (e) => {
+                    const relatedTypeId = e.target.value;
+                    const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
+                    if (alertRelatedObjectField) {
+                        if (relatedTypeId) {
+                            alertRelatedObjectField.disabled = false;
+                            await this.populateAlertRelatedObjects(form, relatedTypeId);
+                        } else {
+                            alertRelatedObjectField.disabled = true;
+                            alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                        }
+                    }
+                });
+            });
+        }
     }
     
     /**
@@ -850,6 +917,8 @@ class ModalManagerV2 {
             'alert': {
                 'message': 'alertName',
                 'ticker_id': 'alertTicker',
+                'related_type_id': 'alertRelatedType',
+                'related_id': 'alertRelatedObject',
                 'condition_attribute': 'alertType',
                 'condition_operator': 'alertCondition',
                 'condition_number': 'alertValue',
@@ -1460,6 +1529,26 @@ class ModalManagerV2 {
         
         // טיפול מיוחד בהתראות עם קישור דרך related_type_id
         const alertTickerField = form.querySelector('#alertTicker');
+        const alertRelatedTypeField = form.querySelector('#alertRelatedType');
+        const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
+        
+        // מילוי related_type_id ו-related_id אם קיימים
+        if (data.related_type_id) {
+            // מציאת ה-radio button הנכון לפי name ו-value
+            const radioButton = form.querySelector(`input[name="alertRelatedType"][value="${data.related_type_id}"]`);
+            if (radioButton) {
+                radioButton.checked = true;
+                console.log(`✅ Set alertRelatedType to: ${data.related_type_id}`);
+                // הפעלת select האובייקטים המקושרים
+                if (alertRelatedObjectField) {
+                    alertRelatedObjectField.disabled = false;
+                    // טעינת האובייקטים לפי סוג השיוך
+                    await this.populateAlertRelatedObjects(form, data.related_type_id, data.related_id);
+                }
+            }
+        }
+        
+        // אם יש related_type_id ו-related_id אבל אין ticker_id, נשלוף את ה-ticker_id מהאובייקט המקושר
         if (alertTickerField && data.related_type_id && data.related_id && !data.ticker_id) {
             try {
                 // אם ההתראה מקושרת לטרייד או תוכנית, נשלוף את ה-ticker_id מהאובייקט המקושר
@@ -1487,6 +1576,91 @@ class ModalManagerV2 {
             } catch (error) {
                 console.warn('⚠️ Error populating alertTicker from related object:', error);
             }
+        }
+    }
+    
+    /**
+     * Populate alert related objects select based on related type
+     * @private
+     */
+    async populateAlertRelatedObjects(form, relatedTypeId, selectedRelatedId = null) {
+        const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
+        if (!alertRelatedObjectField) return;
+        
+        try {
+            let endpoint = '';
+            let valueField = 'id';
+            let textField = 'name';
+            
+            switch (parseInt(relatedTypeId)) {
+                case 1: // account
+                    endpoint = '/api/trading_accounts';
+                    valueField = 'id';
+                    textField = 'name';
+                    break;
+                case 2: // trade
+                    endpoint = '/api/trades';
+                    valueField = 'id';
+                    textField = 'symbol'; // נשתמש ב-symbol או בנתונים אחרים
+                    break;
+                case 3: // trade_plan
+                    endpoint = '/api/trade_plans';
+                    valueField = 'id';
+                    textField = 'symbol'; // נשתמש ב-symbol או בנתונים אחרים
+                    break;
+                case 4: // ticker
+                    endpoint = '/api/tickers';
+                    valueField = 'id';
+                    textField = 'symbol';
+                    break;
+                default:
+                    return;
+            }
+            
+            const response = await fetch(endpoint);
+            if (!response.ok) return;
+            
+            const result = await response.json();
+            const items = result.data || [];
+            
+            // ניקוי ה-select
+            alertRelatedObjectField.innerHTML = '';
+            
+            // הוספת אופציה ריקה
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = 'בחר אובייקט...';
+            alertRelatedObjectField.appendChild(emptyOption);
+            
+            // הוספת כל האובייקטים
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item[valueField];
+                
+                // יצירת טקסט תצוגה מתאים
+                let displayText = item[textField] || `ID: ${item.id}`;
+                if (relatedTypeId === 2 || relatedTypeId === 3) {
+                    // עבור טרייד ותוכנית - נציג סימבול ותאריך
+                    const symbol = item.symbol || item.ticker_symbol || 'לא מוגדר';
+                    const date = item.created_at || item.date;
+                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : '';
+                    displayText = `${symbol}${formattedDate ? ' - ' + formattedDate : ''}`;
+                } else if (relatedTypeId === 1) {
+                    // עבור חשבון - שם + מטבע
+                    const currency = item.currency || 'ILS';
+                    displayText = `${item.name || 'לא מוגדר'} (${currency})`;
+                }
+                
+                option.textContent = displayText;
+                if (selectedRelatedId && item[valueField] == selectedRelatedId) {
+                    option.selected = true;
+                }
+                alertRelatedObjectField.appendChild(option);
+            });
+            
+            console.log(`✅ Populated alertRelatedObject with ${items.length} items for type ${relatedTypeId}`);
+        } catch (error) {
+            console.warn('⚠️ Error populating alert related objects:', error);
         }
     }
 

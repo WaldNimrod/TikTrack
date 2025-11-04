@@ -22,9 +22,31 @@ const alertsModalConfig = {
             type: 'select',
             id: 'alertTicker',
             label: 'טיקר',
-            required: true,
+            required: false, // לא נדרש אם יש שיוך דרך related_type_id
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...'
+        },
+        {
+            type: 'radio',
+            id: 'alertRelatedType',
+            label: 'שיוך לאובייקט',
+            required: false,
+            options: [
+                { value: '1', label: 'חשבון מסחר' },
+                { value: '2', label: 'טרייד' },
+                { value: '3', label: 'תוכנית השקעה' },
+                { value: '4', label: 'טיקר' }
+            ],
+            description: 'אופציונלי - ניתן לשייך התראה לאובייקט ספציפי'
+        },
+        {
+            type: 'select',
+            id: 'alertRelatedObject',
+            label: 'אובייקט מקושר',
+            required: false,
+            options: [], // יטען דינמית לפי סוג השיוך שנבחר
+            placeholder: 'בחר אובייקט...',
+            disabled: true
         },
         {
             type: 'text',

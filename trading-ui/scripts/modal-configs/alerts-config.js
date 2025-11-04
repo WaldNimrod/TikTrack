@@ -49,14 +49,13 @@ const alertsModalConfig = {
         },
         // שורה שנייה: טיקר + פרטי מחיר עדכני
         {
-            type: 'select',
+            type: 'display',
             id: 'alertTicker',
             label: 'טיקר',
-            required: false, // לא נדרש אם יש שיוך דרך related_type_id
-            options: [], // יטען דינמית מ-API
-            placeholder: 'בחר טיקר...',
+            required: false,
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6',
+            description: 'מתעדכן אוטומטית לפי האובייקט המקושר'
         },
         {
             type: 'display',

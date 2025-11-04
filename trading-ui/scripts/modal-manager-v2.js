@@ -936,61 +936,38 @@ class ModalManagerV2 {
      * @private
      */
     attachSpecialEventListeners(form) {
-        // Event listener ל-alertRelatedType - מילוי alertRelatedObject (עכשיו select)
+                // Event listener ל-alertRelatedType - מילוי alertRelatedObject (עכשיו select)                                                                          
         const alertRelatedTypeSelect = form.querySelector('#alertRelatedType');
         if (alertRelatedTypeSelect) {
             alertRelatedTypeSelect.addEventListener('change', async (e) => {
                 const relatedTypeId = e.target.value;
-                const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
+                const alertRelatedObjectField = form.querySelector('#alertRelatedObject');                                                                      
                 if (alertRelatedObjectField) {
                     if (relatedTypeId) {
                         alertRelatedObjectField.disabled = false;
-                        await this.populateAlertRelatedObjects(form, relatedTypeId);
+                        await this.populateAlertRelatedObjects(form, relatedTypeId);                                                                            
+                        // ניקוי הטיקר עד לבחירת אובייקט
+                        await this.updateAlertTickerDisplay(form, null);
                     } else {
                         alertRelatedObjectField.disabled = true;
                         alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                        // ניקוי הטיקר אם אין שיוך
+                        await this.updateAlertTickerDisplay(form, null);
                     }
                 }
             });
         }
         
-        // Event listener ל-alertTicker - רנדור פרטי מחיר טיקר
-        const alertTickerSelect = form.querySelector('#alertTicker');
-        if (alertTickerSelect) {
-            alertTickerSelect.addEventListener('change', async (e) => {
-                const tickerId = e.target.value;
-                const tickerInfoDiv = form.querySelector('#alertTickerInfo');
-                if (tickerInfoDiv && tickerId) {
-                    try {
-                        const response = await fetch(`/api/tickers/${tickerId}`);
-                        if (response.ok) {
-                            const result = await response.json();
-                            const ticker = result.data;
-                            if (ticker && window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-                                tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
-                            } else if (ticker) {
-                                // Fallback אם renderTickerInfo לא זמין
-                                tickerInfoDiv.innerHTML = `
-                                    <div class="ticker-info-display">
-                                        <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}<br>
-                                        <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
-                                        <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
-                                            ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} 
-                                            ${(ticker.daily_change || 0).toFixed(2)} 
-                                            (${(ticker.daily_change_percent || 0).toFixed(2)}%)
-                                        </span>
-                                    </div>
-                                `;
-                            }
-                        }
-                    } catch (error) {
-                        console.warn('⚠️ Error loading ticker info:', error);
-                        if (tickerInfoDiv) {
-                            tickerInfoDiv.innerHTML = '<small class="text-muted">לא ניתן לטעון פרטי טיקר</small>';
-                        }
-                    }
-                } else if (tickerInfoDiv && !tickerId) {
-                    tickerInfoDiv.innerHTML = '';
+        // Event listener ל-alertRelatedObject - עדכון טיקר אוטומטי
+        const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
+        if (alertRelatedObjectField) {
+            alertRelatedObjectField.addEventListener('change', async (e) => {
+                const relatedTypeId = alertRelatedTypeSelect?.value;
+                const relatedId = e.target.value;
+                if (relatedTypeId && relatedId) {
+                    await this.updateAlertTickerFromRelatedObject(form, relatedTypeId, relatedId);
+                } else {
+                    await this.updateAlertTickerDisplay(form, null);
                 }
             });
         }
@@ -1038,7 +1015,7 @@ class ModalManagerV2 {
             },
             'alert': {
                 'message': 'alertName',
-                'ticker_id': 'alertTicker',
+                // ticker_id is handled separately in populateSpecialSelects (not a direct field)
                 'related_type_id': 'alertRelatedType',
                 'related_id': 'alertRelatedObject',
                 'condition_attribute': 'alertType',
@@ -1655,7 +1632,7 @@ class ModalManagerV2 {
         const alertRelatedTypeField = form.querySelector('#alertRelatedType');
         const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
         
-        // מילוי related_type_id ו-related_id אם קיימים
+                // מילוי related_type_id ו-related_id אם קיימים
         if (alertRelatedTypeField && data.related_type_id) {
             // עכשיו זה select ולא radio
             alertRelatedTypeField.value = data.related_type_id;
@@ -1665,21 +1642,87 @@ class ModalManagerV2 {
                 alertRelatedObjectField.disabled = false;
                 // טעינת האובייקטים לפי סוג השיוך
                 await this.populateAlertRelatedObjects(form, data.related_type_id, data.related_id);
+                
+                // עדכון טיקר אוטומטי מהאובייקט המקושר
+                if (data.related_id) {
+                    await this.updateAlertTickerFromRelatedObject(form, data.related_type_id, data.related_id);
+                }
             }
+        } else if (alertTickerField && data.ticker_id) {
+            // אם יש ticker_id ישיר (ללא related object), עדיין נציג אותו
+            await this.updateAlertTickerDisplay(form, data.ticker_id);
+        }
+    }
+    
+    /**
+     * Update alert ticker display from related object
+     * @private
+     */
+    async updateAlertTickerFromRelatedObject(form, relatedTypeId, relatedId) {
+        try {
+            let tickerId = null;
+            
+            // שליפת ticker_id מהאובייקט המקושר
+            if (relatedTypeId === '2' || relatedTypeId === 2) { // trade
+                const response = await fetch(`/api/trades/${relatedId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    tickerId = result.data?.ticker_id;
+                }
+            } else if (relatedTypeId === '3' || relatedTypeId === 3) { // trade_plan
+                const response = await fetch(`/api/trade_plans/${relatedId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    tickerId = result.data?.ticker_id;
+                }
+            } else if (relatedTypeId === '4' || relatedTypeId === 4) { // ticker
+                tickerId = relatedId;
+            }
+            
+            // עדכון תצוגת הטיקר
+            await this.updateAlertTickerDisplay(form, tickerId);
+        } catch (error) {
+            console.warn('⚠️ Error updating ticker from related object:', error);
+            await this.updateAlertTickerDisplay(form, null);
+        }
+    }
+    
+    /**
+     * Update alert ticker display (both ticker name and price info)
+     * @private
+     */
+    async updateAlertTickerDisplay(form, tickerId) {
+        const tickerDisplay = form.querySelector('#alertTicker');
+        const tickerInfoDiv = form.querySelector('#alertTickerInfo');
+        
+        if (!tickerDisplay) return;
+        
+        if (!tickerId) {
+            // ניקוי תצוגת הטיקר
+            tickerDisplay.textContent = '-';
+            if (tickerInfoDiv) {
+                tickerInfoDiv.innerHTML = '';
+            }
+            return;
         }
         
-        // טעינת פרטי מחיר טיקר אם יש ticker_id
-        if (alertTickerField && data.ticker_id) {
-            const tickerInfoDiv = form.querySelector('#alertTickerInfo');
-            if (tickerInfoDiv) {
-                try {
-                    const response = await fetch(`/api/tickers/${data.ticker_id}`);
-                    if (response.ok) {
-                        const result = await response.json();
-                        const ticker = result.data;
-                        if (ticker && window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
+        try {
+            // טעינת פרטי הטיקר
+            const response = await fetch(`/api/tickers/${tickerId}`);
+            if (response.ok) {
+                const result = await response.json();
+                const ticker = result.data;
+                if (ticker) {
+                    // עדכון תצוגת הטיקר (שם וסימבול)
+                    const tickerName = ticker.name || 'לא מוגדר';
+                    const tickerSymbol = ticker.symbol || '';
+                    tickerDisplay.textContent = tickerSymbol ? `${tickerSymbol} - ${tickerName}` : tickerName;
+                    
+                    // עדכון פרטי מחיר
+                    if (tickerInfoDiv) {
+                        if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
                             tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
-                        } else if (ticker) {
+                        } else {
                             // Fallback
                             tickerInfoDiv.innerHTML = `
                                 <div class="ticker-info-display">
@@ -1694,39 +1737,13 @@ class ModalManagerV2 {
                             `;
                         }
                     }
-                } catch (error) {
-                    console.warn('⚠️ Error loading ticker info in populateSpecialSelects:', error);
                 }
             }
-        }
-        
-        // אם יש related_type_id ו-related_id אבל אין ticker_id, נשלוף את ה-ticker_id מהאובייקט המקושר
-        if (alertTickerField && data.related_type_id && data.related_id && !data.ticker_id) {
-            try {
-                // אם ההתראה מקושרת לטרייד או תוכנית, נשלוף את ה-ticker_id מהאובייקט המקושר
-                if (data.related_type_id === 2) { // trade
-                    const response = await fetch(`/api/trades/${data.related_id}`);
-                    if (response.ok) {
-                        const result = await response.json();
-                        if (result.data && result.data.ticker_id) {
-                            // עדכון alertTicker עם ה-ticker_id מהטרייד
-                            alertTickerField.value = result.data.ticker_id;
-                            console.log(`✅ Filled alertTicker from related trade: ${result.data.ticker_id}`);
-                        }
-                    }
-                } else if (data.related_type_id === 3) { // trade_plan
-                    const response = await fetch(`/api/trade_plans/${data.related_id}`);
-                    if (response.ok) {
-                        const result = await response.json();
-                        if (result.data && result.data.ticker_id) {
-                            // עדכון alertTicker עם ה-ticker_id מהתוכנית
-                            alertTickerField.value = result.data.ticker_id;
-                            console.log(`✅ Filled alertTicker from related trade plan: ${result.data.ticker_id}`);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.warn('⚠️ Error populating alertTicker from related object:', error);
+        } catch (error) {
+            console.warn('⚠️ Error loading ticker info:', error);
+            tickerDisplay.textContent = 'שגיאה בטעינת טיקר';
+            if (tickerInfoDiv) {
+                tickerInfoDiv.innerHTML = '<small class="text-muted">לא ניתן לטעון פרטי טיקר</small>';
             }
         }
     }

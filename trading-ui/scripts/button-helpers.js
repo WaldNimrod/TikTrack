@@ -100,8 +100,8 @@ function createCancelButtonHelper(container, itemType, itemId, status = 'open', 
     if (window.addDynamicButton) {
         window.addDynamicButton(container, type, onclick, classes, attributes, '', `cancel-btn-${itemType}-${itemId}`);
     } else {
-        // fallback - יצירת כפתור ישירות
-        const buttonHtml = `<button class="btn ${classes}" onclick="${onclick}" ${attributes}>
+        // fallback - יצירת כפתור ישירות (עם data-onclick)
+        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onclick}" ${attributes}>
             <span class="cancel-icon">${isCancelled ? '✓' : 'X'}</span>
         </button>`;
         container.insertAdjacentHTML('beforeend', buttonHtml);
@@ -165,8 +165,8 @@ function createDeleteButtonByTypeHelper(container, itemType, itemId, size = 'sm'
     if (window.addDynamicButton) {
         window.addDynamicButton(container, 'DELETE', onclick, classes, attributes, '', `delete-btn-${itemType}-${itemId}`);
     } else {
-        // fallback - יצירת כפתור ישירות
-        const buttonHtml = `<button class="btn ${classes}" onclick="${onclick}" ${attributes}>
+        // fallback - יצירת כפתור ישירות (עם data-onclick)
+        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onclick}" ${attributes}>
             <span class="delete-icon">🗑️</span>
         </button>`;
         container.insertAdjacentHTML('beforeend', buttonHtml);
@@ -185,8 +185,8 @@ function createEditButtonHelper(container, onClick, additionalClasses = '') {
     if (window.addDynamicButton) {
         window.addDynamicButton(container, 'EDIT', onClick, classes, '', '', `edit-btn-${Date.now()}`);
     } else {
-        // fallback
-        const buttonHtml = `<button class="btn ${classes}" onclick="${onClick}" title="ערוך">
+        // fallback (עם data-onclick)
+        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" title="ערוך">
             <span class="edit-icon">✏️</span>
         </button>`;
         container.insertAdjacentHTML('beforeend', buttonHtml);
@@ -205,8 +205,8 @@ function createDeleteButtonHelper(container, onClick, additionalClasses = '') {
     if (window.addDynamicButton) {
         window.addDynamicButton(container, 'DELETE', onClick, classes, '', '', `delete-btn-${Date.now()}`);
     } else {
-        // fallback
-        const buttonHtml = `<button class="btn ${classes}" onclick="${onClick}" title="מחק">
+        // fallback (עם data-onclick)
+        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" title="מחק">
             <span class="delete-icon">🗑️</span>
         </button>`;
         container.insertAdjacentHTML('beforeend', buttonHtml);
@@ -225,8 +225,8 @@ function createLinkButtonHelper(container, onClick, additionalClasses = '') {
     if (window.addDynamicButton) {
         window.addDynamicButton(container, 'LINK', onClick, classes, '', '', `link-btn-${Date.now()}`);
     } else {
-        // fallback
-        const buttonHtml = `<button class="btn ${classes}" onclick="${onClick}" title="קישור">
+        // fallback (עם data-onclick)
+        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" title="קישור">
             <span class="link-icon">🔗</span>
         </button>`;
         container.insertAdjacentHTML('beforeend', buttonHtml);
@@ -268,8 +268,8 @@ function createSortButtonHelper(container, onClick, additionalClasses = 'sortabl
     if (window.addDynamicButton) {
         window.addDynamicButton(container, 'SORT', onClick, classes, attributes, text, `sort-btn-${Date.now()}`);
     } else {
-        // fallback
-        const buttonHtml = `<button class="btn ${classes}" onclick="${onClick}" ${attributes} title="מיון">
+        // fallback (עם data-onclick)
+        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" ${attributes} title="מיון">
             ${text}↕️
         </button>`;
         container.insertAdjacentHTML('beforeend', buttonHtml);
@@ -289,8 +289,8 @@ function createToggleButtonHelper(container, onClick, title = 'הצג/הסתר',
     if (window.addDynamicButton) {
         window.addDynamicButton(container, 'TOGGLE', onClick, classes, `title="${title}"`, '', `toggle-btn-${Date.now()}`);
     } else {
-        // fallback
-        const buttonHtml = `<button class="btn ${classes}" onclick="${onClick}" title="${title}">
+        // fallback (עם data-onclick)
+        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" title="${title}">
             <span class="toggle-icon">▼</span>
         </button>`;
         container.insertAdjacentHTML('beforeend', buttonHtml);
@@ -311,8 +311,8 @@ function createButtonHelper(container, type, onClick, additionalClasses = '', ad
     if (window.addDynamicButton) {
         window.addDynamicButton(container, type, onClick, classes, additionalAttributes, '', `btn-${type}-${Date.now()}`);
     } else {
-        // fallback
-        const buttonHtml = `<button class="btn ${classes}" onclick="${onClick}" ${additionalAttributes} title="${type}">
+        // fallback (עם data-onclick)
+        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" ${additionalAttributes} title="${type}">
             <span class="btn-icon">${type}</span>
         </button>`;
         container.insertAdjacentHTML('beforeend', buttonHtml);

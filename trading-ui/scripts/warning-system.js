@@ -125,8 +125,8 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
                         ${message.replace(/\n/g, '<br>')}
                     </div>
                     <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
-                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'" data-classes="ms-2"></button>
-                        <button type="button" class="btn btn-${color} confirm-btn">אישור</button>
+                        <button data-button-type="CANCEL" data-attributes="data-bs-dismiss='modal' type='button'" data-classes="ms-2" data-onclick="window.confirmationModalCancel()"></button>
+                        <button type="button" class="btn btn-${color} confirm-btn" data-onclick="window.confirmationModalConfirm()">אישור</button>
                     </div>
                 </div>
             </div>
@@ -144,10 +144,6 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
 
   // קבלת המודל החדש
   const modal = document.getElementById(modalId);
-
-  // הגדרת אירועי כפתורים
-  const confirmBtn = modal.querySelector('.confirm-btn');
-  const cancelBtn = modal.querySelector('button[data-button-type="CANCEL"]');
 
   // פונקציה לסגירת המודל
   const closeModal = () => {
@@ -180,6 +176,25 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
     }
   };
 
+  // יצירת פונקציות גלובליות לכפתורים (עם data-onclick)
+  window.confirmationModalConfirm = () => {
+    modal.dataset.confirmed = 'true';
+    invokeCallbacks(true);
+    closeModal();
+    // נקה את הפונקציה אחרי שימוש
+    delete window.confirmationModalConfirm;
+    delete window.confirmationModalCancel;
+  };
+
+  window.confirmationModalCancel = () => {
+    modal.dataset.cancelled = 'true';
+    invokeCallbacks(false);
+    closeModal();
+    // נקה את הפונקציה אחרי שימוש
+    delete window.confirmationModalConfirm;
+    delete window.confirmationModalCancel;
+  };
+
   // סגירה בלחיצה על הרקע
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
@@ -188,24 +203,6 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
       closeModal();
     }
   });
-
-  // אירוע אישור
-  if (confirmBtn) {
-    confirmBtn.onclick = () => {
-      modal.dataset.confirmed = 'true';
-      invokeCallbacks(true);
-      closeModal();
-    };
-  }
-
-  // אירוע ביטול
-  if (cancelBtn) {
-    cancelBtn.onclick = () => {
-      modal.dataset.cancelled = 'true';
-      invokeCallbacks(false);
-      closeModal();
-    };
-  }
 
   // אירוע סגירה על ידי לחיצה מחוץ למודל או ESC
   modal.addEventListener('hidden.bs.modal', () => {

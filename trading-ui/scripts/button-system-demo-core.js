@@ -530,9 +530,7 @@ function createVariantButton(button, variant, size = 'normal', style = 'default'
         btn.setAttribute('data-icon', '');
     }
     
-    btn.onclick = () => {
-        alert(`כפתור ${button.name} (${variant}) נלחץ!`);
-    };
+    btn.setAttribute('data-onclick', `alert('כפתור ${button.name} (${variant}) נלחץ!')`);
     
     return btn;
 }
@@ -686,9 +684,7 @@ function createLiveButton(button) {
     liveButton.setAttribute('data-text', variant.text);
     liveButton.setAttribute('data-icon', variant.icon);
     
-    liveButton.onclick = () => {
-        alert(`כפתור ${button.name} נלחץ!`);
-    };
+    liveButton.setAttribute('data-onclick', `alert('כפתור ${button.name} נלחץ!')`);
     
     return liveButton;
 }

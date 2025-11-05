@@ -135,19 +135,19 @@
                         <div class="filter-buttons-container button-row">
                             <button data-button-type="ADD" data-entity-type="alert" data-variant="full" data-onclick="window.showModalSafe('alertsModal','add')" data-text="הוסף התראה" title="הוסף התראה חדשה"></button>
                             <div class="action-separator"></div>
-                            <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" data-tooltip="הצג הכל" data-tooltip-placement="top" data-tooltip-trigger="hover">
+                            <button class="btn btn-sm active" data-onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" data-tooltip="הצג הכל" data-tooltip-placement="top" data-tooltip-trigger="hover">
                                 הכל
                             </button>
-                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות" data-tooltip="סינון לפי חשבון מסחר" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות" data-tooltip="סינון לפי חשבון מסחר" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                 <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="filter-icon" style="width: 14px; height: 14px;">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים" data-tooltip="סינון לפי טרייד" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים" data-tooltip="סינון לפי טרייד" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                 <img src="images/icons/trades.svg" alt="טריידים" class="filter-icon" style="width: 14px; height: 14px;">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" data-tooltip="סינון לפי תכנית השקעה" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" data-tooltip="סינון לפי תכנית השקעה" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                 <img src="images/icons/trade_plans.svg" alt="תוכניות" class="filter-icon" style="width: 14px; height: 14px;">
                             </button>
-                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" data-tooltip="סינון לפי טיקר" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" data-tooltip="סינון לפי טיקר" data-tooltip-placement="top" data-tooltip-trigger="hover" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
                                 <img src="images/icons/tickers.svg" alt="טיקרים" class="filter-icon" style="width: 14px; height: 14px;">
                             </button>
                             
@@ -163,50 +163,50 @@
                                     <tr>
                                         <th class="col-linked-object">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                data-onclick="window.sortTable('alerts', 0)">
                                                 קשור ל: <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-ticker">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                data-onclick="window.sortTable('alerts', 1)">
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-condition">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                data-onclick="window.sortTable('alerts', 2)">
                                                 תנאי <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-status">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                data-onclick="window.sortTable('alerts', 3)">
                                                 סטטוס <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-triggered">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(4, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                data-onclick="window.sortTable('alerts', 4)">
                                                 הופעל <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-condition-source text-center">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(5, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                data-onclick="window.sortTable('alerts', 5)">
                                                 תנאי <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-message">
-                                            <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
-                                                הודעה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-created">
                                             <button class="btn btn-link sortable-header"
-                                                onclick="if (typeof window.sortTable === 'function') { window.sortTableData(7, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                                                data-onclick="window.sortTable('alerts', 6)">
                                                 נוצר ב: <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-expiry">
+                                            <button class="btn btn-link sortable-header"
+                                                data-onclick="window.sortTable('alerts', 7)">
+                                                תאריך תפוגה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="actions-cell col-actions">
@@ -471,14 +471,13 @@
     <script src="scripts/conditions/condition-builder.js?v=0da3519a_20251102_104906"></script>
     
     <!-- Modal Configurations (Must load before modal-manager-v2) -->
-        <script src="scripts/modal-configs/alerts-config.js?v=202511042000"></script>
+        <script src="scripts/modal-configs/alerts-config.js?v=202511050012"></script>
         
         <!-- Modal System V2 -->
-        <script src="scripts/modal-manager-v2.js?v=202511050012"></script>
-        <script src="scripts/modal-configs/alerts-config.js?v=202511050010"></script>
-    
-    <!-- Page-specific Scripts -->
-    <script src="scripts/alerts.js?v=0da3519a_20251102_104906"></script>
+        <script src="scripts/modal-manager-v2.js?v=202511050014"></script>
+        
+        <!-- Page-specific Scripts -->
+        <script src="scripts/alerts.js?v=202511050001"></script>
     
     <!-- 14. Init System Check (Available on all pages) -->
     <script src="scripts/init-system-check.js?v=0da3519a_20251102_104906"></script>

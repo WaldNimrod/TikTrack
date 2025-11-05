@@ -2211,35 +2211,17 @@ window.initializeTradeConditionsSystem = initializeTradeConditionsSystem;
  * @function setupSortEventListeners
  * @returns {void}
  */
+/**
+ * Setup sort event listeners
+ * Note: This function is deprecated - all sortable headers now use data-onclick attributes
+ * Kept for backward compatibility but does nothing (headers use EventHandlerManager)
+ */
 function setupSortEventListeners() {
-  try {
-  const sortButtons = document.querySelectorAll('.sortable-header[data-sort-column]');
-  sortButtons.forEach(button => {
-    button.addEventListener('click', function () {
-        try {
-      const columnIndex = parseInt(this.getAttribute('data-sort-column'));
-      if (typeof window.sortTableData === 'function') {
-        window.sortTableData(columnIndex, window.tradesData || [], 'trades', window.updateTradesTable);
-      } else {
-        if (typeof handleFunctionNotFound === 'function') {
-          handleFunctionNotFound('sortTable');
-        } else {
-              // window.Logger.warn('sortTable function not found', { page: "trades" });
-            }
-          }
-    } catch (error) {
-          window.Logger.error('Error in sort button click:', error, { page: "trades" });
-          if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'שגיאה במיון הטבלה');
-        }
-      }
-    });
-  });
-    } catch (error) {
-    window.Logger.error('Error in setupSortEventListeners:', error, { page: "trades" });
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'שגיאה בהגדרת מיון הטבלה');
-    }
+  // Deprecated: All sortable headers now use data-onclick attributes
+  // EventHandlerManager handles clicks automatically via event delegation
+  // This function is kept for backward compatibility but does nothing
+  if (window.Logger) {
+    window.Logger.debug('setupSortEventListeners called but is deprecated - using data-onclick instead', { page: "trades" });
   }
 }
 
@@ -3251,21 +3233,7 @@ async function deleteTrade(tradeId) {
     return await deleteTradeRecord(tradeId);
 }
 
-/**
- * Show add trade modal (wrapper for ModalManagerV2)
- * Maintains backward compatibility with HTML onclick handlers
- * @function showAddTradeModal
- */
-window.showAddTradeModal = function() {
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-        window.ModalManagerV2.showModal('tradesModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
-        }
-    }
-};
+// REMOVED: window.showAddTradeModal - use window.showModalSafe('tradesModal', 'add') directly
 
 /**
  * Show edit trade modal (wrapper for ModalManagerV2)

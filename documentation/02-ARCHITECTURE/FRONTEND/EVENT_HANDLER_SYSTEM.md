@@ -7,8 +7,14 @@
 
 **מיקום:** `trading-ui/scripts/event-handler-manager.js`
 
-**גרסה:** 1.0  
-**עודכן לאחרונה:** 2025-01-26
+**גרסה:** 1.1  
+**עודכן לאחרונה:** 2025-01-27
+
+### ⚠️ **סטנדרט חדש - מעבר ל-`data-onclick` בלבד**
+
+**מתאריך 2025-01-27, כל הכפתורים במערכת חייבים להשתמש ב-`data-onclick` במקום `onclick` רגיל.**
+
+לפרטים מלאים: `documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLING_STANDARD.md`
 
 ---
 
@@ -163,23 +169,27 @@ handleDelegatedClick(event) {
 - **אין `stopPropagation()`** - כדי לאפשר handlers אחרים לעבוד
 - **אין return מוקדם** - מאפשר מטפלי אירועים אחרים לפעול
 
-### תמיכה ב-onclick רגיל (Legacy Support)
+### ⚠️ **תמיכה ב-onclick רגיל (Legacy - בהסרה)**
 
-המערכת תומכת גם בכפתורים עם `onclick` רגיל לתאימות לאחור:
+**הערה חשובה:** מתאריך 2025-01-27, `onclick` רגיל **אינו עוד התקן** במערכת. כל הכפתורים החדשים חייבים להשתמש ב-`data-onclick`.
+
+תמיכה ב-`onclick` רגיל נשמרת **זמנית** לתאימות לאחור במהלך תהליך המיגרציה, אך **תוסר בעתיד**.
 
 ```html
-<!-- כפתור עם onclick רגיל - עדיין יעבוד! -->
+<!-- ❌ שגוי - לא להשתמש ב-onclick רגיל -->
 <button onclick="doSomething()">לחץ כאן</button>
 
-<!-- אבל מומלץ להשתמש ב-data-onclick -->
+<!-- ✅ נכון - השתמש ב-data-onclick -->
 <button data-button-type="PRIMARY" data-onclick="doSomething()" data-text="לחץ כאן"></button>
 ```
 
 **הערות חשובות:**
-- ✅ **תמיכה כפולה** - גם `data-onclick` וגם `onclick` רגיל עובדים
-- ⚠️ **מומלץ: `data-onclick`** - זה התקן החדש והמומלץ
-- ✅ **תאימות לאחור** - כפתורים ישנים עם `onclick` רגיל עדיין עובדים
+- ⚠️ **`data-onclick` הוא התקן היחיד** - כל הכפתורים החדשים חייבים להשתמש בו
+- ⚠️ **`onclick` רגיל - legacy** - תמיכה זמנית רק במהלך מיגרציה
+- ✅ **תאימות לאחור זמנית** - כפתורים ישנים עם `onclick` רגיל עדיין עובדים (זמנית)
 - ✅ **אין כפילות** - אם לכפתור יש גם `data-onclick` וגם `onclick`, רק `data-onclick` יבוצע
+
+**לפרטים מלאים על הסטנדרט החדש:** `documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLING_STANDARD.md`
 
 ### דוגמאות שימוש
 
@@ -396,13 +406,40 @@ console.log('Function exists:', typeof window[button?.getAttribute('data-onclick
 
 ## 📚 קישורים קשורים
 
-- **מערכת הכפתורים:** `documentation/frontend/button-system.md`
+- **סטנדרט Event Handling:** `documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLING_STANDARD.md` ⭐ **חדש!**
+- **מדריך מעבר:** `documentation/03-DEVELOPMENT/GUIDES/MIGRATION_TO_DATA_ONCLICK.md`
+- **מערכת הכפתורים:** `documentation/02-ARCHITECTURE/FRONTEND/button-system.md`
 - **Button System Init:** `trading-ui/scripts/button-system-init.js`
 - **Event Handler Manager:** `trading-ui/scripts/event-handler-manager.js`
+
+## 🔄 סטטוס סטנדרטיזציה
+
+### Standardization Status
+
+**תאריך התחלה:** 2025-01-27
+
+**מטרה:** מעבר מלא ל-`data-onclick` כסטנדרט יחיד לכל הכפתורים במערכת.
+
+**סטטוס נוכחי:**
+- **כותרות סידור:** 0% (30+ כפתורים ב-`trading_accounts.html` לבד)
+- **כפתורים רגילים:** ~23% (7/30 ב-`trading_accounts.html`)
+- **כפתורי מודולים:** ~50% (משוער)
+- **כפתורי ריענון:** ~30% (משוער)
+
+**התקדמות כוללת:** ~25% (משוער)
+
+**לפרטים מלאים:** `documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLING_STANDARD.md`
 
 ---
 
 ## 🔄 היסטוריית עדכונים
+
+### 2025-01-27 - סטנדרטיזציה מלאה - מעבר ל-data-onclick
+- ✅ יצירת סטנדרט אחיד - `EVENT_HANDLING_STANDARD.md`
+- ✅ הגדרת `data-onclick` כתקן יחיד לכל הכפתורים
+- ✅ תיעוד אינטגרציה מלאה עם כל המערכות
+- ✅ יצירת מדריך מעבר למפתחים
+- ⚠️ `onclick` רגיל - legacy support זמני (יוסר בעתיד)
 
 ### 2025-01-27 - תיקון מערכת הכפתורים השבורה
 - ✅ הוספת `event-handler-manager.js` ל-`package-manifest.js` BASE package

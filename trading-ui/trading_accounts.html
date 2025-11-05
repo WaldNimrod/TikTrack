@@ -129,22 +129,22 @@
                                 <thead>
                                     <tr>
                                         <th class="col-name">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }">שם החשבון מסחר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('accounts', 0)">שם החשבון מסחר <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-currency">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }">מטבע <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('accounts', 1)">מטבע <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-balance">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }">יתרה <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('accounts', 2)">יתרה <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-positions">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">פוזיציות <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('accounts', 3)">פוזיציות <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-total-pl">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">רווח/הפסד <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('accounts', 4)">רווח/הפסד <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-status">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">סטטוס <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('accounts', 5)">סטטוס <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-items">
                                         </th>
@@ -334,28 +334,28 @@
                                 <thead>
                                     <tr>
                                         <th class="col-symbol">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">סימבול <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 0)">סימבול <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-ticker">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">נוכחי <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 1)">נוכחי <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-quantity">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">כמות <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 2)">כמות <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-side">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">צד <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 3)">צד <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-avg-price">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">מחיר ממוצע <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 4)">מחיר ממוצע <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-market-value">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">שווי שוק <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 5)">שווי שוק <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-unrealized-pl">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">רווח/הפסד לא מוכר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 6)">רווח/הפסד לא מוכר <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-percent-account">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.positionsPortfolioState.positionsData || [], 'positions', renderPositionsTable); }">אחוז מהחשבון <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 7)">אחוז מהחשבון <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-1-item">פעולות</th>
                                     </tr>
@@ -408,31 +408,31 @@
                                 <thead>
                                     <tr>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">חשבון <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 0)">חשבון <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-symbol">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">סימבול <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 1)">סימבול <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-ticker">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">נוכחי <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 2)">נוכחי <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-quantity">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">כמות <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 3)">כמות <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-side">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">צד <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 4)">צד <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-avg-price">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">מחיר ממוצע <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 5)">מחיר ממוצע <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-market-value">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">שווי שוק <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 6)">שווי שוק <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-unrealized-pl">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">רווח/הפסד לא מוכר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 7)">רווח/הפסד לא מוכר <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-percent-portfolio">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.positionsPortfolioState.portfolioData?.positions || [], 'portfolio', renderPortfolioTable); }">אחוז מהפורטפוליו <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 8)">אחוז מהפורטפוליו <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-1-item">פעולות</th>
                                     </tr>
@@ -456,7 +456,7 @@
                             סיכום פורטפוליו
                         </div>
                         <div class="table-actions">
-                            <button id="portfolioSummaryToggleSize" class="btn btn-sm btn-outline-secondary" style="margin-inline-end: 0.5rem;">
+                            <button id="portfolioSummaryToggleSize" class="btn btn-sm btn-outline-secondary" style="margin-inline-end: 0.5rem;" data-onclick="togglePortfolioSummarySize()">
                                 הצג מינימאלי
                             </button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('portfolio-summary')" data-text="הצג/הסתר"></button>
@@ -594,6 +594,8 @@
     <script src="scripts/date-utils.js?v=0da3519a_20251102_104906"></script> <!-- כלי עזר תאריכים -->
     <!-- [26] Load Order: 26 -->
     <script src="scripts/data-utils.js?v=0da3519a_20251102_104906"></script> <!-- כלי עזר נתונים כלליים -->
+    <!-- [26.5] Load Order: 26.5 -->
+    <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
     <!-- [26.4] Load Order: 26.4 -->
     <script src="scripts/services/linked-items-service.js?v=0da3519a_20251102_104906"></script> <!-- שירות לוגיקה משותפת לפריטים מקושרים -->
     <!-- [26.5] Load Order: 26.5 -->
@@ -702,6 +704,59 @@
         console.log('🔍 Window InfoSummarySystem:', typeof window.InfoSummarySystem);
         console.log('🔍 Window INFO_SUMMARY_CONFIGS:', typeof window.INFO_SUMMARY_CONFIGS);
         console.log('🔍 Window loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage);
+        
+        // Wait for app initialization before loading tests
+        function waitForAppReady(callback, maxAttempts = 50, interval = 200) {
+            let attempts = 0;
+            const checkReady = () => {
+                attempts++;
+                // Check if UnifiedAppInitializer is done and UnifiedTableSystem is available
+                const isReady = window.UnifiedTableSystem && 
+                               window.unifiedAppInit && 
+                               window.unifiedAppInit.initialized;
+                
+                if (isReady || attempts >= maxAttempts) {
+                    callback(isReady);
+                } else {
+                    setTimeout(checkReady, interval);
+                }
+            };
+            checkReady();
+        }
+        
+        // Load test scripts after app is ready
+        waitForAppReady((ready) => {
+            if (!ready) {
+                console.warn('⚠️ App initialization timeout - running tests anyway');
+            }
+            
+            // Load test scripts
+            const testScript1 = document.createElement('script');
+            testScript1.src = 'scripts/test-unified-table-system.js?v=1.0.0';
+            testScript1.onload = () => {
+                console.log('✅ UnifiedTableSystem test script loaded');
+                // Run tests after a short delay to ensure everything is registered
+                setTimeout(() => {
+                    if (typeof window.testUnifiedTableSystem === 'function') {
+                        window.testUnifiedTableSystem();
+                    }
+                }, 1000);
+            };
+            document.head.appendChild(testScript1);
+            
+            const testScript2 = document.createElement('script');
+            testScript2.src = 'scripts/test-positions-portfolio-comprehensive.js?v=1.0.0';
+            testScript2.onload = () => {
+                console.log('✅ Positions/Portfolio comprehensive test script loaded');
+                // Auto-run comprehensive tests after UnifiedTableSystem tests
+                setTimeout(() => {
+                    if (typeof window.testPositionsPortfolioSystem === 'function') {
+                        window.testPositionsPortfolioSystem();
+                    }
+                }, 3000);
+            };
+            document.head.appendChild(testScript2);
+        });
     </script>
 </body>
 </html>

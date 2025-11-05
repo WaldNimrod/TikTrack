@@ -327,15 +327,15 @@ function formatCurrencyHebrew(value, showSign = false, noDecimals = false) {
  */
 function renderPositionsTable(positions) {
     const tableBody = document.querySelector('#positionsTable tbody');
-    if (!tableBody) return;
-    
-    // Update state with sorted data
-    if (positions && Array.isArray(positions)) {
-        window.positionsPortfolioState.positionsData = positions;
+    if (!tableBody) {
+        return;
     }
     
-    // If no positions provided, try to get from state
-    if (!positions || positions.length === 0) {
+    // If positions provided, use them and update state
+    if (positions && Array.isArray(positions)) {
+        window.positionsPortfolioState.positionsData = positions;
+    } else {
+        // If no positions provided, try to get from state
         positions = window.positionsPortfolioState.positionsData || [];
     }
     
@@ -426,6 +426,7 @@ function renderPositionsTable(positions) {
         `;
     });
     
+    // Update table HTML
     tableBody.innerHTML = html;
 }
 
@@ -556,18 +557,18 @@ async function loadPortfolio() {
  */
 function renderPortfolioTable(positions) {
     const tableBody = document.querySelector('#portfolioTable tbody');
-    if (!tableBody) return;
+    if (!tableBody) {
+        return;
+    }
     
-    // Update state with sorted data
+    // If positions provided, use them and update state
     if (positions && Array.isArray(positions)) {
         if (!window.positionsPortfolioState.portfolioData) {
             window.positionsPortfolioState.portfolioData = {};
         }
         window.positionsPortfolioState.portfolioData.positions = positions;
-    }
-    
-    // If no positions provided, try to get from state
-    if (!positions || positions.length === 0) {
+    } else {
+        // If no positions provided, try to get from state
         positions = window.positionsPortfolioState.portfolioData?.positions || [];
     }
     
@@ -652,27 +653,39 @@ function renderPortfolioTable(positions) {
                     </button>
                 </td>
             </tr>
-        `;
+            `;
     });
     
+    // Update table HTML
     tableBody.innerHTML = html;
 }
 
 /**
  * Setup summary toggle
  */
+/**
+ * Setup summary toggle button
+ * Note: Now uses data-onclick attribute instead of addEventListener
+ */
 function setupSummaryToggle() {
-    const toggleBtn = document.getElementById('portfolioSummaryToggleSize');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            const currentSize = window.positionsPortfolioState.summarySize;
-            const newSize = currentSize === 'minimal' ? 'full' : 'minimal';
-            window.positionsPortfolioState.summarySize = newSize;
-            toggleBtn.textContent = newSize === 'minimal' ? 'הצג מלא' : 'הצג מינימאלי';
-            loadPortfolioSummary();
-        });
-    }
+    // No longer needed - button uses data-onclick attribute
+    // The togglePortfolioSummarySize function is called directly via data-onclick
 }
+
+/**
+ * Toggle portfolio summary size (minimal/full)
+ * Called via data-onclick attribute
+ */
+window.togglePortfolioSummarySize = function() {
+    const toggleBtn = document.getElementById('portfolioSummaryToggleSize');
+    if (!toggleBtn) return;
+    
+    const currentSize = window.positionsPortfolioState.summarySize;
+    const newSize = currentSize === 'minimal' ? 'full' : 'minimal';
+    window.positionsPortfolioState.summarySize = newSize;
+    toggleBtn.textContent = newSize === 'minimal' ? 'הצג מלא' : 'הצג מינימאלי';
+    loadPortfolioSummary();
+};
 
 /**
  * Load portfolio summary
@@ -1122,5 +1135,140 @@ window.PositionsPortfolioSystem = {
 // Export table rendering functions to window scope for sorting
 window.updatePositionsTable = renderPositionsTable;
 window.updatePortfolioTable = renderPortfolioTable;
+
+/**
+ * Debug function to check positions/portfolio system state
+ * Call this from browser console: window.debugPositionsPortfolio()
+ * Uses Logger.debug to keep console quiet in production
+ */
+window.debugPositionsPortfolio = function() {
+    if (window.Logger) {
+        window.Logger.debug('🔍 ===== POSITIONS/PORTFOLIO DEBUG =====', { page: "positions-portfolio" });
+    }
+    
+    // Check state object
+    if (window.Logger) {
+        window.Logger.debug('1. State Object:', window.positionsPortfolioState, { page: "positions-portfolio" });
+        window.Logger.debug('   - Exists:', !!window.positionsPortfolioState, { page: "positions-portfolio" });
+        window.Logger.debug('   - Type:', typeof window.positionsPortfolioState, { page: "positions-portfolio" });
+    }
+    
+    if (window.positionsPortfolioState) {
+        if (window.Logger) {
+            window.Logger.debug('   - selectedAccountId:', window.positionsPortfolioState.selectedAccountId, { page: "positions-portfolio" });
+            window.Logger.debug('   - isLoading:', window.positionsPortfolioState.isLoading, { page: "positions-portfolio" });
+            window.Logger.debug('   - positionsData:', window.positionsPortfolioState.positionsData, { page: "positions-portfolio" });
+            window.Logger.debug('     * Exists:', !!window.positionsPortfolioState.positionsData, { page: "positions-portfolio" });
+            window.Logger.debug('     * Type:', typeof window.positionsPortfolioState.positionsData, { page: "positions-portfolio" });
+            window.Logger.debug('     * Is Array:', Array.isArray(window.positionsPortfolioState.positionsData), { page: "positions-portfolio" });
+            window.Logger.debug('     * Length:', window.positionsPortfolioState.positionsData?.length || 0, { page: "positions-portfolio" });
+            window.Logger.debug('   - portfolioData:', window.positionsPortfolioState.portfolioData, { page: "positions-portfolio" });
+            window.Logger.debug('     * Exists:', !!window.positionsPortfolioState.portfolioData, { page: "positions-portfolio" });
+            window.Logger.debug('     * Positions:', window.positionsPortfolioState.portfolioData?.positions, { page: "positions-portfolio" });
+            window.Logger.debug('       - Exists:', !!window.positionsPortfolioState.portfolioData?.positions, { page: "positions-portfolio" });
+            window.Logger.debug('       - Is Array:', Array.isArray(window.positionsPortfolioState.portfolioData?.positions), { page: "positions-portfolio" });
+            window.Logger.debug('       - Length:', window.positionsPortfolioState.portfolioData?.positions?.length || 0, { page: "positions-portfolio" });
+        }
+    }
+    
+    // Check functions
+    if (window.Logger) {
+        window.Logger.debug('2. Functions:', { page: "positions-portfolio" });
+        window.Logger.debug('   - initPositionsPortfolio:', typeof window.initPositionsPortfolio, { page: "positions-portfolio" });
+        window.Logger.debug('   - updatePositionsTable:', typeof window.updatePositionsTable, { page: "positions-portfolio" });
+        window.Logger.debug('   - updatePortfolioTable:', typeof window.updatePortfolioTable, { page: "positions-portfolio" });
+        window.Logger.debug('   - sortTable:', typeof window.sortTable, { page: "positions-portfolio" });
+        window.Logger.debug('   - sortTableData:', typeof window.sortTableData, { page: "positions-portfolio" });
+    }
+    
+    // Check DOM elements
+    if (window.Logger) {
+        window.Logger.debug('3. DOM Elements:', { page: "positions-portfolio" });
+    }
+    const positionsTable = document.querySelector('#positionsTable');
+    const portfolioTable = document.querySelector('#portfolioTable');
+    const positionsSelector = document.getElementById('positionsAccountSelector');
+    if (window.Logger) {
+        window.Logger.debug('   - #positionsTable:', !!positionsTable, { page: "positions-portfolio" });
+        window.Logger.debug('   - #portfolioTable:', !!portfolioTable, { page: "positions-portfolio" });
+        window.Logger.debug('   - #positionsAccountSelector:', !!positionsSelector, { page: "positions-portfolio" });
+        if (positionsSelector) {
+            window.Logger.debug('     * Selected value:', positionsSelector.value, { page: "positions-portfolio" });
+        }
+    }
+    
+    // Check table data attributes
+    if (positionsTable && window.Logger) {
+        window.Logger.debug('   - positionsTable data-table-type:', positionsTable.getAttribute('data-table-type'), { page: "positions-portfolio" });
+    }
+    if (portfolioTable && window.Logger) {
+        window.Logger.debug('   - portfolioTable data-table-type:', portfolioTable.getAttribute('data-table-type'), { page: "positions-portfolio" });
+    }
+    
+    // Check sortable headers
+    const sortableHeaders = document.querySelectorAll('#positionsTable .sortable-header, #portfolioTable .sortable-header');
+    if (window.Logger) {
+        window.Logger.debug('   - Sortable headers count:', sortableHeaders.length, { page: "positions-portfolio" });
+    }
+    
+    // Check if data was loaded
+    if (window.Logger) {
+        window.Logger.debug('4. Data Loading:', { page: "positions-portfolio" });
+        window.Logger.debug('   - UnifiedCacheManager:', typeof window.UnifiedCacheManager, { page: "positions-portfolio" });
+        if (window.UnifiedCacheManager) {
+            window.Logger.debug('   - Cache available: ✅', { page: "positions-portfolio" });
+        } else {
+            window.Logger.debug('   - Cache available: ❌', { page: "positions-portfolio" });
+        }
+    }
+    
+    // Try to simulate sort
+    if (window.Logger) {
+        window.Logger.debug('5. Sort Test:', { page: "positions-portfolio" });
+    }
+    if (window.positionsPortfolioState?.positionsData && window.positionsPortfolioState.positionsData.length > 0) {
+        if (window.Logger) {
+            window.Logger.debug('   - Attempting to sort positions table...', { page: "positions-portfolio" });
+        }
+        try {
+            if (typeof window.sortTable === 'function') {
+                const result = window.sortTable('positions', 0);
+                if (window.Logger) {
+                    window.Logger.debug('   - Sort result:', result, { page: "positions-portfolio" });
+                    window.Logger.debug('   - Sort successful: ✅', { page: "positions-portfolio" });
+                }
+            } else {
+                if (window.Logger) {
+                    window.Logger.debug('   - window.sortTable not available: ❌', { page: "positions-portfolio" });
+                }
+            }
+        } catch (error) {
+            console.error('   - Sort error:', error);
+        }
+    } else {
+        if (window.Logger) {
+            window.Logger.debug('   - No data to sort (positionsData is empty or missing)', { page: "positions-portfolio" });
+        }
+    }
+    
+    if (window.Logger) {
+        window.Logger.debug('🔍 ===== END DEBUG =====', { page: "positions-portfolio" });
+    }
+    
+    return {
+        state: window.positionsPortfolioState,
+        functions: {
+            initPositionsPortfolio: typeof window.initPositionsPortfolio,
+            updatePositionsTable: typeof window.updatePositionsTable,
+            updatePortfolioTable: typeof window.updatePortfolioTable,
+            sortTable: typeof window.sortTable,
+            sortTableData: typeof window.sortTableData
+        },
+        data: {
+            positionsCount: window.positionsPortfolioState?.positionsData?.length || 0,
+            portfolioCount: window.positionsPortfolioState?.portfolioData?.positions?.length || 0
+        }
+    };
+};
 
 window.Logger.info('✅ Positions & Portfolio System loaded', { page: "trading_accounts" });

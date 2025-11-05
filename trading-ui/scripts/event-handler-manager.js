@@ -34,12 +34,9 @@ class EventHandlerManager {
             return;
         }
         
-        console.log('🔧 [EventHandlerManager] init() called, setting up delegation');
         // Set up global event delegation
         this.setupGlobalDelegation();
         this.initialized = true;
-        
-        console.log('✅ [EventHandlerManager] Initialized successfully, listener attached');
         if (window.Logger) {
             window.Logger.info('EventHandlerManager initialized successfully');
         }
@@ -51,14 +48,8 @@ class EventHandlerManager {
      * @private
      */
     setupGlobalDelegation() {
-        console.log('🔧 [EventHandlerManager] Setting up global delegation');
         // Click events delegation
         document.addEventListener('click', (event) => {
-            console.log('🔍 [EventHandlerManager] Document click event detected:', {
-                target: event.target,
-                tagName: event.target?.tagName,
-                className: event.target?.className
-            });
             this.handleDelegatedClick(event);
         }, true); // Use capture phase to catch events early
 
@@ -87,43 +78,23 @@ class EventHandlerManager {
     handleDelegatedClick(event) {
         // Prevent double handling in bubbling chain
         if (event._ehmHandled) {
-            console.log('🔄 [EventHandlerManager] Event already handled, skipping');
             return;
         }
         const target = event.target;
-        console.log('🔧 [EventHandlerManager] Click detected on:', {
-            tagName: target.tagName,
-            className: target.className,
-            id: target.id,
-            text: target.textContent?.substring(0, 50),
-            hasDataOnclick: target.hasAttribute('data-onclick'),
-            dataOnclick: target.getAttribute('data-onclick')
-        });
         
         // Handle buttons and links with data-onclick attribute (centralized button system)
         // This is the primary way to handle button clicks in TikTrack
         // Based on documentation: documentation/frontend/button-system.md
         // Supports both <button> and <a> elements with data-onclick
         const elementWithOnclick = target.closest('button[data-onclick], a[data-onclick]');
-        console.log('🔍 [EventHandlerManager] Closest element with data-onclick:', {
-            found: !!elementWithOnclick,
-            element: elementWithOnclick,
-            tagName: elementWithOnclick?.tagName,
-            onclick: elementWithOnclick?.getAttribute('data-onclick'),
-            disabled: elementWithOnclick?.disabled,
-            hasDisabledAttr: elementWithOnclick?.hasAttribute('disabled'),
-            className: elementWithOnclick?.className
-        });
         
         if (elementWithOnclick) {
             // Don't process if element is disabled (for buttons)
             if (elementWithOnclick.disabled || elementWithOnclick.hasAttribute('disabled')) {
-                console.warn('⚠️ [EventHandlerManager] Element is disabled, skipping');
                 return;
             }
             
             const onclickValue = elementWithOnclick.getAttribute('data-onclick');
-            console.log('✅ [EventHandlerManager] Found onclick value:', onclickValue);
             
             if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
                 console.log('🚀 [EventHandlerManager] Executing onclick:', onclickValue);
@@ -191,11 +162,8 @@ class EventHandlerManager {
                     event.preventDefault();
                 }
                 return;
-            } else {
-                console.warn('⚠️ [EventHandlerManager] onclick value is empty or null:', onclickValue);
             }
         } else {
-            console.log('ℹ️ [EventHandlerManager] No element with data-onclick found, checking other handlers...');
         }
         
         // Handle TOGGLE buttons without data-onclick (auto-wire to nearest section)
@@ -304,9 +272,14 @@ class EventHandlerManager {
             this.openModal(modalType, target, event);
         }
         
-        // Handle sortable headers
+        // Handle sortable headers - but only if they don't have onclick or data-onclick attributes
+        // Elements with data-onclick are already handled above (lines 89-130)
         if (target.matches('.sortable-header')) {
-            this.handleSortableClick(target, event);
+            // Skip if element has onclick or data-onclick attribute - let it handle itself
+            if (!target.hasAttribute('onclick') && !target.hasAttribute('data-onclick')) {
+                this.handleSortableClick(target, event);
+            }
+            // If onclick or data-onclick exists, let it execute naturally without interference
         }
     }
 
@@ -426,6 +399,10 @@ class EventHandlerManager {
      * @param {HTMLElement} element - Sortable header element
      * @param {Event} event - Original event
      * @private
+     * 
+     * NOTE: This function is for backward compatibility with tables that don't have onclick handlers.
+     * Tables registered with UnifiedTableSystem should use onclick handlers that call window.sortTable directly.
+     * This function only handles sortable headers WITHOUT onclick attributes.
      */
     handleSortableClick(element, event) {
         // If this click is already handled by data-onclick button system, skip to avoid double execution
@@ -433,6 +410,17 @@ class EventHandlerManager {
         if (delegatedElement) {
             return;
         }
+        
+        // If element has onclick attribute, let it handle the click (don't interfere)
+        // NOTE: This is the primary path for UnifiedTableSystem - onclick handlers call window.sortTable directly
+        if (element.hasAttribute('onclick') || element.getAttribute('onclick')) {
+            // Let the onclick handler execute - don't prevent default or stop propagation
+            return;
+        }
+        
+        // ===== OLD CODE - Fallback for tables without onclick handlers =====
+        // This code is kept for backward compatibility with older tables that don't use onclick
+        // Most modern tables (including positions/portfolio) use onclick handlers that call UnifiedTableSystem
         const table = element.closest('table');
         // Try data-table-type first (most common), then data-table-id as fallback
         const tableType = table.getAttribute('data-table-type') || table.getAttribute('data-table-id');
@@ -441,6 +429,7 @@ class EventHandlerManager {
         const columnIndex = th ? th.cellIndex : null;
         
         if (columnIndex !== null && window.sortTable) {
+            // window.sortTable will delegate to UnifiedTableSystem if table is registered
             window.sortTable(tableType, columnIndex);
         }
     }

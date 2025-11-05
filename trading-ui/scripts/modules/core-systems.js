@@ -2111,10 +2111,10 @@ window.showClearCacheConfirmation = async function(level, currentStats) {
                             ` : ''}
                         </div>
                         <div class="modal-footer" style="direction: rtl;">
-                            <button type="button" class="btn btn-secondary" id="clearCache-cancel-btn">
+                            <button type="button" class="btn btn-secondary" id="clearCache-cancel-btn" data-onclick="window.clearCacheCancel()">
                                 ביטול
                             </button>
-                            <button type="button" class="btn btn-${level === 'nuclear' ? 'danger' : level === 'full' ? 'warning' : 'primary'}" id="clearCache-confirm-btn">
+                            <button type="button" class="btn btn-${level === 'nuclear' ? 'danger' : level === 'full' ? 'warning' : 'primary'}" id="clearCache-confirm-btn" data-onclick="window.clearCacheConfirm()">
                                 ${config.emoji} ${level === 'nuclear' ? 'כן, מחק הכל' : level === 'full' ? 'אני מבין - מחק הכל' : 'אישור'}
                             </button>
                         </div>
@@ -2128,18 +2128,23 @@ window.showClearCacheConfirmation = async function(level, currentStats) {
         const modal = window.createAndShowModal(modalHtml, 'clearCacheConfirmationModal');
         const modalElement = document.getElementById('clearCacheConfirmationModal');
         
-        // Confirm button
-        document.getElementById('clearCache-confirm-btn').onclick = () => {
+        // Create global functions for buttons (with data-onclick)
+        window.clearCacheConfirm = () => {
             modal.hide();
             setTimeout(() => modalElement.remove(), 300);
             resolve(true);
+            // Clean up functions after use
+            delete window.clearCacheConfirm;
+            delete window.clearCacheCancel;
         };
         
-        // Cancel button
-        document.getElementById('clearCache-cancel-btn').onclick = () => {
+        window.clearCacheCancel = () => {
             modal.hide();
             setTimeout(() => modalElement.remove(), 300);
             resolve(false);
+            // Clean up functions after use
+            delete window.clearCacheConfirm;
+            delete window.clearCacheCancel;
         };
         
         // Show modal
@@ -3283,7 +3288,7 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-              <button type="button" class="btn btn-primary" onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')">העתק</button>
+              <button type="button" class="btn btn-primary" data-onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')">העתק</button>
             </div>
           </div>
         </div>

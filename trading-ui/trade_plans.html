@@ -95,10 +95,10 @@
 <div class="table-count" id="trade_plansCount">טוען...</div>
 <div class="table-actions">
 <div class="filter-buttons-container button-row">
-<button class="btn btn-sm" onclick="filterTradePlansByType('all')" type="button" data-type="all" title="הצג הכל">הצג הכל</button>
-<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterTradePlansByType('swing')" type="button" data-type="swing" title="Swing Trading"><i class="fas fa-chart-line filter-icon"></i></button>
-<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterTradePlansByType('investment')" type="button" data-type="investment" title="השקעות"><i class="fas fa-chart-bar filter-icon"></i></button>
-<button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterTradePlansByType('passive')" type="button" data-type="passive" title="השקעות פאסיביות"><i class="fas fa-coins filter-icon"></i></button>
+                            <button class="btn btn-sm" data-onclick="filterTradePlansByType('all')" type="button" data-type="all" title="הצג הכל">הצג הכל</button>
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterTradePlansByType('swing')" type="button" data-type="swing" title="Swing Trading"><i class="fas fa-chart-line filter-icon"></i></button>
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterTradePlansByType('investment')" type="button" data-type="investment" title="השקעות"><i class="fas fa-chart-bar filter-icon"></i></button>
+                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterTradePlansByType('passive')" type="button" data-type="passive" title="השקעות פאסיביות"><i class="fas fa-coins filter-icon"></i></button>
 </div>
 <button data-button-type="ADD" data-entity-type="trade_plan" data-variant="full" data-onclick="window.showModalSafe('tradePlansModal','add')" data-text="הוסף תכנון חדש" type="button" id="addTradePlanBtn" title="הוסף תכנון חדש"></button>
 <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" type="button" title="הצג/הסתר אזור תכנון טריידים"></button>
@@ -110,37 +110,37 @@
 <thead>
 <tr>
 <th class="col-ticker">
-                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">טיקר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 0)">טיקר <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-date">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">תאריך <span class="sort-icon">↕</span></button>
+<button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 1)">תאריך <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-type">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">סוג <span class="sort-icon">↕</span></button>
+<button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 2)">סוג <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-side">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">צד <span class="sort-icon">↕</span></button>
+<button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 3)">צד <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-quantity">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">כמות <span class="sort-icon">↕</span></button>
+<button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 4)">כמות <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-price">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">מחיר <span class="sort-icon">↕</span></button>
+<button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 5)">מחיר <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-investment">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">השקעה <span class="sort-icon">↕</span></button>
+<button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 6)">השקעה <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-status">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">סטטוס <span class="sort-icon">↕</span></button>
+<button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 7)">סטטוס <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-reward">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(8, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">סיכוי <span class="sort-icon">↕</span></button>
+<button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 8)">סיכוי <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-risk">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">סיכון <span class="sort-icon">↕</span></button>
+<button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 9)">סיכון <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-ratio">
-<button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(10, window.trade_plansData || [], 'trade_plans', window.updateTradePlansTable); }">יחס <span class="sort-icon">↕</span></button>
+<button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 10)">יחס <span class="sort-icon">↕</span></button>
 </th>
 <th class="col-actions actions-cell actions-3-items"></th>
 </tr>

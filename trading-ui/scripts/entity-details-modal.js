@@ -1027,10 +1027,10 @@ class EntityDetailsModal {
         
         if (entityType === 'ticker') {
             buttonsHtml = `
-                <button class="btn btn-sm" onclick="viewLinkedItemsForTicker(${entityData.id})" title="פריטים מקושרים">
+                <button class="btn btn-sm" data-onclick="viewLinkedItemsForTicker(${entityData.id})" title="פריטים מקושרים">
                     <i class="fas fa-link"></i>
                 </button>
-                <button class="btn btn-sm" onclick="editTicker(${entityData.id})" title="ערוך טיקר">
+                <button class="btn btn-sm" data-onclick="editTicker(${entityData.id})" title="ערוך טיקר">
                     <i class="fas fa-edit"></i>
                 </button>
             `;
@@ -1180,7 +1180,7 @@ class EntityDetailsModal {
                     <h6>שגיאה בטעינת פרטי הישות</h6>
                     <p class="mb-0">${errorMessage}</p>
                 </div>
-                <button type="button" class="btn" onclick="window.entityDetailsModal.retry()">
+                <button type="button" class="btn" data-onclick="window.entityDetailsModal.retry()">
                     נסה שוב
                 </button>
             </div>

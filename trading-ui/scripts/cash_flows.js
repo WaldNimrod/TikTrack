@@ -1325,6 +1325,8 @@ async function saveCashFlow() {
             description: { id: 'cashFlowDescription', type: 'text', default: null },
             source: { id: 'cashFlowSource', type: 'text' },
             external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
+            // Note: trade_id and trade_plan_id are not supported by CashFlow model
+            // These fields are removed from the data before sending to API
         });
         
         // ולידציה מפורטת
@@ -1378,6 +1380,13 @@ async function saveCashFlow() {
         
         console.log('✅ saveCashFlow - Validation passed');
         
+        // Remove fields that are not supported by CashFlow model
+        // CashFlow model does not support trade_id or trade_plan_id
+        const { trade_id, trade_plan_id, ...dataToSend } = cashFlowData;
+        if (trade_id || trade_plan_id) {
+            console.log('⚠️ saveCashFlow - Removing unsupported fields:', { trade_id, trade_plan_id });
+        }
+        
         // Determine if this is add or edit
         const isEdit = form.dataset.mode === 'edit';
         const cashFlowId = form.dataset.cashFlowId;
@@ -1390,6 +1399,8 @@ async function saveCashFlow() {
         const url = isEdit ? `/api/cash_flows/${cashFlowId}` : '/api/cash_flows';
         const method = isEdit ? 'PUT' : 'POST';
         console.log('🔵 saveCashFlow - Fetching to:', url, 'method:', method);
+        console.log('🔵 saveCashFlow - Data to send:', dataToSend);
+        console.log('🔵 saveCashFlow - Data to send (stringified):', JSON.stringify(dataToSend, null, 2));
         
         // Send to API
         const response = await fetch(url, {
@@ -1397,16 +1408,33 @@ async function saveCashFlow() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(cashFlowData)
+            body: JSON.stringify(dataToSend)
         });
         
         console.log('🔵 saveCashFlow - Fetch completed, response ok:', response.ok);
+        console.log('🔵 saveCashFlow - Response status:', response.status);
+        
+        // Log response body for debugging (clone response first so it can be used later)
+        let responseToHandle = response;
+        if (!response.ok) {
+            const responseClone = response.clone();
+            const errorText = await responseClone.text();
+            console.error('❌ saveCashFlow - Error response:', errorText);
+            try {
+                const errorJson = JSON.parse(errorText);
+                console.error('❌ saveCashFlow - Error JSON:', errorJson);
+            } catch (e) {
+                console.error('❌ saveCashFlow - Error is not JSON:', errorText);
+            }
+            // Use original response for CRUDResponseHandler
+            responseToHandle = response;
+        }
         
         // CRUDResponseHandler handles ALL response processing including errors
         // No need to pre-check or call response.json() here
         if (isEdit) {
             console.log('🔵 saveCashFlow - Calling handleUpdateResponse...');
-            await CRUDResponseHandler.handleUpdateResponse(response, {
+            await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן עודכן בהצלחה',
                 entityName: 'תזרים מזומן',
@@ -1415,7 +1443,7 @@ async function saveCashFlow() {
             });
         } else {
             console.log('🔵 saveCashFlow - Calling handleSaveResponse...');
-            await CRUDResponseHandler.handleSaveResponse(response, {
+            await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן נוסף בהצלחה',
                 entityName: 'תזרים מזומן',

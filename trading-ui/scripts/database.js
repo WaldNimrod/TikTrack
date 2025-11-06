@@ -5,35 +5,34 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 16
+ * Total Functions: 15
  * 
  * PAGE INITIALIZATION (2)
- * - initDatabaseDisplay() - initDatabaseDisplay function
- * - setupEventListeners() - * Initialize the database display page
+ * - initDatabaseDisplay() - Initialize the database display page
+ * - setupEventListeners() - Set up page event listeners
  * 
  * DATA LOADING (3)
- * - loadTableData() - * Set up page event listeners
- * - fetchTableData() - * Load data for a specific table type
- * - showLoadingState() - * Apply sorting functionality to table
+ * - loadTableData() - Load data for a specific table type
+ * - fetchTableData() - Fetch table data from server
+ * - showLoadingState() - Show loading state
  * 
  * DATA MANIPULATION (4)
- * - updateTableDisplay() - * Fetch table data from server
- * - createTableBodyHTML() - createTableBodyHTML function
- * - updateTableInfo() - * Show loading state
- * - addRecord() - * Format status value
+ * - updateTableDisplay() - Update table display with data
+ * - createTableBodyHTML() - Create table body HTML from data
+ * - updateTableInfo() - Update table information display
+ * - addRecord() - Add new record (placeholder function)
  * 
  * EVENT HANDLING (1)
- * - applySortingFunctionality() - * Format cell value based on column configuration
+ * - applySortingFunctionality() - Apply sorting functionality to table
  * 
- * UTILITIES (5)
- * - formatCellValue() - formatCellValue function
- * - formatDate() - * Filter table data
- * - formatNumber() - * Format date value
- * - formatCurrency() - * Format date value
- * - formatStatus() - * Format currency value
+ * UTILITIES (4)
+ * - formatCellValue() - Format cell value based on column configuration
+ * - formatNumber() - Format number value
+ * - formatCurrency() - Format currency value
+ * - formatStatus() - Format status value
  * 
  * OTHER (1)
- * - filterTableData() - * Update table information display
+ * - filterTableData() - Filter table data
  * 
  * ==========================================
  */

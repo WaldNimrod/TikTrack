@@ -5,54 +5,56 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 38
+ * Total Functions: 37
  * 
- * DATA LOADING (6)
- * - loadDefaultTradingAccounts() - loadDefaultTradingAccounts function
- * - loadTradingAccountsData() - * Load default trading accounts
- * - loadTradingAccounts() - * Update trading accounts summary
- * - loadTradingAccountsDataForTradingAccountsPage() - loadTradingAccountsDataForTradingAccountsPage function
- * - getTradingAccountName() - * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר
- * - getTradingAccounts() - * Generate detailed log for trading accounts page
+ * DATA LOADING (10)
+ * - loadCurrenciesFromServer() - Load currency metadata for trading account forms.
+ * - loadTradingAccountsFromServer() - Load trading accounts from the server and refresh shared state.
+ * - loadAllTradingAccountsFromServer() - Load all trading accounts for the filter component.
+ * - loadDefaultTradingAccounts() - Load default trading accounts
+ * - loadTradingAccountsData() - Fetch trading accounts directly from the API without using cached results.
+ * - loadAccountBalance() - Load account balance from API
+ * - loadAccountBalancesBatch() - Load balances for multiple accounts in batch
+ * - loadTradingAccounts() - Load trading accounts and refresh the on-page table.
+ * - getTradingAccountName() - Get trading account name
+ * - getTradingAccounts() - Get trading accounts
  * 
- * DATA MANIPULATION (14)
- * - updateTradingAccountsTable() - updateTradingAccountsTable function
- * - updateTradingAccountsSummary() - updateTradingAccountsSummary function
- * - updateTradingAccountFilterDisplayText() - updateTradingAccountFilterDisplayText function
- * - deleteTradingAccountFromAPI() - deleteTradingAccountFromAPI function
- * - deleteTradingAccount() - deleteTradingAccount function
- * - confirmDeleteTradingAccount() - * Show success message
- * - updateTradingAccountFilterMenu() - updateTradingAccountFilterMenu function
- * - deleteTradingAccountWithLinkedItemsCheck() - deleteTradingAccountWithLinkedItemsCheck function
- * - checkLinkedItemsAndDeleteTradingAccount() - checkLinkedItemsAndDeleteTradingAccount function
- * - checkLinkedItemsBeforeDeleteTradingAccount() - * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר
- * - updateTradingAccount() - * בדיקת פריטים מקושרים לפני מחיקת חשבון מסחר
- * - showAddTradingAccountModal() - showAddTradingAccountModal function
- * - saveTradingAccount() - * Show add trading account modal
- * - deleteTradingAccount() - deleteTradingAccount function
+ * DATA MANIPULATION (13)
+ * - updateTradingAccountsTable() - Update trading accounts table
+ * - updateTableRows() - Helper function to update table rows
+ * - updateTradingAccountsSummary() - Update trading accounts summary
+ * - updateTradingAccountFilterDisplayText() - Update trading account filter display text
+ * - deleteTradingAccountFromAPI() - Delete a trading account via the REST API.
+ * - confirmDeleteTradingAccount() - Confirm delete trading account
+ * - updateTradingAccountFilterMenu() - Update trading account filter menu
+ * - deleteTradingAccountWithLinkedItemsCheck() - Delete a trading account after checking for linked entities.
+ * - checkLinkedItemsAndDeleteTradingAccount() - Legacy helper that checks linked items before deleting a trading account.
+ * - checkLinkedItemsBeforeDeleteTradingAccount() - Check linked items before deleting a trading account (legacy helper).
+ * - updateTradingAccount() - Update trading account
+ * - saveTradingAccount() - Save a trading account (handles both add and edit modes).
+ * - deleteTradingAccount() - Delete a trading account from the UI after confirmation and linked-item checks.
  * 
  * EVENT HANDLING (4)
- * - restoreTradingAccountsSectionState() - restoreTradingAccountsSectionState function
- * - performTradingAccountCancellation() - * בדיקת מקושרים וביצוע ביטול חשבון מסחר
- * - performTradingAccountDeletion() - * בדיקת מקושרים וביצוע מחיקת חשבון מסחר
- * - performTradingAccountDeletion() - performTradingAccountDeletion function
+ * - generateCurrencyOptions() - Populate the trading account currency select element with fresh options.
+ * - restoreTradingAccountsSectionState() - Restore the persisted collapsed/expanded state for the trading accounts section.
+ * - performTradingAccountCancellation() - Perform the actual cancellation request after validations complete.
+ * - performTradingAccountDeletion() - Execute trading account deletion after all validations completed.
  * 
  * UI UPDATES (3)
- * - showOpenTradesWarning() - * Show error message
- * - showTradingAccountDetails() - showTradingAccountDetails function
- * - showEditTradingAccountModal() - * Show add trading account modal
+ * - showOpenTradesWarning() - Show open trades warning
+ * - showEditTradingAccountModalById() - Show edit trading account modal by ID
+ * - showTradingAccountDetails() - Show trading account details - uses global entity details system
  * 
  * VALIDATION (3)
- * - cancelTradingAccountWithLinkedItemsCheck() - cancelTradingAccountWithLinkedItemsCheck function
- * - checkLinkedItemsAndCancelTradingAccount() - checkLinkedItemsAndCancelTradingAccount function
- * - checkLinkedItemsBeforeCancelTradingAccount() - checkLinkedItemsBeforeCancelTradingAccount function
+ * - cancelTradingAccountWithLinkedItemsCheck() - Cancel a trading account after checking for linked entities.
+ * - checkLinkedItemsAndCancelTradingAccount() - Legacy helper that checks linked items before cancelling a trading account.
+ * - checkLinkedItemsBeforeCancelTradingAccount() - Check linked items before cancelling a trading account (legacy helper).
  * 
- * OTHER (6)
- * - cancelTradingAccount() - * הצגת מודל חשבון מסחר (הוספה או עריכה)
- * - filterTradingAccountsLocally() - filterTradingAccountsLocally function
- * - restoreTradingAccount() - restoreTradingAccount function
- * - sortTable() - sortTable function
- * - generateDetailedLog() - * Sort table
+ * OTHER (4)
+ * - cancelTradingAccount() - Cancel a trading account (set status to "cancelled").
+ * - filterTradingAccountsLocally() - Filter trading accounts locally
+ * - restoreTradingAccount() - Restore a cancelled trading account back to the "closed" status.
+ * - generateDetailedLog() - Generate detailed log for trading accounts page
  * 
  * ==========================================
  */
@@ -257,7 +259,15 @@ window.trading_accountsLoaded = false;
 window.currenciesData = [];
 window.currenciesLoaded = false;
 
-// פונקציה לטעינת מטבעות מהשרת
+/**
+ * Load currency metadata for trading account forms.
+ *
+ * Retrieves the available currencies from the backend, stores them in the
+ * unified cache, and keeps `window.currenciesData`/`window.currenciesLoaded`
+ * in sync so form components can reuse the data without duplicate requests.
+ *
+ * @returns {Promise<void>} Resolves when the currency list is available.
+ */
 async function loadCurrenciesFromServer() {
   try {
     const token = await window.unifiedCacheManager?.get('authToken') || localStorage.getItem('authToken');
@@ -332,7 +342,16 @@ async function loadCurrenciesFromServer() {
 //   return '$'; // ברירת מחדל
 // }
 
-// פונקציה ליצירת אפשרויות מטבע בטופס
+/**
+ * Populate the trading account currency select element with fresh options.
+ *
+ * Uses `SelectPopulatorService.populateCurrenciesSelect` so all standard
+ * behaviors (default selection, caching, accessibility) remain consistent.
+ * When editing an existing account the current currency is preselected.
+ *
+ * @param {Object|null} tradingAccount - Trading account currently edited, or null when creating a new one.
+ * @returns {Promise<void>}
+ */
 async function generateCurrencyOptions(tradingAccount = null) {
   // שימוש ב-SelectPopulatorService למילוי מטבעות
   const selectId = 'currency_id';
@@ -348,7 +367,15 @@ async function generateCurrencyOptions(tradingAccount = null) {
   await SelectPopulatorService.populateCurrenciesSelect(selectId, options);
 }
 
-// פונקציה לטעינת חשבונות מהשרת
+/**
+ * Load trading accounts from the server and refresh shared state.
+ *
+ * Fetches the latest trading accounts, stores them on `window.trading_accountsData`,
+ * updates global flags, and refreshes filter menus so the UI reflects the
+ * most current data set.
+ *
+ * @returns {Promise<void>} Resolves once trading accounts are loaded and state updated.
+ */
 async function loadTradingAccountsFromServer() {
   window.Logger.info('🚀🚀🚀 loadTradingAccountsFromServer התחיל 🚀🚀🚀', { page: "trading_accounts" });
   try {
@@ -410,7 +437,15 @@ async function loadTradingAccountsFromServer() {
   }
 }
 
-// פונקציה לטעינת כל החשבונות מהשרת (לפילטר)
+/**
+ * Load all trading accounts for the filter component.
+ *
+ * Similar to `loadTradingAccountsFromServer` but dedicated to feeding the
+ * header filter menu with every account (open and closed). Used when the user
+ * opens the filter dropdown to ensure options are current.
+ *
+ * @returns {Promise<void>}
+ */
 async function loadAllTradingAccountsFromServer() {
   try {
     const token = await window.unifiedCacheManager?.get('authToken') || localStorage.getItem('authToken');
@@ -488,7 +523,15 @@ function loadDefaultTradingAccounts() {
 //   return window.trading_accountsLoaded || false;
 // }
 
-// פונקציה לטעינת נתוני חשבונות מסחר מהשרת
+/**
+ * Fetch trading accounts directly from the API without using cached results.
+ *
+ * Adds a timestamp query parameter to bypass any HTTP caching layer, returning
+ * the raw list so callers can decide how to render or filter the records.
+ *
+ * @returns {Promise<Array>} Array of trading account objects returned from the API.
+ * @throws {Error} When the HTTP request fails.
+ */
 async function loadTradingAccountsData() {
   window.Logger.info('Loading trading accounts data (bypass cache)', { page: "trading_accounts" });
   try {
@@ -570,15 +613,15 @@ async function loadAccountBalancesBatch(accountIds) {
   return balanceMap;
 }
 
+// משתנה למניעת עדכונים כפולים
+let isUpdatingTradingAccountsTable = false;
+
 /**
  * Update trading accounts table
  * @function updateTradingAccountsTable
  * @param {Array} trading_accounts - Trading accounts array
  * @returns {void}
  */
-// משתנה למניעת עדכונים כפולים
-let isUpdatingTradingAccountsTable = false;
-
 async function updateTradingAccountsTable(trading_accounts) {
     // מניעת עדכונים כפולים
     if (isUpdatingTradingAccountsTable) {
@@ -883,8 +926,12 @@ async function updateTradingAccountsSummary(trading_accounts) {
 }
 
 /**
- * פונקציה לטעינת חשבונות - מתאימה לעבוד עם designs.html
- * הפונקציה טוענת נתונים ומעדכנת את הטבלה
+ * Load trading accounts and refresh the on-page table.
+ *
+ * Invoked from legacy layouts (e.g., `designs.html`) that still rely on the
+ * trading accounts module to fetch data and render the table content.
+ *
+ * @returns {Promise<void>}
  */
 async function loadTradingAccounts() {
   try {
@@ -914,13 +961,6 @@ async function loadTradingAccounts() {
     }
   }
 }
-
-/**
- * עדכון טבלת חשבונות בדף designs.html
- * הפונקציה מעדכנת את הטבלה השנייה (חשבונות) בדף designs.html
- *
- * @param {Array} trading_accounts - מערך של חשבונות
- */
 
 /**
  * Update trading account filter display text
@@ -1111,15 +1151,9 @@ if (typeof loadCurrenciesFromServer === 'function') {
 // ===== פונקציות נוספות לניהול חשבונות =====
 
 /**
- * הצגת מודל חשבון מסחר (הוספה או עריכה)
- * @param {string} mode - 'add' או 'edit'
- * @param {Object} [tradingAccount] - אובייקט חשבון המסחר (נדרש רק בעריכה)
- */
-
-/**
- * מחיקת חשבון מסחר מהשרת
- * @param {number} tradingAccountId - מזהה חשבון המסחר
- * @param {string} accountName - שם חשבון המסחר
+ * Delete a trading account via the REST API.
+ * @param {number} tradingAccountId - Trading account identifier to delete
+ * @param {string} tradingAccountName - Trading account name used for notifications
  */
 async function deleteTradingAccountFromAPI(tradingAccountId, tradingAccountName) {
   try {
@@ -1142,9 +1176,9 @@ async function deleteTradingAccountFromAPI(tradingAccountId, tradingAccountName)
 }
 
 /**
- * ביטול חשבון מסחר (שינוי סטטוס למבוטל)
- * @param {number} tradingAccountId - מזהה חשבון המסחר
- * @param {string} accountName - שם חשבון המסחר
+ * Cancel a trading account (set status to "cancelled").
+ * @param {number} tradingAccountId - Trading account identifier to cancel
+ * @param {string} tradingAccountName - Trading account name used for confirmations
  */
 async function cancelTradingAccount(tradingAccountId, tradingAccountName) {
 
@@ -1617,7 +1651,8 @@ window.deleteTradingAccount = deleteTradingAccount;
 // window.loadTradingAccountsDataForTradingAccountsPage כבר מוגדר בתחילת הקובץ
 
 /**
- * שחזור מצב סקשן החשבונות
+ * Restore the persisted collapsed/expanded state for the trading accounts section.
+ * @returns {Promise<void>}
  */
 async function restoreTradingAccountsSectionState() {
   const savedState = await window.unifiedCacheManager?.get('trading_accountsSectionCollapsed') || localStorage.getItem('trading_accountsSectionCollapsed');
@@ -1685,9 +1720,9 @@ window.restoreTradingAccountsSectionState = restoreTradingAccountsSectionState;
 // });
 
 /**
- * ביטול חשבון מסחר עם בדיקת פריטים מקושרים
- * @param {number} tradingAccountId - מזהה חשבון המסחר
- * @param {string} accountName - שם חשבון המסחר
+ * Cancel a trading account after checking for linked entities.
+ * @param {number} tradingAccountId - Trading account identifier to cancel
+ * @param {string} _accountName - Unused legacy parameter (kept for backward compatibility)
  */
 async function cancelTradingAccountWithLinkedItemsCheck(tradingAccountId, _accountName) {
   try {
@@ -1746,9 +1781,9 @@ async function cancelTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
 }
 
 /**
- * מחיקת חשבון מסחר עם בדיקת פריטים מקושרים
- * @param {number} tradingAccountId - מזהה חשבון המסחר
- * @param {string} accountName - שם חשבון המסחר
+ * Delete a trading account after checking for linked entities.
+ * @param {number} tradingAccountId - Trading account identifier to delete
+ * @param {string} _accountName - Unused legacy parameter (kept for backward compatibility)
  */
 async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accountName) {
   try {
@@ -1817,9 +1852,9 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
 }
 
 /**
- * החזרת חשבון מסחר מבוטל לסטטוס סגור
- * @param {number} tradingAccountId - מזהה חשבון המסחר
- * @param {string} accountName - שם חשבון המסחר
+ * Restore a cancelled trading account back to the "closed" status.
+ * @param {number} tradingAccountId - Trading account identifier to restore
+ * @param {string} tradingAccountName - Trading account name used for confirmations
  */
 async function restoreTradingAccount(tradingAccountId, tradingAccountName) {
   // ניקוי מטמון לפני פעולת CRUD - עריכה  // אישור מהמשתמש
@@ -1889,7 +1924,7 @@ async function restoreTradingAccount(tradingAccountId, tradingAccountName) {
 }
 
 /**
- * בדיקת מקושרים וביצוע ביטול חשבון מסחר
+ * Legacy helper that checks linked items before cancelling a trading account.
  * @deprecated Use window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'cancel', performTradingAccountCancellation) instead
  */
 async function checkLinkedItemsAndCancelTradingAccount(tradingAccountId) {
@@ -1897,7 +1932,7 @@ async function checkLinkedItemsAndCancelTradingAccount(tradingAccountId) {
 }
 
 /**
- * ביצוע הביטול בפועל
+ * Perform the actual cancellation request after validations complete.
  */
 async function performTradingAccountCancellation(tradingAccountId) {
   try {
@@ -1942,7 +1977,7 @@ async function performTradingAccountCancellation(tradingAccountId) {
 }
 
 /**
- * בדיקת מקושרים וביצוע מחיקת חשבון מסחר
+ * Legacy helper that checks linked items before deleting a trading account.
  * @deprecated Use window.checkLinkedItemsAndPerformAction('account', tradingAccountId, 'delete', performTradingAccountDeletion) instead
  */
 async function checkLinkedItemsAndDeleteTradingAccount(tradingAccountId) {
@@ -1953,7 +1988,7 @@ async function checkLinkedItemsAndDeleteTradingAccount(tradingAccountId) {
 // Replaced by newer implementation at line 2414 with CRUDResponseHandler
 
 /**
- * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר
+ * Check linked items before cancelling a trading account (legacy helper).
  * @deprecated Use window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'cancel') instead
  */
 async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
@@ -1961,7 +1996,7 @@ async function checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId) {
 }
 
 /**
- * בדיקת פריטים מקושרים לפני מחיקת חשבון מסחר
+ * Check linked items before deleting a trading account (legacy helper).
  * @deprecated Use window.checkLinkedItemsBeforeAction('account', tradingAccountId, 'delete') instead
  */
 async function checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId) {
@@ -2212,8 +2247,8 @@ window.getTradingAccounts = getTradingAccounts;
 // REMOVED: showEditTradingAccountModal - use window.ModalManagerV2.showEditModal('tradingAccountsModal', 'account', accountId) directly
 
 /**
- * שמירת חשבון מסחר
- * Handles both add and edit modes
+ * Save a trading account (handles both add and edit modes).
+ * @returns {Promise<void>}
  */
 async function saveTradingAccount() {
     window.Logger.debug('saveTradingAccount called', { page: 'trading_accounts' });
@@ -2318,8 +2353,9 @@ async function saveTradingAccount() {
 }
 
 /**
- * מחיקת חשבון מסחר
- * Includes linked items check
+ * Delete a trading account from the UI after confirmation and linked-item checks.
+ * @param {number|string} accountId - Trading account identifier to delete
+ * @returns {Promise<void>}
  */
 async function deleteTradingAccount(accountId) {
     window.Logger.info(`🗑️ deleteTradingAccount called for account ${accountId}`, { accountId, page: 'trading_accounts' });
@@ -2372,6 +2408,16 @@ async function deleteTradingAccount(accountId) {
     }
 }
 
+/**
+ * Execute trading account deletion after all validations completed.
+ *
+ * Clears related cache layers, issues the DELETE request, and delegates
+ * response handling to `CRUDResponseHandler` so notifications and table reloads
+ * stay consistent with the rest of the system.
+ *
+ * @param {number|string} accountId - Trading account identifier to delete.
+ * @returns {Promise<void>}
+ */
 async function performTradingAccountDeletion(accountId) {
     try {
         // Clear cache before deletion to ensure fresh data after reload

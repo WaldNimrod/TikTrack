@@ -112,25 +112,36 @@ function extractFunctions(content) {
     while ((match = functionPattern.exec(content)) !== null) {
         const funcName = match[1];
         const funcPos = match.index;
+        const declarationOffset = match[0].lastIndexOf('function');
+        const declarationPos = declarationOffset >= 0 ? funcPos + declarationOffset : funcPos;
         
         // Extract JSDoc comment if present
-        const beforeFunction = content.substring(Math.max(0, funcPos - 1000), funcPos);
-        const jsdocMatch = beforeFunction.match(/\/\*\*[\s\S]*?\*\//);
-        let description = '';
-        
-        if (jsdocMatch) {
-            // Extract description from JSDoc
-            const jsdoc = jsdocMatch[0];
-            const descMatch = jsdoc.match(/\*\s+(.+?)(?:\n|$)/);
-            if (descMatch) {
-                description = descMatch[1].trim();
+    let description = '';
+
+    const searchStart = Math.max(0, declarationPos - 5000);
+    const commentStart = content.lastIndexOf('/**', declarationPos);
+    if (commentStart !== -1 && commentStart >= searchStart) {
+        const commentEnd = content.indexOf('*/', commentStart);
+        if (commentEnd !== -1 && commentEnd < declarationPos) {
+            const jsdoc = content.substring(commentStart, commentEnd + 2);
+
+            // Split the block into lines and find the first descriptive line (not a tag)
+            const lines = jsdoc
+                .split('\n')
+                .map(line => line.replace(/^\s*\*\s?/, '').trim())
+                .filter(line => line.length > 0 && line !== '/**' && line !== '*/');
+            const descriptionLine = lines.find(line => !line.startsWith('@'));
+
+            if (descriptionLine) {
+                description = descriptionLine;
             }
         }
+    }
         
         functions.push({
             name: funcName,
             description: description || `${funcName} function`,
-            position: funcPos
+            position: declarationPos
         });
     }
     

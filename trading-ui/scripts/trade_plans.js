@@ -8,70 +8,70 @@
  * Total Functions: 52
  * 
  * PAGE INITIALIZATION (4)
- * - setupPriceCalculation() - * View linked items for trade plan
- * - setupEditPriceCalculation() - setupEditPriceCalculation function
- * - initializeTradePlanConditionsSystem() - initializeTradePlanConditionsSystem function
- * - setupSortableHeadersLocal() - setupSortableHeadersLocal function
+ * - setupPriceCalculation() - Setup price calculation event listeners for add modal
+ * - setupEditPriceCalculation() - Setup price calculation event listeners for edit modal
+ * - initializeTradePlanConditionsSystem() - Initialize conditions system for trade plans
+ * - setupSortableHeadersLocal() - Setup sortable headers for trade plans table
  * 
  * DATA LOADING (4)
- * - loadTickerInfo() - * Disable edit form fields
- * - loadTradePlanTickerInfo() - loadTradePlanTickerInfo function
- * - loadEditTickerInfo() - loadEditTickerInfo function
- * - loadTradePlansData() - loadTradePlansData function
+ * - _REMOVED_loadTickerInfo() - Disable edit form fields
+ * - loadTradePlanTickerInfo() - טעינת מידע על הטיקר (למודל החדש)
+ * - _REMOVED_loadEditTickerInfo() - Update form fields with calculated values based on ticker data and user preferences
+ * - loadTradePlansData() - This function loads all planning from the server and updates the table
  * 
- * DATA MANIPULATION (23)
- * - updateTickerInfo() - * Hide ticker information display
- * - updateSharesFromAmount() - updateSharesFromAmount function
- * - updateAmountFromShares() - updateAmountFromShares function
- * - updateFormFieldsWithTickerData() - updateFormFieldsWithTickerData function
- * - updateEditFormFieldsWithTickerData() - * Hide edit ticker information section
- * - updateEditTickerInfo() - updateEditTickerInfo function
- * - updateEditSharesFromAmount() - updateEditSharesFromAmount function
- * - updateEditAmountFromShares() - updateEditAmountFromShares function
- * - saveEditTradePlan() - * עדכון סכום מתוכנן ממספר מניות במודל העריכה
- * - addEditCondition() - addEditCondition function
- * - addEditReason() - * Add condition to edit modal
- * - addEditImportantNote() - * Add edit reason functionality (placeholder)
- * - addEditReminder() - * Add edit important note functionality (placeholder)
- * - addImportantNote() - * Add edit reminder functionality (placeholder)
- * - addReminder() - * Add important note functionality (placeholder for add modal)
- * - updateDesignsTable() - updateDesignsTable function
- * - updateTradePlansTable() - updateTradePlansTable function
- * - updateTradePlansPageSummaryStats() - updateTradePlansPageSummaryStats function
- * - saveTradePlanData() - saveTradePlanData function
- * - saveNewTradePlan() - saveNewTradePlan function
- * - showAddTradePlanModal() - showAddTradePlanModal function
- * - saveTradePlan() - * Show add trade plan modal
- * - deleteTradePlan() - deleteTradePlan function
+ * DATA MANIPULATION (28)
+ * - _REMOVED_copyTradePlan() - העתקת תוכנית מסחר
+ * - _REMOVED_displayTickerInfo() - טעינת מידע על הטיקר (למודל החדש)
+ * - updateTickerInfo() - Update ticker info in add modal
+ * - updateSharesFromAmount() - Update shares from planned amount in add modal
+ * - updateAmountFromShares() - Update amount from shares in add modal
+ * - _REMOVED_updateFormFieldsWithTickerData() - Update form fields with calculated values based on ticker data and user preferences
+ * - _REMOVED_displayEditTickerInfo() - _REMOVED_displayEditTickerInfo function
+ * - _REMOVED_updateEditFormFieldsWithTickerData() - Update edit form fields with calculated values based on ticker data and user preferences
+ * - updateEditTickerInfo() - עדכון מידע על הטיקר במודל העריכה
+ * - updateEditSharesFromAmount() - Update shares from planned amount in edit modal
+ * - updateEditAmountFromShares() - עדכון סכום מתוכנן ממספר מניות במודל העריכה
+ * - _REMOVED_saveEditTradePlan() - שמירת עריכת תכנון
+ * - addEditCondition() - Add condition to edit modal
+ * - addEditReason() - Add edit reason functionality (placeholder)
+ * - addEditImportantNote() - Add edit important note functionality (placeholder)
+ * - addEditReminder() - Add edit reminder functionality (placeholder)
+ * - addImportantNote() - Add important note functionality (placeholder for add modal)
+ * - addReminder() - Add reminder functionality (placeholder for add modal)
+ * - updatePricesFromPercentages() - Helper function to update prices from percentages
+ * - updatePercentagesFromPrices() - Helper function to update percentages from prices
+ * - _REMOVED_updateDesignsTable() - עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
+ * - _REMOVED_filterTradePlansData() - פילטור נתוני תכנונים
+ * - updateTradePlansTable() - עדכון טבלת תכנונים
+ * - updateTradePlansPageSummaryStats() - Update page summary statistics for trade plans
+ * - saveTradePlanData() - שמירת נתוני תכנון (הוספה או עריכה)
+ * - _REMOVED_saveNewTradePlan() - שמירת תכנון חדש
+ * - saveTradePlan() - שמירת תוכנית מסחר
+ * - deleteTradePlan() - מחיקת תוכנית מסחר
  * 
  * EVENT HANDLING (2)
- * - restorePlanningSectionState() - * Setup sortable headers for trade plans table
- * - performTradePlanDeletion() - performTradePlanDeletion function
+ * - restorePlanningSectionState() - Restore planning section state for trade plans
+ * - performTradePlanDeletion() - מחיקת תוכנית מסחר
  * 
- * UI UPDATES (6)
- * - displayTickerInfo() - * טעינת מידע על הטיקר (למודל החדש)
- * - displayTradePlanTickerInfo() - displayTradePlanTickerInfo function
- * - hideTickerInfo() - hideTickerInfo function
- * - displayEditTickerInfo() - displayEditTickerInfo function
- * - hideEditTickerInfo() - hideEditTickerInfo function
- * - showEditTradePlanModal() - * Show add trade plan modal
+ * UI UPDATES (3)
+ * - displayTradePlanTickerInfo() - הצגת מידע על הטיקר (למודל החדש)
+ * - hideTickerInfo() - Hide ticker information display
+ * - hideEditTickerInfo() - Hide edit ticker information section
  * 
  * VALIDATION (1)
- * - checkLinkedItemsBeforeCancel() - checkLinkedItemsBeforeCancel function
+ * - checkLinkedItemsBeforeCancel() - בדיקת פריטים מקושרים לפני ביטול תכנון
  * 
- * OTHER (12)
- * - executeTradePlan() - executeTradePlan function
- * - copyTradePlan() - copyTradePlan function
- * - enableFormFields() - enableFormFields function
- * - disableFormFields() - * פתיחת מודל הוספת תכנון חדש
- * - enableEditFieldsWrapper() - * Disable form fields for trade plan creation
- * - disableEditFields() - * Enable edit form fields wrapper
- * - reactivateTradePlan() - * בדיקת פריטים מקושרים לפני ביטול תכנון
- * - openCancelTradePlanModal() - * Add reminder functionality (placeholder for add modal)
- * - cancelTradePlan() - cancelTradePlan function
- * - viewLinkedItemsForTradePlan() - viewLinkedItemsForTradePlan function
- * - filterTradePlansData() - * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
- * - filterTradePlansByType() - filterTradePlansByType function
+ * OTHER (10)
+ * - executeTradePlan() - ========================================
+ * - enableFormFields() - Enable form fields for trade plan creation
+ * - disableFormFields() - Disable form fields for trade plan creation
+ * - enableEditFieldsWrapper() - Enable edit form fields wrapper
+ * - disableEditFields() - Disable edit form fields
+ * - reactivateTradePlan() - הפעלה מחדש של תכנון מבוטל
+ * - openCancelTradePlanModal() - פתיחת מודל ביטול תכנון
+ * - cancelTradePlan() - ביטול תכנון מסחר
+ * - viewLinkedItemsForTradePlan() - View linked items for trade plan
+ * - filterTradePlansByType() - Filter trade plans by investment type
  * 
  * ==========================================
  */

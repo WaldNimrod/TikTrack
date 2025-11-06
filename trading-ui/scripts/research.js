@@ -8,22 +8,22 @@
  * Total Functions: 12
  * 
  * PAGE INITIALIZATION (2)
- * - initializeResearchPage() - initializeResearchPage function
- * - setupResearchEventListeners() - * Load research data from server
+ * - initializeResearchPage() - Initialize the research page
+ * - setupResearchEventListeners() - Setup research event listeners
  * 
  * DATA LOADING (4)
- * - loadResearchData() - * Initialize the research page
- * - getMarketOverview() - * Perform technical analysis
- * - getVolatilityIndex() - * Get market overview
- * - getNewsFeed() - * Get volatility index
+ * - loadResearchData() - Load research data from server
+ * - getMarketOverview() - Get market overview
+ * - getVolatilityIndex() - Get volatility index
+ * - getNewsFeed() - Get news feed
  * 
  * OTHER (6)
- * - analyzeMarketTrends() - * Setup research event listeners
- * - compareTickers() - * Analyze market trends
- * - technicalAnalysis() - * Compare tickers
- * - exportResearchData() - * Get news feed
- * - generateDetailedLog() - * Export research data
- * - generateDetailedLogForResearch() - generateDetailedLogForResearch function
+ * - analyzeMarketTrends() - Analyze market trends
+ * - compareTickers() - Compare tickers
+ * - technicalAnalysis() - Perform technical analysis
+ * - exportResearchData() - Export research data
+ * - generateDetailedLog() - Generate detailed log
+ * - generateDetailedLogForResearch() - Generate detailed log
  * 
  * ==========================================
  */

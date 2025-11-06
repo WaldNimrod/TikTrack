@@ -8,76 +8,76 @@
  * Total Functions: 58
  * 
  * PAGE INITIALIZATION (2)
- * - initializeAlertModalTabs() - initializeAlertModalTabs function
- * - initializeAlertConditionBuilder() - * עדכון סטטיסטיקות הערכת תנאים
+ * - initializeAlertModalTabs() - Initialize tab management for add alert modal
+ * - initializeAlertConditionBuilder() - אתחול הממשק המתקדם לבניית תנאי במודל העריכה
  * 
- * DATA LOADING (12)
- * - getDemoAlertsData() - getDemoAlertsData function
- * - loadAlertsData() - loadAlertsData function
- * - loadModalData() - loadModalData function
- * - getAlertState() - * עריכת התראה
- * - loadAlerts() - loadAlerts function
- * - loadConditionsFromSource() - loadConditionsFromSource function
- * - loadTradePlansForConditions() - * Load conditions from source type (trade_plan or trade)
- * - loadTradesForConditions() - * Load trade plans for conditions selection
- * - loadConditionsFromItem() - * Load trades for conditions selection
- * - showEvaluationLoading() - showEvaluationLoading function
- * - getMethodIdFromCondition() - getMethodIdFromCondition function
- * - loadAlertTickerInfo() - * הצגת מודל הוספת התראה
+ * DATA LOADING (13)
+ * - getDemoAlertsData() - טעינת נתוני התראות מהשרת
+ * - loadAlertsData() - פונקציה זו טוענת את כל ההתראות מהשרת ומעדכנת את הטבלה
+ * - getConditionSourceDisplay() - Resolve the display label for an alert's condition source.
+ * - loadModalData() - Load modal data for alerts
+ * - getAlertState() - קביעת מצב התראה לפי status ו-is_triggered
+ * - loadAlerts() - Alias for `loadAlertsData` retained for backward compatibility.
+ * - loadConditionsFromSource() - Load conditions from source type (trade_plan or trade)
+ * - loadTradePlansForConditions() - Load trade plans for conditions selection
+ * - loadTradesForConditions() - Load trades for conditions selection
+ * - loadConditionsFromItem() - Load conditions from selected item
+ * - showEvaluationLoading() - הצגת אינדיקטור טעינה להערכת תנאים
+ * - getMethodIdFromCondition() - קבלת מזהה שיטה מתנאי קיים
+ * - loadAlertTickerInfo() - טעינת מידע על הטיקר (למודל החדש)
  * 
- * DATA MANIPULATION (15)
- * - updatePageSummaryStats() - updatePageSummaryStats function
- * - updateRadioButtons() - updateRadioButtons function
- * - saveAlert() - * פירוק מחרוזת תנאי התראה
- * - updateStatusAndTriggered() - * בדיקת תקינות שילוב status ו-is_triggered
- * - updateAlert() - updateAlert function
- * - deleteAlertInternal() - deleteAlertInternal function
- * - confirmDeleteAlert() - * מחיקת התראה
- * - updateAlertStatus() - updateAlertStatus function
- * - updateEvaluationStats() - updateEvaluationStats function
- * - saveAlertData() - * Update evaluation statistics
- * - updateAlertsSummary() - updateAlertsSummary function
- * - createAlertFromCondition() - * Select condition for alert creation
- * - updateModalButtons() - * Initialize tab management for add alert modal
- * - updateEvaluationSummary() - updateEvaluationSummary function
- * - showAddAlertModal() - * ניקוי הממשק המתקדם
+ * DATA MANIPULATION (17)
+ * - updateAlertsTable() - Render the alerts table body using the provided alerts dataset.
+ * - updatePageSummaryStats_LEGACY() - Legacy fallback for updating alerts page summary statistics.
+ * - updateRadioButtons() - עדכון רדיו באטונים
+ * - _REMOVED_populateEditRelatedObjects() - מילוי רשימת אובייקטים למודל העריכה
+ * - saveAlert() - Save new alert
+ * - updateStatusAndTriggered() - Update status and triggered state
+ * - updateAlert() - עדכון התראה קיימת
+ * - deleteAlertInternal() - מחיקת התראה
+ * - confirmDeleteAlert() - אישור מחיקת התראה
+ * - _REMOVED_toggleAlert() - הפעלה/כיבוי התראה
+ * - updateAlertStatus() - עדכון סטטוס התראה
+ * - updateEvaluationStats() - Update evaluation statistics
+ * - saveAlertData() - Save alert data wrapper
+ * - updateAlertsSummary() - עדכון סטטיסטיקות ההתראות
+ * - createAlertFromCondition() - Create alert from selected condition
+ * - updateModalButtons() - Update modal buttons based on active tab
+ * - updateEvaluationSummary() - עדכון סטטיסטיקות הערכת תנאים
  * 
  * EVENT HANDLING (16)
- * - onRelationTypeChange() - onRelationTypeChange function
- * - onRelatedObjectChange() - * טיפול בשינוי סוג שיוך
- * - toggleConditionFields() - * טיפול בבחירת אובייקט
- * - enableConditionFields() - enableConditionFields function
- * - disableConditionFields() - * Enable condition fields for add modal
- * - enableEditConditionFields() - * Enable condition fields for add modal
- * - disableEditConditionFields() - * Enable condition fields for add modal
- * - parseAlertCondition() - parseAlertCondition function
- * - validateAlertStatusCombination() - validateAlertStatusCombination function
- * - restoreAlertsSectionState() - * אישור מחיקת התראה
- * - displayAvailableConditions() - displayAvailableConditions function
- * - selectConditionForAlert() - selectConditionForAlert function
- * - evaluateAllConditions() - evaluateAllConditions function
- * - refreshConditionEvaluations() - refreshConditionEvaluations function
- * - displayEvaluationResults() - * הצגת אינדיקטור טעינה להערכת תנאים
- * - cleanupAlertConditionBuilder() - * קבלת מזהה שיטה מתנאי קיים
+ * - onRelationTypeChange() - טיפול בשינוי סוג שיוך
+ * - onRelatedObjectChange() - טיפול בבחירת אובייקט
+ * - toggleConditionFields() - הפעלה/השבתה של שדות התנאי
+ * - enableConditionFields() - Enable condition fields for add modal
+ * - disableConditionFields() - השבתת שדות התנאי
+ * - enableEditConditionFields() - הפעלת שדות התנאי במודל העריכה
+ * - disableEditConditionFields() - השבתת שדות התנאי במודל העריכה
+ * - parseAlertCondition() - פירוק מחרוזת תנאי התראה
+ * - validateAlertStatusCombination() - ולידציה של שילוב סטטוס התראה
+ * - restoreAlertsSectionState() - Restore alerts section state
+ * - displayAvailableConditions() - Display available conditions for selection
+ * - selectConditionForAlert() - Select condition for alert creation
+ * - evaluateAllConditions() - הערכת כל התנאים הפעילים במערכת
+ * - refreshConditionEvaluations() - רענון תוצאות הערכת תנאים
+ * - displayEvaluationResults() - הצגת תוצאות הערכת תנאים
+ * - cleanupAlertConditionBuilder() - ניקוי הממשק המתקדם
  * 
- * UI UPDATES (2)
- * - showEditAlertModal() - * ניקוי הממשק המתקדם
- * - displayAlertTickerInfo() - * מחיקת התראה
+ * UI UPDATES (1)
+ * - displayAlertTickerInfo() - הצגת מידע על הטיקר (למודל החדש)
  * 
  * VALIDATION (1)
- * - validateAlertForm() - validateAlertForm function
+ * - validateAlertForm() - Validate alert form wrapper
  * 
- * OTHER (10)
- * - populateSelect() - populateSelect function
- * - populateRelatedObjects() - * Enable condition fields for add modal
- * - populateEditRelatedObjects() - populateEditRelatedObjects function
- * - editAlert() - editAlert function
- * - filterAlertsByRelatedObjectTypeWrapper() - filterAlertsByRelatedObjectTypeWrapper function
- * - filterAlertsByRelatedObjectType() - filterAlertsByRelatedObjectType function
- * - reactivateAlert() - reactivateAlert function
- * - toggleAlert() - toggleAlert function
- * - generateDetailedLog() - generateDetailedLog function
- * - generateDetailedLogForAlerts() - generateDetailedLogForAlerts function
+ * OTHER (8)
+ * - populateSelect() - מילוי select עם נתונים
+ * - populateRelatedObjects() - מילוי רשימת אובייקטים לפי סוג השיוך
+ * - editAlert() - עריכת התראה
+ * - filterAlertsByRelatedObjectTypeWrapper() - פילטר התראות לפי סוג אובייקט מקושר
+ * - filterAlertsByRelatedObjectType() - Filter alerts by related object type
+ * - reactivateAlert() - הפעלה מחדש של התראה מבוטלת
+ * - generateDetailedLog() - Generate detailed log for alerts page
+ * - generateDetailedLogForAlerts() - Copy the alerts detailed log to the clipboard.
  * 
  * ==========================================
  */
@@ -449,6 +449,11 @@ async function loadAlertsData() {
  * @param {Array} alerts - מערך של התראות לעדכון
  */
 // פונקציה להצגת מקור התנאי
+/**
+ * Resolve the display label for an alert's condition source.
+ * @param {Object} alert - Alert record to inspect
+ * @returns {string} Condition source label in Hebrew
+ */
 function getConditionSourceDisplay(alert) {
   try {
     // בדיקה אם ההתראה מקושרת לתנאי
@@ -474,6 +479,11 @@ function getConditionSourceDisplay(alert) {
   }
 }
 
+/**
+ * Render the alerts table body using the provided alerts dataset.
+ * @param {Array<Object>} alerts - Alerts data array to render
+ * @returns {void}
+ */
 function updateAlertsTable(alerts) {
   try {
     const tbody = document.querySelector('#alertsTable tbody');
@@ -709,6 +719,12 @@ function updateAlertsTable(alerts) {
  * @returns {void}
  */
 // REMOVED: updatePageSummaryStats - use window.InfoSummarySystem.calculateAndRender from services/statistics-calculator.js directly
+/**
+ * Legacy fallback for updating alerts page summary statistics.
+ * Prefer using InfoSummarySystem instead of this helper.
+ *
+ * @returns {Promise<void>}
+ */
 async function updatePageSummaryStats_LEGACY() {
   try {
     // Get alerts data from global scope
@@ -2010,6 +2026,10 @@ window.onRelatedObjectChange = onRelatedObjectChange;
 window.parseAlertCondition = parseAlertCondition;
 
 // פונקציה לטעינת התראות (alias ל-loadAlertsData)
+/**
+ * Alias for `loadAlertsData` retained for backward compatibility.
+ * @returns {Promise<Array<Object>>}
+ */
 function loadAlerts() {
   const result = loadAlertsData();
   
@@ -2497,6 +2517,10 @@ window.editAlert = editAlert;
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
 // Local  function for alerts page
+/**
+ * Copy the alerts detailed log to the clipboard.
+ * @returns {Promise<void>}
+ */
 async function generateDetailedLogForAlerts() {
     try {
         const detailedLog = await generateDetailedLog();

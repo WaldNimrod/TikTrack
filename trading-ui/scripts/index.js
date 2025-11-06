@@ -5,29 +5,28 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 16
+ * Total Functions: 15
  * 
- * DATA MANIPULATION (5)
- * - createTradesStatusChart() - * Export overview data from the index page
- * - createPerformanceChart() - createPerformanceChart function
- * - createAccountChart() - createAccountChart function
- * - createMixedChart() - createMixedChart function
- * - createMixedChartData() - REMOVED: not used
+ * DATA MANIPULATION (4)
+ * - createTradesStatusChart() - Create trades status chart on the index page
+ * - createPerformanceChart() - Create performance chart on the index page
+ * - createAccountChart() - Create the account distribution chart on the index page.
+ * - createMixedChart() - Create the mixed analytics chart on the index page.
  * 
  * EVENT HANDLING (1)
- * - quickAction() - * Refresh overview data on the index page
+ * - quickAction() - Execute quick actions on the index page
  * 
  * OTHER (10)
- * - switchTableTab() - switchTableTab function
- * - refreshOverview() - * Switch between table tabs on the index page
- * - exportOverview() - * Switch between table tabs on the index page
- * - refreshAllCharts() - refreshAllCharts function
- * - refreshChart() - refreshChart function
- * - exportChart() - exportChart function
- * - exportAllCharts() - exportAllCharts function
- * - generateDetailedLog() - generateDetailedLog function
- * - debugZIndexStatus() - debugZIndexStatus function
- * - copyDetailedLogLocal() - copyDetailedLogLocal function
+ * - switchTableTab() - Switch between table tabs on the index page
+ * - refreshOverview() - Refresh overview data on the index page
+ * - exportOverview() - Export overview data from the index page
+ * - refreshAllCharts() - Refresh all dashboard charts in parallel.
+ * - refreshChart() - Refresh a single dashboard chart by identifier.
+ * - exportChart() - Export a single dashboard chart using the chart export system.
+ * - exportAllCharts() - Export all rendered dashboard charts at once.
+ * - generateDetailedLog() - Build a detailed diagnostic log for the index dashboard.
+ * - debugZIndexStatus() - Output current z-index values for header components (diagnostic helper).
+ * - copyDetailedLogLocal() - Copy the detailed dashboard log to the clipboard.
  * 
  * ==========================================
  */
@@ -227,6 +226,10 @@ async function createPerformanceChart() {
     }
 }
 
+/**
+ * Create the account distribution chart on the index page.
+ * @returns {Promise<void>}
+ */
 async function createAccountChart() {
     try {
         // window.Logger.info('🏦 Creating account chart...', { page: "index" });
@@ -268,6 +271,10 @@ async function createAccountChart() {
     }
 }
 
+/**
+ * Create the mixed analytics chart on the index page.
+ * @returns {Promise<void>}
+ */
 async function createMixedChart() {
     try {
         // window.Logger.info('🔀 Creating mixed chart...', { page: "index" });
@@ -318,6 +325,10 @@ async function createMixedChart() {
 // Flag to prevent duplicate chart refresh
 let chartsRefreshing = false;
 
+/**
+ * Refresh all dashboard charts in parallel.
+ * @returns {Promise<void>}
+ */
 async function refreshAllCharts() {
     // Prevent duplicate refresh
     if (chartsRefreshing) {
@@ -351,6 +362,11 @@ async function refreshAllCharts() {
     }
 }
 
+/**
+ * Refresh a single dashboard chart by identifier.
+ * @param {string} chartId - Chart identifier (tradesStatusChart, performanceChart, etc.)
+ * @returns {Promise<void>}
+ */
 async function refreshChart(chartId) {
     window.Logger.info(`🔄 Refreshing chart: ${chartId}`, { page: "index" });
     
@@ -386,6 +402,11 @@ async function refreshChart(chartId) {
     }
 }
 
+/**
+ * Export a single dashboard chart using the chart export system.
+ * @param {string} chartId - Chart identifier to export
+ * @returns {Promise<void>}
+ */
 async function exportChart(chartId) {
     window.Logger.info(`📤 Exporting chart: ${chartId}`, { page: "index" });
     
@@ -410,6 +431,10 @@ async function exportChart(chartId) {
     }
 }
 
+/**
+ * Export all rendered dashboard charts at once.
+ * @returns {Promise<void>}
+ */
 async function exportAllCharts() {
     window.Logger.info('📤 Exporting all charts...', { page: "index" });
     
@@ -489,6 +514,10 @@ window.exportChart = exportChart;
 window.exportAllCharts = exportAllCharts;
 
 // Detailed Log Functions for Index Page
+/**
+ * Build a detailed diagnostic log for the index dashboard.
+ * @returns {string} Multiline log string describing charts, counts, and system state
+ */
 function generateDetailedLog() {
     try {
         const logData = {
@@ -604,6 +633,10 @@ function generateDetailedLog() {
 
 
 // Z-Index Debug Function - בדיקת מצב z-index בפועל
+/**
+ * Output current z-index values for header components (diagnostic helper).
+ * @returns {void}
+ */
 function debugZIndexStatus() {
     window.Logger.info('🔍 בדיקת מצב Z-Index במערכת ראש הדף', { page: "index" });
     window.Logger.info('=====================================', { page: "index" });
@@ -670,6 +703,10 @@ function debugZIndexStatus() {
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
 // Local copyDetailedLog function for index page
+/**
+ * Copy the detailed dashboard log to the clipboard.
+ * @returns {Promise<void>}
+ */
 async function copyDetailedLogLocal() {
     try {
         const detailedLog = await generateDetailedLog();

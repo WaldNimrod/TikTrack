@@ -5,81 +5,73 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 62
+ * Total Functions: 54
  * 
  * PAGE INITIALIZATION (2)
- * - setupModalConfigurations() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
- * - setupExecutionsFilterFunctions() - setupExecutionsFilterFunctions function
+ * - setupModalConfigurations() - הגדרת תצורות מודלים
+ * - setupExecutionsFilterFunctions() - Setup executions filter functions
  * 
  * DATA LOADING (6)
- * - loadExecutionsData() - * מעבר להתראה ספציפית
- * - loadTickersWithOpenOrClosedTradesAndPlans() - * הגדרת תצורות מודלים
- * - loadActiveTradesForTicker() - * הפעלה/השבתה של שדה מזהה חיצוני לפי בחירת מקור
- * - loadExecutionTickerInfo() - * Enable execution form fields
- * - loadTradeExecutions() - * מעבר לטרייד המקושר
- * - loadTickersSummaryData() - loadTickersSummaryData function
+ * - loadExecutionsData() - Load executions data from server
+ * - loadTickersWithOpenOrClosedTradesAndPlans() - Load tickers with open or closed trades and plans
+ * - loadActiveTradesForTicker() - טעינת טריידים לטיקר שנבחר
+ * - loadExecutionTickerInfo() - טעינת מידע על הטיקר
+ * - loadTradeExecutions() - טעינת עסקאות לטרייד
+ * - loadTickersSummaryData() - טעינת נתוני טיקרים חלקיים
  * 
- * DATA MANIPULATION (20)
- * - addExecution() - addExecution function
- * - resetAddExecutionForm() - resetAddExecutionForm function
- * - updateRealizedPLField() - updateRealizedPLField function
- * - updateExecutionWrapper() - updateExecutionWrapper function
- * - updateExecutionsTableMain() - updateExecutionsTableMain function
- * - updateTradesOnCheckboxChange() - updateTradesOnCheckboxChange function
- * - updateTradesOnTickerChange() - updateTradesOnTickerChange function
- * - addNewTicker() - * Show ticker help
- * - addNewPlan() - * הוספת טיקר חדש
- * - addNewTrade() - * הוספת טיקר חדש
- * - updateExecutionsSummary() - * הוספת תכנון חדש
- * - calculateAddExecutionValues() - calculateAddExecutionValues function
- * - updateExecutionsTableForTradeModal() - * טעינת עסקאות לטרייד
- * - addEditBuySell() - addEditBuySell function
- * - updateExecutionsGlobalData() - updateExecutionsGlobalData function
- * - updateTickersSummaryTable() - updateTickersSummaryTable function
- * - addExecutionForTicker() - * צפייה בפרטי טיקר
- * - updateTickersList() - * הצגה/הסתרה של סקשן הטיקרים
- * - showAddExecutionModal() - showAddExecutionModal function
- * - deleteExecution() - * Show add execution modal
+ * DATA MANIPULATION (19)
+ * - addExecution() - Add new execution
+ * - updateRealizedPLField() - עדכון שדה Realized P/L לפי סוג הפעולה
+ * - _REMOVED_fillEditExecutionForm() - מילוי טופס עריכת עסקה
+ * - _REMOVED_updateExecutionWrapper() - עדכון עסקה קיימת
+ * - updateExecutionsTableMain() - עדכון טבלת עסקעות
+ * - updateTradesOnCheckboxChange() - עדכון טריידים כאשר הצ'קבוקס משתנה
+ * - updateTradesOnTickerChange() - עדכון טריידים כאשר הטיקר משתנה
+ * - addNewTicker() - הוספת טיקר חדש
+ * - addNewPlan() - הוספת תכנון חדש
+ * - addNewTrade() - הוספת טרייד חדש
+ * - updateExecutionsSummary() - עדכון סיכום נתונים לעסקעות
+ * - calculateAddExecutionValues() - חישוב ערכים מחושבים לטופס הוספה
+ * - updateExecutionsTableForTradeModal() - עדכון טבלת העסקאות במודל עריכת טרייד
+ * - addEditBuySell() - הוספת קניה/מכירה במודל עריכת טרייד
+ * - updateExecutionsGlobalData() - Update the global execution datasets used by the page (original, all, filtered).
+ * - updateTickersSummaryTable() - עדכון טבלת טיקרים חלקית
+ * - addExecutionForTicker() - הוספת עסקה לטיקר
+ * - updateTickersList() - עדכון רשימת הטיקרים לפי הצ'קבוקס
+ * - deleteExecution() - מחיקת ביצוע
  * 
- * EVENT HANDLING (20)
- * - editExecution() - editExecution function
- * - resetExecutionForm() - resetExecutionForm function
- * - resetEditExecutionForm() - resetEditExecutionForm function
- * - fillEditExecutionForm() - * הצגת מודל עריכת עסקה
- * - showExecutionLinkedItemsModal() - showExecutionLinkedItemsModal function
- * - goToNote() - * מעבר לתכנון ספציפי
- * - filterExecutionsLocally() - filterExecutionsLocally function
- * - toggleExecutionFormFields() - toggleExecutionFormFields function
- * - enableExecutionFormFields() - * הפעלה/השבתה של שדות הטופס
- * - disableExecutionFormFields() - * הפעלה/השבתה של שדות הטופס
- * - displayExecutionTickerInfo() - displayExecutionTickerInfo function
- * - hideExecutionTickerInfo() - hideExecutionTickerInfo function
- * - calculateExecutionValues() - * הסתרת מידע על הטיקר
- * - calculateEditExecutionValues() - * חישוב ערכים מחושבים לטופס הוספה
- * - linkExistingExecution() - * הוספת קניה/מכירה במודל עריכת טרייד
- * - unlinkExecution() - * הוספת קניה/מכירה במודל עריכת טרייד
- * - toggleTickersSection() - * הוספת עסקה לטיקר
- * - toggleExecutionsSection() - toggleExecutionsSection function
- * - showEditExecutionModal() - * Show add execution modal
- * - performExecutionDeletion() - performExecutionDeletion function
+ * EVENT HANDLING (13)
+ * - editExecution() - Open the edit modal for a specific execution record.
+ * - goToNote() - מעבר להערה ספציפית
+ * - filterExecutionsLocally() - Perform client-side filtering of executions by status, type, account, date range, and search term.
+ * - toggleExecutionFormFields() - הפעלה/השבתה של שדות הטופס
+ * - enableExecutionFormFields() - Enable execution form fields
+ * - disableExecutionFormFields() - השבתת שדות הטופס
+ * - displayExecutionTickerInfo() - הצגת מידע על הטיקר
+ * - hideExecutionTickerInfo() - הסתרת מידע על הטיקר
+ * - calculateExecutionValues() - חישוב ערכים מחושבים לטופס עסקה (הוספה או עריכה)
+ * - calculateEditExecutionValues() - חישוב ערכים מחושבים לטופס עריכה
+ * - linkExistingExecution() - שיוך עסקה קיימת לטרייד
+ * - unlinkExecution() - ביטול שיוך עסקה מטרייד
+ * - performExecutionDeletion() - Delete an execution via the API and refresh local state.
  * 
  * UI UPDATES (2)
- * - displayLinkedItems() - displayLinkedItems function
- * - showTickerHelp() - * מעבר לדף טיקר (בפיתוח)
+ * - displayLinkedItems() - הצגת הפריטים המקושרים
+ * - showTickerHelp() - Show ticker help
  * 
  * OTHER (12)
- * - goToTrade() - goToTrade function
- * - goToPlan() - * מעבר לטרייד ספציפי
- * - goToAlert() - * מעבר לטרייד ספציפי
- * - isDateInRange() - isDateInRange function
- * - restoreSortState() - restoreSortState function
- * - enableAllFields() - enableAllFields function
- * - goToTickerPage() - * עדכון טריידים כאשר הטיקר משתנה
- * - goToLinkedTrade() - * חישוב ערכים מחושבים לטופס הוספה
- * - applyAccountFilterWithTradesData() - applyAccountFilterWithTradesData function
- * - toggleExternalIdField() - toggleExternalIdField function
- * - refreshTickersSummary() - refreshTickersSummary function
- * - viewTickerDetails() - * רענון רשימת טיקרים
+ * - goToTrade() - מעבר לטרייד ספציפי
+ * - goToPlan() - מעבר לתכנון ספציפי
+ * - goToAlert() - מעבר להתראה ספציפית
+ * - isDateInRange() - Determine whether a given execution date falls within the selected range.
+ * - restoreSortState() - שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * - enableAllFields() - הפעלת כל השדות אחרי בחירת טרייד/תכנון
+ * - goToTickerPage() - מעבר לדף טיקר (בפיתוח)
+ * - goToLinkedTrade() - מעבר לטרייד המקושר
+ * - applyAccountFilterWithTradesData() - Apply account filter to executions using pre-loaded trades data for account names.
+ * - toggleExternalIdField() - הצגת/הסתרת שדה מזהה חיצוני לפי מקור
+ * - refreshTickersSummary() - רענון רשימת טיקרים
+ * - viewTickerDetails() - צפייה בפרטי טיקר
  * 
  * ==========================================
  */
@@ -175,6 +167,11 @@ let tradesData = []; // נתוני טריידים לשמירת מפת חשבונ
 // פונקציות בסיסיות
 // REMOVED: openExecutionDetails - unused function, replaced by showAddExecutionModal
 
+/**
+ * Open the edit modal for a specific execution record.
+ * @param {number|string} id - Execution identifier to edit
+ * @returns {void}
+ */
 function editExecution(id) {
   try {
   // Use ModalManagerV2 directly
@@ -1298,6 +1295,12 @@ async function updateExecutionsTableMain(executions) {
 // פונקציה formatDate מוגדרת בקובץ main.js
 
 // פונקציה לבדיקה אם תאריך נמצא בטווח
+/**
+ * Determine whether a given execution date falls within the selected range.
+ * @param {string} dateString - Execution date string
+ * @param {string} dateRange - Selected date range label
+ * @returns {boolean}
+ */
 function isDateInRange(dateString, dateRange) {
   try {
   // isDateInRange called
@@ -1383,6 +1386,16 @@ function isDateInRange(dateString, dateRange) {
 window.isDateInRange = isDateInRange;
 
 // פונקציית פילטור מקומי לעסקאות
+/**
+ * Perform client-side filtering of executions by status, type, account, date range, and search term.
+ * @param {Array<Object>} executions - Execution dataset to filter
+ * @param {Array<string>} selectedStatuses - Selected status filters
+ * @param {Array<string>} selectedTypes - Selected execution type filters
+ * @param {Array<string>} selectedAccounts - Selected trading account filters
+ * @param {string} dateRange - Selected date range label
+ * @param {string} searchTerm - Free-text search term
+ * @returns {Array<Object>} Filtered executions
+ */
 function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
   try {
   // filterExecutionsLocally called
@@ -2685,6 +2698,11 @@ function setupExecutionsFilterFunctions() {
   };
 
   // פונקציה עזר לפילטר חשבון מסחר עם נתוני טריידים
+  /**
+   * Apply account filter to executions using pre-loaded trades data for account names.
+   * @param {Array<string>} namesArray - Array of account names selected in the filter
+   * @returns {Array<Object>} Filtered execution records
+   */
   function applyAccountFilterWithTradesData(namesArray) {
     const tradesMap = {};
 
@@ -2849,6 +2867,11 @@ function setupExecutionsFilterFunctions() {
 }
 
 // פונקציה לעדכון הנתונים הגלובליים
+/**
+ * Update the global execution datasets used by the page (original, all, filtered).
+ * @param {Array<Object>} executions - Latest execution dataset from the server
+ * @returns {void}
+ */
 function updateExecutionsGlobalData(executions) {
   originalExecutions = executions || [];
   allExecutions = [...originalExecutions];
@@ -3337,6 +3360,11 @@ async function deleteExecution(executionId) {
     }
 }
 
+/**
+ * Delete an execution via the API and refresh local state.
+ * @param {number|string} executionId - Execution identifier to delete
+ * @returns {Promise<void>}
+ */
 async function performExecutionDeletion(executionId) {
     try {
         // Clear cache before deletion to ensure fresh data after reload

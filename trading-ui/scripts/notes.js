@@ -5,63 +5,60 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 40
+ * Total Functions: 37
  * 
  * PAGE INITIALIZATION (1)
- * - setupNoteValidationEvents() - setupNoteValidationEvents function
+ * - setupNoteValidationEvents() - Setup note validation events
  * 
  * DATA LOADING (5)
- * - downloadFile() - downloadFile function
- * - getEditorContent() - * ניקוי עיצוב בעורך
- * - getTypeDisplayName() - getTypeDisplayName function
- * - loadNoteForViewing() - * View a note
- * - getNoteRelatedDisplay() - getNoteRelatedDisplay function
+ * - downloadFile() - Download file from note
+ * - getEditorContent() - קבלת תוכן מעורך הטקסט
+ * - getTypeDisplayName() - Get display name for type
+ * - loadNoteForViewing() - View a note
+ * - getNoteRelatedDisplay() - Get related object display for note
  * 
  * DATA MANIPULATION (11)
- * - deleteNote() - * Open note details modal
- * - updateNotesTable() - updateNotesTable function
- * - updateNotesSummary() - updateNotesSummary function
- * - updateGridFromComponent() - updateGridFromComponent function
- * - updateRadioButtons() - updateRadioButtons function
- * - saveNote() - saveNote function
- * - updateNoteFromModal() - updateNoteFromModal function
+ * - deleteNote() - Delete note
+ * - updateNotesTable() - Update notes table display
+ * - updateNotesSummary() - Update the notes summary section
+ * - updateGridFromComponent() - Update grid from component filters
+ * - updateRadioButtons() - Update radio buttons for note relation types
+ * - _REMOVED_validateEditNoteForm() - Validate edit note form
+ * - saveNote() - Validate edit note form
+ * - updateNoteFromModal() - Validate edit note form
  * - confirmDeleteNote() - confirmDeleteNote function
  * - deleteNoteFromServer() - deleteNoteFromServer function
- * - removeCurrentAttachment() - removeCurrentAttachment function
- * - showAddNoteModal() - * Replace current attachment
+ * - removeCurrentAttachment() - Remove current attachment
  * 
  * EVENT HANDLING (4)
- * - restoreNotesSectionState() - restoreNotesSectionState function
- * - onNoteRelationTypeChange() - onNoteRelationTypeChange function
- * - clearNoteValidationErrors() - clearNoteValidationErrors function
- * - setEditorContent() - * קבלת תוכן מעורך הטקסט
+ * - restoreNotesSectionState() - Restore the state of notes sections from localStorage
+ * - onNoteRelationTypeChange() - Handle note relation type change
+ * - clearNoteValidationErrors() - Clear note validation errors
+ * - setEditorContent() - הגדרת תוכן לעורך הטקסט
  * 
- * UI UPDATES (3)
- * - showTickerPage() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
- * - displayCurrentAttachment() - * Edit current note
- * - showEditNoteModal() - * Toggle section using global function
+ * UI UPDATES (2)
+ * - showTickerPage() - פונקציה להצגת דף טיקר (כרגע הודעת "בפיתוח")
+ * - displayCurrentAttachment() - Display current attachment in edit modal
  * 
- * VALIDATION (2)
- * - validateNoteForm() - validateNoteForm function
- * - validateEditNoteForm() - * ולידציה של טופס הערה
+ * VALIDATION (1)
+ * - validateNoteForm() - ולידציה של טופס הערה
  * 
  * UTILITIES (2)
- * - formatText() - * פונקציה להצגת דף טיקר (כרגע הודעת "בפיתוח")
- * - clearFormatting() - clearFormatting function
+ * - formatText() - עיצוב טקסט בעורך
+ * - clearFormatting() - ניקוי עיצוב בעורך
  * 
- * OTHER (12)
- * - viewLinkedItems() - viewLinkedItems function
- * - openNoteDetails() - openNoteDetails function
- * - editNote() - * Open note details modal
- * - populateSelect() - * Update grid from component filters
- * - populateEditSelectByType() - * Handle note relation type change
+ * OTHER (11)
+ * - openNoteDetails() - Open note details modal
+ * - editNote() - Edit note
+ * - populateSelect() - מילוי select עם נתונים
+ * - populateEditSelectByType() - Handle note relation type change
  * - clearSelectedFile() - clearSelectedFile function
- * - restoreSortState() - restoreSortState function
- * - filterNotesData() - filterNotesData function
- * - filterNotesByType() - * Filter notes data by search term
- * - viewNote() - * Get display name for type
- * - editCurrentNote() - editCurrentNote function
- * - replaceCurrentAttachment() - replaceCurrentAttachment function
+ * - restoreSortState() - שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * - filterNotesData() - Filter notes data by search term
+ * - filterNotesByType() - Filter notes by type
+ * - viewNote() - View a note
+ * - editCurrentNote() - Edit current note
+ * - replaceCurrentAttachment() - Replace current attachment
  * 
  * ==========================================
  */

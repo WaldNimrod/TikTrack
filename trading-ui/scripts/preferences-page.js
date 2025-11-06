@@ -5,19 +5,20 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 4
+ * Total Functions: 5
  * 
  * PAGE INITIALIZATION (1)
- * - initializePreferencesPage() - initializePreferencesPage function
+ * - initializePreferencesPage() - Initialize page-specific functionality
  * 
  * DATA LOADING (1)
- * - loadAccountsForPreferences() - loadAccountsForPreferences function
+ * - loadAccountsForPreferences() - Load trading accounts for default account preference
  * 
  * DATA MANIPULATION (1)
- * - createNewProfile() - createNewProfile function
+ * - createNewProfile() - Create New Profile - Clean Implementation
  * 
- * OTHER (1)
- * - switchActiveProfile() - switchActiveProfile function
+ * OTHER (2)
+ * - switchActiveProfile() - Switch Active Profile - Simple Implementation
+ * - copyDetailedLogLocal() - Copy the preferences page diagnostic log to the clipboard.
  * 
  * ==========================================
  */
@@ -337,6 +338,10 @@ window.debugProfileLoading = async function() {
         console.error('❌ Error in debugProfileLoading:', error);
     }
 };
+/**
+ * Copy the preferences page diagnostic log to the clipboard.
+ * @returns {Promise<void>}
+ */
 async function copyDetailedLogLocal() {
     try {
         const log = [];

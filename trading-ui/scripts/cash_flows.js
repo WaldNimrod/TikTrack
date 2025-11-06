@@ -5,58 +5,60 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 35
+ * Total Functions: 37
  * 
  * PAGE INITIALIZATION (3)
- * - initializeCashFlowsPage() - initializeCashFlowsPage function
- * - setupSourceFieldListeners() - setupSourceFieldListeners function
- * - initializeExternalIdFields() - * Setup source field listeners
+ * - initializeCashFlowsPage() - אתחול הדף
+ * - setupSourceFieldListeners() - Setup source field listeners
+ * - initializeExternalIdFields() - Initialize external ID fields
  * 
  * DATA LOADING (10)
- * - loadCashFlowsData() - loadCashFlowsData function
- * - getAccountNameById() - getAccountNameById function
- * - ensureTradingAccountsLoaded() - ensureTradingAccountsLoaded function
- * - loadCashFlows() - * טעינת נתוני חשבונות מסחר אם הם לא נטענו
- * - loadAccountsForCashFlow() - loadAccountsForCashFlow function
- * - loadCurrenciesForCashFlow() - loadCurrenciesForCashFlow function
- * - getCashFlowTypeWithColor() - * Format amount
- * - getCashFlowTypeText() - getCashFlowTypeText function
- * - loadTradesForCashFlow() - * Edit cash flow
- * - loadTradePlansForCashFlow() - loadTradePlansForCashFlow function
+ * - loadCashFlowsData() - Load cash flows data from server
+ * - getAccountNameById() - Get account name by ID
+ * - ensureTradingAccountsLoaded() - טעינת נתוני חשבונות מסחר אם הם לא נטענו
+ * - _REMOVED_loadCashFlows() - טעינת תזרימי מזומנים מהשרת
+ * - loadAccountsForCashFlow() - טעינת רשימת חשבונות למודולי cash flow
+ * - loadCurrenciesForCashFlow() - טעינת רשימת מטבעות למודולי cash flow
+ * - getCashFlowTypeWithColor() - Get cash flow type with color
+ * - getCashFlowTypeText() - Get cash flow type text
+ * - _REMOVED_loadTradesForCashFlow() - Load trades for cash flow modals
+ * - _REMOVED_loadTradePlansForCashFlow() - Load trade plans for cash flow modals
  * 
- * DATA MANIPULATION (6)
- * - deleteCashFlow() - deleteCashFlow function
- * - updatePageSummaryStats() - Uses InfoSummarySystem from services/statistics-calculator.js
- * - updateCashFlowsTable() - * Format USD rate
- * - updateCashFlow() - updateCashFlow function
- * - saveCashFlow() - saveCashFlow function
- * - confirmDeleteCashFlow() - confirmDeleteCashFlow function
+ * DATA MANIPULATION (7)
+ * - deleteCashFlow() - מחיקת תזרים מזומנים
+ * - updatePageSummaryStats() - Update page summary statistics
+ * - updateCashFlowsTable() - Update cash flows table
+ * - updateCashFlow() - עדכון תזרים מזומנים
+ * - saveCashFlow() - Save cash flow - required by ModalManagerV2
+ * - confirmDeleteCashFlow() - Confirm delete cash flow
+ * - _REMOVED_generateDetailedLogForCashFlows() - _REMOVED_generateDetailedLogForCashFlows function
  * 
  * EVENT HANDLING (1)
- * - performCashFlowDeletion() - performCashFlowDeletion function
+ * - performCashFlowDeletion() - Perform cash flow deletion
  * 
  * UI UPDATES (2)
- * - renderCashFlowsTable() - * טעינת רשימת מטבעות למודולי cash flow
- * - showCashFlowDetails() - * Format USD rate
+ * - renderCashFlowsTable() - רינדור טבלת תזרימי מזומנים
+ * - showCashFlowDetails() - Show cash flow details
  * 
- * VALIDATION (2)
- * - validateCashFlowForm() - validateCashFlowForm function
- * - validateEditCashFlowForm() - validateEditCashFlowForm function
+ * VALIDATION (4)
+ * - validateCashFlowAmount() - Helper validation function for cash flow amount
+ * - validateCashFlowDate() - Helper validation function for cash flow date
+ * - validateCashFlowForm() - Validate cash flow form
+ * - validateEditCashFlowForm() - Validate edit cash flow form
  * 
  * UTILITIES (3)
- * - formatAmount() - formatAmount function
- * - formatCashFlowAmount() - * Get cash flow type text
- * - formatUsdRate() - formatUsdRate function
+ * - formatAmount() - Format amount
+ * - formatCashFlowAmount() - Format cash flow amount
+ * - formatUsdRate() - Format USD rate
  * 
- * OTHER (8)
- * - calculateBalance() - calculateBalance function
- * - startAutoRefresh() - * Update cash flows table
- * - applyDynamicColors() - * Start auto refresh
- * - applyUserPreferences() - applyUserPreferences function
- * - manageExternalIdField() - * Confirm delete cash flow
- * - editCashFlow() - editCashFlow function
- * - generateDetailedLog() - generateDetailedLog function
- * - generateDetailedLogForCashFlows() - generateDetailedLogForCashFlows function
+ * OTHER (7)
+ * - calculateBalance() - Calculate balance
+ * - startAutoRefresh() - Start auto refresh
+ * - applyDynamicColors() - החלת מערכת צבעים דינמית
+ * - applyUserPreferences() - Apply user preferences
+ * - manageExternalIdField() - Manage external ID field
+ * - editCashFlow() - Edit cash flow
+ * - generateDetailedLog() - Generate detailed log
  * 
  * ==========================================
  */

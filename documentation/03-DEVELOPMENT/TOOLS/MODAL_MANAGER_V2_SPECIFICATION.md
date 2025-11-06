@@ -411,7 +411,7 @@ applyDefaultValues(form) {
     
     const preferences = window.PreferencesSystem.manager?.currentPreferences || {};
     
-    // ברירת מחדל לחשבון מסחר
+    // ברירת מחדל לחשבון המסחר
     const accountField = form.querySelector('[id*="Account"], [name*="account"]');
     if (accountField && preferences.defaultTradingAccount) {
         accountField.value = preferences.defaultTradingAccount;

@@ -5,7 +5,7 @@
  * מערכת הצגת פוזיציות ופורטפוליו
  * 
  * תכונות:
- * - טבלת פוזיציות לפי חשבון
+ * - טבלת פוזיציות לפי חשבון מסחר
  * - טבלת פורטפוליו מלא עם פילטרים
  * - וויזארד סיכום (מינימאלי ומלא)
  * - אינטגרציה מלאה עם UnifiedCacheManager
@@ -110,7 +110,7 @@ async function populatePositionsAccountSelector(autoSelectDefault = false) {
         window.trading_accountsData.forEach(account => {
             const option = document.createElement('option');
             option.value = account.id;
-            option.textContent = account.name || `חשבון ${account.id}`;
+            option.textContent = account.name || `חשבון מסחר ${account.id}`;
             selector.appendChild(option);
         });
     }
@@ -446,7 +446,7 @@ async function populatePortfolioAccountSelector() {
         window.trading_accountsData.forEach(account => {
             const option = document.createElement('option');
             option.value = account.id;
-            option.textContent = account.name || `חשבון ${account.id}`;
+            option.textContent = account.name || `חשבון מסחר ${account.id}`;
             selector.appendChild(option);
         });
     }
@@ -842,7 +842,7 @@ window.showPositionDetails = async function(accountId, tickerId) {
                 positionData.side;
             
             window.showInfoNotification('פרטי פוזיציה', 
-                `חשבון: ${positionData.account_name || accountId}\n` +
+                `חשבון מסחר: ${positionData.account_name || accountId}\n` +
                 `טיקר: ${positionData.ticker_symbol || tickerId}\n` +
                 `כמות: ${Math.abs(positionData.quantity || 0)}\n` +
                 `צד: ${sideHtml}\n` +
@@ -937,7 +937,7 @@ function renderPositionDetailsContent(positionData, tickerId) {
                         ${positionData.market_value ? formatCurrency(positionData.market_value, false) : 'לא זמין'}
                     </div>
                     <div class="mb-3">
-                        <strong>אחוז מהחשבון:</strong> 
+                        <strong>אחוז מחשבון המסחר:</strong> 
                         ${(positionData.percent_of_account || 0).toFixed(2)}%
                     </div>
                 </div>
@@ -1091,7 +1091,7 @@ function updatePositionExecutionsTable(executions) {
 function clearPositionsTable() {
     const tableBody = document.querySelector('#positionsTable tbody');
     if (tableBody) {
-        tableBody.innerHTML = '<tr><td colspan="9" class="loading">בחר חשבון להצגת פוזיציות...</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="9" class="loading">בחר חשבון מסחר להצגת פוזיציות...</td></tr>';
     }
     
     // Reset count and totals display
@@ -1102,7 +1102,7 @@ function clearPositionsTable() {
     const accountTotalElement = document.getElementById('positionsAccountTotalValue');
     
     if (countTextElement) {
-        countTextElement.textContent = 'בחר חשבון...';
+        countTextElement.textContent = 'בחר חשבון מסחר...';
     }
     if (separatorElement) separatorElement.style.display = 'none';
     if (totalValueElement) totalValueElement.style.display = 'none';

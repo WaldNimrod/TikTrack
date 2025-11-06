@@ -43,7 +43,7 @@ class StaticCRUDChecker:
                     'addAccountBtn', 'accountsTable', 'editAccountBtn', 'deleteAccountBtn'
                 ],
                 'expected_buttons': [
-                    'הוסף חשבון חדש', 'ערוך', 'מחק'
+                    'הוסף חשבון מסחר חדש', 'ערוך', 'מחק'
                 ],
                 'crud_level': 'full'
             },

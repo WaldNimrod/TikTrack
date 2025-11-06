@@ -842,7 +842,7 @@ function viewAccountDetails(accountId) {
   } catch (error) {
     window.Logger.error('Error in viewAccountDetails:', error, { accountId, page: "trades" });
     if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'שגיאה בפתיחת פרטי החשבון');
+      window.showErrorNotification('שגיאה', 'שגיאה בפתיחת פרטי חשבון המסחר');
     }
   }
 }

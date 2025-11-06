@@ -53,7 +53,7 @@
 - `editAccountModal` - עריכת חשבון מסחר
 
 **שדות**:
-- `tradingAccountName` (text) - שם החשבון
+- `tradingAccountName` (text) - שם חשבון המסחר
 - `tradingAccountCurrency` (select) - מטבע
 - `tradingAccountStatus` (select) - סטטוס
 - `tradingAccountCashBalance` (number) - יתרת מזומן

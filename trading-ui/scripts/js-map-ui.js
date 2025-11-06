@@ -212,7 +212,7 @@ class FunctionsTabsSystem {
         <div class="functions-list">
           <div class="function-item">
             <h4>validateAccountData</h4>
-            <p>בדיקת תקינות נתוני חשבון</p>
+            <p>בדיקת תקינות נתוני חשבון מסחר</p>
             <span class="file-location">accounts.js</span>
           </div>
           <div class="function-item">

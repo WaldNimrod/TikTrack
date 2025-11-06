@@ -665,7 +665,7 @@ function populateRelatedObjects(relationTypeId, selectedTicker = null, selectEle
     let accountsData = (window.accountsData || []).filter(account => 
       account.status === 'open' || account.status === 'active' || account.is_active === true
     );
-    // מיון א-ב לפי שם החשבון מסחר
+    // מיון א-ב לפי שם חשבון המסחר
     accountsData.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'he'));
     populateSelect(selectElementId, accountsData, 'name', 'חשבון מסחר');
     break;

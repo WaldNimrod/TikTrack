@@ -606,7 +606,7 @@ def get_trade_parent_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     # Get account
     try:
         cursor.execute("""
-            SELECT a.id, 'account' as type, 'חשבון' as title, 
+            SELECT a.id, 'account' as type, 'חשבון מסחר' as title, 
                    a.name as description,
                    a.created_at, a.status
             FROM trades t

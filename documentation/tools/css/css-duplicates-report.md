@@ -3431,7 +3431,7 @@ select
 - unified-yesterday.css
 - _entity-colors.css
 
-## /* חשבון - Account */
+## /* חשבון מסחר - Account */
 .entity-account
 מופיע ב-4 קבצים:
 - unified-menus-pushed.css

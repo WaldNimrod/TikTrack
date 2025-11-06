@@ -110,7 +110,7 @@ if (defaultCurrency) {
   document.getElementById('cashFlowCurrencyId').value = defaultCurrency;
 }
 
-// קבלת חשבון ברירת מחדל
+// קבלת חשבון מסחר ברירת מחדל
 const defaultAccount = await window.getPreference('default_trading_account');
 if (defaultAccount) {
   document.getElementById('cashFlowAccountId').value = defaultAccount;
@@ -136,17 +136,17 @@ document.getElementById('cashFlowUsdRate').value = '1.000000';
 | **Cash Flows** | תאריך | היום | קוד |
 | | סוג | deposit | קוד |
 | | מטבע | מהעדפות משתמש | העדפות |
-| | חשבון | מהעדפות משתמש | העדפות |
+| | חשבון מסחר | מהעדפות משתמש | העדפות |
 | | מקור | manual | קוד |
 | | שער USD | 1.000000 | קוד |
 | **Trades** | תאריך פתיחה | היום | קוד |
 | | סטטוס | Open | קוד |
-| | חשבון | מהעדפות משתמש | העדפות |
+| | חשבון מסחר | מהעדפות משתמש | העדפות |
 | **Executions** | תאריך | היום | קוד |
 | | מקור | manual | קוד |
 | **Trade Plans** | תאריך יצירה | היום | קוד |
 | | סטטוס | Active | קוד |
-| | חשבון | מהעדפות משתמש | העדפות |
+| | חשבון מסחר | מהעדפות משתמש | העדפות |
 | **Alerts** | תאריך יצירה | היום | קוד |
 | | סטטוס | Active | קוד |
 | **Notes** | תאריך יצירה | היום | קוד |
@@ -158,7 +158,7 @@ document.getElementById('cashFlowUsdRate').value = '1.000000';
   - ✅ **פורמט ב-HTML:** `<input type="datetime-local">` מאפשר בחירת שעה
   - ✅ **המרה לפני שליחה:** `dateValue.split('T')[0]` להסרת השעה
 - **סטטוס:** ברירת מחדל הגיונית (Open, Active)
-- **חשבון/מטבע:** מהעדפות משתמש אם קיים
+- **חשבון מסחר/מטבע:** מהעדפות משתמש אם קיים
 - **אם העדפה לא קיימת:** בחירה ראשונה ברשימה או ערך קבוע
 
 ---
@@ -447,12 +447,12 @@ async function loadAccountsForCashFlow() {
       const select = document.getElementById('cashFlowAccountId');
       
       if (select) {
-        select.innerHTML = '<option value="">בחר חשבון...</option>';
+        select.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
         
         // סינון חשבונות פעילים בלבד
         const activeAccounts = result.data.filter(account => account.status === 'open');
         
-        // קבלת חשבון ברירת מחדל מהעדפות
+        // קבלת חשבון מסחר ברירת מחדל מהעדפות
         const defaultAccount = await window.getPreference('default_trading_account');
         
         activeAccounts.forEach((account, index) => {
@@ -462,7 +462,7 @@ async function loadAccountsForCashFlow() {
           
           // הגדרת ברירת מחדל:
           // 1. אם יש העדפה מוגדרת - השתמש בה
-          // 2. אם אין העדפה - החשבון הראשון ברשימה
+          // 2. אם אין העדפה - חשבון המסחר הראשון ברשימה
           if (defaultAccount && account.id === parseInt(defaultAccount)) {
             option.selected = true;
           } else if (!defaultAccount && index === 0) {
@@ -544,7 +544,7 @@ function validateTradeForm() {
 ```javascript
 function validateTradingAccountForm() {
   return window.validateEntityForm('addAccountForm', [
-    { id: 'accountName', name: 'שם חשבון' },
+    { id: 'accountName', name: 'שם חשבון מסחר' },
     { id: 'accountStatus', name: 'סטטוס' },
     { id: 'accountCurrency', name: 'מטבע' },
     { 
@@ -836,7 +836,7 @@ function showAdd[Entity]Modal() {
 - [ ] ברירות מחדל מוגדרות:
   - [ ] תאריך - תמיד היום
   - [ ] סוג/סטטוס - ערך לוגי (deposit, Open, Active)
-  - [ ] חשבון - מהעדפות או ראשון ברשימה
+  - [ ] חשבון מסחר - מהעדפות או ראשון ברשימה
   - [ ] מטבע - מהעדפות או USD
 
 ### **📋 בדיקות פונקציונליות:**

@@ -204,7 +204,7 @@ function getTradePlansByInvestmentType(investmentType) {
 }
 
 /**
- * קבלת תכנונים לפי חשבון
+ * קבלת תכנונים לפי חשבון מסחר
  */
 /**
  * Get trade plans by account
@@ -278,7 +278,7 @@ function filterTradePlans(filters = {}) {
     );
   }
 
-  // פילטור לפי חשבון
+  // פילטור לפי חשבון מסחר
   if (filters.accounts && filters.accounts.length > 0) {
     filteredData = filteredData.filter(plan =>
       filters.accounts.includes(plan.account_id),

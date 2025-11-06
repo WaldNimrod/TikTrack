@@ -135,11 +135,11 @@
 **העדפות שצריכות עדכון (5 העדפות):**
 
 **העדפות הקשורות לחשבונות:**
-- ID 14: `entityAccountColor` - צבע חשבון
-- ID 17: `defaultAccountFilter` - פילטר חשבון ברירת מחדל
-- ID 67: `entityAccountColorLight` - צבע חשבון בהיר
-- ID 68: `entityAccountColorDark` - צבע חשבון כהה
-- ID 72: `maxAccountRisk` - סיכון מקסימלי לחשבון
+- ID 14: `entityAccountColor` - צבע חשבון מסחר
+- ID 17: `defaultAccountFilter` - פילטר חשבון מסחר ברירת מחדל
+- ID 67: `entityAccountColorLight` - צבע חשבון מסחר בהיר
+- ID 68: `entityAccountColorDark` - צבע חשבון מסחר כהה
+- ID 72: `maxAccountRisk` - סיכון מקסימלי לחשבון המסחר
 
 **טבלאות העדפות:**
 - `preference_types` - עדכון שמות העדפות

@@ -116,11 +116,11 @@ window.showErrorNotification('שגיאה', 'שגיאה בשמירת טרייד',
 
 ### **עמוד חשבונות**
 ```javascript
-// עדכון חשבון
-window.showSuccessNotification('הצלחה', 'חשבון עודכן בהצלחה', 4000, 'business');
+// עדכון חשבון מסחר
+window.showSuccessNotification('הצלחה', 'חשבון מסחר עודכן בהצלחה', 4000, 'business');
 
 // שגיאת שרת
-window.showErrorNotification('שגיאה', 'שגיאה בעדכון חשבון', 6000, 'system');
+window.showErrorNotification('שגיאה', 'שגיאה בעדכון חשבון מסחר', 6000, 'system');
 ```
 
 ### **דף הבית**

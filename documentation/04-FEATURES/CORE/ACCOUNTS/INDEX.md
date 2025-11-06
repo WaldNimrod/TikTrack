@@ -10,8 +10,8 @@
 
 ### 📖 תיעוד מפורט
 
-#### **Account Activity System** ⭐ מערכת פעילות חשבון
-- **[ACCOUNT_ACTIVITY_SYSTEM.md](ACCOUNT_ACTIVITY_SYSTEM.md)** - מערכת חישוב פעילות חשבון
+#### **Account Activity System** ⭐ מערכת פעילות חשבון מסחר
+- **[ACCOUNT_ACTIVITY_SYSTEM.md](ACCOUNT_ACTIVITY_SYSTEM.md)** - מערכת חישוב פעילות חשבון מסחר
   - מטרות המערכת וארכיטקטורה
   - API endpoints ונתוני תגובה
   - חישוב יתרות לפי מטבע
@@ -39,7 +39,7 @@
 
 ### מערכות חשבונות במערכת:
 
-1. **Account Activity System** - מערכת חישוב פעילות חשבון
+1. **Account Activity System** - מערכת חישוב פעילות חשבון מסחר
    - חישוב יתרות בזמן אמת
    - תמיכה במספר מטבעות
    - אינטגרציה עם executions ו-cash flows

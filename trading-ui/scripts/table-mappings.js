@@ -316,12 +316,12 @@ const TABLE_COLUMN_MAPPINGS = {
     'average_price_net',        // 4 - מחיר ממוצע
     'market_value',            // 5 - שווי שוק
     'unrealized_pl',           // 6 - רווח/הפסד לא מוכר
-    'percent_of_account',      // 7 - אחוז מהחשבון
+    'percent_of_account',      // 7 - אחוז מחשבון המסחר
   ],
 
   // טבלת פורטפוליו (Portfolio) - Full Portfolio Table
   'portfolio': [
-    'account_name',            // 0 - חשבון
+    'account_name',            // 0 - חשבון מסחר
     'ticker_symbol',           // 1 - סימבול
     'ticker_name',             // 2 - נוכחי (שם הטיקר)
     'quantity',                // 3 - כמות

@@ -1137,7 +1137,7 @@ async function checkLinkedItemsBeforeDeleteTicker(tickerId) {
     // const parentEntities = linkedItemsData.parent_entities || []; // Not used
 
     // בדיקה רק אם יש פריטים שמקושרים אל הטיקר (child entities)
-    // parent entities הם פריטים שהטיקר מקושר אליהם (חשבון) - לא רלוונטי למחיקה
+    // parent entities הם פריטים שהטיקר מקושר אליהם (חשבון מסחר) - לא רלוונטי למחיקה
     if (childEntities.length > 0) {
       // יש פריטים מקושרים - הצגת חלון מקושרים
       if (typeof window.showLinkedItemsModal === 'function') {
@@ -1177,7 +1177,7 @@ async function checkLinkedItemsBeforeCancelTicker(tickerId) {
     // const parentEntities = linkedItemsData.parent_entities || []; // Not used
 
     // בדיקה רק אם יש פריטים שמקושרים אל הטיקר (child entities)
-    // parent entities הם פריטים שהטיקר מקושר אליהם (חשבון) - לא רלוונטי לביטול
+    // parent entities הם פריטים שהטיקר מקושר אליהם (חשבון מסחר) - לא רלוונטי לביטול
     if (childEntities.length > 0) {
       // יש פריטים מקושרים - הצגת חלון מקושרים
       if (typeof window.showLinkedItemsModal === 'function') {

@@ -1423,7 +1423,7 @@ function displayConfirmationData(analysisResults, previewData) {
     // Update confirmation summary
     const fileName = window.selectedFile?.name || 'קובץ לא ידוע';
     const accountSelect = document.getElementById('tradingAccountSelect');
-    const accountName = accountSelect?.selectedOptions[0]?.text || 'חשבון לא ידוע';
+    const accountName = accountSelect?.selectedOptions[0]?.text || 'חשבון מסחר לא ידוע';
     
     const totalRecords = analysisResults.total_records || 0;
     const importCount = previewData.records_to_import?.length || 0;

@@ -148,7 +148,7 @@
   │   ├── filter-manager.js   # מנהל פילטרים ראשי
   │   ├── status-filter.js    # פילטר סטטוס
   │   ├── type-filter.js      # פילטר סוג
-  │   ├── account-filter.js   # פילטר חשבון
+  │   ├── account-filter.js   # פילטר חשבון מסחר
   │   ├── date-filter.js      # פילטר תאריך
   │   └── search-filter.js    # פילטר חיפוש
   ├── api/

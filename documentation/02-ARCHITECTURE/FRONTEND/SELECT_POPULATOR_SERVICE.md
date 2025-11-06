@@ -110,7 +110,7 @@ await SelectPopulatorService.populateAccountsSelect('accountSelect', {
 
 **Parameters:**
 - `relationType` (number) - סוג השיוך:
-  - `1` = חשבון
+  - `1` = חשבון מסחר
   - `2` = טרייד
   - `3` = תכנון טרייד
   - `4` = טיקר
@@ -132,7 +132,7 @@ await SelectPopulatorService.populateAccountsSelect('accountSelect', {
 - `selectElementId` (string) - ID של אלמנט הבחירה
 
 **Logic by Relation Type:**
-- **חשבון (1)**: חשבונות פתוחים בלבד, מיון א-ב לפי שם
+- **חשבון מסחר (1)**: חשבונות פתוחים בלבד, מיון א-ב לפי שם
 - **טרייד (2)**: טריידים פתוחים/סגורים, סינון לפי טיקר, מיון א-ב
 - **תוכנית (3)**: תכנונים פתוחים/סגורים, סינון לפי טיקר, מיון א-ב
 - **טיקר (4)**: "לא רלוונטי עבור טיקר"
@@ -149,7 +149,7 @@ await SelectPopulatorService.populateAccountsSelect('accountSelect', {
 **Logic:**
 1. **סוג שיוך** - תמיד פעיל
 2. **טיקר** - פעיל רק עבור טיקר(4)/תוכנית(3)/טרייד(2)
-3. **אובייקט לקישור** - פעיל עבור חשבון(1)/תוכנית(3)/טרייד(2)
+3. **אובייקט לקישור** - פעיל עבור חשבון מסחר(1)/תוכנית(3)/טרייד(2)
 
 #### **`handleTickerChange(tickerSelect, config)`**
 מטפל בבחירת טיקר ומפעיל callback בהתאם
@@ -220,7 +220,7 @@ function onTickerChange(tickerSelect) {
             <select class="form-select" id="alertRelationType" required 
                     onchange="onRelationTypeChange(this)">
                 <option value="">בחר סוג התראה</option>
-                <option value="1">חשבון</option>
+                <option value="1">חשבון מסחר</option>
                 <option value="2">טרייד</option>
                 <option value="3">תוכנית טרייד</option>
                 <option value="4">טיקר</option>

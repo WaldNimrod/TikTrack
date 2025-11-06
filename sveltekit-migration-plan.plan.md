@@ -136,7 +136,7 @@
 3. `SelectFieldComponent` - רשימת בחירה
 4. `DateFieldComponent` - בחירת תאריך (ברירת מחדל: היום)
 5. `TextareaFieldComponent` - טקסט ארוך
-6. `AccountSelectComponent` - בחירת חשבון (עם העדפות ברירת מחדל)
+6. `AccountSelectComponent` - בחירת חשבון מסחר (עם העדפות ברירת מחדל)
 7. `TickerSelectComponent` - בחירת טיקר
 8. `CurrencySelectComponent` - בחירת מטבע (עם העדפות ברירת מחדל)
 9. `CalculatedFieldComponent` - שדה מחושב (read-only)

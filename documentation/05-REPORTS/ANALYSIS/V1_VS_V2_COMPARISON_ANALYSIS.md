@@ -48,7 +48,7 @@
 |--------|----|----|-------|
 | `default_status_filter` | ✅ | ✅ | פילטר סטטוס |
 | `default_type_filter` | ✅ | ✅ | פילטר סוג |
-| `default_account_filter` | ✅ | ✅ | פילטר חשבון |
+| `default_account_filter` | ✅ | ✅ | פילטר חשבון מסחר |
 | `default_date_range_filter` | ✅ | ✅ | פילטר טווח תאריכים |
 | `default_search_filter` | ✅ | ✅ | פילטר חיפוש |
 

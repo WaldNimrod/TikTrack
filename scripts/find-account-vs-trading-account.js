@@ -4,7 +4,7 @@
  * סקריפט למיפוי מקומות שמשתמשים ב-"account" במקום "trading_account"
  * Script to map all places using "account" instead of "trading_account"
  * 
- * ⚠️ חשוב: אין במערכת ישות בשם "חשבון" - רק "חשבון מסחר"
+ * ⚠️ חשוב: אין במערכת ישות בשם "חשבון מסחר" - רק "חשבון מסחר"
  */
 
 const fs = require('fs');
@@ -33,8 +33,8 @@ const SUSPICIOUS_PATTERNS = [
         exclude: ['trading_account', 'default_trading_account']
     },
     {
-        name: 'Comments: חשבון (not חשבון מסחר)',
-        pattern: /\/\/\s*חשבון[^מ]|\/\*\s*חשבון[^מ]/g,
+        name: 'Comments: חשבון מסחר (not חשבון מסחר)',
+        pattern: /\/\/\s*חשבון מסחר[^מ]|\/\*\s*חשבון מסחר[^מ]/g,
         exclude: ['חשבון מסחר']
     },
     {
@@ -233,7 +233,7 @@ function walkDir(dir) {
 function generateReport() {
     let report = `# דוח: מיפוי מקומות שמשתמשים ב-"account" במקום "trading_account"\n\n`;
     report += `**תאריך:** ${new Date().toLocaleString('he-IL')}\n\n`;
-    report += `**⚠️ חשוב:** אין במערכת ישות בשם "חשבון" - רק "חשבון מסחר"\n\n`;
+    report += `**⚠️ חשוב:** אין במערכת ישות בשם "חשבון מסחר" - רק "חשבון מסחר"\n\n`;
     report += `---\n\n`;
     
     report += `## סיכום כללי\n\n`;
@@ -301,7 +301,7 @@ function generateReport() {
     report += `2. **CSS Classes:** שנה מ-\`.entity-account-\` ל-\`.entity-trading_account-\`\n`;
     report += `3. **משתנים:** שנה מ-\`entityAccountColor\` ל-\`entityTradingAccountColor\`\n`;
     report += `4. **מיפויים:** ודא ש-\`PAGE_TO_ENTITY_MAPPING\` ו-\`VALID_ENTITY_TYPES\` מכילים "trading_account"\n`;
-    report += `5. **הערות ותיעוד:** עדכן הערות מ-"חשבון" ל-"חשבון מסחר"\n\n`;
+    report += `5. **הערות ותיעוד:** עדכן הערות מ-"חשבון מסחר" ל-"חשבון מסחר"\n\n`;
     
     report += `---\n\n`;
     report += `*דוח נוצר אוטומטית על ידי \`find-account-vs-trading-account.js\`*\n`;

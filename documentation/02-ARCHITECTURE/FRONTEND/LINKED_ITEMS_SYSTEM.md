@@ -86,9 +86,9 @@ Usage notes:
 ## 🔗 סוגי פריטים מקושרים
 
 ### חשבונות (Accounts)
-- **טריידים** (Trades) - טריידים מקושרים לחשבון
-- **תזרימי מזומנים** (Cash Flows) - תזרימי מזומנים מקושרים לחשבון
-- **הערות** (Notes) - הערות מקושרות לחשבון
+- **טריידים** (Trades) - טריידים מקושרים לחשבון המסחר
+- **תזרימי מזומנים** (Cash Flows) - תזרימי מזומנים מקושרים לחשבון המסחר
+- **הערות** (Notes) - הערות מקושרות לחשבון המסחר
 
 ### טיקרים (Tickers)
 - **טריידים** (Trades) - טריידים מקושרים לטיקר
@@ -136,7 +136,7 @@ linked_items = TickerService.check_linked_items_generic(db, 'ticker', ticker_id)
 # בדיקת פריטים מקושרים לטרייד
 linked_items = TickerService.check_linked_items_generic(db, 'trade', trade_id)
 
-# בדיקת פריטים מקושרים לחשבון
+# בדיקת פריטים מקושרים לחשבון המסחר
 linked_items = TickerService.check_linked_items_generic(db, 'account', account_id)
 ```
 
@@ -425,7 +425,7 @@ const blockingData = {
             name: 'טרייד AAPL',
             status: 'open',
             createdDate: '29/08/2025',
-            details: 'טרייד buy על AAPL, חשבון: חשבון ראשי'
+            details: 'טרייד buy על AAPL, חשבון מסחר: חשבון מסחר ראשי'
         }
     ],
     tickerSymbol: 'AAPL',

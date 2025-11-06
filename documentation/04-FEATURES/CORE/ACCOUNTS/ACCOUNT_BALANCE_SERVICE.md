@@ -31,7 +31,7 @@
 ### טעינת יתרה בודדת
 
 ```javascript
-// יתרה עבור חשבון בודד
+// יתרה עבור חשבון מסחר בודד
 const balance = await AccountBalanceService.getBalance(1);
 
 if (balance) {
@@ -58,7 +58,7 @@ balances.forEach((balance, accountId) => {
 ```javascript
 {
     account_id: 1,
-    account_name: "חשבון מעודכן",
+    account_name: "חשבון מסחר מעודכן",
     base_currency_total: 10000.50,      // יתרה כוללת במטבע בסיס
     base_currency: "USD",               // סימבול מטבע בסיס
     base_currency_id: 1,                // ID מטבע בסיס
@@ -88,7 +88,7 @@ balances.forEach((balance, accountId) => {
 
 ### `getBalance(accountId, options)`
 
-טעינת יתרה עבור חשבון בודד.
+טעינת יתרה עבור חשבון מסחר בודד.
 
 **פרמטרים:**
 - `accountId` (number) - ID של חשבון מסחר
@@ -178,7 +178,7 @@ await AccountBalanceService.refreshBalance(1);
 
 ### `clearCache(accountId)`
 
-נקיית cache עבור חשבון ספציפי.
+נקיית cache עבור חשבון מסחר ספציפי.
 
 **פרמטרים:**
 - `accountId` (number) - ID של חשבון מסחר
@@ -407,7 +407,7 @@ const balances = await AccountBalanceService.getBalances([1, 2, 3]);
 
 `AccountBalanceService` מספק פתרון מרכזי ונוח לטעינת יתרות חשבונות בכל המערכת. השירות מטפל בכל הפרטים הטכניים (cache, batch loading, error handling) ומספק API פשוט ונקי לשימוש.
 
-**עקרון השימוש:** כל עמוד שמציג יתרות חשבון צריך להשתמש ב-`AccountBalanceService` במקום לייצר קוד מקומי.
+**עקרון השימוש:** כל עמוד שמציג יתרות חשבון מסחר צריך להשתמש ב-`AccountBalanceService` במקום לייצר קוד מקומי.
 
 
 

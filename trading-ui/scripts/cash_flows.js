@@ -418,7 +418,7 @@ function validateCashFlowForm() {
       name: 'תאריך',
       validation: validateCashFlowDate
     },
-    { id: 'cashFlowAccount', name: 'חשבון מסחר מסחר' },
+    { id: 'cashFlowAccount', name: 'חשבון מסחר' },
     { id: 'cashFlowCurrency', name: 'מטבע' },
     { id: 'cashFlowSource', name: 'מקור' }
   ]);
@@ -458,7 +458,7 @@ function validateEditCashFlowForm() {
       name: 'תאריך',
       validation: validateCashFlowDate
     },
-    { id: 'editCashFlowAccount', name: 'חשבון מסחר מסחר' },
+    { id: 'editCashFlowAccount', name: 'חשבון מסחר' },
     { id: 'editCashFlowCurrency', name: 'מטבע' },
     { id: 'editCashFlowSource', name: 'מקור' }
   ]);
@@ -725,7 +725,7 @@ async function renderCashFlowsTable() {
 
   cashFlowsData.forEach(cashFlow => {
     const row = document.createElement('tr');
-    // קבלת שם החשבון מסחר - קודם ננסה מהשרת, אחר כך fallback
+    // קבלת שם חשבון המסחר - קודם ננסה מהשרת, אחר כך fallback
     const accountName = cashFlow.account_name || getAccountNameById(cashFlow.trading_account_id) || `חשבון מסחר ${cashFlow.trading_account_id}`;
 
     // הצגת רק סמל המטבע

@@ -77,7 +77,7 @@ ${createButton('SAVE', 'saveNewTradeRecord()', '', 'type="button"')}
 - **צד:** מהתוכנית (side)
 - **כמות:** מהתוכנית (planned_amount)
 - **מחיר:** מהתוכנית (stop_price)
-- **חשבון:** מהתוכנית (account_id)
+- **חשבון מסחר:** מהתוכנית (account_id)
 
 ### טעינה חכמה של נתונים
 - **טיקרים:** רק טיקרים פעילים (open/closed)

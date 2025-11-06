@@ -96,7 +96,7 @@
                     "mtm_pl": -185.5,
                     "id": 21,
                     "created_at": "2025-10-29 22:16:04",
-                    "account_name": "חשבון בדיקה 2",
+                    "account_name": "חשבון מסחר בדיקה 2",
                     "symbol": "ALAB"
                   },
                   "match_type": "field_similarity",
@@ -147,7 +147,7 @@
                     "mtm_pl": -371.5,
                     "id": 22,
                     "created_at": "2025-10-29 22:16:04",
-                    "account_name": "חשבון בדיקה 2",
+                    "account_name": "חשבון מסחר בדיקה 2",
                     "symbol": "ALAB"
                   },
                   "match_type": "field_similarity",
@@ -198,7 +198,7 @@
                     "mtm_pl": 139.2,
                     "id": 23,
                     "created_at": "2025-10-29 22:16:04",
-                    "account_name": "חשבון בדיקה 2",
+                    "account_name": "חשבון מסחר בדיקה 2",
                     "symbol": "ALAB"
                   },
                   "match_type": "field_similarity",
@@ -249,7 +249,7 @@
                     "mtm_pl": 143.83,
                     "id": 1,
                     "created_at": "2025-10-29 20:32:08",
-                    "account_name": "חשבון חדש",
+                    "account_name": "חשבון מסחר חדש",
                     "symbol": "AMZN"
                   },
                   "match_type": "field_similarity",
@@ -274,7 +274,7 @@
                     "mtm_pl": 143.83,
                     "id": 18,
                     "created_at": "2025-10-29 20:59:44",
-                    "account_name": "חשבון חדש",
+                    "account_name": "חשבון מסחר חדש",
                     "symbol": "AMZN"
                   },
                   "match_type": "field_similarity",
@@ -325,7 +325,7 @@
                     "mtm_pl": 14.7,
                     "id": 2,
                     "created_at": "2025-10-29 20:32:08",
-                    "account_name": "חשבון חדש",
+                    "account_name": "חשבון מסחר חדש",
                     "symbol": "AMZN"
                   },
                   "match_type": "field_similarity",
@@ -350,7 +350,7 @@
                     "mtm_pl": 14.7,
                     "id": 19,
                     "created_at": "2025-10-29 20:59:44",
-                    "account_name": "חשבון חדש",
+                    "account_name": "חשבון מסחר חדש",
                     "symbol": "AMZN"
                   },
                   "match_type": "field_similarity",
@@ -401,7 +401,7 @@
                     "mtm_pl": 0.1,
                     "id": 3,
                     "created_at": "2025-10-29 20:32:08",
-                    "account_name": "חשבון חדש",
+                    "account_name": "חשבון מסחר חדש",
                     "symbol": "MSFT"
                   },
                   "match_type": "field_similarity",
@@ -426,7 +426,7 @@
                     "mtm_pl": 0.1,
                     "id": 20,
                     "created_at": "2025-10-29 20:59:44",
-                    "account_name": "חשבון חדש",
+                    "account_name": "חשבון מסחר חדש",
                     "symbol": "MSFT"
                   },
                   "match_type": "field_similarity",
@@ -477,7 +477,7 @@
                     "mtm_pl": -39.3,
                     "id": 4,
                     "created_at": "2025-10-29 20:32:08",
-                    "account_name": "חשבון חדש",
+                    "account_name": "חשבון מסחר חדש",
                     "symbol": "MSFT"
                   },
                   "match_type": "field_similarity",
@@ -528,7 +528,7 @@
                     "mtm_pl": -72.5,
                     "id": 5,
                     "created_at": "2025-10-29 20:32:08",
-                    "account_name": "חשבון חדש",
+                    "account_name": "חשבון מסחר חדש",
                     "symbol": "NVDA"
                   },
                   "match_type": "field_similarity",

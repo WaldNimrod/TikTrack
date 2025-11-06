@@ -1,25 +1,25 @@
 # Account Activity System - TikTrack
-# מערכת תנועות חשבון
+# מערכת תנועות חשבון מסחר
 
 **תאריך יצירה:** 1 בנובמבר 2025  
 **גרסה:** 1.0.0  
 **סטטוס:** ✅ מוכן לשימוש  
-**מטרה:** הצגת תנועות חשבון (תזרימי מזומנים + ביצועים) עם תמיכה במטבעות מרובים
+**מטרה:** הצגת תנועות חשבון מסחר (תזרימי מזומנים + ביצועים) עם תמיכה במטבעות מרובים
 
 ---
 
 ## 📋 סקירה כללית
 
-מערכת תנועות חשבון מציגה את כל התנועות הכספיות בחשבון מסחר, כולל:
+מערכת תנועות חשבון מסחר מציגה את כל התנועות הכספיות בחשבון המסחר, כולל:
 - **תזרימי מזומנים** (cash flows): הפקדות, משיכות, העברות, עמלות, דיבידנדים, ריבית
 - **ביצועים** (executions): קניות ומכירות של נכסים
 
 המערכת מספקת:
-- **קיבוץ לפי מטבע** - תמיכה מלאה במטבעות מרובים באותו חשבון
+- **קיבוץ לפי מטבע** - תמיכה מלאה במטבעות מרובים באותו חשבון מסחר
 - **חישוב יתרות בזמן אמת** - יתרות מחושבות מהנתונים המקוריים, ללא שמירה בבסיס נתונים
-- **יתרה ראשית במטבע בסיס** - יתרה כוללת במטבע הבסיס של החשבון
+- **יתרה ראשית במטבע בסיס** - יתרה כוללת במטבע הבסיס של חשבון המסחר
 - **יתרה פר מטבע** - תמיכה ב-4 מטבעות (USD, EUR, ILS, GBP) - כל מטבע עם יתרה נפרדת
-- **המרה למטבע בסיס** - הצגת סה"כ במטבע הבסיס של החשבון
+- **המרה למטבע בסיס** - הצגת סה"כ במטבע הבסיס של חשבון המסחר
 - **אינטגרציה מלאה** - עם מערכות קיימות (מטמון, פילטרים, EntityDetailsModal)
 
 ## שינוי ארכיטקטוני חשוב - הסרת cash_balance
@@ -72,7 +72,7 @@ elif action == 'sell':
 **קובץ:** `Backend/routes/api/account_activity.py`
 
 **Endpoints:**
-- `GET /api/account-activity/<account_id>` - תנועות חשבון עם אפשרות פילטרים
+- `GET /api/account-activity/<account_id>` - תנועות חשבון מסחר עם אפשרות פילטרים
 - `GET /api/account-activity/<account_id>/balance/<currency_id>` - יתרה למטבע ספציפי
 - `GET /api/account-activity/<account_id>/timeline` - timeline כרונולוגי
 
@@ -115,7 +115,7 @@ elif action == 'sell':
 **מבנה הסקשן:**
 ```html
 <div class="bottom-section" data-section="account-activity">
-  <!-- Header עם בחירת חשבון -->
+  <!-- Header עם בחירת חשבון מסחר -->
   <!-- Summary עם סטטיסטיקות -->
   <!-- Table עם תנועות -->
   <!-- Footer עם סיכומי מטבעות -->
@@ -179,7 +179,7 @@ elif action == 'sell':
 
 ### הבעיה
 חשבון מסחר יכול להחזיק נכסים בכמה מטבעות:
-- **מטבע בסיס:** המטבע הראשי של החשבון (מוגדר ב-`trading_accounts.currency_id`)
+- **מטבע בסיס:** המטבע הראשי של חשבון המסחר (מוגדר ב-`trading_accounts.currency_id`)
 - **מטבעות נוספים:** מטבעות של נכסים שנקנו (מוגדרים ב-`tickers.currency_id`)
 
 ### הפתרון
@@ -228,7 +228,7 @@ const cached = await window.UnifiedCacheManager.get(cacheKey);
 הפילטר הראשי בעמוד (`header-system.js`) מסנן את רשומות הטבלה אוטומטית.
 
 ### 4. Account Selector
-בחירת חשבון מתוך רשימת החשבונות הקיימים:
+בחירת חשבון מסחר מתוך רשימת החשבונות הקיימים:
 ```javascript
 populateAccountSelector() // ממלא את ה-selector
 ```
@@ -237,9 +237,9 @@ populateAccountSelector() // ממלא את ה-selector
 
 ## 📊 דוגמת שימוש
 
-### טעינת תנועות חשבון
+### טעינת תנועות חשבון מסחר
 ```javascript
-// אוטומטי - נטען בעת בחירת חשבון
+// אוטומטי - נטען בעת בחירת חשבון מסחר
 // או ידני:
 await loadAccountActivity(accountId);
 ```
@@ -305,12 +305,12 @@ Display in table
 
 ### 3. מטבע ביצועים
 - אם לביצוע יש `ticker.currency_id` → משתמש במטבע הטיקר
-- אחרת → משתמש במטבע הבסיס של החשבון
+- אחרת → משתמש במטבע הבסיס של חשבון המסחר
 
 ### 4. Cache Invalidation
 - בעת יצירה/עדכון/מחיקה של תזרים מזומנים → invalidate cache
 - בעת יצירה/עדכון/מחיקה של ביצוע → invalidate cache
-- בעת שינוי חשבון → reload data
+- בעת שינוי חשבון מסחר → reload data
 
 ---
 
@@ -334,7 +334,7 @@ Display in table
 ### Backend
 - `Backend/services/account_activity_service.py` - שירות חישוב יתרות
 - `Backend/routes/api/account_activity.py` - API endpoints
-- `Backend/models/trading_account.py` - מודל חשבון
+- `Backend/models/trading_account.py` - מודל חשבון מסחר
 - `Backend/models/cash_flow.py` - מודל תזרים מזומנים
 - `Backend/models/execution.py` - מודל ביצוע
 

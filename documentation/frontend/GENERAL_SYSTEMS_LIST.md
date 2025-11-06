@@ -408,11 +408,11 @@
 - **תיאור:** שירות מרכזי לטעינת יתרות חשבונות מסחר
 - **דוקומנטציה:** [ACCOUNT_BALANCE_SERVICE.md](../04-FEATURES/CORE/ACCOUNTS/ACCOUNT_BALANCE_SERVICE.md)
 - **פונקציות עיקריות:**
-  - `getBalance(accountId, options)` - טעינת יתרה עבור חשבון בודד
+  - `getBalance(accountId, options)` - טעינת יתרה עבור חשבון מסחר בודד
   - `getBalances(accountIds, options)` - טעינת יתרות עבור מספר חשבונות (batch)
   - `refreshBalance(accountId)` - רענון יתרה (נקיית cache וטעינה מחדש)
   - `refreshBalances(accountIds)` - רענון מספר יתרות
-  - `clearCache(accountId)` - נקיית cache עבור חשבון ספציפי
+  - `clearCache(accountId)` - נקיית cache עבור חשבון מסחר ספציפי
   - `clearCaches(accountIds)` - נקיית cache עבור מספר חשבונות
 - **תכונות:**
   - Cache אוטומטי דרך UnifiedCacheManager (TTL: 60 שניות)

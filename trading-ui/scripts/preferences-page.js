@@ -79,7 +79,7 @@ async function loadAccountsForPreferences() {
         
         const accountSelect = document.getElementById('default_trading_account');
         if (accountSelect && accounts && Array.isArray(accounts)) {
-            accountSelect.innerHTML = '<option value="">בחר חשבון...</option>';
+            accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
             
             accounts.forEach(account => {
                 if (account.status === 'open') {

@@ -87,7 +87,7 @@ class TradingAccountService:
         if not trading_account:
             return False
         
-        # הגנה על החשבון האחרון
+        # הגנה על חשבון המסחר האחרון
         all_trading_accounts = db.query(TradingAccount).all()
         if len(all_trading_accounts) == 1:
             logger.warning(f"Cannot delete trading_account {trading_account_id}: it is the last trading_account in the system")

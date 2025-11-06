@@ -60,8 +60,8 @@ window.showInfoNotification('מידע חשוב למשתמש');
 ### התראה עם כותרת
 
 ```javascript
-window.showSuccessNotification('החשבון נשמר בהצלחה', 'שמירת חשבון');
-window.showErrorNotification('שגיאה בשמירה', 'שמירת חשבון');
+window.showSuccessNotification('חשבון המסחר נשמר בהצלחה', 'שמירת חשבון מסחר');
+window.showErrorNotification('שגיאה בשמירה', 'שמירת חשבון מסחר');
 ```
 
 ### בדיקת זמינות המערכת

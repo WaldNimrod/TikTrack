@@ -23,22 +23,22 @@ def add_default_trading_account_preference():
     print("🔧 הוספת העדפת חשבון מסחר ברירת מחדל...")
     
     try:
-        # 1. מציאת חשבון קיים (מעדכנים את preference_name אבל לא את הערך עדיין)
-        # נחפש את החשבון הראשון הפעיל, או "חשבון מעודכן" אם קיים
-        cursor.execute('SELECT id FROM trading_accounts WHERE name = ?', ('חשבון מעודכן',))
+        # 1. מציאת חשבון מסחר קיים (מעדכנים את preference_name אבל לא את הערך עדיין)
+        # נחפש את חשבון המסחר הראשון הפעיל, או "חשבון מסחר מעודכן" אם קיים
+        cursor.execute('SELECT id FROM trading_accounts WHERE name = ?', ('חשבון מסחר מעודכן',))
         account_result = cursor.fetchone()
         
         if not account_result:
-            # נסה את החשבון הראשון הפעיל
+            # נסה את חשבון המסחר הראשון הפעיל
             cursor.execute('SELECT id FROM trading_accounts WHERE status = ? ORDER BY id LIMIT 1', ('open',))
             account_result = cursor.fetchone()
         
         account_id = None
         if account_result:
             account_id = account_result[0]
-            print(f"✅ נמצא חשבון (ID: {account_id}) - ישמש רק ל-default_value")
+            print(f"✅ נמצא חשבון מסחר (ID: {account_id}) - ישמש רק ל-default_value")
         else:
-            print("⚠️  לא נמצא חשבון - נשתמש ב-1 כברירת מחדל")
+            print("⚠️  לא נמצא חשבון מסחר - נשתמש ב-1 כברירת מחדל")
             account_id = 1
         
         # 2. קבלת group_id של trading_settings
@@ -117,7 +117,7 @@ def add_default_trading_account_preference():
         print(f"✅ ההעדפה עודכנה בהצלחה (preference_id: {preference_type_id})")
         print(f"   שם ישן: defaultAccountFilter")
         print(f"   שם חדש: default_trading_account")
-        print(f"   ערך ברירת מחדל: {account_id} (חשבון חדש)")
+        print(f"   ערך ברירת מחדל: {account_id} (חשבון מסחר חדש)")
         
         # 8. ספירה סופית
         cursor.execute('SELECT COUNT(*) FROM preference_types WHERE is_active = 1')

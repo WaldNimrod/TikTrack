@@ -26,7 +26,7 @@ def add_missing_preferences():
             'group_name': 'trading_settings',
             'preference_name': 'maxAccountRisk',
             'data_type': 'float',
-            'description': 'סיכון מקסימלי לחשבון (אחוז)',
+            'description': 'סיכון מקסימלי לחשבון המסחר (אחוז)',
             'default_value': '5.0',
             'is_required': False,
             'constraints': '{"min": 0, "max": 100}'
@@ -35,7 +35,7 @@ def add_missing_preferences():
             'group_name': 'trading_settings',
             'preference_name': 'maxPositionSize',
             'data_type': 'float',
-            'description': 'גודל פוזיציה מקסימלי (אחוז מהחשבון)',
+            'description': 'גודל פוזיציה מקסימלי (אחוז מחשבון המסחר)',
             'default_value': '10.0',
             'is_required': False,
             'constraints': '{"min": 0, "max": 100}'

@@ -30,7 +30,7 @@
  * - תמיכה בערכים פשוטים: price_target, stop_loss, וכו'
  *
  * Color Scheme by Related Object Type:
- * - 💰 חשבון (type=1): צבע טורקיז #29a6a8 / #1f8a8c
+ * - 💰 חשבון מסחר (type=1): צבע טורקיז #29a6a8 / #1f8a8c
  * - 📈 טרייד (type=2): צבע ירוק #28a745 / #1e7e34
  * - 📋 תוכנית טרייד (type=3): צבע כתום #ff9500 / #e67e00
  * - 📊 טיקר (type=4): צבע אדום #dc3545 / #c82333
@@ -43,7 +43,7 @@
  * Related Object Display Format:
  * - טרייד: "🔗 טרייד | סווינג | Long | 24.3.25"
  * - תוכנית: "🔗 תוכנית | השקעה | Short | 24.3.25"
- * - חשבון: "🔗 חשבון מעודכן (USD)"
+ * - חשבון מסחר: "🔗 חשבון מסחר מעודכן (USD)"
  * - טיקר: "🔗 טיקר: AAPL"
  *
  * Styling Features:
@@ -146,7 +146,7 @@ class ActiveAlertsComponent extends HTMLElement {
             <div class="legend-item">
               <div class="legend-color-primary">
                 <img src="images/icons/trading_accounts.svg" alt="חשבון מסחר">
-                <span>חשבון</span>
+                <span>חשבון מסחר</span>
               </div>
             </div>
           </div>
@@ -579,7 +579,7 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   static getEntityTypeDisplay(t) {
-    const m = { account: 'חשבון', trade: 'טרייד', trade_plan: 'תכנון', ticker: 'טיקר' };
+    const m = { account: 'חשבון מסחר', trade: 'טרייד', trade_plan: 'תכנון', ticker: 'טיקר' };
     return m[t] || t;
   }
 
@@ -963,9 +963,9 @@ class ActiveAlertsComponent extends HTMLElement {
     let relatedDisplay = '';
 
     switch (relatedTypeId) {
-    case 1: { // חשבון
-      // נציג שם חשבון עם מטבע
-      const accountNames = ['חשבון מעודכן (USD)', 'חשבון השקעות (ILS)', 'חשבון מסחר (USD)', 'חשבון פנסיה (ILS)'];
+    case 1: { // חשבון מסחר
+      // נציג שם חשבון מסחר עם מטבע
+      const accountNames = ['חשבון מסחר מעודכן (USD)', 'חשבון מסחר השקעות (ILS)', 'חשבון מסחר (USD)', 'חשבון מסחר פנסיה (ILS)'];
       const accountName = accountNames[relatedObjectId % accountNames.length];
       relatedDisplay = accountName;
       break;
@@ -1060,9 +1060,9 @@ class ActiveAlertsComponent extends HTMLElement {
       return planSymbols[relatedObjectId % planSymbols.length];
     }
     case 'account': {
-      // אם זה חשבון, נחזיר שם החשבון
-      const accountNames = ['חשבון מעודכן', 'חשבון השקעות',
-        'חשבון מסחר', 'חשבון פנסיה'];
+      // אם זה חשבון מסחר, נחזיר שם חשבון המסחר
+      const accountNames = ['חשבון מסחר מעודכן', 'חשבון מסחר השקעות',
+        'חשבון מסחר', 'חשבון מסחר פנסיה'];
       return accountNames[relatedObjectId % accountNames.length];
     }
     default:
@@ -1148,7 +1148,7 @@ class ActiveAlertsComponent extends HTMLElement {
     // איקונים עקביים עם המערכת - שימוש באיקונים SVG האמיתיים
     const objectIcons = {
       1: '<img src="images/icons/trading_accounts.svg" alt="חשבון מסחר" ' +
-         'style="width: 16px; height: 16px; vertical-align: middle;">', // חשבון
+         'style="width: 16px; height: 16px; vertical-align: middle;">', // חשבון מסחר
       2: '<img src="images/icons/trades.svg" alt="טרייד" ' +
          'style="width: 16px; height: 16px; vertical-align: middle;">', // טרייד
       3: '<img src="images/icons/trade_plans.svg" alt="תוכנית טרייד" ' +

@@ -26,7 +26,7 @@
 
 **טבלאות DB:**
 ```sql
-1. basic_settings (6 העדפות) - מטבעות, זמן, שפה, חשבון ברירת מחדל
+1. basic_settings (6 העדפות) - מטבעות, זמן, שפה, חשבון מסחר ברירת מחדל
 2. trading_settings (6 העדפות) - Stop Loss, Target, Commission
 3. filter_settings (4 העדפות) - סטטוס, סוג, תאריכים, חיפוש
 4. colors_unified (55 העדפות) - כל הצבעים במקום אחד
@@ -185,7 +185,7 @@ populateGroupFields(sectionId, preferences)  // ממלא שדות
 
 | # | שם קבוצה | העדפות | תוכן |
 |---|-----------|---------|------|
-| 1 | basic_settings | 6 | מטבעות, זמן, שפה, חשבון ברירת מחדל, מצב התראות |
+| 1 | basic_settings | 6 | מטבעות, זמן, שפה, חשבון מסחר ברירת מחדל, מצב התראות |
 | 2 | trading_settings | 6 | Stop Loss, Target, Commission, סיכונים |
 | 3 | filter_settings | 4 | סטטוס, סוג, תאריכים, חיפוש |
 | 4 | colors_unified | 55 | כל הצבעים (מערכת, ישויות, ערכים) |

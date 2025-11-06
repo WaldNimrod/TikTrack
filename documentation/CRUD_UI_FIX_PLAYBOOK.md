@@ -76,18 +76,18 @@
   - בפונקציות פתיחה להשתמש במופע הקיים או ב־`getOrCreateInstance(element)` ורק אז `show()`.
 
 2) טעינת ברירות מחדל ל־selectים (הוספה): חשבון מסחר ומטבע
-- **בעיה**: בחלון הוספה לא נבחר חשבון ברירת מחדל לפי העדפות.
+- **בעיה**: בחלון הוספה לא נבחר חשבון מסחר ברירת מחדל לפי העדפות.
 - **פתרון**: להשתמש ב־`SelectPopulatorService.populateAccountsSelect`/`populateCurrenciesSelect` עם `defaultFromPreferences: true` ובמידת הצורך לחזק עם `DefaultValueSetter.setPreferenceValue`.
 - **דוגמה (tickers – מטבע ברירת מחדל)**: `populateCurrenciesSelect('addTickerCurrency', { includeEmpty: true, defaultFromPreferences: true })`.
 - **דרישת מקדימה חשובה**: לפני שימוש ב־`defaultFromPreferences`, יש לאתחל את מערכת ההעדפות בעמוד: לטעון `scripts/preferences-core.js` ולהריץ `await window.PreferencesSystem.initialize()` במהלך אתחול הדף.
 - **הערות**: העיקרון – קודם טעינת אופציות, ואז הצבה/בחירה בערך ברירת מחדל.
 
 3) טעינת ערכי select במודל עריכה – מעבר מהתבססות על מזהים לשמות
-- **בעיה**: ה־API עשוי להחזיר שם חשבון ומטבע (שם/סימול) במקום מזהי ID. בחירה לפי ID גורמת לשדות להישאר ריקים.
+- **בעיה**: ה־API עשוי להחזיר שם חשבון מסחר ומטבע (שם/סימול) במקום מזהי ID. בחירה לפי ID גורמת לשדות להישאר ריקים.
 - **פתרון**: הרחבת `SelectPopulatorService` לתמיכה ב־`defaultText`, ובמודל עריכה לבחור לפי טקסט האופציה ולא לפי מזהה.
 - **יישום**:
   - `SelectPopulatorService._populateSelect(...)` תומך ב־`defaultText`: אם הועבר, בוחר את ה־option לפי טקסט.
-  - חשבון: להעביר `defaultText` מתוך `account_name`/`account.name`.
+  - חשבון מסחר: להעביר `defaultText` מתוך `account_name`/`account.name`.
   - מטבע: להעביר `defaultText` בפורמט התואם לייצוג בטקסט האופציות (למשל: "שם (קוד/סימול)").
 
 4) שדות חבויים במודל עריכה
@@ -128,8 +128,8 @@
 - סדר כפתורים במודלים: "ביטול" ואז "שמירה/עדכון".
 
 11) To-Do קצר ליישום בעמוד נוסף
-- לאתר selectים לישות חשבון/מטבע/וכו' ולשנות את מילוי ברירת המחדל ל־`defaultText` לפי שם.
-- בהוספה: להשתמש ב־`defaultFromPreferences: true` ב־SelectPopulatorService (למשל מטבע/חשבון).
+- לאתר selectים לישות חשבון מסחר/מטבע/וכו' ולשנות את מילוי ברירת המחדל ל־`defaultText` לפי שם.
+- בהוספה: להשתמש ב־`defaultFromPreferences: true` ב־SelectPopulatorService (למשל מטבע/חשבון מסחר).
 - להוסיף שדות `hidden` למזהים במודל עריכה אם חסרים.
 - בשמירה: אם מזהה חסר – לגזור מזהה לפי שם האופציה.
 - לאכוף סדר כפתורי מודל.
@@ -146,7 +146,7 @@
 - בעיה (type): רשימת סוגי התזרים בטופס חלקית/לא עדכנית; תצוגה בעברית אך שמירה באנגלית.
   - פתרון: לעדכן את האופציות בטפסים לערכים באנגלית עם תווית בעברית:
     - deposit=הפקדה, withdrawal=משיכה, fee=עמלה, dividend=דיבידנד,
-      transfer_in=העברה מחשבון אחר, transfer_out=העברה לחשבון אחר,
+      transfer_in=העברה מחשבון מסחר אחר, transfer_out=העברה לחשבון המסחר אחר,
       other_positive=אחר חיובי, other_negative=אחר שלילי.
     - להצגה: להשתמש ב־`translateCashFlowType(type)`.
 
@@ -154,8 +154,8 @@
   - פתרון: להשתמש בערכים: manual, file_import, direct_import, api.
     - להצגה: `translateCashFlowSource(source)` ממפה: ידני / יבוא קובץ / יבוא ישיר / API.
 
-- בעיה (account): ה־API עשוי להחזיר שם חשבון במקום מזהה → ה־select לא נבחר, והשמירה נכשלת ללא id.
-  - פתרון: בטעינה להשתמש ב־`SelectPopulatorService.populateAccountsSelect` עם `defaultText` (שם החשבון).
+- בעיה (account): ה־API עשוי להחזיר שם חשבון מסחר במקום מזהה → ה־select לא נבחר, והשמירה נכשלת ללא id.
+  - פתרון: בטעינה להשתמש ב־`SelectPopulatorService.populateAccountsSelect` עם `defaultText` (שם חשבון המסחר).
     - בשמירה: אם `trading_account_id` חסר, למפות לפי שם נבחר ל־id דרך `/api/trading-accounts/`.
 
 - בעיה (currency): בחירה על בסיס שם/סימול, לא תמיד יש `currency_id`.
@@ -221,10 +221,10 @@
   - `preferences-core.js` נטען לפני Services.
   - `UnifiedAppInitializer` בשלב 3: קורא `PreferencesSystem.initialize()` ומשגר `preferences:loaded`.
 
-- Selectים של מטבע/חשבון:
+- Selectים של מטבע/חשבון מסחר:
   - הוספה: `populate...Select(..., { includeEmpty: true, defaultFromPreferences: true })`.
   - עריכה: שימוש ב־`defaultText` כדי לבחור לפי שם/סמל כפי שמוצג בטבלה.
-  - טקסט מטבע: "סמל/קוד" בלבד. טקסט חשבון: שם חשבון בלבד.
+  - טקסט מטבע: "סמל/קוד" בלבד. טקסט חשבון מסחר: שם חשבון מסחר בלבד.
 
 - סדר פעולות בטפסי הוספה:
   - `form.reset()` לפני האכלוס.
@@ -344,7 +344,7 @@
 
 ### 18) מערכת פילטרים לפי סוג אובייקט מקושר - מערכת כללית
 
-- **בעיה**: כל עמוד צריך למימוש נפרד של פילטרים לפי סוג אובייקט מקושר (התראות/הערות לפי חשבון/טרייד/תוכנית/טיקר).
+- **בעיה**: כל עמוד צריך למימוש נפרד של פילטרים לפי סוג אובייקט מקושר (התראות/הערות לפי חשבון מסחר/טרייד/תוכנית/טיקר).
 - **פתרון**: מערכת מרכזית ב-`related-object-filters.js` שיוצרת פילטרים אוטומטית לכל יישות.
 
 **יישום לעמוד חדש**:
@@ -370,7 +370,7 @@
    );
    ```
 
-**דרישות נתונים**: הנתונים חייבים לכלול שדה `related_type_id` עם הערכים: 1=חשבון, 2=טרייד, 3=תוכנית, 4=טיקר.
+**דרישות נתונים**: הנתונים חייבים לכלול שדה `related_type_id` עם הערכים: 1=חשבון מסחר, 2=טרייד, 3=תוכנית, 4=טיקר.
 
 **יישות קיימות עם תמיכה אוטומטית**: alerts, notes.
 

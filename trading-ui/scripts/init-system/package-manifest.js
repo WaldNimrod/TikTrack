@@ -237,7 +237,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'services/statistics-calculator.js',
         globalCheck: 'window.StatisticsCalculator',
-        description: 'מחשבון סטטיסטיקות',
+        description: 'מחשבון מסחר סטטיסטיקות',
         required: true,
         loadOrder: 4
       },
@@ -888,7 +888,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'account-activity.js',
         globalCheck: 'window.initAccountActivity',
-        description: 'מערכת תנועות חשבון',
+        description: 'מערכת תנועות חשבון מסחר',
         required: false,
         loadOrder: 12
       },

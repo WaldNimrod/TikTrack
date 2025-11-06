@@ -141,7 +141,7 @@ class CRUDEnhancedTester {
                     cash_balance: 10000.00,
                     notes: 'CRUD Test Record'
                 },
-                expectedButtons: ['הוסף חשבון', 'ערוך', 'מחק'],
+                expectedButtons: ['הוסף חשבון מסחר', 'ערוך', 'מחק'],
                 tableSelector: '#accountsTable',
                 modalSelector: '#addAccountModal',
                 priority: 2

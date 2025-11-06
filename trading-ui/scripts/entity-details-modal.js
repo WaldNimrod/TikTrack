@@ -859,10 +859,10 @@ class EntityDetailsModal {
             
             const iconPath = this.getEntityIcon(finalEntityType);
             
-            // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון
+            // טיפול מיוחד עבור account/trading_account - הצגת שם חשבון המסחר
             let titleText = '';
             if ((finalEntityType === 'account' || finalEntityType === 'trading_account') && entityData && entityData.name) {
-                titleText = `פרטי חשבון: ${entityData.name}`;
+                titleText = `פרטי חשבון מסחר: ${entityData.name}`;
             } else {
                 // כותרת פשוטה ללא שם הרשומה
                 titleText = `פרטי ${entityLabel}`;
@@ -891,10 +891,10 @@ class EntityDetailsModal {
             
             const iconPath = this.getEntityIcon(finalEntityType);
             
-            // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
+            // טיפול מיוחד עבור account/trading_account - הצגת שם חשבון המסחר במקום מספר
             let titleText = '';
             if ((finalEntityType === 'account' || finalEntityType === 'trading_account') && entityData && entityData.name) {
-                titleText = `פרטי חשבון: ${entityData.name}`;
+                titleText = `פרטי חשבון מסחר: ${entityData.name}`;
             } else {
                 // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
                 titleText = `פרטי ${entityLabel}${finalEntityId ? ` מספר ${finalEntityId}` : ''}`;
@@ -967,9 +967,9 @@ class EntityDetailsModal {
      * @returns {string} טקסט כותרת
      */
     getModalTitleText(entityType, entityData) {
-        // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
+        // טיפול מיוחד עבור account/trading_account - הצגת שם חשבון המסחר במקום מספר
         if ((entityType === 'account' || entityType === 'trading_account') && entityData && entityData.name) {
-            return `פרטי חשבון: ${entityData.name}`;
+            return `פרטי חשבון מסחר: ${entityData.name}`;
         }
         
         const entityLabel = (window.getEntityLabel && typeof window.getEntityLabel === 'function') 
@@ -1506,8 +1506,8 @@ class EntityDetailsModal {
     /**
      * Load additional data for trading account - טעינת נתונים נוספים עבור חשבון מסחר
      * 
-     * @param {Object} entityData - נתוני החשבון
-     * @param {number|string} accountId - מזהה החשבון
+     * @param {Object} entityData - נתוני חשבון המסחר
+     * @param {number|string} accountId - מזהה חשבון המסחר
      * @private
      */
     async loadAccountAdditionalData(entityData, accountId) {

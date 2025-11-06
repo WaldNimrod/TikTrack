@@ -23,7 +23,7 @@
 // - Corrected colspan attributes in HTML tables
 //
 // TRADES TABLE STRUCTURE (11 columns):
-// - account_name (0) - חשבון
+// - account_name (0) - חשבון מסחר
 // - ticker_symbol (1) - טיקר
 // - trade_plan_id (2) - תוכנית
 // - status (3) - סטטוס
@@ -150,7 +150,7 @@ const TABLE_COLUMN_MAPPINGS = {
 
   // טבלת תזרימי מזומנים (Cash Flows) - Cash Flows Page Structure
   'cash_flows': [
-    'trading_account_id',    // 0 - Account (חשבון)
+    'trading_account_id',    // 0 - Account (חשבון מסחר)
     'type',                  // 1 - Type (סוג)
     'amount',                // 2 - Amount (סכום)
     'date',                  // 3 - Date (תאריך)
@@ -202,7 +202,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'closed_at',       // 5 - נסגר ב
     'total_pl',        // 6 - רווח/הפסד כולל
     'notes',           // 7 - הערות
-    'account_name',     // 8 - שם חשבון
+    'account_name',     // 8 - שם חשבון מסחר
   ],
 
   'executions_legacy': [
@@ -263,7 +263,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'stop_price',      // 5 - מחיר עצירה
     'target_price',    // 6 - מחיר יעד
     'reasons',         // 7 - סיבות
-    'account_name',    // 8 - שם חשבון
+    'account_name',    // 8 - שם חשבון מסחר
     'ticker_symbol',    // 9 - סמל טיקר
   ],
 
@@ -303,7 +303,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'ticker',          // 0 - טיקר
     'status',          // 1 - סטטוס
     'investment_type', // 2 - סוג השקעה
-    'account',         // 3 - חשבון
+    'account',         // 3 - חשבון מסחר
     'date',            // 4 - תאריך
     'quantity',        // 5 - כמות
     'price',           // 6 - מחיר
@@ -314,7 +314,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'name',            // 0 - שם
     'status',          // 1 - סטטוס
     'investment_type', // 2 - סוג השקעה
-    'account',         // 3 - חשבון
+    'account',         // 3 - חשבון מסחר
     'date',            // 4 - תאריך
     'amount',           // 5 - סכום
   ],
@@ -464,7 +464,7 @@ function getColumnValue(item, columnIndex, tableType) {
           // Fallback to simple display
           if (item.related_type_id && item.related_id) {
             switch (item.related_type_id) {
-              case 1: result = `חשבון ${item.related_id}`; break;
+              case 1: result = `חשבון מסחר ${item.related_id}`; break;
               case 2: result = `טרייד ${item.related_id}`; break;
               case 3: result = `תוכנית ${item.related_id}`; break;
               case 4: result = `טיקר ${item.related_id}`; break;

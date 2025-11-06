@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-הוספת חשבון מסחר ברירת מחדל "חשבון חדש" לבסיס הנתונים
+הוספת חשבון מסחר ברירת מחדל "חשבון מסחר חדש" לבסיס הנתונים
 """
 
 import sqlite3
@@ -21,12 +21,12 @@ def add_default_trading_account():
     print("🔧 הוספת חשבון מסחר ברירת מחדל...")
     
     try:
-        # 1. בדיקה אם החשבון כבר קיים
-        cursor.execute('SELECT id FROM trading_accounts WHERE name = ?', ('חשבון חדש',))
+        # 1. בדיקה אם חשבון המסחר כבר קיים
+        cursor.execute('SELECT id FROM trading_accounts WHERE name = ?', ('חשבון מסחר חדש',))
         existing = cursor.fetchone()
         if existing:
             account_id = existing[0]
-            print(f"⚠️  החשבון 'חשבון חדש' כבר קיים (ID: {account_id})")
+            print(f"⚠️  חשבון המסחר 'חשבון מסחר חדש' כבר קיים (ID: {account_id})")
             return account_id
         
         # 2. קבלת currency_id של USD (ID: 1)
@@ -45,16 +45,16 @@ def add_default_trading_account():
         
         print(f"✅ נמצא מטבע USD (ID: {currency_id})")
         
-        # 3. הוספת החשבון
+        # 3. הוספת חשבון המסחר
         cursor.execute("""
             INSERT INTO trading_accounts (name, currency_id, status, cash_balance, total_value, total_pl, created_at)
             VALUES (?, ?, 'open', 0, 0, 0, datetime('now'))
-        """, ('חשבון חדש', currency_id))
+        """, ('חשבון מסחר חדש', currency_id))
         
         account_id = cursor.lastrowid
         conn.commit()
         
-        print(f"✅ נוסף חשבון 'חשבון חדש' (ID: {account_id})")
+        print(f"✅ נוסף חשבון מסחר 'חשבון מסחר חדש' (ID: {account_id})")
         
         # 4. ספירה סופית
         cursor.execute('SELECT COUNT(*) FROM trading_accounts')

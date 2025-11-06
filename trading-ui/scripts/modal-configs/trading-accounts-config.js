@@ -21,21 +21,21 @@ const tradingAccountsModalConfig = {
         {
             type: 'text',
             id: 'accountName',
-            label: 'שם החשבון',
+            label: 'שם חשבון המסחר',
             required: true,
             placeholder: 'הכנס שם לחשבון המסחר'
         },
         {
             type: 'text',
             id: 'accountNumber',
-            label: 'מספר חשבון',
+            label: 'מספר חשבון מסחר',
             required: true,
-            placeholder: 'הכנס מספר חשבון'
+            placeholder: 'הכנס מספר חשבון מסחר'
         },
         {
             type: 'select',
             id: 'accountType',
-            label: 'סוג חשבון',
+            label: 'סוג חשבון מסחר',
             required: true,
             options: [
                 { value: 'individual', label: 'פרטי' },
@@ -90,7 +90,7 @@ const tradingAccountsModalConfig = {
             label: 'הערות',
             required: false,
             rows: 3,
-            placeholder: 'הכנס הערות נוספות על החשבון...'
+            placeholder: 'הכנס הערות נוספות על חשבון המסחר...'
         }
     ],
     validation: {

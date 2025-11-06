@@ -40,7 +40,7 @@
 **דוגמאות:**
 - "שגיאת חיבור לשרת"
 - "Cache נוקה בהצלחה"
-- "שגיאה בעדכון חשבון"
+- "שגיאה בעדכון חשבון מסחר"
 
 **מתי להשתמש:** כשאתה רוצה לדעת מה קורה ברקע
 
@@ -137,8 +137,8 @@ showErrorNotification('שגיאה', 'שגיאה בשמירת עסקה', 6000, 's
 ### **עמוד חשבונות (Accounts)**
 ```javascript
 // חשבונות - business
-showSuccessNotification('הצלחה', 'חשבון עודכן בהצלחה', 4000, 'business');
-showInfoNotification('מידע', 'נתוני חשבון נטענו', 4000, 'ui');
+showSuccessNotification('הצלחה', 'חשבון מסחר עודכן בהצלחה', 4000, 'business');
+showInfoNotification('מידע', 'נתוני חשבון מסחר נטענו', 4000, 'ui');
 showErrorNotification('שגיאה', 'שגיאה בטעינת חשבונות', 6000, 'system');
 ```
 

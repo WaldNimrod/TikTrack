@@ -318,10 +318,10 @@ const filterButtonsHtml = window.generateEntityTypeFilterButtons(
           id="filterBtn_linkedItemsTable_alert_2_account"
           data-type="account"
           data-onclick="window.filterLinkedItemsByType('linkedItemsTable_alert_2', 'account')"
-          data-tooltip="סינון לפי חשבון"
+          data-tooltip="סינון לפי חשבון מסחר"
           data-tooltip-placement="top"
           data-tooltip-trigger="hover">
-    <img src="/trading-ui/images/icons/trading_accounts.svg" alt="חשבון" class="filter-icon" style="width: 20px; height: 20px;">
+    <img src="/trading-ui/images/icons/trading_accounts.svg" alt="חשבון מסחר" class="filter-icon" style="width: 20px; height: 20px;">
   </button>
   <!-- More buttons... -->
 </div>

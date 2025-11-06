@@ -73,7 +73,7 @@ if (!typeCell) {
   window.Logger.debug(`ℹ️ No type cell found in row, ignoring type filter`, { page: "header-system" });
 }
 
-// פילטר חשבון
+// פילטר חשבון מסחר
 if (!accountCell) {
   window.Logger.debug(`ℹ️ No account cell found in row, ignoring account filter`, { page: "header-system" });
 }
@@ -122,7 +122,7 @@ if (!dateCell) {
 ### ✅ התנהגות נכונה כשחסרים שדות
 - אם אין שדה סטטוס → התעלם מפילטר סטטוס (הצג הכל)
 - אם אין שדה סוג → התעלם מפילטר סוג (הצג Everything)
-- אם אין שדה חשבון → התעלם מפילטר חשבון (הצג הכל)
+- אם אין שדה חשבון מסחר → התעלם מפילטר חשבון מסחר (הצג הכל)
 - אם אין שדה תאריך → התעלם מפילטר תאריך (הצג הכל)
 
 ### ✅ גמישות להרחבה עתידית

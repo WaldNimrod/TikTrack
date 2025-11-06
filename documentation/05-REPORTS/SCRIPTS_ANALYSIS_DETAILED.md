@@ -49,7 +49,7 @@
 ### 2. `scripts/account-activity.js` - רק ב-trading_accounts.html
 
 **תיאור:**
-מערכת הצגת תנועות חשבון (תזרימי מזומנים + ביצועים):
+מערכת הצגת תנועות חשבון מסחר (תזרימי מזומנים + ביצועים):
 - הצגת תנועות לפי מטבע
 - חישוב יתרות בזמן אמת
 - תמיכה במטבעות מרובים
@@ -59,7 +59,7 @@
 **פונקציות עיקריות:**
 - `window.initAccountActivity()` - אתחול מערכת
 - `window.loadAccountActivity(accountId)` - טעינת תנועות
-- `populateAccountSelector()` - מילוי בוחר חשבון
+- `populateAccountSelector()` - מילוי בוחר חשבון מסחר
 - `openMovementDetails()` - פתיחת פרטי תנועה
 
 **המלצה:**

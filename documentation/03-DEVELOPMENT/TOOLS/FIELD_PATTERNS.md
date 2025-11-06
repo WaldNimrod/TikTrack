@@ -282,7 +282,7 @@ window.validateDateRange('startDate', 'endDate', 'תאריך סיום חייב �
 **דוגמה**:
 ```html
 <select class="form-select" id="entityAccount" required>
-    <option value="">בחר חשבון</option>
+    <option value="">בחר חשבון מסחר</option>
 </select>
 ```
 
@@ -555,7 +555,7 @@ function updateCalculatedField() {
 9. **TextareaFieldComponent** - שדה טקסט רב-שורות
 10. **SelectFieldComponent** - רשימת בחירה
 11. **MultiSelectFieldComponent** - בחירה מרובה
-12. **AccountSelectComponent** - בחירת חשבון
+12. **AccountSelectComponent** - בחירת חשבון מסחר
 13. **TickerSelectComponent** - בחירת טיקר
 14. **CurrencySelectComponent** - בחירת מטבע
 15. **TradePlanSelectComponent** - בחירת תוכנית מסחר

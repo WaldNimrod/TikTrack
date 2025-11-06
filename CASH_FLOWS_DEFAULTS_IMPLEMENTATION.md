@@ -87,7 +87,7 @@ if (mode === 'edit' && entityData) {
 {
     type: 'select',
     id: 'cashFlowAccount',
-    label: 'חשבון מסחר מסחר',
+    label: 'חשבון מסחר',
     required: true,
     defaultFromPreferences: true  // ✅ Already configured
 }

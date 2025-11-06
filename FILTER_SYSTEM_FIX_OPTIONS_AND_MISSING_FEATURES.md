@@ -268,7 +268,7 @@ shouldApplyFilterToContainer(containerId, filterType) {
     return text.includes(columnName) || 
            text.includes('סטטוס') || 
            text.includes('סוג') ||
-           text.includes('חשבון') ||
+           text.includes('חשבון מסחר') ||
            text.includes('תאריך');
   });
 }

@@ -77,8 +77,8 @@
 - ✅ `confirmDeleteTrade()` - אישור מחיקת טרייד
 
 ### **Accounts (חשבונות):**
-- ✅ `updateAccount()` - עדכון חשבון קיים
-- ✅ `viewAccountDetails()` - צפייה בפרטי חשבון
+- ✅ `updateAccount()` - עדכון חשבון מסחר קיים
+- ✅ `viewAccountDetails()` - צפייה בפרטי חשבון מסחר
 
 ### **Alerts (התראות):**
 - ✅ `checkAlertCondition()` - בדיקת תנאי התראה

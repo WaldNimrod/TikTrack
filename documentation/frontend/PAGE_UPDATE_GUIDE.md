@@ -2365,12 +2365,12 @@ ls -la trading-ui/scripts/page-name.js
 **שימוש נכון:**
 ```html
 <!-- ✅ נכון - שימוש בצבעי ישויות דינאמיים -->
-<span class="badge badge-account">חשבון</span>
+<span class="badge badge-account">חשבון מסחר</span>
 <span class="badge badge-alert">התראה</span>
 <span class="badge badge-trade">עסקה</span>
 
 <!-- ❌ שגוי - שימוש בצבעים קשיחים -->
-<span style="background-color: #28a745; color: white;">חשבון</span>
+<span style="background-color: #28a745; color: white;">חשבון מסחר</span>
 ```
 
 #### 21.5 צבעים לערכים מספריים

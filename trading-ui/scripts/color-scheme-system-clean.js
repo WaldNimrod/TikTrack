@@ -170,7 +170,7 @@ function getEntityLabel(entityType) {
     trade: 'טרייד',
     trade_plan: 'תכנית השקעה',
     execution: 'עסקה',
-    account: 'חשבון',
+    account: 'חשבון מסחר',
     cash_flow: 'תזרים מזומנים',
     ticker: 'טיקר',
     alert: 'התראה',

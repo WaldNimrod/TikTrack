@@ -164,12 +164,12 @@ def create_preferences_tables():
             (2, 'color', 'dangerColor', 'צבע סכנה', '{"format": "hex"}', '#dc3545', False),
             (2, 'color', 'entityTickerColor', 'צבע טיקר', '{"format": "hex"}', '#dc3545', False),
             (2, 'color', 'entityTradeColor', 'צבע עסקה', '{"format": "hex"}', '#007bff', False),
-            (2, 'color', 'entityAccountColor', 'צבע חשבון', '{"format": "hex"}', '#28a745', False),
+            (2, 'color', 'entityAccountColor', 'צבע חשבון מסחר', '{"format": "hex"}', '#28a745', False),
             
             # קבוצת filters
             (3, 'string', 'defaultStatusFilter', 'פילטר סטטוס ברירת מחדל', '{"options": ["open", "closed", "cancelled", "all"]}', 'open', False),
             (3, 'string', 'defaultTypeFilter', 'פילטר סוג ברירת מחדל', '{"options": ["swing", "investment", "passive", "all"]}', 'swing', False),
-            (3, 'string', 'defaultAccountFilter', 'פילטר חשבון ברירת מחדל', '{"options": ["all"]}', 'all', False),
+            (3, 'string', 'defaultAccountFilter', 'פילטר חשבון מסחר ברירת מחדל', '{"options": ["all"]}', 'all', False),
             (3, 'string', 'defaultDateRangeFilter', 'פילטר טווח תאריכים ברירת מחדל', '{"options": ["today", "this_week", "this_month", "all"]}', 'this_week', False),
             
             # קבוצת ui

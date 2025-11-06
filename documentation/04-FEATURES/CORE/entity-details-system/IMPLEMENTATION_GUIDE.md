@@ -103,7 +103,7 @@ class ExecutionDetailsModule extends BaseEntityModule {
           </div>
           
           <div class="info-row">
-            <label>חשבון:</label>
+            <label>חשבון מסחר:</label>
             <span class="entity-link" data-entity="account" data-id="${account.id}">
               ${account.name}
             </span>
@@ -157,11 +157,11 @@ class EntityLinksSystem {
       'execution': {
         'trade_id': { type: 'trade', module: 'trade-details', label: 'טרייד' },
         'ticker_id': { type: 'ticker', module: 'ticker-details', label: 'טיקר' },
-        'account_id': { type: 'account', module: 'account-details', label: 'חשבון' }
+        'account_id': { type: 'account', module: 'account-details', label: 'חשבון מסחר' }
       },
       'trade': {
         'ticker_id': { type: 'ticker', module: 'ticker-details', label: 'טיקר' },
-        'account_id': { type: 'account', module: 'account-details', label: 'חשבון' },
+        'account_id': { type: 'account', module: 'account-details', label: 'חשבון מסחר' },
         'plan_id': { type: 'trade_plan', module: 'trade-plan-details', label: 'תכנון' }
       }
     };
@@ -350,7 +350,7 @@ class NavigationSystem {
 #### יום 6: קישורים ראשוניים
 1. **קישורים לטריידים** - לחיצה על טרייד פותחת מודול טרייד
 2. **קישורים לטיקרים** - לחיצה על טיקר פותחת מודול טיקר
-3. **קישורים לחשבונות** - לחיצה על חשבון פותחת מודול חשבון
+3. **קישורים לחשבונות** - לחיצה על חשבון מסחר פותחת מודול חשבון מסחר
 4. **עיצוב קישורים** - סגנון ויזואלי ברור
 
 #### יום 7: בדיקות ואופטימיזציה

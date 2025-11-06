@@ -1114,7 +1114,7 @@ class HeaderSystem {
           HeaderSystem.updateFilterUI('type', window.filterSystem.currentFilters.type);
         }
         
-        // עדכון UI של פילטר החשבון מסחר
+        // עדכון UI של פילטר חשבון המסחר
         if (window.filterSystem.currentFilters.account && window.filterSystem.currentFilters.account.length > 0) {
           // window.Logger.info('🔧 Updating account filter UI with:', window.filterSystem.currentFilters.account, { page: "header-system" });
           HeaderSystem.updateFilterUI('account', window.filterSystem.currentFilters.account);
@@ -1255,7 +1255,7 @@ class HeaderSystem {
             'alertsContainer',
             'executionsContainer',
             'accountsContainer',
-            'accountActivityContainer',  // טבלת תנועות חשבון (בעמוד חשבונות)
+            'accountActivityContainer',  // טבלת תנועות חשבון מסחר (בעמוד חשבונות)
             'cashFlowsContainer',
             'notesContainer'
           ];
@@ -1376,7 +1376,7 @@ class HeaderSystem {
                 const rowAccount = accountCell.getAttribute('data-account');
                 shouldShow = shouldShow && this.currentFilters.account.includes(rowAccount);
               } else {
-                // אין שדה חשבון - התעלם מהפילטר (הצג הכל)
+                // אין שדה חשבון מסחר - התעלם מהפילטר (הצג הכל)
                 window.Logger.debug(`ℹ️ No account cell found in row, ignoring account filter`, { page: "header-system" });
               }
             }
@@ -1968,7 +1968,7 @@ function updateFilterSelections(filters) {
     }
   });
   
-  // עדכון חשבון
+  // עדכון חשבון מסחר
   const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
   accountItems.forEach(item => {
     item.classList.remove('selected');
@@ -2451,7 +2451,7 @@ window.updateAccountFilterText = function() {
       accountElement.textContent = 'כל חשבון מסחר';
       console.log('✅ עדכנתי ל-"כל חשבון מסחר"');
     } else if (selectedItems.length === 1) {
-      // שימוש בטקסט האמיתי של הפריט (שם החשבון) במקום data-value (ID)
+      // שימוש בטקסט האמיתי של הפריט (שם חשבון המסחר) במקום data-value (ID)
       const optionText = selectedItems[0].querySelector('.option-text');
       const displayText = optionText ? optionText.textContent.trim() : selectedItems[0].getAttribute('data-value');
       accountElement.textContent = displayText;

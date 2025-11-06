@@ -110,8 +110,8 @@ def main() -> None:
         {'value': 'withdrawal',     'display_name': 'משיכה',               'sort_order': 20},
         {'value': 'fee',            'display_name': 'עמלה',                'sort_order': 30},
         {'value': 'dividend',       'display_name': 'דיבידנד',             'sort_order': 40},
-        {'value': 'transfer_in',    'display_name': 'העברה מחשבון אחר',    'sort_order': 50},
-        {'value': 'transfer_out',   'display_name': 'העברה לחשבון אחר',    'sort_order': 60},
+        {'value': 'transfer_in',    'display_name': 'העברה מחשבון מסחר אחר',    'sort_order': 50},
+    {'value': 'transfer_out',   'display_name': 'העברה לחשבון מסחר אחר',    'sort_order': 60},
         {'value': 'other_positive', 'display_name': 'אחר חיובי',           'sort_order': 70},
         {'value': 'other_negative', 'display_name': 'אחר שלילי',           'sort_order': 80},
     ]

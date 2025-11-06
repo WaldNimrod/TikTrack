@@ -1152,7 +1152,7 @@ async function updateExecutionsTableMain(executions) {
       (execution.action || execution.type) === 'sale' ? 'מכירה' :
         execution.action || execution.type;
 
-    // תמיד להשתמש בחשבון ישירות מהרשומה, או מהטרייד אם אין ישיר
+    // תמיד להשתמש בחשבון המסחר ישירות מהרשומה, או מהטרייד אם אין ישיר
     const accountName = execution.account_name || (trade ? trade.account_name : 'לא מוגדר');
 
     return `

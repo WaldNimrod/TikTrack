@@ -385,7 +385,7 @@ function loadAccounts() {
  */
 function analyzeFile() {
     if (!selectedFile || !selectedAccount) {
-        showNotification('נא לבחור קובץ וחשבון', 'error');
+        showNotification('נא לבחור קובץ וחשבון מסחר', 'error');
         return;
     }
     

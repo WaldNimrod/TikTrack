@@ -29,7 +29,7 @@ CREATE TABLE "executions" (
     -- Flexible Association Fields
     ticker_id INTEGER NULL,                    -- FK לטיקר (מצב זמני)
     trade_id INTEGER NULL,                     -- FK לטרייד (מצב מלא)
-    trading_account_id INTEGER NULL,           -- FK לחשבון (חובה רק עם trade_id)
+    trading_account_id INTEGER NULL,           -- FK לחשבון המסחר (חובה רק עם trade_id)
     
     -- Business Fields
     action VARCHAR(20) NOT NULL DEFAULT 'buy', -- קניה/מכירה
@@ -78,8 +78,8 @@ CHECK (
 - ❌ `ticker_id=NULL, trade_id=NULL` - לא חוקי (ללא שיוך)
 
 #### אילוצי עסקיים
-1. **חשבון:** `trading_account_id` חובה רק כאשר יש `trade_id`
-2. **התאמת חשבון:** אם יש `trade_id`, החשבון חייב להתאים לחשבון של הטרייד
+1. **חשבון מסחר:** `trading_account_id` חובה רק כאשר יש `trade_id`
+2. **התאמת חשבון מסחר:** אם יש `trade_id`, חשבון המסחר חייב להתאים לחשבון המסחר של הטרייד
 
 ---
 
@@ -184,7 +184,7 @@ def get_pending_assignment_executions():
 
 **3. POST/PUT /api/executions/** - ולידציה מורחבת
 - בדיקת אילוץ XOR (ticker_id או trade_id, לא שניהם)
-- בדיקת התאמת חשבון (אם trade_id, החשבון חייב להתאים)
+- בדיקת התאמת חשבון מסחר (אם trade_id, חשבון המסחר חייב להתאים)
 
 ---
 
@@ -250,7 +250,7 @@ async function loadPendingExecutions() {
 ### תהליך יצירת עסקה זמנית
 1. משתמש בוחר "שיוך לטיקר" ✓
 2. בוחר טיקר, מכניס פרטי עסקה
-3. חשבון אופציונלי
+3. חשבון מסחר אופציונלי
 4. שמירה: `ticker_id=X, trade_id=NULL`
 5. העסקה מופיעה בדשבורד כ-"ממתינה לשיוך" ⏳
 
@@ -258,7 +258,7 @@ async function loadPendingExecutions() {
 1. משתמש עורך את העסקה הזמנית 📝
 2. משנה ל-"שיוך לטרייד"
 3. בוחר טרייד קיים או יוצר חדש
-4. בוחר חשבון (חובה)
+4. בוחר חשבון מסחר (חובה)
 5. שמירה: `ticker_id=NULL, trade_id=Y, trading_account_id=Z`
 6. העסקה נעלמת מהדשבורד, מופיעה כרגיל ✅
 

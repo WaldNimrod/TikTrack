@@ -122,7 +122,7 @@ async function getAccountsByStatus(status) {
 
 /**
  * ביטול חשבון מסחר - גרסה פשוטה
- * @param {number} accountId - מזהה החשבון מסחר
+ * @param {number} accountId - מזהה חשבון המסחר
  * @returns {Promise<boolean>} האם הביטול הצליח
  */
 /**
@@ -143,7 +143,7 @@ async function cancelAccount(accountId) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error?.message || 'שגיאה בביטול החשבון מסחר');
+    throw new Error(errorData.error?.message || 'שגיאה בביטול חשבון המסחר');
   }
 
   // ניקוי ה-cache
@@ -154,7 +154,7 @@ async function cancelAccount(accountId) {
 
 /**
  * הפעלה מחדש של חשבון מסחר מבוטל - גרסה פשוטה
- * @param {number} accountId - מזהה החשבון מסחר
+ * @param {number} accountId - מזהה חשבון המסחר
  * @returns {Promise<boolean>} האם ההפעלה מחדש הצליחה
  */
 /**
@@ -175,7 +175,7 @@ async function reactivateAccount(accountId) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error?.message || 'שגיאה בהפעלה מחדש של החשבון מסחר');
+    throw new Error(errorData.error?.message || 'שגיאה בהפעלה מחדש של חשבון המסחר');
   }
 
   // ניקוי ה-cache
@@ -186,8 +186,8 @@ async function reactivateAccount(accountId) {
 
 /**
  * קבלת חשבון מסחר לפי מזהה
- * @param {number} accountId - מזהה החשבון מסחר
- * @returns {Promise<Object|null>} החשבון מסחר או null אם לא נמצא
+ * @param {number} accountId - מזהה חשבון המסחר
+ * @returns {Promise<Object|null>} חשבון המסחר או null אם לא נמצא
  */
 /**
  * Get account by ID

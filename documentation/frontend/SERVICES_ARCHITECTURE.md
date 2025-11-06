@@ -186,7 +186,7 @@ const badgeHTML = FieldRendererService.renderStatus(status, 'account');
 **לא רק PnL:** מתאים לכל ערך מספרי - יתרות, רווח/הפסד, שינויים, תזרימים, וכו'
 
 ```javascript
-// יתרה בחשבון (ללא + לחיוביים)
+// יתרה בחשבון המסחר (ללא + לחיוביים)
 const balance = FieldRendererService.renderNumericValue(1500.50, ' $', false);
 // תוצאה: 1500.50 $ (ירוק)
 

@@ -166,7 +166,7 @@
 
 ## 🔄 דפוסים חוזרים
 
-### 1. **Account Select Pattern** (בחירת חשבון)
+### 1. **Account Select Pattern** (בחירת חשבון מסחר)
 **מופיע ב**: Cash Flows, Trades, Trade Plans, Executions
 
 ```javascript
@@ -258,7 +258,7 @@
 {
   type: 'select',
   id: 'entityAccount',
-  defaultFromPreferences: true // מחשבון ברירת מחדל מהעדפות
+  defaultFromPreferences: true // מחשבון מסחר ברירת מחדל מהעדפות
 }
 ```
 

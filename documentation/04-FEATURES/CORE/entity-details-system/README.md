@@ -61,7 +61,7 @@
 - [x] **4.2** פונקציה `renderTrade(tradeData)` - תצוגת פרטי טרייד ✅
 - [x] **4.3** פונקציה `renderTradePlan(tradePlanData)` - תצוגת פרטי תכנית השקעה ✅
 - [x] **4.4** פונקציה `renderExecution(executionData)` - תצוגת פרטי ביצוע עסקה ✅
-- [x] **4.5** פונקציה `renderAccount(accountData)` - תצוגת פרטי חשבון ✅
+- [x] **4.5** פונקציה `renderAccount(accountData)` - תצוגת פרטי חשבון מסחר ✅
 - [x] **4.6** פונקציה `renderAlert(alertData)` - תצוגת פרטי התראה ✅
 - [x] **4.7** פונקציה `renderCashFlow(cashFlowData)` - תצוגת פרטי תזרים מזומנים ✅
 - [x] **4.8** פונקציה `renderNote(noteData)` - תצוגת פרטי הערה ✅
@@ -171,7 +171,7 @@
 2. **Trade** - טרייד
 3. **TradePlan** - תכנית השקעה
 4. **Execution** - ביצוע עסקה  
-5. **Account** - חשבון
+5. **Account** - חשבון מסחר
 6. **Alert** - התראה
 
 ### תכונות לכל ישות
@@ -323,7 +323,7 @@
 // מכל דף במערכת
 showEntityDetails('ticker', 1);    // טיקר #1
 showEntityDetails('trade', 5);     // טרייד #5  
-showEntityDetails('account', 2);   // חשבון #2
+showEntityDetails('account', 2);   // חשבון מסחר #2
 ```
 
 **מהטבלות (להוסיף בעתיד):**

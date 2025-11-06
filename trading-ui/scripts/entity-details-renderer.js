@@ -2252,7 +2252,7 @@ class EntityDetailsRenderer {
     }
     
     /**
-     * Get default account preference value and name - קבלת ערך העדפה ושם חשבון ברירת מחדל
+     * Get default account preference value and name - קבלת ערך העדפה ושם חשבון מסחר ברירת מחדל
      * מחזיר אובייקט עם הערך והשם (אם קיים) - גם אם הערך הוא "all"
      * @returns {Promise<{value: string, accountName: string|null, profileId: number|null, displayText: string}>}
      * @private
@@ -2312,29 +2312,29 @@ class EntityDetailsRenderer {
                 }
             }
             
-            // אם אין ערך בכלל, אין חשבון ברירת מחדל
+            // אם אין ערך בכלל, אין חשבון מסחר ברירת מחדל
             if (preferenceValue === null || preferenceValue === undefined) {
                 window.Logger.info(`⚠️ [getDefaultAccountInfo] No preference found for default_trading_account`, { page: "entity-details-renderer" });
                 return {
                     value: null,
                     accountName: null,
                     profileId: profileId,
-                    displayText: 'לא הוגדר חשבון ברירת מחדל'
+                    displayText: 'לא הוגדר חשבון מסחר ברירת מחדל'
                 };
             }
             
-            // אם הערך הוא "all" או לא תקין - אין חשבון ספציפי
+            // אם הערך הוא "all" או לא תקין - אין חשבון מסחר ספציפי
             if (preferenceValue === 'all' || preferenceValue === '' || preferenceValue === null || preferenceValue === undefined) {
                 window.Logger.info(`⚠️ [getDefaultAccountInfo] Preference value is 'all' or empty: ${preferenceValue}`, { page: "entity-details-renderer" });
                 return {
                     value: preferenceValue || 'all',
                     accountName: null,
                     profileId: profileId,
-                    displayText: 'לא הוגדר חשבון ספציפי (all)'
+                    displayText: 'לא הוגדר חשבון מסחר ספציפי (all)'
                 };
             }
             
-            // אם הערך הוא מספר - נחפש את שם החשבון
+            // אם הערך הוא מספר - נחפש את שם חשבון המסחר
             const parsedId = parseInt(preferenceValue);
             if (!isNaN(parsedId) && parsedId > 0) {
                 if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
@@ -2355,7 +2355,7 @@ class EntityDetailsRenderer {
                             accountId: parsedId,
                             accountName: null,
                             profileId: profileId,
-                            displayText: `חשבון #${parsedId} (לא נמצא)`
+                            displayText: `חשבון מסחר #${parsedId} (לא נמצא)`
                         };
                     }
                 } else {
@@ -2365,7 +2365,7 @@ class EntityDetailsRenderer {
                         accountId: parsedId,
                         accountName: null,
                         profileId: profileId,
-                        displayText: `חשבון #${parsedId} (נתונים לא זמינים)`
+                        displayText: `חשבון מסחר #${parsedId} (נתונים לא זמינים)`
                     };
                 }
             }
@@ -2393,7 +2393,7 @@ class EntityDetailsRenderer {
     async renderAccount(accountData, options = {}) {
         window.Logger.info(`🎨 Rendering account data:`, accountData, { page: "entity-details-renderer" });
         
-        // קבלת צבע החשבון מסחר מההעדפות - רק trading_account!
+        // קבלת צבע חשבון המסחר מההעדפות - רק trading_account!
         if (!this.entityColors.trading_account) {
             window.Logger.error('❌ trading_account color not found in entityColors!', { entityColors: this.entityColors }, { page: "entity-details-renderer" });
         }
@@ -2404,10 +2404,10 @@ class EntityDetailsRenderer {
             ? window.FieldRendererService.renderStatus(accountData.status, 'account')
             : '';
         
-        // שם חשבון - נחלץ מ-name
+        // שם חשבון מסחר - נחלץ מ-name
         const accountName = accountData.name || accountData.account_name || 'לא מוגדר';
         
-        // קבלת מידע על חשבון ברירת מחדל מהעדפות
+        // קבלת מידע על חשבון מסחר ברירת מחדל מהעדפות
         const defaultAccountInfo = await this.getDefaultAccountInfo();
         window.Logger.info(`🔍 [renderAccount] Default account info from preferences:`, defaultAccountInfo, { page: "entity-details-renderer" });
         
@@ -2416,7 +2416,7 @@ class EntityDetailsRenderer {
         const displayValue = defaultAccountInfo.displayText || defaultAccountInfo.value || 'לא זמין';
         const profileInfo = defaultAccountInfo.profileId ? ` (פרופיל: ${defaultAccountInfo.profileId})` : '';
         
-        // אם יש שם חשבון ספציפי
+        // אם יש שם חשבון מסחר ספציפי
         if (defaultAccountInfo.accountName) {
             defaultAccountLabel = `
                 <div class="mb-4 p-4 rounded" style="
@@ -2451,7 +2451,7 @@ class EntityDetailsRenderer {
                         <!-- Text -->
                         <div style="flex: 1;">
                             <div style="font-size: 0.9em; color: #666; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                🧪 קוביית בדיקה - חשבון ברירת מחדל מהעדפות:
+                                🧪 קוביית בדיקה - חשבון מסחר ברירת מחדל מהעדפות:
                             </div>
                             <div style="font-size: 1.5em; font-weight: bold; color: ${accountColor}; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">
                                 ${displayValue}
@@ -2528,12 +2528,12 @@ class EntityDetailsRenderer {
         return `
             <div class="entity-details-container account-details">
                 
-                <!-- חשבון ברירת מחדל -->
+                <!-- חשבון מסחר ברירת מחדל -->
                 ${defaultAccountLabel}
                 
-                <!-- שורה ראשונה: שם חשבון | הערות (מרכז) | סטטוס (משמאל) -->
+                <!-- שורה ראשונה: שם חשבון מסחר | הערות (מרכז) | סטטוס (משמאל) -->
                 <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom: 1px solid #e0e0e0; padding-bottom: 0.75rem;">
-                    <!-- שם חשבון -->
+                    <!-- שם חשבון מסחר -->
                     <div class="d-flex align-items-center gap-2" style="min-width: 150px;">
                         <strong>שם:</strong>
                         <span class="fw-bold">${accountName}</span>
@@ -2903,7 +2903,7 @@ class EntityDetailsRenderer {
      * Render cash flow linked items - רנדור פריטים מקושרים לתזרים מזומנים
      */
     renderCashFlowLinkedItems(cashFlowData) {
-        // הוספת החשבון מסחר המקושר כפריט מקושר ראשון
+        // הוספת חשבון המסחר המקושר כפריט מקושר ראשון
         const accountItem = cashFlowData.trading_account_id ? `
             <div class="col-md-6">
                 <div class="card linked-item-card">
@@ -2914,7 +2914,7 @@ class EntityDetailsRenderer {
                             </div>
                             <div class="flex-grow-1">
                                 <h6 class="card-title mb-1">${cashFlowData.account_name || `חשבון מסחר ${cashFlowData.trading_account_id}`}</h6>
-                                <p class="card-text text-muted small mb-0">חשבון מסחר מסחר #${cashFlowData.trading_account_id}</p>
+                                <p class="card-text text-muted small mb-0">חשבון מסחר #${cashFlowData.trading_account_id}</p>
                             </div>
                             <div class="linked-item-actions">
                                 <button class="btn btn-sm btn-outline-primary" 

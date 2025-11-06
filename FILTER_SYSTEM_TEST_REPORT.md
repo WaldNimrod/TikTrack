@@ -46,7 +46,7 @@
 - ✅ `data-status` - קיים
 - ✅ `data-date` - קיים
 - ✅ `data-type` - קיים (לא `data-investment-type`)
-- ❌ `data-account` - לא קיים (אין עמודת חשבון)
+- ❌ `data-account` - לא קיים (אין עמודת חשבון מסחר)
 
 #### טבלת trades:
 - ✅ `data-status` - קיים
@@ -79,8 +79,8 @@ const typeCell = row.querySelector('td[data-investment-type]') || row.querySelec
 **מיקום:** `trades.js`, `trade_plans.js`
 
 **מציאות:**
-- `trades.js` - יש עמודת חשבון אבל בלי `data-account` attribute
-- `trade_plans.js` - אין עמודת חשבון בכלל
+- `trades.js` - יש עמודת חשבון מסחר אבל בלי `data-account` attribute
+- `trade_plans.js` - אין עמודת חשבון מסחר בכלל
 
 **פתרון:** הקוד מטפל בזה נכון - אם אין `data-account`, הפילטר מתעלם (מציג הכל).
 
@@ -94,11 +94,11 @@ const typeCell = row.querySelector('td[data-investment-type]') || row.querySelec
    - [ ] פילטר סוג עובד
    - [ ] פילטר תאריך עובד
    - [ ] פילטר חיפוש עובד
-   - [ ] פילטר חשבון מתעלם (נכון - אין שדה)
+   - [ ] פילטר חשבון מסחר מתעלם (נכון - אין שדה)
 
 2. **עמוד מעקב (`trades.html`)**
    - [ ] כל הפילטרים עובדים
-   - [ ] פילטר חשבון - צריך לבדוק אם יש data-account
+   - [ ] פילטר חשבון מסחר - צריך לבדוק אם יש data-account
 
 3. **עמוד בסיס נתונים (`db_display.html`)**
    - [ ] כל 8 הטבלאות מקבלות פילטרים
@@ -117,7 +117,7 @@ const typeCell = row.querySelector('td[data-investment-type]') || row.querySelec
 ## המלצות לתיקון נוסף
 
 ### תיקון #1: הוספת data-account ל-trades.js
-אם יש עמודת חשבון ב-trades, כדאי להוסיף `data-account` attribute.
+אם יש עמודת חשבון מסחר ב-trades, כדאי להוסיף `data-account` attribute.
 
 ### תיקון #2: בדיקת data-type vs data-investment-type
 לוודא שהקוד מחפש את הנכון. הקוד הנוכחי מטפל בשניהם, אבל אולי כדאי לבדוק שוב.

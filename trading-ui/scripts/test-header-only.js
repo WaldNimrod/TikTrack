@@ -401,7 +401,7 @@ function updateCurrentFilterStatus() {
         currentTypeFilter.textContent = typeText.textContent;
     }
 
-    // פילטר חשבון
+    // פילטר חשבון מסחר
     const accountText = document.getElementById('selectedAccount');
     const currentAccountFilter = document.getElementById('currentAccountFilter');
     if (accountText && currentAccountFilter) {
@@ -508,8 +508,8 @@ function testTypeFilter() {
 }
 
 function testAccountFilter() {
-    log('בדיקת פילטר חשבון...');
-    // כאן תוכל להוסיף לוגיקה לבדיקת פילטר חשבון
+    log('בדיקת פילטר חשבון מסחר...');
+    // כאן תוכל להוסיף לוגיקה לבדיקת פילטר חשבון מסחר
 }
 
 function testDateFilter() {

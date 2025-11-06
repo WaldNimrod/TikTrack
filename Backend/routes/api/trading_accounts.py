@@ -197,7 +197,7 @@ def delete_trading_account(trading_account_id: int):
     try:
         db: Session = g.db
         
-        # הגנה על החשבון האחרון
+        # הגנה על חשבון המסחר האחרון
         all_trading_accounts = TradingAccountService.get_all(db)
         if len(all_trading_accounts) == 1:
             return jsonify({

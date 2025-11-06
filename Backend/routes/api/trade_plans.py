@@ -50,7 +50,7 @@ def get_trade_plans_by_account(trading_account_id: int):
         logger.error(f"Error getting trade plans for account {trading_account_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "שגיאה בטעינת תכנונים לחשבון"},
+            "error": {"message": "שגיאה בטעינת תכנונים לחשבון המסחר"},
             "version": "1.0"
         }), 500
     finally:

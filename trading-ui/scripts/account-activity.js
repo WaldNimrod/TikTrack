@@ -2,10 +2,10 @@
  * Account Activity System - TikTrack
  * ===================================
  * 
- * מערכת הצגת תנועות חשבון (תזרימי מזומנים + ביצועים)
+ * מערכת הצגת תנועות חשבון מסחר (תזרימי מזומנים + ביצועים)
  * 
  * תכונות:
- * - הצגת תנועות חשבון לפי מטבע
+ * - הצגת תנועות חשבון מסחר לפי מטבע
  * - חישוב יתרות בזמן אמת
  * - תמיכה במטבעות מרובים
  * - אינטגרציה עם EntityDetailsModal
@@ -30,7 +30,7 @@ window.accountActivityState = {
  * Initialize account activity system
  */
 window.initAccountActivity = function(autoSelectDefault = false) {
-    window.Logger.info('🔧 אתחול מערכת תנועות חשבון', { page: "trading_accounts" });
+    window.Logger.info('🔧 אתחול מערכת תנועות חשבון מסחר', { page: "trading_accounts" });
     
     // Populate account selector when accounts are loaded
     if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
@@ -70,7 +70,7 @@ async function populateAccountSelector(autoSelectDefault = false) {
         window.trading_accountsData.forEach(account => {
             const option = document.createElement('option');
             option.value = account.id;
-            option.textContent = account.name || `חשבון ${account.id}`;
+            option.textContent = account.name || `חשבון מסחר ${account.id}`;
             selector.appendChild(option);
         });
     }
@@ -168,7 +168,7 @@ async function loadAccountActivity(accountId) {
     window.accountActivityState.isLoading = true;
     
     try {
-        window.Logger.info(`📡 טעינת תנועות חשבון ${accountId}`, { page: "trading_accounts" });
+        window.Logger.info(`📡 טעינת תנועות חשבון מסחר ${accountId}`, { page: "trading_accounts" });
         
         // Check cache first - BUT bypass cache to ensure fresh data with executions
         const cacheKey = `account-activity-${accountId}`;
@@ -273,10 +273,10 @@ async function loadAccountActivity(accountId) {
         }
         
     } catch (error) {
-        window.Logger.error('❌ שגיאה בטעינת תנועות חשבון:', error, { page: "trading_accounts" });
+        window.Logger.error('❌ שגיאה בטעינת תנועות חשבון מסחר:', error, { page: "trading_accounts" });
         
         if (window.showNotification) {
-            window.showNotification('שגיאה בטעינת תנועות חשבון: ' + error.message, 'error');
+            window.showNotification('שגיאה בטעינת תנועות חשבון מסחר: ' + error.message, 'error');
         }
         
         showErrorInTable('שגיאה בטעינת נתונים');
@@ -295,7 +295,7 @@ function populateAccountActivityTable(data) {
     tbody.innerHTML = '';
     
     if (!data.currencies || data.currencies.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין תנועות לחשבון זה</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין תנועות לחשבון המסחר זה</td></tr>';
         return;
     }
     
@@ -732,7 +732,7 @@ function openMovementDetails(movementId, movementType) {
 function clearActivityTable() {
     const tbody = document.querySelector('#accountActivityTable tbody');
     if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="8" class="loading">בחר חשבון להצגת תנועות...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="loading">בחר חשבון מסחר להצגת תנועות...</td></tr>';
     }
     
     const footer = document.getElementById('accountActivityFooter');
@@ -742,7 +742,7 @@ function clearActivityTable() {
     
     const tableCount = document.getElementById('accountActivityCount');
     if (tableCount) {
-        tableCount.textContent = 'בחר חשבון...';
+        tableCount.textContent = 'בחר חשבון מסחר...';
     }
 }
 
@@ -952,7 +952,7 @@ function calculateActivityStatistics() {
         const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
         window.Logger.info(`  - מספר ימים בטווח: ${daysDiff}`, { page: "trading_accounts" });
     }
-    window.Logger.info(`  - תאריך פתיחת חשבון: ${accountOpeningDate ? accountOpeningDate.toISOString().split('T')[0] : 'null'}`, { page: "trading_accounts" });
+    window.Logger.info(`  - תאריך פתיחת חשבון מסחר: ${accountOpeningDate ? accountOpeningDate.toISOString().split('T')[0] : 'null'}`, { page: "trading_accounts" });
     
     // Separate rows by type
     const cashFlowRows = rows.filter(row => row.getAttribute('data-movement-type') === 'cash_flow');

@@ -10,10 +10,10 @@
 
 ## 📋 סקירה כללית
 
-מסמך זה מגדיר את הדרישות והממשק הנדרשים להרחבת מערכת הנתונים החיצוניים של TikTrack כך שתכלול תמיכה בשערי מטבע בזמן אמת. המערכת צריכה לספק שערי המרה עדכניים בין מטבעות שונים עבור מערכת תנועות חשבון (Account Activity).
+מסמך זה מגדיר את הדרישות והממשק הנדרשים להרחבת מערכת הנתונים החיצוניים של TikTrack כך שתכלול תמיכה בשערי מטבע בזמן אמת. המערכת צריכה לספק שערי המרה עדכניים בין מטבעות שונים עבור מערכת תנועות חשבון מסחר (Account Activity).
 
 ### מטרה עיקרית
-מערכת תנועות חשבון צריכה להציג יתרות בכמה מטבעות ולהמיר אותן למטבע הבסיס של החשבון. לשם כך נדרש ממשק API אחיד לשערי מטבע עדכניים.
+מערכת תנועות חשבון מסחר צריכה להציג יתרות בכמה מטבעות ולהמיר אותן למטבע הבסיס של חשבון המסחר. לשם כך נדרש ממשק API אחיד לשערי מטבע עדכניים.
 
 ---
 
@@ -131,7 +131,7 @@ Host: localhost:8080
 - **Key Pattern:** `currency-rates:latest`, `currency-rates:historical:{date}`, `currency-rates:convert:{from}:{to}`
 - **Invalidation:** אוטומטית כל 5 דקות או בעת עדכון ידני
 
-### Cache Strategy במערכת תנועות חשבון
+### Cache Strategy במערכת תנועות חשבון מסחר
 ```javascript
 // Policy בקובץ unified-cache-manager.js
 'currency-rates-data': {
@@ -328,7 +328,7 @@ def convert_to_base_currency(amount: float, from_currency_id: int, to_currency_i
 3. **Cache חשוב** - שערי מטבע משתנים לעיתים קרובות, אבל לא כל שנייה
 4. **Fallback תמיד זמין** - תמיד יש ערך מ-`currencies.usd_rate`
 
-### דוגמת שימוש במערכת תנועות חשבון:
+### דוגמת שימוש במערכת תנועות חשבון מסחר:
 ```python
 # במערכת Account Activity
 account_base_currency = "USD"
@@ -359,6 +359,6 @@ usd_balance = convert_currency(
 ---
 
 **מפתח אחראי:** TikTrack Development Team  
-**קישור למערכת תנועות חשבון:** `documentation/04-FEATURES/ACCOUNTS/ACCOUNT_ACTIVITY_SYSTEM.md` (לאחר יצירה)
+**קישור למערכת תנועות חשבון מסחר:** `documentation/04-FEATURES/ACCOUNTS/ACCOUNT_ACTIVITY_SYSTEM.md` (לאחר יצירה)
 
 

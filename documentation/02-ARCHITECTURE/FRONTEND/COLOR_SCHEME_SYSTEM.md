@@ -263,7 +263,7 @@ const legend = window.createInvestmentTypeLegend({
 </div>
 
 <div class="entity-account-badge">
-  חשבון ראשי
+  חשבון מסחר ראשי
 </div>
 
 <div class="entity-alert-border">

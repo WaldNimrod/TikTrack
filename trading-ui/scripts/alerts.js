@@ -944,7 +944,7 @@ function populateSelect(selectId, data, field, prefix = '') {
     let displayText = '';
 
     if (prefix === 'חשבון מסחר') {
-      // עבור חשבון מסחר: שם החשבון מסחר + מטבע
+      // עבור חשבון מסחר: שם חשבון המסחר + מטבע
       const name = item.name || item.account_name || 'לא מוגדר';
       const currency = item.currency || 'ILS';
       displayText = `${name} (${currency})`;

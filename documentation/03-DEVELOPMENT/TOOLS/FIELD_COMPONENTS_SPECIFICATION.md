@@ -684,7 +684,7 @@ class TextareaFieldComponent extends BaseFieldComponent {
 
 class AccountSelectComponent extends SelectFieldComponent {
     /**
-     * Render account select HTML - יצירת HTML של בחירת חשבון
+     * Render account select HTML - יצירת HTML של בחירת חשבון מסחר
      * 
      * @returns {string} HTML של השדה
      */

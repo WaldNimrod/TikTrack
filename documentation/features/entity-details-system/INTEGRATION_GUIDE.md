@@ -60,7 +60,7 @@
 ```javascript
 <button class="btn btn-outline-primary" 
         onclick="showEntityDetails('account', ${account.id})" 
-        title="פרטי חשבון">
+        title="פרטי חשבון מסחר">
     <i class="fas fa-info-circle"></i>
 </button>
 ```

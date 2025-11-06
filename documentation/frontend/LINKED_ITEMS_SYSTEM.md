@@ -215,7 +215,7 @@ const relatedInfo = window.getRelatedObjectDisplay(alert, dataSources, {
 
 // תוצאה
 {
-  display: "חשבון ABC (USD)",
+  display: "חשבון מסחר ABC (USD)",
   icon: "🏦",
   class: "related-account entity-account-badge",
   color: "#28a745",
@@ -238,7 +238,7 @@ const symbol = window.getRelatedObjectSymbol(alert, dataSources);
 
 ```javascript
 const typeName = window.getRelatedObjectTypeName(1); // "account"
-const typeNameHebrew = window.getRelatedObjectTypeNameHebrew(1); // "חשבון"
+const typeNameHebrew = window.getRelatedObjectTypeNameHebrew(1); // "חשבון מסחר"
 ```
 
 ### יתרונות המערכת החדשה
@@ -261,17 +261,17 @@ relatedBgColor: window.getEntityBackgroundColor('account')
 ```
 
 #### 📱 3 פורמטים שונים
-- **`full`**: "חשבון ABC (USD)" - מידע מלא
-- **`simple`**: "חשבון ABC" - מידע בסיסי  
+- **`full`**: "חשבון מסחר ABC (USD)" - מידע מלא
+- **`simple`**: "חשבון מסחר ABC" - מידע בסיסי  
 - **`minimal`**: "ABC" - מינימלי
 
 #### 🔗 אפשרויות קישור
 ```javascript
 // עם אייקון קישור
-{ showLink: true } // "🔗 חשבון ABC"
+{ showLink: true } // "🔗 חשבון מסחר ABC"
 
 // בלי אייקון קישור
-{ showLink: false } // "חשבון ABC"
+{ showLink: false } // "חשבון מסחר ABC"
 ```
 
 #### 🛡️ Fallback בטוח
@@ -288,7 +288,7 @@ const relatedInfo = window.getRelatedObjectDisplay ?
 ```javascript
 // לפני - 150+ שורות קוד מקומי
 switch (alert.related_type_id) {
-  case 1: // חשבון
+  case 1: // חשבון מסחר
     const account = accounts.find(a => a.id === alert.related_id);
     // ... 50+ שורות קוד
     break;
@@ -309,7 +309,7 @@ const relatedClass = relatedObjectInfo.class;
 // לפני - 100+ שורות קוד מקומי
 if (note.related_type_id && note.related_id) {
   switch (note.related_type_id) {
-    case 1: // חשבון
+    case 1: // חשבון מסחר
       // ... 30+ שורות קוד
       break;
     // ... עוד cases
@@ -329,7 +329,7 @@ const relatedClass = relatedObjectInfo.class;
 ```javascript
 // לפני - קוד בסיסי
 switch (item.related_type_id) {
-  case 1: result = `חשבון ${item.related_id}`; break;
+  case 1: result = `חשבון מסחר ${item.related_id}`; break;
   case 2: result = `טרייד ${item.related_id}`; break;
   // ...
 }
@@ -371,9 +371,9 @@ if (window.getRelatedObjectDisplay) {
 ## 🔗 סוגי פריטים מקושרים
 
 ### חשבונות (Accounts)
-- **טריידים** (Trades) - טריידים מקושרים לחשבון
-- **תזרימי מזומנים** (Cash Flows) - תזרימי מזומנים מקושרים לחשבון
-- **הערות** (Notes) - הערות מקושרות לחשבון
+- **טריידים** (Trades) - טריידים מקושרים לחשבון המסחר
+- **תזרימי מזומנים** (Cash Flows) - תזרימי מזומנים מקושרים לחשבון המסחר
+- **הערות** (Notes) - הערות מקושרות לחשבון המסחר
 
 ### טיקרים (Tickers)
 - **טריידים** (Trades) - טריידים מקושרים לטיקר
@@ -421,7 +421,7 @@ linked_items = TickerService.check_linked_items_generic(db, 'ticker', ticker_id)
 # בדיקת פריטים מקושרים לטרייד
 linked_items = TickerService.check_linked_items_generic(db, 'trade', trade_id)
 
-# בדיקת פריטים מקושרים לחשבון
+# בדיקת פריטים מקושרים לחשבון המסחר
 linked_items = TickerService.check_linked_items_generic(db, 'account', account_id)
 ```
 
@@ -710,7 +710,7 @@ const blockingData = {
             name: 'טרייד AAPL',
             status: 'open',
             createdDate: '29/08/2025',
-            details: 'טרייד buy על AAPL, חשבון: חשבון ראשי'
+            details: 'טרייד buy על AAPL, חשבון מסחר: חשבון מסחר ראשי'
         }
     ],
     tickerSymbol: 'AAPL',

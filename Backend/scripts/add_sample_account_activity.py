@@ -5,7 +5,7 @@ Add Sample Account Activity Script - TikTrack
 
 תאריך: נובמבר 2025
 גרסה: 1.0.0
-מטרה: הוספת executions ו-cash_flows מכל הסוגים לחשבונות לבדיקת מערכת תנועות חשבון
+מטרה: הוספת executions ו-cash_flows מכל הסוגים לחשבונות לבדיקת מערכת תנועות חשבון מסחר
 """
 
 import sqlite3
@@ -117,15 +117,15 @@ def generate_sample_cash_flows(account_id, currency_id):
     # Cash flow types and their typical amounts
     cash_flow_types = [
         # Positive cash flows (money coming in)
-        {'type': 'deposit', 'amount_range': (1000, 10000), 'description': 'הפקדה ראשונית לחשבון'},
+        {'type': 'deposit', 'amount_range': (1000, 10000), 'description': 'הפקדה ראשונית לחשבון המסחר'},
         {'type': 'dividend', 'amount_range': (50, 500), 'description': 'תשלום דיבידנד'},
-        {'type': 'transfer_in', 'amount_range': (500, 5000), 'description': 'העברה מחשבון אחר'},
+        {'type': 'transfer_in', 'amount_range': (500, 5000), 'description': 'העברה מחשבון מסחר אחר'},
         {'type': 'other_positive', 'amount_range': (20, 200), 'description': 'החזר עמלה'},
         
         # Negative cash flows (money going out)
-        {'type': 'withdrawal', 'amount_range': (500, 5000), 'description': 'משיכה מהחשבון'},
+        {'type': 'withdrawal', 'amount_range': (500, 5000), 'description': 'משיכה מחשבון המסחר'},
         {'type': 'fee', 'amount_range': (5, 50), 'description': 'עמלות שירות'},
-        {'type': 'transfer_out', 'amount_range': (200, 2000), 'description': 'העברה לחשבון אחר'},
+        {'type': 'transfer_out', 'amount_range': (200, 2000), 'description': 'העברה לחשבון מסחר אחר'},
         {'type': 'other_negative', 'amount_range': (10, 100), 'description': 'הוצאות אחרות'},
         
         # Interest can be positive or negative - generate both

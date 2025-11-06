@@ -91,9 +91,9 @@ def create_sample_test_results():
                     'delete': True
                 },
                 'buttons_tested': [
-                    {'name': 'הוסף חשבון חדש', 'working': True},
-                    {'name': 'ערוך חשבון', 'working': True},
-                    {'name': 'מחק חשבון', 'working': True},
+                    {'name': 'הוסף חשבון מסחר חדש', 'working': True},
+                    {'name': 'ערוך חשבון מסחר', 'working': True},
+                    {'name': 'מחק חשבון מסחר', 'working': True},
                     {'name': 'הצג פרטים', 'working': True},
                     {'name': 'רענן נתונים', 'working': True}
                 ],

@@ -1094,7 +1094,7 @@ class ModalNavigationManager {
                             info.entityType = 'trade';
                         } else if (labelText.includes('ביצוע')) {
                             info.entityType = 'execution';
-                        } else if (labelText.includes('חשבון')) {
+                        } else if (labelText.includes('חשבון מסחר')) {
                             info.entityType = 'account';
                         } else if (labelText.includes('התראה')) {
                             info.entityType = 'alert';
@@ -1168,7 +1168,7 @@ class ModalNavigationManager {
             trade: 'טרייד',
             trade_plan: 'תכנון',
             execution: 'ביצוע',
-            account: 'חשבון',
+            account: 'חשבון מסחר',
             alert: 'התראה',
             cash_flow: 'תזרים מזומנים',
             note: 'הערה'

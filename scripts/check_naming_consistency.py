@@ -50,7 +50,7 @@ SEARCH_PATTERNS = {
         r'defaultAccountFilter',  # Correct name for filter preference
     ],
     'LABEL_INCONSISTENCIES': [
-        r'label.*חשבון.*מסחר.*מסחר',  # Double "מסחר"
+        r'label.*חשבון מסחר.*מסחר.*מסחר',  # Double "מסחר"
         r'label.*filter.*account',  # Using "filter account" in labels
     ]
 }

@@ -234,9 +234,9 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
   } else if (itemType === 'trade_plan') {
     modalTitle = 'פריטים מקושרים לתוכנית השקעה';
   } else if (itemType === 'trading_account') {
-    // עבור חשבון מסחר - הוספת שם החשבון מסחר
+    // עבור חשבון מסחר - הוספת שם חשבון המסחר
     const accountName = data.accountName || `חשבון מסחר ${itemId}`;
-    modalTitle = `פריטים מקושרים לחשבון מסחר ${accountName}`;
+    modalTitle = `פריטים מקושרים לחשבון המסחר ${accountName}`;
   } else if (itemType === 'account') {
     // DEPRECATED - use trading_account instead!
     const error2 = new Error(`❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!`);
@@ -1594,9 +1594,9 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
 
   switch (item.related_type_id) {
     case 1: { // חשבון מסחר
-      // לוגים לבדיקת חיפוש החשבון
+      // לוגים לבדיקת חיפוש חשבון המסחר
       if (window.Logger && window.Logger.info) {
-        window.Logger.info('🔍 חיפוש חשבון:', {
+        window.Logger.info('🔍 חיפוש חשבון מסחר:', {
           related_id: item.related_id,
           accountsCount: accounts.length,
           accountsIds: accounts.map(a => a?.id).slice(0, 5) // רק 5 ראשונים ללוג
@@ -1609,7 +1609,7 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
         const currency = account.currency_symbol || account.currency || 'ILS';
         
         if (window.Logger && window.Logger.info) {
-          window.Logger.info('✅ חשבון נמצא:', { name, currency, id: account.id }, { page: "linked-items" });
+          window.Logger.info('✅ חשבון מסחר נמצא:', { name, currency, id: account.id }, { page: "linked-items" });
         }
         
         if (format === 'minimal') {
@@ -1621,7 +1621,7 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
         }
       } else {
         if (window.Logger && window.Logger.warn) {
-          window.Logger.warn('⚠️ חשבון לא נמצא:', {
+          window.Logger.warn('⚠️ חשבון מסחר לא נמצא:', {
             related_id: item.related_id,
             accountsCount: accounts.length
           }, { page: "linked-items" });

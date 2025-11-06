@@ -448,6 +448,12 @@ function disableEditFields() {
 
 // REMOVED: loadTickerInfo, displayTickerInfo, updateFormFieldsWithTickerData - not used, use loadTradePlanTickerInfo/displayTradePlanTickerInfo instead
 // Ticker info functions
+/**
+ * Legacy helper for the old ticker info workflow (kept for backward compatibility).
+ * @deprecated Use loadTradePlanTickerInfo instead.
+ * @param {number|string} tickerId - Ticker identifier to load
+ * @returns {Promise<void>}
+ */
 async function _REMOVED_loadTickerInfo(tickerId) {
   try {
     window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "trade_plans" });
@@ -513,6 +519,12 @@ async function loadTradePlanTickerInfo(tickerId) {
   }
 }
 
+/**
+ * Legacy renderer for ticker information in the old trade plan modal.
+ * @deprecated Use displayTradePlanTickerInfo instead.
+ * @param {Object} ticker - Ticker payload returned from the server
+ * @returns {Promise<void>}
+ */
 async function _REMOVED_displayTickerInfo(ticker) {
   const tickerInfo = document.getElementById('tickerInfo');
   const tickerPrice = document.getElementById('tickerPrice');
@@ -785,7 +797,11 @@ function updateAmountFromShares() {
 }
 
 /**
- * Update form fields with calculated values based on ticker data and user preferences
+ * Legacy helper that populated add-form fields based on ticker data.
+ * @deprecated Use the new unified calculation helpers instead.
+ * @param {Object} ticker - Ticker payload
+ * @param {number} currentPrice - Current ticker price
+ * @returns {Promise<void>}
  */
 async function _REMOVED_updateFormFieldsWithTickerData(ticker, currentPrice) {
   try {
@@ -866,6 +882,12 @@ async function _REMOVED_updateFormFieldsWithTickerData(ticker, currentPrice) {
 
 // REMOVED: loadEditTickerInfo, displayEditTickerInfo, updateEditFormFieldsWithTickerData - not used
 // Edit modal ticker info functions
+/**
+ * Legacy helper for loading ticker info in the edit modal (deprecated flow).
+ * @deprecated Use updateEditTickerInfo instead.
+ * @param {number|string} tickerId - Ticker identifier
+ * @returns {Promise<void>}
+ */
 async function _REMOVED_loadEditTickerInfo(tickerId) {
   try {
     window.Logger.info('🔄 Loading edit ticker info for ID:', tickerId, { page: "trade_plans" });
@@ -901,6 +923,12 @@ async function _REMOVED_loadEditTickerInfo(tickerId) {
   }
 }
 
+/**
+ * Legacy renderer for ticker information inside the edit modal.
+ * @deprecated Use updateEditTickerInfo/displayTradePlanTickerInfo instead.
+ * @param {Object} ticker - Ticker payload returned from the server
+ * @returns {Promise<void>}
+ */
 async function _REMOVED_displayEditTickerInfo(ticker) {
   const tickerInfo = document.getElementById('editTickerInfo');
   const tickerPrice = document.getElementById('editTickerPrice');
@@ -951,6 +979,13 @@ function hideEditTickerInfo() {
 
 /**
  * Update edit form fields with calculated values based on ticker data and user preferences
+ */
+/**
+ * Legacy helper that populated edit-form fields based on ticker data.
+ * @deprecated Use updateEditTickerInfo instead.
+ * @param {Object} ticker - Ticker payload
+ * @param {number} currentPrice - Current ticker price
+ * @returns {Promise<void>}
  */
 async function _REMOVED_updateEditFormFieldsWithTickerData(ticker, currentPrice) {
   try {
@@ -1283,7 +1318,9 @@ function updateEditAmountFromShares() {
 
 // REMOVED: saveEditTradePlan - deprecated wrapper, use saveTradePlanData('edit') directly
 /**
- * שמירת עריכת תכנון
+ * Legacy wrapper for saving an edited trade plan.
+ * @deprecated Use saveTradePlanData('edit') instead.
+ * @returns {Promise<void>}
  */
 async function _REMOVED_saveEditTradePlan() {
   try {
@@ -1930,7 +1967,10 @@ async function loadTradePlansData() {
 
 // REMOVED: updateDesignsTable - alias not used
 /**
- * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
+ * Legacy alias for updating the designs (trade plans) table.
+ * @deprecated Use updateTradePlansTable directly.
+ * @param {Array<Object>} trade_plans - Trade plans data set
+ * @returns {void}
  */
 function _REMOVED_updateDesignsTable(trade_plans) {
   try {
@@ -1946,7 +1986,10 @@ function _REMOVED_updateDesignsTable(trade_plans) {
 
 // REMOVED: filterTradePlansData - not used
 /**
- * פילטור נתוני תכנונים
+ * Legacy trade plan filtering helper (delegates to tradePlanService when available).
+ * @deprecated Use window.tradePlanService.filterTradePlans instead.
+ * @param {Object} filters - Filter criteria applied to trade plans
+ * @returns {void}
  */
 function _REMOVED_filterTradePlansData(filters) {
   try {
@@ -2633,8 +2676,9 @@ async function saveTradePlanData(mode) {
 
 // REMOVED: saveNewTradePlan - deprecated wrapper
 /**
- * שמירת תכנון חדש
+ * Legacy wrapper for creating a new trade plan.
  * @deprecated Use saveTradePlanData('add') instead
+ * @returns {Promise<void>}
  */
 async function _REMOVED_saveNewTradePlan() {
   await saveTradePlanData('add');
@@ -3042,6 +3086,13 @@ async function deleteTradePlan(tradePlanId) {
     }
 }
 
+/**
+ * Execute deletion of a trade plan after validations complete.
+ * Clears caches and delegates response handling to CRUDResponseHandler for consistency.
+ *
+ * @param {number|string} tradePlanId - Trade plan identifier to delete
+ * @returns {Promise<void>}
+ */
 async function performTradePlanDeletion(tradePlanId) {
     try {
         // Clear cache before deletion to ensure fresh data after reload

@@ -127,6 +127,12 @@ function viewTickerDetails(tickerId) {
 
 // REMOVED: viewTickerDetailsOld - not used, replaced by viewTickerDetails
 // Keep old function for backward compatibility
+/**
+ * Legacy viewer for ticker details (pre-ModalManagerV2 implementation).
+ * @deprecated Use viewTickerDetails instead.
+ * @param {number|string} tickerId - Ticker identifier to view
+ * @returns {void}
+ */
 function _REMOVED_viewTickerDetailsOld(tickerId) {
   try {
     window.Logger.info('👁️ מציג פרטי טיקר:', tickerId, { page: "tickers" });
@@ -2043,6 +2049,10 @@ window.addEventListener('load', function () {
   let attempts = 0;
   const maxAttempts = 10;
 
+  /**
+   * Retry loading ticker data until the table DOM is available.
+   * @returns {void}
+   */
   function tryLoadData() {
 
     // בדיקה מפורטת יותר
@@ -2152,6 +2162,11 @@ async function refreshYahooFinanceDataSilently() {
 }
 
 // פונקציה לפילטר טיקרים לפי סוג (פילטר פשוט - סוג אחד בלבד)
+/**
+ * Filter the displayed tickers by investment type.
+ * @param {string} type - Ticker type identifier (e.g., stock, etf)
+ * @returns {void}
+ */
 function filterTickersByType(type) {
   try {
     window.Logger.info(`🔍 Filtering tickers by type: ${type}`, { page: "tickers" });
@@ -2225,6 +2240,11 @@ function filterTickersByType(type) {
 }
 
 // פונקציה עזר לקבלת שם תצוגה לסוג
+/**
+ * Translate a ticker type key into a human-readable label.
+ * @param {string} type - Ticker type identifier
+ * @returns {string} Display label
+ */
 function getTypeDisplayName(type) {
   try {
     const typeNames = {

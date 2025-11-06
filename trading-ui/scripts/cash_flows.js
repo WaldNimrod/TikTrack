@@ -1928,6 +1928,11 @@ function generateDetailedLog() {
 
 // REMOVED: generateDetailedLogForCashFlows - not used, use global generateDetailedLog from logger-service.js
 // Local  function for cash_flows page
+/**
+ * Legacy helper for copying the cash flows detailed log.
+ * @deprecated Use generateDetailedLog from logger-service instead.
+ * @returns {Promise<void>}
+ */
 async function _REMOVED_generateDetailedLogForCashFlows() {
     try {
         const detailedLog = await generateDetailedLog();

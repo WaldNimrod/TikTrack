@@ -825,6 +825,12 @@ function onNoteRelationTypeChange() {
   // אבל אנחנו צריכים אותה לעבוד גם בעת טעינת נתונים לעריכה
 }
 
+/**
+ * Populate the edit modal relation select based on the chosen relation type.
+ * @param {string} relationType - Relation type identifier (trade, plan, etc.)
+ * @param {number|string|null} selectedId - Currently selected relation identifier
+ * @returns {Promise<void>}
+ */
 async function populateEditSelectByType(relationType, selectedId) {
   try {
     let data = [];
@@ -986,6 +992,10 @@ function _REMOVED_validateEditNoteForm(content, relationType, relatedId, attachm
 }
 
 // פונקציות שמירה ומחיקה
+/**
+ * Save a new note using the add modal form.
+ * @returns {Promise<void>}
+ */
 async function saveNote() {
   
   // ניקוי מטמון לפני פעולת CRUD  // שימוש ב-DataCollectionService לאיסוף נתונים
@@ -1034,6 +1044,10 @@ async function saveNote() {
   }
 }
 
+/**
+ * Persist changes from the edit note modal.
+ * @returns {Promise<void>}
+ */
 async function updateNoteFromModal() {
   
   // ניקוי מטמון לפני פעולת CRUD - עריכה  // שימוש ב-DataCollectionService לאיסוף נתונים
@@ -1118,6 +1132,11 @@ async function updateNoteFromModal() {
 
 // פונקציה זו הוסרה - שימוש במערכת הגלובלית showDeleteWarning
 
+/**
+ * Confirm deletion of a note after the delete modal interaction.
+ * @param {number|string} noteId - Note identifier slated for deletion
+ * @returns {Promise<void>}
+ */
 async function confirmDeleteNote(noteId) {
   // סגירת המודל
   const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoteModal'));
@@ -1129,6 +1148,11 @@ async function confirmDeleteNote(noteId) {
   await deleteNoteFromServer(noteId);
 }
 
+/**
+ * Delete a note via the API and refresh local datasets.
+ * @param {number|string} noteId - Note identifier to delete
+ * @returns {Promise<void>}
+ */
 async function deleteNoteFromServer(noteId) {
   // Clear cache before deletion to ensure fresh data after reload
   if (window.unifiedCacheManager) {
@@ -1379,6 +1403,10 @@ function setupNoteValidationEvents() {
 }
 
 // פונקציה לביטול בחירת קובץ
+/**
+ * Clear the selected attachment from the edit note form UI.
+ * @returns {void}
+ */
 function clearSelectedFile() {
   try {
     const fileInput = document.getElementById('editNoteAttachment');
@@ -1821,6 +1849,11 @@ function viewNote(noteId) {
 }
 
 // פונקציה לטעינת נתוני הערה לצפייה
+/**
+ * Load note data from the server and display it in the view modal.
+ * @param {number|string} noteId - Note identifier to fetch
+ * @returns {Promise<void>}
+ */
 async function loadNoteForViewing(noteId) {
   try {
     const response = await fetch(`/api/notes/${noteId}`);

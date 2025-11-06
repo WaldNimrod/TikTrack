@@ -347,6 +347,10 @@ function generateDetailedLog() {
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
 // Local  function for research page
+/**
+ * Copy the research page detailed log to the clipboard.
+ * @returns {Promise<void>}
+ */
 async function generateDetailedLogForResearch() {
     try {
         const detailedLog = await generateDetailedLog();

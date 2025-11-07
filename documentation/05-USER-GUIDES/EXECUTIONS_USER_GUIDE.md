@@ -270,6 +270,6 @@
 ## 📚 קישורים נוספים
 
 - [תיעוד טכני - Executions Flexible Association](../02-ARCHITECTURE/BACKEND/EXECUTIONS_FLEXIBLE_ASSOCIATION.md)
-- [CHANGELOG - גרסה 2.0.7](../CHANGELOG.md)
+- [CHANGELOG - גרסה 2.0.7](../05-REPORTS/LOCAL_SUMMARIES/CHANGELOG.md)
 - [רשימת בדיקות](../../TESTING_CHECKLIST.md)
 

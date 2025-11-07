@@ -20,6 +20,24 @@ const entityDetailsCode = fs.readFileSync(
 
 describe('Entity Details Modal', () => {
     beforeAll(() => {
+        // Ensure Logger is available with support for multiple parameters
+        if (!window.Logger) {
+            window.Logger = {
+                info: jest.fn((...args) => true),
+                warn: jest.fn((...args) => true),
+                error: jest.fn((...args) => true),
+                debug: jest.fn((...args) => true)
+            };
+        } else {
+            window.Logger.info = jest.fn((...args) => true);
+            window.Logger.warn = jest.fn((...args) => true);
+            window.Logger.error = jest.fn((...args) => true);
+            window.Logger.debug = jest.fn((...args) => true);
+        }
+
+        // Mock showErrorNotification
+        window.showErrorNotification = jest.fn();
+
         // Mock Bootstrap Modal
         global.bootstrap = {
             Modal: jest.fn(function(element) {
@@ -35,6 +53,14 @@ describe('Entity Details Modal', () => {
         global.fetch = jest.fn().mockResolvedValue({
             ok: true,
             json: () => Promise.resolve({})
+        });
+
+        // Mock document methods
+        jest.spyOn(document, 'getElementById').mockImplementation((id) => {
+            if (id === 'entityDetailsModal') {
+                return document.createElement('div');
+            }
+            return null;
         });
 
         // Evaluate the real code

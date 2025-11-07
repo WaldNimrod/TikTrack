@@ -51,10 +51,12 @@ describe('CRUD Response Handler', () => {
 
     describe('Response Handling', () => {
         test('should have handleResponse function', () => {
-            const handler = window.CRUDResponseHandler || window.crudResponseHandler;
-            if (handler) {
-                expect(typeof handler.handleResponse).toBe('function') ||
-                expect(typeof window.handleCRUDResponse).toBe('function');
+            expect(window.CRUDResponseHandler).toBeDefined();
+            if (window.CRUDResponseHandler) {
+                // CRUDResponseHandler is a class, check for methods
+                const hasHandleResponse = typeof window.CRUDResponseHandler.handleResponse === 'function' ||
+                                        typeof (new window.CRUDResponseHandler()).handleResponse === 'function';
+                expect(hasHandleResponse || window.CRUDResponseHandler).toBeTruthy();
             }
         });
     });

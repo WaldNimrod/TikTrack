@@ -256,7 +256,7 @@ Select appropriate header styling based on modal purpose:
 
 - [CSS_ARCHITECTURE.md](CSS_ARCHITECTURE.md) - General CSS architecture
 - [COMPONENT_STYLE_GUIDE.md](COMPONENT_STYLE_GUIDE.md) - Component styling guide
-- [CHANGELOG.md](../../CHANGELOG.md) - Project changelog
+- [CHANGELOG.md](../../05-REPORTS/LOCAL_SUMMARIES/CHANGELOG.md) - Project changelog
 
 ---
 

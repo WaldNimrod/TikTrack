@@ -9,26 +9,30 @@
  * @author TikTrack Development Team
  */
 
-const fs = require('fs');
-const path = require('path');
-
-// Load the actual Unified App Initializer code
-const initializerCode = fs.readFileSync(
-    path.join(__dirname, '../../trading-ui/scripts/unified-app-initializer.js'),
-    'utf8'
-);
+const { loadScriptWithDependencies, setupBasicMocks } = require('../utils/test-loader');
 
 describe('Unified App Initializer', () => {
     beforeAll(() => {
-        // Mock window.location
-        Object.defineProperty(window, 'location', {
-            value: {
-                pathname: '/test-page',
-                search: '',
-                hash: ''
-            },
-            writable: true
-        });
+        // Setup basic mocks (location is already set up there)
+        setupBasicMocks();
+
+        // Update location for this specific test
+        try {
+            Object.defineProperty(window, 'location', {
+                value: {
+                    pathname: '/test-page',
+                    search: '',
+                    hash: ''
+                },
+                writable: true,
+                configurable: true
+            });
+        } catch (e) {
+            // If redefinition fails, location was already set correctly
+            window.location.pathname = '/test-page';
+            window.location.search = '';
+            window.location.hash = '';
+        }
 
         // Mock PACKAGE_MANIFEST
         global.window.PACKAGE_MANIFEST = {
@@ -45,8 +49,9 @@ describe('Unified App Initializer', () => {
             }
         };
 
-        // Evaluate the real code
-        eval(initializerCode);
+        // Load with dependencies using test loader
+        const code = loadScriptWithDependencies('scripts/unified-app-initializer.js');
+        eval(code);
     });
 
     afterEach(() => {

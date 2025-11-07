@@ -39,13 +39,16 @@ describe('Linked Items Service', () => {
 
     describe('Initialization', () => {
         test('should initialize LinkedItemsService', () => {
-            expect(window.LinkedItemsService || window.loadLinkedItemsData).toBeDefined();
+            expect(window.LinkedItemsService).toBeDefined();
         });
     });
 
-    describe('Load Functions', () => {
-        test('should have loadLinkedItemsData function', () => {
-            expect(typeof window.loadLinkedItemsData).toBe('function');
+    describe('Service Methods', () => {
+        test('should have static methods', () => {
+            if (window.LinkedItemsService) {
+                expect(typeof window.LinkedItemsService.sortLinkedItems).toBe('function');
+                expect(typeof window.LinkedItemsService.formatLinkedItemName).toBe('function');
+            }
         });
     });
 });

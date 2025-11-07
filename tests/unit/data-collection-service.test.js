@@ -38,7 +38,8 @@ describe('Data Collection Service', () => {
 
         document.body.appendChild(formElement);
 
-        document.getElementById.mockImplementation((id) => {
+        // Use spyOn instead of mockImplementation
+        jest.spyOn(document, 'getElementById').mockImplementation((id) => {
             if (id === 'test-form') {
                 return formElement;
             }
@@ -61,9 +62,10 @@ describe('Data Collection Service', () => {
 
     describe('Collection Functions', () => {
         test('should have collect function', () => {
+            expect(window.DataCollectionService).toBeDefined();
+            expect(typeof window.collectFormData).toBe('function');
             if (window.DataCollectionService) {
-                expect(typeof window.DataCollectionService.collect).toBe('function') ||
-                expect(typeof window.collectFormData).toBe('function');
+                expect(typeof window.DataCollectionService.collectFormData).toBe('function');
             }
         });
     });

@@ -31,9 +31,9 @@
 - `import-user-data-old.js`: 79 console.log + 157 פונקציות
 
 #### **דוחות שנוצרו**:
-- [Comprehensive System Status Report](../COMPREHENSIVE_SYSTEM_STATUS_REPORT.md)
-- [System Improvement Action Plan](../SYSTEM_IMPROVEMENT_ACTION_PLAN.md)
-- [System Quality Metrics](../SYSTEM_QUALITY_METRICS.json)
+- [Comprehensive System Status Report](05-REPORTS/LOCAL_SUMMARIES/COMPREHENSIVE_SYSTEM_STATUS_REPORT.md)
+- [System Improvement Action Plan](05-REPORTS/LOCAL_SUMMARIES/SYSTEM_IMPROVEMENT_ACTION_PLAN.md)
+- [System Quality Metrics](05-REPORTS/data/SYSTEM_QUALITY_METRICS.json)
 
 #### **המלצות מיידיות**:
 1. **איחוד 35 פונקציות כפולות זהות** (עדיפות קריטית)
@@ -79,10 +79,10 @@
 - **תכונות**: Configuration-driven, Component-based, Validation System, Dynamic Styling, RTL Support
 
 #### **תיעוד פרויקט**:
-- [13 Pages Quality Fix Report](../13_PAGES_QUALITY_FIX_REPORT.md)
-- [Manual Browser Testing Report](../MANUAL_BROWSER_TESTING_REPORT.md)
-- [Functional Testing Report](../FUNCTIONAL_TESTING_REPORT.md)
-- [Phase 5 Re-scan Report](../PHASE5_RESCAN_REPORT.md)
+- [13 Pages Quality Fix Report](05-REPORTS/LOCAL_SUMMARIES/13_PAGES_QUALITY_FIX_REPORT.md)
+- [Manual Browser Testing Report](05-REPORTS/LOCAL_SUMMARIES/MANUAL_BROWSER_TESTING_REPORT.md)
+- [Functional Testing Report](05-REPORTS/LOCAL_SUMMARIES/FUNCTIONAL_TESTING_REPORT.md)
+- [Phase 5 Re-scan Report](05-REPORTS/LOCAL_SUMMARIES/PHASE5_RESCAN_REPORT.md)
 
 ---
 

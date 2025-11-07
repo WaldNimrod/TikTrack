@@ -40,8 +40,8 @@ describe('Color Scheme System', () => {
 
     describe('Color Functions', () => {
         test('should have getEntityColor function', () => {
-            expect(typeof window.getEntityColor).toBe('function') ||
-            expect(window.ColorSchemeSystem && typeof window.ColorSchemeSystem.getEntityColor).toBe('function');
+            expect(window.getEntityColor).toBeDefined();
+            expect(typeof window.getEntityColor).toBe('function');
         });
     });
 });

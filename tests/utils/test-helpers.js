@@ -342,6 +342,10 @@ function createMockSystem(systemName, methods = {}) {
     return mockSystem;
 }
 
+// Import mock helpers
+const mockHelpers = require('./mock-helpers');
+const testFixtures = require('./test-fixtures');
+
 // Export all helper functions
 module.exports = {
     createMockElement,
@@ -358,5 +362,9 @@ module.exports = {
     createMockConsole,
     createMockTimer,
     expectToThrow,
-    createMockSystem
+    createMockSystem,
+    // Export mock helpers
+    ...mockHelpers,
+    // Export test fixtures
+    ...testFixtures
 };

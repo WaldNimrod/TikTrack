@@ -46,8 +46,8 @@ describe('Translation Utils', () => {
 
     describe('Translation Functions', () => {
         test('should have translation functions available', () => {
-            // Check if common translation functions exist
-            expect(window.translate || window.t || window.__).toBeDefined();
+            // Check if translation utility functions exist
+            expect(window.translationUtils || window.translateAccountStatus || window.translateStatus).toBeDefined();
         });
 
         test('should handle RTL direction', () => {

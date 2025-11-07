@@ -41,10 +41,10 @@ describe('Pagination System', () => {
 
     describe('Pagination Functions', () => {
         test('should have pagination functions', () => {
-            const system = window.PaginationSystem || window.paginationSystem;
-            if (system) {
-                expect(typeof system.render).toBe('function') ||
-                expect(typeof system.setPage).toBe('function');
+            expect(window.PaginationSystem).toBeDefined();
+            if (window.PaginationSystem) {
+                expect(typeof window.PaginationSystem.create).toBe('function') ||
+                expect(typeof window.PaginationSystem.get).toBe('function');
             }
         });
     });

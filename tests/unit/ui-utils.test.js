@@ -138,5 +138,85 @@ describe('UI Utils', () => {
             expect(typeof window.updatePageSummaryStats).toBe('function');
         });
     });
+
+    // ===== EDGE CASES & ERROR HANDLING =====
+    
+    describe('Edge Cases - calculateStopPrice', () => {
+        test('should handle negative price', () => {
+            if (window.calculateStopPrice) {
+                const result = window.calculateStopPrice(-100, 10, 'Long');
+                expect(typeof result).toBe('number');
+            }
+        });
+
+        test('should handle negative percentage', () => {
+            if (window.calculateStopPrice) {
+                const result = window.calculateStopPrice(100, -10, 'Long');
+                expect(typeof result).toBe('number');
+            }
+        });
+
+        test('should handle very large percentage', () => {
+            if (window.calculateStopPrice) {
+                const result = window.calculateStopPrice(100, 1000, 'Long');
+                expect(typeof result).toBe('number');
+            }
+        });
+
+        test('should handle invalid side', () => {
+            if (window.calculateStopPrice) {
+                const result = window.calculateStopPrice(100, 10, 'Invalid');
+                expect(typeof result).toBe('number');
+            }
+        });
+
+        test('should handle null price', () => {
+            if (window.calculateStopPrice) {
+                const result = window.calculateStopPrice(null, 10, 'Long');
+                expect(typeof result).toBe('number');
+            }
+        });
+
+        test('should handle undefined price', () => {
+            if (window.calculateStopPrice) {
+                const result = window.calculateStopPrice(undefined, 10, 'Long');
+                expect(typeof result).toBe('number');
+            }
+        });
+    });
+
+    describe('Edge Cases - toggleSection', () => {
+        test('should handle null section ID', () => {
+            if (window.toggleSection) {
+                expect(() => {
+                    window.toggleSection(null);
+                }).not.toThrow();
+            }
+        });
+
+        test('should handle undefined section ID', () => {
+            if (window.toggleSection) {
+                expect(() => {
+                    window.toggleSection(undefined);
+                }).not.toThrow();
+            }
+        });
+
+        test('should handle empty string section ID', () => {
+            if (window.toggleSection) {
+                expect(() => {
+                    window.toggleSection('');
+                }).not.toThrow();
+            }
+        });
+
+        test('should handle non-existent section', () => {
+            if (window.toggleSection) {
+                expect(() => {
+                    window.toggleSection('non-existent-section');
+                }).not.toThrow();
+            }
+        });
+    });
 });
 

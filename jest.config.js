@@ -27,18 +27,18 @@ module.exports = {
     ],
     
     // Coverage thresholds
-    // TODO: Gradual coverage increase plan
-    // Phase 1 (Current): 0% - Building test infrastructure
-    // Phase 2 (Target: Q1 2025): 40% - Core systems covered
+    // Gradual coverage increase plan
+    // Phase 1 (Completed): 0% - Building test infrastructure
+    // Phase 2 (Current): 40% - Core systems covered
     // Phase 3 (Target: Q2 2025): 60% - All critical systems covered
     // Phase 4 (Target: Q3 2025): 80% - Full coverage target
     // See: documentation/02-ARCHITECTURE/FRONTEND/TESTING_SCOPE.md
     coverageThreshold: {
         global: {
-            branches: 0,
-            functions: 0,
-            lines: 0,
-            statements: 0
+            branches: 40,
+            functions: 40,
+            lines: 40,
+            statements: 40
         }
     },
     

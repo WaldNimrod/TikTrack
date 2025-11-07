@@ -346,6 +346,78 @@ function createMockSystem(systemName, methods = {}) {
 const mockHelpers = require('./mock-helpers');
 const testFixtures = require('./test-fixtures');
 
+/**
+ * Create mock backend database session
+ * @returns {Object} Mock database session
+ */
+function createMockDbSession() {
+    return {
+        query: jest.fn(),
+        add: jest.fn(),
+        commit: jest.fn(),
+        rollback: jest.fn(),
+        close: jest.fn(),
+        refresh: jest.fn(),
+        delete: jest.fn(),
+        filter: jest.fn().mockReturnThis(),
+        first: jest.fn(),
+        all: jest.fn().mockReturnValue([]),
+        one: jest.fn(),
+        scalar: jest.fn()
+    };
+}
+
+/**
+ * Create mock Flask app for backend tests
+ * @param {Object} config - App configuration
+ * @returns {Object} Mock Flask app
+ */
+function createMockFlaskApp(config = {}) {
+    return {
+        test_client: jest.fn(() => ({
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+            patch: jest.fn()
+        })),
+        config: {
+            TESTING: true,
+            ...config
+        },
+        register_blueprint: jest.fn()
+    };
+}
+
+/**
+ * Create mock E2E page object
+ * @returns {Object} Mock page object
+ */
+function createMockPage() {
+    return {
+        goto: jest.fn().mockResolvedValue(null),
+        click: jest.fn().mockResolvedValue(null),
+        fill: jest.fn().mockResolvedValue(null),
+        selectOption: jest.fn().mockResolvedValue(null),
+        waitForSelector: jest.fn().mockResolvedValue(null),
+        waitForLoadState: jest.fn().mockResolvedValue(null),
+        evaluate: jest.fn().mockResolvedValue(null),
+        screenshot: jest.fn().mockResolvedValue(Buffer.from('')),
+        close: jest.fn().mockResolvedValue(null)
+    };
+}
+
+/**
+ * Create mock Playwright browser context
+ * @returns {Object} Mock browser context
+ */
+function createMockBrowserContext() {
+    return {
+        newPage: jest.fn().mockResolvedValue(createMockPage()),
+        close: jest.fn().mockResolvedValue(null)
+    };
+}
+
 // Export all helper functions
 module.exports = {
     createMockElement,
@@ -363,6 +435,12 @@ module.exports = {
     createMockTimer,
     expectToThrow,
     createMockSystem,
+    // Backend test helpers
+    createMockDbSession,
+    createMockFlaskApp,
+    // E2E test helpers
+    createMockPage,
+    createMockBrowserContext,
     // Export mock helpers
     ...mockHelpers,
     // Export test fixtures

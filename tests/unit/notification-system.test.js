@@ -284,5 +284,202 @@ describe('Notification System', () => {
             }
         });
     });
+
+    // ===== EDGE CASES & ERROR HANDLING =====
+    
+    describe('Edge Cases - showNotification', () => {
+        test('should handle null message gracefully', async () => {
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            await expect(window.showNotification(null, 'info', 'Test')).resolves.not.toThrow();
+        });
+
+        test('should handle undefined message gracefully', async () => {
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            await expect(window.showNotification(undefined, 'info', 'Test')).resolves.not.toThrow();
+        });
+
+        test('should handle empty string message', async () => {
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            await expect(window.showNotification('', 'info', 'Test')).resolves.not.toThrow();
+        });
+
+        test('should handle invalid notification type', async () => {
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            await expect(window.showNotification('Test', 'invalid-type', 'Test')).resolves.not.toThrow();
+        });
+
+        test('should handle very long message', async () => {
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            const longMessage = 'A'.repeat(10000);
+            await expect(window.showNotification(longMessage, 'info', 'Test')).resolves.not.toThrow();
+        });
+
+        test('should handle negative duration', async () => {
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            await expect(window.showNotification('Test', 'info', 'Test', -1000)).resolves.not.toThrow();
+        });
+
+        test('should handle zero duration', async () => {
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            await expect(window.showNotification('Test', 'info', 'Test', 0)).resolves.not.toThrow();
+        });
+
+        test('should handle missing notification container', async () => {
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            // Remove container temporarily
+            const originalGetElementById = document.getElementById;
+            jest.spyOn(document, 'getElementById').mockReturnValue(null);
+            
+            await expect(window.showNotification('Test', 'info', 'Test')).resolves.not.toThrow();
+            
+            document.getElementById.mockRestore();
+        });
+    });
+
+    describe('Error Handling - showNotification', () => {
+        test('should handle getPreference rejection', async () => {
+            window.getPreference.mockRejectedValue(new Error('Preference error'));
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            await expect(window.showNotification('Test', 'info', 'Test', 5000, 'system')).resolves.not.toThrow();
+        });
+
+        test('should handle preferencesCache.get rejection', async () => {
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockRejectedValue(new Error('Cache error'));
+            
+            await expect(window.showNotification('Test', 'info', 'Test', 5000, 'system')).resolves.not.toThrow();
+        });
+
+        test('should handle missing getPreference function', async () => {
+            const originalGetPreference = window.getPreference;
+            delete window.getPreference;
+            
+            await expect(window.showNotification('Test', 'info', 'Test')).resolves.not.toThrow();
+            
+            window.getPreference = originalGetPreference;
+        });
+
+        test('should handle missing preferencesCache', async () => {
+            const originalCache = window.preferencesCache;
+            delete window.preferencesCache;
+            window.getPreference.mockResolvedValue(true);
+            
+            await expect(window.showNotification('Test', 'info', 'Test')).resolves.not.toThrow();
+            
+            window.preferencesCache = originalCache;
+        });
+    });
+
+    describe('Edge Cases - shouldShowNotification', () => {
+        test('should handle invalid category', async () => {
+            if (!window.shouldShowNotification) {
+                return;
+            }
+
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            const result = await window.shouldShowNotification('invalid-category', 'info', false);
+            expect(typeof result).toBe('boolean');
+        });
+
+        test('should handle invalid notification mode', async () => {
+            if (!window.shouldShowNotification) {
+                return;
+            }
+
+            window.getPreference.mockResolvedValue(true);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'invalid-mode' });
+            
+            const result = await window.shouldShowNotification('system', 'info', false);
+            expect(typeof result).toBe('boolean');
+        });
+
+        test('should handle null preference value', async () => {
+            if (!window.shouldShowNotification) {
+                return;
+            }
+
+            window.getPreference.mockResolvedValue(null);
+            window.preferencesCache.get.mockResolvedValue({ notification_mode: 'work' });
+            
+            const result = await window.shouldShowNotification('system', 'info', false);
+            expect(typeof result).toBe('boolean');
+        });
+
+        test('should handle all notification modes', async () => {
+            if (!window.shouldShowNotification) {
+                return;
+            }
+
+            const modes = ['debug', 'development', 'work', 'silent'];
+            
+            for (const mode of modes) {
+                window.getPreference.mockResolvedValue(true);
+                window.preferencesCache.get.mockResolvedValue({ notification_mode: mode });
+                
+                const result = await window.shouldShowNotification('system', 'info', false);
+                expect(typeof result).toBe('boolean');
+            }
+        });
+    });
+
+    describe('Edge Cases - logWithCategory', () => {
+        test('should handle invalid log level', async () => {
+            if (!window.logWithCategory) {
+                return;
+            }
+
+            window.shouldLogToConsole = jest.fn().mockResolvedValue(true);
+            
+            // Mock console methods to prevent errors
+            const originalConsole = console;
+            console['invalid-level'] = jest.fn();
+            
+            await expect(window.logWithCategory('invalid-level', 'Test', 'system')).resolves.not.toThrow();
+            
+            delete console['invalid-level'];
+        });
+
+        test('should handle null message', async () => {
+            if (!window.logWithCategory) {
+                return;
+            }
+
+            window.shouldLogToConsole = jest.fn().mockResolvedValue(true);
+            
+            await expect(window.logWithCategory('info', null, 'system')).resolves.not.toThrow();
+        });
+
+        test('should handle missing shouldLogToConsole', async () => {
+            if (!window.logWithCategory) {
+                return;
+            }
+
+            const originalShouldLog = window.shouldLogToConsole;
+            delete window.shouldLogToConsole;
+            
+            await expect(window.logWithCategory('info', 'Test', 'system')).resolves.not.toThrow();
+            
+            window.shouldLogToConsole = originalShouldLog;
+        });
+    });
 });
 

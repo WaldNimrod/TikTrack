@@ -75,5 +75,146 @@ describe('Cache Sync Manager', () => {
             }
         });
     });
+
+    // ===== EDGE CASES & ERROR HANDLING =====
+    
+    describe('Edge Cases - syncToBackend', () => {
+        test('should handle null key', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.syncToBackend) {
+                return;
+            }
+
+            await expect(window.CacheSyncManager.syncToBackend(null, {})).resolves.not.toThrow();
+        });
+
+        test('should handle undefined key', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.syncToBackend) {
+                return;
+            }
+
+            await expect(window.CacheSyncManager.syncToBackend(undefined, {})).resolves.not.toThrow();
+        });
+
+        test('should handle empty string key', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.syncToBackend) {
+                return;
+            }
+
+            await expect(window.CacheSyncManager.syncToBackend('', {})).resolves.not.toThrow();
+        });
+
+        test('should handle null value', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.syncToBackend) {
+                return;
+            }
+
+            await expect(window.CacheSyncManager.syncToBackend('test-key', null)).resolves.not.toThrow();
+        });
+
+        test('should handle missing UnifiedCacheManager', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.syncToBackend) {
+                return;
+            }
+
+            const originalCache = window.UnifiedCacheManager;
+            delete window.UnifiedCacheManager;
+
+            await expect(window.CacheSyncManager.syncToBackend('test-key', {})).resolves.not.toThrow();
+
+            window.UnifiedCacheManager = originalCache;
+        });
+    });
+
+    describe('Error Handling - syncToBackend', () => {
+        test('should handle network errors gracefully', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.syncToBackend) {
+                return;
+            }
+
+            // Mock fetch to reject
+            const originalFetch = global.fetch;
+            global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+
+            await expect(window.CacheSyncManager.syncToBackend('test-key', {})).resolves.not.toThrow();
+
+            global.fetch = originalFetch;
+        });
+
+        test('should handle server errors gracefully', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.syncToBackend) {
+                return;
+            }
+
+            // Mock fetch to return error response
+            const originalFetch = global.fetch;
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: false,
+                status: 500,
+                json: () => Promise.resolve({ error: 'Server error' })
+            });
+
+            await expect(window.CacheSyncManager.syncToBackend('test-key', {})).resolves.not.toThrow();
+
+            global.fetch = originalFetch;
+        });
+    });
+
+    describe('Edge Cases - invalidate', () => {
+        test('should handle null action', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.invalidate) {
+                return;
+            }
+
+            await expect(window.CacheSyncManager.invalidate(null)).resolves.not.toThrow();
+        });
+
+        test('should handle undefined action', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.invalidate) {
+                return;
+            }
+
+            await expect(window.CacheSyncManager.invalidate(undefined)).resolves.not.toThrow();
+        });
+
+        test('should handle invalid action', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.invalidate) {
+                return;
+            }
+
+            await expect(window.CacheSyncManager.invalidate('invalid-action')).resolves.not.toThrow();
+        });
+    });
+
+    describe('Error Handling - initialize', () => {
+        test('should handle initialization failure gracefully', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.initialize) {
+                return;
+            }
+
+            // Mock UnifiedCacheManager to fail
+            const originalCache = window.UnifiedCacheManager;
+            window.UnifiedCacheManager = {
+                initialize: jest.fn().mockRejectedValue(new Error('Init error'))
+            };
+
+            await expect(window.CacheSyncManager.initialize()).resolves.not.toThrow();
+
+            window.UnifiedCacheManager = originalCache;
+        });
+
+        test('should handle missing server URL', async () => {
+            if (!window.CacheSyncManager || !window.CacheSyncManager.initialize) {
+                return;
+            }
+
+            // Mock fetch to handle missing URL scenario
+            const originalFetch = global.fetch;
+            global.fetch = jest.fn().mockRejectedValue(new Error('Invalid URL'));
+
+            await expect(window.CacheSyncManager.initialize()).resolves.not.toThrow();
+
+            global.fetch = originalFetch;
+        });
+    });
 });
 

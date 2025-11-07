@@ -94,5 +94,122 @@ describe('Page Utils', () => {
             }
         });
     });
+
+    // ===== EDGE CASES & ERROR HANDLING =====
+    
+    describe('Edge Cases - savePageState', () => {
+        test('should handle null page name', () => {
+            if (window.savePageState) {
+                expect(() => {
+                    window.savePageState(null, { test: 'value' });
+                }).not.toThrow();
+            }
+        });
+
+        test('should handle undefined page name', () => {
+            if (window.savePageState) {
+                expect(() => {
+                    window.savePageState(undefined, { test: 'value' });
+                }).not.toThrow();
+            }
+        });
+
+        test('should handle null state', () => {
+            if (window.savePageState) {
+                expect(() => {
+                    window.savePageState('test-key', null);
+                }).not.toThrow();
+            }
+        });
+
+        test('should handle undefined state', () => {
+            if (window.savePageState) {
+                expect(() => {
+                    window.savePageState('test-key', undefined);
+                }).not.toThrow();
+            }
+        });
+
+        test('should handle circular reference in state', () => {
+            if (window.savePageState) {
+                const circularState = { test: 'value' };
+                circularState.self = circularState;
+                
+                expect(() => {
+                    window.savePageState('test-key', circularState);
+                }).not.toThrow();
+            }
+        });
+    });
+
+    describe('Edge Cases - loadPageState', () => {
+        test('should handle null page name', () => {
+            if (window.loadPageState) {
+                const result = window.loadPageState(null);
+                expect(result === null || typeof result === 'object').toBe(true);
+            }
+        });
+
+        test('should handle undefined page name', () => {
+            if (window.loadPageState) {
+                const result = window.loadPageState(undefined);
+                expect(result === null || typeof result === 'object').toBe(true);
+            }
+        });
+
+        test('should handle invalid JSON in storage', () => {
+            if (window.loadPageState) {
+                storage['pageState_test-key'] = 'invalid-json';
+                
+                const result = window.loadPageState('test-key');
+                expect(result === null || typeof result === 'object').toBe(true);
+            }
+        });
+
+        test('should handle missing state in storage', () => {
+            if (window.loadPageState) {
+                const result = window.loadPageState('non-existent-key');
+                expect(result === null || typeof result === 'object').toBe(true);
+            }
+        });
+    });
+
+    describe('Error Handling - localStorage', () => {
+        test('should handle localStorage.setItem error', () => {
+            if (window.savePageState) {
+                localStorage.setItem.mockImplementationOnce(() => {
+                    throw new Error('Storage quota exceeded');
+                });
+
+                expect(() => {
+                    window.savePageState('test-key', { test: 'value' });
+                }).not.toThrow();
+            }
+        });
+
+        test('should handle localStorage.getItem error', () => {
+            if (window.loadPageState) {
+                localStorage.getItem.mockImplementationOnce(() => {
+                    throw new Error('Storage error');
+                });
+
+                expect(() => {
+                    window.loadPageState('test-key');
+                }).not.toThrow();
+            }
+        });
+
+        test('should handle localStorage.removeItem error', () => {
+            if (window.clearPageState) {
+                localStorage.removeItem.mockImplementationOnce(() => {
+                    throw new Error('Storage error');
+                });
+
+                expect(() => {
+                    window.clearPageState('test-key');
+                }).not.toThrow();
+            }
+        });
+    });
 });
 

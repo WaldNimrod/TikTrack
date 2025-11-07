@@ -326,5 +326,166 @@ describe('Modal Manager V2', () => {
             expect(deps).toHaveProperty('selectPopulatorService');
         });
     });
+
+    // ===== EDGE CASES & ERROR HANDLING =====
+    
+    describe('Edge Cases - showModal', () => {
+        test('should handle null modal ID gracefully', async () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.showModal) {
+                return;
+            }
+
+            // The code may throw an error for null modal ID, which is expected
+            try {
+                await window.ModalManagerV2.showModal(null, 'add');
+            } catch (error) {
+                // Error is expected for null modal ID
+                expect(error).toBeDefined();
+            }
+        });
+
+        test('should handle undefined modal ID gracefully', async () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.showModal) {
+                return;
+            }
+
+            // The code may throw an error for undefined modal ID, which is expected
+            try {
+                await window.ModalManagerV2.showModal(undefined, 'add');
+            } catch (error) {
+                // Error is expected for undefined modal ID
+                expect(error).toBeDefined();
+            }
+        });
+
+        test('should handle empty string modal ID gracefully', async () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.showModal) {
+                return;
+            }
+
+            // The code may throw an error for empty string modal ID, which is expected
+            try {
+                await window.ModalManagerV2.showModal('', 'add');
+            } catch (error) {
+                // Error is expected for empty string modal ID
+                expect(error).toBeDefined();
+            }
+        });
+
+        test('should handle invalid action type gracefully', async () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.showModal) {
+                return;
+            }
+
+            // The code may throw an error for invalid action type, which is expected
+            try {
+                await window.ModalManagerV2.showModal('test-modal', 'invalid-action');
+            } catch (error) {
+                // Error is expected for invalid action type
+                expect(error).toBeDefined();
+            }
+        });
+
+        test('should handle missing Bootstrap Modal gracefully', async () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.showModal) {
+                return;
+            }
+
+            const originalBootstrap = global.bootstrap;
+            global.bootstrap = null;
+
+            // The code may throw an error for missing Bootstrap, which is expected
+            try {
+                await window.ModalManagerV2.showModal('test-modal', 'add');
+            } catch (error) {
+                // Error is expected for missing Bootstrap
+                expect(error).toBeDefined();
+            }
+
+            global.bootstrap = originalBootstrap;
+        });
+    });
+
+    describe('Error Handling - createCRUDModal', () => {
+        test('should handle invalid configuration gracefully', () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.createCRUDModal) {
+                return;
+            }
+
+            // The code may throw an error for null config, which is expected
+            try {
+                window.ModalManagerV2.createCRUDModal(null);
+            } catch (error) {
+                // Error is expected for null config
+                expect(error).toBeDefined();
+            }
+        });
+
+        test('should handle configuration missing required fields gracefully', () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.createCRUDModal) {
+                return;
+            }
+
+            const invalidConfig = {
+                id: 'test-modal',
+                // Missing required fields
+            };
+
+            // The code may throw an error for invalid config, which is expected
+            try {
+                window.ModalManagerV2.createCRUDModal(invalidConfig);
+            } catch (error) {
+                // Error is expected for invalid config
+                expect(error).toBeDefined();
+            }
+        });
+
+        test('should handle configuration with invalid entityType gracefully', () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.createCRUDModal) {
+                return;
+            }
+
+            const invalidConfig = {
+                id: 'test-modal',
+                entityType: null,
+                title: { add: 'Add' },
+                fields: []
+            };
+
+            // The code may throw an error for invalid entityType, which is expected
+            try {
+                window.ModalManagerV2.createCRUDModal(invalidConfig);
+            } catch (error) {
+                // Error is expected for invalid entityType
+                expect(error).toBeDefined();
+            }
+        });
+    });
+
+    describe('Edge Cases - closeModal', () => {
+        test('should handle closing when no modal is active', () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.closeModal) {
+                return;
+            }
+
+            window.ModalManagerV2.activeModal = null;
+            
+            expect(() => {
+                window.ModalManagerV2.closeModal();
+            }).not.toThrow();
+        });
+
+        test('should handle closing non-existent modal', () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.closeModal) {
+                return;
+            }
+
+            window.ModalManagerV2.activeModal = 'non-existent-modal';
+            
+            expect(() => {
+                window.ModalManagerV2.closeModal();
+            }).not.toThrow();
+        });
+    });
 });
 

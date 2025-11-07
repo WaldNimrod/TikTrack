@@ -55,7 +55,7 @@ function sortTable(columnIndex, data, tableType, updateFunction) {
  * @param {string} tableType - Table type
  * @returns {*} Column value
  */
-function getColumnValue(item, columnIndex, tableType) {
+function resolveColumnValue(item, columnIndex, tableType) {
   // Special handling for linked_items table
   if (tableType === 'linked_items') {
     switch (columnIndex) {
@@ -76,18 +76,17 @@ function getColumnValue(item, columnIndex, tableType) {
         return '';
     }
   }
-  
+
   // CRITICAL: Use getColumnValue from table-mappings.js FIRST
   // This is the authoritative source with proper handling of calculated fields
-  // Check for direct export first (window.getColumnValue), then object export (window.tableMappings.getColumnValue)
-  if (typeof window.getColumnValue === 'function') {
-    return window.getColumnValue(item, columnIndex, tableType);
-  }
-  
   if (window.tableMappings && typeof window.tableMappings.getColumnValue === 'function') {
     return window.tableMappings.getColumnValue(item, columnIndex, tableType);
   }
-  
+
+  if (typeof window.getColumnValue === 'function' && window.getColumnValue !== resolveColumnValue) {
+    return window.getColumnValue(item, columnIndex, tableType);
+  }
+
   // Fallback: Try to use TABLE_COLUMN_MAPPINGS directly (basic mapping only)
   // This should rarely execute as table-mappings.js should be loaded first
   if (window.TABLE_COLUMN_MAPPINGS && window.TABLE_COLUMN_MAPPINGS[tableType]) {
@@ -231,130 +230,125 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
 }
 
 window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
-  // Global sortTableData called for table
-  
-  // CRITICAL: Prevent recursion - check if we're already sorting
   if (window._sortTableDataInProgress) {
     console.warn(`[sortTableData] Recursion detected: sort already in progress for ${tableType} column ${columnIndex}, returning original data`);
     console.trace('[sortTableData] Stack trace for rejected call');
     return data;
   }
-  
+
   console.log(`[sortTableData] Starting sort: tableType=${tableType}, columnIndex=${columnIndex}, dataLength=${data?.length || 0}, hasUpdateFunction=${typeof updateFunction === 'function'}`);
-  
-  // Set flag to prevent recursion
   window._sortTableDataInProgress = true;
 
+  const complete = (direction, sortedData) => {
+    if (typeof window.updateSortIcons === 'function') {
+      window.updateSortIcons(tableType, columnIndex, direction);
+    }
+    console.log(`[sortTableData] Completed sort: tableType=${tableType}, columnIndex=${columnIndex}, sortedLength=${sortedData?.length || 0}`);
+    window._sortTableDataInProgress = false;
+  };
+
   try {
-    // Validate input data
-    if (!data || !Array.isArray(data)) {
-      return [];
+    if (!Array.isArray(data) || data.length === 0) {
+      window._sortTableDataInProgress = false;
+      return Array.isArray(data) ? [] : data;
     }
 
-    if (data.length === 0) {
-      return [];
-    }
-
-  // Get current sort state for this specific column
-  const columnStateKey = `sortState_${tableType}_col_${columnIndex}`;
-  const savedColumnState = localStorage.getItem(columnStateKey);
-  let currentColumnState = null;
-  if (savedColumnState) {
-    try {
-      currentColumnState = JSON.parse(savedColumnState);
-    } catch {
-      // Invalid state for this column
-    }
-  }
-
-  // Determine new sort direction
-  let newDirection = 'asc';
-  if (currentColumnState) {
-    // If column has previous state - toggle direction
-    newDirection = currentColumnState.direction === 'asc' ? 'desc' : 'asc';
-  }
-
-  // Save new sort state
-  window.saveSortState(tableType, columnIndex, newDirection);
-
-  // Sort the data with custom logic for specific table types
-  const sortedData = [...data].sort((a, b) => {
-    // Primary sort by current column
-    let aValue = getColumnValue(a, columnIndex, tableType);
-    let bValue = getColumnValue(b, columnIndex, tableType);
-
-    // Custom sorting logic for specific table types and columns
-    const customSortResult = getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue);
-    if (customSortResult !== null) {
-      const primaryResult = newDirection === 'asc' ? customSortResult : -customSortResult;
-      if (primaryResult !== 0) return primaryResult;
-    } else {
-      // Standard sorting logic
-      // Convert to numbers if possible
-      if (!isNaN(aValue) && !isNaN(bValue)) {
-        aValue = parseFloat(aValue);
-        bValue = parseFloat(bValue);
+    const columnStateKey = `sortState_${tableType}_col_${columnIndex}`;
+    const savedColumnState = localStorage.getItem(columnStateKey);
+    let currentColumnState = null;
+    if (savedColumnState) {
+      try {
+        currentColumnState = JSON.parse(savedColumnState);
+      } catch {
+        currentColumnState = null;
       }
+    }
 
-      // Convert to dates if possible
-      if (isDateValue(aValue) && isDateValue(bValue)) {
-        aValue = new Date(aValue);
-        bValue = new Date(bValue);
-      }
+    const newDirection = currentColumnState && currentColumnState.direction === 'asc' ? 'desc' : 'asc';
+    window.saveSortState(tableType, columnIndex, newDirection);
 
-      // Perform sort comparison
-      if (aValue < bValue) {
-        const primaryResult = newDirection === 'asc' ? -1 : 1;
+    const sortedData = [...data].sort((a, b) => {
+      let aValue = resolveColumnValue(a, columnIndex, tableType);
+      let bValue = resolveColumnValue(b, columnIndex, tableType);
+
+      const customSortResult = getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue);
+      if (customSortResult !== null) {
+        const primaryResult = newDirection === 'asc' ? customSortResult : -customSortResult;
         if (primaryResult !== 0) return primaryResult;
+      } else {
+        if (!isNaN(aValue) && !isNaN(bValue)) {
+          aValue = parseFloat(aValue);
+          bValue = parseFloat(bValue);
+        }
+
+        if (isDateValue(aValue) && isDateValue(bValue)) {
+          aValue = new Date(aValue);
+          bValue = new Date(bValue);
+        }
+
+        if (aValue < bValue) {
+          const primaryResult = newDirection === 'asc' ? -1 : 1;
+          if (primaryResult !== 0) return primaryResult;
+        }
+        if (aValue > bValue) {
+          const primaryResult = newDirection === 'asc' ? 1 : -1;
+          if (primaryResult !== 0) return primaryResult;
+        }
       }
-      if (aValue > bValue) {
-        const primaryResult = newDirection === 'asc' ? 1 : -1;
-        if (primaryResult !== 0) return primaryResult;
-      }
+
+      return 0;
+    });
+
+    if (typeof updateFunction !== 'function') {
+      complete(newDirection, sortedData);
+      return sortedData;
     }
 
-    // Secondary sort by previous column if exists
-    // Note: We skip secondary sort for now as each column has its own independent sort state
-    
-    return 0;
-  });
-
-  // Update the table
-  if (typeof updateFunction === 'function') {
-    // CRITICAL: Temporarily disable event handlers to prevent recursion
     const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+    let sortableHeaders = [];
     if (table) {
-      const sortableHeaders = table.querySelectorAll('.sortable-header');
+      sortableHeaders = Array.from(table.querySelectorAll('.sortable-header'));
       sortableHeaders.forEach(header => {
         header.style.pointerEvents = 'none';
       });
-      
-      try {
-        updateFunction(sortedData);
-      } finally {
-        // Re-enable event listeners after a short delay
-        setTimeout(() => {
-          sortableHeaders.forEach(header => {
-            header.style.pointerEvents = '';
-          });
-        }, 150);
-      }
-    } else {
-      updateFunction(sortedData);
     }
-  }
 
-  // Update sort icons
-  if (typeof window.updateSortIcons === 'function') {
-    window.updateSortIcons(tableType, columnIndex, newDirection);
-  }
+    const enableHeaders = () => {
+      if (sortableHeaders.length === 0) {
+        return;
+      }
+      setTimeout(() => {
+        sortableHeaders.forEach(header => {
+          header.style.pointerEvents = '';
+        });
+      }, 150);
+    };
 
-  // Table sorted by column
-  console.log(`[sortTableData] Completed sort: tableType=${tableType}, columnIndex=${columnIndex}, sortedLength=${sortedData?.length || 0}`);
-  return sortedData;
-  } finally {
-    // Clear flag after execution
+    let updateResult;
+    try {
+      updateResult = updateFunction(sortedData);
+    } catch (error) {
+      enableHeaders();
+      window._sortTableDataInProgress = false;
+      throw error;
+    }
+
+    if (updateResult && typeof updateResult.then === 'function') {
+      return updateResult.finally(enableHeaders).then(() => {
+        complete(newDirection, sortedData);
+        return sortedData;
+      }).catch(error => {
+        complete(newDirection, sortedData);
+        throw error;
+      });
+    }
+
+    enableHeaders();
+    complete(newDirection, sortedData);
+    return sortedData;
+  } catch (error) {
     window._sortTableDataInProgress = false;
+    throw error;
   }
 };
 

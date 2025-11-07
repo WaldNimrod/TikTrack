@@ -6,8 +6,8 @@
 
 ## סיכום ביצוע
 
-### בעיות שזוהו: 2
-### תיקונים שבוצעו: 2
+### בעיות שזוהו: 3
+### תיקונים שבוצעו: 3
 ### טבלאות שנפגעו: 7
 ### טבלאות שתוקנו: 7
 
@@ -43,6 +43,22 @@
 ✅ הוספת בדיקה ב-`data-basic.js` - אם `table-mappings.js` כבר נטען, לא לדרוס את המיפויים.
 
 **קובץ:** `trading-ui/scripts/modules/data-basic.js` (שורה 1354-1388)
+
+---
+
+### בעיה #3: קריאות רקורסיביות בין `tables.js` ל-`table-mappings.js` ❌ → ✅
+
+**הבעיה:**
+- כאשר טבלה לא נרשמה עדיין ב-`UnifiedTableSystem`, הקריאה ל-`window.getColumnValue` ב-`tables.js` הובילה בחזרה לפונקציה הגלובלית מאותו קובץ.
+- התוצאה הייתה `Maximum call stack size exceeded` בלחיצה על כפתורי סידור בטבלאות כגון `cash_flows`, `portfolio` ו-`trading_accounts`.
+
+**התיקון:**
+✅ יצירת פונקציה ייעודית `resolveColumnValue` ב-`tables.js`, שמוודאת סדר קריאות תקין:
+- קודם כל פונה ל-`window.tableMappings.getColumnValue` (המערכת הכללית).
+- רק אם לא קיים, בודקת את `window.getColumnValue` ומוודאת שלא חוזרת לעצמה.
+- במידה ואין מיפוי כללי זמין, נופלת לפולבאק הישן ללא רקורסיה.
+
+**קובץ:** `trading-ui/scripts/tables.js` (שורות 58-168, 270-272)
 
 ---
 

@@ -186,13 +186,16 @@ class SelectPopulatorService {
      * });
      */
     static async populateTickersSelect(selectIdOrElement, options = {}) {
+        const selectIdentifier = typeof selectIdOrElement === 'string'
+            ? selectIdOrElement
+            : (selectIdOrElement?.id || selectIdOrElement?.name || selectIdOrElement?.getAttribute?.('data-select-id') || 'element');
+        
         // Support both ID string and element object
         const select = typeof selectIdOrElement === 'string' 
             ? document.getElementById(selectIdOrElement)
             : selectIdOrElement;
         if (!select) {
-            const id = typeof selectIdOrElement === 'string' ? selectIdOrElement : 'element';
-            console.warn(`⚠️ Select ${id} לא נמצא`);
+            console.warn(`⚠️ Select ${selectIdentifier} לא נמצא`);
             return;
         }
         
@@ -220,7 +223,7 @@ class SelectPopulatorService {
                 defaultValue: options.defaultValue
             });
             
-            console.log(`✅ נטענו ${tickers.length} טיקרים ל-${selectId}`);
+            console.log(`✅ נטענו ${tickers.length} טיקרים ל-${selectIdentifier}`);
             
         } catch (error) {
             console.error('❌ שגיאה בטעינת טיקרים:', error);
@@ -240,13 +243,16 @@ class SelectPopulatorService {
      * });
      */
     static async populateAccountsSelect(selectIdOrElement, options = {}) {
+        const selectIdentifier = typeof selectIdOrElement === 'string'
+            ? selectIdOrElement
+            : (selectIdOrElement?.id || selectIdOrElement?.name || selectIdOrElement?.getAttribute?.('data-select-id') || 'element');
+        
         // Support both ID string and element object
         const select = typeof selectIdOrElement === 'string' 
             ? document.getElementById(selectIdOrElement)
             : selectIdOrElement;
         if (!select) {
-            const id = typeof selectIdOrElement === 'string' ? selectIdOrElement : 'element';
-            console.warn(`⚠️ Select ${id} לא נמצא`);
+            console.warn(`⚠️ Select ${selectIdentifier} לא נמצא`);
             return;
         }
         
@@ -294,7 +300,7 @@ class SelectPopulatorService {
                 defaultText: options.defaultText
             });
             
-            console.log(`✅ נטענו ${accounts.length} חשבונות ל-${selectId}`);
+            console.log(`✅ נטענו ${accounts.length} חשבונות ל-${selectIdentifier}`);
             
         } catch (error) {
             console.error('❌ שגיאה בטעינת חשבונות:', error);
@@ -314,13 +320,16 @@ class SelectPopulatorService {
      * });
      */
     static async populateCurrenciesSelect(selectIdOrElement, options = {}) {
+        const selectIdentifier = typeof selectIdOrElement === 'string'
+            ? selectIdOrElement
+            : (selectIdOrElement?.id || selectIdOrElement?.name || selectIdOrElement?.getAttribute?.('data-select-id') || 'element');
+        
         // Support both ID string and element object
         const select = typeof selectIdOrElement === 'string' 
             ? document.getElementById(selectIdOrElement)
             : selectIdOrElement;
         if (!select) {
-            const id = typeof selectIdOrElement === 'string' ? selectIdOrElement : 'element';
-            console.warn(`⚠️ Select ${id} לא נמצא`);
+            console.warn(`⚠️ Select ${selectIdentifier} לא נמצא`);
             return;
         }
         
@@ -421,13 +430,16 @@ class SelectPopulatorService {
      * await SelectPopulatorService.populateTradesSelect('tradeSelect');
      */
     static async populateTradesSelect(selectIdOrElement, options = {}) {
+        const selectIdentifier = typeof selectIdOrElement === 'string'
+            ? selectIdOrElement
+            : (selectIdOrElement?.id || selectIdOrElement?.name || selectIdOrElement?.getAttribute?.('data-select-id') || 'element');
+        
         // Support both ID string and element object
         const select = typeof selectIdOrElement === 'string' 
             ? document.getElementById(selectIdOrElement)
             : selectIdOrElement;
         if (!select) {
-            const id = typeof selectIdOrElement === 'string' ? selectIdOrElement : 'element';
-            console.warn(`⚠️ Select ${id} לא נמצא`);
+            console.warn(`⚠️ Select ${selectIdentifier} לא נמצא`);
             return;
         }
         
@@ -459,7 +471,7 @@ class SelectPopulatorService {
                 defaultValue: options.defaultValue
             });
             
-            console.log(`✅ נטענו ${trades.length} טריידים ל-${selectId}`);
+            console.log(`✅ נטענו ${trades.length} טריידים ל-${selectIdentifier}`);
             
         } catch (error) {
             console.error('❌ שגיאה בטעינת טריידים:', error);
@@ -477,13 +489,16 @@ class SelectPopulatorService {
      * await SelectPopulatorService.populateTradePlansSelect('planSelect');
      */
     static async populateTradePlansSelect(selectIdOrElement, options = {}) {
+        const selectIdentifier = typeof selectIdOrElement === 'string'
+            ? selectIdOrElement
+            : (selectIdOrElement?.id || selectIdOrElement?.name || selectIdOrElement?.getAttribute?.('data-select-id') || 'element');
+        
         // Support both ID string and element object
         const select = typeof selectIdOrElement === 'string' 
             ? document.getElementById(selectIdOrElement)
             : selectIdOrElement;
         if (!select) {
-            const id = typeof selectIdOrElement === 'string' ? selectIdOrElement : 'element';
-            console.warn(`⚠️ Select ${id} לא נמצא`);
+            console.warn(`⚠️ Select ${selectIdentifier} לא נמצא`);
             return;
         }
         
@@ -511,7 +526,7 @@ class SelectPopulatorService {
                 defaultValue: options.defaultValue
             });
             
-            console.log(`✅ נטענו ${plans.length} תכנונים ל-${selectId}`);
+            console.log(`✅ נטענו ${plans.length} תכנונים ל-${selectIdentifier}`);
             
         } catch (error) {
             console.error('❌ שגיאה בטעינת תכנונים:', error);

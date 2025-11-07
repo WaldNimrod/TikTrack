@@ -10,7 +10,7 @@ class CashFlow(BaseModel):
     type = Column(String(50), nullable=False, default='deposit')  # ENUM: deposit, withdrawal, transfer, fee, dividend, interest
     amount = Column(Float, nullable=False)  # RANGE: amount != 0
     date = Column(Date, nullable=True)
-    description = Column(String(500), nullable=True)
+    description = Column(String(5000), nullable=True)
     currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=True, default=1)  # Default to USD
     usd_rate = Column(Numeric(10, 6), nullable=False, default=1.000000)  # RANGE: usd_rate > 0
     source = Column(String(20), nullable=True, default='manual')  # ENUM: manual, file_import, direct_import, api

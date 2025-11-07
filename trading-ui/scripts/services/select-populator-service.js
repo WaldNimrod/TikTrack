@@ -185,10 +185,14 @@ class SelectPopulatorService {
      *   defaultValue: 5 
      * });
      */
-    static async populateTickersSelect(selectId, options = {}) {
-        const select = document.getElementById(selectId);
+    static async populateTickersSelect(selectIdOrElement, options = {}) {
+        // Support both ID string and element object
+        const select = typeof selectIdOrElement === 'string' 
+            ? document.getElementById(selectIdOrElement)
+            : selectIdOrElement;
         if (!select) {
-            console.warn(`⚠️ Select ${selectId} לא נמצא`);
+            const id = typeof selectIdOrElement === 'string' ? selectIdOrElement : 'element';
+            console.warn(`⚠️ Select ${id} לא נמצא`);
             return;
         }
         
@@ -235,16 +239,22 @@ class SelectPopulatorService {
      *   defaultFromPreferences: true 
      * });
      */
-    static async populateAccountsSelect(selectId, options = {}) {
-        const select = document.getElementById(selectId);
+    static async populateAccountsSelect(selectIdOrElement, options = {}) {
+        // Support both ID string and element object
+        const select = typeof selectIdOrElement === 'string' 
+            ? document.getElementById(selectIdOrElement)
+            : selectIdOrElement;
         if (!select) {
-            console.warn(`⚠️ Select ${selectId} לא נמצא`);
+            const id = typeof selectIdOrElement === 'string' ? selectIdOrElement : 'element';
+            console.warn(`⚠️ Select ${id} לא נמצא`);
             return;
         }
         
         try {
-            // טעינת חשבונות מ-API
-            const response = await fetch('/api/trading-accounts/');
+            // טעינת חשבונות פעילים בלבד מ-API
+            // אם רוצים כל החשבונות, יש להשתמש ב-filterFn או להגדיר includeAll: true
+            const endpoint = options.includeAll ? '/api/trading-accounts/' : '/api/trading-accounts/open';
+            const response = await fetch(endpoint);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -252,7 +262,7 @@ class SelectPopulatorService {
             const responseData = await response.json();
             let accounts = responseData.data || responseData || [];
             
-            // סינון אם נדרש
+            // סינון נוסף אם נדרש
             if (options.filterFn && typeof options.filterFn === 'function') {
                 accounts = accounts.filter(options.filterFn);
             }
@@ -303,10 +313,14 @@ class SelectPopulatorService {
      *   defaultFromPreferences: true 
      * });
      */
-    static async populateCurrenciesSelect(selectId, options = {}) {
-        const select = document.getElementById(selectId);
+    static async populateCurrenciesSelect(selectIdOrElement, options = {}) {
+        // Support both ID string and element object
+        const select = typeof selectIdOrElement === 'string' 
+            ? document.getElementById(selectIdOrElement)
+            : selectIdOrElement;
         if (!select) {
-            console.warn(`⚠️ Select ${selectId} לא נמצא`);
+            const id = typeof selectIdOrElement === 'string' ? selectIdOrElement : 'element';
+            console.warn(`⚠️ Select ${id} לא נמצא`);
             return;
         }
         
@@ -397,6 +411,62 @@ class SelectPopulatorService {
     }
 
     /**
+     * מילוי select box של טריידים
+     * 
+     * @param {string} selectId - ID של ה-select element
+     * @param {Object} options - אופציות
+     * @returns {Promise<void>}
+     * 
+     * @example
+     * await SelectPopulatorService.populateTradesSelect('tradeSelect');
+     */
+    static async populateTradesSelect(selectIdOrElement, options = {}) {
+        // Support both ID string and element object
+        const select = typeof selectIdOrElement === 'string' 
+            ? document.getElementById(selectIdOrElement)
+            : selectIdOrElement;
+        if (!select) {
+            const id = typeof selectIdOrElement === 'string' ? selectIdOrElement : 'element';
+            console.warn(`⚠️ Select ${id} לא נמצא`);
+            return;
+        }
+        
+        try {
+            // טעינת טריידים מ-API
+            const response = await fetch('/api/trades/');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const responseData = await response.json();
+            let trades = responseData.data || responseData || [];
+            
+            // סינון אם נדרש (למשל רק פעילים)
+            if (options.filterFn && typeof options.filterFn === 'function') {
+                trades = trades.filter(options.filterFn);
+            }
+            
+            // מילוי ה-select
+            this._populateSelect(select, trades, {
+                valueField: 'id',
+                textField: (item) => {
+                    const symbol = item.ticker?.symbol || item.symbol || 'N/A';
+                    const name = item.name || '';
+                    return name ? `${symbol} - ${name}` : symbol;
+                },
+                includeEmpty: options.includeEmpty !== false,
+                emptyText: options.emptyText || 'בחר טרייד...',
+                defaultValue: options.defaultValue
+            });
+            
+            console.log(`✅ נטענו ${trades.length} טריידים ל-${selectId}`);
+            
+        } catch (error) {
+            console.error('❌ שגיאה בטעינת טריידים:', error);
+        }
+    }
+
+    /**
      * מילוי select box של תוכניות מסחר
      * 
      * @param {string} selectId - ID של ה-select element
@@ -406,10 +476,14 @@ class SelectPopulatorService {
      * @example
      * await SelectPopulatorService.populateTradePlansSelect('planSelect');
      */
-    static async populateTradePlansSelect(selectId, options = {}) {
-        const select = document.getElementById(selectId);
+    static async populateTradePlansSelect(selectIdOrElement, options = {}) {
+        // Support both ID string and element object
+        const select = typeof selectIdOrElement === 'string' 
+            ? document.getElementById(selectIdOrElement)
+            : selectIdOrElement;
         if (!select) {
-            console.warn(`⚠️ Select ${selectId} לא נמצא`);
+            const id = typeof selectIdOrElement === 'string' ? selectIdOrElement : 'element';
+            console.warn(`⚠️ Select ${id} לא נמצא`);
             return;
         }
         
@@ -842,6 +916,7 @@ window.handleTickerChange = handleTickerChange;
 window.populateTickersSelect = (selectId, options) => SelectPopulatorService.populateTickersSelect(selectId, options);
 window.populateAccountsSelect = (selectId, options) => SelectPopulatorService.populateAccountsSelect(selectId, options);
 window.populateCurrenciesSelect = (selectId, options) => SelectPopulatorService.populateCurrenciesSelect(selectId, options);
+window.populateTradesSelect = (selectId, options) => SelectPopulatorService.populateTradesSelect(selectId, options);
 window.populateTradePlansSelect = (selectId, options) => SelectPopulatorService.populateTradePlansSelect(selectId, options);
 window.populateGenericSelect = (selectId, endpoint, config) => SelectPopulatorService.populateGenericSelect(selectId, endpoint, config);
 

@@ -731,14 +731,48 @@ async function renderCashFlowsTable() {
     // הצגת רק סמל המטבע
     const currencyDisplay = cashFlow.currency_symbol || '$';
 
+    // Check if this is a currency exchange
+    const isExchange = isCurrencyExchange(cashFlow);
+    const exchangeId = isExchange ? getExchangeIdFromCashFlow(cashFlow) : null;
+
     // קבלת סוג עם צבע
-    const typeDisplay = getCashFlowTypeWithColor(cashFlow.type);
+    const typeDisplay = isExchange ? '🔄 ' + getCashFlowTypeWithColor(cashFlow.type) : getCashFlowTypeWithColor(cashFlow.type);
 
     // עיצוב סכום עם יישור נכון וצביעה
-    const amountDisplay = formatCashFlowAmount(cashFlow.amount);
+    // For exchanges, we need to show both amounts (from -> to)
+    let amountDisplay = formatCashFlowAmount(cashFlow.amount);
+    if (isExchange) {
+      // For exchange, we need to fetch the "to" flow to show both amounts
+      // For now, show the amount with exchange indicator
+      // The full exchange details will be shown in details modal
+      amountDisplay = `🔄 ${amountDisplay}`;
+    }
 
     // עיצוב שער עם 2 ספרות אחרי הנקודה
     const rateDisplay = formatUsdRate(cashFlow.usd_rate);
+
+    // Actions menu - different for exchanges
+    const actionsMenu = isExchange ? 
+      (() => {
+        if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+        const result = window.createActionsMenu([
+          { type: 'VIEW', onclick: `showEntityDetails('cash_flow', ${cashFlow.id})`, title: 'הצג פרטי המרה' },
+          { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, title: 'צפה בפריטים מקושרים' },
+          { type: 'EDIT', onclick: `window.loadCurrencyExchange && window.loadCurrencyExchange('${exchangeId}').then(() => { window.ModalManagerV2 && window.ModalManagerV2.showModal('cashFlowModal', 'edit'); })`, title: 'ערוך המרת מטבע' },
+          { type: 'DELETE', onclick: `window.deleteCurrencyExchange && window.deleteCurrencyExchange('${exchangeId}')`, title: 'מחק המרת מטבע' }
+        ]);
+        return result || '';
+      })() :
+      (() => {
+        if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+        const result = window.createActionsMenu([
+          { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, title: 'הצג פרטי תזרים' },
+          { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, title: 'צפה בפריטים מקושרים' },
+          { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${cashFlow.id})`, title: 'ערוך תזרים' },
+          { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, title: 'מחק תזרים' }
+        ]);
+        return result || '';
+      })();
 
             row.innerHTML = `
             <td class="col-account ticker-cell" data-account="${cashFlow.trading_account_id || accountName || ''}">
@@ -765,16 +799,7 @@ async function renderCashFlowsTable() {
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
             <td class="col-actions actions-cell actions-4-items">
-              ${(() => {
-                if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
-                const result = window.createActionsMenu([
-                  { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, title: 'הצג פרטי תזרים' },
-                  { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, title: 'צפה בפריטים מקושרים' },
-                  { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${cashFlow.id})`, title: 'ערוך תזרים' },
-                  { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, title: 'מחק תזרים' }
-                ]);
-                return result || '';
-              })()}
+              ${actionsMenu}
             </td>
         `;
     tbody.appendChild(row);
@@ -1201,10 +1226,16 @@ async function initializeCashFlowsPage() {
 
   try {
     // טעינת העדפות משתמש
-    const preferences = await window.loadUserPreferences();
+    // Ensure preferences are initialized before loading
+    if (window.initializePreferencesWithLazyLoading && typeof window.initializePreferencesWithLazyLoading === 'function') {
+      await window.initializePreferencesWithLazyLoading();
+    }
+    const preferences = await window.getAllPreferences();
     
     // החלת העדפות על העמוד
-    applyUserPreferences(preferences);
+    if (preferences && typeof applyUserPreferences === 'function') {
+      applyUserPreferences(preferences);
+    }
     
     // החלת מערכת צבעים דינמית
     await applyDynamicColors();
@@ -1325,9 +1356,13 @@ async function saveCashFlow() {
             description: { id: 'cashFlowDescription', type: 'text', default: null },
             source: { id: 'cashFlowSource', type: 'text' },
             external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
-            // Note: trade_id and trade_plan_id are not supported by CashFlow model
-            // These fields are removed from the data before sending to API
+            // Note: trade_id is collected but not sent - CashFlow model doesn't support it yet
+            // If you want to link CashFlow to Trade, add trade_id column to CashFlow model first
         });
+        
+        // Remove trade_id from data if it exists (CashFlow model doesn't support it)
+        // TODO: When CashFlow model supports trade_id, remove this line
+        const { trade_id, ...dataToSend } = cashFlowData;
         
         // ולידציה מפורטת
         let hasErrors = false;
@@ -1379,13 +1414,6 @@ async function saveCashFlow() {
         }
         
         console.log('✅ saveCashFlow - Validation passed');
-        
-        // Remove fields that are not supported by CashFlow model
-        // CashFlow model does not support trade_id or trade_plan_id
-        const { trade_id, trade_plan_id, ...dataToSend } = cashFlowData;
-        if (trade_id || trade_plan_id) {
-            console.log('⚠️ saveCashFlow - Removing unsupported fields:', { trade_id, trade_plan_id });
-        }
         
         // Determine if this is add or edit
         const isEdit = form.dataset.mode === 'edit';
@@ -1461,9 +1489,286 @@ async function saveCashFlow() {
     }
 }
 
+// ===== Currency Exchange Functions =====
+
+/**
+ * Save currency exchange - creates atomic exchange operation
+ * @function saveCurrencyExchange
+ * @async
+ * @returns {Promise<void>}
+ */
+async function saveCurrencyExchange() {
+    console.log('🔵 saveCurrencyExchange CALLED');
+    window.Logger.debug('saveCurrencyExchange called', { page: 'cash_flows' });
+    
+    try {
+        const form = document.getElementById('cashFlowModalForm');
+        if (!form) {
+            throw new Error('Cash flow form not found');
+        }
+        
+        // Collect exchange form data
+        const exchangeData = DataCollectionService.collectFormData({
+            trading_account_id: { id: 'cashFlowAccount', type: 'int' },
+            from_currency_id: { id: 'currencyExchangeFromCurrency', type: 'int' },
+            to_currency_id: { id: 'currencyExchangeToCurrency', type: 'int' },
+            from_amount: { id: 'currencyExchangeFromAmount', type: 'float' },
+            exchange_rate: { id: 'currencyExchangeRate', type: 'float' },
+            fee_amount: { id: 'currencyExchangeFeeAmount', type: 'float', default: 0 },
+            date: { id: 'cashFlowDate', type: 'dateOnly' },
+            description: { id: 'cashFlowDescription', type: 'text', default: '' }
+        });
+        
+        // Get fee_currency_id from account's primary currency
+        if (exchangeData.fee_amount > 0 && exchangeData.trading_account_id) {
+            try {
+                const accountResponse = await fetch(`/api/trading-accounts/${exchangeData.trading_account_id}`);
+                if (accountResponse.ok) {
+                    const accountData = await accountResponse.json();
+                    if (accountData.status === 'success' && accountData.data) {
+                        exchangeData.fee_currency_id = accountData.data.currency_id;
+                    }
+                }
+            } catch (error) {
+                console.warn('Error fetching account currency for fee:', error);
+                // Fallback to from_currency_id if account fetch fails
+                exchangeData.fee_currency_id = exchangeData.from_currency_id;
+            }
+        } else {
+            exchangeData.fee_currency_id = null;
+        }
+        
+        // Validation
+        if (!exchangeData.from_amount || exchangeData.from_amount <= 0) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('currencyExchangeFromAmount', 'סכום חייב להיות גדול מ-0');
+            }
+            return;
+        }
+        
+        if (!exchangeData.exchange_rate || exchangeData.exchange_rate <= 0) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('currencyExchangeRate', 'שער המרה חייב להיות גדול מ-0');
+            }
+            return;
+        }
+        
+        if (exchangeData.from_currency_id === exchangeData.to_currency_id) {
+            if (window.showNotification) {
+                window.showNotification('שגיאה', 'מטבע מקור ומטבע יעד חייבים להיות שונים', 'error');
+            }
+            return;
+        }
+        
+        // Check if this is edit mode
+        const isEdit = form.dataset.mode === 'edit';
+        const exchangeId = form.dataset.exchangeId;
+        
+        const url = isEdit ? `/api/cash_flows/exchange/${exchangeId}` : '/api/cash_flows/exchange';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        console.log('🔵 saveCurrencyExchange - Fetching to:', url, 'method:', method);
+        console.log('🔵 saveCurrencyExchange - Data to send:', exchangeData);
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(exchangeData)
+        });
+        
+        let responseToHandle = response;
+        if (!response.ok) {
+            const responseClone = response.clone();
+            const errorText = await responseClone.text();
+            console.error('❌ saveCurrencyExchange - Error response:', errorText);
+            responseToHandle = response;
+        }
+        
+        if (isEdit) {
+            await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
+                modalId: 'cashFlowModal',
+                successMessage: 'המרת מטבע עודכנה בהצלחה',
+                entityName: 'המרת מטבע',
+                reloadFn: window.loadCashFlowsData,
+                requiresHardReload: false
+            });
+        } else {
+            await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
+                modalId: 'cashFlowModal',
+                successMessage: 'המרת מטבע נוצרה בהצלחה',
+                entityName: 'המרת מטבע',
+                reloadFn: window.loadCashFlowsData,
+                requiresHardReload: false
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ saveCurrencyExchange - Error caught:', error);
+        CRUDResponseHandler.handleError(error, 'שמירת המרת מטבע');
+    }
+}
+
+/**
+ * Load currency exchange for editing
+ * @function loadCurrencyExchange
+ * @async
+ * @param {string} exchangeId - Exchange UUID
+ * @returns {Promise<void>}
+ */
+async function loadCurrencyExchange(exchangeId) {
+    try {
+        console.log('🔵 loadCurrencyExchange - Loading exchange:', exchangeId);
+        
+        const response = await fetch(`/api/cash_flows/exchange/${exchangeId}`);
+        if (!response.ok) {
+            throw new Error('Failed to load currency exchange');
+        }
+        
+        const result = await response.json();
+        if (result.status !== 'success' || !result.data) {
+            throw new Error('Invalid response from server');
+        }
+        
+        const exchangeData = result.data;
+        const fromFlow = exchangeData.from_flow;
+        const toFlow = exchangeData.to_flow;
+        const feeFlow = exchangeData.fee_flow;
+        
+        // Populate form fields
+        if (document.getElementById('cashFlowAccount')) {
+            document.getElementById('cashFlowAccount').value = fromFlow.trading_account_id;
+        }
+        if (document.getElementById('currencyExchangeFromCurrency')) {
+            document.getElementById('currencyExchangeFromCurrency').value = fromFlow.currency_id;
+        }
+        if (document.getElementById('currencyExchangeToCurrency')) {
+            document.getElementById('currencyExchangeToCurrency').value = toFlow.currency_id;
+        }
+        if (document.getElementById('currencyExchangeFromAmount')) {
+            document.getElementById('currencyExchangeFromAmount').value = Math.abs(fromFlow.amount);
+        }
+        if (document.getElementById('currencyExchangeRate')) {
+            document.getElementById('currencyExchangeRate').value = exchangeData.exchange_rate;
+        }
+        if (document.getElementById('currencyExchangeFeeAmount')) {
+            document.getElementById('currencyExchangeFeeAmount').value = feeFlow ? Math.abs(feeFlow.amount) : 0;
+        }
+        // Note: fee currency is now a label, not a select field - it's updated automatically based on account
+        if (document.getElementById('cashFlowDate')) {
+            document.getElementById('cashFlowDate').value = fromFlow.date;
+        }
+        if (document.getElementById('cashFlowDescription')) {
+            document.getElementById('cashFlowDescription').value = fromFlow.description || '';
+        }
+        
+        // Set exchange ID in form
+        const form = document.getElementById('cashFlowModalForm');
+        if (form) {
+            form.dataset.exchangeId = exchangeId;
+            form.dataset.mode = 'edit';
+        }
+        
+        // Trigger toAmount calculation and update fee currency label
+        if (window.calculateCurrencyExchangeToAmount) {
+            window.calculateCurrencyExchangeToAmount();
+        }
+        
+        // Update fee currency label based on account
+        const accountField = document.getElementById('cashFlowAccount');
+        if (accountField) {
+            accountField.dispatchEvent(new Event('change'));
+        }
+        
+        console.log('✅ loadCurrencyExchange - Exchange loaded successfully');
+        
+    } catch (error) {
+        console.error('❌ loadCurrencyExchange - Error:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה', 'שגיאה בטעינת פרטי המרת מטבע', 'error');
+        }
+    }
+}
+
+/**
+ * Delete currency exchange
+ * @function deleteCurrencyExchange
+ * @async
+ * @param {string} exchangeId - Exchange UUID
+ * @returns {Promise<void>}
+ */
+async function deleteCurrencyExchange(exchangeId) {
+    try {
+        if (!confirm('האם אתה בטוח שברצונך למחוק את המרת המטבע? פעולה זו תמחק את כל הרשומות המקושרות.')) {
+            return;
+        }
+        
+        console.log('🔵 deleteCurrencyExchange - Deleting exchange:', exchangeId);
+        
+        const response = await fetch(`/api/cash_flows/exchange/${exchangeId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete currency exchange');
+        }
+        
+        const result = await response.json();
+        if (result.status === 'success') {
+            if (window.showNotification) {
+                window.showNotification('הצלחה', 'המרת מטבע נמחקה בהצלחה', 'success');
+            }
+            // Reload cash flows
+            if (window.loadCashFlowsData) {
+                await window.loadCashFlowsData();
+            }
+        } else {
+            throw new Error(result.error?.message || 'Failed to delete currency exchange');
+        }
+        
+    } catch (error) {
+        console.error('❌ deleteCurrencyExchange - Error:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה', `שגיאה במחיקת המרת מטבע: ${error.message}`, 'error');
+        }
+    }
+}
+
+/**
+ * Check if cash flow is part of currency exchange
+ * @function isCurrencyExchange
+ * @param {Object} cashFlow - Cash flow object
+ * @returns {boolean}
+ */
+function isCurrencyExchange(cashFlow) {
+    if (!cashFlow || !cashFlow.external_id) {
+        return false;
+    }
+    return cashFlow.external_id.startsWith('exchange_');
+}
+
+/**
+ * Get exchange UUID from cash flow
+ * @function getExchangeIdFromCashFlow
+ * @param {Object} cashFlow - Cash flow object
+ * @returns {string|null}
+ */
+function getExchangeIdFromCashFlow(cashFlow) {
+    if (!isCurrencyExchange(cashFlow)) {
+        return null;
+    }
+    return cashFlow.external_id.replace('exchange_', '');
+}
+
 // Export save function for ModalManagerV2
 window.saveCashFlow = saveCashFlow;
+window.saveCurrencyExchange = saveCurrencyExchange;
 window.updateCashFlow = updateCashFlow;
+window.loadCurrencyExchange = loadCurrencyExchange;
+window.deleteCurrencyExchange = deleteCurrencyExchange;
+window.isCurrencyExchange = isCurrencyExchange;
+window.getExchangeIdFromCashFlow = getExchangeIdFromCashFlow;
 
 // יצירת alias לפונקציית המחיקה לשמירה על תאימות
 /**

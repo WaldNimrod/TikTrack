@@ -18,58 +18,37 @@ const tradingAccountsModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
+        // שורה ראשונה: שם החשבון + מטבע
         {
             type: 'text',
             id: 'accountName',
             label: 'שם החשבון',
             required: true,
-            placeholder: 'הכנס שם לחשבון המסחר'
-        },
-        {
-            type: 'text',
-            id: 'accountNumber',
-            label: 'מספר חשבון',
-            required: true,
-            placeholder: 'הכנס מספר חשבון'
-        },
-        {
-            type: 'select',
-            id: 'accountType',
-            label: 'סוג חשבון',
-            required: true,
-            options: [
-                { value: 'individual', label: 'פרטי' },
-                { value: 'corporate', label: 'עסקי' },
-                { value: 'institutional', label: 'מוסדי' },
-                { value: 'demo', label: 'דמו' }
-            ],
-            defaultValue: 'individual'
+            placeholder: 'הכנס שם לחשבון המסחר',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'select',
             id: 'accountCurrency',
             label: 'מטבע',
             required: true,
-            options: [
-                { value: 'USD', label: 'דולר אמריקאי (USD)' },
-                { value: 'EUR', label: 'יורו (EUR)' },
-                { value: 'GBP', label: 'לירה שטרלינג (GBP)' },
-                { value: 'ILS', label: 'שקל ישראלי (ILS)' },
-                { value: 'JPY', label: 'ין יפני (JPY)' },
-                { value: 'CAD', label: 'דולר קנדי (CAD)' },
-                { value: 'AUD', label: 'דולר אוסטרלי (AUD)' },
-                { value: 'CHF', label: 'פרנק שוויצרי (CHF)' }
-            ],
-            defaultValue: 'USD'
+            defaultFromPreferences: true, // ברירת מחדל מהעדפות
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה שנייה: יתרת פתיחה + סטטוס
         {
             type: 'number',
-            id: 'accountBalance',
-            label: 'יתרה ראשונית',
+            id: 'accountOpeningBalance',
+            label: 'יתרת פתיחה',
             required: false,
             min: 0,
             step: 0.01,
-            placeholder: '0.00'
+            placeholder: '0.00',
+            description: 'יתרת פתיחה במטבע הבסיס של החשבון בלבד. שאר מטבעות מתחילים מ-0.',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'select',
@@ -77,20 +56,36 @@ const tradingAccountsModalConfig = {
             label: 'סטטוס',
             required: true,
             options: [
-                { value: 'active', label: 'פעיל' },
-                { value: 'inactive', label: 'לא פעיל' },
-                { value: 'suspended', label: 'מושעה' },
-                { value: 'closed', label: 'סגור' }
+                { value: 'open', label: 'פתוח' },
+                { value: 'closed', label: 'סגור' },
+                { value: 'cancelled', label: 'מבוטל' }
             ],
-            defaultValue: 'active'
+            defaultValue: 'open',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
-            type: 'textarea',
+            type: 'rich-text',
             id: 'accountNotes',
             label: 'הערות',
             required: false,
-            rows: 3,
-            placeholder: 'הכנס הערות נוספות על החשבון...'
+            placeholder: 'הכנס הערות נוספות על החשבון...',
+            maxLength: 5000,
+            options: {
+                direction: 'rtl',
+                placeholder: 'הכנס הערות נוספות על החשבון...',
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                    [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
         }
     ],
     validation: {
@@ -99,18 +94,10 @@ const tradingAccountsModalConfig = {
             minLength: 2,
             maxLength: 100
         },
-        accountNumber: {
-            required: true,
-            minLength: 3,
-            maxLength: 50
-        },
-        accountType: {
-            required: true
-        },
         accountCurrency: {
             required: true
         },
-        accountBalance: {
+        accountOpeningBalance: {
             required: false,
             min: 0
         },

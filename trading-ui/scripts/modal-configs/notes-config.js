@@ -3,7 +3,7 @@
  * קונפיגורציה למודל הערות
  * 
  * @file notes-config.js
- * @version 1.0.0
+ * @version 2.0.0
  * @lastUpdated January 27, 2025
  */
 
@@ -18,64 +18,92 @@ const notesModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
+        // שורה ראשונה: סוג אובייקט מקושר + אובייקט מקושר (מועברים למעלה)
         {
-            type: 'text',
-            id: 'noteTitle',
-            label: 'כותרת הערה',
+            type: 'select',
+            id: 'noteRelatedType',
+            label: 'סוג אובייקט מקושר',
             required: true,
-            placeholder: 'הכנס כותרת להערה'
+            options: [
+                { value: '1', label: 'חשבון מסחר' },
+                { value: '2', label: 'טרייד' },
+                { value: '3', label: 'תוכנית השקעה' },
+                { value: '4', label: 'טיקר' }
+            ],
+            defaultValue: '',
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            description: 'חובה - בחר לאיזה סוג אובייקט להקשר ההערה'
         },
         {
-            type: 'textarea',
+            type: 'select',
+            id: 'noteRelatedObject',
+            label: 'אובייקט מקושר',
+            required: true,
+            options: [], // יטען דינמית לפי סוג השיוך שנבחר
+            placeholder: 'בחר אובייקט...',
+            disabled: true,
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            description: 'חובה - בחר את האובייקט הספציפי'
+        },
+        // קו מפריד
+        {
+            type: 'separator',
+            id: 'noteSeparator1'
+        },
+        // שורה שנייה: תוכן הערה (בשורה מלאה) - Rich Text Editor
+        {
+            type: 'rich-text',
             id: 'noteContent',
             label: 'תוכן הערה',
             required: true,
-            rows: 6,
-            placeholder: 'הכנס את תוכן ההערה כאן...'
+            placeholder: 'הכנס את תוכן ההערה כאן...',
+            maxLength: 10000,
+            options: {
+                direction: 'rtl',
+                placeholder: 'הכנס את תוכן ההערה כאן...',
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                    [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
         },
+        // שורה שלישית: קובץ מצורף
         {
-            type: 'select',
-            id: 'noteCategory',
-            label: 'קטגוריה',
+            type: 'file',
+            id: 'noteAttachment',
+            label: 'קובץ מצורף',
             required: false,
-            options: [
-                { value: 'general', label: 'כללי' },
-                { value: 'research', label: 'מחקר' },
-                { value: 'analysis', label: 'ניתוח' },
-                { value: 'reminder', label: 'תזכורת' },
-                { value: 'idea', label: 'רעיון' }
-            ],
-            defaultValue: 'general'
-        },
-        {
-            type: 'select',
-            id: 'notePriority',
-            label: 'עדיפות',
-            required: false,
-            options: [
-                { value: 'low', label: 'נמוכה' },
-                { value: 'medium', label: 'בינונית' },
-                { value: 'high', label: 'גבוהה' }
-            ],
-            defaultValue: 'medium'
+            accept: 'image/*,.pdf',
+            description: 'אופציונלי - ניתן לצרף תמונה (JPG, PNG, GIF) או PDF (עד 512KB)',
+            rowClass: 'row',
+            colClass: 'col-12'
         }
     ],
     validation: {
-        noteTitle: {
-            required: true,
-            minLength: 3,
-            maxLength: 100
-        },
         noteContent: {
             required: true,
-            minLength: 10,
-            maxLength: 2000
+            minLength: 1,
+            maxLength: 10000
         },
-        noteCategory: {
-            required: false
+        noteRelatedType: {
+            required: true,
+            enum: ['1', '2', '3', '4']
         },
-        notePriority: {
-            required: false
+        noteRelatedObject: {
+            required: true,
+            type: 'int'
+        },
+        noteAttachment: {
+            required: false,
+            maxSize: 524288 // 512KB in bytes
         }
     },
     onSave: 'saveNote'

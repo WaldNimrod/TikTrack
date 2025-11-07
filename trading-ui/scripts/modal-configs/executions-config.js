@@ -18,13 +18,18 @@ const executionsModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
+        // שורה ראשונה: טיקר + חשבון מסחר
         {
             type: 'select',
             id: 'executionTicker',
             label: 'טיקר',
             required: true,
             options: [], // יטען דינמית מ-API
-            placeholder: 'בחר טיקר...'
+            placeholder: 'בחר טיקר...',
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'select',
@@ -33,8 +38,13 @@ const executionsModalConfig = {
             required: true,
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר חשבון מסחר...',
-            defaultFromPreferences: true // ברירת מחדל מהעדפות
+            defaultFromPreferences: true, // ברירת מחדל מהעדפות
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה שנייה: סוג ביצוע + כמות
         {
             type: 'select',
             id: 'executionType',
@@ -46,7 +56,11 @@ const executionsModalConfig = {
                 { value: 'short', label: 'מכירה בחסר' },
                 { value: 'cover', label: 'כיסוי' }
             ],
-            defaultValue: 'buy'
+            defaultValue: 'buy',
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'number',
@@ -56,8 +70,13 @@ const executionsModalConfig = {
             min: 1,
             step: 1,
             placeholder: 'הכנס כמות...',
-            defaultValue: 100
+            defaultValue: 100,
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה שלישית: מחיר + תאריך ושעה
         {
             type: 'number',
             id: 'executionPrice',
@@ -65,15 +84,24 @@ const executionsModalConfig = {
             required: true,
             min: 0.01,
             step: 0.01,
-            placeholder: 'הכנס מחיר...'
+            placeholder: 'הכנס מחיר...',
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'datetime-local',
             id: 'executionDate',
             label: 'תאריך ושעה',
             required: true,
-            defaultValue: new Date().toISOString().slice(0, 16)
+            defaultValue: new Date().toISOString().slice(0, 16),
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה רביעית: עמלה (בשורה מלאה)
         {
             type: 'number',
             id: 'executionCommission',
@@ -82,16 +110,39 @@ const executionsModalConfig = {
             min: 0,
             step: 0.01,
             placeholder: '0.00',
-            defaultFromPreferences: true // ברירת מחדל מהעדפות
+            defaultFromPreferences: true, // ברירת מחדל מהעדפות
+            width: 300,
+            style: 'width: 300px; min-width: 200px;'
         },
         {
-            type: 'number',
-            id: 'executionFees',
-            label: 'עמלות נוספות',
+            type: 'select',
+            id: 'executionSource',
+            label: 'מקור',
             required: false,
-            min: 0,
-            step: 0.01,
-            placeholder: '0.00'
+            options: [
+                { value: 'manual', label: 'ידני' },
+                { value: 'api', label: 'API' },
+                { value: 'file_import', label: 'ייבוא קובץ' },
+                { value: 'direct_import', label: 'ייבוא ישיר' }
+            ],
+            defaultValue: 'manual',
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        {
+            type: 'text',
+            id: 'executionExternalId',
+            label: 'מזהה חיצוני',
+            required: false,
+            placeholder: 'מזהה חיצוני (אופציונלי)',
+            defaultValue: null,
+            disabled: true, // מושבת כל עוד המקור הוא ידני
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'number',
@@ -100,7 +151,11 @@ const executionsModalConfig = {
             required: false,
             step: 1,
             placeholder: '0',
-            disabled: true  // Will be enabled/disabled based on action type
+            disabled: true,  // Will be enabled/disabled based on action type
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'number',
@@ -108,16 +163,44 @@ const executionsModalConfig = {
             label: 'MTM P/L',
             required: false,
             step: 1,
-            placeholder: 'הכנס MTM P/L...'
+            placeholder: 'הכנס MTM P/L...',
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
-            type: 'textarea',
+            type: 'rich-text',
             id: 'executionNotes',
             label: 'הערות',
             required: false,
-            rows: 3,
             placeholder: 'הכנס הערות נוספות על הביצוע...',
-            maxLength: 500
+            maxLength: 5000,
+            options: {
+                direction: 'rtl',
+                placeholder: 'הכנס הערות נוספות על הביצוע...',
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                    [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        },
+        {
+            type: 'linkButton',
+            id: 'linkedTrade',
+            label: 'קישור לטרייד',
+            required: false,
+            buttonText: 'קשר לטרייד',
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-12'
         }
     ],
     validation: {
@@ -145,9 +228,11 @@ const executionsModalConfig = {
             required: false,
             min: 0
         },
-        executionFees: {
-            required: false,
-            min: 0
+        executionSource: {
+            required: false
+        },
+        executionExternalId: {
+            required: false
         },
         executionRealizedPL: {
             required: false,
@@ -159,7 +244,7 @@ const executionsModalConfig = {
         },
         executionNotes: {
             required: false,
-            maxLength: 500
+            maxLength: 5000
         }
     },
     onSave: 'saveExecution'

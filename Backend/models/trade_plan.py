@@ -22,6 +22,7 @@ class TradePlan(BaseModel):
     target_percentage = Column(Float, default=2000, nullable=True)  # Percentage for target calculation
     # current_price removed - will be fetched from ticker service at runtime
     reasons = Column(String(500), nullable=True)
+    notes = Column(String(5000), nullable=True)  # הערות כלליות על התוכנית
     cancelled_at = Column(DateTime, nullable=True)
     cancel_reason = Column(String(500), nullable=True)
     

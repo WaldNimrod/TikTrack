@@ -261,10 +261,33 @@ const PACKAGE_MANIFEST = {
         description: 'מציג תנאי התראות',
         required: false,
         loadOrder: 7
+      },
+      {
+        file: 'https://cdn.quilljs.com/1.3.7/quill.min.js',
+        globalCheck: 'window.Quill',
+        description: 'Quill.js - Rich Text Editor Library',
+        required: true,
+        loadOrder: 8,
+        external: true
+      },
+      {
+        file: 'https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js',
+        globalCheck: 'window.DOMPurify',
+        description: 'DOMPurify - HTML Sanitizer',
+        required: true,
+        loadOrder: 9,
+        external: true
+      },
+      {
+        file: 'services/rich-text-editor-service.js',
+        globalCheck: 'window.RichTextEditorService',
+        description: 'שירות עורך טקסט עשיר',
+        required: true,
+        loadOrder: 10
       }
     ],
-    estimatedSize: '~120KB',
-    initTime: '~80ms'
+    estimatedSize: '~180KB',
+    initTime: '~100ms'
   },
 
   // 3. UI-ADVANCED PACKAGE - ממשק מתקדם
@@ -277,6 +300,13 @@ const PACKAGE_MANIFEST = {
     loadOrder: 3,
     dependencies: ['base', 'services'],
     scripts: [
+      {
+        file: 'table-mappings.js',
+        globalCheck: 'window.TABLE_COLUMN_MAPPINGS',
+        description: 'מיפוי טבלאות',
+        required: true,
+        loadOrder: 0
+      },
       {
         file: 'tables.js',
         globalCheck: 'window.sortTableData',
@@ -435,7 +465,7 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'modal-configs/cash-flows-config.js',
-        globalCheck: 'window.CashFlowModalConfig',
+        globalCheck: 'window.cashFlowModalConfig',
         description: 'קונפיגורציית מודל תזרימי מזומנים',
         required: false,
         loadOrder: 9
@@ -446,6 +476,13 @@ const PACKAGE_MANIFEST = {
         description: 'קונפיגורציית מודל הערות',
         required: false,
         loadOrder: 10
+      },
+      {
+        file: 'trade-selector-modal.js',
+        globalCheck: 'window.tradeSelectorModal',
+        description: 'מודל בחירת טרייד',
+        required: false,
+        loadOrder: 11
       }
     ],
     estimatedSize: '~250KB',
@@ -476,9 +513,16 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 2
       },
+      {
+        file: 'unified-table-system.js',
+        globalCheck: 'window.UnifiedTableSystem',
+        description: 'מערכת טבלאות מרכזית מאוחדת',
+        required: true,
+        loadOrder: 3
+      }
     ],
-    estimatedSize: '~100KB',
-    initTime: '~60ms'
+    estimatedSize: '~150KB',
+    initTime: '~80ms'
   },
 
   // 5. PREFERENCES PACKAGE - העדפות
@@ -763,13 +807,6 @@ const PACKAGE_MANIFEST = {
         description: 'תצוגת לוגים מאוחדת',
         required: true,
         loadOrder: 3
-      },
-      {
-        file: 'table-mappings.js',
-        globalCheck: 'window.TABLE_COLUMN_MAPPINGS',
-        description: 'מיפוי טבלאות',
-        required: true,
-        loadOrder: 4
       }
     ],
     estimatedSize: '~80KB',

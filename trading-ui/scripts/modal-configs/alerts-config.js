@@ -116,7 +116,7 @@ const alertsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-4'
         },
-        // שורה רביעית: מצב משולב + תאריך יצירה
+        // שורה רביעית: מצב משולב + תאריך יצירה + תאריך תפוגה
         {
             type: 'select',
             id: 'alertStatusCombined',
@@ -132,7 +132,7 @@ const alertsModalConfig = {
             ],
             defaultValue: 'new',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-4'
         },
         {
             type: 'display',
@@ -140,17 +140,40 @@ const alertsModalConfig = {
             label: 'תאריך יצירה',
             required: false,
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-4'
+        },
+        {
+            type: 'date',
+            id: 'alertExpiryDate',
+            name: 'expiry_date',
+            label: 'תאריך תפוגה',
+            required: false,
+            rowClass: 'row',
+            colClass: 'col-md-4',
+            description: 'השאר ריק להתראה ללא תפוגה'
         },
         // הודעה - בסוף אחרי סטטוס ותאריכים
         {
-            type: 'textarea',
+            type: 'rich-text',
             id: 'alertName',
             label: 'הודעה',
             required: true,
             placeholder: 'הכנס הודעת התראה',
-            rows: 3,
-            maxLength: 500
+            maxLength: 5000,
+            options: {
+                direction: 'rtl',
+                placeholder: 'הכנס הודעת התראה',
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                    [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
         },
         // שדות נוספים (לא בשורות)
         {
@@ -174,8 +197,8 @@ const alertsModalConfig = {
         },
         alertName: {
             required: true,
-            minLength: 2,
-            maxLength: 100
+            minLength: 1,
+            maxLength: 5000
         },
         alertType: {
             required: true
@@ -190,6 +213,9 @@ const alertsModalConfig = {
         alertStatusCombined: {
             required: true
         },
+        alertExpiryDate: {
+            required: false
+        },
         alertEmail: {
             required: false
         },
@@ -198,7 +224,7 @@ const alertsModalConfig = {
         },
         alertNotes: {
             required: false,
-            maxLength: 500
+            maxLength: 5000
         }
     },
     onSave: 'saveAlert'

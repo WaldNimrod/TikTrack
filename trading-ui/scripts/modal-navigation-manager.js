@@ -240,8 +240,10 @@ class ModalNavigationManager {
             
             // אם זה מודול CRUD רגיל (הוספה/עריכה) ללא sourceInfo - זה מודול ראשון, ניקוי היסטוריה
             // מודולים מקוננים (עם sourceInfo) נשארים בהיסטוריה
+            // selector-modal לא נחשב כ-CRUD modal - הוא תמיד מקונן
             const isNestedModal = modalInfo.sourceInfo && Object.keys(modalInfo.sourceInfo).length > 0;
-            const isAddOrEditModal = modalInfo.type === 'crud-modal' && !isNestedModal;
+            const isSelectorModal = modalInfo.type === 'selector-modal';
+            const isAddOrEditModal = modalInfo.type === 'crud-modal' && !isNestedModal && !isSelectorModal;
             
             if (isAddOrEditModal && this.modalHistory.length > 0) {
                 // זה מודול הוספה/עריכה חדש - ניקוי היסטוריה קודמת
@@ -258,8 +260,10 @@ class ModalNavigationManager {
             // יצירת מזהה ייחודי למודול
             const modalId = this.generateModalId(modalInfo);
             
-            // בדיקה אם המודול כבר קיים בהיסטוריה
-            const existingIndex = this.findModalIndex(modalId);
+            // בדיקה אם המודול כבר קיים בהיסטוריה (לפי element או modalId)
+            const existingIndexByElement = this.modalHistory.findIndex(item => item.element === modalElement);
+            const existingIndexById = this.findModalIndex(modalId);
+            const existingIndex = existingIndexByElement >= 0 ? existingIndexByElement : existingIndexById;
             
             if (existingIndex >= 0) {
                 // המודול כבר קיים - עדכון המידע
@@ -318,6 +322,9 @@ class ModalNavigationManager {
             
             // ניהול backdrop
             this.manageBackdrop();
+            
+            // עדכון z-index של המודול לפי המיקום ב-history
+            this.updateModalZIndex(modalElement);
             
         } catch (error) {
             if (window.Logger) {
@@ -526,6 +533,9 @@ class ModalNavigationManager {
             // ניהול backdrop
             this.manageBackdrop();
             
+            // עדכון z-index
+            this.updateModalZIndex(previousModal.element);
+            
             if (window.Logger) {
                 window.Logger.info('✅ [showPreviousModal] Previous modal shown', {
                     modalId: this.generateModalId(previousModal.info),
@@ -577,6 +587,80 @@ class ModalNavigationManager {
                 window.Logger.error('❌ Error updating modal navigation:', error, { page: "modal-navigation-manager" });
             } else {
                 console.error('❌ Error updating modal navigation:', error);
+            }
+        }
+    }
+    
+    /**
+     * Update modal z-index - עדכון z-index של מודול לפי המיקום ב-history
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודול
+     * @private
+     */
+    updateModalZIndex(modalElement) {
+        try {
+            if (!modalElement) {
+                return;
+            }
+            
+            // מציאת אינדקס המודול ב-history
+            const modalIndex = this.modalHistory.findIndex(item => item.element === modalElement);
+            
+            // אם המודול לא ב-history, נחשב כמה מודולים פתוחים יש
+            let modalPosition = modalIndex;
+            if (modalIndex < 0) {
+                // ספירת מודולים פתוחים לפי סדר הופעה ב-DOM
+                const openModals = Array.from(document.querySelectorAll('.modal.show'));
+                modalPosition = openModals.indexOf(modalElement);
+                if (modalPosition < 0) {
+                    // אם המודול לא פתוח, לא נעדכן z-index
+                    return;
+                }
+            }
+            
+            // חישוב z-index - כל מודול מקבל z-index גבוה יותר
+            // backdrop: 1040 + (length * 10)
+            // modal: backdrop + 5 + (position * 10)
+            // modal-dialog: modal + 1
+            // modal-content: modal-dialog + 1
+            const backdropZIndex = 1040 + (Math.max(this.modalHistory.length, modalPosition + 1) * 10);
+            const modalZIndex = backdropZIndex + 5 + (modalPosition * 10);
+            const dialogZIndex = modalZIndex + 1;
+            const contentZIndex = dialogZIndex + 1;
+            
+            // עדכון z-index של המודול
+            if (modalElement) {
+                modalElement.style.zIndex = modalZIndex.toString();
+                // הוספת class כדי לשלוט ב-z-index דרך ITCSS
+                modalElement.classList.add('modal-stacked');
+                modalElement.setAttribute('data-stack-position', modalPosition.toString());
+                if (window.Logger) {
+                    window.Logger.debug('🔵 [updateModalZIndex] Updated z-index', {
+                        modalId: modalElement.id,
+                        modalIndex: modalIndex >= 0 ? modalIndex : modalPosition,
+                        modalZIndex,
+                        dialogZIndex,
+                        contentZIndex,
+                        page: "modal-navigation-manager"
+                    });
+                }
+            }
+            
+            // עדכון z-index של modal-dialog
+            const dialog = modalElement.querySelector('.modal-dialog');
+            if (dialog) {
+                dialog.style.zIndex = dialogZIndex.toString();
+            }
+            
+            // עדכון z-index של modal-content
+            const content = modalElement.querySelector('.modal-content');
+            if (content) {
+                content.style.zIndex = contentZIndex.toString();
+            }
+            
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('❌ Error updating modal z-index:', error, { page: "modal-navigation-manager" });
             }
         }
     }
@@ -921,6 +1005,9 @@ class ModalNavigationManager {
             // ניהול backdrop
             this.manageBackdrop();
             
+            // עדכון z-index
+            this.updateModalZIndex(updatedTargetModal.element);
+            
             if (window.Logger) {
                 window.Logger.info('✅ [navigateToModal] Navigation completed', {
                     targetIndex,
@@ -1038,12 +1125,15 @@ class ModalNavigationManager {
                 color: null
             };
             
-            // זיהוי סוג מודול לפי ID - מודולי CRUD (add/edit) לא מכילים "Details" ב-ID
+            // זיהוי סוג מודול לפי ID
             const modalId = modalElement.id || '';
-            const isCRUDModal = modalId && !modalId.includes('Details') && 
-                                (modalId.includes('Modal') || modalId.endsWith('Modal'));
             
-            if (isCRUDModal) {
+            // זיהוי selector modals (לא CRUD modals)
+            if (modalId.includes('Selector') || modalId.includes('selector')) {
+                info.type = 'selector-modal';
+            } else if (modalId && !modalId.includes('Details') && 
+                       (modalId.includes('Modal') || modalId.endsWith('Modal'))) {
+                // מודולי CRUD (add/edit) לא מכילים "Details" ב-ID
                 info.type = 'crud-modal';
             }
             
@@ -1079,6 +1169,8 @@ class ModalNavigationManager {
                     info.entityType = 'ticker';
                 } else if (modalId.includes('cashFlowModal') || modalId.includes('CashFlowModal')) {
                     info.entityType = 'cash_flow';
+                } else if (modalId.includes('tradeSelector') || modalId.includes('TradeSelector')) {
+                    info.entityType = 'trade_selector';
                 }
                 
                 // אם עדיין לא מצאנו, ננסה לזהות מ-DOM
@@ -1259,10 +1351,21 @@ class ModalNavigationManager {
      */
     manageBackdrop() {
         try {
-            if (this.modalHistory.length > 0) {
+            const openModalsCount = document.querySelectorAll('.modal.show').length;
+            
+            if (this.modalHistory.length > 0 || openModalsCount > 0) {
                 // יש מודולים פתוחים - צריך backdrop
                 if (!this.globalBackdrop) {
                     this.createGlobalBackdrop();
+                } else {
+                    // עדכן z-index של backdrop הקיים
+                    const zIndex = 1040 + (Math.max(this.modalHistory.length, openModalsCount) * 10);
+                    this.globalBackdrop.style.zIndex = zIndex.toString();
+                    // עדכן z-index של כל המודולים
+                    const openModals = document.querySelectorAll('.modal.show');
+                    openModals.forEach((modal) => {
+                        this.updateModalZIndex(modal);
+                    });
                 }
             } else {
                 // אין מודולים פתוחים - הסרת backdrop
@@ -1299,8 +1402,15 @@ class ModalNavigationManager {
             }
             
             // עדכון z-index לפי מספר המודולים
-            const zIndex = 1040 + (this.modalHistory.length * 10);
+            const openModalsCount = document.querySelectorAll('.modal.show').length;
+            const zIndex = 1040 + (Math.max(this.modalHistory.length, openModalsCount) * 10);
             this.globalBackdrop.style.zIndex = zIndex.toString();
+            
+            // עדכון z-index של כל המודולים הפתוחים (לא רק מה-history)
+            const openModals = document.querySelectorAll('.modal.show');
+            openModals.forEach((modal, index) => {
+                this.updateModalZIndex(modal);
+            });
             
         } catch (error) {
             if (window.Logger) {
@@ -1419,7 +1529,26 @@ class ModalNavigationManager {
                 });
             }
             
-            // זיהוי מידע על המודול
+            // Check if modal is already in history (pushed manually before shown event)
+            const existingModalIndex = this.modalHistory.findIndex(item => item.element === modalElement);
+            if (existingModalIndex >= 0) {
+                // Modal already in history - just update z-index, don't push again
+                if (window.Logger) {
+                    window.Logger.debug('🔄 [handleModalShown] Modal already in history, updating z-index only', {
+                        modalId,
+                        existingIndex: existingModalIndex,
+                        page: "modal-navigation-manager"
+                    });
+                }
+                // Update z-index for all modals
+                const openModals = document.querySelectorAll('.modal.show');
+                openModals.forEach((modal) => {
+                    this.updateModalZIndex(modal);
+                });
+                return;
+            }
+            
+            // Modal not in history - detect info and push
             let modalInfo = this.detectModalInfo(modalElement);
             
             // בדיקה נוספת: אם detectModalInfo לא מצא sourceInfo, אבל יש ב-EntityDetailsModal
@@ -1430,6 +1559,12 @@ class ModalNavigationManager {
             
             // עדכון או הוספה למערך
             await this.pushModal(modalElement, modalInfo);
+            
+            // עדכון z-index של כל המודולים הפתוחים אחרי pushModal
+            const openModals = document.querySelectorAll('.modal.show');
+            openModals.forEach((modal) => {
+                this.updateModalZIndex(modal);
+            });
             
         } catch (error) {
             if (window.Logger) {

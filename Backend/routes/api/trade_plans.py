@@ -63,6 +63,9 @@ def create_trade_plan():
     """Create new trade plan"""
     try:
         data = request.get_json()
+        # Sanitize HTML content for notes field
+        if 'notes' in data and data['notes']:
+            data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         db: Session = g.db
         plan = TradePlanService.create(db, data)
         return jsonify({
@@ -108,6 +111,10 @@ def update_trade_plan(plan_id: int):
                     "message": "התכנית תבוטל. האם למחוק גם התראות תנאים?",
                     "version": "1.0"
                 })
+        
+        # Sanitize HTML content for notes field
+        if 'notes' in data and data['notes']:
+            data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         
         # עדכון רגיל של התכנית
         plan = TradePlanService.update(db, plan_id, data)

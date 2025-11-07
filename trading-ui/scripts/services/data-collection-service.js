@@ -50,6 +50,24 @@ class DataCollectionService {
                 continue;
             }
             
+            // טיפול מיוחד ב-rich-text editor - לא משתמש ב-value
+            if (config.type === 'rich-text') {
+                if (window.RichTextEditorService) {
+                    const htmlContent = window.RichTextEditorService.getContent(config.id);
+                    // בדיקה אם התוכן ריק (אחרי הסרת תגי HTML)
+                    const textContent = htmlContent.replace(/<[^>]*>/g, '').trim();
+                    if (!textContent) {
+                        data[key] = config.hasOwnProperty('default') ? config.default : '';
+                    } else {
+                        data[key] = htmlContent;
+                    }
+                } else {
+                    console.warn(`⚠️ RichTextEditorService not available for field ${config.id}`);
+                    data[key] = config.hasOwnProperty('default') ? config.default : '';
+                }
+                continue;
+            }
+            
             let value = element.value;
             
             // טיפול בשדות ריקים
@@ -112,6 +130,7 @@ class DataCollectionService {
                 case 'string':
                     value = value.trim();
                     break;
+                    
                 default:
                     // For other types (like datetime-local, number, etc.), keep as-is
                     break;

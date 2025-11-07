@@ -19,7 +19,7 @@ class Note(BaseModel):
     """
     __tablename__ = "notes"
     
-    content = Column(String(1000), nullable=False)
+    content = Column(String(10000), nullable=False)
     attachment = Column(String(500), nullable=True)  # path to file
     related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False)
     related_id = Column(Integer, nullable=False)

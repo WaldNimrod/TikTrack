@@ -24,7 +24,7 @@ class Trade(BaseModel):
     cancelled_at = Column(DateTime, nullable=True)
     cancel_reason = Column(String(500), nullable=True)
     total_pl = Column(Float, default=0, nullable=True)
-    notes = Column(String(500), nullable=True)
+    notes = Column(String(5000), nullable=True)
     
     # Relationships
     account = relationship("TradingAccount", foreign_keys=[trading_account_id], back_populates="trades")

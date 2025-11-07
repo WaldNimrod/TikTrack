@@ -2752,21 +2752,7 @@ window.updateTickerInfo = updateTickerInfo;
 window.updateSharesFromAmount = updateSharesFromAmount;
 window.updateAmountFromShares = updateAmountFromShares;
 
-/**
- * Show add trade plan modal (wrapper for ModalManagerV2)
- * Maintains backward compatibility with HTML onclick handlers
- * @function showAddTradePlanModal
- */
-window.showAddTradePlanModal = function() {
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-        window.ModalManagerV2.showModal('tradePlansModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
-        }
-    }
-};
+// REMOVED: window.showAddTradePlanModal - use window.showModalSafe('tradePlansModal', 'add') directly
 
 /**
  * Show edit trade plan modal (wrapper for ModalManagerV2)

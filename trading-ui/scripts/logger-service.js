@@ -106,7 +106,8 @@ class Logger {
         'trades': 'business',
         'executions': 'business',
         'alerts': 'business',
-        'accounts': 'business',
+        'trading_accounts': 'business',
+        'accounts': 'business', // Legacy support
         'tickers': 'business',
         'trade-plans': 'business',
         'cash-flows': 'business',

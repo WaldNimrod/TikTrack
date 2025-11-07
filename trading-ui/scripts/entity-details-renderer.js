@@ -332,8 +332,6 @@ class EntityDetailsRenderer {
      * @public
      */
     renderTicker(tickerData, options = {}) {
-        window.Logger.info(`🎨 Rendering ticker data:`, tickerData, { page: "entity-details-renderer" });
-        
         // קבלת צבע הטיקר מההעדפות
         const tickerColor = this.entityColors.ticker || '#019193';
         
@@ -654,10 +652,8 @@ class EntityDetailsRenderer {
      * Render market data - רנדור נתוני שוק
      */
     renderMarketData(tickerData, entityColor = '#019193') {
-        window.Logger.info(`📈 Rendering market data for:`, tickerData, { page: "entity-details-renderer" });
         // בדיקה אם יש נתונים חיצוניים
         const hasExternalData = tickerData.current_price || tickerData.change_percent || tickerData.volume || tickerData.yahoo_updated_at;
-        window.Logger.info(`📈 Has external data:`, hasExternalData, { page: "entity-details-renderer" });
         
         if (!hasExternalData) {
             return `
@@ -1081,37 +1077,6 @@ class EntityDetailsRenderer {
                 });
             }
             
-            // לוג לפני קריאה ל-LinkedItemsService
-            if (window.Logger) {
-                window.Logger.info('🔗 [EntityDetailsRenderer] About to call LinkedItemsService.generateLinkedItemActions', {
-                    itemType: item.type,
-                    itemId: item.id,
-                    hasItemSourceInfo: !!itemSourceInfo,
-                    itemSourceInfo: itemSourceInfo,
-                    sourceInfoProvided: !!sourceInfo,
-                    page: "entity-details-renderer"
-                });
-            }
-            
-            console.log('🔗🔗🔗 [renderLinkedItems] About to call LinkedItemsService.generateLinkedItemActions', {
-                itemType: item.type,
-                itemId: item.id,
-                itemSourceInfo: itemSourceInfo,
-                itemSourceInfoString: JSON.stringify(itemSourceInfo),
-                hasLinkedItemsService: !!(window.LinkedItemsService && window.LinkedItemsService.generateLinkedItemActions)
-            });
-            
-            if (window.Logger) {
-                window.Logger.info('✅ [1.8 renderLinkedItems] Calling LinkedItemsService.generateLinkedItemActions', {
-                    itemType: item.type,
-                    itemId: item.id,
-                    itemSourceInfo: itemSourceInfo,
-                    itemSourceInfoString: JSON.stringify(itemSourceInfo),
-                    optionsSourceInfo: itemSourceInfo,
-                    page: "entity-details-renderer"
-                });
-            }
-            
             // LinkedItemsService כבר נבדק בתחילת הפונקציה - אם לא זמין, הפונקציה חזרה מוקדם
             // כאן אנחנו בטוחים שהוא זמין
             
@@ -1120,24 +1085,6 @@ class EntityDetailsRenderer {
                 entityColors: this.entityColors,
                 sourceInfo: itemSourceInfo
             });
-            
-            console.log('🔗🔗🔗 [renderLinkedItems] After calling LinkedItemsService - actionsHtml:', {
-                actionsHtmlLength: actionsHtml?.length || 0,
-                actionsHtmlPreview: actionsHtml?.substring(0, 300) || '',
-                hasSourceInHtml: actionsHtml?.includes('source') || false
-            });
-            
-            // לוג אחרי הקריאה
-            if (window.Logger) {
-                window.Logger.info('✅ [1.12 renderLinkedItems] actionsHtml created', {
-                    itemType: item.type,
-                    itemId: item.id,
-                    actionsHtmlLength: actionsHtml?.length || 0,
-                    actionsHtmlPreview: actionsHtml?.substring(0, 500) || '',
-                    actionsHtmlFull: actionsHtml,
-                    page: "entity-details-renderer"
-                });
-            }
             
             html += `
                 <tr data-item-type="${item.type}" data-item-name="${cleanName}" data-item-status="${item.status || ''}" data-item-date="${dateValue}">
@@ -2065,8 +2012,6 @@ class EntityDetailsRenderer {
 
     renderTradeSpecific(tradeData) { return ''; }
     renderTradePlan(tradePlanData, options = {}) {
-        window.Logger.info(`🎨 Rendering trade plan data:`, tradePlanData, { page: "entity-details-renderer" });
-        
         // קבלת צבע התוכנית מההעדפות
         const planColor = this.entityColors.trade_plan || '#6f42c1';
         
@@ -2187,15 +2132,6 @@ class EntityDetailsRenderer {
                 <div class="row mt-4">
                     <div class="col-12">
                         ${(() => {
-                            if (window.Logger) {
-                                window.Logger.info('✅ [1.5 renderTradePlan] Calling renderLinkedItems with sourceInfo', {
-                                    hasOptions: !!options,
-                                    hasSourceInfo: !!options?.sourceInfo,
-                                    sourceInfo: options?.sourceInfo,
-                                    sourceInfoString: options?.sourceInfo ? JSON.stringify(options.sourceInfo) : null,
-                                    page: "entity-details-renderer"
-                                });
-                            }
                             return this.renderLinkedItems(tradePlanData.linked_items || [], planColor, 'trade_plan', tradePlanData.id, options?.sourceInfo || null, options);
                         })()}
                     </div>
@@ -2213,8 +2149,6 @@ class EntityDetailsRenderer {
      * @public
      */
     renderExecution(executionData, options = {}) {
-        window.Logger.info(`🎨 Rendering execution data:`, executionData, { page: "entity-details-renderer" });
-        
         // קבלת צבע הביצוע מההעדפות
         const executionColor = this.entityColors.execution || '#17a2b8';
         
@@ -2391,8 +2325,6 @@ class EntityDetailsRenderer {
     }
 
     async renderAccount(accountData, options = {}) {
-        window.Logger.info(`🎨 Rendering account data:`, accountData, { page: "entity-details-renderer" });
-        
         // קבלת צבע החשבון מסחר מההעדפות - רק trading_account!
         if (!this.entityColors.trading_account) {
             window.Logger.error('❌ trading_account color not found in entityColors!', { entityColors: this.entityColors }, { page: "entity-details-renderer" });
@@ -2568,8 +2500,6 @@ class EntityDetailsRenderer {
     }
     renderAlert(alertData, options) {
         try {
-            window.Logger.info('🎨 Rendering alert data:', alertData, { page: "entity-details-renderer" });
-            
             // סטטוס למעלה - שימוש במערכת הרינדור הכללית
             const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
                 ? window.FieldRendererService.renderStatus(alertData.status, 'alert')
@@ -3031,8 +2961,6 @@ class EntityDetailsRenderer {
      * @public
      */
     renderNote(noteData, options = {}) {
-        window.Logger.info(`🎨 Rendering note data:`, noteData, { page: "entity-details-renderer" });
-        
         // קבלת צבע ההערה מההעדפות
         const noteColor = this.entityColors.note || '#6c757d';
         

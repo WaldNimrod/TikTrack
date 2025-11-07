@@ -452,14 +452,14 @@ function updateNotesTable(notes) {
       // בדיקה שהנתונים קיימים
       if (!notes || !Array.isArray(notes)) {
         window.Logger.warn('⚠️ notes parameter is not available or not an array', { page: "notes" });
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין הערות להצגה</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center">אין הערות להצגה</td></tr>';
         return;
       }
 
       if (notes.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="6" class="text-center text-muted">
+            <td colspan="5" class="text-center text-muted">
             <div style="padding: 20px;">
               <h5>📝 אין הערות</h5>
               <p>לא נמצאו הערות במערכת</p>
@@ -480,13 +480,43 @@ function updateNotesTable(notes) {
       const rows = notes.map(note => {
     const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
 
-    // הצגת תוכן כטקסט פשוט בלבד
+    // הצגת תוכן HTML עם sanitization
     let contentDisplay = note.content || 'ללא תוכן';
-    // הסרת תגי HTML אם יש
-    contentDisplay = contentDisplay.replace(/<[^>]*>/g, '');
-    // הגבלה ל-100 תווים
-    if (contentDisplay.length > 100) {
-      contentDisplay = contentDisplay.substring(0, 100) + '...';
+    
+    // Sanitize HTML content if DOMPurify is available
+    if (contentDisplay && typeof window.DOMPurify !== 'undefined') {
+      try {
+        // Sanitize HTML content
+        contentDisplay = window.DOMPurify.sanitize(contentDisplay, {
+          ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h2', 'h3', 'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre', 'span'],
+          ALLOWED_ATTR: ['href', 'target', 'rel', 'style', 'class', 'dir'],
+          ALLOW_DATA_ATTR: false
+        });
+      } catch (error) {
+        window.Logger.warn('⚠️ Error sanitizing HTML content:', error, { page: "notes" });
+        // Fallback: strip HTML tags
+        contentDisplay = contentDisplay.replace(/<[^>]*>/g, '');
+      }
+    } else if (contentDisplay) {
+      // Fallback: strip HTML tags if DOMPurify is not available
+      contentDisplay = contentDisplay.replace(/<[^>]*>/g, '');
+    }
+    
+    // Create preview (first 150 characters of text content)
+    const textContent = contentDisplay.replace(/<[^>]*>/g, '');
+    const previewLength = 150;
+    const isLongContent = textContent.length > previewLength;
+    const previewText = isLongContent ? textContent.substring(0, previewLength) + '...' : textContent;
+    
+    // If content is long, show preview with "show more" option
+    if (isLongContent) {
+      contentDisplay = `<div class="note-content-preview" data-note-id="${note.id}">
+        <div class="note-content-short">${previewText}</div>
+        <button class="btn btn-link btn-sm show-full-content" data-note-id="${note.id}" style="padding: 0; font-size: 0.875rem; margin-top: 0.25rem;">הצג עוד...</button>
+        <div class="note-content-full" style="display: none;">${contentDisplay}</div>
+      </div>`;
+    } else {
+      contentDisplay = `<div class="note-content-display">${contentDisplay}</div>`;
     }
 
     // הצגת קובץ עם אייקון ו-10 תווים ראשונים
@@ -582,6 +612,28 @@ function updateNotesTable(notes) {
       tbody.innerHTML = rows;
       window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes" });
       window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
+      
+      // הוספת event listeners לכפתורי "הצג עוד"
+      tbody.querySelectorAll('.show-full-content').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const noteId = this.getAttribute('data-note-id');
+          const row = this.closest('tr');
+          const shortDiv = row.querySelector('.note-content-short');
+          const fullDiv = row.querySelector('.note-content-full');
+          const button = this;
+          
+          if (fullDiv && fullDiv.style.display === 'none') {
+            fullDiv.style.display = 'block';
+            if (shortDiv) shortDiv.style.display = 'none';
+            button.textContent = 'הצג פחות...';
+          } else {
+            if (fullDiv) fullDiv.style.display = 'none';
+            if (shortDiv) shortDiv.style.display = 'block';
+            button.textContent = 'הצג עוד...';
+          }
+        });
+      });
       
       // עדכון table-count ו-info-summary
       updateNotesSummary(notes);
@@ -990,44 +1042,85 @@ function _REMOVED_validateEditNoteForm(content, relationType, relatedId, attachm
 
 // פונקציות שמירה ומחיקה
 async function saveNote() {
+  // ניקוי מטמון לפני פעולת CRUD
+  // הערה: CRUDResponseHandler מטפל בניקוי מטמון אוטומטית, אבל אם רוצים לנקות ידנית:
+  if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+    await window.UnifiedCacheManager.remove('notes');
+  }
   
-  // ניקוי מטמון לפני פעולת CRUD  // שימוש ב-DataCollectionService לאיסוף נתונים
+  // שימוש ב-DataCollectionService לאיסוף נתונים
   const noteData = DataCollectionService.collectFormData({
-    content: { id: 'addNoteContent', type: 'text', isTextContent: true },
-    relationType: { id: 'noteRelationType', type: 'text', isRadioChecked: true },
-    relatedId: { id: 'noteRelatedObjectSelect', type: 'int' }
+    content: { id: 'noteContent', type: 'rich-text' }, // Rich text editor - returns HTML
+    related_type_id: { id: 'noteRelatedType', type: 'text' },
+    related_id: { id: 'noteRelatedObject', type: 'int' }
   });
 
-  const content = getEditorContent('add');
-  const relationType = noteData.relationType;
-  const relatedId = noteData.relatedId;
-  const attachment = document.getElementById('noteAttachment').files[0];
+  const content = noteData.content || ''; // HTML content from rich text editor
+  const related_type_id = noteData.related_type_id;
+  const related_id = noteData.related_id;
+  const attachmentFile = document.getElementById('noteAttachment')?.files[0];
 
-  // ולידציה - משתמש במערכת הכללית window.validateEntityForm
+  // ולידציה בסיסית
+  // Check if content is empty (after stripping HTML tags for validation)
+  const textContent = content.replace(/<[^>]*>/g, '').trim();
+  if (!textContent || textContent.length === 0) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'תוכן ההערה חובה');
+    }
+    return;
+  }
 
-  clearNoteValidationErrors();
+  if (!related_type_id || !related_id) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'יש לבחור סוג אובייקט ואובייקט מקושר');
+    }
+    return;
+  }
+
+  // Check content length (HTML can be longer than plain text)
+  if (content.length > 10000) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'תוכן ההערה לא יכול להיות יותר מ-10000 תווים');
+    }
+    return;
+  }
 
   try {
-    // יצירת אובייקט JSON לשליחה
-    const requestData = {
-      content,
-      related_type_id: parseInt(relationType),
-      related_id: parseInt(relatedId),
-    };
+    let response;
+    
+    // אם יש קובץ מצורף, השתמש ב-FormData
+    if (attachmentFile) {
+      const formData = new FormData();
+      formData.append('content', content);
+      formData.append('related_type_id', related_type_id);
+      formData.append('related_id', related_id);
+      formData.append('attachment', attachmentFile);
 
-    const response = await fetch('/api/notes/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestData),
-    });
+      response = await fetch('/api/notes/', {
+        method: 'POST',
+        body: formData
+      });
+    } else {
+      // אחרת, השתמש ב-JSON
+      const requestData = {
+        content,
+        related_type_id: parseInt(related_type_id),
+        related_id: parseInt(related_id)
+      };
+
+      response = await fetch('/api/notes/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+    }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: 'addNoteModal',
+      modalId: 'notesModal',
       successMessage: 'הערה נשמרה בהצלחה!',
-      apiUrl: '/api/notes/',
       entityName: 'הערה',
       reloadFn: window.loadNotesData,
       requiresHardReload: false
@@ -1039,16 +1132,21 @@ async function saveNote() {
 
 async function updateNoteFromModal() {
   
-  // ניקוי מטמון לפני פעולת CRUD - עריכה  // שימוש ב-DataCollectionService לאיסוף נתונים
+  // ניקוי מטמון לפני פעולת CRUD - עריכה
+  if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
+    await window.UnifiedCacheManager.remove('notes');
+  }
+  
+  // שימוש ב-DataCollectionService לאיסוף נתונים
   const noteData = DataCollectionService.collectFormData({
     id: { id: 'editNoteId', type: 'int' },
-    content: { id: 'editNoteContent', type: 'text', isTextContent: true },
+    content: { id: 'editNoteContent', type: 'rich-text' }, // Rich text editor
     relationType: { id: 'editNoteRelationType', type: 'text', isRadioChecked: true },
     relatedId: { id: 'editNoteRelatedObjectSelect', type: 'int' }
   });
 
   const noteId = noteData.id;
-  const content = getEditorContent('edit');
+  const content = noteData.content || getEditorContent('edit'); // Use rich-text content or fallback
   const relationType = noteData.relationType;
   const relatedId = noteData.relatedId;
   const attachment = document.getElementById('editNoteAttachment').files[0];
@@ -1597,22 +1695,29 @@ function clearFormatting(mode = 'add') {
 function getEditorContent(mode = 'add') {
   try {
     const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
+    
+    // בדיקה אם זה rich-text editor (Quill)
+    if (window.RichTextEditorService) {
+      const content = window.RichTextEditorService.getContent(editorId);
+      return content || '';
+    }
+    
+    // Fallback: עבודה עם אלמנט רגיל
     const editor = document.getElementById(editorId);
+    if (!editor) {
+      return '';
+    }
 
-  if (!editor) {
-    return '';
-  }
+    // בדיקה אם העורך ריק או מכיל רק תגיות HTML ריקות
+    const content = editor.innerHTML;
+    const textContent = editor.textContent || editor.innerText || '';
 
-  // בדיקה אם העורך ריק או מכיל רק תגיות HTML ריקות
-  const content = editor.innerHTML;
-  const textContent = editor.textContent || editor.innerText || '';
+    // אם אין תוכן טקסט, החזר מחרוזת ריקה
+    if (!textContent.trim()) {
+      return '';
+    }
 
-  // אם אין תוכן טקסט, החזר מחרוזת ריקה
-  if (!textContent.trim()) {
-    return '';
-  }
-
-  return content;
+    return content;
   
   } catch (error) {
     window.Logger.error('שגיאה בקבלת תוכן עורך:', error, { page: "notes" });
@@ -1631,13 +1736,20 @@ function getEditorContent(mode = 'add') {
 function setEditorContent(content, mode = 'add') {
   try {
     const editorId = mode === 'edit' ? 'editNoteContent' : 'noteContent';
+    
+    // בדיקה אם זה rich-text editor (Quill)
+    if (window.RichTextEditorService) {
+      window.RichTextEditorService.setContent(editorId, content || '');
+      return;
+    }
+    
+    // Fallback: עבודה עם אלמנט רגיל
     const editor = document.getElementById(editorId);
+    if (!editor) {
+      return;
+    }
 
-  if (!editor) {
-    return;
-  }
-
-  editor.innerHTML = content || '';
+    editor.innerHTML = content || '';
   
   } catch (error) {
     window.Logger.error('שגיאה בהגדרת תוכן עורך:', error, { page: "notes" });
@@ -2110,21 +2222,7 @@ window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (ש�
 // ייצוא ישיר של הפונקציה המקורית - ללא wrapper כדי למנוע רקורסיה
 window.updateNotesTable = updateNotesTable;
 
-/**
- * Show add note modal (wrapper for ModalManagerV2)
- * Maintains backward compatibility with HTML onclick handlers
- * @function showAddNoteModal
- */
-window.showAddNoteModal = function() {
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-        window.ModalManagerV2.showModal('notesModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
-        }
-    }
-};
+// REMOVED: window.showAddNoteModal - use window.showModalSafe('notesModal', 'add') directly
 
 /**
  * Show edit note modal (wrapper for ModalManagerV2)

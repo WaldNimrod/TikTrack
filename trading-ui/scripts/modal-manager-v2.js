@@ -212,7 +212,39 @@ class ModalManagerV2 {
      * @private
      */
     generateModalHTML(config) {
-        const fieldsHTML = this.generateFieldsHTML(config.fields);
+        // Check if config has tabs
+        const hasTabs = config.tabs && Array.isArray(config.tabs) && config.tabs.length > 0;
+        
+        // Generate fields HTML - either from tabs or from direct fields
+        let fieldsHTML = '';
+        let tabsHTML = '';
+        
+        if (hasTabs) {
+            // Generate tabs navigation
+            tabsHTML = this.generateTabsHTML(config.tabs, config.id);
+            
+            // Generate fields for each tab
+            const tabsContentHTML = config.tabs.map(tab => {
+                const tabFieldsHTML = this.generateFieldsHTML(tab.fields);
+                return `
+                    <div class="tab-pane fade ${tab.active ? 'show active' : ''}" 
+                         id="${config.id}Tab${tab.id}" 
+                         role="tabpanel" 
+                         aria-labelledby="${config.id}Tab${tab.id}-tab">
+                        ${tabFieldsHTML}
+                    </div>
+                `;
+            }).join('');
+            
+            fieldsHTML = `
+                <div class="tab-content" id="${config.id}TabContent">
+                    ${tabsContentHTML}
+                </div>
+            `;
+        } else {
+            // No tabs - use direct fields
+            fieldsHTML = this.generateFieldsHTML(config.fields);
+        }
         
         return `
             <div class="modal fade" id="${config.id}" tabindex="-1" 
@@ -248,6 +280,7 @@ class ModalManagerV2 {
                         </div>
                         <div class="modal-body">
                             <form id="${config.id}Form">
+                                ${tabsHTML}
                                 ${fieldsHTML}
                             </form>
                         </div>
@@ -260,6 +293,45 @@ class ModalManagerV2 {
                     </div>
                 </div>
             </div>
+        `;
+    }
+
+    /**
+     * Generate tabs HTML - יצירת HTML של טאבים
+     * 
+     * @param {Array} tabs - רשימת טאבים
+     * @param {string} modalId - מזהה המודל
+     * @returns {string} HTML של הטאבים
+     * @private
+     */
+    generateTabsHTML(tabs, modalId) {
+        if (!tabs || !Array.isArray(tabs) || tabs.length === 0) {
+            return '';
+        }
+        
+        const tabsNavHTML = tabs.map((tab, index) => {
+            const activeClass = tab.active ? 'active' : '';
+            return `
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link ${activeClass}" 
+                            id="${modalId}Tab${tab.id}-tab" 
+                            data-bs-toggle="tab" 
+                            data-bs-target="#${modalId}Tab${tab.id}" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="${modalId}Tab${tab.id}" 
+                            aria-selected="${tab.active ? 'true' : 'false'}"
+                            data-tab-id="${tab.id}">
+                        ${tab.label}
+                    </button>
+                </li>
+            `;
+        }).join('');
+        
+        return `
+            <ul class="nav nav-tabs mb-3" id="${modalId}Tabs" role="tablist">
+                ${tabsNavHTML}
+            </ul>
         `;
     }
 
@@ -372,6 +444,7 @@ class ModalManagerV2 {
                 `;
                 
             case 'text':
+                const textStyle = field.style || (field.width ? `width: ${field.width}px` : '');
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
@@ -384,6 +457,7 @@ class ModalManagerV2 {
                                ${requiredAttr}
                                ${disabledAttr}
                                ${readOnlyAttr}
+                               ${textStyle ? `style="${textStyle}"` : ''}
                                placeholder="${field.placeholder || ''}"
                                value="${field.defaultValue || ''}">
                         <div class="invalid-feedback"></div>
@@ -391,10 +465,14 @@ class ModalManagerV2 {
                 `;
                 
                         case 'number':
+                const numberStyle = field.style || (field.width ? `width: ${field.width}px` : '');
+                // Check if this is a fee field that needs currency label
+                const feeCurrencyLabelHTML = field.feeCurrencyLabel ? 
+                    `<small class="text-muted ms-2" id="${field.id}CurrencyLabel" style="font-size: 0.875rem;">-</small>` : '';
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
-                            ${field.label} ${requiredStar}
+                            ${field.label} ${requiredStar}${feeCurrencyLabelHTML}
                         </label>
                         <input type="number" 
                                class="form-control" 
@@ -403,10 +481,13 @@ class ModalManagerV2 {
                                ${requiredAttr}
                                ${disabledAttr}
                                ${readOnlyAttr}
+                               ${numberStyle ? `style="${numberStyle}"` : ''}
                                ${field.min ? `min="${field.min}"` : ''}
                                ${field.max ? `max="${field.max}"` : ''}
                                ${field.step ? `step="${field.step}"` : ''}
+                               placeholder="${field.placeholder || ''}"
                                value="${field.defaultValue || ''}">
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
@@ -419,6 +500,7 @@ class ModalManagerV2 {
                     const today = new Date();
                     dateValue = today.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm                                                                   
                 }
+                const dateStyle = field.style || (field.width ? `width: ${field.width}px` : '');
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
@@ -431,6 +513,7 @@ class ModalManagerV2 {
                                ${requiredAttr}
                                ${disabledAttr}
                                ${readOnlyAttr}
+                               ${dateStyle ? `style="${dateStyle}"` : ''}
                                value="${dateValue}">
                         <div class="invalid-feedback"></div>
                     </div>
@@ -452,6 +535,7 @@ class ModalManagerV2 {
                     });
                 }
                 
+                const selectStyle = field.style || (field.width ? `width: ${field.width}px` : '');
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
@@ -460,7 +544,9 @@ class ModalManagerV2 {
                         <select class="form-select" 
                                 id="${field.id}" 
                                 name="${field.name || field.id}"
-                                ${requiredAttr}>
+                                ${requiredAttr}
+                                ${disabledAttr}
+                                ${selectStyle ? `style="${selectStyle}"` : ''}>
                             ${optionsHTML}
                         </select>
                         <div class="invalid-feedback"></div>
@@ -468,6 +554,7 @@ class ModalManagerV2 {
                 `;
                 
             case 'textarea':
+                const textareaStyle = field.style || (field.width ? `width: ${field.width}px` : '');
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
@@ -477,6 +564,9 @@ class ModalManagerV2 {
                                   id="${field.id}" 
                                   name="${field.name || field.id}"
                                   ${requiredAttr}
+                                  ${disabledAttr}
+                                  ${readOnlyAttr}
+                                  ${textareaStyle ? `style="${textareaStyle}"` : ''}
                                   rows="${field.rows || 4}"
                                   placeholder="${field.placeholder || ''}">${field.defaultValue || ''}</textarea>
                         <div class="invalid-feedback"></div>
@@ -501,6 +591,29 @@ class ModalManagerV2 {
                             </label>
                         </div>
                         ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}                                          
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
+            case 'linkButton':
+                // Link button for trade selection
+                // Creates a button that opens a selector modal
+                // Also creates a hidden input field to store the selected trade_id (generic field name)
+                const linkButtonId = field.id + 'Button';
+                const linkButtonText = field.buttonText || field.label || 'קשר לטרייד';
+                // Generic field name: trade_id (works for all entity types)
+                return `
+                    <div class="mb-3">
+                        <label class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <input type="hidden" id="trade_id" name="trade_id" value="">
+                        <div id="${linkButtonId}">
+                            <button type="button" class="btn btn-primary" data-onclick="openTradeSelector('${field.id}')">
+                                ${linkButtonText}
+                            </button>
+                        </div>
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
@@ -542,6 +655,53 @@ class ModalManagerV2 {
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
+                
+            case 'file':
+                const fileAccept = field.accept || '*/*';
+                const fileDescription = field.description ? `<small class="form-text text-muted">${field.description}</small>` : '';
+                return `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <input type="file" 
+                               class="form-control" 
+                               id="${field.id}" 
+                               name="${field.name || field.id}"
+                               ${requiredAttr}
+                               ${disabledAttr}
+                               ${readOnlyAttr}
+                               accept="${fileAccept}">
+                        ${fileDescription}
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
+            case 'rich-text':
+                // Rich text editor using Quill.js
+                // The editor will be initialized after modal is shown
+                const richTextStyle = field.style || '';
+                const richTextHeight = field.height || '300px';
+                return `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <div id="${field.id}" 
+                             class="rich-text-editor-container" 
+                             ${richTextStyle ? `style="${richTextStyle}"` : ''}
+                             data-editor-id="${field.id}"
+                             data-options='${JSON.stringify(field.options || {})}'>
+                            <!-- Quill editor will be initialized here -->
+                        </div>
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
+            case 'custom':
+                // Custom HTML field - used for complex UI elements
+                return field.html || '';
                 
             default:
                 console.warn(`Unknown field type: ${field.type}`);
@@ -644,6 +804,11 @@ class ModalManagerV2 {
             // הפעלת מערכת הכפתורים
             this.initializeButtons(modalElement);
             
+            // Initialize tabs if exists
+            if (modalInfo.config.tabs && Array.isArray(modalInfo.config.tabs) && modalInfo.config.tabs.length > 0) {
+                this.initializeTabs(modalElement, modalInfo.config);
+            }
+            
             // יישום צבעים
             this.applyUserColors(modalElement, modalInfo.config.entityType);
             
@@ -692,6 +857,48 @@ class ModalManagerV2 {
             // בדיקה שהמודל נפתח בהצלחה
             console.log(`✅ Modal ${modalId} shown successfully`);
             
+            // אתחול rich-text editors (חייב להיות אחרי שהמודל נפתח)
+            // צריך לחכות קצת כדי שהמודל יוצג במלואו
+            setTimeout(async () => {
+                await this.initializeRichTextEditors(modalElement, modalInfo.config);
+                
+                // אם במצב edit, צריך למלא את התוכן אחרי שהעורך אותחל
+                // populateForm נקרא לפני modal.show(), אז צריך למלא שוב אחרי אתחול העורך
+                if (mode === 'edit' && entityData) {
+                    // מילוי נתונים לעורך rich-text (אחרי אתחול)
+                    const form = modalElement.querySelector('form');
+                    if (form && window.RichTextEditorService) {
+                        const fieldMapping = this.getFieldMapping(modalInfo.config?.entityType);
+                        if (entityData.content) {
+                            // מציאת שדה rich-text בקונפיגורציה
+                            const allFields = [];
+                            if (modalInfo.config.fields && Array.isArray(modalInfo.config.fields)) {
+                                allFields.push(...modalInfo.config.fields);
+                            }
+                            if (modalInfo.config.tabs && Array.isArray(modalInfo.config.tabs)) {
+                                modalInfo.config.tabs.forEach(tab => {
+                                    if (tab.fields && Array.isArray(tab.fields)) {
+                                        allFields.push(...tab.fields);
+                                    }
+                                });
+                            }
+                            
+                            // מציאת שדה content (rich-text)
+                            const contentField = allFields.find(f => 
+                                f.type === 'rich-text' && 
+                                (f.id === 'noteContent' || fieldMapping?.content === f.id || f.id.includes('Content'))
+                            );
+                            if (contentField) {
+                                // Sanitize content before setting
+                                const sanitizedContent = window.RichTextEditorService.sanitizeHTML(entityData.content || '');
+                                window.RichTextEditorService.setContent(contentField.id, sanitizedContent);
+                                console.log(`✅ Rich-text content set for field "${contentField.id}"`);
+                            }
+                        }
+                    }
+                }
+            }, 150);
+            
             // ניקוי backdrops שנוצרו על ידי Bootstrap - חשוב מאוד!
             if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
                 // קריאה מיידית ואחת נוספת אחרי זמן קצר (למקרה ש-Bootstrap יוצר backdrop אחרי show())
@@ -715,6 +922,118 @@ class ModalManagerV2 {
             // Apply remaining defaults after modal shows (date, source, etc.)
             if (mode === 'add') {
                 await this.applyRemainingDefaults(modalElement.querySelector('form'));
+            }
+            
+            // Special handlers for tickers modal - enable/disable external data check button
+            // Must be called AFTER modal is shown to ensure elements exist
+            if (modalElement.id === 'tickersModal' || modalInfo.config?.entityType === 'ticker') {
+                const form = modalElement.querySelector('form');
+                if (form) {
+                    const symbolField = form.querySelector('#tickerSymbol');
+                    const checkBtn = form.querySelector('#checkTickerExternalDataBtn');
+                    
+                    if (symbolField && checkBtn) {
+                        // Enable/disable button based on symbol field value
+                        const updateButtonState = () => {
+                            const symbol = symbolField.value?.trim();
+                            checkBtn.disabled = !symbol || symbol.length === 0;
+                            
+                            // Clear previous results when symbol changes
+                            const resultDiv = form.querySelector('#tickerExternalDataResult');
+                            const warningDiv = form.querySelector('#tickerExternalDataWarning');
+                            if (resultDiv) resultDiv.style.display = 'none';
+                            if (warningDiv) warningDiv.style.display = 'none';
+                        };
+                        
+                        // Initial state
+                        updateButtonState();
+                        
+                        // Add event listeners with multiple event types for better coverage
+                        symbolField.addEventListener('input', updateButtonState, { passive: true });
+                        symbolField.addEventListener('change', updateButtonState, { passive: true });
+                        symbolField.addEventListener('keyup', updateButtonState, { passive: true });
+                        symbolField.addEventListener('paste', () => setTimeout(updateButtonState, 10), { passive: true });
+                        
+                        // Process button through button system
+                        if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+                            window.advancedButtonSystem.processButtons(checkBtn);
+                        }
+                        
+                        console.log('✅ Ticker external data check button initialized', {
+                            symbolField: symbolField.id,
+                            checkBtn: checkBtn.id,
+                            initialDisabled: checkBtn.disabled
+                        });
+                    }
+                }
+            }
+            
+            // Special handlers for notes modal - enable/disable related object select
+            // Must be called AFTER modal is shown to ensure elements exist
+            if (modalElement.id === 'notesModal' || modalInfo.config?.entityType === 'note') {
+                setTimeout(() => {
+                    const form = modalElement.querySelector('form');
+                    if (!form) {
+                        console.warn('⚠️ Form not found for notes modal');
+                        return;
+                    }
+                    
+                    const noteRelatedTypeSelect = form.querySelector('#noteRelatedType');
+                    const noteRelatedObjectField = form.querySelector('#noteRelatedObject');
+                    
+                    if (!noteRelatedTypeSelect || !noteRelatedObjectField) {
+                        console.warn('⚠️ Notes modal elements not found:', {
+                            noteRelatedTypeSelect: !!noteRelatedTypeSelect,
+                            noteRelatedObjectField: !!noteRelatedObjectField
+                        });
+                        return;
+                    }
+                    
+                    // Handler to update related object field - use form reference to get fresh elements
+                    const handleRelatedTypeChange = async (e) => {
+                        const relatedTypeId = e.target.value;
+                        console.log('🔍 noteRelatedType changed to:', relatedTypeId);
+                        
+                        // Get fresh reference to the object field (in case DOM changed)
+                        const formElement = e.target.closest('form');
+                        if (!formElement) return;
+                        
+                        const relatedObjectField = formElement.querySelector('#noteRelatedObject');
+                        if (!relatedObjectField) {
+                            console.warn('⚠️ noteRelatedObject field not found in form');
+                            return;
+                        }
+                        
+                        if (relatedTypeId && relatedTypeId !== '') {
+                            // Enable the related object field
+                            relatedObjectField.disabled = false;
+                            console.log('✅ noteRelatedObject enabled');
+                            
+                            // Populate the related objects
+                            await this.populateNoteRelatedObjects(formElement, relatedTypeId);
+                        } else {
+                            // Disable and clear if no type selected
+                            relatedObjectField.disabled = true;
+                            relatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                            console.log('⚠️ noteRelatedObject disabled - no type selected');
+                        }
+                    };
+                    
+                    // Initial state - disable related object field
+                    noteRelatedObjectField.disabled = true;
+                    
+                    // Add event listener directly (no need to clone/replace)
+                    noteRelatedTypeSelect.addEventListener('change', handleRelatedTypeChange.bind(this));
+                    
+                    // Also add input event for better coverage
+                    noteRelatedTypeSelect.addEventListener('input', handleRelatedTypeChange.bind(this));
+                    
+                    console.log('✅ Notes related type/object handlers initialized', {
+                        noteRelatedTypeSelect: noteRelatedTypeSelect.id,
+                        noteRelatedObjectField: noteRelatedObjectField.id,
+                        initialDisabled: noteRelatedObjectField.disabled
+                    });
+                }, 150); // Slightly longer delay to ensure DOM is fully ready
             }
             
             // עדכון מצב
@@ -827,12 +1146,90 @@ class ModalManagerV2 {
             }
         });
         
+        // ניקוי rich-text editors
+        const richTextContainers = form.querySelectorAll('.rich-text-editor-container');
+        richTextContainers.forEach(container => {
+            if (window.RichTextEditorService) {
+                window.RichTextEditorService.setContent(container.id, '');
+            }
+        });
+        
         // ניקוי שגיאות ולידציה
         this.clearValidationErrors(form);
         
         // Note: applyDefaultValues is async but we don't await it here
         // It will be applied after populateForm for edit mode anyway
         this.applyDefaultValues(form).catch(err => console.warn('Error applying default values:', err));
+    }
+
+    /**
+     * Initialize rich-text editors in modal - אתחול עורכי טקסט עשיר במודל
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @private
+     */
+    async initializeRichTextEditors(modalElement, config) {
+        try {
+            // בדיקה ש-RichTextEditorService זמין
+            if (!window.RichTextEditorService) {
+                console.warn('⚠️ RichTextEditorService not available - rich-text editors will not be initialized');
+                return;
+            }
+
+            // מציאת כל שדות rich-text בקונפיגורציה
+            const allFields = [];
+            if (config.fields && Array.isArray(config.fields)) {
+                allFields.push(...config.fields);
+            }
+            if (config.tabs && Array.isArray(config.tabs)) {
+                config.tabs.forEach(tab => {
+                    if (tab.fields && Array.isArray(tab.fields)) {
+                        allFields.push(...tab.fields);
+                    }
+                });
+            }
+
+            // אתחול כל עורכי rich-text
+            for (const field of allFields) {
+                if (field.type === 'rich-text') {
+                    const container = modalElement.querySelector(`#${field.id}`);
+                    if (container) {
+                        // קבלת options מהשדה
+                        const options = field.options || {};
+                        
+                        // מיזוג עם ברירות מחדל
+                        const editorOptions = {
+                            placeholder: options.placeholder || field.placeholder || 'הכנס תוכן כאן...',
+                            direction: options.direction || 'rtl',
+                            maxLength: options.maxLength || field.maxLength,
+                            modules: {
+                                toolbar: options.toolbar || [
+                                    [{ 'header': [2, 3, false] }],
+                                    ['bold', 'italic', 'underline', 'strike'],
+                                    [{ 'color': [] }, { 'background': [] }],
+                                    [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                                    [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                    ['link'],
+                                    ['clean']
+                                ]
+                            }
+                        };
+
+                        // אתחול העורך
+                        const quill = window.RichTextEditorService.initEditor(field.id, editorOptions);
+                        if (quill) {
+                            console.log(`✅ Rich-text editor "${field.id}" initialized successfully`);
+                        }
+                    } else {
+                        console.warn(`⚠️ Rich-text container "${field.id}" not found in modal`);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error initializing rich-text editors:', error);
+        }
     }
 
     /**
@@ -923,6 +1320,20 @@ class ModalManagerV2 {
                     });
                     field.value = value || '';
                     console.log(`🎯 After setting, field.value is: ${field.value}`);                                                                            
+                } else if (field.classList && field.classList.contains('rich-text-editor-container')) {
+                    // Rich text editor - use RichTextEditorService
+                    if (window.RichTextEditorService) {
+                        window.RichTextEditorService.setContent(field.id, value || '');
+                        console.log(`📝 Set rich-text field ${field.id} to: ${value || ''}`);
+                    } else {
+                        console.warn(`⚠️ RichTextEditorService not available for field ${field.id}`);
+                    }
+                } else if (field.type === 'date' && value) {
+                    // Date type - value should be in YYYY-MM-DD format
+                    const dateStr = typeof value === 'string' ? value : value.toString();
+                    // Extract date part if datetime format (YYYY-MM-DDTHH:MM:SS)
+                    field.value = dateStr.split('T')[0];
+                    console.log(`📅 Set date field ${field.id} to: ${field.value}`);
                 } else if (field.type === 'datetime-local' && value) {
                     // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)                                                                      
                     const dateStr = typeof value === 'string' ? value : value.toString();                                                                       
@@ -939,16 +1350,89 @@ class ModalManagerV2 {
         // מילוי selects מיוחדים
         await this.populateSpecialSelects(form, data);
         
+        // עדכון linkButton fields (trade/plan selectors)
+        await this.updateLinkButtonFields(form, data);
+        
         // הוספת event listeners לשדות מיוחדים
-        this.attachSpecialEventListeners(form);
+        this.attachSpecialEventListeners(form, data, config);
+    }
+
+    /**
+     * Update link button fields - עדכון שדות כפתורי קישור
+     * 
+     * @param {HTMLElement} form - אלמנט הטופס
+     * @param {Object} data - נתוני הישות
+     * @private
+     */
+    async updateLinkButtonFields(form, data) {
+        // Check for linkedTrade field (generic field name)
+        const linkedTradeField = form.querySelector('#linkedTrade');
+        
+        if (linkedTradeField && data.trade_id) {
+            // Update display for linked trade
+            await this.updateLinkButtonDisplay('linkedTrade', data.trade_id, 'trade');
+        } else {
+            // Fallback: check for generic trade_id field
+            const tradeIdField = form.querySelector('#trade_id');
+            if (tradeIdField && data.trade_id) {
+                // Update display for generic trade_id field
+                await this.updateLinkButtonDisplay('linkedTrade', data.trade_id, 'trade');
+            }
+        }
+    }
+
+    /**
+     * Update link button display - עדכון תצוגת כפתור קישור
+     * 
+     * @param {string} fieldId - ID של השדה (generic: 'linkedTrade')
+     * @param {number} itemId - ID של הפריט המקושר (trade ID)
+     * @param {string} itemType - 'trade' (only trades supported now)
+     * @private
+     */
+    async updateLinkButtonDisplay(fieldId, itemId, itemType) {
+        try {
+            // Only trades are supported now
+            if (itemType !== 'trade') {
+                console.warn(`Unsupported item type: ${itemType}. Only 'trade' is supported.`);
+                return;
+            }
+
+            // Fetch trade data
+            const response = await fetch(`/api/trades/${itemId}`);
+            if (!response.ok) {
+                console.warn(`Failed to fetch trade ${itemId}`);
+                return;
+            }
+            
+            const data = await response.json();
+            const trade = data.data || data;
+            
+            // Update generic hidden field: trade_id
+            const tradeField = document.getElementById('trade_id');
+            if (tradeField) {
+                tradeField.value = itemId;
+            }
+            
+            // Update using tradeSelectorModal
+            if (window.tradeSelectorModal) {
+                // Set currentFieldId for proper display update
+                window.tradeSelectorModal.currentFieldId = fieldId;
+                window.tradeSelectorModal.updateParentModalDisplay(trade, 'trade');
+            }
+        } catch (error) {
+            console.error(`Error updating link button for trade ${itemId}:`, error);
+        }
     }
     
     /**
      * Attach special event listeners for form fields
      * @private
+     * @param {HTMLElement} form - The form element
+     * @param {Object} data - The entity data (optional, for edit mode)
+     * @param {Object} config - The modal configuration (optional)
      */
-    attachSpecialEventListeners(form) {
-                // Event listener ל-alertRelatedType - מילוי alertRelatedObject (עכשיו select)                                                                          
+    attachSpecialEventListeners(form, data = null, config = null) {
+        // Event listener ל-alertRelatedType - מילוי alertRelatedObject (עכשיו select)                                                                          
         const alertRelatedTypeSelect = form.querySelector('#alertRelatedType');
         if (alertRelatedTypeSelect) {
             alertRelatedTypeSelect.addEventListener('change', async (e) => {
@@ -1022,14 +1506,31 @@ class ModalManagerV2 {
                 }
             };
             
-            // עדכון ראשוני
+                        // עדכון ראשוני
             updateHiddenFields();
             
             // עדכון כשמשנים את הערך
-            alertStatusCombinedField.addEventListener('change', updateHiddenFields);
+            alertStatusCombinedField.addEventListener('change', updateHiddenFields);                                                                            
         }
         
- 
+        // Add hidden input for entity ID if editing (needed for PUT requests)
+        if (data && data.id) {
+            let idInput = form.querySelector('input[name="id"]');
+            if (!idInput) {
+                idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'id';
+                idInput.id = `${config?.entityType || 'entity'}Id`;
+                form.appendChild(idInput);
+            }
+            idInput.value = data.id;
+            console.log(`✅ Added hidden ID field: ${data.id}`);
+        }
+        
+        // Note: Ticker external data button initialization moved to showModal() 
+        // after modal is shown to ensure elements exist in DOM
+        // Note: Notes related type/object handlers moved to showModal() 
+        // after modal is shown to ensure elements exist in DOM
     }
     
     /**
@@ -1047,8 +1548,7 @@ class ModalManagerV2 {
                 'description': 'cashFlowDescription',
                 'source': 'cashFlowSource',
                 'external_id': 'cashFlowExternalId',
-                'trade_id': 'cashFlowTrade',
-                'trade_plan_id': 'cashFlowTradePlan'
+                'trade_id': 'trade_id'
             },
             'ticker': {
                 'symbol': 'tickerSymbol',
@@ -1081,13 +1581,14 @@ class ModalManagerV2 {
                 'condition_operator': 'alertCondition',
                 'condition_number': 'alertValue',
                 // condition_display_text is calculated field, not stored as separate field
-                // status and is_triggered are handled via alertStatusCombined -> hidden fields
+                                // status and is_triggered are handled via alertStatusCombined -> hidden fields                                                                 
                 'created_at': 'alertCreatedAt',
+                'expiry_date': 'alertExpiryDate',
                 'trade_condition_id': 'alertTradeCondition',
                 'plan_condition_id': 'alertPlanCondition'
             },
             'execution': {
-                'trade_id': 'executionTrade',
+                'trade_id': 'trade_id',
                 'ticker_id': 'executionTicker',
                 'side': 'executionSide',
                 'quantity': 'executionQuantity',
@@ -1096,13 +1597,15 @@ class ModalManagerV2 {
             'trading_account': {
                 'name': 'accountName',
                 'type': 'accountType',
-                'currency_id': 'accountCurrency'
+                'currency_id': 'accountCurrency',
+                'opening_balance': 'accountOpeningBalance',
+                'status': 'accountStatus',
+                'notes': 'accountNotes'
             },
             'note': {
-                'title': 'noteTitle',
                 'content': 'noteContent',
-                'related_entity_type': 'noteEntityType',
-                'related_entity_id': 'noteEntityId'
+                'related_type_id': 'noteRelatedType',
+                'related_id': 'noteRelatedObject'
             }
         };
         
@@ -1305,6 +1808,526 @@ class ModalManagerV2 {
      * @param {HTMLElement} modalElement - אלמנט המודל
      * @private
      */
+    /**
+     * Initialize tabs - אתחול טאבים במודל
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @private
+     */
+    initializeTabs(modalElement, config) {
+        if (!config.tabs || !Array.isArray(config.tabs) || config.tabs.length === 0) {
+            return;
+        }
+        
+        const tabsContainer = modalElement.querySelector(`#${config.id}Tabs`);
+        if (!tabsContainer) {
+            console.warn(`⚠️ Tabs container not found for modal ${config.id}`);
+            return;
+        }
+        
+        // Find active tab
+        const activeTab = config.tabs.find(tab => tab.active) || config.tabs[0];
+        const activeTabId = activeTab.id;
+        
+        // Update save button onclick based on active tab
+        const saveBtn = modalElement.querySelector(`#${config.id}SaveBtn`);
+        if (saveBtn) {
+            if (activeTabId === 'exchange' && config.onSaveExchange) {
+                saveBtn.setAttribute('data-onclick', `${config.onSaveExchange}()`);
+            } else if (config.onSave) {
+                saveBtn.setAttribute('data-onclick', `${config.onSave}()`);
+            }
+        }
+        
+        // Add event listeners to tab buttons
+        const tabButtons = tabsContainer.querySelectorAll('button[data-tab-id]');
+        tabButtons.forEach(button => {
+            button.addEventListener('shown.bs.tab', (e) => {
+                const tabId = e.target.getAttribute('data-tab-id');
+                
+                // Update save button onclick based on selected tab
+                if (saveBtn) {
+                    if (tabId === 'exchange' && config.onSaveExchange) {
+                        saveBtn.setAttribute('data-onclick', `${config.onSaveExchange}()`);
+                    } else if (config.onSave) {
+                        saveBtn.setAttribute('data-onclick', `${config.onSave}()`);
+                    }
+                }
+                
+                // Initialize currency exchange calculations if exchange tab is active
+                if (tabId === 'exchange') {
+                    this.initializeCurrencyExchangeCalculations(modalElement);
+                }
+            });
+        });
+        
+        // Initialize currency exchange calculations if exchange tab is active by default
+        if (activeTabId === 'exchange') {
+            this.initializeCurrencyExchangeCalculations(modalElement);
+        }
+    }
+    
+    /**
+     * Initialize currency exchange calculations - אתחול חישובי המרת מטבע
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @private
+     */
+    initializeCurrencyExchangeCalculations(modalElement) {
+        console.log('🔵 initializeCurrencyExchangeCalculations CALLED');
+        
+        // Find exchange tab pane - fields are inside it
+        const exchangeTabPane = modalElement.querySelector('#cashFlowModalTabexchange');
+        const searchScope = exchangeTabPane || modalElement;
+        
+        console.log('🔵 searchScope:', searchScope ? 'exchangeTabPane found' : 'using modalElement');
+        
+        const fromAmountField = searchScope.querySelector('#currencyExchangeFromAmount');
+        const exchangeRateField = searchScope.querySelector('#currencyExchangeRate');
+        const toAmountField = searchScope.querySelector('#currencyExchangeToAmount');
+        const fromCurrencyField = searchScope.querySelector('#currencyExchangeFromCurrency');
+        const toCurrencyField = searchScope.querySelector('#currencyExchangeToCurrency');
+        const feeAmountField = searchScope.querySelector('#currencyExchangeFeeAmount');
+        const feeCurrencyLabel = searchScope.querySelector('#currencyExchangeFeeAmountCurrencyLabel');
+        const accountField = searchScope.querySelector('#cashFlowAccount');
+        const descriptionField = searchScope.querySelector('#cashFlowDescription');
+        const netAmountField = searchScope.querySelector('#currencyExchangeNetAmount');
+        
+        console.log('🔵 Fields found:', {
+            fromAmountField: !!fromAmountField,
+            exchangeRateField: !!exchangeRateField,
+            toAmountField: !!toAmountField,
+            fromCurrencyField: !!fromCurrencyField,
+            toCurrencyField: !!toCurrencyField,
+            feeAmountField: !!feeAmountField,
+            feeCurrencyLabel: !!feeCurrencyLabel,
+            accountField: !!accountField,
+            descriptionField: !!descriptionField,
+            netAmountField: !!netAmountField
+        });
+        
+        if (!fromAmountField || !exchangeRateField || !toAmountField) {
+            console.warn('⚠️ Required fields not found, returning early');
+            return;
+        }
+        
+        // Helper function to get currency symbol from select field
+        const getCurrencySymbol = (currencyField) => {
+            if (!currencyField || !currencyField.value) return '';
+            const selectedOption = currencyField.options[currencyField.selectedIndex];
+            if (!selectedOption) return '';
+            // The text content is the symbol (code) itself
+            const symbol = selectedOption.textContent.trim() || '';
+            return symbol;
+        };
+        
+        // Helper function to get account's primary currency
+        const getAccountCurrency = async (accountId) => {
+            if (!accountId) return null;
+            try {
+                const response = await fetch(`/api/trading-accounts/${accountId}`);
+                if (!response.ok) return null;
+                const data = await response.json();
+                if (data.status === 'success' && data.data) {
+                    return {
+                        id: data.data.currency_id,
+                        symbol: data.data.currency_symbol || ''
+                    };
+                }
+            } catch (error) {
+                console.warn('Error fetching account currency:', error);
+            }
+            return null;
+        };
+        
+        // Update fee currency label based on selected account
+        const updateFeeCurrencyLabel = async () => {
+            console.log('🔵 updateFeeCurrencyLabel CALLED');
+            
+            // Re-find elements in case they weren't found before (e.g., tab wasn't active)
+            // Search in exchange tab pane first, then in entire modal
+            let currentFeeCurrencyLabel = null;
+            if (exchangeTabPane) {
+                currentFeeCurrencyLabel = exchangeTabPane.querySelector('#currencyExchangeFeeAmountCurrencyLabel');
+            }
+            if (!currentFeeCurrencyLabel) {
+                // Try searching in all tab panes
+                const allTabPanes = modalElement.querySelectorAll('.tab-pane');
+                for (const tabPane of allTabPanes) {
+                    currentFeeCurrencyLabel = tabPane.querySelector('#currencyExchangeFeeAmountCurrencyLabel');
+                    if (currentFeeCurrencyLabel) break;
+                }
+            }
+            if (!currentFeeCurrencyLabel) {
+                // Last resort: search in entire modal
+                currentFeeCurrencyLabel = modalElement.querySelector('#currencyExchangeFeeAmountCurrencyLabel');
+            }
+            
+            const currentAccountField = modalElement.querySelector('#cashFlowAccount');
+            
+            console.log('🔵 currentFeeCurrencyLabel:', currentFeeCurrencyLabel);
+            console.log('🔵 currentAccountField:', currentAccountField);
+            
+            if (!currentFeeCurrencyLabel || !currentAccountField) {
+                console.warn('⚠️ feeCurrencyLabel or accountField not found', {
+                    feeCurrencyLabel: !!currentFeeCurrencyLabel,
+                    accountField: !!currentAccountField,
+                    exchangeTabPane: !!exchangeTabPane
+                });
+                return;
+            }
+            
+            const accountId = currentAccountField.value;
+            console.log('🔵 accountId:', accountId);
+            
+            if (!accountId) {
+                currentFeeCurrencyLabel.textContent = '-';
+                console.log('🔵 No account selected, setting label to "-"');
+                return;
+            }
+            
+            const accountCurrency = await getAccountCurrency(accountId);
+            console.log('🔵 accountCurrency:', accountCurrency);
+            
+            if (accountCurrency && accountCurrency.symbol) {
+                currentFeeCurrencyLabel.textContent = accountCurrency.symbol;
+                console.log(`✅ Fee currency label updated to: ${accountCurrency.symbol}`);
+            } else {
+                currentFeeCurrencyLabel.textContent = '-';
+                console.warn('⚠️ Account currency not found, setting label to "-"');
+            }
+        };
+        
+        // Generate description summary
+        const updateDescription = () => {
+            console.log('🔵 updateDescription CALLED');
+            
+            if (!descriptionField) {
+                console.warn('⚠️ descriptionField not found');
+                return;
+            }
+            
+            const fromAmount = parseFloat(fromAmountField.value) || 0;
+            const toAmount = parseFloat(toAmountField.value) || 0;
+            const exchangeRate = parseFloat(exchangeRateField.value) || 0;
+            const feeAmount = parseFloat(feeAmountField?.value) || 0;
+            
+            console.log('🔵 Values:', { fromAmount, toAmount, exchangeRate, feeAmount });
+            
+            // Check if we have minimum required fields
+            if (!fromAmount || !exchangeRate) {
+                console.log('⚠️ Missing required fields (fromAmount or exchangeRate)');
+                return;
+            }
+            
+            // If toAmount is not calculated yet, calculate it
+            let calculatedToAmount = toAmount;
+            if (!calculatedToAmount && fromAmount && exchangeRate) {
+                calculatedToAmount = fromAmount * exchangeRate;
+                console.log('🔵 Calculated toAmount:', calculatedToAmount);
+            }
+            
+            // If we still don't have toAmount, don't update
+            if (!calculatedToAmount) {
+                console.warn('⚠️ No toAmount available');
+                return;
+            }
+            
+            const fromSymbol = getCurrencySymbol(fromCurrencyField);
+            const toSymbol = getCurrencySymbol(toCurrencyField);
+            
+            // Re-find feeCurrencyLabel in case it wasn't found before
+            // Search in exchange tab pane first, then in all tab panes, then in entire modal
+            let currentFeeCurrencyLabel = null;
+            if (exchangeTabPane) {
+                currentFeeCurrencyLabel = exchangeTabPane.querySelector('#currencyExchangeFeeAmountCurrencyLabel');
+            }
+            if (!currentFeeCurrencyLabel) {
+                // Try searching in all tab panes
+                const allTabPanes = modalElement.querySelectorAll('.tab-pane');
+                for (const tabPane of allTabPanes) {
+                    currentFeeCurrencyLabel = tabPane.querySelector('#currencyExchangeFeeAmountCurrencyLabel');
+                    if (currentFeeCurrencyLabel) break;
+                }
+            }
+            if (!currentFeeCurrencyLabel) {
+                // Last resort: search in entire modal
+                currentFeeCurrencyLabel = modalElement.querySelector('#currencyExchangeFeeAmountCurrencyLabel');
+            }
+            
+            const feeSymbol = currentFeeCurrencyLabel ? currentFeeCurrencyLabel.textContent.trim() : '';
+            
+            console.log('🔵 Symbols:', { fromSymbol, toSymbol, feeSymbol, feeCurrencyLabelFound: !!currentFeeCurrencyLabel });
+            
+            // Calculate net amounts
+            // Fee is always in account's primary currency (feeSymbol)
+            // We need to calculate:
+            // 1. Net in account currency (fromAmount - feeAmount if fee is in account currency)
+            // 2. Net in target currency (toAmount - feeInToCurrency)
+            
+            let netInAccountCurrency = fromAmount;
+            let netInTargetCurrency = calculatedToAmount;
+            let feeInToCurrency = 0;
+            let canCalculateNet = true;
+            
+            if (feeAmount > 0 && feeSymbol) {
+                // Calculate net in account currency
+                if (feeSymbol === fromSymbol) {
+                    // Fee is in account currency (same as fromCurrency) - subtract directly
+                    netInAccountCurrency = fromAmount - feeAmount;
+                    console.log('🔵 Net in account currency:', netInAccountCurrency, `(${fromAmount} - ${feeAmount})`);
+                } else {
+                    // Fee is in different currency - can't calculate net in account currency
+                    netInAccountCurrency = fromAmount;
+                    console.warn('⚠️ Fee is not in account currency, cannot calculate net in account currency');
+                }
+                
+                // Calculate net in target currency
+                if (feeSymbol === toSymbol) {
+                    // Fee is in target currency - subtract directly
+                    feeInToCurrency = feeAmount;
+                    netInTargetCurrency = calculatedToAmount - feeInToCurrency;
+                    console.log('🔵 Net in target currency (same currency):', netInTargetCurrency, 
+                        `(${calculatedToAmount} - ${feeAmount})`);
+                } else if (feeSymbol === fromSymbol) {
+                    // Fee is in fromCurrency - convert to toCurrency using exchange rate
+                    feeInToCurrency = feeAmount * exchangeRate;
+                    netInTargetCurrency = calculatedToAmount - feeInToCurrency;
+                    console.log('🔵 Net in target currency (converted):', netInTargetCurrency, 
+                        `(${calculatedToAmount} - ${feeInToCurrency.toFixed(2)} = ${feeAmount}${feeSymbol} * ${exchangeRate})`);
+                } else {
+                    // Fee is in different currency (not fromCurrency and not toCurrency)
+                    // Cannot convert - show warning
+                    canCalculateNet = false;
+                    console.warn('⚠️ Fee is in different currency (not fromCurrency or toCurrency), cannot convert:', 
+                        { feeSymbol, fromSymbol, toSymbol });
+                }
+            } else {
+                // No fee
+                netInAccountCurrency = fromAmount;
+                netInTargetCurrency = calculatedToAmount;
+                console.log('🔵 No fee, net amounts equal to original amounts');
+            }
+            
+            // Build detailed summary text
+            let summaryHTML = '<div style="line-height: 1.8;">';
+            
+            // סכום להמרה במטבע החשבון
+            if (fromSymbol) {
+                summaryHTML += `<div><strong>סכום להמרה:</strong> ${fromAmount.toFixed(2)}${fromSymbol}</div>`;
+            }
+            
+            // עמלה במטבע החשבון
+            if (feeAmount > 0 && feeSymbol) {
+                summaryHTML += `<div><strong>עמלה:</strong> ${feeAmount.toFixed(2)}${feeSymbol}</div>`;
+            }
+            
+            // נטו יתקבל במטבע החשבון
+            if (feeSymbol === fromSymbol && feeAmount > 0) {
+                summaryHTML += `<div style="color: var(--current-entity-color-dark, #26baac); margin-top: 0.5rem;"><strong>נטו במטבע החשבון:</strong> ${netInAccountCurrency.toFixed(2)}${fromSymbol}</div>`;
+            } else if (feeAmount > 0) {
+                summaryHTML += `<div style="color: #666; margin-top: 0.5rem;"><strong>נטו במטבע החשבון:</strong> ${fromAmount.toFixed(2)}${fromSymbol} (עמלה במטבע אחר)</div>`;
+            }
+            
+            // נטו יתקבל במטבע המבוקש
+            if (toSymbol) {
+                if (canCalculateNet && feeAmount > 0) {
+                    summaryHTML += `<div style="color: var(--current-entity-color-dark, #26baac); margin-top: 0.5rem; font-size: 1.1em;"><strong>נטו במטבע המבוקש:</strong> ${netInTargetCurrency.toFixed(2)}${toSymbol}</div>`;
+                } else {
+                    summaryHTML += `<div style="color: var(--current-entity-color-dark, #26baac); margin-top: 0.5rem; font-size: 1.1em;"><strong>נטו במטבע המבוקש:</strong> ${calculatedToAmount.toFixed(2)}${toSymbol}</div>`;
+                }
+            }
+            
+            summaryHTML += '</div>';
+            
+            // Update net amount display field
+            if (netAmountField) {
+                netAmountField.innerHTML = summaryHTML;
+                console.log('✅ Net amount field updated with detailed summary');
+            } else {
+                console.warn('⚠️ netAmountField not found');
+            }
+            
+            // Build description: "המרת 50$ ל150₪ לפי שער של 3.01 ואחרי עמלה של 5₪"
+            let description = `המרת ${fromAmount}${fromSymbol || ''} ל${calculatedToAmount.toFixed(2)}${toSymbol || ''} לפי שער של ${exchangeRate}`;
+            
+            if (feeAmount > 0 && feeSymbol) {
+                description += ` ואחרי עמלה של ${feeAmount}${feeSymbol}`;
+                // Always show net amount if fee was subtracted
+                if (canCalculateNet && netInTargetCurrency !== calculatedToAmount && netInTargetCurrency > 0) {
+                    description += ` (סכום נטו: ${netInTargetCurrency.toFixed(2)}${toSymbol})`;
+                }
+            }
+            
+            console.log('🔵 Generated description:', description);
+            
+            // Always update description (auto-generated)
+            descriptionField.value = description;
+            console.log('✅ Description updated');
+        };
+        
+        // Calculate toAmount function
+        const calculateToAmount = () => {
+            console.log('🔵 calculateToAmount CALLED');
+            const fromAmount = parseFloat(fromAmountField.value) || 0;
+            const exchangeRate = parseFloat(exchangeRateField.value) || 0;
+            const toAmount = fromAmount * exchangeRate;
+            
+            console.log('🔵 Calculation:', { fromAmount, exchangeRate, toAmount });
+            
+            if (toAmountField) {
+                toAmountField.value = toAmount.toFixed(6);
+                console.log('✅ toAmountField updated to:', toAmountField.value);
+            }
+            
+            // Update description after calculation
+            updateDescription();
+        };
+        
+        // Update toCurrency when fromCurrency changes
+        const updateToCurrency = () => {
+            if (fromCurrencyField && toCurrencyField) {
+                // Get all currencies
+                const currencies = Array.from(fromCurrencyField.options);
+                const fromCurrencyId = fromCurrencyField.value;
+                
+                // Find a different currency for toCurrency
+                const differentCurrency = currencies.find(opt => opt.value !== fromCurrencyId && opt.value !== '');
+                if (differentCurrency && toCurrencyField) {
+                    toCurrencyField.value = differentCurrency.value;
+                }
+            }
+        };
+        
+        // Add event listeners
+        if (fromAmountField) {
+            fromAmountField.addEventListener('input', calculateToAmount);
+            fromAmountField.addEventListener('change', calculateToAmount);
+        }
+        
+        if (exchangeRateField) {
+            exchangeRateField.addEventListener('input', calculateToAmount);
+            exchangeRateField.addEventListener('change', calculateToAmount);
+        }
+        
+        if (fromCurrencyField) {
+            fromCurrencyField.addEventListener('change', () => {
+                updateToCurrency();
+                calculateToAmount();
+                // updateDescription is already called by calculateToAmount
+            });
+            // Also update description on input (for real-time updates)
+            fromCurrencyField.addEventListener('input', () => {
+                setTimeout(updateDescription, 50);
+            });
+        }
+        
+        if (toCurrencyField) {
+            toCurrencyField.addEventListener('change', () => {
+                // Recalculate toAmount if needed, then update description
+                calculateToAmount();
+                updateDescription();
+            });
+            // Also update description on input (for real-time updates)
+            toCurrencyField.addEventListener('input', () => {
+                setTimeout(updateDescription, 50);
+            });
+        }
+        
+        if (feeAmountField) {
+            feeAmountField.addEventListener('input', updateDescription);
+            feeAmountField.addEventListener('change', updateDescription);
+        }
+        
+        if (accountField) {
+            accountField.addEventListener('change', () => {
+                updateFeeCurrencyLabel().then(() => {
+                    updateDescription();
+                });
+            });
+        }
+        
+        // Initial calculation
+        calculateToAmount();
+        updateToCurrency();
+        
+        // Update fee currency label - try multiple times to catch when account is loaded
+        const tryUpdateFeeCurrency = async (attempt = 0) => {
+            if (attempt > 5) {
+                console.warn('⚠️ Max attempts reached for updateFeeCurrencyLabel');
+                return;
+            }
+            
+            const accountId = accountField?.value;
+            console.log(`🔵 Attempt ${attempt + 1}: accountId =`, accountId);
+            
+            if (accountId) {
+                await updateFeeCurrencyLabel();
+                // Also update description after fee currency is updated
+                setTimeout(() => {
+                    updateDescription();
+                }, 50);
+            } else {
+                // Try again after a short delay
+                setTimeout(() => {
+                    tryUpdateFeeCurrency(attempt + 1);
+                }, 200);
+            }
+        };
+        
+        // Start trying to update fee currency
+        tryUpdateFeeCurrency();
+        
+        // Also try after a longer delay to catch late-loading fields
+        setTimeout(() => {
+            if (accountField?.value) {
+                updateFeeCurrencyLabel().then(() => {
+                    updateDescription();
+                });
+            }
+        }, 1000);
+        
+        // Listen for tab switch to exchange tab - update fee currency when tab opens
+        const exchangeTabButton = modalElement.querySelector('#cashFlowModalTabexchange-tab');
+        if (exchangeTabButton) {
+            exchangeTabButton.addEventListener('shown.bs.tab', () => {
+                console.log('🔵 Exchange tab opened, updating fee currency');
+                // Update fee currency when tab opens (account might be loaded by now)
+                setTimeout(() => {
+                    updateFeeCurrencyLabel().then(() => {
+                        updateDescription();
+                    });
+                }, 100);
+            });
+        }
+        
+        // Also listen on the tab pane itself for when it becomes visible
+        if (exchangeTabPane) {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        const target = mutation.target;
+                        if (target.classList.contains('show') && target.classList.contains('active')) {
+                            console.log('🔵 Exchange tab pane became visible, updating fee currency');
+                            setTimeout(() => {
+                                updateFeeCurrencyLabel().then(() => {
+                                    updateDescription();
+                                });
+                            }, 100);
+                        }
+                    }
+                });
+            });
+            observer.observe(exchangeTabPane, { attributes: true, attributeFilter: ['class'] });
+        }
+        
+        // Export to global scope for manual calls
+        window.calculateCurrencyExchangeToAmount = calculateToAmount;
+        window.updateCurrencyExchangeDescription = updateDescription;
+        window.updateCurrencyExchangeFeeCurrency = updateFeeCurrencyLabel;
+    }
+
     initializeButtons(modalElement) {
         // עיבוד כל הכפתורים במודל - מערכת הכפתורים תטפל בזה אוטומטית
         // אין צורך לקרוא לפונקציה ספציפית
@@ -1358,43 +2381,176 @@ class ModalManagerV2 {
             return;
         }
         
-        const selects = modalElement.querySelectorAll('select');
-        console.log(`🔍 populateSelects: Found ${selects.length} select elements`);
-        
-        for (const select of selects) {
-            const selectId = select.id;
-            
-            // Check if this field has defaultFromPreferences in config
-            let shouldUseDefaultFromPrefs = false;
-            if (config && config.fields) {
+        // Helper function to find field config in tabs or fields
+        const findFieldConfig = (selectId, config, tabId = null) => {
+            // Check in tabs first
+            if (config.tabs && Array.isArray(config.tabs)) {
+                for (const tab of config.tabs) {
+                    // If tabId is provided, only check that specific tab
+                    if (tabId && tab.id !== tabId) {
+                        continue;
+                    }
+                    if (tab.fields && Array.isArray(tab.fields)) {
+                        const fieldConfig = tab.fields.find(f => f.id === selectId);
+                        if (fieldConfig) {
+                            return { fieldConfig, tabId: tab.id };
+                        }
+                    }
+                }
+            }
+            // Check in direct fields
+            if (config.fields && Array.isArray(config.fields)) {
                 const fieldConfig = config.fields.find(f => f.id === selectId);
-                if (fieldConfig && fieldConfig.defaultFromPreferences) {
-                    shouldUseDefaultFromPrefs = true;
+                if (fieldConfig) {
+                    return { fieldConfig, tabId: null };
                 }
+            }
+            return null;
+        };
+        
+        // If config has tabs, populate selects in each tab separately
+        if (config.tabs && Array.isArray(config.tabs)) {
+            for (const tab of config.tabs) {
+                const tabPane = modalElement.querySelector(`#${config.id}Tab${tab.id}`);
+                if (!tabPane) {
+                    console.warn(`⚠️ Tab pane ${config.id}Tab${tab.id} not found`);
+                    continue;
+                }
+                
+                const selects = tabPane.querySelectorAll('select');
+                console.log(`🔍 populateSelects: Found ${selects.length} select elements in tab ${tab.id}`);
+                
+                for (const select of selects) {
+                    const selectId = select.id;
+                    const result = findFieldConfig(selectId, config, tab.id);
+                    if (!result) {
+                        console.warn(`⚠️ Field config not found for ${selectId} in tab ${tab.id}`);
+                        continue;
+                    }
+                    
+                    const { fieldConfig } = result;
+                    await this._populateSingleSelect(select, selectId, fieldConfig, config);
+                }
+            }
+        } else {
+            // No tabs - use direct fields
+            const selects = modalElement.querySelectorAll('select');
+            console.log(`🔍 populateSelects: Found ${selects.length} select elements`);
+            
+            for (const select of selects) {
+                const selectId = select.id;
+                const result = findFieldConfig(selectId, config);
+                if (!result) {
+                    console.warn(`⚠️ Field config not found for ${selectId}`);
+                    continue;
+                }
+                
+                const { fieldConfig } = result;
+                await this._populateSingleSelect(select, selectId, fieldConfig, config);
+            }
+        }
+    }
+    
+    /**
+     * Populate a single select field
+     * @private
+     */
+    async _populateSingleSelect(select, selectId, fieldConfig, config) {
+        // Check if this field has defaultFromPreferences in config
+        let shouldUseDefaultFromPrefs = false;
+        if (fieldConfig && fieldConfig.defaultFromPreferences) {
+            shouldUseDefaultFromPrefs = true;
+        }
+        
+        try {
+            // Check if field has options in config - if so, don't populate automatically
+            let hasStaticOptions = false;
+            if (fieldConfig && fieldConfig.options && Array.isArray(fieldConfig.options) && fieldConfig.options.length > 0) {
+                hasStaticOptions = true;
+                console.log(`⏭️ Skipping ${selectId} - Has static options in config`);
             }
             
-            try {
-                // מילוי לפי סוג השדה
-                if (selectId.includes('Account') || selectId.includes('account')) {
-                    await window.SelectPopulatorService.populateAccountsSelect(selectId, {
+            // Skip if field has static options
+            if (hasStaticOptions) {
+                return;
+            }
+            
+            // Check if field has populateFromService in config (highest priority)
+            let populateFromService = null;
+            if (fieldConfig && fieldConfig.populateFromService) {
+                populateFromService = fieldConfig.populateFromService;
+            }
+            
+            // מילוי לפי סוג השדה
+            // Priority 1: populateFromService (explicit configuration)
+            // Pass select element directly to avoid ID conflicts in tabs
+            if (populateFromService === 'currencies') {
+                await window.SelectPopulatorService.populateCurrenciesSelect(select, {
+                    defaultFromPreferences: shouldUseDefaultFromPrefs
+                });
+            } else if (populateFromService === 'accounts') {
+                await window.SelectPopulatorService.populateAccountsSelect(select, {
+                    defaultFromPreferences: shouldUseDefaultFromPrefs
+                });
+            } else if (populateFromService === 'tickers') {
+                await window.SelectPopulatorService.populateTickersSelect(select, {
+                    includeEmpty: true
+                });
+            }
+            // Priority 2: Specific field names (Type, Currency, etc.)
+            // Check for tickerType specifically - should NOT be populated (has static options)
+            else if (selectId === 'tickerType' || (selectId.includes('Type') && selectId.toLowerCase().includes('ticker'))) {
+                // Type field - already has options in config, don't populate
+                console.log(`⏭️ Skipping ${selectId} - Type field with static options`);
+            } 
+            // Check for tickerCurrency specifically - should use populateFromService
+            else if (selectId === 'tickerCurrency' || (selectId.includes('Currency') && selectId.toLowerCase().includes('ticker'))) {
+                // This should have been handled by populateFromService above, but double-check
+                if (populateFromService !== 'currencies') {
+                    console.log(`⚠️ ${selectId} should use populateFromService: 'currencies', falling back to manual populate`);
+                    await window.SelectPopulatorService.populateCurrenciesSelect(select, {
                         defaultFromPreferences: shouldUseDefaultFromPrefs
-                    });
-                } else if (selectId.includes('Ticker') || selectId.includes('ticker')) {
-                    await window.SelectPopulatorService.populateTickersSelect(selectId, {
-                        includeEmpty: true
-                    });
-                } else if (selectId.includes('Currency') || selectId.includes('currency')) {
-                    await window.SelectPopulatorService.populateCurrenciesSelect(selectId, {
-                        defaultFromPreferences: shouldUseDefaultFromPrefs
-                    });
-                } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
-                    await window.SelectPopulatorService.populateTradePlansSelect(selectId, {
-                        includeEmpty: true
                     });
                 }
-            } catch (error) {
-                console.warn(`Error populating select ${selectId}:`, error);
             }
+            // Generic Currency fields (not ticker-related)
+            else if ((selectId.includes('Currency') || selectId.includes('currency')) && 
+                      !selectId.toLowerCase().includes('ticker')) {
+                await window.SelectPopulatorService.populateCurrenciesSelect(select, {
+                    defaultFromPreferences: shouldUseDefaultFromPrefs
+                });
+            }
+            // Priority 3: Generic field matching
+            // Check for Status fields - should NOT be populated (has static options)
+            else if (selectId.includes('Status') || selectId.includes('status')) {
+                console.log(`⏭️ Skipping ${selectId} - Status field with static options`);
+            }
+            else if (selectId.includes('Account') || selectId.includes('account')) {
+                await window.SelectPopulatorService.populateAccountsSelect(select, {
+                    defaultFromPreferences: shouldUseDefaultFromPrefs
+                });
+            } 
+            // Ticker select fields (but NOT tickerType or tickerCurrency)
+            else if ((selectId.includes('Ticker') || selectId.includes('ticker')) && 
+                      !selectId.includes('Type') && !selectId.includes('Currency') &&
+                      selectId !== 'tickerType' && selectId !== 'tickerCurrency') {
+                // Ticker select (e.g., cashFlowTicker, tradePlanTicker)
+                await window.SelectPopulatorService.populateTickersSelect(select, {
+                    includeEmpty: true
+                });
+            } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
+                await window.SelectPopulatorService.populateTradePlansSelect(select, {
+                    includeEmpty: true
+                });
+            } else if ((selectId.includes('Trade') || selectId.includes('trade')) && 
+                      !selectId.includes('TradePlan') && !selectId.includes('tradePlan')) {
+                // Trade select (but not TradePlan) - e.g., cashFlowTrade
+                await window.SelectPopulatorService.populateTradesSelect(select, {
+                    includeEmpty: true
+                });
+            }
+        } catch (error) {
+            console.warn(`Error populating select ${selectId}:`, error);
         }
     }
     
@@ -1526,9 +2682,20 @@ class ModalManagerV2 {
             this.activeModal = null;
         }
         
-        // ניקוי שגיאות ולידציה
+        // ניקוי rich-text editors
         const form = modalElement.querySelector('form');
         if (form) {
+            // ניקוי rich-text editors
+            if (window.RichTextEditorService) {
+                const richTextContainers = form.querySelectorAll('.rich-text-editor-container');
+                richTextContainers.forEach(container => {
+                    if (container.id) {
+                        window.RichTextEditorService.destroyEditor(container.id);
+                    }
+                });
+            }
+            
+            // ניקוי שגיאות ולידציה
             this.clearValidationErrors(form);
         }
         
@@ -1573,12 +2740,32 @@ class ModalManagerV2 {
             throw new Error('Entity type is required');
         }
         
-        if (!config.fields || !Array.isArray(config.fields)) {
-            throw new Error('Fields array is required');
-        }
+        // Check if config has tabs
+        const hasTabs = config.tabs && Array.isArray(config.tabs) && config.tabs.length > 0;
         
-        if (!config.onSave) {
-            throw new Error('Save function is required');
+        if (hasTabs) {
+            // Validate tabs structure
+            for (const tab of config.tabs) {
+                if (!tab.id) {
+                    throw new Error('Tab ID is required for each tab');
+                }
+                if (!tab.fields || !Array.isArray(tab.fields)) {
+                    throw new Error(`Fields array is required for tab "${tab.id}"`);
+                }
+            }
+            // For tabs, we need at least one save function (onSave or tab-specific onSave)
+            if (!config.onSave && !config.tabs.some(tab => tab.onSave)) {
+                throw new Error('Save function is required (onSave or tab-specific onSave)');
+            }
+        } else {
+            // No tabs - validate direct fields
+            if (!config.fields || !Array.isArray(config.fields)) {
+                throw new Error('Fields array is required');
+            }
+            
+            if (!config.onSave) {
+                throw new Error('Save function is required');
+            }
         }
     }
 
@@ -1691,7 +2878,24 @@ class ModalManagerV2 {
         const alertRelatedTypeField = form.querySelector('#alertRelatedType');
         const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
         
-                // מילוי related_type_id ו-related_id אם קיימים
+                // טיפול מיוחד בהערות עם קישור דרך related_type_id
+        const noteRelatedTypeField = form.querySelector('#noteRelatedType');
+        const noteRelatedObjectField = form.querySelector('#noteRelatedObject');
+        
+        // מילוי noteRelatedType ו-noteRelatedObject אם קיימים
+        if (noteRelatedTypeField && data.related_type_id) {
+            noteRelatedTypeField.value = data.related_type_id;
+            // טריגר event כדי למלא את noteRelatedObject
+            noteRelatedTypeField.dispatchEvent(new Event('change'));
+            // מילוי noteRelatedObject אחרי טעינת האובייקטים
+            if (noteRelatedObjectField && data.related_id) {
+                setTimeout(() => {
+                    noteRelatedObjectField.value = data.related_id;
+                }, 100);
+            }
+        }
+        
+        // מילוי related_type_id ו-related_id אם קיימים
         if (alertRelatedTypeField && data.related_type_id) {
             // עכשיו זה select ולא radio
             alertRelatedTypeField.value = data.related_type_id;
@@ -1891,22 +3095,22 @@ class ModalManagerV2 {
             
             switch (parseInt(relatedTypeId)) {
                 case 1: // account
-                    endpoint = '/api/trading_accounts';
+                    endpoint = '/api/trading-accounts/'; // Fixed: use hyphen instead of underscore
                     valueField = 'id';
                     textField = 'name';
                     break;
                 case 2: // trade
-                    endpoint = '/api/trades';
+                    endpoint = '/api/trades/';
                     valueField = 'id';
-                    textField = 'symbol'; // נשתמש ב-symbol או בנתונים אחרים
+                    textField = 'symbol';
                     break;
                 case 3: // trade_plan
-                    endpoint = '/api/trade_plans';
+                    endpoint = '/api/trade_plans/';
                     valueField = 'id';
-                    textField = 'symbol'; // נשתמש ב-symbol או בנתונים אחרים
+                    textField = 'symbol';
                     break;
                 case 4: // ticker
-                    endpoint = '/api/tickers';
+                    endpoint = '/api/tickers/';
                     valueField = 'id';
                     textField = 'symbol';
                     break;
@@ -1915,10 +3119,13 @@ class ModalManagerV2 {
             }
             
             const response = await fetch(endpoint);
-            if (!response.ok) return;
+            if (!response.ok) {
+                console.warn(`⚠️ Failed to fetch ${endpoint}: ${response.status} ${response.statusText}`);
+                return;
+            }
             
             const result = await response.json();
-            const items = result.data || [];
+            const items = result.data || result || [];
             
             // ניקוי ה-select
             alertRelatedObjectField.innerHTML = '';
@@ -1930,22 +3137,68 @@ class ModalManagerV2 {
             alertRelatedObjectField.appendChild(emptyOption);
             
             // הוספת כל האובייקטים
-            items.forEach(item => {
+            items.forEach((item, index) => {
                 const option = document.createElement('option');
                 option.value = item[valueField];
                 
                 // יצירת טקסט תצוגה מתאים
-                let displayText = item[textField] || `ID: ${item.id}`;
-                if (relatedTypeId === 2 || relatedTypeId === 3) {
-                    // עבור טרייד ותוכנית - נציג סימבול ותאריך
-                    const symbol = item.symbol || item.ticker_symbol || 'לא מוגדר';
+                let displayText = '';
+                
+                // Convert relatedTypeId to number for comparison
+                const typeId = parseInt(relatedTypeId);
+                
+                if (typeId === 2) {
+                    // עבור טרייד - צריך להתאים בדיוק לפורמט בטבלה: טרייד | טיקר | צד | סוג השקעה | תאריך
+                    // הפורמט בטבלה הוא: טרייד | AAPL | Long | swing | 15.8.2025 (בלי אייקון 🔗)
+                    let tickerSymbol = 'לא מוגדר';
+                    if (item.ticker_symbol) {
+                        tickerSymbol = item.ticker_symbol;
+                    } else if (item.ticker?.symbol) {
+                        tickerSymbol = item.ticker.symbol;
+                    } else if (item.ticker_id && window.tickersData) {
+                        const ticker = window.tickersData.find(t => t.id === item.ticker_id);
+                        if (ticker) {
+                            tickerSymbol = ticker.symbol || 'לא מוגדר';
+                        }
+                    }
+                    
+                    const side = item.side || 'לא מוגדר';
+                    const investmentType = item.investment_type || 'לא מוגדר';
+                    const date = item.created_at || item.opened_at || item.date;
+                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    displayText = `טרייד | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
+                } else if (typeId === 3) {
+                    // עבור תוכנית - צריך להתאים בדיוק לפורמט בטבלה: תוכנית | טיקר | צד | סוג השקעה | תאריך
+                    // הפורמט בטבלה הוא: תוכנית | TSLA | Short | passive | 15.8.2025 (בלי אייקון 🔗)
+                    let tickerSymbol = 'לא מוגדר';
+                    if (item.ticker?.symbol) {
+                        tickerSymbol = item.ticker.symbol;
+                    } else if (item.ticker_symbol) {
+                        tickerSymbol = item.ticker_symbol;
+                    } else if (item.ticker_id && window.tickersData) {
+                        const ticker = window.tickersData.find(t => t.id === item.ticker_id);
+                        if (ticker) {
+                            tickerSymbol = ticker.symbol || 'לא מוגדר';
+                        }
+                    }
+                    
+                    const side = item.side || 'לא מוגדר';
+                    const investmentType = item.investment_type || 'לא מוגדר';
                     const date = item.created_at || item.date;
-                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : '';
-                    displayText = `${symbol}${formattedDate ? ' - ' + formattedDate : ''}`;
-                } else if (relatedTypeId === 1) {
+                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    displayText = `תוכנית | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
+                } else if (typeId === 1) {
                     // עבור חשבון - שם + מטבע
-                    const currency = item.currency || 'ILS';
+                    const currency = item.currency_symbol || item.currency_name || item.currency?.symbol || item.currency || 'ILS';
                     displayText = `${item.name || 'לא מוגדר'} (${currency})`;
+                } else if (typeId === 4) {
+                    // עבור טיקר - סימבול + שם
+                    const symbol = item.symbol || 'לא מוגדר';
+                    const name = item.name ? ` - ${item.name}` : '';
+                    displayText = `${symbol}${name}`;
+                } else {
+                    // Fallback
+                    displayText = item[textField] || `ID: ${item.id}`;
                 }
                 
                 option.textContent = displayText;
@@ -1958,6 +3211,210 @@ class ModalManagerV2 {
             console.log(`✅ Populated alertRelatedObject with ${items.length} items for type ${relatedTypeId}`);
         } catch (error) {
             console.warn('⚠️ Error populating alert related objects:', error);
+        }
+    }
+
+    /**
+     * Populate note related objects select - מילוי select של אובייקטים מקושרים להערה
+     * Similar to populateAlertRelatedObjects but for notes
+     * 
+     * @param {HTMLElement} form - אלמנט הטופס
+     * @param {string} relatedTypeId - מזהה סוג הקישור (1=account, 2=trade, 3=trade_plan, 4=ticker)
+     * @param {number|null} selectedRelatedId - מזהה האובייקט שנבחר (לעריכה)
+     * @private
+     */
+    async populateNoteRelatedObjects(form, relatedTypeId, selectedRelatedId = null) {
+        const noteRelatedObjectField = form.querySelector('#noteRelatedObject');
+        if (!noteRelatedObjectField) return;
+        
+        try {
+            let endpoint = '';
+            let valueField = 'id';
+            let textField = 'name';
+            
+            switch (parseInt(relatedTypeId)) {
+                case 1: // account
+                    endpoint = '/api/trading-accounts/'; // Fixed: use hyphen instead of underscore
+                    valueField = 'id';
+                    textField = 'name';
+                    break;
+                case 2: // trade
+                    endpoint = '/api/trades/';
+                    valueField = 'id';
+                    textField = 'symbol';
+                    break;
+                case 3: // trade_plan
+                    endpoint = '/api/trade_plans/';
+                    valueField = 'id';
+                    textField = 'symbol';
+                    break;
+                case 4: // ticker
+                    endpoint = '/api/tickers/';
+                    valueField = 'id';
+                    textField = 'symbol';
+                    break;
+                default:
+                    return;
+            }
+            
+            console.log(`🔍 Fetching ${endpoint} for relatedTypeId ${relatedTypeId}`);
+            const response = await fetch(endpoint);
+            if (!response.ok) {
+                console.warn(`⚠️ Failed to fetch ${endpoint}: ${response.status} ${response.statusText}`);
+                return;
+            }
+            
+            const result = await response.json();
+            const items = result.data || result || [];
+            console.log(`📊 Received ${items.length} items from ${endpoint}`);
+            
+            // Debug: Log first item to see structure
+            if (items.length > 0 && (relatedTypeId === 2 || relatedTypeId === 3)) {
+                console.log(`🔍 [DEBUG] First item structure for type ${relatedTypeId}:`, items[0]);
+                console.log(`🔍 [DEBUG] Available fields in first item:`, Object.keys(items[0]));
+                console.log(`🔍 [DEBUG] ticker_id:`, items[0].ticker_id);
+                console.log(`🔍 [DEBUG] ticker object:`, items[0].ticker);
+                console.log(`🔍 [DEBUG] ticker_symbol:`, items[0].ticker_symbol);
+                console.log(`🔍 [DEBUG] side:`, items[0].side);
+                console.log(`🔍 [DEBUG] investment_type:`, items[0].investment_type);
+                console.log(`🔍 [DEBUG] created_at:`, items[0].created_at);
+                console.log(`🔍 [DEBUG] window.tickersData available:`, !!window.tickersData);
+                if (window.tickersData) {
+                    console.log(`🔍 [DEBUG] window.tickersData length:`, window.tickersData.length);
+                }
+            }
+            
+            // ניקוי ה-select
+            noteRelatedObjectField.innerHTML = '';
+            
+            // הוספת אופציה ריקה
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = 'בחר אובייקט...';
+            noteRelatedObjectField.appendChild(emptyOption);
+            
+            // הוספת כל האובייקטים
+            items.forEach((item, index) => {
+                const option = document.createElement('option');
+                option.value = item[valueField];
+                
+                // יצירת טקסט תצוגה מתאים
+                let displayText = '';
+                
+                // Convert relatedTypeId to number for comparison
+                const typeId = parseInt(relatedTypeId);
+                
+                if (typeId === 2) {
+                    // עבור טרייד - צריך להתאים בדיוק לפורמט בטבלה: טרייד | טיקר | צד | סוג השקעה | תאריך
+                    // הפורמט בטבלה הוא: טרייד | AAPL | Long | swing | 15.8.2025 (בלי אייקון 🔗)
+                    // צריך לקבל את הטיקר מתוך item.ticker_id או item.ticker
+                    let tickerSymbol = 'לא מוגדר';
+                    if (item.ticker_symbol) {
+                        tickerSymbol = item.ticker_symbol;
+                        console.log(`🔍 [DEBUG] Trade ${index}: Using ticker_symbol = ${tickerSymbol}`);
+                    } else if (item.ticker?.symbol) {
+                        tickerSymbol = item.ticker.symbol;
+                        console.log(`🔍 [DEBUG] Trade ${index}: Using item.ticker.symbol = ${tickerSymbol}`);
+                    } else if (item.ticker_id && window.tickersData) {
+                        // נסה למצוא את הטיקר מתוך window.tickersData
+                        const ticker = window.tickersData.find(t => t.id === item.ticker_id);
+                        if (ticker) {
+                            tickerSymbol = ticker.symbol || 'לא מוגדר';
+                            console.log(`🔍 [DEBUG] Trade ${index}: Found ticker in window.tickersData: ${tickerSymbol}`);
+                        } else {
+                            console.warn(`⚠️ [DEBUG] Trade ${index}: ticker_id=${item.ticker_id} but not found in window.tickersData`);
+                        }
+                    } else {
+                        console.warn(`⚠️ [DEBUG] Trade ${index}: No ticker symbol found. ticker_id=${item.ticker_id}, ticker_symbol=${item.ticker_symbol}, ticker=${item.ticker}`);
+                    }
+                    
+                    const side = item.side || 'לא מוגדר';
+                    const investmentType = item.investment_type || 'לא מוגדר';
+                    const date = item.created_at || item.opened_at || item.date;
+                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    displayText = `טרייד | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
+                    
+                    if (index < 3) { // Log only first 3 for debugging
+                        console.log(`🔍 [DEBUG] Trade ${index} display text: "${displayText}"`);
+                    }
+                } else if (typeId === 3) {
+                    // עבור תוכנית - צריך להתאים בדיוק לפורמט בטבלה: תוכנית | טיקר | צד | סוג השקעה | תאריך
+                    // הפורמט בטבלה הוא: תוכנית | TSLA | Short | passive | 15.8.2025 (בלי אייקון 🔗)
+                    // צריך לקבל את הטיקר מתוך item.ticker_id או item.ticker
+                    let tickerSymbol = 'לא מוגדר';
+                    if (item.ticker?.symbol) {
+                        tickerSymbol = item.ticker.symbol;
+                        console.log(`🔍 [DEBUG] TradePlan ${index}: Using item.ticker.symbol = ${tickerSymbol}`);
+                    } else if (item.ticker_symbol) {
+                        tickerSymbol = item.ticker_symbol;
+                        console.log(`🔍 [DEBUG] TradePlan ${index}: Using ticker_symbol = ${tickerSymbol}`);
+                    } else if (item.ticker_id && window.tickersData) {
+                        // נסה למצוא את הטיקר מתוך window.tickersData
+                        const ticker = window.tickersData.find(t => t.id === item.ticker_id);
+                        if (ticker) {
+                            tickerSymbol = ticker.symbol || 'לא מוגדר';
+                            console.log(`🔍 [DEBUG] TradePlan ${index}: Found ticker in window.tickersData: ${tickerSymbol}`);
+                        } else {
+                            console.warn(`⚠️ [DEBUG] TradePlan ${index}: ticker_id=${item.ticker_id} but not found in window.tickersData`);
+                        }
+                    } else {
+                        console.warn(`⚠️ [DEBUG] TradePlan ${index}: No ticker symbol found. ticker_id=${item.ticker_id}, ticker_symbol=${item.ticker_symbol}, ticker=${item.ticker}`);
+                    }
+                    
+                    const side = item.side || 'לא מוגדר';
+                    const investmentType = item.investment_type || 'לא מוגדר';
+                    const date = item.created_at || item.date;
+                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    displayText = `תוכנית | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
+                    
+                    if (index < 3) { // Log only first 3 for debugging
+                        console.log(`🔍 [DEBUG] TradePlan ${index} display text: "${displayText}"`);
+                    }
+                } else if (typeId === 1) {
+                    // עבור חשבון - שם + מטבע
+                    // TradingAccount.to_dict() מחזיר: name, currency_symbol או currency
+                    const currency = item.currency_symbol || item.currency_name || item.currency?.symbol || item.currency || 'ILS';
+                    displayText = `${item.name || 'לא מוגדר'} (${currency})`;
+                } else if (typeId === 4) {
+                    // עבור טיקר - סימבול + שם
+                    const symbol = item.symbol || 'לא מוגדר';
+                    const name = item.name ? ` - ${item.name}` : '';
+                    displayText = `${symbol}${name}`;
+                } else {
+                    // Fallback
+                    displayText = item[textField] || `ID: ${item.id}`;
+                }
+                
+                option.textContent = displayText;
+                if (selectedRelatedId && item[valueField] == selectedRelatedId) {
+                    option.selected = true;
+                }
+                noteRelatedObjectField.appendChild(option);
+            });
+            
+            console.log(`✅ Populated noteRelatedObject with ${items.length} items for type ${relatedTypeId}`);
+            
+            // Debug: Check what was actually added to the select
+            const allOptions = noteRelatedObjectField.querySelectorAll('option');
+            console.log(`🔍 [DEBUG] Total options in select: ${allOptions.length}`);
+            console.log(`🔍 [DEBUG] First 3 options text:`, Array.from(allOptions).slice(0, 3).map(opt => opt.textContent));
+            
+            // Debug: Compare with what's displayed in the table
+            if (window.getRelatedObjectDisplay && relatedTypeId === 2) {
+                console.log(`🔍 [DEBUG] Comparing with table display for first trade...`);
+                const firstTrade = items[0];
+                if (firstTrade) {
+                    const tableDisplay = window.getRelatedObjectDisplay(
+                        { related_type_id: 2, related_id: firstTrade.id },
+                        { trades: [firstTrade], tickers: window.tickersData || [] },
+                        { showLink: true, format: 'full' }
+                    );
+                    console.log(`🔍 [DEBUG] Table display (with 🔗):`, tableDisplay.display);
+                    console.log(`🔍 [DEBUG] Dropdown display (first option):`, allOptions[1]?.textContent || 'N/A');
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ Error populating note related objects:', error);
         }
     }
 
@@ -2022,42 +3479,47 @@ class ModalManagerV2 {
 
 // Helper function for easier onclick handlers - created IMMEDIATELY when script loads (before DOMContentLoaded)
 // This ensures it's available for onclick handlers in HTML
-window.showModalSafe = async function(modalId, mode = 'add') {
-    try {
-        console.log(`🔍 [showModalSafe] Called with:`, { modalId, mode, ModalManagerV2Available: !!window.ModalManagerV2 });
-        
-        // אם ModalManagerV2 לא זמין, ננסה לחכות קצת
-        if (!window.ModalManagerV2) {
-            console.warn('⚠️ [showModalSafe] ModalManagerV2 not available, waiting...');
-            // נחכה עד 2 שניות ל-ModalManagerV2
-            for (let i = 0; i < 20; i++) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                if (window.ModalManagerV2) {
-                    console.log(`✅ [showModalSafe] ModalManagerV2 became available after ${(i + 1) * 100}ms`);
-                    break;
+// showModalSafe helper function - only define if not already defined
+if (typeof window.showModalSafe === 'undefined') {
+    window.showModalSafe = async function(modalId, mode = 'add') {
+        try {
+            console.log(`🔍 [showModalSafe] Called with:`, { modalId, mode, ModalManagerV2Available: !!window.ModalManagerV2 });
+            
+            // אם ModalManagerV2 לא זמין, ננסה לחכות קצת
+            if (!window.ModalManagerV2) {
+                console.warn('⚠️ [showModalSafe] ModalManagerV2 not available, waiting...');
+                // נחכה עד 2 שניות ל-ModalManagerV2
+                for (let i = 0; i < 20; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    if (window.ModalManagerV2) {
+                        console.log(`✅ [showModalSafe] ModalManagerV2 became available after ${(i + 1) * 100}ms`);
+                        break;
+                    }
                 }
             }
-        }
-        
-        if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
-            console.log(`✅ [showModalSafe] Calling ModalManagerV2.showModal`);
-            await window.ModalManagerV2.showModal(modalId, mode);
-            console.log(`✅ [showModalSafe] Modal shown successfully`);
-        } else {
-            console.error('❌ [showModalSafe] ModalManagerV2 not available after wait');
+            
+            if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
+                console.log(`✅ [showModalSafe] Calling ModalManagerV2.showModal`);
+                await window.ModalManagerV2.showModal(modalId, mode);
+                console.log(`✅ [showModalSafe] Modal shown successfully`);
+            } else {
+                console.error('❌ [showModalSafe] ModalManagerV2 not available after wait');
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+                }
+            }
+        } catch (error) {
+            console.error('❌ [showModalSafe] Error showing modal:', error);
+            console.error('   Error stack:', error.stack);
             if (window.showErrorNotification) {
-                window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+                window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל: ${error.message}`);
             }
         }
-    } catch (error) {
-        console.error('❌ [showModalSafe] Error showing modal:', error);
-        console.error('   Error stack:', error.stack);
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל: ${error.message}`);
-        }
-    }
-};
-console.log('✅ [showModalSafe] Helper function created immediately');
+    };
+    console.log('✅ [showModalSafe] Helper function created');
+} else {
+    console.log('✅ [showModalSafe] Helper function already exists - skipping duplicate definition');
+}
 
 // אתחול אוטומטי כאשר הדף נטען
 document.addEventListener('DOMContentLoaded', () => {

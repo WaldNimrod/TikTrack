@@ -1,3 +1,9 @@
+// ===== LOADING TRACKING =====
+console.log('🟡 [data-basic.js] FILE LOADING STARTED');
+console.log('🟡 [data-basic.js] window.TABLE_COLUMN_MAPPINGS exists:', !!window.TABLE_COLUMN_MAPPINGS);
+console.log('🟡 [data-basic.js] window.getColumnValue exists:', typeof window.getColumnValue === 'function');
+console.log('🟡 [data-basic.js] window.tableMappings exists:', !!window.tableMappings);
+
 // ===== מיפוי עמודות לכל הטבלאות באתר =====
 // Table Column Mappings for All Tables
 //
@@ -86,33 +92,10 @@ const TABLE_COLUMN_MAPPINGS = {
     'created_at',            // 13 - Created At
   ],
 
-  // טבלת חשבונות (Accounts) - Database Display Page Structure
-  'accounts': [
-    'id',                    // 0 - ID
-    'name',                  // 1 - Name
-    'currency_id',           // 2 - Currency ID
-    'status',                // 3 - Status
-    // 'cash_balance' removed - calculated in real-time via AccountActivityService
-    'total_value',           // 5 - Total Value
-    'total_pl',              // 6 - Total P&L
-    'notes',                 // 7 - Notes
-    'created_at',            // 8 - Created At
-    'status_default',        // 9 - Status Default
-  ],
-
-  // טבלת חשבונות מסחר (Trading Accounts) - Trading Accounts Page Structure
-  'trading_accounts': [
-    'id',                    // 0 - ID
-    'name',                  // 1 - Name
-    'currency_id',           // 2 - Currency ID
-    'status',                // 3 - Status
-    // 'cash_balance' removed - calculated in real-time via AccountActivityService
-    'total_value',           // 5 - Total Value
-    'total_pl',              // 6 - Total P&L
-    'notes',                 // 7 - Notes
-    'created_at',            // 8 - Created At
-    'status_default',        // 9 - Status Default
-  ],
+  // טבלת חשבונות מסחר (Trading Accounts) - REMOVED
+  // Note: This mapping has been moved to table-mappings.js as the authoritative source
+  // The correct mapping for UI tables is: name, currency_id, cash_balance, positions_count, total_pl, status
+  // This file should NOT contain trading_accounts mapping - it's handled by table-mappings.js
 
   // טבלת טיקרים (Tickers) - Original structure
   'tickers': [
@@ -381,7 +364,10 @@ const TABLE_COLUMN_MAPPINGS = {
  */
 function getColumnValue(item, columnIndex, tableType) {
   // console.log(`🔍 [table-mappings.js] getColumnValue called: tableType=${tableType}, columnIndex=${columnIndex}`);
-  const columns = TABLE_COLUMN_MAPPINGS[tableType] || [];
+  // CRITICAL: Use window.TABLE_COLUMN_MAPPINGS (from table-mappings.js) if available, otherwise fallback to local
+  // This ensures table-mappings.js is the authoritative source for all mappings
+  const mappingsSource = window.TABLE_COLUMN_MAPPINGS || TABLE_COLUMN_MAPPINGS;
+  const columns = mappingsSource[tableType] || [];
   const fieldName = columns[columnIndex];
   // console.log(`🔍 [table-mappings.js] columns:`, columns);
   // console.log(`🔍 [table-mappings.js] fieldName:`, fieldName);
@@ -393,7 +379,9 @@ function getColumnValue(item, columnIndex, tableType) {
   }
 
   // Database Display Page - Direct field mapping
-  if (tableType === 'trade_plans' || tableType === 'trades' || tableType === 'accounts' || tableType === 'trading_accounts' ||
+  // Note: 'accounts' removed - only 'trading_accounts' exists in the system
+  // Note: 'trading_accounts' is now handled by table-mappings.js exclusively
+  if (tableType === 'trade_plans' || tableType === 'trades' ||
         tableType === 'tickers' || tableType === 'notes' ||
         tableType === 'executions' || tableType === 'cash_flows' || tableType === 'alerts' ||
         tableType === 'db_extradata' || tableType === 'db_display' || tableType === 'constraints' || tableType === 'preferences') {
@@ -806,23 +794,6 @@ function getTableConfig(tableName) {
           cell: 'table-cell'
         }
       },
-      'accounts': {
-        id: 'accounts-table',
-        title: 'Accounts Table',
-        columns: ['id', 'name', 'currency', 'balance', 'status'],
-        sortable: true,
-        filterable: true,
-        pageable: true,
-        pageSize: 20,
-        defaultSort: { column: 'name', direction: 'asc' },
-        css: {
-          container: 'table-container',
-          header: 'table-header',
-          body: 'table-body',
-          row: 'table-row',
-          cell: 'table-cell'
-        }
-      },
       'tickers': {
         id: 'tickers-table',
         title: 'Tickers Table',
@@ -996,54 +967,6 @@ function getColumnDefinition(tableName, columnName) {
           width: '150px',
           align: 'center',
           format: 'datetime'
-        }
-      },
-      'accounts': {
-        'id': {
-          title: 'ID',
-          type: 'number',
-          sortable: true,
-          filterable: true,
-          width: '80px',
-          align: 'center',
-          format: 'number'
-        },
-        'name': {
-          title: 'Name',
-          type: 'string',
-          sortable: true,
-          filterable: true,
-          width: '200px',
-          align: 'left',
-          format: 'text'
-        },
-        'currency': {
-          title: 'Currency',
-          type: 'string',
-          sortable: true,
-          filterable: true,
-          width: '100px',
-          align: 'center',
-          format: 'text'
-        },
-        'balance': {
-          title: 'Balance',
-          type: 'number',
-          sortable: true,
-          filterable: false,
-          width: '120px',
-          align: 'right',
-          format: 'currency'
-        },
-        'status': {
-          title: 'Status',
-          type: 'string',
-          sortable: true,
-          filterable: true,
-          width: '100px',
-          align: 'center',
-          format: 'status',
-          options: ['Active', 'Inactive', 'Suspended']
         }
       },
       'tickers': {
@@ -1342,29 +1265,54 @@ function setColumnDefinition(tableName, columnName, definition) {
 // ===== ייצוא הפונקציות והמיפויים =====
 // Export functions and mappings to global scope
 //
+// ⚠️ CRITICAL: This file contains OLD/LEGACY mappings for database display pages only.
+// For UI table sorting, use table-mappings.js which has the correct mappings.
+//
 // These functions are made available globally for use by other scripts.
 // All table-related scripts depend on these functions being available.
+//
+// IMPORTANT: Do NOT override table-mappings.js if it's already loaded!
+// table-mappings.js is the authoritative source for UI table mappings.
 
-window.TABLE_COLUMN_MAPPINGS = TABLE_COLUMN_MAPPINGS;
-window.getColumnValue = getColumnValue;
-window.getTableMapping = getTableMapping;
-window.isTableSupported = isTableSupported;
-window.getTableConfig = getTableConfig;
-window.getColumnDefinition = getColumnDefinition;
-window.setTableConfig = setTableConfig;
-window.setColumnDefinition = setColumnDefinition;
+// Only export if table-mappings.js hasn't already set these (table-mappings.js should load first)
+if (!window.TABLE_COLUMN_MAPPINGS || Object.keys(window.TABLE_COLUMN_MAPPINGS).length === 0) {
+  window.TABLE_COLUMN_MAPPINGS = TABLE_COLUMN_MAPPINGS;
+  console.warn('⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!');
+} else {
+  // table-mappings.js already loaded - don't override, but merge any missing mappings
+  // This is for database display pages that might need the legacy mappings
+  console.log('✅ [data-basic.js] table-mappings.js already loaded - preserving existing mappings');
+}
 
-// ייצוא המודול עצמו
-window.tableMappings = {
-  TABLE_COLUMN_MAPPINGS,
-  getColumnValue,
-  getTableMapping,
-  isTableSupported,
-  getTableConfig,
-  getColumnDefinition,
-  setTableConfig,
-  setColumnDefinition,
-};
+// CRITICAL: Only export getColumnValue if table-mappings.js hasn't already set it
+// table-mappings.js exports window.getColumnValue directly (not window.tableMappings.getColumnValue)
+// So we check window.getColumnValue directly to prevent overriding the correct implementation
+if (typeof window.getColumnValue !== 'function') {
+  window.getColumnValue = getColumnValue;
+  window.getTableMapping = getTableMapping;
+  window.isTableSupported = isTableSupported;
+  window.getTableConfig = getTableConfig;
+  window.getColumnDefinition = getColumnDefinition;
+  window.setTableConfig = setTableConfig;
+  window.setColumnDefinition = setColumnDefinition;
+
+  // ייצוא המודול עצמו (only if table-mappings.js hasn't set these)
+  if (!window.tableMappings) {
+    window.tableMappings = {
+      TABLE_COLUMN_MAPPINGS: window.TABLE_COLUMN_MAPPINGS || TABLE_COLUMN_MAPPINGS,
+      getColumnValue,
+      getTableMapping,
+      isTableSupported,
+      getTableConfig,
+      getColumnDefinition,
+      setTableConfig,
+      setColumnDefinition,
+    };
+  }
+} else {
+  // table-mappings.js already loaded - preserve its mappings
+  console.log('✅ [data-basic.js] table-mappings.js already loaded - preserving existing window.getColumnValue');
+}
 
 // Table Mappings loaded successfully
 
@@ -1464,7 +1412,7 @@ window.tableMappings = {
  *
  * Restore previous sort:
  * ```javascript
- * restoreAnyTableSort('accounts', accountsData, updateAccountsTable);
+ * restoreAnyTableSort('trading_accounts', trading_accountsData, updateTradingAccountsTable);
  * ```
  *
  * Get default columns:
@@ -1500,7 +1448,7 @@ window.tableMappings = {
  *
  * @param {number} columnIndex - Index of column to sort by
  * @param {Array} data - Data array to sort
- * @param {string} tableType - Type of table (trades, accounts, alerts, etc.)
+ * @param {string} tableType - Type of table (trades, trading_accounts, alerts, etc.)
  * @param {Function} updateFunction - Function to call with sorted data
  * @returns {Array} Sorted data array
  */
@@ -1619,120 +1567,18 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
   return null; // No custom logic applies - use standard sorting
 }
 
-window.sortTableData = async function (columnIndex, data, tableType, updateFunction) {
-  // Global sortTableData called for table
-
-  // Get current sort state
-  const currentSortState = await window.getSortState(tableType);
-
-  // Determine new sort direction
-  let newDirection = 'asc';
-  if (currentSortState.columnIndex === columnIndex) {
-    // If same column - toggle direction
-    newDirection = currentSortState.direction === 'asc' ? 'desc' : 'asc';
-  }
-
-  // Save new sort state
-  window.saveSortState(tableType, columnIndex, newDirection);
-
-  // Sort the data with custom logic for specific table types
-  const sortedData = [...data].sort((a, b) => {
-    // Primary sort by current column
-    let aValue = getColumnValue(a, columnIndex, tableType);
-    let bValue = getColumnValue(b, columnIndex, tableType);
-
-    // Custom sorting logic for specific table types and columns
-    const customSortResult = getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue);
-    if (customSortResult !== null) {
-      const primaryResult = newDirection === 'asc' ? customSortResult : -customSortResult;
-      if (primaryResult !== 0) return primaryResult;
-    } else {
-      // Standard sorting logic
-      // Handle -Infinity values (missing data should be smallest)
-      if (aValue === -Infinity && bValue === -Infinity) {
-        return 0;
-      }
-      if (aValue === -Infinity) {
-        return newDirection === 'asc' ? -1 : 1; // -Infinity is always smallest
-      }
-      if (bValue === -Infinity) {
-        return newDirection === 'asc' ? 1 : -1; // -Infinity is always smallest
-      }
-
-      // Convert to numbers if possible
-      if (!isNaN(aValue) && !isNaN(bValue)) {
-        aValue = parseFloat(aValue);
-        bValue = parseFloat(bValue);
-      }
-
-      // Convert to dates if possible
-      if (isDateValue(aValue) && isDateValue(bValue)) {
-        aValue = new Date(aValue);
-        bValue = new Date(bValue);
-      }
-
-      // Perform sort comparison
-      if (aValue < bValue) {
-        return newDirection === 'asc' ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return newDirection === 'asc' ? 1 : -1;
-      }
-    }
-
-    // Secondary sort by previous column if exists
-    if (currentSortState.columnIndex !== null && currentSortState.columnIndex !== columnIndex) {
-      const prevColumnIndex = currentSortState.columnIndex;
-      const prevDirection = currentSortState.direction;
-      
-      let aPrevValue = getColumnValue(a, prevColumnIndex, tableType);
-      let bPrevValue = getColumnValue(b, prevColumnIndex, tableType);
-
-      // Custom sorting logic for previous column
-      const prevCustomSortResult = getCustomSortValue(a, b, prevColumnIndex, tableType, aPrevValue, bPrevValue);
-      if (prevCustomSortResult !== null) {
-        return prevDirection === 'asc' ? prevCustomSortResult : -prevCustomSortResult;
-      }
-
-      // Standard sorting logic for previous column
-      // Convert to numbers if possible
-      if (!isNaN(aPrevValue) && !isNaN(bPrevValue)) {
-        aPrevValue = parseFloat(aPrevValue);
-        bPrevValue = parseFloat(bPrevValue);
-      }
-
-      // Convert to dates if possible
-      if (isDateValue(aPrevValue) && isDateValue(bPrevValue)) {
-        aPrevValue = new Date(aPrevValue);
-        bPrevValue = new Date(bPrevValue);
-      }
-
-      // Perform secondary sort comparison
-      if (aPrevValue < bPrevValue) {
-        return prevDirection === 'asc' ? -1 : 1;
-      }
-      if (aPrevValue > bPrevValue) {
-        return prevDirection === 'asc' ? 1 : -1;
-      }
-    }
-
-    return 0;
-  });
-
-
-  // Update the table
-  if (typeof updateFunction === 'function') {
-    updateFunction(sortedData);
-  } else {
-    console.warn(`⚠️ [SORT] updateFunction is not a function:`, typeof updateFunction);
-  }
-
-  // Update sort icons
-  updateSortIcons(tableType, columnIndex, newDirection);
-
-  // Table sorted by column
-  return sortedData;
-};
+// REMOVED: window.sortTableData - This function is now defined in tables.js as the authoritative source
+// The tables.js version includes critical recursion protection (window._sortTableDataInProgress)
+// and proper event handler disabling during table updates to prevent infinite recursion.
+// This duplicate async version was causing Maximum call stack size exceeded errors because:
+// 1. It lacked recursion protection
+// 2. It was overriding the correct implementation from tables.js
+// 3. It was being called by UnifiedTableSystem which expected the sync version with recursion guards
+//
+// If you need to use sortTableData, always use window.sortTableData from tables.js:
+// window.sortTableData(columnIndex, data, tableType, updateFunction)
+//
+// Note: window.getSortState is synchronous (reads from localStorage), so async/await is not needed
 
 /**
  * Update sort icons in table headers
@@ -1874,6 +1720,16 @@ window.sortAnyTable = async function (tableType, columnIndex, data, updateFuncti
 };
 
 /**
+ * ===== OLD CODE - REPLACED BY tables.js =====
+ * 
+ * This function has been REPLACED by the newer version in tables.js which includes:
+ * - UnifiedTableSystem integration
+ * - Better error handling
+ * - Support for positions/portfolio tables
+ * 
+ * DO NOT USE - This code is kept for reference only and will be removed in the future.
+ * The new window.sortTable is defined in tables.js and loads after this file, so it overrides this one.
+ * 
  * Legacy compatibility wrapper for table sorting
  *
  * @param {string|number} tableTypeOrColumnIndex - Type of table OR column index
@@ -1882,6 +1738,8 @@ window.sortAnyTable = async function (tableType, columnIndex, data, updateFuncti
  * @param {Function} updateFunction - Update function (optional)
  * @returns {Array} Sorted data
  */
+// ===== COMMENTED OUT - REPLACED BY tables.js =====
+/*
 window.sortTable = async function (tableTypeOrColumnIndex, columnIndex, dataArray, updateFunction) {
   // Handle legacy call with only column index
   if (typeof tableTypeOrColumnIndex === 'number' && arguments.length === 1) {
@@ -1916,9 +1774,13 @@ window.sortTable = async function (tableTypeOrColumnIndex, columnIndex, dataArra
           console.warn('⚠️ updateTickersTable function not available');
         }
       };
-    } else if (tableType === 'accounts' && window.accountsData) {
-      tableData = window.accountsData;
-      updateFn = (sortedData) => window.updateAccountsTableMain(sortedData);
+    } else if (tableType === 'trading_accounts' && window.trading_accountsData) {
+      tableData = window.trading_accountsData;
+      updateFn = (sortedData) => {
+        if (typeof window.updateTradingAccountsTable === 'function') {
+          window.updateTradingAccountsTable(sortedData);
+        }
+      };
     } else if (tableType === 'cash_flows' && window.cashFlowsData) {
       tableData = window.cashFlowsData;
       updateFn = (sortedData) => window.updateCashFlowsTable(sortedData);
@@ -1951,7 +1813,7 @@ window.sortTable = async function (tableTypeOrColumnIndex, columnIndex, dataArra
       console.warn(`❌ [SORT] Available data:`, {
         executionsData: !!window.executionsData,
         tickersData: !!window.tickersData,
-        accountsData: !!window.accountsData,
+        trading_accountsData: !!window.trading_accountsData,
         cashFlowsData: !!window.cashFlowsData,
         alertsData: !!window.alertsData,
         notesData: !!window.notesData,
@@ -1982,6 +1844,8 @@ window.sortTable = async function (tableTypeOrColumnIndex, columnIndex, dataArra
   // Handle new call with all parameters
   return await window.sortTableData(columnIndex, dataArray, tableTypeOrColumnIndex, updateFunction);
 };
+*/
+// ===== END OLD CODE =====
 
 /**
  * Restore previous sort state for any table
@@ -2116,6 +1980,8 @@ window.tables = {
   setSortState: window.setSortState,
   updateSortIcons: window.updateSortIcons,
   sortAnyTable: window.sortAnyTable,
+  // NOTE: window.sortTable is now defined in tables.js (loads after this file)
+  // It will be undefined here until tables.js loads, which is fine
   sortTable: window.sortTable,
   restoreAnyTableSort: window.restoreAnyTableSort,
   applyDefaultSort: window.applyDefaultSort,
@@ -2124,8 +1990,9 @@ window.tables = {
   getDefaultColumnDefs: window.getDefaultColumnDefs,
 };
 
-// ייצוא פונקציית sortTable גלובלית
-window.sortTable = sortTable;
+// NOTE: window.sortTable is defined in tables.js (loads after this file)
+// DO NOT redefine it here - it will cause conflicts
+// The tables.js file properly exports window.sortTable
 
 // ייצוא closeModalGlobal ככינוי ל-closeModal
 window.closeModalGlobal = window.closeModal;
@@ -2163,7 +2030,6 @@ window.loadTableData = async function(tableType, updateFunction, options = {}) {
     const apiEndpoints = {
       'tickers': '/api/tickers/',
       'executions': '/api/executions/',
-      'accounts': '/api/trading-accounts/',
       'trading_accounts': '/api/trading-accounts/',
       'alerts': '/api/alerts/',
       'notes': '/api/notes/',

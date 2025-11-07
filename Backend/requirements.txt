@@ -42,4 +42,6 @@ schedule==1.2.0
 pytz==2023.3
 yfinance==0.2.18
 
+# HTML sanitization for rich text content
+bleach==6.1.0
 

@@ -23,6 +23,15 @@ import re
 import logging
 
 
+try:
+    import bleach  # type: ignore
+except ImportError:  # pragma: no cover - bleach is optional dependency
+    bleach = None
+
+
+logger = logging.getLogger(__name__)
+
+
 class BaseEntityUtils:
     """Utility functions for API modules"""
     
@@ -171,6 +180,65 @@ class BaseEntityUtils:
         
         return sanitized
     
+    @staticmethod
+    def sanitize_rich_text(html_content: Optional[str]) -> str:
+        """Sanitize rich text HTML content while keeping allowed formatting"""
+        if not html_content:
+            return ''
+
+        # If bleach is unavailable, fall back to basic sanitization
+        if bleach is None:
+            logger.warning("⚠️ Using basic HTML sanitization (bleach not available)")
+            # Remove script/style blocks and inline event handlers
+            html_content = re.sub(r'<script[^>]*>.*?</script>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
+            html_content = re.sub(r'<style[^>]*>.*?</style>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
+            html_content = re.sub(r'on\w+="[^"]*"', '', html_content, flags=re.IGNORECASE)
+            html_content = re.sub(r"on\w+='[^']*'", '', html_content, flags=re.IGNORECASE)
+            return html_content
+
+        # When bleach is available, use curated allowlists
+        allowed_tags = [
+            'p', 'br', 'strong', 'em', 'u', 's', 'h2', 'h3',
+            'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre',
+            'span'
+        ]
+
+        allowed_attrs = {
+            'a': ['href', 'target', 'rel'],
+            'span': ['style', 'class', 'dir'],
+            'p': ['style', 'class', 'dir'],
+            'h2': ['style', 'class', 'dir'],
+            'h3': ['style', 'class', 'dir'],
+            'ul': ['style', 'class', 'dir'],
+            'ol': ['style', 'class', 'dir'],
+            'li': ['style', 'class', 'dir'],
+            'blockquote': ['style', 'class', 'dir'],
+            'code': ['style', 'class'],
+            'pre': ['style', 'class']
+        }
+
+        allowed_styles = [
+            'color', 'background-color', 'text-align', 'direction',
+            'font-weight', 'font-style', 'text-decoration'
+        ]
+
+        try:
+            return bleach.clean(
+                html_content,
+                tags=allowed_tags,
+                attributes=allowed_attrs,
+                styles=allowed_styles,
+                strip=True
+            )
+        except Exception as exc:
+            logger.error(f"❌ Error sanitizing HTML content: {exc}")
+            # Fall back to basic sanitization if bleach fails unexpectedly
+            html_content = re.sub(r'<script[^>]*>.*?</script>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
+            html_content = re.sub(r'<style[^>]*>.*?</style>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
+            html_content = re.sub(r'on\w+="[^"]*"', '', html_content, flags=re.IGNORECASE)
+            html_content = re.sub(r"on\w+='[^']*'", '', html_content, flags=re.IGNORECASE)
+            return html_content
+
     @staticmethod
     def format_response(data: Any, message: str = None, status: str = "success") -> Dict:
         """

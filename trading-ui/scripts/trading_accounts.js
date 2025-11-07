@@ -2227,10 +2227,8 @@ async function saveTradingAccount() {
         
         const accountData = DataCollectionService.collectFormData({
             name: { id: 'accountName', type: 'text' },
-            number: { id: 'accountNumber', type: 'text' },
-            type: { id: 'accountType', type: 'text' },
-            currency: { id: 'accountCurrency', type: 'text' },
-            balance: { id: 'accountBalance', type: 'float', default: 0 },
+            currency_id: { id: 'accountCurrency', type: 'int' }, // currency_id הוא integer - ID של מטבע
+            opening_balance: { id: 'accountOpeningBalance', type: 'float', default: 0 },
             status: { id: 'accountStatus', type: 'text' },
             notes: { id: 'accountNotes', type: 'text', default: null }
         });
@@ -2244,21 +2242,7 @@ async function saveTradingAccount() {
             hasErrors = true;
         }
         
-        if (!accountData.number || accountData.number.trim() === '') {
-            if (window.showValidationWarning) {
-                window.showValidationWarning('accountNumber', 'מספר החשבון הוא שדה חובה');
-            }
-            hasErrors = true;
-        }
-        
-        if (!accountData.type) {
-            if (window.showValidationWarning) {
-                window.showValidationWarning('accountType', 'סוג החשבון הוא שדה חובה');
-            }
-            hasErrors = true;
-        }
-        
-        if (!accountData.currency) {
+        if (!accountData.currency_id || accountData.currency_id <= 0) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('accountCurrency', 'מטבע החשבון הוא שדה חובה');
             }
@@ -2272,6 +2256,15 @@ async function saveTradingAccount() {
             hasErrors = true;
         }
         
+        // ולידציה של ערכי status - רק open, closed, cancelled מותרים
+        const allowedStatuses = ['open', 'closed', 'cancelled'];
+        if (accountData.status && !allowedStatuses.includes(accountData.status)) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('accountStatus', 'סטטוס לא תקין. אפשרויות: פתוח, סגור, מבוטל');
+            }
+            hasErrors = true;
+        }
+        
         if (hasErrors) {
             return;
         }
@@ -2281,7 +2274,7 @@ async function saveTradingAccount() {
         const accountId = form.dataset.accountId;
         
         // Prepare API call
-        const url = isEdit ? `/api/trading_accounts/${accountId}` : '/api/trading_accounts';
+        const url = isEdit ? `/api/trading-accounts/${accountId}` : '/api/trading-accounts';
         const method = isEdit ? 'PUT' : 'POST';
         
         // Send to API
@@ -2299,7 +2292,7 @@ async function saveTradingAccount() {
                 modalId: 'tradingAccountsModal',
                 successMessage: 'חשבון מסחר עודכן בהצלחה',
                 entityName: 'חשבון מסחר',
-                reloadFn: window.loadTradingAccountsData,
+                reloadFn: window.loadTradingAccountsDataForTradingAccountsPage,
                 requiresHardReload: false
             });
         } else {
@@ -2307,7 +2300,7 @@ async function saveTradingAccount() {
                 modalId: 'tradingAccountsModal',
                 successMessage: 'חשבון מסחר נוסף בהצלחה',
                 entityName: 'חשבון מסחר',
-                reloadFn: window.loadTradingAccountsData,
+                reloadFn: window.loadTradingAccountsDataForTradingAccountsPage,
                 requiresHardReload: false
             });
         }
@@ -2376,7 +2369,7 @@ async function performTradingAccountDeletion(accountId) {
     try {
         // Clear cache before deletion to ensure fresh data after reload
         if (window.unifiedCacheManager) {
-            await window.unifiedCacheManager.clearByPattern('accounts-data');
+            await window.unifiedCacheManager.clearByPattern('trading-accounts-data');
             await window.unifiedCacheManager.clearByPattern('account-balance-*');
             await window.unifiedCacheManager.clearByPattern('account-activity-*');
         }
@@ -2423,10 +2416,178 @@ window.loadDefaultTradingAccounts = loadDefaultTradingAccounts;
 window.updateTradingAccountsTable = updateTradingAccountsTable;
 window.updateTradingAccountsSummary = updateTradingAccountsSummary;
 window.updateTradingAccountFilterDisplayText = updateTradingAccountFilterDisplayText;
-// REMOVED: window.showSuccessMessage - use window.showSuccessNotification from notification-system.js
+// REMOVED: window.showSuccessMessage - use window.showErrorNotification from notification-system.js
 // REMOVED: window.showErrorMessage - use window.showErrorNotification from notification-system.js
 window.confirmDeleteTradingAccount = confirmDeleteTradingAccount;
 window.showOpenTradesWarning = showOpenTradesWarning;
+
+// ===== UNIFIED TABLE SYSTEM REGISTRATION =====
+/**
+ * Register trading_accounts page tables with UnifiedTableSystem
+ * This should be called after all scripts are loaded
+ */
+window.registerTradingAccountsTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "trading_accounts" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register trading_accounts table
+    window.UnifiedTableSystem.registry.register('trading_accounts', {
+        dataGetter: () => {
+            return window.trading_accountsData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateTradingAccountsTable === 'function') {
+                window.updateTradingAccountsTable(data);
+            }
+        },
+        tableSelector: '#accountsTable',
+        columns: getColumns('trading_accounts'),
+        sortable: true,
+        filterable: true
+    });
+
+    // Register positions table
+    window.UnifiedTableSystem.registry.register('positions', {
+        dataGetter: () => {
+            return window.positionsPortfolioState?.positionsData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updatePositionsTable === 'function') {
+                window.updatePositionsTable(data);
+            }
+        },
+        tableSelector: '#positionsTable',
+        columns: getColumns('positions'),
+        sortable: true,
+        filterable: false
+    });
+
+    // Register portfolio table
+    window.UnifiedTableSystem.registry.register('portfolio', {
+        dataGetter: () => {
+            return window.positionsPortfolioState?.portfolioData?.positions || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updatePortfolioTable === 'function') {
+                window.updatePortfolioTable(data);
+            }
+        },
+        tableSelector: '#portfolioTable',
+        columns: getColumns('portfolio'),
+        sortable: true,
+        filterable: false
+    });
+
+    // Register account_activity table
+    // Note: This table uses a special data structure with currencies array
+    // We need to extract movements from all currencies for sorting
+    window.UnifiedTableSystem.registry.register('account_activity', {
+        dataGetter: () => {
+            // Extract movements from accountActivityState
+            if (window.accountActivityState && window.accountActivityState.activityData) {
+                const allMovements = [];
+                const data = window.accountActivityState.activityData;
+                if (data.currencies && Array.isArray(data.currencies)) {
+                    data.currencies.forEach(currency => {
+                        if (currency.movements && Array.isArray(currency.movements)) {
+                            currency.movements.forEach(movement => {
+                                allMovements.push({
+                                    ...movement,
+                                    currency_id: currency.currency_id,
+                                    currency_symbol: currency.currency_symbol
+                                });
+                            });
+                        }
+                    });
+                }
+                return allMovements;
+            }
+            return [];
+        },
+        updateFunction: (data) => {
+            // For account_activity, we need to reconstruct the currencies structure
+            // from sorted movements back to the original format
+            if (window.accountActivityState && window.accountActivityState.activityData) {
+                // Reconstruct the data structure from sorted movements
+                const activityData = { ...window.accountActivityState.activityData };
+                // Group movements back by currency
+                const currenciesMap = {};
+                data.forEach(movement => {
+                    const currencyId = movement.currency_id;
+                    if (!currenciesMap[currencyId]) {
+                        currenciesMap[currencyId] = {
+                            currency_id: currencyId,
+                            currency_symbol: movement.currency_symbol,
+                            movements: []
+                        };
+                    }
+                    currenciesMap[currencyId].movements.push(movement);
+                });
+                activityData.currencies = Object.values(currenciesMap);
+                // Call populateAccountActivityTable - now exported globally
+                if (typeof window.populateAccountActivityTable === 'function') {
+                    window.populateAccountActivityTable(activityData);
+                }
+            }
+        },
+        tableSelector: '#accountActivityTable',
+        columns: getColumns('account_activity'),
+        sortable: true,
+        filterable: false
+    });
+
+    window.Logger?.info('✅ Trading accounts tables registered with UnifiedTableSystem', { 
+        page: "trading_accounts",
+        tables: ['trading_accounts', 'account_activity', 'positions', 'portfolio']
+    });
+};
+
+// Auto-register when DOM is ready and UnifiedTableSystem is available
+async function waitAndRegisterTables() {
+    // Wait for UnifiedAppInitializer to finish
+    if (window.unifiedAppInit && !window.unifiedAppInit.initialized) {
+        // Wait up to 10 seconds for initialization
+        for (let i = 0; i < 100; i++) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            if (window.unifiedAppInit.initialized && window.UnifiedTableSystem) {
+                break;
+            }
+        }
+    }
+    
+    // Wait for UnifiedTableSystem specifically (it's loaded in crud package)
+    if (!window.UnifiedTableSystem) {
+        // Wait up to 5 seconds for UnifiedTableSystem
+        for (let i = 0; i < 50; i++) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            if (window.UnifiedTableSystem) {
+                break;
+            }
+        }
+    }
+    
+    // Now try to register
+    if (window.UnifiedTableSystem) {
+        window.registerTradingAccountsTables();
+    } else {
+        window.Logger?.error('❌ UnifiedTableSystem not available after waiting', { page: "trading_accounts" });
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        waitAndRegisterTables();
+    });
+} else {
+    waitAndRegisterTables();
+}
 window.filterTradingAccountsLocally = filterTradingAccountsLocally;
 window.updateTradingAccountFilterMenu = updateTradingAccountFilterMenu;
 window.getTradingAccountName = getTradingAccountName;

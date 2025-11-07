@@ -9,7 +9,7 @@ class Alert(BaseModel):
     
     # Fields that exist in the database
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
-    message = Column(String(500), nullable=True)
+    message = Column(String(5000), nullable=True)
     triggered_at = Column(DateTime, nullable=True)
     status = Column(String(20), default='open', nullable=True)
     is_triggered = Column(String(20), default='false', nullable=True)  # false, new, true
@@ -22,6 +22,9 @@ class Alert(BaseModel):
     # New condition linking fields
     plan_condition_id = Column(Integer, ForeignKey('plan_conditions.id'), nullable=True)
     trade_condition_id = Column(Integer, ForeignKey('trade_conditions.id'), nullable=True)
+    
+    # Expiry date field (DATE only, stored as VARCHAR(10) in YYYY-MM-DD format)
+    expiry_date = Column(String(10), nullable=True)  # NULL = no expiration
     
     # Relationships
     # ticker = relationship("Ticker", back_populates="alerts")  # Removed - not in database
@@ -112,7 +115,8 @@ class Alert(BaseModel):
             'condition_number': self.condition_number,
             'condition_display_text': self.get_condition_display_text(),
             'plan_condition_id': self.plan_condition_id,
-            'trade_condition_id': self.trade_condition_id
+            'trade_condition_id': self.trade_condition_id,
+            'expiry_date': self.expiry_date  # DATE in YYYY-MM-DD format, NULL if no expiration
         }
         
         # Determine related_type based on related_type_id

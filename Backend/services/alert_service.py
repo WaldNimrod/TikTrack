@@ -64,6 +64,9 @@ class AlertService:
             # Handle new condition fields
             AlertService._process_condition_fields(alert_data)
             
+            # Validate expiry_date format if provided
+            AlertService._validate_expiry_date(alert_data)
+            
             # Validate data against constraints
             logger.info("Validating alert data before creation")
             is_valid, errors = ValidationService.validate_data(db, 'alerts', alert_data)
@@ -99,11 +102,14 @@ class AlertService:
             # Convert related_type to related_type_id if exists
             if 'related_type' in alert_data:
                 related_type = alert_data.pop('related_type')
-                related_type_id = AlertService._get_relation_type_id(db, related_type)
+                related_type_id = AlertService._get_relation_type_id(db, related_type)                                                                          
                 alert_data['related_type_id'] = related_type_id
             
             # Handle new condition fields
             AlertService._process_condition_fields(alert_data)
+            
+            # Validate expiry_date format if provided
+            AlertService._validate_expiry_date(alert_data)
             
             # Validate data against constraints
             logger.info("Validating alert data before update")
@@ -400,6 +406,33 @@ class AlertService:
                 
         except Exception as e:
             logger.error(f"Error processing condition fields: {e}")
+            raise
+    
+    @staticmethod
+    def _validate_expiry_date(alert_data: Dict[str, Any]) -> None:
+        """Validate expiry_date format (YYYY-MM-DD) if provided"""
+        try:
+            if 'expiry_date' in alert_data and alert_data['expiry_date']:
+                expiry_date = alert_data['expiry_date']
+                
+                # Allow empty string or None (no expiration)
+                if expiry_date == '' or expiry_date is None:
+                    alert_data['expiry_date'] = None
+                    return
+                
+                # Validate format YYYY-MM-DD
+                import re
+                date_pattern = r'^\d{4}-\d{2}-\d{2}$'
+                if not re.match(date_pattern, expiry_date):
+                    raise ValueError(f"Invalid expiry_date format: {expiry_date}. Expected YYYY-MM-DD")
+                
+                # Validate that it's a valid date
+                try:
+                    datetime.strptime(expiry_date, '%Y-%m-%d')
+                except ValueError:
+                    raise ValueError(f"Invalid expiry_date value: {expiry_date}. Not a valid date")
+        except Exception as e:
+            logger.error(f"Error validating expiry_date: {e}")
             raise
     
     @staticmethod

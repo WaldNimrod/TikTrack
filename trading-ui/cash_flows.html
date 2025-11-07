@@ -270,10 +270,12 @@
 
     <!-- [24.5] Load Order: 24.5 -->
     <script src="scripts/modal-navigation-manager.js?v=0da3519a_20251102_104906"></script> <!-- מערכת ניווט מודולים מקוננים -->
+    <!-- [24.5.4] Load Order: 24.5.4 - CRITICAL: Must load before trade-selector-modal.js for window.createAndShowModal -->
+    <script src="scripts/modules/core-systems.js?v=0da3519a_20251102_104906"></script> <!-- מערכות ליבה - חובה לפני trade-selector-modal -->
     <!-- [24.5.5] Load Order: 24.5.5 - CRITICAL: Must load before modal-manager-v2.js -->
     <script src="scripts/modal-configs/cash-flows-config.js?v=0da3519a_20251102_104906"></script> <!-- קונפיגורציית מודל תזרימי מזומנים - חובה לפני ModalManagerV2 -->
     <!-- [24.5.6] Load Order: 24.5.6 - CRITICAL: Must load before modal-manager-v2.js for linkButton support -->
-    <script src="scripts/trade-plan-selector-modal.js?v=0da3519a_20251102_104906"></script> <!-- מודל בחירת טרייד/תוכנית - חובה לפני ModalManagerV2 -->
+    <script src="scripts/trade-selector-modal.js?v=0da3519a_20251102_104906"></script> <!-- מודל בחירת טרייד - חובה לפני ModalManagerV2 -->
     <!-- [24.5.7] Load Order: 24.5.7 - Debug tool for modal stacking issues -->
     <script src="scripts/debug-modal-stacking.js?v=0da3519a_20251102_104906"></script> <!-- כלי בדיקה לבעיות מודולים -->
     <!-- [24.6] Load Order: 24.6 -->

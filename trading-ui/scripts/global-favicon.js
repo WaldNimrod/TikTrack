@@ -52,7 +52,8 @@ function setPageSpecificFavicon(pageType = 'home') {
         'home': 'images/icons/favicon.ico',
         'linter': 'images/icons/development.svg',
         'js-map': 'images/icons/development.svg',
-        'accounts': 'images/icons/trading_accounts.svg',
+        'trading_accounts': 'images/icons/trading_accounts.svg',
+        'accounts': 'images/icons/trading_accounts.svg', // Legacy support for old URLs
         'alerts': 'images/icons/alerts.svg',
         'cash-flows': 'images/icons/cash_flows.svg',
         'executions': 'images/icons/executions.svg',
@@ -78,7 +79,8 @@ function autoSetFavicon() {
         'index': 'home',
         'linter-realtime-monitor': 'linter',
         'js-map': 'js-map',
-        'accounts': 'accounts',
+        'trading_accounts': 'trading_accounts',
+        'accounts': 'trading_accounts', // Legacy support for old URLs
         'alerts': 'alerts',
         'cash-flows': 'cash-flows',
         'executions': 'executions',

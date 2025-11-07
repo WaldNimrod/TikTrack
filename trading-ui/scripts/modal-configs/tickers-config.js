@@ -18,13 +18,16 @@ const tickersModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
+        // שורה ראשונה: סמל הטיקר + שם החברה
         {
             type: 'text',
             id: 'tickerSymbol',
             label: 'סמל הטיקר',
             required: true,
             placeholder: 'הכנס סמל טיקר (למשל: AAPL)',
-            maxLength: 10
+            maxLength: 10,
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'text',
@@ -32,8 +35,11 @@ const tickersModalConfig = {
             label: 'שם החברה',
             required: true,
             placeholder: 'הכנס שם החברה',
-            maxLength: 100
+            maxLength: 100,
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה שנייה: סוג הטיקר + מטבע
         {
             type: 'select',
             id: 'tickerType',
@@ -41,81 +47,57 @@ const tickersModalConfig = {
             required: true,
             options: [
                 { value: 'stock', label: 'מניה' },
-                { value: 'etf', label: 'קרן נסחרת (ETF)' },
-                { value: 'bond', label: 'אג"ח' },
-                { value: 'commodity', label: 'סחורה' },
-                { value: 'crypto', label: 'מטבע קריפטו' },
-                { value: 'forex', label: 'מט"ח' },
-                { value: 'index', label: 'מדד' }
+                { value: 'etf', label: 'קרן נאמנות (ETF)' },
+                { value: 'crypto', label: 'מטבע דיגיטלי' },
+                { value: 'forex', label: 'מטבע חוץ' },
+                { value: 'commodity', label: 'סחורה' }
             ],
-            defaultValue: 'stock'
-        },
-        {
-            type: 'select',
-            id: 'tickerExchange',
-            label: 'בורסה',
-            required: true,
-            options: [
-                { value: 'NYSE', label: 'NYSE (ניו יורק)' },
-                { value: 'NASDAQ', label: 'NASDAQ' },
-                { value: 'AMEX', label: 'AMEX' },
-                { value: 'OTC', label: 'OTC' },
-                { value: 'TSX', label: 'TSX (טורונטו)' },
-                { value: 'LSE', label: 'LSE (לונדון)' },
-                { value: 'TASE', label: 'תל אביב' },
-                { value: 'CRYPTO', label: 'בורסות קריפטו' },
-                { value: 'FOREX', label: 'מט"ח' }
-            ],
-            defaultValue: 'NYSE'
+            defaultValue: 'stock',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'select',
             id: 'tickerCurrency',
             label: 'מטבע',
             required: true,
-            options: [
-                { value: 'USD', label: 'דולר אמריקאי (USD)' },
-                { value: 'EUR', label: 'יורו (EUR)' },
-                { value: 'GBP', label: 'לירה שטרלינג (GBP)' },
-                { value: 'ILS', label: 'שקל ישראלי (ILS)' },
-                { value: 'JPY', label: 'ין יפני (JPY)' },
-                { value: 'CAD', label: 'דולר קנדי (CAD)' },
-                { value: 'AUD', label: 'דולר אוסטרלי (AUD)' },
-                { value: 'CHF', label: 'פרנק שוויצרי (CHF)' },
-                { value: 'BTC', label: 'ביטקוין (BTC)' },
-                { value: 'ETH', label: 'אתריום (ETH)' }
-            ],
-            defaultValue: 'USD'
+            populateFromService: 'currencies', // יטען מ-SelectPopulatorService.populateCurrenciesSelect
+            defaultFromPreferences: true, // ברירת מחדל מהעדפות
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
-        {
-            type: 'text',
-            id: 'tickerLogo',
-            label: 'לוגו החברה (URL)',
-            required: false,
-            placeholder: 'https://example.com/logo.png',
-            description: 'קישור לתמונת לוגו של החברה'
-        },
-        {
-            type: 'select',
-            id: 'tickerStatus',
-            label: 'סטטוס',
-            required: true,
-            options: [
-                { value: 'active', label: 'פעיל' },
-                { value: 'inactive', label: 'לא פעיל' },
-                { value: 'suspended', label: 'מושעה' },
-                { value: 'delisted', label: 'הוסרה מהמסחר' }
-            ],
-            defaultValue: 'active'
-        },
+        // שורה אחרונה: הערות (בשורה מלאה)
         {
             type: 'textarea',
-            id: 'tickerNotes',
+            id: 'tickerRemarks',
             label: 'הערות',
             required: false,
             rows: 3,
             placeholder: 'הכנס הערות נוספות על הטיקר...',
             maxLength: 500
+        },
+        // אזור בדיקת נתונים חיצוניים (נוסף דינמית)
+        {
+            type: 'custom',
+            id: 'tickerExternalDataSection',
+            html: `
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="d-flex gap-2 align-items-center mb-2">
+                            <button type="button" 
+                                    id="checkTickerExternalDataBtn" 
+                                    class="btn btn-outline-info btn-sm" 
+                                    disabled
+                                    data-onclick="checkTickerExternalData()">
+                                <i class="fas fa-sync-alt"></i> בדוק נתונים חיצוניים
+                            </button>
+                            <small class="text-muted">הכנס סמל טיקר כדי לבדוק נתונים</small>
+                        </div>
+                        <div id="tickerExternalDataResult" class="mt-2" style="display: none;"></div>
+                        <div id="tickerExternalDataWarning" class="alert alert-warning mt-2" style="display: none;"></div>
+                    </div>
+                </div>
+            `
         }
     ],
     validation: {
@@ -131,23 +113,14 @@ const tickersModalConfig = {
             maxLength: 100
         },
         tickerType: {
-            required: true
-        },
-        tickerExchange: {
-            required: true
+            required: true,
+            enum: ['stock', 'etf', 'crypto', 'forex', 'commodity']
         },
         tickerCurrency: {
-            required: true
+            required: true,
+            type: 'int' // currency_id הוא Integer
         },
-        tickerLogo: {
-            required: false,
-            fileType: 'image',
-            maxSize: '5MB'
-        },
-        tickerStatus: {
-            required: true
-        },
-        tickerNotes: {
+        tickerRemarks: {
             required: false,
             maxLength: 500
         }

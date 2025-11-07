@@ -514,7 +514,156 @@ async function _REMOVED_fillEditExecutionForm(execution, linkedObject, tickerId)
 // פונקציות שמירה ועדכון
 // ========================================
 
-// REMOVED: saveExecution - unused function, replaced by general CRUD system
+/**
+ * Save execution - required by ModalManagerV2
+ * Handles both add and edit modes
+ * @function saveExecution
+ * @async
+ * @returns {Promise<void>}
+ */
+async function saveExecution() {
+    window.Logger.debug('saveExecution called', { page: 'executions' });
+    
+    try {
+        // Collect form data using DataCollectionService
+        const form = document.getElementById('executionsModalForm');
+        if (!form) {
+            throw new Error('Execution form not found');
+        }
+        
+        const executionData = DataCollectionService.collectFormData({
+            ticker_id: { id: 'executionTicker', type: 'int' },
+            trading_account_id: { id: 'executionAccount', type: 'int' },
+            action: { id: 'executionType', type: 'text' }, // Map executionType to action
+            quantity: { id: 'executionQuantity', type: 'float' },
+            price: { id: 'executionPrice', type: 'float' },
+            date: { id: 'executionDate', type: 'date' }, // DateTime format
+            fee: { id: 'executionCommission', type: 'float', default: 0 }, // Map executionCommission to fee
+            realized_pl: { id: 'executionRealizedPL', type: 'int', default: null },
+            mtm_pl: { id: 'executionMTMPL', type: 'int', default: null },
+            notes: { id: 'executionNotes', type: 'text', default: null },
+            source: { id: 'executionSource', type: 'text', default: 'manual' },
+            external_id: { id: 'executionExternalId', type: 'text', default: null },
+            trade_id: { id: 'trade_id', type: 'int', default: null }
+        });
+        
+        // ולידציה מפורטת
+        let hasErrors = false;
+        if (!executionData.ticker_id) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('executionTicker', 'טיקר הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!executionData.trading_account_id) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('executionAccount', 'חשבון מסחר הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!executionData.action) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('executionType', 'סוג ביצוע הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        if (!executionData.quantity || executionData.quantity <= 0) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('executionQuantity', 'כמות חייבת להיות גדולה מ-0');
+            }
+            hasErrors = true;
+        }
+        
+        if (!executionData.price || executionData.price <= 0) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('executionPrice', 'מחיר חייב להיות גדול מ-0');
+            }
+            hasErrors = true;
+        }
+        
+        if (!executionData.date) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('executionDate', 'תאריך ושעה הם שדות חובה');
+            }
+            hasErrors = true;
+        }
+        
+        // Validate realized_pl for sell actions
+        if (executionData.action === 'sell' || executionData.action === 'sale' || executionData.action === 'cover') {
+            if (executionData.realized_pl === null || executionData.realized_pl === undefined) {
+                if (window.showValidationWarning) {
+                    window.showValidationWarning('executionRealizedPL', 'Realized P/L חובה במכירה');
+                }
+                hasErrors = true;
+            }
+        }
+        
+        if (hasErrors) {
+            return;
+        }
+        
+        // Determine if this is add or edit
+        const isEdit = form.dataset.mode === 'edit';
+        const executionId = form.dataset.executionId;
+        
+        // Prepare API call
+        const url = isEdit ? `/api/executions/${executionId}` : '/api/executions';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        // Send to API
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(executionData)
+        });
+        
+        // Use CRUDResponseHandler for consistent response handling
+        if (isEdit) {
+            await CRUDResponseHandler.handleUpdateResponse(response, {
+                modalId: 'executionsModal',
+                successMessage: 'ביצוע עודכן בהצלחה',
+                entityName: 'ביצוע',
+                reloadFn: window.loadExecutionsData,
+                requiresHardReload: false
+            });
+        } else {
+            await CRUDResponseHandler.handleSaveResponse(response, {
+                modalId: 'executionsModal',
+                successMessage: 'ביצוע נוסף בהצלחה',
+                entityName: 'ביצוע',
+                reloadFn: window.loadExecutionsData,
+                requiresHardReload: false
+            });
+        }
+        
+    } catch (error) {
+        CRUDResponseHandler.handleError(error, 'שמירת ביצוע');
+    }
+}
+
+// Export save function for ModalManagerV2
+window.saveExecution = saveExecution;
+
+/**
+ * Update execution - wrapper for saveExecution in edit mode
+ * @function updateExecution
+ * @async
+ * @param {number} executionId - Execution ID (optional, gets from form if not provided)
+ * @returns {Promise<void>}
+ */
+async function updateExecution(executionId) {
+    // Update execution uses the same saveExecution function
+    // The form's dataset.mode will be set to 'edit' by ModalManagerV2
+    return await saveExecution();
+}
+
+// Export update function
+window.updateExecution = updateExecution;
 
 // REMOVED: updateExecutionWrapper - not used, ModalManagerV2 uses its own save handlers
 /**
@@ -1487,16 +1636,7 @@ window.editExecution = editExecution;
 // resetAllFiltersAndReloadData() - לא בשימוש, הוסרה
 
 // פונקציות מודלים - Wrapper functions for backward compatibility
-window.showAddExecutionModal = function() {
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-        window.ModalManagerV2.showModal('executionsModal', 'add');
-    } else {
-        console.error('ModalManagerV2 not available');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
-        }
-    }
-};
+// REMOVED: window.showAddExecutionModal - use window.showModalSafe('executionsModal', 'add') directly
 
 window.showEditExecutionModal = function(executionId) {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {

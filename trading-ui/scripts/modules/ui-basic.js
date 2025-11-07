@@ -648,8 +648,8 @@ function getPageDataFunctions() {
       loadData: window.loadTradesData,
       updateActive: window.updateActiveTradesField
     },
-    'accounts': {
-      loadData: window.loadAccountsDataForAccountsPage,
+    'trading_accounts': {
+      loadData: window.loadTradingAccountsDataForTradingAccountsPage,
       updateActive: null
     },
     'alerts': {

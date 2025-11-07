@@ -146,8 +146,16 @@ class AccountActivityService:
             # Group by currency
             currencies_dict = {}
             
-            # Process cash flows
+            # Process cash flows (filter currency exchanges to show only other_negative)
+            from services.cash_flow_service import CashFlowService as CashFlowHelperService
+            exchange_ids_seen = set()
+            
             for cf in cash_flows:
+                # Filter currency exchanges: only process other_negative flow for display
+                # But still include all flows for balance calculation
+                external_id = cf.external_id
+                is_exchange = CashFlowHelperService.is_currency_exchange(external_id)
+                
                 currency_id = cf.currency_id or 1  # Default to USD
                 currency_symbol = cf.currency.symbol if cf.currency else 'USD'
                 
@@ -160,30 +168,50 @@ class AccountActivityService:
                         'balance': 0.0
                     }
                 
-                # Add cash flow as movement
-                movement = {
-                    'id': cf.id,
-                    'type': 'cash_flow',
-                    'sub_type': cf.type,
-                    'date': cf.date.isoformat() if cf.date else None,
-                    'amount': float(cf.amount),
-                    'description': cf.description,
-                    'ticker_symbol': None,
-                    'created_at': cf.created_at.isoformat() if cf.created_at else None
-                }
+                # Always update balance for all flows (including all exchange flows)
+                # For exchange flows, amount is already correctly signed (negative for other_negative, positive for other_positive)
+                currencies_dict[currency_id]['balance'] += float(cf.amount)
                 
-                currencies_dict[currency_id]['movements'].append(movement)
-                
-                # Calculate balance (positive for deposits, negative for withdrawals)
-                # Interest can be positive or negative - add/subtract based on actual amount sign
-                if cf.type == 'interest':
-                    # Interest can be positive or negative - use the amount as-is
-                    currencies_dict[currency_id]['balance'] += float(cf.amount)
-                elif cf.type in ['deposit', 'dividend']:
-                    currencies_dict[currency_id]['balance'] += float(cf.amount)
-                elif cf.type in ['withdrawal', 'fee']:
-                    currencies_dict[currency_id]['balance'] -= float(cf.amount)
-                # Transfer handled separately if needed
+                # For display: filter exchanges to show only other_negative
+                if is_exchange:
+                    if external_id in exchange_ids_seen:
+                        # We've already processed this exchange for display - skip
+                        continue
+                    
+                    if cf.type == 'other_negative':
+                        # This is the flow we want to show - mark exchange as seen and include
+                        exchange_ids_seen.add(external_id)
+                        # Add to movements for display
+                        movement = {
+                            'id': cf.id,
+                            'type': 'cash_flow',
+                            'sub_type': cf.type,
+                            'date': cf.date.isoformat() if cf.date else None,
+                            'amount': float(cf.amount),
+                            'description': cf.description,
+                            'ticker_symbol': None,
+                            'external_id': external_id,
+                            'is_exchange': True,
+                            'created_at': cf.created_at.isoformat() if cf.created_at else None
+                        }
+                        currencies_dict[currency_id]['movements'].append(movement)
+                    else:
+                        # This is other_positive or fee - skip for display
+                        exchange_ids_seen.add(external_id)
+                        continue
+                else:
+                    # Regular cash flow - include in display
+                    movement = {
+                        'id': cf.id,
+                        'type': 'cash_flow',
+                        'sub_type': cf.type,
+                        'date': cf.date.isoformat() if cf.date else None,
+                        'amount': float(cf.amount),
+                        'description': cf.description,
+                        'ticker_symbol': None,
+                        'created_at': cf.created_at.isoformat() if cf.created_at else None
+                    }
+                    currencies_dict[currency_id]['movements'].append(movement)
             
             # Process executions
             logger.info(f"🔄 Processing {len(executions)} executions...")

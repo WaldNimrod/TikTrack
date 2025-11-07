@@ -13,8 +13,15 @@
 
 ## תכונות חדשות
 
-### Event Delegation System (חדש!)
+### ⚠️ Event Delegation System - תקן מחייב
+
+**מתאריך 2025-01-27, `data-onclick` הוא התקן היחיד לניהול אירועים במערכת.**
+
 מערכת הכפתורים כוללת מערכת event delegation מתקדמת המטפלת ב-`data-onclick` attributes דרך `EventHandlerManager`:
+
+**חובה:** כל הכפתורים החדשים חייבים להשתמש ב-`data-onclick`. `onclick` רגיל אינו עוד תקן.
+
+לפרטים מלאים: `documentation/02-ARCHITECTURE/FRONTEND/EVENT_HANDLING_STANDARD.md`
 
 ### תמיכה במטבעות (עדכון 2025-10-29)
 מערכת הכפתורים תומכת כעת במטבעות שונים במודל הוספת טיקר:

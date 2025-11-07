@@ -1371,7 +1371,7 @@ class EntityDetailsModal {
                 trade: 'trades',
                 trade_plan: 'trade_plans',
                 execution: 'executions', 
-                account: 'accounts',
+                trading_account: 'trading_accounts',
                 alert: 'alerts',
                 cash_flow: 'cash_flows',
                 note: 'notes'

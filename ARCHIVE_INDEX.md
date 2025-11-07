@@ -39,6 +39,36 @@ cp -r archive/cleanup-2025-01-16/* ./
 cp -r archive/cleanup-2025-01-16/root-files/* ./
 ```
 
+## ארכיון סקריפטי כפתורים 2025-11-07
+**מיקום**: `archive/scripts/button-migration/`  
+**תאריך**: 7 בנובמבר 2025  
+**תכולה**: 13 סקריפטי החלפת כפתורים היסטוריים ששימשו למיגרציה ל-`data-onclick`
+
+### שחזור
+```bash
+cp archive/scripts/button-migration/replace_all_buttons.py scripts/
+```
+
+> הסקריפטים נשמרים לצורך עיון בלבד. לפני הרצה מחדש יש לפתוח טיקט תחזוקה ולאשר מול נמרוד.
+
+## ארכיון מיגרציות SQLite היסטוריות 2025-11-07
+**מיקום**: `archive/backend/migrations/legacy/`  
+**תאריך**: 7 בנובמבר 2025  
+**תכולה**: גרסאות `*_simple.py` של מיגרציות חיבור נתונים חיצוניים (הוחלפו בגרסאות SQLAlchemy)
+
+### שחזור
+```bash
+cp archive/backend/migrations/legacy/create_external_data_tables_simple.py Backend/migrations/
+```
+
+> הגרסאות הפשוטות אינן חלק מתהליך המיגרציה הרשמי. השתמשו בהן רק כ-reference.
+
+## כלי תחזוקה רגישים 2025-11-07
+**מיקום**: `scripts/cleanup/`  
+**תכולה**: סקריפטי מחיקה/ניקוי עם README וטChecklist בטיחות הפעלה
+
+> להרצה יש להשתמש בנתיבים החדשים בלבד ולהקפיד על ההנחיות המופיעות ב-`scripts/cleanup/README.md`.
+
 ## הערות
 - כל הקבצים הועברו (לא נמחקו)
 - המערכת מכילה רק קבצים פעילים וחיוניים

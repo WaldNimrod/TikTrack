@@ -385,7 +385,7 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
       
       if (!shouldShow) {
         if (window.DEBUG_MODE) {
-          window.Logger.info(`🔍 Notification filtered out by mode ${mode}: category=${category}, type=${type}, userInitiated=${userInitiated}`, { page: "notification-system" });
+          // window.Logger.info(`🔍 Notification filtered out by mode ${mode}: category=${category}, type=${type}, userInitiated=${userInitiated}`, { page: "notification-system" });
         }
         return false;
       }
@@ -393,7 +393,7 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
     
     // בדוק את ההגדרות הישנות (תאימות לאחור)
     const preferenceName = `notifications_${category}_enabled`;
-    window.Logger.info(`🔍 Checking preference: ${preferenceName}`, { page: "notification-system" });
+    // window.Logger.info(`🔍 Checking preference: ${preferenceName}`, { page: "notification-system" });
     
     if (typeof window.getPreference !== 'function') {
       window.Logger.warn('getPreference function not available, showing notification by default', { page: "notification-system" });
@@ -402,18 +402,18 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
     
     const isEnabled = await window.getPreference(preferenceName);
     if (window.DEBUG_MODE) {
-      window.Logger.info(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled, { page: "notification-system" });
+      // window.Logger.info(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled, { page: "notification-system" });
     }
     
     // If preference is not found (null), don't show notification
     if (isEnabled === null) {
-      window.Logger.info(`⚠️ Preference ${preferenceName} not found - notification disabled`, { page: "notification-system" });
+      // window.Logger.info(`⚠️ Preference ${preferenceName} not found - notification disabled`, { page: "notification-system" });
       return false;
     }
     
     const result = isEnabled === 'true' || isEnabled === true;
     if (window.DEBUG_MODE) {
-      window.Logger.info(`🔍 Should show notification for ${category}:`, result, { page: "notification-system" });
+      // window.Logger.info(`🔍 Should show notification for ${category}:`, result, { page: "notification-system" });
     }
     return result;
   } catch (error) {

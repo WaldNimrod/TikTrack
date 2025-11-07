@@ -18,13 +18,16 @@ const tradePlansModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
+        // שורה ראשונה: טיקר + שם התוכנית
         {
             type: 'select',
             id: 'tradePlanTicker',
             label: 'טיקר',
             required: true,
             options: [], // יטען דינמית מ-API
-            placeholder: 'בחר טיקר...'
+            placeholder: 'בחר טיקר...',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'text',
@@ -32,8 +35,11 @@ const tradePlansModalConfig = {
             label: 'שם התוכנית',
             required: true,
             placeholder: 'הכנס שם לתוכנית',
-            maxLength: 100
+            maxLength: 100,
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה שנייה: סוג השקעה + כמות מתוכננת
         {
             type: 'select',
             id: 'tradePlanType',
@@ -45,7 +51,9 @@ const tradePlansModalConfig = {
                 { value: 'investment', label: 'השקעה - השקעה ארוכת טווח' },
                 { value: 'passive', label: 'פאסיבי - השקעה פאסיבית ללא פעילות מסחרית' }
             ],
-            defaultValue: 'swing'
+            defaultValue: 'swing',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'number',
@@ -54,8 +62,11 @@ const tradePlansModalConfig = {
             required: true,
             min: 1,
             step: 1,
-            placeholder: 'הכנס כמות...'
+            placeholder: 'הכנס כמות...',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה שלישית: מחיר כניסה מתוכנן + תאריך כניסה מתוכנן
         {
             type: 'number',
             id: 'tradePlanEntryPrice',
@@ -63,8 +74,20 @@ const tradePlansModalConfig = {
             required: false,
             min: 0.01,
             step: 0.01,
-            placeholder: 'הכנס מחיר כניסה...'
+            placeholder: 'הכנס מחיר כניסה...',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        {
+            type: 'datetime-local',
+            id: 'tradePlanEntryDate',
+            label: 'תאריך כניסה מתוכנן',
+            required: false,
+            description: 'השאר ריק לכניסה מיידית',
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        // שורה רביעית: Stop Loss + Take Profit
         {
             type: 'number',
             id: 'tradePlanStopLoss',
@@ -72,7 +95,9 @@ const tradePlansModalConfig = {
             required: false,
             min: 0.01,
             step: 0.01,
-            placeholder: 'הכנס מחיר Stop Loss...'
+            placeholder: 'הכנס מחיר Stop Loss...',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'number',
@@ -81,15 +106,11 @@ const tradePlansModalConfig = {
             required: false,
             min: 0.01,
             step: 0.01,
-            placeholder: 'הכנס מחיר Take Profit...'
+            placeholder: 'הכנס מחיר Take Profit...',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
-        {
-            type: 'datetime-local',
-            id: 'tradePlanEntryDate',
-            label: 'תאריך כניסה מתוכנן',
-            required: false,
-            description: 'השאר ריק לכניסה מיידית'
-        },
+        // שורה חמישית: סטטוס (בשורה מלאה)
         {
             type: 'select',
             id: 'tradePlanStatus',
@@ -104,14 +125,28 @@ const tradePlansModalConfig = {
             ],
             defaultValue: 'draft'
         },
+        // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
-            type: 'textarea',
+            type: 'rich-text',
             id: 'tradePlanNotes',
             label: 'הערות',
             required: false,
-            rows: 4,
             placeholder: 'הכנס הערות נוספות על התוכנית...',
-            maxLength: 1000
+            maxLength: 5000,
+            options: {
+                direction: 'rtl',
+                placeholder: 'הכנס הערות נוספות על התוכנית...',
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                    [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
         }
     ],
     // REMOVED: validation property - Validation is handled by centralized validation system (validation-utils.js)

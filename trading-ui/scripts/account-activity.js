@@ -2489,6 +2489,7 @@ if (document.readyState === 'loading') {
 // Export functions globally
 window.loadAccountActivity = loadAccountActivity;
 window.populateAccountSelector = populateAccountSelector;
+window.populateAccountActivityTable = populateAccountActivityTable; // Export for UnifiedTableSystem
 
 window.Logger.info('✅ account-activity.js נטען בהצלחה', { page: "trading_accounts" });
 

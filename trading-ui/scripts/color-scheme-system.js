@@ -564,9 +564,6 @@ function generateNumericValueCSS() {
 // ===== COLOR SCHEME FUNCTIONS =====
 function applyColorScheme(schemeName = 'light', customColors = null) {
   try {
-    if (window.Logger) {
-      window.Logger.info(`🎨 Applying color scheme: ${schemeName}`, { page: 'color-scheme' });
-    }
     
     // Remove existing scheme classes
     document.body.classList.remove('light-scheme', 'dark-scheme', 'custom-scheme');
@@ -630,8 +627,6 @@ function applyDarkScheme() {
 
 function applyCustomScheme(customColors) {
   try {
-    if (window.Logger) { window.Logger.info('🎨 Applying custom color scheme', { page: "color-scheme" }); }
-    
     // Apply custom colors to CSS variables
     Object.entries(customColors).forEach(([key, value]) => {
       document.documentElement.style.setProperty(`--custom-${key}`, value);
@@ -738,15 +733,6 @@ async function setCurrentEntityColorFromPage() {
           // Apply colors to headers after setting CSS variables
           if (typeof window.applyEntityColorsToHeaders === 'function') {
             window.applyEntityColorsToHeaders(entityType);
-          }
-          
-          if (window.Logger) {
-            window.Logger.info(`🎨 Set current entity color for ${entityType} (from ${pageClass}):`, { 
-              page: 'color-scheme',
-              primary: entityColor,
-              light: lightColor,
-              dark: darkColor
-            });
           }
         }
       } else {

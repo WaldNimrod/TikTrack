@@ -93,6 +93,9 @@ def create_trading_account():
     """Create new trading account"""
     try:
         data = request.get_json()
+        # Sanitize HTML content for notes field
+        if 'notes' in data and data['notes']:
+            data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         db: Session = g.db
         trading_account = TradingAccountService.create(db, data)
         
@@ -130,6 +133,9 @@ def update_trading_account(trading_account_id: int):
     """Update trading account"""
     try:
         data = request.get_json()
+        # Sanitize HTML content for notes field
+        if 'notes' in data and data['notes']:
+            data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         db: Session = g.db
         trading_account = TradingAccountService.update(db, trading_account_id, data)
         if trading_account:

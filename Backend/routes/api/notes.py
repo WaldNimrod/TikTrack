@@ -64,6 +64,7 @@ def save_uploaded_file(file: FileStorage) -> Optional[str]:
         logger.warning(f"❌ File not allowed or missing: {file.filename if file else 'None'}")
         return None
 
+
 def delete_uploaded_file(filename: str) -> bool:
     """Delete uploaded file"""
     if filename:
@@ -243,12 +244,16 @@ def create_note():
             
             # Get data from form data
             content = request.form.get('content', '')
+            # Sanitize HTML content
+            content = BaseEntityUtils.sanitize_rich_text(content)
             related_type_id = request.form.get('related_type_id')
             related_id = request.form.get('related_id')
         else:
             # Get data from JSON
             data = request.get_json()
             content = data.get('content', '')
+            # Sanitize HTML content
+            content = BaseEntityUtils.sanitize_rich_text(content)
             related_type_id = data.get('related_type_id')
             related_id = data.get('related_id')
             attachment_filename = data.get('attachment')
@@ -364,6 +369,8 @@ def update_note(note_id: int):
                 
                 # Get data from form data
                 content = request.form.get('content', '')
+                # Sanitize HTML content
+                content = BaseEntityUtils.sanitize_rich_text(content)
                 related_type_id = request.form.get('related_type_id')
                 related_id = request.form.get('related_id')
                 logger.info(f"📋 Form data - content: {content[:50]}..., related_type_id: {related_type_id}, related_id: {related_id}")
@@ -381,6 +388,8 @@ def update_note(note_id: int):
                 # Get data from JSON
                 data = request.get_json()
                 content = data.get('content', '')
+                # Sanitize HTML content
+                content = BaseEntityUtils.sanitize_rich_text(content)
                 related_type_id = data.get('related_type_id')
                 related_id = data.get('related_id')
                 attachment_filename = data.get('attachment')

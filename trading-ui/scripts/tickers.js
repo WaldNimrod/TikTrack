@@ -702,27 +702,49 @@ function restoreTickersSectionState() {
  */
 async function saveTicker() {
   
-  // ניקוי מטמון לפני פעולת CRUD  // איסוף נתונים מהטופס באמצעות DataCollectionService
+  // איסוף נתונים מהטופס באמצעות DataCollectionService
+  // השדות תואמים לקונפיגורציה החדשה ב-tickers-config.js
   const tickerData = DataCollectionService.collectFormData({
-    symbol: { id: 'addTickerSymbol', type: 'text' },
-    name: { id: 'addTickerName', type: 'text' },
-    type: { id: 'addTickerType', type: 'text' },
-    currency_id: { id: 'addTickerCurrency', type: 'int' },
-    remarks: { id: 'addTickerRemarks', type: 'text' },
-    status: { id: 'addTickerStatus', type: 'text', default: 'closed' }
+    symbol: { id: 'tickerSymbol', type: 'text' },
+    name: { id: 'tickerName', type: 'text' },
+    type: { id: 'tickerType', type: 'text' },
+    currency_id: { id: 'tickerCurrency', type: 'int' },
+    remarks: { id: 'tickerRemarks', type: 'text' }
   });
 
-  const symbol = tickerData.symbol.trim().toUpperCase();
-  const name = tickerData.name.trim();
+  const symbol = tickerData.symbol?.trim().toUpperCase();
+  const name = tickerData.name?.trim();
   const type = tickerData.type;
   const currency_id = tickerData.currency_id;
-  const remarks = tickerData.remarks.trim();
+  const remarks = tickerData.remarks?.trim();
 
-  // ולידציה גלובלית
-  if (window.validateForm) {
-    if (!window.validateForm('addTickerForm')) {
+  // ולידציה בסיסית
+  if (!symbol || symbol.length === 0) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'סמל הטיקר הוא שדה חובה');
+    }
       return;
     }
+
+  if (!name || name.length < 2) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'שם החברה חייב להכיל לפחות 2 תווים');
+    }
+    return;
+  }
+
+  if (!type) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'סוג הטיקר הוא שדה חובה');
+    }
+    return;
+  }
+
+  if (!currency_id) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'מטבע הוא שדה חובה');
+    }
+    return;
   }
 
   // בדיקה אם הסמל כבר קיים במערכת
@@ -731,7 +753,7 @@ async function saveTicker() {
     if (window.showErrorNotification) {
       window.showErrorNotification(
         'שגיאת וולידציה',
-        `הסמל ${symbol} כבר קיים במערכת (טיקר: ${existingTicker.name})`,
+        `הסמל ${symbol} כבר קיים במערכת (טיקר: ${existingTicker.name})`
       );
     }
     return;
@@ -745,9 +767,9 @@ async function saveTicker() {
       symbol,
       name,
       type,
-      currency_id,
+      currency_id: parseInt(currency_id),
       status: finalStatus,
-      remarks: remarks || null,
+      remarks: remarks || null
     };
 
     const response = await fetch('/api/tickers', {
@@ -760,9 +782,8 @@ async function saveTicker() {
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: 'addTickerModal',
+      modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
-      apiUrl: '/api/tickers/',
       entityName: 'טיקר',
       reloadFn: window.loadTickersData,
       requiresHardReload: false
@@ -1878,6 +1899,136 @@ window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
 // REMOVED: window.showEditTickerModal - use window.ModalManagerV2.showEditModal('tickersModal', 'ticker', id) directly
 // Note: showDeleteTickerModal removed - not needed (using confirmDeleteTicker directly)
 window.saveTicker = saveTicker;
+
+/**
+ * בדיקת נתונים חיצוניים עבור טיקר חדש
+ * טוען נתונים מ-Yahoo Finance ומציג אותם במודל
+ * 
+ * @function checkTickerExternalData
+ * @async
+ * @returns {Promise<void>}
+ */
+async function checkTickerExternalData() {
+    const symbolField = document.getElementById('tickerSymbol');
+    const checkBtn = document.getElementById('checkTickerExternalDataBtn');
+    const resultDiv = document.getElementById('tickerExternalDataResult');
+    const warningDiv = document.getElementById('tickerExternalDataWarning');
+    
+    if (!symbolField || !checkBtn || !resultDiv || !warningDiv) {
+        console.warn('⚠️ Elements not found for external data check');
+        return;
+    }
+    
+    const symbol = symbolField.value?.trim().toUpperCase();
+    if (!symbol || symbol.length === 0) {
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', 'יש להכניס סמל טיקר לפני הבדיקה');
+        }
+        return;
+    }
+    
+    try {
+        // Disable button and show loading
+        checkBtn.disabled = true;
+        checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> בודק...';
+        resultDiv.style.display = 'none';
+        warningDiv.style.display = 'none';
+        
+        window.Logger?.info(`Checking external data for symbol: ${symbol}`, { page: 'tickers' });
+        
+        // Check if ExternalDataService is available
+        if (!window.ExternalDataService) {
+            throw new Error('שירות נתונים חיצוניים לא זמין');
+        }
+        
+        // Fetch quote data - force refresh to get latest data
+        const quoteData = await window.ExternalDataService.getQuote(symbol, { forceRefresh: true });
+        
+        if (quoteData && quoteData.price) {
+            // Success - Display ticker info
+            // המרת נתונים לפורמט שמצפה FieldRendererService.renderTickerInfo
+            // ExternalDataService מחזיר: price, change_amount_day, change_pct_day, volume, currency
+            const tickerInfo = {
+                symbol: symbol,
+                name: quoteData.name || symbol, // Use name from quote if available
+                current_price: parseFloat(quoteData.price) || 0,
+                daily_change: parseFloat(quoteData.change_amount_day || quoteData.change_amount || 0),
+                daily_change_percent: parseFloat(quoteData.change_pct_day || quoteData.change_percent || 0),
+                volume: parseInt(quoteData.volume || 0),
+                currency_symbol: (quoteData.currency === 'USD' || !quoteData.currency) ? '$' : quoteData.currency
+            };
+            
+            // Render using FieldRendererService
+            let tickerInfoHTML = '';
+            if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
+                tickerInfoHTML = window.FieldRendererService.renderTickerInfo(tickerInfo, 'ticker-info-display');
+            } else {
+                // Fallback display
+                const changeColor = tickerInfo.daily_change >= 0 ? 'text-success' : 'text-danger';
+                const changeIcon = tickerInfo.daily_change >= 0 ? '↗' : '↘';
+                const formattedVolume = tickerInfo.volume > 0 ? tickerInfo.volume.toLocaleString('he-IL') : 'N/A';
+                tickerInfoHTML = `
+                    <div class="d-flex gap-3 align-items-center flex-wrap justify-content-center">
+                        <span class="fw-bold">מחיר: ${tickerInfo.currency_symbol}${tickerInfo.current_price.toFixed(2)}</span>
+                        <span class="${changeColor}">
+                            ${changeIcon} ${tickerInfo.daily_change >= 0 ? '+' : ''}${tickerInfo.daily_change.toFixed(2)} 
+                            (${tickerInfo.daily_change_percent >= 0 ? '+' : ''}${tickerInfo.daily_change_percent.toFixed(2)}%)
+                        </span>
+                        <span class="text-muted small">נפח: ${formattedVolume}</span>
+                    </div>
+                `;
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="alert alert-success mb-0">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>נתונים נמצאו עבור ${symbol}</strong>
+                    </div>
+                    ${tickerInfoHTML}
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+            warningDiv.style.display = 'none';
+            
+            window.Logger?.info(`✅ External data loaded successfully for ${symbol}`, { page: 'tickers' });
+        } else {
+            throw new Error('לא התקבלו נתונים מהשרת');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error checking external data:', error);
+        window.Logger?.error(`Error checking external data for ${symbol}`, error, { page: 'tickers' });
+        
+        // Show warning
+        warningDiv.innerHTML = `
+            <div class="d-flex align-items-start">
+                <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+                <div>
+                    <strong>לא ניתן לטעון נתונים חיצוניים</strong>
+                    <p class="mb-0 small">${error.message || 'שגיאה בטעינת נתונים מהשרת'}</p>
+                    <p class="mb-0 small mt-1">ניתן להמשיך בהוספת הטיקר ללא נתונים חיצוניים.</p>
+                </div>
+            </div>
+        `;
+        warningDiv.style.display = 'block';
+        resultDiv.style.display = 'none';
+        
+        if (window.showWarningNotification) {
+            window.showWarningNotification(
+                'נתונים חיצוניים לא זמינים',
+                `לא ניתן לטעון נתונים עבור ${symbol}. ניתן להמשיך בהוספת הטיקר ללא נתונים אלה.`
+            );
+        }
+    } finally {
+        // Re-enable button
+        checkBtn.disabled = false;
+        checkBtn.innerHTML = '<i class="fas fa-sync-alt"></i> בדוק נתונים חיצוניים';
+    }
+}
+
+// Export function globally
+window.checkTickerExternalData = checkTickerExternalData;
 window.updateTicker = updateTicker;
 window.confirmDeleteTicker = confirmDeleteTicker;
 

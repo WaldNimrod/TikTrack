@@ -688,13 +688,15 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
+        // - 'external-data': שירות נתונים חיצוניים (Yahoo Finance, etc.)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'external-data', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
+            'ExternalDataService',
             'window.loadTickersData'
         ],
         

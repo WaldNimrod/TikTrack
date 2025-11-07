@@ -44,6 +44,25 @@ describe('Field Renderer Service', () => {
         // Evaluate the real code to get the FieldRendererService
         eval(fieldRendererCode);
         FieldRendererService = global.FieldRendererService;
+
+        const wrapMethod = (methodName) => {
+            const original = FieldRendererService?.[methodName];
+            if (typeof original === 'function') {
+                return jest.fn(function (...args) {
+                    return original.apply(FieldRendererService, args);
+                });
+            }
+            return jest.fn();
+        };
+
+        const proxy = {};
+        Object.getOwnPropertyNames(FieldRendererService).forEach((key) => {
+            if (typeof FieldRendererService[key] === 'function') {
+                proxy[key] = wrapMethod(key);
+            }
+        });
+
+        global.fieldRenderer = proxy;
     });
     
     beforeEach(() => {
@@ -278,7 +297,7 @@ describe('Field Renderer Service', () => {
     
     describe('Error Handling', () => {
         test('should handle invalid status', () => {
-            fieldRenderer.renderStatus.mockImplementation(() => {
+            fieldRenderer.renderStatus.mockImplementationOnce(() => {
                 throw new Error('Invalid status');
             });
             
@@ -288,7 +307,7 @@ describe('Field Renderer Service', () => {
         });
         
         test('should handle invalid side', () => {
-            fieldRenderer.renderSide.mockImplementation(() => {
+            fieldRenderer.renderSide.mockImplementationOnce(() => {
                 throw new Error('Invalid side');
             });
             

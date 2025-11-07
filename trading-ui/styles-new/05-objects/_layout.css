@@ -765,6 +765,20 @@
   transition: transform 0.2s ease;
 }
 
+.filter-icon-btn {
+  width: var(--filter-icon-btn-size, 32px);
+  height: var(--filter-icon-btn-size, 32px);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-icon-btn .filter-icon {
+  width: 14px;
+  height: 14px;
+}
+
 .filter-toggle-btn:hover .filter-icon {
   transform: scale(1.1);
 }

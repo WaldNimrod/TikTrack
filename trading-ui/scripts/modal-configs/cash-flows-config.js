@@ -18,67 +18,120 @@ const cashFlowModalConfig = {
     },
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
-    fields: [
+    tabs: [
+        {
+            id: 'regular',
+            label: 'תזרים רגיל',
+            active: true,
+            fields: [
+        // שורה ראשונה: סוג תזרים + חשבון מסחר
         {
             type: 'select',
             id: 'cashFlowType',
             label: 'סוג תזרים',
             required: true,
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
             options: [
                 { value: 'deposit', label: 'הפקדה' },
                 { value: 'withdrawal', label: 'משיכה' },
-                { value: 'transfer', label: 'העברה' },
                 { value: 'fee', label: 'עמלה' },
-                { value: 'dividend', label: 'דיבידנד' }
-            ]
-        },
-        {
-            type: 'number',
-            id: 'cashFlowAmount',
-            label: 'סכום',
-            required: true,
-            min: 0.01,
-            step: 0.01
-        },
-        {
-            type: 'select',
-            id: 'cashFlowCurrency',
-            label: 'מטבע',
-            required: true,
-            defaultFromPreferences: true // ברירת מחדל מהעדפות
+                { value: 'dividend', label: 'דיבידנד' },
+                { value: 'transfer_in', label: 'העברה מחשבון אחר' },
+                { value: 'transfer_out', label: 'העברה לחשבון אחר' },
+                { value: 'other_positive', label: 'אחר חיובי' },
+                { value: 'other_negative', label: 'אחר שלילי' }
+            ],
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'select',
             id: 'cashFlowAccount',
             label: 'חשבון מסחר',
             required: true,
-            defaultFromPreferences: true // ברירת מחדל מהעדפות
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            defaultFromPreferences: true, // ברירת מחדל מהעדפות
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה שנייה: סכום + מטבע (ברירת מחדל מהעדפות)
+        {
+            type: 'number',
+            id: 'cashFlowAmount',
+            label: 'סכום',
+            required: true,
+            min: 0.01,
+            step: 0.01,
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        {
+            type: 'select',
+            id: 'cashFlowCurrency',
+            label: 'מטבע',
+            required: true,
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            defaultFromPreferences: true, // ברירת מחדל מטבע ראשי מהעדפות
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        // שורה שלישית: תאריך + תיאור
         {
             type: 'date',
             id: 'cashFlowDate',
             label: 'תאריך תזרים',
             required: true,
             dateTime: false,
-            defaultTime: 'now'
+            defaultTime: 'now',
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
-            type: 'text',
+            type: 'rich-text',
             id: 'cashFlowDescription',
             label: 'תיאור',
-            placeholder: 'תיאור התזרים'
+            placeholder: 'תיאור התזרים',
+            maxLength: 5000,
+            options: {
+                direction: 'rtl',
+                placeholder: 'תיאור התזרים',
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                    [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            },
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה רביעית: מקור + מזהה חיצוני
         {
             type: 'select',
             id: 'cashFlowSource',
             label: 'מקור',
             required: true,
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
             options: [
                 { value: 'manual', label: 'ידני' },
                 { value: 'IBKR-tradelog-csv', label: 'IBKR CSV' },
                 { value: 'IBKR-api', label: 'IBKR API' }
             ],
-            defaultValue: 'manual'
+            defaultValue: 'manual',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
         {
             type: 'text',
@@ -86,21 +139,165 @@ const cashFlowModalConfig = {
             label: 'מזהה חיצוני',
             placeholder: 'מזהה חיצוני (אופציונלי)',
             defaultValue: '0',
-            disabled: true // מושבת כל עוד המקור הוא ידני
+            disabled: true, // מושבת כל עוד המקור הוא ידני
+            width: 300,
+            style: 'width: 300px; min-width: 200px;',
+            rowClass: 'row',
+            colClass: 'col-md-6'
         },
+        // שורה חמישית: קישור לטרייד
         {
-            type: 'select',
-            id: 'cashFlowTrade',
+            type: 'linkButton',
+            id: 'linkedTrade',
             label: 'קישור לטרייד',
-            includeEmpty: true,
-            emptyText: 'בחר טרייד (אופציונלי)'
+            buttonText: 'קשר לטרייד',
+            description: 'לחיצה תפתח מודל לבחירת טרייד',
+            rowClass: 'row',
+            colClass: 'col-12',
+            width: 300,
+            style: 'width: 300px; min-width: 200px;'
+        }
+            ]
         },
         {
-            type: 'select',
-            id: 'cashFlowTradePlan',
-            label: 'קישור לתוכנית השקעה',
-            includeEmpty: true,
-            emptyText: 'בחר תוכנית השקעה (אופציונלי)'
+            id: 'exchange',
+            label: 'המרת מטבע',
+            active: false,
+            fields: [
+                // שורה ראשונה: חשבון מסחר + תאריך
+                {
+                    type: 'select',
+                    id: 'cashFlowAccount',
+                    label: 'חשבון מסחר',
+                    required: true,
+                    width: 300,
+                    style: 'width: 300px; min-width: 200px;',
+                    defaultFromPreferences: true,
+                    rowClass: 'row',
+                    colClass: 'col-md-6'
+                },
+                {
+                    type: 'date',
+                    id: 'cashFlowDate',
+                    label: 'תאריך',
+                    required: true,
+                    dateTime: false,
+                    defaultTime: 'now',
+                    width: 300,
+                    style: 'width: 300px; min-width: 200px;',
+                    rowClass: 'row',
+                    colClass: 'col-md-6'
+                },
+                // שורה שנייה: מטבע מקור + מטבע יעד
+                {
+                    type: 'select',
+                    id: 'currencyExchangeFromCurrency',
+                    label: 'מטבע מקור',
+                    required: true,
+                    width: 300,
+                    style: 'width: 300px; min-width: 200px;',
+                    populateFromService: 'currencies',
+                    rowClass: 'row',
+                    colClass: 'col-md-6'
+                },
+                {
+                    type: 'select',
+                    id: 'currencyExchangeToCurrency',
+                    label: 'מטבע יעד',
+                    required: true,
+                    width: 300,
+                    style: 'width: 300px; min-width: 200px;',
+                    populateFromService: 'currencies',
+                    rowClass: 'row',
+                    colClass: 'col-md-6'
+                },
+                // שורה שנייה המשך: שער המרה
+                {
+                    type: 'number',
+                    id: 'currencyExchangeRate',
+                    label: 'שער המרה',
+                    required: true,
+                    min: 0.000001,
+                    step: 0.000001,
+                    width: 300,
+                    style: 'width: 300px; min-width: 200px;',
+                    rowClass: 'row',
+                    colClass: 'col-md-6'
+                },
+                // שורה שלישית: עמלה (עם label של מטבע עמלה)
+                {
+                    type: 'number',
+                    id: 'currencyExchangeFeeAmount',
+                    label: 'עמלה',
+                    required: false,
+                    min: 0,
+                    step: 0.01,
+                    defaultValue: 0,
+                    width: 300,
+                    style: 'width: 300px; min-width: 200px;',
+                    rowClass: 'row',
+                    colClass: 'col-md-6',
+                    feeCurrencyLabel: true // Signal to render currency label next to fee field
+                },
+                // שורה רביעית: סכום להמרה + סכום מומר
+                {
+                    type: 'number',
+                    id: 'currencyExchangeFromAmount',
+                    label: 'סכום להמרה',
+                    required: true,
+                    min: 0.01,
+                    step: 0.01,
+                    width: 300,
+                    style: 'width: 300px; min-width: 200px;',
+                    rowClass: 'row',
+                    colClass: 'col-md-6'
+                },
+                {
+                    type: 'number',
+                    id: 'currencyExchangeToAmount',
+                    label: 'סכום מומר',
+                    required: false,
+                    readOnly: true,
+                    disabled: true,
+                    width: 300,
+                    style: 'width: 300px; min-width: 200px;',
+                    rowClass: 'row',
+                    colClass: 'col-md-6'
+                },
+                // שורה חמישית: חישוב סופי מפורט
+                {
+                    type: 'display',
+                    id: 'currencyExchangeNetAmount',
+                    label: 'סיכום חישוב',
+                    description: 'פירוט מלא של ההמרה והעמלה',
+                    rowClass: 'row',
+                    colClass: 'col-12'
+                },
+                // שורה שישית: תיאור (בשורה מלאה)
+                {
+                    type: 'rich-text',
+                    id: 'cashFlowDescription',
+                    label: 'תיאור',
+                    placeholder: 'תיאור ההמרה',
+                    maxLength: 5000,
+                    options: {
+                        direction: 'rtl',
+                        placeholder: 'תיאור ההמרה',
+                        toolbar: [
+                            [{ 'header': [2, 3, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ 'color': [] }, { 'background': [] }],
+                            [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                            [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['link'],
+                            ['clean']
+                        ]
+                    },
+                    rowClass: 'row',
+                    colClass: 'col-12'
+                }
+            ]
         }
     ],
     validation: {
@@ -122,9 +319,25 @@ const cashFlowModalConfig = {
         },
         cashFlowSource: { 
             required: true 
+        },
+        // Currency exchange validations
+        currencyExchangeFromAmount: {
+            required: true,
+            min: 0.01
+        },
+        currencyExchangeRate: {
+            required: true,
+            min: 0.000001
+        },
+        currencyExchangeFromCurrency: {
+            required: true
+        },
+        currencyExchangeToCurrency: {
+            required: true
         }
     },
-    onSave: 'saveCashFlow'
+    onSave: 'saveCashFlow',
+    onSaveExchange: 'saveCurrencyExchange' // Function to call when saving exchange
 };
 
 // יצירת המודל כאשר הקובץ נטען

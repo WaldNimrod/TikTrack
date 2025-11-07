@@ -153,6 +153,10 @@ def create_trade():
         if 'investment_type' not in data or not data['investment_type']:
             data['investment_type'] = 'swing'
         
+        # Sanitize HTML content for notes field
+        if 'notes' in data and data['notes']:
+            data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
+        
         db: Session = g.db
         trade = TradeService.create(db, data)
         return jsonify({
@@ -184,6 +188,10 @@ def update_trade(trade_id: int):
         # Ensure investment_type has a default value
         if 'investment_type' not in data or not data['investment_type']:
             data['investment_type'] = 'swing'
+        
+        # Sanitize HTML content for notes field
+        if 'notes' in data and data['notes']:
+            data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         
         db: Session = g.db
         trade = TradeService.update(db, trade_id, data)

@@ -84,6 +84,10 @@ def create_execution():
             except ValueError:
                 data['date'] = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S')
         
+        # Sanitize HTML content for notes field
+        if 'notes' in data and data['notes']:
+            data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
+        
         execution = Execution(**data)
         db.add(execution)
         db.commit()
@@ -131,6 +135,10 @@ def update_execution(execution_id: int):
                     data['date'] = datetime.fromisoformat(data['date'].replace('Z', '+00:00'))
                 except ValueError:
                     data['date'] = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S')
+            
+            # Sanitize HTML content for notes field
+            if 'notes' in data and data['notes']:
+                data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
             
             for key, value in data.items():
                 if hasattr(execution, key):

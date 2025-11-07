@@ -13,6 +13,10 @@
  * Last Updated: 2025-01-27
  */
 
+// ===== LOADING TRACKING =====
+console.log('🔵 [table-mappings.js] FILE LOADING STARTED');
+console.log('🔵 [table-mappings.js] Current window.TABLE_COLUMN_MAPPINGS:', window.TABLE_COLUMN_MAPPINGS ? `exists (${Object.keys(window.TABLE_COLUMN_MAPPINGS).length} keys)` : 'NOT FOUND');
+
 // ===== TABLE COLUMN MAPPINGS =====
 const TABLE_COLUMN_MAPPINGS = {
   // טבלת תכנונים (Trade Plans) - Trade Plans Page Structure (מוצג בפועל)
@@ -45,16 +49,6 @@ const TABLE_COLUMN_MAPPINGS = {
     'account_name',          // 10 - חשבון מסחר
     'created_at',            // 11 - נוצר ב
     'closed_at',             // 12 - נסגר ב
-  ],
-
-  // טבלת חשבונות (Accounts) - Trading Accounts Page Structure (מוצג בפועל)
-  'accounts': [
-    'name',                  // 0 - שם החשבון מסחר
-    'currency_id',           // 1 - מטבע
-    'cash_balance',          // 2 - יתרה (מחושב)
-    'positions_count',       // 3 - פוזיציות (מחושב)
-    'total_pl',              // 4 - רווח/הפסד
-    'status',                // 5 - סטטוס
   ],
 
   // טבלת חשבונות מסחר (Trading Accounts) - Trading Accounts Page Structure (מוצג בפועל)
@@ -124,11 +118,13 @@ const TABLE_COLUMN_MAPPINGS = {
   ],
 
   // טבלת הערות (Notes) - Notes Page Structure (מוצג בפועל)
+  // מציג: אובייקט מקושר, תוכן, תאריך, קובץ מצורף, פעולות
   'notes': [
-    'related_object',        // 0 - קשור ל (מחושב)
-    'content',               // 1 - תוכן
-    'created_at',            // 2 - נוצר ב
+    'related_object',        // 0 - אובייקט מקושר (מחושב מהאובייקט המקושר)
+    'content',               // 1 - תוכן ההערה
+    'created_at',            // 2 - תאריך (תאריך ההערה)
     'attachment',            // 3 - קובץ מצורף
+    // Note: actions column is not part of the mapping (handled separately)
   ],
 
   // טבלת תנועות חשבון (Account Activity) - Trading Accounts Page Structure
@@ -225,15 +221,45 @@ function getColumnValue(item, columnIndex, tableType) {
 
   // Database Display Page - Direct field mapping
   // Note: Some tables have calculated fields that need special handling
-  if (tableType === 'positions' || tableType === 'portfolio' ||
-        tableType === 'position_executions' || tableType === 'account_activity') {
-
+  if (tableType === 'positions' || tableType === 'portfolio') {
     // Return the field value directly from the item
     return item[fieldName] || '';
   }
   
-  // Accounts and Trading Accounts tables - special handling for calculated fields
-  if (tableType === 'accounts' || tableType === 'trading_accounts') {
+  // Account Activity table - special handling for field name mapping
+  if (tableType === 'account_activity') {
+    // Map field names to actual data structure
+    if (fieldName === 'ticker') {
+      return item.ticker_symbol || '';
+    }
+    if (fieldName === 'currency') {
+      return item.currency_symbol || '';
+    }
+    if (fieldName === 'subtype') {
+      return item.sub_type || item.subtype || item.action || '';
+    }
+    // For other fields, return directly
+    return item[fieldName] || '';
+  }
+  
+  // Position Executions table - special handling for calculated 'total' field
+  if (tableType === 'position_executions') {
+    if (fieldName === 'total') {
+      // Calculate total if not present: (quantity * price) + fee
+      if (item.total !== undefined && item.total !== null) {
+        return item.total;
+      }
+      const quantity = parseFloat(item.quantity) || 0;
+      const price = parseFloat(item.price) || 0;
+      const fee = parseFloat(item.fee) || 0;
+      return (quantity * price) + fee;
+    }
+    // For other fields, return directly
+    return item[fieldName] || '';
+  }
+  
+  // Trading Accounts table - special handling for calculated fields
+  if (tableType === 'trading_accounts') {
     if (fieldName === 'cash_balance') {
       // This is calculated in real-time via AccountActivityService
       return item.cash_balance || item.balance || 0;
@@ -303,7 +329,7 @@ function getColumnValue(item, columnIndex, tableType) {
     return item[fieldName] || '';
   }
   
-  // Notes table - special handling for related_object
+  // Notes table - special handling for calculated fields
   if (tableType === 'notes') {
     if (fieldName === 'related_object') {
       // This is a calculated field - we need to get it from the display
@@ -312,7 +338,15 @@ function getColumnValue(item, columnIndex, tableType) {
       const relatedId = item.related_id || '';
       return `${typeId}_${relatedId}`; // Combined for sorting
     }
-    // For other fields, return directly
+    if (fieldName === 'content') {
+      // Return content for sorting (will be sorted by text)
+      return item.content || '';
+    }
+    if (fieldName === 'attachment') {
+      // Return attachment filename for sorting
+      return item.attachment || '';
+    }
+    // For other fields (created_at, etc.), return directly
     return item[fieldName] || '';
   }
   
@@ -726,6 +760,9 @@ function getColumnDefinition(tableName, columnName) {
 // These functions are made available globally for use by other scripts.
 // All table-related scripts depend on these functions being available.
 
+console.log('🔵 [table-mappings.js] About to export TABLE_COLUMN_MAPPINGS');
+console.log('🔵 [table-mappings.js] TABLE_COLUMN_MAPPINGS keys:', Object.keys(TABLE_COLUMN_MAPPINGS));
+
 window.TABLE_COLUMN_MAPPINGS = TABLE_COLUMN_MAPPINGS;
 window.getColumnValue = getColumnValue;
 window.getTableMapping = getTableMapping;
@@ -740,5 +777,9 @@ window.tableMappings = {
   getTableMapping,
   isTableSupported,
 };
+
+console.log('🔵 [table-mappings.js] Exported to window.TABLE_COLUMN_MAPPINGS');
+console.log('🔵 [table-mappings.js] window.TABLE_COLUMN_MAPPINGS keys:', Object.keys(window.TABLE_COLUMN_MAPPINGS || {}));
+console.log('🔵 [table-mappings.js] window.getColumnValue type:', typeof window.getColumnValue);
 
 // Table Mappings loaded successfully

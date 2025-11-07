@@ -21,6 +21,7 @@ const loggerCode = fs.readFileSync(
 
 describe('Logger Service', () => {
     let Logger;
+    let logger;
     
     beforeAll(() => {
         // Mock the global environment before loading the real code
@@ -43,6 +44,29 @@ describe('Logger Service', () => {
         // Evaluate the real code to get the Logger
         eval(loggerCode);
         Logger = global.window.Logger;
+
+        const wrapMethod = (methodName) => {
+            const original = Logger?.[methodName];
+            if (typeof original === 'function') {
+                Logger[methodName] = jest.fn(function (...args) {
+                    return original.apply(Logger, args);
+                });
+            } else {
+                Logger[methodName] = jest.fn();
+            }
+        };
+
+        const methodsToWrap = [
+            'debug', 'info', 'warn', 'error', 'success', 'trace', 'log', 'critical',
+            'setLevel', 'getLevel', 'flush', 'clear', 'getLogs', 'exportLogs',
+            'sendToServer', 'setServerEndpoint', 'setConfig', 'startTimer',
+            'endTimer', 'measurePerformance', 'logBatch'
+        ];
+
+        methodsToWrap.forEach(wrapMethod);
+
+        logger = Logger;
+        global.logger = logger;
     });
     
     beforeEach(() => {

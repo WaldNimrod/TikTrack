@@ -348,6 +348,14 @@ try:
 except Exception as e:
     logger.error(f"❌ Failed to register import sessions cleanup task: {e}")
 
+# Register alert expiry task
+try:
+    from services.alert_expiry_task import register_alert_expiry_task
+    register_alert_expiry_task(background_task_manager)
+    logger.info("✅ Alert expiry task registered successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to register alert expiry task: {e}")
+
 # Start background task scheduler automatically
 try:
     logger.info("🚀 Starting background task scheduler...")

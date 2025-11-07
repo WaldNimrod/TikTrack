@@ -301,8 +301,8 @@ function initializePage(pageName) {
     case 'trades':
       initializeTradesPage();
       break;
-    case 'accounts':
-      initializeAccountsPage();
+    case 'trading_accounts':
+      // Trading accounts page initialization handled by unified initialization system
       break;
     case 'alerts':
       initializeAlertsPage();

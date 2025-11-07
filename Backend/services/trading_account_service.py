@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from models.trading_account import TradingAccount
 from models.cash_flow import CashFlow
@@ -36,7 +36,7 @@ class TradingAccountService:
     def create(db: Session, data: Dict[str, Any]) -> TradingAccount:
         """Create new trading_account"""
         # Validate that all fields exist in the TradingAccount model
-        allowed_fields = {'name', 'currency_id', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'}
+        allowed_fields = {'name', 'currency_id', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes', 'opening_balance'}
         invalid_fields = set(data.keys()) - allowed_fields
         if invalid_fields:
             raise ValueError(f"Invalid fields: {', '.join(invalid_fields)}. Allowed fields: {', '.join(allowed_fields)}")

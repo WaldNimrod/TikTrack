@@ -1,0 +1,707 @@
+{
+  "stats": {
+    "total": 33,
+    "missingDataOnclick": 31,
+    "needsMigration": 2
+  },
+  "findings": [
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-helpers.js",
+        "line": 249,
+        "column": 27
+      },
+      "context": "const buttonHtml = `<button class=\"btn ${classes}\" ${attributes} title=\"סגור\">",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-demo-core.js",
+        "line": 245,
+        "column": 30
+      },
+      "context": "newHtml: '<button data-button-type=\"CLOSE\" data-attributes=\"type=\\'button\\' class=\\'btn-close\\' data-bs-dismiss=\\'modal\\'\"></button>',",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-demo-core.js",
+        "line": 481,
+        "column": 25
+      },
+      "context": "const btn = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-demo-core.js",
+        "line": 678,
+        "column": 32
+      },
+      "context": "const liveButton = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-init.js",
+        "line": 589,
+        "column": 19
+      },
+      "context": "return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${tooltipAttrs}${allAttributes}>${content}</button>`;",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-init.js",
+        "line": 589,
+        "column": 65
+      },
+      "context": "return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${tooltipAttrs}${allAttributes}>${content}</button>`;",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-init.js",
+        "line": 747,
+        "column": 15
+      },
+      "context": "return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${allAttributes}>${buttonText}</button>`;",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-init.js",
+        "line": 747,
+        "column": 61
+      },
+      "context": "return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${allAttributes}>${buttonText}</button>`;",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions/condition-builder.js",
+        "line": 302,
+        "column": 28
+      },
+      "context": "<button data-button-type=\"EDIT\" data-variant=\"small\" data-index=\"${index}\" data-text=\"\" title=\"ערוך\"></button>",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions/condition-builder.js",
+        "line": 303,
+        "column": 28
+      },
+      "context": "<button data-button-type=\"DELETE\" data-variant=\"small\" data-index=\"${index}\" data-text=\"\" title=\"מחק\"></button>",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions-test.js",
+        "line": 1235,
+        "column": 33
+      },
+      "context": "const editBtn = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions-test.js",
+        "line": 1242,
+        "column": 35
+      },
+      "context": "const deleteBtn = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions-test.js",
+        "line": 1249,
+        "column": 34
+      },
+      "context": "const alertBtn = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/constraint-manager.js",
+        "line": 664,
+        "column": 32
+      },
+      "context": "<button data-button-type=\"CANCEL\" data-attributes=\"data-bs-dismiss='modal' type='button'\"></button>",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/constraints.js",
+        "line": 671,
+        "column": 32
+      },
+      "context": "<button data-button-type=\"CLOSE\" data-attributes=\"data-bs-dismiss='modal' type='button'\"></button>",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/constraints.js",
+        "line": 795,
+        "column": 32
+      },
+      "context": "<button data-button-type=\"CLOSE\" data-attributes=\"data-bs-dismiss='modal' type='button'\"></button>",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/enhancements/index-enhancements.js",
+        "line": 383,
+        "column": 47
+      },
+      "context": "const refreshButton = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/entity-details-renderer.js",
+        "line": 1515,
+        "column": 23
+      },
+      "context": "return `<button class=\"btn ${buttonSize} ${buttonClass}\" ${onclick} title=\"${title}\">` +",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linked-items.js",
+        "line": 531,
+        "column": 16
+      },
+      "context": "<button data-button-type=\"CLOSE\" data-attributes=\"data-bs-dismiss='modal' type='button'\"></button>",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/modal-navigation-manager.js",
+        "line": 1031,
+        "column": 38
+      },
+      "context": "backButton = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/modules/core-systems.js",
+        "line": 2623,
+        "column": 36
+      },
+      "context": "${includeCopyButton ? `<button type=\"button\" class=\"btn btn-sm btn-primary\" id=\"${modalId}-copy-btn\" title=\"העתק ללוח\">",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/notification-system.js",
+        "line": 993,
+        "column": 22
+      },
+      "context": "<button data-button-type=\"COPY\" id=\"${modalId}-copy-btn\" data-text=\"העתק\" title=\"העתק ללוח\">",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/notification-system.js",
+        "line": 995,
+        "column": 22
+      },
+      "context": "<button data-button-type=\"CLOSE\" id=\"${modalId}-close-btn\" data-text=\"סגור\" title=\"סגור\">",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/notification-system.js",
+        "line": 1006,
+        "column": 20
+      },
+      "context": "<button data-button-type=\"CANCEL\" id=\"${modalId}-footer-close\" data-text=\"סגור\" title=\"סגור\"></button>",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/system-management/system-management-main.js",
+        "line": 281,
+        "column": 34
+      },
+      "context": "const refreshBtn = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/system-management/system-management-main.js",
+        "line": 299,
+        "column": 33
+      },
+      "context": "const toggleBtn = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "onclick-needs-migration",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trade_plans.js",
+        "line": 2160,
+        "column": 35
+      },
+      "context": "const tickerLink = design.id ? `<button class=\"btn btn-sm\" onclick=\"if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('trade_plan', ${design.id}); }\" title=\"קישור\">🔗</button>` : '';",
+      "recommendation": "המר מ-onclick ל-data-onclick"
+    },
+    {
+      "type": "onclick-needs-migration",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trades.js",
+        "line": 603,
+        "column": 23
+      },
+      "context": "const tickerLink = `<button class=\"btn btn-sm btn-outline-secondary\" onclick=\"viewTickerDetails('${trade.ticker_id}')\" title=\"פרטי טיקר\" style=\"padding: 2px 6px; font-size: 12px;\">🔗</button>`;",
+      "recommendation": "המר מ-onclick ל-data-onclick"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/unified-log-display.js",
+        "line": 533,
+        "column": 24
+      },
+      "context": "<button data-button-type=\"VIEW\" data-variant=\"small\" data-text=\"\" title=\"פרטים\"></button>",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/unified-log-display.js",
+        "line": 534,
+        "column": 24
+      },
+      "context": "<button data-button-type=\"COPY\" data-variant=\"small\" data-text=\"\" title=\"העתקה\"></button>",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/unified-log-display.js",
+        "line": 594,
+        "column": 37
+      },
+      "context": "const testBtn = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/unified-log-display.js",
+        "line": 1348,
+        "column": 29
+      },
+      "context": "const testBtn = document.createElement('button');",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    },
+    {
+      "type": "missing-data-onclick",
+      "location": {
+        "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/warning-system.js",
+        "line": 128,
+        "column": 32
+      },
+      "context": "<button data-button-type=\"CANCEL\" data-attributes=\"data-bs-dismiss='modal' type='button'\" data-classes=\"ms-2\"></button>",
+      "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+    }
+  ],
+  "byFile": {
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-helpers.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-helpers.js",
+          "line": 249,
+          "column": 27
+        },
+        "context": "const buttonHtml = `<button class=\"btn ${classes}\" ${attributes} title=\"סגור\">",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-demo-core.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-demo-core.js",
+          "line": 245,
+          "column": 30
+        },
+        "context": "newHtml: '<button data-button-type=\"CLOSE\" data-attributes=\"type=\\'button\\' class=\\'btn-close\\' data-bs-dismiss=\\'modal\\'\"></button>',",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-demo-core.js",
+          "line": 481,
+          "column": 25
+        },
+        "context": "const btn = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-demo-core.js",
+          "line": 678,
+          "column": 32
+        },
+        "context": "const liveButton = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-init.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-init.js",
+          "line": 589,
+          "column": 19
+        },
+        "context": "return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${tooltipAttrs}${allAttributes}>${content}</button>`;",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-init.js",
+          "line": 589,
+          "column": 65
+        },
+        "context": "return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${tooltipAttrs}${allAttributes}>${content}</button>`;",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-init.js",
+          "line": 747,
+          "column": 15
+        },
+        "context": "return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${allAttributes}>${buttonText}</button>`;",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/button-system-init.js",
+          "line": 747,
+          "column": 61
+        },
+        "context": "return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${allAttributes}>${buttonText}</button>`;",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions/condition-builder.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions/condition-builder.js",
+          "line": 302,
+          "column": 28
+        },
+        "context": "<button data-button-type=\"EDIT\" data-variant=\"small\" data-index=\"${index}\" data-text=\"\" title=\"ערוך\"></button>",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions/condition-builder.js",
+          "line": 303,
+          "column": 28
+        },
+        "context": "<button data-button-type=\"DELETE\" data-variant=\"small\" data-index=\"${index}\" data-text=\"\" title=\"מחק\"></button>",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions-test.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions-test.js",
+          "line": 1235,
+          "column": 33
+        },
+        "context": "const editBtn = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions-test.js",
+          "line": 1242,
+          "column": 35
+        },
+        "context": "const deleteBtn = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions-test.js",
+          "line": 1249,
+          "column": 34
+        },
+        "context": "const alertBtn = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/constraint-manager.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/constraint-manager.js",
+          "line": 664,
+          "column": 32
+        },
+        "context": "<button data-button-type=\"CANCEL\" data-attributes=\"data-bs-dismiss='modal' type='button'\"></button>",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/constraints.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/constraints.js",
+          "line": 671,
+          "column": 32
+        },
+        "context": "<button data-button-type=\"CLOSE\" data-attributes=\"data-bs-dismiss='modal' type='button'\"></button>",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/constraints.js",
+          "line": 795,
+          "column": 32
+        },
+        "context": "<button data-button-type=\"CLOSE\" data-attributes=\"data-bs-dismiss='modal' type='button'\"></button>",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/enhancements/index-enhancements.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/enhancements/index-enhancements.js",
+          "line": 383,
+          "column": 47
+        },
+        "context": "const refreshButton = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/entity-details-renderer.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/entity-details-renderer.js",
+          "line": 1515,
+          "column": 23
+        },
+        "context": "return `<button class=\"btn ${buttonSize} ${buttonClass}\" ${onclick} title=\"${title}\">` +",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linked-items.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linked-items.js",
+          "line": 531,
+          "column": 16
+        },
+        "context": "<button data-button-type=\"CLOSE\" data-attributes=\"data-bs-dismiss='modal' type='button'\"></button>",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/modal-navigation-manager.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/modal-navigation-manager.js",
+          "line": 1031,
+          "column": 38
+        },
+        "context": "backButton = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/modules/core-systems.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/modules/core-systems.js",
+          "line": 2623,
+          "column": 36
+        },
+        "context": "${includeCopyButton ? `<button type=\"button\" class=\"btn btn-sm btn-primary\" id=\"${modalId}-copy-btn\" title=\"העתק ללוח\">",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/notification-system.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/notification-system.js",
+          "line": 993,
+          "column": 22
+        },
+        "context": "<button data-button-type=\"COPY\" id=\"${modalId}-copy-btn\" data-text=\"העתק\" title=\"העתק ללוח\">",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/notification-system.js",
+          "line": 995,
+          "column": 22
+        },
+        "context": "<button data-button-type=\"CLOSE\" id=\"${modalId}-close-btn\" data-text=\"סגור\" title=\"סגור\">",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/notification-system.js",
+          "line": 1006,
+          "column": 20
+        },
+        "context": "<button data-button-type=\"CANCEL\" id=\"${modalId}-footer-close\" data-text=\"סגור\" title=\"סגור\"></button>",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/system-management/system-management-main.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/system-management/system-management-main.js",
+          "line": 281,
+          "column": 34
+        },
+        "context": "const refreshBtn = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/system-management/system-management-main.js",
+          "line": 299,
+          "column": 33
+        },
+        "context": "const toggleBtn = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trade_plans.js": [
+      {
+        "type": "onclick-needs-migration",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trade_plans.js",
+          "line": 2160,
+          "column": 35
+        },
+        "context": "const tickerLink = design.id ? `<button class=\"btn btn-sm\" onclick=\"if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('trade_plan', ${design.id}); }\" title=\"קישור\">🔗</button>` : '';",
+        "recommendation": "המר מ-onclick ל-data-onclick"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trades.js": [
+      {
+        "type": "onclick-needs-migration",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trades.js",
+          "line": 603,
+          "column": 23
+        },
+        "context": "const tickerLink = `<button class=\"btn btn-sm btn-outline-secondary\" onclick=\"viewTickerDetails('${trade.ticker_id}')\" title=\"פרטי טיקר\" style=\"padding: 2px 6px; font-size: 12px;\">🔗</button>`;",
+        "recommendation": "המר מ-onclick ל-data-onclick"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/unified-log-display.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/unified-log-display.js",
+          "line": 533,
+          "column": 24
+        },
+        "context": "<button data-button-type=\"VIEW\" data-variant=\"small\" data-text=\"\" title=\"פרטים\"></button>",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/unified-log-display.js",
+          "line": 534,
+          "column": 24
+        },
+        "context": "<button data-button-type=\"COPY\" data-variant=\"small\" data-text=\"\" title=\"העתקה\"></button>",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/unified-log-display.js",
+          "line": 594,
+          "column": 37
+        },
+        "context": "const testBtn = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      },
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/unified-log-display.js",
+          "line": 1348,
+          "column": 29
+        },
+        "context": "const testBtn = document.createElement('button');",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ],
+    "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/warning-system.js": [
+      {
+        "type": "missing-data-onclick",
+        "location": {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/warning-system.js",
+          "line": 128,
+          "column": 32
+        },
+        "context": "<button data-button-type=\"CANCEL\" data-attributes=\"data-bs-dismiss='modal' type='button'\" data-classes=\"ms-2\"></button>",
+        "recommendation": "הוסף data-onclick לכפתור או השתמש ב-Button System"
+      }
+    ]
+  }
+}

@@ -241,29 +241,14 @@ class UnifiedAppInitializer {
         if (typeof window.pageInitializationConfigs !== 'undefined' && 
             window.pageInitializationConfigs[this.pageInfo?.name]) {
             pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
-            console.log(`📋 Loaded page config for ${this.pageInfo.name} from pageInitializationConfigs`);
-            window.Logger.info(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig, { page: "unified-app-initializer" });
         } else if (typeof window.PAGE_CONFIGS !== 'undefined' && 
                    window.PAGE_CONFIGS[this.pageInfo?.name]) {
             pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
-            console.log(`📋 Loaded page config for ${this.pageInfo.name} from PAGE_CONFIGS`);
-            window.Logger.info(`📋 Loaded page config from PAGE_CONFIGS for ${this.pageInfo.name}:`, pageConfig, { page: "unified-app-initializer" });
-        } else {
-            console.warn(`⚠️ No page config found for ${pageName}`);
-            window.Logger.info(`⚠️ No page config found for ${this.pageInfo?.name || 'unknown'}`, { page: "unified-app-initializer" });
-            window.Logger.info('🔍 Available configs in pageInitializationConfigs:', window.pageInitializationConfigs ? Object.keys(window.pageInitializationConfigs, { page: "unified-app-initializer" }) : 'undefined');
-            window.Logger.info('🔍 Available configs in PAGE_CONFIGS:', window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS, { page: "unified-app-initializer" }) : 'undefined');
         }
         
         // Store custom initializers from page config
         if (pageConfig?.customInitializers) {
             this.customInitializers = pageConfig.customInitializers;
-            console.log('🔧 Loaded custom initializers from page config:', this.customInitializers.length);
-            if (window.DEBUG_MODE) {
-                window.Logger.info('🔧 Loaded custom initializers from page config:', this.customInitializers.length, { page: "unified-app-initializer" });
-            }
-        } else {
-            console.warn('⚠️ No custom initializers found in page config');
         }
         
         const config = {
@@ -297,7 +282,6 @@ class UnifiedAppInitializer {
      * Stage 3: Execute initialization
      */
     async executeInitialization(config) {
-        window.Logger.info('🎯 Stage 3: Executing initialization...', { page: "unified-app-initializer" });
         const stageStart = Date.now();
         
         try {
@@ -369,16 +353,11 @@ class UnifiedAppInitializer {
         }
         
         // Execute custom finalizers
-        window.Logger.info('🔧 Executing custom initializers:', this.customInitializers.length, { page: "unified-app-initializer" });
         for (let i = 0; i < this.customInitializers.length; i++) {
             const initializer = this.customInitializers[i];
-            window.Logger.info(`🔧 Executing custom initializer ${i + 1}/${this.customInitializers.length}:`, typeof initializer, { page: "unified-app-initializer" });
             if (typeof initializer === 'function') {
                 try {
                     await initializer(config);
-                    if (window.DEBUG_MODE) {
-                        window.Logger.info(`✅ Custom initializer ${i + 1} completed successfully`, { page: "unified-app-initializer" });
-                    }
                 } catch (error) {
                     // window.Logger.error(`❌ Custom initializer ${i + 1} failed:`, error, { page: "unified-app-initializer" });
                 }
@@ -390,8 +369,7 @@ class UnifiedAppInitializer {
         // Restore section states with small delay to ensure DOM is ready
         if (typeof window.restoreAllSectionStates === 'function') {
             setTimeout(async () => {
-                const restoredCount = await window.restoreAllSectionStates();
-                window.Logger.info(`✅ Restored ${restoredCount} section states`, { page: "unified-app-initializer" });
+                await window.restoreAllSectionStates();
             }, 100);
         }
         
@@ -411,8 +389,6 @@ class UnifiedAppInitializer {
         const path = window.location.pathname;
         const filename = path.split('/').pop() || 'index';
         const pageName = filename.replace('.html', '');
-        
-        window.Logger.info('🔍 Page detection:', { path, filename, pageName }, { page: "unified-app-initializer" });
         
         const pageInfo = {
             name: pageName,
@@ -547,12 +523,12 @@ class UnifiedAppInitializer {
                 }
             } catch (error) {
                 window.Logger.error('❌ UnifiedCacheManager initialization failed:', error, { page: "unified-app-initializer" });
-                window.Logger.info('⚠️ Using localStorage fallback', { page: "unified-app-initializer" });
+                // window.Logger.info('⚠️ Using localStorage fallback', { page: "unified-app-initializer" });
                 // Set a flag to indicate cache system is not available
                 window.UnifiedCacheManager = null;
             }
         } else {
-            window.Logger.info('⚠️ UnifiedCacheManager not available, using localStorage fallback', { page: "unified-app-initializer" });
+            // window.Logger.info('⚠️ UnifiedCacheManager not available, using localStorage fallback', { page: "unified-app-initializer" });
         }
 
         // Initialize CacheSyncManager with timeout
@@ -693,7 +669,7 @@ class UnifiedAppInitializer {
         // Initialize Actions Menu System (Table Actions)
         if (typeof window.actionsMenuSystem !== 'undefined') {
             // Actions Menu System is already initialized when loaded
-            window.Logger.info('✅ Actions Menu System ready', { page: "unified-app-initializer" });
+            // window.Logger.info('✅ Actions Menu System ready', { page: "unified-app-initializer" });
         }
         
         // Initialize page-specific systems
@@ -713,19 +689,19 @@ class UnifiedAppInitializer {
         }
         
         // Initialize page-specific custom initializers
-        console.log('🔍 Checking custom initializers for:', config.name, { hasInitializers: !!config.customInitializers, isArray: Array.isArray(config.customInitializers), count: config.customInitializers?.length });
+        // console.log('🔍 Checking custom initializers for:', config.name, { hasInitializers: !!config.customInitializers, isArray: Array.isArray(config.customInitializers), count: config.customInitializers?.length });
         if (config.customInitializers && Array.isArray(config.customInitializers)) {
-            console.log(`🔧 Found ${config.customInitializers.length} custom initializers for ${config.name}`);
-            window.Logger.info(`🔧 Found ${config.customInitializers.length} custom initializers for ${config.name}`, { page: "unified-app-initializer" });
+            // console.log(`🔧 Found ${config.customInitializers.length} custom initializers for ${config.name}`);
+            // window.Logger.info(`🔧 Found ${config.customInitializers.length} custom initializers for ${config.name}`, { page: "unified-app-initializer" });
             for (let i = 0; i < config.customInitializers.length; i++) {
                 const initializer = config.customInitializers[i];
-                console.log(`🔧 Executing custom initializer ${i + 1}/${config.customInitializers.length} for ${config.name}`);
-                window.Logger.info(`🔧 Executing custom initializer ${i + 1}/${config.customInitializers.length} for ${config.name}`, { page: "unified-app-initializer" });
+                // console.log(`🔧 Executing custom initializer ${i + 1}/${config.customInitializers.length} for ${config.name}`);
+                // window.Logger.info(`🔧 Executing custom initializer ${i + 1}/${config.customInitializers.length} for ${config.name}`, { page: "unified-app-initializer" });
                 if (typeof initializer === 'function') {
                     try {
                         await initializer(config);
-                        console.log(`✅ Custom initializer ${i + 1} completed`);
-                        window.Logger.info(`✅ Custom initializer ${i + 1} completed`, { page: "unified-app-initializer" });
+                        // console.log(`✅ Custom initializer ${i + 1} completed`);
+                        // window.Logger.info(`✅ Custom initializer ${i + 1} completed`, { page: "unified-app-initializer" });
                     } catch (error) {
                         console.error(`❌ Error in custom initializer ${i + 1}:`, error);
                         window.Logger.error(`❌ Error in custom initializer ${i + 1}:`, error, { page: "unified-app-initializer" });
@@ -736,12 +712,12 @@ class UnifiedAppInitializer {
                 }
             }
         } else {
-            console.warn(`⚠️ No custom initializers found for ${config.name}`, { hasCustomInitializers: !!config.customInitializers, isArray: Array.isArray(config.customInitializers) });
-            window.Logger.info(`⚠️ No custom initializers found for ${config.name}`, { 
-                hasCustomInitializers: !!config.customInitializers,
-                isArray: Array.isArray(config.customInitializers),
-                customInitializers: config.customInitializers
-            }, { page: "unified-app-initializer" });
+            // console.warn(`⚠️ No custom initializers found for ${config.name}`, { hasCustomInitializers: !!config.customInitializers, isArray: Array.isArray(config.customInitializers) });
+            // window.Logger.info(`⚠️ No custom initializers found for ${config.name}`, { 
+            //     hasCustomInitializers: !!config.customInitializers,
+            //     isArray: Array.isArray(config.customInitializers),
+            //     customInitializers: config.customInitializers
+            // }, { page: "unified-app-initializer" });
         }
     }
 

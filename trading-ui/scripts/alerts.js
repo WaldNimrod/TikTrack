@@ -115,6 +115,10 @@ window.loadAlertsData = window.loadAlertsData || function() {
 // ===== DATA LOADING FUNCTIONS =====
 // Data fetching, table updates, and statistics
 
+// Guard to prevent multiple simultaneous calls
+let loadAlertsDataInProgress = false;
+let loadAlertsDataPromise = null;
+
 /**
  * Load alerts data from server
  * Fetches all alerts and updates the table display
@@ -124,53 +128,67 @@ window.loadAlertsData = window.loadAlertsData || function() {
  * @returns {Promise<void>}
  */
 window.loadAlertsData = async function() {
-  window.Logger.info('🚀🚀🚀 loadAlertsData התחיל 🚀🚀🚀', { page: "alerts" });
-
-  try {
-    // קריאה לשרת לקבלת נתוני התראות
-    window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
-    const response = await fetch('/api/alerts/');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
-
-    // שמירת הנתונים במשתנה גלובלי
-    window.alertsData = data.data || data;
-    window.Logger.info('💾 נתונים נשמרו ב-window.alertsData:', window.alertsData.length, 'התראות', { page: "alerts" });
-
-    // עדכון הטבלה
-    if (typeof window.updateAlertsTable === 'function') {
-      window.Logger.info('📊 מעדכן את טבלת ההתראות', { page: "alerts" });
-      window.updateAlertsTable(window.alertsData);
-    } else {
-      window.Logger.warn('⚠️ updateAlertsTable לא זמין', { page: "alerts" });
-    }
-
-    // עדכון סטטיסטיקות
-    if (typeof window.updateAlertsSummary === 'function') {
-      window.Logger.info('📈 מעדכן את סטטיסטיקות ההתראות', { page: "alerts" });
-      window.updateAlertsSummary(window.alertsData);
-    } else {
-      window.Logger.warn('⚠️ updateAlertsSummary לא זמין', { page: "alerts" });
-    }
-
-    window.Logger.info('✅ loadAlertsData הושלם בהצלחה', { page: "alerts" });
-
-  } catch (error) {
-    window.Logger.error('❌ שגיאה ב-loadAlertsData:', error, { page: "alerts" });
-    
-    // הצגת הודעת שגיאה למשתמש
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בטעינת נתוני ההתראות', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בטעינת נתוני ההתראות', 'error');
-    } else {
-      alert('שגיאה בטעינת נתוני ההתראות: ' + error.message);
-    }
+  // Prevent multiple simultaneous calls
+  if (loadAlertsDataInProgress) {
+    window.Logger.info('⏳ loadAlertsData כבר רץ, ממתין לסיום הקריאה הקודמת...', { page: "alerts" });
+    return loadAlertsDataPromise;
   }
+
+  loadAlertsDataInProgress = true;
+  loadAlertsDataPromise = (async () => {
+    try {
+      window.Logger.info('🚀🚀🚀 loadAlertsData התחיל 🚀🚀🚀', { page: "alerts" });
+
+      // קריאה לשרת לקבלת נתוני התראות
+      window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
+      const response = await fetch('/api/alerts/');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
+
+      // שמירת הנתונים במשתנה גלובלי
+      window.alertsData = data.data || data;
+      window.Logger.info('💾 נתונים נשמרו ב-window.alertsData:', window.alertsData.length, 'התראות', { page: "alerts" });
+
+      // עדכון הטבלה
+      if (typeof window.updateAlertsTable === 'function') {
+        window.Logger.info('📊 מעדכן את טבלת ההתראות', { page: "alerts" });
+        window.updateAlertsTable(window.alertsData);
+      } else {
+        window.Logger.warn('⚠️ updateAlertsTable לא זמין', { page: "alerts" });
+      }
+
+      // עדכון סטטיסטיקות
+      if (typeof window.updateAlertsSummary === 'function') {
+        window.Logger.info('📈 מעדכן את סטטיסטיקות ההתראות', { page: "alerts" });
+        window.updateAlertsSummary(window.alertsData);
+      } else {
+        window.Logger.warn('⚠️ updateAlertsSummary לא זמין', { page: "alerts" });
+      }
+
+      window.Logger.info('✅ loadAlertsData הושלם בהצלחה', { page: "alerts" });
+    } catch (error) {
+      window.Logger.error('❌ שגיאה ב-loadAlertsData:', error, { page: "alerts" });
+      
+      // הצגת הודעת שגיאה למשתמש
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בטעינת נתוני ההתראות', error.message);
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('שגיאה בטעינת נתוני ההתראות', 'error');
+      } else {
+        alert('שגיאה בטעינת נתוני ההתראות: ' + error.message);
+      }
+      throw error;
+    } finally {
+      loadAlertsDataInProgress = false;
+      loadAlertsDataPromise = null;
+    }
+  })();
+
+  return loadAlertsDataPromise;
 };
 
 /**
@@ -347,96 +365,12 @@ function getDemoAlertsData() {
 }
 
 /**
- * פונקציה זו טוענת את כל ההתראות מהשרת ומעדכנת את הטבלה
- * אם השרת לא זמין, משתמשת בנתוני דמו
- *
- * @returns {Array} מערך של התראות
+ * REMOVED: Duplicate loadAlertsData function
+ * This function has been replaced by window.loadAlertsData (defined above)
+ * The new implementation includes proper guards to prevent multiple simultaneous calls
+ * 
+ * @deprecated Use window.loadAlertsData instead
  */
-async function loadAlertsData() {
-  window.Logger.info('Loading alerts data (bypass cache)', { page: "alerts" });
-  try {
-    // קריאה ישירה לשרת עם timestamp למניעת cache
-    const response = await fetch(`/api/alerts/?_t=${Date.now()}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      }
-    });
-
-    if (!response.ok) {
-      window.Logger.warn(`⚠️ Server error ${response.status}, using demo data`, { page: "alerts" });
-      // שימוש בנתוני דמו במקרה של שגיאת שרת
-      alertsData = getDemoAlertsData();
-      updateAlertsTable(alertsData);
-      
-      // עדכון סטטיסטיקות
-      if (typeof updateAlertsSummary === 'function') {
-        updateAlertsSummary(alertsData);
-      }
-      
-      // רענון כפוי של הטבלה
-      setTimeout(() => {
-        updateAlertsTable(alertsData);
-        if (typeof updateAlertsSummary === 'function') {
-          updateAlertsSummary(alertsData);
-        }
-      }, 100);
-      
-      return alertsData;
-    }
-
-    const data = await response.json();
-    const alerts = data.data || data;
-    window.Logger.info('📊 נתונים שהתקבלו:', alerts.length, 'התראות', { page: "alerts" });
-
-    // עדכון המשתנה הגלובלי
-    alertsData = alerts.map(alert => ({
-      id: alert.id,
-      title: alert.title,
-      status: alert.status,
-      related_type_id: alert.related_type_id,
-      related_id: alert.related_id,
-      condition: alert.condition,
-      condition_attribute: alert.condition_attribute,
-      condition_operator: alert.condition_operator,
-      condition_number: alert.condition_number,
-      message: alert.message,
-      created_at: alert.created_at,
-      is_triggered: alert.is_triggered,
-    }));
-
-    window.Logger.info('📊 נתונים מעובדים:', alertsData.length, 'התראות', { page: "alerts" });
-    
-      // עדכון הטבלה
-      updateAlertsTable(alertsData);
-      
-      // עדכון סטטיסטיקות
-      if (typeof updateAlertsSummary === 'function') {
-        updateAlertsSummary(alertsData);
-      }
-    
-
-    return alertsData;
-  } catch (error) {
-    window.Logger.error('שגיאה בטעינת התראות:', error, { page: "alerts" });
-    // שימוש בנתוני דמו במקרה של שגיאה
-    alertsData = getDemoAlertsData();
-    updateAlertsTable(alertsData);
-    
-    // עדכון סטטיסטיקות
-    if (typeof updateAlertsSummary === 'function') {
-      updateAlertsSummary(alertsData);
-    }
-    
-    // הצגת הודעת שגיאה
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה בטעינת התראות', 'לא ניתן לטעון התראות מהשרת. מוצגים נתוני דמו.');
-    }
-    
-    return alertsData;
-  }
-}
 
 // REMOVED: filterAlertsLocally - unused function
 
@@ -646,8 +580,8 @@ function updateAlertsTable(alerts) {
           <td class="text-center">
             ${getConditionSourceDisplay(alert)}
           </td>
-          <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
+          <td data-date="${alert.expiry_date || ''}"><span class="date-text">${alert.expiry_date ? new Date(alert.expiry_date).toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '-'}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${(() => {
               if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
@@ -1241,10 +1175,14 @@ function parseAlertCondition(condition) {
 async function saveAlert() {
   window.Logger.info('🔧 saveAlert function called', { page: "alerts" });
   
-  // ניקוי מטמון לפני פעולת CRUD - הוספה
-  const form = document.getElementById('addAlertForm');
+  // Find form - try new modal form first (ModalManagerV2), then fallback to old form
+  let form = document.getElementById('alertsModalForm');
   if (!form) {
-    window.Logger.warn('⚠️ Form element not found - skipping save operation', { page: "alerts" });
+    form = document.getElementById('addAlertForm');
+  }
+  
+  if (!form) {
+    window.Logger.warn('⚠️ Form element not found - skipping save operation', { page: "alerts" });                                                               
     return;
   }
   window.Logger.info('🔧 Form found, proceeding with validation', { page: "alerts" });
@@ -1258,23 +1196,55 @@ async function saveAlert() {
   }
   window.Logger.info('🔧 Form validation passed', { page: "alerts" });
 
-  // איסוף נתונים מהטופס באמצעות DataCollectionService
-  const alertData = DataCollectionService.collectFormData({
-    alertRelationType: { id: 'alertRelationType', type: 'text' },
-    alertRelatedObjectSelect: { id: 'alertRelatedObjectSelect', type: 'int' },
-    conditionAttribute: { id: 'conditionAttribute', type: 'text' },
-    conditionOperator: { id: 'conditionOperator', type: 'text' },
-    conditionNumber: { id: 'conditionNumber', type: 'number' },
-    message: { id: 'message', type: 'text' },
-    priority: { id: 'priority', type: 'text' },
-    status: { id: 'status', type: 'text', default: 'open' }
-  });
-
-  const relatedType = alertData.alertRelationType;
-  const relatedId = alertData.alertRelatedObjectSelect;
-  const conditionAttribute = alertData.conditionAttribute;
-  const conditionOperator = alertData.conditionOperator;
-  const conditionNumber = alertData.conditionNumber;
+  // איסוף נתונים מהטופס - תומך גם בטופס החדש (ModalManagerV2) וגם בטופס הישן
+  // Check if new form structure (ModalManagerV2) or old form structure
+  const isNewForm = form.querySelector('#alertRelatedType');
+  
+  let relatedType, relatedId, conditionAttribute, conditionOperator, conditionNumber, message, status, isTriggered, expiryDate;
+  
+  if (isNewForm) {
+    // New form structure (ModalManagerV2)
+    relatedType = form.querySelector('#alertRelatedType')?.value || '';
+    relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+    conditionAttribute = form.querySelector('#alertType')?.value || '';
+    conditionOperator = form.querySelector('#alertCondition')?.value || '';
+    conditionNumber = form.querySelector('#alertValue')?.value || '';
+    message = form.querySelector('#alertName')?.value || '';
+    
+    // Get combined status and parse to status + is_triggered
+    const statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
+    const statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
+    const isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+    
+    status = statusHidden;
+    isTriggered = isTriggeredHidden;
+    
+    // Get expiry_date
+    expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
+    if (expiryDate === '') expiryDate = null;
+  } else {
+    // Old form structure (backward compatibility)
+    const alertData = DataCollectionService.collectFormData({
+      alertRelationType: { id: 'alertRelationType', type: 'text' },
+      alertRelatedObjectSelect: { id: 'alertRelatedObjectSelect', type: 'int' },
+      conditionAttribute: { id: 'conditionAttribute', type: 'text' },
+      conditionOperator: { id: 'conditionOperator', type: 'text' },
+      conditionNumber: { id: 'conditionNumber', type: 'number' },
+      message: { id: 'message', type: 'text' },
+      priority: { id: 'priority', type: 'text' },
+      status: { id: 'status', type: 'text', default: 'open' }
+    });
+    
+    relatedType = alertData.alertRelationType;
+    relatedId = alertData.alertRelatedObjectSelect;
+    conditionAttribute = alertData.conditionAttribute;
+    conditionOperator = alertData.conditionOperator;
+    conditionNumber = alertData.conditionNumber;
+    message = alertData.message;
+    status = alertData.status || 'open';
+    isTriggered = 'false';
+    expiryDate = null;
+  }
 
   // window.Logger.info('🔧 Condition validation:', { page: "alerts" });
   // window.Logger.info('🔧 Condition attribute:', conditionAttribute, { page: "alerts" });
@@ -1357,37 +1327,49 @@ async function saveAlert() {
     }
   }
 
-  if (hasErrors) {
+    if (hasErrors) {
     return;
   }
 
+  // Check if editing (form has alert ID)
+  const alertId = form.querySelector('input[name="id"]')?.value || 
+                  form.querySelector('[data-alert-id]')?.getAttribute('data-alert-id') ||
+                  form.closest('.modal')?.querySelector('[data-alert-id]')?.getAttribute('data-alert-id');
+  
+  const isEdit = !!alertId;
+  
   const alertPayload = {
-    related_type_id: parseInt(relatedType),
-    related_id: parseInt(relatedId),
+    related_type_id: parseInt(relatedType) || null,
+    related_id: parseInt(relatedId) || null,
     condition_attribute: conditionAttribute,
     condition_operator: conditionOperator,
     condition_number: conditionNumber,
-    message: alertData.message || null,
-    status: 'open',
-    is_triggered: 'false',
+    message: message || null,
+    status: status || 'open',
+    is_triggered: isTriggered || 'false',
   };
+  
+  // Add expiry_date if provided
+  if (expiryDate) {
+    alertPayload.expiry_date = expiryDate;
+  }
 
-  // שולח התראה חדשה
-  // window.Logger.info('🔧 === SAVING ALERT ===', { page: "alerts" });
-  // window.Logger.info('🔧 Alert data:', alertData, { page: "alerts" });
-  // window.Logger.info('🔧 Request URL:', '/api/alerts/', { page: "alerts" });
-  // window.Logger.info('🔧 Request method:', 'POST', { page: "alerts" });
-  // window.Logger.info('🔧 Request body:', JSON.stringify(alertData, null, 2, { page: "alerts" }));
-
+  // שולח התראה חדשה או מעדכן קיימת
   try {
     window.Logger.info('🔧 === SAVING ALERT ===', { page: "alerts" });
-    window.Logger.info('🔧 Alert data:', alertData, { page: "alerts" });
-    window.Logger.info('🔧 Request URL:', '/api/alerts/', { page: "alerts" });
-    window.Logger.info('🔧 Request method:', 'POST', { page: "alerts" });
-    window.Logger.info('🔧 Request body:', JSON.stringify(alertData, null, 2, { page: "alerts" }));
+    window.Logger.info('🔧 Is Edit:', isEdit, { page: "alerts" });
+    window.Logger.info('🔧 Alert ID:', alertId, { page: "alerts" });
+    window.Logger.info('🔧 Alert payload:', alertPayload, { page: "alerts" });
+    window.Logger.info('🔧 Request URL:', isEdit ? `/api/alerts/${alertId}` : '/api/alerts/', { page: "alerts" });
+    window.Logger.info('🔧 Request method:', isEdit ? 'PUT' : 'POST', { page: "alerts" });
+    window.Logger.info('🔧 Request body:', JSON.stringify(alertPayload, null, 2), { page: "alerts" });
 
-    const response = await fetch('/api/alerts/', {
-      method: 'POST',
+    const url = isEdit ? `/api/alerts/${alertId}` : '/api/alerts/';
+    const method = isEdit ? 'PUT' : 'POST';
+    const modalId = 'alertsModal'; // ModalManagerV2 uses alertsModal
+    
+    const response = await fetch(url, {
+      method: method,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -1396,8 +1378,8 @@ async function saveAlert() {
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: 'addAlertModal',
-      successMessage: 'התראה נשמרה בהצלחה!',
+      modalId: modalId,
+      successMessage: isEdit ? 'התראה עודכנה בהצלחה!' : 'התראה נשמרה בהצלחה!',
       apiUrl: '/api/alerts/',
       entityName: 'התראה',
       reloadFn: window.loadAlertsData,
@@ -2086,13 +2068,6 @@ async function reactivateAlert(alertId) {
       // רענון הטבלה
       if (typeof window.loadAlertsData === 'function') {
         await window.loadAlertsData();
-        
-        // רענון כפוי של הטבלה
-        setTimeout(() => {
-          if (window.loadAlertsData) {
-            window.loadAlertsData();
-          }
-        }, 500);
       }
     } else {
       const data = await response.json();

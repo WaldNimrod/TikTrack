@@ -16,7 +16,7 @@ class Execution(BaseModel):
     fee = Column(Float, default=0, nullable=True)  # RANGE: fee >= 0
     source = Column(String(50), default='manual', nullable=True)  # ENUM: manual, api, file_import, direct_import
     external_id = Column(String(100), nullable=True)  # מזהה חיצוני
-    notes = Column(String(500), nullable=True)  # הערות על העסקה
+    notes = Column(String(5000), nullable=True)  # הערות על העסקה
     realized_pl = Column(Integer, nullable=True, default=None)  # Realized P/L: NULL in buy, required in sell
     mtm_pl = Column(Integer, nullable=True, default=None)  # MTM P/L: optional in both buy and sell
     

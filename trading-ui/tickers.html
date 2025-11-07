@@ -353,21 +353,37 @@
     <script src="scripts/info-summary-configs.js?v=0da3519a_20251102_104906"></script> <!-- תצורות עמודים לסיכום נתונים -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 9/9: INITIALIZATION PACKAGE ===== -->
+    <!-- ===== PACKAGE 9/10: EXTERNAL DATA PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 7 | Description: מערכות נתונים חיצוניים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [39] Load Order: 39 -->
+    <script src="scripts/yahoo-finance-service.js?v=0da3519a_20251102_104906"></script> <!-- שירות Yahoo Finance -->
+    <!-- [40] Load Order: 40 -->
+    <script src="scripts/external-data-service.js?v=0da3519a_20251102_104906"></script> <!-- שירות נתונים חיצוניים -->
+    <!-- [41] Load Order: 41 -->
+    <script src="scripts/external-data-settings-service.js?v=0da3519a_20251102_104906"></script> <!-- הגדרות נתונים חיצוניים -->
+    <!-- [42] Load Order: 42 -->
+    <script src="scripts/external-data-dashboard.js?v=0da3519a_20251102_104906"></script> <!-- דשבורד נתונים חיצוניים -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 10/10: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
     <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, filters, advanced-notifications, entity-details, info-summary, import -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [39] Load Order: 39 -->
-    <script src="scripts/init-system/package-manifest.js?v=0da3519a_20251102_104906"></script> <!-- מנפסט חבילות -->
-    <!-- [40] Load Order: 40 -->
-    <script src="scripts/page-initialization-configs.js?v=0da3519a_20251102_104906"></script> <!-- הגדרות אתחול עמודים -->
-    <!-- [41] Load Order: 41 -->
-    <script src="scripts/init-system-check.js?v=0da3519a_20251102_104906"></script> <!-- בדיקת מערכת איתחול -->
-    <!-- [42] Load Order: 42 -->
-    <script src="scripts/monitoring-functions.js?v=0da3519a_20251102_104906"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [43] Load Order: 43 -->
+    <script src="scripts/init-system/package-manifest.js?v=0da3519a_20251102_104906"></script> <!-- מנפסט חבילות -->
+    <!-- [44] Load Order: 44 -->
+    <script src="scripts/page-initialization-configs.js?v=0da3519a_20251102_104906"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [45] Load Order: 45 -->
+    <script src="scripts/init-system-check.js?v=0da3519a_20251102_104906"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [46] Load Order: 46 -->
+    <script src="scripts/monitoring-functions.js?v=0da3519a_20251102_104906"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [47] Load Order: 47 -->
     <script src="scripts/unified-app-initializer.js?v=0da3519a_20251102_104906"></script> <!-- מאתחל אפליקציה מאוחד -->
 
     <!-- =============================================================== -->
@@ -378,13 +394,13 @@
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
-    <!-- [44] Page-specific: tickers -->
+    <!-- [48] Page-specific: tickers -->
     <script src="scripts/tickers.js?v=0da3519a_20251102_104906"></script> <!-- Page-specific script for tickers -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 44 | Unique Scripts Loaded: 44 -->
+    <!-- 📊 Total Scripts Processed: 48 | Unique Scripts Loaded: 48 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("tickers") -->
     
     <!-- Page-specific functions are now handled by the unified initialization system -->

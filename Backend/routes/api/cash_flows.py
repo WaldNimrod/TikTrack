@@ -5,7 +5,11 @@ from models.cash_flow import CashFlow
 from models.currency import Currency
 from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, invalidate_cache
+from services.cash_flow_service import CashFlowService as CashFlowHelperService
+from services.account_activity_service import AccountActivityService
 import logging
+import uuid
+from datetime import datetime
 
 # Import base classes
 from .base_entity import BaseEntityAPI
@@ -53,14 +57,16 @@ base_api = BaseEntityAPI('cash_flows', cash_flow_service, 'cash_flows')
 @cash_flows_bp.route('/', methods=['GET'])
 @handle_database_session(auto_commit=True, auto_close=True)
 def get_cash_flows():
-    """Get all cash flows using base API with custom data enhancement"""
+    """Get all cash flows using base API with custom data enhancement and exchange filtering"""
     # Use the session from the decorator (in g.db)
     db: Session = g.db
     response, status_code = base_api.get_all(db)
     
-    # Enhance data with additional information
+    # Enhance data with additional information and filter currency exchanges
     if response.get('status') == 'success' and response.get('data'):
         enhanced_data = []
+        exchange_ids_seen = set()  # Track exchange IDs we've already included
+        
         for cf_dict in response['data']:
             # Add additional fields if they exist
             if 'account' in cf_dict and cf_dict['account']:
@@ -68,7 +74,28 @@ def get_cash_flows():
             if 'currency' in cf_dict and cf_dict['currency']:
                 cf_dict['currency_symbol'] = cf_dict['currency'].get('symbol', '')
                 cf_dict['currency_name'] = cf_dict['currency'].get('name', '')
-            enhanced_data.append(cf_dict)
+            
+            # Filter currency exchanges: only show other_negative flow (the "from" flow)
+            external_id = cf_dict.get('external_id')
+            if CashFlowHelperService.is_currency_exchange(external_id):
+                # This is part of a currency exchange
+                if external_id in exchange_ids_seen:
+                    # We've already included a flow from this exchange - skip
+                    continue
+                
+                # Check if this is the other_negative flow (the one we want to show)
+                if cf_dict.get('type') == 'other_negative':
+                    # Mark this exchange as seen and include it
+                    exchange_ids_seen.add(external_id)
+                    enhanced_data.append(cf_dict)
+                else:
+                    # This is other_positive or fee - skip it (we'll show only other_negative)
+                    exchange_ids_seen.add(external_id)  # Mark as seen so we don't process other flows
+                    continue
+            else:
+                # Regular cash flow - include it
+                enhanced_data.append(cf_dict)
+        
         response['data'] = enhanced_data
     
     return jsonify(response), status_code
@@ -147,6 +174,10 @@ def create_cash_flow():
                     "version": "1.0"
                 }), 400
         
+        # Sanitize HTML content for description field
+        if 'description' in data and data['description']:
+            data['description'] = BaseEntityUtils.sanitize_rich_text(data['description'])
+        
         # Validate data against constraints
         logger.info("Validating cash flow data before creation")
         is_valid, errors = ValidationService.validate_data(db, 'cash_flows', data)
@@ -223,6 +254,10 @@ def update_cash_flow(cash_flow_id: int):
                         "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
                         "version": "1.0"
                     }), 400
+            
+            # Sanitize HTML content for description field
+            if 'description' in data and data['description']:
+                data['description'] = BaseEntityUtils.sanitize_rich_text(data['description'])
             
             # Validate data against constraints
             logger.info("Validating cash flow data before update")
@@ -349,3 +384,542 @@ def delete_all_cash_flows():
             "version": "1.0"
         }), 500
     # Don't close db here - handle_database_session decorator will do it
+
+# ===== Currency Exchange Endpoints =====
+
+@cash_flows_bp.route('/exchange', methods=['POST'])
+@handle_database_session(auto_commit=False, auto_close=True)
+@invalidate_cache(['cash_flows', 'account-activity-*'])
+def create_currency_exchange():
+    """
+    Create a currency exchange operation (atomic creation of 2-3 cash flows)
+    
+    Creates:
+    - From flow: type='other_negative', amount=-from_amount, currency_id=from_currency_id
+    - To flow: type='other_positive', amount=+to_amount, currency_id=to_currency_id
+    - Fee flow (optional): type='fee', amount=-fee_amount, currency_id=fee_currency_id
+    
+    All flows share the same external_id: 'exchange_<uuid>'
+    """
+    try:
+        logger.info("=== CREATE CURRENCY EXCHANGE START ===")
+        data = request.get_json()
+        logger.info(f"Received exchange data: {data}")
+        
+        db: Session = g.db
+        
+        # Validate required fields
+        required_fields = ['trading_account_id', 'from_currency_id', 'to_currency_id', 
+                          'from_amount', 'exchange_rate', 'date']
+        for field in required_fields:
+            if field not in data or data[field] is None:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": f"Field '{field}' is required"},
+                    "version": "1.0"
+                }), 400
+        
+        # Extract and validate data
+        trading_account_id = int(data['trading_account_id'])
+        from_currency_id = int(data['from_currency_id'])
+        to_currency_id = int(data['to_currency_id'])
+        from_amount = float(data['from_amount'])
+        exchange_rate = float(data['exchange_rate'])
+        fee_amount = float(data.get('fee_amount', 0)) if data.get('fee_amount') else 0
+        fee_currency_id = int(data.get('fee_currency_id', from_currency_id))
+        date_str = data['date']
+        description = data.get('description', '')
+        
+        # Validate currencies are different
+        if from_currency_id == to_currency_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "From and to currencies must be different"},
+                "version": "1.0"
+            }), 400
+        
+        # Validate amounts
+        if from_amount <= 0:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "From amount must be greater than 0"},
+                "version": "1.0"
+            }), 400
+        
+        if exchange_rate <= 0:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Exchange rate must be greater than 0"},
+                "version": "1.0"
+            }), 400
+        
+        if fee_amount < 0:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Fee amount cannot be negative"},
+                "version": "1.0"
+            }), 400
+        
+        # Convert date
+        try:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                "version": "1.0"
+            }), 400
+        
+        # Check balance sufficiency
+        current_balance = AccountActivityService.calculate_balance_by_currency(
+            db, trading_account_id, from_currency_id
+        )
+        required_amount = from_amount + fee_amount
+        if current_balance < required_amount:
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Insufficient balance. Required: {required_amount}, Available: {current_balance}"},
+                "version": "1.0"
+            }), 400
+        
+        # Calculate to_amount
+        to_amount = from_amount * exchange_rate
+        
+        # Get currency objects for usd_rate
+        from_currency = db.query(Currency).filter(Currency.id == from_currency_id).first()
+        to_currency = db.query(Currency).filter(Currency.id == to_currency_id).first()
+        
+        if not from_currency or not to_currency:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Currency not found"},
+                "version": "1.0"
+            }), 404
+        
+        # Create exchange UUID
+        exchange_uuid = uuid.uuid4().hex[:12]
+        exchange_id = CashFlowHelperService.create_exchange_id(exchange_uuid)
+        
+        # Create cash flows within transaction
+        try:
+            # From flow (negative - outgoing)
+            from_flow = CashFlow(
+                trading_account_id=trading_account_id,
+                type='other_negative',
+                amount=-from_amount,
+                currency_id=from_currency_id,
+                usd_rate=float(from_currency.usd_rate),
+                date=date_obj,
+                description=description,
+                source='manual',
+                external_id=exchange_id
+            )
+            db.add(from_flow)
+            
+            # To flow (positive - incoming)
+            to_flow = CashFlow(
+                trading_account_id=trading_account_id,
+                type='other_positive',
+                amount=to_amount,
+                currency_id=to_currency_id,
+                usd_rate=float(to_currency.usd_rate),
+                date=date_obj,
+                description=description,
+                source='manual',
+                external_id=exchange_id
+            )
+            db.add(to_flow)
+            
+            # Fee flow (optional)
+            fee_flow = None
+            if fee_amount > 0:
+                fee_currency = db.query(Currency).filter(Currency.id == fee_currency_id).first()
+                if not fee_currency:
+                    raise ValueError(f"Fee currency {fee_currency_id} not found")
+                
+                fee_description = f"המרת מטבע: {from_currency.symbol} -> {to_currency.symbol}, שער: {exchange_rate}"
+                if description:
+                    fee_description = f"{fee_description}, {description}"
+                
+                fee_flow = CashFlow(
+                    trading_account_id=trading_account_id,
+                    type='fee',
+                    amount=-fee_amount,
+                    currency_id=fee_currency_id,
+                    usd_rate=float(fee_currency.usd_rate),
+                    date=date_obj,
+                    description=fee_description,
+                    source='manual',
+                    external_id=exchange_id
+                )
+                db.add(fee_flow)
+            
+            # Commit transaction
+            db.commit()
+            
+            # Refresh to get IDs
+            db.refresh(from_flow)
+            db.refresh(to_flow)
+            if fee_flow:
+                db.refresh(fee_flow)
+            
+            # Return response
+            result = {
+                "exchange_id": exchange_uuid,
+                "exchange_external_id": exchange_id,
+                "from_flow": from_flow.to_dict(),
+                "to_flow": to_flow.to_dict(),
+                "fee_flow": fee_flow.to_dict() if fee_flow else None
+            }
+            
+            logger.info(f"✅ Currency exchange created successfully: {exchange_id}")
+            
+            return jsonify({
+                "status": "success",
+                "data": result,
+                "message": "Currency exchange created successfully",
+                "version": "1.0"
+            }), 201
+            
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error creating currency exchange: {str(e)}")
+            raise
+            
+    except Exception as e:
+        logger.error(f"Error in create_currency_exchange: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "1.0"
+        }), 400
+
+@cash_flows_bp.route('/exchange/<exchange_uuid>', methods=['GET'])
+@handle_database_session(auto_commit=True, auto_close=True)
+def get_currency_exchange(exchange_uuid: str):
+    """Get currency exchange details by UUID"""
+    try:
+        db: Session = g.db
+        exchange_id = CashFlowHelperService.create_exchange_id(exchange_uuid)
+        
+        flows = CashFlowHelperService.get_exchange_flows(db, exchange_id)
+        
+        if not flows:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Currency exchange not found"},
+                "version": "1.0"
+            }), 404
+        
+        # Validate completeness
+        is_valid, error_msg = CashFlowHelperService.validate_exchange_completeness(flows)
+        if not is_valid:
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Invalid exchange structure: {error_msg}"},
+                "version": "1.0"
+            }), 400
+        
+        # Separate flows by type
+        from_flow = next((f for f in flows if f.type == 'other_negative'), None)
+        to_flow = next((f for f in flows if f.type == 'other_positive'), None)
+        fee_flow = next((f for f in flows if f.type == 'fee'), None)
+        
+        # Calculate exchange rate from amounts
+        exchange_rate = abs(to_flow.amount / from_flow.amount) if from_flow and to_flow else 0
+        
+        result = {
+            "exchange_id": exchange_uuid,
+            "exchange_external_id": exchange_id,
+            "exchange_rate": exchange_rate,
+            "from_flow": from_flow.to_dict() if from_flow else None,
+            "to_flow": to_flow.to_dict() if to_flow else None,
+            "fee_flow": fee_flow.to_dict() if fee_flow else None
+        }
+        
+        return jsonify({
+            "status": "success",
+            "data": result,
+            "message": "Currency exchange retrieved successfully",
+            "version": "1.0"
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting currency exchange {exchange_uuid}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to retrieve currency exchange"},
+            "version": "1.0"
+        }), 500
+
+@cash_flows_bp.route('/exchange/<exchange_uuid>', methods=['PUT'])
+@handle_database_session(auto_commit=False, auto_close=True)
+@invalidate_cache(['cash_flows', 'account-activity-*'])
+def update_currency_exchange(exchange_uuid: str):
+    """Update currency exchange operation (atomic update of all related flows)"""
+    try:
+        logger.info(f"=== UPDATE CURRENCY EXCHANGE START: {exchange_uuid} ===")
+        data = request.get_json()
+        logger.info(f"Received update data: {data}")
+        
+        db: Session = g.db
+        exchange_id = CashFlowHelperService.create_exchange_id(exchange_uuid)
+        
+        # Get existing flows
+        flows = CashFlowHelperService.get_exchange_flows(db, exchange_id)
+        
+        if not flows:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Currency exchange not found"},
+                "version": "1.0"
+            }), 404
+        
+        # Validate completeness
+        is_valid, error_msg = CashFlowHelperService.validate_exchange_completeness(flows)
+        if not is_valid:
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Invalid exchange structure: {error_msg}"},
+                "version": "1.0"
+            }), 400
+        
+        # Separate existing flows
+        from_flow = next((f for f in flows if f.type == 'other_negative'), None)
+        to_flow = next((f for f in flows if f.type == 'other_positive'), None)
+        existing_fee_flow = next((f for f in flows if f.type == 'fee'), None)
+        
+        # Validate required fields
+        required_fields = ['trading_account_id', 'from_currency_id', 'to_currency_id',
+                          'from_amount', 'exchange_rate', 'date']
+        for field in required_fields:
+            if field not in data or data[field] is None:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": f"Field '{field}' is required"},
+                    "version": "1.0"
+                }), 400
+        
+        # Extract data
+        trading_account_id = int(data['trading_account_id'])
+        from_currency_id = int(data['from_currency_id'])
+        to_currency_id = int(data['to_currency_id'])
+        from_amount = float(data['from_amount'])
+        exchange_rate = float(data['exchange_rate'])
+        fee_amount = float(data.get('fee_amount', 0)) if data.get('fee_amount') else 0
+        fee_currency_id = int(data.get('fee_currency_id', from_currency_id))
+        date_str = data['date']
+        description = data.get('description', '')
+        
+        # Validate
+        if from_currency_id == to_currency_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "From and to currencies must be different"},
+                "version": "1.0"
+            }), 400
+        
+        if from_amount <= 0 or exchange_rate <= 0:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Amounts and exchange rate must be greater than 0"},
+                "version": "1.0"
+            }), 400
+        
+        # Convert date
+        try:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                "version": "1.0"
+            }), 400
+        
+        # Check balance if amount increased
+        old_from_amount = abs(from_flow.amount) if from_flow else 0
+        old_fee_amount = abs(existing_fee_flow.amount) if existing_fee_flow else 0
+        if from_amount + fee_amount > old_from_amount + old_fee_amount:
+            current_balance = AccountActivityService.calculate_balance_by_currency(
+                db, trading_account_id, from_currency_id
+            )
+            required_amount = from_amount + fee_amount
+            if current_balance < required_amount:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": f"Insufficient balance. Required: {required_amount}, Available: {current_balance}"},
+                    "version": "1.0"
+                }), 400
+        
+        # Calculate to_amount
+        to_amount = from_amount * exchange_rate
+        
+        # Get currencies
+        from_currency = db.query(Currency).filter(Currency.id == from_currency_id).first()
+        to_currency = db.query(Currency).filter(Currency.id == to_currency_id).first()
+        
+        if not from_currency or not to_currency:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Currency not found"},
+                "version": "1.0"
+            }), 404
+        
+        try:
+            # Update from flow
+            if from_flow:
+                from_flow.trading_account_id = trading_account_id
+                from_flow.amount = -from_amount
+                from_flow.currency_id = from_currency_id
+                from_flow.usd_rate = float(from_currency.usd_rate)
+                from_flow.date = date_obj
+                from_flow.description = description
+            
+            # Update to flow
+            if to_flow:
+                to_flow.trading_account_id = trading_account_id
+                to_flow.amount = to_amount
+                to_flow.currency_id = to_currency_id
+                to_flow.usd_rate = float(to_currency.usd_rate)
+                to_flow.date = date_obj
+                to_flow.description = description
+            
+            # Handle fee flow
+            if fee_amount > 0:
+                fee_currency = db.query(Currency).filter(Currency.id == fee_currency_id).first()
+                if not fee_currency:
+                    raise ValueError(f"Fee currency {fee_currency_id} not found")
+                
+                fee_description = f"המרת מטבע: {from_currency.symbol} -> {to_currency.symbol}, שער: {exchange_rate}"
+                if description:
+                    fee_description = f"{fee_description}, {description}"
+                
+                if existing_fee_flow:
+                    # Update existing fee flow
+                    existing_fee_flow.amount = -fee_amount
+                    existing_fee_flow.currency_id = fee_currency_id
+                    existing_fee_flow.usd_rate = float(fee_currency.usd_rate)
+                    existing_fee_flow.date = date_obj
+                    existing_fee_flow.description = fee_description
+                else:
+                    # Create new fee flow
+                    new_fee_flow = CashFlow(
+                        trading_account_id=trading_account_id,
+                        type='fee',
+                        amount=-fee_amount,
+                        currency_id=fee_currency_id,
+                        usd_rate=float(fee_currency.usd_rate),
+                        date=date_obj,
+                        description=fee_description,
+                        source='manual',
+                        external_id=exchange_id
+                    )
+                    db.add(new_fee_flow)
+            else:
+                # Remove fee flow if it exists
+                if existing_fee_flow:
+                    db.delete(existing_fee_flow)
+            
+            # Commit transaction
+            db.commit()
+            
+            # Refresh flows
+            if from_flow:
+                db.refresh(from_flow)
+            if to_flow:
+                db.refresh(to_flow)
+            if existing_fee_flow:
+                db.refresh(existing_fee_flow)
+            
+            # Get updated flows
+            updated_flows = CashFlowHelperService.get_exchange_flows(db, exchange_id)
+            fee_flow = next((f for f in updated_flows if f.type == 'fee'), None)
+            
+            result = {
+                "exchange_id": exchange_uuid,
+                "exchange_external_id": exchange_id,
+                "from_flow": from_flow.to_dict() if from_flow else None,
+                "to_flow": to_flow.to_dict() if to_flow else None,
+                "fee_flow": fee_flow.to_dict() if fee_flow else None
+            }
+            
+            logger.info(f"✅ Currency exchange updated successfully: {exchange_id}")
+            
+            return jsonify({
+                "status": "success",
+                "data": result,
+                "message": "Currency exchange updated successfully",
+                "version": "1.0"
+            }), 200
+            
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error updating currency exchange: {str(e)}")
+            raise
+            
+    except Exception as e:
+        logger.error(f"Error in update_currency_exchange: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "1.0"
+        }), 400
+
+@cash_flows_bp.route('/exchange/<exchange_uuid>', methods=['DELETE'])
+@handle_database_session(auto_commit=False, auto_close=True)
+@invalidate_cache(['cash_flows', 'account-activity-*'])
+def delete_currency_exchange(exchange_uuid: str):
+    """Delete currency exchange operation (atomic deletion of all related flows)"""
+    try:
+        logger.info(f"=== DELETE CURRENCY EXCHANGE START: {exchange_uuid} ===")
+        
+        db: Session = g.db
+        exchange_id = CashFlowHelperService.create_exchange_id(exchange_uuid)
+        
+        # Get existing flows
+        flows = CashFlowHelperService.get_exchange_flows(db, exchange_id)
+        
+        if not flows:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Currency exchange not found"},
+                "version": "1.0"
+            }), 404
+        
+        # Validate completeness
+        is_valid, error_msg = CashFlowHelperService.validate_exchange_completeness(flows)
+        if not is_valid:
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Invalid exchange structure: {error_msg}"},
+                "version": "1.0"
+            }), 400
+        
+        try:
+            # Delete all flows
+            for flow in flows:
+                db.delete(flow)
+            
+            # Commit transaction
+            db.commit()
+            
+            logger.info(f"✅ Currency exchange deleted successfully: {exchange_id} ({len(flows)} flows)")
+            
+            return jsonify({
+                "status": "success",
+                "message": f"Currency exchange deleted successfully ({len(flows)} flows removed)",
+                "version": "1.0"
+            }), 200
+            
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error deleting currency exchange: {str(e)}")
+            raise
+            
+    except Exception as e:
+        logger.error(f"Error in delete_currency_exchange: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to delete currency exchange"},
+            "version": "1.0"
+        }), 500

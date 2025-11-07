@@ -605,8 +605,16 @@ class CRUDResponseHandler {
             // פשטות מקסימלית: אם יש reloadFn - קוראים לו ישירות ללא cache clearing
             if (options.reloadFn && typeof options.reloadFn === 'function') {
                 console.log('✅ handleTableRefresh: Calling reloadFn...');
-                await options.reloadFn();
-                console.log('✅ handleTableRefresh: reloadFn completed');
+                console.log('🔍 handleTableRefresh: reloadFn type:', typeof options.reloadFn);
+                console.log('🔍 handleTableRefresh: reloadFn name:', options.reloadFn.name || 'anonymous');
+                try {
+                    await options.reloadFn();
+                    console.log('✅ handleTableRefresh: reloadFn completed successfully');
+                } catch (reloadError) {
+                    console.error('❌ handleTableRefresh: Error in reloadFn:', reloadError);
+                    console.error('❌ handleTableRefresh: Error stack:', reloadError.stack);
+                    throw reloadError; // Re-throw to be caught by outer catch
+                }
                 return;
             }
 
@@ -624,6 +632,10 @@ class CRUDResponseHandler {
             console.warn('⚠️ handleTableRefresh called without reloadFn - no action taken');
         } catch (error) {
             console.error('❌ שגיאה ברענון טבלה:', error);
+            console.error('❌ שגיאה ברענון טבלה - stack:', error.stack);
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה ברענון טבלה', error.message || 'שגיאה לא ידועה');
+            }
         }
     }
 
@@ -838,7 +850,7 @@ class CRUDResponseHandler {
             'trades': () => window.loadTradesData ? window.loadTradesData() : null,
             'executions': () => window.loadExecutionsData ? window.loadExecutionsData() : null,
             'tickers': () => window.loadTickersData ? window.loadTickersData() : null,
-            'trading_accounts': () => window.loadAccountsData ? window.loadAccountsData() : null,
+            'trading_accounts': () => window.loadTradingAccountsDataForTradingAccountsPage ? window.loadTradingAccountsDataForTradingAccountsPage() : null,
             'cash_flows': () => window.loadCashFlowsData ? window.loadCashFlowsData() : null,
             'trade_plans': () => window.loadTradePlansData ? window.loadTradePlansData() : null
         };

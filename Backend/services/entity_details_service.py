@@ -86,8 +86,8 @@ class EntityDetailsService:
                      'commission', 'execution_date', 'status', 'created_at'],
         'account': ['id', 'name', 'account_number', 'account_type', 'bank_name', 'balance',
                    'currency_id', 'status', 'remarks', 'created_at', 'updated_at'],
-        'trading_account': ['id', 'name', 'account_number', 'account_type', 'bank_name', 'balance',
-                           'currency_id', 'status', 'remarks', 'created_at', 'updated_at'],  # Same as account
+        'trading_account': ['id', 'name', 'currency_id', 'status', 'opening_balance', 'total_value',
+                           'total_pl', 'notes', 'created_at', 'updated_at'],
         'alert': ['id', 'title', 'ticker_id', 'alert_type', 'condition', 'target_value',
                  'is_active', 'status', 'triggered_at', 'created_at', 'updated_at'],
         'cash_flow': ['id', 'trading_account_id', 'flow_type', 'amount', 'flow_date', 'category',

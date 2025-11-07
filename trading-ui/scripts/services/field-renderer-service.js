@@ -113,6 +113,14 @@ class FieldRendererService {
     }
 
     /**
+     * Legacy alias לשם הישן renderNumericBadge
+     * שומר על תאימות אחורה לבדיקות וכלים קיימים
+     */
+    static renderNumericBadge(value, suffix = '', showPrefix = true) {
+        return this.renderNumericValue(value, suffix, showPrefix);
+    }
+
+    /**
      * רנדור P&L (רווח/הפסד)
      * @deprecated - השתמש ב-renderNumericValue במקום
      */
@@ -684,15 +692,7 @@ class FieldRendererService {
      * });
      */
     static renderTickerInfo(ticker, cssClass = '') {
-        console.log('🔍🔍🔍 [renderTickerInfo] CALLED with:', {
-            ticker,
-            cssClass,
-            hasTicker: !!ticker,
-            tickerKeys: ticker ? Object.keys(ticker) : []
-        });
-        
         if (!ticker) {
-            console.log('⚠️ [renderTickerInfo] No ticker provided, returning empty');
             return '';
         }
         
@@ -702,15 +702,6 @@ class FieldRendererService {
         const change = ticker.daily_change || 0;
         const changePercent = ticker.daily_change_percent || 0;
         const volume = ticker.volume || 0;
-        
-        console.log('🔍🔍🔍 [renderTickerInfo] Extracted values:', {
-            symbol,
-            name,
-            price,
-            change,
-            changePercent,
-            volume
-        });
         
         // סמל מטבע דינמי
         const currencySymbol = ticker.currency_symbol || '$';
@@ -734,11 +725,6 @@ class FieldRendererService {
                 </span>
             </div>
         `;
-        
-        console.log('🔍🔍🔍 [renderTickerInfo] Returning HTML:', {
-            htmlLength: compactDisplay.length,
-            htmlPreview: compactDisplay.substring(0, 200)
-        });
         
         return compactDisplay;
     }
@@ -798,6 +784,7 @@ window.FieldRendererService = FieldRendererService;
 window.renderStatus = (status, entityType) => FieldRendererService.renderStatus(status, entityType);
 window.renderSide = (side) => FieldRendererService.renderSide(side);
 window.renderNumericValue = (value, suffix, showPrefix) => FieldRendererService.renderNumericValue(value, suffix, showPrefix);
+window.renderNumericBadge = (value, suffix, showPrefix) => FieldRendererService.renderNumericBadge(value, suffix, showPrefix);
 window.renderPnL = (value, currency) => FieldRendererService.renderPnL(value, currency); // deprecated - use renderNumericValue
 window.renderCurrency = (id, name, symbol) => FieldRendererService.renderCurrency(id, name, symbol);
 window.renderAmount = (value, currencySymbol, decimals, showSign) => FieldRendererService.renderAmount(value, currencySymbol, decimals, showSign);

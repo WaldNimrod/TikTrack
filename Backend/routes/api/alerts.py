@@ -43,6 +43,9 @@ def create_alert():
     """Create new alert"""
     try:
         data = request.get_json()
+        # Sanitize HTML content for message field
+        if 'message' in data and data['message']:
+            data['message'] = BaseEntityUtils.sanitize_rich_text(data['message'])
         db: Session = g.db
         alert = AlertService.create(db, data)
         return jsonify({
@@ -66,6 +69,9 @@ def update_alert(alert_id: int):
     """Update alert"""
     try:
         data = request.get_json()
+        # Sanitize HTML content for message field
+        if 'message' in data and data['message']:
+            data['message'] = BaseEntityUtils.sanitize_rich_text(data['message'])
         db: Session = g.db
         alert = AlertService.update(db, alert_id, data)
         return jsonify({

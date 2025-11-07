@@ -99,8 +99,6 @@ class CacheSyncManager {
      */
     async initialize() {
         try {
-            if (window.Logger) { window.Logger.info('🔄 Initializing Cache Sync Manager...', { page: "cache" }); }
-            
             // בדיקת חיבור לשרת
             const isConnected = await this.checkServerConnection();
             if (!isConnected) {
@@ -111,9 +109,6 @@ class CacheSyncManager {
             this.startQueueProcessing();
             
             this.initialized = true;
-            if (window.Logger) { window.Logger.info('✅ Cache Sync Manager initialized successfully', { page: "cache" }); }
-            
-            // הודעת הצלחה
             if (window.notificationSystem) {
                 window.notificationSystem.showNotification(
                     'מערכת סינכרון מטמון אותחלה בהצלחה',
@@ -170,7 +165,6 @@ class CacheSyncManager {
             if (!success) {
                 // הוספה לתור אם הסינכרון נכשל
                 await this.addToQueue('syncToBackend', syncData);
-                if (window.Logger) { window.Logger.info(`⚠️ Sync failed, added ${key} to queue`, { page: "cache" }); }
             }
             
             const responseTime = performance.now() - startTime;
@@ -215,7 +209,6 @@ class CacheSyncManager {
             if (data === null && options.retries !== false) {
                 // הוספה לתור אם הסינכרון נכשל
                 await this.addToQueue('syncFromBackend', { key, options });
-                if (window.Logger) { window.Logger.info(`⚠️ Sync failed, added ${key} to queue`, { page: "cache" }); }
             }
             
             const responseTime = performance.now() - startTime;
@@ -259,7 +252,6 @@ class CacheSyncManager {
             if (!success) {
                 // הוספה לתור אם הביטול נכשל
                 await this.addToQueue('invalidate', { dependencies });
-                if (window.Logger) { window.Logger.info(`⚠️ Invalidation failed, added to queue`, { page: "cache" }); }
             }
             
             const responseTime = performance.now() - startTime;
@@ -392,7 +384,7 @@ class CacheSyncManager {
             
             // Log what we're sending for debugging
             if (window.Logger) { 
-                window.Logger.debug(`🔄 Invalidating backend cache with dependencies: ${JSON.stringify(dependencies)}`, { page: "cache" }); 
+                // window.Logger.debug(`🔄 Invalidating backend cache with dependencies: ${JSON.stringify(dependencies)}`, { page: "cache" }); 
             }
             
             const response = await fetch('/api/cache-sync/invalidate', {
@@ -432,7 +424,7 @@ class CacheSyncManager {
             
             const result = await response.json();
             if (window.Logger) {
-                window.Logger.debug(`✅ Backend cache invalidated: ${result.clearedCount || 0} entries cleared`, { page: "cache" });
+                // window.Logger.debug(`✅ Backend cache invalidated: ${result.clearedCount || 0} entries cleared`, { page: "cache" });
             }
             return result.success === true;
             
@@ -507,13 +499,11 @@ class CacheSyncManager {
                 
                 if (success) {
                     this.syncQueue.shift();
-                    if (window.Logger) { window.Logger.info(`✅ Processed queued ${item.type}`, { page: "cache" }); }
                 } else {
                     item.attempts++;
                     if (item.attempts >= this.retryAttempts) {
                         this.syncQueue.shift();
                         this.stats.retries++;
-                        if (window.Logger) { window.Logger.info(`❌ Failed to process queued ${item.type} after ${this.retryAttempts} attempts`, { page: "cache" }); }
                     } else {
                         console.log(`⚠️ Retrying queued ${item.type} (attempt ${item.attempts + 1})`);
                         await this.delay(this.retryDelay * item.attempts);
@@ -552,7 +542,6 @@ class CacheSyncManager {
     clearQueue() {
         this.syncQueue = [];
         this.stats.queueSize = 0;
-        if (window.Logger) { window.Logger.info('🧹 Sync queue cleared', { page: "cache" }); }
     }
 
     /**
@@ -698,6 +687,4 @@ if (window.UnifiedInitializationSystem) {
     });
 }
 
-if (window.Logger) {
-  window.Logger.info('🔄 Cache Sync Manager loaded', { page: 'cache' });
-}
+// Cache Sync Manager loaded

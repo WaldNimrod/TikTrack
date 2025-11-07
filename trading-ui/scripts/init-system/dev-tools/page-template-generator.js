@@ -113,7 +113,11 @@ ${scriptsHTML}
           .sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0));
         
         sortedScripts.forEach(script => {
-          html += `    <script src="scripts/${script.file}?v=1.0.0"></script> <!-- ${script.description} -->\n`;
+          // Handle external URLs (CDN) vs local files
+          const scriptSrc = script.file.startsWith('http://') || script.file.startsWith('https://') 
+            ? script.file 
+            : `scripts/${script.file}?v=1.0.0`;
+          html += `    <script src="${scriptSrc}"></script> <!-- ${script.description} -->\n`;
         });
         html += '\n';
       });
@@ -443,7 +447,11 @@ if (document.readyState === 'loading') {
           // This is a runtime check - actual verification should be done by monitoring system
           // For now, we generate all scripts from manifest and let monitoring catch missing files
           html += `    <!-- [${scriptCounter}] Load Order: ${scriptCounter} -->\n`;
-          html += `    <script src="scripts/${script.file}?v=1.0.0"></script> <!-- ${script.description} -->\n`;
+          // Handle external URLs (CDN) vs local files
+          const scriptSrc = script.file.startsWith('http://') || script.file.startsWith('https://') 
+            ? script.file 
+            : `scripts/${script.file}?v=1.0.0`;
+          html += `    <script src="${scriptSrc}"></script> <!-- ${script.description} -->\n`;
           scriptCounter++;
         });
         html += '\n';

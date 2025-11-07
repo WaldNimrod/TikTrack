@@ -13,6 +13,11 @@
  * Last Updated: 2025-01-27
  */
 
+// ===== LOADING TRACKING =====
+console.log('🟢 [tables.js] FILE LOADING STARTED');
+console.log('🟢 [tables.js] window.TABLE_COLUMN_MAPPINGS exists:', !!window.TABLE_COLUMN_MAPPINGS);
+console.log('🟢 [tables.js] window.getColumnValue exists:', typeof window.getColumnValue === 'function');
+
 // ===== GLOBAL SORTING SYSTEM =====
 
 /**
@@ -38,7 +43,7 @@ function sortTable(columnIndex, data, tableType, updateFunction) {
  *
  * @param {number} columnIndex - Index of column to sort by
  * @param {Array} data - Data array to sort
- * @param {string} tableType - Type of table (trades, accounts, alerts, etc.)
+ * @param {string} tableType - Type of table (trades, trading_accounts, alerts, etc.)
  * @param {Function} updateFunction - Function to call with sorted data
  * @returns {Array} Sorted data array
  */
@@ -72,7 +77,19 @@ function getColumnValue(item, columnIndex, tableType) {
     }
   }
   
-  // Try to use TABLE_COLUMN_MAPPINGS from table-mappings.js first
+  // CRITICAL: Use getColumnValue from table-mappings.js FIRST
+  // This is the authoritative source with proper handling of calculated fields
+  // Check for direct export first (window.getColumnValue), then object export (window.tableMappings.getColumnValue)
+  if (typeof window.getColumnValue === 'function') {
+    return window.getColumnValue(item, columnIndex, tableType);
+  }
+  
+  if (window.tableMappings && typeof window.tableMappings.getColumnValue === 'function') {
+    return window.tableMappings.getColumnValue(item, columnIndex, tableType);
+  }
+  
+  // Fallback: Try to use TABLE_COLUMN_MAPPINGS directly (basic mapping only)
+  // This should rarely execute as table-mappings.js should be loaded first
   if (window.TABLE_COLUMN_MAPPINGS && window.TABLE_COLUMN_MAPPINGS[tableType]) {
     const mapping = window.TABLE_COLUMN_MAPPINGS[tableType];
     const fieldName = mapping[columnIndex];
@@ -91,16 +108,17 @@ function getColumnValue(item, columnIndex, tableType) {
     }
   }
   
-  // Default column mappings for different table types (fallback)
+  // Fallback: If table-mappings.js is not loaded, use basic mapping
+  // This should rarely happen as table-mappings.js should be loaded before tables.js
+  console.warn(`⚠️ table-mappings.js getColumnValue not available, using fallback for ${tableType} column ${columnIndex}`);
+  
+  // Default column mappings for different table types (fallback only)
   const columnMappings = {
     'alerts': [
       'id', 'title', 'status', 'related_type_id', 'condition', 'message', 'created_at', 'is_triggered',
     ],
     'trades': [
       'id', 'symbol', 'side', 'investment_type', 'status', 'account_name', 'created_at', 'amount',
-    ],
-    'accounts': [
-      'id', 'name', 'currency_name', 'balance', 'status', 'created_at',
     ],
     'tickers': [
       'symbol', 'status', 'active_trades', 'current_price', 'change_percent', 'type', 'name', 'remarks', 'yahoo_updated_at',
@@ -214,17 +232,28 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
 
 window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   // Global sortTableData called for table
-
-  // Validate input data
-  if (!data || !Array.isArray(data)) {
-    console.error(`❌ [SORT] Invalid data: expected array, got ${typeof data}`, data);
-    return [];
+  
+  // CRITICAL: Prevent recursion - check if we're already sorting
+  if (window._sortTableDataInProgress) {
+    console.warn(`[sortTableData] Recursion detected: sort already in progress for ${tableType} column ${columnIndex}, returning original data`);
+    console.trace('[sortTableData] Stack trace for rejected call');
+    return data;
   }
+  
+  console.log(`[sortTableData] Starting sort: tableType=${tableType}, columnIndex=${columnIndex}, dataLength=${data?.length || 0}, hasUpdateFunction=${typeof updateFunction === 'function'}`);
+  
+  // Set flag to prevent recursion
+  window._sortTableDataInProgress = true;
 
-  if (data.length === 0) {
-    console.warn(`⚠️ [SORT] No data to sort for table type: ${tableType}`);
-    return [];
-  }
+  try {
+    // Validate input data
+    if (!data || !Array.isArray(data)) {
+      return [];
+    }
+
+    if (data.length === 0) {
+      return [];
+    }
 
   // Get current sort state for this specific column
   const columnStateKey = `sortState_${tableType}_col_${columnIndex}`;
@@ -292,7 +321,27 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
 
   // Update the table
   if (typeof updateFunction === 'function') {
-    updateFunction(sortedData);
+    // CRITICAL: Temporarily disable event handlers to prevent recursion
+    const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+    if (table) {
+      const sortableHeaders = table.querySelectorAll('.sortable-header');
+      sortableHeaders.forEach(header => {
+        header.style.pointerEvents = 'none';
+      });
+      
+      try {
+        updateFunction(sortedData);
+      } finally {
+        // Re-enable event listeners after a short delay
+        setTimeout(() => {
+          sortableHeaders.forEach(header => {
+            header.style.pointerEvents = '';
+          });
+        }, 150);
+      }
+    } else {
+      updateFunction(sortedData);
+    }
   }
 
   // Update sort icons
@@ -301,7 +350,12 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   }
 
   // Table sorted by column
+  console.log(`[sortTableData] Completed sort: tableType=${tableType}, columnIndex=${columnIndex}, sortedLength=${sortedData?.length || 0}`);
   return sortedData;
+  } finally {
+    // Clear flag after execution
+    window._sortTableDataInProgress = false;
+  }
 };
 
 // REMOVED: updateSortIconsLocal - duplicate, use window.updateSortIcons from data-basic.js instead
@@ -437,82 +491,148 @@ window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
  * @returns {Array} Sorted data
  */
 window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, updateFunction) {
-  // Handle call with string tableType and number columnIndex
-  if (typeof tableTypeOrColumnIndex === 'string' && typeof columnIndex === 'number' && arguments.length === 2) {
-    // Find the current table element
-    const currentTable = document.querySelector('table[data-table-type]');
-    if (!currentTable) {
-      console.warn('No table with data-table-type found');
+  // CRITICAL: Always log to console to trace calls - this is the first line of the function
+  console.log('🔍 [sortTable] FUNCTION CALLED', {
+    tableTypeOrColumnIndex: typeof tableTypeOrColumnIndex === 'string' ? tableTypeOrColumnIndex : typeof tableTypeOrColumnIndex,
+    columnIndex: columnIndex,
+    hasDataArray: !!dataArray,
+    hasUpdateFunction: !!updateFunction,
+    argsLength: arguments.length,
+    stackTrace: new Error().stack.split('\n').slice(0, 3).join('\n')
+  });
+  // Handle call with only columnIndex (number) - find table from DOM
+  // This is used by older tables that call sortTable(0) without tableType
+  if (typeof tableTypeOrColumnIndex === 'number' && (columnIndex === undefined || typeof columnIndex !== 'number') && arguments.length === 1) {
+    // Try to find the table from the event target or active element
+    let clickedElement = null;
+    
+    // Try to get from window.event (old browsers) or global event
+    if (typeof event !== 'undefined' && event && event.target) {
+      clickedElement = event.target;
+    } else {
+      // Fallback: try to find the active/clicked button
+      clickedElement = document.activeElement;
+      // If activeElement is not a button, try to find the last clicked sortable header
+      if (!clickedElement || !clickedElement.classList.contains('sortable-header')) {
+        const sortableHeaders = document.querySelectorAll('.sortable-header');
+        // Find the one that was recently clicked (this is a workaround)
+        clickedElement = Array.from(sortableHeaders).find(el => {
+          const rect = el.getBoundingClientRect();
+          // Check if element is visible and potentially clicked
+          return rect.width > 0 && rect.height > 0;
+        });
+      }
+    }
+    
+    const table = clickedElement?.closest('table[data-table-type]');
+    if (!table) {
       return;
     }
     
-    const tableType = currentTable.getAttribute('data-table-type');
-    const tableId = currentTable.id;
+    const tableType = table.getAttribute('data-table-type');
+    const actualColumnIndex = tableTypeOrColumnIndex;
     
+    // Now handle as if called with (tableType, columnIndex)
+    return window.sortTable(tableType, actualColumnIndex);
+  }
+  
+  // Handle call with string tableType and number columnIndex
+  if (typeof tableTypeOrColumnIndex === 'string' && typeof columnIndex === 'number' && arguments.length === 2) {
+    const tableType = tableTypeOrColumnIndex;
+    
+    // Use UnifiedTableSystem if available
+    if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+      if (window.Logger) {
+        window.Logger.debug(`[sortTable] Using UnifiedTableSystem for "${tableType}" column ${columnIndex}`, { page: "tables" });
+      }
+      const result = window.UnifiedTableSystem.sorter.sort(tableType, columnIndex);
+      if (window.Logger) {
+        window.Logger.debug(`[sortTable] UnifiedTableSystem returned ${result?.length || 0} items`, { page: "tables" });
+      }
+      return result;
+    }
+    
+    // ===== FALLBACK TO OLD SYSTEM =====
+    // This code is for backward compatibility with tables not yet registered with UnifiedTableSystem
+    // Once all tables are migrated to UnifiedTableSystem, this fallback code can be removed
     // Get the table data from the current page
     let tableData = [];
     let updateFn = null;
     
-    // Try to get data from page-specific functions
+    // Try to get data from page-specific functions (OLD APPROACH)
     if (tableType === 'executions' && window.executionsData) {
       tableData = window.executionsData;
       updateFn = (sortedData) => window.updateExecutionsTableMain(sortedData);
-      console.log(`🔍 [SORT] Found executions data:`, tableData.length, 'items');
     } else if (tableType === 'tickers' && window.tickersData) {
       tableData = window.tickersData;
       updateFn = (sortedData) => window.updateTickersTableMain(sortedData);
-      console.log(`🔍 [SORT] Found tickers data:`, tableData.length, 'items');
-    } else if (tableType === 'accounts' && window.accountsData) {
-      tableData = window.accountsData;
-      updateFn = (sortedData) => window.updateAccountsTableMain(sortedData);
-      console.log(`🔍 [SORT] Found accounts data:`, tableData.length, 'items');
+    } else if (tableType === 'trading_accounts') {
+      // Get trading accounts data
+      if (window.trading_accountsData) {
+        tableData = window.trading_accountsData;
+        updateFn = (sortedData) => {
+          if (typeof window.updateTradingAccountsTable === 'function') {
+            window.updateTradingAccountsTable(sortedData);
+          }
+        };
+      } else {
+        return;
+      }
     } else if (tableType === 'cash_flows' && window.cashFlowsData) {
       tableData = window.cashFlowsData;
       updateFn = (sortedData) => window.updateCashFlowsTable(sortedData);
-      console.log(`🔍 [SORT] Found cash_flows data:`, tableData.length, 'items');
     } else if (tableType === 'alerts' && window.alertsData) {
       tableData = window.alertsData;
       updateFn = (sortedData) => window.updateAlertsTable(sortedData);
-      console.log(`🔍 [SORT] Found alerts data:`, tableData.length, 'items');
     } else if (tableType === 'notes' && window.notesData) {
       tableData = window.notesData;
       updateFn = (sortedData) => window.updateNotesTable(sortedData);
-      console.log(`🔍 [SORT] Found notes data:`, tableData.length, 'items');
     } else if (tableType === 'trades' && window.tradesData) {
       tableData = window.tradesData;
       updateFn = (sortedData) => window.updateTradesTable(sortedData);
-      console.log(`🔍 [SORT] Found trades data:`, tableData.length, 'items');
     } else if (tableType === 'trade_plans' && window.tradePlansData) {
       tableData = window.tradePlansData;
       updateFn = (sortedData) => window.updateTradePlansTable(sortedData);
-      console.log(`🔍 [SORT] Found trade_plans data:`, tableData.length, 'items');
-    } else {
-      console.warn(`❌ [SORT] No data found for table type: ${tableType}`);
-      console.warn(`❌ [SORT] Available data:`, {
-        executionsData: !!window.executionsData,
-        tickersData: !!window.tickersData,
-        accountsData: !!window.accountsData,
-        cashFlowsData: !!window.cashFlowsData,
-        alertsData: !!window.alertsData,
-        notesData: !!window.notesData,
-        tradesData: !!window.tradesData,
-        tradePlansData: !!window.tradePlansData
-      });
+    } 
+    // ===== OLD CODE - REPLACED BY UnifiedTableSystem =====
+    // NOTE: positions and portfolio tables are now handled by UnifiedTableSystem (registered in trading_accounts.js)
+    // This code is commented out to prevent conflicts - it should never execute for registered tables
+    // The UnifiedTableSystem check above (line 487) will catch these tables before this fallback code runs
+    // This code is kept here for reference only and can be removed after full system-wide migration
+    /*
+    else if (tableType === 'positions') {
+      // OLD CODE - positions table is now registered with UnifiedTableSystem
+      // This code should never execute because UnifiedTableSystem handles it first
+      if (window.positionsPortfolioState && window.positionsPortfolioState.positionsData) {
+        tableData = window.positionsPortfolioState.positionsData;
+        updateFn = (sortedData) => window.updatePositionsTable(sortedData);
+      } else {
+        return;
+      }
+    } else if (tableType === 'portfolio') {
+      // OLD CODE - portfolio table is now registered with UnifiedTableSystem
+      // This code should never execute because UnifiedTableSystem handles it first
+      if (window.positionsPortfolioState && window.positionsPortfolioState.portfolioData && window.positionsPortfolioState.portfolioData.positions) {
+        tableData = window.positionsPortfolioState.portfolioData.positions;
+        updateFn = (sortedData) => window.updatePortfolioTable(sortedData);
+      } else {
+        return;
+      }
+    } 
+    */
+    else {
       return;
     }
     
     // Validate data before sorting
     if (!Array.isArray(tableData)) {
-      console.warn(`❌ [SORT] Data is not an array for table type: ${tableType}`, typeof tableData);
       return;
     }
     
     if (tableData.length === 0) {
-      console.warn(`⚠️ [SORT] No data to sort for table type: ${tableType}`);
       return;
     }
     
-    console.log(`🔍 [SORT] Sorting ${tableData.length} items by column ${columnIndex}`);
     const result = window.sortTableData(columnIndex, tableData, tableType, updateFn);
     return result;
   }
@@ -523,12 +643,6 @@ window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, upd
   }
   
   // If we get here, parameters are invalid
-  console.error('❌ [SORT] Invalid parameters for sortTable:', {
-    tableTypeOrColumnIndex,
-    columnIndex,
-    dataArrayType: typeof dataArray,
-    updateFunctionType: typeof updateFunction
-  });
   return [];
 };
 
@@ -633,8 +747,10 @@ window.tables = {
   getDefaultColumnDefs: window.getDefaultColumnDefs,
 };
 
-// ייצוא פונקציית sortTable גלובלית
-window.sortTable = sortTable;
+// NOTE: window.sortTable is already defined above (line 450) with the correct signature
+// that handles both old-style calls (sortTable(columnIndex)) and new-style calls (sortTable(tableType, columnIndex))
+// The local function sortTable() (line 27) is a helper function only, not exported
+// DO NOT override window.sortTable here - it's already correctly defined above
 
 // ייצוא closeModalGlobal ככינוי ל-closeModal
 window.closeModalGlobal = window.closeModal;

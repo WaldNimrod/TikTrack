@@ -472,14 +472,116 @@ function updateAlertsTable(alerts) {
         tickers: tickers
       };
 
-      const relatedObjectInfo = window.getRelatedObjectDisplay ? 
+      const relatedObjectInfo = window.getRelatedObjectDisplay ?
         window.getRelatedObjectDisplay(alert, dataSources, { showLink: true, format: 'full' }) :
         { display: 'כללי', icon: '🌐', class: 'related-general', color: '', bgColor: '', type: 'general', id: null };
 
-      const relatedDisplay = relatedObjectInfo.display;
-      const relatedClass = relatedObjectInfo.class;
-      const relatedColor = relatedObjectInfo.color;
-      const relatedBgColor = relatedObjectInfo.bgColor;
+      let relatedCellHtml = '';
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
+        try {
+          let displayName = '';
+          let metaForEntity = { renderMode: 'notes-table' };
+          const relatedType = parseInt(alert.related_type_id, 10);
+
+          switch (relatedType) {
+          case 1: { // Trading account
+            const account = accounts.find(a => a && a.id === alert.related_id);
+            const accountName = account?.name || account?.account_name || `חשבון מסחר ${alert.related_id}`;
+            displayName = accountName;
+            metaForEntity = {
+              renderMode: 'notes-table',
+              name: accountName,
+              status: account?.status || '',
+              currency: account?.currency_symbol || account?.currency || ''
+            };
+            break;
+          }
+          case 2: { // Trade
+            const trade = trades.find(t => t && t.id === alert.related_id);
+            const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
+              if (trade?.ticker_id) {
+                const ticker = tickers.find(tk => tk && tk.id === trade.ticker_id);
+                return ticker?.symbol;
+              }
+              return null;
+            })();
+            const tickerSymbol = tradeTicker || `טרייד ${alert.related_id}`;
+            const tradeDate = trade?.created_at || trade?.opened_at || trade?.date || '';
+            displayName = tickerSymbol;
+            metaForEntity = {
+              renderMode: 'notes-table',
+              ticker: tickerSymbol,
+              date: tradeDate,
+              status: trade?.status || '',
+              side: trade?.side || '',
+              investment_type: trade?.investment_type || ''
+            };
+            break;
+          }
+          case 3: { // Trade plan
+            const plan = tradePlans.find(p => p && p.id === alert.related_id);
+            const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
+              if (plan?.ticker_id) {
+                const ticker = tickers.find(tk => tk && tk.id === plan.ticker_id);
+                return ticker?.symbol;
+              }
+              return null;
+            })();
+            const tickerSymbol = planTicker || `תוכנית ${alert.related_id}`;
+            const planDate = plan?.created_at || plan?.date || '';
+            displayName = tickerSymbol;
+            metaForEntity = {
+              renderMode: 'notes-table',
+              ticker: tickerSymbol,
+              date: planDate,
+              status: plan?.status || '',
+              side: plan?.side || '',
+              investment_type: plan?.investment_type || ''
+            };
+            break;
+          }
+          case 4: { // Ticker
+            const ticker = tickers.find(tk => tk && tk.id === alert.related_id);
+            const tickerSymbol = ticker?.symbol || `טיקר ${alert.related_id}`;
+            displayName = tickerSymbol;
+            metaForEntity = {
+              renderMode: 'notes-table',
+              ticker: tickerSymbol,
+              status: ticker?.status || ''
+            };
+            break;
+          }
+          default:
+            displayName = `אובייקט ${alert.related_id}`;
+            metaForEntity = { renderMode: 'notes-table' };
+          }
+
+          relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
+            alert.related_type_id,
+            alert.related_id,
+            displayName,
+            metaForEntity
+          );
+        } catch (error) {
+          window.Logger?.warn('⚠️ renderLinkedEntity failed for alert row, falling back to legacy renderer', { error, alertId: alert.id }, { page: "alerts" });
+          relatedCellHtml = '';
+        }
+      }
+
+      if (!relatedCellHtml) {
+        const relatedDisplay = relatedObjectInfo.display;
+        const relatedClass = relatedObjectInfo.class;
+        const relatedColor = relatedObjectInfo.color;
+        const relatedBgColor = relatedObjectInfo.bgColor;
+
+        relatedCellHtml = `
+          <div class="related-object-cell ${relatedClass}"
+           style="${relatedColor ? `color: ${relatedColor};` : ''} ${relatedBgColor ? `background-color: ${relatedBgColor};` : ''}"
+           title="${relatedObjectInfo.type || 'כללי'}">
+            ${relatedDisplay}
+          </div>
+        `;
+      }
 
       // קביעת הסימבול לטור הראשון באמצעות המערכת הכללית
       const symbolDisplay = window.getRelatedObjectSymbol ? 
@@ -543,10 +645,7 @@ function updateAlertsTable(alerts) {
       return `
         <tr data-status="${alert.status || ''}" data-date="${alert.created_at || ''}">
           <td class="related-cell">
-            <div class="related-object-cell ${relatedClass}" 
-             title="קישור לדף אובייקט - בפיתוח">
-              ${relatedDisplay}
-            </div>
+            ${relatedCellHtml}
           </td>
           <td class="ticker-cell">
             <div class="ticker-cell-content">
@@ -1201,6 +1300,7 @@ async function saveAlert() {
   const isNewForm = form.querySelector('#alertRelatedType');
   
   let relatedType, relatedId, conditionAttribute, conditionOperator, conditionNumber, message, status, isTriggered, expiryDate;
+  let hasErrors = false;
   
   if (isNewForm) {
     // New form structure (ModalManagerV2)
@@ -1209,7 +1309,11 @@ async function saveAlert() {
     conditionAttribute = form.querySelector('#alertType')?.value || '';
     conditionOperator = form.querySelector('#alertCondition')?.value || '';
     conditionNumber = form.querySelector('#alertValue')?.value || '';
-    message = form.querySelector('#alertName')?.value || '';
+    if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
+      message = window.RichTextEditorService.getContent('alertName') || '';
+    } else {
+      message = form.querySelector('#alertName')?.value || '';
+    }
     
     // Get combined status and parse to status + is_triggered
     const statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
@@ -1246,14 +1350,30 @@ async function saveAlert() {
     expiryDate = null;
   }
 
+  const sanitizedMessage = window.RichTextEditorService && typeof window.RichTextEditorService.sanitizeHTML === 'function'
+    ? window.RichTextEditorService.sanitizeHTML(message || '')
+    : (message || '');
+  const messageText = sanitizedMessage.replace(/<[^>]*>/g, '').trim();
+  if (!messageText) {
+    if (window.showValidationWarning) {
+      window.showValidationWarning('alertName', 'יש להזין הודעת התראה');
+    }
+    hasErrors = true;
+  }
+  if (sanitizedMessage.length > 5000) {
+    if (window.showValidationWarning) {
+      window.showValidationWarning('alertName', 'הודעת ההתראה חורגת מהאורך המותר (5,000 תווים)');
+    }
+    hasErrors = true;
+  }
+  message = sanitizedMessage;
+
   // window.Logger.info('🔧 Condition validation:', { page: "alerts" });
   // window.Logger.info('🔧 Condition attribute:', conditionAttribute, { page: "alerts" });
   // window.Logger.info('🔧 Condition operator:', conditionOperator, { page: "alerts" });
   // window.Logger.info('🔧 Condition number:', conditionNumber, { page: "alerts" });
 
   // ולידציה באמצעות מערכת הולידציה הגלובלית
-  let hasErrors = false;
-
   // בדיקת סוג אובייקט מקושר
   if (!relatedType) {
     if (window.showValidationWarning) {
@@ -1550,7 +1670,7 @@ async function updateAlert() {
     condition_attribute: { id: 'editConditionAttribute', type: 'text' },
     condition_operator: { id: 'editConditionOperator', type: 'text' },
     condition_number: { id: 'editConditionNumber', type: 'number' },
-    message: { id: 'editAlertMessage', type: 'text', default: null },
+    message: { id: 'editAlertMessage', type: 'rich-text', default: null },
     status: { id: 'editAlertStatus', type: 'text' },
     is_triggered: { id: 'editAlertIsTriggered', type: 'text' }
   });
@@ -1565,9 +1685,25 @@ async function updateAlert() {
   const conditionNumber = alertData.condition_number;
   const status = alertData.status;
   const isTriggered = alertData.is_triggered;
+  const messageHtml = alertData.message || '';
+  const messageText = messageHtml.replace(/<[^>]*>/g, '').trim();
 
   // ולידציה באמצעות מערכת הולידציה הגלובלית
   let hasErrors = false;
+
+  if (!messageText) {
+    if (window.showValidationWarning) {
+      window.showValidationWarning('editAlertMessage', 'יש להזין הודעת התראה');
+    }
+    hasErrors = true;
+  }
+
+  if (messageHtml.length > 5000) {
+    if (window.showValidationWarning) {
+      window.showValidationWarning('editAlertMessage', 'הודעת ההתראה חורגת מהאורך המותר (5,000 תווים)');
+    }
+    hasErrors = true;
+  }
 
   if (!validateAlertStatusCombination(status, isTriggered)) {
     if (window.showErrorNotification) {
@@ -1657,7 +1793,7 @@ async function updateAlert() {
     condition_attribute: conditionAttribute,
     condition_operator: conditionOperator,
     condition_number: conditionNumber,
-    message: alertData.message || null,
+    message: messageHtml || null,
     status: status,
     is_triggered: isTriggered,
   };

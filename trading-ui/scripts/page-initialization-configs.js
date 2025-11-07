@@ -189,6 +189,7 @@ const PAGE_CONFIGS = {
         // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
+        // - 'entity-details': מערכות פרטי ישויות
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
         packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
         
@@ -333,7 +334,10 @@ const PAGE_CONFIGS = {
             'window.Logger',
             'window.CacheSyncManager',
             'window.loadTradesData',
-            'window.checkLinkedItemsBeforeAction'
+            'window.checkLinkedItemsBeforeAction',
+            'window.RichTextEditorService',
+            'window.Quill',
+            'window.DOMPurify'
         ],
         
         // ← NEW: מטאדאטה
@@ -401,7 +405,10 @@ const PAGE_CONFIGS = {
             'window.SelectPopulatorService',
             'window.tickerService',
             'window.loadUserPreferences', // From modules/ui-advanced.js (modules package)
-            'window.openImportUserDataModal'
+            'window.openImportUserDataModal',
+            'window.RichTextEditorService',
+            'window.Quill',
+            'window.DOMPurify'
         ],
         
         // ← NEW: מטאדאטה
@@ -471,7 +478,10 @@ const PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'window.loadTradePlansData'
+            'window.loadTradePlansData',
+            'window.RichTextEditorService',
+            'window.Quill',
+            'window.DOMPurify'
         ],
         
         requiresFilters: true,
@@ -512,13 +522,17 @@ const PAGE_CONFIGS = {
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'window.loadAlertsData'
+            'window.loadAlertsData',
+            'window.ModalManagerV2',
+            'window.RichTextEditorService',
+            'window.Quill',
+            'window.DOMPurify'
         ],
         
         // ← NEW: מטאדאטה
@@ -579,7 +593,10 @@ const PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'window.loadTradingAccountsDataForTradingAccountsPage'
+            'window.loadTradingAccountsDataForTradingAccountsPage',
+            'window.RichTextEditorService',
+            'window.Quill',
+            'window.DOMPurify'
         ],
         
         // ← NEW: מטאדאטה
@@ -650,7 +667,10 @@ const PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',    // from base package
             'DataUtils',            // from services package  
-            'window.loadCashFlowsData'
+            'window.loadCashFlowsData',
+            'window.RichTextEditorService',
+            'window.Quill',
+            'window.DOMPurify'
         ],
         description: 'ניהול תזרימי מזומנים - הכנסות והוצאות',
         lastModified: '2025-10-19',
@@ -745,7 +765,10 @@ const PAGE_CONFIGS = {
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
-            'window.loadNotesData'
+            'window.loadNotesData',
+            'window.RichTextEditorService',
+            'window.Quill',
+            'window.DOMPurify'
         ],
         
         requiresFilters: true,
@@ -1485,32 +1508,6 @@ const ADDITIONAL_PAGE_CONFIGS = {
         ]
     },
     
-    'page-scripts-matrix': {
-        name: 'Page Scripts Matrix',
-        packages: ['base', 'init-system'],
-        requiredGlobals: [
-            'NotificationSystem',
-            'window.loadScriptsMatrix',
-            'window.ScriptsMatrix'
-        ],
-        description: 'מטריצת סקריפטים לעמודים',
-        lastModified: '2025-10-19',
-        pageType: 'development',
-        preloadAssets: ['scripts-matrix'],
-        cacheStrategy: 'standard',
-        requiresFilters: false,
-        requiresValidation: false,
-        requiresTables: true,
-        customInitializers: [
-            async (pageConfig) => {
-                window.Logger.info('📊 Initializing Page Scripts Matrix...', { page: "page-initialization-configs" });
-                if (typeof window.loadScriptsMatrix === 'function') {
-                    await window.loadScriptsMatrix();
-                }
-            }
-        ]
-    },
-    
     'css-management': {
         name: 'CSS Management',
         packages: ['base', 'init-system'],
@@ -1692,33 +1689,6 @@ const ADDITIONAL_PAGE_CONFIGS = {
                 if (typeof window.loadConditionsTest === 'function') {
                     await window.loadConditionsTest();
                 }
-            }
-        ]
-    },
-    
-    // Duplicate Detector
-    'duplicate-detector': {
-        name: 'Duplicate Detector',
-        packages: ['base', 'init-system'],
-        requiredGlobals: [
-            'NotificationSystem',
-            'Logger',
-            'UnifiedCacheManager'
-        ],
-        description: 'Advanced duplicate code detection system',
-        lastModified: '2025-01-26',
-        pageType: 'development',
-        preloadAssets: [],
-        cacheStrategy: 'standard',
-        requiresFilters: false,
-        requiresValidation: false,
-        requiresTables: false,
-        customInitializers: [
-            function() {
-                if (window.Logger) {
-                    window.Logger.info('🔍 Initializing Duplicate Detector...', { page: "page-initialization-configs" });
-                }
-                // Duplicate detector specific initialization
             }
         ]
     },

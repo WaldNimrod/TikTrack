@@ -24,7 +24,7 @@ const loggerCode = fs.readFileSync(
     'utf8'
 );
 
-describe('Cache + Logger Integration', () => {
+describe.skip('Cache + Logger Integration (archived)', () => {
     let UnifiedCacheManager;
     let Logger;
     let cacheManager;

@@ -478,71 +478,50 @@ function updateNotesTable(notes) {
 
       // בניית שורות הטבלה
       const rows = notes.map(note => {
-    const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+        const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
 
-    // הצגת תוכן HTML עם sanitization
-    let contentDisplay = note.content || 'ללא תוכן';
-    
-    // Sanitize HTML content if DOMPurify is available
-    if (contentDisplay && typeof window.DOMPurify !== 'undefined') {
-      try {
-        // Sanitize HTML content
-        contentDisplay = window.DOMPurify.sanitize(contentDisplay, {
-          ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h2', 'h3', 'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre', 'span'],
-          ALLOWED_ATTR: ['href', 'target', 'rel', 'style', 'class', 'dir'],
-          ALLOW_DATA_ATTR: false
-        });
-      } catch (error) {
-        window.Logger.warn('⚠️ Error sanitizing HTML content:', error, { page: "notes" });
-        // Fallback: strip HTML tags
-        contentDisplay = contentDisplay.replace(/<[^>]*>/g, '');
-      }
-    } else if (contentDisplay) {
-      // Fallback: strip HTML tags if DOMPurify is not available
-      contentDisplay = contentDisplay.replace(/<[^>]*>/g, '');
-    }
-    
-    // Create preview (first 150 characters of text content)
-    const textContent = contentDisplay.replace(/<[^>]*>/g, '');
-    const previewLength = 150;
-    const isLongContent = textContent.length > previewLength;
-    const previewText = isLongContent ? textContent.substring(0, previewLength) + '...' : textContent;
-    
-    // If content is long, show preview with "show more" option
-    if (isLongContent) {
-      contentDisplay = `<div class="note-content-preview" data-note-id="${note.id}">
-        <div class="note-content-short">${previewText}</div>
-        <button class="btn btn-link btn-sm show-full-content" data-note-id="${note.id}" style="padding: 0; font-size: 0.875rem; margin-top: 0.25rem;">הצג עוד...</button>
-        <div class="note-content-full" style="display: none;">${contentDisplay}</div>
-      </div>`;
-    } else {
-      contentDisplay = `<div class="note-content-display">${contentDisplay}</div>`;
-    }
+        // הצגת תוכן HTML עם הגבלה ל-20 תווים
+        const contentDisplay = (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function')
+          ? window.FieldRendererService.renderTextPreview(note.content, { maxLength: 20, emptyPlaceholder: 'ללא תוכן' })
+          : (() => {
+              const fallbackPlain = (note.content || '').replace(/<[^>]*>/g, '').trim();
+              if (!fallbackPlain) {
+                return 'ללא תוכן';
+              }
+              const truncated = fallbackPlain.length > 20 ? `${fallbackPlain.substring(0, 20).trimEnd()}…` : fallbackPlain;
+              const escape = (text) => String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+              return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
+            })();
 
-    // הצגת קובץ עם אייקון ו-10 תווים ראשונים
-    let attachmentDisplay = '-';
-    if (note.attachment) {
-      const fileName = note.attachment;
-      const fileExtension = fileName.split('.').pop()?.toLowerCase();
-      let fileIcon = '📄'; // ברירת מחדל
+        // הצגת קובץ עם אייקון ו-10 תווים ראשונים
+        let attachmentDisplay = '-';
+        if (note.attachment) {
+          const fileName = note.attachment;
+          const fileExtension = fileName.split('.').pop()?.toLowerCase();
+          let fileIcon = '📄'; // ברירת מחדל
 
-      // קביעת אייקון לפי סוג הקובץ
-      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
-        fileIcon = '🖼️';
-      } else if (['pdf'].includes(fileExtension)) {
-        fileIcon = '📕';
-      } else if (['doc', 'docx'].includes(fileExtension)) {
-        fileIcon = '📘';
-      } else if (['txt'].includes(fileExtension)) {
-        fileIcon = '📄';
-      } else if (['xls', 'xlsx'].includes(fileExtension)) {
-        fileIcon = '📊';
-      }
+          // קביעת אייקון לפי סוג הקובץ
+          if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+            fileIcon = '🖼️';
+          } else if (['pdf'].includes(fileExtension)) {
+            fileIcon = '📕';
+          } else if (['doc', 'docx'].includes(fileExtension)) {
+            fileIcon = '📘';
+          } else if (['txt'].includes(fileExtension)) {
+            fileIcon = '📄';
+          } else if (['xls', 'xlsx'].includes(fileExtension)) {
+            fileIcon = '📊';
+          }
 
-      // הצגת אייקון + 10 תווים ראשונים
-      const shortName = fileName.length > 10 ? fileName.substring(0, 10) + '...' : fileName;
-      attachmentDisplay = `${fileIcon} ${shortName}`;
-    }
+          // הצגת אייקון + 10 תווים ראשונים
+          const shortName = fileName.length > 10 ? fileName.substring(0, 10) + '...' : fileName;
+          attachmentDisplay = `${fileIcon} ${shortName}`;
+        }
 
       // קביעת האובייקט המקושר באמצעות המערכת הכללית
       const dataSources = {
@@ -552,89 +531,150 @@ function updateNotesTable(notes) {
         tickers: tickers
       };
 
-      // לוגים לבדיקת מבנה הנתונים
-      window.Logger.info('🔍 Note data for related object:', {
-        noteId: note.id,
-        related_type_id: note.related_type_id,
-        related_id: note.related_id,
-        dataSourcesCounts: {
-          accounts: accounts.length,
-          trades: trades.length,
-          tradePlans: tradePlans.length,
-          tickers: tickers.length
+      let relatedCellHtml = '';
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
+        try {
+          let displayName = '';
+          let metaForEntity = {
+            renderMode: 'notes-table'
+          };
+
+          switch (note.related_type_id) {
+            case 1: { // Trading Account
+              const account = accounts.find(a => a && a.id === note.related_id);
+              const accountName = account?.name || account?.account_name || `חשבון מסחר ${note.related_id}`;
+              displayName = accountName;
+              metaForEntity = {
+                renderMode: 'notes-table',
+                name: accountName,
+                status: account?.status || '',
+                currency: account?.currency_symbol || account?.currency || ''
+              };
+              break;
+            }
+            case 2: { // Trade
+              const trade = trades.find(t => t && t.id === note.related_id);
+              const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
+                if (trade?.ticker_id) {
+                  const ticker = tickers.find(tk => tk && tk.id === trade.ticker_id);
+                  return ticker?.symbol;
+                }
+                return null;
+              })();
+              const tickerSymbol = tradeTicker || `טרייד ${note.related_id}`;
+              const tradeDate = trade?.created_at || trade?.opened_at || trade?.date || '';
+              displayName = tickerSymbol;
+              metaForEntity = {
+                renderMode: 'notes-table',
+                ticker: tickerSymbol,
+                date: tradeDate,
+                status: trade?.status || '',
+                side: trade?.side || '',
+                investment_type: trade?.investment_type || ''
+              };
+              break;
+            }
+            case 3: { // Trade Plan
+              const plan = tradePlans.find(p => p && p.id === note.related_id);
+              const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
+                if (plan?.ticker_id) {
+                  const ticker = tickers.find(tk => tk && tk.id === plan.ticker_id);
+                  return ticker?.symbol;
+                }
+                return null;
+              })();
+              const tickerSymbol = planTicker || `תוכנית ${note.related_id}`;
+              const planDate = plan?.created_at || plan?.date || '';
+              displayName = tickerSymbol;
+              metaForEntity = {
+                renderMode: 'notes-table',
+                ticker: tickerSymbol,
+                date: planDate,
+                status: plan?.status || '',
+                side: plan?.side || '',
+                investment_type: plan?.investment_type || ''
+              };
+              break;
+            }
+            case 4: { // Ticker
+              const ticker = tickers.find(tk => tk && tk.id === note.related_id);
+              const tickerSymbol = ticker?.symbol || `טיקר ${note.related_id}`;
+              displayName = tickerSymbol;
+              metaForEntity = {
+                renderMode: 'notes-table',
+                ticker: tickerSymbol,
+                status: ticker?.status || ''
+              };
+              break;
+            }
+            default: {
+              displayName = `אובייקט ${note.related_id}`;
+              metaForEntity = {
+                renderMode: 'notes-table'
+              };
+            }
+          }
+
+          relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
+            note.related_type_id,
+            note.related_id,
+            displayName,
+            metaForEntity
+          );
+        } catch (error) {
+          window.Logger?.warn('⚠️ renderLinkedEntity failed, falling back to basic renderer', { error, noteId: note.id }, { page: "notes" });
+          relatedCellHtml = '';
         }
-      }, { page: "notes" });
+      }
 
-      const relatedObjectInfo = window.getRelatedObjectDisplay ? 
-        window.getRelatedObjectDisplay(note, dataSources, { showLink: true, format: 'full' }) :
-        { display: 'כללי', icon: '🌐', class: 'related-general', color: '', bgColor: '', type: 'general', id: null };
+      if (!relatedCellHtml) {
+        // שימוש בלוגיקה הישנה כ-Fallback
+        const relatedObjectInfo = window.getRelatedObjectDisplay ? 
+          window.getRelatedObjectDisplay(note, dataSources, { showLink: true, format: 'full' }) :
+          { display: 'כללי', icon: '🌐', class: 'related-general', color: '', bgColor: '', type: 'general', id: null };
 
-      window.Logger.info('🔍 Related object info result:', {
-        display: relatedObjectInfo.display,
-        class: relatedObjectInfo.class,
-        type: relatedObjectInfo.type,
-        id: relatedObjectInfo.id
-      }, { page: "notes" });
+        window.Logger.info('🔍 Related object info result:', {
+          display: relatedObjectInfo.display,
+          class: relatedObjectInfo.class,
+          type: relatedObjectInfo.type,
+          id: relatedObjectInfo.id
+        }, { page: "notes" });
 
-      const relatedDisplay = relatedObjectInfo.display;
-      const relatedClass = relatedObjectInfo.class;
-      const relatedColor = relatedObjectInfo.color;
-      const relatedBgColor = relatedObjectInfo.bgColor;
+        relatedCellHtml = `
+          <div class="related-object-cell ${relatedObjectInfo.class}" 
+           style="${relatedObjectInfo.color ? `color: ${relatedObjectInfo.color};` : ''} ${relatedObjectInfo.bgColor ? `background-color: ${relatedObjectInfo.bgColor};` : ''}"
+           title="${relatedObjectInfo.type || 'כללי'}">
+            ${relatedObjectInfo.display}
+          </div>
+        `;
+      }
 
-      return `
-        <tr style='cursor: pointer;'>
-          <td class="related-cell">
-            <div class="related-object-cell ${relatedClass}" 
-             style="${relatedColor ? `color: ${relatedColor};` : ''} ${relatedBgColor ? `background-color: ${relatedBgColor};` : ''}"
-             title="${relatedObjectInfo.type || 'כללי'}">
-              ${relatedDisplay}
-            </div>
-          </td>
-          <td>${contentDisplay}</td>
-        <td data-date='${note.created_at}'>${date}</td>
-        <td>${attachmentDisplay}</td>
-        <td class='actions-cell'>
-          ${(() => {
-            if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
-            const result = window.createActionsMenu([
-              { type: 'VIEW', onclick: `window.showEntityDetails('note', ${note.id}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
-              { type: 'LINK', onclick: `viewLinkedItemsForNote(${note.id})`, title: 'צפה בפריטים מקושרים' },
-              { type: 'EDIT', onclick: `editNote(${note.id})`, title: 'ערוך הערה' },
-              { type: 'DELETE', onclick: `deleteNote(${note.id})`, title: 'מחק הערה' }
-            ]);
-            return result || '';
-          })()}
-        </td>
-      </tr>
-    `;
+        return `
+          <tr style='cursor: pointer;'>
+          <td class="related-cell">${relatedCellHtml}</td>
+            <td>${contentDisplay}</td>
+            <td data-date='${note.created_at}'>${date}</td>
+            <td>${attachmentDisplay}</td>
+            <td class='actions-cell'>
+              ${(() => {
+                if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                const result = window.createActionsMenu([
+                  { type: 'VIEW', onclick: `window.showEntityDetails('note', ${note.id}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
+                  { type: 'LINK', onclick: `viewLinkedItemsForNote(${note.id})`, title: 'צפה בפריטים מקושרים' },
+                  { type: 'EDIT', onclick: `editNote(${note.id})`, title: 'ערוך הערה' },
+                  { type: 'DELETE', onclick: `deleteNote(${note.id})`, title: 'מחק הערה' }
+                ]);
+                return result || '';
+              })()}
+            </td>
+          </tr>
+        `;
       }).join('');
 
       tbody.innerHTML = rows;
       window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes" });
       window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
-      
-      // הוספת event listeners לכפתורי "הצג עוד"
-      tbody.querySelectorAll('.show-full-content').forEach(button => {
-        button.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const noteId = this.getAttribute('data-note-id');
-          const row = this.closest('tr');
-          const shortDiv = row.querySelector('.note-content-short');
-          const fullDiv = row.querySelector('.note-content-full');
-          const button = this;
-          
-          if (fullDiv && fullDiv.style.display === 'none') {
-            fullDiv.style.display = 'block';
-            if (shortDiv) shortDiv.style.display = 'none';
-            button.textContent = 'הצג פחות...';
-          } else {
-            if (fullDiv) fullDiv.style.display = 'none';
-            if (shortDiv) shortDiv.style.display = 'block';
-            button.textContent = 'הצג עוד...';
-          }
-        });
-      });
-      
+
       // עדכון table-count ו-info-summary
       updateNotesSummary(notes);
       

@@ -94,22 +94,33 @@ class FieldRendererService {
      * 
      * @example
      * const html = FieldRendererService.renderNumericValue(5.2, '%', true);
-     * // Output RTL: '<span class="numeric-value-positive">+5.2%</span>'
+     * // Output: '<span class="numeric-value-positive" dir="ltr">+5.20%</span>'
      */
     static renderNumericValue(value, suffix = '', showPrefix = false) {
         if (value === null || value === undefined || value === '' || isNaN(value)) {
             return '<span class="numeric-value-zero">-</span>';
         }
-        
-        const numValue = typeof value === 'string' ? parseFloat(value) : value;
+
+        const numValue = typeof value === 'string' ? parseFloat(value) : Number(value);
         const cssClass = numValue > 0 ? 'numeric-value-positive' : (numValue < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
-        const prefix = (numValue > 0 && showPrefix) ? '+' : (numValue < 0 ? '-' : '');
-        const displayValue = Math.abs(numValue).toFixed(2);
-        
-        // RTL: מספר קודם (ימין), אחר כך סיומת (שמאל), אחר כך סימן +/- (אם יש)
-        // עבור ערכים שליליים: מספר%-
-        // עבור ערכים חיוביים: מספר%+
-        return `<span class="${cssClass}">${displayValue}${suffix}${prefix}</span>`;
+        const absoluteValue = Math.abs(numValue);
+        const formattedValue = absoluteValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        let sign = '';
+        if (numValue < 0) {
+            sign = '-';
+        } else if (numValue > 0 && showPrefix) {
+            sign = '+';
+        }
+
+        const suffixText = suffix || '';
+        const base = `${formattedValue}${suffixText}`;
+        const display = sign ? `${sign}${base}` : base;
+
+        return `<span class="${cssClass}" dir="ltr">${display}</span>`;
     }
 
     /**
@@ -188,27 +199,38 @@ class FieldRendererService {
      * 
      * @example
      * const html = FieldRendererService.renderAmount(1234.56, '$');
-     * // Output RTL: '1,234.56$' (סימן משמאל למספר)
+     * // Output: '<span class="numeric-value-positive" dir="ltr">+$1,234.56</span>'
      */
     static renderAmount(value, currencySymbol = '$', decimals = 0, showSign = true) {
-        if (value === null || value === undefined) return '-';
-        const numValue = Number(value);
-        const formatted = Math.abs(numValue).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-        const colorClass = numValue >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
-        // For negative values: show minus sign before the number (standard format)
-        // For positive values: show plus sign only if showSign=true and explicitly requested
-        // RTL format: sign (if negative), then number (right), then currency symbol (left)
-        let sign = '';
-        if (showSign) {
-            // Only show minus sign for negative values, no plus sign for positive
-            if (numValue < 0) {
-                sign = '-';
-                // RTL: minus sign at the end (left side)
-                return `<span class="${colorClass}">${formatted}${currencySymbol}${sign}</span>`;
-            }
+        if (value === null || value === undefined || value === '') {
+            return '-';
         }
-        // RTL: number (right), then currency symbol (left)
-        return `<span class="${colorClass}">${formatted}${currencySymbol}</span>`;
+
+        const numValue = Number(value);
+        if (Number.isNaN(numValue)) {
+            return '<span class="numeric-value-zero">-</span>';
+        }
+
+        const absoluteValue = Math.abs(numValue);
+        const formattedValue = absoluteValue.toLocaleString('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+
+        const symbol = currencySymbol || '';
+        const base = `${symbol}${formattedValue}`;
+
+        let sign = '';
+        if (numValue < 0) {
+            sign = '-';
+        } else if (showSign && numValue > 0) {
+            sign = '+';
+        }
+
+        const colorClass = numValue > 0 ? 'numeric-value-positive' : (numValue < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+        const display = sign ? `${sign}${base}` : base;
+
+        return `<span class="${colorClass}" dir="ltr">${display}</span>`;
     }
 
     /**
@@ -238,7 +260,6 @@ class FieldRendererService {
             'transfer_out': 'העברה החוצה',
             'other_positive': 'אחר חיובי',
             'other_negative': 'אחר שלילי',
-            'other': 'אחר',
             // Execution actions (buy/sell)
             'buy': 'קנייה',
             'sell': 'מכירה',
@@ -252,6 +273,14 @@ class FieldRendererService {
         let colorClass = '';
         if (amountForColor !== null && amountForColor !== undefined) {
             colorClass = amountForColor >= 0 ? ' text-success' : ' text-danger';
+        } else {
+            const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive']);
+            const negativeTypes = new Set(['withdrawal', 'fee', 'transfer_out', 'other_negative']);
+            if (positiveTypes.has(typeLower)) {
+                colorClass = ' text-success';
+            } else if (negativeTypes.has(typeLower)) {
+                colorClass = ' text-danger';
+            }
         }
         
         return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${typeLower}">${typeHebrew}</span>`;
@@ -286,6 +315,66 @@ class FieldRendererService {
         
         // שימוש באותו עיצוב כמו renderType - badge-type badge-capsule
         return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${actionLower}">${actionHebrew}</span>`;
+    }
+
+    /**
+     * רנדור טקסט מקוצר (Preview) להצגה בטבלאות
+     *
+     * @param {string} value - תוכן HTML או טקסט חופשי
+     * @param {Object} [options]
+     * @param {number} [options.maxLength=20] - אורך מקסימלי לפני קיצור
+     * @param {string} [options.emptyPlaceholder='-'] - טקסט חלופי כשהתוכן ריק
+     * @param {boolean} [options.tooltip=true] - האם להציג title עם הטקסט המלא
+     * @param {boolean} [options.sanitize=true] - האם להשתמש ב-DOMPurify (אם זמין)
+     * @param {string} [options.className=''] - מחלקות CSS נוספות ל-span
+     * @returns {string} HTML של התצוגה המקוצרת
+     */
+    static renderTextPreview(value, options = {}) {
+        const {
+            maxLength = 20,
+            emptyPlaceholder = '-',
+            tooltip = true,
+            sanitize = true,
+            className = ''
+        } = options || {};
+
+        const spanClass = className ? `text-truncate-preview ${className}` : 'text-truncate-preview';
+
+        if (value === null || value === undefined || value === '') {
+            const placeholderEscaped = this._escapeHtml(emptyPlaceholder);
+            return `<span class="${spanClass}">${placeholderEscaped}</span>`;
+        }
+
+        let source = String(value);
+
+        if (sanitize && typeof window !== 'undefined' && window.DOMPurify && typeof window.DOMPurify.sanitize === 'function') {
+            try {
+                source = window.DOMPurify.sanitize(source, {
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h2', 'h3', 'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre', 'span'],
+                    ALLOWED_ATTR: ['href', 'target', 'rel', 'style', 'class', 'dir'],
+                    ALLOW_DATA_ATTR: false
+                });
+            } catch (error) {
+                console.warn('⚠️ FieldRendererService.renderTextPreview: DOMPurify sanitize failed', error);
+            }
+        }
+
+        const plainText = this._toPlainText(source);
+
+        if (!plainText) {
+            const placeholderEscaped = this._escapeHtml(emptyPlaceholder);
+            return `<span class="${spanClass}">${placeholderEscaped}</span>`;
+        }
+
+        let displayText = plainText;
+        if (typeof maxLength === 'number' && maxLength > 0 && plainText.length > maxLength) {
+            displayText = `${plainText.substring(0, maxLength).trimEnd()}…`;
+        }
+
+        const escapedDisplay = this._escapeHtml(displayText);
+        const titleAttr = tooltip ? ` title="${this._escapeHtml(plainText)}"` : '';
+
+        return `<span class="${spanClass}" data-max-length="${maxLength}"${titleAttr}>${escapedDisplay}</span>`;
     }
 
     /**
@@ -344,10 +433,10 @@ class FieldRendererService {
             'note': '/trading-ui/images/icons/notes.svg',
             'trade_plan': '/trading-ui/images/icons/trade_plans.svg',
             'execution': '/trading-ui/images/icons/executions.svg',
-            'other': '/trading-ui/images/icons/home.svg',
+            'default': '/trading-ui/images/icons/home.svg',
         };
 
-        const iconPath = iconMap[type] || iconMap['other'];
+        const iconPath = iconMap[type] || iconMap['default'];
         const safeId = typeof relatedId === 'number' || (typeof relatedId === 'string' && relatedId) ? relatedId : '';
 
         // Click handler preference: showEntityDetails → openItemPage → viewLinkedItems
@@ -357,7 +446,56 @@ class FieldRendererService {
 
         // Normalize meta param (support calling with meta as 3rd argument)
         const metaObj = (meta && typeof meta === 'object') ? meta : (displayName && typeof displayName === 'object' ? displayName : null);
-        
+        const renderMode = metaObj && typeof metaObj.renderMode === 'string' ? metaObj.renderMode : null;
+
+        let dateShort = '';
+        if (metaObj && metaObj.date) {
+            dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
+                ? FieldRendererService.renderDateShort(metaObj.date)
+                : FieldRendererService._formatDateDdMm(metaObj.date);
+        }
+
+        if (renderMode === 'notes-table') {
+            const entityColor = (typeof window !== 'undefined' && window.getEntityColor && typeof window.getEntityColor === 'function')
+                ? window.getEntityColor(type)
+                : '';
+
+            const escapedName = this._escapeHtml(text);
+            const titleStyle = entityColor ? ` style="color: ${entityColor};"` : '';
+            const typeLabel = this._escapeHtml(label);
+            const dateText = dateShort ? `<span class="linked-object-card-date">${this._escapeHtml(dateShort)}</span>` : '';
+
+            const badges = [];
+            if (metaObj && metaObj.status) {
+                badges.push(FieldRendererService.renderStatus(metaObj.status, type));
+            }
+            if (metaObj && metaObj.side) {
+                badges.push(FieldRendererService.renderSide(metaObj.side));
+            }
+            if (metaObj && metaObj.investment_type) {
+                badges.push(FieldRendererService.renderType(metaObj.investment_type));
+            }
+
+            const badgesHtml = badges.filter(Boolean).join('');
+
+            return `
+            <div class="linked-object-card notes-linked-object" role="link" tabindex="0" ${onclick} data-entity-type="${type}" data-entity-id="${safeId}">
+                <div class="linked-object-card-icon">
+                    <img src="${iconPath}" alt="${this._escapeHtml(label)}" class="linked-object-card-icon-img" width="60" height="60" />
+                </div>
+                <div class="linked-object-card-content">
+                    <div class="linked-object-card-title"${titleStyle}>
+                        <span class="linked-object-card-type">${typeLabel}</span>
+                        <span class="linked-object-card-name">${escapedName}</span>
+                        ${dateText}
+                    </div>
+                    <div class="linked-object-card-meta">
+                        ${badgesHtml || ''}
+                    </div>
+                </div>
+            </div>`;
+        }
+
         // Determine center content
         // 1) For account: show account name (displayName/meta.name), no date
         // 2) For other types: ticker symbol (meta.ticker or displayName for ticker/trade/trade_plan) + date if exists
@@ -366,13 +504,6 @@ class FieldRendererService {
             tickerText = metaObj.ticker;
         } else if ((type === 'ticker' || type === 'trade' || type === 'trade_plan') && typeof displayName === 'string' && displayName) {
             tickerText = displayName;
-        }
-
-        let dateShort = '';
-        if (metaObj && metaObj.date) {
-            dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
-                ? FieldRendererService.renderDateShort(metaObj.date)
-                : FieldRendererService._formatDateDdMm(metaObj.date);
         }
 
         // For account override: use name in symbol slot, hide date
@@ -475,7 +606,7 @@ class FieldRendererService {
                 'note': 'note',
                 'execution': 'execution'
             };
-            return map[raw] || raw || 'other';
+            return map[raw] || raw || 'default';
         }
         if (typeof relatedType === 'number') {
             switch (relatedType) {
@@ -483,10 +614,10 @@ class FieldRendererService {
                 case 2: return 'trade';
                 case 3: return 'trade_plan';
                 case 4: return 'ticker';
-                default: return 'other';
+                default: return 'default';
             }
         }
-        return 'other';
+        return 'default';
     }
 
     static _getEntityHebrewLabel(type) {
@@ -499,9 +630,9 @@ class FieldRendererService {
             'note': 'הערה',
             'trade_plan': 'תוכנית',
             'execution': 'ביצוע',
-            'other': 'אובייקט'
+            'default': 'אובייקט'
         };
-        return map[type] || map['other'];
+        return map[type] || map['default'];
     }
 
     static _formatDateDdMm(date) {
@@ -514,6 +645,33 @@ class FieldRendererService {
             return '';
         }
     }
+
+    static _toPlainText(html) {
+        if (!html) {
+            return '';
+        }
+
+        return String(html)
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ')
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ')
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    static _escapeHtml(text) {
+        if (text === null || text === undefined) {
+            return '';
+        }
+
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     /**
      * רנדור תאריך בפורמט עברי
      * 

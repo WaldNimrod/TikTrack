@@ -3114,10 +3114,13 @@ class EntityDetailsRenderer {
             `;
         }
 
-        const attachmentRender = window.FieldRendererService.renderAttachment(noteData, {
+        const attachmentPath = String(attachment || '').trim();
+        const fileUrl = `/api/notes/files/${encodeURIComponent(attachmentPath)}`;
+
+        const attachmentRender = window.FieldRendererService.renderAttachment({ attachment: attachmentPath }, {
             attachmentPathKey: 'attachment',
-            fileNameKey: 'attachment',
-            baseUrl: '/api/notes/files/',
+            fileName: attachmentPath,
+            downloadUrl: fileUrl,
             previewMaxHeight: 220,
             pdfHeight: 240,
             showExtension: false,

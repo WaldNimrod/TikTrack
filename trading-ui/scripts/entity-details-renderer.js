@@ -1191,6 +1191,17 @@ class EntityDetailsRenderer {
                 }, 250);
             }
 
+            // Debug: Verify rowsHtml before inserting into template
+            console.log('🔍 [renderLinkedItems] Before creating HTML template', {
+                rowsHtmlLength: rowsHtml.length,
+                rowsHtmlStartsWithTR: rowsHtml.trim().startsWith('<tr'),
+                rowsHtmlEndsWithTR: rowsHtml.trim().endsWith('</tr>'),
+                rowsHtmlFirstChars: rowsHtml.substring(0, 100),
+                rowsHtmlLastChars: rowsHtml.substring(Math.max(0, rowsHtml.length - 100)),
+                enrichedItemsCount: enrichedItems.length,
+                tableHeadersLength: tableHeaders.length
+            });
+            
             const html = `
                 <section class="content-section entity-linked-items mt-4" data-section="linked-items-${parentEntityType}" data-linked-entity="${parentEntityType}" data-linked-entity-id="${parentEntityId}">
                     <div class="section-header-with-extra-info d-flex align-items-center justify-content-between flex-wrap gap-3">
@@ -1222,6 +1233,20 @@ class EntityDetailsRenderer {
             </div>
                 </section>
             `;
+            
+            // Debug: Verify HTML structure after creation
+            const tbodyIndex = html.indexOf('<tbody>');
+            const tbodyEndIndex = html.indexOf('</tbody>');
+            const tbodyContent = tbodyIndex >= 0 && tbodyEndIndex > tbodyIndex 
+                ? html.substring(tbodyIndex + 7, tbodyEndIndex) 
+                : 'NOT FOUND';
+            console.log('🔍 [renderLinkedItems] After creating HTML template', {
+                htmlLength: html.length,
+                tbodyFound: tbodyIndex >= 0,
+                tbodyContentLength: tbodyContent.length,
+                tbodyContentPreview: tbodyContent.substring(0, 200),
+                tbodyContentMatchesRowsHtml: tbodyContent.trim() === rowsHtml.trim()
+            });
 
             if (enrichedItems.some(item => this._needsLinkedItemHydration(item))) {
                 setTimeout(() => {
@@ -3125,14 +3150,40 @@ class EntityDetailsRenderer {
      * @private
      */
     updateLinkedItemsTableBody(tableId, sortedData) {
+        console.log('🔍 [updateLinkedItemsTableBody] START', {
+            tableId,
+            sortedDataCount: sortedData?.length || 0,
+            sortedData: sortedData?.slice(0, 2) // First 2 items for debugging
+        });
+        
         const table = document.getElementById(tableId);
-        if (!table || !sortedData) return;
+        if (!table) {
+            console.warn('⚠️ [updateLinkedItemsTableBody] Table not found:', tableId);
+            return;
+        }
+        if (!sortedData) {
+            console.warn('⚠️ [updateLinkedItemsTableBody] No sorted data provided');
+            return;
+        }
         
         const tbody = table.querySelector('tbody');
-        if (!tbody) return;
+        if (!tbody) {
+            console.warn('⚠️ [updateLinkedItemsTableBody] tbody not found in table:', tableId);
+            return;
+        }
+        
+        console.log('🔍 [updateLinkedItemsTableBody] Before clearing tbody', {
+            tbodyRowsBefore: tbody.querySelectorAll('tr').length,
+            tbodyHTMLBefore: tbody.innerHTML.substring(0, 100)
+        });
         
         // ניקוי הטבלה
         tbody.innerHTML = '';
+        
+        console.log('🔍 [updateLinkedItemsTableBody] After clearing tbody', {
+            tbodyRowsAfter: tbody.querySelectorAll('tr').length,
+            tbodyHTMLAfter: tbody.innerHTML
+        });
         
         // קבלת sourceInfo מהטבלה
         const entityTypeAttr = table.closest('.modal')?.querySelector('[data-entity-type]')?.getAttribute('data-entity-type');
@@ -3144,15 +3195,48 @@ class EntityDetailsRenderer {
             sourceId: entityIdAttr || this.currentEntityId
         };
         
+        console.log('🔍 [updateLinkedItemsTableBody] About to render rows', {
+            sortedDataCount: sortedData.length,
+            itemSourceInfo,
+            firstItem: sortedData[0]
+        });
+        
         // יצירת שורות חדשות באמצעות הפונקציה המאוחדת
-        sortedData.forEach(item => {
-            const rowHtml = this._renderLinkedItemRow(item, tableId, itemSourceInfo);
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = rowHtml.trim();
-            const row = tempDiv.querySelector('tr');
-            if (row) {
-                tbody.appendChild(row);
+        let rowsAdded = 0;
+        sortedData.forEach((item, index) => {
+            try {
+                const rowHtml = this._renderLinkedItemRow(item, tableId, itemSourceInfo);
+                if (!rowHtml || rowHtml.trim() === '') {
+                    console.warn(`⚠️ [updateLinkedItemsTableBody] Empty row HTML for item ${index}:`, item);
+                    return;
+                }
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = rowHtml.trim();
+                const row = tempDiv.querySelector('tr');
+                if (row) {
+                    tbody.appendChild(row);
+                    rowsAdded++;
+                    if (index === 0) {
+                        console.log('🔍 [updateLinkedItemsTableBody] First row added:', {
+                            rowHTML: rowHtml.substring(0, 200),
+                            rowElement: row.outerHTML.substring(0, 200)
+                        });
+                    }
+                } else {
+                    console.warn(`⚠️ [updateLinkedItemsTableBody] No <tr> found in row HTML for item ${index}:`, {
+                        rowHtml: rowHtml.substring(0, 200),
+                        item
+                    });
+                }
+            } catch (error) {
+                console.error(`❌ [updateLinkedItemsTableBody] Error rendering row ${index}:`, error, item);
             }
+        });
+        
+        console.log('🔍 [updateLinkedItemsTableBody] After adding rows', {
+            rowsAdded,
+            tbodyRowsAfter: tbody.querySelectorAll('tr').length,
+            tbodyHTMLAfter: tbody.innerHTML.substring(0, 300)
         });
         
         // עדכון אייקוני המיון
@@ -3170,6 +3254,13 @@ class EntityDetailsRenderer {
             } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
                 window.ButtonSystem.initializeButtons();
             }
+            
+            // Final check after initialization
+            const finalTbody = table.querySelector('tbody');
+            console.log('🔍 [updateLinkedItemsTableBody] Final check after initialization', {
+                tbodyRowsFinal: finalTbody ? finalTbody.querySelectorAll('tr').length : 0,
+                tbodyHTMLFinal: finalTbody ? finalTbody.innerHTML.substring(0, 300) : 'N/A'
+            });
         }, 100);
     }
     
@@ -3400,11 +3491,20 @@ class EntityDetailsRenderer {
     }
 
     async _hydrateLinkedItemsAsync(tableId, items, parentEntityType, parentEntityId) {
+        console.log('🔍 [_hydrateLinkedItemsAsync] START', {
+            tableId,
+            itemsCount: items?.length || 0,
+            parentEntityType,
+            parentEntityId
+        });
+        
         if (!Array.isArray(items) || items.length === 0) {
+            console.log('🔍 [_hydrateLinkedItemsAsync] No items to hydrate');
             return;
         }
 
         if (!window.entityDetailsAPI || typeof window.entityDetailsAPI.getEntityDetails !== 'function') {
+            console.log('🔍 [_hydrateLinkedItemsAsync] entityDetailsAPI not available');
             return;
         }
 
@@ -3413,6 +3513,7 @@ class EntityDetailsRenderer {
         }
 
         if (this._linkedItemsHydrationState[tableId]) {
+            console.log('🔍 [_hydrateLinkedItemsAsync] Already hydrating, skipping');
             return;
         }
 
@@ -3421,7 +3522,13 @@ class EntityDetailsRenderer {
         const itemsWithIndex = items.map((item, index) => ({ item, index }))
             .filter(({ item }) => this._needsLinkedItemHydration(item));
 
+        console.log('🔍 [_hydrateLinkedItemsAsync] Items needing hydration', {
+            itemsNeedingHydration: itemsWithIndex.length,
+            totalItems: items.length
+        });
+
         if (itemsWithIndex.length === 0) {
+            console.log('🔍 [_hydrateLinkedItemsAsync] No items need hydration');
             this._linkedItemsHydrationState[tableId] = false;
             return;
         }
@@ -3443,8 +3550,15 @@ class EntityDetailsRenderer {
 
                 const entityId = this._normalizeLinkedItemId(item.id);
                 if (entityId === null || entityId === undefined) {
+                    console.warn('⚠️ [_hydrateLinkedItemsAsync] Invalid entity ID for item:', item);
                     continue;
                 }
+
+                console.log('🔍 [_hydrateLinkedItemsAsync] Fetching details for item', {
+                    index,
+                    type: normalizedType,
+                    id: entityId
+                });
 
                 const details = await window.entityDetailsAPI.getEntityDetails(normalizedType, entityId, {
                     includeLinkedItems: false,
@@ -3452,9 +3566,20 @@ class EntityDetailsRenderer {
                 });
 
                 if (details) {
+                    console.log('🔍 [_hydrateLinkedItemsAsync] Details fetched, merging', {
+                        index,
+                        detailsKeys: Object.keys(details)
+                    });
                     this._mergeLinkedItemDetails(updatedItems[index], details);
+                } else {
+                    console.warn('⚠️ [_hydrateLinkedItemsAsync] No details returned for item:', {
+                        index,
+                        type: normalizedType,
+                        id: entityId
+                    });
                 }
             } catch (error) {
+                console.error('❌ [_hydrateLinkedItemsAsync] Error hydrating item:', error, item);
                 window.Logger?.debug('Linked item hydration skipped', { error, item }, { page: 'entity-details-renderer' });
             }
         }
@@ -3462,8 +3587,15 @@ class EntityDetailsRenderer {
         window.linkedItemsTableData = window.linkedItemsTableData || {};
         window.linkedItemsTableData[tableId] = updatedItems;
 
+        console.log('🔍 [_hydrateLinkedItemsAsync] About to update table body', {
+            tableId,
+            updatedItemsCount: updatedItems.length
+        });
+
         this.updateLinkedItemsTableBody(tableId, updatedItems);
         this._linkedItemsHydrationState[tableId] = false;
+        
+        console.log('🔍 [_hydrateLinkedItemsAsync] END');
     }
 
     _mergeLinkedItemDetails(target, details) {
@@ -3643,12 +3775,27 @@ class EntityDetailsRenderer {
             const formattedFlowDate = flowDate ? this.formatDate(flowDate) : 'לא זמין';
             const { symbol, name } = this._resolveCashFlowCurrencyDetails(entityData);
             const amountValue = Number(entityData.amount || 0);
+            
+            // Normalize amount based on type - same logic as in cash_flows.js formatCashFlowAmount
+            const typeLower = (entityData.type || '').toLowerCase();
+            const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive']);
+            const negativeTypes = new Set(['withdrawal', 'fee', 'transfer_out', 'other_negative']);
+            
+            let effectiveAmount = amountValue;
+            if (typeLower) {
+                if (positiveTypes.has(typeLower)) {
+                    effectiveAmount = Math.abs(amountValue);
+                } else if (negativeTypes.has(typeLower)) {
+                    effectiveAmount = -Math.abs(amountValue);
+                }
+            }
+            
             const amountHtml = (window.FieldRendererService && window.FieldRendererService.renderAmount)
-                ? window.FieldRendererService.renderAmount(amountValue, symbol || '', 0, true)
-                : `<span class="${amountValue >= 0 ? 'text-success' : 'text-danger'} fw-bold" dir="ltr">${(symbol || '')}${Math.abs(amountValue).toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 })}</span>`;
+                ? window.FieldRendererService.renderAmount(effectiveAmount, symbol || '', 0, true)
+                : `<span class="${effectiveAmount >= 0 ? 'text-success' : 'text-danger'} fw-bold" dir="ltr">${(symbol || '')}${Math.abs(effectiveAmount).toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 })}</span>`;
             const typeHtml = entityData.type
                 ? (window.FieldRendererService && window.FieldRendererService.renderType
-                    ? window.FieldRendererService.renderType(entityData.type, amountValue)
+                    ? window.FieldRendererService.renderType(entityData.type, effectiveAmount)
                     : `<span class="badge bg-secondary">${this.translateCashFlowType(entityData.type)}</span>`)
                 : '<span class="text-muted">לא זמין</span>';
             const currencyNameDisplay = name || 'לא זמין';

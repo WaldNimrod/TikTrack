@@ -20,10 +20,13 @@
         priceDisplay: null,
         stopField: null,
         targetField: null,
+        stopPercentField: null,
+        targetPercentField: null,
         stopPreferenceKey: 'defaultStopLoss',
         targetPreferenceKey: 'defaultTargetPrice',
         forceRiskOnBind: false,
-        forceSyncOnBind: false
+        forceSyncOnBind: false,
+        percentDecimals: 2
     };
 
     const boundContexts = new WeakMap();
@@ -73,6 +76,46 @@
 
     function isPositiveNumber(value) {
         return typeof value === 'number' && Number.isFinite(value) && value > 0;
+    }
+
+    function formatPercent(percent, options) {
+        if (!Number.isFinite(percent)) {
+            return '';
+        }
+        const decimals = Number.isInteger(options.percentDecimals) ? options.percentDecimals : DEFAULT_OPTIONS.percentDecimals;
+        return Number(percent).toFixed(decimals);
+    }
+
+    function computeStopPercent(entryPrice, stopPrice) {
+        if (!Number.isFinite(entryPrice) || entryPrice === 0 || !Number.isFinite(stopPrice) || stopPrice <= 0) {
+            return null;
+        }
+        const percent = ((entryPrice - stopPrice) / entryPrice) * 100;
+        return Number.isFinite(percent) ? percent : null;
+    }
+
+    function computeTargetPercent(entryPrice, targetPrice) {
+        if (!Number.isFinite(entryPrice) || entryPrice === 0 || !Number.isFinite(targetPrice) || targetPrice <= 0) {
+            return null;
+        }
+        const percent = ((targetPrice - entryPrice) / entryPrice) * 100;
+        return Number.isFinite(percent) ? percent : null;
+    }
+
+    function computePriceFromPercent(entryPrice, percentValue, type) {
+        if (!isPositiveNumber(entryPrice) || !Number.isFinite(percentValue)) {
+            return null;
+        }
+        const ratio = percentValue / 100;
+        if (type === 'stop') {
+            const price = entryPrice * (1 - ratio);
+            return price > 0 ? price : null;
+        }
+        if (type === 'target') {
+            const price = entryPrice * (1 + ratio);
+            return price > 0 ? price : null;
+        }
+        return null;
     }
 
     function computeQuantityFromInvestment(totalInvestment, price, options = {}) {
@@ -181,6 +224,84 @@
     function attachRiskListeners(context) {
         markFieldAsUserModified(context.stopInput);
         markFieldAsUserModified(context.targetInput);
+        markFieldAsUserModified(context.stopPercentInput);
+        markFieldAsUserModified(context.targetPercentInput);
+    }
+
+    function updatePercentFromPrices(context, options = {}) {
+        if (!context) {
+            return;
+        }
+
+        const systemGenerated = options.systemGenerated !== false;
+        const entryPrice = getPriceFromContext(context);
+
+        const applyValue = (input, percentValue) => {
+            if (!input) {
+                return;
+            }
+
+            if (percentValue === null || !Number.isFinite(percentValue)) {
+                input.value = '';
+                if (systemGenerated) {
+                    delete input.dataset.userModified;
+                    delete input.dataset.systemGenerated;
+                }
+                return;
+            }
+
+            input.value = formatPercent(percentValue, context.options);
+
+            if (systemGenerated) {
+                input.dataset.systemGenerated = 'true';
+                delete input.dataset.userModified;
+            } else {
+                delete input.dataset.systemGenerated;
+            }
+        };
+
+        if (context.stopPercentInput) {
+            const stopPrice = parseInputValue(context.stopInput);
+            const stopPercent = Number.isFinite(entryPrice) ? computeStopPercent(entryPrice, stopPrice) : null;
+            applyValue(context.stopPercentInput, stopPercent);
+        }
+
+        if (context.targetPercentInput) {
+            const targetPrice = parseInputValue(context.targetInput);
+            const targetPercent = Number.isFinite(entryPrice) ? computeTargetPercent(entryPrice, targetPrice) : null;
+            applyValue(context.targetPercentInput, targetPercent);
+        }
+    }
+
+    function updatePriceFromPercent(context, type) {
+        if (!context) {
+            return false;
+        }
+
+        const percentInput = type === 'stop' ? context.stopPercentInput : context.targetPercentInput;
+        const priceInput = type === 'stop' ? context.stopInput : context.targetInput;
+        if (!percentInput || !priceInput) {
+            return false;
+        }
+
+        const rawValue = typeof percentInput.value === 'string' ? percentInput.value.trim() : '';
+        if (rawValue === '') {
+            priceInput.value = '';
+            delete priceInput.dataset.systemGenerated;
+            return true;
+        }
+
+        const percentValue = parseNumericString(rawValue);
+        const entryPrice = getPriceFromContext(context);
+        const computedPrice = computePriceFromPercent(entryPrice, percentValue, type === 'stop' ? 'stop' : 'target');
+
+        if (!Number.isFinite(computedPrice) || computedPrice <= 0) {
+            return false;
+        }
+
+        priceInput.value = computedPrice.toFixed(context.options.amountDecimals ?? DEFAULT_OPTIONS.amountDecimals);
+        markFieldAsSystemGenerated(priceInput);
+        return true;
     }
 
     function getRiskCacheKey(options) {
@@ -266,6 +387,8 @@
                     }
                 }
             }
+
+            updatePercentFromPrices(context);
         });
     }
 
@@ -321,6 +444,8 @@
         if (context.amountInput && normalizedInvestment !== null) {
             context.amountInput.value = formatAmount(normalizedInvestment, context.options);
         }
+
+        updatePercentFromPrices(context);
     }
 
     function updateFromQuantity(context) {
@@ -345,6 +470,8 @@
                 delete context.amountInput.dataset.systemGenerated;
             }
         }
+
+        updatePercentFromPrices(context);
     }
 
     function syncValues(context, options = {}) {
@@ -404,6 +531,8 @@
                 return;
             }
         }
+
+        updatePercentFromPrices(context);
     }
 
     function attachListeners(context) {
@@ -414,6 +543,108 @@
         const { amountInput, quantityInput, priceInput } = context;
 
         attachRiskListeners(context);
+
+        if (quantityInput && !quantityInput.dataset.investmentCalcBound) {
+            const markQuantityModified = () => {
+                quantityInput.dataset.userModified = 'true';
+                delete quantityInput.dataset.systemGenerated;
+            };
+            const handleQuantityCommit = () => {
+                markQuantityModified();
+                withLock(context, () => updateFromQuantity(context));
+            };
+            quantityInput.addEventListener('input', markQuantityModified);
+            quantityInput.addEventListener('change', handleQuantityCommit);
+            quantityInput.addEventListener('blur', handleQuantityCommit);
+            quantityInput.dataset.investmentCalcBound = 'true';
+        }
+
+        if (context.stopPercentInput && !context.stopPercentInput.dataset.investmentCalcPercentInputBound) {
+            const markStopPercentModified = () => {
+                context.stopPercentInput.dataset.userModified = 'true';
+                delete context.stopPercentInput.dataset.systemGenerated;
+            };
+            const handleStopPercentCommit = () => {
+                markStopPercentModified();
+                withLock(context, () => {
+                    const updated = updatePriceFromPercent(context, 'stop');
+                    if (updated) {
+                        updatePercentFromPrices(context, { systemGenerated: false });
+                    }
+                });
+            };
+            context.stopPercentInput.addEventListener('input', markStopPercentModified);
+            context.stopPercentInput.addEventListener('change', handleStopPercentCommit);
+            context.stopPercentInput.addEventListener('blur', handleStopPercentCommit);
+            context.stopPercentInput.dataset.investmentCalcPercentInputBound = 'true';
+        }
+
+        if (context.targetPercentInput && !context.targetPercentInput.dataset.investmentCalcPercentInputBound) {
+            const markTargetPercentModified = () => {
+                context.targetPercentInput.dataset.userModified = 'true';
+                delete context.targetPercentInput.dataset.systemGenerated;
+            };
+            const handleTargetPercentCommit = () => {
+                markTargetPercentModified();
+                withLock(context, () => {
+                    const updated = updatePriceFromPercent(context, 'target');
+                    if (updated) {
+                        updatePercentFromPrices(context, { systemGenerated: false });
+                    }
+                });
+            };
+            context.targetPercentInput.addEventListener('input', markTargetPercentModified);
+            context.targetPercentInput.addEventListener('change', handleTargetPercentCommit);
+            context.targetPercentInput.addEventListener('blur', handleTargetPercentCommit);
+            context.targetPercentInput.dataset.investmentCalcPercentInputBound = 'true';
+        }
+
+        if (priceInput && !priceInput.dataset.investmentCalcBound) {
+            const handler = () => {
+                priceInput.dataset.userModified = 'true';
+                delete priceInput.dataset.systemGenerated;
+                const amountValue = parseInputValue(amountInput);
+                const quantityValue = parseInputValue(quantityInput);
+
+                if (isPositiveNumber(amountValue)) {
+                    withLock(context, () => updateFromAmount(context));
+                } else if (isPositiveNumber(quantityValue)) {
+                    withLock(context, () => updateFromQuantity(context));
+                }
+
+                const riskPromise = applyDefaultRiskLevels(context, { force: false });
+                if (riskPromise && typeof riskPromise.catch === 'function') {
+                    riskPromise.catch(error => {
+                        window.Logger?.warn?.('⚠️ Error applying default risk levels after price change', { error, source: 'InvestmentCalculationService' });
+                    });
+                }
+
+                updatePercentFromPrices(context);
+            };
+
+            priceInput.addEventListener('input', handler);
+            priceInput.addEventListener('change', handler);
+            priceInput.addEventListener('blur', handler);
+            priceInput.dataset.investmentCalcBound = 'true';
+        }
+
+        if (context.stopInput && !context.stopInput.dataset.investmentCalcPercentBound) {
+            const syncStopPercent = () => {
+                updatePercentFromPrices(context);
+            };
+            context.stopInput.addEventListener('change', syncStopPercent);
+            context.stopInput.addEventListener('blur', syncStopPercent);
+            context.stopInput.dataset.investmentCalcPercentBound = 'true';
+        }
+
+        if (context.targetInput && !context.targetInput.dataset.investmentCalcPercentBound) {
+            const syncTargetPercent = () => {
+                updatePercentFromPrices(context);
+            };
+            context.targetInput.addEventListener('change', syncTargetPercent);
+            context.targetInput.addEventListener('blur', syncTargetPercent);
+            context.targetInput.dataset.investmentCalcPercentBound = 'true';
+        }
 
         if (amountInput && !amountInput.dataset.investmentCalcBound) {
             const markAmountModified = () => {
@@ -444,33 +675,6 @@
             quantityInput.addEventListener('blur', handleQuantityCommit);
             quantityInput.dataset.investmentCalcBound = 'true';
         }
-
-        if (priceInput && !priceInput.dataset.investmentCalcBound) {
-            const handler = () => {
-                priceInput.dataset.userModified = 'true';
-                delete priceInput.dataset.systemGenerated;
-                const amountValue = parseInputValue(amountInput);
-                const quantityValue = parseInputValue(quantityInput);
-
-                if (isPositiveNumber(amountValue)) {
-                    withLock(context, () => updateFromAmount(context));
-                } else if (isPositiveNumber(quantityValue)) {
-                    withLock(context, () => updateFromQuantity(context));
-                }
-
-                const riskPromise = applyDefaultRiskLevels(context, { force: false });
-                if (riskPromise && typeof riskPromise.catch === 'function') {
-                    riskPromise.catch(error => {
-                        window.Logger?.warn?.('⚠️ Error applying default risk levels after price change', { error, source: 'InvestmentCalculationService' });
-                    });
-                }
-            };
-
-            priceInput.addEventListener('input', handler);
-            priceInput.addEventListener('change', handler);
-            priceInput.addEventListener('blur', handler);
-            priceInput.dataset.investmentCalcBound = 'true';
-        }
     }
 
     function createContext(modalElement, config) {
@@ -486,6 +690,8 @@
         const priceDisplay = resolveElement(modalElement, options.priceDisplay || options.priceDisplaySelector);
         const stopInput = resolveElement(modalElement, options.stopField || options.stopSelector);
         const targetInput = resolveElement(modalElement, options.targetField || options.targetSelector);
+        const stopPercentInput = resolveElement(modalElement, options.stopPercentField || options.stopPercentSelector);
+        const targetPercentInput = resolveElement(modalElement, options.targetPercentField || options.targetPercentSelector);
 
         if (!amountInput && !quantityInput) {
             return null;
@@ -499,6 +705,8 @@
             priceDisplay,
             stopInput,
             targetInput,
+            stopPercentInput,
+            targetPercentInput,
             options,
             updateLock: false
         };
@@ -521,7 +729,10 @@
                 context.priceDisplay = resolveElement(modalElement, context.options.priceDisplay || context.options.priceDisplaySelector);
                 context.stopInput = resolveElement(modalElement, context.options.stopField || context.options.stopSelector);
                 context.targetInput = resolveElement(modalElement, context.options.targetField || context.options.targetSelector);
+                context.stopPercentInput = resolveElement(modalElement, context.options.stopPercentField || context.options.stopPercentSelector);
+                context.targetPercentInput = resolveElement(modalElement, context.options.targetPercentField || context.options.targetPercentSelector);
                 attachListeners(context);
+                updatePercentFromPrices(context);
             } else {
                 context = createContext(modalElement, config);
                 if (!context) {
@@ -529,6 +740,7 @@
                 }
                 boundContexts.set(modalElement, context);
                 attachListeners(context);
+                updatePercentFromPrices(context);
             }
 
             const forceSync = Boolean(context.options.forceSyncOnBind || context.options.forceRiskOnBind);
@@ -548,6 +760,7 @@
             }
 
             syncValues(context, { force: Boolean(options.force) });
+            updatePercentFromPrices(context);
             const riskPromise = applyDefaultRiskLevels(context, { force: Boolean(options.force) });
             if (riskPromise && typeof riskPromise.catch === 'function') {
                 riskPromise.catch(error => {

@@ -146,6 +146,30 @@ const tradesModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
         },
+        {
+            type: 'number',
+            id: 'tradeStopLossPercent',
+            label: 'Stop Loss (%)',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס אחוז סטופ...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12',
+            description: 'אחוז סטופ יחסית למחיר הכניסה'
+        },
+        {
+            type: 'number',
+            id: 'tradeTakeProfitPercent',
+            label: 'Take Profit (%)',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס אחוז יעד...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12',
+            description: 'אחוז יעד יחסית למחיר הכניסה'
+        },
         // שורה שישית: מחיר יציאה (אופציונלי)
         {
             type: 'number',
@@ -200,15 +224,19 @@ const tradesModalConfig = {
             required: true,
             min: 0.01
         },
-        tradeExitPrice: {
-            required: false,
-            min: 0.01
-        },
         tradeStopLoss: {
             required: false,
             min: 0.01
         },
         tradeTakeProfit: {
+            required: false,
+            min: 0.01
+        },
+        tradeStopLossPercent: {
+            required: false,
+            min: 0.01
+        },
+        tradeTakeProfitPercent: {
             required: false,
             min: 0.01
         },

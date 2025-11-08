@@ -3139,7 +3139,6 @@ async function saveTrade() {
             type: { id: 'tradeType', type: 'text' },
             quantity: { id: 'tradeQuantity', type: 'int' },
             entry_price: { id: 'tradeEntryPrice', type: 'float' },
-            exit_price: { id: 'tradeExitPrice', type: 'float', default: null },
             stop_loss: { id: 'tradeStopLoss', type: 'float', default: null },
             take_profit: { id: 'tradeTakeProfit', type: 'float', default: null },
             entry_date: { id: 'tradeEntryDate', type: 'date' },
@@ -3147,12 +3146,6 @@ async function saveTrade() {
             status: { id: 'tradeStatus', type: 'text' },
             notes: { id: 'tradeNotes', type: 'rich-text', default: null }
         });
-        
-        // Calculate P&L if exit price is provided
-        if (tradeData.exit_price && tradeData.entry_price) {
-            const pnl = (tradeData.exit_price - tradeData.entry_price) * tradeData.quantity;
-            tradeData.pnl = pnl;
-        }
         
         // Validate data
         if (!window.validateEntityForm) {
@@ -3165,7 +3158,6 @@ async function saveTrade() {
             tradeType: { required: true },
             tradeQuantity: { required: true, min: 1 },
             tradeEntryPrice: { required: true, min: 0.01 },
-            tradeExitPrice: { required: false, min: 0.01 },
             tradeStopLoss: { required: false, min: 0.01 },
             tradeTakeProfit: { required: false, min: 0.01 },
             tradeEntryDate: { required: true },

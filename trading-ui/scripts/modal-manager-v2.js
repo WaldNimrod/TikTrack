@@ -3927,6 +3927,8 @@ class ModalManagerV2 {
             const tradeStopInput = modalElement.querySelector('#tradeStopLoss');
             const tradeTargetInput = modalElement.querySelector('#tradeTakeProfit');
             const tradeEntryDateInput = modalElement.querySelector('#tradeEntryDate');
+            const tradeStopPercentInput = modalElement.querySelector('#tradeStopLossPercent');
+            const tradeTargetPercentInput = modalElement.querySelector('#tradeTakeProfitPercent');
 
             if (tradesMode === 'add') {
                 if (tradeStopInput) {
@@ -3941,6 +3943,14 @@ class ModalManagerV2 {
                     delete tradeEntryDateInput.dataset.userModified;
                     delete tradeEntryDateInput.dataset.systemGenerated;
                 }
+                if (tradeStopPercentInput) {
+                    delete tradeStopPercentInput.dataset.userModified;
+                    delete tradeStopPercentInput.dataset.systemGenerated;
+                }
+                if (tradeTargetPercentInput) {
+                    delete tradeTargetPercentInput.dataset.userModified;
+                    delete tradeTargetPercentInput.dataset.systemGenerated;
+                }
             } else {
                 if (tradeStopInput) {
                     tradeStopInput.dataset.userModified = tradeStopInput.dataset.userModified || 'true';
@@ -3950,6 +3960,12 @@ class ModalManagerV2 {
                 }
                 if (tradeEntryDateInput) {
                     tradeEntryDateInput.dataset.userModified = tradeEntryDateInput.dataset.userModified || 'true';
+                }
+                if (tradeStopPercentInput) {
+                    tradeStopPercentInput.dataset.userModified = tradeStopPercentInput.dataset.userModified || 'true';
+                }
+                if (tradeTargetPercentInput) {
+                    tradeTargetPercentInput.dataset.userModified = tradeTargetPercentInput.dataset.userModified || 'true';
                 }
             }
 

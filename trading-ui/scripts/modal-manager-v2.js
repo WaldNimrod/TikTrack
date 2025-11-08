@@ -1098,7 +1098,7 @@ class ModalManagerV2 {
                             alertRelatedObjectField.removeAttribute('disabled');
                             const normalizedSelectedId = selectedRelatedIdOverride !== undefined
                                 ? selectedRelatedIdOverride
-                                : alertRelatedObjectField.value || data.related_id || null;
+                                : alertRelatedObjectField.value || (formDataForAlerts && formDataForAlerts.related_id) || null;
                             await this.populateAlertRelatedObjects(form, relatedTypeId, normalizedSelectedId);
                             if (normalizedSelectedId) {
                                 alertRelatedObjectField.value = normalizedSelectedId;
@@ -1176,7 +1176,8 @@ class ModalManagerV2 {
 
                     // Ensure state is consistent when modal opens with existing selection
                     if (alertRelatedTypeSelect.value) {
-                        handleAlertRelatedTypeChange(alertRelatedTypeSelect.value, data?.related_id || alertRelatedObjectField.value || undefined);
+                        const initialRelatedId = (formDataForAlerts && formDataForAlerts.related_id) || alertRelatedObjectField.value || undefined;
+                        handleAlertRelatedTypeChange(alertRelatedTypeSelect.value, initialRelatedId);
                     }
                     if (alertRelatedTypeSelect.value && alertRelatedObjectField.value) {
                         handleAlertRelatedObjectChange(alertRelatedObjectField.value);
@@ -1464,11 +1465,11 @@ class ModalManagerV2 {
         const ignoreCreatedAt = !fieldMapping || !fieldMapping['created_at'];
         
         // מילוי שדות רגילים
-        Object.entries(data).forEach(([key, value]) => {
+        for (const [key, value] of Object.entries(data)) {
             // Ignore metadata fields (but allow created_at if mapped)
             if (fieldsToIgnore.includes(key) || (key === 'created_at' && ignoreCreatedAt)) {
                 console.log(`⏭️ Skipping ${key} (metadata field)`);
-                return;
+                continue;
             }
             
             // Try direct match first (search in form and all tab panes)
@@ -1533,9 +1534,19 @@ class ModalManagerV2 {
                         availableOptions: Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})),                                           
                         hasOption: Array.from(field.options).some(opt => opt.value === selectValue || opt.value === value)                                                                   
                     });
+                    
+                    // Wait a bit if select has no options yet (might still be loading)
+                    if (field.options.length <= 1 && (field.id.includes('Ticker') || field.id.includes('Account'))) {
+                        console.log(`⏳ Select ${field.id} has no options yet, waiting...`);
+                        // Retry a few times if select is still loading
+                        for (let retry = 0; retry < 5 && field.options.length <= 1; retry++) {
+                            await new Promise(resolve => setTimeout(resolve, 100));
+                        }
+                    }
+                    
                     // Try to set the value
                     field.value = selectValue;
-                    // If value didn't set (option doesn't exist), try to find matching option
+                    // If value didn't set (option doesn't exist), try to find matching option or add it dynamically
                     if (field.value !== selectValue && selectValue) {
                         const matchingOption = Array.from(field.options).find(opt => 
                             opt.value === selectValue || 
@@ -1546,7 +1557,24 @@ class ModalManagerV2 {
                             field.value = matchingOption.value;
                             console.log(`✅ Found matching option: ${matchingOption.value} (${matchingOption.text})`);
                         } else {
-                            console.warn(`⚠️ No matching option found for value: ${selectValue}`);
+                            // If no matching option found and this is a select with static options,
+                            // add the value dynamically to allow editing existing records with new source values
+                            console.warn(`⚠️ No matching option found for value: ${selectValue} in field ${field.id}`);
+                            console.warn(`   Available options:`, Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})));
+                            
+                            // Add the missing option dynamically (for backward compatibility with new source values)
+                            const newOption = document.createElement('option');
+                            newOption.value = selectValue;
+                            // Try to create a readable label from the value (e.g., 'ibkr_import' -> 'ייבוא IBKR')
+                            const labelMap = {
+                                'ibkr_import': 'ייבוא IBKR',
+                                'IBKR-tradelog-csv': 'IBKR CSV',
+                                'IBKR-api': 'IBKR API'
+                            };
+                            newOption.textContent = labelMap[selectValue] || selectValue.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            field.appendChild(newOption);
+                            field.value = selectValue;
+                            console.log(`✅ Added missing option dynamically: ${selectValue} (${newOption.textContent})`);
                         }
                     }
                     console.log(`🎯 After setting, field.value is: ${field.value}`);                                                                            
@@ -1571,9 +1599,22 @@ class ModalManagerV2 {
                     field.value = dateStr.split('T')[0];
                     console.log(`📅 Set date field ${field.id} to: ${field.value}`);
                 } else if (field.type === 'datetime-local' && value) {
-                    // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)                                                                      
-                    const dateStr = typeof value === 'string' ? value : value.toString();                                                                       
-                    field.value = dateStr.includes('T') ? dateStr : `${dateStr}T00:00`;                                                                         
+                    // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)
+                    const dateStr = typeof value === 'string' ? value : value.toString();
+                    // Handle both formats: 'YYYY-MM-DD HH:MM:SS' and 'YYYY-MM-DDTHH:MM:SS'
+                    let formattedDate = dateStr;
+                    if (dateStr.includes(' ')) {
+                        // Convert 'YYYY-MM-DD HH:MM:SS' to 'YYYY-MM-DDTHH:MM'
+                        formattedDate = dateStr.replace(' ', 'T').substring(0, 16);
+                    } else if (!dateStr.includes('T')) {
+                        // If no time part, add default time
+                        formattedDate = `${dateStr}T00:00`;
+                    } else {
+                        // If has T, ensure it's in correct format (YYYY-MM-DDTHH:MM)
+                        formattedDate = dateStr.substring(0, 16);
+                    }
+                    field.value = formattedDate;
+                    console.log(`📅 Set datetime-local field ${field.id} to: ${field.value} (from: ${value})`);
                 } else {
                     field.value = value || '';
                     console.log(`✏️ Set ${field.tagName}/${field.type || 'input'} field ${field.id} to: ${field.value}`);
@@ -1581,7 +1622,7 @@ class ModalManagerV2 {
             } else {
                 console.log(`❌ No field found for ${key} (value: ${value})`);
             }
-        });
+        }
         
         // מילוי selects מיוחדים
         await this.populateSpecialSelects(form, data);
@@ -2175,9 +2216,19 @@ class ModalManagerV2 {
             'execution': {
                 'trade_id': 'trade_id',
                 'ticker_id': 'executionTicker',
+                'trading_account_id': 'executionAccount',
+                'action': 'executionType',
+                'type': 'executionType', // Alias for action
                 'side': 'executionSide',
                 'quantity': 'executionQuantity',
-                'price': 'executionPrice'
+                'price': 'executionPrice',
+                'date': 'executionDate',
+                'fee': 'executionCommission',
+                'source': 'executionSource',
+                'external_id': 'executionExternalId',
+                'notes': 'executionNotes',
+                'realized_pl': 'executionRealizedPL',
+                'mtm_pl': 'executionMTMPL'
             },
             'trading_account': {
                 'name': 'accountName',
@@ -2215,10 +2266,30 @@ class ModalManagerV2 {
         const modalInfo = this.modals.get(modalElement?.id);
         const config = modalInfo?.config;
         
+        // Collect all fields from config (including tabs)
+        const allFields = [];
+        if (config) {
+            if (config.fields) {
+                allFields.push(...config.fields);
+            }
+            if (config.tabs) {
+                for (const tab of config.tabs) {
+                    if (tab.fields) {
+                        allFields.push(...tab.fields);
+                    }
+                }
+            }
+        }
+        
         // Apply defaults from config
-        if (config && config.fields) {
-            for (const field of config.fields) {
-                const fieldElement = form.querySelector(`#${field.id}`);
+        if (allFields.length > 0) {
+            for (const field of allFields) {
+                // Search for field in entire modal (including tabs)
+                let fieldElement = form.querySelector(`#${field.id}`);
+                if (!fieldElement && modalElement) {
+                    // Also search in tab panes
+                    fieldElement = modalElement.querySelector(`#${field.id}`);
+                }
                 if (!fieldElement) continue;
                 
                 // Skip if field already has a value
@@ -3343,6 +3414,65 @@ class ModalManagerV2 {
                     }
                 }
             }
+            
+            // Handle account selection - update currency to account's primary currency
+            const accountSelects = [
+                modalElement.querySelector('#cashFlowAccount'),
+                modalElement.querySelector('#currencyExchangeAccount')
+            ];
+            
+            accountSelects.forEach(accountSelect => {
+                if (accountSelect) {
+                    // Remove existing listeners
+                    const newAccountSelect = accountSelect.cloneNode(true);
+                    accountSelect.parentNode.replaceChild(newAccountSelect, accountSelect);
+                    
+                    // Add change listener
+                    newAccountSelect.addEventListener('change', async (e) => {
+                        const accountId = e.target.value;
+                        if (accountId) {
+                            try {
+                                // Fetch account details
+                                const response = await fetch(`/api/trading-accounts/${accountId}`);
+                                if (response.ok) {
+                                    const data = await response.json();
+                                    const account = data.data || data;
+                                    
+                                    // Update currency field to account's primary currency
+                                    if (account.primary_currency_id) {
+                                        // Find the currency field in the same tab
+                                        const tabPane = accountSelect.closest('.tab-pane');
+                                        const currencyField = tabPane 
+                                            ? tabPane.querySelector('#cashFlowCurrency, #currencyExchangeCurrency')
+                                            : modalElement.querySelector('#cashFlowCurrency, #currencyExchangeCurrency');
+                                        
+                                        if (currencyField && currencyField.tagName === 'SELECT') {
+                                            // Check if the currency option exists
+                                            const optionExists = Array.from(currencyField.options).some(
+                                                opt => opt.value == account.primary_currency_id
+                                            );
+                                            
+                                            if (optionExists) {
+                                                currencyField.value = account.primary_currency_id;
+                                                console.log(`✅ Updated currency to account's primary currency: ${account.primary_currency_id}`);
+                                            } else {
+                                                console.warn(`⚠️ Currency ${account.primary_currency_id} not found in currency select`);
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (error) {
+                                console.warn('Error fetching account details:', error);
+                            }
+                        }
+                    });
+                    
+                    // Trigger change event if account is already selected (for initial load)
+                    if (newAccountSelect.value && mode !== 'edit') {
+                        newAccountSelect.dispatchEvent(new Event('change'));
+                    }
+                }
+            });
         }
     }
 

@@ -849,7 +849,10 @@ class UnifiedAppInitializer {
                                     }
                                 }
                             }
-                        } catch {}
+                            // Silently ignore 404 or other errors - endpoint may not be available
+                        } catch (err) {
+                            // Silently ignore errors - endpoint may not be available or network issues
+                        }
                     }
                 });
             }

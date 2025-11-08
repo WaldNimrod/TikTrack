@@ -855,6 +855,89 @@ def get_preference_info(preference_name: str) -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
+@preferences_bp.route('/version', methods=['GET'])
+def get_preferences_version() -> Any:
+    """
+    קבלת גרסת העדפות - משמש לבדיקת עדכונים
+    
+    Query Parameters:
+        - user_id (optional): מזהה משתמש (default: 1)
+        - profile_id (optional): מזהה פרופיל
+    
+    Returns:
+        גרסה או timestamp של העדכון האחרון
+    """
+    try:
+        user_id = request.args.get('user_id', 1, type=int)
+        profile_id = request.args.get('profile_id', type=int)
+        
+        # קבלת timestamp של העדכון האחרון של העדפות
+        # אם אין עדכונים, נחזיר גרסה סטטית
+        try:
+            import sqlite3
+            
+            # Use preferences_service db_path
+            db_path = preferences_service.db_path
+            
+            # Get active profile if not specified
+            if profile_id is None:
+                profile_id = preferences_service._get_active_profile_id(user_id)
+            
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT MAX(updated_at) 
+                FROM user_preferences_v3 
+                WHERE user_id = ? AND profile_id = ?
+            ''', (user_id, profile_id))
+            
+            result = cursor.fetchone()
+            conn.close()
+            
+            last_update = result[0] if result and result[0] else None
+            
+            # אם יש עדכון אחרון, נשתמש בו כגרסה
+            # אחרת נשתמש בגרסה סטטית
+            if last_update:
+                # המרת timestamp למחרוזת ייחודית (format: YYYYMMDDTHHMMSS)
+                # Remove spaces, colons, and hyphens for a clean version string
+                version = last_update.replace(' ', 'T').replace(':', '').replace('-', '')
+            else:
+                # גרסה סטטית
+                version = "3.1.0"
+            
+            return jsonify({
+                "success": True,
+                "data": {
+                    "version": version,
+                    "last_update": last_update,
+                    "user_id": user_id,
+                    "profile_id": profile_id
+                },
+                "timestamp": datetime.now().isoformat()
+            }), 200
+            
+        except Exception as db_error:
+            logger.warning(f"Could not get last update timestamp: {db_error}")
+            # Fallback to static version
+            return jsonify({
+                "success": True,
+                "data": {
+                    "version": "3.1.0",
+                    "last_update": None
+                },
+                "timestamp": datetime.now().isoformat()
+            }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting preferences version: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
 @preferences_bp.route('/health', methods=['GET'])
 def health_check() -> Any:
     """

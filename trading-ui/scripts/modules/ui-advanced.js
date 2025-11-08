@@ -518,7 +518,8 @@ function getEntityLabel(entityType) {
     'trade': 'טרייד',
     'trade_plan': 'תכנון השקעה',
     'execution': 'עסקה',
-    'account': 'חשבון',
+    'trading_account': 'חשבון מסחר',
+    'account': 'חשבון מסחר', // alias for backward compatibility
     'cash_flow': 'תזרים מזומנים',
     'ticker': 'טיקר',
     'alert': 'התראה',
@@ -613,7 +614,7 @@ function getInvestmentTypeBorderColor(investmentType) {
 function getInvestmentTypeEntityType(investmentType) {
   const mapping = {
     'swing': 'trade',
-    'investment': 'account',
+    'investment': 'trading_account',
     'passive': 'note',
   };
 

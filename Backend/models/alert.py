@@ -121,7 +121,7 @@ class Alert(BaseModel):
         
         # Determine related_type based on related_type_id
         if self.related_type_id == 1:
-            result['related_type'] = 'account'
+            result['related_type'] = 'trading_account'
         elif self.related_type_id == 2:
             result['related_type'] = 'trade'
         elif self.related_type_id == 3:
@@ -133,7 +133,7 @@ class Alert(BaseModel):
         result['condition'] = f"{self.condition_attribute} | {self.condition_operator} | {self.condition_number}"
         
         # Add fields for backward compatibility
-        if self.related_type_id == 1:  # account
+        if self.related_type_id == 1:  # trading_account
             result['trade_id'] = None
             result['trade_plan_id'] = None
         elif self.related_type_id == 2:  # trade

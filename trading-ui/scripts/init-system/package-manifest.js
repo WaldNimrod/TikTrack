@@ -140,7 +140,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.CacheSyncManager',
         description: 'מנהל סנכרון מטמון',
         required: true,
-        loadOrder: 7
+        loadOrder: 3
       },
       {
         file: 'logger-service.js',
@@ -453,7 +453,7 @@ const PACKAGE_MANIFEST = {
         file: 'modal-configs/trade-plans-config.js',
         globalCheck: 'window.tradePlansModalConfig',
         description: 'קונפיגורציית מודל תוכניות מסחר',
-        required: false,
+        required: true,
         loadOrder: 7
       },
       {

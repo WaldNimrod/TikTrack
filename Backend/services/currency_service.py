@@ -57,6 +57,38 @@ class CurrencyService:
     MAX_NAME_LENGTH: int = 100
     MIN_USD_RATE: Decimal = Decimal('0.000001')
     MAX_USD_RATE: Decimal = Decimal('1000000.000000')
+
+    # Mapping between stored currency codes (e.g. USD) and display symbols (e.g. $)
+    DISPLAY_SYMBOL_MAP = {
+        'USD': '$',
+        'ILS': '₪',
+        'EUR': '€',
+        'GBP': '£',
+        'JPY': '¥',
+        'AUD': 'A$',
+        'CAD': 'C$',
+        'CHF': 'CHF',
+        'CNY': '¥',
+        'HKD': 'HK$',
+        'INR': '₹'
+    }
+
+    @staticmethod
+    def get_display_symbol(symbol: Optional[str]) -> str:
+        """Return a UI-friendly currency symbol for the provided code."""
+        if symbol is None:
+            return ''
+
+        symbol_trimmed = str(symbol).strip()
+        if not symbol_trimmed:
+            return ''
+
+        # If symbol already looks like a display glyph, keep it as-is
+        if len(symbol_trimmed) == 1 or any(ch for ch in symbol_trimmed if not ch.isalpha()):
+            return symbol_trimmed
+
+        upper_symbol = symbol_trimmed.upper()
+        return CurrencyService.DISPLAY_SYMBOL_MAP.get(upper_symbol, symbol_trimmed)
     
     @staticmethod
     def get_all(db: Session) -> List[Currency]:

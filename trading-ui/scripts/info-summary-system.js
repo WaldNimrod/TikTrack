@@ -221,7 +221,7 @@ class InfoSummarySystem {
           if (isNaN(amount)) {
             // Use renderAmount for consistency
             if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
-              return window.FieldRendererService.renderAmount(0, '$', 2, false); // showSign = false for zero
+              return window.FieldRendererService.renderAmount(0, '$', 0, false); // showSign = false for zero
             }
             return '$0';
           }
@@ -231,11 +231,11 @@ class InfoSummarySystem {
         // Format balance like in table: number + currency symbol (RTL), with color based on value
         // Show minus sign for negative values (showSign = true)
         if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
-          return window.FieldRendererService.renderAmount(amount, currency, 2, true); // showSign = true (show minus for negative)
+          return window.FieldRendererService.renderAmount(amount, currency, 0, true); // showSign = true (show minus for negative)
         }
         
         // Fallback if renderAmount not available
-        const formatted = Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const formatted = Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
         const colorClass = amount >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
         // RTL: מספר קודם (ימין), אחר כך סימן מטבע (שמאל)
         return `<span class="${colorClass}">${formatted}${currency}</span>`;

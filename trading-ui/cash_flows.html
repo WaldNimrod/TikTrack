@@ -187,10 +187,10 @@
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
     <!-- 🎯 Page: cash_flows | Generated: 2025-11-07T16:33:35.340Z -->
-    <!-- 📦 Packages: base, services, ui-advanced, crud, preferences, validation, entity-details, info-summary, init-system -->
+    <!-- 📦 Packages: base, services, ui-advanced, modules, crud, preferences, validation, entity-details, info-summary, init-system -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 1/9: BASE PACKAGE ===== -->
+    <!-- ===== PACKAGE 1/10: BASE PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
     <!-- Dependencies:  -->
@@ -228,7 +228,7 @@
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 2/9: SERVICES PACKAGE ===== -->
+    <!-- ===== PACKAGE 2/10: SERVICES PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 2 | Description: שירותים כלליים -->
     <!-- Dependencies: base -->
@@ -254,7 +254,7 @@
     <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 3/9: UI ADVANCED PACKAGE ===== -->
+    <!-- ===== PACKAGE 3/10: UI ADVANCED PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 3 | Description: ממשק משתמש מתקדם -->
     <!-- Dependencies: base, services -->
@@ -270,7 +270,7 @@
     <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- מערכת תפריט פעולות -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 4/9: MODULES PACKAGE ===== -->
+    <!-- ===== PACKAGE 4/10: MODULES PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 3.5 | Description: מודולים כלליים -->
     <!-- Dependencies: base, services -->
@@ -282,7 +282,23 @@
     <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- מנהל מודלים V2 -->
     <!-- [30.3] Load Order: 30.3 -->
     <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה (נדרש ל-trade-selector-modal) -->
+    <!-- [30.4] Load Order: 30.4 -->
+    <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
     <!-- [30.5] Load Order: 30.5 -->
+    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script> <!-- ממשק בסיסי -->
+    <!-- [30.6] Load Order: 30.6 -->
+    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script> <!-- נתונים מתקדמים -->
+    <!-- [30.7] Load Order: 30.7 -->
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script> <!-- ממשק מתקדם -->
+    <!-- [30.8] Load Order: 30.8 -->
+    <script src="scripts/modules/communication-module.js?v=1.0.0"></script> <!-- מודול תקשורת -->
+    <!-- [30.9] Load Order: 30.9 -->
+    <script src="scripts/modules/business-module.js?v=1.0.0"></script> <!-- מודול עסקי -->
+    <!-- [30.95] Load Order: 30.95 -->
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script> <!-- סנכרון localStorage -->
+    <!-- [30.97] Load Order: 30.97 -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- תצורת טעינה דינמית -->
+    <!-- [31] Load Order: 31 -->
     <script src="scripts/trade-selector-modal.js?v=1.0.0"></script> <!-- מודול בחירת טרייד -->
 
     <!-- =============================================================== -->
@@ -337,9 +353,9 @@
     <!-- Critical: NO | Version: 2.0.0 -->
 
     <!-- [41] Load Order: 41 -->
-    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <script src="scripts/entity-details-api.js?v=1.0.6"></script> <!-- API פרטי ישויות -->
     <!-- [42] Load Order: 42 -->
-    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.19"></script> <!-- מציג פרטי ישויות -->
     <!-- [43] Load Order: 43 -->
     <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
 
@@ -389,7 +405,7 @@
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 49 | Unique Scripts Loaded: 49 -->
+    <!-- 📊 Total Scripts Processed: 52 | Unique Scripts Loaded: 52 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("cash_flows") -->
 </body>
 </html>

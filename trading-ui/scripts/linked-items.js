@@ -297,6 +297,11 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
           window.entityDetailsRenderer._initializeFilterTooltips(tableId);
         });
       }
+      
+      // Initialize dynamic buttons (data-onclick attributes)
+      if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+        window.ButtonSystem.initializeButtons();
+      }
     }, 200);
   });
   
@@ -810,20 +815,29 @@ function getTradePlanDetails(planId, data = null) {
 /**
  * Get icon for item type
  *
- * Returns the appropriate emoji icon for each item type
+ * Returns the appropriate icon for each item type
+ * מעודכן להשתמש ב-LinkedItemsService ללוגיקה משותפת
  *
  * @param {string} type - Item type
- * @returns {string} Emoji icon
+ * @returns {string} Icon HTML
  */
 function getItemTypeIcon(type) {
-  // השתמש בפונקציה הגלובלית אם היא זמינה
+  // שימוש ב-LinkedItemsService אם זמין
+  if (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemIcon) {
+    const iconPath = window.LinkedItemsService.getLinkedItemIcon(type);
+    // המרת נתיב לאיקון ל-HTML עם גודל 48px
+    const iconName = iconPath.split('/').pop().replace('.svg', '');
+    return `<img src="${iconPath}" alt="${type}" class="linked-item-icon-img" width="48" height="48">`;
+  }
+  
+  // Fallback אם Service לא זמין
   if (window.uiUtils && window.uiUtils.getItemTypeIcon) {
     const globalIcon = window.uiUtils.getItemTypeIcon(type);
     // החלף את הגודל ל-48px עבור חלון המקושרים (פי 2 מהמקורי)
     return globalIcon.replace('width: 16px; height: 16px;', 'width: 48px; height: 48px;').replace('class="', 'class="linked-item-icon-img ');
   }
 
-  // ברירת מחדל אם הפונקציה הגלובלית לא זמינה
+  // Fallback אחרון אם שום דבר לא זמין
   const icons = {
     'trade': '<img src="/images/icons/trades.svg" alt="טרייד" class="linked-item-icon-img" width="48" height="48">',
     'trading_account': '<img src="/images/icons/trading_accounts.svg" alt="חשבון מסחר" class="linked-item-icon-img" width="48" height="48">',
@@ -1313,9 +1327,12 @@ function downloadCSV(csvContent, filename) {
 /**
  * View item details - צפייה בפרטי פריט מקושר
  * 
- * פותח modal של entity details עם המידע של הפריט המקושר.
- * מעדכן את מערכת הניווט כדי לוודא שהמידע מועבר נכון בין מודולים מקוננים.
+ * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
  * 
+ * פונקציה זו לא משמשת יותר כי משתמשים ב-LinkedItemsService.generateLinkedItemActions()
+ * שיוצר כפתורי פעולות עם data-onclick שמקושרים ישירות ל-window.showEntityDetails().
+ * 
+ * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
  * @param {string} type - סוג הפריט
  * @param {number|string} id - מזהה הפריט
  */
@@ -1368,8 +1385,12 @@ function viewItemDetails(type, id) {
 /**
  * Edit item
  *
- * Navigate to item edit page
- *
+ * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
+ * 
+ * פונקציה זו לא משמשת יותר כי משתמשים ב-LinkedItemsService.generateLinkedItemActions()
+ * שיוצר כפתורי פעולות עם data-onclick שמקושרים ישירות לפונקציות העריכה המתאימות.
+ * 
+ * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
  * @param {string} type - Item type
  * @param {string|number} id - Item ID
  */
@@ -1381,8 +1402,12 @@ function editItem(type, id) {
 /**
  * Delete item
  *
- * Delete item with confirmation
- *
+ * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
+ * 
+ * פונקציה זו לא משמשת יותר כי משתמשים ב-LinkedItemsService.generateLinkedItemActions()
+ * שיוצר כפתורי פעולות עם data-onclick שמקושרים ישירות לפונקציות המחיקה המתאימות.
+ * 
+ * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
  * @param {string} type - Item type
  * @param {string|number} id - Item ID
  */
@@ -1394,8 +1419,12 @@ function deleteItem(type, id) {
 /**
  * Open item page
  *
- * Opens the item's page (currently shows development message)
- *
+ * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
+ * 
+ * פונקציה זו לא משמשת יותר כי משתמשים ב-LinkedItemsService.generateLinkedItemActions()
+ * שיוצר כפתורי פעולות עם data-onclick שמקושרים ישירות לפונקציות המתאימות.
+ * 
+ * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
  * @param {string} itemType - Item type
  * @param {number|string} itemId - Item ID
  */
@@ -1488,6 +1517,13 @@ function viewLinkedItemsForExecution(executionId) {
 
 /**
  * Get badge class for item type
+ * 
+ * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
+ * 
+ * פונקציה זו לא משמשת יותר כי משתמשים ב-EntityDetailsRenderer.renderLinkedItems()
+ * שכבר מטפל בכל הרנדור של פריטים מקושרים.
+ * 
+ * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
  * @param {string} type - Item type
  * @returns {string} Badge CSS class
  */
@@ -1508,8 +1544,12 @@ function getTypeBadgeClass(type) {
 /**
  * Get status badge HTML
  *
- * Uses the same color scheme as the main application tables
- *
+ * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
+ * 
+ * פונקציה זו לא משמשת יותר כי משתמשים ב-EntityDetailsRenderer.renderLinkedItems()
+ * שכבר משתמש ב-FieldRendererService.renderStatus() לרנדור סטטוס.
+ * 
+ * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
  * @param {string} status - Item status
  * @returns {string} Status badge HTML
  */

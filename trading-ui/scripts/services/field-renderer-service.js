@@ -153,7 +153,8 @@ class FieldRendererService {
      */
     static renderCurrency(id, name, symbol) {
         if (!symbol && !name) return '-';
-        const displayText = symbol || name || id;
+        const normalizedSymbol = this._normalizeCurrencySymbol(symbol);
+        const displayText = normalizedSymbol || name || id;
         const title = name || symbol || '';
         return `<span class="currency-display" title="${title}">${displayText}</span>`;
     }
@@ -217,7 +218,7 @@ class FieldRendererService {
             maximumFractionDigits: decimals
         });
 
-        const symbol = currencySymbol || '';
+        const symbol = this._normalizeCurrencySymbol(currencySymbol) || '';
         const base = `${symbol}${formattedValue}`;
 
         let sign = '';
@@ -231,6 +232,33 @@ class FieldRendererService {
         const display = sign ? `${sign}${base}` : base;
 
         return `<span class="${colorClass}" dir="ltr">${display}</span>`;
+    }
+
+    static _normalizeCurrencySymbol(symbol) {
+        if (!symbol) return '';
+        const trimmed = String(symbol).trim();
+        if (!trimmed) return '';
+
+        const map = {
+            'USD': '$',
+            'ILS': '₪',
+            'EUR': '€',
+            'GBP': '£',
+            'JPY': '¥',
+            'AUD': 'A$',
+            'CAD': 'C$',
+            'CHF': 'CHF',
+            'CNY': '¥',
+            'HKD': 'HK$',
+            'INR': '₹'
+        };
+
+        if (trimmed.length === 1 || /[^A-Za-z]/.test(trimmed)) {
+            return trimmed;
+        }
+
+        const upper = trimmed.toUpperCase();
+        return map[upper] || trimmed;
     }
 
     /**
@@ -500,10 +528,16 @@ class FieldRendererService {
         if (renderMode === 'linked-items-table') {
             const escapedLabel = this._escapeHtml(label);
             const escapedText = this._escapeHtml(text);
+            const entityColorClass = `entity-${type}`;
             return `
-            <a href="#" class="linked-items-table-link text-decoration-none d-flex flex-column align-items-start gap-1" role="link" tabindex="0" ${onclick} data-entity-type="${type}" data-entity-id="${safeId}">
-                <span class="linked-items-table-label fw-semibold text-body">${escapedLabel}</span>
-                <span class="linked-items-table-name text-muted small">${escapedText}</span>
+            <a href="#" class="linked-items-table-link text-decoration-none d-flex align-items-center gap-2" role="link" tabindex="0" ${onclick} data-entity-type="${type}" data-entity-id="${safeId}">
+                <span class="linked-items-table-icon ${entityColorClass}">
+                    <img src="${iconPath}" alt="${escapedLabel}" class="linked-items-table-icon-image" />
+                </span>
+                <span class="linked-items-table-text d-flex flex-column align-items-start gap-1">
+                    <span class="linked-items-table-label fw-semibold text-body">${escapedLabel}</span>
+                    <span class="linked-items-table-name text-muted small">${escapedText}</span>
+                </span>
             </a>`;
         }
 

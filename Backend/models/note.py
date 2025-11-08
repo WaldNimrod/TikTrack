@@ -7,7 +7,7 @@ class Note(BaseModel):
     Notes model with flexible association system
     
     The association system allows linking notes to different entities in the system:
-    - account (id=1): Note associated with account
+    - trading_account (id=1): Note associated with trading account
     - trade (id=2): Note associated with trade  
     - trade_plan (id=3): Note associated with trade plan
     - ticker (id=4): Note associated with ticker
@@ -25,7 +25,7 @@ class Note(BaseModel):
     related_id = Column(Integer, nullable=False)
     
     def __repr__(self) -> str:
-        related_type = 'account' if self.related_type_id == 1 else 'trade' if self.related_type_id == 2 else 'trade_plan' if self.related_type_id == 3 else 'none'
+        related_type = 'trading_account' if self.related_type_id == 1 else 'trade' if self.related_type_id == 2 else 'trade_plan' if self.related_type_id == 3 else 'none'
         return f"<Note(id={self.id}, related_type='{related_type}', related_id={self.related_id}, content='{self.content[:50]}...')>"
     
     def to_dict(self) -> Dict[str, Any]:
@@ -34,7 +34,7 @@ class Note(BaseModel):
         
         # Determine related_type based on related_type_id
         if self.related_type_id == 1:
-            result['related_type'] = 'account'
+            result['related_type'] = 'trading_account'
         elif self.related_type_id == 2:
             result['related_type'] = 'trade'
         elif self.related_type_id == 3:

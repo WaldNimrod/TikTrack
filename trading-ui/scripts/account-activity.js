@@ -2196,14 +2196,14 @@ function renderBreakdownBySubtype(stats, typeName, column) {
                 if (subtypeNegativeAmount !== 0 && subtypePositiveAmount !== 0) {
                     let subtypeNegativeAmountHtml;
                     if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
-                        subtypeNegativeAmountHtml = window.FieldRendererService.renderAmount(subtypeNegativeAmount, currencySymbol, 2, true);
+                        subtypeNegativeAmountHtml = window.FieldRendererService.renderAmount(subtypeNegativeAmount, currencySymbol, 0, true);
                     } else {
                         subtypeNegativeAmountHtml = `<span class="text-danger">${subtypeNegativeAmount.toFixed(2)}${currencySymbol}</span>`;
                     }
                     
                     let subtypePositiveAmountHtml;
                     if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
-                        subtypePositiveAmountHtml = window.FieldRendererService.renderAmount(subtypePositiveAmount, currencySymbol, 2, true);
+                        subtypePositiveAmountHtml = window.FieldRendererService.renderAmount(subtypePositiveAmount, currencySymbol, 0, true);
                     } else {
                         subtypePositiveAmountHtml = `<span class="text-success">${subtypePositiveAmount >= 0 ? '+' : ''}${subtypePositiveAmount.toFixed(2)}${currencySymbol}</span>`;
                     }

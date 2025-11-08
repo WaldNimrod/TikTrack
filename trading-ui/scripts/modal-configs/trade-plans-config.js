@@ -117,13 +117,11 @@ const tradePlansModalConfig = {
             label: 'סטטוס',
             required: true,
             options: [
-                { value: 'draft', label: 'טיוטה' },
-                { value: 'active', label: 'פעילה' },
-                { value: 'executed', label: 'מבוצעת' },
-                { value: 'cancelled', label: 'מבוטלת' },
-                { value: 'expired', label: 'פגה' }
+                { value: 'open', label: 'פתוח' },
+                { value: 'closed', label: 'סגור' },
+                { value: 'cancelled', label: 'מבוטל' }
             ],
-            defaultValue: 'draft'
+            defaultValue: 'open'
         },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {

@@ -694,7 +694,7 @@ function updateTradingAccountsTable(trading_accounts) {
         </td>
         <td>${tradingAccount.currency_symbol || tradingAccount.currency || '-'}</td>
         <td>
-          ${window.renderAmount ? window.renderAmount(balanceValue, currencySymbol, 2, true) : `${balanceValue.toFixed(2)} ${currencySymbol}`}
+          ${window.renderAmount ? window.renderAmount(balanceValue, currencySymbol, 0, true) : `${balanceValue.toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 })} ${currencySymbol}`}
         </td>
         <td><span class="text-muted fst-italic">בפיתוח</span></td>
         <td><span class="text-muted fst-italic">בפיתוח</span></td>
@@ -825,7 +825,7 @@ async function updateTradingAccountsSummary(trading_accounts) {
           <div>סה"כ חשבונות: <strong id="totalAccounts">${totalAccounts}</strong></div>
           <div>חשבונות פעילים: <strong id="activeAccounts">${activeAccounts}</strong></div>
           <div>חשבונות פתוחים: <strong id="openAccounts">${openAccounts}</strong></div>
-          <div>סה"כ יתרה: <strong id="totalBalance">${window.renderAmount ? window.renderAmount(totalBaseCurrencyBalance, baseCurrencySymbol, 2, false) : `${totalBaseCurrencyBalance.toFixed(2)} ${baseCurrencySymbol}`}</strong></div>
+          <div>סה"כ יתרה: <strong id="totalBalance">${window.renderAmount ? window.renderAmount(totalBaseCurrencyBalance, baseCurrencySymbol, 0, false) : `${totalBaseCurrencyBalance.toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 })} ${baseCurrencySymbol}`}</strong></div>
         `;
       } else if (summaryStatsElement) {
         summaryStatsElement.innerHTML = `

@@ -423,6 +423,25 @@ class EntityDetailsModal {
             
             let entityData = await window.entityDetailsAPI.getEntityDetails(entityType, entityId, apiOptions);
             
+            if (entityType === 'trading_account' && apiOptions.includeLinkedItems !== false) {
+                const hasLinkedItemsArray = Array.isArray(entityData.linked_items);
+                if (!hasLinkedItemsArray || options.forceRefresh) {
+                    try {
+                        const linkedItems = await window.entityDetailsAPI.getLinkedItems('trading_account', entityId, {
+                            forceRefresh: options.forceRefresh || false
+                        });
+                        entityData.linked_items = linkedItems;
+                        entityData.linked_items_count = Array.isArray(linkedItems) ? linkedItems.length : 0;
+                    } catch (linkedItemsError) {
+                        window.Logger?.warn('⚠️ Failed to load trading account linked items', linkedItemsError, { page: 'entity-details-modal' });
+                        if (!Array.isArray(entityData.linked_items)) {
+                            entityData.linked_items = [];
+                            entityData.linked_items_count = 0;
+                        }
+                    }
+                }
+            }
+            
             // טעינת נתונים נוספים עבור trading_account
             if (entityType === 'trading_account') {
                 await this.loadAccountAdditionalData(entityData, entityId);
@@ -863,7 +882,7 @@ class EntityDetailsModal {
             // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון
             let titleText = '';
             if (finalEntityType === 'trading_account' && entityData && entityData.name) {
-                titleText = `פרטי חשבון: ${entityData.name}`;
+                titleText = `פרטי חשבון מסחר: ${entityData.name}`;
             } else {
                 // כותרת פשוטה ללא שם הרשומה
                 titleText = `פרטי ${entityLabel}`;
@@ -895,7 +914,7 @@ class EntityDetailsModal {
             // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
             let titleText = '';
             if (finalEntityType === 'trading_account' && entityData && entityData.name) {
-                titleText = `פרטי חשבון: ${entityData.name}`;
+                titleText = `פרטי חשבון מסחר: ${entityData.name}`;
             } else {
                 // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
                 titleText = `פרטי ${entityLabel}${finalEntityId ? ` מספר ${finalEntityId}` : ''}`;
@@ -970,7 +989,7 @@ class EntityDetailsModal {
     getModalTitleText(entityType, entityData) {
         // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
         if (entityType === 'trading_account' && entityData && entityData.name) {
-            return `פרטי חשבון: ${entityData.name}`;
+            return `פרטי חשבון מסחר: ${entityData.name}`;
         }
         
         const entityLabel = (window.getEntityLabel && typeof window.getEntityLabel === 'function') 
@@ -1026,18 +1045,22 @@ class EntityDetailsModal {
 
         let buttonsHtml = '';
         
+        // עבור ticker - לא מציגים כפתורי פעולות מהירות
         if (entityType === 'ticker') {
-            buttonsHtml = `
-                <button class="btn btn-sm" data-onclick="viewLinkedItemsForTicker(${entityData.id})" title="פריטים מקושרים">
-                    <i class="fas fa-link"></i>
-                </button>
-                <button class="btn btn-sm" data-onclick="editTicker(${entityData.id})" title="ערוך טיקר">
-                    <i class="fas fa-edit"></i>
-                </button>
-            `;
+            buttonsHtml = ''; // ריק - לא מציגים כפתורים
         }
         
         buttonsContainer.innerHTML = buttonsHtml;
+        
+        // עבור ticker - מסתירים גם את כפתור החזרה
+        const backButton = document.getElementById('entityDetailsBackBtn');
+        if (backButton) {
+            if (entityType === 'ticker') {
+                backButton.style.display = 'none';
+            } else {
+                backButton.style.display = '';
+            }
+        }
     }
 
     /**

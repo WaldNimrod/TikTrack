@@ -135,7 +135,7 @@ def get_notes():
                 # Set related_type according to related_type_id
                 related_type = None
                 if row[4] == 1:  # related_type_id (now at index 4)
-                    related_type = 'account'
+                    related_type = 'trading_account'
                 elif row[4] == 2:
                     related_type = 'trade'
                 elif row[4] == 3:

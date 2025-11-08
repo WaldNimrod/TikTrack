@@ -148,37 +148,59 @@ class EntityDetailsAPI {
             
             const shouldLoadLinkedItems = options.includeLinkedItems !== false;
             if (shouldLoadLinkedItems) {
-                try {
-                    console.log(`🔗 [ENTITY-DETAILS-API] Loading linked items for ${entityType} ${entityId}...`);
-                    if (window.Logger) {
-                        window.Logger.info(`🔗 Loading linked items for ${entityType} ${entityId}...`, { page: "entity-details-api" });
-                    }
-                    const linkedItems = await this.getLinkedItems(entityType, entityId);
-                    console.log(`🔗 [ENTITY-DETAILS-API] Linked items received for ${entityType} ${entityId}:`, {
-                        count: linkedItems.length,
-                        items: linkedItems
+                // בדיקה אם הבאקאנד כבר החזיר linked_items (כמו עבור ticker)
+                // חשוב: נבדוק אם השדה קיים גם אם הוא ריק (מערך ריק)
+                const hasLinkedItemsFromBackend = entityData.linked_items !== undefined && Array.isArray(entityData.linked_items);
+                
+                if (hasLinkedItemsFromBackend) {
+                    console.log(`✅ [ENTITY-DETAILS-API] Using linked_items from backend for ${entityType} ${entityId}:`, {
+                        count: entityData.linked_items.length,
+                        items: entityData.linked_items
                     });
                     if (window.Logger) {
-                        window.Logger.info(`🔗 Linked items received for ${entityType} ${entityId}:`, {
-                            count: linkedItems.length,
-                            items: linkedItems,
+                        window.Logger.info(`✅ Using linked_items from backend for ${entityType} ${entityId}:`, {
+                            count: entityData.linked_items.length,
                             page: "entity-details-api"
                         });
                     }
-                    entityData.linked_items = linkedItems;
-                } catch (error) {
-                    console.error(`❌ [ENTITY-DETAILS-API] Failed to load linked items for ${entityType} ${entityId}:`, error);
-                    if (window.Logger) {
-                        window.Logger.error(`❌ Failed to load linked items for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });
+                    // הבאקאנד כבר החזיר linked_items - לא צריך לטעון שוב
+                } else {
+                    // הבאקאנד לא החזיר linked_items - נטען בנפרד
+                    try {
+                        console.log(`🔗 [ENTITY-DETAILS-API] Loading linked items separately for ${entityType} ${entityId}...`);
+                        if (window.Logger) {
+                            window.Logger.info(`🔗 Loading linked items separately for ${entityType} ${entityId}...`, { page: "entity-details-api" });
+                        }
+                        const linkedItems = await this.getLinkedItems(entityType, entityId);
+                        console.log(`🔗 [ENTITY-DETAILS-API] Linked items received for ${entityType} ${entityId}:`, {
+                            count: linkedItems.length,
+                            items: linkedItems
+                        });
+                        if (window.Logger) {
+                            window.Logger.info(`🔗 Linked items received for ${entityType} ${entityId}:`, {
+                                count: linkedItems.length,
+                                items: linkedItems,
+                                page: "entity-details-api"
+                            });
+                        }
+                        entityData.linked_items = linkedItems;
+                    } catch (error) {
+                        console.error(`❌ [ENTITY-DETAILS-API] Failed to load linked items for ${entityType} ${entityId}:`, error);
+                        if (window.Logger) {
+                            window.Logger.error(`❌ Failed to load linked items for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });
+                        }
+                        // אם הבאקאנד החזיר linked_items ריק, נשתמש בזה
+                        if (!entityData.linked_items) {
+                            entityData.linked_items = [];
+                        }
                     }
-                    entityData.linked_items = [];
                 }
             } else {
                 console.log(`⏭️ [ENTITY-DETAILS-API] Skipping linked items load for ${entityType} ${entityId} (includeLinkedItems=false)`);
                 if (window.Logger) {
                     window.Logger.info(`⏭️ Skipping linked items load for ${entityType} ${entityId} (includeLinkedItems=false)`, { page: "entity-details-api" });
                 }
-                entityData.linked_items = [];
+                entityData.linked_items = entityData.linked_items || [];
             }
             
             // טעינת נתוני שוק אם נדרש (לטיקרים)
@@ -304,7 +326,60 @@ class EntityDetailsAPI {
         
         // נסה קודם את ה-endpoint החדש (מחזיר ticker object עם נתוני שוק)
         try {
-            return await this.fetchFromNewEndpoint(entityType, entityId);
+            let entityData = await this.fetchFromNewEndpoint(entityType, entityId);
+
+            // 🔄 Post-fetch validation for cash flows to ensure critical fields are present
+            if (entityType === 'cash_flow') {
+                const missingFields = this._getMissingCashFlowFields(entityData);
+                if (missingFields.length > 0) {
+                    const recoveryContext = {
+                        entityId,
+                        missingFields,
+                        hasType: 'type' in entityData,
+                        hasSource: 'source' in entityData,
+                        hasExternalId: 'external_id' in entityData,
+                        hasAccountName: 'account_name' in entityData,
+                        hasCurrencySymbol: 'currency_symbol' in entityData
+                    };
+
+                    console.warn('⚠️ [CASH_FLOW_API] Critical fields missing after new endpoint fetch, attempting recovery via legacy endpoint', recoveryContext);
+                    window.Logger?.warn('⚠️ [CASH_FLOW_API] Missing fields after new endpoint fetch, attempting recovery', recoveryContext, { page: 'entity-details-api' });
+
+                    try {
+                        const fallbackRaw = await this.fetchFromExistingEndpoints(entityType, entityId);
+                        const fallbackData = this.normalizeEntityData(entityType, fallbackRaw);
+                        const recovered = [];
+
+                        missingFields.forEach(field => {
+                            if ((fallbackData[field] !== undefined && fallbackData[field] !== null) &&
+                                (entityData[field] === undefined || entityData[field] === null)) {
+                                entityData[field] = fallbackData[field];
+                                recovered.push(field);
+                            }
+                        });
+
+                        const remainingMissing = this._getMissingCashFlowFields(entityData);
+                        window.Logger?.info('✅ [CASH_FLOW_API] Recovery attempt completed', {
+                            entityId,
+                            recoveredFields: recovered,
+                            remainingMissing,
+                            page: 'entity-details-api'
+                        });
+
+                        if (remainingMissing.length > 0) {
+                            console.warn('⚠️ [CASH_FLOW_API] Some fields remain missing after recovery attempt', {
+                                entityId,
+                                remainingMissing
+                            });
+                        }
+                    } catch (recoveryError) {
+                        console.error('❌ [CASH_FLOW_API] Recovery via legacy endpoint failed', recoveryError);
+                        window.Logger?.error('❌ [CASH_FLOW_API] Recovery via legacy endpoint failed', recoveryError, { page: 'entity-details-api' });
+                    }
+                }
+            }
+
+            return entityData;
         } catch (error) {
             // אם נכשל, נסה את ה-endpoints הישנים כגיבוי
             window.Logger.warn(`New endpoint failed for ${entityType} ${entityId}, trying old endpoint:`, error.message, { page: "entity-details-api" });
@@ -359,8 +434,27 @@ class EntityDetailsAPI {
                 tickerData: entityData.ticker ? JSON.stringify(entityData.ticker, null, 2) : null
             });
         }
+        
+        // 🔍 DEBUG: Log for cash flows from new endpoint
+        if (entityType === 'cash_flow') {
+            console.group('🔍 [CASH_FLOW_API] New Endpoint Response');
+            console.log('URL:', url);
+            console.log('Response Status:', response.status);
+            console.log('Raw Data:', data);
+            console.log('Entity Data:', entityData);
+            if (entityData) {
+                console.log('Entity Data Keys:', Object.keys(entityData));
+                console.log('Has flow_type:', 'flow_type' in entityData);
+                console.log('Has flow_date:', 'flow_date' in entityData);
+                console.log('Has type:', 'type' in entityData);
+                console.log('Has date:', 'date' in entityData);
+                console.log('Has account_name:', 'account_name' in entityData);
+                console.log('Has currency_symbol:', 'currency_symbol' in entityData);
+            }
+            console.groupEnd();
+        }
 
-        return entityData;
+        return this.normalizeEntityData(entityType, entityData);
     }
 
     /**
@@ -405,6 +499,34 @@ class EntityDetailsAPI {
         }
 
         const data = await response.json();
+        
+        // 🔍 DEBUG: Log raw API response for cash flows
+        if (entityType === 'cash_flow') {
+            console.group('🔍 [CASH_FLOW_API] Raw API Response');
+            console.log('Status:', response.status);
+            console.log('Status Text:', response.statusText);
+            console.log('Raw Data:', data);
+            console.log('Data Field:', data.data);
+            console.log('Normalized Data:', data.data || data);
+            if (data.data) {
+                console.log('Data Keys:', Object.keys(data.data));
+                console.log('Account Name:', data.data.account_name);
+                console.log('Currency Symbol:', data.data.currency_symbol);
+                console.log('Type:', data.data.type);
+                console.log('Source:', data.data.source);
+                console.log('External ID:', data.data.external_id);
+            }
+            console.groupEnd();
+            if (window.Logger) {
+                window.Logger.debug('🔍 [CASH_FLOW_API] Raw API response:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    rawData: data,
+                    dataField: data.data,
+                    normalizedData: data.data || data
+                }, { page: 'entity-details-api' });
+            }
+        }
         
         // עיצוב נתונים אחיד
         return this.normalizeEntityData(entityType, data);
@@ -530,6 +652,77 @@ class EntityDetailsAPI {
         // אם הנתונים עטופים בsucess/data, חלץ אותם
         const data = rawData.data || rawData;
         
+        // 🔍 DEBUG: Log normalization for cash flows
+        if (entityType === 'cash_flow') {
+            console.group('🔍 [CASH_FLOW_NORMALIZE] Before Normalization');
+            console.log('Raw Data:', rawData);
+            console.log('Extracted Data:', data);
+            console.log('Has Data Field:', !!rawData.data);
+            console.log('Has flow_type:', 'flow_type' in data);
+            console.log('Has flow_date:', 'flow_date' in data);
+            console.log('Has type:', 'type' in data);
+            console.log('Has date:', 'date' in data);
+            console.groupEnd();
+            if (window.Logger) {
+                window.Logger.debug('🔍 [CASH_FLOW_NORMALIZE] Before normalization:', {
+                    rawData: rawData,
+                    extractedData: data,
+                    hasDataField: !!rawData.data,
+                    hasFlowType: 'flow_type' in data,
+                    hasFlowDate: 'flow_date' in data
+                }, { page: 'entity-details-api' });
+            }
+        }
+        
+        // 🔧 FIX: Transform flow_type/flow_date to type/date for cash flows
+        if (entityType === 'cash_flow') {
+            if (data.flow_type !== undefined && data.type === undefined) {
+                data.type = data.flow_type;
+                console.log('🔧 [CASH_FLOW_NORMALIZE] Transformed flow_type to type:', data.type);
+            }
+            if (data.flow_date !== undefined && data.date === undefined) {
+                data.date = data.flow_date;
+                console.log('🔧 [CASH_FLOW_NORMALIZE] Transformed flow_date to date:', data.date);
+            }
+
+            if (!data.account_name) {
+                if (data.trading_account_name) {
+                    data.account_name = data.trading_account_name;
+                } else if (data.account && data.account.name) {
+                    data.account_name = data.account.name;
+                }
+            }
+
+            if (!data.currency_symbol) {
+                if (data.currency && data.currency.symbol) {
+                    data.currency_symbol = data.currency.symbol;
+                } else if (data.currency_code) {
+                    data.currency_symbol = data.currency_code;
+                } else if (data.currency_id && typeof window !== 'undefined' && typeof window.getCurrencyDisplay === 'function') {
+                    try {
+                        const currencyInfo = window.getCurrencyDisplay(data.currency_id);
+                        if (currencyInfo && currencyInfo.symbol) {
+                            data.currency_symbol = currencyInfo.symbol;
+                        }
+                    } catch (error) {
+                        window.Logger?.warn('⚠️ [CASH_FLOW_NORMALIZE] Failed to resolve currency symbol', error, { page: 'entity-details-api' });
+                    }
+                }
+            }
+
+            if (!data.source) {
+                data.source = 'manual';
+            }
+
+            if (data.status === undefined || data.status === null) {
+                delete data.status;
+            }
+
+            if (!data.external_id) {
+                data.external_id = null;
+            }
+        }
+        
         // וודא שיש מזהה
         if (!data.id && !data.ticker_id && !data.trade_id) {
             window.Logger.warn('Entity data missing ID field:', data, { page: "entity-details-api" });
@@ -544,7 +737,51 @@ class EntityDetailsAPI {
             data.linked_items = [];
         }
 
+        // 🔍 DEBUG: Log after normalization for cash flows
+        if (entityType === 'cash_flow') {
+            console.group('🔍 [CASH_FLOW_NORMALIZE] After Normalization');
+            console.log('Normalized Data:', data);
+            console.log('ID:', data.id);
+            console.log('Type:', data.type);
+            console.log('Account Name:', data.account_name);
+            console.log('Currency Symbol:', data.currency_symbol);
+            console.log('Source:', data.source);
+            console.log('External ID:', data.external_id);
+            console.log('Status:', data.status);
+            console.log('Date:', data.date);
+            console.log('All Keys:', Object.keys(data));
+            console.groupEnd();
+            if (window.Logger) {
+                window.Logger.debug('🔍 [CASH_FLOW_NORMALIZE] After normalization:', {
+                    normalizedData: data,
+                    id: data.id,
+                    type: data.type,
+                    account_name: data.account_name,
+                    currency_symbol: data.currency_symbol,
+                    source: data.source,
+                    external_id: data.external_id,
+                    allKeys: Object.keys(data)
+                }, { page: 'entity-details-api' });
+            }
+        }
+
         return data;
+    }
+
+    /**
+     * Identify missing critical fields for cash flow entities
+     * @param {Object} entityData - normalized entity data
+     * @returns {Array<string>} - list of fields missing (undefined/null)
+     * @private
+     */
+    _getMissingCashFlowFields(entityData) {
+        if (!entityData || typeof entityData !== 'object') {
+            return ['type', 'source', 'external_id', 'account_name', 'currency_symbol'];
+        }
+
+        const criticalFields = ['type', 'source', 'external_id', 'account_name', 'currency_symbol', 'currency_name'];
+
+        return criticalFields.filter(field => entityData[field] === undefined || entityData[field] === null);
     }
 
     /**
@@ -1313,3 +1550,84 @@ async function refreshEntityData(entityType, entityId) {
  * - getEntityDetails() - קבלת פרטי ישות
  * - refreshEntityData() - רענון נתוני ישות
  */
+
+/**
+ * Debug cash flow data - פונקציה גלובלית לניטור נתוני תזרים מזומנים
+ * 
+ * @param {number} cashFlowId - מזהה תזרים מזומנים
+ * @returns {Promise<void>}
+ * 
+ * @example
+ * // בקונסול:
+ * await debugCashFlow(13);
+ */
+window.debugCashFlow = async function(cashFlowId) {
+    console.group(`🔍 [DEBUG] Cash Flow #${cashFlowId}`);
+    
+    try {
+        // 1. Fetch from API
+        console.log('📡 Step 1: Fetching from API...');
+        const response = await fetch(`/api/cash_flows/${cashFlowId}`);
+        const apiData = await response.json();
+        console.log('✅ API Response:', apiData);
+        console.log('📊 API Data Field:', apiData.data);
+        
+        // 2. Get via EntityDetailsAPI
+        console.log('\n📡 Step 2: Fetching via EntityDetailsAPI...');
+        if (window.entityDetailsAPI) {
+            const entityData = await window.entityDetailsAPI.getEntityDetails('cash_flow', cashFlowId, { forceRefresh: true });
+            console.log('✅ Entity Details:', entityData);
+            
+            // 3. Check specific fields
+            console.log('\n📋 Step 3: Field Check:');
+            console.table({
+                'ID': entityData.id || '❌ MISSING',
+                'Type': entityData.type || '❌ MISSING',
+                'Amount': entityData.amount || '❌ MISSING',
+                'Status': entityData.status || '❌ MISSING',
+                'Source': entityData.source || '❌ MISSING',
+                'External ID': entityData.external_id || '❌ MISSING',
+                'Date': entityData.date || '❌ MISSING',
+                'Trading Account ID': entityData.trading_account_id || '❌ MISSING',
+                'Account Name': entityData.account_name || '❌ MISSING',
+                'Trading Account Name': entityData.trading_account_name || '❌ MISSING',
+                'Currency ID': entityData.currency_id || '❌ MISSING',
+                'Currency Symbol': entityData.currency_symbol || '❌ MISSING',
+                'Currency Code': entityData.currency_code || '❌ MISSING',
+                'Account Object': entityData.account ? '✅ EXISTS' : '❌ MISSING',
+                'Currency Object': entityData.currency ? '✅ EXISTS' : '❌ MISSING',
+                'Trading Account Object': entityData.trading_account ? '✅ EXISTS' : '❌ MISSING'
+            });
+            
+            // 4. Check nested objects
+            if (entityData.account) {
+                console.log('\n📦 Account Object:', entityData.account);
+            }
+            if (entityData.currency) {
+                console.log('\n📦 Currency Object:', entityData.currency);
+            }
+            if (entityData.trading_account) {
+                console.log('\n📦 Trading Account Object:', entityData.trading_account);
+            }
+            
+            // 5. All keys
+            console.log('\n🔑 All Keys:', Object.keys(entityData));
+            
+            // 6. Full object
+            console.log('\n📦 Full Entity Data Object:', entityData);
+            
+        } else {
+            console.error('❌ EntityDetailsAPI not available');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error:', error);
+    }
+    
+    console.groupEnd();
+    
+    return {
+        message: 'Debug complete. Check console for details.',
+        cashFlowId: cashFlowId
+    };
+};

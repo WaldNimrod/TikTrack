@@ -73,7 +73,8 @@
 
 .entity-linked-items-table th.col-linked-entity,
 .entity-linked-items-table td.col-linked-entity {
-  min-width: 240px;
+  min-width: 170px;
+  max-width: 220px;
 }
 
 .entity-linked-items-table th.col-linked-status,
@@ -98,7 +99,58 @@
 
 .entity-linked-items-table th.col-linked-actions,
 .entity-linked-items-table td.col-linked-actions {
-  width: 120px;
+  width: 150px;
+  min-width: 140px;
+  white-space: nowrap;
+}
+
+.entity-linked-items-table th.col-linked-actions {
+  font-weight: 500;
+  color: var(--bs-body-color);
+}
+
+.linked-items-table-link {
+  color: inherit;
+}
+
+.linked-items-table-icon {
+  --linked-item-color: #e9ecef;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--linked-item-color);
+  flex-shrink: 0;
+}
+
+.linked-items-table-icon-image {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.linked-items-table-icon.entity-trade { --linked-item-color: var(--entity-trade-color, #007bff); }
+.linked-items-table-icon.entity-trade_plan { --linked-item-color: var(--entity-trade-plan-color, #28a745); }
+.linked-items-table-icon.entity-execution { --linked-item-color: var(--entity-execution-color, #17a2b8); }
+.linked-items-table-icon.entity-trading_account { --linked-item-color: var(--entity-trading-account-color, #28a745); }
+.linked-items-table-icon.entity-ticker { --linked-item-color: var(--entity-ticker-color, #20c997); }
+.linked-items-table-icon.entity-alert { --linked-item-color: var(--entity-alert-color, #dc3545); }
+.linked-items-table-icon.entity-cash_flow { --linked-item-color: var(--entity-cash-flow-color, #fd7e14); }
+.linked-items-table-icon.entity-note { --linked-item-color: var(--entity-note-color, #6c757d); }
+.linked-items-table-icon.entity-position { --linked-item-color: var(--entity-position-color, #0d6efd); }
+
+.linked-items-table-text {
+  line-height: 1.2;
+  max-width: 100%;
+}
+
+.linked-items-table-name {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

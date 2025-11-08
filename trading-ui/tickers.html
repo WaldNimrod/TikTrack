@@ -279,17 +279,33 @@
     <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- מערכת תפריט פעולות -->
 
     <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3.5/10: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3.5 | Description: מודולים כלליים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script> <!-- מערכת ניווט מודולים מקוננים -->
+    <!-- [30] Load Order: 30 -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- מנהל מודלים V2 -->
+    <!-- [30.5] Load Order: 30.5 - Modal Configuration (Page-specific) -->
+    <script src="scripts/modal-configs/tickers-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טיקרים -->
+    <!-- [31] Load Order: 31 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
+
+    <!-- =============================================================== -->
     <!-- ===== PACKAGE 4/10: CRUD OPERATIONS PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 4 | Description: מערכות לניהול נתונים וטבלאות -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [29] Load Order: 29 -->
+    <!-- [32] Load Order: 32 -->
     <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- כלי עזר תאריכים -->
-    <!-- [30] Load Order: 30 -->
+    <!-- [33] Load Order: 33 -->
     <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- כלי עזר נתונים כלליים -->
-    <!-- [31] Load Order: 31 -->
+    <!-- [34] Load Order: 34 -->
     <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
 
     <!-- =============================================================== -->
@@ -299,17 +315,17 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [32] Load Order: 32 -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
-    <!-- [33] Load Order: 33 -->
-    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- מערכת צבעים (60+ העדפות) -->
-    <!-- [34] Load Order: 34 -->
-    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- ניהול פרופילים -->
     <!-- [35] Load Order: 35 -->
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [36] Load Order: 36 -->
-    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- מערכת צבעים (60+ העדפות) -->
     <!-- [37] Load Order: 37 -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- ניהול פרופילים -->
+    <!-- [38] Load Order: 38 -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <!-- [39] Load Order: 39 -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <!-- [40] Load Order: 40 -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
 
     <!-- =============================================================== -->
@@ -319,7 +335,7 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [38] Load Order: 38 -->
+    <!-- [41] Load Order: 41 -->
     <script src="scripts/validation-utils.js?v=1.0.0"></script> <!-- כלי ולידציה -->
 
     <!-- =============================================================== -->
@@ -329,14 +345,12 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [39] Load Order: 39 -->
-    <script src="scripts/yahoo-finance-service.js?v=1.0.0"></script> <!-- שירות Yahoo Finance -->
-    <!-- [40] Load Order: 40 -->
-    <script src="scripts/external-data-service.js?v=1.0.0"></script> <!-- שירות נתונים חיצוניים -->
-    <!-- [41] Load Order: 41 -->
-    <script src="scripts/external-data-settings-service.js?v=1.0.0"></script> <!-- הגדרות נתונים חיצוניים -->
     <!-- [42] Load Order: 42 -->
-    <script src="scripts/external-data-dashboard.js?v=1.0.0"></script> <!-- דשבורד נתונים חיצוניים -->
+    <script src="scripts/yahoo-finance-service.js?v=1.0.0"></script> <!-- שירות Yahoo Finance -->
+    <!-- [43] Load Order: 43 -->
+    <script src="scripts/external-data-service.js?v=1.0.0"></script> <!-- שירות נתונים חיצוניים -->
+    <!-- [44] Load Order: 44 -->
+    <script src="scripts/external-data-settings-service.js?v=1.0.0"></script> <!-- הגדרות נתונים חיצוניים -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 8/10: ENTITY DETAILS PACKAGE ===== -->
@@ -345,11 +359,11 @@
     <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [43] Load Order: 43 -->
-    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
-    <!-- [44] Load Order: 44 -->
-    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
     <!-- [45] Load Order: 45 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [46] Load Order: 46 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.1"></script> <!-- מציג פרטי ישויות -->
+    <!-- [47] Load Order: 47 -->
     <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
 
     <!-- =============================================================== -->
@@ -359,9 +373,9 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [46] Load Order: 46 -->
+    <!-- [48] Load Order: 48 -->
     <script src="scripts/info-summary-system.js?v=1.0.0"></script> <!-- מערכת סיכום נתונים ליבה -->
-    <!-- [47] Load Order: 47 -->
+    <!-- [49] Load Order: 49 -->
     <script src="scripts/info-summary-configs.js?v=1.0.0"></script> <!-- תצורות עמודים לסיכום נתונים -->
 
     <!-- =============================================================== -->
@@ -371,15 +385,15 @@
     <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, filters, advanced-notifications, entity-details, info-summary, import -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [48] Load Order: 48 -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
-    <!-- [49] Load Order: 49 -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
     <!-- [50] Load Order: 50 -->
-    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
     <!-- [51] Load Order: 51 -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
     <!-- [52] Load Order: 52 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [53] Load Order: 53 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [54] Load Order: 54 -->
     <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
 
     <!-- =============================================================== -->
@@ -390,13 +404,13 @@
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
-    <!-- [53] Page-specific: tickers -->
+    <!-- [55] Page-specific: tickers -->
     <script src="scripts/tickers.js?v=1.0.0"></script> <!-- Page-specific script for tickers -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 53 | Unique Scripts Loaded: 53 -->
+    <!-- 📊 Total Scripts Processed: 55 | Unique Scripts Loaded: 55 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("tickers") -->
 </body>
 </html>

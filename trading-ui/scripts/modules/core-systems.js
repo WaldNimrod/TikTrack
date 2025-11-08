@@ -741,10 +741,34 @@ class UnifiedAppInitializer {
         }
         
         // Execute custom finalizers with double initialization prevention
+        // Check if customInitializers exists and is an array
+        if (!this.customInitializers || !Array.isArray(this.customInitializers)) {
+            console.log('⚠️ No custom initializers found or not an array, skipping...');
+            return;
+        }
+        
+        if (!this.pageInfo || !this.pageInfo.name) {
+            console.warn('⚠️ pageInfo or pageInfo.name is missing, cannot execute custom initializers');
+            return;
+        }
+        
         console.log('🔧 Executing custom initializers:', this.customInitializers.length);
         for (let i = 0; i < this.customInitializers.length; i++) {
             const initializer = this.customInitializers[i];
             const initializerKey = `${this.pageInfo.name}_${i}`;
+            
+            // Ensure globalInitializationState exists before accessing it
+            if (!window.globalInitializationState) {
+                window.globalInitializationState = {
+                    unifiedAppInitialized: false,
+                    unifiedAppInitializing: false,
+                    pageInitializers: new Map(),
+                    customInitializers: new Map()
+                };
+            }
+            if (!window.globalInitializationState.customInitializers) {
+                window.globalInitializationState.customInitializers = new Map();
+            }
             
             // Check if this initializer was already executed
             if (window.globalInitializationState.customInitializers.has(initializerKey)) {
@@ -757,6 +781,18 @@ class UnifiedAppInitializer {
                 try {
                     // Pass config to initializer (as in unified-app-initializer.js)
                     await initializer(config || {});
+                    // Ensure globalInitializationState still exists before marking as executed
+                    if (!window.globalInitializationState) {
+                        window.globalInitializationState = {
+                            unifiedAppInitialized: false,
+                            unifiedAppInitializing: false,
+                            pageInitializers: new Map(),
+                            customInitializers: new Map()
+                        };
+                    }
+                    if (!window.globalInitializationState.customInitializers) {
+                        window.globalInitializationState.customInitializers = new Map();
+                    }
                     // Mark as executed to prevent double execution
                     window.globalInitializationState.customInitializers.set(initializerKey, {
                         executed: true,
@@ -1301,6 +1337,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('🔍 Current URL:', window.location.href);
     console.log('🔍 Current pathname:', window.location.pathname);
     
+    // Initialize globalInitializationState if not exists
+    if (!window.globalInitializationState) {
+        window.globalInitializationState = {
+            unifiedAppInitialized: false,
+            unifiedAppInitializing: false,
+            pageInitializers: new Set(),
+            customInitializers: new Map()
+        };
+    }
+    
     // Prevent double initialization
     if (window.globalInitializationState.unifiedAppInitialized || 
         window.globalInitializationState.unifiedAppInitializing) {
@@ -1315,38 +1361,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(async () => {
             console.log('🚀 About to call initializeUnifiedApp...');
             await window.initializeUnifiedApp();
-            window.globalInitializationState.unifiedAppInitialized = true;
-            window.globalInitializationState.unifiedAppInitializing = false;
+            if (window.globalInitializationState) {
+                window.globalInitializationState.unifiedAppInitialized = true;
+                window.globalInitializationState.unifiedAppInitializing = false;
+            }
             console.log('✅ Unified App Initialization completed');
         }, 100);
         
     } catch (error) {
         console.error('❌ Unified App auto-initialization failed:', error);
-        window.globalInitializationState.unifiedAppInitializing = false;
+        if (window.globalInitializationState) {
+            window.globalInitializationState.unifiedAppInitializing = false;
+        }
     }
 });
 
 // ===== ERROR HANDLING =====
 
 window.addEventListener('error', (event) => {
-    console.error('❌ Global Error:', event.error);
-    console.error('❌ Error details:', {
+    const details = {
         message: event.message,
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno,
-        stack: event.error?.stack
-    });
+        stack: event.error?.stack,
+        errorObject: event.error ?? null,
+        time: new Date().toISOString()
+    };
     
-    if (typeof window.showNotification === 'function') {
+    window.__LAST_GLOBAL_ERROR = details;
+    
+    if (window.Logger?.error) {
+        window.Logger.error('❌ Global Error captured', details, { page: 'core-systems' });
+    } else {
+        console.error('❌ Global Error:', details);
+    }
+    
+    if (event.error && typeof window.showNotification === 'function') {
         window.showNotification('❌ System error occurred', 'error');
     }
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-    console.error('❌ Unhandled Promise Rejection:', event.reason);
+    const details = {
+        reason: event.reason,
+        stack: event.reason?.stack,
+        time: new Date().toISOString()
+    };
     
-    if (typeof window.showNotification === 'function') {
+    window.__LAST_GLOBAL_REJECTION = details;
+    
+    if (window.Logger?.error) {
+        window.Logger.error('❌ Unhandled Promise Rejection', details, { page: 'core-systems' });
+    } else {
+        console.error('❌ Unhandled Promise Rejection:', details);
+    }
+    
+    if (event.reason && typeof window.showNotification === 'function') {
         window.showNotification('❌ Promise rejection occurred', 'error');
     }
 });
@@ -4316,5 +4387,6 @@ window.getPageInitSummary = function(pageName) {
 // ===== GLOBAL EXPORT =====
 
 window.PAGE_CONFIGS = PAGE_CONFIGS;
+window.PAGE_CONFIGS.__SOURCE = 'core-systems';
 window.pageInitializationConfigs = PAGE_CONFIGS;
 }

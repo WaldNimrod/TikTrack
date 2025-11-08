@@ -177,7 +177,7 @@
 
 // ===== PAGE CONFIGURATIONS =====
 
-if (typeof window.PAGE_CONFIGS === 'undefined') {
+if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE === 'core-systems') {
 const PAGE_CONFIGS = {
     // Main Pages
     'index': {
@@ -663,7 +663,7 @@ const PAGE_CONFIGS = {
         // - 'entity-details': מערכות פרטי ישויות
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
         requiredGlobals: [
             'NotificationSystem',    // from base package
             'DataUtils',            // from services package  
@@ -708,9 +708,10 @@ const PAGE_CONFIGS = {
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
+        // - 'modules': מודולים כלליים (core-systems, modal-manager-v2)
         // - 'external-data': שירות נתונים חיצוניים (Yahoo Finance, etc.)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'external-data', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'external-data', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -1820,6 +1821,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
 Object.assign(PAGE_CONFIGS, ADDITIONAL_PAGE_CONFIGS);
 
 window.PAGE_CONFIGS = PAGE_CONFIGS;
+window.PAGE_CONFIGS.__SOURCE = 'page-initialization-configs';
 window.pageInitializationConfigs = PAGE_CONFIGS;
 console.log('✅ PAGE_CONFIGS loaded, trading_accounts exists:', !!PAGE_CONFIGS.trading_accounts);
 } else {

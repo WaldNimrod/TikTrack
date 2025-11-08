@@ -329,6 +329,88 @@ class EntityDetailsRenderer {
     }
 
     /**
+     * Render market data for ticker - רנדור נתוני שוק לטיקר
+     * 
+     * @param {Object} tickerData - נתוני טיקר
+     * @param {string} tickerColor - צבע הטיקר
+     * @returns {string} - HTML מרונדר
+     * @public
+     */
+    renderMarketData(tickerData, tickerColor = '#019193') {
+        const price = tickerData.current_price || tickerData.price || 0;
+        const change = tickerData.daily_change || tickerData.change_amount || 0;
+        const changePercent = tickerData.daily_change_percent || tickerData.change_percent || 0;
+        const volume = tickerData.volume || 0;
+        const currencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
+        const updatedAt = tickerData.yahoo_updated_at || tickerData.updated_at || null;
+        const dataSource = tickerData.data_source || null;
+        
+        // אם אין נתוני שוק, נחזיר רק קו מפריד
+        if (!price || price === 0) {
+            return `
+                <div class="market-data-container pb-2 mb-3 border-bottom">
+                    <div class="text-muted small">
+                        אין נתוני שוק זמינים
+                    </div>
+                </div>
+            `;
+        }
+        
+        // עיצוב שינוי
+        const changeColor = change >= 0 ? '#28a745' : '#dc3545';
+        const changeIcon = change >= 0 ? '↗' : '↘';
+        const changeSign = change >= 0 ? '+' : '';
+        
+        // פורמט נפח
+        const formattedVolume = volume > 0 ? volume.toLocaleString('he-IL') : 'N/A';
+        
+        // פורמט תאריך עדכון
+        let updatedAtDisplay = '';
+        if (updatedAt) {
+            try {
+                const date = new Date(updatedAt);
+                updatedAtDisplay = date.toLocaleString('he-IL', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                updatedAtDisplay = updatedAt;
+            }
+        }
+        
+        return `
+            <div class="market-data-container pb-2 mb-3 border-bottom">
+                <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
+                    <div class="fw-bold fs-5" style="direction: ltr;">
+                        ${currencySymbol}${parseFloat(price).toFixed(2)}
+                    </div>
+                    <div class="d-flex align-items-center gap-2" style="color: ${changeColor}; font-weight: bold; direction: ltr;">
+                        <span>${changeIcon}</span>
+                        <span>${changeSign}${parseFloat(change).toFixed(2)}</span>
+                        <span>(${changeSign}${parseFloat(changePercent).toFixed(2)}%)</span>
+                    </div>
+                    <div class="text-muted small">
+                        נפח: ${formattedVolume}
+                    </div>
+                    ${updatedAtDisplay ? `
+                    <div class="text-muted small">
+                        עודכן: ${updatedAtDisplay}
+                    </div>
+                    ` : ''}
+                    ${dataSource ? `
+                    <div class="text-muted small">
+                        מקור: ${dataSource}
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
      * Render ticker details - רנדור פרטי טיקר
      * 
      * @param {Object} tickerData - נתוני טיקר
@@ -339,6 +421,30 @@ class EntityDetailsRenderer {
     renderTicker(tickerData, options = {}) {
         // קבלת צבע הטיקר מההעדפות
         const tickerColor = this.entityColors.ticker || '#019193';
+        const sourceInfo = (options && options.sourceInfo) ? options.sourceInfo : null;
+        
+        // לוג לבדיקת linked_items
+        console.log('🔍 [renderTicker] Ticker data:', {
+            id: tickerData.id,
+            symbol: tickerData.symbol,
+            hasLinkedItems: !!tickerData.linked_items,
+            linkedItemsType: typeof tickerData.linked_items,
+            linkedItemsIsArray: Array.isArray(tickerData.linked_items),
+            linkedItemsCount: tickerData.linked_items?.length || 0,
+            linkedItems: tickerData.linked_items
+        });
+        
+        if (window.Logger) {
+            window.Logger.info('🔍 [renderTicker] Ticker data:', {
+                id: tickerData.id,
+                symbol: tickerData.symbol,
+                hasLinkedItems: !!tickerData.linked_items,
+                linkedItemsType: typeof tickerData.linked_items,
+                linkedItemsIsArray: Array.isArray(tickerData.linked_items),
+                linkedItemsCount: tickerData.linked_items?.length || 0,
+                page: 'entity-details-renderer'
+            });
+        }
         
         return `
             <div class="entity-details-container ticker-details">
@@ -354,15 +460,76 @@ class EntityDetailsRenderer {
                         ${this.renderBasicInfo(tickerData, 'ticker', tickerColor)}
                     </div>
                     <div class="col-md-6">
-                        ${this.renderAdditionalInfo(tickerData, 'ticker', tickerColor)}
+                        ${this.renderTickerSpecific(tickerData, tickerColor)}
                     </div>
                 </div>
                 
                 <div class="row g-3 mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(tickerData.linked_items || [], tickerColor, 'ticker', tickerData.id, options?.sourceInfo || null, options)}
+                        ${this.renderLinkedItems(tickerData.linked_items || [], tickerColor, 'ticker', tickerData.id, sourceInfo, options)}
                     </div>
                 </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Render ticker specific information - רנדור מידע ספציפי לטיקר
+     * 
+     * @param {Object} tickerData - נתוני טיקר
+     * @param {string} tickerColor - צבע הטיקר
+     * @returns {string} - HTML מרונדר
+     * @public
+     */
+    renderTickerSpecific(tickerData, tickerColor = null) {
+        const color = tickerColor || this.entityColors.ticker || '#019193';
+        
+        // סוג נכס
+        const type = tickerData.type || null;
+        const typeDisplay = type || 'לא זמין';
+        
+        // מטבע
+        const currencySymbol = tickerData.currency_symbol || 
+                              (tickerData.currency && tickerData.currency.symbol) || 
+                              '$';
+        const currencyName = tickerData.currency_name || 
+                            (tickerData.currency && tickerData.currency.name) || 
+                            null;
+        const currencyDisplay = currencyName ? `${currencySymbol} - ${currencyName}` : currencySymbol;
+        
+        // תאריך יצירה
+        const createdAt = this.formatDateTime(tickerData.created_at) || '-';
+        
+        // הערות
+        const remarks = tickerData.remarks || null;
+        
+        return `
+            <div class="ticker-specific">
+                <h6 class="border-bottom pb-2 mb-3" style="border-color: ${color} !important;">פרטי טיקר</h6>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סוג:</label>
+                    <span>${typeDisplay}</span>
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מטבע:</label>
+                    <span>${currencyDisplay}</span>
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך יצירה:</label>
+                    <span class="text-muted">${createdAt}</span>
+                </div>
+                
+                ${remarks ? `
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-2">הערות:</label>
+                    <p class="mb-0">${window.FieldRendererService && window.FieldRendererService.renderTextPreview ? 
+                        window.FieldRendererService.renderTextPreview(remarks, { maxLength: 500 }) : 
+                        (remarks.length > 500 ? remarks.substring(0, 500) + '...' : remarks)}</p>
+                </div>
+                ` : ''}
             </div>
         `;
     }
@@ -553,7 +720,7 @@ class EntityDetailsRenderer {
         const quantitySign = quantityValue > 0 ? '+' : (quantityValue < 0 ? '-' : '');
         const quantityHtml = `<span class="${quantityClass}" dir="ltr">${quantitySign}#${Math.abs(quantityValue).toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>`;
 
-        const renderAmount = (value, showSign = true, decimals = 2) => {
+        const renderAmount = (value, showSign = true, decimals = 0) => {
             if (FieldRenderer?.renderAmount) {
                 return FieldRenderer.renderAmount(value || 0, currencySymbol, decimals, showSign);
             }
@@ -634,10 +801,10 @@ class EntityDetailsRenderer {
                     const qtyClass = qty > 0 ? 'numeric-value-positive' : (qty < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
                     const qtySign = qty > 0 ? '+' : (qty < 0 ? '-' : '');
                     const qtyHtml = `<span class="${qtyClass}" dir="ltr">${qtySign}#${Math.abs(qty).toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>`;
-                const feeHtml = renderAmount(exec.fee || 0, true, 2);
+                const feeHtml = renderAmount(exec.fee || 0, true);
                     const dateText = exec.date ? new Date(exec.date).toLocaleString('he-IL') : 'לא זמין';
                     const priceHtml = renderAmount(exec.price || 0, false, 2);
-                const totalHtml = renderAmount(exec.total || 0, true, 2);
+                const totalHtml = renderAmount(exec.total || 0, true);
 
                     return `
                         <tr>
@@ -664,8 +831,8 @@ class EntityDetailsRenderer {
                 const qtyHtml = `<span class="${qtyClass}" dir="ltr">${qtySign}#${Math.abs(qty).toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>`;
                 const dateText = exec.date ? new Date(exec.date).toLocaleString('he-IL') : 'לא זמין';
                 const priceHtml = renderAmount(exec.price || 0, false, 2);
-                const feeHtml = renderAmount(exec.fee || 0, true, 2);
-                const totalHtml = renderAmount(exec.total || 0, true, 2);
+                const feeHtml = renderAmount(exec.fee || 0, true);
+                const totalHtml = renderAmount(exec.total || 0, true);
 
                 return `
                     <tr>
@@ -794,7 +961,7 @@ class EntityDetailsRenderer {
                     <div class="section-title-wrapper d-flex align-items-center gap-2">
                         <h5 class="section-title mb-0">ביצועים לפוזיציה</h5>
                         <span class="badge bg-light text-dark">${normalizedExecutions.length}</span>
-                </div>
+                    </div>
                 </div>
                 <div class="section-content">
                     ${normalizedExecutions.length ? `
@@ -851,14 +1018,14 @@ class EntityDetailsRenderer {
                             <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                 <span class="text-muted">כמות</span>
                                 ${quantityHtml}
-                            </div>
+                    </div>
                             <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                 <span class="text-muted">מחיר ממוצע (ברוטו / נטו)</span>
                                 <span class="d-flex flex-column align-items-end">
                                     ${renderAmount(positionData.average_price_gross || 0, false, 2)}
                                     <small class="text-muted">${renderAmount(positionData.average_price_net || 0, false, 2)} נטו</small>
                                 </span>
-                            </div>
+                </div>
                             <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
                                 <span class="text-muted">סה"כ עלות</span>
                                 ${renderAmount(positionData.current_position_cost || 0, false)}
@@ -937,7 +1104,12 @@ class EntityDetailsRenderer {
             const sanitizedSuffix = `${parentEntityType || 'entity'}_${parentEntityId || '0'}`.replace(/[^a-zA-Z0-9_-]/g, '_');
             const tableId = `linkedItemsTable_${sanitizedSuffix}`;
 
-            const enrichedItems = this._enrichLinkedItems(items, parentEntityType, options);
+            let enrichedItems = this._enrichLinkedItems(items, parentEntityType, options);
+            
+            // מיון פריטים מקושרים - פתוחים ראשון, אחר כך תאריך (חדש לישן)
+            if (window.LinkedItemsService && window.LinkedItemsService.sortLinkedItems) {
+                enrichedItems = window.LinkedItemsService.sortLinkedItems(enrichedItems);
+            }
 
             if (!window.linkedItemsTableData) {
                 window.linkedItemsTableData = {};
@@ -968,72 +1140,16 @@ class EntityDetailsRenderer {
             const effectiveSourceInfo = Object.assign({}, baseSourceInfo, typeof sourceInfo === 'object' ? sourceInfo : {});
 
             const rowsHtml = enrichedItems.length ? enrichedItems.map(item => {
-            const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
-                ? window.LinkedItemsService.getEntityLabel(item.type)
-                    : (window.getEntityLabel && typeof window.getEntityLabel === 'function'
-                    ? window.getEntityLabel(item.type)
-                        : item.type);
-            
-            const cleanName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
-                ? window.LinkedItemsService.formatLinkedItemName(item)
-                    : this.getCleanEntityName(item);
-
-                const linkedBadge = (window.FieldRendererService && window.FieldRendererService.renderLinkedEntity)
-                    ? window.FieldRendererService.renderLinkedEntity(
-                        item.type,
-                        item.id,
-                        cleanName,
-                        {
-                            renderMode: 'linked-items-table',
-                            status: item.status,
-                            side: item.side,
-                            investment_type: item.investment_type
-                        }
-                    )
-                    : `
-                        <div class="linked-items-table-link d-flex flex-column align-items-start gap-1">
-                            <span class="linked-items-table-label fw-semibold text-body">${entityLabel}</span>
-                            <span class="linked-items-table-name text-muted small">${cleanName}</span>
-                </div>
-            `;
-            
-            const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
-                ? window.FieldRendererService.renderStatus(item.status, item.type)
-                : this.getStatusBadge(item.status);
-            
-                const sideDisplay = (window.FieldRendererService && window.FieldRendererService.renderSide)
-                    ? window.FieldRendererService.renderSide(item.side)
-                    : (item.side ? `<span class="badge badge-secondary">${item.side}</span>` : '<span class="badge badge-secondary">-</span>');
-
-                const investmentDisplay = (window.FieldRendererService && window.FieldRendererService.renderType)
-                    ? window.FieldRendererService.renderType(item.investment_type)
-                    : (item.investment_type ? `<span class="badge badge-secondary">${item.investment_type}</span>` : '<span class="badge badge-secondary">-</span>');
-
-                const createdDisplay = this.formatDateTime(item.created_at || item.updated_at);
-
-                const actionsHtml = (window.LinkedItemsService && window.LinkedItemsService.generateLinkedItemActions)
-                    ? window.LinkedItemsService.generateLinkedItemActions(item, 'table', {
-                entityColors: this.entityColors,
-                        sourceInfo: effectiveSourceInfo
-                    })
-                    : '';
-
-                return `
-                    <tr>
-                        <td class="linked-item-entity text-end col-linked-entity">${linkedBadge}</td>
-                        <td class="text-center col-linked-status">${statusDisplay}</td>
-                        <td class="text-center col-linked-side">${sideDisplay}</td>
-                        <td class="text-center col-linked-investment">${investmentDisplay}</td>
-                        <td class="text-center col-linked-date">${createdDisplay || ''}</td>
-                        <td class="text-center col-linked-actions">${actionsHtml}</td>
-                </tr>
-            `;
+                return this._renderLinkedItemRow(item, tableId, effectiveSourceInfo);
             }).join('') : '<tr><td colspan="6" class="text-center text-muted py-4">אין פריטים מקושרים להצגה</td></tr>';
 
             const sortHandlerReference = `window.linkedItemsSortHandlers['${tableId}']`;
             const makeSortButton = (label, columnIndex, alignment = 'start') => `
                 <button class="btn btn-link sortable-header px-0 text-${alignment}" data-onclick="window.sortTableData(${columnIndex}, window.linkedItemsTableData['${tableId}'] || [], 'linked_items', ${sortHandlerReference})">${label} <span class="sort-icon">↕</span></button>
             `;
+
+            // Get table headers based on entity types in the table
+            const tableHeaders = this._getLinkedItemsTableHeaders(enrichedItems, makeSortButton);
 
             if (showFilter) {
                 setTimeout(() => {
@@ -1062,21 +1178,16 @@ class EntityDetailsRenderer {
                                 <table class="table table-sm table-hover mb-0 entity-linked-items-table" id="${tableId}" data-table-type="linked_items">
                                     <thead>
                                         <tr>
-                                            <th class="col-linked-entity">${makeSortButton('מקושר ל', 0)}</th>
-                                            <th class="text-center col-linked-status">${makeSortButton('סטטוס', 1, 'center')}</th>
-                                            <th class="text-center col-linked-side">${makeSortButton('צד', 2, 'center')}</th>
-                                            <th class="text-center col-linked-investment">${makeSortButton('סוג השקעה', 3, 'center')}</th>
-                                            <th class="text-center col-linked-date">${makeSortButton('תאריך יצירה', 4, 'center')}</th>
-                                            <th class="text-center col-linked-actions">פעולות</th>
+                                            ${tableHeaders}
                                         </tr>
                                     </thead>
                                     <tbody>${rowsHtml}</tbody>
-                                </table>
-                            </div>
+                    </table>
+                </div>
                         ` : `
                             <div class="alert alert-info text-center mb-0">אין פריטים מקושרים להצגה</div>
                         `}
-                    </div>
+            </div>
                 </section>
             `;
 
@@ -1085,12 +1196,192 @@ class EntityDetailsRenderer {
                     this._hydrateLinkedItemsAsync(tableId, enrichedItems, parentEntityType, parentEntityId);
                 }, 60);
             }
+
+            setTimeout(() => {
+                if (window.initializeButtons && typeof window.initializeButtons === 'function') {
+                    window.initializeButtons();
+                } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+                    window.ButtonSystem.initializeButtons();
+                }
+            }, 100);
         
         return html;
         } catch (error) {
             window.Logger?.error('Error rendering linked items section', error, { page: 'entity-details-renderer' });
             return '<div class="alert alert-warning text-center my-3">שגיאה בטעינת פריטים מקושרים</div>';
         }
+    }
+
+    /**
+     * Get table headers based on entity types in the linked items
+     * @private
+     * @param {Array} items - Array of linked items
+     * @param {Function} makeSortButton - Function to create sort button
+     * @returns {string} HTML for table headers
+     */
+    _getLinkedItemsTableHeaders(items, makeSortButton) {
+        // Use generic headers that work for all entity types
+        // Each row will use colspan as needed
+        return `
+            <th class="col-linked-entity">${makeSortButton('מקושר ל', 0)}</th>
+            <th class="text-center col-linked-status">${makeSortButton('סטטוס', 1, 'center')}</th>
+            <th class="text-center col-linked-side">${makeSortButton('צד', 2, 'center')}</th>
+            <th class="text-center col-linked-investment">${makeSortButton('סוג השקעה', 3, 'center')}</th>
+            <th class="text-center col-linked-date">${makeSortButton('תאריך יצירה', 4, 'center')}</th>
+            <th class="text-center col-linked-actions">פעולות</th>
+        `;
+    }
+    
+    /**
+     * Render a single linked item row based on entity type
+     * @private
+     * @param {Object} item - Linked item object
+     * @param {string} tableId - Table ID
+     * @param {Object} sourceInfo - Source information
+     * @returns {string} HTML for table row
+     */
+    _renderLinkedItemRow(item, tableId, sourceInfo) {
+        const entityType = String(item.type || '').toLowerCase();
+        const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
+            ? window.LinkedItemsService.getEntityLabel(item.type)
+            : (window.getEntityLabel && typeof window.getEntityLabel === 'function'
+                ? window.getEntityLabel(item.type)
+                : item.type);
+        
+        const cleanName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
+            ? window.LinkedItemsService.formatLinkedItemName(item)
+            : (item.description || item.title || item.name || item.symbol || `#${item.id || 'לא זמין'}`);
+        
+        const itemId = item.id || item.entity_id || item.linked_id || '';
+        
+        // Create linked badge with ID for alerts and notes
+        let linkedBadge;
+        if (entityType === 'alert' || entityType === 'note') {
+            // Add ID below entity type
+            const escapedLabel = this._escapeHtml(entityLabel);
+            const escapedName = this._escapeHtml(cleanName);
+            const escapedId = this._escapeHtml(`#${itemId}`);
+            
+            linkedBadge = `
+                <div class="linked-items-table-link d-flex flex-column align-items-start gap-1">
+                    <span class="linked-items-table-label fw-semibold text-body">${escapedLabel}</span>
+                    <span class="linked-items-table-name text-muted small">${escapedId}</span>
+                    <span class="linked-items-table-name text-muted small">${escapedName}</span>
+                </div>
+            `;
+        } else {
+            // Use standard renderLinkedEntity for other types
+            linkedBadge = (window.FieldRendererService && window.FieldRendererService.renderLinkedEntity)
+                ? window.FieldRendererService.renderLinkedEntity(
+                    item.type,
+                    item.id,
+                    cleanName,
+                    {
+                        renderMode: 'linked-items-table',
+                        status: item.status,
+                        side: item.side,
+                        investment_type: item.investment_type
+                    }
+                )
+                : `
+                    <div class="linked-items-table-link d-flex flex-column align-items-start gap-1">
+                        <span class="linked-items-table-label fw-semibold text-body">${entityLabel}</span>
+                        <span class="linked-items-table-name text-muted small">${cleanName}</span>
+                    </div>
+                `;
+        }
+        
+        const createdDisplay = this.formatDateTime(item.created_at || item.updated_at);
+        
+        let actionsHtml = (window.LinkedItemsService && window.LinkedItemsService.generateLinkedItemActions)
+            ? window.LinkedItemsService.generateLinkedItemActions(item, 'table', {
+                entityColors: this.entityColors,
+                sourceInfo: sourceInfo
+            })
+            : '';
+        
+        const normalizedItemId = this._normalizeLinkedItemId(item.id ?? item.entity_id ?? item.linked_id);
+        if (!actionsHtml) {
+            if (item.type && normalizedItemId !== null && normalizedItemId !== undefined) {
+                const normalizedType = String(item.type).toLowerCase();
+                const onclickValue = `window.showEntityDetails('${normalizedType}', '${normalizedItemId}')`;
+                actionsHtml = `
+                    <button class="btn btn-sm btn-outline-primary" data-onclick="${onclickValue}">
+                        צפייה בפרטים
+                    </button>
+                `;
+            } else {
+                actionsHtml = '<span class="text-muted">אין פעולות</span>';
+            }
+        }
+        
+        // Render cells based on entity type
+        let cells = `<td class="linked-item-entity text-end col-linked-entity">${linkedBadge}</td>`;
+        
+        if (entityType === 'alert') {
+            // Alert: Status | Condition (combined side+investment, colspan=2) | Date | Actions
+            const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
+                ? window.FieldRendererService.renderStatus(item.status, item.type)
+                : this.getStatusBadge(item.status);
+            
+            const condition = item.condition || '';
+            const targetValue = item.target_value !== null && item.target_value !== undefined ? item.target_value : '';
+            const conditionDisplay = condition || targetValue
+                ? `${this._escapeHtml(String(condition || ''))}${condition && targetValue ? ' → ' : ''}${targetValue !== '' ? this._escapeHtml(String(targetValue)) : ''}`
+                : '<span class="text-muted">-</span>';
+            
+            cells += `<td class="text-center col-linked-status">${statusDisplay}</td>`;
+            cells += `<td class="text-center col-linked-side" colspan="2">${conditionDisplay}</td>`;
+            cells += `<td class="text-center col-linked-date">${createdDisplay || ''}</td>`;
+            cells += `<td class="text-center col-linked-actions">${actionsHtml}</td>`;
+            
+        } else if (entityType === 'note') {
+            // Note: Content (spanning 3 columns: status+side+investment) | Date | Actions
+            const content = item.content || item.note_content || '';
+            const contentDisplay = content
+                ? `<span class="text-muted small">${this._escapeHtml(content.length > 100 ? content.substring(0, 100) + '...' : content)}</span>`
+                : '<span class="text-muted">אין תוכן</span>';
+            
+            cells += `<td class="text-center col-linked-status" colspan="3">${contentDisplay}</td>`;
+            cells += `<td class="text-center col-linked-date">${createdDisplay || ''}</td>`;
+            cells += `<td class="text-center col-linked-actions">${actionsHtml}</td>`;
+            
+        } else if (entityType === 'execution') {
+            // Execution: Side, Quantity, Price (spanning 3 columns: status+side+investment) | Date | Actions
+            const side = item.side || '';
+            const quantity = item.quantity || 0;
+            const price = item.price || 0;
+            
+            const sideDisplay = side && window.FieldRendererService && window.FieldRendererService.renderSide
+                ? window.FieldRendererService.renderSide(side)
+                : (side ? `<span class="badge bg-secondary me-1">${this._escapeHtml(String(side))}</span>` : '');
+            const quantityDisplay = quantity ? `<span class="text-muted me-2">כמות: ${parseFloat(quantity).toFixed(2)}</span>` : '';
+            const priceDisplay = price ? `<span class="text-muted">מחיר: ${parseFloat(price).toFixed(2)}</span>` : '';
+            
+            const executionDisplay = `${sideDisplay} ${quantityDisplay} ${priceDisplay}`.trim() || '<span class="text-muted">-</span>';
+            
+            cells += `<td class="text-center col-linked-status" colspan="3">${executionDisplay}</td>`;
+            cells += `<td class="text-center col-linked-date">${createdDisplay || ''}</td>`;
+            cells += `<td class="text-center col-linked-actions">${actionsHtml}</td>`;
+            
+        } else {
+            // Standard: Status | Side | Investment | Date | Actions
+            const statusDisplay = this._getStatusOrAlternativeDisplay(item);
+            const sideDisplay = (window.FieldRendererService && window.FieldRendererService.renderSide)
+                ? window.FieldRendererService.renderSide(item.side)
+                : (item.side ? `<span class="badge badge-secondary">${item.side}</span>` : '<span class="badge badge-secondary">-</span>');
+            const investmentDisplay = (window.FieldRendererService && window.FieldRendererService.renderType)
+                ? window.FieldRendererService.renderType(item.investment_type)
+                : (item.investment_type ? `<span class="badge badge-secondary">${item.investment_type}</span>` : '<span class="badge badge-secondary">-</span>');
+            
+            cells += `<td class="text-center col-linked-status">${statusDisplay}</td>`;
+            cells += `<td class="text-center col-linked-side">${sideDisplay}</td>`;
+            cells += `<td class="text-center col-linked-investment">${investmentDisplay}</td>`;
+            cells += `<td class="text-center col-linked-date">${createdDisplay || ''}</td>`;
+            cells += `<td class="text-center col-linked-actions">${actionsHtml}</td>`;
+        }
+        
+        return `<tr>${cells}</tr>`;
     }
 
     formatDateTime(dateValue) {
@@ -1116,6 +1407,18 @@ class EntityDetailsRenderer {
         }
     }
 
+    /**
+     * Get status badge HTML - Fallback function
+     * 
+     * ⚠️ FALLBACK ONLY - משמש רק כ-Fallback אם FieldRendererService לא זמין
+     * 
+     * העדיפות היא להשתמש ב-FieldRendererService.renderStatus() אם זמין.
+     * פונקציה זו משמשת רק במקרים שבהם FieldRendererService לא זמין.
+     * 
+     * @param {string} status - סטטוס הישות
+     * @returns {string} HTML של badge סטטוס
+     * @private
+     */
     getStatusBadge(status) {
         if (!status) {
             return '<span class="badge bg-light text-muted">לא זמין</span>';
@@ -1137,26 +1440,6 @@ class EntityDetailsRenderer {
             : status;
 
         return `<span class="${badgeClass}">${label}</span>`;
-    }
-
-    getCleanEntityName(item = {}) {
-        if (!item || typeof item !== 'object') {
-            return 'לא זמין';
-        }
-
-        const candidates = [
-            item.display_name,
-            item.name,
-            item.title,
-            item.symbol,
-            item.ticker_symbol,
-            item.account_name,
-            item.description,
-            item.id
-        ];
-
-        const value = candidates.find(val => val !== undefined && val !== null && val !== '') ?? 'לא זמין';
-        return typeof value === 'number' ? value.toString() : value;
     }
 
     getEntityIcon(entityType) {
@@ -1307,8 +1590,8 @@ class EntityDetailsRenderer {
                         <span class="badge bg-light text-dark d-inline-block" style="word-break: break-word; max-width: 100%; overflow-wrap: break-word; white-space: normal;">${externalId}</span>
                     </div>
                     ` : ''}
-                </div>
-                
+                    </div>
+                    
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">עמלה:</label>
                     <span>${fee}</span>
@@ -1322,7 +1605,7 @@ class EntityDetailsRenderer {
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">MTM P/L:</label>
                     <span>${mtmPL}</span>
-                </div>
+                    </div>
                 
                 ${tradeId ? `
                 <div class="mb-3 d-flex align-items-center">
@@ -1332,7 +1615,7 @@ class EntityDetailsRenderer {
                             טרייד #${tradeId}${tradeSymbol ? ` (${tradeSymbol})` : ''}
                         </a>
                     </span>
-                </div>
+                    </div>
                 ` : ''}
                 
                 ${notes ? `
@@ -1341,7 +1624,7 @@ class EntityDetailsRenderer {
                     <p class="mb-0">${window.FieldRendererService && window.FieldRendererService.renderTextPreview ? 
                         window.FieldRendererService.renderTextPreview(notes, { maxLength: 500 }) : 
                         (notes.length > 500 ? notes.substring(0, 500) + '...' : notes)}</p>
-                </div>
+                    </div>
                 ` : ''}
             </div>
         `;
@@ -1490,14 +1773,14 @@ class EntityDetailsRenderer {
         if (!this.entityColors.trading_account) {
             window.Logger.error('❌ trading_account color not found in entityColors!', { entityColors: this.entityColors }, { page: "entity-details-renderer" });
         }
-
+        
         const accountColor = this.entityColors.trading_account || '#0d6efd';
         const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
             ? window.FieldRendererService.renderStatus(accountData.status, 'trading_account')
             : '';
-
+        
         const accountName = accountData.name || accountData.account_name || 'לא מוגדר';
-
+        
         const defaultAccountInfo = await this.getDefaultAccountInfo();
         const currentAccountId = accountData.id ? parseInt(accountData.id, 10) : null;
         let defaultAccountId = null;
@@ -1520,18 +1803,28 @@ class EntityDetailsRenderer {
             }
         }
         accountData.is_default_trading_account = isDefaultAccount;
-
-        const currencySymbol = accountData.base_currency_symbol || accountData.currency_symbol || '';
-        const currencyName = accountData.base_currency_name || accountData.currency_name || '';
+        
+        const balancesData = (accountData.balances && typeof accountData.balances === 'object') ? accountData.balances : null;
+        const currencySymbol = accountData.base_currency_symbol || balancesData?.base_currency || accountData.currency_symbol || '';
+        const currencyName = accountData.base_currency_name || accountData.currency_name || balancesData?.base_currency_name || '';
         const formattingContext = { ...accountData };
         if (!formattingContext.currency_symbol && currencySymbol) {
             formattingContext.currency_symbol = currencySymbol;
         }
 
-        const positionsValue = Number(accountData.positions_total_value ?? accountData.total_positions_value ?? 0);
-        const baseCurrencyTotalValue = Number(accountData.base_currency_total ?? accountData.base_currency_balance ?? 0);
-        const totalAccountValue = Number(accountData.total_account_value ?? accountData.account_total_value ?? (baseCurrencyTotalValue + positionsValue));
-        const currencyBalancesRaw = Array.isArray(accountData.currency_balances) ? accountData.currency_balances : [];
+        const positionsValue = Number(accountData.positions_total_value ?? accountData.total_positions_value ?? balancesData?.positions_total_value ?? 0);
+        const baseCurrencyTotalValue = Number(accountData.base_currency_total ?? accountData.base_currency_balance ?? balancesData?.base_currency_total ?? 0);
+        const totalAccountValue = Number(accountData.total_account_value ?? accountData.account_total_value ?? balancesData?.total_account_value ?? (baseCurrencyTotalValue + positionsValue));
+        const currencyBalancesSource = Array.isArray(accountData.currency_balances) && accountData.currency_balances.length
+            ? accountData.currency_balances
+            : (Array.isArray(balancesData?.currencies) ? balancesData.currencies : []);
+        const currencyBalancesRaw = currencyBalancesSource.map(balance => ({
+            currency_id: balance.currency_id,
+            currency_symbol: balance.currency_symbol,
+            currency_name: balance.currency_name,
+            balance: typeof balance.balance === 'number' ? balance.balance : Number(balance.balance || 0),
+            is_base: Boolean(balance.is_base)
+        }));
         const currencyBalances = currencyBalancesRaw.filter(item => Math.abs(item.balance || 0) > 0.0001);
 
         const baseCurrencyLabelText = currencySymbol
@@ -1568,8 +1861,21 @@ class EntityDetailsRenderer {
             }).join('')
             : '<li class="text-muted">אין יתרות פעילות</li>';
 
+        let linkedItemsArray = Array.isArray(accountData.linked_items) ? accountData.linked_items : [];
+        if ((!linkedItemsArray || linkedItemsArray.length === 0) && window.entityDetailsAPI && typeof window.entityDetailsAPI.getLinkedItems === 'function') {
+            try {
+                const fetchedLinkedItems = await window.entityDetailsAPI.getLinkedItems('trading_account', currentAccountId || accountData.id);
+                if (Array.isArray(fetchedLinkedItems)) {
+                    linkedItemsArray = fetchedLinkedItems;
+                    accountData.linked_items = fetchedLinkedItems;
+                }
+            } catch (linkedItemsError) {
+                window.Logger?.warn('⚠️ Failed to load trading account linked items in renderer', linkedItemsError, { page: 'entity-details-renderer' });
+            }
+        }
+
         const linkedItemsSection = this.renderLinkedItems(
-            accountData.linked_items || [],
+            linkedItemsArray,
             accountColor,
             'trading_account',
             accountData.id,
@@ -1584,8 +1890,8 @@ class EntityDetailsRenderer {
                         <span class="entity-card-title fs-4 fw-bold">${accountName}</span>
                         ${statusDisplay || ''}
                     </div>
-                </div>
-
+                        </div>
+                        
                 <div class="row g-3 align-items-stretch">
                     <div class="col-lg-6">
                         <div class="card h-100 border-0 shadow-sm">
@@ -1597,53 +1903,62 @@ class EntityDetailsRenderer {
                                     <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
                                         <span class="text-muted">מזהה</span>
                                         <span class="fw-bold">${accountData.id ?? '-'}</span>
-                                    </div>
+                            </div>
                                     <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
                                         <span class="text-muted">מטבע ראשי</span>
                                         ${baseCurrencyHtml}
-                                    </div>
+                        </div>
                                     <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
                                         <span class="text-muted">חשבון ברירת מחדל</span>
                                         ${defaultAccountHtml}
-                                    </div>
+                    </div>
                                     <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
                                         <span class="text-muted">תאריך יצירה</span>
                                         ${createdAtHtml}
-                                    </div>
+                </div>
                                     <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
                                         <span class="text-muted">סה״כ שווי פוזיציות</span>
                                         ${positionsValueHtml}
-                                    </div>
+                            </div>
                                     <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
                                         <span class="text-muted">סה״כ שווי חשבון</span>
                                         ${totalAccountValueHtml}
-                                    </div>
-                                </div>
+                            </div>
+                            </div>
                                 <div class="mt-4">
                                     <h6 class="text-muted mb-2">הערות</h6>
                                     <div class="border rounded p-3 bg-light">${notesHtml}</div>
-                                </div>
-                            </div>
                         </div>
+                    </div>
+                </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="card h-100 border-0 shadow-sm">
                             <div class="card-header bg-transparent border-bottom">
                                 <h6 class="mb-0">יתרות מטבע</h6>
-                            </div>
+                    </div>
                             <div class="card-body d-flex flex-column">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">סה״כ שווי פוזיציות</span>
+                                        ${positionsValueHtml}
+                </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <span class="text-muted">סה״כ שווי חשבון</span>
+                                        ${totalAccountValueHtml}
+                    </div>
+                                </div>
                                 <ul class="list-unstyled mb-4 flex-grow-1">
                                     ${balancesListHtml}
                                 </ul>
-                                <div class="pt-3 border-top d-flex justify-content-between align-items-center">
-                                    <span class="text-muted">סה״כ במטבע הבסיס</span>
-                                    ${baseCurrencyTotalHtml}
-                                </div>
-                            </div>
+                                <div class="pt-3 border-top small text-muted">
+                                    הנתונים כוללים יתרות פעילות בלבד. שערי ההמרה העדכניים: ${Object.keys(accountData.exchange_rates_used || {}).length ? Object.entries(accountData.exchange_rates_used).map(([symbol, rate]) => `${symbol}: ${Number(rate).toFixed(4)}`).join(', ') : 'לא זמינים'}
+                </div>
+                    </div>
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="row g-3 mt-4">
                     <div class="col-12">
                         ${linkedItemsSection}
@@ -1740,7 +2055,7 @@ class EntityDetailsRenderer {
         const messageHtml = alertData.message && String(alertData.message).trim()
             ? alertData.message
             : '<span class="text-muted">אין הודעה</span>';
-
+        
         return `
             <div class="row g-3 align-items-start">
                 <div class="col-md-6">
@@ -1748,19 +2063,19 @@ class EntityDetailsRenderer {
                         <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <span class="text-muted fw-bold">מספר:</span>
                             <span class="text-break">${alertData.id ?? '-'}</span>
-                        </div>
+                    </div>
                         <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <span class="text-muted fw-bold">הופעל:</span>
                             <span class="text-break">${triggeredBadge}</span>
-                        </div>
+                    </div>
                         <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <span class="text-muted fw-bold">תאריך יצירה:</span>
                             <span class="text-break">${createdAtDisplay}</span>
-                        </div>
+                    </div>
                         <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <span class="text-muted fw-bold">תאריך תפוגה:</span>
                             <span class="text-break">${expiryDisplay}</span>
-                        </div>
+                    </div>
                         ${triggeredAtDisplay ? `
                             <div class="d-flex justify-content-between align-items-center flex-wrap">
                                 <span class="text-muted fw-bold">תאריך הפעלה:</span>
@@ -2067,7 +2382,7 @@ class EntityDetailsRenderer {
                         ${this.renderBasicInfo(cashFlowData, 'cash_flow')}
                     </div>
                     <div class="col-md-6">
-                        ${this.renderCashFlowSpecific(cashFlowData)}
+                        ${this.renderCashFlowSpecific(cashFlowData, { section: 'secondary' })}
                     </div>
                 </div>
                 
@@ -2089,39 +2404,59 @@ class EntityDetailsRenderer {
     /**
      * Render cash flow specific information - רנדור מידע ספציפי לתזרים מזומנים
      */
-    renderCashFlowSpecific(cashFlowData) {
+    renderCashFlowSpecific(cashFlowData, options = {}) {
+        const section = (options && options.section) ? options.section : 'primary';
+        const { symbol, name, displayHtml } = this._resolveCashFlowCurrencyDetails(cashFlowData);
         const amount = Number(cashFlowData.amount || 0);
-        const currencySymbol = cashFlowData.currency_symbol ||
-            (cashFlowData.currency && cashFlowData.currency.symbol) ||
-            '';
+        const flowDate = cashFlowData.date || cashFlowData.flow_date || cashFlowData.created_at || null;
+        const formattedDate = flowDate ? this.formatDate(flowDate) : 'לא זמין';
 
         const amountHtml = (window.FieldRendererService && window.FieldRendererService.renderAmount)
-            ? window.FieldRendererService.renderAmount(amount, currencySymbol, 2, true)
-            : `<span class="${amount >= 0 ? 'text-success' : 'text-danger'} fw-bold" dir="ltr">${currencySymbol}${Math.abs(amount).toFixed(2)}</span>`;
+            ? window.FieldRendererService.renderAmount(amount, symbol || '', 0, true)
+            : `<span class="${amount >= 0 ? 'text-success' : 'text-danger'} fw-bold" dir="ltr">${(symbol || '')}${Math.abs(amount).toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 })}</span>`;
+
+        if (section === 'primary') {
+            const typeHtml = cashFlowData.type
+                ? (window.FieldRendererService && window.FieldRendererService.renderType
+                    ? window.FieldRendererService.renderType(cashFlowData.type, amount)
+                    : `<span class="badge bg-secondary">${this.translateCashFlowType(cashFlowData.type)}</span>`)
+                : '<span class="text-muted">לא זמין</span>';
+
+            const currencyNameDisplay = name || 'לא זמין';
+        
+        return `
+                <div class="cash-flow-primary">
+                    <h6 class="border-bottom pb-2 mb-3">נתונים כספיים</h6>
+
+                    <div class="mb-3 d-flex align-items-center">
+                        <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך:</label>
+                        <span class="text-muted">${formattedDate}</span>
+                    </div>
+
+                    <div class="mb-3 d-flex align-items-center">
+                        <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סוג תזרים:</label>
+                        ${typeHtml}
+                </div>
+                
+                    <div class="mb-3 d-flex align-items-center">
+                        <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סכום:</label>
+                        <div class="d-flex align-items-center gap-2">
+                            ${amountHtml}
+                        </div>
+                </div>
+                
+                    <div class="mb-3 d-flex align-items-center">
+                        <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מטבע:</label>
+                        <span class="text-muted">${currencyNameDisplay}</span>
+                </div>
+                </div>
+            `;
+        }
 
         const feeAmount = Number(cashFlowData.fee_amount || 0);
         const feeHtml = (window.FieldRendererService && window.FieldRendererService.renderAmount)
-            ? window.FieldRendererService.renderAmount(feeAmount, currencySymbol, 2, true)
-            : `<span class="${feeAmount >= 0 ? 'text-success' : 'text-danger'} fw-bold" dir="ltr">${currencySymbol}${Math.abs(feeAmount).toFixed(2)}</span>`;
-
-        const currencyName = cashFlowData.currency_name ||
-                             (cashFlowData.currency && cashFlowData.currency.name) ||
-                             '';
-        let currencyDisplay = '<span class="text-muted">לא זמין</span>';
-        if (currencySymbol || currencyName) {
-            if (window.FieldRendererService && typeof window.FieldRendererService.renderCurrency === 'function') {
-                currencyDisplay = window.FieldRendererService.renderCurrency(
-                    cashFlowData.currency_id || null,
-                    currencyName,
-                    currencySymbol || currencyName || ''
-                );
-            } else {
-                const symbolText = currencySymbol ? currencySymbol : '';
-                const nameText = currencyName ? ` (${currencyName})` : '';
-                const combined = `${symbolText}${nameText}`.trim();
-                currencyDisplay = `<span class="text-muted" dir="ltr">${combined || currencyName || symbolText}</span>`;
-            }
-        }
+            ? window.FieldRendererService.renderAmount(feeAmount, symbol || '', 0, true)
+            : `<span class="${feeAmount >= 0 ? 'text-success' : 'text-danger'} fw-bold" dir="ltr">${(symbol || '')}${Math.abs(feeAmount).toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 })}</span>`;
 
         let tradeDisplay = '<span class="text-muted">לא מקושר</span>';
         if (cashFlowData.trade_id) {
@@ -2151,20 +2486,8 @@ class EntityDetailsRenderer {
             ? `<span class="badge bg-light text-dark text-break" style="word-break: break-word; max-width: 100%;">${cashFlowData.external_id}</span>`
             : '<span class="text-muted">לא זמין</span>';
 
-        const typeDisplay = cashFlowData.type
-            ? `<span class="badge bg-secondary">${this.translateCashFlowType(cashFlowData.type)}</span>`
-            : '<span class="text-muted">לא זמין</span>';
-
         return `
-            <div class="cash-flow-specific">
-                <h6 class="border-bottom pb-2 mb-3">פרטי תזרים</h6>
-
-                <div class="mb-3 d-flex align-items-center">
-                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סכום:</label>
-                    <div class="d-flex align-items-center gap-2">
-                        ${amountHtml}
-                    </div>
-                </div>
+            <div class="cash-flow-secondary mt-4">
 
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">עמלה:</label>
@@ -2172,41 +2495,112 @@ class EntityDetailsRenderer {
                         ${feeHtml}
                     </div>
                 </div>
-
+                
                 <div class="mb-3 d-flex align-items-center">
-                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מטבע:</label>
-                    <span class="d-flex align-items-center gap-2">${currencyDisplay}</span>
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מקור:</label>
+                    ${sourceDisplay}
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מזהה חיצוני:</label>
+                    ${externalIdDisplay}
                 </div>
 
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">טרייד מקושר:</label>
                     <span class="d-flex align-items-center gap-2">${tradeDisplay}</span>
                 </div>
-
-                <div class="mb-3 d-flex align-items-center">
-                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סוג תזרים:</label>
-                    ${typeDisplay}
-                </div>
-
-                <div class="mb-3">
-                    <div class="d-flex align-items-center mb-2">
-                        <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מקור:</label>
-                        ${sourceDisplay}
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מזהה חיצוני:</label>
-                        ${externalIdDisplay}
-                    </div>
-                </div>
-
-                ${cashFlowData.description ? `
-                    <div class="mb-3">
-                        <label class="form-label fw-bold me-2 mb-2 d-block">תיאור:</label>
-                        <div class="p-3 bg-light rounded border" style="white-space: pre-wrap;">${cashFlowData.description}</div>
-                    </div>
-                ` : ''}
             </div>
         `;
+    }
+
+    _resolveCashFlowCurrencyDetails(cashFlowData) {
+        const fallbackSymbols = {
+            USD: '$',
+            ILS: '₪',
+            EUR: '€',
+            GBP: '£',
+            JPY: '¥',
+            CAD: 'C$',
+            AUD: 'A$',
+            CHF: '₣',
+            NZD: 'NZ$',
+            SEK: 'kr',
+            NOK: 'kr',
+            DKK: 'kr',
+            ZAR: 'R',
+            CNY: '¥',
+            HKD: 'HK$',
+            SGD: 'S$',
+            RUB: '₽',
+            TRY: '₺',
+            INR: '₹',
+            MXN: '$'
+        };
+
+        let symbol = cashFlowData.currency_symbol ||
+            (cashFlowData.currency && (cashFlowData.currency.symbol || cashFlowData.currency.code)) ||
+            '';
+        let name = cashFlowData.currency_name ||
+            (cashFlowData.currency && cashFlowData.currency.name) ||
+            '';
+        let code = cashFlowData.currency_code ||
+            (cashFlowData.currency && (cashFlowData.currency.code || cashFlowData.currency.symbol)) ||
+            '';
+
+        if (!code && typeof symbol === 'string' && symbol.length === 3 && /^[A-Z]+$/.test(symbol)) {
+            code = symbol;
+        }
+
+        if (cashFlowData.currency_id && typeof window !== 'undefined' && typeof window.getCurrencyDisplay === 'function') {
+            try {
+                const currencyInfo = window.getCurrencyDisplay(cashFlowData.currency_id);
+                if (currencyInfo) {
+                    if (currencyInfo.symbol) {
+                        symbol = currencyInfo.symbol;
+                    }
+                    if (currencyInfo.name) {
+                        name = currencyInfo.name;
+                    }
+                    if (currencyInfo.code) {
+                        code = currencyInfo.code;
+                    }
+                }
+            } catch (error) {
+                window.Logger?.warn('⚠️ [CASH_FLOW_RENDER] getCurrencyDisplay failed', error, { page: 'entity-details-renderer' });
+            }
+        }
+
+        if ((!symbol || /^[A-Z]{3}$/.test(symbol || '')) && code) {
+            const mapped = fallbackSymbols[String(code).toUpperCase()];
+            if (mapped) {
+                symbol = mapped;
+            }
+        }
+
+        if (symbol && /^[A-Z]{3}$/.test(symbol)) {
+            symbol = '';
+        }
+
+        let displayHtml = '<span class="text-muted">לא זמין</span>';
+        if (symbol || name) {
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderCurrency === 'function') {
+                displayHtml = window.FieldRendererService.renderCurrency(
+                    cashFlowData.currency_id || null,
+                    name,
+                    symbol || ''
+                );
+            } else {
+                const combined = `${symbol || ''}${name ? ` (${name})` : ''}`.trim();
+                displayHtml = `<span class="text-muted" dir="ltr">${combined || name || symbol || ''}</span>`;
+            }
+        }
+
+        return {
+            symbol: typeof symbol === 'string' ? symbol : '',
+            name: typeof name === 'string' ? name : '',
+            displayHtml
+        };
     }
 
     /**
@@ -2227,6 +2621,36 @@ class EntityDetailsRenderer {
         };
         const key = (type || '').toLowerCase();
         return translations[key] || type;
+    }
+
+    translateNoteRelationType(rawType) {
+        if (!rawType) {
+            return '';
+        }
+
+        const normalized = String(rawType).toLowerCase().replace(/[-\s]/g, '_');
+        const mapping = {
+            'trade': 'טרייד',
+            'trades': 'טרייד',
+            'trade_plan': 'תכנית מסחר',
+            'trade_plans': 'תכנית מסחר',
+            'ticker': 'טיקר',
+            'tickers': 'טיקר',
+            'trading_account': 'חשבון מסחר',
+            'trading_accounts': 'חשבון מסחר',
+            'account': 'חשבון מסחר',
+            'accounts': 'חשבון מסחר',
+            'execution': 'ביצוע',
+            'executions': 'ביצוע',
+            'cash_flow': 'תזרים',
+            'cash_flows': 'תזרים',
+            'alert': 'התראה',
+            'alerts': 'התראה',
+            'note': 'הערה',
+            'notes': 'הערה'
+        };
+
+        return mapping[normalized] || rawType;
     }
 
     /**
@@ -2251,8 +2675,39 @@ class EntityDetailsRenderer {
      */
     renderCashFlowLinkedItems(cashFlowData) {
         // Use the general renderLinkedItems method like other entities
-        const linkedItems = cashFlowData.linked_items || [];
+        let linkedItems = Array.isArray(cashFlowData.linked_items) ? [...cashFlowData.linked_items] : [];
         const entityColor = this.entityColors.cash_flow || '#fd7e14';
+
+        const tradingAccountId = cashFlowData.trading_account_id 
+            || cashFlowData.account?.id 
+            || cashFlowData.account_id 
+            || null;
+        const tradingAccountName = cashFlowData.trading_account_name 
+            || cashFlowData.account_name 
+            || cashFlowData.account?.name 
+            || (tradingAccountId ? `חשבון #${tradingAccountId}` : null);
+
+        if (tradingAccountId) {
+            const hasTradingAccountLinked = linkedItems.some(item => {
+                if (!item) return false;
+                const itemType = (item.type || item.entity_type || '').toLowerCase();
+                const itemId = Number(item.id ?? item.entity_id ?? item.linked_id);
+                return ['trading_account', 'account'].includes(itemType) && !Number.isNaN(itemId) && itemId === Number(tradingAccountId);
+            });
+
+            if (!hasTradingAccountLinked) {
+                linkedItems.push({
+                    id: tradingAccountId,
+                    type: 'trading_account',
+                    title: tradingAccountName,
+                    name: tradingAccountName,
+                    status: cashFlowData.account?.status || null,
+                    created_at: cashFlowData.created_at || null,
+                    description: tradingAccountName ? `חשבון מסחר: ${tradingAccountName}` : 'חשבון מסחר מקושר'
+                });
+            }
+        }
+
         return this.renderLinkedItems(linkedItems, entityColor, 'cash_flow', cashFlowData.id, null, { disableFilter: true });
     }
 
@@ -2271,7 +2726,10 @@ class EntityDetailsRenderer {
             return '';
         }
         
-        return entityTypes.map(entityType => this._generateFilterButton(entityType, tableId)).join('');
+        // Use Set to prevent duplicate buttons
+        const uniqueEntityTypes = [...new Set(entityTypes)];
+        
+        return uniqueEntityTypes.map(entityType => this._generateFilterButton(entityType, tableId)).join('');
     }
     
     /**
@@ -2330,6 +2788,82 @@ class EntityDetailsRenderer {
         };
         return labels[entityType] || entityType;
     }
+    
+    /**
+     * Get status display or alternative data for entities without status
+     * @private
+     * @param {Object} item - Linked item object
+     * @returns {string} HTML for status or alternative display
+     */
+    _getStatusOrAlternativeDisplay(item) {
+        const entityType = String(item.type || '').toLowerCase();
+        
+        // Entities that have status - show status
+        if (['trade', 'trade_plan', 'alert', 'trading_account', 'ticker'].includes(entityType)) {
+            if (window.FieldRendererService && window.FieldRendererService.renderStatus) {
+                return window.FieldRendererService.renderStatus(item.status, item.type);
+            }
+            return this.getStatusBadge(item.status);
+        }
+        
+        // Entities without status - show alternative data
+        if (entityType === 'note') {
+            // Show note content (truncated)
+            const content = item.content || item.note_content || '';
+            const truncatedContent = content.length > 50 
+                ? content.substring(0, 50) + '...' 
+                : content;
+            return truncatedContent 
+                ? `<span class="text-muted small" data-tooltip="${this._escapeHtml(content)}" data-tooltip-placement="top">${this._escapeHtml(truncatedContent)}</span>`
+                : '<span class="text-muted">אין תוכן</span>';
+        }
+        
+        if (entityType === 'cash_flow') {
+            // Show cash flow type and amount
+            const flowType = item.type || item.flow_type || '';
+            const amount = item.amount || 0;
+            const currencySymbol = item.currency_symbol || '$';
+            const typeDisplay = flowType ? `<span class="badge bg-info text-dark me-1">${this._escapeHtml(String(flowType))}</span>` : '';
+            const amountDisplay = amount !== 0 ? `${currencySymbol}${parseFloat(amount).toFixed(2)}` : '-';
+            return `${typeDisplay}${amountDisplay}`;
+        }
+        
+        if (entityType === 'execution') {
+            // Show side and quantity
+            const side = item.side || '';
+            const quantity = item.quantity || 0;
+            const sideDisplay = side && window.FieldRendererService && window.FieldRendererService.renderSide
+                ? window.FieldRendererService.renderSide(side)
+                : (side ? `<span class="badge bg-secondary me-1">${this._escapeHtml(String(side))}</span>` : '');
+            const quantityDisplay = quantity ? `<span class="text-muted">כמות: ${parseFloat(quantity).toFixed(2)}</span>` : '';
+            return sideDisplay ? `${sideDisplay} ${quantityDisplay}`.trim() : quantityDisplay || '<span class="text-muted">-</span>';
+        }
+        
+        // Default: show status if exists, otherwise show "-"
+        if (item.status !== null && item.status !== undefined) {
+            if (window.FieldRendererService && window.FieldRendererService.renderStatus) {
+                return window.FieldRendererService.renderStatus(item.status, item.type);
+            }
+            return this.getStatusBadge(item.status);
+        }
+        
+        return '<span class="text-muted">-</span>';
+    }
+    
+    /**
+     * Escape HTML special characters
+     * @private
+     * @param {string} text - Text to escape
+     * @returns {string} Escaped text
+     */
+    _escapeHtml(text) {
+        if (typeof text !== 'string') {
+            text = String(text || '');
+        }
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
     /**
      * Render note details - רנדור פרטי הערה
      * 
@@ -2341,38 +2875,177 @@ class EntityDetailsRenderer {
     renderNote(noteData, options = {}) {
         // קבלת צבע ההערה מההעדפות
         const noteColor = this.entityColors.note || '#6c757d';
-        
-        // סטטוס למעלה - שימוש במערכת הרינדור הכללית
-        const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
-            ? window.FieldRendererService.renderStatus(noteData.status || 'active', 'note')
-            : '';
+        const sourceInfo = options?.sourceInfo || null;
+        const linkedItemsOptions = Object.assign({}, options, { disableFilter: true });
+        const sanitizedContent = this._sanitizeRichText(noteData?.content);
+        const contentHtml = `
+            <div class="note-content-section">
+                <h6 class="border-bottom pb-2 mb-3" style="border-color: ${noteColor} !important;">תוכן ההודעה</h6>
+                <div class="note-content text-break" dir="auto">
+                    ${sanitizedContent || '<span class="text-muted">אין תוכן</span>'}
+                </div>
+            </div>
+        `;
+        const attachmentHtml = this._renderNoteAttachment(noteData, noteColor);
         
         return `
             <div class="entity-details-container note-details">
                 
-                <!-- סטטוס למעלה -->
-                ${statusDisplay ? `<div class="mb-3 d-flex justify-content-start align-items-center gap-2">
-                    <strong>סטטוס:</strong>
-                    ${statusDisplay}
-                </div>` : ''}
-                
-                <!-- מידע בסיסי בשתי עמודות -->
+                <!-- מידע בסיסי + תוכן -->
                 <div class="row g-3">
                     <div class="col-md-6">
                         ${this.renderBasicInfo(noteData, 'note', noteColor)}
                     </div>
-                    <div class="col-md-6">
-                        ${this.renderAdditionalInfo(noteData, 'note', noteColor)}
+                    <div class="col-md-6 d-flex flex-column gap-4">
+                        ${contentHtml}
+                        ${attachmentHtml}
                     </div>
                 </div>
                 
                 <div class="row g-3 mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(noteData.linked_items || [], noteColor, 'note', noteData.id, options?.sourceInfo || null, options)}
+                        ${this.renderLinkedItems(noteData.linked_items || [], noteColor, 'note', noteData.id, sourceInfo, linkedItemsOptions)}
                     </div>
                 </div>
             </div>
         `;
+    }
+    
+    _sanitizeRichText(html) {
+        if (!html) {
+            return '';
+        }
+        
+        if (window.RichTextEditorService && typeof window.RichTextEditorService.sanitizeHTML === 'function') {
+            return window.RichTextEditorService.sanitizeHTML(html);
+        }
+        
+        if (typeof window !== 'undefined' && window.DOMPurify && typeof window.DOMPurify.sanitize === 'function') {
+            try {
+                return window.DOMPurify.sanitize(String(html), {
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'span', 'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre'],
+                    ALLOWED_ATTR: ['href', 'target', 'rel', 'style', 'class', 'dir']
+                });
+            } catch (error) {
+                window.Logger?.warn('⚠️ [EntityDetailsRenderer] Failed to sanitize rich text', { error }, { page: 'entity-details-renderer' });
+            }
+        }
+        
+        return String(html)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/\n/g, '<br />');
+    }
+    
+    _renderNoteAttachment(noteData = {}, noteColor = '#6c757d') {
+        const attachment = noteData?.attachment;
+        const headerHtml = `<h6 class="border-bottom pb-2 mb-3" style="border-color: ${noteColor} !important;">קובץ מצורף</h6>`;
+        const escapeHtml = (value) => String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        
+        if (!attachment && attachment !== 0) {
+            return `
+                <div class="note-attachment-section">
+                    ${headerHtml}
+                    <span class="text-muted">אין קובץ מצורף</span>
+                </div>
+            `;
+        }
+        
+        const attachmentPath = String(attachment);
+        const fileName = this._extractAttachmentFileName(attachmentPath);
+        const fileUrl = `/api/notes/files/${encodeURI(attachmentPath)}`;
+        const attachmentMeta = this._getAttachmentMeta(fileName);
+        const extension = attachmentMeta.extension;
+        
+        let previewHtml = '';
+        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(extension)) {
+            previewHtml = `
+                <div class="border rounded bg-light p-2 text-center mb-2">
+                    <img src="${fileUrl}" alt="${escapeHtml(fileName)}" class="img-fluid rounded" style="max-height: 220px; object-fit: contain;" loading="lazy" />
+                </div>
+            `;
+        } else if (extension === 'pdf') {
+            previewHtml = `
+                <div class="border rounded bg-light p-2 mb-2">
+                    <embed src="${fileUrl}" type="application/pdf" class="w-100" style="height: 240px;" />
+                </div>
+            `;
+        } else {
+            previewHtml = `
+                <div class="border rounded bg-light p-3 d-flex align-items-center gap-2 mb-2">
+                    <span class="fs-4">${attachmentMeta.icon}</span>
+                    <span class="text-break" title="${escapeHtml(fileName)}">${escapeHtml(attachmentMeta.displayName)}</span>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="note-attachment-section">
+                ${headerHtml}
+                ${previewHtml}
+                <div class="d-flex align-items-center gap-2 mb-3 text-break">
+                    <span class="fs-5">${attachmentMeta.icon}</span>
+                    <span class="text-break" title="${escapeHtml(fileName)}">${escapeHtml(attachmentMeta.label)}</span>
+                </div>
+                <a href="${fileUrl}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
+                    פתיחת קובץ
+                </a>
+            </div>
+        `;
+    }
+    
+    _extractAttachmentFileName(attachment) {
+        if (!attachment) {
+            return '';
+        }
+        
+        const parts = String(attachment).split(/[/\\]/);
+        return parts[parts.length - 1];
+    }
+    
+    _getAttachmentMeta(fileName = '') {
+        const safeName = String(fileName || '').trim();
+        const extension = (safeName.split('.').pop() || '').toLowerCase();
+        let icon = '📄';
+        
+        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(extension)) {
+            icon = '🖼️';
+        } else if (extension === 'pdf') {
+            icon = '📕';
+        } else if (['doc', 'docx'].includes(extension)) {
+            icon = '📘';
+        } else if (['xls', 'xlsx'].includes(extension)) {
+            icon = '📊';
+        } else if (extension === 'txt') {
+            icon = '📄';
+        }
+        
+        const maxLength = 30;
+        const displayName = safeName || 'קובץ מצורף';
+        const label = displayName.length > maxLength
+            ? `${displayName.substring(0, maxLength).trimEnd()}…`
+            : displayName;
+        
+        const shortLabelLength = 10;
+        const tableStyleLabel = displayName.length > shortLabelLength
+            ? `${displayName.substring(0, shortLabelLength)}…`
+            : displayName;
+        
+        return {
+            icon,
+            extension,
+            displayName,
+            label,
+            tableStyleLabel
+        };
     }
     renderGeneric(entityData, entityType, options) { return '<div>ישות כללית</div>'; }
     
@@ -2394,77 +3067,25 @@ class EntityDetailsRenderer {
         // ניקוי הטבלה
         tbody.innerHTML = '';
         
-        // יצירת שורות חדשות - אותו קוד כמו ב-renderLinkedItems
+        // קבלת sourceInfo מהטבלה
+        const entityTypeAttr = table.closest('.modal')?.querySelector('[data-entity-type]')?.getAttribute('data-entity-type');
+        const entityIdAttr = table.closest('.modal')?.querySelector('[data-entity-id]')?.getAttribute('data-entity-id');
+        
+        const itemSourceInfo = {
+            sourceModal: 'entity-details',
+            sourceType: entityTypeAttr || this.currentEntityType,
+            sourceId: entityIdAttr || this.currentEntityId
+        };
+        
+        // יצירת שורות חדשות באמצעות הפונקציה המאוחדת
         sortedData.forEach(item => {
-            const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
-                ? window.LinkedItemsService.getEntityLabel(item.type)
-                : (window.getEntityLabel && typeof window.getEntityLabel === 'function'
-                    ? window.getEntityLabel(item.type)
-                    : item.type);
-            
-            const cleanName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
-                ? window.LinkedItemsService.formatLinkedItemName(item)
-                : this.getCleanEntityName(item);
-            
-            const linkedBadge = (window.FieldRendererService && window.FieldRendererService.renderLinkedEntity)
-                ? window.FieldRendererService.renderLinkedEntity(
-                    item.type,
-                    item.id,
-                    cleanName,
-                    {
-                        renderMode: 'linked-items-table',
-                        status: item.status,
-                        side: item.side,
-                        investment_type: item.investment_type
-                    }
-                )
-                : `
-                    <div class="linked-items-table-link d-flex flex-column align-items-start gap-1">
-                        <span class="linked-items-table-label fw-semibold text-body">${entityLabel}</span>
-                        <span class="linked-items-table-name text-muted small">${cleanName}</span>
-                </div>
-            `;
-            
-            const createdDisplay = this.formatDateTime(item.created_at || item.updated_at) || '';
-            
-            const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
-                ? window.FieldRendererService.renderStatus(item.status, item.type)
-                : this.getStatusBadge(item.status);
-            
-            const sideDisplay = (window.FieldRendererService && window.FieldRendererService.renderSide)
-                ? window.FieldRendererService.renderSide(item.side)
-                : (item.side ? `<span class="badge badge-secondary">${item.side}</span>` : '<span class="badge badge-secondary">-</span>');
-
-            const investmentDisplay = (window.FieldRendererService && window.FieldRendererService.renderType)
-                ? window.FieldRendererService.renderType(item.investment_type)
-                : (item.investment_type ? `<span class="badge badge-secondary">${item.investment_type}</span>` : '<span class="badge badge-secondary">-</span>');
-
-            const entityTypeAttr = table.closest('.modal')?.querySelector('[data-entity-type]')?.getAttribute('data-entity-type');
-            const entityIdAttr = table.closest('.modal')?.querySelector('[data-entity-id]')?.getAttribute('data-entity-id');
-            
-            const itemSourceInfo = {
-                sourceModal: 'entity-details',
-                sourceType: entityTypeAttr || this.currentEntityType,
-                sourceId: entityIdAttr || this.currentEntityId
-            };
-            
-            const actionsHtml = (window.LinkedItemsService && window.LinkedItemsService.generateLinkedItemActions)
-                ? window.LinkedItemsService.generateLinkedItemActions(item, 'table', { 
-                    entityColors: this.entityColors,
-                    sourceInfo: itemSourceInfo
-                })
-                : '';
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="linked-item-entity text-end col-linked-entity">${linkedBadge}</td>
-                <td class="text-center col-linked-status">${statusDisplay}</td>
-                <td class="text-center col-linked-side">${sideDisplay}</td>
-                <td class="text-center col-linked-investment">${investmentDisplay}</td>
-                <td class="text-center col-linked-date">${createdDisplay}</td>
-                <td class="text-center col-linked-actions">${actionsHtml}</td>
-            `;
-            tbody.appendChild(row);
+            const rowHtml = this._renderLinkedItemRow(item, tableId, itemSourceInfo);
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = rowHtml.trim();
+            const row = tempDiv.querySelector('tr');
+            if (row) {
+                tbody.appendChild(row);
+            }
         });
         
         // עדכון אייקוני המיון
@@ -2474,6 +3095,15 @@ class EntityDetailsRenderer {
         
         // Initialize tooltips for filter buttons
         this._initializeFilterTooltips(tableId);
+        
+        // Initialize buttons for action buttons
+        setTimeout(() => {
+            if (window.initializeButtons && typeof window.initializeButtons === 'function') {
+                window.initializeButtons();
+            } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+                window.ButtonSystem.initializeButtons();
+            }
+        }, 100);
     }
     
     /**
@@ -2802,65 +3432,192 @@ class EntityDetailsRenderer {
         let html = `
             <div class="basic-info">
                 <h6 class="border-bottom pb-2 mb-3" style="border-color: ${color} !important;">מידע בסיסי</h6>
-                
+        `;
+        
+        // תאריך יצירה מוצג רק עבור ישויות שאינן ticker (עבור ticker הוא מועבר לעמודה השנייה)
+        if (entityType !== 'ticker' && entityType !== 'cash_flow') {
+            html += `
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך יצירה:</label>
                     <span class="text-muted">${createdAt}</span>
                 </div>
-        `;
+            `;
+        }
         
         // Entity-specific fields
-        if (entityType === 'cash_flow') {
-            const currencySymbol = entityData.currency_symbol ||
-                                  entityData.currency_code ||
-                                  (entityData.currency && entityData.currency.symbol) ||
-                                  (entityData.currency && entityData.currency.code) ||
-                                  null;
-            const currencyName = entityData.currency_name ||
-                                 (entityData.currency && entityData.currency.name) ||
-                                 '';
+        if (entityType === 'ticker') {
+            const symbol = entityData.symbol || 'לא זמין';
+            const name = entityData.name || null;
             
-            console.log('🔍 [CASH_FLOW_BASIC_INFO] Currency Resolution:', {
-                currency_symbol: entityData.currency_symbol,
-                currency_code: entityData.currency_code,
-                currency_name: entityData.currency_name,
-                currency_object: entityData.currency,
-                resolved_symbol: currencySymbol,
-                resolved_name: currencyName
-            });
-            if (window.Logger) {
-                window.Logger.debug('🔍 [CASH_FLOW_BASIC_INFO] Currency values:', {
-                    currency_symbol: entityData.currency_symbol,
-                    currency_code: entityData.currency_code,
-                    currency_name: entityData.currency_name,
-                    currency_object: entityData.currency,
-                    resolved_currency_symbol: currencySymbol,
-                    resolved_currency_name: currencyName
-                }, { page: 'entity-details-renderer' });
-            }
+            // סטטוס
+            const status = entityData.status || null;
+            const statusDisplay = status && window.FieldRendererService && window.FieldRendererService.renderStatus
+                ? window.FieldRendererService.renderStatus(status, 'ticker')
+                : (status ? `<span class="badge bg-secondary">${status}</span>` : '<span class="text-muted">לא זמין</span>');
             
-            let currencyDisplay = '<span class="text-muted">לא זמין</span>';
-            if (currencySymbol || currencyName) {
-                if (window.FieldRendererService && typeof window.FieldRendererService.renderCurrency === 'function') {
-                    currencyDisplay = window.FieldRendererService.renderCurrency(
-                        entityData.currency_id || null,
-                        currencyName || '',
-                        currencySymbol || currencyName || ''
-                    );
-                } else {
-                    const symbolText = currencySymbol ? currencySymbol : '';
-                    const nameText = currencyName ? ` (${currencyName})` : '';
-                    const combined = `${symbolText}${nameText}`.trim();
-                    currencyDisplay = `<span class="text-muted" dir="ltr">${combined || currencyName || symbolText}</span>`;
-                }
+            // טריידים פעילים - בדיקה דינמית מתוך פריטים מקושרים
+            let activeTrades = 'לא זמין';
+            if (entityData.active_trades !== null && entityData.active_trades !== undefined) {
+                activeTrades = entityData.active_trades ? 'כן' : 'לא';
+            } else if (Array.isArray(entityData.linked_items) && entityData.linked_items.length > 0) {
+                // בדיקה דינמית מתוך פריטים מקושרים
+                const activeTradesList = entityData.linked_items.filter(item => {
+                    const itemType = String(item.type || '').toLowerCase();
+                    const itemStatus = String(item.status || '').toLowerCase();
+                    return (itemType === 'trade' || itemType === 'trade_plan') && itemStatus === 'open';
+                });
+                activeTrades = activeTradesList.length > 0 ? 'כן' : 'לא';
             }
             
             html += `
                 <div class="mb-3 d-flex align-items-center">
-                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מטבע:</label>
-                    ${currencyDisplay}
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סמל:</label>
+                    <span class="fw-bold">${symbol}</span>
+                </div>
+                
+                ${name ? `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">שם:</label>
+                    <span>${name}</span>
+                </div>
+                ` : ''}
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סטטוס:</label>
+                    <span>${statusDisplay}</span>
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">טריידים פעילים:</label>
+                    <span>${activeTrades}</span>
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך עדכון אחרון:</label>
+                    <span class="text-muted">${updatedAt}</span>
                 </div>
             `;
+            
+            // תאריך יצירה לא מוצג כאן - מועבר לעמודה השנייה
+        } else if (entityType === 'note') {
+            const relatedEntity = entityData.related_entity
+                || (Array.isArray(entityData.linked_items) && entityData.linked_items.length ? entityData.linked_items[0] : null);
+            const relatedTypeSource = (entityData.related_type_label || (relatedEntity && relatedEntity.type)) || '';
+            const relatedTypeDisplay = this.translateNoteRelationType(relatedTypeSource);
+
+            let relatedBadge = '<span class="text-muted">לא מקושר</span>';
+            if (relatedEntity && window.FieldRendererService && window.FieldRendererService.renderLinkedEntity) {
+                const cleanName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
+                    ? window.LinkedItemsService.formatLinkedItemName(relatedEntity)
+                    : (relatedEntity.description || relatedEntity.title || relatedEntity.name || relatedEntity.symbol || `#${relatedEntity.id || 'לא זמין'}`);
+                const meta = Object.assign(
+                    {
+                        renderMode: 'notes-table',
+                        status: relatedEntity.status,
+                        side: relatedEntity.side,
+                        investment_type: relatedEntity.investment_type,
+                        date: relatedEntity.date || relatedEntity.created_at || relatedEntity.updated_at || null,
+                        ticker: relatedEntity.ticker,
+                        planned_amount: relatedEntity.planned_amount
+                    },
+                    {}
+                );
+                relatedBadge = window.FieldRendererService.renderLinkedEntity(
+                    relatedEntity.type,
+                    relatedEntity.id,
+                    cleanName,
+                    meta
+                );
+            } else if (relatedEntity) {
+                const fallbackLabel = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
+                    ? window.LinkedItemsService.formatLinkedItemName(relatedEntity)
+                    : (relatedEntity.description || relatedEntity.title || relatedEntity.name || relatedEntity.symbol || `#${relatedEntity.id || 'לא זמין'}`);
+                relatedBadge = `
+                    <a href="#" class="entity-link d-inline-flex align-items-center gap-2"
+                       onclick="window.showEntityDetails && window.showEntityDetails('${relatedEntity.type}', ${relatedEntity.id}); return false;">
+                        <span class="badge bg-primary-subtle text-primary">🔗</span>
+                        <span>${fallbackLabel}</span>
+                    </a>
+                `;
+            }
+
+            html += `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סוג שיוך:</label>
+                    <span class="text-muted">${relatedTypeDisplay || 'לא זמין'}</span>
+                </div>
+                <div class="mb-3 d-flex align-items-start">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">רשומה מקושרת:</label>
+                    <div class="flex-grow-1">
+                        ${relatedBadge}
+                    </div>
+                </div>
+            `;
+
+            const updatedAtHtml = updatedAt && updatedAt !== createdAt
+                ? `<span class="text-muted">${updatedAt}</span>`
+                : '<span class="text-muted">-</span>';
+
+            html += `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך עדכון אחרון:</label>
+                    ${updatedAtHtml}
+                </div>
+            `;
+        } else if (entityType === 'cash_flow') {
+            const flowDate = entityData.date || entityData.flow_date || entityData.created_at || null;
+            const formattedFlowDate = flowDate ? this.formatDate(flowDate) : 'לא זמין';
+            const { symbol, name } = this._resolveCashFlowCurrencyDetails(entityData);
+            const amountValue = Number(entityData.amount || 0);
+            const amountHtml = (window.FieldRendererService && window.FieldRendererService.renderAmount)
+                ? window.FieldRendererService.renderAmount(amountValue, symbol || '', 0, true)
+                : `<span class="${amountValue >= 0 ? 'text-success' : 'text-danger'} fw-bold" dir="ltr">${(symbol || '')}${Math.abs(amountValue).toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 })}</span>`;
+            const typeHtml = entityData.type
+                ? (window.FieldRendererService && window.FieldRendererService.renderType
+                    ? window.FieldRendererService.renderType(entityData.type, amountValue)
+                    : `<span class="badge bg-secondary">${this.translateCashFlowType(entityData.type)}</span>`)
+                : '<span class="text-muted">לא זמין</span>';
+            const currencyNameDisplay = name || 'לא זמין';
+
+            html += `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך:</label>
+                    <span class="text-muted">${formattedFlowDate}</span>
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סוג תזרים:</label>
+                    ${typeHtml}
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סכום:</label>
+                    <div class="d-flex align-items-center gap-2">
+                        ${amountHtml}
+                    </div>
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מטבע:</label>
+                    <span class="text-muted">${currencyNameDisplay}</span>
+                </div>
+            `;
+
+            if (window.Logger) {
+                window.Logger.debug('🔍 [CASH_FLOW_BASIC_INFO] Currency values present (rendered in specific section)', {
+                    currency_symbol: entityData.currency_symbol,
+                    currency_code: entityData.currency_code,
+                    currency_name: entityData.currency_name,
+                    currency_object: entityData.currency
+                }, { page: 'entity-details-renderer' });
+            } else {
+                console.log('🔍 [CASH_FLOW_BASIC_INFO] Currency values present (rendered in specific section):', {
+                    currency_symbol: entityData.currency_symbol,
+                    currency_code: entityData.currency_code,
+                    currency_name: entityData.currency_name,
+                    currency_object: entityData.currency
+                });
+            }
         } else if (entityType === 'execution') {
             // טיקר - תמיכה ב-symbol (מ-to_dict) וגם ticker_symbol
             const tickerSymbol = entityData.ticker_symbol || 
@@ -2915,7 +3672,8 @@ class EntityDetailsRenderer {
             `;
         }
         
-        if (updatedAt !== '-' && updatedAt !== createdAt) {
+        // תאריך עדכון אחרון - עבור ticker כבר מוצג בתוך ה-if, עבור ישויות אחרות מוצג רק אם שונה מתאריך יצירה
+        if (entityType !== 'ticker' && entityType !== 'cash_flow' && updatedAt !== '-' && updatedAt !== createdAt) {
             html += `
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך עדכון אחרון:</label>
@@ -2948,8 +3706,7 @@ class EntityDetailsRenderer {
         
         // Entity-specific additional fields
         if (entityType === 'cash_flow') {
-            // For cash flows, all info is shown in renderCashFlowSpecific
-            // No additional fields needed here
+            // For cash flows, specific fields are rendered via renderCashFlowSpecific (primary/secondary sections)
         }
         // Execution uses renderExecutionSpecific instead of renderAdditionalInfo
         
@@ -3024,7 +3781,15 @@ class EntityDetailsRenderer {
             case 'currency':
             case 'amount': {
                 const symbol = this._resolveCurrencySymbol(data, renderer?.defaultCurrencySymbol || '');
-                const decimals = fieldKey && fieldKey.toLowerCase().includes('balance') ? 2 : 2;
+                const lowerKey = (fieldKey || '').toString().toLowerCase();
+                let decimals = 0;
+                if (lowerKey.includes('rate')) {
+                    decimals = 4;
+                } else if (lowerKey.includes('price')) {
+                    decimals = 2;
+                } else if (lowerKey.includes('percentage') || lowerKey.includes('percent')) {
+                    decimals = 2;
+                }
                 if (renderer && typeof renderer.renderAmount === 'function') {
                     return renderer.renderAmount(value, symbol, decimals, true);
                 }
@@ -3037,8 +3802,9 @@ class EntityDetailsRenderer {
                     maximumFractionDigits: decimals
                 });
                 const sign = numeric > 0 ? '+' : (numeric < 0 ? '-' : '');
+                const cssClass = numeric > 0 ? 'numeric-value-positive' : (numeric < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
                 const display = sign ? `${sign}${symbol}${absoluteFormatted}` : `${symbol}${absoluteFormatted}`;
-                return `<span class="text-body" dir="ltr">${display}</span>`;
+                return `<span class="${cssClass}" dir="ltr">${display}</span>`;
             }
             case 'number': {
                 if (renderer && typeof renderer.renderNumericValue === 'function') {
@@ -3116,174 +3882,27 @@ class EntityDetailsRenderer {
     }
 }
 
-// ===== GLOBAL FILTER FUNCTION FOR LINKED ITEMS TABLE =====
-
-/**
- * פילטר פריטים מקושרים לפי סוג ישות
- * Filter linked items by entity type
- * 
- * @param {string} tableId - ID של הטבלה
- * @param {string} type - סוג הישות ('all', 'account', 'trade', 'trade_plan', 'ticker', 'alert', 'execution', 'cash_flow', 'note')
- */
-window.filterLinkedItemsByType = function(tableId, type) {
-    // עדכון מצב הכפתורים
-    const filterContainer = document.getElementById(`linkedItemsFilter_${tableId}`);
-    if (filterContainer) {
-        const buttons = filterContainer.querySelectorAll('[data-type]');
-        buttons.forEach(btn => {
-            if (btn.getAttribute('data-type') === type) {
-                btn.classList.add('active');
-                btn.classList.remove('btn-outline-primary');
-                const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745' };
-                btn.style.backgroundColor = 'white';
-                btn.style.color = colors.positive || '#28a745';
-                btn.style.borderColor = colors.positive || '#28a745';
-            } else {
-                btn.classList.remove('active');
-                btn.classList.add('btn-outline-primary');
-                btn.style.backgroundColor = '';
-                btn.style.color = '';
-                btn.style.borderColor = '';
-            }
-        });
-    }
-    
-    // קבלת הנתונים המקוריים
-    if (!window.linkedItemsTableData || !window.linkedItemsTableData[tableId]) {
-        console.warn(`[filterLinkedItemsByType] No data found for table:`, tableId);
-        return;
-    }
-    
-    const allItems = window.linkedItemsTableData[tableId];
-    
-    // פילטור הנתונים
-    let filteredItems = allItems;
-    if (type !== 'all') {
-        // מיפוי סוגים - רק trading_account נתמך!
-        const typeMapping = {
-            'trading_account': ['trading_account'],
-            'trade': ['trade'],
-            'trade_plan': ['trade_plan'],
-            'ticker': ['ticker'],
-            'alert': ['alert'],
-            'execution': ['execution'],
-            'cash_flow': ['cash_flow'],
-            'note': ['note']
-        };
-        
-        const allowedTypes = typeMapping[type] || [];
-        if (allowedTypes.length > 0) {
-            filteredItems = allItems.filter(item => allowedTypes.includes(item.type));
-        }
-    }
-    
-    // עדכון הכותרת עם מספר הפריטים
-    const headerElement = document.querySelector(`#${tableId}`).closest('.entity-linked-items')?.querySelector('h6');
-    if (headerElement) {
-        // עדכון הטקסט של הכותרת (הצד הימני)
-        const titleSpan = headerElement.querySelector('span');
-        if (titleSpan) {
-            titleSpan.textContent = `פריטים מקושרים (${filteredItems.length})`;
-        } else {
-            // אם אין span, עדכון ישירות
-            const titleText = headerElement.childNodes[0];
-            if (titleText && titleText.nodeType === Node.TEXT_NODE) {
-                titleText.textContent = `פריטים מקושרים (${filteredItems.length})`;
-            } else {
-                // יצירת span חדש
-                const newSpan = document.createElement('span');
-                newSpan.textContent = `פריטים מקושרים (${filteredItems.length})`;
-                if (headerElement.firstChild) {
-                    headerElement.insertBefore(newSpan, headerElement.firstChild);
-                } else {
-                    headerElement.appendChild(newSpan);
-                }
-            }
-        }
-    }
-    
-    // עדכון הטבלה עם הנתונים המסוננים
-    if (window.entityDetailsRenderer && window.entityDetailsRenderer.updateLinkedItemsTableBody) {
-        window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, filteredItems);
-        // Initialize tooltips after table update
-        if (window.entityDetailsRenderer._initializeFilterTooltips) {
-            setTimeout(() => {
-                window.entityDetailsRenderer._initializeFilterTooltips(tableId);
-            }, 100);
-        }
-    } else {
-        console.warn(`[filterLinkedItemsByType] EntityDetailsRenderer not available`);
-    }
-    
-    if (window.Logger) {
-        window.Logger.info('✅ [filterLinkedItemsByType] Linked items filtered', {
-            tableId,
-            type,
-            totalItems: allItems.length,
-            filteredItems: filteredItems.length,
-            page: 'entity-details-renderer'
-        });
-    }
-};
-
-// ===== GLOBAL UPDATE FUNCTION FOR LINKED ITEMS TABLE =====
-
-/**
- * עדכון טבלת פריטים מקושרים לאחר מיון
- * Global function for updating linked items table after sorting
- * 
- * @param {string} tableId - ID של הטבלה
- * @param {Array} sortedData - נתונים ממוינים
- */
-window.updateLinkedItemsTable = function(tableId, sortedData) {
-    const table = document.getElementById(tableId);
-    if (!table || !sortedData) {
-        console.warn(`[updateLinkedItemsTable] Table or data not found:`, { tableId, hasTable: !!table, hasData: !!sortedData });
-        return;
-    }
-    
-    // עדכון הנתונים הגולמיים
-    if (!window.linkedItemsTableData) {
-        window.linkedItemsTableData = {};
-    }
-    window.linkedItemsTableData[tableId] = sortedData;
-    
-    // שמירת מצב הפילטר הנוכחי
-    const filterContainer = document.getElementById(`linkedItemsFilter_${tableId}`);
-    let currentFilterType = 'all';
-    if (filterContainer) {
-        const activeButton = filterContainer.querySelector('.active[data-type]');
-        if (activeButton) {
-            currentFilterType = activeButton.getAttribute('data-type') || 'all';
-        }
-    }
-    
-    // הפעלת הפילטר מחדש כדי לשמור את מצב הסינון
-    if (currentFilterType !== 'all') {
-        window.filterLinkedItemsByType(tableId, currentFilterType);
-    } else {
-        // אם אין סינון - עדכון רגיל
-        if (window.entityDetailsRenderer && window.entityDetailsRenderer.updateLinkedItemsTableBody) {
-            window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, sortedData);
-        } else {
-            console.warn(`[updateLinkedItemsTable] EntityDetailsRenderer not available`);
-        }
-    }
-};
-
 // ===== AUTO INITIALIZATION =====
 
 /**
- * Auto-initialize when DOM is ready - אתחול אוטומטי כשה-DOM מוכן
+ * Auto-initialize EntityDetailsRenderer - אתחול אוטומטי של EntityDetailsRenderer
  */
-// document.addEventListener('DOMContentLoaded', () => {
-//     try {
-//         // אתחול מערכת הרנדור
+try {
+    // אתחול מערכת Renderer והצמדה ל-window בצורה מאובטחת
+    if (!window.entityDetailsRenderer || !(window.entityDetailsRenderer instanceof EntityDetailsRenderer)) {
         window.entityDetailsRenderer = new EntityDetailsRenderer();
-        
-        window.Logger.info('Entity Details Renderer system loaded and ready', { page: "entity-details-renderer" });
-        
-//     } catch (error) {
-//         window.Logger.error('Error auto-initializing EntityDetailsRenderer:', error, { page: "entity-details-renderer" });
-//     }
-// });
+        if (typeof window.Logger !== 'undefined' && window.Logger.info) {
+            window.Logger.info('Entity Details Renderer system loaded and ready', { page: "entity-details-renderer" });
+        } else {
+            console.log('✅ Entity Details Renderer system loaded and ready');
+        }
+    } else if (typeof window.Logger !== 'undefined' && window.Logger.debug) {
+        window.Logger.debug('Entity Details Renderer already initialized - reusing existing instance', { page: "entity-details-renderer" });
+    }
+} catch (error) {
+    if (typeof window.Logger !== 'undefined' && window.Logger.error) {
+        window.Logger.error('Error auto-initializing EntityDetailsRenderer:', error, { page: "entity-details-renderer" });
+    } else {
+        console.error('❌ Error auto-initializing EntityDetailsRenderer:', error);
+    }
+}

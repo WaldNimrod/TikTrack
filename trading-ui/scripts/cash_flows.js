@@ -1104,9 +1104,9 @@ function formatCashFlowAmount(amount, type = null, currencySymbol = '$') {
   }
 
   const baseAmount = window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function'
-    ? window.FieldRendererService.renderAmount(effectiveAmount, currencySymbol || '$', 2, true)
+    ? window.FieldRendererService.renderAmount(effectiveAmount, currencySymbol || '$', 0, true)
     : (() => {
-        const absValue = Math.abs(effectiveAmount).toFixed(2);
+        const absValue = Math.abs(effectiveAmount).toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 });
         const sign = effectiveAmount < 0 ? '-' : (effectiveAmount > 0 ? '+' : '');
         const colorClass = effectiveAmount > 0 ? 'numeric-value-positive' : (effectiveAmount < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
         const base = `${currencySymbol || '$'}${absValue}`;

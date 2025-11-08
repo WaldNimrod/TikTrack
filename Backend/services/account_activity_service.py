@@ -24,6 +24,7 @@ from models.cash_flow import CashFlow
 from models.execution import Execution
 from models.currency import Currency
 from models.ticker import Ticker
+from services.currency_service import CurrencyService
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +62,9 @@ class AccountActivityService:
             if not account:
                 raise ValueError(f"Trading account {account_id} not found")
             
+            # Helper to track most recent transaction timestamp
+            last_transaction_dt: Optional[datetime] = account.created_at
+
             # Get all cash flows for this account
             cash_flows_query = db.query(CashFlow).options(
                 joinedload(CashFlow.currency)
@@ -148,7 +152,8 @@ class AccountActivityService:
             
             # Ensure base currency entry exists and include opening balance
             base_currency_id = account.currency_id if account.currency_id else 1
-            base_currency_symbol = account.currency.symbol if account.currency else 'USD'
+            base_currency_symbol_raw = account.currency.symbol if account.currency else 'USD'
+            base_currency_symbol = CurrencyService.get_display_symbol(base_currency_symbol_raw) or base_currency_symbol_raw
             base_currency_name = account.currency.name if account.currency else 'US Dollar'
             opening_balance = float(account.opening_balance or 0.0)
             
@@ -163,6 +168,8 @@ class AccountActivityService:
             
             if opening_balance != 0.0:
                 currencies_dict[base_currency_id]['balance'] += opening_balance
+                if account.created_at:
+                    last_transaction_dt = account.created_at
                 currencies_dict[base_currency_id]['opening_balance'] = opening_balance
                 currencies_dict[base_currency_id]['movements'].append({
                     'id': f'opening-balance-{account.id}',
@@ -188,7 +195,8 @@ class AccountActivityService:
                 is_exchange = CashFlowHelperService.is_currency_exchange(external_id)
                 
                 currency_id = cf.currency_id or 1  # Default to USD
-                currency_symbol = cf.currency.symbol if cf.currency else 'USD'
+                currency_symbol_raw = cf.currency.symbol if cf.currency else 'USD'
+                currency_symbol = CurrencyService.get_display_symbol(currency_symbol_raw) or currency_symbol_raw
                 
                 if currency_id not in currencies_dict:
                     currencies_dict[currency_id] = {
@@ -202,6 +210,15 @@ class AccountActivityService:
                 # Always update balance for all flows (including all exchange flows)
                 # For exchange flows, amount is already correctly signed (negative for other_negative, positive for other_positive)
                 currencies_dict[currency_id]['balance'] += float(cf.amount)
+
+                update_candidate_dates = [cf.date, getattr(cf, 'created_at', None)]
+                for candidate in update_candidate_dates:
+                    if candidate:
+                        candidate_dt = candidate
+                        if isinstance(candidate_dt, date) and not isinstance(candidate_dt, datetime):
+                            candidate_dt = datetime.combine(candidate_dt, datetime.max.time())
+                        if last_transaction_dt is None or (isinstance(candidate_dt, datetime) and candidate_dt > last_transaction_dt):
+                            last_transaction_dt = candidate_dt
                 
                 # For display: filter exchanges to show only other_negative
                 if is_exchange:
@@ -267,7 +284,8 @@ class AccountActivityService:
                     currency_id = 1  # Default to USD
                     currency = None
                 
-                currency_symbol = currency.symbol if currency else 'USD'
+                currency_symbol_raw = currency.symbol if currency else 'USD'
+                currency_symbol = CurrencyService.get_display_symbol(currency_symbol_raw) or currency_symbol_raw
                 
                 if currency_id not in currencies_dict:
                     currencies_dict[currency_id] = {
@@ -313,6 +331,15 @@ class AccountActivityService:
                 
                 # Update balance
                 currencies_dict[currency_id]['balance'] += execution_amount
+
+                update_candidate_dates = [ex.date, getattr(ex, 'created_at', None)]
+                for candidate in update_candidate_dates:
+                    if candidate:
+                        candidate_dt = candidate
+                        if isinstance(candidate_dt, date) and not isinstance(candidate_dt, datetime):
+                            candidate_dt = datetime.combine(candidate_dt, datetime.max.time())
+                        if last_transaction_dt is None or (isinstance(candidate_dt, datetime) and candidate_dt > last_transaction_dt):
+                            last_transaction_dt = candidate_dt
             
             # Sort movements by date (newest first)
             logger.info(f"📊 Sorting movements by currency...")
@@ -334,7 +361,8 @@ class AccountActivityService:
             currencies_list = list(currencies_dict.values())
             
             # Get base currency info
-            base_currency_symbol = account.currency.symbol if account.currency else 'USD'
+            base_currency_symbol_raw = account.currency.symbol if account.currency else 'USD'
+            base_currency_symbol = CurrencyService.get_display_symbol(base_currency_symbol_raw) or base_currency_symbol_raw
             base_currency_id = account.currency_id if account.currency_id else 1
             
             # Calculate base currency total (using existing usd_rate from currencies table)
@@ -357,8 +385,11 @@ class AccountActivityService:
                         balance_usd = curr_data['balance'] * float(currency_obj.usd_rate)
                         balance_base = balance_usd / float(base_currency_obj.usd_rate)
                         base_currency_total += balance_base
-                        exchange_rates_used[curr_data['currency_symbol']] = float(currency_obj.usd_rate)
+                        display_symbol = CurrencyService.get_display_symbol(currency_obj.symbol)
+                        exchange_rates_used[display_symbol or currency_obj.symbol] = float(currency_obj.usd_rate)
             
+            last_transaction_date = last_transaction_dt.isoformat() if isinstance(last_transaction_dt, datetime) else None
+
             return {
                 'account_id': account.id,
                 'account_name': account.name,
@@ -367,7 +398,8 @@ class AccountActivityService:
                 'opening_balance': round(opening_balance, 2),
                 'currencies': currencies_list,
                 'base_currency_total': round(base_currency_total, 2),
-                'exchange_rates_used': exchange_rates_used
+                'exchange_rates_used': exchange_rates_used,
+                'last_transaction_date': last_transaction_date
             }
             
         except Exception as e:

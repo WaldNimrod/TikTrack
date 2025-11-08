@@ -115,6 +115,10 @@
   --entity-note-bg: rgba(111, 66, 193, 0.1);
   --entity-note-text: #5a32a3;
   --entity-note-border: rgba(111, 66, 193, 0.3);
+  --entity-position-color: #0d6efd;
+  --entity-position-bg: rgba(13, 110, 253, 0.12);
+  --entity-position-text: #0a58ca;
+  --entity-position-border: rgba(13, 110, 253, 0.3);
   
   /* העדפות - Preference */
   --entity-preference-color: #adb5bd;

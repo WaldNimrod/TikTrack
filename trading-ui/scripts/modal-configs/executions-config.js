@@ -101,7 +101,20 @@ const executionsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
-        // שורה רביעית: עמלה (בשורה מלאה)
+        // שורה רביעית: קישור לטרייד (מעל העמלה)
+        {
+            type: 'linkButton',
+            id: 'linkedTrade',
+            label: 'קישור לטרייד',
+            required: false,
+            buttonText: 'קשר לטרייד',
+            description: 'לחיצה תפתח מודל לבחירת טרייד',
+            rowClass: 'row',
+            colClass: 'col-md-12',
+            width: 300,
+            style: 'width: 300px; min-width: 200px;'
+        },
+        // שורה חמישית: עמלה (בשורה מלאה)
         {
             type: 'number',
             id: 'executionCommission',
@@ -123,7 +136,8 @@ const executionsModalConfig = {
                 { value: 'manual', label: 'ידני' },
                 { value: 'api', label: 'API' },
                 { value: 'file_import', label: 'ייבוא קובץ' },
-                { value: 'direct_import', label: 'ייבוא ישיר' }
+                { value: 'direct_import', label: 'ייבוא ישיר' },
+                { value: 'ibkr_import', label: 'ייבוא IBKR' }
             ],
             defaultValue: 'manual',
             width: 300,
@@ -190,17 +204,6 @@ const executionsModalConfig = {
                     ['clean']
                 ]
             }
-        },
-        {
-            type: 'linkButton',
-            id: 'linkedTrade',
-            label: 'קישור לטרייד',
-            required: false,
-            buttonText: 'קשר לטרייד',
-            width: 300,
-            style: 'width: 300px; min-width: 200px;',
-            rowClass: 'row',
-            colClass: 'col-md-12'
         }
     ],
     validation: {

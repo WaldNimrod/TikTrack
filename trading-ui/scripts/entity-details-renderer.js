@@ -1302,9 +1302,9 @@ class EntityDetailsRenderer {
                         </span>
                     </div>
                     ${externalId ? `
-                    <div class="d-flex align-items-center">
-                        <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מזהה חיצוני:</label>
-                        <span class="badge bg-light text-dark text-break" style="word-break: break-word; max-width: 100%;">${externalId}</span>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold me-2 mb-1 d-block" style="min-width: 120px;">מזהה חיצוני:</label>
+                        <span class="badge bg-light text-dark d-inline-block" style="word-break: break-word; max-width: 100%; overflow-wrap: break-word; white-space: normal;">${externalId}</span>
                     </div>
                     ` : ''}
                 </div>
@@ -1487,26 +1487,21 @@ class EntityDetailsRenderer {
     }
 
     async renderAccount(accountData, options = {}) {
-        // קבלת צבע החשבון מסחר מההעדפות - רק trading_account!
         if (!this.entityColors.trading_account) {
             window.Logger.error('❌ trading_account color not found in entityColors!', { entityColors: this.entityColors }, { page: "entity-details-renderer" });
         }
-        const accountColor = this.entityColors.trading_account || '';
-        
-        // סטטוס למעלה - שימוש במערכת הרינדור הכללית
+
+        const accountColor = this.entityColors.trading_account || '#0d6efd';
         const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
             ? window.FieldRendererService.renderStatus(accountData.status, 'trading_account')
             : '';
-        
-        // שם חשבון - נחלץ מ-name
+
         const accountName = accountData.name || accountData.account_name || 'לא מוגדר';
-        
-        // קבלת מידע על חשבון ברירת מחדל מהעדפות
+
         const defaultAccountInfo = await this.getDefaultAccountInfo();
-        window.Logger.info(`🔍 [renderAccount] Default account info from preferences:`, defaultAccountInfo, { page: "entity-details-renderer" });
-        
         const currentAccountId = accountData.id ? parseInt(accountData.id, 10) : null;
         let defaultAccountId = null;
+
         if (defaultAccountInfo && defaultAccountInfo.accountId !== undefined && defaultAccountInfo.accountId !== null) {
             defaultAccountId = parseInt(defaultAccountInfo.accountId, 10);
         } else if (defaultAccountInfo && typeof defaultAccountInfo.value === 'string') {
@@ -1515,9 +1510,8 @@ class EntityDetailsRenderer {
                 defaultAccountId = parsed;
             }
         }
-        let isDefaultAccount = Boolean(
-            defaultAccountId && currentAccountId && defaultAccountId === currentAccountId
-        );
+
+        let isDefaultAccount = Boolean(defaultAccountId && currentAccountId && defaultAccountId === currentAccountId);
         if (!isDefaultAccount && defaultAccountInfo && defaultAccountInfo.accountName) {
             const normalizedPrefName = String(defaultAccountInfo.accountName || '').trim().toLowerCase();
             const normalizedAccountName = String(accountName || '').trim().toLowerCase();
@@ -1526,154 +1520,133 @@ class EntityDetailsRenderer {
             }
         }
         accountData.is_default_trading_account = isDefaultAccount;
-        
-        // יצירת קוביית בדיקה בולטת וברורה - מוצגת תמיד עם הערך בפועל
-        let defaultAccountLabel = '';
-        const displayValue = defaultAccountInfo.displayText || defaultAccountInfo.value || 'לא זמין';
-        const profileInfo = defaultAccountInfo.profileId ? ` (פרופיל: ${defaultAccountInfo.profileId})` : '';
-        
-        // אם יש שם חשבון ספציפי
-        if (defaultAccountInfo.accountName) {
-            defaultAccountLabel = `
-                <div class="mb-4 p-4 rounded" style="
-                    background: linear-gradient(135deg, ${accountColor}15 0%, ${accountColor}08 100%);
-                    border: 3px solid ${accountColor};
-                    border-radius: 12px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    position: relative;
-                    overflow: hidden;
-                ">
-                    <!-- Background decoration -->
-                    <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: ${accountColor}20; border-radius: 50%;"></div>
-                    <div style="position: absolute; bottom: -30px; left: -30px; width: 80px; height: 80px; background: ${accountColor}15; border-radius: 50%;"></div>
-                    
-                    <!-- Content -->
-                    <div class="d-flex align-items-center gap-4" style="position: relative; z-index: 1;">
-                        <!-- Icon -->
-                        <div style="
-                            width: 60px; 
-                            height: 60px; 
-                            background: linear-gradient(135deg, ${accountColor} 0%, ${accountColor}dd 100%);
-                            border-radius: 50%; 
-                            display: flex; 
-                            align-items: center; 
-                            justify-content: center; 
-                            flex-shrink: 0;
-                            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-                        ">
-                            <span style="color: white; font-size: 28px; font-weight: bold;">✓</span>
-                        </div>
-                        
-                        <!-- Text -->
-                        <div style="flex: 1;">
-                            <div style="font-size: 0.9em; color: #666; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                🧪 קוביית בדיקה - חשבון ברירת מחדל מהעדפות:
-                            </div>
-                            <div style="font-size: 1.5em; font-weight: bold; color: ${accountColor}; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">
-                                ${displayValue}
-                            </div>
-                            ${profileInfo ? `<div style="font-size: 0.85em; color: #999; margin-top: 4px;">${profileInfo}</div>` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        } else {
-            // הערך הוא "all" או null - הצג את הערך בפועל מהבסיס נתונים
-            const hasValue = defaultAccountInfo.value !== null && defaultAccountInfo.value !== undefined;
-            const isAll = defaultAccountInfo.value === 'all';
-            const bgColor = isAll ? '#e7f3ff' : (hasValue ? '#fff3cd' : '#f8f9fa');
-            const borderColor = isAll ? '#2196F3' : (hasValue ? '#ffc107' : '#dee2e6');
-            const iconBg = isAll ? '#2196F3' : (hasValue ? '#ffc107' : '#6c757d');
-            const iconText = isAll ? 'ℹ' : (hasValue ? '⚠' : '?');
-            
-            defaultAccountLabel = `
-                <div class="mb-4 p-4 rounded" style="
-                    background: linear-gradient(135deg, ${bgColor} 0%, ${bgColor}dd 100%);
-                    border: 3px solid ${borderColor};
-                    border-radius: 12px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    position: relative;
-                    overflow: hidden;
-                ">
-                    <!-- Background decoration -->
-                    <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: ${borderColor}30; border-radius: 50%;"></div>
-                    <div style="position: absolute; bottom: -30px; left: -30px; width: 80px; height: 80px; background: ${borderColor}20; border-radius: 50%;"></div>
-                    
-                    <!-- Content -->
-                    <div class="d-flex align-items-center gap-4" style="position: relative; z-index: 1;">
-                        <!-- Icon -->
-                        <div style="
-                            width: 60px; 
-                            height: 60px; 
-                            background: linear-gradient(135deg, ${iconBg} 0%, ${iconBg}dd 100%);
-                            border-radius: 50%; 
-                            display: flex; 
-                            align-items: center; 
-                            justify-content: center; 
-                            flex-shrink: 0;
-                            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-                        ">
-                            <span style="color: white; font-size: 28px; font-weight: bold;">${iconText}</span>
-                        </div>
-                        
-                        <!-- Text -->
-                        <div style="flex: 1;">
-                            <div style="font-size: 0.9em; color: #666; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                🧪 קוביית בדיקה - חשבון מסחר ברירת מחדל מהעדפות:
-                            </div>
-                            <div style="font-size: 1.4em; font-weight: bold; color: ${borderColor}; margin-bottom: 4px;">
-                                ${displayValue}
-                            </div>
-                            ${profileInfo ? `<div style="font-size: 0.85em; color: #999; margin-bottom: 4px;">${profileInfo}</div>` : ''}
-                            <div style="font-size: 0.9em; color: #666; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.1);">
-                                <strong>ערך בפועל מהבסיס נתונים:</strong> <code style="background: rgba(0,0,0,0.08); padding: 3px 8px; border-radius: 4px; font-size: 1.1em; color: ${borderColor}; font-weight: bold;">${defaultAccountInfo.value || 'null'}</code>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+
+        const currencySymbol = accountData.base_currency_symbol || accountData.currency_symbol || '';
+        const currencyName = accountData.base_currency_name || accountData.currency_name || '';
+        const formattingContext = { ...accountData };
+        if (!formattingContext.currency_symbol && currencySymbol) {
+            formattingContext.currency_symbol = currencySymbol;
         }
-        
-        window.Logger.info(`🔍 [renderAccount] Default account label HTML: ${defaultAccountLabel ? 'Created' : 'Empty'}`, { page: "entity-details-renderer" });
-        
-        // הערות - להציג במרכז השורה הראשונה, ללא כותרת
-        const notesDisplay = accountData.notes && accountData.notes.trim() 
-            ? `<div class="text-center" style="flex: 1;">${this.formatFieldValue(accountData.notes, 'text', accountColor, 'notes', accountData)}</div>`
-            : '<div class="text-center" style="flex: 1;"></div>';
-        
+
+        const positionsValue = Number(accountData.positions_total_value ?? accountData.total_positions_value ?? 0);
+        const baseCurrencyTotalValue = Number(accountData.base_currency_total ?? accountData.base_currency_balance ?? 0);
+        const totalAccountValue = Number(accountData.total_account_value ?? accountData.account_total_value ?? (baseCurrencyTotalValue + positionsValue));
+        const currencyBalancesRaw = Array.isArray(accountData.currency_balances) ? accountData.currency_balances : [];
+        const currencyBalances = currencyBalancesRaw.filter(item => Math.abs(item.balance || 0) > 0.0001);
+
+        const baseCurrencyLabelText = currencySymbol
+            ? `${currencySymbol}${currencyName ? ` (${currencyName})` : ''}`
+            : (currencyName || '-');
+        const baseCurrencyHtml = this.formatFieldValue(baseCurrencyLabelText, 'text', accountColor, 'base_currency', formattingContext);
+        const defaultAccountHtml = this.formatFieldValue(isDefaultAccount, 'boolean', accountColor, 'is_default_trading_account', accountData);
+        const positionsValueHtml = this.formatFieldValue(positionsValue, 'currency', accountColor, 'positions_total_value', formattingContext);
+        const totalAccountValueHtml = this.formatFieldValue(totalAccountValue, 'currency', accountColor, 'total_account_value', formattingContext);
+        const baseCurrencyTotalHtml = this.formatFieldValue(baseCurrencyTotalValue, 'currency', accountColor, 'base_currency_total', formattingContext);
+        const createdAtHtml = this.formatFieldValue(accountData.created_at, 'datetime', accountColor, 'created_at', accountData);
+        const notesHtml = accountData.notes && String(accountData.notes).trim()
+            ? this.formatFieldValue(accountData.notes, 'text', accountColor, 'notes', accountData)
+            : '<span class="text-muted">אין הערות</span>';
+
+        const balancesListHtml = currencyBalances.length
+            ? currencyBalances.map(item => {
+                const balanceContext = { ...formattingContext };
+                if (item.currency_symbol) {
+                    balanceContext.currency_symbol = item.currency_symbol;
+                }
+                const balanceHtml = this.formatFieldValue(item.balance, 'currency', accountColor, 'currency_balance', balanceContext);
+                const labelSymbol = item.currency_symbol || '';
+                const labelName = item.currency_name || '';
+                const labelText = labelSymbol
+                    ? `${labelSymbol}${labelName ? ` (${labelName})` : ''}`
+                    : (labelName || (item.currency_id ? `מטבע ${item.currency_id}` : 'מטבע'));
+                return `
+                    <li class="d-flex justify-content-between align-items-center py-1">
+                        <span class="text-muted">${labelText}</span>
+                        ${balanceHtml}
+                    </li>
+                `;
+            }).join('')
+            : '<li class="text-muted">אין יתרות פעילות</li>';
+
+        const linkedItemsSection = this.renderLinkedItems(
+            accountData.linked_items || [],
+            accountColor,
+            'trading_account',
+            accountData.id,
+            options?.sourceInfo || null,
+            options
+        );
+
         return `
-            <div class="entity-details-container account-details">
-                
-                <!-- שורה ראשונה: שם חשבון | הערות (מרכז) | סטטוס (משמאל) -->
-                <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom: 1px solid #e0e0e0; padding-bottom: 0.75rem;">
-                    <!-- שם חשבון -->
-                    <div class="d-flex align-items-center gap-2" style="min-width: 150px;">
-                        <strong>שם:</strong>
-                        <span class="fw-bold">${accountName}</span>
-                    </div>
-                    
-                    <!-- הערות במרכז -->
-                    ${notesDisplay}
-                    
-                    <!-- סטטוס משמאל -->
-                    <div class="d-flex align-items-center gap-2" style="min-width: 150px; justify-content: flex-end;">
-                        ${statusDisplay ? `<strong>סטטוס:</strong> ${statusDisplay}` : '<span class="text-muted">לא מוגדר</span>'}
+            <div class="entity-details-container account-details entity-details-card p-4">
+                <div class="entity-card-header d-flex flex-wrap justify-content-between align-items-center gap-3 pb-3 mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="entity-card-title fs-4 fw-bold">${accountName}</span>
+                        ${statusDisplay || ''}
                     </div>
                 </div>
-                
-                <!-- מידע בסיסי בשתי עמודות -->
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        ${this.renderBasicInfo(accountData, 'trading_account', accountColor)}
+
+                <div class="row g-3 align-items-stretch">
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header bg-transparent border-bottom">
+                                <h6 class="mb-0">מידע חשבון</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush border-0">
+                                    <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">מזהה</span>
+                                        <span class="fw-bold">${accountData.id ?? '-'}</span>
+                                    </div>
+                                    <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">מטבע ראשי</span>
+                                        ${baseCurrencyHtml}
+                                    </div>
+                                    <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">חשבון ברירת מחדל</span>
+                                        ${defaultAccountHtml}
+                                    </div>
+                                    <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">תאריך יצירה</span>
+                                        ${createdAtHtml}
+                                    </div>
+                                    <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">סה״כ שווי פוזיציות</span>
+                                        ${positionsValueHtml}
+                                    </div>
+                                    <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">סה״כ שווי חשבון</span>
+                                        ${totalAccountValueHtml}
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <h6 class="text-muted mb-2">הערות</h6>
+                                    <div class="border rounded p-3 bg-light">${notesHtml}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        ${this.renderAdditionalInfo(accountData, 'trading_account', accountColor)}
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header bg-transparent border-bottom">
+                                <h6 class="mb-0">יתרות מטבע</h6>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <ul class="list-unstyled mb-4 flex-grow-1">
+                                    ${balancesListHtml}
+                                </ul>
+                                <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">סה״כ במטבע הבסיס</span>
+                                    ${baseCurrencyTotalHtml}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
+
                 <div class="row g-3 mt-4">
                     <div class="col-12">
-                        ${this.renderLinkedItems(accountData.linked_items || [], accountColor, 'trading_account', accountData.id, options?.sourceInfo || null, options)}
+                        ${linkedItemsSection}
                     </div>
                 </div>
             </div>
@@ -2131,7 +2104,24 @@ class EntityDetailsRenderer {
             ? window.FieldRendererService.renderAmount(feeAmount, currencySymbol, 2, true)
             : `<span class="${feeAmount >= 0 ? 'text-success' : 'text-danger'} fw-bold" dir="ltr">${currencySymbol}${Math.abs(feeAmount).toFixed(2)}</span>`;
 
-        const dateDisplay = cashFlowData.date ? this.formatDate(cashFlowData.date) : 'לא זמין';
+        const currencyName = cashFlowData.currency_name ||
+                             (cashFlowData.currency && cashFlowData.currency.name) ||
+                             '';
+        let currencyDisplay = '<span class="text-muted">לא זמין</span>';
+        if (currencySymbol || currencyName) {
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderCurrency === 'function') {
+                currencyDisplay = window.FieldRendererService.renderCurrency(
+                    cashFlowData.currency_id || null,
+                    currencyName,
+                    currencySymbol || currencyName || ''
+                );
+            } else {
+                const symbolText = currencySymbol ? currencySymbol : '';
+                const nameText = currencyName ? ` (${currencyName})` : '';
+                const combined = `${symbolText}${nameText}`.trim();
+                currencyDisplay = `<span class="text-muted" dir="ltr">${combined || currencyName || symbolText}</span>`;
+            }
+        }
 
         let tradeDisplay = '<span class="text-muted">לא מקושר</span>';
         if (cashFlowData.trade_id) {
@@ -2184,8 +2174,8 @@ class EntityDetailsRenderer {
                 </div>
 
                 <div class="mb-3 d-flex align-items-center">
-                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך תזרים:</label>
-                    <span class="text-muted">${dateDisplay}</span>
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מטבע:</label>
+                    <span class="d-flex align-items-center gap-2">${currencyDisplay}</span>
                 </div>
 
                 <div class="mb-3 d-flex align-items-center">
@@ -2821,54 +2811,54 @@ class EntityDetailsRenderer {
         
         // Entity-specific fields
         if (entityType === 'cash_flow') {
-            // 🔍 DEBUG: Log account and currency resolution
-            const accountName = entityData.account_name || 
-                               entityData.trading_account_name || 
-                               (entityData.account && entityData.account.name) ||
-                               (entityData.trading_account && entityData.trading_account.name) ||
-                               '-';
-            const currencySymbol = entityData.currency_symbol || 
-                                  entityData.currency_code || 
+            const currencySymbol = entityData.currency_symbol ||
+                                  entityData.currency_code ||
                                   (entityData.currency && entityData.currency.symbol) ||
                                   (entityData.currency && entityData.currency.code) ||
-                                  '-';
+                                  null;
+            const currencyName = entityData.currency_name ||
+                                 (entityData.currency && entityData.currency.name) ||
+                                 '';
             
-            console.log('🔍 [CASH_FLOW_BASIC_INFO] Account Name Resolution:', {
-                account_name: entityData.account_name,
-                trading_account_name: entityData.trading_account_name,
-                account_object: entityData.account,
-                trading_account_object: entityData.trading_account,
-                resolved: accountName
-            });
-            console.log('🔍 [CASH_FLOW_BASIC_INFO] Currency Symbol Resolution:', {
+            console.log('🔍 [CASH_FLOW_BASIC_INFO] Currency Resolution:', {
                 currency_symbol: entityData.currency_symbol,
                 currency_code: entityData.currency_code,
+                currency_name: entityData.currency_name,
                 currency_object: entityData.currency,
-                resolved: currencySymbol
+                resolved_symbol: currencySymbol,
+                resolved_name: currencyName
             });
             if (window.Logger) {
-                window.Logger.debug('🔍 [CASH_FLOW_BASIC_INFO] Resolved values:', {
-                    account_name: entityData.account_name,
-                    trading_account_name: entityData.trading_account_name,
-                    account_object: entityData.account,
-                    trading_account_object: entityData.trading_account,
-                    resolved_account_name: accountName,
+                window.Logger.debug('🔍 [CASH_FLOW_BASIC_INFO] Currency values:', {
                     currency_symbol: entityData.currency_symbol,
                     currency_code: entityData.currency_code,
+                    currency_name: entityData.currency_name,
                     currency_object: entityData.currency,
-                    resolved_currency_symbol: currencySymbol
+                    resolved_currency_symbol: currencySymbol,
+                    resolved_currency_name: currencyName
                 }, { page: 'entity-details-renderer' });
+            }
+            
+            let currencyDisplay = '<span class="text-muted">לא זמין</span>';
+            if (currencySymbol || currencyName) {
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderCurrency === 'function') {
+                    currencyDisplay = window.FieldRendererService.renderCurrency(
+                        entityData.currency_id || null,
+                        currencyName || '',
+                        currencySymbol || currencyName || ''
+                    );
+                } else {
+                    const symbolText = currencySymbol ? currencySymbol : '';
+                    const nameText = currencyName ? ` (${currencyName})` : '';
+                    const combined = `${symbolText}${nameText}`.trim();
+                    currencyDisplay = `<span class="text-muted" dir="ltr">${combined || currencyName || symbolText}</span>`;
+                }
             }
             
             html += `
                 <div class="mb-3 d-flex align-items-center">
-                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">חשבון מסחר:</label>
-                    <span class="text-muted">${accountName}</span>
-                </div>
-                
-                <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מטבע:</label>
-                    <span class="text-muted">${currencySymbol}</span>
+                    ${currencyDisplay}
                 </div>
             `;
         } else if (entityType === 'execution') {

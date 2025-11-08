@@ -1527,31 +1527,73 @@ class ModalManagerV2 {
                 } else if (field.tagName === 'SELECT') {
                     // For selects, set value directly
                     const selectValue = value !== null && value !== undefined ? String(value) : '';
+                    const isDynamicSelect = field.id.includes('Ticker') || field.id.includes('Account') || 
+                                            field.id.includes('Currency') || field.id.includes('TradePlan');
+                    
                     console.log(`🎯 Setting SELECT field ${field.id}:`, {
                         tryingToSet: selectValue,
                         originalValue: value,
                         currentValue: field.value,
+                        isDynamicSelect: isDynamicSelect,
+                        optionsCount: field.options.length,
                         availableOptions: Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})),                                           
                         hasOption: Array.from(field.options).some(opt => opt.value === selectValue || opt.value === value)                                                                   
                     });
                     
-                    // Wait a bit if select has no options yet (might still be loading)
-                    if (field.options.length <= 1 && (field.id.includes('Ticker') || field.id.includes('Account'))) {
-                        console.log(`⏳ Select ${field.id} has no options yet, waiting...`);
-                        // Retry a few times if select is still loading
-                        for (let retry = 0; retry < 5 && field.options.length <= 1; retry++) {
+                    // Wait a bit if select has no options yet (might still be loading dynamically)
+                    // For dynamic selects, wait until we have more than just the empty option
+                    if (isDynamicSelect && field.options.length <= 1) {
+                        console.log(`⏳ Select ${field.id} has no options yet (dynamic select), waiting...`);
+                        // Retry up to 10 times (1 second total) if select is still loading
+                        for (let retry = 0; retry < 10 && field.options.length <= 1; retry++) {
                             await new Promise(resolve => setTimeout(resolve, 100));
+                            // Re-check options after wait
+                            if (field.options.length > 1) {
+                                console.log(`✅ Select ${field.id} options loaded after ${retry + 1} retries (${field.options.length} options)`);
+                                break;
+                            }
+                        }
+                        if (field.options.length <= 1) {
+                            console.warn(`⚠️ Select ${field.id} still has no options after retries - may need manual population`);
+                        }
+                    }
+                    
+                    // Check if the value exists in options before trying to set it
+                    let valueExists = Array.from(field.options).some(opt => 
+                        opt.value === selectValue || 
+                        String(opt.value) === String(value) ||
+                        opt.value === String(value)
+                    );
+                    
+                    if (!valueExists && selectValue && isDynamicSelect) {
+                        console.warn(`⚠️ Value ${selectValue} not found in options for ${field.id}, waiting a bit more...`);
+                        // Wait a bit more for dynamic selects that might still be loading
+                        for (let retry = 0; retry < 5 && !valueExists; retry++) {
+                            await new Promise(resolve => setTimeout(resolve, 100));
+                            valueExists = Array.from(field.options).some(opt => 
+                                opt.value === selectValue || 
+                                String(opt.value) === String(value) ||
+                                opt.value === String(value)
+                            );
+                            if (valueExists) {
+                                console.log(`✅ Value ${selectValue} found after additional wait (retry ${retry + 1})`);
+                                break;
+                            }
                         }
                     }
                     
                     // Try to set the value
                     field.value = selectValue;
+                    
                     // If value didn't set (option doesn't exist), try to find matching option or add it dynamically
                     if (field.value !== selectValue && selectValue) {
+                        console.log(`⚠️ Value ${selectValue} didn't set directly, searching for matching option...`);
                         const matchingOption = Array.from(field.options).find(opt => 
                             opt.value === selectValue || 
                             String(opt.value) === String(value) ||
-                            opt.text === value
+                            opt.value === String(value) ||
+                            opt.text === value ||
+                            opt.text === selectValue
                         );
                         if (matchingOption) {
                             field.value = matchingOption.value;
@@ -1559,23 +1601,30 @@ class ModalManagerV2 {
                         } else {
                             // If no matching option found and this is a select with static options,
                             // add the value dynamically to allow editing existing records with new source values
-                            console.warn(`⚠️ No matching option found for value: ${selectValue} in field ${field.id}`);
-                            console.warn(`   Available options:`, Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})));
-                            
-                            // Add the missing option dynamically (for backward compatibility with new source values)
-                            const newOption = document.createElement('option');
-                            newOption.value = selectValue;
-                            // Try to create a readable label from the value (e.g., 'ibkr_import' -> 'ייבוא IBKR')
-                            const labelMap = {
-                                'ibkr_import': 'ייבוא IBKR',
-                                'IBKR-tradelog-csv': 'IBKR CSV',
-                                'IBKR-api': 'IBKR API'
-                            };
-                            newOption.textContent = labelMap[selectValue] || selectValue.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                            field.appendChild(newOption);
-                            field.value = selectValue;
-                            console.log(`✅ Added missing option dynamically: ${selectValue} (${newOption.textContent})`);
+                            if (!isDynamicSelect) {
+                                console.warn(`⚠️ No matching option found for value: ${selectValue} in field ${field.id}`);
+                                console.warn(`   Available options:`, Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})));
+                                
+                                // Add the missing option dynamically (for backward compatibility with new source values)
+                                const newOption = document.createElement('option');
+                                newOption.value = selectValue;
+                                // Try to create a readable label from the value (e.g., 'ibkr_import' -> 'ייבוא IBKR')
+                                const labelMap = {
+                                    'ibkr_import': 'ייבוא IBKR',
+                                    'IBKR-tradelog-csv': 'IBKR CSV',
+                                    'IBKR-api': 'IBKR API'
+                                };
+                                newOption.textContent = labelMap[selectValue] || selectValue.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                field.appendChild(newOption);
+                                field.value = selectValue;
+                                console.log(`✅ Added missing option dynamically: ${selectValue} (${newOption.textContent})`);
+                            } else {
+                                console.error(`❌ Value ${selectValue} not found in dynamic select ${field.id} after waiting`);
+                                console.error(`   Available options:`, Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})));
+                            }
                         }
+                    } else if (field.value === selectValue) {
+                        console.log(`✅ Successfully set ${field.id} to ${selectValue}`);
                     }
                     console.log(`🎯 After setting, field.value is: ${field.value}`);                                                                            
                 } else if (field.classList && field.classList.contains('rich-text-editor-container')) {

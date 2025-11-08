@@ -13,7 +13,7 @@ Version: 1.0.0
 Date: September 4, 2025
 """
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload  # type: ignore
 from models.ticker import Ticker
 from models.trade import Trade
 from models.trade_plan import TradePlan
@@ -22,9 +22,12 @@ from models.trading_account import TradingAccount
 from models.alert import Alert
 from models.cash_flow import CashFlow
 from models.note import Note
+from models.currency import Currency
 from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 from services.smart_query_optimizer import optimize_query, profile_query
+from services.account_activity_service import AccountActivityService
+from services.position_portfolio_service import PositionPortfolioService
 from typing import List, Optional, Dict, Any, Union, Tuple
 import logging
 import time
@@ -82,16 +85,17 @@ class EntityDetailsService:
                       'planned_amount', 'entry_conditions', 'target_price', 'stop_price', 
                       'target_percentage', 'stop_percentage', 'status', 'cancelled_at', 
                       'cancel_reason', 'created_at', 'updated_at'],
-        'execution': ['id', 'trade_id', 'symbol', 'execution_type', 'quantity', 'price',
-                     'commission', 'execution_date', 'status', 'created_at'],
+        'execution': ['id', 'trade_id', 'ticker_id', 'trading_account_id', 'action', 'date', 'quantity', 'price',
+                     'fee', 'source', 'external_id', 'notes', 'realized_pl', 'mtm_pl', 'created_at', 'updated_at'],
         'account': ['id', 'name', 'account_number', 'account_type', 'bank_name', 'balance',
                    'currency_id', 'status', 'remarks', 'created_at', 'updated_at'],
         'trading_account': ['id', 'name', 'currency_id', 'status', 'opening_balance', 'total_value',
                            'total_pl', 'notes', 'created_at', 'updated_at'],
         'alert': ['id', 'title', 'ticker_id', 'alert_type', 'condition', 'target_value',
                  'is_active', 'status', 'triggered_at', 'created_at', 'updated_at'],
-        'cash_flow': ['id', 'trading_account_id', 'flow_type', 'amount', 'flow_date', 'category',
-                     'description', 'status', 'created_at', 'updated_at'],
+        'cash_flow': ['id', 'trading_account_id', 'type', 'amount', 'fee_amount', 'date',
+                     'currency_id', 'usd_rate', 'description', 'source', 'external_id',
+                     'trade_id', 'created_at', 'updated_at'],
         'note': ['id', 'title', 'content', 'category', 'importance', 'linked_object_type',
                 'linked_object_id', 'created_at', 'updated_at']
     }
@@ -136,7 +140,6 @@ class EntityDetailsService:
             model_class = EntityDetailsService.ENTITY_MODELS[entity_type]
             
             # Create optimized query with relationships
-            from sqlalchemy.orm import joinedload
             
             base_query = db.query(model_class).filter(model_class.id == entity_id)
             
@@ -147,6 +150,15 @@ class EntityDetailsService:
                 base_query = base_query.options(joinedload(Trade.ticker), joinedload(Trade.trade_plan))
             elif entity_type == 'ticker':
                 base_query = base_query.options(joinedload(Ticker.currency))
+            elif entity_type == 'execution':
+                from models.execution import Execution
+                base_query = base_query.options(joinedload(Execution.ticker), joinedload(Execution.trading_account), joinedload(Execution.trade))
+            elif entity_type == 'cash_flow':
+                base_query = base_query.options(
+                    joinedload(CashFlow.account),
+                    joinedload(CashFlow.currency),
+                    joinedload(CashFlow.trade).joinedload(Trade.ticker)  # type: ignore[attr-defined]
+                )
             
             # Optimize query using smart query optimizer
             optimization_result = optimize_query(
@@ -192,6 +204,126 @@ class EntityDetailsService:
                     else:
                         entity_dict['account_name'] = None
             
+            # Special handling for execution: add ticker_symbol and account_name from relationships
+            if entity_type == 'execution':
+                # Add ticker symbol
+                if hasattr(entity, 'ticker') and entity.ticker:
+                    entity_dict['ticker_symbol'] = entity.ticker.symbol
+                elif hasattr(entity, 'ticker_id') and entity.ticker_id:
+                    # Fallback: fetch ticker if relationship not loaded
+                    from models.ticker import Ticker
+                    ticker = db.query(Ticker).filter(Ticker.id == entity.ticker_id).first()
+                    if ticker:
+                        entity_dict['ticker_symbol'] = ticker.symbol
+                    else:
+                        entity_dict['ticker_symbol'] = None
+                else:
+                    entity_dict['ticker_symbol'] = None
+                
+                # Add account name
+                if hasattr(entity, 'trading_account') and entity.trading_account:
+                    entity_dict['account_name'] = entity.trading_account.name
+                    entity_dict['trading_account_name'] = entity.trading_account.name
+                elif hasattr(entity, 'trading_account_id') and entity.trading_account_id:
+                    # Fallback: fetch account if relationship not loaded
+                    account = db.query(TradingAccount).filter(TradingAccount.id == entity.trading_account_id).first()
+                    if account:
+                        entity_dict['account_name'] = account.name
+                        entity_dict['trading_account_name'] = account.name
+                    else:
+                        entity_dict['account_name'] = None
+                        entity_dict['trading_account_name'] = None
+                else:
+                    entity_dict['account_name'] = None
+                    entity_dict['trading_account_name'] = None
+                
+                # Add trade ticker symbol if trade exists
+                if hasattr(entity, 'trade') and entity.trade:
+                    if hasattr(entity.trade, 'ticker') and entity.trade.ticker:
+                        entity_dict['trade_ticker_symbol'] = entity.trade.ticker.symbol
+                    elif hasattr(entity.trade, 'ticker_id') and entity.trade.ticker_id:
+                        from models.ticker import Ticker
+                        trade_ticker = db.query(Ticker).filter(Ticker.id == entity.trade.ticker_id).first()
+                        if trade_ticker:
+                            entity_dict['trade_ticker_symbol'] = trade_ticker.symbol
+                
+                # Use to_dict() to get symbol field (from Execution.to_dict)
+                execution_dict = entity.to_dict()
+                if 'symbol' in execution_dict:
+                    entity_dict['symbol'] = execution_dict['symbol']
+            
+            # Special handling for cash flow: enrich with related metadata
+            if entity_type == 'cash_flow':
+                # Ensure date is ISO formatted string if available
+                if hasattr(entity, 'date') and entity.date and not isinstance(entity_dict.get('date'), str):
+                    try:
+                        entity_dict['date'] = entity.date.isoformat()
+                    except AttributeError:
+                        entity_dict['date'] = entity_dict.get('date')
+
+                # Add account name
+                account_name = None
+                if hasattr(entity, 'account') and entity.account:
+                    account_name = entity.account.name
+                elif entity_dict.get('trading_account_id'):
+                    account = db.query(TradingAccount).filter(TradingAccount.id == entity_dict['trading_account_id']).first()
+                    account_name = account.name if account else None
+                entity_dict['account_name'] = account_name
+                entity_dict['trading_account_name'] = account_name
+
+                # Add currency metadata
+                currency_symbol = None
+                currency_name = None
+                if hasattr(entity, 'currency') and entity.currency:
+                    currency_symbol = entity.currency.symbol
+                    currency_name = entity.currency.name
+                elif entity_dict.get('currency_id'):
+                    currency = db.query(Currency).filter(Currency.id == entity_dict['currency_id']).first()
+                    if currency:
+                        currency_symbol = currency.symbol
+                        currency_name = currency.name
+                entity_dict['currency_symbol'] = currency_symbol
+                entity_dict['currency_name'] = currency_name
+
+                # Ensure type aliases for backward compatibility
+                if 'type' in entity_dict and entity_dict.get('type') is not None:
+                    entity_dict['flow_type'] = entity_dict['type']
+                if 'date' in entity_dict and entity_dict.get('date') is not None:
+                    entity_dict['flow_date'] = entity_dict['date']
+
+                # Add trade metadata if linked
+                trade_symbol = None
+                trade_ticker_symbol = None
+                trade_status = None
+                trade_side = None
+                trade_ticker_id = None
+
+                if hasattr(entity, 'trade') and entity.trade:
+                    trade_symbol = getattr(entity.trade, 'symbol', None)
+                    trade_status = getattr(entity.trade, 'status', None)
+                    trade_side = getattr(entity.trade, 'side', None)
+                    if hasattr(entity.trade, 'ticker') and entity.trade.ticker:
+                        trade_ticker_id = entity.trade.ticker.id
+                        trade_ticker_symbol = entity.trade.ticker.symbol
+                elif entity_dict.get('trade_id'):
+                    trade = db.query(Trade).filter(Trade.id == entity_dict['trade_id']).first()
+                    if trade:
+                        trade_symbol = getattr(trade, 'symbol', None)
+                        trade_status = getattr(trade, 'status', None)
+                        trade_side = getattr(trade, 'side', None)
+                        if hasattr(trade, 'ticker') and trade.ticker:
+                            trade_ticker_id = trade.ticker.id
+                            trade_ticker_symbol = trade.ticker.symbol
+                entity_dict['trade_symbol'] = trade_symbol
+                entity_dict['trade_ticker_id'] = trade_ticker_id
+                entity_dict['trade_ticker_symbol'] = trade_ticker_symbol
+                entity_dict['trade_status'] = trade_status
+                entity_dict['trade_side'] = trade_side
+
+                # Default values when not provided
+                entity_dict['source'] = entity_dict.get('source') or 'manual'
+                entity_dict['external_id'] = entity_dict.get('external_id') or None
+
             # Add ticker object with market data for trade and trade_plan
             if entity_type in ['trade', 'trade_plan']:
                 # Add ticker object if ticker relationship is loaded
@@ -258,6 +390,73 @@ class EntityDetailsService:
                 entity_dict['external_data'] = EntityDetailsService._get_external_data_summary(entity)
             
             logger.debug(f"Successfully fetched details for {entity_type} {entity_id}")
+
+            if entity_type == 'trading_account':
+                try:
+                    linked_items = EntityDetailsService.get_linked_items(db, entity_type, entity_id)
+                    entity_dict['linked_items'] = linked_items
+                    entity_dict['linked_items_count'] = len(linked_items)
+                except Exception as linked_error:
+                    logger.error(f"Error loading linked items for trading_account {entity_id}: {linked_error}")
+                    entity_dict['linked_items'] = []
+                    entity_dict['linked_items_count'] = 0
+
+                try:
+                    positions = PositionPortfolioService.calculate_all_account_positions(
+                        db=db,
+                        trading_account_id=entity_id,
+                        include_closed=True,
+                        include_market_data=True
+                    )
+                    positions_total_value = sum((position.get('market_value') or 0.0) for position in positions)
+                    entity_dict['positions_total_value'] = round(positions_total_value, 2)
+                    entity_dict['positions_total_count'] = len(positions)
+                except Exception as positions_error:
+                    logger.error(f"Error calculating positions for trading_account {entity_id}: {positions_error}")
+                    entity_dict['positions_total_value'] = 0.0
+                    entity_dict['positions_total_count'] = 0
+
+                try:
+                    activity = AccountActivityService.get_account_activity(db, entity_id)
+                    if activity:
+                        entity_dict['base_currency_id'] = activity.get('base_currency_id')
+                        entity_dict['base_currency_symbol'] = activity.get('base_currency') or entity_dict.get('currency_symbol')
+                        entity_dict['base_currency_name'] = entity_dict.get('currency_name')
+                        entity_dict['base_currency_total'] = round(activity.get('base_currency_total') or 0.0, 2)
+
+                        currency_balances = []
+                        for currency_data in activity.get('currencies', []):
+                            balance_value = float(currency_data.get('balance') or 0.0)
+                            currency_entry = {
+                                'currency_id': currency_data.get('currency_id'),
+                                'currency_symbol': currency_data.get('currency_symbol'),
+                                'currency_name': currency_data.get('currency_name'),
+                                'balance': round(balance_value, 2),
+                                'is_base': currency_data.get('currency_id') == activity.get('base_currency_id')
+                            }
+                            if currency_entry['is_base']:
+                                entity_dict['base_currency_balance'] = currency_entry['balance']
+                                if not entity_dict.get('base_currency_name'):
+                                    entity_dict['base_currency_name'] = currency_data.get('currency_name')
+                            currency_balances.append(currency_entry)
+
+                        entity_dict['currency_balances'] = currency_balances
+
+                        if not entity_dict.get('currency_symbol') and entity_dict.get('base_currency_symbol'):
+                            entity_dict['currency_symbol'] = entity_dict['base_currency_symbol']
+                        if not entity_dict.get('currency_name') and entity_dict.get('base_currency_name'):
+                            entity_dict['currency_name'] = entity_dict['base_currency_name']
+
+                        total_account_value = entity_dict.get('base_currency_total', 0.0) + entity_dict.get('positions_total_value', 0.0)
+                        entity_dict['total_account_value'] = round(total_account_value, 2)
+                except Exception as activity_error:
+                    logger.error(f"Error loading account activity for trading_account {entity_id}: {activity_error}")
+                    if 'currency_balances' not in entity_dict:
+                        entity_dict['currency_balances'] = []
+                    if 'base_currency_total' not in entity_dict:
+                        entity_dict['base_currency_total'] = 0.0
+                    if 'total_account_value' not in entity_dict:
+                        entity_dict['total_account_value'] = entity_dict.get('positions_total_value', 0.0)
             return entity_dict
             
         except Exception as e:
@@ -560,42 +759,123 @@ class EntityDetailsService:
         linked_items = []
         
         try:
-            # Get related trades
-            trades = db.query(Trade).filter(Trade.trading_trading_account_id == trading_account_id).all()
+            # Trades linked to this account
+            trades = (
+                db.query(Trade)
+                .options(joinedload(Trade.ticker))
+                .filter(Trade.trading_account_id == trading_account_id)
+                .all()
+            )
             for trade in trades:
+                ticker_symbol = trade.ticker.symbol if getattr(trade, 'ticker', None) else None
+                title = f"טרייד {trade.side or ''} על {ticker_symbol}".strip() if ticker_symbol else f"טרייד #{trade.id}"
                 linked_items.append({
                     'id': trade.id,
                     'type': 'trade',
-                    'title': f"טרייד {trade.symbol}",
+                    'title': title,
                     'status': trade.status,
-                    'created_at': trade.created_at.isoformat() if trade.created_at else None
+                    'side': trade.side,
+                    'investment_type': trade.investment_type,
+                    'created_at': trade.created_at.isoformat() if trade.created_at else None,
+                    'updated_at': trade.updated_at.isoformat() if trade.updated_at else None
                 })
-            
-            # Get related trade plans
-            trade_plans = db.query(TradePlan).filter(TradePlan.trading_trading_account_id == trading_account_id).all()
+
+            # Trade plans owned by this account
+            trade_plans = (
+                db.query(TradePlan)
+                .options(joinedload(TradePlan.ticker))
+                .filter(TradePlan.trading_account_id == trading_account_id)
+                .all()
+            )
             for plan in trade_plans:
+                ticker_symbol = plan.ticker.symbol if getattr(plan, 'ticker', None) else None
+                title = f"תכנית {plan.side or ''} על {ticker_symbol}".strip() if ticker_symbol else f"תכנית #{plan.id}"
                 linked_items.append({
                     'id': plan.id,
                     'type': 'trade_plan',
-                    'title': f"תכנית {plan.symbol}",
+                    'title': title,
                     'status': plan.status,
-                    'created_at': plan.created_at.isoformat() if plan.created_at else None
+                    'side': plan.side,
+                    'investment_type': plan.investment_type,
+                    'created_at': plan.created_at.isoformat() if plan.created_at else None,
+                    'updated_at': plan.updated_at.isoformat() if plan.updated_at else None
                 })
-            
-            # Get related cash flows
-            cash_flows = db.query(CashFlow).filter(CashFlow.trading_trading_account_id == trading_account_id).all()
+
+            # Executions executed on this account
+            executions = (
+                db.query(Execution)
+                .options(joinedload(Execution.ticker))
+                .filter(Execution.trading_account_id == trading_account_id)
+                .all()
+            )
+            for execution in executions:
+                ticker_symbol = execution.ticker.symbol if getattr(execution, 'ticker', None) else None
+                title = f"ביצוע {execution.action} {ticker_symbol}".strip() if ticker_symbol else f"ביצוע #{execution.id}"
+                linked_items.append({
+                    'id': execution.id,
+                    'type': 'execution',
+                    'title': title,
+                    'status': 'active',
+                    'side': execution.action,
+                    'investment_type': None,
+                    'created_at': execution.date.isoformat() if execution.date else (execution.created_at.isoformat() if execution.created_at else None),
+                    'updated_at': execution.updated_at.isoformat() if execution.updated_at else None
+                })
+
+            # Cash flows associated with this account
+            cash_flows = (
+                db.query(CashFlow)
+                .options(joinedload(CashFlow.currency))
+                .filter(CashFlow.trading_account_id == trading_account_id)
+                .all()
+            )
             for flow in cash_flows:
+                currency_symbol = flow.currency.symbol if getattr(flow, 'currency', None) else ''
+                title = f"תזרים {flow.type}" if flow.type else f"תזרים #{flow.id}"
                 linked_items.append({
                     'id': flow.id,
                     'type': 'cash_flow',
-                    'title': f"תזרים {flow.flow_type}",
-                    'status': flow.status,
-                    'created_at': flow.created_at.isoformat() if flow.created_at else None
+                    'title': title,
+                    'status': 'active',
+                    'side': None,
+                    'investment_type': None,
+                    'created_at': flow.date.isoformat() if hasattr(flow, 'date') and flow.date else (flow.created_at.isoformat() if flow.created_at else None),
+                    'updated_at': flow.updated_at.isoformat() if flow.updated_at else None,
+                    'amount': flow.amount,
+                    'currency_symbol': currency_symbol
                 })
-                
+
+            # Alerts that relate to this account (related_type_id == 1)
+            alerts = db.query(Alert).filter(Alert.related_type_id == 1, Alert.related_id == trading_account_id).all()
+            for alert in alerts:
+                linked_items.append({
+                    'id': alert.id,
+                    'type': 'alert',
+                    'title': alert.title or alert.message or f"התראה #{alert.id}",
+                    'status': alert.status,
+                    'side': None,
+                    'investment_type': None,
+                    'created_at': alert.created_at.isoformat() if alert.created_at else None,
+                    'updated_at': alert.updated_at.isoformat() if alert.updated_at else None
+                })
+
+            # Notes linked to this account (related_type_id == 1)
+            notes = db.query(Note).filter(Note.related_type_id == 1, Note.related_id == trading_account_id).all()
+            for note in notes:
+                linked_items.append({
+                    'id': note.id,
+                    'type': 'note',
+                    'title': note.title or f"הערה #{note.id}",
+                    'status': 'active',
+                    'side': None,
+                    'investment_type': None,
+                    'created_at': note.created_at.isoformat() if note.created_at else None,
+                    'updated_at': note.updated_at.isoformat() if note.updated_at else None
+                })
+         
         except Exception as e:
             logger.error(f"Error getting account linked items: {str(e)}")
-        
+         
         return linked_items
     
     @staticmethod

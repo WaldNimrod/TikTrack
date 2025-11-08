@@ -542,9 +542,9 @@ class EntityDetailsRenderer {
      */
     renderTrade(tradeData, options = {}) {
         try {
-            const entityColor = this.entityColors.trade || '#007bff';
-            
-            // סטטוס - שימוש במערכת הרינדור הכללית
+        const entityColor = this.entityColors.trade || '#007bff';
+        
+        // סטטוס - שימוש במערכת הרינדור הכללית
         const statusDisplay = window.FieldRendererService.renderStatus(tradeData.status, 'trade');
         
         // טיקר - נחלץ מה-tickerObject או מה-ticker_symbol
@@ -1185,7 +1185,7 @@ class EntityDetailsRenderer {
                         ${this.renderTradePlanSpecific(tradePlanData, entityColor)}
                     </div>
                 </div>
-
+                
                 <div class="row g-3 mt-4">
                     <div class="col-12">
                         ${this.renderLinkedItems(tradePlanData.linked_items || [], this.entityColors.trade_plan || entityColor, 'trade_plan', tradePlanData.id, options?.sourceInfo || null, options)}
@@ -1250,43 +1250,82 @@ class EntityDetailsRenderer {
             return `<span class="${cssClass}" dir="ltr">${sign}${Math.abs(num).toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>`;
         };
 
-        const entryDate = this.formatDateTime(tradePlanData.entry_date) || 'לא הוגדר';
+        // Calculate stop_price and target_price if not provided but percentages exist
+        const entryPrice = Number(tradePlanData.entry_price || 0);
+        let stopPrice = tradePlanData.stop_price || null;
+        let targetPrice = tradePlanData.target_price || null;
+        
+        if (!stopPrice && entryPrice > 0 && tradePlanData.stop_percentage) {
+            // Calculate stop_price from entry_price and stop_percentage
+            const stopPercent = Number(tradePlanData.stop_percentage) / 100;
+            const side = tradePlanData.side?.toLowerCase() || 'long';
+            if (side === 'long') {
+                stopPrice = entryPrice * (1 - stopPercent);
+            } else {
+                stopPrice = entryPrice * (1 + stopPercent);
+            }
+        }
+        
+        if (!targetPrice && entryPrice > 0 && tradePlanData.target_percentage) {
+            // Calculate target_price from entry_price and target_percentage
+            const targetPercent = Number(tradePlanData.target_percentage) / 100;
+            const side = tradePlanData.side?.toLowerCase() || 'long';
+            if (side === 'long') {
+                targetPrice = entryPrice * (1 + targetPercent);
+            } else {
+                targetPrice = entryPrice * (1 - targetPercent);
+            }
+        }
+
+        // Render Stop Loss with percentage and amount in one line (negative color)
+        const renderStopLossCombined = () => {
+            if (!stopPrice && !tradePlanData.stop_percentage) {
+                return '<span class="text-muted">לא הוגדר</span>';
+            }
+            // Render amount with negative color
+            const amountValue = stopPrice ? Number(stopPrice) : 0;
+            const amountHtml = stopPrice 
+                ? `<span class="numeric-value-negative" dir="ltr">${currencySymbol}${Math.abs(amountValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`
+                : '<span class="text-muted">-</span>';
+            // Render percentage with negative color (always negative for stop loss)
+            let percentHtml = '<span class="text-muted">-</span>';
+            if (tradePlanData.stop_percentage) {
+                const stopPercent = Number(tradePlanData.stop_percentage);
+                percentHtml = `<span class="numeric-value-negative" dir="ltr">-${Math.abs(stopPercent).toFixed(2)}%</span>`;
+            }
+            return `<span dir="ltr">${amountHtml} ${percentHtml}</span>`;
+        };
+
+        // Render Take Profit with percentage and amount in one line (positive color)
+        const renderTakeProfitCombined = () => {
+            if (!targetPrice && !tradePlanData.target_percentage) {
+                return '<span class="text-muted">לא הוגדר</span>';
+            }
+            // Render amount with positive color
+            const amountValue = targetPrice ? Number(targetPrice) : 0;
+            const amountHtml = targetPrice 
+                ? `<span class="numeric-value-positive" dir="ltr">${currencySymbol}${Math.abs(amountValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`
+                : '<span class="text-muted">-</span>';
+            // Render percentage with positive color
+            const percentHtml = tradePlanData.target_percentage ? renderPercent(tradePlanData.target_percentage) : '<span class="text-muted">-</span>';
+            return `<span dir="ltr">${amountHtml} ${percentHtml}</span>`;
+        };
 
         return `
             <div class="trade-plan-specific">
                 <h6 class="border-bottom pb-2 mb-3" style="border-color: ${entityColor} !important;">פרטי תכנון</h6>
                 <div class="list-group list-group-flush">
                     <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                        <span class="text-muted">כמות מתוכננת</span>
-                        <span>${renderQuantity(tradePlanData.quantity)}</span>
-                    </div>
-                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                        <span class="text-muted">סכום מתוכנן</span>
-                        <span>${renderAmount(tradePlanData.planned_amount, 2)}</span>
-                    </div>
-                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
                         <span class="text-muted">מחיר כניסה מתוכנן</span>
                         <span>${tradePlanData.entry_price ? renderAmount(tradePlanData.entry_price, 2) : '<span class="text-muted">לא הוגדר</span>'}</span>
                     </div>
                     <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                        <span class="text-muted">תאריך כניסה</span>
-                        <span class="text-muted">${entryDate}</span>
-                    </div>
-                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
                         <span class="text-muted">Stop Loss</span>
-                        <span>${tradePlanData.stop_loss ? renderAmount(tradePlanData.stop_loss, 2) : '<span class="text-muted">לא הוגדר</span>'}</span>
+                        ${renderStopLossCombined()}
                     </div>
                     <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
                         <span class="text-muted">Take Profit</span>
-                        <span>${tradePlanData.take_profit ? renderAmount(tradePlanData.take_profit, 2) : '<span class="text-muted">לא הוגדר</span>'}</span>
-                    </div>
-                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                        <span class="text-muted">סטופ (%)</span>
-                        <span>${tradePlanData.stop_percentage ? renderPercent(tradePlanData.stop_percentage) : '<span class="text-muted">לא הוגדר</span>'}</span>
-                    </div>
-                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                        <span class="text-muted">יעד (%)</span>
-                        <span>${tradePlanData.target_percentage ? renderPercent(tradePlanData.target_percentage) : '<span class="text-muted">לא הוגדר</span>'}</span>
+                        ${renderTakeProfitCombined()}
                     </div>
                 </div>
             </div>
@@ -1871,6 +1910,18 @@ class EntityDetailsRenderer {
             const tbodyContent = tbodyIndex >= 0 && tbodyEndIndex > tbodyIndex 
                 ? html.substring(tbodyIndex + 7, tbodyEndIndex) 
                 : 'NOT FOUND';
+            window.Logger?.info('🔍 [renderLinkedItems] After creating HTML template', {
+                htmlLength: html.length,
+                tbodyFound: tbodyIndex >= 0,
+                tbodyContentLength: tbodyContent.length,
+                tbodyContentPreview: tbodyContent.substring(0, 200),
+                tbodyContentMatchesRowsHtml: tbodyContent.trim() === rowsHtml.trim(),
+                enrichedItemsCount: enrichedItems.length,
+                tableId: tableId,
+                hasTableInHTML: html.includes(`id="${tableId}"`),
+                htmlIncludesLinkedItemsTable: html.includes('linkedItemsTable_')
+            }, { page: 'entity-details-renderer' });
+            
             console.log('🔍 [renderLinkedItems] After creating HTML template', {
                 htmlLength: html.length,
                 tbodyFound: tbodyIndex >= 0,
@@ -4469,6 +4520,34 @@ class EntityDetailsRenderer {
                 ? `<a href="#" onclick="window.showEntityDetails('trading_account', ${accountId}); return false;" class="entity-link" style="color: ${color};">${accountName || `חשבון #${accountId}`}</a>`
                 : (accountName ? `<span>${accountName}</span>` : null);
 
+            // Calculate quantity from planned_amount and entry_price
+            const plannedAmount = Number(entityData.planned_amount || 0);
+            const entryPrice = Number(entityData.entry_price || 0);
+            const calculatedQuantity = (entryPrice > 0 && plannedAmount > 0) ? plannedAmount / entryPrice : 0;
+            const quantity = (entityData.quantity && Number(entityData.quantity) > 0) ? Number(entityData.quantity) : calculatedQuantity;
+
+            // Render quantity and amount without positive/negative colors
+            const renderQuantityNeutral = (value) => {
+                if (value === null || value === undefined || Number.isNaN(Number(value)) || value === 0) {
+                    return '<span class="text-muted">לא הוגדר</span>';
+                }
+                const num = Number(value);
+                return `<span dir="ltr">${num.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>`;
+            };
+
+            const currencySymbol = entityData.currency_symbol ||
+                entityData.account_currency_symbol ||
+                entityData.trading_account?.currency_symbol ||
+                '$';
+
+            const renderAmountNeutral = (value, decimals = 2) => {
+                if (value === null || value === undefined || Number.isNaN(Number(value)) || value === 0) {
+                    return '<span class="text-muted">לא הוגדר</span>';
+                }
+                const num = Number(value || 0);
+                return `<span dir="ltr">${currencySymbol}${num.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</span>`;
+            };
+
             html += `
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">צד:</label>
@@ -4490,6 +4569,21 @@ class EntityDetailsRenderer {
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך יצירה:</label>
                     <span class="text-muted">${createdAt}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך כניסה:</label>
+                    <span class="text-muted">${this.formatDateTime(entityData.entry_date || entityData.created_at) || 'לא הוגדר'}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">כמות מתוכננת:</label>
+                    <span>${renderQuantityNeutral(quantity)}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סכום מתוכנן:</label>
+                    <span>${renderAmountNeutral(entityData.planned_amount, 2)}</span>
                 </div>
             `;
         } else if (entityType === 'execution') {

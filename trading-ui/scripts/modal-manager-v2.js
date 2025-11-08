@@ -1737,14 +1737,20 @@ class ModalManagerV2 {
                 // Fields to ignore (metadata/relationship fields)
         const fieldsToIgnore = ['id', 'updated_at', 'account_name', 'currency_name', 'currency_symbol', 'usd_rate'];
         
-        // Don't ignore created_at if it has a field mapping (e.g., alerts)
-        const ignoreCreatedAt = !fieldMapping || !fieldMapping['created_at'];
+        // Don't ignore created_at/opened_at if they have field mappings (e.g., trade entry date)
+        const ignoreCreatedAt = !fieldMapping || (!fieldMapping['created_at'] && !fieldMapping['opened_at']);
         
         // מילוי שדות רגילים
         for (const [key, value] of Object.entries(data)) {
-            // Ignore metadata fields (but allow created_at if mapped)
+            // Ignore metadata fields (but allow created_at/opened_at if mapped)
             if (fieldsToIgnore.includes(key) || (key === 'created_at' && ignoreCreatedAt)) {
                 console.log(`⏭️ Skipping ${key} (metadata field)`);
+                continue;
+            }
+            
+            // Skip opened_at if it's the same as created_at (to avoid duplicate)
+            if (key === 'opened_at' && data['created_at'] && data['created_at'] === value && fieldMapping['created_at']) {
+                console.log(`⏭️ Skipping ${key} (same as created_at)`);
                 continue;
             }
             
@@ -2514,6 +2520,9 @@ class ModalManagerV2 {
             'ticker': {
                 'symbol': 'tickerSymbol',
                 'name': 'tickerName',
+                'type': 'tickerType',
+                'currency_id': 'tickerCurrency',
+                'remarks': 'tickerRemarks',
                 'sector': 'tickerSector',
                 'industry': 'tickerIndustry'
             },
@@ -2522,16 +2531,28 @@ class ModalManagerV2 {
                 'ticker_id': 'tradeTicker',
                 'side': 'tradeSide',
                 'status': 'tradeStatus',
-                'notes': 'tradeNotes'
+                'notes': 'tradeNotes',
+                'investment_type': 'tradeType',
+                'entry_price': 'tradeEntryPrice',
+                'quantity': 'tradeQuantity',
+                'created_at': 'tradeEntryDate',
+                'opened_at': 'tradeEntryDate',
+                'stop_price': 'tradeStopLoss',
+                'target_price': 'tradeTakeProfit'
             },
             'trade_plan': {
                 'trading_account_id': 'tradePlanAccount',
-                'ticker_id': 'planTicker',
+                'ticker_id': 'tradePlanTicker', // Fixed: was 'planTicker', should be 'tradePlanTicker'
                 'side': 'tradePlanSide',
                 'investment_type': 'tradePlanType', // Map investment_type to tradePlanType field
+                'status': 'tradePlanStatus',
                 'planned_amount': 'planAmount',
-                'stop_loss': 'planStopLoss',
-                'target_price': 'planTargetPrice'
+                'entry_price': 'tradePlanEntryPrice', // Map entry_price to tradePlanEntryPrice field
+                'created_at': 'tradePlanEntryDate', // Map created_at to tradePlanEntryDate field
+                'entry_date': 'tradePlanEntryDate', // Alias for created_at (if exists in API response)
+                'stop_price': 'tradePlanStopLoss', // Map stop_price to tradePlanStopLoss field
+                'target_price': 'tradePlanTakeProfit', // Map target_price to tradePlanTakeProfit field
+                'notes': 'tradePlanNotes' // Map notes to tradePlanNotes field
             },
                         'alert': {
                 'message': 'alertName',
@@ -2554,7 +2575,7 @@ class ModalManagerV2 {
                 'trading_account_id': 'executionAccount',
                 'action': 'executionType',
                 'type': 'executionType', // Alias for action
-                'side': 'executionSide',
+                // 'side' removed - not in config and not in database model
                 'quantity': 'executionQuantity',
                 'price': 'executionPrice',
                 'date': 'executionDate',
@@ -2576,7 +2597,8 @@ class ModalManagerV2 {
             'note': {
                 'content': 'noteContent',
                 'related_type_id': 'noteRelatedType',
-                'related_id': 'noteRelatedObject'
+                'related_id': 'noteRelatedObject',
+                'attachment': 'noteAttachment' // Map attachment to noteAttachment field
             }
         };
         

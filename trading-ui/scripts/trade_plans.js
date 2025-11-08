@@ -3056,6 +3056,7 @@ async function saveTradePlan() {
             side: { id: 'tradePlanSide', type: 'text' },
             investment_type: { id: 'tradePlanType', type: 'text' }, // Map tradePlanType field to investment_type column
             planned_amount: { id: 'planAmount', type: 'float' },
+            entry_price: { id: 'tradePlanEntryPrice', type: 'float' }, // Required field - entry price
             stop_price: { id: 'tradePlanStopLoss', type: 'float', default: null },
             target_price: { id: 'tradePlanTakeProfit', type: 'float', default: null },
             entry_date: { id: 'tradePlanEntryDate', type: 'dateOnly', default: null },
@@ -3099,6 +3100,14 @@ async function saveTradePlan() {
         if (!tradePlanData.ticker_id) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanTicker', 'טיקר הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+        
+        // Validate entry_price - required field
+        if (!tradePlanData.entry_price || tradePlanData.entry_price <= 0) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('tradePlanEntryPrice', 'מחיר כניסה הוא שדה חובה וחייב להיות גדול מ-0');
             }
             hasErrors = true;
         }

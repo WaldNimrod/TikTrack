@@ -98,12 +98,13 @@ const tradePlansModalConfig = {
             type: 'number',
             id: 'tradePlanEntryPrice',
             label: 'מחיר כניסה מתוכנן',
-            required: false,
+            required: true,
             min: 0.01,
             step: 0.01,
             placeholder: 'הכנס מחיר כניסה...',
             rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            colClass: 'col-md-6 col-sm-12',
+            description: 'מחיר הכניסה המתוכנן - מתעדכן אוטומטית לאחר בחירת טיקר'
         },
         {
             type: 'datetime-local',

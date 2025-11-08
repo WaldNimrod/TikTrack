@@ -1,0 +1,39 @@
+/* ========================================================
+   PAGE-SCRIPTS-MATRIX.CSS - Only what you asked for
+   ======================================================== */
+
+/* Container with horizontal scroll */
+.table-container {
+    overflow-x: auto;
+}
+
+/* Table with auto layout - no fixed widths */
+#page-scripts-matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* ALL headers - vertical text from top to bottom */
+#page-scripts-matrix-table th {
+    transform: rotate(-90deg);
+    padding: 0.1rem 0.05rem;
+    height: 60px;
+    white-space: nowrap;
+}
+
+/* ALL data cells - auto width */
+#page-scripts-matrix-table td {
+    padding: 0.1rem 0.05rem;
+    text-align: center;
+}
+
+/* First column - sticky for script names */
+#page-scripts-matrix-table th:first-child,
+#page-scripts-matrix-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: #e8f0fe;
+    writing-mode: horizontal-tb;
+    text-orientation: initial;
+    height: auto;
+}

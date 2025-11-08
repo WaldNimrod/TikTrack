@@ -611,6 +611,200 @@
                 "id": "package",
                 "color": "terminal.ansiMagenta"
             }
+        },
+        
+        // ========================================
+        // 🏭 TikTrack Production Server Management
+        // ========================================
+        {
+            "label": "TT: Start Production Server",
+            "type": "shell",
+            "command": "cd production/Backend && python3 app.py",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "rocket",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "TT: Start Production (Script)",
+            "type": "shell",
+            "command": "./production/start_production.sh",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "TT: Stop Production Server",
+            "type": "shell",
+            "command": "lsof -ti :5001 | xargs kill -9 2>/dev/null || true",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "debug-stop",
+                "color": "terminal.ansiRed"
+            }
+        },
+        {
+            "label": "TT: Restart Production Server",
+            "type": "shell",
+            "command": "lsof -ti :5001 | xargs kill -9 2>/dev/null || true; sleep 1; cd production/Backend && python3 app.py",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "refresh",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        {
+            "label": "TT: Production Server Status",
+            "type": "shell",
+            "command": "lsof -i :5001 || echo 'Production server is not running'",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "server",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        {
+            "label": "TT: Production Health Check",
+            "type": "shell",
+            "command": "curl -s http://localhost:5001/api/health | python3 -m json.tool",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "pulse",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "TT: Sync to Production",
+            "type": "shell",
+            "command": "./scripts/sync_to_production.py",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "sync",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        {
+            "label": "TT: Verify Production",
+            "type": "shell",
+            "command": "./scripts/verify_production.sh",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "checklist",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "TT: View Production Logs",
+            "type": "shell",
+            "command": "tail -f production/Backend/logs/app.log",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "never"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "file-text",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        {
+            "label": "TT: Open Production Dashboard",
+            "type": "shell",
+            "command": "open http://localhost:5001",
+            "group": "none",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "focus": false,
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "dashboard",
+                "color": "terminal.ansiGreen"
+            }
         }
     ]
 }

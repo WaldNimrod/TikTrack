@@ -12,8 +12,9 @@ BASE_DIR = Path(__file__).parent.parent  # production/Backend/
 # Database path - always production database
 DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"
 
-# UI directory - go up from production/Backend/ to project root, then to trading-ui
-UI_DIR = BASE_DIR.parent.parent / "trading-ui"
+# UI directory - production has its own trading-ui directory
+# Go up from production/Backend/ to production/, then to trading-ui
+UI_DIR = BASE_DIR.parent / "trading-ui"
 
 # Flask settings
 DEBUG = False

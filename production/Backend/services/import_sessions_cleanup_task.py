@@ -24,8 +24,9 @@ def register_import_sessions_cleanup_task(task_manager: BackgroundTaskManager):
             from sqlalchemy import create_engine, text
             from sqlalchemy.orm import sessionmaker
             
-            # Database path
-            db_path = backend_dir / "db" / "simpleTrade_new.db"
+            # Database path - use config.settings
+            from config.settings import DB_PATH
+            db_path = DB_PATH
             
             if not db_path.exists():
                 print(f"❌ Database not found at: {db_path}")

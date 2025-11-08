@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דשבורד בדיקות CRUD - TikTrack</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+
+    <!-- TikTrack Master Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=0da3519a_20251102_104906"></script>
+    
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js?v=0da3519a_20251102_104906"></script>
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=0da3519a_20251102_104906"></script>
+</head>
+
+<body>
+    <div class="background-wrapper">
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
+        <div class="page-body">
+            <!-- Main content limited in width -->
+            <div class="main-content" data-section="crud-testing">
+                
+                <!-- UI Content Section Top Start-->
+                <div class="top-section">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="דשבורד בדיקות CRUD" class="section-icon">
+                            דשבורד בדיקות CRUD
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="PLAY" data-onclick="runSmartTestAllEntities()" data-text="הרץ כל הבדיקות" title="הרץ את כל בדיקות CRUD">
+                            </button>
+                            <button data-button-type="REFRESH" data-onclick="refreshCRUDDashboard()" data-text="רענן" title="רענן את הדשבורד">
+                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- כרטיסי סטטיסטיקה מרכזיים -->
+                        <div class="row">
+                            <!-- כרטיס סטטיסטיקות כללי -->
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-center mb-2">
+                                            <i class="fas fa-chart-line fa-2x text-primary"></i>
+                            </div>
+                                        <h5 class="card-title">סך בדיקות</h5>
+                                        <h3 class="text-primary" id="totalTestsCount">0</h3>
+                                        <small class="text-muted">כל הבדיקות במערכת</small>
+                            </div>
+                            </div>
+                            </div>
+                            
+                            <!-- כרטיס בדיקות מוצלחות -->
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-center mb-2">
+                                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                        </div>
+                                        <h5 class="card-title">מוצלחות</h5>
+                                        <h3 class="text-success" id="passedTestsCount">0</h3>
+                                        <small class="text-muted">בדיקות שעברו</small>
+                    </div>
+                </div>
+                        </div>
+
+                            <!-- כרטיס בדיקות נכשלות -->
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-center mb-2">
+                                            <i class="fas fa-times-circle fa-2x text-danger"></i>
+                                    </div>
+                                        <h5 class="card-title">נכשלות</h5>
+                                        <h3 class="text-danger" id="failedTestsCount">0</h3>
+                                        <small class="text-muted">בדיקות שנכשלו</small>
+                                </div>
+                            </div>
+                                    </div>
+                            
+                            <!-- כרטיס זמן ביצוע -->
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-center mb-2">
+                                            <i class="fas fa-clock fa-2x text-info"></i>
+                                        </div>
+                                        <h5 class="card-title">זמן ביצוע</h5>
+                                        <h3 class="text-info" id="executionTime">0ms</h3>
+                                        <small class="text-muted">זמן כולל</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- סטטוס כללי -->
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-info-circle text-primary"></i>
+                                            סטטוס מערכת הבדיקות
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="systemStatus">
+                                            <div class="alert alert-info mb-0">
+                                                <i class="fas fa-info-circle"></i>
+                                                מערכת הבדיקות מוכנה לפעולה. לחץ על "הרץ כל הבדיקות" כדי להתחיל.
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                <!-- UI Content Section Top End -->  
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section" id="crud-api-tests">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/server.svg" alt="בדיקות API" class="section-icon">
+                            בדיקות API מהירות
+                                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="PLAY" data-onclick="runSmartTestAllEntities()" data-text="הרץ בדיקות API" title="הרץ בדיקות API מהירות">
+                                </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('crud-api-tests')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
+                                </button>
+                    </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- כפתורי בדיקה פשוטים -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-cogs text-primary"></i>
+                                            בקרת בדיקות API
+                                        </h6>
+                </div>
+                                    <div class="card-body">
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                            <button class="btn btn-primary btn-lg" onclick="runSmartTestAllEntities()">
+                                                <i class="fas fa-play"></i> הרץ בדיקות מהירות (29 עמודים)
+                                            </button>
+                                            <button class="btn btn-outline-info" onclick="exportReportHTML()">
+                                                <i class="fas fa-download"></i> ייצא דוח HTML
+                                            </button>
+                                            <button class="btn btn-outline-secondary" onclick="copyReportToClipboard()">
+                                                <i class="fas fa-copy"></i> העתק דוח
+                                            </button>
+                                        </div>
+                                        <div class="mt-3 text-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle"></i>
+                                                בדיקות API מהירות לכל 29 העמודים במערכת (13 עמודי משתמש + 16 כלי פיתוח)
+                                            </small>
+                    </div>
+                            </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                <!-- UI Content Section 1 End-->   
+
+                <!-- UI Content Section 2 Start-->
+                <div class="content-section" id="crud-test-results">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="תוצאות בדיקות" class="section-icon">
+                            תוצאות בדיקות מפורטות
+                    </div>
+                        <div class="table-actions">
+                            <button data-button-type="REFRESH" data-onclick="refreshTestResults()" data-text="רענן תוצאות" title="רענן תוצאות בדיקות">
+                                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('crud-test-results')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
+                                            </button>
+                                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- תוצאות בדיקות מפורטות -->
+                        <div class="row">
+                            <!-- סטטיסטיקות כללי -->
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-chart-bar text-success"></i>
+                                            תוצאות בדיקות API
+                                        </h6>
+                            </div>
+                                    <div class="card-body">
+                                        <!-- פס התקדמות -->
+                                        <div class="progress mb-3" >
+                                            <div class="progress-bar" id="apiProgressBar" role="progressbar" >
+                                                <span id="apiProgressText">0%</span>
+                            </div>
+                            </div>
+
+                                        <!-- טבלת תוצאות מפורטת -->
+                                        <div class="table-responsive" >
+                                            <table class="table table-sm table-hover" id="testResultsTable">
+                                                <thead class="table-dark sticky-top">
+                                                    <tr>
+                                                        <th>עמוד</th>
+                                                        <th>סטטוס</th>
+                                                        <th>זמן (ms)</th>
+                                                        <th>ציון</th>
+                                                        <th>פרטים</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="apiTestResultsTable">
+                                                    <tr>
+                                                        <td colspan="5" class="text-center text-muted">
+                                                            לחץ על "הרץ כל הבדיקות" כדי להתחיל
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+
+                        <!-- דוח מפורט -->
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="card" id="finalReportCard" >
+                                    <div class="card-header">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-file-alt text-info"></i>
+                                            דוח סופי
+                                        </h6>
+                        </div>
+                                    <div class="card-body">
+                                        <div id="detailedReport">
+                                            <div class="text-center text-muted">
+                                                <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                                <p>התחל בדיקות כדי לראות דוח מפורט</p>
+                    </div>
+                    </div>
+                                        </div>
+                    </div>
+                    
+                                        <!-- תוצאות בדיקות מפורטות -->
+                                        <div class="card" id="deepTestingResults" >
+                                            <div class="card-header">
+                                                <h6 class="mb-0">
+                                                    <i class="fas fa-search text-info"></i>
+                                                    תוצאות בדיקות מפורטות
+                                                </h6>
+                    </div>
+                                            <div class="card-body">
+                                                <div class="text-center text-muted">
+                                                    לחץ על "בדיקה מפורטת" כדי לראות תוצאות מפורטות
+                </div>
+                                </div>
+                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                        </div>
+                <!-- UI Content Section 2 End-->
+
+                <!-- UI Content Section 3 Start-->
+                <div class="content-section" id="additional-tests">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="בדיקות נוספות" class="section-icon">
+                            בדיקות נוספות חשובות
+                                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('additional-tests')" data-text="הצג/הסתר" title="הצג/הסתר סקשן">
+                                            </button>
+                                                </div>
+                                                </div>
+                    <div class="section-body">
+                        <!-- בדיקות נוספות -->
+                        <div class="row">
+                            <!-- בדיקות מערכת כפתורים -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-mouse-pointer text-info"></i>
+                                            בדיקות מערכת כפתורים
+                                        </h6>
+                                                </div>
+                                    <div class="card-body">
+                                        <p class="card-text">בדיקות מקיפות למערכת הכפתורים כולל:</p>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-check text-success"></i> פונקציונליות</li>
+                                            <li><i class="fas fa-check text-success"></i> נגישות</li>
+                                            <li><i class="fas fa-check text-success"></i> ביצועים</li>
+                                            <li><i class="fas fa-check text-success"></i> תאימות דפדפנים</li>
+                                            </ul>
+                                        <div class="d-grid">
+                                            <button class="btn btn-info" onclick="runButtonSystemTests()">
+                                                <i class="fas fa-play"></i> הרץ בדיקות כפתורים
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- בדיקות CRUD Executions -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-database text-warning"></i>
+                                            בדיקות CRUD Executions
+                                        </h6>
+                                        </div>
+                                    <div class="card-body">
+                                        <p class="card-text">בדיקות CRUD מקיפות לטבלת Executions כולל:</p>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-check text-success"></i> יצירת רשומות</li>
+                                            <li><i class="fas fa-check text-success"></i> עדכון רשומות</li>
+                                            <li><i class="fas fa-check text-success"></i> מחיקת רשומות</li>
+                                            <li><i class="fas fa-check text-success"></i> קשרים עם Tickers</li>
+                                        </ul>
+                                        <div class="d-grid">
+                                            <button class="btn btn-warning" onclick="runExecutionsCRUDTests()">
+                                                <i class="fas fa-play"></i> הרץ בדיקות Executions
+                                            </button>
+                                        </div>
+                                        </div>
+                                                </div>
+                                                </div>
+                                                </div>
+                                                </div>
+                                                </div>
+                <!-- UI Content Section 3 End-->
+
+                                    </div>
+                                </div>
+                            </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+    
+    
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: crud-testing-dashboard | Generated: 2025-11-07T22:30:33.553Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, crud, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/5: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
+
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/5: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: שירותים כלליים -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- שירות איסוף נתונים -->
+    <!-- [17] Load Order: 17 -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- שירות רנדור שדות -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- שירות מילוי select boxes -->
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
+    <!-- [20] Load Order: 20 -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [22] Load Order: 22 -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [23] Load Order: 23 -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/5: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: ממשק משתמש מתקדם -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [25] Load Order: 25 -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- מיפוי טבלאות -->
+    <!-- [26] Load Order: 26 -->
+    <script src="scripts/tables.js?v=1.0.0"></script> <!-- מערכת טבלאות -->
+    <!-- [27] Load Order: 27 -->
+    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- מערכת עימוד -->
+    <!-- [28] Load Order: 28 -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- מערכת תפריט פעולות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/5: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: מערכות לניהול נתונים וטבלאות -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- כלי עזר תאריכים -->
+    <!-- [30] Load Order: 30 -->
+    <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- כלי עזר נתונים כלליים -->
+    <!-- [31] Load Order: 31 -->
+    <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/5: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, import -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [32] Load Order: 32 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [33] Load Order: 33 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [34] Load Order: 34 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [35] Load Order: 35 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [36] Load Order: 36 -->
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+
+    <!-- =============================================================== -->
+    <!-- ===== END SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [37] Page-specific: crud-testing-dashboard -->
+    <script src="scripts/crud-testing-dashboard.js?v=1.0.0"></script> <!-- Page-specific script for crud-testing-dashboard -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 37 | Unique Scripts Loaded: 37 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("crud-testing-dashboard") -->
+</body>
+</html>

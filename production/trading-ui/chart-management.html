@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>ניהול גרפים - TikTrack</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS - חייב להיות קודם -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet"><link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=0da3519a_20251102_104906"></script>
+    
+    <!-- TikTrack CSS - Unified CSS (No @import) -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    <!-- Header Styles - נפרד מ-ITCSS -->
+    
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+</head>
+<body>
+    <!-- Header System -->
+    <div id="unified-header"></div>
+
+    <div class="main-content">
+        <div class="top-section" data-section="top">
+            <div class="section-header">
+                <h2>📊 ניהול גרפים</h2>
+                <div class="header-actions">
+                    <button data-button-type="TOGGLE" data-onclick="refreshChartsStatus()" data-classes="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-sync"></i> רענן סטטוס
+                    </button>
+                    <button data-button-type="EXPORT" data-onclick="exportAllCharts()" data-classes="btn btn-outline-success btn-sm">
+                        <i class="fas fa-download"></i> ייצא הכל
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- סקירה כללית -->
+        <div class="content-section" id="overviewSection">
+            <div class="section-header">
+                <h3>📈 סקירת גרפים</h3>
+                <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('overviewSection')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+            </div>
+            <div class="section-content">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-chart-bar fa-2x text-primary mb-2"></i>
+                                <h5 class="card-title" id="totalCharts">0</h5>
+                                <p class="card-text">סה"כ גרפים</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                                <h5 class="card-title" id="activeCharts">0</h5>
+                                <p class="card-text">גרפים פעילים</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                                <h5 class="card-title" id="errorCharts">0</h5>
+                                <p class="card-text">גרפים עם שגיאות</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-memory fa-2x text-info mb-2"></i>
+                                <h5 class="card-title" id="memoryUsage">0MB</h5>
+                                <p class="card-text">שימוש זיכרון</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ניהול גרפים -->
+        <div class="content-section" id="managementSection">
+            <div class="section-header">
+                <h3>🔧 ניהול גרפים</h3>
+                <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('managementSection')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+            </div>
+            <div class="section-content">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <button data-button-type="ADD" data-entity-type="chart" data-variant="full" data-onclick="createNewChart()" data-text="צור גרף חדש" title="צור גרף חדש"></button>
+                        <button data-button-type="REFRESH" data-onclick="refreshAllCharts()" data-text="רענן">
+                            <i class="fas fa-sync"></i> רענן הכל
+                        </button>
+                        <button data-button-type="DELETE" data-onclick="destroyAllCharts()" data-text="מחק הכל" title="מחק כל הגרפים">
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>🧪 גרפים לדוגמה</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <button class="btn btn-primary btn-sm me-2 mb-2" onclick="createTestChart()">
+                                            <i class="fas fa-plus"></i> גרף בדיקה
+                                        </button>
+                                        <button class="btn btn-info btn-sm me-2 mb-2" onclick="createPerformanceChart()">
+                                            <i class="fas fa-chart-line"></i> גרף ביצועים
+                                        </button>
+                                        <button class="btn btn-success btn-sm me-2 mb-2" onclick="createAccountChart()">
+                                            <i class="fas fa-users"></i> גרף חשבונות
+                                        </button>
+                                        <button class="btn btn-warning btn-sm me-2 mb-2" onclick="createMixedChart()">
+                                            <i class="fas fa-layer-group"></i> גרף מעורב
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm me-2 mb-2" onclick="updateTestChart()">
+                                            <i class="fas fa-sync"></i> עדכן נתונים
+                                        </button>
+                                        <button data-button-type="VIEW" data-onclick="exportTestChart()" data-classes="btn btn-outline-primary">
+                                            <i class="fas fa-download"></i> ייצא גרף
+                                        </button>
+                                        <button data-button-type="DELETE" data-onclick="destroyTestChart()" data-classes="btn btn-outline-danger">
+                                            <i class="fas fa-trash"></i> מחק גרף
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <canvas id="testChart" width="800" height="400" ></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>📋 רשימת גרפים</h5>
+                            </div>
+                            <div class="card-body" id="chartsList">
+                                <!-- Charts will be dynamically populated here -->
+                                <p class="text-muted">אין גרפים פעילים כרגע</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- הגדרות מערכת -->
+        <div class="content-section" id="settingsSection">
+            <div class="section-header">
+                <h3>⚙️ הגדרות מערכת</h3>
+                <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('settingsSection')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+            </div>
+            <div class="section-content">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>🎨 הגדרות גרפים</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label" for="chartTheme">נושא גרפים:</label>
+                                    <select class="form-select" id="chartTheme" onchange="changeChartTheme(this.value)">
+                                        <option value="default">ברירת מחדל</option>
+                                        <option value="dark">כהה</option>
+                                        <option value="light">בהיר</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="autoRefresh" onchange="toggleAutoRefresh(this.checked)">
+                                    <label class="form-check-label" for="autoRefresh">רענון אוטומטי</label>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label" for="refreshInterval">מרווח רענון (שניות):</label>
+                                    <input type="number" class="form-control" id="refreshInterval" value="30" min="5" max="300">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>📤 אפשרויות ייצוא</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label" for="exportFormat">פורמט:</label>
+                                    <select class="form-select" id="exportFormat">
+                                        <option value="png">PNG</option>
+                                        <option value="jpg">JPG</option>
+                                        <option value="pdf">PDF</option>
+                                        <option value="svg">SVG</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label" for="exportQuality">איכות:</label>
+                                    <select class="form-select" id="exportQuality">
+                                        <option value="low">נמוכה</option>
+                                        <option value="medium">בינונית</option>
+                                        <option value="high" selected>גבוהה</option>
+                                        <option value="ultra">אולטרה</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    
+    
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: chart-management | Generated: 2025-11-08T00:19:40.682Z -->
+    <!-- 📦 Packages: base, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/2: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
+
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/2: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [17] Load Order: 17 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [20] Load Order: 20 -->
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [21] Page-specific: chart-management -->
+    <script src="scripts/chart-management.js?v=1.0.0"></script> <!-- Page-specific script for chart-management -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 21 | Unique Scripts Loaded: 21 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("chart-management") -->
+
+</body>
+</html>
+

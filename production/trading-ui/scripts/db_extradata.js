@@ -1,0 +1,429 @@
+/**
+ * Database Extra Data Display System
+ * מערכת תצוגת טבלאות עזר במסד נתונים
+ *
+ * This script handles the display of extra database tables
+ * in a structured, user-friendly format similar to db_display.js
+ *
+ * @author TikTrack System
+ * @version 1.0.0
+ * @lastUpdated October 30, 2025
+ * @since 2025-10-30
+ */
+
+// ===== GLOBAL VARIABLES =====
+let totalRecords = 0;
+let tableData = {};
+
+// ===== INITIALIZATION =====
+
+/**
+ * Initialize the database extra data display page
+ */
+function initDatabaseExtraData() {
+  console.log('🔄 Initializing database extra data page...');
+  
+  // Load all tables
+  loadAllTables();
+  
+  console.log('✅ Database extra data page initialized successfully');
+}
+
+/**
+ * Load all extra data tables
+ */
+async function loadAllTables() {
+  console.log('🔄 Loading all extra data tables...');
+  
+  // API endpoints and their corresponding container IDs
+  const tables = [
+    { api: 'constraints', container: 'constraintsContainer' },
+    { api: 'currencies', container: 'currenciesContainer' },
+    { api: 'preference_groups', container: 'preferenceGroupsContainer' },
+    { api: 'system_setting_groups', container: 'systemSettingGroupsContainer' },
+    { api: 'external_data_providers', container: 'externalDataProvidersContainer' },
+    { api: 'quotes_last', container: 'quotesLastContainer' },
+    { api: 'plan_conditions', container: 'planConditionsContainer' },
+    { api: 'user_preferences', container: 'userPreferencesContainer' }
+  ];
+  
+  totalRecords = 0;
+  
+  for (const table of tables) {
+    try {
+      console.log(`📊 Loading ${table.api}...`);
+      await loadTableData(table.api, table.container);
+    } catch (error) {
+      console.error(`Error loading ${table.api}:`, error);
+    }
+  }
+  
+  // Update summary stats
+  updateSummaryStats();
+  console.log('✅ All extra data tables loaded');
+}
+
+// ===== DATA LOADING =====
+
+/**
+ * Load data for a specific table type
+ * @param {string} tableType - The table type to load
+ * @param {string} containerId - The container ID for the table
+ */
+async function loadTableData(tableType, containerId) {
+  try {
+    console.log(`📊 Loading data for table type: ${tableType}`);
+
+    // Show loading state
+    showLoadingState(tableType);
+
+    // Fetch data from server
+    const data = await fetchTableData(tableType);
+
+    // Store data
+    tableData[tableType] = data;
+
+    // Update table display
+    updateTableDisplay(data, tableType, containerId);
+
+    // Update table info
+    updateTableInfo(tableType, data.length);
+
+    // Add to total records
+    totalRecords += data.length;
+
+    console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
+
+  } catch (error) {
+    console.error(`❌ Error loading ${tableType}:`, error);
+    // Show error state
+    updateTableDisplay([], tableType, containerId);
+    updateTableInfo(tableType, 0);
+  }
+}
+
+/**
+ * Fetch table data from server
+ * @param {string} tableType - The table type to fetch
+ * @returns {Array} The table data
+ */
+async function fetchTableData(tableType) {
+  console.log(`🌐 Fetching data for ${tableType} from /api/${tableType}/`);
+  
+  const response = await fetch(`/api/${tableType}/`);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const result = await response.json();
+  console.log(`📥 Received response for ${tableType}:`, result);
+  
+  if (result.data && Array.isArray(result.data)) {
+    return result.data;
+  } else {
+    console.warn(`⚠️ No data array found in response for ${tableType}`);
+    return [];
+  }
+}
+
+/**
+ * Show loading state for a table
+ * @param {string} tableType - The table type
+ */
+function showLoadingState(tableType) {
+  const containerId = getContainerId(tableType);
+  const tableContainer = document.getElementById(containerId);
+  if (tableContainer) {
+    const tbody = tableContainer.querySelector('tbody');
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="100" class="text-center text-muted">Loading data...</td></tr>';
+    }
+  }
+}
+
+/**
+ * Show error state for a table
+ * @param {string} tableType - The table type
+ * @param {string} errorMessage - The error message
+ */
+function showErrorState(tableType, errorMessage) {
+  const containerId = getContainerId(tableType);
+  const tableContainer = document.getElementById(containerId);
+  if (tableContainer) {
+    const tbody = tableContainer.querySelector('tbody');
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="100" class="text-center text-danger">Error: ${errorMessage}</td></tr>`;
+    }
+  }
+}
+
+// ===== TABLE DISPLAY =====
+
+/**
+ * Update table display with data
+ * @param {Array} data - The data to display
+ * @param {string} tableType - The table type
+ * @param {string} containerId - The container ID for the table
+ */
+function updateTableDisplay(data, tableType, containerId) {
+  // Convert table type to section ID
+  const sectionId = getSectionId(tableType);
+  const tableId = getTableId(tableType);
+  
+  const tableContainer = document.getElementById(containerId);
+  if (!tableContainer) {
+    console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
+    return;
+  }
+
+  const table = document.getElementById(tableId);
+  if (!table) {
+    console.error(`❌ Table not found: ${tableId}`);
+    return;
+  }
+
+  const tbody = table.querySelector('tbody');
+  if (!tbody) {
+    console.error(`❌ Table body not found in table ${tableId}`);
+    return;
+  }
+
+  console.log(`🔧 Updating table display for ${tableType} with ${data.length} records`);
+
+  // Create table headers from first data row
+  const thead = table.querySelector('thead');
+  if (thead && data.length > 0) {
+    const headers = createTableHeaders(data);
+    thead.innerHTML = headers;
+  }
+
+  // Create table rows
+  const rows = createTableRows(data);
+  tbody.innerHTML = rows;
+
+  // Update table count
+  updateTableCount(tableType, data.length);
+}
+
+/**
+ * Create table headers from data
+ * @param {Array} data - The table data
+ * @returns {string} HTML for table headers
+ */
+function createTableHeaders(data) {
+  if (data.length === 0) return '<tr><th>No data</th></tr>';
+  
+  const firstRow = data[0];
+  const headers = Object.keys(firstRow);
+  
+  const headerCells = headers.map(header => 
+    `<th>${header}</th>`
+  ).join('');
+  
+  return `<tr>${headerCells}</tr>`;
+}
+
+/**
+ * Create table rows from data
+ * @param {Array} data - The table data
+ * @returns {string} HTML for table rows
+ */
+function createTableRows(data) {
+  if (data.length === 0) {
+    return '<tr><td colspan="100" class="text-center text-muted">No data available</td></tr>';
+  }
+  
+  return data.map(row => {
+    const cells = Object.values(row).map(value => 
+      `<td>${formatCellValue(value)}</td>`
+    ).join('');
+    
+    return `<tr>${cells}</tr>`;
+  }).join('');
+}
+
+/**
+ * Format cell value for display
+ * @param {*} value - The cell value
+ * @returns {string} Formatted value
+ */
+function formatCellValue(value) {
+  if (value === null || value === undefined) {
+    return '<span class="text-muted">-</span>';
+  }
+  
+  if (typeof value === 'boolean') {
+    return value ? '✓' : '✗';
+  }
+  
+  if (typeof value === 'number') {
+    return value.toLocaleString();
+  }
+  
+  if (typeof value === 'string' && value.length > 50) {
+    return `<span title="${value}">${value.substring(0, 50)}...</span>`;
+  }
+  
+  return String(value);
+}
+
+/**
+ * Update table information display
+ * @param {string} tableType - The table type
+ * @param {number} recordCount - The number of records
+ */
+function updateTableInfo(tableType, recordCount) {
+  // Convert table type to count element ID
+  const countElementId = getCountElementId(tableType);
+  const countElement = document.getElementById(countElementId);
+  if (countElement) {
+    countElement.textContent = `${recordCount} records`;
+  } else {
+    console.log(`ℹ️ No count element found for ${countElementId}`);
+  }
+}
+
+/**
+ * Get count element ID from table type
+ * @param {string} tableType - Table type
+ * @returns {string} Count element ID
+ */
+function getCountElementId(tableType) {
+  const mapping = {
+    'constraints': 'constraintsCount',
+    'currencies': 'currenciesCount',
+    'preference_groups': 'preferenceGroupsCount',
+    'system_setting_groups': 'systemSettingGroupsCount',
+    'external_data_providers': 'externalDataProvidersCount',
+    'quotes_last': 'quotesLastCount',
+    'plan_conditions': 'planConditionsCount',
+    'user_preferences': 'userPreferencesCount'
+  };
+  return mapping[tableType] || tableType + 'Count';
+}
+
+/**
+ * Update summary statistics in top section
+ */
+function updateSummaryStats() {
+  const totalTablesElement = document.getElementById('totalExtraTables');
+  const totalRecordsElement = document.getElementById('totalExtraRecords');
+  const dataSizeElement = document.getElementById('extraDataSize');
+  const lastUpdateElement = document.getElementById('extraLastUpdate');
+  
+  if (totalTablesElement) {
+    totalTablesElement.textContent = '8';
+  }
+  
+  if (totalRecordsElement) {
+    totalRecordsElement.textContent = totalRecords.toLocaleString();
+  }
+  
+  if (dataSizeElement) {
+    // Estimate data size (rough calculation)
+    const estimatedSize = Math.round(totalRecords * 0.5); // 0.5KB per record estimate
+    dataSizeElement.textContent = `${estimatedSize} KB`;
+  }
+  
+  if (lastUpdateElement) {
+    lastUpdateElement.textContent = new Date().toLocaleString('he-IL');
+  }
+}
+
+// ===== UTILITY FUNCTIONS =====
+
+/**
+ * Get section ID from table type
+ * @param {string} tableType - Table type
+ * @returns {string} Section ID
+ */
+function getSectionId(tableType) {
+  const mapping = {
+    'constraints': 'constraintsSection',
+    'currencies': 'currenciesSection',
+    'preference_groups': 'preferenceGroupsSection',
+    'system_setting_groups': 'systemSettingGroupsSection',
+    'external_data_providers': 'externalDataProvidersSection',
+    'quotes_last': 'quotesLastSection',
+    'plan_conditions': 'planConditionsSection',
+    'user_preferences': 'userPreferencesSection'
+  };
+  return mapping[tableType] || tableType + 'Section';
+}
+
+/**
+ * Get container ID from table type
+ * @param {string} tableType - Table type
+ * @returns {string} Container ID
+ */
+function getContainerId(tableType) {
+  const mapping = {
+    'constraints': 'constraintsContainer',
+    'currencies': 'currenciesContainer',
+    'preference_groups': 'preferenceGroupsContainer',
+    'system_setting_groups': 'systemSettingGroupsContainer',
+    'external_data_providers': 'externalDataProvidersContainer',
+    'quotes_last': 'quotesLastContainer',
+    'plan_conditions': 'planConditionsContainer',
+    'user_preferences': 'userPreferencesContainer'
+  };
+  return mapping[tableType] || tableType + 'Container';
+}
+
+/**
+ * Get table ID from table type
+ * @param {string} tableType - Table type
+ * @returns {string} Table ID
+ */
+function getTableId(tableType) {
+  const mapping = {
+    'constraints': 'constraintsTable',
+    'currencies': 'currenciesTable',
+    'preference_groups': 'preferenceGroupsTable',
+    'system_setting_groups': 'systemSettingGroupsTable',
+    'external_data_providers': 'externalDataProvidersTable',
+    'quotes_last': 'quotesLastTable',
+    'plan_conditions': 'planConditionsTable',
+    'user_preferences': 'userPreferencesTable'
+  };
+  return mapping[tableType] || tableType + 'Table';
+}
+
+/**
+ * Toggle section visibility
+ * @param {string} sectionId - The section ID to toggle
+ */
+function toggleSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (section) {
+    const body = section.querySelector('.section-body');
+    const icon = section.querySelector('.filter-icon');
+    
+    if (body && icon) {
+      if (body.style.display === 'none') {
+        body.style.display = 'block';
+        icon.textContent = '▲';
+      } else {
+        body.style.display = 'none';
+        icon.textContent = '▼';
+      }
+    }
+  }
+}
+
+// ===== EVENT LISTENERS =====
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('➕ Database extra data page DOM loaded');
+  
+  // Initialize the page
+  initDatabaseExtraData();
+});
+
+// Export for global access
+window.initDatabaseExtraData = initDatabaseExtraData;
+window.toggleSection = toggleSection;
+
+console.log('✅ DB Extra Data script loaded successfully');

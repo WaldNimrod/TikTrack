@@ -125,7 +125,8 @@ class BackupService:
     def _backup_database(self, backup_path: Path) -> Dict[str, Any]:
         """Backup SQLite database"""
         try:
-            db_path = Path("Backend/db/simpleTrade_new.db")
+            from config.settings import DB_PATH
+            db_path = DB_PATH
             if not db_path.exists():
                 return {'status': 'error', 'error': 'Database file not found'}
             
@@ -153,11 +154,15 @@ class BackupService:
     def _backup_configuration(self, backup_path: Path) -> Dict[str, Any]:
         """Backup configuration files"""
         try:
+            # Production environment - use relative paths from current location
+            from pathlib import Path
+            current_dir = Path(__file__).parent.parent  # production/Backend/
             config_files = [
-                "Backend/config/database.py",
-                "Backend/config/settings.py",
-                "test_mode.json"
+                str(current_dir / "config" / "database.py"),
+                str(current_dir / "config" / "settings.py"),
+                str(current_dir / "test_mode.json") if (current_dir / "test_mode.json").exists() else None
             ]
+            config_files = [f for f in config_files if f]  # Remove None values
             
             config_backup_path = backup_path / "config"
             config_backup_path.mkdir(exist_ok=True)
@@ -396,7 +401,8 @@ class BackupService:
                 return {'status': 'error', 'error': 'Database backup not found'}
             
             # Backup current database
-            current_db_path = Path("Backend/db/simpleTrade_new.db")
+            from config.settings import DB_PATH
+            current_db_path = DB_PATH
             if current_db_path.exists():
                 backup_current_path = current_db_path.parent / f"{current_db_path.stem}_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
                 shutil.copy2(current_db_path, backup_current_path)
@@ -425,7 +431,10 @@ class BackupService:
             
             for config_file in config_backup_path.iterdir():
                 if config_file.is_file():
-                    dest_path = Path("Backend/config") / config_file.name
+                    # Production environment - restore to config/ directory
+                    from pathlib import Path
+                    current_dir = Path(__file__).parent.parent  # production/Backend/
+                    dest_path = current_dir / "config" / config_file.name
                     dest_path.parent.mkdir(exist_ok=True)
                     shutil.copy2(config_file, dest_path)
                     restored_files.append(str(dest_path))

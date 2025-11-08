@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>מנהל מערכת - TikTrack</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=0da3519a_20251102_104906"></script>
+</head>
+
+<body>
+    <div class="background-wrapper">
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
+        <div class="page-body">
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- System Management Dashboard - Top Section -->
+                <div class="top-section" data-section="top">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>🔧 מנהל מערכת</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-success" id="quickRestartSystemBtn" title="איתחול מהיר של השרת">
+                                <i class="fas fa-redo"></i> איתחול מהיר
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" id="changeModeSystemBtn" title="שינוי מצב מטמון">
+                                <i class="fas fa-cogs"></i> מצב מטמון
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" id="openServerMonitorBtn" title="פתח דשבורד ניטור שרת">
+                                <i class="fas fa-desktop"></i> ניטור שרת
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" id="refreshSystemDataBtn" title="רענן נתוני מערכת">
+                                <i class="fas fa-sync-alt"></i> רענן
+                            </button>
+                            </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- סקשן סטטיסטיקות מערכת מרוכז -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-line text-primary"></i> סטטיסטיקות מערכת
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- סטטיסטיקות מערכת מהירות -->
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">🏥 בריאות</div>
+                                                    <span id="overallHealthStatus" class="badge bg-warning fs-6">טוען...</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">📊 ציון</div>
+                                                    <span id="systemScore" class="badge bg-info fs-6">טוען...</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">⏱️ תגובה</div>
+                                                    <span id="responseTime" class="badge bg-success fs-6">טוען...</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">🔄 פעילות</div>
+                                                    <span id="uptime" class="badge bg-primary fs-6">טוען...</span>
+                                            </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">💾 זיכרון</div>
+                                                    <span id="systemMemory" class="badge bg-secondary fs-6">טוען...</span>
+                                    </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="text-center">
+                                                    <div class="h5 mb-1">🗄️ מטמון</div>
+                                                    <span id="systemCacheMode" class="badge bg-primary fs-6">טוען...</span>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- סטטיסטיקות נוספות -->
+                                        <div class="row mt-3">
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">🌐 שרת</div>
+                                                    <span id="serverHealthStats" class="badge bg-success">פעיל</span>
+                                    </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">🗃️ בסיס נתונים</div>
+                                                    <span id="databaseHealthStats" class="badge bg-success">מחובר</span>
+                                                </div>
+                                                    </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">🔗 רשת</div>
+                                                    <span id="networkHealthStats" class="badge bg-success">יציב</span>
+                                        </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <div class="h6 mb-1">📋 גרסה</div>
+                                                    <span class="badge bg-secondary">2.0.5</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <!-- UI Content Section End-->
+
+            </div>
+        </div>
+    </div>
+
+    
+    
+    
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: system-management | Generated: 2025-11-07T23:24:47.848Z -->
+    <!-- 📦 Packages: base, logs, cache, system-management, management, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/6: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
+
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/6: LOGS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 9 | Description: מערכות לוגים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/unified-log-api.js?v=1.0.0"></script> <!-- API לוגים מאוחד -->
+    <!-- [17] Load Order: 17 -->
+    <script src="scripts/unified-log-manager.js?v=1.0.0"></script> <!-- מנהל לוגים מאוחד -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/unified-log-display.js?v=1.0.0"></script> <!-- תצוגת לוגים מאוחדת -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/6: CACHE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 9 | Description: מערכות מטמון -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/cache-policy-manager.js?v=1.0.0"></script> <!-- מנהל מדיניות מטמון -->
+    <!-- [20] Load Order: 20 -->
+    <script src="scripts/cache-management.js?v=1.0.0"></script> <!-- ניהול מטמון -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/6: SYSTEM MANAGEMENT PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 12 | Description: ניהול מערכת מתקדם -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/system-management/system-management-main.js?v=1.0.0"></script> <!-- ניהול מערכת ראשי -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/system-management/core/sm-base.js?v=1.0.0"></script> <!-- בסיס ניהול מערכת -->
+    <!-- [23] Load Order: 23 -->
+    <script src="scripts/system-management/core/sm-error-handler.js?v=1.0.0"></script> <!-- מטפל שגיאות ניהול מערכת -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/system-management/core/sm-ui-components.js?v=1.0.0"></script> <!-- רכיבי UI ניהול מערכת -->
+    <!-- [25] Load Order: 25 -->
+    <script src="scripts/system-management/sections/sm-section-alerts.js?v=1.0.0"></script> <!-- סקציית התראות -->
+    <!-- [26] Load Order: 26 -->
+    <script src="scripts/system-management/sections/sm-section-background-tasks.js?v=1.0.0"></script> <!-- סקציית משימות רקע -->
+    <!-- [27] Load Order: 27 -->
+    <script src="scripts/system-management/sections/sm-section-cache.js?v=1.0.0"></script> <!-- סקציית מטמון -->
+    <!-- [28] Load Order: 28 -->
+    <script src="scripts/system-management/sections/sm-section-dashboard.js?v=1.0.0"></script> <!-- סקציית דשבורד -->
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/system-management/sections/sm-section-database.js?v=1.0.0"></script> <!-- סקציית מסד נתונים -->
+    <!-- [30] Load Order: 30 -->
+    <script src="scripts/system-management/sections/sm-section-external-data.js?v=1.0.0"></script> <!-- סקציית נתונים חיצוניים -->
+    <!-- [31] Load Order: 31 -->
+    <script src="scripts/system-management/sections/sm-section-operations.js?v=1.0.0"></script> <!-- סקציית פעולות -->
+    <!-- [32] Load Order: 32 -->
+    <script src="scripts/system-management/sections/sm-section-performance.js?v=1.0.0"></script> <!-- סקציית ביצועים -->
+    <!-- [33] Load Order: 33 -->
+    <script src="scripts/system-management/sections/sm-section-server.js?v=1.0.0"></script> <!-- סקציית שרת -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/6: MANAGEMENT PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 13 | Description: מערכות ניהול -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [34] Load Order: 34 -->
+    <script src="scripts/auth.js?v=1.0.0"></script> <!-- מערכת אימות -->
+    <!-- [35] Load Order: 35 -->
+    <script src="scripts/server-monitor.js?v=1.0.0"></script> <!-- ניטור שרת -->
+    <!-- [36] Load Order: 36 -->
+    <script src="scripts/background-tasks.js?v=1.0.0"></script> <!-- משימות רקע -->
+    <!-- [37] Load Order: 37 -->
+    <script src="scripts/system-management.js?v=1.0.0"></script> <!-- ניהול מערכת כללי -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/6: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, import -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [38] Load Order: 38 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [39] Load Order: 39 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [40] Load Order: 40 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [41] Load Order: 41 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [42] Load Order: 42 -->
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- ⚠️ Page-specific script "system-management.js" already loaded via selected packages -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 42 | Unique Scripts Loaded: 42 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("system-management") -->
+
+
+
+</body>
+</html>

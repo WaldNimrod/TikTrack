@@ -31,9 +31,9 @@ class UserService:
     def __init__(self, db_path: str = None):
         """Initialize the user service"""
         if db_path is None:
-            # Default database path
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            db_path = os.path.join(current_dir, "..", "db", "simpleTrade_new.db")
+            # Default database path - use config.settings
+            from config.settings import DB_PATH
+            db_path = str(DB_PATH)
         
         self.db_path = db_path
         self.preferences_service = PreferencesService(db_path)

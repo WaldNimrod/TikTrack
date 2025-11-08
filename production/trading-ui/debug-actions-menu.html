@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Actions Menu System</title>
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+</head>
+<body>
+    <div class="header-container">
+        <div class="header-content">
+            <h1>Debug Actions Menu System</h1>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="page-body">
+            <h2>בדיקת מערכת תפריט פעולות</h2>
+            
+            <div id="debug-results"></div>
+            
+            <h3>בדיקות:</h3>
+            <button onclick="runDebugTests()">הרץ בדיקות</button>
+            <button onclick="testCreateActionsMenu()">בדוק createActionsMenu</button>
+            <button onclick="testActionsMenuSystem()">בדוק ActionsMenuSystem</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/modules/actions-menu-system.js?v=0da3519a_20251102_104906"></script>
+    
+    <script>
+        function runDebugTests() {
+            const results = document.getElementById('debug-results');
+            results.innerHTML = '<h3>תוצאות בדיקה:</h3>';
+            
+            // בדיקה 1: ActionsMenuSystem
+            const hasActionsMenuSystem = typeof window.ActionsMenuSystem !== 'undefined';
+            results.innerHTML += `<p>ActionsMenuSystem: ${hasActionsMenuSystem ? '✅ קיים' : '❌ חסר'}</p>`;
+            
+            // בדיקה 2: actionsMenuSystem instance
+            const hasInstance = typeof window.actionsMenuSystem !== 'undefined';
+            results.innerHTML += `<p>actionsMenuSystem instance: ${hasInstance ? '✅ קיים' : '❌ חסר'}</p>`;
+            
+            // בדיקה 3: createActionsMenu function
+            const hasCreateFunction = typeof window.createActionsMenu !== 'undefined';
+            results.innerHTML += `<p>createActionsMenu function: ${hasCreateFunction ? '✅ קיים' : '❌ חסר'}</p>`;
+            
+            // בדיקה 4: debugActionsMenu function
+            const hasDebugFunction = typeof window.debugActionsMenu !== 'undefined';
+            results.innerHTML += `<p>debugActionsMenu function: ${hasDebugFunction ? '✅ קיים' : '❌ חסר'}</p>`;
+            
+            // בדיקה 5: console messages
+            results.innerHTML += `<p>בדוק את הקונסול להודעות ActionsMenuSystem</p>`;
+            
+            // בדיקה 6: test createActionsMenu
+            if (hasCreateFunction) {
+                try {
+                    const testMenu = window.createActionsMenu([
+                        { type: 'VIEW', onclick: 'console.log("test")', title: 'בדיקה' }
+                    ]);
+                    results.innerHTML += `<p>createActionsMenu test: ${testMenu ? '✅ עובד' : '❌ לא עובד'}</p>`;
+                } catch (error) {
+                    results.innerHTML += `<p>createActionsMenu error: ❌ ${error.message}</p>`;
+                }
+            }
+        }
+        
+        function testCreateActionsMenu() {
+            console.log('=== בדיקת createActionsMenu ===');
+            console.log('window.createActionsMenu:', typeof window.createActionsMenu);
+            
+            if (typeof window.createActionsMenu === 'function') {
+                try {
+                    const testButtons = [
+                        { type: 'VIEW', onclick: 'console.log("test view")', title: 'צפה' },
+                        { type: 'EDIT', onclick: 'console.log("test edit")', title: 'ערוך' }
+                    ];
+                    
+                    const result = window.createActionsMenu(testButtons);
+                    console.log('createActionsMenu result:', result);
+                    
+                    // הוסף את התוצאה לעמוד
+                    const testDiv = document.createElement('div');
+                    testDiv.innerHTML = result;
+                    testDiv.style.border = '1px solid #ccc';
+                    testDiv.style.padding = '10px';
+                    testDiv.style.margin = '10px 0';
+                    document.getElementById('debug-results').appendChild(testDiv);
+                    
+                } catch (error) {
+                    console.error('Error in createActionsMenu:', error);
+                }
+            } else {
+                console.error('createActionsMenu is not a function!');
+            }
+        }
+        
+        function testActionsMenuSystem() {
+            console.log('=== בדיקת ActionsMenuSystem ===');
+            console.log('window.ActionsMenuSystem:', typeof window.ActionsMenuSystem);
+            console.log('window.actionsMenuSystem:', typeof window.actionsMenuSystem);
+            
+            if (window.actionsMenuSystem) {
+                console.log('actionsMenuSystem methods:', Object.getOwnPropertyNames(window.actionsMenuSystem));
+            }
+        }
+        
+        // הרץ בדיקות אוטומטיות
+        window.addEventListener('load', function() {
+            console.log('=== Actions Menu Debug Page Loaded ===');
+            runDebugTests();
+        });
+    </script>
+    <script src="scripts/logger-service.js?v=0da3519a_20251102_104906"></script>
+    <script src="scripts/cache-sync-manager.js?v=0da3519a_20251102_104906"></script> <!-- מנהל סנכרון מטמון --> <!-- שירות לוגים מתקדם -->
+</body>
+</html>

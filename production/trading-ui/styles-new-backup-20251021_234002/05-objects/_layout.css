@@ -1,0 +1,463 @@
+/**
+ * Layout Objects - אובייקטי פריסה
+ * 
+ * קובץ זה מכיל את מערכת הפריסה הבסיסית
+ * containers, wrappers וmain layout objects
+ * 
+ * @version 1.1.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* Main page layout */
+.page-body {
+  min-height: 100vh;
+  direction: rtl;
+  text-align: right;
+  width: 100%;
+}
+
+/* Dashboard rows - for statistics sections */
+.dashboard-row {
+  margin-bottom: 20px;
+}
+
+.dashboard-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Detailed Statistics Row */
+.dashboard-row.detailed-stats {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Content wrapper */
+.content-wrapper {
+  width: 100%;
+  max-width: var(--container-xl, 1400px);
+  margin: 0 auto;
+  padding: var(--spacing-md, 16px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* התאמה רספונסיבית לנקודות שבירה */
+@media (min-width: 768px) {
+  .content-wrapper {
+    max-width: var(--container-md, 960px);
+    padding: var(--spacing-lg, 24px);
+  }
+}
+
+@media (min-width: 992px) {
+  .content-wrapper {
+    max-width: var(--container-lg, 1200px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .content-wrapper {
+    max-width: var(--container-xl, 1400px);
+  }
+}
+
+/* Dashboard container - מבוסס על index.css */
+.dashboard-container {
+  width: 100%;
+  max-width: var(--container-xl, 1400px);
+  margin: 0 auto;
+  padding: var(--spacing-md, 16px);
+  font-family: var(--font-family-primary);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* התאמה רספונסיבית לנקודות שבירה */
+@media (min-width: 768px) {
+  .dashboard-container {
+    max-width: var(--container-md, 960px);
+    padding: var(--spacing-lg, 24px);
+  }
+}
+
+@media (min-width: 992px) {
+  .dashboard-container {
+    max-width: var(--container-lg, 1200px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .dashboard-container {
+    max-width: var(--container-xl, 1400px);
+  }
+}
+
+/* Background wrapper */
+.background-wrapper {
+  background-color: var(--apple-bg-secondary);
+  min-height: 100vh;
+  direction: rtl;
+  text-align: right;
+  width: 100%;
+}
+
+/* Main content container */
+.main-content {
+  width: 100%;
+  max-width: var(--container-xl, 1400px);
+  margin: 0 auto;
+  padding: var(--spacing-md, 16px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* התאמה רספונסיבית לנקודות שבירה */
+@media (min-width: 768px) {
+  .main-content {
+    max-width: var(--container-md, 960px);
+    padding: var(--spacing-lg, 24px);
+  }
+}
+
+@media (min-width: 992px) {
+  .main-content {
+    max-width: var(--container-lg, 1200px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .main-content {
+    max-width: var(--container-xl, 1400px);
+  }
+}
+
+/* Container with border */
+.container-with-border {
+  background: var(--apple-bg-elevated);
+  border-radius: var(--apple-radius-large);
+  box-shadow: var(--apple-shadow-light);
+  border: 1px solid var(--apple-border-light);
+  padding: var(--apple-spacing-lg);
+  margin-bottom: var(--apple-spacing-md);
+}
+
+/* ===== סגנונות קונטיינרים מהמערכת הישנה ===== */
+
+/* כותרת סקשן */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  border-radius: 8px;
+  background: var(--card-bg, #ffffff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+/* יישור כל האלמנטים לימין - תחילת השורה */
+.section-header h1,
+.section-header h2,
+.section-header h3 {
+  margin: 0;
+  flex: 1;
+  text-align: right; /* יישור לימין - תחילת השורה */
+  direction: rtl; /* RTL לכותרת */
+}
+
+/* יישור לאמצע הגובה לכל האלמנטים ב-section-header */
+.section-header > * {
+  align-self: center;
+}
+
+/* כפתורים בשורת הכותרת - ייצוא ורענון */
+.section-header .btn,
+.section-header .action-btn,
+.section-header .export-btn,
+.section-header .refresh-btn {
+  margin-inline-end: 0.5rem;
+  align-self: center;
+}
+
+/* הפרדה בין כפתורי פעולה לכפתור הפתיחה/סגירה */
+.section-header .section-actions,
+.section-header .chart-actions,
+.section-header .table-actions {
+  margin-inline-end: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-end;
+  order: 2; /* לפני כפתור הפתיחה/סגירה */
+}
+
+/* רקע ברירת מחדל לכותרות ללא מחלקות דינמיות */
+.section-header:not([class*="entity-"]) {
+  background: #ffffff;
+}
+
+/* כותרות עם שקיפות מוגברת */
+.section-header.transparent {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* כותרות עם רקע צבעוני */
+.section-header.colored {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 250, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* גוף סקשן */
+.section-body {
+  background: var(--apple-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.section-body .table {
+  margin: 0;
+  background: var(--apple-bg);
+}
+
+/* אזור עליון */
+.top-section {
+  width: 100%;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--spacing-md, 16px) 0 0 0;
+  max-width: var(--container-xl, 1400px);
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* התאמה רספונסיבית לנקודות שבירה */
+@media (min-width: 768px) {
+  .top-section {
+    padding: var(--spacing-lg, 24px) 0 0 0;
+  }
+}
+
+.top-section .section-header {
+  margin-bottom: 2rem;
+  padding: 1rem;
+}
+
+.top-section .content-section {
+  padding: 0;
+}
+
+/* אזור תוכן */
+.content-section {
+  width: 100%;
+  background: white;
+  padding: var(--spacing-md, 16px);
+  border-radius: 16px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: opacity 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* התאמה רספונסיבית לנקודות שבירה */
+@media (min-width: 768px) {
+  .content-section {
+    padding: var(--spacing-lg, 24px);
+  }
+}
+
+/* מיכל סקשן */
+.section-container {
+  background: var(--apple-bg-elevated);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+  margin-bottom: var(--apple-spacing-md);
+}
+
+/* מצב סגור */
+.content-section.collapsed {
+  padding: 20px 0;
+}
+
+.section-body.collapsed {
+  padding: 20px 0;
+}
+
+/* אזור פעולות הכותרת */
+.table-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* מרווח בתחתית העמוד */
+.page-bottom-spacing {
+  height: 3rem;
+}
+
+/* כפתור רענון */
+.refresh-btn {
+  background: var(--apple-bg-primary);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--apple-radius-small);
+  padding: 0.5rem 1rem;
+  color: var(--apple-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.refresh-btn:hover {
+  background: var(--apple-gray-1);
+  border-color: var(--apple-border);
+}
+
+/* כפתור פילטר */
+.filter-toggle-btn {
+  background: white;
+  border: 1px solid var(--secondary-color, #6c757d);
+  border-radius: 50%;
+  padding: 0;
+  color: var(--secondary-color, #6c757d);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  align-self: center;
+  margin-inline-start: 0.5rem;
+  order: 3;
+  position: relative;
+  top: 0;
+  box-shadow: none;
+}
+
+.filter-toggle-btn:hover {
+  background: white;
+  border-color: var(--secondary-color, #6c757d);
+  transform: none;
+  box-shadow: none;
+}
+
+/* איקון פעולה */
+.action-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* איקון פילטר */
+.filter-icon {
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.filter-toggle-btn:hover .filter-icon {
+  transform: scale(1.1);
+}
+
+/* Section Toggle Icon */
+.section-toggle-icon {
+  transition: transform 0.3s ease;
+  font-size: 0.8rem;
+  color: var(--secondary-color, #6c757d);
+  font-weight: bold;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  width: auto;
+  height: auto;
+  display: inline-block;
+  line-height: 1;
+}
+
+.filter-toggle-btn:hover .section-toggle-icon {
+  color: var(--secondary-color, #6c757d);
+}
+
+.filter-toggle-btn.collapsed .section-toggle-icon {
+  transform: rotate(180deg);
+}
+
+/* ===== תיקוני כפתורים ===== */
+
+/* תיקון לכפתורים עם container-fluid main-content */
+.container-fluid .main-content .btn {
+  box-sizing: border-box;
+  min-height: 38px;
+  padding: 6px 12px;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* וודא שמסגרת הכפתור מכסה את כל התוכן */
+.container-fluid .main-content .btn::before,
+.container-fluid .main-content .btn::after {
+  content: none;
+}
+
+/* תיקון לכפתורי Bootstrap ספציפיים - הוסר, מוגדר ב-data-button-type */
+
+/* תיקון לכפתורים קטנים */
+.container-fluid .main-content .btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: auto; /* רוחב אוטומטי לפי התוכן */
+  min-width: auto; /* ללא רוחב מינימלי */
+  white-space: normal; /* מאפשר מעבר שורה אם צריך */
+}
+
+/* תיקון כללי לכפתורים */
+.container-fluid .main-content .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 12px;
+  width: auto; /* רוחב אוטומטי לפי התוכן */
+  min-width: auto; /* ללא רוחב מינימלי */
+  white-space: normal; /* מאפשר מעבר שורה אם צריך */
+}
+
+/* תיקון לכפתורים גדולים */
+.container-fluid .main-content .btn-lg {
+  padding: 8px 16px;
+  width: auto; /* רוחב אוטומטי לפי התוכן */
+  min-width: auto; /* ללא רוחב מינימלי */
+  font-size: 16px;
+  border-radius: 5px;
+}

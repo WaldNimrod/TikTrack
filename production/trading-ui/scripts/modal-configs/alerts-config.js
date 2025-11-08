@@ -1,0 +1,257 @@
+/**
+ * Alerts Modal Configuration
+ * קונפיגורציה למודל התראות
+ * 
+ * @file alerts-config.js
+ * @version 1.0.0
+ * @lastUpdated January 27, 2025
+ */
+
+// קונפיגורציה למודל התראות
+const alertsModalConfig = {
+    id: 'alertsModal',
+    entityType: 'alert',
+    title: {
+        add: 'הוספת התראה',
+        edit: 'עריכת התראה'
+    },
+    size: 'lg',
+    headerType: 'dynamic', // צבעים דינמיים לפי ישות
+    fields: [
+        // שורה ראשונה: טיקר + פרטי מחיר עדכני
+        {
+            type: 'display',
+            id: 'alertTicker',
+            label: 'טיקר',
+            required: false,
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        {
+            type: 'display',
+            id: 'alertTickerInfo',
+            label: 'פרטי מחיר עדכני',
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            renderFn: 'renderTickerInfo'
+        },
+        // קו מפריד
+        {
+            type: 'separator',
+            id: 'alertSeparator1'
+        },
+        // שורה שנייה: סוג אובייקט מקושר + אובייקט מקושר
+        {
+            type: 'select',
+            id: 'alertRelatedType',
+            label: 'סוג אובייקט מקושר',
+            required: false,
+            options: [
+                { value: '1', label: 'חשבון מסחר' },
+                { value: '2', label: 'טרייד' },
+                { value: '3', label: 'תוכנית השקעה' },
+                { value: '4', label: 'טיקר' }
+            ],
+            defaultValue: '4',
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            description: 'אופציונלי - ניתן לשייך התראה לאובייקט ספציפי'
+        },
+        {
+            type: 'select',
+            id: 'alertRelatedObject',
+            label: 'אובייקט מקושר',
+            required: false,
+            options: [], // יטען דינמית לפי סוג השיוך שנבחר
+            placeholder: 'בחר אובייקט...',
+            disabled: true,
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        // שורה שלישית: מצב משולב + תאריך יצירה + תאריך תפוגה
+        {
+            type: 'select',
+            id: 'alertStatusCombined',
+            name: 'alertStatusCombined',
+            label: 'מצב',
+            required: true,
+            options: [
+                { value: 'new', label: 'חדש' },  // open + false
+                { value: 'active', label: 'פעיל' },  // open + new
+                { value: 'unread', label: 'לא נקרא' },  // closed + new
+                { value: 'read', label: 'נקרא' },  // closed + true
+                { value: 'cancelled', label: 'מבוטל' }  // cancelled + false
+            ],
+            defaultValue: 'new',
+            rowClass: 'row',
+            colClass: 'col-md-4'
+        },
+        {
+            type: 'display',
+            id: 'alertCreatedAt',
+            label: 'תאריך יצירה',
+            required: false,
+            rowClass: 'row',
+            colClass: 'col-md-4'
+        },
+        {
+            type: 'date',
+            id: 'alertExpiryDate',
+            name: 'expiry_date',
+            label: 'תאריך תפוגה',
+            required: false,
+            rowClass: 'row',
+            colClass: 'col-md-4',
+            description: 'ברירת מחדל: שנה מהיום (ניתן לשינוי)'
+        },
+        // שורה רביעית: שדות התנאי
+        {
+            type: 'select',
+            id: 'alertType',
+            label: 'מאפיין תנאי',
+            required: true,
+            options: [
+                { value: 'price', label: 'מחיר' },
+                { value: 'change', label: 'שינוי' },
+                { value: 'ma', label: 'ממוצע נע' },
+                { value: 'volume', label: 'נפח' }
+            ],
+            defaultValue: 'price',
+            rowClass: 'row',
+            colClass: 'col-md-4'
+        },
+        {
+            type: 'select',
+            id: 'alertCondition',
+            label: 'אופרטור תנאי',
+            required: true,
+            options: [
+                { value: 'more_than', label: 'יותר מ-' },
+                { value: 'less_than', label: 'פחות מ-' },
+                { value: 'cross', label: 'חוצה' },
+                { value: 'cross_up', label: 'חוצה למעלה' },
+                { value: 'cross_down', label: 'חוצה למטה' },
+                { value: 'change', label: 'שינוי' },
+                { value: 'change_up', label: 'שינוי למעלה' },
+                { value: 'change_down', label: 'שינוי למטה' },
+                { value: 'equals', label: 'שווה' }
+            ],
+            defaultValue: 'more_than',
+            rowClass: 'row',
+            colClass: 'col-md-4'
+        },
+        {
+            type: 'number',
+            id: 'alertValue',
+            label: 'ערך התראה',
+            required: true,
+            min: 0,
+            step: 0.01,
+            placeholder: 'הכנס ערך התראה...',
+            rowClass: 'row',
+            colClass: 'col-md-4'
+        },
+        // הודעה - בסוף אחרי סטטוס ותאריכים
+        {
+            type: 'rich-text',
+            id: 'alertName',
+            label: 'הודעה',
+            required: true,
+            placeholder: 'הכנס הודעת התראה',
+            maxLength: 5000,
+            options: {
+                direction: 'rtl',
+                placeholder: 'הכנס הודעת התראה',
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                    [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        }
+    ],
+    validation: {
+        alertTicker: {
+            required: true
+        },
+        alertName: {
+            required: true,
+            minLength: 1,
+            maxLength: 5000
+        },
+        alertType: {
+            required: true
+        },
+        alertValue: {
+            required: true,
+            min: 0
+        },
+        alertCondition: {
+            required: true
+        },
+        alertStatusCombined: {
+            required: true
+        },
+        alertExpiryDate: {
+            required: false
+        },
+        alertNotes: {
+            required: false,
+            maxLength: 5000
+        }
+    },
+    onSave: 'saveAlert'
+};
+
+// יצירת המודל אם ModalManagerV2 זמין - Deferred initialization
+function initializeAlertsModal() {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
+        try {
+            window.ModalManagerV2.createCRUDModal(alertsModalConfig);
+            console.log('✅ Alerts modal created successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Error creating Alerts modal:', error);
+            return false;
+        }
+    }
+    return false;
+}
+
+if (window.ModalManagerV2) {
+    initializeAlertsModal();
+} else {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (!initializeAlertsModal()) {
+                    setTimeout(() => {
+                        if (!initializeAlertsModal()) {
+                            console.warn('⚠️ ModalManagerV2 not available for Alerts modal after retries');
+                        }
+                    }, 500);
+                }
+            }, 100);
+        });
+    } else {
+        setTimeout(() => {
+            if (!initializeAlertsModal()) {
+                setTimeout(() => {
+                    if (!initializeAlertsModal()) {
+                        console.warn('⚠️ ModalManagerV2 not available for Alerts modal after retries');
+                    }
+                }, 500);
+            }
+        }, 100);
+    }
+}
+
+// ייצוא לקונסול (לצורך debug)
+window.alertsModalConfig = alertsModalConfig;
+
+

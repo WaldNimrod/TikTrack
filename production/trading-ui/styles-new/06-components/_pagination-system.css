@@ -1,0 +1,217 @@
+/**
+ * Pagination System Styles
+ * ========================
+ * 
+ * עיצוב מערכת pagination כללית
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 2025
+ * @author TikTrack Development Team
+ */
+
+/* ===== PAGINATION CONTAINER ===== */
+
+.pagination-container {
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.pagination-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* ===== PAGINATION INFO ===== */
+
+.pagination-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.items-info {
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.page-size-selector {
+    padding: 6px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background: white;
+    color: #495057;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.page-size-selector:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.page-size-selector:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* ===== PAGINATION NAVIGATION ===== */
+
+.pagination-navigation {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination-btn {
+    padding: 8px 16px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background: white;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f8f9fa;
+}
+
+.pagination-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.page-info {
+    color: #495057;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0 10px;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+    .pagination-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .pagination-info {
+        justify-content: center;
+        order: 2;
+    }
+    
+    .pagination-navigation {
+        justify-content: center;
+        order: 1;
+    }
+    
+    .pagination-btn {
+        flex: 1;
+        justify-content: center;
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination-container {
+        padding: 10px;
+    }
+    
+    .pagination-info {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .page-size-selector {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .pagination-navigation {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .pagination-btn {
+        width: 100%;
+    }
+}
+
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* ⚠️ Dark mode removed - all pagination components use light mode colors by default */
+
+/* ===== ANIMATIONS ===== */
+
+.pagination-container {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pagination-btn {
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:active {
+    transform: translateY(1px);
+}
+
+/* ===== ACCESSIBILITY ===== */
+
+.pagination-btn:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.page-size-selector:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* ===== PRINT STYLES ===== */
+
+@media print {
+    .pagination-container {
+        display: none;
+    }
+}
+
+
+
+
+

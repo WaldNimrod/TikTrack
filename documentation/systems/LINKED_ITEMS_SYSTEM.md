@@ -1,8 +1,22 @@
 # Linked Items System Documentation
 
+**Version**: 2.0.0  
+**Architecture**: Configuration-Based Schema  
+**Last Updated**: 2025-11-08
+
 ## System Overview
 
 The Linked Items System is a core component of TikTrack that manages relationships between different entities (trades, accounts, tickers, alerts, etc.). It provides a unified interface for checking dependencies before performing critical operations like cancellation or deletion.
+
+### Architecture
+
+The system uses a **Configuration-Based Schema Architecture** that replaces the previous Strategy Pattern approach:
+
+- **Central Schema** (`entity_relationship_schema.py`) - Single source of truth for all relationships
+- **Generic Resolver** (`entity_relationship_resolver.py`) - Interprets schema and builds queries dynamically
+- **Service Layer** (`EntityDetailsService.get_linked_items()`) - Public API for accessing linked items
+
+See `documentation/developers/ENTITY_RELATIONSHIP_SCHEMA.md` for detailed schema documentation.
 
 ### Purpose and Role
 

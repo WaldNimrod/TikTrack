@@ -29,6 +29,7 @@ from services.advanced_cache_service import cache_for, cache_with_deps, invalida
 from services.smart_query_optimizer import optimize_query, profile_query
 from services.account_activity_service import AccountActivityService
 from services.position_portfolio_service import PositionPortfolioService
+from services.position_calculator_service import PositionCalculatorService
 from services.currency_service import CurrencyService
 from typing import List, Optional, Dict, Any, Union, Tuple
 import logging
@@ -79,7 +80,7 @@ class EntityDetailsService:
     ENTITY_FIELDS = {
         'ticker': ['id', 'symbol', 'name', 'type', 'status', 'sector', 'currency_id', 
                   'remarks', 'active_trades', 'created_at', 'updated_at', 'deleted_at'],
-        'trade': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'quantity', 'entry_price',
+        'trade': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'trade_plan_id', 'quantity', 'entry_price',
                  'exit_price', 'trade_type', 'status', 'profit_loss', 'total_pl', 'side', 'investment_type', 
                  'closed_at', 'cancelled_at', 'cancel_reason', 'notes', 'created_at', 'updated_at'],
         'trade_plan': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'investment_type', 'side', 
@@ -148,7 +149,7 @@ class EntityDetailsService:
             if entity_type == 'trade_plan':
                 base_query = base_query.options(joinedload(TradePlan.account), joinedload(TradePlan.ticker))
             elif entity_type == 'trade':
-                base_query = base_query.options(joinedload(Trade.ticker), joinedload(Trade.trade_plan))
+                base_query = base_query.options(joinedload(Trade.account), joinedload(Trade.ticker), joinedload(Trade.trade_plan))
             elif entity_type == 'ticker':
                 base_query = base_query.options(joinedload(Ticker.currency))
             elif entity_type == 'execution':
@@ -200,9 +201,66 @@ class EntityDetailsService:
                     if display_symbol:
                         entity_dict['base_currency_symbol'] = display_symbol
 
-            # Special handling for trade: opened_at is mapped from created_at
-            if entity_type == 'trade' and 'created_at' in entity_dict and 'opened_at' not in entity_dict:
-                entity_dict['opened_at'] = entity_dict['created_at']
+            # Special handling for trade: opened_at is mapped from created_at and calculate position
+            if entity_type == 'trade':
+                if 'created_at' in entity_dict and 'opened_at' not in entity_dict:
+                    entity_dict['opened_at'] = entity_dict['created_at']
+                
+                # Add account name and total value for percent calculation
+                if hasattr(entity, 'account') and entity.account:
+                    entity_dict['account_name'] = entity.account.name
+                elif hasattr(entity, 'trading_account_id') and entity.trading_account_id:
+                    # Fallback: fetch account if relationship not loaded
+                    account = db.query(TradingAccount).filter(TradingAccount.id == entity.trading_account_id).first()
+                    if account:
+                        entity_dict['account_name'] = account.name
+                    else:
+                        entity_dict['account_name'] = None
+                
+                # Get account total value (cash + positions) for percent calculation
+                # Same calculation as in PositionPortfolioService.calculate_all_account_positions
+                try:
+                    # Get cash balance
+                    activity_data = AccountActivityService.get_account_activity(
+                        db=db,
+                        account_id=entity.trading_account_id,
+                        start_date=None,
+                        end_date=None
+                    )
+                    cash_balance = activity_data.get('base_currency_total', 0.0) or 0.0
+                    
+                    # Get all positions for this account and sum market values
+                    positions = PositionPortfolioService.calculate_all_account_positions(
+                        db=db,
+                        trading_account_id=entity.trading_account_id,
+                        include_closed=False,
+                        include_market_data=True
+                    )
+                    account_positions_value = sum(p.get('market_value', 0) or 0 for p in positions)
+                    
+                    # Total account value = cash balance + positions value
+                    entity_dict['account_total_value'] = cash_balance + account_positions_value
+                except Exception as balance_error:
+                    logger.warning(f"Error getting account total value for trade {entity_id}: {str(balance_error)}")
+                    entity_dict['account_total_value'] = 0.0
+                
+                # Calculate position for this trade
+                try:
+                    position_calculator = PositionCalculatorService()
+                    position = position_calculator.calculate_position(db, entity_id)
+                    if position:
+                        entity_dict['position'] = position
+                        entity_dict['position_quantity'] = position.get('quantity', 0)
+                        entity_dict['position_amount'] = position.get('total_cost', 0)
+                    else:
+                        entity_dict['position'] = None
+                        entity_dict['position_quantity'] = 0
+                        entity_dict['position_amount'] = 0
+                except Exception as position_error:
+                    logger.warning(f"Error calculating position for trade {entity_id}: {str(position_error)}")
+                    entity_dict['position'] = None
+                    entity_dict['position_quantity'] = 0
+                    entity_dict['position_amount'] = 0
             
             # Special handling for trade_plan: add account_name from relationship
             if entity_type == 'trade_plan':
@@ -385,12 +443,43 @@ class EntityDetailsService:
                             entity_dict['ticker']['current_price'] = latest_quote.price
                             entity_dict['ticker']['change_percent'] = latest_quote.change_pct_day
                             entity_dict['ticker']['change_amount'] = latest_quote.change_amount_day
-                            entity_dict['ticker']['daily_change'] = latest_quote.change_amount_day
-                            entity_dict['ticker']['daily_change_percent'] = latest_quote.change_pct_day
-                            entity_dict['ticker']['volume'] = latest_quote.volume
-                            entity_dict['ticker']['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
-                            entity_dict['ticker']['data_source'] = latest_quote.source
-                            logger.debug(f"Added market data to ticker {ticker.id} (fetched) for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%")
+            
+            # Add trade_plan object for trade
+            if entity_type == 'trade':
+                # Add trade_plan object if trade_plan relationship is loaded
+                if hasattr(entity, 'trade_plan') and entity.trade_plan:
+                    entity_dict['trade_plan'] = {
+                        'id': entity.trade_plan.id,
+                        'planned_amount': entity.trade_plan.planned_amount,
+                        'target_price': entity.trade_plan.target_price,
+                        'stop_price': entity.trade_plan.stop_price,
+                        'status': entity.trade_plan.status,
+                        'side': entity.trade_plan.side,
+                        'investment_type': entity.trade_plan.investment_type
+                    }
+                    # Add ticker symbol if available
+                    if hasattr(entity.trade_plan, 'ticker') and entity.trade_plan.ticker:
+                        entity_dict['trade_plan']['ticker_symbol'] = entity.trade_plan.ticker.symbol
+                elif hasattr(entity, 'trade_plan_id') and entity.trade_plan_id:
+                    # Trade plan relationship not loaded - fetch trade plan
+                    trade_plan = db.query(TradePlan).filter(TradePlan.id == entity.trade_plan_id).first()
+                    if trade_plan:
+                        entity_dict['trade_plan'] = {
+                            'id': trade_plan.id,
+                            'planned_amount': trade_plan.planned_amount,
+                            'target_price': trade_plan.target_price,
+                            'stop_price': trade_plan.stop_price,
+                            'status': trade_plan.status,
+                            'side': trade_plan.side,
+                            'investment_type': trade_plan.investment_type
+                        }
+                        # Add ticker symbol if available
+                        if hasattr(trade_plan, 'ticker') and trade_plan.ticker:
+                            entity_dict['trade_plan']['ticker_symbol'] = trade_plan.ticker.symbol
+                        elif hasattr(trade_plan, 'ticker_id') and trade_plan.ticker_id:
+                            ticker = db.query(Ticker).filter(Ticker.id == trade_plan.ticker_id).first()
+                            if ticker:
+                                entity_dict['trade_plan']['ticker_symbol'] = ticker.symbol
             
             if entity_type == 'note':
                 EntityDetailsService._augment_note_details(db, entity, entity_dict)
@@ -588,13 +677,15 @@ class EntityDetailsService:
         """
         Get linked items for a specific entity
         
+        Uses the new EntityRelationshipResolver based on schema configuration.
+        
         Args:
             db (Session): Database connection
             entity_type (str): Type of parent entity
             entity_id (int): ID of the parent entity
             
         Returns:
-            List[Dict[str, Any]]: List of linked items with basic info
+            List[Dict[str, Any]]: List of linked items with basic info conforming to canonical schema
             
         Example:
             >>> linked = EntityDetailsService.get_linked_items(db, 'ticker', 1)
@@ -609,26 +700,12 @@ class EntityDetailsService:
             if entity_type not in EntityDetailsService.ENTITY_MODELS:
                 raise ValueError(f"Unsupported entity type: {entity_type}")
             
-            linked_items = []
+            # Use new schema-based resolver
+            from services.entity_relationship_resolver import EntityRelationshipResolver
+            from services.entity_relationship_schema import ENTITY_RELATIONSHIPS
             
-            # Get linked items based on entity type
-            if entity_type == 'ticker':
-                linked_items.extend(EntityDetailsService._get_ticker_linked_items(db, entity_id))
-            elif entity_type == 'trade':
-                linked_items.extend(EntityDetailsService._get_trade_linked_items(db, entity_id))
-            elif entity_type == 'trade_plan':
-                linked_items.extend(EntityDetailsService._get_trade_plan_linked_items(db, entity_id))
-            elif entity_type == 'trading_account':
-                linked_items.extend(EntityDetailsService._get_account_linked_items(db, entity_id))
-            elif entity_type == 'execution':
-                linked_items.extend(EntityDetailsService._get_execution_linked_items(db, entity_id))
-            elif entity_type == 'cash_flow':
-                linked_items.extend(EntityDetailsService._get_cash_flow_linked_items(db, entity_id))
-            elif entity_type == 'alert':
-                linked_items.extend(EntityDetailsService._get_alert_linked_items(db, entity_id))
-            elif entity_type == 'note':
-                linked_items.extend(EntityDetailsService._get_note_linked_items(db, entity_id))
-            # Add other entity types as needed...
+            resolver = EntityRelationshipResolver(ENTITY_RELATIONSHIPS)
+            linked_items = resolver.get_linked_items(db, entity_type, entity_id)
             
             logger.debug(f"Found {len(linked_items)} linked items for {entity_type} {entity_id}")
             return linked_items

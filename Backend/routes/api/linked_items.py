@@ -147,7 +147,10 @@ def get_entity_types():
 @handle_database_session()
 def get_linked_items(entity_type: str, entity_id: str) -> Dict[str, Any]:
     """
-    Get linked items for a specific entity using base API patterns
+    Get linked items for a specific entity using the new schema-based resolver
+    
+    Uses EntityDetailsService.get_linked_items which uses EntityRelationshipResolver
+    based on the centralized schema configuration.
     
     Args:
         entity_type: Type of entity (trade, account, ticker, alert, etc.)
@@ -155,26 +158,71 @@ def get_linked_items(entity_type: str, entity_id: str) -> Dict[str, Any]:
         
     Returns:
         Dictionary with child_entities and parent_entities lists
+        (separated from unified linked_items array based on schema)
     """
     try:
         entity_id_normalized, context = normalize_entity_identifier(entity_type, entity_id)
-        logger.info(f"Getting linked items for {entity_type} {entity_id_normalized}")
+        logger.info(f"Getting linked items for {entity_type} {entity_id_normalized} using schema-based resolver")
         
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        # Use SQLAlchemy session from Flask g context
+        db_session = getattr(g, 'db', None)
+        if not db_session:
+            # Fallback: try to get from get_db() if available
+            try:
+                from config.database import get_db
+                db_session = next(get_db())
+            except Exception:
+                logger.error("No database session available")
+                return jsonify({'error': 'Database session not available'}), 500
         
-        # Get child entities (entities that reference this entity)
-        logger.info(f"Calling get_child_entities for {entity_type} {entity_id_normalized}")
-        child_entities = get_child_entities(cursor, entity_type, entity_id_normalized, context)
-        logger.info(f"Found {len(child_entities)} child entities")
+        # Use new schema-based resolver via EntityDetailsService
+        linked_items = EntityDetailsService.get_linked_items(db_session, entity_type, entity_id_normalized)
         
-        # Get parent entities (entities that this entity references)
-        logger.info(f"Calling get_parent_entities for {entity_type} {entity_id_normalized}")
-        parent_entities = get_parent_entities(cursor, entity_type, entity_id_normalized, context)
-        logger.info(f"Found {len(parent_entities)} parent entities: {parent_entities}")
+        # Separate into children and parents based on schema
+        from services.entity_relationship_schema import ENTITY_RELATIONSHIPS
         
-        # Get entity details for display
-        entity_details = get_entity_details(cursor, entity_type, entity_id_normalized, context)
+        child_entities = []
+        parent_entities = []
+        
+        if entity_type in ENTITY_RELATIONSHIPS:
+            entity_schema = ENTITY_RELATIONSHIPS[entity_type]
+            
+            # Get list of child types from schema
+            child_types = set()
+            if 'children' in entity_schema:
+                child_types = set(entity_schema['children'].keys())
+            
+            # Get list of parent types from schema
+            parent_types = set()
+            if 'parents' in entity_schema:
+                parent_types = set(entity_schema['parents'].keys())
+            
+            # Separate linked items
+            for item in linked_items:
+                item_type = item.get('type')
+                if item_type in child_types:
+                    child_entities.append(item)
+                elif item_type in parent_types:
+                    parent_entities.append(item)
+                else:
+                    # If not in schema, assume it's a child (for backward compatibility)
+                    logger.warning(f"Linked item type {item_type} not found in schema for {entity_type}, treating as child")
+                    child_entities.append(item)
+        
+        else:
+            # Fallback: if schema not found, treat all as children (backward compatibility)
+            logger.warning(f"Schema not found for {entity_type}, treating all linked items as children")
+            child_entities = linked_items
+        
+        # Get entity details for display (using old method for now)
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            entity_details = get_entity_details(cursor, entity_type, entity_id_normalized, context)
+            conn.close()
+        except Exception as e:
+            logger.warning(f"Could not get entity details: {e}")
+            entity_details = {}
         
         result = {
             'entity_type': entity_type,
@@ -186,7 +234,7 @@ def get_linked_items(entity_type: str, entity_id: str) -> Dict[str, Any]:
             'entity_details': entity_details
         }
         
-        logger.info(f"Found {len(child_entities)} child entities and {len(parent_entities)} parent entities")
+        logger.info(f"Found {len(child_entities)} child entities and {len(parent_entities)} parent entities using schema-based resolver")
         
         return jsonify(result), 200
         
@@ -194,11 +242,8 @@ def get_linked_items(entity_type: str, entity_id: str) -> Dict[str, Any]:
         logger.error(f"Validation error for linked items {entity_type} {entity_id}: {str(ve)}")
         return jsonify({'error': str(ve)}), 400
     except Exception as e:
-        logger.error(f"Error getting linked items for {entity_type} {entity_id}: {str(e)}")
+        logger.error(f"Error getting linked items for {entity_type} {entity_id}: {str(e)}", exc_info=True)
         return jsonify({'error': f'Failed to get linked items: {str(e)}'}), 500
-    finally:
-        if 'conn' in locals():
-            conn.close()
 
 
 def normalize_entity_identifier(entity_type: str, raw_entity_id: str):

@@ -633,3 +633,29 @@ button[data-button-type="BACK"][data-navigation-listener="true"] {
   width: 3rem;
   height: 3rem;
 }
+
+.entity-details-card {
+  border-radius: 12px;
+  border: 1px solid var(--entity-card-border, rgba(15, 23, 42, 0.08));
+  background-color: var(--entity-card-bg, #ffffff);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.entity-details-card .entity-card-header {
+  border-bottom: 1px solid var(--entity-card-divider, rgba(15, 23, 42, 0.08));
+}
+
+.entity-details-card .entity-card-title {
+  color: var(--entity-card-title, var(--bs-body-color));
+}
+
+.entity-details-card .entity-card-subtitle {
+  color: var(--entity-card-subtitle-color, var(--bs-secondary-color));
+}
+
+.entity-position {
+  --entity-card-border: var(--entity-position-border, rgba(13, 110, 253, 0.3));
+  --entity-card-divider: rgba(13, 110, 253, 0.2);
+  --entity-card-title: var(--entity-position-color, #0d6efd);
+  --entity-card-subtitle-color: var(--entity-position-text, #0a58ca);
+}

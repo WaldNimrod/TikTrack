@@ -140,10 +140,10 @@ def get_entity_types():
         return jsonify({'error': f'Failed to get entity types: {str(e)}'}), 500
 
 
-@linked_items_bp.route('/<entity_type>/<int:entity_id>', methods=['GET'])
+@linked_items_bp.route('/<entity_type>/<entity_id>', methods=['GET'])
 @api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
-def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
+def get_linked_items(entity_type: str, entity_id: str) -> Dict[str, Any]:
     """
     Get linked items for a specific entity using base API patterns
     
@@ -155,27 +155,28 @@ def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
         Dictionary with child_entities and parent_entities lists
     """
     try:
-        logger.info(f"Getting linked items for {entity_type} {entity_id}")
+        entity_id_normalized, context = normalize_entity_identifier(entity_type, entity_id)
+        logger.info(f"Getting linked items for {entity_type} {entity_id_normalized}")
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
         # Get child entities (entities that reference this entity)
-        logger.info(f"Calling get_child_entities for {entity_type} {entity_id}")
-        child_entities = get_child_entities(cursor, entity_type, entity_id)
+        logger.info(f"Calling get_child_entities for {entity_type} {entity_id_normalized}")
+        child_entities = get_child_entities(cursor, entity_type, entity_id_normalized, context)
         logger.info(f"Found {len(child_entities)} child entities")
         
         # Get parent entities (entities that this entity references)
-        logger.info(f"Calling get_parent_entities for {entity_type} {entity_id}")
-        parent_entities = get_parent_entities(cursor, entity_type, entity_id)
+        logger.info(f"Calling get_parent_entities for {entity_type} {entity_id_normalized}")
+        parent_entities = get_parent_entities(cursor, entity_type, entity_id_normalized, context)
         logger.info(f"Found {len(parent_entities)} parent entities: {parent_entities}")
         
         # Get entity details for display
-        entity_details = get_entity_details(cursor, entity_type, entity_id)
+        entity_details = get_entity_details(cursor, entity_type, entity_id_normalized, context)
         
         result = {
             'entity_type': entity_type,
-            'entity_id': entity_id,
+            'entity_id': context.get('composite_id', entity_id_normalized),
             'child_entities': child_entities,
             'parent_entities': parent_entities,
             'total_child_count': len(child_entities),
@@ -187,6 +188,9 @@ def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
         
         return jsonify(result), 200
         
+    except ValueError as ve:
+        logger.error(f"Validation error for linked items {entity_type} {entity_id}: {str(ve)}")
+        return jsonify({'error': str(ve)}), 400
     except Exception as e:
         logger.error(f"Error getting linked items for {entity_type} {entity_id}: {str(e)}")
         return jsonify({'error': f'Failed to get linked items: {str(e)}'}), 500
@@ -194,7 +198,33 @@ def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
         if 'conn' in locals():
             conn.close()
 
-def get_child_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[str, Any]]:
+
+def normalize_entity_identifier(entity_type: str, raw_entity_id: str):
+    """Normalize raw entity identifier based on entity type"""
+    context: Dict[str, Any] = {}
+    if entity_type == 'position':
+        if not raw_entity_id or '-' not in raw_entity_id:
+            raise ValueError("Position entity id must be in <account_id>-<ticker_id> format")
+        account_part, ticker_part = raw_entity_id.split('-', 1)
+        try:
+            trading_account_id = int(account_part)
+            ticker_id = int(ticker_part)
+        except ValueError:
+            raise ValueError("Position entity id parts must be integers")
+        context.update({
+            'trading_account_id': trading_account_id,
+            'ticker_id': ticker_id,
+            'composite_id': f"{trading_account_id}-{ticker_id}"
+        })
+        return (trading_account_id, ticker_id), context
+    
+    try:
+        entity_id_int = int(raw_entity_id)
+    except (TypeError, ValueError):
+        raise ValueError(f"Entity id for {entity_type} must be numeric")
+    return entity_id_int, context
+
+def get_child_entities(cursor, entity_type: str, entity_id: Any, context: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
     """
     Get child entities that reference this entity
     
@@ -216,6 +246,14 @@ def get_child_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[st
         elif entity_type == 'trading_account':
             # TradingAccounts can have trades, trade_plans, cash_flows, executions, notes
             child_entities.extend(get_account_child_entities(cursor, entity_id))
+        elif entity_type == 'position':
+            if not context:
+                raise ValueError("Context required for position entity type")
+            child_entities.extend(get_position_child_entities(
+                cursor,
+                context['trading_account_id'],
+                context['ticker_id']
+            ))
         elif entity_type == 'account':
             # DEPRECATED - use trading_account instead!
             raise ValueError(f"❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!")
@@ -249,7 +287,7 @@ def get_child_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[st
     
     return child_entities
 
-def get_entity_details(cursor, entity_type: str, entity_id: int) -> Dict[str, Any]:
+def get_entity_details(cursor, entity_type: str, entity_id: Any, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
     Get entity details for display in linked items modal
     
@@ -317,6 +355,30 @@ def get_entity_details(cursor, entity_type: str, entity_id: int) -> Dict[str, An
                     'created_at': row['created_at'],
                     'accountName': row['name']
                 }
+        elif entity_type == 'position':
+            if not context:
+                raise ValueError("Context required for position entity type")
+            cursor.execute("""
+                SELECT name, currency_name
+                FROM trading_accounts
+                WHERE id = ?
+            """, (context['trading_account_id'],))
+            account_row = cursor.fetchone()
+            cursor.execute("""
+                SELECT symbol, name
+                FROM tickers
+                WHERE id = ?
+            """, (context['ticker_id'],))
+            ticker_row = cursor.fetchone()
+            return {
+                'id': context['composite_id'],
+                'trading_account_id': context['trading_account_id'],
+                'ticker_id': context['ticker_id'],
+                'account_name': account_row['name'] if account_row else None,
+                'account_currency': account_row['currency_name'] if account_row else None,
+                'ticker_symbol': ticker_row['symbol'] if ticker_row else None,
+                'ticker_name': ticker_row['name'] if ticker_row else None
+            }
         elif entity_type == 'account':
             # DEPRECATED - use trading_account instead!
             raise ValueError(f"❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!")
@@ -327,7 +389,7 @@ def get_entity_details(cursor, entity_type: str, entity_id: int) -> Dict[str, An
     
     return {}
 
-def get_parent_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[str, Any]]:
+def get_parent_entities(cursor, entity_type: str, entity_id: Any, context: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
     """
     Get parent entities that this entity references
     
@@ -361,6 +423,14 @@ def get_parent_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[s
         elif entity_type == 'alert':
             # Alerts can reference any entity
             parent_entities.extend(get_alert_parent_entities(cursor, entity_id))
+        elif entity_type == 'position':
+            if not context:
+                raise ValueError("Context required for position entity type")
+            parent_entities.extend(get_position_parent_entities(
+                cursor,
+                context['trading_account_id'],
+                context['ticker_id']
+            ))
             
     except Exception as e:
         logger.error(f"Error getting parent entities for {entity_type} {entity_id}: {str(e)}")
@@ -1127,3 +1197,238 @@ def get_execution_child_entities(cursor, execution_id: int) -> List[Dict[str, An
         })
     
     return children
+
+
+def get_position_child_entities(cursor, trading_account_id: int, ticker_id: int) -> List[Dict[str, Any]]:
+    """Get child entities for a position (account + ticker combination)"""
+    children: List[Dict[str, Any]] = []
+
+    # Trades linked to this position
+    cursor.execute("""
+        SELECT t.id, 'trade' as type, 'טרייד' as title,
+               'טרייד ' || t.side || ' על ' || tk.symbol as description,
+               t.created_at,
+               t.updated_at,
+               t.status,
+               t.side,
+               t.investment_type
+        FROM trades t
+        JOIN tickers tk ON t.ticker_id = tk.id
+        WHERE t.trading_account_id = ? AND t.ticker_id = ?
+    """, (trading_account_id, ticker_id))
+
+    for row in cursor.fetchall():
+        children.append({
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': row['side'],
+            'investment_type': row['investment_type']
+        })
+
+    # Executions for this position
+    cursor.execute("""
+        SELECT e.id, 'execution' as type, 'ביצוע' as title,
+               'ביצוע ' || e.action || ' ' || e.quantity || ' יחידות' as description,
+               e.created_at,
+               e.updated_at,
+               CASE WHEN e.action = 'sell' THEN 'closed' ELSE 'active' END as status,
+               e.action as side,
+               NULL as investment_type
+        FROM executions e
+        WHERE e.trading_account_id = ? AND e.ticker_id = ?
+    """, (trading_account_id, ticker_id))
+
+    for row in cursor.fetchall():
+        children.append({
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': row['side'],
+            'investment_type': row['investment_type']
+        })
+
+    # Trade plans associated with this account and ticker
+    cursor.execute("""
+        SELECT tp.id, 'trade_plan' as type, 'תוכנית מסחר' as title,
+               'תוכנית ' || tp.side || ' על ' || tk.symbol as description,
+               tp.created_at,
+               tp.updated_at,
+               tp.status,
+               tp.side,
+               tp.investment_type
+        FROM trade_plans tp
+        JOIN tickers tk ON tp.ticker_id = tk.id
+        WHERE tp.trading_account_id = ? AND tp.ticker_id = ?
+    """, (trading_account_id, ticker_id))
+
+    for row in cursor.fetchall():
+        children.append({
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': row['side'],
+            'investment_type': row['investment_type']
+        })
+
+    # Cash flows linked via trades
+    cursor.execute("""
+        SELECT cf.id, 'cash_flow' as type, 'תזרים מזומנים' as title,
+               CASE 
+                   WHEN cf.type = 'deposit' THEN 'הפקדה'
+                   WHEN cf.type = 'withdrawal' THEN 'משיכה'
+                   WHEN cf.type = 'fee' THEN 'עמלה'
+                   WHEN cf.type = 'dividend' THEN 'דיבידנד'
+                   WHEN cf.type = 'other_positive' THEN 'אחר חיובי'
+                   WHEN cf.type = 'other_negative' THEN 'אחר שלילי'
+                   ELSE cf.type
+               END || ' - ' || COALESCE(c.currency_symbol, '') || ' ' || cf.amount as description,
+               cf.date as created_at,
+               cf.updated_at,
+               'active' as status,
+               NULL as side,
+               NULL as investment_type
+        FROM cash_flows cf
+        LEFT JOIN currencies c ON cf.currency_id = c.id
+        WHERE cf.trading_account_id = ? AND cf.ticker_id = ?
+    """, (trading_account_id, ticker_id))
+
+    for row in cursor.fetchall():
+        children.append({
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'] if row['description'] else '',
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': row['side'],
+            'investment_type': row['investment_type']
+        })
+
+    # Notes linked to this account+ticker position (via executions or direct linkage)
+    cursor.execute("""
+        SELECT n.id, 'note' as type, 'הערה' as title,
+               substr(n.content, 1, 100) as description,
+               n.created_at,
+               n.updated_at,
+               'active' as status
+        FROM notes n
+        WHERE (
+            (n.related_type_id = 7 AND n.related_id IN (
+                SELECT e.id FROM executions e WHERE e.trading_account_id = ? AND e.ticker_id = ?
+            ))
+            OR (n.related_type_id = 2 AND n.related_id IN (
+                SELECT t.id FROM trades t WHERE t.trading_account_id = ? AND t.ticker_id = ?
+            ))
+        )
+    """, (trading_account_id, ticker_id, trading_account_id, ticker_id))
+
+    for row in cursor.fetchall():
+        description = row['description'] if row['description'] is not None else ''
+        children.append({
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': description + ('...' if len(description) == 100 else ''),
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': None,
+            'investment_type': None
+        })
+
+    # Alerts linked to trades or ticker for this position
+    cursor.execute("""
+        SELECT a.id, 'alert' as type, 'התראה' as title,
+               'התראה: ' || a.message as description,
+               a.created_at,
+               a.updated_at,
+               a.status
+        FROM alerts a
+        WHERE (
+            (a.related_type_id = 2 AND a.related_id IN (
+                SELECT t.id FROM trades t WHERE t.trading_account_id = ? AND t.ticker_id = ?
+            ))
+            OR (a.related_type_id = 4 AND a.related_id = ?)
+        )
+    """, (trading_account_id, ticker_id, ticker_id))
+
+    for row in cursor.fetchall():
+        children.append({
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': None,
+            'investment_type': None
+        })
+
+    return children
+
+
+def get_position_parent_entities(cursor, trading_account_id: int, ticker_id: int) -> List[Dict[str, Any]]:
+    """Get parent entities for a position (account + ticker)"""
+    parents: List[Dict[str, Any]] = []
+
+    # Trading account parent
+    cursor.execute("""
+        SELECT id, 'trading_account' as type, 'חשבון מסחר' as title,
+               name as description,
+               created_at,
+               updated_at,
+               status
+        FROM trading_accounts
+        WHERE id = ?
+    """, (trading_account_id,))
+
+    row = cursor.fetchone()
+    if row:
+        parents.append({
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status']
+        })
+
+    # Ticker parent
+    cursor.execute("""
+        SELECT id, 'ticker' as type, 'טיקר' as title,
+               symbol || ' - ' || name as description,
+               created_at,
+               'active' as status
+        FROM tickers
+        WHERE id = ?
+    """, (ticker_id,))
+
+    row = cursor.fetchone()
+    if row:
+        parents.append({
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': None,
+            'status': row['status']
+        })
+
+    return parents

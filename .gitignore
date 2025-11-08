@@ -43,3 +43,10 @@ logs/*.log.*
 # Archive directories (keep local but don't backup)
 archive/
 reports/advanced-duplicates-*.json
+
+# Production environment - exclude DB and logs only
+production/Backend/db/*.db
+production/Backend/db/*.db-shm
+production/Backend/db/*.db-wal
+production/Backend/logs/
+production/Backend/logs-production/

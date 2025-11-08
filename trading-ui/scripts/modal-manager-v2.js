@@ -3764,11 +3764,25 @@ class ModalManagerV2 {
             }
 
             const entryDateInput = modalElement.querySelector('#tradePlanEntryDate');
+            const stopPercentInput = modalElement.querySelector('#tradePlanStopLossPercent');
+            const targetPercentInput = modalElement.querySelector('#tradePlanTakeProfitPercent');
             if (entryDateInput && !entryDateInput.dataset.autocalcBound) {
                 entryDateInput.addEventListener('input', () => {
                     entryDateInput.dataset.userModified = 'true';
                 });
                 entryDateInput.dataset.autocalcBound = 'true';
+            }
+            if (stopPercentInput && !stopPercentInput.dataset.autocalcBound) {
+                stopPercentInput.addEventListener('input', () => {
+                    stopPercentInput.dataset.userModified = 'true';
+                });
+                stopPercentInput.dataset.autocalcBound = 'true';
+            }
+            if (targetPercentInput && !targetPercentInput.dataset.autocalcBound) {
+                targetPercentInput.addEventListener('input', () => {
+                    targetPercentInput.dataset.userModified = 'true';
+                });
+                targetPercentInput.dataset.autocalcBound = 'true';
             }
 
             if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.bindForm === 'function') {
@@ -3779,9 +3793,12 @@ class ModalManagerV2 {
                     priceDisplay: '#currentPriceDisplay',
                     stopField: '#tradePlanStopLoss',
                     targetField: '#tradePlanTakeProfit',
+                    stopPercentField: '#tradePlanStopLossPercent',
+                    targetPercentField: '#tradePlanTakeProfitPercent',
                     allowFractionalShares: null,
-                    quantityDecimals: 4,
+                    quantityDecimals: 1,
                     amountDecimals: 2,
+                    percentDecimals: 2,
                     syncPreference: 'auto',
                     forceRiskOnBind: mode === 'add',
                     forceSyncOnBind: mode === 'add',
@@ -3797,13 +3814,7 @@ class ModalManagerV2 {
             }
 
             const stopInput = modalElement.querySelector('#tradePlanStopLoss');
-            if (stopInput) {
-                stopInput.dataset.autocalcBound = 'true';
-            }
             const targetInput = modalElement.querySelector('#tradePlanTakeProfit');
-            if (targetInput) {
-                targetInput.dataset.autocalcBound = 'true';
-            }
 
             if (mode === 'add') {
                 if (stopInput) {
@@ -3818,6 +3829,14 @@ class ModalManagerV2 {
                     delete entryDateInput.dataset.userModified;
                     delete entryDateInput.dataset.systemGenerated;
                 }
+                if (stopPercentInput) {
+                    delete stopPercentInput.dataset.userModified;
+                    delete stopPercentInput.dataset.systemGenerated;
+                }
+                if (targetPercentInput) {
+                    delete targetPercentInput.dataset.userModified;
+                    delete targetPercentInput.dataset.systemGenerated;
+                }
             } else {
                 if (stopInput) {
                     stopInput.dataset.userModified = stopInput.dataset.userModified || 'true';
@@ -3827,6 +3846,12 @@ class ModalManagerV2 {
                 }
                 if (entryDateInput) {
                     entryDateInput.dataset.userModified = entryDateInput.dataset.userModified || 'true';
+                }
+                if (stopPercentInput) {
+                    stopPercentInput.dataset.userModified = stopPercentInput.dataset.userModified || 'true';
+                }
+                if (targetPercentInput) {
+                    targetPercentInput.dataset.userModified = targetPercentInput.dataset.userModified || 'true';
                 }
             }
 
@@ -3907,9 +3932,12 @@ class ModalManagerV2 {
                     priceField: '#tradeEntryPrice',
                     stopField: '#tradeStopLoss',
                     targetField: '#tradeTakeProfit',
+                    stopPercentField: '#tradeStopLossPercent',
+                    targetPercentField: '#tradeTakeProfitPercent',
                     allowFractionalShares: null,
-                    quantityDecimals: 0,
+                    quantityDecimals: 1,
                     amountDecimals: 2,
+                    percentDecimals: 2,
                     syncPreference: 'auto',
                     forceRiskOnBind: tradesMode === 'add',
                     forceSyncOnBind: tradesMode === 'add',

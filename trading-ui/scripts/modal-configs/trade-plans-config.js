@@ -132,6 +132,30 @@ const tradePlansModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
+        {
+            type: 'number',
+            id: 'tradePlanStopLossPercent',
+            label: 'Stop Loss (%)',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'אחוז סטופ מתוכנן...',
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            description: 'אחוז סטופ ביחס למחיר הכניסה'
+        },
+        {
+            type: 'number',
+            id: 'tradePlanTakeProfitPercent',
+            label: 'Take Profit (%)',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'אחוז יעד מתוכנן...',
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            description: 'אחוז יעד ביחס למחיר הכניסה'
+        },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
             type: 'rich-text',

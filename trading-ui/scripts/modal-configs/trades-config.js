@@ -96,7 +96,6 @@ const tradesModalConfig = {
             id: 'tradeEntryDate',
             label: 'תאריך כניסה',
             required: true,
-            defaultValue: 'today',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
         },

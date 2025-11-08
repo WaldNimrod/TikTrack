@@ -79,7 +79,7 @@ const tradePlansModalConfig = {
             colClass: 'col-md-6'
         },
         {
-            type: 'date',
+            type: 'datetime-local',
             id: 'tradePlanEntryDate',
             label: 'תאריך כניסה מתוכנן',
             required: false,

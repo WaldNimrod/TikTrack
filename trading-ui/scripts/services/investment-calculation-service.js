@@ -343,6 +343,7 @@
             } else {
                 context.amountInput.value = '';
                 delete context.amountInput.dataset.systemGenerated;
+            }
         }
     }
 
@@ -415,26 +416,32 @@
         attachRiskListeners(context);
 
         if (amountInput && !amountInput.dataset.investmentCalcBound) {
-            const handleAmountChange = () => {
+            const markAmountModified = () => {
                 amountInput.dataset.userModified = 'true';
                 delete amountInput.dataset.systemGenerated;
+            };
+            const handleAmountCommit = () => {
+                markAmountModified();
                 withLock(context, () => updateFromAmount(context));
             };
-            amountInput.addEventListener('input', handleAmountChange);
-            amountInput.addEventListener('change', handleAmountChange);
-            amountInput.addEventListener('blur', handleAmountChange);
+            amountInput.addEventListener('input', markAmountModified);
+            amountInput.addEventListener('change', handleAmountCommit);
+            amountInput.addEventListener('blur', handleAmountCommit);
             amountInput.dataset.investmentCalcBound = 'true';
         }
 
         if (quantityInput && !quantityInput.dataset.investmentCalcBound) {
-            const handleQuantityChange = () => {
+            const markQuantityModified = () => {
                 quantityInput.dataset.userModified = 'true';
                 delete quantityInput.dataset.systemGenerated;
+            };
+            const handleQuantityCommit = () => {
+                markQuantityModified();
                 withLock(context, () => updateFromQuantity(context));
             };
-            quantityInput.addEventListener('input', handleQuantityChange);
-            quantityInput.addEventListener('change', handleQuantityChange);
-            quantityInput.addEventListener('blur', handleQuantityChange);
+            quantityInput.addEventListener('input', markQuantityModified);
+            quantityInput.addEventListener('change', handleQuantityCommit);
+            quantityInput.addEventListener('blur', handleQuantityCommit);
             quantityInput.dataset.investmentCalcBound = 'true';
         }
 

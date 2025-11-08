@@ -36,8 +36,40 @@ class ModalManagerV2 {
         this.attachmentPreviewSpinner = null;
         this.attachmentPreviewError = null;
         this.attachmentPreviewTitleEl = null;
+        this.modalQueue = [];
         
         this.init();
+    }
+
+    static assignDefaultDateValue(inputElement) {
+        if (!inputElement) {
+            return;
+        }
+
+        const includeTime = (inputElement.type || '').toLowerCase() === 'datetime-local';
+        let assignedValue = null;
+
+        if (window.DefaultValueSetter) {
+            if (includeTime && typeof window.DefaultValueSetter.setCurrentDateTime === 'function') {
+                assignedValue = window.DefaultValueSetter.setCurrentDateTime(inputElement.id);
+            } else if (typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                assignedValue = window.DefaultValueSetter.setCurrentDate(inputElement.id);
+            }
+        }
+
+        if (!assignedValue) {
+            const today = new Date();
+            today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+            assignedValue = includeTime
+                ? today.toISOString().slice(0, 16)
+                : today.toISOString().slice(0, 10);
+            inputElement.value = assignedValue;
+        } else {
+            inputElement.value = assignedValue;
+        }
+
+        inputElement.dataset.systemGenerated = 'true';
+        delete inputElement.dataset.userModified;
     }
 
     /**
@@ -3919,6 +3951,10 @@ class ModalManagerV2 {
                 if (tradeEntryDateInput) {
                     tradeEntryDateInput.dataset.userModified = tradeEntryDateInput.dataset.userModified || 'true';
                 }
+            }
+
+            if (tradesMode === 'add' && tradeEntryDateInput && !tradeEntryDateInput.value) {
+                ModalManagerV2.assignDefaultDateValue(tradeEntryDateInput);
             }
 
             scheduleTradeFinalize();

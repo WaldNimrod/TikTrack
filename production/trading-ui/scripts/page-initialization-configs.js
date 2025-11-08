@@ -407,7 +407,6 @@ const PAGE_CONFIGS = {
             'window.SelectPopulatorService',
             'window.tickerService',
             'window.loadUserPreferences', // From modules/ui-advanced.js (modules package)
-            'window.openImportUserDataModal',
             'window.RichTextEditorService',
             'window.Quill',
             'window.DOMPurify'

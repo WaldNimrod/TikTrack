@@ -139,6 +139,9 @@ class EntityDetailsAPI {
             }
             
             const shouldLoadLinkedItems = options.includeLinkedItems !== false;
+            const expectedLinkedItemsCount = typeof entityData.linked_items_count === 'number'
+                ? entityData.linked_items_count
+                : null;
             if (shouldLoadLinkedItems) {
                 // בדיקה אם הבאקאנד כבר החזיר linked_items (כמו עבור ticker)
                 // חשוב: נבדוק אם השדה קיים גם אם הוא ריק (מערך ריק)
@@ -163,7 +166,10 @@ class EntityDetailsAPI {
                         if (window.Logger) {
                             window.Logger.info(`🔗 Loading linked items separately for ${entityType} ${entityId}...`, { page: "entity-details-api" });
                         }
-                        const linkedItems = await this.getLinkedItems(entityType, entityId);
+                        const linkedItems = await this.getLinkedItems(entityType, entityId, {
+                            forceRefresh: options.forceRefresh || (expectedLinkedItemsCount !== null && expectedLinkedItemsCount > 0),
+                            expectedCount: expectedLinkedItemsCount
+                        });
                         console.log(`🔗 [ENTITY-DETAILS-API] Linked items received for ${entityType} ${entityId}:`, {
                             count: linkedItems.length,
                             items: linkedItems
@@ -943,26 +949,40 @@ class EntityDetailsAPI {
      */
     async getLinkedItems(entityType, entityId, options = {}) {
         const cacheKey = `linked-items-${entityType}-${entityId}`;
+        const expectedCount = typeof options.expectedCount === 'number' ? options.expectedCount : null;
         
-            try {
-                // בדיקה במטמון אם לא forceRefresh
-                if (!options.forceRefresh && window.UnifiedCacheManager.initialized) {
-                    const cachedData = await window.UnifiedCacheManager.get(cacheKey, {
-                        layer: 'memory',
-                        fallback: null
-                    });
+        try {
+            // בדיקה במטמון אם לא forceRefresh
+            if (!options.forceRefresh && window.UnifiedCacheManager.initialized) {
+                const cachedData = await window.UnifiedCacheManager.get(cacheKey, {
+                    layer: 'memory',
+                    fallback: null
+                });
+                
+                if (cachedData !== null && Array.isArray(cachedData)) {
+                    const cachedCount = cachedData.length;
+                    const cacheMatchesExpectation = expectedCount === null || expectedCount === cachedCount;
                     
-                    if (cachedData !== null && Array.isArray(cachedData)) {
+                    if (cacheMatchesExpectation) {
                         if (window.Logger) {
                             window.Logger.debug(`✅ Linked items retrieved from cache for ${entityType} ${entityId}`, {
-                                count: cachedData.length,
+                                count: cachedCount,
+                                expectedCount,
                                 page: "entity-details-api"
                             });
                         }
                         return cachedData;
                     }
+                    
+                    // אם כמות הפריטים במטמון לא תואמת את מה שהשרת מבטיח, נרענן
+                    if (window.Logger) {
+                        window.Logger.info(`🔄 Cache mismatch for ${entityType} ${entityId} (cached=${cachedCount}, expected=${expectedCount}) - refreshing from API`, {
+                            page: "entity-details-api"
+                        });
+                    }
                 }
-            
+            }
+        
             // אם לא במטמון - טעינה מה-API
             const url = `/api/linked-items/${entityType}/${entityId}`;
             console.log(`🔗 [ENTITY-DETAILS-API] Fetching linked items from: ${url}`);
@@ -1005,47 +1025,74 @@ class EntityDetailsAPI {
                 window.Logger.info(`🔗 Raw linked items data:`, data, { page: "entity-details-api" });
             }
             
-            // איחוד child_entities ו-parent_entities למערך אחד
-            const allLinkedItems = [];
-            
-            // הוספת child_entities
-            if (data && data.child_entities && Array.isArray(data.child_entities)) {
-                console.log(`🔗 [ENTITY-DETAILS-API] Processing child entities:`, data.child_entities);
-                if (window.Logger) {
-                    window.Logger.info(`🔗 Processing child entities:`, data.child_entities, { page: "entity-details-api" });
+            const enrichLinkedItems = (items, direction) => {
+                if (!Array.isArray(items)) {
+                    return [];
                 }
-                data.child_entities.forEach(item => {
-                    allLinkedItems.push({
-                        id: item.id,
-                        type: item.type,
-                        title: item.title || `${item.type} ${item.id}`,
-                        description: item.description || '',
-                        status: item.status,
-                        created_at: item.created_at,
-                        updated_at: item.updated_at
-                    });
+                return items.map(item => {
+                    const enrichedItem = { ...item };
+                    const metrics = item.metrics || {};
+                    const conditions = item.conditions || {};
+                    const timestamps = item.timestamps || {};
+                    const statusObject = item.status;
+
+                    if (!enrichedItem.link_direction) {
+                        enrichedItem.link_direction = direction;
+                    }
+
+                    // שמירה על התאמה לאחור - העדפה לנתונים החדשים אם קיימים
+                    if (statusObject && typeof statusObject === 'object') {
+                        enrichedItem.status = statusObject.value ?? statusObject.status ?? enrichedItem.status;
+                    }
+                    enrichedItem.side = metrics.side ?? enrichedItem.side;
+                    enrichedItem.investment_type = metrics.investment_type ?? enrichedItem.investment_type;
+                    if (metrics.quantity !== undefined) {
+                        enrichedItem.quantity = metrics.quantity;
+                    }
+                    if (metrics.price !== undefined) {
+                        enrichedItem.price = metrics.price;
+                    }
+                    if (metrics.amount !== undefined) {
+                        enrichedItem.amount = metrics.amount;
+                    }
+
+                    if (conditions.trigger_type !== undefined) {
+                        enrichedItem.condition = conditions.trigger_type;
+                    }
+                    if (conditions.target_value !== undefined) {
+                        enrichedItem.target_value = conditions.target_value;
+                    }
+
+                    if (!enrichedItem.created_at && timestamps.created_at) {
+                        enrichedItem.created_at = timestamps.created_at;
+                    }
+                    if (!enrichedItem.updated_at && timestamps.updated_at) {
+                        enrichedItem.updated_at = timestamps.updated_at;
+                    }
+                    if (!enrichedItem.closed_at && timestamps.closed_at) {
+                        enrichedItem.closed_at = timestamps.closed_at;
+                    }
+
+                    // מידע מתצוגה חדשה
+                    const display = item.display || {};
+                    if (!enrichedItem.title && display.title) {
+                        enrichedItem.title = display.title;
+                    }
+                    if (!enrichedItem.name && display.name) {
+                        enrichedItem.name = display.name;
+                    }
+                    if (!enrichedItem.description && display.description) {
+                        enrichedItem.description = display.description;
+                    }
+
+                    return enrichedItem;
                 });
-            }
-            
-            // הוספת parent_entities (חשוב! זה כולל trade_plan עבור trade)
-            if (data && data.parent_entities && Array.isArray(data.parent_entities)) {
-                console.log(`🔗 [ENTITY-DETAILS-API] Processing parent entities:`, data.parent_entities);
-                if (window.Logger) {
-                    window.Logger.info(`🔗 Processing parent entities:`, data.parent_entities, { page: "entity-details-api" });
-                }
-                data.parent_entities.forEach(item => {
-                    allLinkedItems.push({
-                        id: item.id,
-                        type: item.type,
-                        title: item.title || `${item.type} ${item.id}`,
-                        description: item.description || '',
-                        status: item.status,
-                        created_at: item.created_at,
-                        updated_at: item.updated_at
-                    });
-                });
-            }
-            
+            };
+
+            const childLinkedItems = enrichLinkedItems(data?.child_entities, 'child');
+            const parentLinkedItems = enrichLinkedItems(data?.parent_entities, 'parent');
+            const allLinkedItems = [...childLinkedItems, ...parentLinkedItems];
+
                 // שמירה במטמון עם TTL של 5 דקות
                 if (window.UnifiedCacheManager.initialized) {
                     await window.UnifiedCacheManager.save(cacheKey, allLinkedItems, {

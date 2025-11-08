@@ -22,11 +22,16 @@
         targetField: null,
         stopPercentField: null,
         targetPercentField: null,
+        sideField: null,
+        tickerField: null,
+        summaryField: null,
+        summaryTitle: 'סיכום',
         stopPreferenceKey: 'defaultStopLoss',
         targetPreferenceKey: 'defaultTargetPrice',
         forceRiskOnBind: false,
         forceSyncOnBind: false,
-        percentDecimals: 2
+        percentDecimals: 2,
+        currencySymbol: '$'
     };
 
     const boundContexts = new WeakMap();
@@ -116,6 +121,112 @@
             return price > 0 ? price : null;
         }
         return null;
+    }
+
+    function getSelectedOptionText(selectElement) {
+        if (!selectElement) {
+            return '';
+        }
+        if (selectElement instanceof HTMLSelectElement) {
+            const option = selectElement.options[selectElement.selectedIndex];
+            if (option) {
+                const text = option.textContent || option.innerText;
+                if (text) {
+                    return text.trim();
+                }
+            }
+        }
+        const value = selectElement.value || '';
+        return typeof value === 'string' ? value.trim() : '';
+    }
+
+    function normalizeSide(sideValue) {
+        if (!sideValue) {
+            return '';
+        }
+        return String(sideValue).trim().toLowerCase();
+    }
+
+    function formatQuantityDisplay(quantity, options) {
+        if (!Number.isFinite(quantity)) {
+            return '-';
+        }
+        const decimals = Number.isInteger(options.quantityDecimals) ? options.quantityDecimals : DEFAULT_OPTIONS.quantityDecimals;
+        const formatter = new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+        return formatter.format(quantity);
+    }
+
+    function formatCurrencyDisplay(amount, currencySymbol = '$', decimals = 2) {
+        if (!Number.isFinite(amount)) {
+            return '-';
+        }
+        const formatter = new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+        return `${currencySymbol}${formatter.format(amount)}`;
+    }
+
+    function formatRatioDisplay(ratio) {
+        if (!Number.isFinite(ratio) || ratio <= 0) {
+            return '-';
+        }
+        const formatted = ratio >= 10 ? ratio.toFixed(1) : ratio.toFixed(2);
+        return `1:${formatted}`;
+    }
+
+    function escapeHtmlText(value) {
+        if (value === null || value === undefined) {
+            return '-';
+        }
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function renderAmountWithVariant(value, options, variant = 'neutral') {
+        if (value === null || value === undefined || value === '') {
+            return '<span class="numeric-value-zero">-</span>';
+        }
+
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) {
+            return '<span class="numeric-value-zero">-</span>';
+        }
+
+        let signedValue = numericValue;
+        if (variant === 'negative') {
+            signedValue = -Math.abs(numericValue);
+        } else if (variant === 'positive') {
+            signedValue = Math.abs(numericValue);
+        }
+
+        const currencySymbol = options.currencySymbol || DEFAULT_OPTIONS.currencySymbol;
+        const decimals = Number.isInteger(options.amountDecimals) ? options.amountDecimals : DEFAULT_OPTIONS.amountDecimals;
+        const showPositiveSign = variant !== 'neutral';
+
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+            return window.FieldRendererService.renderAmount(signedValue, currencySymbol, decimals, showPositiveSign);
+        }
+
+        const formatted = formatCurrencyDisplay(Math.abs(signedValue), currencySymbol, decimals);
+        let sign = '';
+        if (signedValue < 0) {
+            sign = '-';
+        } else if (showPositiveSign && signedValue > 0) {
+            sign = '+';
+        }
+        const cssClass = signedValue > 0
+            ? 'numeric-value-positive'
+            : (signedValue < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+        const display = sign ? `${sign}${formatted}` : formatted;
+        return `<span class="${cssClass}" dir="ltr">${display}</span>`;
     }
 
     function computeQuantityFromInvestment(totalInvestment, price, options = {}) {
@@ -271,6 +382,8 @@
             const targetPercent = Number.isFinite(entryPrice) ? computeTargetPercent(entryPrice, targetPrice) : null;
             applyValue(context.targetPercentInput, targetPercent);
         }
+
+        updateSummary(context);
     }
 
     function updatePriceFromPercent(context, type) {
@@ -302,6 +415,243 @@
         priceInput.value = computedPrice.toFixed(context.options.amountDecimals ?? DEFAULT_OPTIONS.amountDecimals);
         markFieldAsSystemGenerated(priceInput);
         return true;
+    }
+
+    function computeSummaryData(context) {
+        const tickerLabel = getSelectedOptionText(context.tickerInput);
+        const sideRaw = context.sideInput ? context.sideInput.value : '';
+        const sideNormalized = normalizeSide(sideRaw);
+        const sideLabel = getSelectedOptionText(context.sideInput);
+
+        const entryPrice = getPriceFromContext(context);
+        const quantityValue = parseInputValue(context.quantityInput);
+        const amountValue = parseInputValue(context.amountInput);
+        const stopPrice = parseInputValue(context.stopInput);
+        const targetPrice = parseInputValue(context.targetInput);
+
+        const quantity = Number.isFinite(quantityValue) && quantityValue > 0 ? quantityValue : null;
+        const amount = Number.isFinite(amountValue) && amountValue > 0 ? amountValue : null;
+
+        let totalInvestment = amount;
+        if ((!totalInvestment || totalInvestment <= 0) && quantity !== null && isPositiveNumber(entryPrice)) {
+            totalInvestment = quantity * entryPrice;
+        }
+
+        let riskPerUnit = null;
+        if (quantity !== null && isPositiveNumber(entryPrice) && isPositiveNumber(stopPrice)) {
+            if (sideNormalized === 'short') {
+                const diff = stopPrice - entryPrice;
+                riskPerUnit = diff > 0 ? diff : null;
+            } else {
+                const diff = entryPrice - stopPrice;
+                riskPerUnit = diff > 0 ? diff : null;
+            }
+        }
+
+        let rewardPerUnit = null;
+        if (quantity !== null && isPositiveNumber(entryPrice) && isPositiveNumber(targetPrice)) {
+            if (sideNormalized === 'short') {
+                const diff = entryPrice - targetPrice;
+                rewardPerUnit = diff > 0 ? diff : null;
+            } else {
+                const diff = targetPrice - entryPrice;
+                rewardPerUnit = diff > 0 ? diff : null;
+            }
+        }
+
+        const riskAmount = riskPerUnit !== null && quantity !== null ? riskPerUnit * quantity : null;
+        const rewardAmount = rewardPerUnit !== null && quantity !== null ? rewardPerUnit * quantity : null;
+        const ratio = riskAmount !== null && riskAmount > 0 && rewardAmount !== null && rewardAmount > 0
+            ? rewardAmount / riskAmount
+            : null;
+
+        return {
+            tickerLabel,
+            sideNormalized,
+            sideLabel,
+            totalInvestment,
+            quantity,
+            riskAmount,
+            rewardAmount,
+            ratio
+        };
+    }
+
+    function renderSideDisplay(sideNormalized, sideLabel) {
+        if (!sideNormalized && !sideLabel) {
+            return '-';
+        }
+
+        const capitalized = sideNormalized ? `${sideNormalized.charAt(0).toUpperCase()}${sideNormalized.slice(1)}` : '';
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderSide === 'function' && capitalized) {
+            return window.FieldRendererService.renderSide(capitalized);
+        }
+        if (typeof window.renderSide === 'function' && capitalized) {
+            return window.renderSide(capitalized);
+        }
+
+        return sideLabel || capitalized || '-';
+    }
+
+    function renderSummaryCard(context, summaryData) {
+        if (!context.summaryElement) {
+            return;
+        }
+
+        const currencySymbol = context.options.currencySymbol || DEFAULT_OPTIONS.currencySymbol;
+        const amountDecimals = Number.isInteger(context.options.amountDecimals)
+            ? context.options.amountDecimals
+            : DEFAULT_OPTIONS.amountDecimals;
+        const quantityText = summaryData.quantity !== null
+            ? formatQuantityDisplay(summaryData.quantity, context.options)
+            : '-';
+        const ratioText = formatRatioDisplay(summaryData.ratio);
+        const sideDisplay = renderSideDisplay(summaryData.sideNormalized, summaryData.sideLabel);
+
+        const summaryTitle = context.options.summaryTitle || DEFAULT_OPTIONS.summaryTitle;
+        const tickerDisplay = summaryData.tickerLabel || '-';
+
+        const summaryFields = [
+            { label: 'טיקר', value: tickerDisplay, valueType: 'text' },
+            { label: 'צד', value: sideDisplay, valueType: 'html' },
+            {
+                label: 'סה"כ השקעה',
+                value: summaryData.totalInvestment,
+                valueType: 'amount'
+            },
+            {
+                label: 'מספר מניות',
+                value: quantityText,
+                valueType: 'text',
+                direction: 'ltr'
+            },
+            {
+                label: 'סיכון / סיכוי',
+                valueType: 'riskRewardSummary',
+                direction: 'ltr'
+            }
+        ];
+
+        context.summaryElement.innerHTML = '';
+
+        const container = document.createElement('div');
+        container.classList.add('risk-summary-card', 'summary-card');
+
+        if (summaryTitle) {
+            const titleEl = document.createElement('div');
+            titleEl.classList.add('risk-summary-card__title');
+            titleEl.textContent = summaryTitle;
+            container.appendChild(titleEl);
+        }
+
+        const table = document.createElement('table');
+        table.classList.add('risk-summary-card__table', 'table', 'table-sm');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.tableLayout = 'fixed';
+        table.setAttribute('dir', 'rtl');
+
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        headerRow.classList.add('risk-summary-card__row', 'risk-summary-card__row--header');
+
+        const tbody = document.createElement('tbody');
+        const dataRow = document.createElement('tr');
+        dataRow.classList.add('risk-summary-card__row', 'risk-summary-card__row--values');
+
+        summaryFields.forEach((field, index) => {
+            const th = document.createElement('th');
+            th.textContent = field.label;
+            th.style.fontWeight = '600';
+            th.style.fontSize = '0.75rem';
+            th.style.padding = '6px 10px';
+            th.style.textAlign = 'right';
+            th.style.whiteSpace = 'nowrap';
+            th.style.color = field.labelVariant === 'negative'
+                ? 'var(--numeric-negative-medium)'
+                : (field.labelVariant === 'positive'
+                    ? 'var(--numeric-positive-medium)'
+                    : 'var(--text-muted, #6c757d)');
+            if (index < summaryFields.length - 1) {
+                th.style.borderLeft = '1px solid var(--border-color, #e0e0e0)';
+            }
+            headerRow.appendChild(th);
+
+            const td = document.createElement('td');
+            td.style.padding = '8px 10px';
+            td.style.fontSize = '0.95rem';
+            td.style.color = 'var(--text-color, #1d1d1f)';
+            td.style.textAlign = 'center';
+            td.style.verticalAlign = 'middle';
+            if (index < summaryFields.length - 1) {
+                td.style.borderLeft = '1px solid var(--border-color, #e0e0e0)';
+            }
+
+            switch (field.valueType) {
+                case 'html':
+                    td.innerHTML = field.value || '-';
+                    break;
+                case 'amount':
+                    td.innerHTML = renderAmountWithVariant(field.value, { currencySymbol, amountDecimals }, 'neutral');
+                    break;
+                case 'riskRewardSummary': {
+                    const riskHtml = renderAmountWithVariant(summaryData.riskAmount, { currencySymbol, amountDecimals }, 'negative');
+                    const rewardHtml = renderAmountWithVariant(summaryData.rewardAmount, { currencySymbol, amountDecimals }, 'positive');
+                    const ratioHtml = escapeHtmlText(ratioText);
+
+                    td.innerHTML = `
+                        <div class="risk-summary-card__risk-reward" style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+                            <div class="risk-summary-card__risk-reward-row" style="display: flex; gap: 12px; align-items: center; justify-content: center;">
+                                <span>${riskHtml}</span>
+                                <span style="color: var(--text-muted, #6c757d);">/</span>
+                                <span>${rewardHtml}</span>
+                            </div>
+                            <div class="risk-summary-card__risk-reward-ratio" style="font-size: 0.85rem; color: var(--text-muted, #6c757d);" dir="ltr">
+                                ${ratioHtml}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'text': {
+                    const safeValue = field.value === null || field.value === undefined || field.value === ''
+                        ? '-'
+                        : field.value;
+                    if (field.direction === 'ltr') {
+                        td.innerHTML = `<span dir="ltr">${escapeHtmlText(safeValue)}</span>`;
+                    } else {
+                        td.textContent = safeValue;
+                    }
+                    break;
+                }
+                default: {
+                    const safeValue = field.value === null || field.value === undefined || field.value === ''
+                        ? '-'
+                        : field.value;
+                    td.textContent = safeValue;
+                    break;
+                }
+            }
+
+            dataRow.appendChild(td);
+        });
+
+        thead.appendChild(headerRow);
+        tbody.appendChild(dataRow);
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        container.appendChild(table);
+
+        context.summaryElement.appendChild(container);
+    }
+
+    function updateSummary(context) {
+        if (!context || !context.summaryElement) {
+            return;
+        }
+
+        const summaryData = computeSummaryData(context);
+        renderSummaryCard(context, summaryData);
     }
 
     function getRiskCacheKey(options) {
@@ -425,6 +775,7 @@
             if (context.quantityInput) {
                 context.quantityInput.value = '';
             }
+            updateSummary(context);
             return;
         }
 
@@ -455,6 +806,7 @@
             if (context.amountInput) {
                 context.amountInput.value = '';
             }
+            updateSummary(context);
             return;
         }
 
@@ -661,19 +1013,23 @@
             amountInput.dataset.investmentCalcBound = 'true';
         }
 
-        if (quantityInput && !quantityInput.dataset.investmentCalcBound) {
-            const markQuantityModified = () => {
-                quantityInput.dataset.userModified = 'true';
-                delete quantityInput.dataset.systemGenerated;
+        if (context.sideInput && !context.sideInput.dataset.investmentCalcSideBound) {
+            const handleSideChange = () => {
+                context.sideInput.dataset.userModified = 'true';
+                delete context.sideInput.dataset.systemGenerated;
+                updateSummary(context);
             };
-            const handleQuantityCommit = () => {
-                markQuantityModified();
-                withLock(context, () => updateFromQuantity(context));
+            context.sideInput.addEventListener('change', handleSideChange);
+            context.sideInput.addEventListener('blur', handleSideChange);
+            context.sideInput.dataset.investmentCalcSideBound = 'true';
+        }
+
+        if (context.tickerInput && !context.tickerInput.dataset.investmentCalcTickerBound) {
+            const handleTickerChange = () => {
+                updateSummary(context);
             };
-            quantityInput.addEventListener('input', markQuantityModified);
-            quantityInput.addEventListener('change', handleQuantityCommit);
-            quantityInput.addEventListener('blur', handleQuantityCommit);
-            quantityInput.dataset.investmentCalcBound = 'true';
+            context.tickerInput.addEventListener('change', handleTickerChange);
+            context.tickerInput.dataset.investmentCalcTickerBound = 'true';
         }
     }
 
@@ -692,6 +1048,9 @@
         const targetInput = resolveElement(modalElement, options.targetField || options.targetSelector);
         const stopPercentInput = resolveElement(modalElement, options.stopPercentField || options.stopPercentSelector);
         const targetPercentInput = resolveElement(modalElement, options.targetPercentField || options.targetPercentSelector);
+        const sideInput = resolveElement(modalElement, options.sideField || options.sideSelector);
+        const tickerInput = resolveElement(modalElement, options.tickerField || options.tickerSelector);
+        const summaryElement = resolveElement(modalElement, options.summaryField || options.summarySelector);
 
         if (!amountInput && !quantityInput) {
             return null;
@@ -707,6 +1066,9 @@
             targetInput,
             stopPercentInput,
             targetPercentInput,
+            sideInput,
+            tickerInput,
+            summaryElement,
             options,
             updateLock: false
         };
@@ -731,8 +1093,12 @@
                 context.targetInput = resolveElement(modalElement, context.options.targetField || context.options.targetSelector);
                 context.stopPercentInput = resolveElement(modalElement, context.options.stopPercentField || context.options.stopPercentSelector);
                 context.targetPercentInput = resolveElement(modalElement, context.options.targetPercentField || context.options.targetPercentSelector);
+                context.sideInput = resolveElement(modalElement, context.options.sideField || context.options.sideSelector);
+                context.tickerInput = resolveElement(modalElement, context.options.tickerField || context.options.tickerSelector);
+                context.summaryElement = resolveElement(modalElement, context.options.summaryField || context.options.summarySelector);
                 attachListeners(context);
                 updatePercentFromPrices(context);
+                updateSummary(context);
             } else {
                 context = createContext(modalElement, config);
                 if (!context) {
@@ -741,6 +1107,7 @@
                 boundContexts.set(modalElement, context);
                 attachListeners(context);
                 updatePercentFromPrices(context);
+                updateSummary(context);
             }
 
             const forceSync = Boolean(context.options.forceSyncOnBind || context.options.forceRiskOnBind);

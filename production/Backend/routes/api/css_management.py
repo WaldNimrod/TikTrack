@@ -94,9 +94,7 @@ def get_css_status():
         # בדיקת איזה מערכת פעילה
         # השרת רץ מתיקיית Backend, אז צריך לחזור לתיקיית הבסיס
         base_dir = Path(__file__).parent.parent.parent.parent
-        # Use production UI directory from config.settings
-        from config.settings import UI_DIR
-        trading_ui_path = UI_DIR
+        trading_ui_path = base_dir / 'trading-ui'
         html_files = list(trading_ui_path.glob('*.html'))
         
         if not html_files:

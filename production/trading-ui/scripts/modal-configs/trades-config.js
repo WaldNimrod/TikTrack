@@ -18,16 +18,7 @@ const tradesModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
-        // שדה תצוגה לנתוני שוק לפני כל השדות
-        {
-            type: 'display',
-            id: 'tradeTickerInfoDisplay',
-            label: 'נתוני שוק',
-            description: 'מתעדכן אוטומטית לאחר בחירת טיקר',
-            rowClass: 'row',
-            colClass: 'col-12'
-        },
-        // שורה ראשונה: טיקר + חשבון מסחר
+        // שורה ראשונה: טיקר + נתוני שוק
         {
             type: 'select',
             id: 'tradeTicker',
@@ -37,6 +28,28 @@ const tradesModalConfig = {
             placeholder: 'בחר טיקר...',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
+        },
+        {
+            type: 'display',
+            id: 'tradeTickerInfoDisplay',
+            label: 'נתוני שוק',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        // שורה שנייה: צד + חשבון מסחר
+        {
+            type: 'select',
+            id: 'tradeSide',
+            label: 'צד',
+            required: true,
+            options: [
+                { value: 'long', label: 'לונג (Long)' },
+                { value: 'short', label: 'שורט (Short)' }
+            ],
+            defaultValue: 'long',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12',
+            description: 'בחר האם מדובר בלונג או שורט'
         },
         {
             type: 'select',
@@ -49,7 +62,7 @@ const tradesModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
         },
-        // שורה שנייה: סוג השקעה + סטטוס
+        // שורה שלישית: סוג השקעה + סטטוס
         {
             type: 'select',
             id: 'tradeType',
@@ -79,7 +92,7 @@ const tradesModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
         },
-        // שורה שלישית: מחיר כניסה + תאריך כניסה
+        // שורה רביעית: מחיר כניסה + תאריך כניסה
         {
             type: 'number',
             id: 'tradeEntryPrice',
@@ -106,7 +119,7 @@ const tradesModalConfig = {
             label: 'כמות',
             required: true,
             min: 1,
-            step: 1,
+            step: 0.1,
             placeholder: 'הכנס כמות...',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
@@ -133,7 +146,8 @@ const tradesModalConfig = {
             step: 0.01,
             placeholder: 'הכנס מחיר Stop Loss...',
             rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            colClass: 'col-md-6 col-sm-12',
+            labelStyle: 'color: var(--numeric-negative-medium);'
         },
         {
             type: 'number',
@@ -144,7 +158,8 @@ const tradesModalConfig = {
             step: 0.01,
             placeholder: 'הכנס מחיר Take Profit...',
             rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            colClass: 'col-md-6 col-sm-12',
+            labelStyle: 'color: var(--numeric-positive-medium);'
         },
         {
             type: 'number',
@@ -156,6 +171,7 @@ const tradesModalConfig = {
             placeholder: 'הכנס אחוז סטופ...',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12',
+            labelStyle: 'color: var(--numeric-negative-medium);',
             description: 'אחוז סטופ יחסית למחיר הכניסה'
         },
         {
@@ -168,7 +184,16 @@ const tradesModalConfig = {
             placeholder: 'הכנס אחוז יעד...',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12',
+            labelStyle: 'color: var(--numeric-positive-medium);',
             description: 'אחוז יעד יחסית למחיר הכניסה'
+        },
+        {
+            type: 'display',
+            id: 'tradeRiskSummaryCard',
+            label: 'סיכום טרייד',
+            description: 'חישוב ריכוזי של נתוני ההשקעה, הסיכון והסיכוי',
+            rowClass: 'row',
+            colClass: 'col-12'
         },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
@@ -199,6 +224,9 @@ const tradesModalConfig = {
             required: true
         },
         tradeAccount: {
+            required: true
+        },
+        tradeSide: {
             required: true
         },
         tradeType: {

@@ -18,9 +18,10 @@ external_data_providers_bp = Blueprint('external_data_providers', __name__, url_
 
 def get_db_connection():
     """Get database connection"""
-    from config.settings import DB_PATH
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
     
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 

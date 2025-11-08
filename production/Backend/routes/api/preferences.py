@@ -11,7 +11,7 @@ Date: January 2025
 """
 
 from flask import Blueprint, request, jsonify, g
-from services.preferences_service import preferences_service
+from services.preferences_service import preferences_service, ValidationError
 from typing import Any, Dict, List
 import logging
 import json
@@ -530,6 +530,93 @@ def get_user_profiles() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
+@preferences_bp.route('/profiles', methods=['POST'])
+def create_profile() -> Any:
+    """
+    יצירת פרופיל חדש
+    
+    Body:
+        - user_id (required): מזהה משתמש
+        - profile_name (required): שם הפרופיל
+        - description (optional): תיאור הפרופיל
+        - created_by (optional): מזהה משתמש שיצר את הפרופיל
+        - is_default (optional): האם זה פרופיל ברירת מחדל (default: false)
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                "success": False,
+                "error": "No data provided",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        user_id = data.get('user_id')
+        profile_name = data.get('profile_name')
+        description = data.get('description', '')
+        created_by = data.get('created_by')
+        is_default = data.get('is_default', False)
+        
+        # בדיקת פרמטרים חובה
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "user_id is required",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        if not profile_name:
+            return jsonify({
+                "success": False,
+                "error": "profile_name is required",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        # יצירת הפרופיל
+        try:
+            profile_id = preferences_service.create_profile(
+                user_id=user_id,
+                profile_name=profile_name,
+                description=description,
+                created_by=created_by,
+                is_default=is_default
+            )
+            
+            if profile_id:
+                return jsonify({
+                    "success": True,
+                    "data": {
+                        "profile_id": profile_id,
+                        "user_id": user_id,
+                        "profile_name": profile_name,
+                        "description": description,
+                        "is_default": is_default,
+                        "is_active": False  # פרופיל חדש נוצר לא פעיל
+                    },
+                    "timestamp": datetime.now().isoformat()
+                }), 201
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": "Failed to create profile",
+                    "timestamp": datetime.now().isoformat()
+                }), 500
+                
+        except ValidationError as ve:
+            return jsonify({
+                "success": False,
+                "error": str(ve),
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+    except Exception as e:
+        logger.error(f"Error creating profile: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
 @preferences_bp.route('/profiles/activate', methods=['POST'])
 def activate_profile() -> Any:
     """
@@ -762,6 +849,89 @@ def get_preference_info(preference_name: str) -> Any:
         
     except Exception as e:
         logger.error(f"Error getting preference info: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@preferences_bp.route('/version', methods=['GET'])
+def get_preferences_version() -> Any:
+    """
+    קבלת גרסת העדפות - משמש לבדיקת עדכונים
+    
+    Query Parameters:
+        - user_id (optional): מזהה משתמש (default: 1)
+        - profile_id (optional): מזהה פרופיל
+    
+    Returns:
+        גרסה או timestamp של העדכון האחרון
+    """
+    try:
+        user_id = request.args.get('user_id', 1, type=int)
+        profile_id = request.args.get('profile_id', type=int)
+        
+        # קבלת timestamp של העדכון האחרון של העדפות
+        # אם אין עדכונים, נחזיר גרסה סטטית
+        try:
+            import sqlite3
+            
+            # Use preferences_service db_path
+            db_path = preferences_service.db_path
+            
+            # Get active profile if not specified
+            if profile_id is None:
+                profile_id = preferences_service._get_active_profile_id(user_id)
+            
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT MAX(updated_at) 
+                FROM user_preferences_v3 
+                WHERE user_id = ? AND profile_id = ?
+            ''', (user_id, profile_id))
+            
+            result = cursor.fetchone()
+            conn.close()
+            
+            last_update = result[0] if result and result[0] else None
+            
+            # אם יש עדכון אחרון, נשתמש בו כגרסה
+            # אחרת נשתמש בגרסה סטטית
+            if last_update:
+                # המרת timestamp למחרוזת ייחודית (format: YYYYMMDDTHHMMSS)
+                # Remove spaces, colons, and hyphens for a clean version string
+                version = last_update.replace(' ', 'T').replace(':', '').replace('-', '')
+            else:
+                # גרסה סטטית
+                version = "3.1.0"
+            
+            return jsonify({
+                "success": True,
+                "data": {
+                    "version": version,
+                    "last_update": last_update,
+                    "user_id": user_id,
+                    "profile_id": profile_id
+                },
+                "timestamp": datetime.now().isoformat()
+            }), 200
+            
+        except Exception as db_error:
+            logger.warning(f"Could not get last update timestamp: {db_error}")
+            # Fallback to static version
+            return jsonify({
+                "success": True,
+                "data": {
+                    "version": "3.1.0",
+                    "last_update": None
+                },
+                "timestamp": datetime.now().isoformat()
+            }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting preferences version: {e}")
         return jsonify({
             "success": False,
             "error": str(e),

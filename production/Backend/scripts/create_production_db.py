@@ -20,9 +20,7 @@ from pathlib import Path
 from datetime import datetime
 
 # Add Backend directory to path
-backend_dir = Path(__file__).parent.parent  # production/Backend/
-project_root = backend_dir.parent.parent  # TikTrackApp/
-dev_backend = project_root / "Backend"  # Backend/ (development)
+backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
 def get_default_trading_account_id(source_db_path: str) -> int:
@@ -125,12 +123,7 @@ def create_production_database():
     """Create production database from development database"""
     
     # Paths
-    # Source: development database
-    project_root = backend_dir.parent.parent
-    dev_backend = project_root / "Backend"
-    source_db = dev_backend / "db" / "simpleTrade_new.db"
-    
-    # Target: production database
+    source_db = backend_dir / "db" / "simpleTrade_new.db"
     target_db = backend_dir / "db" / "TikTrack_DB.db"
     
     # Check if source database exists

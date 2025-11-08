@@ -28,12 +28,8 @@ DEVELOPMENT_MODE = False
 CACHE_DISABLED = False  # Cache enabled in production for performance
 
 # Cache settings
-if DEVELOPMENT_MODE:
-    # מצב פיתוח - Cache מופחת
-    DEFAULT_CACHE_TTL = 10  # 10 שניות במקום 300
-else:
-    # מצב ייצור - Cache רגיל
-    DEFAULT_CACHE_TTL = 300  # 5 דקות
+# In production, cache is always enabled and uses default TTL
+DEFAULT_CACHE_TTL = 300  # 5 minutes - standard production cache
 
 # Cache enabled/disabled setting applies to both modes
 CACHE_ENABLED = not CACHE_DISABLED

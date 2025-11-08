@@ -61,10 +61,9 @@ from services.advanced_cache_service import cache_for
 # Create Blueprint
 file_scanner_bp = Blueprint('file_scanner', __name__, url_prefix='/api/file-scanner')
 
-# Path configurations - use config.settings for production isolation
-from config.settings import UI_DIR as PRODUCTION_UI_DIR
+# Path configurations
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-UI_DIR = str(PRODUCTION_UI_DIR)  # Use production UI directory from config
+UI_DIR = os.path.join(PROJECT_ROOT, 'trading-ui')
 SCRIPTS_DIR = os.path.join(UI_DIR, 'scripts')
 
 print(f"🔍 PROJECT_ROOT: {PROJECT_ROOT}")
@@ -90,7 +89,7 @@ FILE_TYPE_MAPPINGS = {
     },
     'python': {
         'extensions': ['.py'],
-        'directories': [os.path.join(PROJECT_ROOT, 'Backend')],  # Production Backend (PROJECT_ROOT is already production/)
+        'directories': [os.path.join(PROJECT_ROOT, 'Backend')],
         'exclude_patterns': ['node_modules', '.git', '__pycache__', 'venv', 'env', 'dist', 'build', 'coverage', 'backup', 'temp', 'tmp']
     },
     'other': {

@@ -439,7 +439,7 @@ const PACKAGE_MANIFEST = {
         file: 'modal-configs/trades-config.js',
         globalCheck: 'window.tradesModalConfig',
         description: 'קונפיגורציית מודל טריידים',
-        required: false,
+        required: true,
         loadOrder: 5
       },
       {

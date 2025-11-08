@@ -1158,6 +1158,14 @@ class EntityDetailsService:
         linked_items = []
         
         try:
+            def _format_datetime(value):
+                if not value:
+                    return None
+                try:
+                    return value.isoformat()  # datetime objects
+                except AttributeError:
+                    return str(value)
+
             # Trades linked to this account
             trades = (
                 db.query(Trade)
@@ -1175,8 +1183,8 @@ class EntityDetailsService:
                     'status': trade.status,
                     'side': trade.side,
                     'investment_type': trade.investment_type,
-                    'created_at': trade.created_at.isoformat() if trade.created_at else None,
-                    'updated_at': trade.updated_at.isoformat() if trade.updated_at else None
+                    'created_at': _format_datetime(trade.created_at),
+                    'updated_at': _format_datetime(getattr(trade, 'updated_at', None) or getattr(trade, 'closed_at', None))
                 })
 
             # Trade plans owned by this account
@@ -1196,8 +1204,8 @@ class EntityDetailsService:
                     'status': plan.status,
                     'side': plan.side,
                     'investment_type': plan.investment_type,
-                    'created_at': plan.created_at.isoformat() if plan.created_at else None,
-                    'updated_at': plan.updated_at.isoformat() if plan.updated_at else None
+                    'created_at': _format_datetime(plan.created_at),
+                    'updated_at': _format_datetime(getattr(plan, 'updated_at', None) or getattr(plan, 'cancelled_at', None))
                 })
 
             # Executions executed on this account
@@ -1217,8 +1225,8 @@ class EntityDetailsService:
                     'status': 'active',
                     'side': execution.action,
                     'investment_type': None,
-                    'created_at': execution.date.isoformat() if execution.date else (execution.created_at.isoformat() if execution.created_at else None),
-                    'updated_at': execution.updated_at.isoformat() if execution.updated_at else None
+                    'created_at': _format_datetime(execution.date or getattr(execution, 'created_at', None)),
+                    'updated_at': _format_datetime(getattr(execution, 'updated_at', None))
                 })
 
             # Cash flows associated with this account
@@ -1239,8 +1247,8 @@ class EntityDetailsService:
                     'status': 'active',
                     'side': None,
                     'investment_type': None,
-                    'created_at': flow.date.isoformat() if hasattr(flow, 'date') and flow.date else (flow.created_at.isoformat() if flow.created_at else None),
-                    'updated_at': flow.updated_at.isoformat() if flow.updated_at else None,
+                    'created_at': _format_datetime(getattr(flow, 'date', None) or getattr(flow, 'created_at', None)),
+                    'updated_at': _format_datetime(getattr(flow, 'updated_at', None)),
                     'amount': flow.amount,
                     'currency_symbol': currency_symbol
                 })
@@ -1248,29 +1256,35 @@ class EntityDetailsService:
             # Alerts that relate to this account (related_type_id == 1)
             alerts = db.query(Alert).filter(Alert.related_type_id == 1, Alert.related_id == trading_account_id).all()
             for alert in alerts:
+                alert_title = getattr(alert, 'title', None) or getattr(alert, 'message', None) or f"התראה #{alert.id}"
                 linked_items.append({
                     'id': alert.id,
                     'type': 'alert',
-                    'title': alert.title or alert.message or f"התראה #{alert.id}",
+                    'title': alert_title,
                     'status': alert.status,
                     'side': None,
                     'investment_type': None,
-                    'created_at': alert.created_at.isoformat() if alert.created_at else None,
-                    'updated_at': alert.updated_at.isoformat() if alert.updated_at else None
+                    'created_at': _format_datetime(getattr(alert, 'created_at', None)),
+                    'updated_at': _format_datetime(getattr(alert, 'updated_at', None) or getattr(alert, 'triggered_at', None))
                 })
 
             # Notes linked to this account (related_type_id == 1)
             notes = db.query(Note).filter(Note.related_type_id == 1, Note.related_id == trading_account_id).all()
             for note in notes:
+                raw_title = getattr(note, 'title', None)
+                if not raw_title:
+                    content = getattr(note, 'content', '') or ''
+                    first_line = content.split('\n')[0]
+                    raw_title = first_line[:50] if first_line else f"הערה #{note.id}"
                 linked_items.append({
                     'id': note.id,
                     'type': 'note',
-                    'title': note.title or f"הערה #{note.id}",
+                    'title': raw_title,
                     'status': 'active',
                     'side': None,
                     'investment_type': None,
-                    'created_at': note.created_at.isoformat() if note.created_at else None,
-                    'updated_at': note.updated_at.isoformat() if note.updated_at else None
+                    'created_at': _format_datetime(getattr(note, 'created_at', None)),
+                    'updated_at': _format_datetime(getattr(note, 'updated_at', None))
                 })
 
             logger.info(

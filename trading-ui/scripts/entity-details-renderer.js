@@ -1227,9 +1227,10 @@ class EntityDetailsRenderer {
                                     <tbody>${rowsHtml}</tbody>
                     </table>
                 </div>
-                        ` : `
-                            <div class="alert alert-info text-center mb-0">אין פריטים מקושרים להצגה</div>
-                        `}
+                        ` : (window.LinkedItemsService && window.LinkedItemsService.renderEmptyLinkedItems 
+                            ? `<div class="text-center py-4">${window.LinkedItemsService.renderEmptyLinkedItems(parentEntityType, parentEntityId, entityColor)}</div>`
+                            : `<div class="alert alert-info text-center mb-0">אין פריטים מקושרים להצגה</div>`)
+                        }
             </div>
                 </section>
             `;
@@ -1271,21 +1272,69 @@ class EntityDetailsRenderer {
                 tableStructure: html.substring(html.indexOf('<table'), html.indexOf('</table>') + 8).substring(0, 500)
             });
             
-            // Debug: Check if tbody has content
+            // Debug: Check if tbody has content - multiple checks at different times
             setTimeout(() => {
                 const table = document.getElementById(tableId);
                 if (table) {
                     const tbody = table.querySelector('tbody');
-                    console.log('🔍 [renderLinkedItems] DOM Check:', {
-                        tableExists: !!table,
+                    const rows = tbody ? tbody.querySelectorAll('tr') : [];
+                    console.log('🔍 [renderLinkedItems] DOM Check (100ms):', {
+                        tableExists: true,
                         tbodyExists: !!tbody,
-                        tbodyRows: tbody ? tbody.querySelectorAll('tr').length : 0,
+                        tbodyRows: rows.length,
+                        tbodyHTML: tbody ? tbody.innerHTML.substring(0, 200) : 'N/A',
+                        tableParent: table.parentElement ? table.parentElement.tagName : 'N/A',
+                        tableVisible: table.offsetParent !== null
+                    });
+                } else {
+                    console.warn('⚠️ [renderLinkedItems] Table not found in DOM (100ms):', tableId);
+                }
+            }, 100);
+            
+            setTimeout(() => {
+                const table = document.getElementById(tableId);
+                if (table) {
+                    const tbody = table.querySelector('tbody');
+                    const rows = tbody ? tbody.querySelectorAll('tr') : [];
+                    console.log('🔍 [renderLinkedItems] DOM Check (500ms):', {
+                        tableExists: true,
+                        tbodyExists: !!tbody,
+                        tbodyRows: rows.length,
+                        tbodyHTML: tbody ? tbody.innerHTML.substring(0, 200) : 'N/A',
+                        rowsHtmlLength: rowsHtml.length,
+                        enrichedItemsCount: enrichedItems.length
+                    });
+                    
+                    // Check if rowsHtml was actually inserted
+                    if (rows.length === 0 && rowsHtml.length > 0) {
+                        console.error('❌ [renderLinkedItems] PROBLEM DETECTED: rowsHtml exists but tbody is empty!', {
+                            rowsHtmlLength: rowsHtml.length,
+                            rowsHtmlPreview: rowsHtml.substring(0, 500),
+                            tbodyInnerHTML: tbody ? tbody.innerHTML : 'N/A',
+                            tableInnerHTML: table.innerHTML.substring(0, 1000),
+                            tableOuterHTML: table.outerHTML.substring(0, 1000)
+                        });
+                    }
+                } else {
+                    console.warn('⚠️ [renderLinkedItems] Table not found in DOM (500ms):', tableId);
+                }
+            }, 500);
+            
+            setTimeout(() => {
+                const table = document.getElementById(tableId);
+                if (table) {
+                    const tbody = table.querySelector('tbody');
+                    const rows = tbody ? tbody.querySelectorAll('tr') : [];
+                    console.log('🔍 [renderLinkedItems] DOM Check (1000ms):', {
+                        tableExists: true,
+                        tbodyExists: !!tbody,
+                        tbodyRows: rows.length,
                         tbodyHTML: tbody ? tbody.innerHTML.substring(0, 200) : 'N/A'
                     });
                 } else {
-                    console.warn('⚠️ [renderLinkedItems] Table not found in DOM:', tableId);
+                    console.warn('⚠️ [renderLinkedItems] Table not found in DOM (1000ms):', tableId);
                 }
-            }, 500);
+            }, 1000);
             
             return html;
         } catch (error) {
@@ -3161,14 +3210,23 @@ class EntityDetailsRenderer {
             console.warn('⚠️ [updateLinkedItemsTableBody] Table not found:', tableId);
             return;
         }
-        if (!sortedData) {
-            console.warn('⚠️ [updateLinkedItemsTableBody] No sorted data provided');
+        if (!sortedData || !Array.isArray(sortedData)) {
+            console.warn('⚠️ [updateLinkedItemsTableBody] No sorted data provided or invalid data:', {
+                sortedData,
+                isArray: Array.isArray(sortedData)
+            });
             return;
         }
         
         const tbody = table.querySelector('tbody');
         if (!tbody) {
             console.warn('⚠️ [updateLinkedItemsTableBody] tbody not found in table:', tableId);
+            return;
+        }
+        
+        // הגנה: אם אין נתונים תקינים, אל ננקה את הטבלה
+        if (sortedData.length === 0) {
+            console.warn('⚠️ [updateLinkedItemsTableBody] Empty sorted data, keeping existing table content');
             return;
         }
         
@@ -3584,15 +3642,30 @@ class EntityDetailsRenderer {
             }
         }
 
+        // הגנה: וידוא שיש לפחות פריט אחד לפני עדכון הטבלה
+        if (!Array.isArray(updatedItems) || updatedItems.length === 0) {
+            console.warn('⚠️ [_hydrateLinkedItemsAsync] No items to update after hydration, keeping original table');
+            this._linkedItemsHydrationState[tableId] = false;
+            return;
+        }
+
         window.linkedItemsTableData = window.linkedItemsTableData || {};
         window.linkedItemsTableData[tableId] = updatedItems;
 
         console.log('🔍 [_hydrateLinkedItemsAsync] About to update table body', {
             tableId,
-            updatedItemsCount: updatedItems.length
+            updatedItemsCount: updatedItems.length,
+            updatedItemsSample: updatedItems.slice(0, 2)
         });
 
-        this.updateLinkedItemsTableBody(tableId, updatedItems);
+        // עדכון הטבלה רק אם יש נתונים תקינים
+        try {
+            this.updateLinkedItemsTableBody(tableId, updatedItems);
+        } catch (error) {
+            console.error('❌ [_hydrateLinkedItemsAsync] Error updating table body:', error);
+            // במקרה של שגיאה, נשאיר את הטבלה המקורית
+        }
+        
         this._linkedItemsHydrationState[tableId] = false;
         
         console.log('🔍 [_hydrateLinkedItemsAsync] END');

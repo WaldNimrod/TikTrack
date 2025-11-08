@@ -615,6 +615,13 @@ function displayTradePlanTickerInfo(ticker) {
   if (entryPriceField && ticker.current_price) {
     entryPriceField.value = ticker.current_price;
   }
+
+  if (typeof window.updateSharesFromAmount === 'function') {
+    window.updateSharesFromAmount();
+  }
+  if (typeof window.updateAmountFromShares === 'function') {
+    window.updateAmountFromShares();
+  }
 }
 
 // ===== UI MANAGEMENT FUNCTIONS =====
@@ -685,41 +692,43 @@ async function updateTickerInfo() {
  */
 function updateSharesFromAmount() {
   try {
-    const amountInput = document.getElementById('plannedAmount');
-    const sharesInput = document.getElementById('shares');
-    const priceDisplay = document.getElementById('currentPriceDisplay');
-    
-    // Fallback to alternative field names
-    if (!amountInput) {
-      const altAmountInput = document.getElementById('addTradePlanPlannedAmount');
-      if (altAmountInput) amountInput = altAmountInput;
-    }
-    if (!sharesInput) {
-      const altSharesInput = document.getElementById('addTradePlanShares');
-      if (altSharesInput) sharesInput = altSharesInput;
-    }
+    const {
+      amountInput,
+      sharesInput,
+      priceInput,
+      priceDisplay,
+    } = getTradePlanModalElements();
 
-    if (!amountInput || !sharesInput || !priceDisplay) {
+    if (!amountInput || !sharesInput) {
       return;
     }
 
-    const amount = parseFloat(amountInput.value) || 0;
-    const priceText = priceDisplay.textContent;
-    const price = parseFloat(priceText.replace('$', '')) || 0;
+    const amount = parseFieldValue(amountInput);
+    const price = parsePriceValue(priceInput, priceDisplay);
 
-    if (price > 0) {
-      // Try to use global function first
-      if (typeof window.convertAmountToShares === 'function') {
-        const result = window.convertAmountToShares(amount, price);
-        sharesInput.value = result.shares || result;
-      } else if (typeof convertAmountToShares === 'function') {
-        // Fallback to local function if exists
-        const result = convertAmountToShares(amount, price);
-        sharesInput.value = result.shares || result;
-      } else {
-        // Simple calculation fallback
-        sharesInput.value = Math.floor(amount / price);
-      }
+    if (amount <= 0 || price <= 0) {
+      sharesInput.value = '';
+      return;
+    }
+
+    let result = null;
+    if (typeof window.convertAmountToShares === 'function') {
+      result = window.convertAmountToShares(amount, price);
+    } else if (typeof convertAmountToShares === 'function') {
+      result = convertAmountToShares(amount, price);
+    } else {
+      result = amount / price;
+    }
+
+    const { sharesValue, adjustedAmount } = normalizeSharesResult(result);
+    if (sharesValue !== null) {
+      sharesInput.value = sharesValue;
+    } else {
+      sharesInput.value = '';
+    }
+
+    if (typeof adjustedAmount === 'number' && adjustedAmount >= 0) {
+      amountInput.value = adjustedAmount.toFixed(2);
     }
     
   } catch (error) {
@@ -739,41 +748,38 @@ function updateSharesFromAmount() {
  */
 function updateAmountFromShares() {
   try {
-    const amountInput = document.getElementById('plannedAmount');
-    const sharesInput = document.getElementById('shares');
-    const priceDisplay = document.getElementById('currentPriceDisplay');
-    
-    // Fallback to alternative field names
-    if (!amountInput) {
-      const altAmountInput = document.getElementById('addTradePlanPlannedAmount');
-      if (altAmountInput) amountInput = altAmountInput;
-    }
-    if (!sharesInput) {
-      const altSharesInput = document.getElementById('addTradePlanShares');
-      if (altSharesInput) sharesInput = altSharesInput;
-    }
+    const {
+      amountInput,
+      sharesInput,
+      priceInput,
+      priceDisplay,
+    } = getTradePlanModalElements();
 
-    if (!amountInput || !sharesInput || !priceDisplay) {
+    if (!amountInput || !sharesInput) {
       return;
     }
 
-    const shares = parseFloat(sharesInput.value) || 0;
-    const priceText = priceDisplay.textContent;
-    const price = parseFloat(priceText.replace('$', '')) || 0;
+    const shares = parseFieldValue(sharesInput);
+    const price = parsePriceValue(priceInput, priceDisplay);
 
-    if (price > 0) {
-      // Try to use global function first
-      if (typeof window.convertSharesToAmount === 'function') {
-        const amount = window.convertSharesToAmount(shares, price);
-        amountInput.value = amount;
-      } else if (typeof convertSharesToAmount === 'function') {
-        // Fallback to local function if exists
-        const amount = convertSharesToAmount(shares, price);
-        amountInput.value = amount;
-      } else {
-        // Simple calculation fallback
-        amountInput.value = (shares * price).toFixed(2);
-      }
+    if (shares <= 0 || price <= 0) {
+      amountInput.value = '';
+      return;
+    }
+
+    let amount = null;
+    if (typeof window.convertSharesToAmount === 'function') {
+      amount = window.convertSharesToAmount(shares, price);
+    } else if (typeof convertSharesToAmount === 'function') {
+      amount = convertSharesToAmount(shares, price);
+    } else {
+      amount = shares * price;
+    }
+
+    if (typeof amount === 'number') {
+      amountInput.value = amount.toFixed(2);
+    } else if (amount) {
+      amountInput.value = amount;
     }
     
   } catch (error) {
@@ -1825,6 +1831,98 @@ window.addEditReason = addEditReason;
 window.addEditImportantNote = addEditImportantNote;
 window.addEditReminder = addEditReminder;
 
+/**
+ * Helper to gather modal inputs used for amount/quantity calculations
+ * @returns {{amountInput: HTMLInputElement|null, sharesInput: HTMLInputElement|null, priceInput: HTMLInputElement|null, priceDisplay: HTMLElement|null}}
+ */
+function getTradePlanModalElements() {
+  const amountInput = document.getElementById('planAmount')
+    || document.getElementById('plannedAmount')
+    || document.getElementById('addTradePlanPlannedAmount')
+    || null;
+
+  const sharesInput = document.getElementById('tradePlanQuantity')
+    || document.getElementById('shares')
+    || document.getElementById('addTradePlanShares')
+    || null;
+
+  const priceInput = document.getElementById('tradePlanEntryPrice') || null;
+  const priceDisplay = document.getElementById('currentPriceDisplay') || null;
+
+  return { amountInput, sharesInput, priceInput, priceDisplay };
+}
+
+/**
+ * Parse numeric value from input, allowing partial decimal typing
+ * @param {HTMLInputElement|null} input
+ * @returns {number}
+ */
+function parseFieldValue(input) {
+  if (!input) {
+    return 0;
+  }
+  const raw = (input.value || '').toString().trim().replace(/,/g, '');
+  if (raw === '' || raw === '.' || raw === '-' || raw === '-.') {
+    return 0;
+  }
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+/**
+ * Parse price from entry input (or fallback to display element)
+ * @param {HTMLInputElement|null} priceInput
+ * @param {HTMLElement|null} priceDisplay
+ * @returns {number}
+ */
+function parsePriceValue(priceInput, priceDisplay) {
+  const priceFromInput = parseFieldValue(priceInput);
+  if (priceFromInput > 0) {
+    return priceFromInput;
+  }
+
+  if (priceDisplay && priceDisplay.textContent) {
+    const normalized = priceDisplay.textContent.replace(/[^\d.\-]/g, '');
+    const parsed = Number(normalized);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      return parsed;
+    }
+  }
+
+  return 0;
+}
+
+/**
+ * Normalize response from convertAmountToShares into consistent structure
+ * @param {number|object} result
+ * @returns {{sharesValue: number|null, adjustedAmount: number|null}}
+ */
+function normalizeSharesResult(result) {
+  if (result == null) {
+    return { sharesValue: null, adjustedAmount: null };
+  }
+
+  if (typeof result === 'object') {
+    const shares = Number(result.shares);
+    const adjustedAmount = result.adjustedAmount !== undefined
+      ? Number(result.adjustedAmount)
+      : null;
+
+    return {
+      sharesValue: Number.isFinite(shares) ? Number(shares.toFixed(4)) : null,
+      adjustedAmount: Number.isFinite(adjustedAmount) ? adjustedAmount : null,
+    };
+  }
+
+  const numericShares = Number(result);
+  return {
+    sharesValue: Number.isFinite(numericShares)
+      ? Number(numericShares.toFixed(4))
+      : null,
+    adjustedAmount: null,
+  };
+}
+
 // The translateDateRangeToDates function is already defined at the beginning of the file
 
 // Defining the updateGridFromComponent function immediately at the beginning of the file
@@ -2868,7 +2966,8 @@ async function saveTradePlan() {
             ticker_id: { id: 'tradePlanTicker', type: 'int' },
             name: { id: 'tradePlanName', type: 'text' },
             investment_type: { id: 'tradePlanType', type: 'text' }, // Map tradePlanType field to investment_type column
-            quantity: { id: 'tradePlanQuantity', type: 'int' },
+            planned_amount: { id: 'planAmount', type: 'float' },
+            quantity: { id: 'tradePlanQuantity', type: 'float' },
             entry_price: { id: 'tradePlanEntryPrice', type: 'float', default: null },
             stop_loss: { id: 'tradePlanStopLoss', type: 'float', default: null },
             take_profit: { id: 'tradePlanTakeProfit', type: 'float', default: null },

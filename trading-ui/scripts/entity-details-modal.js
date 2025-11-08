@@ -1071,9 +1071,36 @@ class EntityDetailsModal {
      */
     showRenderedContent(renderedContent) {
         const contentElement = document.getElementById('entityDetailsContent');
-        if (!contentElement) return;
+        if (!contentElement) {
+            console.error('❌ [showRenderedContent] Content element not found!');
+            return;
+        }
+
+        console.log('🔍 [showRenderedContent] Before setting innerHTML', {
+            contentLength: renderedContent.length,
+            hasLinkedItemsSection: renderedContent.includes('entity-linked-items'),
+            linkedItemsTableExists: renderedContent.includes('linkedItemsTable_'),
+            contentElementExists: !!contentElement
+        });
 
         contentElement.innerHTML = renderedContent;
+        
+        // Debug: Check if linked items table exists after insertion
+        setTimeout(() => {
+            const linkedItemsTables = contentElement.querySelectorAll('[id^="linkedItemsTable_"]');
+            console.log('🔍 [showRenderedContent] After setting innerHTML - Linked items tables found:', linkedItemsTables.length);
+            linkedItemsTables.forEach((table, index) => {
+                const tbody = table.querySelector('tbody');
+                const rows = tbody ? tbody.querySelectorAll('tr') : [];
+                console.log(`🔍 [showRenderedContent] Table ${index + 1} (${table.id}):`, {
+                    tableExists: !!table,
+                    tbodyExists: !!tbody,
+                    tbodyRows: rows.length,
+                    tbodyHTML: tbody ? tbody.innerHTML.substring(0, 200) : 'N/A',
+                    tableHTML: table.outerHTML.substring(0, 500)
+                });
+            });
+        }, 100);
         
         // Initialize tooltips for linked items filter buttons after content is displayed
         // Use multiple attempts to ensure tooltips are initialized even if systems load slowly

@@ -39,7 +39,7 @@ const tradePlansModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
-        // שורה שנייה: סוג השקעה + כמות מתוכננת
+        // שורה שנייה: סוג השקעה + סכום השקעה מתוכנן
         {
             type: 'select',
             id: 'tradePlanType',
@@ -57,6 +57,18 @@ const tradePlansModalConfig = {
         },
         {
             type: 'number',
+            id: 'planAmount',
+            label: 'סכום השקעה מתוכנן ($)',
+            required: true,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס סכום השקעה...',
+            colClass: 'col-md-6',
+            description: 'הסכום הכולל להשקעה בתכנון'
+        },
+        // שורה שלישית: כמות מתוכננת + מחיר כניסה מתוכנן
+        {
+            type: 'number',
             id: 'tradePlanQuantity',
             label: 'כמות מתוכננת',
             required: true,
@@ -66,7 +78,6 @@ const tradePlansModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
-        // שורה שלישית: מחיר כניסה מתוכנן + תאריך כניסה מתוכנן
         {
             type: 'number',
             id: 'tradePlanEntryPrice',
@@ -75,9 +86,9 @@ const tradePlansModalConfig = {
             min: 0.01,
             step: 0.01,
             placeholder: 'הכנס מחיר כניסה...',
-            rowClass: 'row',
             colClass: 'col-md-6'
         },
+        // שורה רביעית: תאריך כניסה מתוכנן + Stop Loss
         {
             type: 'datetime-local',
             id: 'tradePlanEntryDate',
@@ -87,7 +98,6 @@ const tradePlansModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
-        // שורה רביעית: Stop Loss + Take Profit
         {
             type: 'number',
             id: 'tradePlanStopLoss',

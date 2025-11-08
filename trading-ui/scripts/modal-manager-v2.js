@@ -3393,17 +3393,61 @@ class ModalManagerV2 {
         if (modalId === 'tradePlansModal') {
             const tickerSelect = modalElement.querySelector('#tradePlanTicker');
             if (tickerSelect) {
-                // Remove existing listeners
-                const newTickerSelect = tickerSelect.cloneNode(true);
-                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
-                
-                // Add change listener
-                newTickerSelect.addEventListener('change', async (e) => {
+                if (!tickerSelect.dataset.autocalcBound) {
+                    tickerSelect.addEventListener('change', async (e) => {
                     const tickerId = e.target.value;
                     if (tickerId && window.loadTradePlanTickerInfo) {
                         await window.loadTradePlanTickerInfo(tickerId);
+                            if (typeof window.updateSharesFromAmount === 'function') {
+                                window.updateSharesFromAmount();
+                            }
+                            if (typeof window.updateAmountFromShares === 'function') {
+                                window.updateAmountFromShares();
+                            }
                     }
                 });
+                    tickerSelect.dataset.autocalcBound = 'true';
+                }
+            }
+
+            const amountInput = modalElement.querySelector('#planAmount');
+            if (amountInput && !amountInput.dataset.autocalcBound) {
+                amountInput.addEventListener('blur', () => {
+                    if (typeof window.updateSharesFromAmount === 'function') {
+                        window.updateSharesFromAmount();
+                    }
+                });
+                amountInput.dataset.autocalcBound = 'true';
+            }
+
+            const quantityInput = modalElement.querySelector('#tradePlanQuantity');
+            if (quantityInput && !quantityInput.dataset.autocalcBound) {
+                quantityInput.addEventListener('blur', () => {
+                    if (typeof window.updateAmountFromShares === 'function') {
+                        window.updateAmountFromShares();
+                    }
+                });
+                quantityInput.dataset.autocalcBound = 'true';
+            }
+
+            const entryPriceInput = modalElement.querySelector('#tradePlanEntryPrice');
+            if (entryPriceInput && !entryPriceInput.dataset.autocalcBound) {
+                entryPriceInput.addEventListener('blur', () => {
+                    if (typeof window.updateSharesFromAmount === 'function') {
+                        window.updateSharesFromAmount();
+                    }
+                    if (typeof window.updateAmountFromShares === 'function') {
+                        window.updateAmountFromShares();
+                    }
+                });
+                entryPriceInput.dataset.autocalcBound = 'true';
+            }
+
+            if (typeof window.updateSharesFromAmount === 'function') {
+                window.updateSharesFromAmount();
+            }
+            if (typeof window.updateAmountFromShares === 'function') {
+                window.updateAmountFromShares();
             }
         }
         

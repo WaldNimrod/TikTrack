@@ -17062,3 +17062,27 @@ sqlalchemy.exc.DatabaseError: (sqlite3.DatabaseError) database disk image is mal
 [SQL: PRAGMA main.table_info("tickers")]
 (Background on this error at: https://sqlalche.me/e/20/4xp6)
 
+2025-11-08 04:31:00,588 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:df2fa39f9ed68be80f9f7de3754ec20a
+2025-11-08 04:31:00,588 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:df2fa39f9ed68be80f9f7de3754ec20a
+2025-11-08 04:31:00,589 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:c51444056fd4147d0ca722b2c46ae21f
+2025-11-08 04:31:00,589 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:c51444056fd4147d0ca722b2c46ae21f
+2025-11-08 04:31:00,589 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:8e6902fed1550cdc14c5f61bfc7fe172
+2025-11-08 04:31:00,589 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:8e6902fed1550cdc14c5f61bfc7fe172
+2025-11-08 04:31:00,590 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:bd026b126fb1182acbcbabdba380c9d3
+2025-11-08 04:31:00,590 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:bd026b126fb1182acbcbabdba380c9d3
+2025-11-08 04:31:00,590 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:fed80bbc818ba0678e799306172f35fe
+2025-11-08 11:24:27,175 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:4757dc050e06bef4330413bcf242a58b
+2025-11-08 11:24:32,126 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:ffd044ebf14035cb6900db8635669e15
+2025-11-08 11:24:32,127 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:ffd044ebf14035cb6900db8635669e15
+2025-11-08 11:24:32,127 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:ffd044ebf14035cb6900db8635669e15
+2025-11-08 11:28:31,667 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:53e6a7f9b5450629ef5990f7ea84e965
+2025-11-08 11:28:31,669 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:53e6a7f9b5450629ef5990f7ea84e965
+2025-11-08 11:28:31,670 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:53e6a7f9b5450629ef5990f7ea84e965
+2025-11-08 11:28:31,670 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:53e6a7f9b5450629ef5990f7ea84e965
+2025-11-08 13:51:25,446 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:e2698f28d401169fd65bd475de031b68
+2025-11-08 13:52:20,799 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:ff0f3478cbe612bbb1fb42d62e625693
+2025-11-08 13:53:01,270 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:f0c154f1e14ac05340fe0bc47076fae6
+2025-11-08 13:55:17,195 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:9c3da9b5f33e6a0bc25cebe1cad6dbca
+2025-11-08 13:56:08,865 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:1a3ad2173af10aecd472f5b95fd72089
+2025-11-08 13:56:08,867 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:1a3ad2173af10aecd472f5b95fd72089
+2025-11-08 13:56:08,937 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:1a3ad2173af10aecd472f5b95fd72089

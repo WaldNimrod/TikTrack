@@ -12,6 +12,8 @@ Location: scripts/sync_to_production.py
 
 import os
 import shutil
+import sys
+import subprocess
 from pathlib import Path
 from typing import Set
 
@@ -26,7 +28,8 @@ ALLOWED_DIRS = {
     'routes',
     'services',
     'models',
-    'utils'
+    'utils',
+    'connectors'  # Required for user_data_import
 }
 
 # Allowed root files
@@ -162,12 +165,31 @@ def main():
     
     print()
     print("=" * 60)
-    print("Sync Complete")
+    print("Backend Sync Complete")
     print("=" * 60)
     print(f"✅ Copied: {copied} files")
     print(f"⏭️  Skipped: {skipped} items")
     print(f"📁 Target: {TARGET_BACKEND}")
     print()
+    
+    # Sync UI to production
+    print("=" * 60)
+    print("Syncing UI to production...")
+    print("=" * 60)
+    ui_sync_script = Path(__file__).parent / "sync_ui_to_production.py"
+    if ui_sync_script.exists():
+        result = subprocess.run([sys.executable, str(ui_sync_script)], capture_output=True, text=True)
+        print(result.stdout)
+        if result.returncode != 0:
+            print("⚠️  UI sync had issues, but Backend sync completed")
+            return False
+    else:
+        print("⚠️  UI sync script not found, skipping UI sync")
+    
+    print()
+    print("=" * 60)
+    print("✅ Complete sync finished!")
+    print("=" * 60)
     
     return True
 

@@ -1426,13 +1426,21 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
       finalConfig.showDelete
     );
 
+    // בדיקה אם כבר יש כפתורים - למנוע כפילות
+    if (actionsCell.querySelector('.actions-menu-wrapper')) {
+      if (window.Logger) { window.Logger.warn(`⚠️ Actions menu already exists in row ${index}, skipping`, { page: "ui-utils" }); }
+      return;
+    }
+    
     actionsCell.innerHTML = buttonsHtml;
   });
 
 }
 
-// Export the new function
-window.loadTableActionButtons = loadTableActionButtons;
+// Export the new function only if not already defined (prefer ui-basic.js version)
+if (!window.loadTableActionButtons) {
+  window.loadTableActionButtons = loadTableActionButtons;
+}
 
 // Export demo functions for testing
 window.viewTickerDetails = viewTickerDetails;

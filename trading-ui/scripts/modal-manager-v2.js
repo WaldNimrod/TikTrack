@@ -799,13 +799,13 @@ class ModalManagerV2 {
             // עדכון כותרת לפי מצב
             this.updateModalTitle(modalElement, modalInfo.config, mode);
             
-            // איפוס טופס
-            this.resetForm(modalElement);
-            
             const formElement = modalElement.querySelector('form');
             if (formElement) {
                 formElement.dataset.modalMode = mode;
             }
+            
+            // איפוס טופס
+            this.resetForm(modalElement);
             
             if (modalElement.id === 'alertsModal' || modalInfo.config?.entityType === 'alert') {
                 if (!this.alertsContext) {
@@ -1086,8 +1086,8 @@ class ModalManagerV2 {
                         window.Logger?.warn?.(message, data, { page: 'modal-manager-v2' });
                     };
 
-                    const handleAlertRelatedTypeChange = async (relatedTypeId) => {
-                        logInfo('🔁 [alertsModal] related type changed', { relatedTypeId });
+                    const handleAlertRelatedTypeChange = async (relatedTypeId, selectedRelatedIdOverride = undefined) => {
+                        logInfo('🔁 [alertsModal] related type changed', { relatedTypeId, selectedRelatedIdOverride });
                         if (!alertRelatedObjectField) {
                             logWarn('⚠️ [alertsModal] alertRelatedObject not found when handling type change');
                             return;
@@ -1096,7 +1096,13 @@ class ModalManagerV2 {
                         if (relatedTypeId && relatedTypeId !== '') {
                             alertRelatedObjectField.disabled = false;
                             alertRelatedObjectField.removeAttribute('disabled');
-                            await this.populateAlertRelatedObjects(form, relatedTypeId);
+                            const normalizedSelectedId = selectedRelatedIdOverride !== undefined
+                                ? selectedRelatedIdOverride
+                                : alertRelatedObjectField.value || data.related_id || null;
+                            await this.populateAlertRelatedObjects(form, relatedTypeId, normalizedSelectedId);
+                            if (normalizedSelectedId) {
+                                alertRelatedObjectField.value = normalizedSelectedId;
+                            }
                             await this.updateAlertTickerDisplay(form, null);
                             this.handleAlertLinkedEntityUpdate(null);
                         } else {
@@ -1170,7 +1176,7 @@ class ModalManagerV2 {
 
                     // Ensure state is consistent when modal opens with existing selection
                     if (alertRelatedTypeSelect.value) {
-                        handleAlertRelatedTypeChange(alertRelatedTypeSelect.value);
+                        handleAlertRelatedTypeChange(alertRelatedTypeSelect.value, data?.related_id || alertRelatedObjectField.value || undefined);
                     }
                     if (alertRelatedTypeSelect.value && alertRelatedObjectField.value) {
                         handleAlertRelatedObjectChange(alertRelatedObjectField.value);
@@ -1331,9 +1337,13 @@ class ModalManagerV2 {
         // ניקוי שגיאות ולידציה
         this.clearValidationErrors(form);
         
-        // Note: applyDefaultValues is async but we don't await it here
-        // It will be applied after populateForm for edit mode anyway
-        this.applyDefaultValues(form).catch(err => console.warn('Error applying default values:', err));
+        const formMode = form.dataset.modalMode || modalElement.dataset?.modalMode || '';
+        if (formMode !== 'edit') {
+            // Note: applyDefaultValues is async but we don't await it here
+            this.applyDefaultValues(form).catch(err => console.warn('Error applying default values:', err));
+        } else {
+            console.log('⏭️ Skipping applyDefaultValues in edit mode');
+        }
     }
 
     /**
@@ -3903,7 +3913,7 @@ class ModalManagerV2 {
             alertRelatedObjectField.appendChild(emptyOption);
             
             // הוספת כל האובייקטים
-            items.forEach((item, index) => {
+            items.forEach((item) => {
                 const option = document.createElement('option');
                 option.value = item[valueField];
                 
@@ -3973,7 +3983,17 @@ class ModalManagerV2 {
                 }
                 alertRelatedObjectField.appendChild(option);
             });
-            
+
+            if (selectedRelatedId) {
+                const normalizedSelectedId = String(selectedRelatedId);
+                const hasOption = Array.from(alertRelatedObjectField.options).some(
+                    opt => opt.value === normalizedSelectedId
+                );
+                if (hasOption) {
+                    alertRelatedObjectField.value = normalizedSelectedId;
+                }
+            }
+
             console.log(`✅ Populated alertRelatedObject with ${items.length} items for type ${relatedTypeId}`);
         } catch (error) {
             console.warn('⚠️ Error populating alert related objects:', error);

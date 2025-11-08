@@ -8,6 +8,220 @@
  * @created 2025-01-06
  */
 
+// ============================================================================
+// GLOBAL FALLBACKS - Bootstrap CDN Failover
+// ============================================================================
+(() => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const needsModalFallback = !window.bootstrap || !window.bootstrap.Modal;
+  const needsTooltipFallback = !window.bootstrap || !window.bootstrap.Tooltip;
+
+  if (!needsModalFallback && !needsTooltipFallback) {
+    return;
+  }
+
+  console.warn('⚠️ [Bootstrap Fallback] Bootstrap assets not available - installing lightweight fallback for modals/tooltips');
+
+  const dispatchEvent = (element, name) => {
+    if (!element) {
+      return;
+    }
+    try {
+      const event = new Event(name, { bubbles: true, cancelable: false });
+      element.dispatchEvent(event);
+    } catch (error) {
+      // Older browsers fallback
+      try {
+        const event = document.createEvent('Event');
+        event.initEvent(name, true, false);
+        element.dispatchEvent(event);
+      } catch (e) {
+        console.error('❌ [Bootstrap Fallback] Failed to dispatch event', name, e);
+      }
+    }
+  };
+
+  class BootstrapModalFallback {
+    constructor(element, options = {}) {
+      if (!element) {
+        throw new Error('BootstrapModalFallback requires a DOM element');
+      }
+      this._element = element;
+      this._options = {
+        backdrop: options.backdrop !== undefined ? options.backdrop : true,
+        keyboard: options.keyboard !== undefined ? options.keyboard : true,
+        focus: options.focus !== undefined ? options.focus : true
+      };
+      this._isShown = false;
+      this._backdrop = null;
+      this._handleKeydown = null;
+      this._previouslyFocused = null;
+      BootstrapModalFallback._instances.set(element, this);
+    }
+
+    show() {
+      if (this._isShown) {
+        return;
+      }
+
+      dispatchEvent(this._element, 'show.bs.modal');
+      this._isShown = true;
+
+      if (this._options.backdrop !== false) {
+        this._createBackdrop();
+      }
+
+      this._element.style.display = 'block';
+      this._element.removeAttribute('aria-hidden');
+      this._element.setAttribute('aria-modal', 'true');
+      this._element.classList.add('show');
+
+      document.body.classList.add('modal-open');
+      this._originalBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+
+      if (this._options.focus !== false) {
+        this._previouslyFocused = document.activeElement;
+        try {
+          this._element.focus({ preventScroll: true });
+        } catch (error) {
+          // ignore focus errors
+        }
+      }
+
+      if (this._options.keyboard !== false) {
+        this._handleKeydown = (event) => {
+          if (event.key === 'Escape') {
+            this.hide();
+          }
+        };
+        document.addEventListener('keydown', this._handleKeydown);
+      }
+
+      setTimeout(() => dispatchEvent(this._element, 'shown.bs.modal'), 0);
+    }
+
+    hide() {
+      if (!this._isShown) {
+        return;
+      }
+
+      dispatchEvent(this._element, 'hide.bs.modal');
+      this._isShown = false;
+
+      if (this._handleKeydown) {
+        document.removeEventListener('keydown', this._handleKeydown);
+        this._handleKeydown = null;
+      }
+
+      if (this._options.backdrop !== false && this._backdrop) {
+        this._backdrop.remove();
+        this._backdrop = null;
+      }
+
+      this._element.classList.remove('show');
+      this._element.style.display = 'none';
+      this._element.setAttribute('aria-hidden', 'true');
+      this._element.removeAttribute('aria-modal');
+
+      document.body.classList.remove('modal-open');
+      if (this._originalBodyOverflow !== undefined) {
+        document.body.style.overflow = this._originalBodyOverflow;
+      }
+
+      if (this._previouslyFocused && typeof this._previouslyFocused.focus === 'function') {
+        try {
+          this._previouslyFocused.focus({ preventScroll: true });
+        } catch (error) {
+          // ignore focus errors
+        }
+      }
+      this._previouslyFocused = null;
+
+      setTimeout(() => dispatchEvent(this._element, 'hidden.bs.modal'), 0);
+    }
+
+    toggle() {
+      if (this._isShown) {
+        this.hide();
+      } else {
+        this.show();
+      }
+    }
+
+    dispose() {
+      this.hide();
+      BootstrapModalFallback._instances.delete(this._element);
+      this._element = null;
+    }
+
+    _createBackdrop() {
+      if (this._backdrop) {
+        return;
+      }
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      document.body.appendChild(backdrop);
+      this._backdrop = backdrop;
+    }
+
+    static getInstance(element) {
+      return BootstrapModalFallback._instances.get(element) || null;
+    }
+
+    static get VERSION() {
+      return 'fallback-1.0.0';
+    }
+  }
+
+  BootstrapModalFallback._instances = new WeakMap();
+
+  class BootstrapTooltipFallback {
+    constructor(element, options = {}) {
+      if (!element) {
+        throw new Error('BootstrapTooltipFallback requires a DOM element');
+      }
+      this._element = element;
+      this._options = options;
+      BootstrapTooltipFallback._instances.set(element, this);
+
+      const title = options?.title || element.getAttribute('title') || element.getAttribute('data-bs-original-title');
+      if (title) {
+        element.setAttribute('data-bs-original-title', title);
+        element.setAttribute('title', title);
+      }
+    }
+
+    dispose() {
+      BootstrapTooltipFallback._instances.delete(this._element);
+    }
+
+    static getInstance(element) {
+      return BootstrapTooltipFallback._instances.get(element) || null;
+    }
+
+    static get VERSION() {
+      return 'fallback-1.0.0';
+    }
+  }
+
+  BootstrapTooltipFallback._instances = new WeakMap();
+
+  const bootstrapGlobal = window.bootstrap ? { ...window.bootstrap } : {};
+  if (needsModalFallback) {
+    bootstrapGlobal.Modal = BootstrapModalFallback;
+  }
+  if (needsTooltipFallback) {
+    bootstrapGlobal.Tooltip = BootstrapTooltipFallback;
+  }
+  bootstrapGlobal.__isFallback = true;
+
+  window.bootstrap = bootstrapGlobal;
+})();
+
 // ===== UNIFIED APP INITIALIZER =====
 
 if (typeof window.UnifiedAppInitializer === 'undefined') {

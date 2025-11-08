@@ -445,7 +445,28 @@ class EntityDetailsService:
                     logger.error(f"Error loading linked items for trading_account {entity_id}: {linked_error}")
                     entity_dict['linked_items'] = []
                     entity_dict['linked_items_count'] = 0
-
+            
+            if entity_type == 'execution':
+                try:
+                    linked_items = EntityDetailsService.get_linked_items(db, entity_type, entity_id)
+                    entity_dict['linked_items'] = linked_items
+                    entity_dict['linked_items_count'] = len(linked_items)
+                except Exception as linked_error:
+                    logger.error(f"Error loading linked items for execution {entity_id}: {linked_error}")
+                    entity_dict['linked_items'] = []
+                    entity_dict['linked_items_count'] = 0
+            
+            if entity_type == 'cash_flow':
+                try:
+                    linked_items = EntityDetailsService.get_linked_items(db, entity_type, entity_id)
+                    entity_dict['linked_items'] = linked_items
+                    entity_dict['linked_items_count'] = len(linked_items)
+                except Exception as linked_error:
+                    logger.error(f"Error loading linked items for cash_flow {entity_id}: {linked_error}")
+                    entity_dict['linked_items'] = []
+                    entity_dict['linked_items_count'] = 0
+            
+            if entity_type == 'trading_account':
                 try:
                     positions = PositionPortfolioService.calculate_all_account_positions(
                         db=db,
@@ -569,6 +590,10 @@ class EntityDetailsService:
                 linked_items.extend(EntityDetailsService._get_trade_plan_linked_items(db, entity_id))
             elif entity_type == 'trading_account':
                 linked_items.extend(EntityDetailsService._get_account_linked_items(db, entity_id))
+            elif entity_type == 'execution':
+                linked_items.extend(EntityDetailsService._get_execution_linked_items(db, entity_id))
+            elif entity_type == 'cash_flow':
+                linked_items.extend(EntityDetailsService._get_cash_flow_linked_items(db, entity_id))
             elif entity_type == 'alert':
                 linked_items.extend(EntityDetailsService._get_alert_linked_items(db, entity_id))
             elif entity_type == 'note':
@@ -960,6 +985,14 @@ class EntityDetailsService:
         linked_items = []
         
         try:
+            def _format_datetime(value):
+                if not value:
+                    return None
+                try:
+                    return value.isoformat()  # datetime objects
+                except AttributeError:
+                    return str(value)
+            
             # Get related trades with ticker relationship loaded
             trades = db.query(Trade).options(joinedload(Trade.ticker)).filter(Trade.ticker_id == ticker_id).all()
             for trade in trades:
@@ -1010,6 +1043,30 @@ class EntityDetailsService:
                     'is_triggered': alert.is_triggered,
                     'created_at': alert.created_at.isoformat() if alert.created_at else None,
                     'updated_at': updated_at.isoformat() if updated_at else None
+                })
+            
+            # Get executions directly linked to this ticker (not through trades)
+            executions = (
+                db.query(Execution)
+                .options(joinedload(Execution.ticker))
+                .filter(Execution.ticker_id == ticker_id)
+                .all()
+            )
+            for execution in executions:
+                ticker_symbol = execution.ticker.symbol if getattr(execution, 'ticker', None) else None
+                action = execution.action or ''
+                quantity = execution.quantity or 0
+                title = f"ביצוע {action} {quantity} יחידות {ticker_symbol}".strip() if ticker_symbol else f"ביצוע {action} #{execution.id}"
+                linked_items.append({
+                    'id': execution.id,
+                    'type': 'execution',
+                    'name': title,
+                    'title': title,
+                    'status': 'active',
+                    'side': execution.action,
+                    'investment_type': None,
+                    'created_at': _format_datetime(execution.date or getattr(execution, 'created_at', None)),
+                    'updated_at': _format_datetime(getattr(execution, 'updated_at', None))
                 })
             
             # Get related notes (by related_type_id = 4 for ticker and related_id)
@@ -1330,6 +1387,205 @@ class EntityDetailsService:
                 
         except Exception as e:
             logger.error(f"Error getting alert linked items: {str(e)}")
+        
+        return linked_items
+    
+    @staticmethod
+    def _get_execution_linked_items(db: Session, execution_id: int) -> List[Dict[str, Any]]:
+        """Get linked items for execution"""
+        linked_items = []
+        
+        try:
+            # Get the execution entity
+            execution = db.query(Execution).filter(Execution.id == execution_id).first()
+            if not execution:
+                logger.warning(f"Execution {execution_id} not found")
+                return []
+            
+            def _format_datetime(value):
+                if not value:
+                    return None
+                try:
+                    return value.isoformat()  # datetime objects
+                except AttributeError:
+                    return str(value)
+            
+            # Get trading account (always present)
+            if execution.trading_account_id:
+                account = db.query(TradingAccount).filter(TradingAccount.id == execution.trading_account_id).first()
+                if account:
+                    linked_items.append({
+                        'id': account.id,
+                        'type': 'trading_account',
+                        'title': 'חשבון מסחר',
+                        'name': account.name,
+                        'description': account.name,
+                        'status': account.status,
+                        'side': None,
+                        'investment_type': None,
+                        'created_at': _format_datetime(account.created_at),
+                        'updated_at': _format_datetime(getattr(account, 'updated_at', None))
+                    })
+            
+            # Get trade if linked
+            trade = None
+            trade_ticker_id = None
+            if execution.trade_id:
+                trade = db.query(Trade).options(joinedload(Trade.ticker)).filter(Trade.id == execution.trade_id).first()
+                if trade:
+                    ticker_symbol = trade.ticker.symbol if getattr(trade, 'ticker', None) else None
+                    trade_ticker_id = trade.ticker_id if hasattr(trade, 'ticker_id') else None
+                    side = trade.side or ''
+                    investment_type = trade.investment_type or ''
+                    description = f"טרייד {side} על {ticker_symbol}" if ticker_symbol else f"טרייד {side} - {investment_type}".strip() or f"טרייד #{trade.id}"
+                    linked_items.append({
+                        'id': trade.id,
+                        'type': 'trade',
+                        'title': 'טרייד',
+                        'name': ticker_symbol or f"טרייד #{trade.id}",
+                        'description': description,
+                        'status': trade.status,
+                        'side': trade.side,
+                        'investment_type': trade.investment_type,
+                        'created_at': _format_datetime(trade.created_at),
+                        'updated_at': _format_datetime(getattr(trade, 'updated_at', None) or getattr(trade, 'closed_at', None))
+                    })
+                    
+                    # Add ticker from trade if it exists and not already added
+                    if trade_ticker_id and hasattr(trade, 'ticker') and trade.ticker:
+                        ticker_already_added = any(
+                            item.get('type') == 'ticker' and item.get('id') == trade.ticker.id 
+                            for item in linked_items
+                        )
+                        if not ticker_already_added:
+                            linked_items.append({
+                                'id': trade.ticker.id,
+                                'type': 'ticker',
+                                'title': 'טיקר',
+                                'name': trade.ticker.symbol,
+                                'description': f"טיקר {trade.ticker.symbol}",
+                                'status': trade.ticker.status,
+                                'side': None,
+                                'investment_type': None,
+                                'created_at': _format_datetime(trade.ticker.created_at),
+                                'updated_at': _format_datetime(getattr(trade.ticker, 'updated_at', None))
+                            })
+            
+            # Get ticker if directly linked (always add, even if also linked through trade)
+            if execution.ticker_id:
+                ticker = db.query(Ticker).filter(Ticker.id == execution.ticker_id).first()
+                if ticker:
+                    # Check if this ticker was already added through trade to avoid duplicates
+                    ticker_already_added = any(
+                        item.get('type') == 'ticker' and item.get('id') == ticker.id 
+                        for item in linked_items
+                    )
+                    if not ticker_already_added:
+                        linked_items.append({
+                            'id': ticker.id,
+                            'type': 'ticker',
+                            'title': 'טיקר',
+                            'name': ticker.symbol,
+                            'description': f"טיקר {ticker.symbol}",
+                            'status': ticker.status,
+                            'side': None,
+                            'investment_type': None,
+                            'created_at': _format_datetime(ticker.created_at),
+                            'updated_at': _format_datetime(getattr(ticker, 'updated_at', None))
+                        })
+            
+            logger.debug(f"Found {len(linked_items)} linked items for execution {execution_id}")
+                
+        except Exception as e:
+            logger.error(f"Error getting execution linked items: {str(e)}")
+        
+        return linked_items
+    
+    @staticmethod
+    def _get_cash_flow_linked_items(db: Session, cash_flow_id: int) -> List[Dict[str, Any]]:
+        """Get linked items for cash flow"""
+        linked_items = []
+        
+        try:
+            # Get the cash flow entity
+            cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
+            if not cash_flow:
+                logger.warning(f"Cash flow {cash_flow_id} not found")
+                return []
+            
+            def _format_datetime(value):
+                if not value:
+                    return None
+                try:
+                    return value.isoformat()  # datetime objects
+                except AttributeError:
+                    return str(value)
+            
+            # Get trading account (always present)
+            if cash_flow.trading_account_id:
+                account = db.query(TradingAccount).filter(TradingAccount.id == cash_flow.trading_account_id).first()
+                if account:
+                    linked_items.append({
+                        'id': account.id,
+                        'type': 'trading_account',
+                        'title': 'חשבון מסחר',
+                        'name': account.name,
+                        'description': account.name,
+                        'status': account.status,
+                        'side': None,
+                        'investment_type': None,
+                        'created_at': _format_datetime(account.created_at),
+                        'updated_at': _format_datetime(getattr(account, 'updated_at', None))
+                    })
+            
+            # Get trade if linked
+            trade = None
+            trade_ticker_id = None
+            if cash_flow.trade_id:
+                trade = db.query(Trade).options(joinedload(Trade.ticker)).filter(Trade.id == cash_flow.trade_id).first()
+                if trade:
+                    ticker_symbol = trade.ticker.symbol if getattr(trade, 'ticker', None) else None
+                    trade_ticker_id = trade.ticker_id if hasattr(trade, 'ticker_id') else None
+                    side = trade.side or ''
+                    investment_type = trade.investment_type or ''
+                    description = f"טרייד {side} על {ticker_symbol}" if ticker_symbol else f"טרייד {side} - {investment_type}".strip() or f"טרייד #{trade.id}"
+                    linked_items.append({
+                        'id': trade.id,
+                        'type': 'trade',
+                        'title': 'טרייד',
+                        'name': ticker_symbol or f"טרייד #{trade.id}",
+                        'description': description,
+                        'status': trade.status,
+                        'side': trade.side,
+                        'investment_type': trade.investment_type,
+                        'created_at': _format_datetime(trade.created_at),
+                        'updated_at': _format_datetime(getattr(trade, 'updated_at', None) or getattr(trade, 'closed_at', None))
+                    })
+                    
+                    # Add ticker from trade if it exists and not already added
+                    if trade_ticker_id and hasattr(trade, 'ticker') and trade.ticker:
+                        ticker_already_added = any(
+                            item.get('type') == 'ticker' and item.get('id') == trade.ticker.id 
+                            for item in linked_items
+                        )
+                        if not ticker_already_added:
+                            linked_items.append({
+                                'id': trade.ticker.id,
+                                'type': 'ticker',
+                                'title': 'טיקר',
+                                'name': trade.ticker.symbol,
+                                'description': f"טיקר {trade.ticker.symbol}",
+                                'status': trade.ticker.status,
+                                'side': None,
+                                'investment_type': None,
+                                'created_at': _format_datetime(trade.ticker.created_at),
+                                'updated_at': _format_datetime(getattr(trade.ticker, 'updated_at', None))
+                            })
+            
+            logger.debug(f"Found {len(linked_items)} linked items for cash_flow {cash_flow_id}")
+                
+        except Exception as e:
+            logger.error(f"Error getting cash flow linked items: {str(e)}")
         
         return linked_items
     

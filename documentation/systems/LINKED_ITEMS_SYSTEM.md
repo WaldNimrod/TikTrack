@@ -128,9 +128,9 @@ The Linked Items System is a core component of TikTrack that manages relationshi
 | `trade_plan` | `/api/linked-items/trade_plan/{id}` | Investment plans |
 | `account` | `/api/linked-items/account/{id}` | Trading accounts |
 | `alert` | `/api/linked-items/alert/{id}` | Price alerts |
-| `execution` | `/api/linked-items/execution/{id}` | Trade executions |
+| `execution` | `/api/linked-items/execution/{id}` | Trade executions (always linked to trading_account and ticker, optionally to trade) |
 | `note` | `/api/linked-items/note/{id}` | Notes and comments |
-| `cash_flow` | `/api/linked-items/cash_flow/{id}` | Cash flow records |
+| `cash_flow` | `/api/linked-items/cash_flow/{id}` | Cash flow records (always linked to trading_account, optionally to trade and ticker via trade) |
 
 ## Integration Guide for Developers
 

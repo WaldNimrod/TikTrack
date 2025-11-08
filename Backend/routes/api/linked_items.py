@@ -612,6 +612,34 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
             'investment_type': row['investment_type']
         })
 
+    # Get executions directly linked to this account
+    cursor.execute("""
+        SELECT e.id,
+               'execution' AS type,
+               'ביצוע' AS title,
+               'ביצוע ' || COALESCE(e.action, '') || ' ' || COALESCE(CAST(e.quantity AS TEXT), '') || ' יחידות' || 
+               CASE WHEN tk.symbol IS NOT NULL THEN ' על ' || tk.symbol ELSE '' END AS description,
+               e.date AS created_at,
+               e.created_at AS updated_at,
+               'active' AS status,
+               e.action AS side
+        FROM executions e
+        LEFT JOIN tickers tk ON e.ticker_id = tk.id
+        WHERE e.trading_account_id = ?
+    """, (trading_account_id,))
+
+    for row in cursor.fetchall():
+        children.append({
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': row['side']
+        })
+
     # Get notes
     cursor.execute("""
         SELECT n.id,
@@ -761,15 +789,16 @@ def get_ticker_child_entities(cursor, ticker_id: int) -> List[Dict[str, Any]]:
             'status': row['status']
         })
     
-    # Get executions (through trades)
+    # Get executions directly linked to this ticker (not through trades)
     cursor.execute("""
         SELECT e.id, 'execution' as type, 'ביצוע' as title,
                'ביצוע ' || COALESCE(e.action, '') || ' ' || COALESCE(CAST(e.quantity AS TEXT), '') || ' יחידות' as description,
-               e.created_at,
-               e.action
+               e.date as created_at,
+               e.created_at as updated_at,
+               e.action,
+               'active' as status
         FROM executions e
-        JOIN trades t ON e.trade_id = t.id
-        WHERE t.ticker_id = ?
+        WHERE e.ticker_id = ?
     """, (ticker_id,))
     
     for row in cursor.fetchall():
@@ -779,9 +808,36 @@ def get_ticker_child_entities(cursor, ticker_id: int) -> List[Dict[str, Any]]:
             'title': row['title'],
             'description': row['description'],
             'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
             'action': row['action'],
-            'status': 'active'
+            'side': row['action'],
+            'status': row['status']
         })
+    
+    # Get executions through trades (for backward compatibility)
+    cursor.execute("""
+        SELECT e.id, 'execution' as type, 'ביצוע' as title,
+               'ביצוע ' || COALESCE(e.action, '') || ' ' || COALESCE(CAST(e.quantity AS TEXT), '') || ' יחידות' as description,
+               e.created_at,
+               e.action
+        FROM executions e
+        JOIN trades t ON e.trade_id = t.id
+        WHERE t.ticker_id = ? AND e.ticker_id IS NULL
+    """, (ticker_id,))
+    
+    for row in cursor.fetchall():
+        # Check if this execution was already added (by ticker_id)
+        if not any(child['id'] == row['id'] for child in children):
+            children.append({
+                'id': row['id'],
+                'type': row['type'],
+                'title': row['title'],
+                'description': row['description'],
+                'created_at': row['created_at'],
+                'action': row['action'],
+                'side': row['action'],
+                'status': 'active'
+            })
     
     return children
 
@@ -894,10 +950,11 @@ def get_execution_parent_entities(cursor, execution_id: int) -> List[Dict[str, A
     cursor.execute("""
         SELECT t.id, 'trade' as type, 'טרייד' as title, 
                'טרייד ' || t.side || ' על ' || tk.symbol as description,
-               t.created_at, t.status
+               t.created_at, t.status, t.ticker_id, tk.id as ticker_db_id, tk.symbol as ticker_symbol, 
+               COALESCE(tk.name, '') as ticker_name, tk.status as ticker_status, tk.created_at as ticker_created_at
         FROM executions e
         JOIN trades t ON e.trade_id = t.id
-        JOIN tickers tk ON t.ticker_id = tk.id
+        LEFT JOIN tickers tk ON t.ticker_id = tk.id
         WHERE e.id = ? AND e.trade_id IS NOT NULL
     """, (execution_id,))
     
@@ -911,6 +968,26 @@ def get_execution_parent_entities(cursor, execution_id: int) -> List[Dict[str, A
             'created_at': row[4],
             'status': row[5]
         })
+        
+        # Add ticker from trade if it exists and not already added
+        if row[6] and row[7]:  # ticker_id and ticker_db_id
+            ticker_id = row[7]
+            ticker_already_added = any(
+                p.get('type') == 'ticker' and p.get('id') == ticker_id 
+                for p in parents
+            )
+            if not ticker_already_added:
+                ticker_symbol = row[8] or ''
+                ticker_name = row[9] or ''
+                ticker_description = f"{ticker_symbol} - {ticker_name}".strip(' - ') if ticker_name else ticker_symbol
+                parents.append({
+                    'id': ticker_id,
+                    'type': 'ticker',
+                    'title': 'טיקר',
+                    'description': ticker_description,
+                    'created_at': row[11],  # ticker_created_at
+                    'status': row[10]  # ticker_status
+                })
     
     # Get trading account (always present)
     cursor.execute("""
@@ -933,6 +1010,34 @@ def get_execution_parent_entities(cursor, execution_id: int) -> List[Dict[str, A
             'status': row[5]
         })
     
+    # Get ticker if directly linked (always add, even if also linked through trade)
+    cursor.execute("""
+        SELECT tk.id, 'ticker' as type, 'טיקר' as title,
+               tk.symbol || ' - ' || COALESCE(tk.name, '') as description,
+               tk.created_at, tk.status
+        FROM executions e
+        JOIN tickers tk ON e.ticker_id = tk.id
+        WHERE e.id = ? AND e.ticker_id IS NOT NULL
+    """, (execution_id,))
+    
+    row = cursor.fetchone()
+    if row:
+        # Check if this specific ticker was already added through trade to avoid duplicates
+        ticker_id = row[0]
+        ticker_already_added = any(
+            p.get('type') == 'ticker' and p.get('id') == ticker_id 
+            for p in parents
+        )
+        if not ticker_already_added:
+            parents.append({
+                'id': row[0],
+                'type': row[1],
+                'title': row[2],
+                'description': row[3],
+                'created_at': row[4],
+                'status': row[5]
+            })
+    
     return parents
 
 # Cash flow parent entities
@@ -944,10 +1049,11 @@ def get_cash_flow_parent_entities(cursor, cash_flow_id: int) -> List[Dict[str, A
     cursor.execute("""
         SELECT t.id, 'trade' as type, 'טרייד' as title, 
                'טרייד ' || t.side || ' על ' || tk.symbol as description,
-               t.created_at, t.status
+               t.created_at, t.status, t.ticker_id, tk.id as ticker_db_id, tk.symbol as ticker_symbol, 
+               COALESCE(tk.name, '') as ticker_name, tk.status as ticker_status, tk.created_at as ticker_created_at
         FROM cash_flows cf
         JOIN trades t ON cf.trade_id = t.id
-        JOIN tickers tk ON t.ticker_id = tk.id
+        LEFT JOIN tickers tk ON t.ticker_id = tk.id
         WHERE cf.id = ? AND cf.trade_id IS NOT NULL
     """, (cash_flow_id,))
     
@@ -961,6 +1067,26 @@ def get_cash_flow_parent_entities(cursor, cash_flow_id: int) -> List[Dict[str, A
             'created_at': row[4],
             'status': row[5]
         })
+        
+        # Add ticker from trade if it exists and not already added
+        if row[6] and row[7]:  # ticker_id and ticker_db_id
+            ticker_id = row[7]
+            ticker_already_added = any(
+                p.get('type') == 'ticker' and p.get('id') == ticker_id 
+                for p in parents
+            )
+            if not ticker_already_added:
+                ticker_symbol = row[8] or ''
+                ticker_name = row[9] or ''
+                ticker_description = f"{ticker_symbol} - {ticker_name}".strip(' - ') if ticker_name else ticker_symbol
+                parents.append({
+                    'id': ticker_id,
+                    'type': 'ticker',
+                    'title': 'טיקר',
+                    'description': ticker_description,
+                    'created_at': row[11],  # ticker_created_at
+                    'status': row[10]  # ticker_status
+                })
     
     # Get trading account (always present)
     cursor.execute("""

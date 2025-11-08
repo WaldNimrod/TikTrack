@@ -955,7 +955,7 @@ class EntityDetailsRenderer {
 
             const filterTypes = this._getFilterConfig(parentEntityType);
             const filterButtonsHtml = [
-                `<button class="btn btn-sm btn-outline-primary filter-icon-btn active" id="filterBtn_${tableId}_all" data-type="all" data-onclick="window.filterLinkedItemsByType('${tableId}', 'all')" data-tooltip="הצג הכל" data-tooltip-placement="top" data-tooltip-trigger="hover" style="padding: 4px 12px;">הכל</button>`,
+                `<button class="btn btn-sm btn-outline-primary filter-icon-btn active" id="filterBtn_${tableId}_all" data-type="all" data-onclick="window.filterLinkedItemsByType('${tableId}', 'all')" data-tooltip="הצג הכל" data-tooltip-placement="top" data-tooltip-trigger="hover">הכל</button>`,
                 this._generateFilterButtons(tableId, filterTypes)
             ].join('');
 
@@ -2096,42 +2096,49 @@ class EntityDetailsRenderer {
         
         // יצירת שורות חדשות - אותו קוד כמו ב-renderLinkedItems
         sortedData.forEach(item => {
-            const iconPath = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemIcon)
-                ? window.LinkedItemsService.getLinkedItemIcon(item.type)
-                : this.getEntityIcon(item.type);
-            
-            const itemEntityColor = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemColor)
-                ? window.LinkedItemsService.getLinkedItemColor(item.type, { entityColors: this.entityColors })
-                : (this.entityColors[item.type] || '#6c757d');
-            
-            const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
-                ? window.LinkedItemsService.getEntityLabel(item.type)
-                : item.type;
-            
-            // עמודה "מקושר ל" - איקון + [סוג] בשורה אחת, [שם] בשורה נפרדת
             const cleanName = (window.LinkedItemsService && window.LinkedItemsService.formatLinkedItemName)
                 ? window.LinkedItemsService.formatLinkedItemName(item)
                 : this.getCleanEntityName(item);
-            
-            // מבנה: איקון | [סוג] בשורה אחת, [שם] בשורה נפרדת
-            const linkedToDisplay = `
-                <div class="d-flex align-items-start" style="gap: 12px;">
-                    <img src="${iconPath}" alt="${item.type}" class="linked-item-type-icon" style="width: 48px; height: 48px; mask-image: url('${iconPath}'); mask-repeat: no-repeat; mask-position: center; mask-size: contain; -webkit-mask-image: url('${iconPath}'); -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; -webkit-mask-size: contain; background-color: ${itemEntityColor}; display: inline-block; flex-shrink: 0;" />
-                    <div class="d-flex flex-column">
-                        <strong>${entityLabel}</strong>
-                        <span>${cleanName}</span>
+
+            const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
+                ? window.LinkedItemsService.getEntityLabel(item.type)
+                : (window.getEntityLabel && typeof window.getEntityLabel === 'function'
+                    ? window.getEntityLabel(item.type)
+                    : item.type);
+
+            const linkedBadge = (window.FieldRendererService && window.FieldRendererService.renderLinkedEntity)
+                ? window.FieldRendererService.renderLinkedEntity(
+                    item.type,
+                    item.id,
+                    cleanName,
+                    {
+                        renderMode: 'linked-items-table',
+                        status: item.status,
+                        side: item.side,
+                        investment_type: item.investment_type
+                    }
+                )
+                : `
+                    <div class="linked-items-table-link d-flex flex-column align-items-start gap-1">
+                        <span class="linked-items-table-label fw-semibold text-body">${entityLabel}</span>
+                        <span class="linked-items-table-name text-muted small">${cleanName}</span>
                     </div>
-                </div>
-            `;
-            
-            const itemDate = this.formatDateTime(item.created_at || item.updated_at);
-            const dateDisplay = itemDate || '';
-            
+                `;
+
+            const createdDisplay = this.formatDateTime(item.created_at || item.updated_at) || '';
+
             const statusDisplay = (window.FieldRendererService && window.FieldRendererService.renderStatus)
                 ? window.FieldRendererService.renderStatus(item.status, item.type)
                 : this.getStatusBadge(item.status);
-            
-            // קבלת sourceInfo מה-table
+
+            const sideDisplay = (window.FieldRendererService && window.FieldRendererService.renderSide)
+                ? window.FieldRendererService.renderSide(item.side)
+                : (item.side ? `<span class="badge badge-secondary">${item.side}</span>` : '<span class="badge badge-secondary">-</span>');
+
+            const investmentDisplay = (window.FieldRendererService && window.FieldRendererService.renderType)
+                ? window.FieldRendererService.renderType(item.investment_type)
+                : (item.investment_type ? `<span class="badge badge-secondary">${item.investment_type}</span>` : '<span class="badge badge-secondary">-</span>');
+
             const entityTypeAttr = table.closest('.modal')?.querySelector('[data-entity-type]')?.getAttribute('data-entity-type');
             const entityIdAttr = table.closest('.modal')?.querySelector('[data-entity-id]')?.getAttribute('data-entity-id');
             

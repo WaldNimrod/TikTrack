@@ -350,6 +350,10 @@ def get_parent_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[s
             # Executions reference trades
             parent_entities.extend(get_execution_parent_entities(cursor, entity_id))
             
+        elif entity_type == 'cash_flow':
+            # Cash flows can reference trades
+            parent_entities.extend(get_cash_flow_parent_entities(cursor, entity_id))
+            
         elif entity_type == 'note':
             # Notes can reference any entity
             parent_entities.extend(get_note_parent_entities(cursor, entity_id))
@@ -383,6 +387,35 @@ def get_trade_child_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
             'type': row[1],
             'title': row[2],
             'description': row[3],
+            'created_at': row[4],
+            'status': row[5]
+        })
+    
+    # Get cash flows linked to this trade
+    cursor.execute("""
+        SELECT cf.id, 'cash_flow' as type, 'תזרים מזומנים' as title,
+               CASE 
+                   WHEN cf.type = 'deposit' THEN 'הפקדה'
+                   WHEN cf.type = 'withdrawal' THEN 'משיכה'
+                   WHEN cf.type = 'fee' THEN 'עמלה'
+                   WHEN cf.type = 'dividend' THEN 'דיבידנד'
+                   WHEN cf.type = 'other_positive' THEN 'אחר חיובי'
+                   WHEN cf.type = 'other_negative' THEN 'אחר שלילי'
+                   ELSE cf.type
+               END || ' - ' || COALESCE(c.currency_symbol, '') || ' ' || cf.amount as description,
+               cf.date as created_at,
+               'active' as status
+        FROM cash_flows cf
+        LEFT JOIN currencies c ON cf.currency_id = c.id
+        WHERE cf.trade_id = ?
+    """, (trade_id,))
+    
+    for row in cursor.fetchall():
+        children.append({
+            'id': row[0],
+            'type': row[1],
+            'title': row[2],
+            'description': row[3] if row[3] else '',
             'created_at': row[4],
             'status': row[5]
         })
@@ -746,7 +779,7 @@ def get_execution_parent_entities(cursor, execution_id: int) -> List[Dict[str, A
     """Get parent entities for an execution"""
     parents = []
     
-    # Get trade
+    # Get trade if linked
     cursor.execute("""
         SELECT t.id, 'trade' as type, 'טרייד' as title, 
                'טרייד ' || t.side || ' על ' || tk.symbol as description,
@@ -754,8 +787,79 @@ def get_execution_parent_entities(cursor, execution_id: int) -> List[Dict[str, A
         FROM executions e
         JOIN trades t ON e.trade_id = t.id
         JOIN tickers tk ON t.ticker_id = tk.id
+        WHERE e.id = ? AND e.trade_id IS NOT NULL
+    """, (execution_id,))
+    
+    row = cursor.fetchone()
+    if row:
+        parents.append({
+            'id': row[0],
+            'type': row[1],
+            'title': row[2],
+            'description': row[3],
+            'created_at': row[4],
+            'status': row[5]
+        })
+    
+    # Get trading account (always present)
+    cursor.execute("""
+        SELECT ta.id, 'trading_account' as type, 'חשבון מסחר' as title,
+               ta.name as description,
+               ta.created_at, ta.status
+        FROM executions e
+        JOIN trading_accounts ta ON e.trading_account_id = ta.id
         WHERE e.id = ?
     """, (execution_id,))
+    
+    row = cursor.fetchone()
+    if row:
+        parents.append({
+            'id': row[0],
+            'type': row[1],
+            'title': row[2],
+            'description': row[3],
+            'created_at': row[4],
+            'status': row[5]
+        })
+    
+    return parents
+
+# Cash flow parent entities
+def get_cash_flow_parent_entities(cursor, cash_flow_id: int) -> List[Dict[str, Any]]:
+    """Get parent entities for a cash flow"""
+    parents = []
+    
+    # Get trade if linked
+    cursor.execute("""
+        SELECT t.id, 'trade' as type, 'טרייד' as title, 
+               'טרייד ' || t.side || ' על ' || tk.symbol as description,
+               t.created_at, t.status
+        FROM cash_flows cf
+        JOIN trades t ON cf.trade_id = t.id
+        JOIN tickers tk ON t.ticker_id = tk.id
+        WHERE cf.id = ? AND cf.trade_id IS NOT NULL
+    """, (cash_flow_id,))
+    
+    row = cursor.fetchone()
+    if row:
+        parents.append({
+            'id': row[0],
+            'type': row[1],
+            'title': row[2],
+            'description': row[3],
+            'created_at': row[4],
+            'status': row[5]
+        })
+    
+    # Get trading account (always present)
+    cursor.execute("""
+        SELECT ta.id, 'trading_account' as type, 'חשבון מסחר' as title,
+               ta.name as description,
+               ta.created_at, ta.status
+        FROM cash_flows cf
+        JOIN trading_accounts ta ON cf.trading_account_id = ta.id
+        WHERE cf.id = ?
+    """, (cash_flow_id,))
     
     row = cursor.fetchone()
     if row:

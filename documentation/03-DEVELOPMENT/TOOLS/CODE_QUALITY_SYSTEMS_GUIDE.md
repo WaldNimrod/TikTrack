@@ -31,7 +31,7 @@
 #### **קבצים בעייתיים ביותר:**
 - `init-system-management.js`: 85 console.log + 57 פונקציות
 - `core-systems.js`: 187 console.log + 46 כפילויות
-- `import-user-data-old.js`: 79 console.log + 157 פונקציות
+- `import-user-data-old.js`: 79 console.log + 157 פונקציות _(הכלי הועבר לארכיון בנובמבר 2025)_
 
 #### **דוחות שנוצרו:**
 - `COMPREHENSIVE_SYSTEM_STATUS_REPORT.md` - דוח מצב מקיף

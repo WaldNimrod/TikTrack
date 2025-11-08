@@ -776,7 +776,13 @@ async function renderCashFlowsTable() {
     const exchangeId = isExchange ? getExchangeIdFromCashFlow(cashFlow) : null;
 
     // קבלת סוג עם צבע
-    const typeDisplay = isExchange ? '🔄 ' + getCashFlowTypeWithColor(cashFlow.type) : getCashFlowTypeWithColor(cashFlow.type);
+    let typeDisplay = isExchange ? '🔄 ' + getCashFlowTypeWithColor(cashFlow.type) : getCashFlowTypeWithColor(cashFlow.type);
+    
+    // Add trade link indicator if trade_id exists
+    if (cashFlow.trade_id) {
+      const tradeSymbol = cashFlow.trade_ticker_symbol || '';
+      typeDisplay += ` <span class="badge bg-info" title="מקושר לטרייד #${cashFlow.trade_id}${tradeSymbol ? ' (' + tradeSymbol + ')' : ''}" style="font-size: 0.75em; margin-inline-start: 4px;">🔗</span>`;
+    }
 
     // עיצוב סכום עם יישור נכון וצביעה
     // For exchanges, we need to show both amounts (from -> to)

@@ -66,6 +66,42 @@
 }
 .linked-items-container .linked-item-row .badge { margin: 0 4px; }
 
+.entity-linked-items-table {
+  width: 100%;
+  table-layout: auto;
+}
+
+.entity-linked-items-table th.col-linked-entity,
+.entity-linked-items-table td.col-linked-entity {
+  min-width: 240px;
+}
+
+.entity-linked-items-table th.col-linked-status,
+.entity-linked-items-table td.col-linked-status {
+  width: 120px;
+}
+
+.entity-linked-items-table th.col-linked-side,
+.entity-linked-items-table td.col-linked-side {
+  width: 110px;
+}
+
+.entity-linked-items-table th.col-linked-investment,
+.entity-linked-items-table td.col-linked-investment {
+  width: 140px;
+}
+
+.entity-linked-items-table th.col-linked-date,
+.entity-linked-items-table td.col-linked-date {
+  width: 160px;
+}
+
+.entity-linked-items-table th.col-linked-actions,
+.entity-linked-items-table td.col-linked-actions {
+  width: 120px;
+  white-space: nowrap;
+}
+
 /* Colored start-border per entity type using logical property */
 .linked-items-container .linked-item-row.trade { border-inline-start: 4px solid var(--entity-trade-color); }
 .linked-items-container .linked-item-row.account,

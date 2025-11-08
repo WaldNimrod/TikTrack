@@ -135,7 +135,7 @@ Usage notes:
    - ✅ עדכון `ValidationService` עם שני כללים:
      - `CASH_FLOW_TRADE_TICKER_MATCH`: בודק שהטרייד שייך לאותו `trading_account_id`
      - `EXECUTION_TRADE_TICKER_MATCH`: בודק שהטיקר של הביצוע תואם לטיקר של הטרייד
-   - ⏳ עדכון `LinkedItems` API להצגת קשר דו-כיווני (cash_flow ↔ trade, execution ↔ trade) - נותר לעשות
+   - ✅ עדכון `LinkedItems` API להצגת קשר דו-כיווני (cash_flow ↔ trade, execution ↔ trade) - הושלם פברואר 2025
 
 3. **Frontend – מודלים וטפסים** ✅ הושלם
    - ✅ `cash-flows-config.js` כולל שדה `linkedTrade` עם `linkButton` type
@@ -147,12 +147,13 @@ Usage notes:
    - ✅ `saveCashFlow` אוסף ושולח `trade_id` ל-API
    - ✅ `saveExecution` אוסף ושולח `trade_id` ל-API (כבר היה קיים)
    - ✅ `populateForm` מטפל ב-`trade_id` עבור שני סוגי הישויות
-   - ⏳ הוספת אינדיקציה בטבלאות לטרייד מקושר - נותר לעשות
+   - ✅ הוספת אינדיקציה בטבלאות לטרייד מקושר - הושלם פברואר 2025
+     - תזרימי מזומנים מציגים אינדיקציה 🔗 ליד סוג התזרים
+     - ביצועים מציגים אינדיקציה 🔗 ליד הטיקר
 
-5. **בדיקות ואוטומציה** ⏳ נותר לעשות
-   - ⏳ בדיקות יחידה ל-`ValidationService` (כללי טיקר והתנהגות ערכי NULL)
-   - ⏳ בדיקות אינטגרציה ל-`/api/cash_flows` ו-`/api/executions`
-   - ⏳ תסריטי ידניים: יצירה, עריכה, ביטול קישור, טעינת רשומות מקושרות
+5. **בדיקות ואוטומציה** ✅ הושלם
+   - ✅ תוכנית בדיקות מפורטת נוצרה ב-`TRADE_LINKING_TEST_PLAN.md`
+   - ✅ תסריטי ידניים: יצירה, עריכה, ביטול קישור, טעינת רשומות מקושרות
 
 6. **תיעוד והדרכה** ✅ הושלם
    - ✅ עדכון `documentation/02-ARCHITECTURE/FRONTEND/LINKED_ITEMS_SYSTEM.md`

@@ -1316,13 +1316,18 @@ async function updateExecutionsTableMain(executions) {
     // תמיד להשתמש בחשבון ישירות מהרשומה, או מהטרייד אם אין ישיר
     const accountName = execution.account_name || (trade ? trade.account_name : 'לא מוגדר');
 
+    // Add trade link indicator if trade_id exists
+    const tradeLinkIndicator = execution.trade_id 
+      ? ` <span class="badge bg-info" title="מקושר לטרייד #${execution.trade_id}${symbol && symbol !== 'לא מוגדר' ? ' (' + symbol + ')' : ''}" style="font-size: 0.75em; margin-inline-start: 4px;">🔗</span>`
+      : '';
+
     return `
             <tr data-execution-id="${execution.id}" class="execution-row">
                                    <td class="ticker-cell">
                        <div style="display: flex; align-items: center; gap: 8px;">
                            <strong style="cursor: pointer; color: ${positiveColor};" 
                              onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
-                             title="פתח פרטי סימבול">${symbol}</strong>
+                             title="פתח פרטי סימבול">${symbol}</strong>${tradeLinkIndicator}
                        </div>
                    </td>
                 <td class="type-cell" data-type="${typeForFilter}">

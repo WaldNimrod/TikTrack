@@ -25,6 +25,10 @@ class ModalManagerV2 {
         this.configurations = new Map();
         this.activeModal = null;
         this.isInitialized = false;
+        this.alertsContext = {
+            ticker: null,
+            linkedEntity: null
+        };
         
         this.init();
     }
@@ -803,11 +807,13 @@ class ModalManagerV2 {
                 formElement.dataset.modalMode = mode;
             }
             
-            if ((modalElement.id === 'alertsModal' || modalInfo.config?.entityType === 'alert') && mode === 'add') {
-                this.alertsContext = {
-                    ticker: null,
-                    linkedEntity: null
-                };
+            if (modalElement.id === 'alertsModal' || modalInfo.config?.entityType === 'alert') {
+                if (!this.alertsContext) {
+                    this.alertsContext = { ticker: null, linkedEntity: null };
+                } else {
+                    this.alertsContext.ticker = null;
+                    this.alertsContext.linkedEntity = null;
+                }
             }
             
             // הפעלת ולידציה
@@ -1389,6 +1395,11 @@ class ModalManagerV2 {
                         const quill = window.RichTextEditorService.initEditor(field.id, editorOptions);
                         if (quill) {
                             console.log(`✅ Rich-text editor "${field.id}" initialized successfully`);
+                            if (container.dataset.pendingContent !== undefined) {
+                                const pendingHtml = container.dataset.pendingContent || '';
+                                this._setRichTextContent(field.id, pendingHtml, pendingHtml ? {} : { clearAutoMessage: true });
+                                delete container.dataset.pendingContent;
+                            }
                             quill.on('text-change', (delta, oldDelta, source) => {
                                 if (this._richTextUpdateGuards && this._richTextUpdateGuards.has(field.id)) {
                                     return;
@@ -1531,11 +1542,17 @@ class ModalManagerV2 {
                     console.log(`🎯 After setting, field.value is: ${field.value}`);                                                                            
                 } else if (field.classList && field.classList.contains('rich-text-editor-container')) {
                     // Rich text editor - use RichTextEditorService
-                    if (window.RichTextEditorService) {
-                        window.RichTextEditorService.setContent(field.id, value || '');
-                        console.log(`📝 Set rich-text field ${field.id} to: ${value || ''}`);
+                    if (window.RichTextEditorService && typeof window.RichTextEditorService.getEditorInstance === 'function') {
+                        const editor = window.RichTextEditorService.getEditorInstance(field.id);
+                        if (editor) {
+                            this._setRichTextContent(field.id, value || '', value ? {} : { clearAutoMessage: true });
+                            console.log(`📝 Set rich-text field ${field.id} to: ${value || ''}`);
+                        } else {
+                            field.dataset.pendingContent = value || '';
+                        }
                     } else {
-                        console.warn(`⚠️ RichTextEditorService not available for field ${field.id}`);
+                        field.dataset.pendingContent = value || '';
+                        console.warn(`⚠️ RichTextEditorService not available for field ${field.id}, storing pending content`);
                     }
                 } else if (field.type === 'date' && value) {
                     // Date type - value should be in YYYY-MM-DD format
@@ -1638,6 +1655,9 @@ class ModalManagerV2 {
      * @param {Object|null} tickerData
      */
     handleAlertTickerDataUpdate(tickerData) {
+        if (!this.alertsContext) {
+            this.alertsContext = { ticker: null, linkedEntity: null };
+        }
         this.alertsContext.ticker = tickerData || null;
         
         if (tickerData && window.AlertConditionRenderer && typeof window.AlertConditionRenderer.updatePriceUnit === 'function') {
@@ -1660,6 +1680,9 @@ class ModalManagerV2 {
      * @param {Object|null} linkedEntity
      */
     handleAlertLinkedEntityUpdate(linkedEntity) {
+        if (!this.alertsContext) {
+            this.alertsContext = { ticker: null, linkedEntity: null };
+        }
         this.alertsContext.linkedEntity = linkedEntity || null;
         const alertsModal = document.getElementById('alertsModal');
         const form = alertsModal ? alertsModal.querySelector('form') : null;

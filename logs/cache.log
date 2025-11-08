@@ -17086,3 +17086,6 @@ sqlalchemy.exc.DatabaseError: (sqlite3.DatabaseError) database disk image is mal
 2025-11-08 13:56:08,865 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:1a3ad2173af10aecd472f5b95fd72089
 2025-11-08 13:56:08,867 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:1a3ad2173af10aecd472f5b95fd72089
 2025-11-08 13:56:08,937 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:1a3ad2173af10aecd472f5b95fd72089
+2025-11-08 18:35:26,927 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:32b67cdd290972561b6a13202c59c5e1
+2025-11-08 18:36:23,886 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:99a46b8e1eff84edff727f9da4714c89
+2025-11-08 18:36:23,886 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:99a46b8e1eff84edff727f9da4714c89

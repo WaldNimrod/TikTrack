@@ -39,8 +39,14 @@ logger = get_logger('server_lock_manager')
 class ServerLockManager:
     """Manages server process detection and prevention of multiple instances"""
     
-    def __init__(self):
-        self.port = 8080
+    def __init__(self, port: int = 8080):
+        """
+        Initialize ServerLockManager
+        
+        Args:
+            port: Port number to check (default: 8080 for development, 5001 for production)
+        """
+        self.port = port
         self.server_keywords = ['app.py', 'dev_server', 'tiktrack', 'flask']
         self.logger = logger
     
@@ -51,7 +57,7 @@ class ServerLockManager:
         Returns:
             List of process dictionaries with details
         """
-        self.logger.info("Checking for existing processes on port 8080...")
+        self.logger.info(f"Checking for existing processes on port {self.port}...")
         
         processes = []
         
@@ -69,7 +75,7 @@ class ServerLockManager:
                 result = sock.connect_ex(('127.0.0.1', self.port))
                 sock.close()
                 if result == 0:
-                    self.logger.warning("Port 8080 appears to be in use, but cannot identify the process")
+                    self.logger.warning(f"Port {self.port} appears to be in use, but cannot identify the process")
                     # Try to find and kill Python processes that might be TikTrack
                     return self.find_python_processes_on_port()
                 return processes
@@ -89,7 +95,7 @@ class ServerLockManager:
             self.logger.warning(f"Error checking processes: {e}")
             # Continue execution - this is not a critical error
             
-        self.logger.info(f"Found {len(processes)} processes on port 8080")
+        self.logger.info(f"Found {len(processes)} processes on port {self.port}")
         return processes
     
     def find_python_processes_on_port(self) -> List[Dict]:
@@ -299,7 +305,7 @@ class ServerLockManager:
         """
         self.logger.info("Starting server conflict check...")
         
-        # Get all processes on port 8080
+        # Get all processes on configured port
         processes = self.check_existing_processes()
         
         # Filter for TikTrack servers
@@ -322,7 +328,17 @@ class ServerLockManager:
 
 def main():
     """Command line interface for server lock manager"""
-    manager = ServerLockManager()
+    # Check for port argument
+    port = 8080  # Default development port
+    if len(sys.argv) > 1:
+        if sys.argv[1] == '--port' and len(sys.argv) > 2:
+            try:
+                port = int(sys.argv[2])
+            except ValueError:
+                print(f"Invalid port: {sys.argv[2]}")
+                sys.exit(1)
+    
+    manager = ServerLockManager(port=port)
     
     if len(sys.argv) > 1 and sys.argv[1] == '--check':
         # Just check and return exit code

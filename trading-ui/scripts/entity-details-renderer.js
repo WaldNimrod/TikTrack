@@ -1394,6 +1394,16 @@ class EntityDetailsRenderer {
             const cleanName = window.LinkedItemsService.formatLinkedItemName(item);
             
             const itemId = item.id || item.entity_id || item.linked_id || '';
+            const metrics = item.metrics || {};
+            const conditions = item.conditions || {};
+            const timestamps = item.timestamps || {};
+            const sideValue = metrics.side ?? item.side;
+            const investmentTypeValue = metrics.investment_type ?? item.investment_type;
+            const quantityValue = metrics.quantity ?? item.quantity;
+            const priceValue = metrics.price ?? item.price;
+            const amountValue = metrics.amount ?? item.amount;
+            const createdAtValue = item.created_at || timestamps.created_at;
+            const updatedAtValue = item.updated_at || timestamps.updated_at;
             
             // Create linked badge with ID for alerts and notes
             let linkedBadge;
@@ -1434,7 +1444,7 @@ class EntityDetailsRenderer {
                     `;
             }
             
-            const createdDisplay = this.formatDateTime(item.created_at || item.updated_at);
+            const createdDisplay = this.formatDateTime(createdAtValue || updatedAtValue);
             
             let actionsHtml = '';
             if (window.LinkedItemsService && window.LinkedItemsService.generateLinkedItemActions) {
@@ -1471,8 +1481,9 @@ class EntityDetailsRenderer {
                 // Alert: Status | Condition (combined side+investment, colspan=2) | Date | Actions
                 const statusDisplay = window.FieldRendererService.renderStatus(item.status, item.type);
                 
-                const condition = item.condition || '';
-                const targetValue = item.target_value !== null && item.target_value !== undefined ? item.target_value : '';
+                const condition = conditions.trigger_type ?? item.condition ?? '';
+                const targetValueRaw = conditions.target_value ?? item.target_value;
+                const targetValue = targetValueRaw !== null && targetValueRaw !== undefined ? targetValueRaw : '';
                 const conditionDisplay = condition || targetValue
                     ? `${this._escapeHtml(String(condition || ''))}${condition && targetValue ? ' → ' : ''}${targetValue !== '' ? this._escapeHtml(String(targetValue)) : ''}`
                     : '<span class="text-muted">-</span>';
@@ -1495,9 +1506,9 @@ class EntityDetailsRenderer {
                 
             } else if (entityType === 'execution') {
                 // Execution: Side, Quantity, Price (spanning 3 columns: status+side+investment) | Date | Actions
-                const side = item.side || '';
-                const quantity = item.quantity || 0;
-                const price = item.price || 0;
+                const side = sideValue || '';
+                const quantity = quantityValue || 0;
+                const price = priceValue || 0;
                 
                 const sideDisplay = side ? window.FieldRendererService.renderSide(side) : '';
                 const quantityDisplay = quantity ? `<span class="text-muted me-2">כמות: ${parseFloat(quantity).toFixed(2)}</span>` : '';
@@ -1512,13 +1523,15 @@ class EntityDetailsRenderer {
             } else {
                 // Standard: Status | Side | Investment | Date | Actions
                 const statusDisplay = this._getStatusOrAlternativeDisplay(item);
-                const sideDisplay = item.side ? window.FieldRendererService.renderSide(item.side) : '<span class="badge badge-secondary">-</span>';
-                const investmentDisplay = item.investment_type ? window.FieldRendererService.renderType(item.investment_type) : '<span class="badge badge-secondary">-</span>';
+                const effectiveSide = sideValue;
+                const effectiveInvestmentType = investmentTypeValue;
+                const sideDisplay = effectiveSide ? window.FieldRendererService.renderSide(effectiveSide) : '<span class="badge badge-secondary">-</span>';
+                const investmentDisplay = effectiveInvestmentType ? window.FieldRendererService.renderType(effectiveInvestmentType) : '<span class="badge badge-secondary">-</span>';
                 
                 cells += `<td class="text-center col-linked-status">${statusDisplay}</td>`;
                 cells += `<td class="text-center col-linked-side">${sideDisplay}</td>`;
                 cells += `<td class="text-center col-linked-investment">${investmentDisplay}</td>`;
-                cells += `<td class="text-center col-linked-date">${createdDisplay || ''}</td>`;
+                cells += `<td class="text-center col-linked-date">${createdDisplay || this.formatDateTime(createdAtValue || updatedAtValue) || ''}</td>`;
                 cells += `<td class="text-center col-linked-actions">${actionsHtml}</td>`;
             }
             

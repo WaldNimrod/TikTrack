@@ -1,0 +1,86 @@
+{
+  "cash_flow": {
+    "backend_changes": [
+      "Adopt canonical formatter to populate metrics.amount and relations.trade_id",
+      "Ensure timestamps use ISO 8601"
+    ],
+    "frontend_changes": [
+      "Switch renderer to read metrics.amount",
+      "Keep existing status/side columns as-is (no change)"
+    ],
+    "notes": "Already renders correctly; mainly migrate to schema without dropping fields"
+  },
+  "ticker": {
+    "backend_changes": [
+      "Expose relation counts in canonical format (child counts)"
+    ],
+    "frontend_changes": [
+      "Update entity-details-api to preserve child item metadata (side/investment/status already present)"
+    ],
+    "notes": "Functions today; schema upgrade should keep existing behaviour"
+  },
+  "trading_account": {
+    "backend_changes": [
+      "Include metrics for executions (quantity/price) via canonical mapping"
+    ],
+    "frontend_changes": [
+      "Table should read metrics.side etc. instead of flattened props"
+    ],
+    "notes": "Largest payload; ensure caching invalidation once schema ships"
+  },
+  "note": {
+    "backend_changes": [
+      "Strip HTML into display.description",
+      "Populate relations (trade_id, ticker_id) for navigation"
+    ],
+    "frontend_changes": [
+      "Renderer to read display.description instead of content/raw"
+    ],
+    "notes": "Currently works but still relying on implicit fields"
+  },
+  "execution": {
+    "backend_changes": [
+      "Populate metrics.side, metrics.quantity, metrics.price in canonical item",
+      "Set relations.trade_id, relations.ticker_id, relations.trading_account_id",
+      "Attach source.origin to track mapper name"
+    ],
+    "frontend_changes": [
+      "Stop trimming fields in entity-details-api",
+      "Renderer to read metrics.* instead of root-level properties"
+    ],
+    "notes": "UI today misses side/quantity because of flattening" 
+  },
+  "alert": {
+    "backend_changes": [
+      "Expose conditions.trigger_operator/target_value",
+      "Ensure related entity IDs appear under relations.*"
+    ],
+    "frontend_changes": [
+      "Renderer should consume conditions.*",
+      "LinkedItemsService.generateLinkedItemActions to pipe source info"
+    ],
+    "notes": "Currently shows status only; missing trigger details"
+  },
+  "trade": {
+    "backend_changes": [
+      "Standardize description to display.description",
+      "Populate metrics.side/investment_type consistently"
+    ],
+    "frontend_changes": [
+      "Update renderer to read from metrics",
+      "Ensure action buttons pass canonical source"
+    ],
+    "notes": "Works but will break until schema adoption occurs"
+  },
+  "trade_plan": {
+    "backend_changes": [
+      "Include metrics.side/investment_type",
+      "Expose relations.ticker_id"
+    ],
+    "frontend_changes": [
+      "Renderer to rely on metrics/investment",
+      "No UI change for now (module disabled)"
+    ],
+    "notes": "Module currently inaccessible but must be ready for relaunch"
+  }
+}

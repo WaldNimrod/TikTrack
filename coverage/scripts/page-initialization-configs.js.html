@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/340</span>
+                <span class='fraction'>0/341</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/203</span>
+                <span class='fraction'>0/205</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/340</span>
+                <span class='fraction'>0/341</span>
             </div>
         
             
@@ -1895,7 +1895,12 @@
 <a name='L1830'></a><a href='#L1830'>1830</a>
 <a name='L1831'></a><a href='#L1831'>1831</a>
 <a name='L1832'></a><a href='#L1832'>1832</a>
-<a name='L1833'></a><a href='#L1833'>1833</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L1833'></a><a href='#L1833'>1833</a>
+<a name='L1834'></a><a href='#L1834'>1834</a>
+<a name='L1835'></a><a href='#L1835'>1835</a>
+<a name='L1836'></a><a href='#L1836'>1836</a>
+<a name='L1837'></a><a href='#L1837'>1837</a>
+<a name='L1838'></a><a href='#L1838'>1838</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2252,6 +2257,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2349,6 +2356,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2386,6 +2394,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2589,6 +2598,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -3046,7 +3056,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -3717,6 +3726,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -3906,7 +3916,7 @@
 &nbsp;
 // ===== PAGE CONFIGURATIONS =====
 &nbsp;
-<span class="cstat-no" title="statement not covered" >if (typeof window.PAGE_CONFIGS === 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE === 'core-systems') {</span>
 const PAGE_CONFIGS = <span class="cstat-no" title="statement not covered" >{</span>
     // Main Pages
     'index': {
@@ -4054,7 +4064,7 @@ const PAGE_CONFIGS = <span class="cstat-no" title="statement not covered" >{</sp
         // - 'validation': מערכת ולידציה מאוחדת
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'validation', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -4062,6 +4072,8 @@ const PAGE_CONFIGS = <span class="cstat-no" title="statement not covered" >{</sp
             'DataUtils',
             'window.Logger',
             'window.CacheSyncManager',
+            'window.ModalManagerV2',
+            'window.InvestmentCalculationService',
             'window.loadTradesData',
             'window.checkLinkedItemsBeforeAction',
             'window.RichTextEditorService',
@@ -4201,13 +4213,15 @@ const PAGE_CONFIGS = <span class="cstat-no" title="statement not covered" >{</sp
         // - 'entity-details': מערכות פרטי ישויות
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'modules', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
             'window.loadTradePlansData',
+            'window.ModalManagerV2',
+            'window.InvestmentCalculationService',
             'window.RichTextEditorService',
             'window.Quill',
             'window.DOMPurify'
@@ -4392,7 +4406,7 @@ const PAGE_CONFIGS = <span class="cstat-no" title="statement not covered" >{</sp
         // - 'entity-details': מערכות פרטי ישויות
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'init-system'],
         requiredGlobals: [
             'NotificationSystem',    // from base package
             'DataUtils',            // from services package  
@@ -4437,9 +4451,10 @@ const PAGE_CONFIGS = <span class="cstat-no" title="statement not covered" >{</sp
         // - 'crud': מערכות CRUD ו-entity-details
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
+        // - 'modules': מודולים כלליים (core-systems, modal-manager-v2)
         // - 'external-data': שירות נתונים חיצוניים (Yahoo Finance, etc.)
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'external-data', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'info-summary', 'external-data', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -4870,8 +4885,7 @@ const PAGE_CONFIGS = <span class="cstat-no" title="statement not covered" >{</sp
         packages: ['base', 'init-system'],
         
         requiredGlobals: [
-            'NotificationSystem',
-            'DataUtils'
+            'NotificationSystem'
         ],
         
         requiresFilters: false,
@@ -5550,6 +5564,7 @@ const ADDITIONAL_PAGE_CONFIGS = <span class="cstat-no" title="statement not cove
 <span class="cstat-no" title="statement not covered" >Object.assign(PAGE_CONFIGS, ADDITIONAL_PAGE_CONFIGS);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >window.PAGE_CONFIGS = PAGE_CONFIGS;</span>
+<span class="cstat-no" title="statement not covered" >window.PAGE_CONFIGS.__SOURCE = 'page-initialization-configs';</span>
 <span class="cstat-no" title="statement not covered" >window.pageInitializationConfigs = PAGE_CONFIGS;</span>
 <span class="cstat-no" title="statement not covered" >console.log('✅ PAGE_CONFIGS loaded, trading_accounts exists:', !!PAGE_CONFIGS.trading_accounts);</span>
 } else {
@@ -5566,7 +5581,7 @@ const ADDITIONAL_PAGE_CONFIGS = <span class="cstat-no" title="statement not cove
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-07T23:26:01.679Z
+                at 2025-11-08T18:05:39.024Z
             </div>
         <script src="../prettify.js"></script>
         <script>

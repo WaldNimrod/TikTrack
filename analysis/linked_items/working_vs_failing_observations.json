@@ -1,0 +1,44 @@
+{
+  "working_samples": {
+    "cash_flow_13": {
+      "parent_entities_count": 1,
+      "parent_fields": ["id", "type", "title", "description", "status", "created_at"],
+      "child_entities_count": 0,
+      "child_fields": []
+    },
+    "ticker_1": {
+      "parent_entities_count": 0,
+      "child_entities_count": 18,
+      "child_sample_fields": ["id", "type", "title", "description", "status", "side", "investment_type", "created_at"],
+      "includes_alerts": true,
+      "includes_executions": true
+    },
+    "trading_account_1": {
+      "parent_entities_count": 0,
+      "child_entities_count": 149,
+      "child_sample_fields": ["id", "type", "title", "description", "status", "side", "investment_type", "created_at", "updated_at"],
+      "contains_executions": true
+    },
+    "note_6": {
+      "parent_entities_count": 1,
+      "parent_fields": ["id", "type", "title", "description", "status", "created_at"],
+      "child_entities_count": 0
+    }
+  },
+  "failing_samples": {
+    "execution_1": {
+      "parent_entities_count": 2,
+      "parent_fields": ["id", "type", "title", "description", "status", "created_at"],
+      "child_entities_count": 0,
+      "missing_fields_for_ui": ["side", "quantity", "price"],
+      "entity_details_empty": true
+    },
+    "alert_2": {
+      "parent_entities_count": 1,
+      "parent_fields": ["id", "type", "title", "description", "status", "created_at"],
+      "child_entities_count": 0,
+      "entity_details_empty": true,
+      "lacks_related_object_metadata": true
+    }
+  }
+}

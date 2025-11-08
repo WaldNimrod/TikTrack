@@ -343,7 +343,41 @@
 <a name='L278'></a><a href='#L278'>278</a>
 <a name='L279'></a><a href='#L279'>279</a>
 <a name='L280'></a><a href='#L280'>280</a>
-<a name='L281'></a><a href='#L281'>281</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -354,6 +388,40 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -643,7 +711,16 @@ const tradesModalConfig = <span class="cstat-no" title="statement not covered" >
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
-        // שורה ראשונה: טיקר + חשבון מסחר
+        // שדה תצוגה לנתוני שוק לפני כל השדות
+        {
+            type: 'display',
+            id: 'tradeTickerInfoDisplay',
+            label: 'נתוני שוק',
+            description: 'מתעדכן אוטומטית לאחר בחירת טיקר',
+            rowClass: 'row',
+            colClass: 'col-12'
+        },
+        // שורה ראשונה: טיקר + צד + חשבון מסחר
         {
             type: 'select',
             id: 'tradeTicker',
@@ -652,7 +729,21 @@ const tradesModalConfig = <span class="cstat-no" title="statement not covered" >
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-4 col-sm-12'
+        },
+        {
+            type: 'select',
+            id: 'tradeSide',
+            label: 'צד',
+            required: true,
+            options: [
+                { value: 'long', label: 'לונג (Long)' },
+                { value: 'short', label: 'שורט (Short)' }
+            ],
+            defaultValue: 'long',
+            rowClass: 'row',
+            colClass: 'col-md-4 col-sm-12',
+            description: 'בחר האם מדובר בלונג או שורט'
         },
         {
             type: 'select',
@@ -663,110 +754,23 @@ const tradesModalConfig = <span class="cstat-no" title="statement not covered" >
             placeholder: 'בחר חשבון מסחר...',
             defaultFromPreferences: true, // ברירת מחדל מהעדפות
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-4 col-sm-12'
         },
-        // שורה שנייה: שם הטרייד + סוג טרייד
-        {
-            type: 'text',
-            id: 'tradeName',
-            label: 'שם הטרייד',
-            required: true,
-            placeholder: 'הכנס שם לטרייד',
-            maxLength: 100,
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
+        // שורה שנייה: סוג השקעה + סטטוס
         {
             type: 'select',
             id: 'tradeType',
-            label: 'סוג טרייד',
+            label: 'סוג השקעה',
             required: true,
             options: [
-                { value: 'long', label: 'קנייה ארוכת טווח' },
-                { value: 'short', label: 'מכירה בחסר' },
-                { value: 'swing', label: 'מסחר תנודות' },
-                { value: 'scalp', label: 'סקלפינג' },
-                { value: 'position', label: 'פוזיציה' }
+                { value: 'swing', label: 'סווינג - מסחר לטווח קצר עד בינוני' },
+                { value: 'investment', label: 'השקעה - השקעה ארוכת טווח' },
+                { value: 'passive', label: 'פאסיבי - השקעה פאסיבית ללא פעילות מסחרית' }
             ],
-            defaultValue: 'long',
+            defaultValue: 'swing',
             rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        // שורה שלישית: כמות + מחיר כניסה
-        {
-            type: 'number',
-            id: 'tradeQuantity',
-            label: 'כמות',
-            required: true,
-            min: 1,
-            step: 1,
-            placeholder: 'הכנס כמות...',
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        {
-            type: 'number',
-            id: 'tradeEntryPrice',
-            label: 'מחיר כניסה',
-            required: true,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס מחיר כניסה...',
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        // שורה רביעית: מחיר יציאה + תאריך כניסה
-        {
-            type: 'number',
-            id: 'tradeExitPrice',
-            label: 'מחיר יציאה',
-            required: false,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס מחיר יציאה...',
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        {
-            type: 'datetime-local',
-            id: 'tradeEntryDate',
-            label: 'תאריך כניסה',
-            required: true,
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        // שורה חמישית: Stop Loss + Take Profit
-        {
-            type: 'number',
-            id: 'tradeStopLoss',
-            label: 'Stop Loss',
-            required: false,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס מחיר Stop Loss...',
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        {
-            type: 'number',
-            id: 'tradeTakeProfit',
-            label: 'Take Profit',
-            required: false,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס מחיר Take Profit...',
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        // שורה שישית: תאריך יציאה + סטטוס
-        {
-            type: 'datetime-local',
-            id: 'tradeExitDate',
-            label: 'תאריך יציאה',
-            required: false,
-            description: 'השאר ריק לטרייד פתוח',
-            rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6 col-sm-12',
+            description: 'המערכת תומכת בשלושת סוגי ההשקעה המאוחדים: Swing, Investment, Passive'
         },
         {
             type: 'select',
@@ -780,7 +784,106 @@ const tradesModalConfig = <span class="cstat-no" title="statement not covered" >
             ],
             defaultValue: 'open',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6 col-sm-12'
+        },
+        // שורה שלישית: מחיר כניסה + תאריך כניסה
+        {
+            type: 'number',
+            id: 'tradeEntryPrice',
+            label: 'מחיר כניסה',
+            required: true,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס מחיר כניסה...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        {
+            type: 'datetime-local',
+            id: 'tradeEntryDate',
+            label: 'תאריך כניסה',
+            required: true,
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        // שורה רביעית: כמות + סה"כ השקעה
+        {
+            type: 'number',
+            id: 'tradeQuantity',
+            label: 'כמות',
+            required: true,
+            min: 1,
+            step: 0.1,
+            placeholder: 'הכנס כמות...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        {
+            type: 'number',
+            id: 'tradeTotalInvestment',
+            label: 'סה״כ השקעה ($)',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס סכום להשקעה...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12',
+            description: 'הסכום הכולל להשקעה בטרייד'
+        },
+        // שורה חמישית: Stop Loss + Take Profit
+        {
+            type: 'number',
+            id: 'tradeStopLoss',
+            label: 'Stop Loss',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס מחיר Stop Loss...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        {
+            type: 'number',
+            id: 'tradeTakeProfit',
+            label: 'Take Profit',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס מחיר Take Profit...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        {
+            type: 'number',
+            id: 'tradeStopLossPercent',
+            label: 'Stop Loss (%)',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס אחוז סטופ...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12',
+            description: 'אחוז סטופ יחסית למחיר הכניסה'
+        },
+        {
+            type: 'number',
+            id: 'tradeTakeProfitPercent',
+            label: 'Take Profit (%)',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס אחוז יעד...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12',
+            description: 'אחוז יעד יחסית למחיר הכניסה'
+        },
+        {
+            type: 'display',
+            id: 'tradeRiskSummaryCard',
+            label: 'סיכום טרייד',
+            description: 'חישוב ריכוזי של נתוני ההשקעה, הסיכון והסיכוי',
+            rowClass: 'row',
+            colClass: 'col-12'
         },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
@@ -813,10 +916,8 @@ const tradesModalConfig = <span class="cstat-no" title="statement not covered" >
         tradeAccount: {
             required: true
         },
-        tradeName: {
-            required: true,
-            minLength: 2,
-            maxLength: 100
+        tradeSide: {
+            required: true
         },
         tradeType: {
             required: true
@@ -829,10 +930,6 @@ const tradesModalConfig = <span class="cstat-no" title="statement not covered" >
             required: true,
             min: 0.01
         },
-        tradeExitPrice: {
-            required: false,
-            min: 0.01
-        },
         tradeStopLoss: {
             required: false,
             min: 0.01
@@ -841,11 +938,16 @@ const tradesModalConfig = <span class="cstat-no" title="statement not covered" >
             required: false,
             min: 0.01
         },
+        tradeStopLossPercent: {
+            required: false,
+            min: 0.01
+        },
+        tradeTakeProfitPercent: {
+            required: false,
+            min: 0.01
+        },
         tradeEntryDate: {
             required: true
-        },
-        tradeExitDate: {
-            required: false
         },
         tradeStatus: {
             required: true
@@ -910,7 +1012,7 @@ function <span class="fstat-no" title="function not covered" >initializeTradesMo
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-07T23:26:01.679Z
+                at 2025-11-08T18:05:39.024Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

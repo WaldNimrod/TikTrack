@@ -33,11 +33,13 @@ Recent Updates:
 """
 
 from flask import Blueprint, jsonify, request, g
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.currency_service import CurrencyService
 from services.entity_details_service import EntityDetailsService
+from services.linked_item_formatter import canonicalize_linked_items
 import logging
+import sqlite3
 
 # Import base classes
 from .base_entity import BaseEntityAPI
@@ -52,11 +54,28 @@ linked_items_bp = Blueprint('linked_items', __name__, url_prefix='/api/linked-it
 
 # Initialize base API (linked_items is complex, so we'll use it selectively)
 
+SCHEMA_COLUMN_CACHE: Dict[Tuple[str, str], bool] = {}
+
+
+def table_has_column(cursor, table_name: str, column_name: str) -> bool:
+    """
+    Check if a given table contains the requested column. Results are cached
+    per (table, column) tuple to avoid repetitive PRAGMA calls within the same request.
+    """
+    cache_key = (table_name, column_name)
+    if cache_key in SCHEMA_COLUMN_CACHE:
+        return SCHEMA_COLUMN_CACHE[cache_key]
+
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    columns = {row[1] for row in cursor.fetchall()}
+    exists = column_name in columns
+    SCHEMA_COLUMN_CACHE[cache_key] = exists
+    return exists
+
+
 def get_db_connection():
     """Get database connection"""
     import os
-    import sqlite3
-    
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
     
@@ -157,6 +176,9 @@ def get_linked_items(entity_type: str, entity_id: str) -> Dict[str, Any]:
         Dictionary with child_entities and parent_entities lists
     """
     try:
+        # Reset schema cache per request (protect against migrations during runtime)
+        SCHEMA_COLUMN_CACHE.clear()
+
         entity_id_normalized, context = normalize_entity_identifier(entity_type, entity_id)
         logger.info(f"Getting linked items for {entity_type} {entity_id_normalized}")
         
@@ -175,6 +197,23 @@ def get_linked_items(entity_type: str, entity_id: str) -> Dict[str, Any]:
         
         # Get entity details for display
         entity_details = get_entity_details(cursor, entity_type, entity_id_normalized, context)
+
+        enrichment_provider = make_sqlite_enrichment_provider(cursor)
+        source_base = {
+            'api_path': f"/api/linked-items/{entity_type}/{entity_id_normalized}"
+        }
+        child_entities = canonicalize_linked_items(
+            child_entities,
+            'child',
+            enrichment_provider=enrichment_provider,
+            source_context={**source_base, 'origin': f'linked_items.child.{entity_type}'}
+        )
+        parent_entities = canonicalize_linked_items(
+            parent_entities,
+            'parent',
+            enrichment_provider=enrichment_provider,
+            source_context={**source_base, 'origin': f'linked_items.parent.{entity_type}'}
+        )
         
         result = {
             'entity_type': entity_type,
@@ -225,6 +264,185 @@ def normalize_entity_identifier(entity_type: str, raw_entity_id: str):
     except (TypeError, ValueError):
         raise ValueError(f"Entity id for {entity_type} must be numeric")
     return entity_id_int, context
+
+
+def make_sqlite_enrichment_provider(cursor):
+    """Return a callable that enriches raw linked-item dictionaries with canonical metadata."""
+    execution_cache: Dict[int, Dict[str, Any]] = {}
+    alert_cache: Dict[int, Dict[str, Any]] = {}
+
+    def _mark_bool(value: Any) -> bool:
+        if isinstance(value, bool):
+            return value
+        if value is None:
+            return False
+        return str(value).lower() in {'1', 'true', 'yes', 'y'}
+
+    def provider(raw_item: Dict[str, Any]) -> Dict[str, Any]:
+        item_type = (raw_item.get('type') or '').lower()
+        item_id = raw_item.get('id')
+        if not item_id:
+            return {}
+
+        if item_type == 'execution':
+            cached = execution_cache.get(item_id)
+            if cached is not None:
+                return cached
+
+            cursor.execute(
+                """
+                SELECT id, action, quantity, price, trade_id, ticker_id, trading_account_id,
+                       created_at, updated_at
+                FROM executions
+                WHERE id = ?
+                """,
+                (item_id,)
+            )
+            row = cursor.fetchone()
+            if not row:
+                execution_cache[item_id] = {}
+                return execution_cache[item_id]
+
+            row = dict(row)
+            metrics = {
+                'side': row.get('action'),
+                'quantity': row.get('quantity'),
+                'price': row.get('price')
+            }
+            relations = {
+                'trade_id': row.get('trade_id'),
+                'ticker_id': row.get('ticker_id'),
+                'trading_account_id': row.get('trading_account_id')
+            }
+            timestamps = {
+                'created_at': row.get('created_at'),
+                'updated_at': row.get('updated_at')
+            }
+            display = {
+                'description': raw_item.get('description') or f"ביצוע {row.get('action') or ''} {row.get('quantity') or ''} יחידות".strip()
+            }
+
+            investment_type = None
+            trade_side = None
+            trade_id = row.get('trade_id')
+            if trade_id:
+                cursor.execute(
+                    """
+                    SELECT side, investment_type
+                    FROM trades
+                    WHERE id = ?
+                    """,
+                    (trade_id,)
+                )
+                trade_row = cursor.fetchone()
+                if trade_row:
+                    trade_row = dict(trade_row)
+                    trade_side = trade_row.get('side') or trade_side
+                    investment_type = trade_row.get('investment_type')
+            # Prefer trade side over execution action if available
+            if trade_side:
+                metrics['side'] = trade_side
+            if investment_type:
+                metrics['investment_type'] = investment_type
+
+            cached_payload = {
+                'display': display,
+                'metrics': metrics,
+                'relations': relations,
+                'timestamps': timestamps
+            }
+            execution_cache[item_id] = cached_payload
+            return cached_payload
+
+        if item_type == 'alert':
+            cached = alert_cache.get(item_id)
+            if cached is not None:
+                return cached
+
+            cursor.execute(
+                """
+                SELECT message,
+                       condition_attribute,
+                       condition_operator,
+                       condition_number,
+                       ticker_id,
+                       trading_account_id,
+                       related_type_id,
+                       related_id,
+                       created_at,
+                       triggered_at,
+                       is_triggered,
+                       status
+                FROM alerts
+                WHERE id = ?
+                """,
+                (item_id,)
+            )
+            row = cursor.fetchone()
+            if not row:
+                alert_cache[item_id] = {}
+                return alert_cache[item_id]
+
+            row = dict(row)
+            status_value = row.get('status') or raw_item.get('status')
+            status_category = 'triggered' if _mark_bool(row.get('is_triggered')) else status_value
+
+            cached_payload = {
+                'display': {
+                    'name': row.get('message') or raw_item.get('name'),
+                    'description': raw_item.get('description') or row.get('message') or f"התראה #{item_id}"
+                },
+                'status': {
+                    'value': status_value,
+                    'category': status_category
+                },
+                'conditions': {
+                    'trigger_type': row.get('condition_attribute'),
+                    'trigger_operator': row.get('condition_operator'),
+                    'target_value': row.get('condition_number')
+                },
+                'relations': {
+                    'ticker_id': row.get('ticker_id'),
+                    'trading_account_id': row.get('trading_account_id'),
+                    'related_type_id': row.get('related_type_id'),
+                    'related_id': row.get('related_id')
+                },
+                'timestamps': {
+                    'created_at': row.get('created_at'),
+                    'updated_at': row.get('triggered_at')
+                }
+            }
+            alert_cache[item_id] = cached_payload
+            return cached_payload
+
+        if item_type == 'trade':
+            return {'relations': {'trade_id': item_id}}
+        if item_type == 'trade_plan':
+            return {'relations': {'trade_plan_id': item_id}}
+        if item_type == 'trading_account':
+            return {'relations': {'trading_account_id': item_id}}
+        if item_type == 'ticker':
+            return {'relations': {'ticker_id': item_id}}
+        if item_type == 'cash_flow':
+            enrichment = {'relations': {}}
+            if raw_item.get('trade_id'):
+                enrichment['relations']['trade_id'] = raw_item.get('trade_id')
+            if raw_item.get('trading_account_id'):
+                enrichment['relations']['trading_account_id'] = raw_item.get('trading_account_id')
+            if raw_item.get('amount') is not None:
+                enrichment.setdefault('metrics', {})['amount'] = raw_item.get('amount')
+            return enrichment
+        if item_type == 'note':
+            enrichment = {'relations': {}}
+            if raw_item.get('related_type_id'):
+                enrichment['relations']['related_type_id'] = raw_item.get('related_type_id')
+            if raw_item.get('related_id'):
+                enrichment['relations']['related_id'] = raw_item.get('related_id')
+            return enrichment
+
+        return {}
+
+    return provider
 
 def get_child_entities(cursor, entity_type: str, entity_id: Any, context: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
     """
@@ -347,29 +565,80 @@ def get_entity_details(cursor, entity_type: str, entity_id: Any, context: Option
                     'symbol': row['symbol']
                 }
         elif entity_type == 'trading_account':
-            cursor.execute("""
-                SELECT id, name, currency_name, created_at
-                FROM trading_accounts
-                WHERE id = ?
-            """, (entity_id,))
-            row = cursor.fetchone()
-            if row:
-                return {
-                    'id': row['id'],
-                    'name': row['name'],
-                    'currency_name': row['currency_name'],
-                    'created_at': row['created_at'],
-                    'accountName': row['name']
-                }
+            try:
+                cursor.execute("""
+                    SELECT ta.id,
+                           ta.name,
+                           c.name AS currency_name,
+                           c.symbol AS currency_symbol,
+                           ta.created_at
+                    FROM trading_accounts ta
+                    LEFT JOIN currencies c ON ta.currency_id = c.id
+                    WHERE ta.id = ?
+                """, (entity_id,))
+            except sqlite3.OperationalError as db_error:
+                logger.warning(
+                    "Currency join failed for trading_account %s (%s). Falling back to legacy schema.",
+                    entity_id,
+                    db_error
+                )
+                cursor.execute("""
+                    SELECT ta.id,
+                           ta.name,
+                           ta.created_at
+                    FROM trading_accounts ta
+                    WHERE ta.id = ?
+                """, (entity_id,))
+                row = cursor.fetchone()
+                if row:
+                    return {
+                        'id': row['id'],
+                        'name': row['name'],
+                        'created_at': row['created_at'],
+                        'accountName': row['name']
+                    }
+            else:
+                row = cursor.fetchone()
+                if row:
+                    return {
+                        'id': row['id'],
+                        'name': row['name'],
+                        'currency_name': row['currency_name'],
+                        'currency_symbol': row['currency_symbol'],
+                        'created_at': row['created_at'],
+                        'accountName': row['name']
+                    }
         elif entity_type == 'position':
             if not context:
                 raise ValueError("Context required for position entity type")
-            cursor.execute("""
-                SELECT name, currency_name
-                FROM trading_accounts
-                WHERE id = ?
-            """, (context['trading_account_id'],))
-            account_row = cursor.fetchone()
+            try:
+                cursor.execute("""
+                    SELECT ta.name,
+                           c.name AS currency_name,
+                           c.symbol AS currency_symbol
+                    FROM trading_accounts ta
+                    LEFT JOIN currencies c ON ta.currency_id = c.id
+                    WHERE ta.id = ?
+                """, (context['trading_account_id'],))
+                account_row = cursor.fetchone()
+            except sqlite3.OperationalError as db_error:
+                logger.warning(
+                    "Currency join failed for position account %s (%s). Fallback to legacy schema.",
+                    context['trading_account_id'],
+                    db_error
+                )
+                cursor.execute("""
+                    SELECT name
+                    FROM trading_accounts
+                    WHERE id = ?
+                """, (context['trading_account_id'],))
+                account_row = cursor.fetchone()
+                if account_row:
+                    account_row = {
+                        'name': account_row['name'],
+                        'currency_name': None,
+                        'currency_symbol': None
+                    }
             cursor.execute("""
                 SELECT symbol, name
                 FROM tickers
@@ -382,6 +651,7 @@ def get_entity_details(cursor, entity_type: str, entity_id: Any, context: Option
                 'ticker_id': context['ticker_id'],
                 'account_name': account_row['name'] if account_row else None,
                 'account_currency': account_row['currency_name'] if account_row else None,
+                'account_currency_symbol': account_row['currency_symbol'] if account_row else None,
                 'ticker_symbol': ticker_row['symbol'] if ticker_row else None,
                 'ticker_name': ticker_row['name'] if ticker_row else None
             }
@@ -932,6 +1202,27 @@ def get_execution_parent_entities(cursor, execution_id: int) -> List[Dict[str, A
             'created_at': row[4],
             'status': row[5]
         })
+
+    # Get ticker if linked directly (covers executions without trade reference)
+    cursor.execute("""
+        SELECT tk.id, 'ticker' as type, 'טיקר' as title,
+               'טיקר ' || tk.symbol as description,
+               tk.created_at, tk.status
+        FROM executions e
+        JOIN tickers tk ON e.ticker_id = tk.id
+        WHERE e.id = ? AND e.ticker_id IS NOT NULL
+    """, (execution_id,))
+
+    row = cursor.fetchone()
+    if row:
+        parents.append({
+            'id': row[0],
+            'type': row[1],
+            'title': row[2],
+            'description': row[3],
+            'created_at': row[4],
+            'status': row[5]
+        })
     
     return parents
 
@@ -1002,7 +1293,15 @@ def get_note_parent_entities(cursor, note_id: int) -> List[Dict[str, Any]]:
         related_type_id = row[1]
         
         # Get the related entity based on type
-        if related_type_id == 2:  # trade
+        if related_type_id == 1:  # trading account
+            cursor.execute("""
+                SELECT ta.id, 'trading_account' as type, 'חשבון מסחר' as title,
+                       ta.name as description,
+                       ta.created_at, ta.status
+                FROM trading_accounts ta
+                WHERE ta.id = ?
+            """, (related_id,))
+        elif related_type_id == 2:  # trade
             cursor.execute("""
                 SELECT t.id, 'trade' as type, 'טרייד' as title, 
                        'טרייד ' || t.side || ' על ' || tk.symbol as description,
@@ -1193,10 +1492,14 @@ def get_note_child_entities(cursor, note_id: int) -> List[Dict[str, Any]]:
     """Get child entities for a note (replies)"""
     children = []
     
-    # Get reply notes
+    if not table_has_column(cursor, 'notes', 'parent_note_id'):
+        logger.debug("Skipping note child lookup for note %s - column parent_note_id missing in schema", note_id)
+        return children
+
+    # Get reply notes (available only in newer schemas)
     cursor.execute("""
         SELECT n.id, 'note' as type, 'תגובה' as title, 
-               LEFT(n.content, 100) as description,
+               substr(n.content, 1, 100) as description,
                n.created_at, 'active' as status
         FROM notes n
         WHERE n.parent_note_id = ?

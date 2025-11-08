@@ -107,8 +107,8 @@ check_files() {
 check_conflicts() {
     log_header "Checking for existing server processes..."
     
-    # Run the lock manager to check for conflicts
-    if python3 "$LOCK_MANAGER" --check; then
+    # Run the lock manager to check for conflicts on development port (8080)
+    if python3 "$LOCK_MANAGER" --port 8080 --check; then
         log_success "No conflicts found - server can start safely"
         return 0
     else
@@ -133,6 +133,8 @@ start_server() {
     echo "🌐 TikTrack Server Starting..."
     echo "📍 URL: http://127.0.0.1:8080"
     echo "📁 Working Directory: $(pwd)"
+    echo "🗄️  Database: simpleTrade_new.db (Development)"
+    echo "📝 Logs: logs/"
     echo "📅 Started: $(date)"
     echo "🔄 Mode: Development (Foreground)"
     echo ""

@@ -58,8 +58,19 @@ import psutil
 # Add Backend directory to Python path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Import configuration settings for cache modes
-from config.settings import DEVELOPMENT_MODE, CACHE_DISABLED, DEFAULT_CACHE_TTL, CACHE_ENABLED
+# Import configuration settings for cache modes and server config
+from config.settings import (
+    DEVELOPMENT_MODE, 
+    CACHE_DISABLED, 
+    DEFAULT_CACHE_TTL, 
+    CACHE_ENABLED,
+    HOST,
+    PORT,
+    IS_PRODUCTION,
+    ENVIRONMENT,
+    DB_PATH,
+    UI_DIR
+)
 
 # Import new architecture components
 from config.database import init_db
@@ -1272,19 +1283,15 @@ def get_yahoo_quotes() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-# Relative path to DB file
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
-
-# Path to UI files
-UI_DIR = os.path.join(os.path.dirname(BASE_DIR), "trading-ui")
+# Database and UI paths are now imported from config.settings
+# They are automatically set based on environment (development/production)
 
 # Check if DB file exists
-if not os.path.exists(DB_PATH):
+if not DB_PATH.exists():
     raise FileNotFoundError(f"Database not found at: {DB_PATH}")
 
 # Check if UI directory exists
-if not os.path.exists(UI_DIR):
+if not UI_DIR.exists():
     raise FileNotFoundError(f"UI directory not found at: {UI_DIR}")
 
 # UI Directory validation - removed debug prints
@@ -1292,8 +1299,10 @@ if not os.path.exists(UI_DIR):
 def get_db_connection() -> sqlite3.Connection:
     try:
         # Enhanced SQLite settings for stability
+        # Convert Path object to string for sqlite3.connect
+        db_path_str = str(DB_PATH)
         conn = sqlite3.connect(
-            DB_PATH, 
+            db_path_str, 
             timeout=30.0,  # Longer timeout
             check_same_thread=False  # Allow multi-thread usage
         )
@@ -2035,14 +2044,18 @@ if __name__ == "__main__":
     # - Background task feedback available via API polling
     # - Notification system works without WebSockets
     
+    # Display server startup information
+    env_name = "PRODUCTION" if IS_PRODUCTION else "DEVELOPMENT"
     print("🚀 Starting TikTrack Server...")
-    print("📡 Server running on port 8080")
+    print(f"🌍 Environment: {env_name}")
+    print(f"📡 Server running on port {PORT}")
+    print(f"🔗 URL: http://{HOST}:{PORT}")
     print("✅ All systems operational")
     
     # Run with standard Flask
     app.run(
-        host='127.0.0.1',
-        port=8080,
+        host=HOST,
+        port=PORT,
         debug=DEVELOPMENT_MODE,
         use_reloader=False  # Disable auto-reload to prevent issues
     )

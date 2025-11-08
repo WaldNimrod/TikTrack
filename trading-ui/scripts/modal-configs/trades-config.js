@@ -25,7 +25,7 @@ const tradesModalConfig = {
             label: 'נתוני שוק',
             description: 'מתעדכן אוטומטית לאחר בחירת טיקר',
             rowClass: 'row',
-            colClass: 'col-12'
+            colClass: 'col-12 col-lg-8 col-md-7'
         },
         // שורה ראשונה: טיקר + צד + חשבון מסחר
         {
@@ -36,7 +36,7 @@ const tradesModalConfig = {
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
             rowClass: 'row',
-            colClass: 'col-md-4 col-sm-12'
+            colClass: 'col-12 col-lg-4 col-md-5 col-sm-12'
         },
         {
             type: 'select',

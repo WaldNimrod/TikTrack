@@ -117,3 +117,4 @@ git push origin production
 **עודכן:** 2025-11-08  
 **גרסה:** 1.0.0
 
+

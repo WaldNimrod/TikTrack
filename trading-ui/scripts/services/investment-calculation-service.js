@@ -468,32 +468,64 @@
         const summaryFields = [
             { label: 'טיקר', value: tickerDisplay },
             { label: 'צד', value: sideDisplay, allowHtml: true },
-            { label: 'סה"כ השקעה', value: investmentText, direction: 'ltr' },
+            { label: 'סה\"כ השקעה', value: investmentText, direction: 'ltr' },
             { label: 'מספר מניות', value: quantityText, direction: 'ltr' },
             { label: 'סכום סיכון', value: riskText, direction: 'ltr' },
             { label: 'סכום סיכוי', value: rewardText, direction: 'ltr' },
             { label: 'יחס סיכון/סיכוי', value: ratioText, direction: 'ltr' }
         ];
 
-        const summaryHtml = `
-            <div class="risk-summary-card" style="background: var(--card-background, #f9f9f9); border: 1px solid var(--border-color, #e0e0e0); border-radius: 12px; padding: 16px;">
-                <div class="risk-summary-card__title" style="font-weight: 600; font-size: 1rem; margin-bottom: 12px; color: var(--text-color, #1d1d1f);">
-                    ${summaryTitle}
-                </div>
-                <div class="risk-summary-card__grid" style="display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
-                    ${summaryFields.map(field => `
-                        <div class="risk-summary-card__item" style="background: var(--light-color, #ffffff); border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; padding: 8px 12px; display: flex; flex-direction: column; gap: 4px;">
-                            <span class="risk-summary-card__label" style="font-size: 0.75rem; color: var(--text-muted, #6c757d);">${field.label}</span>
-                            <span class="risk-summary-card__value" style="font-size: 0.95rem; color: var(--text-color, #1d1d1f);${field.direction ? ` direction: ${field.direction}; text-align: ${field.direction === 'ltr' ? 'left' : 'right'};` : ''}">
-                                ${field.allowHtml ? field.value : String(field.value)}
-                            </span>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
+        const container = document.createElement('div');
+        container.classList.add('risk-summary-card', 'summary-card');
 
-        context.summaryElement.innerHTML = summaryHtml;
+        if (summaryTitle) {
+            const titleEl = document.createElement('div');
+            titleEl.classList.add('risk-summary-card__title');
+            titleEl.textContent = summaryTitle;
+            container.appendChild(titleEl);
+        }
+
+        const lineEl = document.createElement('div');
+        lineEl.classList.add('risk-summary-card__line');
+        lineEl.setAttribute('dir', 'rtl');
+
+        summaryFields.forEach((field, index) => {
+            const segment = document.createElement('span');
+            segment.classList.add('risk-summary-card__segment');
+
+            const labelSpan = document.createElement('span');
+            labelSpan.classList.add('risk-summary-card__label');
+            labelSpan.textContent = `${field.label}: `;
+            segment.appendChild(labelSpan);
+
+            const valueSpan = document.createElement('span');
+            valueSpan.classList.add('risk-summary-card__value');
+            if (field.direction === 'ltr') {
+                valueSpan.setAttribute('dir', 'ltr');
+                valueSpan.classList.add('risk-summary-card__value--ltr');
+            }
+
+            if (field.allowHtml) {
+                valueSpan.innerHTML = field.value || '-';
+            } else {
+                valueSpan.textContent = field.value === null || field.value === undefined || field.value === '' ? '-' : String(field.value);
+            }
+
+            segment.appendChild(valueSpan);
+            lineEl.appendChild(segment);
+
+            if (index < summaryFields.length - 1) {
+                const separator = document.createElement('span');
+                separator.classList.add('risk-summary-card__separator');
+                separator.textContent = ' | ';
+                lineEl.appendChild(separator);
+            }
+        });
+
+        container.appendChild(lineEl);
+
+        context.summaryElement.innerHTML = '';
+        context.summaryElement.appendChild(container);
     }
 
     function updateSummary(context) {

@@ -1,19 +1,40 @@
 import os
 from pathlib import Path
 
+# Environment detection - check if production mode is requested
+ENVIRONMENT = os.getenv('TIKTRACK_ENV', 'development').lower()  # 'development' or 'production'
+IS_PRODUCTION = ENVIRONMENT == 'production'
+
 # Paths
 BASE_DIR = Path(__file__).parent.parent
-DB_PATH = BASE_DIR / "db" / "simpleTrade_new.db"
+
+# Database path - different for production vs development
+if IS_PRODUCTION:
+    DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"  # Production database
+else:
+    DB_PATH = BASE_DIR / "db" / "simpleTrade_new.db"  # Development database
+
 UI_DIR = BASE_DIR.parent / "trading-ui"
 
 # Flask settings
 DEBUG = False
 HOST = '127.0.0.1'
-PORT = 8080
 
-# Development settings
-DEVELOPMENT_MODE = os.getenv('TIKTRACK_DEV_MODE', 'true').lower() == 'true'  # Changed to 'true' for development
-CACHE_DISABLED = os.getenv('TIKTRACK_CACHE_DISABLED', 'true').lower() == 'true'  # Changed to 'true' to disable cache
+# Port - different for production vs development
+if IS_PRODUCTION:
+    PORT = 5001  # Production port
+else:
+    PORT = 8080  # Development port
+
+# Development/Production settings
+if IS_PRODUCTION:
+    # Production mode settings
+    DEVELOPMENT_MODE = False
+    CACHE_DISABLED = False  # Cache enabled in production for performance
+else:
+    # Development mode settings
+    DEVELOPMENT_MODE = os.getenv('TIKTRACK_DEV_MODE', 'true').lower() == 'true'
+    CACHE_DISABLED = os.getenv('TIKTRACK_CACHE_DISABLED', 'true').lower() == 'true'
 
 # Cache settings
 if DEVELOPMENT_MODE:

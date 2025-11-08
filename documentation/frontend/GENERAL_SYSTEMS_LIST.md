@@ -20,6 +20,7 @@
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | Data Collection Service | `trading-ui/scripts/services/data-collection-service.js` | [SERVICES_INTEGRATION_COMPLETION_REPORT.md](SERVICES_INTEGRATION_COMPLETION_REPORT.md) | איסוף/הצבת נתוני טפסים במפה אחידה והמרות טיפוס |
+| Investment Calculation Service | `trading-ui/scripts/services/investment-calculation-service.js` | [INVESTMENT_CALCULATION_SERVICE.md](INVESTMENT_CALCULATION_SERVICE.md) | חישוב דו־כיווני סכום↔כמות↔מחיר + ריסק ברירת מחדל |
 | CRUD Response Handler | `trading-ui/scripts/services/crud-response-handler.js` | [CRUD_RESPONSE_HANDLER.md](../02-ARCHITECTURE/FRONTEND/CRUD_RESPONSE_HANDLER.md) | טיפול בתגובות CRUD, סגירת מודלים, הודעות ושחזור טבלאות |
 | Select Populator Service | `trading-ui/scripts/services/select-populator-service.js` | [SELECT_POPULATOR_SERVICE.md](../02-ARCHITECTURE/FRONTEND/SELECT_POPULATOR_SERVICE.md) | מילוי Selectים מבוססי API כולל caching, fallback ושמירת העדפות |
 | Default Value Setter | `trading-ui/scripts/services/default-value-setter.js` | [SERVICES_INTEGRATION_COMPLETION_REPORT.md](SERVICES_INTEGRATION_COMPLETION_REPORT.md) | ברירות מחדל לטפסים (תאריך/שעה/העדפות) וטעינה מרוכזת |

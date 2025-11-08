@@ -1,0 +1,26 @@
+{
+  "child_entities": [],
+  "entity_details": {},
+  "entity_id": 1,
+  "entity_type": "execution",
+  "parent_entities": [
+    {
+      "created_at": "2025-08-15 03:51:43",
+      "description": "\u05d7\u05e9\u05d1\u05d5\u05df \u05de\u05e2\u05d5\u05d3\u05db\u05df",
+      "id": 1,
+      "status": "open",
+      "title": "\u05d7\u05e9\u05d1\u05d5\u05df \u05de\u05e1\u05d7\u05e8",
+      "type": "trading_account"
+    },
+    {
+      "created_at": "2025-08-15 03:51:43",
+      "description": "\u05d8\u05d9\u05e7\u05e8 AMZN",
+      "id": 6,
+      "status": "open",
+      "title": "\u05d8\u05d9\u05e7\u05e8",
+      "type": "ticker"
+    }
+  ],
+  "total_child_count": 0,
+  "total_parent_count": 2
+}

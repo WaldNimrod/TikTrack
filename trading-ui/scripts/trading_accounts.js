@@ -2236,8 +2236,20 @@ async function saveTradingAccount() {
         }
         
         // Determine if this is add or edit
-        const isEdit = form.dataset.mode === 'edit';
-        const accountId = form.dataset.accountId;
+        const formMode = form.dataset.modalMode || form.dataset.mode;
+        const isEdit = formMode === 'edit';
+        const accountId = form.dataset.accountId || form.dataset.entityId;
+        if (isEdit && !accountId) {
+            throw new Error('Missing trading account ID for update operation');
+        }
+        if (isEdit) {
+            const originalCurrencyId = form.dataset.originalCurrencyId;
+            if (originalCurrencyId) {
+                accountData.currency_id = parseInt(originalCurrencyId, 10);
+            } else if (typeof accountData.currency_id !== 'undefined' && accountData.currency_id !== null) {
+                accountData.currency_id = parseInt(accountData.currency_id, 10);
+            }
+        }
         
         // Prepare API call
         const url = isEdit ? `/api/trading-accounts/${accountId}` : '/api/trading-accounts';

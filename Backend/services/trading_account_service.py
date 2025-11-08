@@ -62,6 +62,21 @@ class TradingAccountService:
             logger.error(f"TradingAccount {trading_account_id} not found")
             return None
         
+        # Prevent base currency changes for existing accounts
+        if 'currency_id' in data and data['currency_id'] is not None:
+            try:
+                new_currency_id = int(data['currency_id'])
+            except (TypeError, ValueError):
+                new_currency_id = data['currency_id']
+            if trading_account.currency_id != new_currency_id:
+                logger.warning(
+                    "Rejected base currency change for trading account %s: current=%s, requested=%s",
+                    trading_account_id,
+                    trading_account.currency_id,
+                    new_currency_id
+                )
+                raise ValueError("Changing base currency for an existing trading account is not supported")
+
         # Validate data against dynamic constraints (excluding current ID for unique checks)
         logger.info(f"Validating data with exclude_id={trading_account_id}")
         is_valid, errors = ValidationService.validate_data(db, 'trading_accounts', data, exclude_id=trading_account_id)

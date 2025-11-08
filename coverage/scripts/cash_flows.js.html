@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/1001</span>
+                <span class='fraction'>0/1004</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/743</span>
+                <span class='fraction'>0/749</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/973</span>
+                <span class='fraction'>0/976</span>
             </div>
         
             
@@ -2693,7 +2693,11 @@
 <a name='L2628'></a><a href='#L2628'>2628</a>
 <a name='L2629'></a><a href='#L2629'>2629</a>
 <a name='L2630'></a><a href='#L2630'>2630</a>
-<a name='L2631'></a><a href='#L2631'>2631</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L2631'></a><a href='#L2631'>2631</a>
+<a name='L2632'></a><a href='#L2632'>2632</a>
+<a name='L2633'></a><a href='#L2633'>2633</a>
+<a name='L2634'></a><a href='#L2634'>2634</a>
+<a name='L2635'></a><a href='#L2635'>2635</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -3474,7 +3478,13 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -4186,8 +4196,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -6101,7 +6109,13 @@ async function <span class="fstat-no" title="function not covered" >renderCashFl
     const exchangeId = <span class="cstat-no" title="statement not covered" >isExchange ? getExchangeIdFromCashFlow(cashFlow) : null;</span>
 &nbsp;
     // קבלת סוג עם צבע
-    const typeDisplay = <span class="cstat-no" title="statement not covered" >isExchange ? '🔄 ' + getCashFlowTypeWithColor(cashFlow.type) : getCashFlowTypeWithColor(cashFlow.type);</span>
+    let typeDisplay = <span class="cstat-no" title="statement not covered" >isExchange ? '🔄 ' + getCashFlowTypeWithColor(cashFlow.type) : getCashFlowTypeWithColor(cashFlow.type);</span>
+    
+    // Add trade link indicator if trade_id exists
+<span class="cstat-no" title="statement not covered" >    if (cashFlow.trade_id) {</span>
+      const tradeSymbol = <span class="cstat-no" title="statement not covered" >cashFlow.trade_ticker_symbol || '';</span>
+<span class="cstat-no" title="statement not covered" >      typeDisplay += ` &lt;span class="badge bg-info" title="מקושר לטרייד #${cashFlow.trade_id}${tradeSymbol ? ' (' + tradeSymbol + ')' : ''}" style="font-size: 0.75em; margin-inline-start: 4px;"&gt;🔗&lt;/span&gt;`;</span>
+    }
 &nbsp;
     // עיצוב סכום עם יישור נכון וצביעה
     // For exchanges, we need to show both amounts (from -&gt; to)
@@ -6423,9 +6437,9 @@ function <span class="fstat-no" title="function not covered" >formatCashFlowAmou
   }
 &nbsp;
   const baseAmount = <span class="cstat-no" title="statement not covered" >window.FieldRendererService &amp;&amp; typeof window.FieldRendererService.renderAmount === 'function'</span>
-    ? window.FieldRendererService.renderAmount(effectiveAmount, currencySymbol || '$', 2, true)
+    ? window.FieldRendererService.renderAmount(effectiveAmount, currencySymbol || '$', 0, true)
     : (<span class="fstat-no" title="function not covered" >()</span> =&gt; {
-        const absValue = <span class="cstat-no" title="statement not covered" >Math.abs(effectiveAmount).toFixed(2);</span>
+        const absValue = <span class="cstat-no" title="statement not covered" >Math.abs(effectiveAmount).toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 });</span>
         const sign = <span class="cstat-no" title="statement not covered" >effectiveAmount &lt; 0 ? '-' : (effectiveAmount &gt; 0 ? '+' : '');</span>
         const colorClass = <span class="cstat-no" title="statement not covered" >effectiveAmount &gt; 0 ? 'numeric-value-positive' : (effectiveAmount &lt; 0 ? 'numeric-value-negative' : 'numeric-value-zero');</span>
         const base = <span class="cstat-no" title="statement not covered" >`${currencySymbol || '$'}${absValue}`;</span>
@@ -6823,14 +6837,12 @@ async function <span class="fstat-no" title="function not covered" >saveCashFlow
             date: { id: 'cashFlowDate', type: 'dateOnly' },  // Backend expects Date only, not datetime
             description: { id: 'cashFlowDescription', type: 'rich-text', default: null },
             source: { id: 'cashFlowSource', type: 'text' },
-            external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
-            // Note: trade_id is collected but not sent - CashFlow model doesn't support it yet
-            // If you want to link CashFlow to Trade, add trade_id column to CashFlow model first
+            external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' },
+            trade_id: { id: 'trade_id', type: 'int', default: null }  // Optional link to trade
         });
         
-        // Remove trade_id from data if it exists (CashFlow model doesn't support it)
-        // TODO: When CashFlow model supports trade_id, remove this line
-        const { trade_id, ...dataToSend } = <span class="cstat-no" title="statement not covered" >cashFlowData;</span>
+        // Prepare data to send (trade_id is optional, can be null)
+        const dataToSend = <span class="cstat-no" title="statement not covered" >{ ...cashFlowData };</span>
         
         // ולידציה מפורטת
         let hasErrors = <span class="cstat-no" title="statement not covered" >false;</span>
@@ -7960,7 +7972,7 @@ async function <span class="fstat-no" title="function not covered" >_REMOVED_gen
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-07T23:26:01.679Z
+                at 2025-11-08T18:05:39.024Z
             </div>
         <script src="../prettify.js"></script>
         <script>

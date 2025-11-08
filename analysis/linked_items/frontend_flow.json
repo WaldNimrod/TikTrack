@@ -1,0 +1,23 @@
+{
+  "data_flow": [
+    "entity-details-renderer.js invokes window.entityDetailsAPI.getEntityDetails(entityType, entityId, { includeLinkedItems: true }) when opening the modal",
+    "EntityDetailsAPI.getEntityDetails() calls fetchWithRetry() -> fetchEntityFromAPI() to retrieve entity core data",
+    "If the backend payload lacks linked_items, getEntityDetails() triggers getLinkedItems(entityType, entityId)",
+    "getLinkedItems() applies UnifiedCacheManager (memory layer) before issuing GET /api/linked-items/<entity_type>/<entity_id>",
+    "Response is normalized by flattening child_entities and parent_entities into allLinkedItems array",
+    "Normalization keeps only id, type, title, description, status, created_at, updated_at fields — dropping side, investment_type, quantity, price, condition, etc.",
+    "Normalized array is cached (memory TTL 5m) and returned to renderer",
+    "entity-details-renderer.js -> _renderLinkedItemsTableBody() iterates through allLinkedItems and delegates per-row rendering to _renderLinkedItemRow()",
+    "_renderLinkedItemRow() expects type-specific properties (e.g., alert.condition, alert.target_value, execution.side, execution.quantity, execution.price)",
+    "Because the aggregator trimmed the payload, type-specific cells fall back to empty strings, so alerts/executions lose critical data while cash_flows/notes/tickers still render" 
+  ],
+  "cache_layers": {
+    "frontend": "UnifiedCacheManager (memory -> localStorage) keyed by linked-items-<type>-<id>",
+    "backend": "Flask blueprint decorated with cache_for and EntityDetailsService internal caching"
+  },
+  "identified_field_loss": {
+    "execution": ["side", "quantity", "price", "action"],
+    "alert": ["condition", "target_value", "trigger_price", "source_type"],
+    "generic": ["title overrides", "updated_at vs closed_at metadata"]
+  }
+}

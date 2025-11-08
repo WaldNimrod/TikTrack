@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/640</span>
+                <span class='fraction'>0/644</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/568</span>
+                <span class='fraction'>0/584</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/580</span>
+                <span class='fraction'>0/584</span>
             </div>
         
             
@@ -1814,7 +1814,19 @@
 <a name='L1749'></a><a href='#L1749'>1749</a>
 <a name='L1750'></a><a href='#L1750'>1750</a>
 <a name='L1751'></a><a href='#L1751'>1751</a>
-<a name='L1752'></a><a href='#L1752'>1752</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L1752'></a><a href='#L1752'>1752</a>
+<a name='L1753'></a><a href='#L1753'>1753</a>
+<a name='L1754'></a><a href='#L1754'>1754</a>
+<a name='L1755'></a><a href='#L1755'>1755</a>
+<a name='L1756'></a><a href='#L1756'>1756</a>
+<a name='L1757'></a><a href='#L1757'>1757</a>
+<a name='L1758'></a><a href='#L1758'>1758</a>
+<a name='L1759'></a><a href='#L1759'>1759</a>
+<a name='L1760'></a><a href='#L1760'>1760</a>
+<a name='L1761'></a><a href='#L1761'>1761</a>
+<a name='L1762'></a><a href='#L1762'>1762</a>
+<a name='L1763'></a><a href='#L1763'>1763</a>
+<a name='L1764'></a><a href='#L1764'>1764</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2188,6 +2200,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2214,6 +2229,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2243,6 +2261,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2316,6 +2337,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -3937,7 +3961,10 @@ async function <span class="fstat-no" title="function not covered" >cancelItem(<
 <span class="cstat-no" title="statement not covered" >  if (currentStatus === 'cancelled') {</span>
     // Item is already cancelled
 <span class="cstat-no" title="statement not covered" >    if (typeof window.showInfoNotification === 'function') {</span>
-<span class="cstat-no" title="statement not covered" >      window.showInfoNotification(`${getItemTypeDisplayName(itemType)} כבר מבוטל`);</span>
+      const entityLabel = <span class="cstat-no" title="statement not covered" >(window.LinkedItemsService &amp;&amp; window.LinkedItemsService.getEntityLabel) </span>
+        ? window.LinkedItemsService.getEntityLabel(itemType) 
+        : itemType;
+<span class="cstat-no" title="statement not covered" >      window.showInfoNotification(`${entityLabel} כבר מבוטל`);</span>
     }
 <span class="cstat-no" title="statement not covered" >    return;</span>
   }
@@ -3965,7 +3992,10 @@ async function <span class="fstat-no" title="function not covered" >cancelItem(<
         } else {
 <span class="cstat-no" title="statement not covered" >          handleFunctionNotFound('showLinkedItemsModal', 'פונקציית הצגת פריטים מקושרים לא נמצאה');</span>
 <span class="cstat-no" title="statement not covered" >          if (window.showErrorNotification) {</span>
-<span class="cstat-no" title="statement not covered" >            window.showErrorNotification('שגיאה בביטול', `לא ניתן לבטל ${getItemTypeDisplayName(itemType)} זה - יש פריטים מקושרים אליו`);</span>
+            const entityLabel = <span class="cstat-no" title="statement not covered" >(window.LinkedItemsService &amp;&amp; window.LinkedItemsService.getEntityLabel) </span>
+              ? window.LinkedItemsService.getEntityLabel(itemType) 
+              : itemType;
+<span class="cstat-no" title="statement not covered" >            window.showErrorNotification('שגיאה בביטול', `לא ניתן לבטל ${entityLabel} זה - יש פריטים מקושרים אליו`);</span>
           }
         }
 <span class="cstat-no" title="statement not covered" >        return;</span>
@@ -3992,7 +4022,10 @@ async function <span class="fstat-no" title="function not covered" >performItemC
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const base = <span class="cstat-no" title="statement not covered" >location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';</span>
     let response;
-    const successMessage = <span class="cstat-no" title="statement not covered" >`${getItemTypeDisplayName(itemType)} בוטל בהצלחה!`;</span>
+    const entityLabel = <span class="cstat-no" title="statement not covered" >(window.LinkedItemsService &amp;&amp; window.LinkedItemsService.getEntityLabel) </span>
+      ? window.LinkedItemsService.getEntityLabel(itemType) 
+      : itemType;
+    const successMessage = <span class="cstat-no" title="statement not covered" >`${entityLabel} בוטל בהצלחה!`;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    switch (itemType) {</span>
     case 'trade_plan':
@@ -4067,10 +4100,13 @@ async function <span class="fstat-no" title="function not covered" >performItemC
 &nbsp;
   } catch (error) {
 <span class="cstat-no" title="statement not covered" >    handleApiError(error, `cancelling ${itemType} ${itemId}`);</span>
+    const entityLabel = <span class="cstat-no" title="statement not covered" >(window.LinkedItemsService &amp;&amp; window.LinkedItemsService.getEntityLabel) </span>
+      ? window.LinkedItemsService.getEntityLabel(itemType) 
+      : itemType;
 <span class="cstat-no" title="statement not covered" >    if (typeof window.showErrorNotification === 'function') {</span>
-<span class="cstat-no" title="statement not covered" >      window.showErrorNotification(`שגיאה בביטול ${getItemTypeDisplayName(itemType)}`, error.message);</span>
+<span class="cstat-no" title="statement not covered" >      window.showErrorNotification(`שגיאה בביטול ${entityLabel}`, error.message);</span>
     } else <span class="cstat-no" title="statement not covered" >if (typeof window.showNotification === 'function') {</span>
-<span class="cstat-no" title="statement not covered" >      window.showNotification(`שגיאה בביטול ${getItemTypeDisplayName(itemType)}`, 'error', 'שגיאה', 6000, 'system');</span>
+<span class="cstat-no" title="statement not covered" >      window.showNotification(`שגיאה בביטול ${entityLabel}`, 'error', 'שגיאה', 6000, 'system');</span>
     }
   }
 }
@@ -5323,7 +5359,7 @@ function <span class="fstat-no" title="function not covered" >updatePageSummaryS
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-07T23:26:01.986Z
+                at 2025-11-08T18:05:39.331Z
             </div>
         <script src="../prettify.js"></script>
         <script>

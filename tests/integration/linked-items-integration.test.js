@@ -24,6 +24,56 @@ const linkedItemsCode = fs.readFileSync(
     'utf8'
 );
 
+const createCanonicalItem = (overrides = {}) => {
+    const statusValue = overrides.status || 'open';
+    const description = overrides.description || '';
+    return {
+        id: overrides.id || 1,
+        type: overrides.type || 'trade',
+        link_direction: overrides.link_direction || 'child',
+        display: {
+            title: overrides.title || 'טרייד',
+            name: overrides.name || description,
+            description,
+            icon: overrides.icon || (overrides.type || 'trade'),
+            color: overrides.color || null
+        },
+        status: {
+            value: statusValue,
+            category: overrides.status_category || statusValue,
+            badge_variant: 'outline'
+        },
+        metrics: {
+            side: overrides.side,
+            investment_type: overrides.investment_type,
+            quantity: overrides.quantity,
+            price: overrides.price,
+            amount: overrides.amount
+        },
+        conditions: overrides.conditions || {},
+        relations: overrides.relations || {},
+        timestamps: {
+            created_at: overrides.created_at,
+            updated_at: overrides.updated_at,
+            closed_at: overrides.closed_at
+        },
+        title: overrides.title || 'טרייד',
+        name: overrides.name || description,
+        description,
+        status: statusValue,
+        side: overrides.side,
+        investment_type: overrides.investment_type,
+        quantity: overrides.quantity,
+        price: overrides.price,
+        amount: overrides.amount,
+        created_at: overrides.created_at,
+        updated_at: overrides.updated_at,
+        closed_at: overrides.closed_at,
+        condition: overrides.conditions?.trigger_type,
+        target_value: overrides.conditions?.target_value
+    };
+};
+
 describe('Linked Items Integration', () => {
     let LinkedItemsService;
     let linkedItemsModule;
@@ -100,14 +150,16 @@ describe('Linked Items Integration', () => {
                 entity_type: 'ticker',
                 entity_id: 1,
                 child_entities: [
-                    {
+                    createCanonicalItem({
                         id: 1,
                         type: 'trade',
                         title: 'Trade 1',
                         description: 'טרייד Long על TSLA',
                         created_at: '2025-01-01T10:00:00',
-                        status: 'open'
-                    }
+                        status: 'open',
+                        side: 'Long',
+                        investment_type: 'swing'
+                    })
                 ],
                 parent_entities: [],
                 total_child_count: 1,
@@ -148,22 +200,26 @@ describe('Linked Items Integration', () => {
                 entity_type: 'ticker',
                 entity_id: 1,
                 child_entities: [
-                    {
+                    createCanonicalItem({
                         id: 1,
                         type: 'trade',
                         title: 'Trade 1',
                         description: 'טרייד Long על TSLA',
                         created_at: '2025-01-01T10:00:00',
-                        status: 'open'
-                    },
-                    {
+                        status: 'open',
+                        side: 'Long',
+                        investment_type: 'swing'
+                    }),
+                    createCanonicalItem({
                         id: 2,
                         type: 'trade',
                         title: 'Trade 2',
                         description: 'טרייד Short על AAPL',
                         created_at: '2025-01-02T10:00:00',
-                        status: 'closed'
-                    }
+                        status: 'closed',
+                        side: 'Short',
+                        investment_type: 'swing'
+                    })
                 ],
                 parent_entities: [],
                 total_child_count: 2,
@@ -203,13 +259,14 @@ describe('Linked Items Integration', () => {
                 entity_type: 'ticker',
                 entity_id: 1,
                 child_entities: [
-                    {
+                    createCanonicalItem({
                         id: 1,
                         type: 'trade',
                         description: 'טרייד Long על TSLA',
                         created_at: '2025-01-01T10:00:00',
-                        status: 'open'
-                    }
+                        status: 'open',
+                        side: 'Long'
+                    })
                 ],
                 parent_entities: [],
                 total_child_count: 1,
@@ -374,10 +431,17 @@ describe('Linked Items Integration', () => {
                 entity_type: 'ticker',
                 entity_id: 1,
                 child_entities: [
-                    { id: 1, type: 'trade', status: 'open', created_at: '2025-01-01', description: 'Trade 1' },
-                    { id: 2, type: 'trade', status: 'closed', created_at: '2025-01-02', description: 'Trade 2' },
-                    { id: 3, type: 'trade_plan', status: 'open', created_at: '2025-01-03', description: 'Plan 1' },
-                    { id: 4, type: 'alert', status: 'active', created_at: '2025-01-04', description: 'Alert 1' }
+                    createCanonicalItem({ id: 1, type: 'trade', status: 'open', created_at: '2025-01-01', description: 'Trade 1', side: 'Long', investment_type: 'swing' }),
+                    createCanonicalItem({ id: 2, type: 'trade', status: 'closed', created_at: '2025-01-02', description: 'Trade 2', side: 'Short', investment_type: 'swing' }),
+                    createCanonicalItem({ id: 3, type: 'trade_plan', status: 'open', created_at: '2025-01-03', description: 'Plan 1', investment_type: 'investment' }),
+                    createCanonicalItem({
+                        id: 4,
+                        type: 'alert',
+                        status: 'active',
+                        created_at: '2025-01-04',
+                        description: 'Alert 1',
+                        conditions: { trigger_type: 'price_above', target_value: 120 }
+                    })
                 ],
                 parent_entities: [],
                 total_child_count: 4,

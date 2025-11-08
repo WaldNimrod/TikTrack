@@ -27,7 +27,7 @@ const tradesModalConfig = {
             rowClass: 'row',
             colClass: 'col-12'
         },
-        // שורה ראשונה: טיקר + חשבון מסחר
+        // שורה ראשונה: טיקר + צד + חשבון מסחר
         {
             type: 'select',
             id: 'tradeTicker',
@@ -36,7 +36,21 @@ const tradesModalConfig = {
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
             rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            colClass: 'col-md-4 col-sm-12'
+        },
+        {
+            type: 'select',
+            id: 'tradeSide',
+            label: 'צד',
+            required: true,
+            options: [
+                { value: 'long', label: 'לונג (Long)' },
+                { value: 'short', label: 'שורט (Short)' }
+            ],
+            defaultValue: 'long',
+            rowClass: 'row',
+            colClass: 'col-md-4 col-sm-12',
+            description: 'בחר האם מדובר בלונג או שורט'
         },
         {
             type: 'select',
@@ -47,7 +61,7 @@ const tradesModalConfig = {
             placeholder: 'בחר חשבון מסחר...',
             defaultFromPreferences: true, // ברירת מחדל מהעדפות
             rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            colClass: 'col-md-4 col-sm-12'
         },
         // שורה שנייה: סוג השקעה + סטטוס
         {
@@ -106,7 +120,7 @@ const tradesModalConfig = {
             label: 'כמות',
             required: true,
             min: 1,
-            step: 1,
+            step: 0.1,
             placeholder: 'הכנס כמות...',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
@@ -170,6 +184,14 @@ const tradesModalConfig = {
             colClass: 'col-md-6 col-sm-12',
             description: 'אחוז יעד יחסית למחיר הכניסה'
         },
+        {
+            type: 'display',
+            id: 'tradeRiskSummaryCard',
+            label: 'סיכום טרייד',
+            description: 'חישוב ריכוזי של נתוני ההשקעה, הסיכון והסיכוי',
+            rowClass: 'row',
+            colClass: 'col-12'
+        },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
             type: 'rich-text',
@@ -199,6 +221,9 @@ const tradesModalConfig = {
             required: true
         },
         tradeAccount: {
+            required: true
+        },
+        tradeSide: {
             required: true
         },
         tradeType: {

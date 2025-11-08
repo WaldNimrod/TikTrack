@@ -3050,6 +3050,7 @@ async function saveTradePlan() {
         const tradePlanData = DataCollectionService.collectFormData({
             trading_account_id: { id: 'tradePlanAccount', type: 'int' }, // Backend expects trading_account_id
             ticker_id: { id: 'tradePlanTicker', type: 'int' },
+            side: { id: 'tradePlanSide', type: 'text' },
             investment_type: { id: 'tradePlanType', type: 'text' }, // Map tradePlanType field to investment_type column
             planned_amount: { id: 'planAmount', type: 'float' },
             quantity: { id: 'tradePlanQuantity', type: 'float' },

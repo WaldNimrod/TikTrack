@@ -118,26 +118,24 @@
 - `addTradePlanModal` - הוספת תכנון חדש
 - `editTradePlanModal` - עריכת תכנון
 
-**שדות** (Tab 1 - פרטים בסיסיים):
-- `ticker` (select) - טיקר
-- `tickerInfo` (calculated) - מידע טיקר (מחיר, שינוי, ווליום)
-- `account` (select) - חשבון מסחר
-- `tradeType` (select) - סוג טרייד
-- `side` (select) - צד (קניה/מכירה)
-- `quantity` (number) - כמות
-- `entryPrice` (number) - מחיר כניסה
-- `stopLoss` (number) - הפסד מקסימלי
-- `takeProfit` (number) - רווח יעד
-- `riskAmount` (number) - סכום סיכון
-- `riskPercentage` (number) - אחוז סיכון
+**שדות** (פרטים בסיסיים במודל):
+- `tradePlanTickerInfo` (display) - נתוני שוק עדכניים לטיקר שנבחר
+- `tradePlanTicker` (select) - בחירת טיקר
+- `tradePlanSide` (select) - צד הפעולה (Long / Short)
+- `tradePlanType` (select) - סוג השקעה (Swing / Investment / Passive)
+- `tradePlanStatus` (select) - סטטוס התוכנית
+- `tradePlanEntryPrice` (number) - מחיר כניסה מתוכנן
+- `tradePlanEntryDate` (datetime-local) - תאריך ושעת כניסה מתוכננים
+- `planAmount` (number) - סכום השקעה מתוכנן
+- `tradePlanQuantity` (number) - כמות מניות (תומך בשברים)
+- `tradePlanStopLoss` (number) - מחיר Stop Loss
+- `tradePlanTakeProfit` (number) - מחיר Take Profit
+- `tradePlanStopLossPercent` (number) - אחוז סטופ יחסית למחיר הכניסה
+- `tradePlanTakeProfitPercent` (number) - אחוז יעד יחסית למחיר הכניסה
+- `tradePlanRiskSummaryCard` (display) - כרטיס סיכום (טיקר, צד, השקעה, כמות, סיכון, סיכוי, יחס)
+- `tradePlanNotes` (rich-text) - הערות חופשיות על התוכנית
 
-**שדות** (Tab 2 - סיבות ותנאים):
-- `reason` (textarea) - סיבה לכניסה
-- `conditions` (textarea) - תנאי כניסה
-- `marketAnalysis` (textarea) - ניתוח שוק
-- `technicalIndicators` (textarea) - אינדיקטורים טכניים
-
-**מורכבות**: מורכב מאוד - 16 שדות עם טאבים ולוגיקה מתקדמת
+**מורכבות**: מורכב מאוד - שילוב חישובי השקעה, אחוזי ריסק וכרטיס סיכום מרוכז
 
 ### 8. **trades** (מעקב טריידים) - מורכב מאוד
 **מודלים**:
@@ -145,21 +143,24 @@
 - `editTradeModal` - עריכת טרייד
 
 **שדות**:
-- `tradeAccountId` (select) - חשבון מסחר
-- `tradeTickerId` (select) - טיקר
-- `tradeTradePlanId` (select) - תוכנית טרייד
-- `tradeStatus` (select) - סטטוס
-- `tradeType` (select) - סוג טרייד
-- `tradeSide` (select) - צד
-- `tradeOpenedAt` (datetime-local) - תאריך פתיחה
-- `tradeClosedAt` (datetime-local) - תאריך סגירה
-- `tradeQuantity` (number) - כמות
-- `tradeEntryPrice` (number) - מחיר כניסה
-- `tradeStopLoss` (number) - הפסד מקסימלי
-- `tradeTakeProfit` (number) - רווח יעד
-- `tradeNotes` (textarea) - הערות
+- `tradeTickerInfoDisplay` (display) - נתוני שוק עדכניים לטיקר שנבחר
+- `tradeTicker` (select) - בחירת טיקר
+- `tradeSide` (select) - צד הפעולה (Long / Short)
+- `tradeAccount` (select) - חשבון מסחר
+- `tradeType` (select) - סוג השקעה
+- `tradeStatus` (select) - סטטוס טרייד
+- `tradeEntryPrice` (number) - מחיר כניסה בפועל
+- `tradeEntryDate` (datetime-local) - תאריך ושעת כניסה
+- `tradeQuantity` (number) - כמות מניות (תומך בשברים)
+- `tradeTotalInvestment` (number) - סכום השקעה כולל
+- `tradeStopLoss` (number) - מחיר Stop Loss
+- `tradeTakeProfit` (number) - מחיר Take Profit
+- `tradeStopLossPercent` (number) - אחוז סטופ מתוך מחיר הכניסה
+- `tradeTakeProfitPercent` (number) - אחוז יעד מתוך מחיר הכניסה
+- `tradeRiskSummaryCard` (display) - כרטיס סיכום (טיקר, צד, השקעה, כמות, סיכון, סיכוי, יחס)
+- `tradeNotes` (rich-text) - הערות על הטרייד
 
-**מורכבות**: מורכב מאוד - 14 שדות עם לוגיקה עסקית מורכבת
+**מורכבות**: מורכב מאוד - חישובי השקעה בזמן אמת, אחוזי ריסק, כרטיס סיכום וולידציה משותפת
 
 ---
 

@@ -18,7 +18,7 @@ const tradePlansModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
-        // שורה ראשונה: טיקר + סוג השקעה + סטטוס
+        // שורה ראשונה: טיקר + צד + סוג השקעה + סטטוס
         {
             type: 'display',
             id: 'tradePlanTickerInfo',
@@ -35,7 +35,21 @@ const tradePlansModalConfig = {
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
             rowClass: 'row',
-            colClass: 'col-md-4'
+            colClass: 'col-md-3 col-sm-12'
+        },
+        {
+            type: 'select',
+            id: 'tradePlanSide',
+            label: 'צד',
+            required: true,
+            options: [
+                { value: 'long', label: 'לונג (Long)' },
+                { value: 'short', label: 'שורט (Short)' }
+            ],
+            defaultValue: 'long',
+            rowClass: 'row',
+            colClass: 'col-md-3 col-sm-12',
+            description: 'בחירת צד הפעולה המתוכננת'
         },
         {
             type: 'select',
@@ -50,7 +64,7 @@ const tradePlansModalConfig = {
             ],
             defaultValue: 'swing',
             rowClass: 'row',
-            colClass: 'col-md-4'
+            colClass: 'col-md-3 col-sm-12'
         },
         {
             type: 'select',
@@ -64,7 +78,7 @@ const tradePlansModalConfig = {
             ],
             defaultValue: 'open',
             rowClass: 'row',
-            colClass: 'col-md-4'
+            colClass: 'col-md-3 col-sm-12'
         },
         // שורה שנייה: מחיר כניסה + תאריך כניסה
         {
@@ -105,7 +119,7 @@ const tradePlansModalConfig = {
             label: 'כמות מתוכננת',
             required: true,
             min: 1,
-            step: 1,
+            step: 0.1,
             placeholder: 'הכנס כמות...',
             colClass: 'col-md-6'
         },
@@ -155,6 +169,14 @@ const tradePlansModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6',
             description: 'אחוז יעד ביחס למחיר הכניסה'
+        },
+        {
+            type: 'display',
+            id: 'tradePlanRiskSummaryCard',
+            label: 'סיכום תוכנית',
+            description: 'תצוגת נתוני השקעה, סיכון וסיכוי עבור התוכנית',
+            rowClass: 'row',
+            colClass: 'col-12'
         },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {

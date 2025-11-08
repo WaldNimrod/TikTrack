@@ -22,11 +22,16 @@
         targetField: null,
         stopPercentField: null,
         targetPercentField: null,
+        sideField: null,
+        tickerField: null,
+        summaryField: null,
+        summaryTitle: 'סיכום',
         stopPreferenceKey: 'defaultStopLoss',
         targetPreferenceKey: 'defaultTargetPrice',
         forceRiskOnBind: false,
         forceSyncOnBind: false,
-        percentDecimals: 2
+        percentDecimals: 2,
+        currencySymbol: '$'
     };
 
     const boundContexts = new WeakMap();
@@ -116,6 +121,61 @@
             return price > 0 ? price : null;
         }
         return null;
+    }
+
+    function getSelectedOptionText(selectElement) {
+        if (!selectElement) {
+            return '';
+        }
+        if (selectElement instanceof HTMLSelectElement) {
+            const option = selectElement.options[selectElement.selectedIndex];
+            if (option) {
+                const text = option.textContent || option.innerText;
+                if (text) {
+                    return text.trim();
+                }
+            }
+        }
+        const value = selectElement.value || '';
+        return typeof value === 'string' ? value.trim() : '';
+    }
+
+    function normalizeSide(sideValue) {
+        if (!sideValue) {
+            return '';
+        }
+        return String(sideValue).trim().toLowerCase();
+    }
+
+    function formatQuantityDisplay(quantity, options) {
+        if (!Number.isFinite(quantity)) {
+            return '-';
+        }
+        const decimals = Number.isInteger(options.quantityDecimals) ? options.quantityDecimals : DEFAULT_OPTIONS.quantityDecimals;
+        const formatter = new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+        return formatter.format(quantity);
+    }
+
+    function formatCurrencyDisplay(amount, currencySymbol = '$', decimals = 2) {
+        if (!Number.isFinite(amount)) {
+            return '-';
+        }
+        const formatter = new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+        return `${currencySymbol}${formatter.format(amount)}`;
+    }
+
+    function formatRatioDisplay(ratio) {
+        if (!Number.isFinite(ratio) || ratio <= 0) {
+            return '-';
+        }
+        const formatted = ratio >= 10 ? ratio.toFixed(1) : ratio.toFixed(2);
+        return `1:${formatted}`;
     }
 
     function computeQuantityFromInvestment(totalInvestment, price, options = {}) {
@@ -271,6 +331,8 @@
             const targetPercent = Number.isFinite(entryPrice) ? computeTargetPercent(entryPrice, targetPrice) : null;
             applyValue(context.targetPercentInput, targetPercent);
         }
+
+        updateSummary(context);
     }
 
     function updatePriceFromPercent(context, type) {
@@ -302,6 +364,145 @@
         priceInput.value = computedPrice.toFixed(context.options.amountDecimals ?? DEFAULT_OPTIONS.amountDecimals);
         markFieldAsSystemGenerated(priceInput);
         return true;
+    }
+
+    function computeSummaryData(context) {
+        const tickerLabel = getSelectedOptionText(context.tickerInput);
+        const sideRaw = context.sideInput ? context.sideInput.value : '';
+        const sideNormalized = normalizeSide(sideRaw);
+        const sideLabel = getSelectedOptionText(context.sideInput);
+
+        const entryPrice = getPriceFromContext(context);
+        const quantityValue = parseInputValue(context.quantityInput);
+        const amountValue = parseInputValue(context.amountInput);
+        const stopPrice = parseInputValue(context.stopInput);
+        const targetPrice = parseInputValue(context.targetInput);
+
+        const quantity = Number.isFinite(quantityValue) && quantityValue > 0 ? quantityValue : null;
+        const amount = Number.isFinite(amountValue) && amountValue > 0 ? amountValue : null;
+
+        let totalInvestment = amount;
+        if ((!totalInvestment || totalInvestment <= 0) && quantity !== null && isPositiveNumber(entryPrice)) {
+            totalInvestment = quantity * entryPrice;
+        }
+
+        let riskPerUnit = null;
+        if (quantity !== null && isPositiveNumber(entryPrice) && isPositiveNumber(stopPrice)) {
+            if (sideNormalized === 'short') {
+                const diff = stopPrice - entryPrice;
+                riskPerUnit = diff > 0 ? diff : null;
+            } else {
+                const diff = entryPrice - stopPrice;
+                riskPerUnit = diff > 0 ? diff : null;
+            }
+        }
+
+        let rewardPerUnit = null;
+        if (quantity !== null && isPositiveNumber(entryPrice) && isPositiveNumber(targetPrice)) {
+            if (sideNormalized === 'short') {
+                const diff = entryPrice - targetPrice;
+                rewardPerUnit = diff > 0 ? diff : null;
+            } else {
+                const diff = targetPrice - entryPrice;
+                rewardPerUnit = diff > 0 ? diff : null;
+            }
+        }
+
+        const riskAmount = riskPerUnit !== null && quantity !== null ? riskPerUnit * quantity : null;
+        const rewardAmount = rewardPerUnit !== null && quantity !== null ? rewardPerUnit * quantity : null;
+        const ratio = riskAmount !== null && riskAmount > 0 && rewardAmount !== null && rewardAmount > 0
+            ? rewardAmount / riskAmount
+            : null;
+
+        return {
+            tickerLabel,
+            sideNormalized,
+            sideLabel,
+            totalInvestment,
+            quantity,
+            riskAmount,
+            rewardAmount,
+            ratio
+        };
+    }
+
+    function renderSideDisplay(sideNormalized, sideLabel) {
+        if (!sideNormalized && !sideLabel) {
+            return '-';
+        }
+
+        const capitalized = sideNormalized ? `${sideNormalized.charAt(0).toUpperCase()}${sideNormalized.slice(1)}` : '';
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderSide === 'function' && capitalized) {
+            return window.FieldRendererService.renderSide(capitalized);
+        }
+        if (typeof window.renderSide === 'function' && capitalized) {
+            return window.renderSide(capitalized);
+        }
+
+        return sideLabel || capitalized || '-';
+    }
+
+    function renderSummaryCard(context, summaryData) {
+        if (!context.summaryElement) {
+            return;
+        }
+
+        const currencySymbol = context.options.currencySymbol || DEFAULT_OPTIONS.currencySymbol;
+        const amountDecimals = Number.isInteger(context.options.amountDecimals) ? context.options.amountDecimals : DEFAULT_OPTIONS.amountDecimals;
+        const quantityText = summaryData.quantity !== null ? formatQuantityDisplay(summaryData.quantity, context.options) : '-';
+        const investmentText = summaryData.totalInvestment !== null
+            ? formatCurrencyDisplay(summaryData.totalInvestment, currencySymbol, amountDecimals)
+            : '-';
+        const riskText = summaryData.riskAmount !== null
+            ? formatCurrencyDisplay(summaryData.riskAmount, currencySymbol, amountDecimals)
+            : '-';
+        const rewardText = summaryData.rewardAmount !== null
+            ? formatCurrencyDisplay(summaryData.rewardAmount, currencySymbol, amountDecimals)
+            : '-';
+        const ratioText = formatRatioDisplay(summaryData.ratio);
+        const sideDisplay = renderSideDisplay(summaryData.sideNormalized, summaryData.sideLabel);
+
+        const summaryTitle = context.options.summaryTitle || DEFAULT_OPTIONS.summaryTitle;
+        const tickerDisplay = summaryData.tickerLabel || '-';
+
+        const summaryFields = [
+            { label: 'טיקר', value: tickerDisplay },
+            { label: 'צד', value: sideDisplay, allowHtml: true },
+            { label: 'סה"כ השקעה', value: investmentText, direction: 'ltr' },
+            { label: 'מספר מניות', value: quantityText, direction: 'ltr' },
+            { label: 'סכום סיכון', value: riskText, direction: 'ltr' },
+            { label: 'סכום סיכוי', value: rewardText, direction: 'ltr' },
+            { label: 'יחס סיכון/סיכוי', value: ratioText, direction: 'ltr' }
+        ];
+
+        const summaryHtml = `
+            <div class="risk-summary-card" style="background: var(--card-background, #f9f9f9); border: 1px solid var(--border-color, #e0e0e0); border-radius: 12px; padding: 16px;">
+                <div class="risk-summary-card__title" style="font-weight: 600; font-size: 1rem; margin-bottom: 12px; color: var(--text-color, #1d1d1f);">
+                    ${summaryTitle}
+                </div>
+                <div class="risk-summary-card__grid" style="display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+                    ${summaryFields.map(field => `
+                        <div class="risk-summary-card__item" style="background: var(--light-color, #ffffff); border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; padding: 8px 12px; display: flex; flex-direction: column; gap: 4px;">
+                            <span class="risk-summary-card__label" style="font-size: 0.75rem; color: var(--text-muted, #6c757d);">${field.label}</span>
+                            <span class="risk-summary-card__value" style="font-size: 0.95rem; color: var(--text-color, #1d1d1f);${field.direction ? ` direction: ${field.direction}; text-align: ${field.direction === 'ltr' ? 'left' : 'right'};` : ''}">
+                                ${field.allowHtml ? field.value : String(field.value)}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        context.summaryElement.innerHTML = summaryHtml;
+    }
+
+    function updateSummary(context) {
+        if (!context || !context.summaryElement) {
+            return;
+        }
+
+        const summaryData = computeSummaryData(context);
+        renderSummaryCard(context, summaryData);
     }
 
     function getRiskCacheKey(options) {
@@ -425,6 +626,7 @@
             if (context.quantityInput) {
                 context.quantityInput.value = '';
             }
+            updateSummary(context);
             return;
         }
 
@@ -455,6 +657,7 @@
             if (context.amountInput) {
                 context.amountInput.value = '';
             }
+            updateSummary(context);
             return;
         }
 
@@ -661,19 +864,23 @@
             amountInput.dataset.investmentCalcBound = 'true';
         }
 
-        if (quantityInput && !quantityInput.dataset.investmentCalcBound) {
-            const markQuantityModified = () => {
-                quantityInput.dataset.userModified = 'true';
-                delete quantityInput.dataset.systemGenerated;
+        if (context.sideInput && !context.sideInput.dataset.investmentCalcSideBound) {
+            const handleSideChange = () => {
+                context.sideInput.dataset.userModified = 'true';
+                delete context.sideInput.dataset.systemGenerated;
+                updateSummary(context);
             };
-            const handleQuantityCommit = () => {
-                markQuantityModified();
-                withLock(context, () => updateFromQuantity(context));
+            context.sideInput.addEventListener('change', handleSideChange);
+            context.sideInput.addEventListener('blur', handleSideChange);
+            context.sideInput.dataset.investmentCalcSideBound = 'true';
+        }
+
+        if (context.tickerInput && !context.tickerInput.dataset.investmentCalcTickerBound) {
+            const handleTickerChange = () => {
+                updateSummary(context);
             };
-            quantityInput.addEventListener('input', markQuantityModified);
-            quantityInput.addEventListener('change', handleQuantityCommit);
-            quantityInput.addEventListener('blur', handleQuantityCommit);
-            quantityInput.dataset.investmentCalcBound = 'true';
+            context.tickerInput.addEventListener('change', handleTickerChange);
+            context.tickerInput.dataset.investmentCalcTickerBound = 'true';
         }
     }
 
@@ -692,6 +899,9 @@
         const targetInput = resolveElement(modalElement, options.targetField || options.targetSelector);
         const stopPercentInput = resolveElement(modalElement, options.stopPercentField || options.stopPercentSelector);
         const targetPercentInput = resolveElement(modalElement, options.targetPercentField || options.targetPercentSelector);
+        const sideInput = resolveElement(modalElement, options.sideField || options.sideSelector);
+        const tickerInput = resolveElement(modalElement, options.tickerField || options.tickerSelector);
+        const summaryElement = resolveElement(modalElement, options.summaryField || options.summarySelector);
 
         if (!amountInput && !quantityInput) {
             return null;
@@ -707,6 +917,9 @@
             targetInput,
             stopPercentInput,
             targetPercentInput,
+            sideInput,
+            tickerInput,
+            summaryElement,
             options,
             updateLock: false
         };
@@ -731,8 +944,12 @@
                 context.targetInput = resolveElement(modalElement, context.options.targetField || context.options.targetSelector);
                 context.stopPercentInput = resolveElement(modalElement, context.options.stopPercentField || context.options.stopPercentSelector);
                 context.targetPercentInput = resolveElement(modalElement, context.options.targetPercentField || context.options.targetPercentSelector);
+                context.sideInput = resolveElement(modalElement, context.options.sideField || context.options.sideSelector);
+                context.tickerInput = resolveElement(modalElement, context.options.tickerField || context.options.tickerSelector);
+                context.summaryElement = resolveElement(modalElement, context.options.summaryField || context.options.summarySelector);
                 attachListeners(context);
                 updatePercentFromPrices(context);
+                updateSummary(context);
             } else {
                 context = createContext(modalElement, config);
                 if (!context) {
@@ -741,6 +958,7 @@
                 boundContexts.set(modalElement, context);
                 attachListeners(context);
                 updatePercentFromPrices(context);
+                updateSummary(context);
             }
 
             const forceSync = Boolean(context.options.forceSyncOnBind || context.options.forceRiskOnBind);

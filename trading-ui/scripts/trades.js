@@ -3136,8 +3136,9 @@ async function saveTrade() {
         const tradeData = DataCollectionService.collectFormData({
             ticker_id: { id: 'tradeTicker', type: 'int' },
             trading_account_id: { id: 'tradeAccount', type: 'int' }, // Backend expects trading_account_id
+            side: { id: 'tradeSide', type: 'text' },
             type: { id: 'tradeType', type: 'text' },
-            quantity: { id: 'tradeQuantity', type: 'int' },
+            quantity: { id: 'tradeQuantity', type: 'float' },
             entry_price: { id: 'tradeEntryPrice', type: 'float' },
             stop_loss: { id: 'tradeStopLoss', type: 'float', default: null },
             take_profit: { id: 'tradeTakeProfit', type: 'float', default: null },
@@ -3155,6 +3156,7 @@ async function saveTrade() {
         const isValid = window.validateEntityForm('tradesModalForm', {
             tradeTicker: { required: true },
             tradeAccount: { required: true },
+            tradeSide: { required: true },
             tradeType: { required: true },
             tradeQuantity: { required: true, min: 1 },
             tradeEntryPrice: { required: true, min: 0.01 },

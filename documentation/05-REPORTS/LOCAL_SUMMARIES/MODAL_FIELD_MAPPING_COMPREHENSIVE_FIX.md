@@ -48,7 +48,7 @@ getFieldMapping(entityType) {
         'trade_plan': {
             'ticker_id': 'planTicker',
             'account_id': 'planAccount',
-            'side': 'planSide',
+            'side': 'tradePlanSide',
             'planned_amount': 'planAmount',
             'stop_loss': 'planStopLoss',
             'target_price': 'planTargetPrice'

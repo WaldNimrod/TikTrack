@@ -1079,6 +1079,77 @@ class PreferencesService:
         except Exception as e:
             logger.error(f"Error checking preference type existence for {preference_name}: {e}")
             return False
+    
+    def create_profile(self, user_id: int, profile_name: str, description: str = '', created_by: int = None, is_default: bool = False) -> Optional[int]:
+        """
+        יצירת פרופיל חדש
+        
+        Args:
+            user_id: מזהה משתמש
+            profile_name: שם הפרופיל
+            description: תיאור הפרופיל (אופציונלי)
+            created_by: מזהה משתמש שיצר את הפרופיל (אופציונלי)
+            is_default: האם זה פרופיל ברירת מחדל (default: False)
+        
+        Returns:
+            מזהה הפרופיל החדש או None אם נכשל
+        
+        Raises:
+            ValidationError: אם שם הפרופיל לא תקין או כבר קיים
+        """
+        try:
+            # בדיקת תקינות שם הפרופיל
+            if not profile_name or not profile_name.strip():
+                raise ValidationError("Profile name cannot be empty")
+            
+            profile_name = profile_name.strip()
+            
+            # בדיקה אם פרופיל עם אותו שם כבר קיים למשתמש
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT id FROM preference_profiles 
+                WHERE user_id = ? AND profile_name = ?
+            ''', (user_id, profile_name))
+            
+            existing = cursor.fetchone()
+            if existing:
+                conn.close()
+                raise ValidationError(f"Profile '{profile_name}' already exists for this user")
+            
+            # יצירת הפרופיל החדש
+            # חשוב: הפרופיל נוצר עם is_active=0 (לא פעיל) עד שהמשתמש מפעיל אותו
+            cursor.execute('''
+                INSERT INTO preference_profiles 
+                (user_id, profile_name, description, is_active, is_default, created_by, created_at, updated_at)
+                VALUES (?, ?, ?, 0, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            ''', (user_id, profile_name, description or f'פרופיל {profile_name}', int(is_default), created_by))
+            
+            profile_id = cursor.lastrowid
+            
+            # אם זה פרופיל ברירת מחדל, צריך לוודא שאין פרופיל ברירת מחדל אחר למשתמש
+            if is_default:
+                cursor.execute('''
+                    UPDATE preference_profiles 
+                    SET is_default = 0 
+                    WHERE user_id = ? AND id != ?
+                ''', (user_id, profile_id))
+            
+            conn.commit()
+            conn.close()
+            
+            # ניקוי מטמון
+            self._invalidate_user_cache(user_id)
+            
+            logger.info(f"Created profile '{profile_name}' (ID: {profile_id}) for user {user_id}")
+            return profile_id
+            
+        except ValidationError:
+            raise
+        except Exception as e:
+            logger.error(f"Error creating profile '{profile_name}' for user {user_id}: {e}")
+            raise
 
 
 # יצירת מופע גלובלי

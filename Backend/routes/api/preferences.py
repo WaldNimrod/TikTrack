@@ -11,7 +11,7 @@ Date: January 2025
 """
 
 from flask import Blueprint, request, jsonify, g
-from services.preferences_service import preferences_service
+from services.preferences_service import preferences_service, ValidationError
 from typing import Any, Dict, List
 import logging
 import json
@@ -524,6 +524,93 @@ def get_user_profiles() -> Any:
         
     except Exception as e:
         logger.error(f"Error getting user profiles: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@preferences_bp.route('/profiles', methods=['POST'])
+def create_profile() -> Any:
+    """
+    יצירת פרופיל חדש
+    
+    Body:
+        - user_id (required): מזהה משתמש
+        - profile_name (required): שם הפרופיל
+        - description (optional): תיאור הפרופיל
+        - created_by (optional): מזהה משתמש שיצר את הפרופיל
+        - is_default (optional): האם זה פרופיל ברירת מחדל (default: false)
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                "success": False,
+                "error": "No data provided",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        user_id = data.get('user_id')
+        profile_name = data.get('profile_name')
+        description = data.get('description', '')
+        created_by = data.get('created_by')
+        is_default = data.get('is_default', False)
+        
+        # בדיקת פרמטרים חובה
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "user_id is required",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        if not profile_name:
+            return jsonify({
+                "success": False,
+                "error": "profile_name is required",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        # יצירת הפרופיל
+        try:
+            profile_id = preferences_service.create_profile(
+                user_id=user_id,
+                profile_name=profile_name,
+                description=description,
+                created_by=created_by,
+                is_default=is_default
+            )
+            
+            if profile_id:
+                return jsonify({
+                    "success": True,
+                    "data": {
+                        "profile_id": profile_id,
+                        "user_id": user_id,
+                        "profile_name": profile_name,
+                        "description": description,
+                        "is_default": is_default,
+                        "is_active": False  # פרופיל חדש נוצר לא פעיל
+                    },
+                    "timestamp": datetime.now().isoformat()
+                }), 201
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": "Failed to create profile",
+                    "timestamp": datetime.now().isoformat()
+                }), 500
+                
+        except ValidationError as ve:
+            return jsonify({
+                "success": False,
+                "error": str(ve),
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+    except Exception as e:
+        logger.error(f"Error creating profile: {e}")
         return jsonify({
             "success": False,
             "error": str(e),

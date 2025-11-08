@@ -74,12 +74,20 @@ class LinkedItemsService {
         
         // שימוש ב-description אם קיים (מכיל את הפורמט הנכון מהשרת: "טרייד Long על TSLA")
         // אחרת נופל ל-title או name
-        let name = item.description || item.title || item.name || item.symbol || `#${item.id}`;
+        let name = item.description || item.title || item.name || item.symbol || '';
+        
+        // אם עדיין אין שם, נבנה שם בסיסי
+        if (!name || name.trim() === '') {
+            const typeLabel = this.getEntityLabel(item.type);
+            const itemId = item.id || item.entity_id || item.linked_id || 'לא זמין';
+            name = `${typeLabel} #${itemId}`;
+            return name; // Return early - no need to clean prefixes for generated names
+        }
         
         // הסרת סוג הישות מהשם אם הוא קיים
         const typePrefixes = {
             'trade': ['טרייד:', 'Trade:', 'trade:', 'טרייד '],
-            'trade_plan': ['תכנון:', 'תכנית:', 'Plan:', 'plan:', 'תוכנית השקעה '],
+            'trade_plan': ['תכנון:', 'תכנית:', 'Plan:', 'plan:', 'תוכנית השקעה ', 'תוכנית טרייד '],
             'alert': ['התראה:', 'Alert:', 'alert:'],
             'trading_account': ['חשבון מסחר:', 'Account:', 'account:'],
             'ticker': ['טיקר:', 'Ticker:', 'ticker:'],
@@ -107,7 +115,7 @@ class LinkedItemsService {
             }
         }
         
-        return name;
+        return name || `#${item.id || 'לא זמין'}`;
     }
     
     /**

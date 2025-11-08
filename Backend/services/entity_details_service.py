@@ -1253,9 +1253,52 @@ class EntityDetailsService:
                     'id': note.id,
                     'type': 'note',
                     'title': note.title or f"הערה #{note.id}",
+                    'name': note.title or f"הערה #{note.id}",
+                    'description': note.content[:50] + '...' if note.content and len(note.content) > 50 else (note.content or ''),
                     'status': 'active',
                     'created_at': note.created_at.isoformat() if note.created_at else None
                 })
+            
+            # Get related alerts through plan_condition
+            from models.plan_condition import PlanCondition
+            plan_conditions = db.query(PlanCondition).filter(PlanCondition.trade_plan_id == plan_id).all()
+            for condition in plan_conditions:
+                alerts = db.query(Alert).filter(Alert.plan_condition_id == condition.id).all()
+                for alert in alerts:
+                    # Check if alert already added (avoid duplicates)
+                    if not any(item['type'] == 'alert' and item['id'] == alert.id for item in linked_items):
+                        linked_items.append({
+                            'id': alert.id,
+                            'type': 'alert',
+                            'title': alert.message or f"התראה #{alert.id}",
+                            'name': alert.message or f"התראה #{alert.id}",
+                            'description': f"התראה לטיקר {alert.ticker_id}" if alert.ticker_id else f"התראה #{alert.id}",
+                            'status': alert.status,
+                            'is_triggered': alert.is_triggered,
+                            'created_at': alert.created_at.isoformat() if alert.created_at else None
+                        })
+            
+            # Also get alerts linked through related_id/related_type_id (legacy support)
+            from models.note_relation_type import NoteRelationType
+            trade_plan_relation_type = db.query(NoteRelationType).filter(NoteRelationType.name == 'trade_plan').first()
+            if trade_plan_relation_type:
+                alerts_legacy = db.query(Alert).filter(
+                    Alert.related_type_id == trade_plan_relation_type.id,
+                    Alert.related_id == plan_id
+                ).all()
+                for alert in alerts_legacy:
+                    # Check if alert already added (avoid duplicates)
+                    if not any(item['type'] == 'alert' and item['id'] == alert.id for item in linked_items):
+                        linked_items.append({
+                            'id': alert.id,
+                            'type': 'alert',
+                            'title': alert.message or f"התראה #{alert.id}",
+                            'name': alert.message or f"התראה #{alert.id}",
+                            'description': f"התראה לטיקר {alert.ticker_id}" if alert.ticker_id else f"התראה #{alert.id}",
+                            'status': alert.status,
+                            'is_triggered': alert.is_triggered,
+                            'created_at': alert.created_at.isoformat() if alert.created_at else None
+                        })
                 
         except Exception as e:
             logger.error(f"Error getting trade plan linked items: {str(e)}")
@@ -1414,29 +1457,145 @@ class EntityDetailsService:
         linked_items = []
         
         try:
-            # Get the ticker this alert is for
             alert = db.query(Alert).filter(Alert.id == alert_id).first()
-            if alert and alert.ticker_id:
+            if not alert:
+                logger.warning(f"Alert {alert_id} not found")
+                return []
+            
+            # Get the ticker this alert is for (parent)
+            if alert.ticker_id:
                 ticker = db.query(Ticker).filter(Ticker.id == alert.ticker_id).first()
                 if ticker:
                     linked_items.append({
                         'id': ticker.id,
                         'type': 'ticker',
                         'title': f"טיקר {ticker.symbol}",
+                        'name': ticker.symbol,
+                        'description': f"טיקר {ticker.symbol}",
                         'status': ticker.status,
                         'created_at': ticker.created_at.isoformat() if ticker.created_at else None
                     })
-                
-                # Get related trades for this ticker
+            
+            # Get trading_account through plan_condition -> trade_plan
+            if alert.plan_condition_id:
+                from models.plan_condition import PlanCondition
+                plan_condition = db.query(PlanCondition).filter(PlanCondition.id == alert.plan_condition_id).first()
+                if plan_condition and plan_condition.trade_plan_id:
+                    trade_plan = db.query(TradePlan).filter(TradePlan.id == plan_condition.trade_plan_id).first()
+                    if trade_plan and trade_plan.trading_account_id:
+                        account = db.query(TradingAccount).filter(TradingAccount.id == trade_plan.trading_account_id).first()
+                        if account:
+                            # Check if already added
+                            if not any(item['type'] == 'trading_account' and item['id'] == account.id for item in linked_items):
+                                linked_items.append({
+                                    'id': account.id,
+                                    'type': 'trading_account',
+                                    'title': f"חשבון {account.name}",
+                                    'name': account.name,
+                                    'description': f"חשבון מסחר {account.name}",
+                                    'status': account.status,
+                                    'created_at': account.created_at.isoformat() if account.created_at else None
+                                })
+                    
+                    # Add trade_plan as parent
+                    if trade_plan:
+                        linked_items.append({
+                            'id': trade_plan.id,
+                            'type': 'trade_plan',
+                            'title': f"תכנית #{trade_plan.id}",
+                            'name': f"תכנית #{trade_plan.id}",
+                            'description': f"תכנית השקעה #{trade_plan.id}",
+                            'status': trade_plan.status,
+                            'side': trade_plan.side,
+                            'investment_type': trade_plan.investment_type,
+                            'created_at': trade_plan.created_at.isoformat() if trade_plan.created_at else None
+                        })
+            
+            # Get trading_account and trade_plan through trade_condition -> trade
+            if alert.trade_condition_id:
+                from models.trade_condition import TradeCondition
+                trade_condition = db.query(TradeCondition).filter(TradeCondition.id == alert.trade_condition_id).first()
+                if trade_condition and trade_condition.trade_id:
+                    trade = db.query(Trade).filter(Trade.id == trade_condition.trade_id).first()
+                    if trade:
+                        # Add trade as parent
+                        linked_items.append({
+                            'id': trade.id,
+                            'type': 'trade',
+                            'title': f"טרייד {trade.symbol}",
+                            'name': trade.symbol,
+                            'description': f"טרייד {trade.symbol}",
+                            'status': trade.status,
+                            'side': trade.side,
+                            'created_at': trade.created_at.isoformat() if trade.created_at else None
+                        })
+                        
+                        # Add trading_account through trade
+                        if trade.trading_account_id:
+                            account = db.query(TradingAccount).filter(TradingAccount.id == trade.trading_account_id).first()
+                            if account:
+                                # Check if already added
+                                if not any(item['type'] == 'trading_account' and item['id'] == account.id for item in linked_items):
+                                    linked_items.append({
+                                        'id': account.id,
+                                        'type': 'trading_account',
+                                        'title': f"חשבון {account.name}",
+                                        'name': account.name,
+                                        'description': f"חשבון מסחר {account.name}",
+                                        'status': account.status,
+                                        'created_at': account.created_at.isoformat() if account.created_at else None
+                                    })
+                        
+                        # Add trade_plan through trade
+                        if trade.trade_plan_id:
+                            trade_plan = db.query(TradePlan).filter(TradePlan.id == trade.trade_plan_id).first()
+                            if trade_plan:
+                                # Check if already added
+                                if not any(item['type'] == 'trade_plan' and item['id'] == trade_plan.id for item in linked_items):
+                                    linked_items.append({
+                                        'id': trade_plan.id,
+                                        'type': 'trade_plan',
+                                        'title': f"תכנית #{trade_plan.id}",
+                                        'name': f"תכנית #{trade_plan.id}",
+                                        'description': f"תכנית השקעה #{trade_plan.id}",
+                                        'status': trade_plan.status,
+                                        'side': trade_plan.side,
+                                        'investment_type': trade_plan.investment_type,
+                                        'created_at': trade_plan.created_at.isoformat() if trade_plan.created_at else None
+                                    })
+            
+            # Get related trades for this ticker (children)
+            if alert.ticker_id:
                 trades = db.query(Trade).filter(Trade.ticker_id == alert.ticker_id).all()
                 for trade in trades:
-                    linked_items.append({
-                        'id': trade.id,
-                        'type': 'trade',
-                        'title': f"טרייד {trade.symbol}",
-                        'status': trade.status,
-                        'created_at': trade.created_at.isoformat() if trade.created_at else None
-                    })
+                    # Check if already added as parent
+                    if not any(item['type'] == 'trade' and item['id'] == trade.id for item in linked_items):
+                        linked_items.append({
+                            'id': trade.id,
+                            'type': 'trade',
+                            'title': f"טרייד {trade.symbol}",
+                            'name': trade.symbol,
+                            'description': f"טרייד {trade.symbol}",
+                            'status': trade.status,
+                            'side': trade.side,
+                            'created_at': trade.created_at.isoformat() if trade.created_at else None
+                        })
+            
+            # Get related notes (children)
+            notes = db.query(Note).filter(
+                Note.linked_object_type == 'alert',
+                Note.linked_object_id == alert_id
+            ).all()
+            for note in notes:
+                linked_items.append({
+                    'id': note.id,
+                    'type': 'note',
+                    'title': note.title or f"הערה #{note.id}",
+                    'name': note.title or f"הערה #{note.id}",
+                    'description': note.content[:50] + '...' if note.content and len(note.content) > 50 else (note.content or ''),
+                    'status': 'active',
+                    'created_at': note.created_at.isoformat() if note.created_at else None
+                })
                 
         except Exception as e:
             logger.error(f"Error getting alert linked items: {str(e)}")

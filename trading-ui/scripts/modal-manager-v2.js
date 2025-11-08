@@ -732,9 +732,14 @@ class ModalManagerV2 {
                 // Check if this is a fee field that needs currency label
                 const feeCurrencyLabelHTML = field.feeCurrencyLabel ? 
                     `<small class="text-muted ms-2" id="${field.id}CurrencyLabel" style="font-size: 0.875rem;">-</small>` : '';
+                const numberLabelClasses = ['form-label'];
+                if (field.labelClass) {
+                    numberLabelClasses.push(field.labelClass);
+                }
+                const numberLabelStyle = field.labelStyle ? ` style="${field.labelStyle}"` : '';
                 return `
                     <div class="mb-3">
-                        <label for="${field.id}" class="form-label">
+                        <label for="${field.id}" class="${numberLabelClasses.join(' ')}"${numberLabelStyle}>
                             ${field.label} ${requiredStar}${feeCurrencyLabelHTML}
                         </label>
                         <input type="number" 

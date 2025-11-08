@@ -952,6 +952,26 @@ window.initializePreferencesWithLazyLoading = async function(userId = null, prof
     return await window.PreferencesCore.initializeWithLazyLoading(userId, profileId);
 };
 
+/**
+ * Initialize preferences (legacy alias)
+ * @param {number} userId - User ID
+ * @param {number} profileId - Profile ID
+ */
+window.initializePreferences = async function(userId = null, profileId = null) {
+    if (typeof window.initializePreferencesWithLazyLoading === 'function') {
+        return await window.initializePreferencesWithLazyLoading(userId, profileId);
+    }
+    
+    if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
+        return await window.PreferencesUI.loadAllPreferences(
+            userId ?? window.PreferencesCore?.currentUserId ?? 1,
+            profileId ?? window.PreferencesCore?.currentProfileId ?? 0
+        );
+    }
+    
+    return await window.PreferencesCore.getAllPreferences(userId, profileId);
+};
+
 // window.refreshUserPreferences removed - using UnifiedCacheManager.refreshUserPreferences instead
 
 // ============================================================================

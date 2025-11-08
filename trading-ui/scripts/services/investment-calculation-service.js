@@ -178,6 +178,56 @@
         return `1:${formatted}`;
     }
 
+    function escapeHtmlText(value) {
+        if (value === null || value === undefined) {
+            return '-';
+        }
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function renderAmountWithVariant(value, options, variant = 'neutral') {
+        if (value === null || value === undefined || value === '') {
+            return '<span class="numeric-value-zero">-</span>';
+        }
+
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) {
+            return '<span class="numeric-value-zero">-</span>';
+        }
+
+        let signedValue = numericValue;
+        if (variant === 'negative') {
+            signedValue = -Math.abs(numericValue);
+        } else if (variant === 'positive') {
+            signedValue = Math.abs(numericValue);
+        }
+
+        const currencySymbol = options.currencySymbol || DEFAULT_OPTIONS.currencySymbol;
+        const decimals = Number.isInteger(options.amountDecimals) ? options.amountDecimals : DEFAULT_OPTIONS.amountDecimals;
+
+        const showPositiveSign = variant !== 'neutral';
+
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+            return window.FieldRendererService.renderAmount(signedValue, currencySymbol, decimals, showPositiveSign);
+        }
+
+        const formatted = formatCurrencyDisplay(Math.abs(signedValue), currencySymbol, decimals);
+        let sign = '';
+        if (signedValue < 0) {
+            sign = '-';
+        } else if (showPositiveSign && signedValue > 0) {
+            sign = '+';
+        }
+        const cssClass = signedValue > 0 ? 'numeric-value-positive' : (signedValue < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+        const display = sign ? `${sign}${formatted}` : formatted;
+        return `<span class="${cssClass}" dir="ltr">${display}</span>`;
+    }
+
     function computeQuantityFromInvestment(totalInvestment, price, options = {}) {
         if (!isPositiveNumber(totalInvestment) || !isPositiveNumber(price)) {
             return { quantity: null, normalizedInvestment: null };
@@ -449,16 +499,6 @@
 
         const currencySymbol = context.options.currencySymbol || DEFAULT_OPTIONS.currencySymbol;
         const amountDecimals = Number.isInteger(context.options.amountDecimals) ? context.options.amountDecimals : DEFAULT_OPTIONS.amountDecimals;
-        const quantityText = summaryData.quantity !== null ? formatQuantityDisplay(summaryData.quantity, context.options) : '-';
-        const investmentText = summaryData.totalInvestment !== null
-            ? formatCurrencyDisplay(summaryData.totalInvestment, currencySymbol, amountDecimals)
-            : '-';
-        const riskText = summaryData.riskAmount !== null
-            ? formatCurrencyDisplay(summaryData.riskAmount, currencySymbol, amountDecimals)
-            : '-';
-        const rewardText = summaryData.rewardAmount !== null
-            ? formatCurrencyDisplay(summaryData.rewardAmount, currencySymbol, amountDecimals)
-            : '-';
         const ratioText = formatRatioDisplay(summaryData.ratio);
         const sideDisplay = renderSideDisplay(summaryData.sideNormalized, summaryData.sideLabel);
 
@@ -466,14 +506,14 @@
         const tickerDisplay = summaryData.tickerLabel || '-';
 
         const summaryFields = [
-            { label: 'טיקר', value: tickerDisplay },
-            { label: 'צד', value: sideDisplay, allowHtml: true },
-            { label: 'סה\"כ השקעה', value: investmentText, direction: 'ltr' },
-            { label: 'מספר מניות', value: quantityText, direction: 'ltr' },
-            { label: 'סכום סיכון', value: riskText, direction: 'ltr' },
-            { label: 'סכום סיכוי', value: rewardText, direction: 'ltr' },
-            { label: 'יחס סיכון/סיכוי', value: ratioText, direction: 'ltr' }
+            { label: 'טיקר', value: tickerDisplay, valueType: 'text' },
+            { label: 'צד', value: sideDisplay, valueType: 'html' },
+            { label: 'סה\"כ השקעה', value: summaryData.totalInvestment, valueType: 'amount', direction: 'ltr' },
+            { label: 'מספר מניות', value: summaryData.quantity !== null ? formatQuantityDisplay(summaryData.quantity, context.options) : '-', valueType: 'text', direction: 'ltr' },
+            { label: 'סיכון / סיכוי', valueType: 'riskRewardSummary', direction: 'ltr' }
         ];
+
+        context.summaryElement.innerHTML = '';
 
         const container = document.createElement('div');
         container.classList.add('risk-summary-card', 'summary-card');
@@ -485,46 +525,88 @@
             container.appendChild(titleEl);
         }
 
-        const lineEl = document.createElement('div');
-        lineEl.classList.add('risk-summary-card__line');
-        lineEl.setAttribute('dir', 'rtl');
+        const table = document.createElement('table');
+        table.classList.add('risk-summary-card__table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.tableLayout = 'fixed';
+        table.setAttribute('dir', 'rtl');
+
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        headerRow.classList.add('risk-summary-card__row', 'risk-summary-card__row--header');
+
+        const tbody = document.createElement('tbody');
+        const dataRow = document.createElement('tr');
+        dataRow.classList.add('risk-summary-card__row', 'risk-summary-card__row--values');
 
         summaryFields.forEach((field, index) => {
-            const segment = document.createElement('span');
-            segment.classList.add('risk-summary-card__segment');
-
-            const labelSpan = document.createElement('span');
-            labelSpan.classList.add('risk-summary-card__label');
-            labelSpan.textContent = `${field.label}: `;
-            segment.appendChild(labelSpan);
-
-            const valueSpan = document.createElement('span');
-            valueSpan.classList.add('risk-summary-card__value');
-            if (field.direction === 'ltr') {
-                valueSpan.setAttribute('dir', 'ltr');
-                valueSpan.classList.add('risk-summary-card__value--ltr');
-            }
-
-            if (field.allowHtml) {
-                valueSpan.innerHTML = field.value || '-';
+            const th = document.createElement('th');
+            th.textContent = field.label;
+            th.style.fontWeight = '600';
+            th.style.fontSize = '0.75rem';
+            th.style.padding = '6px 10px';
+            th.style.textAlign = 'center';
+            th.style.whiteSpace = 'nowrap';
+            if (index === summaryFields.length - 1) {
+                th.style.color = 'var(--text-color, #1d1d1f)';
             } else {
-                valueSpan.textContent = field.value === null || field.value === undefined || field.value === '' ? '-' : String(field.value);
+                th.style.color = 'var(--text-muted, #6c757d)';
             }
-
-            segment.appendChild(valueSpan);
-            lineEl.appendChild(segment);
-
             if (index < summaryFields.length - 1) {
-                const separator = document.createElement('span');
-                separator.classList.add('risk-summary-card__separator');
-                separator.textContent = ' | ';
-                lineEl.appendChild(separator);
+                th.style.borderLeft = '1px solid var(--border-color, #e0e0e0)';
             }
+            headerRow.appendChild(th);
+
+            const td = document.createElement('td');
+            td.style.padding = '8px 10px';
+            td.style.fontSize = '0.95rem';
+            td.style.color = 'var(--text-color, #1d1d1f)';
+            td.style.textAlign = 'center';
+            td.style.verticalAlign = 'middle';
+            if (index < summaryFields.length - 1) {
+                td.style.borderLeft = '1px solid var(--border-color, #e0e0e0)';
+            }
+
+            switch (field.valueType) {
+                case 'html':
+                    td.innerHTML = field.value || '-';
+                    break;
+                case 'amount':
+                    td.innerHTML = renderAmountWithVariant(field.value, { currencySymbol, amountDecimals }, 'neutral');
+                    break;
+                case 'riskRewardSummary': {
+                    const riskHtml = renderAmountWithVariant(summaryData.riskAmount, { currencySymbol, amountDecimals }, 'negative');
+                    const rewardHtml = renderAmountWithVariant(summaryData.rewardAmount, { currencySymbol, amountDecimals }, 'positive');
+                    const ratioHtml = escapeHtmlText(ratioText);
+                    td.innerHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <span>${riskHtml}</span>
+                                <span style="color: var(--text-muted, #6c757d);">/</span>
+                                <span>${rewardHtml}</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted, #6c757d);">
+                                ${ratioHtml}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                }
+                default:
+                    td.textContent = field.value === null || field.value === undefined || field.value === '' ? '-' : String(field.value);
+                    break;
+            }
+
+            dataRow.appendChild(td);
         });
 
-        container.appendChild(lineEl);
+        thead.appendChild(headerRow);
+        tbody.appendChild(dataRow);
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        container.appendChild(table);
 
-        context.summaryElement.innerHTML = '';
         context.summaryElement.appendChild(container);
     }
 

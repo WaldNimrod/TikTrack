@@ -411,6 +411,347 @@ class EntityDetailsRenderer {
     }
 
     /**
+     * Render trade specific information - רנדור מידע ספציפי לטרייד
+     * @param {Object} tradeData
+     * @returns {string}
+     * @private
+     */
+    renderTradeSpecific(tradeData) {
+        if (!tradeData) {
+            return this.renderError('לא נמצאו נתוני טרייד להצגה');
+        }
+
+        const FieldRenderer = window.FieldRendererService || null;
+        const statusHtml = tradeData.status
+            ? (FieldRenderer?.renderStatus
+                ? FieldRenderer.renderStatus(tradeData.status, 'trade')
+                : this.getStatusBadge(tradeData.status))
+            : '<span class="text-muted">לא זמין</span>';
+        const sideHtml = tradeData.side
+            ? (FieldRenderer?.renderSide
+                ? FieldRenderer.renderSide(tradeData.side)
+                : `<span class="badge bg-secondary">${this._escapeHtml(String(tradeData.side))}</span>`)
+            : '<span class="text-muted">לא זמין</span>';
+        const investmentHtml = tradeData.investment_type
+            ? (FieldRenderer?.renderType
+                ? FieldRenderer.renderType(tradeData.investment_type)
+                : `<span class="badge bg-primary-subtle text-primary">${this._escapeHtml(String(tradeData.investment_type))}</span>`)
+            : '<span class="text-muted">לא זמין</span>';
+
+        const currencySymbol = tradeData.currency_symbol || tradeData.ticker?.currency_symbol || '$';
+        const totalPlHtml = (tradeData.total_pl !== null && tradeData.total_pl !== undefined)
+            ? (FieldRenderer?.renderAmount
+                ? FieldRenderer.renderAmount(tradeData.total_pl, currencySymbol, 2, true)
+                : `${currencySymbol}${Number(tradeData.total_pl).toFixed(2)}`)
+            : '<span class="text-muted">לא זמין</span>';
+
+        const openedAt = this.formatDateTime(tradeData.opened_at || tradeData.created_at) || 'לא זמין';
+        const closedAt = tradeData.closed_at ? this.formatDateTime(tradeData.closed_at) : null;
+        const cancelledAt = tradeData.cancelled_at ? this.formatDateTime(tradeData.cancelled_at) : null;
+        const cancelReason = tradeData.cancel_reason ? this._escapeHtml(tradeData.cancel_reason) : null;
+
+        const accountDisplay = this._renderLinkedEntityReference(
+            'trading_account',
+            tradeData.trading_account_id,
+            tradeData.account_name || (tradeData.trading_account && tradeData.trading_account.name) || null,
+            { renderMode: 'entity-details', status: tradeData.account_status }
+        );
+        const tickerDisplay = this._renderLinkedEntityReference(
+            'ticker',
+            tradeData.ticker_id,
+            tradeData.ticker?.symbol || tradeData.symbol || null,
+            { renderMode: 'entity-details', status: tradeData.ticker?.status }
+        );
+
+        const notesHtml = tradeData.notes
+            ? `<div class="mb-3">
+                    <label class="form-label fw-bold">הערות:</label>
+                    <p class="mb-0">${FieldRenderer?.renderTextPreview
+                        ? FieldRenderer.renderTextPreview(tradeData.notes, { maxLength: 600 })
+                        : this._escapeHtml(tradeData.notes)}</p>
+               </div>`
+            : '';
+
+        return `
+            <div class="trade-specific">
+                <h6 class="border-bottom pb-2 mb-3">פרטי טרייד</h6>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">סטטוס:</label>
+                    <span>${statusHtml}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">צד:</label>
+                    <span>${sideHtml}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">סוג השקעה:</label>
+                    <span>${investmentHtml}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">רווח / הפסד כולל:</label>
+                    <span>${totalPlHtml}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">חשבון מסחר:</label>
+                    <span>${accountDisplay}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">טיקר:</label>
+                    <span>${tickerDisplay}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">תאריך פתיחה:</label>
+                    <span class="text-muted">${openedAt}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">תאריך סגירה:</label>
+                    <span class="text-muted">${closedAt || (tradeData.status === 'open' ? 'טרייד פעיל' : 'לא זמין')}</span>
+                </div>
+
+                ${(cancelledAt || cancelReason) ? `
+                <div class="mb-3">
+                    <label class="form-label fw-bold me-2 mb-1" style="min-width: 140px;">פרטי ביטול:</label>
+                    <div class="d-flex flex-column gap-1">
+                        ${cancelledAt ? `<span class="text-muted">בוטל בתאריך: ${cancelledAt}</span>` : ''}
+                        ${cancelReason ? `<span class="text-muted">סיבה: ${cancelReason}</span>` : ''}
+                    </div>
+                </div>
+                ` : ''}
+
+                ${notesHtml}
+            </div>
+        `;
+    }
+
+    /**
+     * Render trade plan view - רנדור פרטי תכנית מסחר
+     * @param {Object} tradePlanData
+     * @param {Object} options
+     * @returns {string}
+     * @public
+     */
+    renderTradePlan(tradePlanData, options = {}) {
+        try {
+            if (!tradePlanData) {
+                return this.renderError('לא נמצאו פרטי תכנית להצגה');
+            }
+
+            const FieldRenderer = window.FieldRendererService || null;
+            const planColor = this.entityColors.trade_plan || '#0056b3';
+
+            let tickerData = tradePlanData.ticker
+                || (Array.isArray(window.tickersData) ? window.tickersData.find(t => t?.id === tradePlanData.ticker_id) : null)
+                || null;
+
+            if (!tickerData && tradePlanData.ticker_id) {
+                tickerData = {
+                    id: tradePlanData.ticker_id,
+                    symbol: tradePlanData.symbol || `טיקר #${tradePlanData.ticker_id}`,
+                    name: tradePlanData.ticker_name || ''
+                };
+            }
+
+            let tickerInfoHTML = '';
+            if (tickerData && FieldRenderer?.renderTickerInfo) {
+                tickerInfoHTML = FieldRenderer.renderTickerInfo(tickerData, 'mb-2');
+            }
+
+            const statusDisplay = tradePlanData.status
+                ? (FieldRenderer?.renderStatus
+                    ? FieldRenderer.renderStatus(tradePlanData.status, 'trade_plan')
+                    : this.getStatusBadge(tradePlanData.status))
+                : '<span class="text-muted">לא זמין</span>';
+
+            const tickerSymbol = tickerData?.symbol || tradePlanData.symbol || `תוכנית #${tradePlanData.id}`;
+
+            return `
+                <div class="entity-details-container trade-plan-details">
+                    <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom: 1px solid #e0e0e0; padding-bottom: 0.75rem;">
+                        <div class="d-flex align-items-center gap-2" style="min-width: 120px;">
+                            <strong>טיקר:</strong>
+                            <span class="fw-bold">${tickerSymbol}</span>
+                        </div>
+                        <div class="flex-grow-1" style="text-align: center;">
+                            ${tickerInfoHTML || ''}
+                        </div>
+                        <div class="d-flex align-items-center gap-2" style="min-width: 150px; justify-content: flex-end;">
+                            <strong>סטטוס:</strong> ${statusDisplay}
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            ${this.renderBasicInfo(tradePlanData, 'trade_plan')}
+                        </div>
+                        <div class="col-md-6">
+                            ${this.renderTradePlanSpecific(tradePlanData, planColor)}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-4">
+                        <div class="col-12">
+                            ${this.renderLinkedItems(
+                                tradePlanData.linked_items || [],
+                                planColor,
+                                'trade_plan',
+                                tradePlanData.id,
+                                options?.sourceInfo || null,
+                                options
+                            )}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-4">
+                        <div class="col-12">
+                            ${this.renderActionButtons('trade_plan', tradePlanData.id, tradePlanData, options?.sourceInfo || null)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            window.Logger?.error('Error rendering trade plan details:', error, { page: "entity-details-renderer" });
+            return this.renderError(`שגיאה ברנדור פרטי תוכנית: ${error.message}`);
+        }
+    }
+
+    /**
+     * Render trade plan specific information - רנדור מידע ספציפי לתכנית מסחר
+     * @param {Object} tradePlanData
+     * @param {string} planColor
+     * @returns {string}
+     * @private
+     */
+    renderTradePlanSpecific(tradePlanData, planColor = null) {
+        if (!tradePlanData) {
+            return this.renderError('לא נמצאו נתוני תכנית להצגה');
+        }
+
+        const FieldRenderer = window.FieldRendererService || null;
+        const color = planColor || this.entityColors.trade_plan || '#0056b3';
+
+        const sideHtml = tradePlanData.side
+            ? (FieldRenderer?.renderSide
+                ? FieldRenderer.renderSide(tradePlanData.side)
+                : `<span class="badge bg-secondary">${this._escapeHtml(String(tradePlanData.side))}</span>`)
+            : '<span class="text-muted">לא זמין</span>';
+        const investmentHtml = tradePlanData.investment_type
+            ? (FieldRenderer?.renderType
+                ? FieldRenderer.renderType(tradePlanData.investment_type)
+                : `<span class="badge bg-primary-subtle text-primary">${this._escapeHtml(String(tradePlanData.investment_type))}</span>`)
+            : '<span class="text-muted">לא זמין</span>';
+
+        const currencySymbol = tradePlanData.currency_symbol || tradePlanData.base_currency_symbol || '$';
+        const plannedAmountHtml = (tradePlanData.planned_amount !== null && tradePlanData.planned_amount !== undefined)
+            ? (FieldRenderer?.renderAmount
+                ? FieldRenderer.renderAmount(tradePlanData.planned_amount, currencySymbol, 0, true)
+                : `${currencySymbol}${Number(tradePlanData.planned_amount).toFixed(0)}`)
+            : '<span class="text-muted">לא זמין</span>';
+
+        const targetPriceHtml = (tradePlanData.target_price !== null && tradePlanData.target_price !== undefined)
+            ? `${currencySymbol}${Number(tradePlanData.target_price).toFixed(2)}`
+            : '<span class="text-muted">לא זמין</span>';
+        const targetPctHtml = (tradePlanData.target_percentage !== null && tradePlanData.target_percentage !== undefined)
+            ? (FieldRenderer?.renderNumericValue
+                ? FieldRenderer.renderNumericValue(tradePlanData.target_percentage, '%', true)
+                : `${Number(tradePlanData.target_percentage).toFixed(2)}%`)
+            : '<span class="text-muted">לא זמין</span>';
+
+        const stopPriceHtml = (tradePlanData.stop_price !== null && tradePlanData.stop_price !== undefined)
+            ? `${currencySymbol}${Number(tradePlanData.stop_price).toFixed(2)}`
+            : '<span class="text-muted">לא זמין</span>';
+        const stopPctHtml = (tradePlanData.stop_percentage !== null && tradePlanData.stop_percentage !== undefined)
+            ? (FieldRenderer?.renderNumericValue
+                ? FieldRenderer.renderNumericValue(tradePlanData.stop_percentage * 100, '%', true)
+                : `${Number(tradePlanData.stop_percentage * 100).toFixed(2)}%`)
+            : '<span class="text-muted">לא זמין</span>';
+
+        const accountDisplay = this._renderLinkedEntityReference(
+            'trading_account',
+            tradePlanData.trading_account_id,
+            tradePlanData.account_name || null,
+            { renderMode: 'entity-details' }
+        );
+        const tickerDisplay = this._renderLinkedEntityReference(
+            'ticker',
+            tradePlanData.ticker_id,
+            tradePlanData.ticker?.symbol || tradePlanData.symbol || null,
+            { renderMode: 'entity-details', status: tradePlanData.ticker?.status }
+        );
+
+        const cancelInfo = (tradePlanData.cancelled_at || tradePlanData.cancel_reason)
+            ? `<div class="mb-3">
+                    <label class="form-label fw-bold me-2 mb-1" style="min-width: 140px;">פרטי ביטול:</label>
+                    <div class="d-flex flex-column gap-1">
+                        ${tradePlanData.cancelled_at ? `<span class="text-muted">בוטל בתאריך: ${this.formatDateTime(tradePlanData.cancelled_at)}</span>` : ''}
+                        ${tradePlanData.cancel_reason ? `<span class="text-muted">סיבה: ${this._escapeHtml(tradePlanData.cancel_reason)}</span>` : ''}
+                    </div>
+               </div>`
+            : '';
+
+        const entryConditions = tradePlanData.entry_conditions
+            ? `<div class="mb-3">
+                    <label class="form-label fw-bold">תנאי כניסה:</label>
+                    <p class="mb-0">${FieldRenderer?.renderTextPreview
+                        ? FieldRenderer.renderTextPreview(tradePlanData.entry_conditions, { maxLength: 600 })
+                        : this._escapeHtml(tradePlanData.entry_conditions)}</p>
+               </div>`
+            : '';
+
+        return `
+            <div class="trade-plan-specific">
+                <h6 class="border-bottom pb-2 mb-3" style="border-color: ${color} !important;">פרטי תוכנית</h6>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">צד:</label>
+                    <span>${sideHtml}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">סוג השקעה:</label>
+                    <span>${investmentHtml}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">סכום מתוכנן:</label>
+                    <span>${plannedAmountHtml}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center flex-wrap gap-2">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">מחיר יעד:</label>
+                    <span>${targetPriceHtml}</span>
+                    <span>${targetPctHtml}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center flex-wrap gap-2">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">מחיר סטופ:</label>
+                    <span>${stopPriceHtml}</span>
+                    <span>${stopPctHtml}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">חשבון מסחר:</label>
+                    <span>${accountDisplay}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 140px;">טיקר:</label>
+                    <span>${tickerDisplay}</span>
+                </div>
+
+                ${cancelInfo}
+                ${entryConditions}
+            </div>
+        `;
+    }
+    /**
      * Render ticker details - רנדור פרטי טיקר
      * 
      * @param {Object} tickerData - נתוני טיקר
@@ -1364,6 +1705,33 @@ class EntityDetailsRenderer {
             <th class="text-center col-linked-investment">${makeSortButton('סוג השקעה', 3, 'center')}</th>
             <th class="text-center col-linked-date">${makeSortButton('תאריך יצירה', 4, 'center')}</th>
             <th class="text-center col-linked-actions">פעולות</th>
+        `;
+    }
+
+    _renderLinkedEntityReference(entityType, entityId, displayName = null, meta = {}) {
+        if (!entityId) {
+            return '<span class="text-muted">לא זמין</span>';
+        }
+
+        const label = displayName
+            ? this._escapeHtml(String(displayName))
+            : this._escapeHtml(`${this.getEntityLabel(entityType)} #${entityId}`);
+
+        if (window.FieldRendererService?.renderLinkedEntity) {
+            return window.FieldRendererService.renderLinkedEntity(
+                entityType,
+                entityId,
+                label,
+                Object.assign({}, meta)
+            );
+        }
+
+        return `
+            <a href="#"
+               class="entity-link"
+               onclick="if (window.showEntityDetails) { window.showEntityDetails('${entityType}', ${entityId}); } return false;">
+               ${label}
+            </a>
         `;
     }
     

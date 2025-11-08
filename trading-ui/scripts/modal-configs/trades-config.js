@@ -20,15 +20,6 @@ const tradesModalConfig = {
     fields: [
         // שדה תצוגה לנתוני שוק לפני כל השדות
         {
-            type: 'display',
-            id: 'tradeTickerInfoDisplay',
-            label: 'נתוני שוק',
-            description: 'מתעדכן אוטומטית לאחר בחירת טיקר',
-            rowClass: 'row',
-            colClass: 'col-12 col-lg-8 col-md-7'
-        },
-        // שורה ראשונה: טיקר + צד + חשבון מסחר
-        {
             type: 'select',
             id: 'tradeTicker',
             label: 'טיקר',
@@ -36,8 +27,16 @@ const tradesModalConfig = {
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
             rowClass: 'row',
-            colClass: 'col-12 col-lg-4 col-md-5 col-sm-12'
+            colClass: 'col-md-6 col-sm-12'
         },
+        {
+            type: 'display',
+            id: 'tradeTickerInfoDisplay',
+            label: 'נתוני שוק',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        // שורה שנייה: צד + סוג השקעה
         {
             type: 'select',
             id: 'tradeSide',
@@ -49,21 +48,9 @@ const tradesModalConfig = {
             ],
             defaultValue: 'long',
             rowClass: 'row',
-            colClass: 'col-md-4 col-sm-12',
+            colClass: 'col-md-6 col-sm-12',
             description: 'בחר האם מדובר בלונג או שורט'
         },
-        {
-            type: 'select',
-            id: 'tradeAccount',
-            label: 'חשבון מסחר',
-            required: true,
-            options: [], // יטען דינמית מ-API
-            placeholder: 'בחר חשבון מסחר...',
-            defaultFromPreferences: true, // ברירת מחדל מהעדפות
-            rowClass: 'row',
-            colClass: 'col-md-4 col-sm-12'
-        },
-        // שורה שנייה: סוג השקעה + סטטוס
         {
             type: 'select',
             id: 'tradeType',
@@ -78,6 +65,18 @@ const tradesModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12',
             description: 'המערכת תומכת בשלושת סוגי ההשקעה המאוחדים: Swing, Investment, Passive'
+        },
+        // שורה שלישית: חשבון מסחר + סטטוס
+        {
+            type: 'select',
+            id: 'tradeAccount',
+            label: 'חשבון מסחר',
+            required: true,
+            options: [], // יטען דינמית מ-API
+            placeholder: 'בחר חשבון מסחר...',
+            defaultFromPreferences: true, // ברירת מחדל מהעדפות
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
         },
         {
             type: 'select',
@@ -147,7 +146,8 @@ const tradesModalConfig = {
             step: 0.01,
             placeholder: 'הכנס מחיר Stop Loss...',
             rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            colClass: 'col-md-6 col-sm-12',
+            labelStyle: 'color: var(--numeric-negative-medium);'
         },
         {
             type: 'number',
@@ -158,7 +158,8 @@ const tradesModalConfig = {
             step: 0.01,
             placeholder: 'הכנס מחיר Take Profit...',
             rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            colClass: 'col-md-6 col-sm-12',
+            labelStyle: 'color: var(--numeric-positive-medium);'
         },
         {
             type: 'number',
@@ -170,6 +171,7 @@ const tradesModalConfig = {
             placeholder: 'הכנס אחוז סטופ...',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12',
+            labelStyle: 'color: var(--numeric-negative-medium);',
             description: 'אחוז סטופ יחסית למחיר הכניסה'
         },
         {
@@ -182,6 +184,7 @@ const tradesModalConfig = {
             placeholder: 'הכנס אחוז יעד...',
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12',
+            labelStyle: 'color: var(--numeric-positive-medium);',
             description: 'אחוז יעד יחסית למחיר הכניסה'
         },
         {

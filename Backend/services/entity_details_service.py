@@ -1628,40 +1628,138 @@ class EntityDetailsService:
         linked_items = []
         
         try:
-            # Get the ticker this alert is for
             alert = db.query(Alert).filter(Alert.id == alert_id).first()
-            if alert and alert.ticker_id:
-                ticker = db.query(Ticker).filter(Ticker.id == alert.ticker_id).first()
-                if ticker:
-                    linked_items.append({
-                        'id': ticker.id,
-                        'type': 'ticker',
-                        'title': 'טיקר',
-                        'description': f"טיקר {ticker.symbol}",
-                        'status': ticker.status,
-                        'created_at': ticker.created_at.isoformat() if ticker.created_at else None
-                    })
-                
-                # Get related trades for this ticker
-                trades = db.query(Trade).options(joinedload(Trade.ticker)).filter(Trade.ticker_id == alert.ticker_id).all()
-                for trade in trades:
-                    ticker_symbol = trade.ticker.symbol if getattr(trade, 'ticker', None) else None
-                    side = trade.side or ''
-                    investment_type = trade.investment_type or ''
-                    description = f"טרייד {side} על {ticker_symbol}" if ticker_symbol else f"טרייד {side} - {investment_type}".strip() or f"טרייד #{trade.id}"
-                    linked_items.append({
-                        'id': trade.id,
-                        'type': 'trade',
-                        'title': 'טרייד',
-                        'description': description,
-                        'status': trade.status,
-                        'created_at': trade.created_at.isoformat() if trade.created_at else None
-                    })
-                
+            if not alert:
+                return linked_items
+
+            parent_item = EntityDetailsService._build_related_entity_reference(
+                db,
+                getattr(alert, 'related_type_id', None),
+                getattr(alert, 'related_id', None)
+            )
+            if parent_item:
+                linked_items.append(parent_item)
+
+            # Include the directly linked ticker when available (and avoid duplicates)
+            ticker_id = getattr(alert, 'ticker_id', None)
+            if ticker_id:
+                already_has_ticker = any(
+                    item.get('type') == 'ticker' and item.get('id') == ticker_id
+                    for item in linked_items
+                )
+                if not already_has_ticker:
+                    ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
+                    if ticker:
+                        linked_items.append({
+                            'id': ticker.id,
+                            'type': 'ticker',
+                            'title': 'טיקר',
+                            'description': f"{ticker.symbol} - {ticker.name or 'טיקר'}",
+                            'status': ticker.status,
+                            'created_at': ticker.created_at.isoformat() if ticker.created_at else None
+                        })
+
         except Exception as e:
             logger.error(f"Error getting alert linked items: {str(e)}")
         
         return linked_items
+    
+    @staticmethod
+    def _build_related_entity_reference(db: Session, related_type_id: Optional[int], related_id: Optional[int]) -> Optional[Dict[str, Any]]:
+        """
+        Build a basic linked-item representation for entities referenced via related_type_id/related_id.
+        Used by alerts and other systems that store numeric relation identifiers.
+        """
+        if not related_type_id or not related_id:
+            return None
+
+        relation_map: Dict[int, Tuple[str, Any]] = {
+            1: ('trading_account', TradingAccount),
+            2: ('trade', Trade),
+            3: ('trade_plan', TradePlan),
+            4: ('ticker', Ticker),
+        }
+
+        relation_entry = relation_map.get(int(related_type_id))
+        if not relation_entry:
+            return None
+
+        entity_type, model_cls = relation_entry
+        entity = db.query(model_cls).filter(model_cls.id == related_id).first()
+        if not entity:
+            return None
+
+        formatter = {
+            'trading_account': EntityDetailsService._format_trading_account_reference,
+            'trade': EntityDetailsService._format_trade_reference,
+            'trade_plan': EntityDetailsService._format_trade_plan_reference,
+            'ticker': EntityDetailsService._format_ticker_reference,
+        }.get(entity_type)
+
+        if not formatter:
+            return None
+
+        return formatter(entity)
+
+    @staticmethod
+    def _format_trading_account_reference(account: TradingAccount) -> Dict[str, Any]:
+        account_name = getattr(account, 'name', None) or f"חשבון #{account.id}"
+        return {
+            'id': account.id,
+            'type': 'trading_account',
+            'title': 'חשבון מסחר',
+            'description': account_name,
+            'status': getattr(account, 'status', None),
+            'created_at': account.created_at.isoformat() if getattr(account, 'created_at', None) else None
+        }
+
+    @staticmethod
+    def _format_trade_reference(trade: Trade) -> Dict[str, Any]:
+        ticker_symbol = getattr(getattr(trade, 'ticker', None), 'symbol', None) or getattr(trade, 'symbol', None)
+        side = getattr(trade, 'side', None) or ''
+        investment_type = getattr(trade, 'investment_type', None) or ''
+        description = f"טרייד {side} על {ticker_symbol}" if ticker_symbol else f"טרייד {side} - {investment_type}".strip()
+        if not description:
+            description = f"טרייד #{trade.id}"
+
+        return {
+            'id': trade.id,
+            'type': 'trade',
+            'title': 'טרייד',
+            'description': description,
+            'status': getattr(trade, 'status', None),
+            'created_at': trade.created_at.isoformat() if getattr(trade, 'created_at', None) else None
+        }
+
+    @staticmethod
+    def _format_trade_plan_reference(trade_plan: TradePlan) -> Dict[str, Any]:
+        ticker_symbol = getattr(getattr(trade_plan, 'ticker', None), 'symbol', None) or getattr(trade_plan, 'symbol', None)
+        side = getattr(trade_plan, 'side', None) or ''
+        investment_type = getattr(trade_plan, 'investment_type', None) or ''
+        description = f"תכנית {side} על {ticker_symbol}" if ticker_symbol else f"תכנית {side} - {investment_type}".strip()
+        if not description:
+            description = f"תכנית #{trade_plan.id}"
+
+        return {
+            'id': trade_plan.id,
+            'type': 'trade_plan',
+            'title': 'תוכנית מסחר',
+            'description': description,
+            'status': getattr(trade_plan, 'status', None),
+            'created_at': trade_plan.created_at.isoformat() if getattr(trade_plan, 'created_at', None) else None
+        }
+
+    @staticmethod
+    def _format_ticker_reference(ticker: Ticker) -> Dict[str, Any]:
+        description = f"{ticker.symbol} - {ticker.name}" if getattr(ticker, 'name', None) else f"טיקר {ticker.symbol}"
+        return {
+            'id': ticker.id,
+            'type': 'ticker',
+            'title': 'טיקר',
+            'description': description,
+            'status': getattr(ticker, 'status', None),
+            'created_at': ticker.created_at.isoformat() if getattr(ticker, 'created_at', None) else None
+        }
     
     @staticmethod
     def _get_external_data_summary(ticker_entity) -> Optional[Dict[str, Any]]:

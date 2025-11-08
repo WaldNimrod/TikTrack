@@ -595,7 +595,7 @@ const PACKAGE_MANIFEST = {
         file: 'preferences-group-manager.js',
         globalCheck: 'window.PreferencesGroupManager',
         description: 'מנהל קבוצות העדפות',
-        required: false,
+        required: true,
         loadOrder: 8
       }
     ],

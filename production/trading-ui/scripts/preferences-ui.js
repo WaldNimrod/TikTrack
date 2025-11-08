@@ -575,6 +575,18 @@ class PreferencesUI {
             // Update currentProfileId to match the loaded profile
             this.currentProfileId = finalProfileId;
             window.Logger.info(`✅ PreferencesUI currentProfileId updated to: ${finalProfileId}`, { page: "preferences-ui" });
+
+            // Ensure PreferencesCore works with the same profile (required for saves)
+            if (window.PreferencesCore) {
+                if (typeof window.PreferencesCore.setCurrentProfile === 'function') {
+                    await window.PreferencesCore.setCurrentProfile(finalUserId, finalProfileId);
+                    window.Logger.info(`✅ PreferencesCore currentProfileId synced to: ${finalProfileId}`, { page: "preferences-ui" });
+                } else {
+                    window.PreferencesCore.currentUserId = finalUserId;
+                    window.PreferencesCore.currentProfileId = finalProfileId;
+                    window.Logger.info(`✅ PreferencesCore currentProfileId manually set to: ${finalProfileId}`, { page: "preferences-ui" });
+                }
+            }
             
             // 🔍 Cache & Profile Debug Logging
             window.Logger.info(`🔍 CACHE DEBUG: Loading preferences for user ${finalUserId}, profile ${finalProfileId}`, { page: "preferences-ui" });

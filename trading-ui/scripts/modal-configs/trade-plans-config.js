@@ -20,14 +20,6 @@ const tradePlansModalConfig = {
     fields: [
         // שורה ראשונה: טיקר + צד + סוג השקעה + סטטוס
         {
-            type: 'display',
-            id: 'tradePlanTickerInfo',
-            label: 'נתוני שוק',
-            description: 'מתעדכן אוטומטית לאחר בחירת טיקר',
-            rowClass: 'row',
-            colClass: 'col-12 col-lg-8 col-md-7'
-        },
-        {
             type: 'select',
             id: 'tradePlanTicker',
             label: 'טיקר',
@@ -35,7 +27,14 @@ const tradePlansModalConfig = {
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
             rowClass: 'row',
-            colClass: 'col-12 col-lg-4 col-md-5 col-sm-12'
+            colClass: 'col-md-6 col-sm-12'
+        },
+        {
+            type: 'display',
+            id: 'tradePlanTickerInfo',
+            label: 'נתוני שוק',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
         },
         {
             type: 'select',
@@ -133,7 +132,8 @@ const tradePlansModalConfig = {
             step: 0.01,
             placeholder: 'הכנס מחיר Stop Loss...',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6',
+            labelStyle: 'color: var(--numeric-negative-medium);'
         },
         {
             type: 'number',
@@ -144,7 +144,8 @@ const tradePlansModalConfig = {
             step: 0.01,
             placeholder: 'הכנס מחיר Take Profit...',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6',
+            labelStyle: 'color: var(--numeric-positive-medium);'
         },
         {
             type: 'number',
@@ -156,6 +157,7 @@ const tradePlansModalConfig = {
             placeholder: 'אחוז סטופ מתוכנן...',
             rowClass: 'row',
             colClass: 'col-md-6',
+            labelStyle: 'color: var(--numeric-negative-medium);',
             description: 'אחוז סטופ ביחס למחיר הכניסה'
         },
         {
@@ -168,6 +170,7 @@ const tradePlansModalConfig = {
             placeholder: 'אחוז יעד מתוכנן...',
             rowClass: 'row',
             colClass: 'col-md-6',
+            labelStyle: 'color: var(--numeric-positive-medium);',
             description: 'אחוז יעד ביחס למחיר הכניסה'
         },
         {

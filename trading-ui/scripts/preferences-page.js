@@ -59,39 +59,108 @@ window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "prefe
 async function loadAccountsForPreferences() {
     try {
         window.Logger.info('🔄 Loading trading accounts for default account preference...', { page: "preferences-page" });
-        
-        // Fetch accounts directly from API
-        const response = await fetch(`/api/trading-accounts/?_t=${Date.now()}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        const accounts = result.data || result;
-        window.Logger.info('📊 Trading accounts loaded:', accounts, { page: "preferences-page" });
-        
         const accountSelect = document.getElementById('default_trading_account');
-        if (accountSelect && accounts && Array.isArray(accounts)) {
-            accountSelect.innerHTML = '<option value="">בחר חשבון...</option>';
+        if (!accountSelect) {
+            window.Logger.warn('⚠️ default_trading_account select element not found', { page: "preferences-page" });
+            return;
+        }
+
+        let defaultAccountId = null;
+
+        if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+            try {
+                const preferenceValue = await window.PreferencesCore.getPreference('default_trading_account', 1, window.PreferencesCore.currentProfileId);
+                if (preferenceValue !== null && preferenceValue !== undefined && preferenceValue !== '') {
+                    if (typeof preferenceValue === 'object') {
+                        if (Object.prototype.hasOwnProperty.call(preferenceValue, 'id')) {
+                            defaultAccountId = String(preferenceValue.id);
+                        } else if (Object.prototype.hasOwnProperty.call(preferenceValue, 'value')) {
+                            defaultAccountId = String(preferenceValue.value);
+                        }
+                    } else {
+                        defaultAccountId = String(preferenceValue);
+                    }
+                }
+            } catch (prefError) {
+                window.Logger.warn('⚠️ Failed to resolve default_trading_account from PreferencesCore', prefError, { page: "preferences-page" });
+            }
+        }
+
+        let usedSelectPopulatorService = false;
+
+        window.Logger.info('🔍 Checking accounts select population prerequisites...', {
+            page: "preferences-page",
+            hasSelectElement: Boolean(accountSelect),
+            hasSelectPopulatorService: Boolean(window.SelectPopulatorService),
+            hasPopulateFunction: Boolean(window.SelectPopulatorService?.populateAccountsSelect),
+            defaultAccountId
+        });
+
+        if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateAccountsSelect === 'function') {
+            usedSelectPopulatorService = true;
+            window.Logger.info('🚀 Using SelectPopulatorService.populateAccountsSelect for default trading account', {
+                page: "preferences-page",
+                defaultFromPreferences: !defaultAccountId,
+                defaultValue: defaultAccountId
+            });
+            await window.SelectPopulatorService.populateAccountsSelect(accountSelect, {
+                includeEmpty: true,
+                defaultFromPreferences: !defaultAccountId,
+                defaultValue: defaultAccountId
+            });
+        } else {
+            window.Logger.warn('⚠️ SelectPopulatorService.populateAccountsSelect unavailable, falling back to direct fetch', { page: "preferences-page" });
             
-            accounts.forEach(account => {
-                if (account.status === 'open') {
+            const response = await fetch(`/api/trading-accounts/open?_t=${Date.now()}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            const accounts = result.data || result;
+
+            accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
+
+            accounts
+                .filter(account => account && (account.status === 'open' || account.status === 'active' || account.is_active === true))
+                .forEach(account => {
                     const option = document.createElement('option');
                     option.value = account.id;
                     option.textContent = account.name;
                     accountSelect.appendChild(option);
-                }
-            });
-            
-            window.Logger.info('✅ Loaded trading accounts for default account preference:', accounts.length, { page: "preferences-page" });
+                });
+
+            if (defaultAccountId) {
+                accountSelect.value = defaultAccountId;
+            }
         }
+
+        if (defaultAccountId && !accountSelect.value) {
+            accountSelect.value = defaultAccountId;
+            window.Logger.info('✅ Applied default trading account after population', {
+                page: "preferences-page",
+                defaultAccountId,
+                appliedPostPopulation: true
+            });
+        }
+
+        const selectedOption = accountSelect.options[accountSelect.selectedIndex];
+        const totalOptions = Math.max(accountSelect.options.length - (accountSelect.options[0]?.value === '' ? 1 : 0), 0);
+
+        window.Logger.info('✅ Loaded trading accounts for default account select', {
+            page: "preferences-page",
+            usedSelectPopulatorService,
+            accountsCount: totalOptions,
+            defaultAccountId: accountSelect.value || null,
+            defaultAccountName: selectedOption ? selectedOption.textContent : null
+        });
     } catch (error) {
         window.Logger.error('❌ Error loading trading accounts for default account preference:', error, { page: "preferences-page" });
     }

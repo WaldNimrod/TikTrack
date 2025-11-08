@@ -24,12 +24,19 @@ class PageStandardizer {
             'base': [
                 'scripts/global-favicon.js?v=1.0.0',
                 'scripts/notification-system.js?v=1.0.0',
+                'scripts/cache-sync-manager.js?v=1.0.0',
                 'scripts/ui-utils.js?v=1.0.0',
+                'scripts/warning-system.js?v=1.0.0',
+                'scripts/error-handlers.js?v=1.0.0',
+                'scripts/unified-cache-manager.js?v=1.0.0',
+                'scripts/logger-service.js?v=1.0.0',
+                'scripts/header-system.js?v=v6.0.0',
                 'scripts/page-utils.js?v=1.0.0',
                 'scripts/translation-utils.js?v=1.0.0',
-                'scripts/unified-cache-manager.js?v=1.0.0',
-                'scripts/cache-sync-manager.js?v=1.0.0',
-                'scripts/header-system.js?v=v6.0.0'
+                'scripts/button-icons.js?v=1.0.0',
+                'scripts/event-handler-manager.js?v=1.0.0',
+                'scripts/button-system-init.js?v=1.0.0',
+                'scripts/color-scheme-system.js?v=1.0.0'
             ],
             'crud': [
                 'scripts/tables.js?v=1.0.0',
@@ -42,10 +49,22 @@ class PageStandardizer {
             'charts': [
                 'scripts/chart-management.js?v=1.0.0'
             ],
+            'services': [
+                'scripts/services/data-collection-service.js?v=1.0.0',
+                'scripts/services/field-renderer-service.js?v=1.0.0',
+                'scripts/services/select-populator-service.js?v=1.0.0',
+                'scripts/services/statistics-calculator.js?v=1.0.0',
+                'scripts/services/default-value-setter.js?v=1.0.0',
+                'scripts/services/crud-response-handler.js?v=1.0.0',
+                'scripts/services/investment-calculation-service.js?v=1.0.0',
+                'https://cdn.quilljs.com/1.3.7/quill.min.js',
+                'https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js',
+                'scripts/services/rich-text-editor-service.js?v=1.0.0'
+            ],
             'preferences': [
-                'scripts/preferences.js?v=1.0.0',
                 'scripts/preferences-core.js?v=1.0.0',
-                'scripts/preferences-page.js?v=1.0.0'
+                'scripts/preferences-page.js?v=1.0.0',
+                'scripts/preferences-group-manager.js?v=1.0.0'
             ],
             'validation': [
                 'scripts/validation-utils.js?v=1.0.0',

@@ -139,6 +139,9 @@ class EntityDetailsAPI {
             }
             
             const shouldLoadLinkedItems = options.includeLinkedItems !== false;
+            const expectedLinkedItemsCount = typeof entityData.linked_items_count === 'number'
+                ? entityData.linked_items_count
+                : null;
             if (shouldLoadLinkedItems) {
                 // בדיקה אם הבאקאנד כבר החזיר linked_items (כמו עבור ticker)
                 // חשוב: נבדוק אם השדה קיים גם אם הוא ריק (מערך ריק)
@@ -163,7 +166,10 @@ class EntityDetailsAPI {
                         if (window.Logger) {
                             window.Logger.info(`🔗 Loading linked items separately for ${entityType} ${entityId}...`, { page: "entity-details-api" });
                         }
-                        const linkedItems = await this.getLinkedItems(entityType, entityId);
+                        const linkedItems = await this.getLinkedItems(entityType, entityId, {
+                            forceRefresh: options.forceRefresh || (expectedLinkedItemsCount !== null && expectedLinkedItemsCount > 0),
+                            expectedCount: expectedLinkedItemsCount
+                        });
                         console.log(`🔗 [ENTITY-DETAILS-API] Linked items received for ${entityType} ${entityId}:`, {
                             count: linkedItems.length,
                             items: linkedItems
@@ -943,26 +949,40 @@ class EntityDetailsAPI {
      */
     async getLinkedItems(entityType, entityId, options = {}) {
         const cacheKey = `linked-items-${entityType}-${entityId}`;
+        const expectedCount = typeof options.expectedCount === 'number' ? options.expectedCount : null;
         
-            try {
-                // בדיקה במטמון אם לא forceRefresh
-                if (!options.forceRefresh && window.UnifiedCacheManager.initialized) {
-                    const cachedData = await window.UnifiedCacheManager.get(cacheKey, {
-                        layer: 'memory',
-                        fallback: null
-                    });
+        try {
+            // בדיקה במטמון אם לא forceRefresh
+            if (!options.forceRefresh && window.UnifiedCacheManager.initialized) {
+                const cachedData = await window.UnifiedCacheManager.get(cacheKey, {
+                    layer: 'memory',
+                    fallback: null
+                });
+                
+                if (cachedData !== null && Array.isArray(cachedData)) {
+                    const cachedCount = cachedData.length;
+                    const cacheMatchesExpectation = expectedCount === null || expectedCount === cachedCount;
                     
-                    if (cachedData !== null && Array.isArray(cachedData)) {
+                    if (cacheMatchesExpectation) {
                         if (window.Logger) {
                             window.Logger.debug(`✅ Linked items retrieved from cache for ${entityType} ${entityId}`, {
-                                count: cachedData.length,
+                                count: cachedCount,
+                                expectedCount,
                                 page: "entity-details-api"
                             });
                         }
                         return cachedData;
                     }
+                    
+                    // אם כמות הפריטים במטמון לא תואמת את מה שהשרת מבטיח, נרענן
+                    if (window.Logger) {
+                        window.Logger.info(`🔄 Cache mismatch for ${entityType} ${entityId} (cached=${cachedCount}, expected=${expectedCount}) - refreshing from API`, {
+                            page: "entity-details-api"
+                        });
+                    }
                 }
-            
+            }
+        
             // אם לא במטמון - טעינה מה-API
             const url = `/api/linked-items/${entityType}/${entityId}`;
             console.log(`🔗 [ENTITY-DETAILS-API] Fetching linked items from: ${url}`);

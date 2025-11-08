@@ -3143,33 +3143,65 @@ async function saveTrade() {
             stop_loss: { id: 'tradeStopLoss', type: 'float', default: null },
             take_profit: { id: 'tradeTakeProfit', type: 'float', default: null },
             entry_date: { id: 'tradeEntryDate', type: 'date' },
-            exit_date: { id: 'tradeExitDate', type: 'date', default: null },
             status: { id: 'tradeStatus', type: 'text' },
             notes: { id: 'tradeNotes', type: 'rich-text', default: null }
         });
+
+        if (tradeData.side) {
+            const normalizedSide = String(tradeData.side).trim().toLowerCase();
+            if (normalizedSide === 'long') {
+                tradeData.side = 'Long';
+            } else if (normalizedSide === 'short') {
+                tradeData.side = 'Short';
+            }
+        }
+        
+        const payload = {
+            trading_account_id: tradeData.trading_account_id,
+            ticker_id: tradeData.ticker_id,
+            status: tradeData.status,
+            side: tradeData.side,
+            type: tradeData.type,
+            investment_type: tradeData.type,
+            notes: tradeData.notes || null
+        };
+        
+        if (tradeData.entry_date) {
+            try {
+                const entryDate = new Date(tradeData.entry_date);
+                payload.created_at = entryDate.toISOString();
+            } catch (dateError) {
+                window.Logger.warn('Invalid entry date provided', { entryDate: tradeData.entry_date, error: dateError });
+            }
+        }
         
         // Validate data
         if (!window.validateEntityForm) {
             throw new Error('Validation system not available');
         }
         
-        const isValid = window.validateEntityForm('tradesModalForm', {
-            tradeTicker: { required: true },
-            tradeAccount: { required: true },
-            tradeSide: { required: true },
-            tradeType: { required: true },
-            tradeQuantity: { required: true, min: 1 },
-            tradeEntryPrice: { required: true, min: 0.01 },
-            tradeStopLoss: { required: false, min: 0.01 },
-            tradeTakeProfit: { required: false, min: 0.01 },
-            tradeEntryDate: { required: true },
-            tradeExitDate: { required: false },
-            tradeStatus: { required: true },
-            tradeNotes: { required: false, maxLength: 5000 }
-        });
+        const validationConfig = [
+            { id: 'tradeTicker', name: 'טיקר', rules: { required: true } },
+            { id: 'tradeAccount', name: 'חשבון מסחר', rules: { required: true } },
+            { id: 'tradeSide', name: 'צד', rules: { required: true } },
+            { id: 'tradeType', name: 'סוג השקעה', rules: { required: true } },
+            { id: 'tradeQuantity', name: 'כמות', rules: { required: true, min: 1 } },
+            { id: 'tradeEntryPrice', name: 'מחיר כניסה', rules: { required: true, min: 0.01 } },
+            { id: 'tradeStopLoss', name: 'Stop Loss', rules: { required: false, min: 0.01 } },
+            { id: 'tradeTakeProfit', name: 'Take Profit', rules: { required: false, min: 0.01 } },
+            { id: 'tradeStopLossPercent', name: 'Stop Loss (%)', rules: { required: false, min: 0.01 } },
+            { id: 'tradeTakeProfitPercent', name: 'Take Profit (%)', rules: { required: false, min: 0.01 } },
+            { id: 'tradeEntryDate', name: 'תאריך כניסה', rules: { required: true } },
+            { id: 'tradeStatus', name: 'סטטוס', rules: { required: true } }
+        ];
         
-        if (!isValid) {
+        const validationResult = window.validateEntityForm('tradesModalForm', validationConfig);
+        
+        if (!validationResult.isValid) {
             window.Logger.warn('Trade validation failed', { page: 'trades' });
+            if (validationResult.errorMessages?.length && window.showErrorNotification) {
+                window.showErrorNotification('שגיאת ולידציה', validationResult.errorMessages.join('\n'));
+            }
             return;
         }
         
@@ -3187,7 +3219,7 @@ async function saveTrade() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(tradeData)
+            body: JSON.stringify(payload)
         });
         
         // Use CRUDResponseHandler for consistent response handling

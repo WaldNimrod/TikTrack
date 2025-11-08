@@ -1,3 +1,35 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 12
+ * 
+ * DATA MANIPULATION (2)
+ * - sortLinkedItems() - מיון פריטים מקושרים - פתוחים ראשון, אחר כך תאריך
+ * - formatLinkedItemName() - פורמט שם נקי של פריט מקושר - הסרת קידומות סוג ישות
+ * 
+ * UI RENDERING (3)
+ * - getLinkedItemIcon() - קבלת נתיב איקון לסוג ישות
+ * - getLinkedItemColor() - קבלת צבע לסוג ישות
+ * - renderEmptyLinkedItems() - יצירת הודעת "אין פריטים" עם כפתור חיפוש
+ * 
+ * UTILITIES (3)
+ * - getEntityLabel() - קבלת שם תצוגה בעברית לסוג ישות
+ * - generateLinkedItemActions() - יצירת HTML של כפתורי פעולות לפריט מקושר
+ * - shouldShowAction() - בדיקה אם יש להציג פעולה מסוימת
+ * 
+ * PRIVATE HELPERS (4)
+ * - _getLinkedItemsFunctionForType() - קבלת פונקציית LINK לפי סוג ישות
+ * - _getEditFunctionForType() - קבלת פונקציית EDIT לפי סוג ישות
+ * - _getCancelFunctionForType() - קבלת פונקציית CANCEL/REACTIVATE לפי סוג ישות
+ * - _getDeleteFunctionForType() - קבלת פונקציית DELETE לפי סוג ישות
+ * 
+ * ==========================================
+ */
+
 /**
  * Linked Items Service - TikTrack
  * ===============================
@@ -18,6 +50,8 @@
  * @author TikTrack Development Team
  * 
  * תיעוד: documentation/02-ARCHITECTURE/FRONTEND/LINKED_ITEMS_SYSTEM.md
+ * 
+ * @class LinkedItemsService
  */
 
 // ===== LINKED ITEMS SERVICE =====
@@ -147,29 +181,24 @@ class LinkedItemsService {
      * קבלת צבע לסוג ישות
      * 
      * @param {string} entityType - סוג ישות
-     * @param {Object} options - אפשרויות (entityColors object או fallback)
+     * @param {Object} options - אפשרויות
+     * @param {Object} options.entityColors - אובייקט צבעים לפי סוג ישות
      * @returns {string} - קוד צבע hex
+     * 
+     * @throws {Error} אם entityType לא מוגדר
      * 
      * @example
      * const color = LinkedItemsService.getLinkedItemColor('trade', { entityColors: this.entityColors });
      */
     static getLinkedItemColor(entityType, options = {}) {
-        // ניסיון להשתמש ב-entityColors אם מסופק
+        if (!entityType) {
+            throw new Error('entityType is required');
+        }
+        
         if (options.entityColors && options.entityColors[entityType]) {
             return options.entityColors[entityType];
         }
         
-        // ניסיון להשתמש בפונקציה גלובלית
-        if (window.getEntityColor && typeof window.getEntityColor === 'function') {
-            try {
-                const color = window.getEntityColor(entityType);
-                if (color) return color;
-            } catch (e) {
-                // אם יש שגיאה, נמשיך ל-fallback
-            }
-        }
-        
-        // Fallback לצבעים בסיסיים
         const defaultColors = {
             'trade': '#007bff',
             'trade_plan': '#007bff',
@@ -191,21 +220,16 @@ class LinkedItemsService {
      * @param {string} entityType - סוג ישות
      * @returns {string} - שם תצוגה בעברית
      * 
+     * @throws {Error} אם entityType לא מוגדר
+     * 
      * @example
      * const label = LinkedItemsService.getEntityLabel('trade');
      */
     static getEntityLabel(entityType) {
-        // ניסיון להשתמש בפונקציה גלובלית
-        if (window.getEntityLabel && typeof window.getEntityLabel === 'function') {
-            try {
-                const label = window.getEntityLabel(entityType);
-                if (label) return label;
-            } catch (e) {
-                // אם יש שגיאה, נמשיך ל-fallback
-            }
+        if (!entityType) {
+            throw new Error('entityType is required');
         }
         
-        // Fallback למיפוי מקומי
         const labels = {
             'trade': 'טרייד',
             'trade_plan': 'תוכנית השקעה',
@@ -264,19 +288,6 @@ class LinkedItemsService {
         };
         
         const viewOptionsStr = buildObjectLiteral(viewOptions);
-        
-        if (window.Logger) {
-            // window.Logger.debug('🔗 [LinkedItemsService] Generating action button with sourceInfo', {
-            //     itemType: item.type,
-            //     itemId: item.id,
-            //     hasSourceInfo: !!options.sourceInfo,
-            //     sourceInfo: options.sourceInfo,
-            //     viewOptions: viewOptions,
-            //     viewOptionsStr: viewOptionsStr,
-            //     onclickCode: `window.showEntityDetails('${item.type}', ${item.id}, ${viewOptionsStr})`,
-            //     page: "linked-items-service"
-            // });
-        }
         
         // כפתור VIEW - עם העברת מידע על המקור
         // נבנה את הקוד עם single quotes בתוך המחרוזת (כי כבר בררנו אותם ב-buildObjectLiteral)
@@ -367,7 +378,7 @@ class LinkedItemsService {
                 <div class="text-muted text-center py-4">
                     <i class="fas fa-link fa-2x mb-3"></i>
                     <p>אין פריטים מקושרים</p>
-                    <button class="btn btn-outline-primary btn-sm mt-2" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], '${entityType}', ${entityId || 'null'})">
+                    <button class="btn btn-outline-primary btn-sm mt-2" onclick="window.showLinkedItemsModal([], '${entityType}', ${entityId || 'null'})">
                         <i class="fas fa-search me-1"></i>חפש פריטים מקושרים
                     </button>
                 </div>
@@ -392,12 +403,12 @@ class LinkedItemsService {
             'ticker': `viewLinkedItemsForTicker(${id})`,
             'trading_account': `viewLinkedItemsForAccount(${id})`,
             'alert': `viewLinkedItemsForAlert(${id})`,
-            'cash_flow': `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${id})`,
+            'cash_flow': `window.showLinkedItemsModal([], 'cash_flow', ${id})`,
             'execution': `viewLinkedItemsForExecution(${id})`,
             'note': `viewLinkedItemsForNote(${id})`
         };
         
-        return functions[type] || `window.showLinkedItemsModal && window.showLinkedItemsModal([], '${type}', ${id})`;
+        return functions[type] || `window.showLinkedItemsModal([], '${type}', ${id})`;
     }
     
     /**
@@ -412,12 +423,12 @@ class LinkedItemsService {
         const functions = {
             'trade': `editTradeRecord('${id}')`,
             'trade_plan': `editTradePlan('${id}')`,
-            'ticker': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${id})`,
+            'ticker': `window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${id})`,
             'trading_account': `editAccount('${id}')`,
             'alert': `editAlert(${id})`,
-            'cash_flow': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${id})`,
-            'execution': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('executionsModal', 'execution', ${id})`,
-            'note': `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('notesModal', 'note', ${id})`
+            'cash_flow': `window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${id})`,
+            'execution': `window.ModalManagerV2.showEditModal('executionsModal', 'execution', ${id})`,
+            'note': `window.ModalManagerV2.showEditModal('notesModal', 'note', ${id})`
         };
         
         return functions[type] || null;
@@ -438,19 +449,19 @@ class LinkedItemsService {
         if (isCancelled) {
             // Reactivate functions
             const reactivateFunctions = {
-                'trade': `window.reactivateTrade && window.reactivateTrade(${id})`,
-                'trade_plan': `window.reactivateTradePlan && window.reactivateTradePlan(${id})`,
-                'trading_account': `window.reactivateAccount && window.reactivateAccount(${id})`,
-                'alert': `window.reactivateAlert && window.reactivateAlert(${id})`
+                'trade': `window.reactivateTrade(${id})`,
+                'trade_plan': `window.reactivateTradePlan(${id})`,
+                'trading_account': `window.reactivateAccount(${id})`,
+                'alert': `window.reactivateAlert(${id})`
             };
             return reactivateFunctions[type] || null;
         } else {
             // Cancel functions
             const cancelFunctions = {
                 'trade': `cancelTradeRecord('${id}')`,
-                'trade_plan': `window.openCancelTradePlanModal && window.openCancelTradePlanModal(${id})`,
-                'trading_account': `window.cancelAccount && window.cancelAccount(${id})`,
-                'alert': `window.cancelAlert && window.cancelAlert(${id})`
+                'trade_plan': `window.openCancelTradePlanModal(${id})`,
+                'trading_account': `window.cancelAccount(${id})`,
+                'alert': `window.cancelAlert(${id})`
             };
             return cancelFunctions[type] || null;
         }
@@ -473,13 +484,22 @@ class LinkedItemsService {
     }
 }
 
-// הוספה לאובייקט הגלובלי
-if (typeof window !== 'undefined') {
-    window.LinkedItemsService = LinkedItemsService;
-    console.log('✅ LinkedItemsService loaded successfully');
-}
+// ===== GLOBAL EXPORT =====
 
-// Export for module systems
+/**
+ * הוספה לאובייקט הגלובלי
+ * 
+ * @global
+ * @name window.LinkedItemsService
+ * @type {LinkedItemsService}
+ */
+window.LinkedItemsService = LinkedItemsService;
+
+/**
+ * Export for module systems
+ * 
+ * @module LinkedItemsService
+ */
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = LinkedItemsService;
 }

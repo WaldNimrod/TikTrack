@@ -89,18 +89,10 @@
  *    - getTickerSymbol() - Get ticker symbol from global data
  *
  * 4. ITEM TYPE MANAGEMENT:
- *    - getItemTypeIcon() - Get icon for item type
- *    - getItemTypeDisplayName() - Get display name for item type
- *    - getTypeBadgeClass() - Get badge color class for item type
- *    - getStatusBadge() - Get status badge HTML with color coding
+ *    - Uses LinkedItemsService.getLinkedItemIcon() directly
+ *    - Uses LinkedItemsService.getEntityLabel() directly
  *
- * 5. ACTION BUTTONS:
- *    - viewItemDetails() - View item details
- *    - editItem() - Edit item
- *    - openItemPage() - Open item page
- *    - deleteItem() - Delete item
- *
- * 6. SPECIFIC ITEM TYPE HANDLERS:
+ * 5. SPECIFIC ITEM TYPE HANDLERS:
  *    - createTradeDetails() - Create trade details display
  *    - createAccountDetails() - Create account details display
  *    - createTickerDetails() - Create ticker details display
@@ -110,12 +102,8 @@
  *    - createTradePlanDetails() - Create trade plan details display
  *    - createExecutionDetails() - Create execution details display
  *
- * 7. UTILITY FUNCTIONS:
+ * 6. UTILITY FUNCTIONS:
  *    - exportLinkedItemsData() - Export linked items data
- *    - viewItemDetails() - View item details
- *    - editItem() - Edit item
- *    - deleteItem() - Delete item
- *    - openItemPage() - Open item page (currently shows "in development")
  *
  * DEPENDENCIES:
  * ============
@@ -244,7 +232,7 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
     console.error(error2);
     throw error2;
   } else {
-    modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
+    modalTitle = `פריטים מקושרים ל-${window.LinkedItemsService.getEntityLabel(itemType)}`;
   }
 
   // Add mode indicator to title
@@ -508,7 +496,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
       content += `
         <div class="alert alert-warning">
           <strong>ℹ️ לא נמצאו פריטים מקושרים</strong><br>
-          ל-${getItemTypeDisplayName(itemType)} זה אין פריטים מקושרים במערכת.
+          ל-${window.LinkedItemsService.getEntityLabel(itemType)} זה אין פריטים מקושרים במערכת.
         </div>
       `;
     }
@@ -525,7 +513,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
       content += `
         <div class="alert alert-warning">
           <strong>ℹ️ לא נמצאו פריטים מקושרים</strong><br>
-          ל-${getItemTypeDisplayName(itemType)} זה אין פריטים מקושרים במערכת.
+          ל-${window.LinkedItemsService.getEntityLabel(itemType)} זה אין פריטים מקושרים במערכת.
         </div>
       `;
     }
@@ -812,74 +800,6 @@ function getTradePlanDetails(planId, data = null) {
   }
 }
 
-/**
- * Get icon for item type
- *
- * Returns the appropriate icon for each item type
- * מעודכן להשתמש ב-LinkedItemsService ללוגיקה משותפת
- *
- * @param {string} type - Item type
- * @returns {string} Icon HTML
- */
-function getItemTypeIcon(type) {
-  // שימוש ב-LinkedItemsService אם זמין
-  if (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemIcon) {
-    const iconPath = window.LinkedItemsService.getLinkedItemIcon(type);
-    // המרת נתיב לאיקון ל-HTML עם גודל 48px
-    const iconName = iconPath.split('/').pop().replace('.svg', '');
-    return `<img src="${iconPath}" alt="${type}" class="linked-item-icon-img" width="48" height="48">`;
-  }
-  
-  // Fallback אם Service לא זמין
-  if (window.uiUtils && window.uiUtils.getItemTypeIcon) {
-    const globalIcon = window.uiUtils.getItemTypeIcon(type);
-    // החלף את הגודל ל-48px עבור חלון המקושרים (פי 2 מהמקורי)
-    return globalIcon.replace('width: 16px; height: 16px;', 'width: 48px; height: 48px;').replace('class="', 'class="linked-item-icon-img ');
-  }
-
-  // Fallback אחרון אם שום דבר לא זמין
-  const icons = {
-    'trade': '<img src="/images/icons/trades.svg" alt="טרייד" class="linked-item-icon-img" width="48" height="48">',
-    'trading_account': '<img src="/images/icons/trading_accounts.svg" alt="חשבון מסחר" class="linked-item-icon-img" width="48" height="48">',
-    'ticker': '<img src="/images/icons/tickers.svg" alt="טיקר" class="linked-item-icon-img" width="48" height="48">',
-    'alert': '<img src="/images/icons/alerts.svg" alt="התראה" class="linked-item-icon-img" width="48" height="48">',
-    'cash_flow': '<img src="/images/icons/cash_flows.svg" alt="תזרים מזומנים" class="linked-item-icon-img" width="48" height="48">',
-    'note': '<img src="/images/icons/notes.svg" alt="הערה" class="linked-item-icon-img" width="48" height="48">',
-    'trade_plan': '<img src="/images/icons/trade_plans.svg" alt="תכנון טרייד" class="linked-item-icon-img" width="48" height="48">',
-    'execution': '<img src="/images/icons/executions.svg" alt="ביצוע" class="linked-item-icon-img" width="48" height="48">',
-  };
-  return icons[type] || '<img src="/images/icons/home.svg" alt="דף הבית" class="linked-item-icon-img" width="48" height="48">';
-}
-
-/**
- * Get display name for item type
- *
- * Returns a human-readable display name for each item type
- * 
- * מעודכן להשתמש ב-LinkedItemsService ללוגיקה משותפת
- *
- * @param {string} type - Item type
- * @returns {string} Display name
- */
-function getItemTypeDisplayName(type) {
-  // שימוש ב-LinkedItemsService אם זמין
-  if (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) {
-    return window.LinkedItemsService.getEntityLabel(type);
-  }
-  
-  // Fallback אם Service לא זמין
-  const names = {
-    'trade': 'טרייד',
-    'trading_account': 'חשבון מסחר',
-    'ticker': 'טיקר',
-    'alert': 'התראה',
-    'cash_flow': 'תזרים מזומנים',
-    'note': 'הערה',
-    'trade_plan': 'תוכנית השקעה',
-    'execution': 'ביצוע',
-  };
-  return names[type] || 'פריט';
-}
 
 /**
  * Create basic item info for display
@@ -1131,7 +1051,7 @@ function createCashFlowDetails(item) {
 function createNoteDetails(item) {
   let details = '';
   if (item.related_object_type && item.related_object_id) {
-    const objectType = getItemTypeDisplayName(item.related_object_type);
+    const objectType = window.LinkedItemsService.getEntityLabel(item.related_object_type);
     const objectId = item.related_object_id;
     details += `<div><strong>קשור ל:</strong> ${objectType} #${objectId}</div>`;
   }
@@ -1269,7 +1189,7 @@ function createCSVFromLinkedItems(data, itemType, itemId) {
 
     return [
       item.id || '',
-      getItemTypeDisplayName(item.type) || '',
+      window.LinkedItemsService.getEntityLabel(item.type) || '',
       item.title || '',
       item.description || '',
       item.status || '',
@@ -1324,124 +1244,6 @@ function downloadCSV(csvContent, filename) {
  * @param {string} type - Item type
  * @param {string|number} id - Item ID
  */
-/**
- * View item details - צפייה בפרטי פריט מקושר
- * 
- * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
- * 
- * פונקציה זו לא משמשת יותר כי משתמשים ב-LinkedItemsService.generateLinkedItemActions()
- * שיוצר כפתורי פעולות עם data-onclick שמקושרים ישירות ל-window.showEntityDetails().
- * 
- * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
- * @param {string} type - סוג הפריט
- * @param {number|string} id - מזהה הפריט
- */
-function viewItemDetails(type, id) {
-  try {
-    // וידוא ש-showEntityDetails זמין
-    if (window.showEntityDetails) {
-      // שמירת הקשר למודול המקור (linked items) במערכת הניווט
-      if (window.modalNavigationManager && window.modalNavigationManager.modalHistory.length > 0) {
-        const currentModal = window.modalNavigationManager.modalHistory[window.modalNavigationManager.modalHistory.length - 1];
-        if (currentModal && currentModal.info) {
-          // שמירת מידע על המודול המקור
-          const sourceInfo = {
-            sourceModal: 'linked-items',
-            sourceType: currentModal.info.entityType,
-            sourceId: currentModal.info.entityId
-          };
-          
-          // פתיחת entity details modal עם מידע על המקור
-          window.showEntityDetails(type, id, {
-            source: sourceInfo,
-            includeLinkedItems: true // תמיד לכלול פריטים מקושרים במודול החדש
-          });
-        } else {
-          // אם אין מידע על המקור, פתיחה רגילה
-          window.showEntityDetails(type, id, {
-            includeLinkedItems: true
-          });
-        }
-      } else {
-        // אם אין modal navigation manager, פתיחה רגילה
-        window.showEntityDetails(type, id, {
-          includeLinkedItems: true
-        });
-      }
-    } else {
-      window.Logger?.warn('showEntityDetails not available', { page: "linked-items" });
-      if (window.showErrorNotification) {
-        window.showErrorNotification('שגיאה: לא ניתן לפתוח פרטי ישות - המערכת לא זמינה');
-      }
-    }
-  } catch (error) {
-    window.Logger?.error('Error in viewItemDetails:', error, { page: "linked-items" });
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה בפתיחת פרטי הישות');
-    }
-  }
-}
-
-/**
- * Edit item
- *
- * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
- * 
- * פונקציה זו לא משמשת יותר כי משתמשים ב-LinkedItemsService.generateLinkedItemActions()
- * שיוצר כפתורי פעולות עם data-onclick שמקושרים ישירות לפונקציות העריכה המתאימות.
- * 
- * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
- * @param {string} type - Item type
- * @param {string|number} id - Item ID
- */
-function editItem(type, id) {
-  // Editing item
-  // Implementation for editing item
-}
-
-/**
- * Delete item
- *
- * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
- * 
- * פונקציה זו לא משמשת יותר כי משתמשים ב-LinkedItemsService.generateLinkedItemActions()
- * שיוצר כפתורי פעולות עם data-onclick שמקושרים ישירות לפונקציות המחיקה המתאימות.
- * 
- * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
- * @param {string} type - Item type
- * @param {string|number} id - Item ID
- */
-function deleteItem(type, id) {
-  // Deleting item
-  // Implementation for deleting item
-}
-
-/**
- * Open item page
- *
- * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
- * 
- * פונקציה זו לא משמשת יותר כי משתמשים ב-LinkedItemsService.generateLinkedItemActions()
- * שיוצר כפתורי פעולות עם data-onclick שמקושרים ישירות לפונקציות המתאימות.
- * 
- * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
- * @param {string} itemType - Item type
- * @param {number|string} itemId - Item ID
- */
-function openItemPage(itemType, itemId) {
-
-  // Show development message
-  if (typeof window.showNotification === 'function') {
-    window.showNotification('פתיחת דף רשומה - בפיתוח', 'info');
-  } else {
-    if (typeof window.showInfoNotification === 'function') {
-      window.showInfoNotification('פיתוח', 'פתיחת דף רשומה - בפיתוח');
-    }
-  }
-
-  // Future implementation: navigate to item page
-  // window.location.href = `/${itemType}/${itemId}`;
-}
 
 // ===== SPECIFIC TABLE FUNCTIONS =====
 /**
@@ -1515,75 +1317,6 @@ function viewLinkedItemsForExecution(executionId) {
  */
 
 
-/**
- * Get badge class for item type
- * 
- * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
- * 
- * פונקציה זו לא משמשת יותר כי משתמשים ב-EntityDetailsRenderer.renderLinkedItems()
- * שכבר מטפל בכל הרנדור של פריטים מקושרים.
- * 
- * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
- * @param {string} type - Item type
- * @returns {string} Badge CSS class
- */
-function getTypeBadgeClass(type) {
-  const badgeClasses = {
-    'trade': 'bg-primary',
-    'trading_account': 'bg-success',
-    'ticker': 'bg-info',
-    'alert': 'bg-warning',
-    'cash_flow': 'bg-secondary',
-    'note': 'bg-dark',
-    'trade_plan': 'bg-primary',
-    'execution': 'bg-success',
-  };
-  return badgeClasses[type] || 'bg-secondary';
-}
-
-/**
- * Get status badge HTML
- *
- * ⚠️ DEPRECATED - קוד ישן שלא בשימוש
- * 
- * פונקציה זו לא משמשת יותר כי משתמשים ב-EntityDetailsRenderer.renderLinkedItems()
- * שכבר משתמש ב-FieldRendererService.renderStatus() לרנדור סטטוס.
- * 
- * @deprecated לא בשימוש - נשאר רק לתאימות לאחור
- * @param {string} status - Item status
- * @returns {string} Status badge HTML
- */
-function getStatusBadge(status) {
-  if (!status) {return '';}
-
-  // סולם הצבעים הזהה לעמודי הטבלאות
-  const statusClasses = {
-    'open': 'status-badge status-open',
-    'closed': 'status-badge status-closed',
-    'active': 'status-badge status-active',
-    'completed': 'status-badge status-completed',
-    'pending': 'status-badge status-pending',
-    'cancelled': 'status-badge status-cancelled',
-    'inactive': 'status-badge status-inactive',
-    'archived': 'status-badge status-archived',
-  };
-
-  const statusText = {
-    'open': 'פתוח',
-    'closed': 'סגור',
-    'active': 'פעיל',
-    'completed': 'הושלם',
-    'pending': 'ממתין',
-    'cancelled': 'בוטל',
-    'inactive': 'לא פעיל',
-    'archived': 'בארכיון',
-  };
-
-  const badgeClass = statusClasses[status] || 'status-badge status-inactive';
-  const badgeText = statusText[status] || status;
-
-  return `<span class="${badgeClass}">${badgeText}</span>`;
-}
 
 // ===== UNIFIED RELATED OBJECT DISPLAY SYSTEM =====
 
@@ -1955,14 +1688,6 @@ window.checkLinkedItemsAndPerformAction = checkLinkedItemsAndPerformAction;
 window.createCSVFromLinkedItems = createCSVFromLinkedItems;
 window.downloadCSV = downloadCSV;
 window.createDetailedItemInfo = createDetailedItemInfo;
-window.getItemTypeIcon = getItemTypeIcon;
-window.getItemTypeDisplayName = getItemTypeDisplayName;
-window.getTypeBadgeClass = getTypeBadgeClass;
-window.getStatusBadge = getStatusBadge;
-
-window.viewItemDetails = viewItemDetails;
-window.editItem = editItem;
-window.deleteItem = deleteItem;
 
 // Specific table functions
 window.viewLinkedItemsForTrade = viewLinkedItemsForTrade;
@@ -1992,18 +1717,11 @@ window.linkedItems = {
   createCSVFromLinkedItems,
   downloadCSV,
   createDetailedItemInfo,
-  getItemTypeIcon,
-  getItemTypeDisplayName,
-  getTypeBadgeClass,
-  getStatusBadge,
 
   // New unified linked items checking functions
   checkLinkedItemsBeforeAction,
   checkLinkedItemsAndPerformAction,
 
-  viewItemDetails,
-  editItem,
-  deleteItem,
   viewLinkedItemsForTrade,
   viewLinkedItemsForAccount,
   viewLinkedItemsForTicker,

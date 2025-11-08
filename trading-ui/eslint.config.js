@@ -98,8 +98,6 @@ module.exports = [
         'updateStatusFilterDisplayText': 'readonly',
         'updateTypeFilterDisplayText': 'readonly',
         'updateDateRangeFilterDisplayText': 'readonly',
-        // Linked items functions
-        'getItemTypeDisplayName': 'readonly',
         // Ticker functions from tickers.js
         'getTickerSymbol': 'readonly',
         // Notification system functions from notification-system.js

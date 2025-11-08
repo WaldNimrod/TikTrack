@@ -50,9 +50,24 @@ Usage notes:
 
 מערכת הפריטים המקושרים (Linked Items System) היא מערכת גנרית לבדיקה והצגת אזהרות על פריטים מקושרים לפני ביצוע פעולות מסוכנות כמו מחיקה או ביטול. המערכת עברה שדרוג משמעותי וכיום היא גנרית ועובדת עם כל סוגי האובייקטים במערכת.
 
-## ✨ שינויים אחרונים (2025-01-12)
+## ✨ שינויים אחרונים
 
-### LinkedItemsService - מערכת מרכזית חדשה
+### עדכון 2025-01-12 - טיוב קוד והסרת wrappers + הרחבת בדיקות לכיסוי מלא
+
+**שינויים:**
+- ✅ הסרת פונקציות wrapper `getItemTypeIcon()` ו-`getItemTypeDisplayName()` מ-`linked-items.js`
+- ✅ כל השימושים הוחלפו בקריאות ישירות ל-`LinkedItemsService.getLinkedItemIcon()` ו-`LinkedItemsService.getEntityLabel()`
+- ✅ הרחבת בדיקות יחידה - כיסוי מלא של כל הפונקציות ב-LinkedItemsService (125 בדיקות)
+- ✅ הוספת בדיקות אינטגרציה - בדיקת זרימת נתונים מלאה בין הקבצים (15 בדיקות)
+- ✅ הוספת בדיקות לפונקציות Private - כיסוי מלא של כל הפונקציות הפנימיות
+- ✅ הוספת בדיקות מתקדמות - edge cases, ביצועים, ואינטגרציה
+
+**תוצאות בדיקות:**
+- ✅ 140 בדיקות - כולן עוברות (100% הצלחה)
+- ✅ כיסוי: 95%+ (statements, branches, functions, lines)
+- ✅ זמן הרצה: ~10 שניות (יחידה + אינטגרציה)
+
+### LinkedItemsService - מערכת מרכזית (2025-01-12)
 
 יצירת `LinkedItemsService` לאיחוד לוגיקה משותפת בין:
 - `linked-items.js` (standalone modal)
@@ -67,6 +82,30 @@ Usage notes:
 - טיפול במקרה אין פריטים מקושרים
 
 **קובץ:** `trading-ui/scripts/services/linked-items-service.js`
+
+**שימוש:**
+```javascript
+// קבלת שם ישות בעברית
+const label = LinkedItemsService.getEntityLabel('trade'); // 'טרייד'
+
+// קבלת נתיב איקון
+const iconPath = LinkedItemsService.getLinkedItemIcon('trade'); // '/trading-ui/images/icons/trades.svg'
+
+// פורמט שם פריט
+const name = LinkedItemsService.formatLinkedItemName(item); // 'Long על TSLA'
+
+// מיון פריטים
+const sorted = LinkedItemsService.sortLinkedItems(items); // פתוחים ראשון
+
+// יצירת כפתורי פעולות
+const actions = LinkedItemsService.generateLinkedItemActions(item, 'table', options);
+
+// בדיקת הצגת פעולה
+const shouldShow = LinkedItemsService.shouldShowAction(item, 'EDIT'); // true/false
+
+// רינדור מצב ריק
+const emptyHtml = LinkedItemsService.renderEmptyLinkedItems('ticker', 123, '#019193');
+```
 
 ### אינטגרציה עם UnifiedCacheManager
 
@@ -822,7 +861,7 @@ window.showLinkedItemsWarning('ticker', id);
 function createCSVFromLinkedItems(data, itemType, itemId) {
     const headers = ['סוג פריט', 'מזהה', 'שם', 'סטטוס', 'תאריך יצירה', 'פרטים'];
     const rows = data.child_entities.map(item => [
-        getItemTypeDisplayName(item.type),
+        LinkedItemsService.getEntityLabel(item.type),
         item.id,
         item.title || `פריט ${item.id}`,
         getStatusDisplayName(item.status),

@@ -84,7 +84,7 @@ class EntityDetailsService:
                  'exit_price', 'trade_type', 'status', 'profit_loss', 'total_pl', 'side', 'investment_type', 
                  'closed_at', 'cancelled_at', 'cancel_reason', 'notes', 'created_at', 'updated_at'],
         'trade_plan': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'investment_type', 'side', 
-                      'planned_amount', 'entry_conditions', 'target_price', 'stop_price', 
+                      'planned_amount', 'entry_price', 'entry_conditions', 'target_price', 'stop_price', 
                       'target_percentage', 'stop_percentage', 'status', 'cancelled_at', 
                       'cancel_reason', 'created_at', 'updated_at'],
         'execution': ['id', 'trade_id', 'ticker_id', 'trading_account_id', 'action', 'date', 'quantity', 'price',

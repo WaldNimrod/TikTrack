@@ -541,9 +541,10 @@ class EntityDetailsRenderer {
      * @public
      */
     renderTrade(tradeData, options = {}) {
-        const entityColor = this.entityColors.trade || '#007bff';
-        
-        // סטטוס - שימוש במערכת הרינדור הכללית
+        try {
+            const entityColor = this.entityColors.trade || '#007bff';
+            
+            // סטטוס - שימוש במערכת הרינדור הכללית
         const statusDisplay = window.FieldRendererService.renderStatus(tradeData.status, 'trade');
         
         // טיקר - נחלץ מה-tickerObject או מה-ticker_symbol
@@ -670,14 +671,12 @@ class EntityDetailsRenderer {
                         })()}
                     </div>
                 </div>
-                
-                <div class="row g-3 mt-4">
-                    <div class="col-12">
-                        ${this.renderActionButtons('trade', tradeData.id, tradeData, options?.sourceInfo || null)}
-                    </div>
-                </div>
             </div>
         `;
+        } catch (error) {
+            window.Logger?.error('Error in renderTrade:', error, { page: "entity-details-renderer" });
+            return this.renderError(`שגיאה ברנדור טרייד: ${error.message || error}`);
+        }
     }
 
     /**
@@ -689,8 +688,9 @@ class EntityDetailsRenderer {
      * @private
      */
     renderTradeSpecific(tradeData, tradeColor = null) {
-        const color = tradeColor || this.entityColors.trade || '#007bff';
-        const FieldRenderer = window.FieldRendererService || null;
+        try {
+            const color = tradeColor || this.entityColors.trade || '#007bff';
+            const FieldRenderer = window.FieldRendererService || null;
         
         // Trade Plan Link
         const tradePlanId = tradeData.trade_plan_id || null;
@@ -880,9 +880,14 @@ class EntityDetailsRenderer {
         let mtmPLPercent = null;
         let totalPLPercent = null;
         
-        // Realized P/L אחוז - יחסית למחיר הממוצע של המכירות
-        if (hasSales && hasRealizedPLData && totalSoldAverage > 0) {
-            realizedPLPercent = (realizedPL / (totalSoldQuantity * totalSoldAverage)) * 100;
+        // Realized P/L אחוז - יחסית למחיר הממוצע של הקניות שנמכרו
+        // השלם: סכום הקניות שנמכרו (מחיר ממוצע קניות * כמות שנמכרה)
+        if (hasSales && hasRealizedPLData && totalBoughtAverage > 0 && totalSoldQuantity > 0) {
+            // חישוב: רווח/הפסד מוכר / (מחיר ממוצע קניות * כמות שנמכרה) * 100
+            const soldCostBasis = totalBoughtAverage * totalSoldQuantity;
+            if (soldCostBasis > 0) {
+                realizedPLPercent = (realizedPL / soldCostBasis) * 100;
+            }
         }
         
         // Unrealized P/L אחוז - יחסית למחיר הממוצע של הפוזיציה
@@ -951,9 +956,15 @@ class EntityDetailsRenderer {
         // חישוב אחוז מהחשבון - שימוש בנתונים מה-backend
         let accountTotalValue = tradeData.account_total_value || 0;
         
-        // חישוב אחוז מהחשבון
+        // חישוב אחוז מהחשבון עבור פוזיציה בפועל
         if (accountTotalValue > 0 && positionMarketValue > 0) {
             positionPercentOfAccount = (positionMarketValue / accountTotalValue) * 100;
+        }
+        
+        // חישוב אחוז מהחשבון עבור תכנון
+        let plannedPercentOfAccount = 0;
+        if (accountTotalValue > 0 && plannedAmount > 0) {
+            plannedPercentOfAccount = (plannedAmount / accountTotalValue) * 100;
         }
         
         // פורמט כמות - ספרה אחת אחרי הנקודה
@@ -988,11 +999,11 @@ class EntityDetailsRenderer {
         
         // פונקציה עזר לפורמט P/L עם אחוזים
         const formatPLWithPercent = (plValue, plPercent, hasData) => {
-            if (!hasData) return null;
-            if (plValue === null || plValue === undefined) return null;
+            if (!hasData) return formatAmount(plValue || 0);
+            if (plValue === null || plValue === undefined) return formatAmount(0);
             
             const plFormatted = formatAmount(plValue);
-            if (plPercent !== null && plPercent !== undefined) {
+            if (plPercent !== null && plPercent !== undefined && !isNaN(plPercent)) {
                 return `${plFormatted} <span class="text-muted">(${plPercent >= 0 ? '+' : ''}${plPercent.toFixed(2)}%)</span>`;
             }
             return plFormatted;
@@ -1039,6 +1050,11 @@ class EntityDetailsRenderer {
                                 <td style="border: none; padding: 8px;">${formatAmount(positionMarketValue)}</td>
                             </tr>
                             <tr>
+                                <td style="border: none; padding: 8px;"><strong>אחוז מהחשבון:</strong></td>
+                                <td style="border: none; padding: 8px;">${plannedPercentOfAccount > 0 ? formatPercent(plannedPercentOfAccount) : '-'}</td>
+                                <td style="border: none; padding: 8px;">${positionPercentOfAccount > 0 ? formatPercent(positionPercentOfAccount) : '-'}</td>
+                            </tr>
+                            <tr>
                                 <td style="border: none; padding: 8px;"><strong>מחיר כניסה:</strong></td>
                                 <td style="border: none; padding: 8px;">${formatAveragePrice(plannedEntryPrice)}</td>
                                 <td style="border: none; padding: 8px;">${formatAveragePrice(positionAveragePrice)}</td>
@@ -1073,14 +1089,6 @@ class EntityDetailsRenderer {
                             </tbody>
                         </table>
                     </div>
-                    ${positionPercentOfAccount > 0 ? `
-                    <div class="mt-2 pt-2" style="border-top: 1px solid #e0e0e0;">
-                        <div class="d-flex align-items-center">
-                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">אחוז מהחשבון:</label>
-                            <span>${formatPercent(positionPercentOfAccount)}</span>
-                        </div>
-                    </div>
-                    ` : ''}
                     <div class="mt-2 pt-2" style="border-top: 1px solid #e0e0e0;">
                         <div class="d-flex align-items-center mb-2">
                             <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">Realized P/L:</label>
@@ -1102,6 +1110,15 @@ class EntityDetailsRenderer {
                 </div>
             </div>
         `;
+        } catch (error) {
+            window.Logger?.error('Error in renderTradeSpecific:', error, { page: "entity-details-renderer" });
+            return `<div class="trade-specific">
+                <h6 class="border-bottom pb-2 mb-3">פרטי טרייד</h6>
+                <div class="alert alert-danger">
+                    שגיאה ברנדור: ${error.message || error}
+                </div>
+            </div>`;
+        }
     }
 
     /**
@@ -1248,7 +1265,7 @@ class EntityDetailsRenderer {
                         <span>${renderAmount(tradePlanData.planned_amount, 2)}</span>
                     </div>
                     <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                        <span class="text-muted">מחיר כניסה</span>
+                        <span class="text-muted">מחיר כניסה מתוכנן</span>
                         <span>${tradePlanData.entry_price ? renderAmount(tradePlanData.entry_price, 2) : '<span class="text-muted">לא הוגדר</span>'}</span>
                     </div>
                     <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
@@ -1693,6 +1710,15 @@ class EntityDetailsRenderer {
     renderLinkedItems(linkedItems = [], entityColor = '#6c757d', parentEntityType = 'entity', parentEntityId = '0', sourceInfo = null, options = {}) {
         try {
             const items = Array.isArray(linkedItems) ? linkedItems.filter(Boolean) : [];
+            window.Logger?.info('🔍 [renderLinkedItems] Starting render', { 
+                itemsCount: items.length, 
+                parentEntityType, 
+                parentEntityId,
+                items: items.slice(0, 3), // Show first 3 items for debugging
+                itemsIsArray: Array.isArray(items),
+                itemsType: typeof items
+            }, { page: 'entity-details-renderer' });
+            
             console.log('🔍 [renderLinkedItems] Starting render', { 
                 itemsCount: items.length, 
                 parentEntityType, 

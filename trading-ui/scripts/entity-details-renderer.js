@@ -3100,93 +3100,57 @@ class EntityDetailsRenderer {
             `;
         }
         
-        const attachmentPath = String(attachment);
-        const fileName = this._extractAttachmentFileName(attachmentPath);
-        const fileUrl = `/api/notes/files/${encodeURI(attachmentPath)}`;
-        const attachmentMeta = this._getAttachmentMeta(fileName);
-        const extension = attachmentMeta.extension;
-        
-        let previewHtml = '';
-        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(extension)) {
-            previewHtml = `
-                <div class="border rounded bg-light p-2 text-center mb-2">
-                    <img src="${fileUrl}" alt="${escapeHtml(fileName)}" class="img-fluid rounded" style="max-height: 220px; object-fit: contain;" loading="lazy" />
-                </div>
-            `;
-        } else if (extension === 'pdf') {
-            previewHtml = `
-                <div class="border rounded bg-light p-2 mb-2">
-                    <embed src="${fileUrl}" type="application/pdf" class="w-100" style="height: 240px;" />
-                </div>
-            `;
-        } else {
-            previewHtml = `
-                <div class="border rounded bg-light p-3 d-flex align-items-center gap-2 mb-2">
-                    <span class="fs-4">${attachmentMeta.icon}</span>
-                    <span class="text-break" title="${escapeHtml(fileName)}">${escapeHtml(attachmentMeta.displayName)}</span>
+        if (!window.FieldRendererService || typeof window.FieldRendererService.renderAttachment !== 'function') {
+            const safePath = String(attachment || '');
+            const fileUrl = `/api/notes/files/${encodeURI(safePath)}`;
+            return `
+                <div class="note-attachment-section">
+                    ${headerHtml}
+                    <div class="text-muted">קובץ מצורף</div>
+                    <a href="${fileUrl}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
+                        פתיחת קובץ
+                    </a>
                 </div>
             `;
         }
-        
+
+        const attachmentRender = window.FieldRendererService.renderAttachment(noteData, {
+            attachmentPathKey: 'attachment',
+            fileNameKey: 'attachment',
+            baseUrl: '/api/notes/files/',
+            previewMaxHeight: 220,
+            pdfHeight: 240,
+            showExtension: false,
+            download: true,
+            iconClass: 'fs-5',
+            linkClass: 'd-inline-flex align-items-center gap-2 text-break fw-semibold',
+            labelStrategy: 'full',
+            metaWrapperClass: 'd-flex align-items-center gap-2 flex-wrap'
+        });
+
+        if (!attachmentRender || !attachmentRender.hasAttachment) {
+            return `
+                <div class="note-attachment-section">
+                    ${headerHtml}
+                    <span class="text-muted">אין קובץ מצורף</span>
+                </div>
+            `;
+        }
+
+        const metaSection = `
+            <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+                ${attachmentRender.linkHtml}
+                ${attachmentRender.extensionBadgeHtml || ''}
+            </div>
+        `;
+
         return `
             <div class="note-attachment-section">
                 ${headerHtml}
-                ${previewHtml}
-                <div class="d-flex align-items-center gap-2 mb-3 text-break">
-                    <span class="fs-5">${attachmentMeta.icon}</span>
-                    <span class="text-break" title="${escapeHtml(fileName)}">${escapeHtml(attachmentMeta.label)}</span>
-                </div>
-                <a href="${fileUrl}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
-                    פתיחת קובץ
-                </a>
+                ${attachmentRender.previewHtml || ''}
+                ${metaSection}
             </div>
         `;
-    }
-    
-    _extractAttachmentFileName(attachment) {
-        if (!attachment) {
-            return '';
-        }
-        
-        const parts = String(attachment).split(/[/\\]/);
-        return parts[parts.length - 1];
-    }
-    
-    _getAttachmentMeta(fileName = '') {
-        const safeName = String(fileName || '').trim();
-        const extension = (safeName.split('.').pop() || '').toLowerCase();
-        let icon = '📄';
-        
-        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(extension)) {
-            icon = '🖼️';
-        } else if (extension === 'pdf') {
-            icon = '📕';
-        } else if (['doc', 'docx'].includes(extension)) {
-            icon = '📘';
-        } else if (['xls', 'xlsx'].includes(extension)) {
-            icon = '📊';
-        } else if (extension === 'txt') {
-            icon = '📄';
-        }
-        
-        const maxLength = 30;
-        const displayName = safeName || 'קובץ מצורף';
-        const label = displayName.length > maxLength
-            ? `${displayName.substring(0, maxLength).trimEnd()}…`
-            : displayName;
-        
-        const shortLabelLength = 10;
-        const tableStyleLabel = displayName.length > shortLabelLength
-            ? `${displayName.substring(0, shortLabelLength)}…`
-            : displayName;
-        
-        return {
-            icon,
-            extension,
-            displayName,
-            label,
-            tableStyleLabel
-        };
     }
     renderGeneric(entityData, entityType, options) { return '<div>ישות כללית</div>'; }
     

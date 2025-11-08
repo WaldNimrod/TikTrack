@@ -615,6 +615,110 @@ class FieldRendererService {
         </div>`;
     }
 
+    /**
+     * Render attachment preview and download link
+     * 
+     * @param {Object|string} attachmentInput - attachment path or object with attachment data
+     * @param {Object} options - rendering options
+     * @returns {Object} - rendering fragments (hasAttachment, previewHtml, linkHtml, metaHtml, etc.)
+     */
+    static renderAttachment(attachmentInput, options = {}) {
+        const normalized = this._normalizeAttachmentInput(attachmentInput, options);
+        if (!normalized.attachmentPath) {
+            return {
+                hasAttachment: false,
+                previewHtml: '',
+                linkHtml: '',
+                metaHtml: '',
+                extensionBadgeHtml: '',
+                downloadUrl: '',
+                meta: null,
+                fileName: '',
+                attachmentPath: ''
+            };
+        }
+
+        const { meta, downloadUrl, fileName } = normalized;
+        const previewMaxHeight = Number(options.previewMaxHeight || options.imageMaxHeight || 220);
+        const pdfHeight = Number(options.pdfHeight || 240);
+        const previewEnabled = options.preview !== false;
+
+        let previewHtml = '';
+        if (previewEnabled) {
+            if (meta.isImage) {
+                previewHtml = `
+                    <div class="${options.imagePreviewWrapperClass || 'attachment-preview-image border rounded bg-light p-2 text-center mb-2'}">
+                        <img src="${downloadUrl}" alt="${this._escapeHtml(meta.displayName || fileName)}" class="${options.imageClass || 'img-fluid rounded'}" style="max-height: ${previewMaxHeight}px; object-fit: contain;" loading="lazy" decoding="async" />
+                    </div>
+                `;
+            } else if (meta.isPdf) {
+                previewHtml = `
+                    <div class="${options.pdfPreviewWrapperClass || 'attachment-preview-pdf border rounded bg-light p-2 mb-2'}">
+                        <embed src="${downloadUrl}" type="application/pdf" class="${options.pdfClass || 'w-100'}" style="height: ${pdfHeight}px;" />
+                    </div>
+                `;
+            } else if (typeof options.customPreview === 'function') {
+                previewHtml = options.customPreview({ downloadUrl, meta, fileName, attachmentPath: normalized.attachmentPath }) || '';
+            }
+        }
+
+        const iconClass = options.iconClass || 'fs-5';
+        const linkClass = options.linkClass || 'attachment-file-link d-inline-flex align-items-center gap-2 text-break fw-semibold';
+        const titleAttr = this._escapeHtml(meta.displayName || fileName);
+        const downloadAttr = options.download === false ? '' : ` download="${this._escapeHtml(fileName)}"`;
+        const targetAttr = options.openInSameTab ? '' : ' target="_blank" rel="noopener"';
+        const labelStrategy = options.labelStrategy || 'label';
+        let linkLabel = meta.label || fileName;
+        if (labelStrategy === 'full') {
+            linkLabel = meta.displayName || fileName;
+        } else if (labelStrategy === 'short') {
+            linkLabel = meta.tableStyleLabel || meta.label || fileName;
+        }
+
+        const iconHtml = `<span class="${iconClass}">${meta.icon}</span>`;
+        const linkHtml = `
+            <a href="${downloadUrl}"${targetAttr} class="${linkClass}"${downloadAttr} title="${titleAttr}">
+                ${iconHtml}
+                <span class="attachment-file-name" dir="auto">${this._escapeHtml(linkLabel)}</span>
+            </a>
+        `;
+
+        const extensionBadgeHtml = (options.showExtension === false || !meta.extension)
+            ? ''
+            : `<span class="${options.extensionBadgeClass || 'badge bg-light text-dark attachment-extension-badge'}">${this._escapeHtml(meta.extension.toUpperCase())}</span>`;
+
+        const metaWrapperClass = options.metaWrapperClass || 'attachment-meta d-flex align-items-center gap-2 flex-wrap';
+        const metaHtml = `
+            <div class="${metaWrapperClass}">
+                ${linkHtml}
+                ${extensionBadgeHtml}
+            </div>
+        `;
+
+        const containerClass = options.containerClass || 'attachment-display';
+        const containerHtml = options.withContainer === false
+            ? ''
+            : `
+                <div class="${containerClass}">
+                    ${previewHtml}
+                    ${metaHtml}
+                </div>
+            `;
+
+        return {
+            hasAttachment: true,
+            previewHtml,
+            linkHtml,
+            metaHtml,
+            extensionBadgeHtml,
+            containerHtml,
+            downloadUrl,
+            meta,
+            fileName,
+            attachmentPath: normalized.attachmentPath
+        };
+    }
+
     // Backwards-compatible alias (generic naming enforced)
     static renderLinkedObject(relatedType, relatedId, displayName = '') {
         return this.renderLinkedEntity(relatedType, relatedId, displayName);
@@ -717,6 +821,146 @@ class FieldRendererService {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
+    }
+
+    static _normalizeAttachmentInput(attachmentInput, options = {}) {
+        const pathKeys = [
+            options.pathKey,
+            options.attachmentPathKey,
+            'attachment',
+            'path',
+            'file_path',
+            'filePath',
+            'url',
+            'href'
+        ].filter(Boolean);
+
+        const nameKeys = [
+            options.fileNameKey,
+            'fileName',
+            'file_name',
+            'filename',
+            'name',
+            'original_name'
+        ].filter(Boolean);
+
+        let attachmentPath = '';
+        let fileName = options.fileName ? String(options.fileName).trim() : '';
+
+        if (attachmentInput && typeof attachmentInput === 'object' && !(attachmentInput instanceof String)) {
+            for (const key of pathKeys) {
+                if (attachmentInput[key]) {
+                    attachmentPath = attachmentInput[key];
+                    break;
+                }
+            }
+            if (!attachmentPath && attachmentInput.attachment !== undefined) {
+                attachmentPath = attachmentInput.attachment;
+            }
+            if (!fileName) {
+                for (const key of nameKeys) {
+                    if (attachmentInput[key]) {
+                        fileName = String(attachmentInput[key]).trim();
+                        break;
+                    }
+                }
+            }
+        } else if (attachmentInput !== null && attachmentInput !== undefined) {
+            attachmentPath = attachmentInput;
+        }
+
+        attachmentPath = String(attachmentPath || '').trim();
+        if (!attachmentPath) {
+            return { attachmentPath: '', fileName: '', meta: null, downloadUrl: '' };
+        }
+
+        if (!fileName) {
+            fileName = this._extractAttachmentFileName(attachmentPath);
+        }
+
+        const meta = this._getAttachmentMeta(fileName || attachmentPath);
+        const encodePath = options.encode === undefined ? true : options.encode;
+        const encodedPath = encodePath ? encodeURI(attachmentPath) : String(attachmentPath);
+
+        let downloadUrl = options.downloadUrl || '';
+        if (!downloadUrl) {
+            if (typeof options.urlBuilder === 'function') {
+                downloadUrl = options.urlBuilder(encodedPath, { attachmentPath, fileName, meta });
+            } else {
+                const baseUrl = options.baseUrl || '';
+                if (baseUrl) {
+                    const normalizedBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+                    const trimmedPath = options.preserveLeadingSlash ? encodedPath : encodedPath.replace(/^\/+/, '');
+                    downloadUrl = `${normalizedBase}${trimmedPath}`;
+                } else {
+                    downloadUrl = encodedPath;
+                }
+            }
+        }
+
+        return {
+            attachmentPath,
+            fileName,
+            meta,
+            downloadUrl
+        };
+    }
+
+    static _extractAttachmentFileName(attachmentPath) {
+        if (!attachmentPath) {
+            return '';
+        }
+
+        const parts = String(attachmentPath).split(/[/\\]/);
+        return parts[parts.length - 1] || '';
+    }
+
+    static _getAttachmentMeta(fileName = '') {
+        const safeName = String(fileName || '').trim();
+        const extension = (safeName.split('.').pop() || '').toLowerCase();
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+        const iconMap = {
+            image: '🖼️',
+            pdf: '📕',
+            word: '📘',
+            excel: '📊',
+            text: '📄',
+            default: '📄'
+        };
+
+        let icon = iconMap.default;
+        if (imageExtensions.includes(extension)) {
+            icon = iconMap.image;
+        } else if (extension === 'pdf') {
+            icon = iconMap.pdf;
+        } else if (['doc', 'docx'].includes(extension)) {
+            icon = iconMap.word;
+        } else if (['xls', 'xlsx'].includes(extension)) {
+            icon = iconMap.excel;
+        } else if (extension === 'txt') {
+            icon = iconMap.text;
+        }
+
+        const maxLabelLength = 30;
+        const fullName = safeName || 'קובץ מצורף';
+        const label = fullName.length > maxLabelLength
+            ? `${fullName.substring(0, maxLabelLength).trimEnd()}…`
+            : fullName;
+
+        const shortLabelLength = 10;
+        const tableStyleLabel = fullName.length > shortLabelLength
+            ? `${fullName.substring(0, shortLabelLength)}…`
+            : fullName;
+
+        return {
+            icon,
+            extension,
+            displayName: fullName,
+            label,
+            tableStyleLabel,
+            isImage: imageExtensions.includes(extension),
+            isPdf: extension === 'pdf'
+        };
     }
 
     /**

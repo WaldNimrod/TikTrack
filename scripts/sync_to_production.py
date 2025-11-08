@@ -38,11 +38,12 @@ ALLOWED_ROOT_FILES = {
     'requirements.txt'
 }
 
-# Allowed scripts (only these 3)
+# Allowed scripts (production-ready scripts)
 ALLOWED_SCRIPTS = {
     'backup_database.py',
     'create_production_db.py',
-    'map_active_files.py'
+    'map_active_files.py',
+    'cleanup_import_sessions.py'  # For periodic cleanup of old import sessions
 }
 
 # Excluded patterns

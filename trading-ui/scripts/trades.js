@@ -445,37 +445,17 @@ async function loadTradeTickerInfo(tickerId) {
  * הצגת מידע על הטיקר (למודל החדש)
  */
 function displayTradeTickerInfo(ticker) {
-  // Create or update ticker info display
-  let tickerInfoDiv = document.getElementById('tradeTickerInfo');
+  const tickerInfoContainer = document.getElementById('tradeTickerInfoDisplay');
+  if (!tickerInfoContainer) {
+    window.Logger?.warn('⚠️ tradeTickerInfoDisplay element not found in trades modal', { page: 'trades' });
+    return;
+  }
+
+  let tickerInfoDiv = tickerInfoContainer.querySelector('.ticker-info-box');
   if (!tickerInfoDiv) {
-    // Create a new row for ticker info spanning full width
-    const tickerInfoRow = document.createElement('div');
-    tickerInfoRow.className = 'row';
-    tickerInfoRow.id = 'tradeTickerInfoRow';
-    
-    // Create column for ticker info - full width
-    const tickerInfoCol = document.createElement('div');
-    tickerInfoCol.className = 'col-12';
-    
     tickerInfoDiv = document.createElement('div');
-    tickerInfoDiv.id = 'tradeTickerInfo';
-    tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
-    
-    tickerInfoCol.appendChild(tickerInfoDiv);
-    tickerInfoRow.appendChild(tickerInfoCol);
-    
-    // Insert after the ticker/account row
-    const tickerSelect = document.getElementById('tradeTicker');
-    if (tickerSelect) {
-      const tickerField = tickerSelect.closest('.mb-3');
-      if (tickerField && tickerField.parentNode) {
-        // Find the row containing the ticker field
-        const row = tickerField.closest('.row');
-        if (row && row.parentNode) {
-          row.parentNode.insertBefore(tickerInfoRow, row.nextSibling);
-        }
-      }
-    }
+    tickerInfoDiv.className = 'ticker-info-box mb-3 p-3 bg-light rounded';
+    tickerInfoContainer.appendChild(tickerInfoDiv);
   }
   
   // Use the new global renderTickerInfo function
@@ -483,24 +463,29 @@ function displayTradeTickerInfo(ticker) {
     tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
   } else {
     // Fallback if renderTickerInfo not available
+    const currentPrice = typeof ticker.current_price === 'number' ? `$${ticker.current_price.toFixed(2)}` : 'לא זמין';
+    const dailyChange = typeof ticker.daily_change === 'number' ? ticker.daily_change.toFixed(2) : 'לא זמין';
+    const dailyChangePercent = typeof ticker.daily_change_percent === 'number' ? ticker.daily_change_percent.toFixed(2) : 'לא זמין';
+    const volume = typeof ticker.volume === 'number' ? ticker.volume.toLocaleString() : 'לא זמין';
+    const isPositive = typeof ticker.daily_change === 'number' && ticker.daily_change >= 0;
+
     tickerInfoDiv.innerHTML = `
       <div class="ticker-info-display">
         <div class="row">
           <div class="col-md-6">
-            <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}
+            <strong>${ticker.symbol || 'לא זמין'}</strong> - ${ticker.name || 'לא זמין'}
           </div>
           <div class="col-md-6 text-end">
-            <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
-            <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
-              ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
-            </span>
+            <span class="fw-bold">${currentPrice}</span>
+            ${typeof ticker.daily_change === 'number' && typeof ticker.daily_change_percent === 'number'
+              ? `<span class="${isPositive ? 'text-success' : 'text-danger'}">${isPositive ? '↗' : '↘'} ${dailyChange} (${dailyChangePercent}%)</span>`
+              : '<span class="text-muted">לא זמין</span>'}
           </div>
         </div>
         <div class="row mt-1">
           <div class="col-12">
             <small class="text-muted">
-              נפח: ${(ticker.volume || 0).toLocaleString()} | 
-              שינוי יומי: ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+              נפח: ${volume} | שינוי יומי: ${dailyChange} (${dailyChangePercent}%)
             </small>
           </div>
         </div>
@@ -512,6 +497,17 @@ function displayTradeTickerInfo(ticker) {
   const entryPriceField = document.getElementById('tradeEntryPrice');
   if (entryPriceField && ticker.current_price) {
     entryPriceField.value = ticker.current_price;
+  }
+
+  const tradesModalElement = document.getElementById('tradesModal');
+  if (tradesModalElement && window.InvestmentCalculationService && typeof window.InvestmentCalculationService.resync === 'function') {
+    window.InvestmentCalculationService.resync(tradesModalElement, { force: true });
+  }
+
+  if (typeof window.applyTradePlanDefaultRiskLevels === 'function') {
+    window.applyTradePlanDefaultRiskLevels({ force: false, modalElement: tradesModalElement }).catch(error => {
+      window.Logger?.warn('⚠️ applyTradePlanDefaultRiskLevels failed for trades modal after ticker update', { error, page: 'trades' });
+    });
   }
 }
 
@@ -3140,7 +3136,6 @@ async function saveTrade() {
         const tradeData = DataCollectionService.collectFormData({
             ticker_id: { id: 'tradeTicker', type: 'int' },
             trading_account_id: { id: 'tradeAccount', type: 'int' }, // Backend expects trading_account_id
-            name: { id: 'tradeName', type: 'text' },
             type: { id: 'tradeType', type: 'text' },
             quantity: { id: 'tradeQuantity', type: 'int' },
             entry_price: { id: 'tradeEntryPrice', type: 'float' },
@@ -3167,7 +3162,6 @@ async function saveTrade() {
         const isValid = window.validateEntityForm('tradesModalForm', {
             tradeTicker: { required: true },
             tradeAccount: { required: true },
-            tradeName: { required: true, minLength: 2, maxLength: 100 },
             tradeType: { required: true },
             tradeQuantity: { required: true, min: 1 },
             tradeEntryPrice: { required: true, min: 0.01 },

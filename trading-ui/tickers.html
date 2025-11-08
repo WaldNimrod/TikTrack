@@ -353,47 +353,75 @@
     <script src="scripts/external-data-settings-service.js?v=1.0.0"></script> <!-- הגדרות נתונים חיצוניים -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 8/10: ENTITY DETAILS PACKAGE ===== -->
+    <!-- ===== PACKAGE 8/10: ENTITY SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 10 | Description: שירותי ישויות -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [45] Load Order: 45 -->
+    <script src="scripts/account-service.js?v=1.0.0"></script> <!-- שירות חשבונות -->
+    <!-- [46] Load Order: 46 -->
+    <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- שירות התראות -->
+    <!-- [47] Load Order: 47 -->
+    <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- שירות טיקרים -->
+    <!-- [48] Load Order: 48 -->
+    <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- שירות תכניות מסחר -->
+    <!-- [49] Load Order: 49 -->
+    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- רכיב התראות פעילות -->
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- מתרגם תנאים -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/constraints.js?v=1.0.0"></script> <!-- מערכת אילוצים -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- שירות לוגיקה משותפת לפריטים מקושרים -->
+    <!-- [53] Load Order: 53 -->
+    <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- פריטים מקושרים -->
+    <!-- [54] Load Order: 54 -->
+    <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- פילטרים של אובייקטים קשורים -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 9/10: ENTITY DETAILS PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
     <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [45] Load Order: 45 -->
+    <!-- [55] Load Order: 55 -->
     <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
-    <!-- [46] Load Order: 46 -->
+    <!-- [56] Load Order: 56 -->
     <script src="scripts/entity-details-renderer.js?v=1.0.4"></script> <!-- מציג פרטי ישויות -->
-    <!-- [47] Load Order: 47 -->
+    <!-- [57] Load Order: 57 -->
     <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 9/10: INFO SUMMARY PACKAGE ===== -->
+    <!-- ===== PACKAGE 10/10: INFO SUMMARY PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 18 | Description: מערכת סיכום נתונים מאוחדת לכל העמודים -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [48] Load Order: 48 -->
+    <!-- [58] Load Order: 58 -->
     <script src="scripts/info-summary-system.js?v=1.0.0"></script> <!-- מערכת סיכום נתונים ליבה -->
-    <!-- [49] Load Order: 49 -->
+    <!-- [59] Load Order: 59 -->
     <script src="scripts/info-summary-configs.js?v=1.0.0"></script> <!-- תצורות עמודים לסיכום נתונים -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 10/10: INITIALIZATION PACKAGE ===== -->
+    <!-- ===== PACKAGE 11/11: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
     <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, filters, advanced-notifications, entity-details, info-summary, import -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [50] Load Order: 50 -->
+    <!-- [60] Load Order: 60 -->
     <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
-    <!-- [51] Load Order: 51 -->
+    <!-- [61] Load Order: 61 -->
     <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
-    <!-- [52] Load Order: 52 -->
+    <!-- [62] Load Order: 62 -->
     <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
-    <!-- [53] Load Order: 53 -->
+    <!-- [63] Load Order: 63 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
-    <!-- [54] Load Order: 54 -->
+    <!-- [64] Load Order: 64 -->
     <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
 
     <!-- =============================================================== -->

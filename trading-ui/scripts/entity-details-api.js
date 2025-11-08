@@ -68,17 +68,9 @@ class EntityDetailsAPI {
             // הוספה לאובייקט הגלובלי
             window.entityDetailsAPI = this;
             
-            if (typeof window.Logger !== 'undefined' && window.Logger.info) {
-                window.Logger.info('EntityDetailsAPI initialized successfully', { page: "entity-details-api" });
-            } else {
-                console.log('EntityDetailsAPI initialized successfully');
-            }
+            window.Logger.info('EntityDetailsAPI initialized successfully', { page: "entity-details-api" });
         } catch (error) {
-            if (typeof window.Logger !== 'undefined' && window.Logger.error) {
-                window.Logger.error('Error initializing EntityDetailsAPI:', error, { page: "entity-details-api" });
-            } else {
-                console.error('Error initializing EntityDetailsAPI:', error);
-            }
+            window.Logger.error('Error initializing EntityDetailsAPI:', error, { page: "entity-details-api" });
         }
     }
 
@@ -343,7 +335,7 @@ class EntityDetailsAPI {
                     };
 
                     console.warn('⚠️ [CASH_FLOW_API] Critical fields missing after new endpoint fetch, attempting recovery via legacy endpoint', recoveryContext);
-                    window.Logger?.warn('⚠️ [CASH_FLOW_API] Missing fields after new endpoint fetch, attempting recovery', recoveryContext, { page: 'entity-details-api' });
+                    window.Logger.warn('⚠️ [CASH_FLOW_API] Missing fields after new endpoint fetch, attempting recovery', recoveryContext, { page: 'entity-details-api' });
 
                     try {
                         const fallbackRaw = await this.fetchFromExistingEndpoints(entityType, entityId);
@@ -359,7 +351,7 @@ class EntityDetailsAPI {
                         });
 
                         const remainingMissing = this._getMissingCashFlowFields(entityData);
-                        window.Logger?.info('✅ [CASH_FLOW_API] Recovery attempt completed', {
+                        window.Logger.info('✅ [CASH_FLOW_API] Recovery attempt completed', {
                             entityId,
                             recoveredFields: recovered,
                             remainingMissing,
@@ -374,7 +366,7 @@ class EntityDetailsAPI {
                         }
                     } catch (recoveryError) {
                         console.error('❌ [CASH_FLOW_API] Recovery via legacy endpoint failed', recoveryError);
-                        window.Logger?.error('❌ [CASH_FLOW_API] Recovery via legacy endpoint failed', recoveryError, { page: 'entity-details-api' });
+                        window.Logger.error('❌ [CASH_FLOW_API] Recovery via legacy endpoint failed', recoveryError, { page: 'entity-details-api' });
                     }
                 }
             }
@@ -698,14 +690,14 @@ class EntityDetailsAPI {
                     data.currency_symbol = data.currency.symbol;
                 } else if (data.currency_code) {
                     data.currency_symbol = data.currency_code;
-                } else if (data.currency_id && typeof window !== 'undefined' && typeof window.getCurrencyDisplay === 'function') {
+                } else if (data.currency_id && window.getCurrencyDisplay) {
                     try {
                         const currencyInfo = window.getCurrencyDisplay(data.currency_id);
                         if (currencyInfo && currencyInfo.symbol) {
                             data.currency_symbol = currencyInfo.symbol;
                         }
                     } catch (error) {
-                        window.Logger?.warn('⚠️ [CASH_FLOW_NORMALIZE] Failed to resolve currency symbol', error, { page: 'entity-details-api' });
+                        window.Logger.warn('⚠️ [CASH_FLOW_NORMALIZE] Failed to resolve currency symbol', error, { page: 'entity-details-api' });
                     }
                 }
             }
@@ -954,7 +946,7 @@ class EntityDetailsAPI {
         
             try {
                 // בדיקה במטמון אם לא forceRefresh
-                if (!options.forceRefresh && window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                if (!options.forceRefresh && window.UnifiedCacheManager.initialized) {
                     const cachedData = await window.UnifiedCacheManager.get(cacheKey, {
                         layer: 'memory',
                         fallback: null
@@ -996,7 +988,7 @@ class EntityDetailsAPI {
                     window.Logger.debug(`No linked items found for ${entityType} ${entityId}`, { page: "entity-details-api" });
                         // שמירת מערך ריק במטמון גם במקרה של 404 (כדי לא לטעון שוב)
                         const emptyArray = [];
-                        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                        if (window.UnifiedCacheManager.initialized) {
                             await window.UnifiedCacheManager.save(cacheKey, emptyArray, {
                                 layer: 'memory',
                                 ttl: 300000 // 5 דקות
@@ -1055,7 +1047,7 @@ class EntityDetailsAPI {
             }
             
                 // שמירה במטמון עם TTL של 5 דקות
-                if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                if (window.UnifiedCacheManager.initialized) {
                     await window.UnifiedCacheManager.save(cacheKey, allLinkedItems, {
                         layer: 'memory',
                         ttl: 300000 // 5 דקות
@@ -1513,42 +1505,62 @@ async function refreshEntityData(entityType, entityId) {
 
 // ===== FUNCTION INDEX =====
 /*
- * 📚 אינדקס פונקציות:
- * ================
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
  * 
- * מחלקה ראשית:
- * - EntityDetailsAPI.constructor() - אתחול המחלקה
- * - EntityDetailsAPI.init() - אתחול מערכת API
- * - EntityDetailsAPI.getEntityDetails() - קבלת פרטי ישות
- * - EntityDetailsAPI.refreshEntityData() - רענון נתוני ישות
- * - EntityDetailsAPI.updateEntityData() - עדכון נתוני ישות
- * - EntityDetailsAPI.deleteEntity() - מחיקת ישות
+ * This index lists all functions in this file, organized by category.
  * 
- * פונקציות קריאה:
- * - fetchWithRetry() - קריאה עם retry logic
- * - fetchEntityFromAPI() - קריאת ישות מ-API
- * - fetchFromNewEndpoint() - קריאה מendpoint חדש
- * - fetchFromExistingEndpoints() - קריאה מendpoints קיימים
+ * Total Functions: 20
+ * 
+ * INITIALIZATION (2)
+ * - constructor() - אתחול מחלקת EntityDetailsAPI
+ * - init() - אתחול מערכת API וניקוי cache
+ * 
+ * MAIN API METHODS (3)
+ * - getEntityDetails() - קבלת פרטי ישות מהשרת עם caching
+ * - refreshEntityData() - רענון נתוני ישות (force refresh)
+ * - updateEntityData() - עדכון נתוני ישות בשרת
+ * - deleteEntity() - מחיקת ישות מהשרת
+ * 
+ * FETCH METHODS (5)
+ * - fetchWithRetry() - קריאה עם retry logic (3 ניסיונות)
+ * - fetchEntityFromAPI() - קריאת ישות מ-API (מנהל endpoints שונים)
+ * - fetchFromNewEndpoint() - קריאה מ-endpoint חדש (/api/entity-details/)
+ * - fetchFromExistingEndpoints() - קריאה מ-endpoints קיימים (legacy)
+ * - fetchPositionDetails() - קריאת פרטי פוזיציה (composite ID)
+ * 
+ * LINKED ITEMS & EXTERNAL DATA (3)
  * - getEntityWithLinkedItems() - קבלת ישות עם פריטים מקושרים
- * - getLinkedItems() - קבלת פריטים מקושרים
- * - getExternalData() - קבלת נתונים חיצוניים
+ * - getLinkedItems() - קבלת פריטים מקושרים בלבד
+ * - getExternalData() - קבלת נתונים חיצוניים (Yahoo Finance)
  * 
- * פונקציות cache:
- * - getCachedData() - קבלת נתונים מcache
- * - setCachedData() - שמירת נתונים בcache
+ * MARKET & CURRENCY DATA (2)
+ * - getMarketData() - קבלת נתוני שוק לטיקר
+ * - getCurrencyData() - קבלת נתוני מטבע
+ * 
+ * CACHE MANAGEMENT (6)
+ * - getCachedData() - קבלת נתונים מ-cache
+ * - setCachedData() - שמירת נתונים ב-cache
  * - clearExpiredCache() - ניקוי cache פג תוקף
- * - clearCache() - ניקוי כל הcache
+ * - clearCache() - ניקוי כל ה-cache
  * - clearEntityCache() - ניקוי cache לישות ספציפית
  * - getCacheStats() - סטטיסטיקות cache
  * 
- * פונקציות עזר:
- * - normalizeEntityData() - עיצוב נתונים אחיד
- * - confirmDeletion() - אישור מחיקה
- * - delay() - המתנה
+ * DATA NORMALIZATION & HELPERS (3)
+ * - normalizeEntityData() - עיצוב נתונים אחיד (flow_type→type, flow_date→date)
+ * - _getMissingCashFlowFields() - זיהוי שדות חסרים בתזרים מזומנים
+ * - _resolvePositionIdentifiers() - פירוק composite ID לפוזיציה
+ * - _determineMarketStatus() - קביעת סטטוס שוק לפי נתונים חיצוניים
+ * - confirmDeletion() - אישור מחיקה עם confirmation dialog
+ * - delay() - פונקציית עזר להמתנה
  * 
- * פונקציות גלובליות:
- * - getEntityDetails() - קבלת פרטי ישות
- * - refreshEntityData() - רענון נתוני ישות
+ * GLOBAL FUNCTIONS (2)
+ * - getEntityDetails() - פונקציה גלובלית לקבלת פרטי ישות
+ * - refreshEntityData() - פונקציה גלובלית לרענון נתוני ישות
+ * - debugCashFlow() - פונקציה גלובלית לניטור נתוני תזרים מזומנים
+ * 
+ * ==========================================
  */
 
 /**

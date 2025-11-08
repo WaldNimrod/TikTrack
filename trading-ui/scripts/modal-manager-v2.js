@@ -29,6 +29,13 @@ class ModalManagerV2 {
             ticker: null,
             linkedEntity: null
         };
+        this.attachmentPreviewModal = null;
+        this.attachmentPreviewModalInstance = null;
+        this.attachmentPreviewImg = null;
+        this.attachmentPreviewPdfFrame = null;
+        this.attachmentPreviewSpinner = null;
+        this.attachmentPreviewError = null;
+        this.attachmentPreviewTitleEl = null;
         
         this.init();
     }
@@ -87,6 +94,28 @@ class ModalManagerV2 {
             this.handleModalShown(event.target);
         });
         
+        // מאזין לתצוגת קובץ מצורף (תצוגה מקדימה)
+        document.addEventListener('click', (event) => {
+            const trigger = event.target.closest('[data-attachment-preview]');
+            if (!trigger) {
+                return;
+            }
+
+            event.preventDefault();
+            const src = trigger.getAttribute('data-preview-src');
+            const title = trigger.getAttribute('data-preview-title') || '';
+            const type = (trigger.getAttribute('data-attachment-preview') || 'image').toLowerCase();
+            const mime = trigger.getAttribute('data-preview-mime') || '';
+            if (src) {
+                this.showAttachmentPreview(src, title, { type, mime });
+            } else if (window.Logger) {
+                window.Logger.warn('⚠️ [ModalManagerV2] Attachment preview trigger missing src', {
+                    trigger,
+                    page: 'modal-manager-v2'
+                });
+            }
+        });
+        
         // מאזין לשינוי העדפות משתמש - עם validation
         const deps = this._checkDependencies();
         if (deps.preferencesSystem.available && deps.preferencesSystem.initialized) {
@@ -111,6 +140,204 @@ class ModalManagerV2 {
             if (DEBUG_MODE) {
                 console.debug('⚠️ PreferencesSystem not yet available - will retry registration later');
             }
+        }
+    }
+
+    /**
+     * Show attachment preview modal (images)
+     * @param {string} src - attachment source URL
+     * @param {string} title - modal title / attachment name
+     * @param {Object} options - preview options (type, mime)
+     * @public
+     */
+    showAttachmentPreview(src, title = '', options = {}) {
+        if (!src) {
+            window.Logger?.warn('⚠️ [ModalManagerV2] showAttachmentPreview called without src', { page: 'modal-manager-v2' });
+            return;
+        }
+
+        this._ensureAttachmentPreviewModal();
+
+        if (!this.attachmentPreviewModal) {
+            window.Logger?.error('❌ [ModalManagerV2] attachment preview modal not initialized', { page: 'modal-manager-v2' });
+            return;
+        }
+
+        const safeTitle = title && title.trim() ? title.trim() : 'תצוגת קובץ';
+        const previewType = (options.type || 'image').toLowerCase();
+        const mimeType = options.mime || '';
+
+        if (this.attachmentPreviewTitleEl) {
+            this.attachmentPreviewTitleEl.textContent = safeTitle;
+        }
+
+        if (this.attachmentPreviewImg) {
+            this.attachmentPreviewImg.classList.add('d-none');
+            this.attachmentPreviewImg.dataset.previewSrc = src;
+            this.attachmentPreviewImg.alt = safeTitle;
+            this.attachmentPreviewImg.src = previewType === 'image' ? src : '';
+        }
+
+        if (this.attachmentPreviewPdfFrame) {
+            this.attachmentPreviewPdfFrame.classList.add('d-none');
+            this.attachmentPreviewPdfFrame.dataset.previewSrc = src;
+            this.attachmentPreviewPdfFrame.title = safeTitle;
+            this.attachmentPreviewPdfFrame.src = '';
+            if (mimeType) {
+                this.attachmentPreviewPdfFrame.dataset.previewMime = mimeType;
+            } else {
+                delete this.attachmentPreviewPdfFrame.dataset.previewMime;
+            }
+        }
+
+        if (this.attachmentPreviewSpinner) {
+            this.attachmentPreviewSpinner.classList.remove('d-none');
+        }
+
+        if (this.attachmentPreviewError) {
+            this.attachmentPreviewError.classList.add('d-none');
+            this.attachmentPreviewError.textContent = 'לא ניתן להציג את הקובץ.';
+        }
+
+        if (previewType === 'image') {
+            if (this.attachmentPreviewImg) {
+                this.attachmentPreviewImg.src = src;
+            }
+        } else if (previewType === 'pdf') {
+            setTimeout(() => {
+                if (this.attachmentPreviewPdfFrame) {
+                    this.attachmentPreviewPdfFrame.src = src;
+                }
+            }, 0);
+        } else {
+            window.Logger?.warn('⚠️ [ModalManagerV2] Unsupported attachment preview type', {
+                previewType,
+                page: 'modal-manager-v2'
+            });
+        }
+
+        try {
+            if (!this.attachmentPreviewModalInstance) {
+                this.attachmentPreviewModalInstance = new bootstrap.Modal(this.attachmentPreviewModal, {
+                    backdrop: true,
+                    keyboard: true
+                });
+            }
+            this.attachmentPreviewModalInstance.show();
+        } catch (error) {
+            window.Logger?.error('❌ [ModalManagerV2] Failed to show attachment preview modal', {
+                error,
+                page: 'modal-manager-v2'
+            });
+        }
+    }
+
+    /**
+     * Ensure the attachment preview modal exists in DOM
+     * @private
+     */
+    _ensureAttachmentPreviewModal() {
+        if (this.attachmentPreviewModal) {
+            return;
+        }
+
+        const modalId = 'attachmentPreviewModal';
+        if (document.getElementById(modalId)) {
+            this.attachmentPreviewModal = document.getElementById(modalId);
+        } else {
+            const modalHtml = `
+                <div class="modal fade attachment-preview-modal" id="${modalId}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered attachment-preview-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">תצוגת קובץ</h5>
+                                <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div class="attachment-preview-spinner my-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                </div>
+                                <img src="" alt="" class="attachment-preview-modal-image img-fluid rounded d-none" loading="lazy" decoding="async" />           
+                                <iframe src="" class="attachment-preview-pdf-frame w-100 border rounded d-none" style="min-height: 70vh;" title="תצוגת קובץ"></iframe>
+                                <div class="attachment-preview-error text-muted d-none mt-3">לא ניתן להציג את הקובץ.</div>
+                            </div>
+                            <div class="modal-footer justify-content-end">
+                                <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            this.attachmentPreviewModal = document.getElementById(modalId);
+        }
+
+        this.attachmentPreviewTitleEl = this.attachmentPreviewModal?.querySelector('.modal-title') || null;                                                     
+        this.attachmentPreviewImg = this.attachmentPreviewModal?.querySelector('.attachment-preview-modal-image') || null;                                      
+        this.attachmentPreviewPdfFrame = this.attachmentPreviewModal?.querySelector('.attachment-preview-pdf-frame') || null;                                    
+        this.attachmentPreviewSpinner = this.attachmentPreviewModal?.querySelector('.attachment-preview-spinner') || null;                                      
+        this.attachmentPreviewError = this.attachmentPreviewModal?.querySelector('.attachment-preview-error') || null;                                          
+
+        if (this.attachmentPreviewImg) {
+            this.attachmentPreviewImg.addEventListener('load', () => {
+                if (this.attachmentPreviewSpinner) {
+                    this.attachmentPreviewSpinner.classList.add('d-none');
+                }
+                this.attachmentPreviewImg.classList.remove('d-none');
+            });
+
+            this.attachmentPreviewImg.addEventListener('error', () => {
+                if (this.attachmentPreviewSpinner) {
+                    this.attachmentPreviewSpinner.classList.add('d-none');
+                }
+                this.attachmentPreviewImg.classList.add('d-none');
+                if (this.attachmentPreviewError) {
+                    this.attachmentPreviewError.classList.remove('d-none');
+                }
+            });
+        }
+
+        if (this.attachmentPreviewPdfFrame) {
+            this.attachmentPreviewPdfFrame.addEventListener('load', () => {
+                if (this.attachmentPreviewSpinner) {
+                    this.attachmentPreviewSpinner.classList.add('d-none');
+                }
+                this.attachmentPreviewPdfFrame.classList.remove('d-none');
+                if (this.attachmentPreviewError) {
+                    this.attachmentPreviewError.classList.add('d-none');
+                }
+            });
+
+            this.attachmentPreviewPdfFrame.addEventListener('error', () => {
+                if (this.attachmentPreviewSpinner) {
+                    this.attachmentPreviewSpinner.classList.add('d-none');
+                }
+                this.attachmentPreviewPdfFrame.classList.add('d-none');
+                if (this.attachmentPreviewError) {
+                    this.attachmentPreviewError.classList.remove('d-none');
+                }
+            });
+        }
+
+        if (this.attachmentPreviewModal) {
+            this.attachmentPreviewModal.addEventListener('hidden.bs.modal', () => {
+                if (this.attachmentPreviewImg) {
+                    this.attachmentPreviewImg.src = '';
+                    this.attachmentPreviewImg.classList.add('d-none');
+                }
+                if (this.attachmentPreviewPdfFrame) {
+                    this.attachmentPreviewPdfFrame.src = 'about:blank';
+                    this.attachmentPreviewPdfFrame.classList.add('d-none');
+                }
+                if (this.attachmentPreviewSpinner) {
+                    this.attachmentPreviewSpinner.classList.add('d-none');
+                }
+                if (this.attachmentPreviewError) {
+                    this.attachmentPreviewError.classList.add('d-none');
+                }
+            }, { once: false });
         }
     }
 
@@ -1330,9 +1557,24 @@ class ModalManagerV2 {
         // ניקוי rich-text editors
         const richTextContainers = form.querySelectorAll('.rich-text-editor-container');
         richTextContainers.forEach(container => {
-            if (window.RichTextEditorService) {
-                window.RichTextEditorService.setContent(container.id, '');
+            const editorId = container.id;
+            if (!editorId) {
+                return;
             }
+
+            const hasService = window.RichTextEditorService
+                && typeof window.RichTextEditorService.getEditorInstance === 'function'
+                && typeof window.RichTextEditorService.setContent === 'function';
+
+            if (hasService) {
+                const editorInstance = window.RichTextEditorService.getEditorInstance(editorId);
+                if (editorInstance) {
+                    window.RichTextEditorService.setContent(editorId, '');
+                    return;
+                }
+            }
+
+            container.dataset.pendingContent = '';
         });
         
         // ניקוי שגיאות ולידציה
@@ -1668,6 +1910,12 @@ class ModalManagerV2 {
                     field.value = value || '';
                     console.log(`✏️ Set ${field.tagName}/${field.type || 'input'} field ${field.id} to: ${field.value}`);
                 }
+
+                if (field.dataset && value !== null && value !== undefined && value !== '' &&
+                    (field.id === 'tradePlanStopLoss' || field.id === 'tradeStopLoss' ||
+                     field.id === 'tradePlanTakeProfit' || field.id === 'tradeTakeProfit')) {
+                    field.dataset.userModified = 'true';
+                }
             } else {
                 console.log(`❌ No field found for ${key} (value: ${value})`);
             }
@@ -1681,6 +1929,10 @@ class ModalManagerV2 {
         
         // הוספת event listeners לשדות מיוחדים
         this.attachSpecialEventListeners(form, data, config);
+
+        if (modalElement && window.InvestmentCalculationService && typeof window.InvestmentCalculationService.resync === 'function') {
+            window.InvestmentCalculationService.resync(modalElement, { force: true });
+        }
     }
 
     /**
@@ -3391,68 +3643,214 @@ class ModalManagerV2 {
         
         // For Trade Plans modal - handle ticker selection
         if (modalId === 'tradePlansModal') {
+            const runResync = (forceFlag = true) => {
+                if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.resync === 'function') {
+                    const resyncPromise = window.InvestmentCalculationService.resync(modalElement, { force: forceFlag });
+                    if (resyncPromise && typeof resyncPromise.catch === 'function') {
+                        resyncPromise.catch(error => {
+                            window.Logger?.warn('⚠️ InvestmentCalculationService resync failed for trade plan modal', { error, page: 'modal-manager-v2' });
+                        });
+                    }
+                    return resyncPromise;
+                }
+                return Promise.resolve();
+            };
+
+            const triggerRiskDefaults = (forceFlag = false) => {
+                if (typeof window.applyTradePlanDefaultRiskLevels === 'function') {
+                    const riskPromise = window.applyTradePlanDefaultRiskLevels({ force: forceFlag, modalElement });
+                    if (riskPromise && typeof riskPromise.catch === 'function') {
+                        riskPromise.catch(error => {
+                            window.Logger?.warn('⚠️ applyTradePlanDefaultRiskLevels failed during trade plan modal handling', { error, page: 'modal-manager-v2' });
+                        });
+                    }
+                    return riskPromise;
+                }
+                return Promise.resolve();
+            };
+
+            const form = modalElement.querySelector('#tradePlansModalForm');
+            const mode = form?.dataset?.mode || modalElement.dataset?.mode || 'add';
+            let bindPromiseRef = null;
+
+            const ensureEntryDateDefault = () => {
+                if (!entryDateInput || mode !== 'add' || entryDateInput.dataset.userModified === 'true') {
+                    return;
+                }
+
+                if (entryDateInput.value) {
+                    return;
+                }
+
+                let assignedValue = null;
+
+                if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                    assignedValue = window.DefaultValueSetter.setCurrentDate(entryDateInput.id);
+                }
+
+                if (!assignedValue) {
+                    const today = new Date();
+                    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+                    assignedValue = today.toISOString().slice(0, 10);
+                    entryDateInput.value = assignedValue;
+                } else {
+                    entryDateInput.value = assignedValue;
+                }
+
+                entryDateInput.dataset.systemGenerated = 'true';
+                delete entryDateInput.dataset.userModified;
+            };
+
+            const finalizeInitialization = () => {
+                const resyncResult = runResync(true);
+                if (resyncResult && typeof resyncResult.then === 'function') {
+                    return resyncResult.then(() => triggerRiskDefaults(mode === 'add'));
+                }
+                return triggerRiskDefaults(mode === 'add');
+            };
+
+            const scheduleFinalize = () => {
+                if (bindPromiseRef && typeof bindPromiseRef.then === 'function') {
+                    bindPromiseRef.then(() => finalizeInitialization()).catch(error => {
+                        window.Logger?.warn('⚠️ finalizeInitialization failed for trade plan modal', { error, page: 'modal-manager-v2' });
+                    });
+                } else {
+                    finalizeInitialization();
+                }
+            };
             const tickerSelect = modalElement.querySelector('#tradePlanTicker');
-            if (tickerSelect) {
-                if (!tickerSelect.dataset.autocalcBound) {
-                    tickerSelect.addEventListener('change', async (e) => {
+            if (tickerSelect && !tickerSelect.dataset.autocalcBound) {
+                tickerSelect.addEventListener('change', async (e) => {
                     const tickerId = e.target.value;
                     if (tickerId && window.loadTradePlanTickerInfo) {
                         await window.loadTradePlanTickerInfo(tickerId);
-                            if (typeof window.updateSharesFromAmount === 'function') {
-                                window.updateSharesFromAmount();
-                            }
-                            if (typeof window.updateAmountFromShares === 'function') {
-                                window.updateAmountFromShares();
-                            }
                     }
+                    await runResync(true);
+                    await triggerRiskDefaults(false);
                 });
-                    tickerSelect.dataset.autocalcBound = 'true';
+                tickerSelect.dataset.autocalcBound = 'true';
+            }
+
+            const entryDateInput = modalElement.querySelector('#tradePlanEntryDate');
+            if (entryDateInput && !entryDateInput.dataset.autocalcBound) {
+                entryDateInput.addEventListener('input', () => {
+                    entryDateInput.dataset.userModified = 'true';
+                });
+                entryDateInput.dataset.autocalcBound = 'true';
+            }
+
+            if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.bindForm === 'function') {
+                const bindPromise = window.InvestmentCalculationService.bindForm(modalElement, {
+                    amountField: '#planAmount',
+                    quantityField: '#tradePlanQuantity',
+                    priceField: '#tradePlanEntryPrice',
+                    priceDisplay: '#currentPriceDisplay',
+                    stopField: '#tradePlanStopLoss',
+                    targetField: '#tradePlanTakeProfit',
+                    allowFractionalShares: null,
+                    quantityDecimals: 4,
+                    amountDecimals: 2,
+                    syncPreference: 'auto',
+                    forceRiskOnBind: mode === 'add',
+                    forceSyncOnBind: mode === 'add',
+                    stopPreferenceKey: 'defaultStopLoss',
+                    targetPreferenceKey: 'defaultTargetPrice'
+                });
+                if (bindPromise && typeof bindPromise.catch === 'function') {
+                    bindPromise.catch(error => {
+                        window.Logger?.warn('⚠️ InvestmentCalculationService bind failed for trade plan modal', { error, page: 'modal-manager-v2' });
+                    });
+                }
+                bindPromiseRef = bindPromise;
+            }
+
+            const stopInput = modalElement.querySelector('#tradePlanStopLoss');
+            if (stopInput) {
+                stopInput.dataset.autocalcBound = 'true';
+            }
+            const targetInput = modalElement.querySelector('#tradePlanTakeProfit');
+            if (targetInput) {
+                targetInput.dataset.autocalcBound = 'true';
+            }
+
+            if (mode === 'add') {
+                if (stopInput) {
+                    delete stopInput.dataset.userModified;
+                    delete stopInput.dataset.systemGenerated;
+                }
+                if (targetInput) {
+                    delete targetInput.dataset.userModified;
+                    delete targetInput.dataset.systemGenerated;
+                }
+                if (entryDateInput) {
+                    delete entryDateInput.dataset.userModified;
+                    delete entryDateInput.dataset.systemGenerated;
+                }
+            } else {
+                if (stopInput) {
+                    stopInput.dataset.userModified = stopInput.dataset.userModified || 'true';
+                }
+                if (targetInput) {
+                    targetInput.dataset.userModified = targetInput.dataset.userModified || 'true';
+                }
+                if (entryDateInput) {
+                    entryDateInput.dataset.userModified = entryDateInput.dataset.userModified || 'true';
                 }
             }
 
-            const amountInput = modalElement.querySelector('#planAmount');
-            if (amountInput && !amountInput.dataset.autocalcBound) {
-                amountInput.addEventListener('blur', () => {
-                    if (typeof window.updateSharesFromAmount === 'function') {
-                        window.updateSharesFromAmount();
-                    }
-                });
-                amountInput.dataset.autocalcBound = 'true';
-            }
-
-            const quantityInput = modalElement.querySelector('#tradePlanQuantity');
-            if (quantityInput && !quantityInput.dataset.autocalcBound) {
-                quantityInput.addEventListener('blur', () => {
-                    if (typeof window.updateAmountFromShares === 'function') {
-                        window.updateAmountFromShares();
-                    }
-                });
-                quantityInput.dataset.autocalcBound = 'true';
-            }
-
-            const entryPriceInput = modalElement.querySelector('#tradePlanEntryPrice');
-            if (entryPriceInput && !entryPriceInput.dataset.autocalcBound) {
-                entryPriceInput.addEventListener('blur', () => {
-                    if (typeof window.updateSharesFromAmount === 'function') {
-                        window.updateSharesFromAmount();
-                    }
-                    if (typeof window.updateAmountFromShares === 'function') {
-                        window.updateAmountFromShares();
-                    }
-                });
-                entryPriceInput.dataset.autocalcBound = 'true';
-            }
-
-            if (typeof window.updateSharesFromAmount === 'function') {
-                window.updateSharesFromAmount();
-            }
-            if (typeof window.updateAmountFromShares === 'function') {
-                window.updateAmountFromShares();
-            }
+            ensureEntryDateDefault();
+            scheduleFinalize();
         }
         
         // For Trades modal - handle ticker selection
         if (modalId === 'tradesModal') {
+            const runTradeResync = (forceFlag = true) => {
+                if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.resync === 'function') {
+                    const resyncPromise = window.InvestmentCalculationService.resync(modalElement, { force: forceFlag });
+                    if (resyncPromise && typeof resyncPromise.catch === 'function') {
+                        resyncPromise.catch(error => {
+                            window.Logger?.warn('⚠️ InvestmentCalculationService resync failed for trades modal', { error, page: 'modal-manager-v2' });
+                        });
+                    }
+                    return resyncPromise;
+                }
+                return Promise.resolve();
+            };
+
+            const triggerTradeRiskDefaults = (forceFlag = false) => {
+                if (typeof window.applyTradePlanDefaultRiskLevels === 'function') {
+                    const riskPromise = window.applyTradePlanDefaultRiskLevels({ force: forceFlag, modalElement });
+                    if (riskPromise && typeof riskPromise.catch === 'function') {
+                        riskPromise.catch(error => {
+                            window.Logger?.warn('⚠️ applyTradePlanDefaultRiskLevels failed during trades modal handling', { error, page: 'modal-manager-v2' });
+                        });
+                    }
+                    return riskPromise;
+                }
+                return Promise.resolve();
+            };
+
+            const tradesForm = modalElement.querySelector('#tradesModalForm');
+            const tradesMode = tradesForm?.dataset?.mode || modalElement.dataset?.mode || 'add';
+            let tradeBindPromise = null;
+
+            const finalizeTradeInitialization = () => {
+                const resyncResult = runTradeResync(true);
+                if (resyncResult && typeof resyncResult.then === 'function') {
+                    return resyncResult.then(() => triggerTradeRiskDefaults(tradesMode === 'add'));
+                }
+                return triggerTradeRiskDefaults(tradesMode === 'add');
+            };
+
+            const scheduleTradeFinalize = () => {
+                if (tradeBindPromise && typeof tradeBindPromise.then === 'function') {
+                    tradeBindPromise.then(() => finalizeTradeInitialization()).catch(error => {
+                        window.Logger?.warn('⚠️ finalizeTradeInitialization failed for trades modal', { error, page: 'modal-manager-v2' });
+                    });
+                } else {
+                    finalizeTradeInitialization();
+                }
+            };
             const tickerSelect = modalElement.querySelector('#tradeTicker');
             if (tickerSelect) {
                 // Remove existing listeners
@@ -3465,8 +3863,65 @@ class ModalManagerV2 {
                     if (tickerId && window.loadTradeTickerInfo) {
                         await window.loadTradeTickerInfo(tickerId);
                     }
+                    await runTradeResync(true);
+                    await triggerTradeRiskDefaults(false);
                 });
             }
+
+            if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.bindForm === 'function') {
+                const bindPromise = window.InvestmentCalculationService.bindForm(modalElement, {
+                    amountField: '#tradeTotalInvestment',
+                    quantityField: '#tradeQuantity',
+                    priceField: '#tradeEntryPrice',
+                    stopField: '#tradeStopLoss',
+                    targetField: '#tradeTakeProfit',
+                    allowFractionalShares: null,
+                    quantityDecimals: 0,
+                    amountDecimals: 2,
+                    syncPreference: 'auto',
+                    forceRiskOnBind: tradesMode === 'add',
+                    forceSyncOnBind: tradesMode === 'add',
+                    stopPreferenceKey: 'defaultStopLoss',
+                    targetPreferenceKey: 'defaultTargetPrice'
+                });
+                if (bindPromise && typeof bindPromise.catch === 'function') {
+                    bindPromise.catch(error => {
+                        window.Logger?.warn('⚠️ InvestmentCalculationService bind failed for trades modal', { error, page: 'modal-manager-v2' });
+                    });
+                }
+                tradeBindPromise = bindPromise;
+            }
+
+            const tradeStopInput = modalElement.querySelector('#tradeStopLoss');
+            const tradeTargetInput = modalElement.querySelector('#tradeTakeProfit');
+            const tradeEntryDateInput = modalElement.querySelector('#tradeEntryDate');
+
+            if (tradesMode === 'add') {
+                if (tradeStopInput) {
+                    delete tradeStopInput.dataset.userModified;
+                    delete tradeStopInput.dataset.systemGenerated;
+                }
+                if (tradeTargetInput) {
+                    delete tradeTargetInput.dataset.userModified;
+                    delete tradeTargetInput.dataset.systemGenerated;
+                }
+                if (tradeEntryDateInput) {
+                    delete tradeEntryDateInput.dataset.userModified;
+                    delete tradeEntryDateInput.dataset.systemGenerated;
+                }
+            } else {
+                if (tradeStopInput) {
+                    tradeStopInput.dataset.userModified = tradeStopInput.dataset.userModified || 'true';
+                }
+                if (tradeTargetInput) {
+                    tradeTargetInput.dataset.userModified = tradeTargetInput.dataset.userModified || 'true';
+                }
+                if (tradeEntryDateInput) {
+                    tradeEntryDateInput.dataset.userModified = tradeEntryDateInput.dataset.userModified || 'true';
+                }
+            }
+
+            scheduleTradeFinalize();
         }
         
         // For Alerts modal - handle ticker selection

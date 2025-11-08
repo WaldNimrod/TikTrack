@@ -343,7 +343,10 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
   if (currentStatus === 'cancelled') {
     // Item is already cancelled
     if (typeof window.showInfoNotification === 'function') {
-      window.showInfoNotification(`${getItemTypeDisplayName(itemType)} כבר מבוטל`);
+      const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
+        ? window.LinkedItemsService.getEntityLabel(itemType) 
+        : itemType;
+      window.showInfoNotification(`${entityLabel} כבר מבוטל`);
     }
     return;
   }
@@ -371,7 +374,10 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
         } else {
           handleFunctionNotFound('showLinkedItemsModal', 'פונקציית הצגת פריטים מקושרים לא נמצאה');
           if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה בביטול', `לא ניתן לבטל ${getItemTypeDisplayName(itemType)} זה - יש פריטים מקושרים אליו`);
+            const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
+              ? window.LinkedItemsService.getEntityLabel(itemType) 
+              : itemType;
+            window.showErrorNotification('שגיאה בביטול', `לא ניתן לבטל ${entityLabel} זה - יש פריטים מקושרים אליו`);
           }
         }
         return;
@@ -398,7 +404,10 @@ async function performItemCancellation(itemType, itemId, _itemName) {
   try {
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
     let response;
-    const successMessage = `${getItemTypeDisplayName(itemType)} בוטל בהצלחה!`;
+    const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
+      ? window.LinkedItemsService.getEntityLabel(itemType) 
+      : itemType;
+    const successMessage = `${entityLabel} בוטל בהצלחה!`;
 
     switch (itemType) {
     case 'trade_plan':
@@ -473,10 +482,13 @@ async function performItemCancellation(itemType, itemId, _itemName) {
 
   } catch (error) {
     handleApiError(error, `cancelling ${itemType} ${itemId}`);
+    const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
+      ? window.LinkedItemsService.getEntityLabel(itemType) 
+      : itemType;
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification(`שגיאה בביטול ${getItemTypeDisplayName(itemType)}`, error.message);
+      window.showErrorNotification(`שגיאה בביטול ${entityLabel}`, error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification(`שגיאה בביטול ${getItemTypeDisplayName(itemType)}`, 'error', 'שגיאה', 6000, 'system');
+      window.showNotification(`שגיאה בביטול ${entityLabel}`, 'error', 'שגיאה', 6000, 'system');
     }
   }
 }

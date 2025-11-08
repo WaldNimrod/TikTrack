@@ -18,6 +18,15 @@ const tradesModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
+        // שדה תצוגה לנתוני שוק לפני כל השדות
+        {
+            type: 'display',
+            id: 'tradeTickerInfoDisplay',
+            label: 'נתוני שוק',
+            description: 'מתעדכן אוטומטית לאחר בחירת טיקר',
+            rowClass: 'row',
+            colClass: 'col-12'
+        },
         // שורה ראשונה: טיקר + חשבון מסחר
         {
             type: 'select',
@@ -27,7 +36,7 @@ const tradesModalConfig = {
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6 col-sm-12'
         },
         {
             type: 'select',
@@ -38,110 +47,23 @@ const tradesModalConfig = {
             placeholder: 'בחר חשבון מסחר...',
             defaultFromPreferences: true, // ברירת מחדל מהעדפות
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6 col-sm-12'
         },
-        // שורה שנייה: שם הטרייד + סוג טרייד
-        {
-            type: 'text',
-            id: 'tradeName',
-            label: 'שם הטרייד',
-            required: true,
-            placeholder: 'הכנס שם לטרייד',
-            maxLength: 100,
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
+        // שורה שנייה: סוג השקעה + סטטוס
         {
             type: 'select',
             id: 'tradeType',
-            label: 'סוג טרייד',
+            label: 'סוג השקעה',
             required: true,
             options: [
-                { value: 'long', label: 'קנייה ארוכת טווח' },
-                { value: 'short', label: 'מכירה בחסר' },
-                { value: 'swing', label: 'מסחר תנודות' },
-                { value: 'scalp', label: 'סקלפינג' },
-                { value: 'position', label: 'פוזיציה' }
+                { value: 'swing', label: 'סווינג - מסחר לטווח קצר עד בינוני' },
+                { value: 'investment', label: 'השקעה - השקעה ארוכת טווח' },
+                { value: 'passive', label: 'פאסיבי - השקעה פאסיבית ללא פעילות מסחרית' }
             ],
-            defaultValue: 'long',
+            defaultValue: 'swing',
             rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        // שורה שלישית: כמות + מחיר כניסה
-        {
-            type: 'number',
-            id: 'tradeQuantity',
-            label: 'כמות',
-            required: true,
-            min: 1,
-            step: 1,
-            placeholder: 'הכנס כמות...',
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        {
-            type: 'number',
-            id: 'tradeEntryPrice',
-            label: 'מחיר כניסה',
-            required: true,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס מחיר כניסה...',
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        // שורה רביעית: מחיר יציאה + תאריך כניסה
-        {
-            type: 'number',
-            id: 'tradeExitPrice',
-            label: 'מחיר יציאה',
-            required: false,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס מחיר יציאה...',
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        {
-            type: 'datetime-local',
-            id: 'tradeEntryDate',
-            label: 'תאריך כניסה',
-            required: true,
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        // שורה חמישית: Stop Loss + Take Profit
-        {
-            type: 'number',
-            id: 'tradeStopLoss',
-            label: 'Stop Loss',
-            required: false,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס מחיר Stop Loss...',
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        {
-            type: 'number',
-            id: 'tradeTakeProfit',
-            label: 'Take Profit',
-            required: false,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס מחיר Take Profit...',
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        // שורה שישית: תאריך יציאה + סטטוס
-        {
-            type: 'datetime-local',
-            id: 'tradeExitDate',
-            label: 'תאריך יציאה',
-            required: false,
-            description: 'השאר ריק לטרייד פתוח',
-            rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6 col-sm-12',
+            description: 'המערכת תומכת בשלושת סוגי ההשקעה המאוחדים: Swing, Investment, Passive'
         },
         {
             type: 'select',
@@ -155,7 +77,87 @@ const tradesModalConfig = {
             ],
             defaultValue: 'open',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6 col-sm-12'
+        },
+        // שורה שלישית: מחיר כניסה + תאריך כניסה
+        {
+            type: 'number',
+            id: 'tradeEntryPrice',
+            label: 'מחיר כניסה',
+            required: true,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס מחיר כניסה...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        {
+            type: 'datetime-local',
+            id: 'tradeEntryDate',
+            label: 'תאריך כניסה',
+            required: true,
+            defaultValue: 'today',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        // שורה רביעית: כמות + סה"כ השקעה
+        {
+            type: 'number',
+            id: 'tradeQuantity',
+            label: 'כמות',
+            required: true,
+            min: 1,
+            step: 1,
+            placeholder: 'הכנס כמות...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        {
+            type: 'number',
+            id: 'tradeTotalInvestment',
+            label: 'סה״כ השקעה ($)',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס סכום להשקעה...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12',
+            description: 'הסכום הכולל להשקעה בטרייד'
+        },
+        // שורה חמישית: Stop Loss + Take Profit
+        {
+            type: 'number',
+            id: 'tradeStopLoss',
+            label: 'Stop Loss',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס מחיר Stop Loss...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        {
+            type: 'number',
+            id: 'tradeTakeProfit',
+            label: 'Take Profit',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס מחיר Take Profit...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        // שורה שישית: מחיר יציאה (אופציונלי)
+        {
+            type: 'number',
+            id: 'tradeExitPrice',
+            label: 'מחיר יציאה',
+            required: false,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס מחיר יציאה...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
         },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
@@ -188,11 +190,6 @@ const tradesModalConfig = {
         tradeAccount: {
             required: true
         },
-        tradeName: {
-            required: true,
-            minLength: 2,
-            maxLength: 100
-        },
         tradeType: {
             required: true
         },
@@ -218,9 +215,6 @@ const tradesModalConfig = {
         },
         tradeEntryDate: {
             required: true
-        },
-        tradeExitDate: {
-            required: false
         },
         tradeStatus: {
             required: true

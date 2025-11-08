@@ -334,6 +334,8 @@ function _REMOVED_copyTradePlan(planId) {
 // Global variables
 window.tradePlansData = [];
 window.tradePlansLoaded = false;
+let tradePlanDefaultPercentsCache = null;
+let tradePlanDefaultPercentsPromise = null;
 
 // ===== CRUD Modal Functions =====
 
@@ -622,6 +624,15 @@ function displayTradePlanTickerInfo(ticker) {
   if (typeof window.updateAmountFromShares === 'function') {
     window.updateAmountFromShares();
   }
+  if (typeof window.applyTradePlanDefaultRiskLevels === 'function') {
+    const tradePlansModalElement = document.getElementById('tradePlansModal');
+    const riskPromise = window.applyTradePlanDefaultRiskLevels({ force: false, modalElement: tradePlansModalElement });
+    if (riskPromise && typeof riskPromise.catch === 'function') {
+      riskPromise.catch(error => {
+        window.Logger?.warn('⚠️ applyTradePlanDefaultRiskLevels failed', { error, page: 'trade_plans' });
+      });
+    }
+  }
 }
 
 // ===== UI MANAGEMENT FUNCTIONS =====
@@ -692,45 +703,16 @@ async function updateTickerInfo() {
  */
 function updateSharesFromAmount() {
   try {
-    const {
-      amountInput,
-      sharesInput,
-      priceInput,
-      priceDisplay,
-    } = getTradePlanModalElements();
-
-    if (!amountInput || !sharesInput) {
-      return;
+    if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.updateFromAmount === 'function') {
+      const tradePlansModal = document.getElementById('tradePlansModal');
+      const tradesModal = document.getElementById('tradesModal');
+      if (tradePlansModal) {
+        window.InvestmentCalculationService.updateFromAmount(tradePlansModal);
+      }
+      if (tradesModal) {
+        window.InvestmentCalculationService.updateFromAmount(tradesModal);
+      }
     }
-
-    const amount = parseFieldValue(amountInput);
-    const price = parsePriceValue(priceInput, priceDisplay);
-
-    if (amount <= 0 || price <= 0) {
-      sharesInput.value = '';
-      return;
-    }
-
-    let result = null;
-    if (typeof window.convertAmountToShares === 'function') {
-      result = window.convertAmountToShares(amount, price);
-    } else if (typeof convertAmountToShares === 'function') {
-      result = convertAmountToShares(amount, price);
-    } else {
-      result = amount / price;
-    }
-
-    const { sharesValue, adjustedAmount } = normalizeSharesResult(result);
-    if (sharesValue !== null) {
-      sharesInput.value = sharesValue;
-    } else {
-      sharesInput.value = '';
-    }
-
-    if (typeof adjustedAmount === 'number' && adjustedAmount >= 0) {
-      amountInput.value = adjustedAmount.toFixed(2);
-    }
-    
   } catch (error) {
     window.Logger?.error('שגיאה בעדכון מניות מסכום:', error, { page: "trade_plans" });
     if (typeof window.showErrorNotification === 'function') {
@@ -748,40 +730,16 @@ function updateSharesFromAmount() {
  */
 function updateAmountFromShares() {
   try {
-    const {
-      amountInput,
-      sharesInput,
-      priceInput,
-      priceDisplay,
-    } = getTradePlanModalElements();
-
-    if (!amountInput || !sharesInput) {
-      return;
+    if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.updateFromQuantity === 'function') {
+      const tradePlansModal = document.getElementById('tradePlansModal');
+      const tradesModal = document.getElementById('tradesModal');
+      if (tradePlansModal) {
+        window.InvestmentCalculationService.updateFromQuantity(tradePlansModal);
+      }
+      if (tradesModal) {
+        window.InvestmentCalculationService.updateFromQuantity(tradesModal);
+      }
     }
-
-    const shares = parseFieldValue(sharesInput);
-    const price = parsePriceValue(priceInput, priceDisplay);
-
-    if (shares <= 0 || price <= 0) {
-      amountInput.value = '';
-      return;
-    }
-
-    let amount = null;
-    if (typeof window.convertSharesToAmount === 'function') {
-      amount = window.convertSharesToAmount(shares, price);
-    } else if (typeof convertSharesToAmount === 'function') {
-      amount = convertSharesToAmount(shares, price);
-    } else {
-      amount = shares * price;
-    }
-
-    if (typeof amount === 'number') {
-      amountInput.value = amount.toFixed(2);
-    } else if (amount) {
-      amountInput.value = amount;
-    }
-    
   } catch (error) {
     window.Logger?.error('שגיאה בעדכון סכום ממניות:', error, { page: "trade_plans" });
     if (typeof window.showErrorNotification === 'function') {
@@ -1830,6 +1788,126 @@ window.addEditCondition = addEditCondition;
 window.addEditReason = addEditReason;
 window.addEditImportantNote = addEditImportantNote;
 window.addEditReminder = addEditReminder;
+window.applyTradePlanDefaultRiskLevels = applyTradePlanDefaultRiskLevels;
+
+async function getTradePlanDefaultPercents() {
+  if (tradePlanDefaultPercentsCache) {
+    return tradePlanDefaultPercentsCache;
+  }
+  if (tradePlanDefaultPercentsPromise) {
+    return tradePlanDefaultPercentsPromise;
+  }
+
+  const loadPromise = (async () => {
+    let stopPercent = 2.5;
+    let targetPercent = 5.0;
+
+    const fetchPreference = async (key, fallback) => {
+      try {
+        if (typeof window.getUserPreference === 'function') {
+          const value = await window.getUserPreference(key, fallback);
+          return value;
+        }
+        if (typeof window.getPreference === 'function') {
+          const value = await window.getPreference(key, fallback);
+          return value;
+        }
+      } catch (error) {
+        window.Logger?.warn(`⚠️ Failed to load preference ${key}`, { error, page: 'trade_plans' });
+      }
+      return fallback;
+    };
+
+    try {
+      const [stopPref, targetPref] = await Promise.all([
+        fetchPreference('defaultStopLoss', null),
+        fetchPreference('defaultTargetPrice', null),
+      ]);
+
+      if (stopPref !== null && stopPref !== undefined && !Number.isNaN(parseFloat(stopPref))) {
+        stopPercent = Math.abs(parseFloat(stopPref));
+      }
+      if (targetPref !== null && targetPref !== undefined && !Number.isNaN(parseFloat(targetPref))) {
+        targetPercent = Math.abs(parseFloat(targetPref));
+      }
+    } catch (error) {
+      window.Logger?.warn('⚠️ Error loading trade plan default percents', { error, page: 'trade_plans' });
+    }
+
+    return {
+      stopPercent,
+      targetPercent,
+    };
+  })();
+
+  tradePlanDefaultPercentsPromise = loadPromise
+    .then(result => {
+      tradePlanDefaultPercentsCache = result;
+      tradePlanDefaultPercentsPromise = null;
+      return result;
+    })
+    .catch(error => {
+      tradePlanDefaultPercentsPromise = null;
+      throw error;
+    });
+
+  return tradePlanDefaultPercentsPromise;
+}
+
+async function applyTradePlanDefaultRiskLevels(options = {}) {
+  if (!window.InvestmentCalculationService || typeof window.InvestmentCalculationService.applyDefaultRisk !== 'function') {
+    return;
+  }
+
+  const modalElement = options.modalElement
+    || document.querySelector('.modal.show#tradePlansModal')
+    || document.querySelector('.modal.show#tradesModal')
+    || document.getElementById('tradePlansModal')
+    || document.getElementById('tradesModal');
+
+  if (!modalElement) {
+    return;
+  }
+
+  const promise = window.InvestmentCalculationService.applyDefaultRisk(modalElement, options);
+
+  const entryDateInput = document.getElementById('tradePlanEntryDate')
+    || document.getElementById('tradeEntryDate');
+  if (entryDateInput && (!entryDateInput.dataset.userModified || options.force) && !entryDateInput.value) {
+    let assignedValue = null;
+
+    if (entryDateInput.type === 'date') {
+      if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+        assignedValue = window.DefaultValueSetter.setCurrentDate(entryDateInput.id);
+      }
+
+      if (!assignedValue) {
+        const today = new Date();
+        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+        assignedValue = today.toISOString().slice(0, 10);
+      }
+
+      entryDateInput.value = assignedValue;
+    } else {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      const isoString = now.toISOString();
+
+      if (entryDateInput.type === 'datetime-local') {
+        assignedValue = isoString.slice(0, 16);
+      } else {
+        assignedValue = isoString;
+      }
+
+      entryDateInput.value = assignedValue;
+    }
+
+    entryDateInput.dataset.systemGenerated = 'true';
+    delete entryDateInput.dataset.userModified;
+  }
+
+  return promise;
+}
 
 /**
  * Helper to gather modal inputs used for amount/quantity calculations
@@ -1839,17 +1917,24 @@ function getTradePlanModalElements() {
   const amountInput = document.getElementById('planAmount')
     || document.getElementById('plannedAmount')
     || document.getElementById('addTradePlanPlannedAmount')
+    || document.getElementById('tradeTotalInvestment')
     || null;
 
   const sharesInput = document.getElementById('tradePlanQuantity')
     || document.getElementById('shares')
     || document.getElementById('addTradePlanShares')
+    || document.getElementById('tradeQuantity')
     || null;
 
-  const priceInput = document.getElementById('tradePlanEntryPrice') || null;
+  const priceInput = document.getElementById('tradePlanEntryPrice')
+    || document.getElementById('tradeEntryPrice')
+    || null;
   const priceDisplay = document.getElementById('currentPriceDisplay') || null;
+  const entryDateInput = document.getElementById('tradePlanEntryDate')
+    || document.getElementById('tradeEntryDate')
+    || null;
 
-  return { amountInput, sharesInput, priceInput, priceDisplay };
+  return { amountInput, sharesInput, priceInput, priceDisplay, entryDateInput };
 }
 
 /**
@@ -2849,6 +2934,7 @@ window.addReminder = addReminder;
 window.updateTickerInfo = updateTickerInfo;
 window.updateSharesFromAmount = updateSharesFromAmount;
 window.updateAmountFromShares = updateAmountFromShares;
+window.applyTradePlanDefaultRiskLevels = applyTradePlanDefaultRiskLevels;
 
 // REMOVED: window.showAddTradePlanModal - use window.showModalSafe('tradePlansModal', 'add') directly
 
@@ -2964,7 +3050,6 @@ async function saveTradePlan() {
         const tradePlanData = DataCollectionService.collectFormData({
             trading_account_id: { id: 'tradePlanAccount', type: 'int' }, // Backend expects trading_account_id
             ticker_id: { id: 'tradePlanTicker', type: 'int' },
-            name: { id: 'tradePlanName', type: 'text' },
             investment_type: { id: 'tradePlanType', type: 'text' }, // Map tradePlanType field to investment_type column
             planned_amount: { id: 'planAmount', type: 'float' },
             quantity: { id: 'tradePlanQuantity', type: 'float' },
@@ -2988,13 +3073,6 @@ async function saveTradePlan() {
         if (!tradePlanData.ticker_id) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanTicker', 'טיקר הוא שדה חובה');
-            }
-            hasErrors = true;
-        }
-        
-        if (!tradePlanData.name || tradePlanData.name.trim() === '') {
-            if (window.showValidationWarning) {
-                window.showValidationWarning('tradePlanName', 'שם התוכנית הוא שדה חובה');
             }
             hasErrors = true;
         }

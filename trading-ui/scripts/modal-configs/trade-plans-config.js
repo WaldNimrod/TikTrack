@@ -18,7 +18,15 @@ const tradePlansModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
-        // שורה ראשונה: טיקר + שם התוכנית
+        // שורה ראשונה: טיקר + סוג השקעה + סטטוס
+        {
+            type: 'display',
+            id: 'tradePlanTickerInfo',
+            label: 'נתוני שוק',
+            description: 'מתעדכן אוטומטית לאחר בחירת טיקר',
+            rowClass: 'row',
+            colClass: 'col-12'
+        },
         {
             type: 'select',
             id: 'tradePlanTicker',
@@ -27,19 +35,8 @@ const tradePlansModalConfig = {
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-4'
         },
-        {
-            type: 'text',
-            id: 'tradePlanName',
-            label: 'שם התוכנית',
-            required: true,
-            placeholder: 'הכנס שם לתוכנית',
-            maxLength: 100,
-            rowClass: 'row',
-            colClass: 'col-md-6'
-        },
-        // שורה שנייה: סוג השקעה + סכום השקעה מתוכנן
         {
             type: 'select',
             id: 'tradePlanType',
@@ -53,31 +50,23 @@ const tradePlansModalConfig = {
             ],
             defaultValue: 'swing',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-4'
         },
         {
-            type: 'number',
-            id: 'planAmount',
-            label: 'סכום השקעה מתוכנן ($)',
+            type: 'select',
+            id: 'tradePlanStatus',
+            label: 'סטטוס',
             required: true,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס סכום השקעה...',
-            colClass: 'col-md-6',
-            description: 'הסכום הכולל להשקעה בתכנון'
-        },
-        // שורה שלישית: כמות מתוכננת + מחיר כניסה מתוכנן
-        {
-            type: 'number',
-            id: 'tradePlanQuantity',
-            label: 'כמות מתוכננת',
-            required: true,
-            min: 1,
-            step: 1,
-            placeholder: 'הכנס כמות...',
+            options: [
+                { value: 'open', label: 'פתוח' },
+                { value: 'closed', label: 'סגור' },
+                { value: 'cancelled', label: 'מבוטל' }
+            ],
+            defaultValue: 'open',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-4'
         },
+        // שורה שנייה: מחיר כניסה + תאריך כניסה
         {
             type: 'number',
             id: 'tradePlanEntryPrice',
@@ -86,18 +75,41 @@ const tradePlansModalConfig = {
             min: 0.01,
             step: 0.01,
             placeholder: 'הכנס מחיר כניסה...',
-            colClass: 'col-md-6'
-        },
-        // שורה רביעית: תאריך כניסה מתוכנן + Stop Loss
-        {
-            type: 'datetime-local',
-            id: 'tradePlanEntryDate',
-            label: 'תאריך כניסה מתוכנן',
-            required: false,
-            description: 'השאר ריק לכניסה מיידית',
             rowClass: 'row',
             colClass: 'col-md-6'
         },
+        {
+            type: 'date',
+            id: 'tradePlanEntryDate',
+            label: 'תאריך כניסה מתוכנן',
+            required: false,
+            description: 'ברירת מחדל: היום',
+            colClass: 'col-md-6'
+        },
+        // שורה שלישית: כמות + סכום השקעה
+        {
+            type: 'number',
+            id: 'planAmount',
+            label: 'סכום השקעה מתוכנן ($)',
+            required: true,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס סכום השקעה...',
+            rowClass: 'row',
+            colClass: 'col-md-6',
+            description: 'הסכום הכולל להשקעה בתכנון'
+        },
+        {
+            type: 'number',
+            id: 'tradePlanQuantity',
+            label: 'כמות מתוכננת',
+            required: true,
+            min: 1,
+            step: 1,
+            placeholder: 'הכנס כמות...',
+            colClass: 'col-md-6'
+        },
+        // שורה רביעית: סטופ + יעד
         {
             type: 'number',
             id: 'tradePlanStopLoss',
@@ -119,19 +131,6 @@ const tradePlansModalConfig = {
             placeholder: 'הכנס מחיר Take Profit...',
             rowClass: 'row',
             colClass: 'col-md-6'
-        },
-        // שורה חמישית: סטטוס (בשורה מלאה)
-        {
-            type: 'select',
-            id: 'tradePlanStatus',
-            label: 'סטטוס',
-            required: true,
-            options: [
-                { value: 'open', label: 'פתוח' },
-                { value: 'closed', label: 'סגור' },
-                { value: 'cancelled', label: 'מבוטל' }
-            ],
-            defaultValue: 'open'
         },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {

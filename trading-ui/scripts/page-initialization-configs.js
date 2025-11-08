@@ -325,7 +325,7 @@ const PAGE_CONFIGS = {
         // - 'validation': מערכת ולידציה מאוחדת
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'validation', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -333,6 +333,8 @@ const PAGE_CONFIGS = {
             'DataUtils',
             'window.Logger',
             'window.CacheSyncManager',
+            'window.ModalManagerV2',
+            'window.InvestmentCalculationService',
             'window.loadTradesData',
             'window.checkLinkedItemsBeforeAction',
             'window.RichTextEditorService',
@@ -472,13 +474,15 @@ const PAGE_CONFIGS = {
         // - 'entity-details': מערכות פרטי ישויות
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'modules', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
             'DataUtils',
             'window.loadTradePlansData',
+            'window.ModalManagerV2',
+            'window.InvestmentCalculationService',
             'window.RichTextEditorService',
             'window.Quill',
             'window.DOMPurify'

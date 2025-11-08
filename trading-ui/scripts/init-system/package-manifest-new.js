@@ -106,15 +106,21 @@ const PACKAGE_MANIFEST = {
         required: true
       },
       {
-        file: 'ui-utils.js',
-        globalCheck: 'window.toggleSection',
-        description: 'כלי עזר UI',
+        file: 'cache-sync-manager.js',
+        globalCheck: 'window.CacheSyncManager',
+        description: 'מנהל סנכרון מטמון',
         required: true
       },
       {
         file: 'warning-system.js',
         globalCheck: 'window.WarningSystem',
         description: 'מערכת אזהרות',
+        required: true
+      },
+      {
+        file: 'ui-utils.js',
+        globalCheck: 'window.toggleSection',
+        description: 'כלי עזר UI',
         required: true
       },
       {
@@ -127,12 +133,6 @@ const PACKAGE_MANIFEST = {
         file: 'unified-cache-manager.js',
         globalCheck: 'window.UnifiedCacheManager',
         description: 'מנהל מטמון מאוחד',
-        required: true
-      },
-      {
-        file: 'cache-sync-manager.js',
-        globalCheck: 'window.CacheSyncManager',
-        description: 'מנהל סנכרון מטמון',
         required: true
       },
       {
@@ -214,6 +214,12 @@ const PACKAGE_MANIFEST = {
         file: 'services/default-value-setter.js',
         globalCheck: 'window.DefaultValueSetter',
         description: 'שירות ברירות מחדל',
+        required: true
+      },
+      {
+        file: 'services/investment-calculation-service.js',
+        globalCheck: 'window.InvestmentCalculationService',
+        description: 'חישובי סכום ↔ כמות לטפסי השקעה',
         required: true
       }
     ],

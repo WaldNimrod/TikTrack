@@ -230,7 +230,7 @@ def check_all():
                         'pages': []
                     }
                 elif check == 'duplicates':
-                    result = run_script('simple-duplicate-detector.js')
+                    result = run_script('advanced-duplicate-detector.js')
                     if result['success']:
                         results[check] = parse_duplicates_output(result['output'])
             except Exception as e:
@@ -449,9 +449,52 @@ def parse_naming_output(output):
 def parse_duplicates_output(output):
     """Parse Advanced Duplicate Detector output"""
     try:
-        # Look for the summary section in the output
         lines = output.split('\n')
-        
+        marker = '__REPORT_JSON__'
+
+        report_json = None
+        for line in reversed(lines):
+            if line.startswith(marker):
+                report_json = line[len(marker):].strip()
+                break
+
+        if report_json:
+            try:
+                report = json.loads(report_json)
+            except json.JSONDecodeError as exc:
+                logger.error(f"Failed to decode duplicate detector report: {exc}")
+            else:
+                summary = report.get('summary', {})
+                duplicates_map = report.get('duplicates', {})
+
+                flattened_duplicates = []
+                for dup_type, dup_items in duplicates_map.items():
+                    for item in dup_items:
+                        flattened_duplicates.append({
+                            'type': dup_type.lower(),
+                            'similarity': item.get('similarity', 0),
+                            'confidence': item.get('confidence', 0),
+                            'category': item.get('category'),
+                            'func1': item.get('func1', {}),
+                            'func2': item.get('func2', {}),
+                            'recommendation': item.get('recommendation', None)
+                        })
+
+                return {
+                    'summary': {
+                        'totalFunctions': summary.get('totalFunctions', 0),
+                        'totalDuplicates': summary.get('totalDuplicates', 0),
+                        'exactDuplicates': summary.get('exactDuplicates', 0),
+                        'nearDuplicates': summary.get('nearDuplicates', 0),
+                        'similarPatterns': summary.get('similarPatterns', 0),
+                        'potentialDuplicates': summary.get('potentialDuplicates', 0)
+                    },
+                    'duplicates': flattened_duplicates,
+                    'categories': report.get('categories', {}),
+                    'recommendations': report.get('recommendations', [])
+                }
+
+        # Fallback to legacy parsing if JSON marker not found
         summary = {
             'totalFunctions': 0,
             'totalDuplicates': 0,
@@ -460,15 +503,7 @@ def parse_duplicates_output(output):
             'similarPatterns': 0,
             'potentialDuplicates': 0
         }
-        
-        duplicates = {
-            'exact': [],
-            'near': [],
-            'similar': [],
-            'potential': []
-        }
-        
-        # Parse the output to extract summary
+
         for line in lines:
             if 'Total Functions Analyzed' in line:
                 summary['totalFunctions'] = int(line.split(':')[1].strip())
@@ -482,10 +517,10 @@ def parse_duplicates_output(output):
                 summary['similarPatterns'] = int(line.split(':')[1].strip())
             elif 'Potential Duplicates' in line:
                 summary['potentialDuplicates'] = int(line.split(':')[1].strip())
-        
+
         return {
             'summary': summary,
-            'duplicates': duplicates,
+            'duplicates': [],
             'categories': {},
             'recommendations': []
         }
@@ -493,8 +528,15 @@ def parse_duplicates_output(output):
     except Exception as e:
         logger.error(f"Error parsing duplicates output: {e}")
         return {
-            'summary': summary,
-            'duplicates': duplicates,
+            'summary': {
+                'totalFunctions': 0,
+                'totalDuplicates': 0,
+                'exactDuplicates': 0,
+                'nearDuplicates': 0,
+                'similarPatterns': 0,
+                'potentialDuplicates': 0
+            },
+            'duplicates': [],
             'categories': {},
             'recommendations': [],
             'error': str(e)
@@ -506,8 +548,8 @@ def check_duplicates():
     try:
         logger.info("Running Simple Duplicate Code Detector")
         
-        # Run the detector script
-        result = run_script('simple-duplicate-detector.js')
+        # Run the advanced detector script
+        result = run_script('advanced-duplicate-detector.js')
         
         if result['success']:
             # Parse the output to extract results

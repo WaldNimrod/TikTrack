@@ -25,7 +25,6 @@
 - **Inline styles**: 17 קבצי HTML עם styles מוטמעים
 
 #### **קבצים בעייתיים ביותר**:
-- `js-map.js`: 126 console.log + 43 כפילויות
 - `init-system-management.js`: 85 console.log + 57 פונקציות
 - `core-systems.js`: 187 console.log + 46 כפילויות
 - `import-user-data-old.js`: 79 console.log + 157 פונקציות
@@ -115,7 +114,6 @@
 | **cache-test.html** | בדיקת מטמון | `http://localhost:5000/cache-test.html` | `/api/cache/*` |
 | **linter-realtime-monitor.html** | ניטור לינטר | `http://localhost:5000/linter-realtime-monitor.html` | `/api/linter/*` |
 | **notifications-center.html** | מרכז התראות | `http://localhost:5000/notifications-center.html` | `/api/notifications/*` |
-| **page-scripts-matrix.html** | מטריצת סקריפטים | `http://localhost:5000/page-scripts-matrix.html` | `/api/scripts/*` |
 | **css-management.html** | ניהול CSS | `http://localhost:5000/css-management.html` | `/api/css/*` |
 | **dynamic-colors-display.html** | תצוגת צבעים | `http://localhost:5000/dynamic-colors-display.html` | `/api/colors/*` |
 | **designs.html** | עיצובים | `http://localhost:5000/designs.html` | `/api/designs/*` |
@@ -157,9 +155,9 @@
 
 - **סה"כ עמודים ראשיים:** 24 עמודים
 - **עמודים מרכזיים:** 11 עמודים
-- **עמודים טכניים:** 13 עמודים
+- **עמודים טכניים:** 12 עמודים
 - **עמודים משניים:** 5 עמודים
-- **סה"כ עמודים:** 29 עמודים
+- **סה"כ עמודים:** 28 עמודים
 
 ---
 
@@ -170,6 +168,9 @@
 3. **כל העמודים** עובדים עם מערכת ההתראות הגלובלית
 4. **כל העמודים** תומכים במערכת התנאים החדשה
 5. **כל העמודים** עובדים עם מערכת הכפתורים המרכזית
+6. עמוד `page-scripts-matrix` הועבר לארכיון ב-7 בנובמבר 2025 ואינו זמין בסביבת הפיתוח הפעילה
+7. כלי זיהוי הכפילויות הועבר לדשבורד איכות הקוד (`/code-quality-dashboard`) ב-7 בנובמבר 2025 והעמוד `duplicate-detector.html` הועבר לארכיון
+8. עמוד `js-map` (מפת JS) הועבר לארכיון ב-7 בנובמבר 2025; פונקציות המיפוי עברו לכלים משודרגים ומטופלות בדוחות מערכת אחרים
 
 ---
 

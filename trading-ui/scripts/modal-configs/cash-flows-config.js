@@ -80,7 +80,7 @@ const cashFlowModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
-        // שורה שלישית: תאריך + תיאור
+        // שורה שלישית: תאריך + קישור לטרייד
         {
             type: 'date',
             id: 'cashFlowDate',
@@ -94,27 +94,15 @@ const cashFlowModalConfig = {
             colClass: 'col-md-6'
         },
         {
-            type: 'rich-text',
-            id: 'cashFlowDescription',
-            label: 'תיאור',
-            placeholder: 'תיאור התזרים',
-            maxLength: 5000,
-            options: {
-                direction: 'rtl',
-                placeholder: 'תיאור התזרים',
-                toolbar: [
-                    [{ 'header': [2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'align': ['right', 'center', 'left', 'justify'] }],
-                    [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['link'],
-                    ['clean']
-                ]
-            },
+            type: 'linkButton',
+            id: 'linkedTrade',
+            label: 'קישור לטרייד',
+            buttonText: 'קשר לטרייד',
+            description: 'לחיצה תפתח מודל לבחירת טרייד',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6',
+            width: 300,
+            style: 'width: 300px; min-width: 200px;'
         },
         // שורה רביעית: מקור + מזהה חיצוני
         {
@@ -145,17 +133,29 @@ const cashFlowModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
-        // שורה חמישית: קישור לטרייד
+        // שורה חמישית: תיאור לכל רוחב המודל
         {
-            type: 'linkButton',
-            id: 'linkedTrade',
-            label: 'קישור לטרייד',
-            buttonText: 'קשר לטרייד',
-            description: 'לחיצה תפתח מודל לבחירת טרייד',
+            type: 'rich-text',
+            id: 'cashFlowDescription',
+            label: 'תיאור',
+            placeholder: 'תיאור התזרים',
+            maxLength: 5000,
+            options: {
+                direction: 'rtl',
+                placeholder: 'תיאור התזרים',
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                    [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            },
             rowClass: 'row',
-            colClass: 'col-12',
-            width: 300,
-            style: 'width: 300px; min-width: 200px;'
+            colClass: 'col-12'
         }
             ]
         },
@@ -167,18 +167,19 @@ const cashFlowModalConfig = {
                 // שורה ראשונה: חשבון מסחר + תאריך
                 {
                     type: 'select',
-                    id: 'cashFlowAccount',
+                    id: 'currencyExchangeAccount',
                     label: 'חשבון מסחר',
                     required: true,
                     width: 300,
                     style: 'width: 300px; min-width: 200px;',
                     defaultFromPreferences: true,
+                    populateFromService: 'accounts',
                     rowClass: 'row',
                     colClass: 'col-md-6'
                 },
                 {
                     type: 'date',
-                    id: 'cashFlowDate',
+                    id: 'currencyExchangeDate',
                     label: 'תאריך',
                     required: true,
                     dateTime: false,
@@ -273,10 +274,39 @@ const cashFlowModalConfig = {
                     rowClass: 'row',
                     colClass: 'col-12'
                 },
-                // שורה שישית: תיאור (בשורה מלאה)
+                // שורה שישית: מקור + מזהה חיצוני
+                {
+                    type: 'select',
+                    id: 'currencyExchangeSource',
+                    label: 'מקור',
+                    required: true,
+                    width: 300,
+                    style: 'width: 300px; min-width: 200px;',
+                    options: [
+                        { value: 'manual', label: 'ידני' },
+                        { value: 'IBKR-tradelog-csv', label: 'IBKR CSV' },
+                        { value: 'IBKR-api', label: 'IBKR API' }
+                    ],
+                    defaultValue: 'manual',
+                    rowClass: 'row',
+                    colClass: 'col-md-6'
+                },
+                {
+                    type: 'text',
+                    id: 'currencyExchangeExternalId',
+                    label: 'מזהה חיצוני',
+                    placeholder: 'מזהה חיצוני (אופציונלי)',
+                    defaultValue: '0',
+                    disabled: true,
+                    width: 300,
+                    style: 'width: 300px; min-width: 200px;',
+                    rowClass: 'row',
+                    colClass: 'col-md-6'
+                },
+                // שורה שביעית: תיאור (בשורה מלאה)
                 {
                     type: 'rich-text',
-                    id: 'cashFlowDescription',
+                    id: 'currencyExchangeDescription',
                     label: 'תיאור',
                     placeholder: 'תיאור ההמרה',
                     maxLength: 5000,

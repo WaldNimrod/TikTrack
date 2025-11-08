@@ -48,28 +48,12 @@ class CSSDuplicatesAnalyzer {
                 files: ['styles-new/06-components/_forms-advanced.css', 'styles-new/09-utilities/_utilities.css']
             },
             {
-                selector: '.info-item',
-                files: ['styles-new/06-components/_info-summary.css', 'styles-new/07-trumps/js-map-advanced.css']
-            },
-            {
                 selector: '.logo-section',
                 files: ['styles-new/06-components/_navigation.css', 'styles-new/header-styles.css']
             },
             {
                 selector: '.logo-text',
                 files: ['styles-new/06-components/_navigation.css', 'styles-new/header-styles.css']
-            },
-            {
-                selector: '.status-grid',
-                files: ['styles-new/06-components/_system-management.css', 'styles-new/07-trumps/js-map-advanced.css']
-            },
-            {
-                selector: '.status-label',
-                files: ['styles-new/06-components/_system-management.css', 'styles-new/07-trumps/js-map-advanced.css']
-            },
-            {
-                selector: '.quick-actions',
-                files: ['styles-new/06-components/_system-management.css', 'styles-new/07-trumps/js-map-advanced.css']
             },
             {
                 selector: '.header-actions',

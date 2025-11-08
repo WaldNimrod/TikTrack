@@ -142,14 +142,17 @@ async function handleAccountSelection(event) {
     
     window.accountActivityState.selectedAccountId = accountId;
     
-    // Show section body
-    const sectionBody = document.querySelector('[data-section="account-activity"] .section-body');
-    if (sectionBody) {
-        sectionBody.style.display = 'block';
-        // Setup statistics filter hook when section is shown
+    // Show section bodies
+    const summaryBody = document.querySelector('[data-section="account-activity-summary"] .section-body');
+    if (summaryBody) {
+        summaryBody.style.display = 'block';
         setTimeout(() => {
             setupStatisticsFilterHook();
         }, 500);
+    }
+    const tableBody = document.querySelector('[data-section="account-activity-table"] .section-body');
+    if (tableBody) {
+        tableBody.style.display = 'block';
     }
     
     // Load activity data
@@ -413,19 +416,35 @@ function renderMovementRow(movement, runningBalance) {
     typeCell.className = 'col-type';
     // שמירת סוג באנגלית לפילטר
     typeCell.setAttribute('data-type', movement.type || '');
-    typeCell.textContent = movement.type === 'cash_flow' ? 'תזרים מזומנים' : 'ביצוע';
+    const rawSubtype = movement.sub_type || movement.subtype || movement.action || '';
+    const subtypeKey = (rawSubtype || '').toLowerCase();
+    const isOpeningBalance = (movement.type === 'cash_flow' && subtypeKey === 'opening_balance');
+    if (isOpeningBalance) {
+        typeCell.textContent = 'מערכת';
+    } else if (movement.type === 'cash_flow') {
+        typeCell.textContent = 'תזרים מזומנים';
+    } else if (movement.type === 'execution') {
+        typeCell.textContent = 'ביצוע';
+    } else {
+        typeCell.textContent = movement.type || '-';
+    }
     row.appendChild(typeCell);
     
     // Sub-type - using FieldRendererService.renderType for cash flows or renderAction for executions
     const subtypeCell = document.createElement('td');
     subtypeCell.className = 'col-subtype';
     // שמירת תת-סוג באנגלית לפילטר (יכול להיות רלוונטי לפילטר סוג)
-    const subTypeValue = movement.sub_type || movement.subtype || movement.action || '';
+    const subTypeValue = rawSubtype;
     subtypeCell.setAttribute('data-type', subTypeValue);
+    const normalizedAmountForColor = normalizeAmountBySubtype(
+        movement.amount || '0',
+        movement.type || '',
+        subTypeValue
+    );
     if (movement.type === 'cash_flow') {
         // Use renderType for cash flow subtypes (deposit, withdrawal, fee, etc.)
         if (window.FieldRendererService && window.FieldRendererService.renderType) {
-            subtypeCell.innerHTML = window.FieldRendererService.renderType(movement.sub_type || movement.subtype, movement.amount);
+            subtypeCell.innerHTML = window.FieldRendererService.renderType(subTypeValue, normalizedAmountForColor);
         } else {
             subtypeCell.textContent = getSubtypeDisplay(movement.sub_type || movement.subtype);
         }
@@ -476,11 +495,7 @@ function renderMovementRow(movement, runningBalance) {
       }
     }
     // Normalize amount for display based on subtype rules (each subtype has clear direction)
-    const displayAmount = normalizeAmountBySubtype(
-        movement.amount || '0',
-        movement.type || '',
-        movement.sub_type || movement.subtype || movement.action || ''
-    );
+    const displayAmount = normalizedAmountForColor;
     
     if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
         amountCell.innerHTML = window.FieldRendererService.renderAmount(displayAmount, currencySymbol, 0);
@@ -514,11 +529,15 @@ function renderMovementRow(movement, runningBalance) {
     // Actions - simple details button (square button: width equals height)
     const actionsCell = document.createElement('td');
     actionsCell.className = 'col-actions actions-cell';
-    actionsCell.innerHTML = `
+    if (isOpeningBalance) {
+        actionsCell.innerHTML = `<span class="text-muted">-</span>`;
+    } else {
+        actionsCell.innerHTML = `
         <button class="btn btn-sm" onclick="openMovementDetails(${movement.id}, '${movement.type}')" title="פרטים" style="width: 2.5em; height: 2.5em; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
             👁️
         </button>
     `;
+    }
     row.appendChild(actionsCell);
     
     return row;
@@ -530,7 +549,8 @@ function renderMovementRow(movement, runningBalance) {
 function updateActivitySummary(data) {
     // Always update date range in title first (works even if data is null)
     const tableTitleDateRange = document.getElementById('accountActivityDateRange');
-    if (tableTitleDateRange) {
+    const summaryDateRange = document.getElementById('accountActivitySelectedRange');
+    if (tableTitleDateRange || summaryDateRange) {
         const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
         let startDate = null;
         let endDate = new Date(); // Today
@@ -591,7 +611,13 @@ function updateActivitySummary(data) {
             dateRangeDisplay = 'כל הזמנים';
         }
         
-        tableTitleDateRange.textContent = `[${dateRangeDisplay}]`;
+        if (tableTitleDateRange) {
+            tableTitleDateRange.textContent = dateRangeDisplay;
+        }
+
+        if (summaryDateRange) {
+            summaryDateRange.textContent = dateRangeDisplay;
+        }
     }
     
     // Update table count (always update, even if no data - show 0)
@@ -710,6 +736,10 @@ function updateCurrencyBalancesFooter(data) {
  * Open movement details in EntityDetailsModal
  */
 function openMovementDetails(movementId, movementType) {
+    if (!movementId || (typeof movementId === 'string' && movementId.startsWith('opening-balance'))) {
+        window.Logger.debug('Skipping details for opening balance movement', { movementId, movementType, page: "trading_accounts" });
+        return;
+    }
     if (!window.EntityDetailsModal) {
         window.Logger.warn('⚠️ EntityDetailsModal not available', { page: "trading_accounts" });
         if (window.showNotification) {
@@ -801,10 +831,9 @@ function getSubtypeDisplay(subtype) {
         'interest': 'ריבית',
         'transfer_in': 'העברה פנימה',
         'transfer_out': 'העברה החוצה',
-        'transfer': 'העברה',
         'other_positive': 'אחר חיובי',
         'other_negative': 'אחר שלילי',
-        'other': 'אחר',
+        'opening_balance': 'יתרת פתיחה',
         // Execution subtypes
         'buy': 'קנייה',
         'sell': 'מכירה',
@@ -831,6 +860,10 @@ function normalizeAmountBySubtype(amount, type, subtype) {
         // Always positive or neutral (if 0)
         // Deposit: always positive (money coming in), neutral if 0
         if (subTypeValue === 'deposit' || subTypeValue === 'הפקדה') {
+            return amountNum === 0 ? 0 : Math.abs(amountNum);
+        }
+        
+        if (subTypeValue === 'opening_balance' || subTypeValue === 'יתרת פתיחה') {
             return amountNum === 0 ? 0 : Math.abs(amountNum);
         }
         
@@ -1036,25 +1069,13 @@ function calculateActivityStatistics() {
         // Group by subtype
         // IMPORTANT: Merge related subtypes into single groups:
         // - 'deposit' and 'withdrawal' into 'deposits_withdrawals'
-        // - 'other_positive' and 'other_negative' into 'other'
-        // - 'transfer_in' and 'transfer_out' into 'transfer'
         const bySubtype = {};
         movements.forEach(m => {
-            let subtype = m.subtype || 'other';
+            let subtype = (m.subtype || (m.amount >= 0 ? 'other_positive' : 'other_negative')).toLowerCase();
             
             // Merge 'deposit' and 'withdrawal' into 'deposits_withdrawals'
             if (subtype === 'deposit' || subtype === 'withdrawal') {
                 subtype = 'deposits_withdrawals';
-            }
-            
-            // Merge 'other_positive' and 'other_negative' into 'other'
-            if (subtype === 'other_positive' || subtype === 'other_negative') {
-                subtype = 'other';
-            }
-            
-            // Merge 'transfer_in' and 'transfer_out' into 'transfer'
-            if (subtype === 'transfer_in' || subtype === 'transfer_out') {
-                subtype = 'transfer';
             }
             
             if (!bySubtype[subtype]) {
@@ -2112,7 +2133,7 @@ function renderBreakdownBySubtype(stats, typeName, column) {
         // 5. interest (ריבית)
         // 6. other (אחר)
         // For executions: keep alphabetical order (buy/sell)
-        const subtypeOrder = ['deposits_withdrawals', 'fee', 'dividend', 'transfer', 'interest', 'other'];
+        const subtypeOrder = ['deposits_withdrawals', 'fee', 'dividend', 'transfer_in', 'transfer_out', 'interest', 'other_positive', 'other_negative'];
         const subtypes = Object.keys(stats.bySubtype).sort((a, b) => {
             if (isExecution) {
                 // For executions: alphabetical order

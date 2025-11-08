@@ -260,6 +260,7 @@ class FieldRendererService {
             'transfer_out': 'העברה החוצה',
             'other_positive': 'אחר חיובי',
             'other_negative': 'אחר שלילי',
+            'opening_balance': 'יתרת פתיחה',
             // Execution actions (buy/sell)
             'buy': 'קנייה',
             'sell': 'מכירה',
@@ -274,7 +275,7 @@ class FieldRendererService {
         if (amountForColor !== null && amountForColor !== undefined) {
             colorClass = amountForColor >= 0 ? ' text-success' : ' text-danger';
         } else {
-            const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive']);
+            const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive', 'opening_balance']);
             const negativeTypes = new Set(['withdrawal', 'fee', 'transfer_out', 'other_negative']);
             if (positiveTypes.has(typeLower)) {
                 colorClass = ' text-success';
@@ -496,6 +497,16 @@ class FieldRendererService {
             </div>`;
         }
 
+        if (renderMode === 'linked-items-table') {
+            const escapedLabel = this._escapeHtml(label);
+            const escapedText = this._escapeHtml(text);
+            return `
+            <a href="#" class="linked-items-table-link text-decoration-none d-flex flex-column align-items-start gap-1" role="link" tabindex="0" ${onclick} data-entity-type="${type}" data-entity-id="${safeId}">
+                <span class="linked-items-table-label fw-semibold text-body">${escapedLabel}</span>
+                <span class="linked-items-table-name text-muted small">${escapedText}</span>
+            </a>`;
+        }
+
         // Determine center content
         // 1) For account: show account name (displayName/meta.name), no date
         // 2) For other types: ticker symbol (meta.ticker or displayName for ticker/trade/trade_plan) + date if exists
@@ -604,7 +615,8 @@ class FieldRendererService {
                 'cash_flow': 'cash_flow',
                 'alert': 'alert',
                 'note': 'note',
-                'execution': 'execution'
+                'execution': 'execution',
+                'position': 'position'
             };
             return map[raw] || raw || 'default';
         }
@@ -630,6 +642,7 @@ class FieldRendererService {
             'note': 'הערה',
             'trade_plan': 'תוכנית',
             'execution': 'ביצוע',
+            'position': 'פוזיציה',
             'default': 'אובייקט'
         };
         return map[type] || map['default'];

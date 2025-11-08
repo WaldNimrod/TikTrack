@@ -587,11 +587,46 @@ function updateAlertsTable(alerts) {
       const symbolDisplay = window.getRelatedObjectSymbol ? 
         window.getRelatedObjectSymbol(alert, dataSources) : '-';
 
-      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }) : 'לא מוגדר';
+      const createdAtRawCandidates = [
+        alert.created_at,
+        alert.createdAt,
+        alert.created_at_utc,
+        alert.createdAtUtc,
+        alert.created_at_iso,
+        alert.createdAtIso,
+        alert.created_at_local,
+        alert.createdAtLocal
+      ];
+      const createdAtRaw = createdAtRawCandidates.find(value => {
+        if (!value) {return false;}
+        const normalized = String(value).trim();
+        return normalized && normalized.toLowerCase() !== 'none' && normalized.toLowerCase() !== 'null';
+      }) || '';
+
+      const createdDateObj = createdAtRaw
+        ? (window.parseDate ? window.parseDate(createdAtRaw) : new Date(createdAtRaw))
+        : null;
+
+      const createdAtDisplay = createdAtRaw
+        ? (
+            window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function'
+              ? window.FieldRendererService.renderDate(createdAtRaw, true)
+              : window.formatDate
+                ? window.formatDate(createdAtRaw, true)
+                : (createdDateObj && !isNaN(createdDateObj.getTime()))
+                  ? createdDateObj.toLocaleString('he-IL', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })
+                  : 'לא מוגדר'
+          )
+        : 'לא מוגדר';
+      const createdAtDataAttr = createdDateObj && !isNaN(createdDateObj?.getTime())
+        ? createdDateObj.toISOString()
+        : (createdAtRaw || '');
 
       // המרת סטטוס לעברית להצגה
       // לפי הדוקומנטציה: open=פעיל, closed=הופעל, cancelled=בוטל
@@ -679,7 +714,7 @@ function updateAlertsTable(alerts) {
           <td class="text-center">
             ${getConditionSourceDisplay(alert)}
           </td>
-          <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
+          <td data-date="${createdAtDataAttr}"><span class="date-text">${createdAtDisplay}</span></td>
           <td data-date="${alert.expiry_date || ''}"><span class="date-text">${alert.expiry_date ? new Date(alert.expiry_date).toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '-'}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${(() => {
@@ -706,13 +741,9 @@ function updateAlertsTable(alerts) {
       countElement.textContent = `${alerts.length} התראות`;
     }
 
-    // עדכון סטטיסטיקות
-    // Use InfoSummarySystem directly
-    if (window.InfoSummarySystem && typeof window.InfoSummarySystem.calculateAndRender === 'function') {
-      const config = {
-        entityType: 'alert',
-        summaryContainerId: 'alertsSummaryStats'
-      };
+    // עדכון סטטיסטיקות דרך המערכת הגנרית
+    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS.alerts) {
+      const config = window.INFO_SUMMARY_CONFIGS.alerts;
       window.InfoSummarySystem.calculateAndRender(alertsData || [], config);
     } else if (typeof updatePageSummaryStats_LEGACY === 'function') {
       updatePageSummaryStats_LEGACY();
@@ -3183,7 +3214,7 @@ function cleanupAlertConditionBuilder() {
  */
 async function loadAlertTickerInfo(tickerId) {
   try {
-    window.Logger.info('🔄 Loading ticker info for ID:', tickerId, { page: "alerts" });
+    window.Logger?.info?.('🔄 [loadAlertTickerInfo] Loading ticker info', { tickerId }, { page: "alerts" });
     
     // Get ticker data from API
     const response = await fetch(`/api/tickers/`);
@@ -3195,16 +3226,20 @@ async function loadAlertTickerInfo(tickerId) {
     const tickers = data.data || data;
     
     // Find the specific ticker
-    const ticker = tickers.find(t => t.id == tickerId);
+    const ticker = tickers.find(t => String(t.id) === String(tickerId));
     if (!ticker) {
       throw new Error('Ticker not found');
     }
     
     // Display ticker info
     displayAlertTickerInfo(ticker);
+    window.Logger?.info?.('✅ [loadAlertTickerInfo] Ticker loaded', {
+      tickerId,
+      symbol: ticker?.symbol
+    }, { page: "alerts" });
     
   } catch (error) {
-    window.Logger.error('❌ Error loading ticker info:', error, { page: "alerts" });
+    window.Logger?.error?.('❌ [loadAlertTickerInfo] Error', { tickerId, error: error?.message || error }, { page: "alerts" });
   }
 }
 
@@ -3212,68 +3247,115 @@ async function loadAlertTickerInfo(tickerId) {
  * הצגת מידע על הטיקר (למודל החדש)
  */
 function displayAlertTickerInfo(ticker) {
-  // Create or update ticker info display
-  let tickerInfoDiv = document.getElementById('alertTickerInfo');
-  if (!tickerInfoDiv) {
-    // Create a new row for ticker info spanning full width
+  window.Logger?.info?.('🖥️ [displayAlertTickerInfo] Rendering ticker', {
+    tickerId: ticker?.id,
+    symbol: ticker?.symbol
+  }, { page: "alerts" });
+  const tickerDisplay = document.getElementById('alertTicker');
+  const tickerInfoDiv = document.getElementById('alertTickerInfo');
+  
+  if (tickerDisplay || tickerInfoDiv) {
+    if (tickerDisplay) {
+      tickerDisplay.textContent = ticker.symbol || 'לא מוגדר';
+      tickerDisplay.dataset.tickerId = ticker.id ? String(ticker.id) : '';
+    }
+    
+    window.currentAlertTickerData = ticker;
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.handleAlertTickerDataUpdate === 'function') {
+      window.ModalManagerV2.handleAlertTickerDataUpdate(ticker);
+    }
+    
+    if (tickerInfoDiv) {
+      if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
+        tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+      } else if (window.renderTickerInfo) {
+        tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+      } else {
+        tickerInfoDiv.innerHTML = `
+          <div class="ticker-info-display">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <strong>${(ticker.currency_symbol || '$')}${(ticker.current_price || 0).toFixed(2)}</strong>
+              <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+                ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+              </span>
+              <span class="text-muted small">
+                נפח: ${(ticker.volume || 0).toLocaleString('he-IL')}
+              </span>
+            </div>
+          </div>
+        `;
+      }
+    }
+    window.Logger?.info?.('✅ [displayAlertTickerInfo] Ticker rendered (primary containers)', {
+      hasTickerDiv: !!tickerDisplay,
+      hasInfoDiv: !!tickerInfoDiv
+    }, { page: "alerts" });
+    return;
+  }
+  
+  // שמירה על התמיכה בפריסות ישנות
+  let legacyTickerInfoDiv = document.getElementById('alertTickerInfoLegacy');
+  if (!legacyTickerInfoDiv) {
     const tickerInfoRow = document.createElement('div');
     tickerInfoRow.className = 'row';
     tickerInfoRow.id = 'alertTickerInfoRow';
     
-    // Create column for ticker info - full width
     const tickerInfoCol = document.createElement('div');
     tickerInfoCol.className = 'col-12';
     
-    tickerInfoDiv = document.createElement('div');
-    tickerInfoDiv.id = 'alertTickerInfo';
-    tickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
+    legacyTickerInfoDiv = document.createElement('div');
+    legacyTickerInfoDiv.id = 'alertTickerInfoLegacy';
+    legacyTickerInfoDiv.className = 'mb-3 p-3 bg-light rounded';
     
-    tickerInfoCol.appendChild(tickerInfoDiv);
+    tickerInfoCol.appendChild(legacyTickerInfoDiv);
     tickerInfoRow.appendChild(tickerInfoCol);
     
-    // Insert after the ticker field
-    const tickerSelect = document.getElementById('alertTicker');
-    if (tickerSelect) {
-      const tickerField = tickerSelect.closest('.mb-3');
-      if (tickerField && tickerField.parentNode) {
-        // Find the row containing the ticker field
-        const row = tickerField.closest('.row');
-        if (row && row.parentNode) {
-          row.parentNode.insertBefore(tickerInfoRow, row.nextSibling);
-        }
+    const tickerField = document.getElementById('alertTicker');
+    if (tickerField) {
+      const row = tickerField.closest('.row');
+      if (row && row.parentNode) {
+        row.parentNode.insertBefore(tickerInfoRow, row.nextSibling);
       }
     }
   }
   
-  // Use the new global renderTickerInfo function
-  if (window.renderTickerInfo) {
-    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+  if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
+    legacyTickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
   } else {
-    // Fallback if renderTickerInfo not available
-    tickerInfoDiv.innerHTML = `
-      <div class="ticker-info-display">
-        <div class="row">
-          <div class="col-md-6">
-            <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}
-          </div>
-          <div class="col-md-6 text-end">
-            <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
-            <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
-              ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
-            </span>
-          </div>
-        </div>
-        <div class="row mt-1">
-          <div class="col-12">
-            <small class="text-muted">
-              נפח: ${(ticker.volume || 0).toLocaleString()} | 
-              שינוי יומי: ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
-            </small>
-          </div>
-        </div>
-      </div>
-    `;
+    legacyTickerInfoDiv.innerHTML = window.renderTickerInfo
+      ? window.renderTickerInfo(ticker, 'ticker-info-display')
+      : `<strong>${ticker.symbol || 'N/A'}</strong>`;
   }
+  window.Logger?.info?.('✅ [displayAlertTickerInfo] Ticker rendered (legacy)', {}, { page: "alerts" });
+}
+
+/**
+ * ניקוי תצוגת מידע טיקר במודל ההתראות
+ */
+function clearAlertTickerInfo() {
+  window.Logger?.info?.('🧼 [clearAlertTickerInfo] Clearing ticker UI', {}, { page: "alerts" });
+  const tickerDisplay = document.getElementById('alertTicker');
+  const tickerInfoDiv = document.getElementById('alertTickerInfo');
+  const legacyTickerInfoDiv = document.getElementById('alertTickerInfoLegacy');
+  
+  if (tickerDisplay) {
+    tickerDisplay.textContent = '-';
+    delete tickerDisplay.dataset.tickerId;
+  }
+  
+  window.currentAlertTickerData = null;
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.handleAlertTickerDataUpdate === 'function') {
+    window.ModalManagerV2.handleAlertTickerDataUpdate(null);
+  }
+  
+  if (tickerInfoDiv) {
+    tickerInfoDiv.innerHTML = '';
+  }
+  
+  if (legacyTickerInfoDiv) {
+    legacyTickerInfoDiv.remove();
+  }
+  window.Logger?.info?.('✅ [clearAlertTickerInfo] Cleared', {}, { page: "alerts" });
 }
 
 // Export functions to window for global access
@@ -3281,4 +3363,5 @@ function displayAlertTickerInfo(ticker) {
 // REMOVED: window.showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', id) directly
 window.loadAlertTickerInfo = loadAlertTickerInfo;
 window.displayAlertTickerInfo = displayAlertTickerInfo;
+window.clearAlertTickerInfo = clearAlertTickerInfo;
 // Note: saveAlert and deleteAlert removed - using ModalManagerV2 and confirmDeleteAlert instead

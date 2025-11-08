@@ -216,8 +216,14 @@ function translateCashFlowType(type) {
     'interest': 'ריבית',
     'bonus': 'בונוס',
     'tax': 'מס',
+    'transfer_in': 'העברה מחשבון אחר',
+    'transfer_out': 'העברה לחשבון אחר',
+    'other_positive': 'אחר חיובי',
+    'other_negative': 'אחר שלילי',
+    'opening_balance': 'יתרת פתיחה',
   };
-  return typeNames[type] || type;
+  const key = (type || '').toLowerCase();
+  return typeNames[key] || type;
 }
 
 /**

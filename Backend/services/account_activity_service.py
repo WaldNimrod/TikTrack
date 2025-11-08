@@ -146,6 +146,37 @@ class AccountActivityService:
             # Group by currency
             currencies_dict = {}
             
+            # Ensure base currency entry exists and include opening balance
+            base_currency_id = account.currency_id if account.currency_id else 1
+            base_currency_symbol = account.currency.symbol if account.currency else 'USD'
+            base_currency_name = account.currency.name if account.currency else 'US Dollar'
+            opening_balance = float(account.opening_balance or 0.0)
+            
+            if base_currency_id not in currencies_dict:
+                currencies_dict[base_currency_id] = {
+                    'currency_id': base_currency_id,
+                    'currency_symbol': base_currency_symbol,
+                    'currency_name': base_currency_name,
+                    'movements': [],
+                    'balance': 0.0
+                }
+            
+            if opening_balance != 0.0:
+                currencies_dict[base_currency_id]['balance'] += opening_balance
+                currencies_dict[base_currency_id]['opening_balance'] = opening_balance
+                currencies_dict[base_currency_id]['movements'].append({
+                    'id': f'opening-balance-{account.id}',
+                    'type': 'cash_flow',
+                    'sub_type': 'opening_balance',
+                    'date': account.created_at.isoformat() if account.created_at else None,
+                    'amount': opening_balance,
+                    'fee_amount': 0.0,
+                    'description': 'יתרת פתיחה',
+                    'ticker_symbol': None,
+                    'created_at': account.created_at.isoformat() if account.created_at else None,
+                    'is_system': True
+                })
+            
             # Process cash flows (filter currency exchanges to show only other_negative)
             from services.cash_flow_service import CashFlowService as CashFlowHelperService
             exchange_ids_seen = set()
@@ -188,6 +219,7 @@ class AccountActivityService:
                             'sub_type': cf.type,
                             'date': cf.date.isoformat() if cf.date else None,
                             'amount': float(cf.amount),
+                            'fee_amount': float(cf.fee_amount or 0),
                             'description': cf.description,
                             'ticker_symbol': None,
                             'external_id': external_id,
@@ -207,6 +239,7 @@ class AccountActivityService:
                         'sub_type': cf.type,
                         'date': cf.date.isoformat() if cf.date else None,
                         'amount': float(cf.amount),
+                        'fee_amount': float(cf.fee_amount or 0),
                         'description': cf.description,
                         'ticker_symbol': None,
                         'created_at': cf.created_at.isoformat() if cf.created_at else None
@@ -331,6 +364,7 @@ class AccountActivityService:
                 'account_name': account.name,
                 'base_currency_id': base_currency_id,
                 'base_currency': base_currency_symbol,
+                'opening_balance': round(opening_balance, 2),
                 'currencies': currencies_list,
                 'base_currency_total': round(base_currency_total, 2),
                 'exchange_rates_used': exchange_rates_used

@@ -103,18 +103,27 @@ class CashFlow(Base):
     __tablename__ = 'cash_flows'
     
     id = Column(Integer, primary_key=True)
-    account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
-    flow_type = Column(String(20), nullable=False)  # 'income', 'expense'
-    amount = Column(Decimal(15, 2), nullable=False)
-    category = Column(String(50))
-    description = Column(Text)
-    flow_date = Column(DateTime, nullable=False)
+    trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)
+    type = Column(String(50), nullable=False)  # deposit, withdrawal, other_positive/negative, fee, dividend, interest
+    amount = Column(Float, nullable=False)
+    fee_amount = Column(Float, nullable=False, default=0)  # Stored in the trading account base currency
+    date = Column(Date, nullable=True)
+    description = Column(String(5000))
+    currency_id = Column(Integer, ForeignKey('currencies.id'), default=1)
+    usd_rate = Column(Numeric(10, 6), nullable=False, default=1.000000)
+    source = Column(String(20), default='manual')
+    external_id = Column(String(100), default='0')
+    trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)  # Optional link to trade
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
-    account = relationship('Account', back_populates='cash_flows')
+    account = relationship('TradingAccount', back_populates='cash_flows')
+    currency = relationship('Currency', back_populates='cash_flows')
+    trade = relationship('Trade', foreign_keys=[trade_id])
 ```
+
+> **New (Nov 2025):** `fee_amount` ensures every cash flow stores the fee amount in the account's base currency. The column is mandatory with default `0` and validated via range constraint (`fee_amount ≥ 0`).
+
+> **New (Feb 2025):** `trade_id` enables optional linking of cash flows to trades. When set, the trade must belong to the same `trading_account_id` as the cash flow (validated via `CASH_FLOW_TRADE_TICKER_MATCH` constraint). This allows tracking cash flows associated with specific trading positions.
 
 ### **6. Currency Model**
 ```python

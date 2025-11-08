@@ -513,7 +513,7 @@ function toggleSection(sectionId) {
 
 ## 📊 מטריצת מערכות כלליות - מצב נוכחי
 
-| # | מערכת כללית | דוק' (1-5) | index.html | trade_plans.html | trades.html | research.html | alerts.html | notes.html | accounts.html | tickers.html | executions.html | cash_flows.html | preferences.html | designs.html | css-management.html | cache-test.html | constraints.html | server-monitor.html | linter-realtime-monitor.html | js-map.html |
+| # | מערכת כללית | דוק' (1-5) | index.html | trade_plans.html | trades.html | research.html | alerts.html | notes.html | accounts.html | tickers.html | executions.html | cash_flows.html | preferences.html | designs.html | css-management.html | cache-test.html | constraints.html | server-monitor.html | linter-realtime-monitor.html | js-map.html (ארכיון) |
 |---|-------------|-----------|------------|------------------|-------------|---------------|-------------|------------|---------------|--------------|-----------------|-----------------|------------------|-------------|-------------------|-----------------|------------------|--------------------|---------------------------|-------------|
 | **1. מערכות ליבה קריטיות** | | | | | | | | | | | | | | | | | | | |
 | 1.1 | initializeApplication | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
@@ -1016,10 +1016,10 @@ function toggleSection(sectionId) {
 | `dynamic-colors-display.html` | ✅ | הוספת `data-section="top"` |
 | `executions.html` | ✅ | הוספת `data-section="top"` |
 | `external-data-dashboard.html` | ✅ | הוספת `data-section="top"` |
-| `js-map.html` | ✅ | הוספת `data-section="top"` |
+| `js-map.html (ארכיון)` | 📦 | הועבר לארכיון ב-7 בנובמבר 2025 |
 | `notes.html` | ✅ | הוספת `data-section="top"` |
 | `notifications-center.html` | ✅ | הוספת `data-section="top"` |
-| `page-scripts-matrix.html` | ✅ | הוספת `data-section="top"` |
+| `page-scripts-matrix.html` | 📦 | הועבר לארכיון (הוספת `data-section="top"` בגרסה האחרונה) |
 | `preferences.html` | ✅ | הוספת `data-section="top"` |
 | `research.html` | ✅ | הוספת `data-section="top"` |
 | `server-monitor.html` | ✅ | הוספת `data-section="top"` |
@@ -1029,13 +1029,13 @@ function toggleSection(sectionId) {
 
 ### **🎯 תוצאות:**
 
-- **✅ שמירת מצב:** עובדת מושלם בכל 29 העמודים
+- **✅ שמירת מצב:** עובדת מושלם בכל 28 העמודים הפעילים
 - **✅ שחזור מצב:** עובד מושלם אחרי רענון
 - **✅ שמירה בין עמודים:** עובדת מושלם במעבר בין עמודים
 - **✅ תזמון נכון:** הפונקציה נקראת כשהדף מוכן
 - **✅ פונקציונליות מלאה:** כל הפונקציות עובדות מושלם
 
-**מערכת שמירת מצב הסקשנים עובדת מושלם בכל 29 העמודים!**
+**מערכת שמירת מצב הסקשנים עובדת מושלם בכל 28 העמודים הפעילים!**
 
 ---
 

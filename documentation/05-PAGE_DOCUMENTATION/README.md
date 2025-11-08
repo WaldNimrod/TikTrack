@@ -1,7 +1,7 @@
 # Page Documentation - TikTrack
 
 ## Overview
-תיעוד מפורט לכל 29 העמודים במערכת TikTrack.
+תיעוד מפורט לכל 28 העמודים במערכת TikTrack.
 
 ## 📋 Page Categories
 
@@ -22,7 +22,7 @@
 12. **[DB Display Page](db-display-page.md)** - תצוגת בסיס נתונים
 13. **[DB Extra Data Page](db-extradata-page.md)** - נתונים נוספים
 
-### Technical Pages (Priority 2) - 16 עמודים
+### Technical Pages (Priority 2) - 15 עמודים
 עמודים טכניים לפיתוח וניהול:
 
 1. **[Constraints Page](constraints-page.md)** - אילוצי מערכת
@@ -32,15 +32,17 @@
 5. **[Cache Test Page](cache-test-page.md)** - בדיקת מטמון
 6. **[Linter Monitor Page](linter-monitor-page.md)** - ניטור לינטר
 7. **[Notifications Center Page](notifications-center-page.md)** - מרכז התראות
-8. **[Page Scripts Matrix Page](page-scripts-matrix-page.md)** - מטריצת סקריפטים
-9. **[CSS Management Page](css-management-page.md)** - ניהול CSS
-10. **[Dynamic Colors Display Page](dynamic-colors-display-page.md)** - תצוגת צבעים
-11. **[Designs Page](designs-page.md)** - עיצובים
-12. **[External Data Dashboard Page](external-data-dashboard-page.md)** - דשבורד נתונים חיצוניים
-13. **[Chart Management Page](chart-management-page.md)** - ניהול גרפים
-14. **[Entity Details Page](entity-details-page.md)** - פרטי ישויות
-15. **[Linked Items Page](linked-items-page.md)** - פריטים מקושרים
-16. **[Testing Page](testing-page.md)** - בדיקות מערכת
+8. **[CSS Management Page](css-management-page.md)** - ניהול CSS
+9. **[Dynamic Colors Display Page](dynamic-colors-display-page.md)** - תצוגת צבעים
+10. **[Designs Page](designs-page.md)** - עיצובים
+11. **[External Data Dashboard Page](external-data-dashboard-page.md)** - דשבורד נתונים חיצוניים
+12. **[Chart Management Page](chart-management-page.md)** - ניהול גרפים
+13. **[Entity Details Page](entity-details-page.md)** - פרטי ישויות
+14. **[Linked Items Page](linked-items-page.md)** - פריטים מקושרים
+15. **[Testing Page](testing-page.md)** - בדיקות מערכת
+
+> עמוד `page-scripts-matrix` הועבר לארכיון ב-7 בנובמבר 2025 ומופיע בתיעוד היסטורי בלבד.
+> פונקציית זיהוי הכפילויות שולבה בדשבורד איכות הקוד (`/code-quality-dashboard`) ב-7 בנובמבר 2025, והעמוד `duplicate-detector.html` הועבר לארכיון.
 
 ## 📊 Page Documentation Structure
 

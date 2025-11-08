@@ -833,7 +833,7 @@ function viewAccountDetails(accountId) {
   try {
     // צפייה בפרטי חשבון מסחר באמצעות מודל פרטי ישות
   if (typeof window.showEntityDetails === 'function') {
-    window.showEntityDetails('account', accountId, { mode: 'view' });
+    window.showEntityDetails('trading_account', accountId, { mode: 'view' });
   } else {
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'פונקציונליות צפייה בפרטי חשבון מסחר תהיה זמינה בקרוב');
@@ -3150,7 +3150,7 @@ async function saveTrade() {
             entry_date: { id: 'tradeEntryDate', type: 'date' },
             exit_date: { id: 'tradeExitDate', type: 'date', default: null },
             status: { id: 'tradeStatus', type: 'text' },
-            notes: { id: 'tradeNotes', type: 'text', default: null }
+            notes: { id: 'tradeNotes', type: 'rich-text', default: null }
         });
         
         // Calculate P&L if exit price is provided
@@ -3177,7 +3177,7 @@ async function saveTrade() {
             tradeEntryDate: { required: true },
             tradeExitDate: { required: false },
             tradeStatus: { required: true },
-            tradeNotes: { required: false, maxLength: 1000 }
+            tradeNotes: { required: false, maxLength: 5000 }
         });
         
         if (!isValid) {

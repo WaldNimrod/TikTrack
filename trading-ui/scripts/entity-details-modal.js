@@ -206,7 +206,7 @@ class EntityDetailsModal {
                     trade: 'טרייד', 
                     trade_plan: 'תכנית השקעה',
                     execution: 'ביצוע עסקה',
-                    account: 'חשבון מסחר',
+                    trading_account: 'חשבון מסחר',
                     alert: 'התראה',
                     cash_flow: 'תזרים מזומנים',
                     note: 'הערה'
@@ -424,7 +424,7 @@ class EntityDetailsModal {
             let entityData = await window.entityDetailsAPI.getEntityDetails(entityType, entityId, apiOptions);
             
             // טעינת נתונים נוספים עבור trading_account
-            if (entityType === 'trading_account' || entityType === 'account') {
+            if (entityType === 'trading_account') {
                 await this.loadAccountAdditionalData(entityData, entityId);
             }
             
@@ -766,7 +766,8 @@ class EntityDetailsModal {
             design: '/trading-ui/images/icons/design.svg',
             constraint: '/trading-ui/images/icons/constraint.svg',
             development: '/trading-ui/images/icons/development.svg',
-            info: '/trading-ui/images/icons/info.svg'
+            info: '/trading-ui/images/icons/info.svg',
+            position: '/trading-ui/images/icons/trades.svg'
         };
 
         return iconMappings[entityType] || '/trading-ui/images/icons/home.svg';
@@ -861,7 +862,7 @@ class EntityDetailsModal {
             
             // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון
             let titleText = '';
-            if ((finalEntityType === 'account' || finalEntityType === 'trading_account') && entityData && entityData.name) {
+            if (finalEntityType === 'trading_account' && entityData && entityData.name) {
                 titleText = `פרטי חשבון: ${entityData.name}`;
             } else {
                 // כותרת פשוטה ללא שם הרשומה
@@ -893,7 +894,7 @@ class EntityDetailsModal {
             
             // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
             let titleText = '';
-            if ((finalEntityType === 'account' || finalEntityType === 'trading_account') && entityData && entityData.name) {
+            if (finalEntityType === 'trading_account' && entityData && entityData.name) {
                 titleText = `פרטי חשבון: ${entityData.name}`;
             } else {
                 // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
@@ -968,7 +969,7 @@ class EntityDetailsModal {
      */
     getModalTitleText(entityType, entityData) {
         // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
-        if ((entityType === 'account' || entityType === 'trading_account') && entityData && entityData.name) {
+        if (entityType === 'trading_account' && entityData && entityData.name) {
             return `פרטי חשבון: ${entityData.name}`;
         }
         
@@ -991,7 +992,7 @@ class EntityDetailsModal {
         if (!headerElement || !modalElement) return;
 
         // הסרת כל המחלקות הישנות של ישויות
-        const validEntityTypes = ['trade', 'ticker', 'account', 'trading_account', 'alert', 'cash_flow', 'cash-flow', 'note', 'trade_plan', 'trade-plan', 'execution', 'preference', 'research', 'design', 'constraint', 'development'];
+        const validEntityTypes = ['trade', 'ticker', 'trading_account', 'alert', 'cash_flow', 'cash-flow', 'note', 'trade_plan', 'trade-plan', 'execution', 'preference', 'research', 'design', 'constraint', 'development', 'position'];
         validEntityTypes.forEach(type => {
             headerElement.classList.remove(`entity-${type}`);
         });

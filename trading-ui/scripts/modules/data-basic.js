@@ -52,7 +52,7 @@ console.log('🟡 [data-basic.js] window.tableMappings exists:', !!window.tableM
  * Column mappings for all tables in the application.
  * Each table is defined with an array of field names in column order.
  */
-const TABLE_COLUMN_MAPPINGS = {
+const LEGACY_TABLE_COLUMN_MAPPINGS = {
   // טבלת תכנונים (Trade Plans) - Database Display Page Structure
   'trade_plans': [
     'id',                    // 0 - ID
@@ -366,7 +366,7 @@ function getColumnValue(item, columnIndex, tableType) {
   // console.log(`🔍 [table-mappings.js] getColumnValue called: tableType=${tableType}, columnIndex=${columnIndex}`);
   // CRITICAL: Use window.TABLE_COLUMN_MAPPINGS (from table-mappings.js) if available, otherwise fallback to local
   // This ensures table-mappings.js is the authoritative source for all mappings
-  const mappingsSource = window.TABLE_COLUMN_MAPPINGS || TABLE_COLUMN_MAPPINGS;
+  const mappingsSource = window.TABLE_COLUMN_MAPPINGS || LEGACY_TABLE_COLUMN_MAPPINGS;
   const columns = mappingsSource[tableType] || [];
   const fieldName = columns[columnIndex];
   // console.log(`🔍 [table-mappings.js] columns:`, columns);
@@ -746,7 +746,8 @@ function getColumnValue(item, columnIndex, tableType) {
  * @returns {Array} מערך שמות השדות / Array of field names
  */
 function getTableMapping(tableType) {
-  return TABLE_COLUMN_MAPPINGS[tableType] || [];
+  const mappingsSource = window.TABLE_COLUMN_MAPPINGS || LEGACY_TABLE_COLUMN_MAPPINGS;
+  return mappingsSource[tableType] || [];
 }
 
 /**
@@ -759,7 +760,8 @@ function getTableMapping(tableType) {
  * @returns {boolean} האם הטבלה נתמכת / Whether the table is supported
  */
 function isTableSupported(tableType) {
-  return tableType in TABLE_COLUMN_MAPPINGS;
+  const mappingsSource = window.TABLE_COLUMN_MAPPINGS || LEGACY_TABLE_COLUMN_MAPPINGS;
+  return tableType in mappingsSource;
 }
 
 /**
@@ -1276,7 +1278,7 @@ function setColumnDefinition(tableName, columnName, definition) {
 
 // Only export if table-mappings.js hasn't already set these (table-mappings.js should load first)
 if (!window.TABLE_COLUMN_MAPPINGS || Object.keys(window.TABLE_COLUMN_MAPPINGS).length === 0) {
-  window.TABLE_COLUMN_MAPPINGS = TABLE_COLUMN_MAPPINGS;
+  window.TABLE_COLUMN_MAPPINGS = LEGACY_TABLE_COLUMN_MAPPINGS;
   console.warn('⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!');
 } else {
   // table-mappings.js already loaded - don't override, but merge any missing mappings
@@ -1299,7 +1301,7 @@ if (typeof window.getColumnValue !== 'function') {
   // ייצוא המודול עצמו (only if table-mappings.js hasn't set these)
   if (!window.tableMappings) {
     window.tableMappings = {
-      TABLE_COLUMN_MAPPINGS: window.TABLE_COLUMN_MAPPINGS || TABLE_COLUMN_MAPPINGS,
+      TABLE_COLUMN_MAPPINGS: window.TABLE_COLUMN_MAPPINGS || LEGACY_TABLE_COLUMN_MAPPINGS,
       getColumnValue,
       getTableMapping,
       isTableSupported,

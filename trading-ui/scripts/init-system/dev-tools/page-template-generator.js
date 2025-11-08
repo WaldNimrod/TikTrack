@@ -428,6 +428,7 @@ if (document.readyState === 'loading') {
         .sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0));
       
       let scriptCounter = 1;
+      const loadedScripts = new Set();
       
       sortedPackages.forEach((pkg, pkgIndex) => {
         html += `    <!-- =============================================================== -->\n`;
@@ -443,53 +444,31 @@ if (document.readyState === 'loading') {
           .sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0));
         
         sortedScripts.forEach((script, scriptIndex) => {
-          // ⚠️ IMPORTANT: Verify file exists before generating script tag
-          // This is a runtime check - actual verification should be done by monitoring system
-          // For now, we generate all scripts from manifest and let monitoring catch missing files
           html += `    <!-- [${scriptCounter}] Load Order: ${scriptCounter} -->\n`;
           // Handle external URLs (CDN) vs local files
           const scriptSrc = script.file.startsWith('http://') || script.file.startsWith('https://') 
             ? script.file 
             : `scripts/${script.file}?v=1.0.0`;
           html += `    <script src="${scriptSrc}"></script> <!-- ${script.description} -->\n`;
+          if (!(script.file.startsWith('http://') || script.file.startsWith('https://'))) {
+            loadedScripts.add(script.file);
+          }
           scriptCounter++;
         });
         html += '\n';
       });
       
       html += '    <!-- =============================================================== -->\n';
-      html += '    <!-- ===== END SCRIPT LOADING ORDER ===== -->\n';
-      html += '    <!-- =============================================================== -->\n\n';
-      
-      // Add Entity Details Systems (if entity-details package is included)
-      // Note: These are handled by the package itself if included in packages array
-      // Only add manually if entity-details package exists but scripts aren't in manifest
-      if (packages.includes('entity-details')) {
-        const entityDetailsPkg = window.PACKAGE_MANIFEST['entity-details'];
-        if (!entityDetailsPkg || !entityDetailsPkg.scripts || entityDetailsPkg.scripts.length === 0) {
-          html += '    <!-- =============================================================== -->\n';
-          html += '    <!-- ===== ENTITY DETAILS SYSTEMS (Depend on Header) ===== -->\n';
-          html += '    <!-- =============================================================== -->\n';
-          html += `    <!-- [${scriptCounter}] Load Order: ${scriptCounter} -->\n`;
-          html += '    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->\n';
-          scriptCounter++;
-          html += `    <!-- [${scriptCounter}] Load Order: ${scriptCounter} -->\n`;
-          html += '    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->\n';
-          scriptCounter++;
-          html += `    <!-- [${scriptCounter}] Load Order: ${scriptCounter} -->\n`;
-          html += '    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->\n';
-          scriptCounter++;
-          html += '\n';
-        }
-      }
-      
-      // Add page-specific script
-      html += '    <!-- =============================================================== -->\n';
       html += '    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->\n';
       html += '    <!-- =============================================================== -->\n\n';
-      html += `    <!-- [${scriptCounter}] Page-specific: ${pageName} -->\n`;
-      html += `    <script src="scripts/${pageName}.js?v=1.0.0"></script> <!-- Page-specific script for ${pageName} -->\n\n`;
-      scriptCounter++;
+      const pageScriptFilename = `${pageName}.js`;
+      if (!loadedScripts.has(pageScriptFilename)) {
+        html += `    <!-- [${scriptCounter}] Page-specific: ${pageName} -->\n`;
+        html += `    <script src="scripts/${pageName}.js?v=1.0.0"></script> <!-- Page-specific script for ${pageName} -->\n\n`;
+        scriptCounter++;
+      } else {
+        html += `    <!-- ⚠️ Page-specific script \"${pageScriptFilename}\" already loaded via selected packages -->\n\n`;
+      }
       
       html += '    <!-- =============================================================== -->\n';
       html += '    <!-- ===== FINAL SUMMARY ===== -->\n';

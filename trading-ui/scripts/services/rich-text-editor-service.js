@@ -205,12 +205,31 @@ class RichTextEditorService {
     static destroyEditor(editorId) {
         try {
             const quill = this._editors.get(editorId);
-            if (quill) {
-                // ניקוי event listeners אם יש
-                // Quill לא מספק destroy method רשמי, אז רק נסיר מה-registry
-                this._editors.delete(editorId);
-                console.log(`✅ RichTextEditorService: עורך "${editorId}" הוסר`);
+            if (quill && typeof quill.off === 'function') {
+                // Remove any event listeners if needed
+                quill.off('text-change');
             }
+            this._editors.delete(editorId);
+
+            const container = document.getElementById(editorId);
+            if (container) {
+                // Remove Quill toolbar that may have been injected as a sibling
+                const prevSibling = container.previousElementSibling;
+                if (prevSibling && prevSibling.classList && prevSibling.classList.contains('ql-toolbar')) {
+                    prevSibling.remove();
+                }
+                const nextSibling = container.nextElementSibling;
+                if (nextSibling && nextSibling.classList && nextSibling.classList.contains('ql-toolbar')) {
+                    nextSibling.remove();
+                }
+
+                // Clear container content and restore base classes
+                container.innerHTML = '';
+                container.classList.remove('ql-container', 'ql-snow');
+                container.removeAttribute('data-placeholder');
+            }
+
+            console.log(`✅ RichTextEditorService: עורך "${editorId}" הוסר`);
         } catch (error) {
             console.error(`❌ RichTextEditorService: שגיאה בהרס עורך "${editorId}":`, error);
         }

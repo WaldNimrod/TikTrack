@@ -121,9 +121,23 @@ async function loadCashFlowsData() {
     cashFlowsData = data;
     
     console.log('🔥 loadCashFlowsData: Calling updateCashFlowsTable...');
-    // עדכון הטבלה
+    // עדכון הטבלה (ראשוני לפני החלת סידור ברירת מחדל/מצב שמור)
     updateCashFlowsTable(data);
     console.log('🔥 loadCashFlowsData: updateCashFlowsTable completed');
+    
+    // החלת סידור ברירת מחדל לפי מערכת המיון הכללית (תאריך יורד כברירת מחדל)
+    if (typeof window.applyDefaultSort === 'function') {
+      try {
+        await window.applyDefaultSort('cash_flows', data, updateCashFlowsTable);
+        console.log('✅ loadCashFlowsData: applyDefaultSort executed for cash_flows');
+      } catch (sortError) {
+        console.warn('⚠️ loadCashFlowsData: applyDefaultSort failed, falling back to manual sort', sortError);
+        applyFallbackDateSort(data);
+      }
+    } else {
+      console.warn('⚠️ loadCashFlowsData: applyDefaultSort not available, using fallback sort');
+      applyFallbackDateSort(data);
+    }
     
     // Count records AFTER refresh
     const afterTableCount = data.length;
@@ -141,6 +155,32 @@ async function loadCashFlowsData() {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);
     }
+  }
+}
+
+/**
+ * Fallback sorting by date (newest first) in case the general system is unavailable
+ * @function applyFallbackDateSort
+ * @param {Array} data - Cash flows array
+ */
+function applyFallbackDateSort(data) {
+  if (!Array.isArray(data) || data.length === 0) {
+    return;
+  }
+
+  try {
+    const sortedData = [...data].sort((a, b) => {
+      const aDate = a && a.date ? new Date(a.date) : new Date(0);
+      const bDate = b && b.date ? new Date(b.date) : new Date(0);
+      return bDate - aDate;
+    });
+
+    updateCashFlowsTable(sortedData);
+    if (typeof window.saveSortState === 'function') {
+      window.saveSortState('cash_flows', 3, 'desc');
+    }
+  } catch (error) {
+    console.error('❌ applyFallbackDateSort: failed to sort data', error);
   }
 }
 
@@ -728,8 +768,8 @@ async function renderCashFlowsTable() {
     // קבלת שם החשבון מסחר - קודם ננסה מהשרת, אחר כך fallback
     const accountName = cashFlow.account_name || getAccountNameById(cashFlow.trading_account_id) || `חשבון מסחר ${cashFlow.trading_account_id}`;
 
-    // הצגת רק סמל המטבע
-    const currencyDisplay = cashFlow.currency_symbol || '$';
+    // הצגת סמל מטבע עם שימוש במערכת הכללית getCurrencyDisplay
+    const currencyDisplay = resolveCurrencySymbolForCashFlow(cashFlow);
 
     // Check if this is a currency exchange
     const isExchange = isCurrencyExchange(cashFlow);
@@ -740,7 +780,7 @@ async function renderCashFlowsTable() {
 
     // עיצוב סכום עם יישור נכון וצביעה
     // For exchanges, we need to show both amounts (from -> to)
-    let amountDisplay = formatCashFlowAmount(cashFlow.amount);
+    let amountDisplay = formatCashFlowAmount(cashFlow.amount, cashFlow.type, currencyDisplay);
     if (isExchange) {
       // For exchange, we need to fetch the "to" flow to show both amounts
       // For now, show the amount with exchange indicator
@@ -774,6 +814,23 @@ async function renderCashFlowsTable() {
         return result || '';
       })();
 
+    const descriptionDisplay = (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function')
+      ? window.FieldRendererService.renderTextPreview(cashFlow.description, { maxLength: 20, emptyPlaceholder: '-' })
+      : (() => {
+          const fallbackPlain = (cashFlow.description || '').replace(/<[^>]*>/g, '').trim();
+          if (!fallbackPlain) {
+            return '-';
+          }
+          const truncated = fallbackPlain.length > 20 ? `${fallbackPlain.substring(0, 20).trimEnd()}…` : fallbackPlain;
+          const escape = (text) => String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+          return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
+        })();
+
             row.innerHTML = `
             <td class="col-account ticker-cell" data-account="${cashFlow.trading_account_id || accountName || ''}">
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -790,11 +847,11 @@ async function renderCashFlowsTable() {
                 </div>
             </td>
             <td class="col-type type-cell" data-type="${cashFlow.type || ''}">${typeDisplay}</td>
-            <td class="col-amount" style="text-align: left; direction: ltr;">
+            <td class="col-amount text-end">
                 ${amountDisplay}
             </td>
             <td class="col-date" data-date="${cashFlow.date || ''}" style="text-align: center;">${formatDate(cashFlow.date)}</td>
-            <td class="col-description">${cashFlow.description || '-'}</td>
+            <td class="col-description">${descriptionDisplay}</td>
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
@@ -899,16 +956,16 @@ function getCashFlowTypeWithColor(type) {
     
     switch (type) {
     case 'deposit':
-      color = colors.positive; // הפקדה - ירוק
+    case 'dividend':
+    case 'transfer_in':
+    case 'other_positive':
+      color = colors.positive;
       break;
     case 'withdrawal':
-      color = colors.negative; // משיכה - אדום
-      break;
-    case 'dividend':
-      color = colors.success; // דיבידנד - צבע הצלחה
-      break;
+    case 'transfer_out':
     case 'fee':
-      color = colors.warning; // עמלה - צבע אזהרה
+    case 'other_negative':
+      color = colors.negative;
       break;
     default:
       color = colors.secondary;
@@ -921,16 +978,16 @@ function getCashFlowTypeWithColor(type) {
   let cssClass = '';
   switch (type) {
   case 'deposit':
-    cssClass = 'numeric-value-positive'; // הפקדה - ירוק
+  case 'dividend':
+  case 'transfer_in':
+  case 'other_positive':
+    cssClass = 'numeric-value-positive';
     break;
   case 'withdrawal':
-    cssClass = 'numeric-value-negative'; // משיכה - אדום
-    break;
-  case 'dividend':
-    cssClass = 'entity-trading_account-badge entity-account-badge'; // דיבידנד - צבע חשבון מסחר
-    break;
+  case 'transfer_out':
   case 'fee':
-    cssClass = 'numeric-value-zero'; // עמלה - אפור
+  case 'other_negative':
+    cssClass = 'numeric-value-negative';
     break;
   default:
     cssClass = 'numeric-value-zero';
@@ -958,31 +1015,106 @@ function getCashFlowTypeText(type) {
 }
 
 /**
+ * Resolve currency symbol for cash flow rows using general currency display system
+ * @function resolveCurrencySymbolForCashFlow
+ * @param {Object} cashFlow - Cash flow record
+ * @returns {string} Currency symbol (₪, $, € וכו')
+ */
+function resolveCurrencySymbolForCashFlow(cashFlow) {
+  const fallbackSymbol = '$';
+  if (!cashFlow || typeof cashFlow !== 'object') {
+    return fallbackSymbol;
+  }
+
+  // Build minimal structure expected by getCurrencyDisplay (general system)
+  const stubAccount = {
+    currency_id: cashFlow.currency_id,
+    currency: cashFlow.currency && typeof cashFlow.currency === 'object' ? cashFlow.currency : undefined
+  };
+
+  if (!stubAccount.currency && cashFlow.currency_symbol) {
+    stubAccount.currency = { symbol: cashFlow.currency_symbol };
+  }
+
+  if (typeof window.getCurrencyDisplay === 'function') {
+    try {
+      const displaySymbol = window.getCurrencyDisplay(stubAccount);
+      if (displaySymbol && displaySymbol !== '-' && typeof displaySymbol === 'string') {
+        return displaySymbol;
+      }
+    } catch (error) {
+      window.Logger && window.Logger.warn && window.Logger.warn('resolveCurrencySymbolForCashFlow failed via getCurrencyDisplay', { error, page: 'cash_flows' });
+    }
+  }
+
+  const rawSymbol = cashFlow.currency_symbol || (cashFlow.currency && cashFlow.currency.symbol) || '';
+  switch (rawSymbol) {
+  case '$':
+  case '₪':
+  case '€':
+  case '£':
+  case '¥':
+    return rawSymbol;
+  case 'USD':
+    return '$';
+  case 'ILS':
+    return '₪';
+  case 'EUR':
+    return '€';
+  case 'GBP':
+    return '£';
+  case 'JPY':
+    return '¥';
+  default:
+    return rawSymbol && rawSymbol.length === 1 ? rawSymbol : fallbackSymbol;
+  }
+}
+
+/**
  * Format cash flow amount
  * @function formatCashFlowAmount
  * @param {number} amount - Amount to format
+ * @param {string|null} type - Cash flow type (deposit/withdrawal/transfer/etc.)
+ * @param {string} currencySymbol - Symbol to show
  * @returns {string} Formatted amount
  */
-function formatCashFlowAmount(amount) {
+function formatCashFlowAmount(amount, type = null, currencySymbol = '$') {
   if (!amount && amount !== 0) {return '-';}
 
-  const numAmount = parseFloat(amount);
-  const isPositive = numAmount >= 0;
-  const absAmount = Math.abs(numAmount);
+  const numAmount = Number(amount);
+  if (Number.isNaN(numAmount)) {return '-';}
 
-  // עיצוב הסכום עם סימן בצד הנכון (שמאל)
-  const formattedAmount = `${isPositive ? '+' : '-'}$${absAmount.toFixed(2)}`;
+  const typeLower = type ? String(type).toLowerCase() : '';
+  const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive']);
+  const negativeTypes = new Set(['withdrawal', 'fee', 'transfer_out', 'other_negative']);
 
-  // שימוש במערכת הצבעים הדינמית - רק צבע טקסט ללא רקע
-  if (window.getTableColors) {
-    const colors = window.getTableColors();
-    const color = isPositive ? colors.positive : colors.negative;
-    return `<span style="color: ${color}; font-weight: 600;">${formattedAmount}</span>`;
+  let effectiveAmount = numAmount;
+  if (typeLower) {
+    if (positiveTypes.has(typeLower)) {
+      effectiveAmount = Math.abs(numAmount);
+    } else if (negativeTypes.has(typeLower)) {
+      effectiveAmount = -Math.abs(numAmount);
+    }
   }
 
-  // fallback למערכת הצביעה הישנה
-  const colorClass = isPositive ? 'numeric-value-positive' : 'numeric-value-negative';
-  return `<span class="${colorClass}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">${formattedAmount}</span>`;
+  const baseAmount = window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function'
+    ? window.FieldRendererService.renderAmount(effectiveAmount, currencySymbol || '$', 2, true)
+    : (() => {
+        const absValue = Math.abs(effectiveAmount).toFixed(2);
+        const sign = effectiveAmount < 0 ? '-' : (effectiveAmount > 0 ? '+' : '');
+        const colorClass = effectiveAmount > 0 ? 'numeric-value-positive' : (effectiveAmount < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+        const base = `${currencySymbol || '$'}${absValue}`;
+        const display = sign ? `${sign}${base}` : base;
+        return `<span class="${colorClass}" dir="ltr">${display}</span>`;
+      })();
+
+  if (window.getTableColors && typeof window.getTableColors === 'function') {
+    const colors = window.getTableColors();
+    const color = effectiveAmount >= 0 ? colors.positive : colors.negative;
+    return baseAmount.replace('<span', `<span style="color: ${color};"`);
+  }
+
+  return baseAmount;
 }
 
 /**
@@ -1234,7 +1366,7 @@ async function initializeCashFlowsPage() {
     
     // החלת העדפות על העמוד
     if (preferences && typeof applyUserPreferences === 'function') {
-      applyUserPreferences(preferences);
+    applyUserPreferences(preferences);
     }
     
     // החלת מערכת צבעים דינמית
@@ -1333,6 +1465,17 @@ async function saveCashFlow() {
     window.Logger.debug('saveCashFlow called', { page: 'cash_flows' });
     
     try {
+        const modal = document.getElementById('cashFlowModal');
+        const activeTabButton = modal ? modal.querySelector('#cashFlowModalTabs .nav-link.active') : null;
+        const activeTabId = activeTabButton ? activeTabButton.getAttribute('data-tab-id') : null;
+        if (activeTabId === 'exchange') {
+            if (typeof window.saveCurrencyExchange === 'function') {
+                return await window.saveCurrencyExchange();
+            }
+            window.Logger.warn('saveCashFlow invoked from exchange tab but saveCurrencyExchange missing', { page: 'cash_flows' });
+            return;
+        }
+
         // Count records BEFORE save
         const initialTableCount = cashFlowsData ? cashFlowsData.length : 0;
         console.log('📊 INITIAL STATE: Table has', initialTableCount, 'records');
@@ -1353,16 +1496,14 @@ async function saveCashFlow() {
             currency_id: { id: 'cashFlowCurrency', type: 'int' },
             trading_account_id: { id: 'cashFlowAccount', type: 'int' },  // Backend expects trading_account_id
             date: { id: 'cashFlowDate', type: 'dateOnly' },  // Backend expects Date only, not datetime
-            description: { id: 'cashFlowDescription', type: 'text', default: null },
+            description: { id: 'cashFlowDescription', type: 'rich-text', default: null },
             source: { id: 'cashFlowSource', type: 'text' },
-            external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' }
-            // Note: trade_id is collected but not sent - CashFlow model doesn't support it yet
-            // If you want to link CashFlow to Trade, add trade_id column to CashFlow model first
+            external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' },
+            trade_id: { id: 'trade_id', type: 'int', default: null }  // Optional link to trade
         });
         
-        // Remove trade_id from data if it exists (CashFlow model doesn't support it)
-        // TODO: When CashFlow model supports trade_id, remove this line
-        const { trade_id, ...dataToSend } = cashFlowData;
+        // Prepare data to send (trade_id is optional, can be null)
+        const dataToSend = { ...cashFlowData };
         
         // ולידציה מפורטת
         let hasErrors = false;
@@ -1376,6 +1517,13 @@ async function saveCashFlow() {
         if (!cashFlowData.type) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('cashFlowType', 'סוג תזרים הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+
+        if (cashFlowData.description && cashFlowData.description.length > 5000) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('cashFlowDescription', 'תיאור התזרים חורג מהאורך המותר (5,000 תווים)');
             }
             hasErrors = true;
         }
@@ -1509,57 +1657,137 @@ async function saveCurrencyExchange() {
         
         // Collect exchange form data
         const exchangeData = DataCollectionService.collectFormData({
-            trading_account_id: { id: 'cashFlowAccount', type: 'int' },
+            trading_account_id: { id: 'currencyExchangeAccount', type: 'int' },
             from_currency_id: { id: 'currencyExchangeFromCurrency', type: 'int' },
             to_currency_id: { id: 'currencyExchangeToCurrency', type: 'int' },
             from_amount: { id: 'currencyExchangeFromAmount', type: 'float' },
             exchange_rate: { id: 'currencyExchangeRate', type: 'float' },
             fee_amount: { id: 'currencyExchangeFeeAmount', type: 'float', default: 0 },
-            date: { id: 'cashFlowDate', type: 'dateOnly' },
-            description: { id: 'cashFlowDescription', type: 'text', default: '' }
+            date: { id: 'currencyExchangeDate', type: 'dateOnly' },
+            description: { id: 'currencyExchangeDescription', type: 'rich-text', default: '' },
+            source: { id: 'currencyExchangeSource', type: 'text', default: 'manual' },
+            external_id: { id: 'currencyExchangeExternalId', type: 'text', default: '0' }
         });
+
+        manageExternalIdField(exchangeData.source, 'exchange');
+        const exchangeExternalIdField = document.getElementById('currencyExchangeExternalId');
+        if (exchangeExternalIdField) {
+            exchangeData.external_id = exchangeExternalIdField.value || '0';
+        } else {
+            exchangeData.external_id = exchangeData.external_id || '0';
+        }
+
+        if (typeof window.clearValidation === 'function') {
+            window.clearValidation('cashFlowModalForm');
+        }
+
+        let validationResult = { isValid: true, errorMessages: [] };
+        if (typeof window.validateEntityForm === 'function') {
+            validationResult = window.validateEntityForm('cashFlowModalForm', [
+                { id: 'currencyExchangeAccount', name: 'חשבון מסחר', rules: { required: true } },
+                { id: 'currencyExchangeFromCurrency', name: 'מטבע מקור', rules: { required: true } },
+                { id: 'currencyExchangeToCurrency', name: 'מטבע יעד', rules: { required: true } },
+                { id: 'currencyExchangeFromAmount', name: 'סכום להמרה', rules: { required: true, min: 0.01 } },
+                { id: 'currencyExchangeRate', name: 'שער המרה', rules: { required: true, min: 0.000001 } },
+                { id: 'currencyExchangeFeeAmount', name: 'עמלה', rules: { required: false, min: 0 } },
+                { id: 'currencyExchangeDate', name: 'תאריך', rules: { required: true } },
+                { id: 'currencyExchangeSource', name: 'מקור', rules: { required: true } }
+            ]);
+        }
+
+        if (!validationResult.isValid) {
+            const firstError = validationResult.errorMessages?.[0] || 'נא להשלים את כל השדות הנדרשים';
+            if (typeof window.showSimpleErrorNotification === 'function') {
+                window.showSimpleErrorNotification('שגיאת ולידציה', firstError);
+            } else if (typeof window.showNotification === 'function') {
+                window.showNotification('שגיאת ולידציה', firstError, 'error');
+            }
+            return;
+        }
+
+        // Cross-field validation: different currencies
+        if (exchangeData.from_currency_id === exchangeData.to_currency_id) {
+            if (typeof window.showFieldError === 'function') {
+                window.showFieldError('currencyExchangeToCurrency', 'מטבע יעד חייב להיות שונה ממטבע המקור');
+            }
+            if (typeof window.showSimpleErrorNotification === 'function') {
+                window.showSimpleErrorNotification('שגיאת ולידציה', 'מטבע יעד חייב להיות שונה ממטבע המקור');
+            } else if (typeof window.showNotification === 'function') {
+                window.showNotification('שגיאת ולידציה', 'מטבע יעד חייב להיות שונה ממטבע המקור', 'error');
+            }
+            return;
+        }
+
+        // Ensure calculated to amount is positive
+        const toAmountField = document.getElementById('currencyExchangeToAmount');
+        let calculatedToAmount = toAmountField ? parseFloat(toAmountField.value) : NaN;
+        if (isNaN(calculatedToAmount) || calculatedToAmount <= 0) {
+            calculatedToAmount = (exchangeData.from_amount || 0) * (exchangeData.exchange_rate || 0);
+            if (toAmountField) {
+                toAmountField.value = calculatedToAmount ? calculatedToAmount.toFixed(6) : '';
+            }
+        }
+        if (!calculatedToAmount || calculatedToAmount <= 0) {
+            if (typeof window.showFieldError === 'function') {
+                window.showFieldError('currencyExchangeToAmount', 'סכום מומר חייב להיות גדול מ-0');
+            }
+            if (typeof window.showSimpleErrorNotification === 'function') {
+                window.showSimpleErrorNotification('שגיאת ולידציה', 'לא ניתן לחשב סכום מומר תקין');
+            } else if (typeof window.showNotification === 'function') {
+                window.showNotification('שגיאת ולידציה', 'לא ניתן לחשב סכום מומר תקין', 'error');
+            }
+            return;
+        }
+
+        exchangeData.to_amount = calculatedToAmount;
+        exchangeData.fee_amount = exchangeData.fee_amount || 0;
+
+        // Normalize external ID for manual source
+        if (exchangeData.external_id === null || exchangeData.external_id === undefined || exchangeData.external_id === '') {
+            exchangeData.external_id = '0';
+        }
+        if (exchangeData.source === 'manual') {
+            exchangeData.external_id = '0';
+        }
+
+        // Additional description length check
+        if (exchangeData.description && exchangeData.description.length > 5000) {
+            if (typeof window.showFieldError === 'function') {
+                window.showFieldError('currencyExchangeDescription', 'תיאור ההמרה חורג מהאורך המותר (5,000 תווים)');
+            }
+            if (typeof window.showSimpleErrorNotification === 'function') {
+                window.showSimpleErrorNotification('שגיאת ולידציה', 'תיאור ההמרה חורג מהאורך המותר (5,000 תווים)');
+            }
+            return;
+        }
         
-        // Get fee_currency_id from account's primary currency
-        if (exchangeData.fee_amount > 0 && exchangeData.trading_account_id) {
+        // Align fee currency with trading account base currency
+        let accountCurrencyId = null;
+        if (exchangeData.trading_account_id) {
             try {
                 const accountResponse = await fetch(`/api/trading-accounts/${exchangeData.trading_account_id}`);
                 if (accountResponse.ok) {
                     const accountData = await accountResponse.json();
                     if (accountData.status === 'success' && accountData.data) {
-                        exchangeData.fee_currency_id = accountData.data.currency_id;
+                        accountCurrencyId = accountData.data.currency_id || null;
                     }
                 }
             } catch (error) {
-                console.warn('Error fetching account currency for fee:', error);
-                // Fallback to from_currency_id if account fetch fails
-                exchangeData.fee_currency_id = exchangeData.from_currency_id;
+                console.error('❌ saveCurrencyExchange - Failed to load account currency:', error);
             }
-        } else {
-            exchangeData.fee_currency_id = null;
         }
-        
-        // Validation
-        if (!exchangeData.from_amount || exchangeData.from_amount <= 0) {
-            if (window.showValidationWarning) {
-                window.showValidationWarning('currencyExchangeFromAmount', 'סכום חייב להיות גדול מ-0');
+
+        if (exchangeData.trading_account_id && !accountCurrencyId) {
+            if (typeof window.showSimpleErrorNotification === 'function') {
+                window.showSimpleErrorNotification('שגיאת ולידציה', 'לא ניתן לטעון את מטבע הבסיס של חשבון המסחר');
+            } else if (typeof window.showNotification === 'function') {
+                window.showNotification('שגיאת ולידציה', 'לא ניתן לטעון את מטבע הבסיס של חשבון המסחר', 'error');
             }
             return;
         }
-        
-        if (!exchangeData.exchange_rate || exchangeData.exchange_rate <= 0) {
-            if (window.showValidationWarning) {
-                window.showValidationWarning('currencyExchangeRate', 'שער המרה חייב להיות גדול מ-0');
-            }
-            return;
-        }
-        
-        if (exchangeData.from_currency_id === exchangeData.to_currency_id) {
-            if (window.showNotification) {
-                window.showNotification('שגיאה', 'מטבע מקור ומטבע יעד חייבים להיות שונים', 'error');
-            }
-            return;
-        }
-        
+
+        exchangeData.fee_currency_id = accountCurrencyId;
+
         // Check if this is edit mode
         const isEdit = form.dataset.mode === 'edit';
         const exchangeId = form.dataset.exchangeId;
@@ -1634,11 +1862,12 @@ async function loadCurrencyExchange(exchangeId) {
         const exchangeData = result.data;
         const fromFlow = exchangeData.from_flow;
         const toFlow = exchangeData.to_flow;
-        const feeFlow = exchangeData.fee_flow;
+        const feeAmount = exchangeData.fee_amount ?? (fromFlow ? Math.abs(fromFlow.fee_amount || 0) : 0);
         
         // Populate form fields
-        if (document.getElementById('cashFlowAccount')) {
-            document.getElementById('cashFlowAccount').value = fromFlow.trading_account_id;
+        const accountField = document.getElementById('currencyExchangeAccount');
+        if (accountField) {
+            accountField.value = fromFlow.trading_account_id;
         }
         if (document.getElementById('currencyExchangeFromCurrency')) {
             document.getElementById('currencyExchangeFromCurrency').value = fromFlow.currency_id;
@@ -1653,14 +1882,28 @@ async function loadCurrencyExchange(exchangeId) {
             document.getElementById('currencyExchangeRate').value = exchangeData.exchange_rate;
         }
         if (document.getElementById('currencyExchangeFeeAmount')) {
-            document.getElementById('currencyExchangeFeeAmount').value = feeFlow ? Math.abs(feeFlow.amount) : 0;
+            document.getElementById('currencyExchangeFeeAmount').value = feeAmount;
         }
         // Note: fee currency is now a label, not a select field - it's updated automatically based on account
-        if (document.getElementById('cashFlowDate')) {
-            document.getElementById('cashFlowDate').value = fromFlow.date;
+        if (document.getElementById('currencyExchangeSource')) {
+            document.getElementById('currencyExchangeSource').value = fromFlow.source || 'manual';
         }
-        if (document.getElementById('cashFlowDescription')) {
-            document.getElementById('cashFlowDescription').value = fromFlow.description || '';
+        if (document.getElementById('currencyExchangeExternalId')) {
+            const externalField = document.getElementById('currencyExchangeExternalId');
+            externalField.value = fromFlow.external_id || '0';
+            manageExternalIdField((fromFlow.source || 'manual'), 'exchange');
+        }
+        if (document.getElementById('currencyExchangeDate')) {
+            document.getElementById('currencyExchangeDate').value = fromFlow.date;
+        }
+        const descriptionContent = fromFlow.description || '';
+        if (window.RichTextEditorService && typeof window.RichTextEditorService.setContent === 'function') {
+            window.RichTextEditorService.setContent('currencyExchangeDescription', descriptionContent);
+        } else {
+            const descriptionField = document.getElementById('currencyExchangeDescription');
+            if (descriptionField) {
+                descriptionField.value = descriptionContent;
+            }
         }
         
         // Set exchange ID in form
@@ -1676,9 +1919,12 @@ async function loadCurrencyExchange(exchangeId) {
         }
         
         // Update fee currency label based on account
-        const accountField = document.getElementById('cashFlowAccount');
         if (accountField) {
             accountField.dispatchEvent(new Event('change'));
+        }
+
+        if (window.updateCurrencyExchangeDescription) {
+            window.updateCurrencyExchangeDescription();
         }
         
         console.log('✅ loadCurrencyExchange - Exchange loaded successfully');
@@ -1819,7 +2065,18 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
  * @returns {void}
  */
 function manageExternalIdField(source, modalType) {
-  const fieldId = modalType === 'edit' ? 'editCashFlowExternalId' : 'cashFlowExternalId';
+  let fieldId = 'cashFlowExternalId';
+  switch (modalType) {
+  case 'edit':
+    fieldId = 'editCashFlowExternalId';
+    break;
+  case 'exchange':
+  case 'exchange-edit':
+    fieldId = 'currencyExchangeExternalId';
+    break;
+  default:
+    fieldId = 'cashFlowExternalId';
+  }
   const externalIdField = document.getElementById(fieldId);
 
   if (!externalIdField) {
@@ -1865,6 +2122,13 @@ function setupSourceFieldListeners() {
       manageExternalIdField(this.value, 'edit');
     });
   }
+
+  const exchangeSourceField = document.getElementById('currencyExchangeSource');
+  if (exchangeSourceField) {
+    exchangeSourceField.addEventListener('change', function () {
+      manageExternalIdField(this.value, 'exchange');
+    });
+  }
 }
 
 
@@ -1891,6 +2155,11 @@ function initializeExternalIdFields() {
   const editSourceField = document.getElementById('editCashFlowSource');
   if (editSourceField) {
     manageExternalIdField(editSourceField.value, 'edit');
+  }
+
+  const exchangeSourceField = document.getElementById('currencyExchangeSource');
+  if (exchangeSourceField) {
+    manageExternalIdField(exchangeSourceField.value, 'exchange');
   }
 }
 

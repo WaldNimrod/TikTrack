@@ -146,7 +146,8 @@ class EntityDetailsAPI {
                 });
             }
             
-            if (options.includeLinkedItems !== false) {
+            const shouldLoadLinkedItems = options.includeLinkedItems !== false;
+            if (shouldLoadLinkedItems) {
                 try {
                     console.log(`🔗 [ENTITY-DETAILS-API] Loading linked items for ${entityType} ${entityId}...`);
                     if (window.Logger) {
@@ -270,7 +271,7 @@ class EntityDetailsAPI {
                 window.Logger.debug(`Fetch attempt ${attempt}/${this.retryAttempts} for ${entityType} ${entityId}`, { page: "entity-details-api" });
                 
                 // קריאה ישירה לAPI
-                const entityData = await this.fetchEntityFromAPI(entityType, entityId);
+                const entityData = await this.fetchEntityFromAPI(entityType, entityId, options);
                 
                 return entityData;
                 
@@ -296,7 +297,11 @@ class EntityDetailsAPI {
      * @returns {Promise<Object>} - Promise עם נתוני הישות
      * @private
      */
-    async fetchEntityFromAPI(entityType, entityId) {
+    async fetchEntityFromAPI(entityType, entityId, options = {}) {
+        if (entityType === 'position') {
+            return this.fetchPositionDetails(entityId, options);
+        }
+        
         // נסה קודם את ה-endpoint החדש (מחזיר ticker object עם נתוני שוק)
         try {
             return await this.fetchFromNewEndpoint(entityType, entityId);
@@ -403,6 +408,114 @@ class EntityDetailsAPI {
         
         // עיצוב נתונים אחיד
         return this.normalizeEntityData(entityType, data);
+    }
+
+    /**
+     * Fetch position details (composite key: accountId+tickerId)
+     * @param {string} entityId - composite identifier (accountId-tickerId)
+     * @param {Object} options - Additional options (expects accountId/tickerId under positionContext)
+     * @returns {Promise<Object>} - Position details payload
+     * @private
+     */
+    async fetchPositionDetails(entityId, options = {}) {
+        const { accountId, tickerId } = this._resolvePositionIdentifiers(entityId, options);
+
+        if (!accountId || !tickerId) {
+            throw new Error('position identifier missing accountId or tickerId');
+        }
+
+        const url = `/api/positions/${accountId}/${tickerId}/details`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error(`פוזיציה לא נמצאה עבור חשבון ${accountId} וטיקר ${tickerId}`);
+            }
+            throw new Error(`שגיאת שרת: ${response.status} ${response.statusText}`);
+        }
+
+        const payload = await response.json();
+        const positionData = payload?.data || null;
+
+        if (!positionData) {
+            throw new Error('השרת החזיר נתונים ריקים עבור פרטי פוזיציה');
+        }
+
+        const compositeId = `${accountId}-${tickerId}`;
+        positionData.id = compositeId;
+        positionData.entity_type = 'position';
+        positionData.account_id = positionData.account_id || accountId;
+        positionData.ticker_id = positionData.ticker_id || tickerId;
+
+        // Ensure executions data exists for sorting
+        if (Array.isArray(positionData.executions)) {
+            positionData.executions = positionData.executions.map(exec => ({
+                ...exec,
+                date: exec.date || exec.execution_date || exec.created_at || null,
+                total: (exec.quantity * exec.price) + (exec.fee || 0)
+            }));
+        } else {
+            positionData.executions = [];
+        }
+
+        // Ensure linked items array (positions currently lack linked items endpoint)
+        if (!Array.isArray(positionData.linked_items)) {
+            positionData.linked_items = [];
+        }
+
+        return positionData;
+    }
+
+    /**
+     * Resolve accountId/tickerId for position entity
+     * @param {string} entityId
+     * @param {Object} options
+     * @returns {{accountId: number|null, tickerId: number|null}}
+     * @private
+     */
+    _resolvePositionIdentifiers(entityId, options = {}) {
+        let accountId = null;
+        let tickerId = null;
+
+        if (options.positionContext) {
+            const ctx = options.positionContext;
+            if (ctx.accountId) {
+                accountId = Number(ctx.accountId);
+            }
+            if (ctx.tickerId) {
+                tickerId = Number(ctx.tickerId);
+            }
+        }
+
+        if ((!accountId || !tickerId) && typeof entityId === 'string') {
+            const parts = entityId.split(/[:|-]/);
+            if (parts.length >= 2) {
+                const maybeAccount = Number(parts[0]);
+                const maybeTicker = Number(parts[1]);
+                if (!accountId && !Number.isNaN(maybeAccount)) {
+                    accountId = maybeAccount;
+                }
+                if (!tickerId && !Number.isNaN(maybeTicker)) {
+                    tickerId = maybeTicker;
+                }
+            }
+        }
+
+        if ((!accountId || !tickerId) && options.accountId && options.tickerId) {
+            accountId = Number(options.accountId);
+            tickerId = Number(options.tickerId);
+        }
+
+        return {
+            accountId: !Number.isNaN(accountId) && accountId ? Number(accountId) : null,
+            tickerId: !Number.isNaN(tickerId) && tickerId ? Number(tickerId) : null
+        };
     }
 
     /**

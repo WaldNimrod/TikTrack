@@ -215,6 +215,7 @@ Database constraints are dynamically displayed under each table:
 3. **Type Validation**: Enhanced type constraint management
 4. **Source Tracking**: Manual/automatic source differentiation
 5. **Form Validation**: Comprehensive client and server validation
+6. **Fee Persistence (Nov 2025)**: Added `fee_amount` column with default `0`, stored in trading account base currency and validated (`fee_amount ≥ 0`).
 
 ### System Enhancements
 1. **Warning System**: Centralized modal system for confirmations

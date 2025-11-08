@@ -101,6 +101,64 @@ Usage notes:
 - **הערות** (Notes) - הערות מקושרות לטרייד
 - **התראות** (Alerts) - התראות מקושרות לטרייד
 
+#### עדכון 2025-11-07 – קישורים מטרנזקציות לטריידים
+- קישור של תזרימי מזומנים (`cash_flow`) או ביצועים (`execution`) נתמך לטריידים בלבד; אין אפשרות לקשר ישירות לתוכניות טרייד.
+- השדה `trade_id` בכל רשומה הוא רשות ואינו מחליף שדות קיימים (כמו `ticker_id`, `source` או `external_id`).
+- בעת בחירת טרייד במודלים (לדוגמה, מודל תזרים מזומנים) יש לסנן לפי טיקר זהה לרשומה הפעילה ולוודא וולידציה של ההתאמה לפני שמירה.
+- נתונים היסטוריים עם `trade_plan_id` נשמרים לקריאה בלבד ואינם ניתנים ליצירה או עריכה חדשה.
+
+#### מיפוי ולידציה לקישור טריידים (הושלם פברואר 2025)
+- **Frontend – בחירת טרייד:** `trading-ui/scripts/trade-selector-modal.js` טוען טריידים בלבד (`/api/trades/`) ומסנן אוטומטית:
+  - עבור תזרימי מזומנים: לפי `trading_account_id` בלבד
+  - עבור ביצועים: לפי `trading_account_id` ו-`ticker_id` (שניהם נדרשים להתאמה)
+- **Frontend – שמירת תזרים:** `trading-ui/scripts/cash_flows.js` אוסף ושולח `trade_id` ל-API. הולידציה מתבצעת בצד השרת.
+- **Frontend – שמירת ביצוע:** `trading-ui/scripts/executions.js` אוסף ושולח `trade_id` ל-API. הולידציה מתבצעת בצד השרת (טיקר חייב להתאים).
+- **Backend – מודל ביצועים:** `Backend/models/execution.py` כולל `trade_id` אופציונלי ו-`CheckConstraint` שמונע מצב של ללא טיקר וללא טרייד או שניהם יחד. ✅ הושלם
+- **Backend – ולידציה מותאמת:** `Backend/services/validation_service.py` מפעיל שני כללים:
+  - `EXECUTION_TRADE_TICKER_MATCH`: בודק שהטיקר של הביצוע תואם לטיקר של הטרייד המקושר ✅ הושלם
+  - `CASH_FLOW_TRADE_TICKER_MATCH`: בודק שהטרייד שייך לאותו `trading_account_id` (תזרים אין טיקר ישיר) ✅ הושלם
+- **Backend – תזרימי מזומנים:** `Backend/models/cash_flow.py` כולל `trade_id` אופציונלי עם relationship ל-Trade. ✅ הושלם
+- **Backend – API:** כל ה-endpoints (GET/POST/PUT) תומכים ב-`trade_id` ומחזירים מידע על הטרייד המקושר. ✅ הושלם
+- **שכבת נתונים מאוחדת:** `Backend/routes/api/linked_items.py` ו-`services/account_activity_service.py` יידרשו לעדכון כך שמידע על קישור לטרייד יוצג בקונסיסטנטיות בכל הממשקים. ⏳ נותר לעשות
+
+#### תוכנית יישום רב-שלבית (סטטוס: הושלם פברואר 2025)
+
+1. **מיגרציה וסכמה** ✅ הושלם
+   - ✅ הוספת עמודת `trade_id` לטבלת `cash_flows` עם `FOREIGN KEY` ל-`trades.id`
+   - ✅ עדכון `Backend/models/cash_flow.py` עם `trade_id` ו-relationship ל-Trade
+   - ✅ עדכון `to_dict()` להצגת נתוני הטרייד המקושר
+   - ✅ תיעוד ב-`documentation/database/MODELS.md` וב-`CASH_FLOWS_FIXES_SUMMARY.md`
+
+2. **Backend API** ✅ הושלם
+   - ✅ הרחבת נקודות הקצה `/api/cash_flows` (POST/PUT/GET) לקבל ולהחזיר `trade_id`
+   - ✅ הרחבת נקודות הקצה `/api/executions` (POST/PUT/GET) לקבל ולהחזיר `trade_id` (כבר היה קיים)
+   - ✅ עדכון `ValidationService` עם שני כללים:
+     - `CASH_FLOW_TRADE_TICKER_MATCH`: בודק שהטרייד שייך לאותו `trading_account_id`
+     - `EXECUTION_TRADE_TICKER_MATCH`: בודק שהטיקר של הביצוע תואם לטיקר של הטרייד
+   - ⏳ עדכון `LinkedItems` API להצגת קשר דו-כיווני (cash_flow ↔ trade, execution ↔ trade) - נותר לעשות
+
+3. **Frontend – מודלים וטפסים** ✅ הושלם
+   - ✅ `cash-flows-config.js` כולל שדה `linkedTrade` עם `linkButton` type
+   - ✅ `executions-config.js` כולל שדה `linkedTrade` עם `linkButton` type
+   - ✅ `trade-selector-modal.js` מסנן אוטומטית לפי `trading_account_id` (תזרים) או `trading_account_id` + `ticker_id` (ביצועים)
+   - ✅ `ModalManagerV2.updateLinkButtonDisplay` מציג פרטי טרייד ומנהל state
+
+4. **Frontend – איסוף נתונים וולידציה** ✅ הושלם
+   - ✅ `saveCashFlow` אוסף ושולח `trade_id` ל-API
+   - ✅ `saveExecution` אוסף ושולח `trade_id` ל-API (כבר היה קיים)
+   - ✅ `populateForm` מטפל ב-`trade_id` עבור שני סוגי הישויות
+   - ⏳ הוספת אינדיקציה בטבלאות לטרייד מקושר - נותר לעשות
+
+5. **בדיקות ואוטומציה** ⏳ נותר לעשות
+   - ⏳ בדיקות יחידה ל-`ValidationService` (כללי טיקר והתנהגות ערכי NULL)
+   - ⏳ בדיקות אינטגרציה ל-`/api/cash_flows` ו-`/api/executions`
+   - ⏳ תסריטי ידניים: יצירה, עריכה, ביטול קישור, טעינת רשומות מקושרות
+
+6. **תיעוד והדרכה** ✅ הושלם
+   - ✅ עדכון `documentation/02-ARCHITECTURE/FRONTEND/LINKED_ITEMS_SYSTEM.md`
+   - ✅ עדכון `documentation/database/MODELS.md`
+   - ✅ עדכון `documentation/06-ARCHIVE/temp-work/CASH_FLOWS_FIXES_SUMMARY.md`
+
 ### התראות (Alerts)
 - **הערות** (Notes) - הערות מקושרות להתראה
 

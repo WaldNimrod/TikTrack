@@ -223,7 +223,6 @@ class ResponseOptimizer:
                 '/api/preferences',
                 '/api/users',
                 '/api/query-optimization',
-                '/api/js-map',
                 '/api/cache',
                 '/api/trades',
                 '/api/trade_plans',

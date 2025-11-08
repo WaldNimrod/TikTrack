@@ -830,17 +830,12 @@ const PAGE_CONFIGS = {
     'system-management': {
         name: 'System Management',
         
-        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
-        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
-        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
-        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
-        // - 'crud': מערכות CRUD ו-entity-details
-        packages: ['base', 'init-system'],
+        // החבילות הדרושות למערכת הניהול המשולבת
+        packages: ['base', 'logs', 'cache', 'system-management', 'management', 'init-system'],
         
-        // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
-            'DataUtils'
+            'window.systemManagement'
         ],
         
         // ← NEW: מטאדאטה
@@ -880,12 +875,11 @@ const PAGE_CONFIGS = {
     'server-monitor': {
         name: 'Server Monitor',
         
-        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
-        packages: ['base', 'init-system'],
+        packages: ['base', 'management', 'init-system'],
         
         requiredGlobals: [
             'NotificationSystem',
-            'DataUtils'
+            'window.serverMonitor'
         ],
         
         requiresFilters: false,
@@ -910,17 +904,12 @@ const PAGE_CONFIGS = {
     'external-data-dashboard': {
         name: 'External Data',
         
-        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
-        // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
-        // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
-        // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
-        // - 'crud': מערכות CRUD ו-entity-details
-        packages: ['base', 'init-system'],
+        packages: ['base', 'logs', 'external-data', 'init-system'],
         
-        // ← NEW: בדיקות תקינות
         requiredGlobals: [
             'NotificationSystem',
-            'DataUtils'
+            'window.ExternalDataDashboard',
+            'window.YahooFinanceService'
         ],
         
         // ← NEW: מטאדאטה
@@ -940,30 +929,11 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 window.Logger.info('🌐 Initializing External Data...', { page: "page-initialization-configs" });
                 
-                // Check if ExternalDataDashboard class is available
-                window.Logger.info('🔍 Checking ExternalDataDashboard availability:', {
-                    ExternalDataDashboard: typeof ExternalDataDashboard,
-                    windowExternalDataDashboard: typeof window.ExternalDataDashboard
-                }, { page: "page-initialization-configs" });
-                
-                if (typeof window.loadExternalData === 'function') {
-                    await window.loadExternalData();
-                }
-                
-                // Initialize External Data Dashboard
-                if (typeof ExternalDataDashboard !== 'undefined' && !window.externalDataDashboard) {
-                    try {
-                        window.externalDataDashboard = new ExternalDataDashboard();
-                        window.externalDataDashboard.init();
-                        window.Logger.info('✅ External Data Dashboard initialized', { page: "page-initialization-configs" });
-                    } catch (error) {
-                        window.Logger.error('❌ Failed to initialize External Data Dashboard:', error, { page: "page-initialization-configs" });
-                    }
-                } else {
-                    window.Logger.info('🔍 External Data Dashboard check:', {
-                        ExternalDataDashboard: typeof ExternalDataDashboard,
-                        externalDataDashboard: typeof window.externalDataDashboard
-                    }, { page: "page-initialization-configs" });
+                // Ensure dashboard instance is ready
+                if (!window.externalDataDashboard && typeof window.ExternalDataDashboard === 'function') {
+                    window.externalDataDashboard = new window.ExternalDataDashboard();
+                    window.externalDataDashboard.init();
+                    window.Logger.info('✅ External Data Dashboard initialized', { page: "page-initialization-configs" });
                 }
                 
                 // Initialize Unified Log System
@@ -979,16 +949,6 @@ const PAGE_CONFIGS = {
                 // Define global functions for button onclick handlers
                 window.Logger.info('🔧 Defining global functions for External Data Dashboard...', { page: "page-initialization-configs" });
                 
-                window.testProvider = function(providerId) {
-                    // window.Logger.info('🧪 Testing provider:', providerId, { page: "page-initialization-configs" });
-                    // Implementation for testing specific provider
-                };
-
-                window.toggleProvider = function(providerId) {
-                    // window.Logger.info('🔄 Toggling provider:', providerId, { page: "page-initialization-configs" });
-                    // Implementation for toggling provider status
-                };
-
                 window.refreshLogs = function() {
                     if (window.externalDataDashboard) {
                         window.externalDataDashboard.loadLogs();
@@ -1181,8 +1141,7 @@ const PAGE_CONFIGS = {
         packages: ['base', 'init-system'],
         
         requiredGlobals: [
-            'NotificationSystem',
-            'DataUtils'
+            'NotificationSystem'
         ],
         
         requiresFilters: false,
@@ -1201,73 +1160,48 @@ const PAGE_CONFIGS = {
     
     'notifications-center': {
         name: 'Notifications Center',
-        
-        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
-        packages: ['base', 'init-system'],
-        
+        packages: ['base', 'crud', 'logs', 'init-system'],
         requiredGlobals: [
             'NotificationSystem',
-            'DataUtils'
+            'window.initializeNotificationsCenter'
         ],
-        
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: false,
         customInitializers: [
-            async (pageConfig) => {
+            async () => {
                 window.Logger.info('📬 Initializing Notifications Center...', { page: "page-initialization-configs" });
-                
+
                 if (typeof window.initializeNotificationsCenter === 'function') {
                     await window.initializeNotificationsCenter();
                 } else if (typeof window.loadNotifications === 'function') {
                     await window.loadNotifications();
+                } else {
+                    window.Logger.warn('⚠️ Notifications Center initializer not found', { page: "page-initialization-configs" });
                 }
             }
         ]
     },
     'notifications-center.html': {
         name: 'Notifications Center HTML',
-        
-        // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
-        packages: ['base', 'init-system'],
-        
+        packages: ['base', 'crud', 'logs', 'init-system'],
         requiredGlobals: [
             'NotificationSystem',
-            'DataUtils'
+            'window.initializeNotificationsCenter'
         ],
-        
         requiresFilters: false,
         requiresValidation: false,
         requiresTables: false,
         customInitializers: [
-            async (pageConfig) => {
-                window.Logger.info('📬 Initializing Notifications Center HTML...', { page: "page-initialization-configs" });
-                
+            async () => {
+                window.Logger.info('📬 Initializing Notifications Center (HTML)...', { page: "page-initialization-configs" });
+
                 if (typeof window.initializeNotificationsCenter === 'function') {
                     await window.initializeNotificationsCenter();
                 } else if (typeof window.loadNotifications === 'function') {
                     await window.loadNotifications();
-                }
-                
-                // Initialize Unified Log System if available
-                if (window.UnifiedLogAPI) {
-                    window.Logger.info('📊 Initializing Unified Log System for notifications center...', { page: "page-initialization-configs" });
-                    try {
-                        await window.UnifiedLogAPI.initialize();
-                        
-                        // Load notification log in the correct container
-                        const logContainer = document.getElementById('notification-log-container');
-                        if (logContainer && !logContainer.querySelector('.unified-log-display')) {
-                            window.Logger.info('🔄 Loading notification log in container...', { page: "page-initialization-configs" });
-                            await window.showNotificationLog('notification-log-container', {
-                                displayConfig: 'default',
-                                autoRefresh: true,
-                                refreshInterval: 10000
-                            });
-                        }
-                    } catch (error) {
-                        window.Logger.warn('⚠️ Failed to initialize Unified Log System:', error, { page: "page-initialization-configs" });
-                    }
+                } else {
+                    window.Logger.warn('⚠️ Notifications Center initializer not found', { page: "page-initialization-configs" });
                 }
             }
         ]
@@ -1330,6 +1264,165 @@ const PAGE_CONFIGS = {
                 if (typeof window.initializeResearchTools === 'function') {
                     await window.initializeResearchTools();
                 }
+            }
+        ]
+    },
+    
+    'background-tasks': {
+        name: 'Background Tasks',
+        packages: ['base', 'crud', 'logs', 'init-system'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.startScheduler',
+            'window.refreshBackgroundTasksLog'
+        ],
+        description: 'ניהול משימות רקע',
+        lastModified: '2025-10-19',
+        pageType: 'system',
+        preloadAssets: ['background-tasks'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                window.Logger.info('⚙️ Initializing Background Tasks...', { page: "page-initialization-configs" });
+                if (typeof window.initializeBackgroundTasksLog === 'function') {
+                    window.initializeBackgroundTasksLog();
+                }
+            }
+        ]
+    },
+    
+    'init-system-management': {
+        name: 'Init System Management',
+        packages: ['base', 'dev-tools', 'init-system'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'PackageManifest',
+            'RuntimeValidator',
+            'ScriptAnalyzer',
+            'PageTemplateGenerator'
+        ],
+        description: 'ניהול מערכת האתחול - חבילות, ולידציה, כלי פיתוח',
+        lastModified: '2025-10-19',
+        pageType: 'development',
+        preloadAssets: ['package-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: false,
+        customInitializers: [
+            function() {
+                window.Logger.info('🚀 Initializing Init System Management...', { page: "page-initialization-configs" });
+                // Init system management specific initialization
+            }
+        ]
+    },
+    
+    // Cache Management
+    'cache-management': {
+        name: 'Cache Management',
+        packages: ['base', 'logs', 'cache', 'init-system'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.cacheManagementPage',
+            'window.refreshCacheStats'
+        ],
+        description: 'ניהול מטמון מערכת - ניקוי, אופטימיזציה וניטור',
+        lastModified: '2025-10-19',
+        pageType: 'system',
+        preloadAssets: ['cache-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                window.Logger.info('🗄️ Initializing Cache Management...', { page: "page-initialization-configs" });
+                if (typeof window.refreshCacheStats === 'function') {
+                    await window.refreshCacheStats();
+                }
+            }
+        ]
+    },
+    
+    // Conditions Test
+    'conditions-test': {
+        name: 'Conditions Test',
+        packages: ['base', 'init-system'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.loadConditionsTest',
+            'window.ConditionsTestManager'
+        ],
+        description: 'בדיקת תנאי מערכת - ולידציה ובדיקות',
+        lastModified: '2025-10-19',
+        pageType: 'testing',
+        preloadAssets: ['conditions-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: true,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                window.Logger.info('🧪 Initializing Conditions Test...', { page: "page-initialization-configs" });
+                if (typeof window.loadConditionsTest === 'function') {
+                    await window.loadConditionsTest();
+                }
+            }
+        ]
+    },
+    
+    // CRUD Testing Dashboard
+    'crud-testing-dashboard': {
+        name: 'CRUD Testing Dashboard',
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'init-system'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'CRUDEnhancedTester',
+            'window.runCRUDTests',
+            'window.runAPITests',
+            'window.runUITests'
+        ],
+        description: 'דשבורד בדיקות CRUD - בדיקות API ו-UI אוטומטיות',
+        lastModified: '2025-10-26',
+        pageType: 'development',
+        preloadAssets: ['crud-test-data'],
+        cacheStrategy: 'standard',
+        requiresFilters: false,
+        requiresValidation: false,
+        requiresTables: true,
+        customInitializers: [
+            async (pageConfig) => {
+                window.Logger.info('🧪 Initializing CRUD Testing Dashboard...', { page: "page-initialization-configs" });
+                
+                // Initialize CRUD Enhanced Tester
+                if (typeof window.CRUDEnhancedTester !== 'undefined') {
+                    window.crudTester = new window.CRUDEnhancedTester();
+                    window.Logger.info('✅ CRUD Enhanced Tester initialized', { page: "page-initialization-configs" });
+                }
+                
+                // Define global functions for CRUD testing
+                window.runCRUDTests = function() {
+                    if (window.crudTester) {
+                        window.crudTester.runAllTests();
+                    }
+                };
+                
+                window.runAPITests = function() {
+                    if (window.crudTester) {
+                        window.crudTester.runAPITests();
+                    }
+                };
+                
+                window.runUITests = function() {
+                    if (window.crudTester) {
+                        window.crudTester.runUITests();
+                    }
+                };
+                
+                window.Logger.info('✅ CRUD Testing Dashboard initialized successfully', { page: "page-initialization-configs" });
             }
         ]
     }
@@ -1482,32 +1575,6 @@ const ADDITIONAL_PAGE_CONFIGS = {
         ]
     },
     
-    'background-tasks': {
-        name: 'Background Tasks',
-        packages: ['base', 'init-system'],
-        requiredGlobals: [
-            'NotificationSystem',
-            'window.loadBackgroundTasks',
-            'window.BackgroundTaskManager'
-        ],
-        description: 'ניהול משימות רקע',
-        lastModified: '2025-10-19',
-        pageType: 'system',
-        preloadAssets: ['background-tasks'],
-        cacheStrategy: 'standard',
-        requiresFilters: false,
-        requiresValidation: false,
-        requiresTables: true,
-        customInitializers: [
-            async (pageConfig) => {
-                window.Logger.info('⚙️ Initializing Background Tasks...', { page: "page-initialization-configs" });
-                if (typeof window.loadBackgroundTasks === 'function') {
-                    await window.loadBackgroundTasks();
-                }
-            }
-        ]
-    },
-    
     'css-management': {
         name: 'CSS Management',
         packages: ['base', 'init-system'],
@@ -1615,7 +1682,7 @@ const ADDITIONAL_PAGE_CONFIGS = {
     // Init System Management
     'init-system-management': {
         name: 'Init System Management',
-        packages: ['base', 'init-system'],
+        packages: ['base', 'dev-tools', 'init-system'],
         requiredGlobals: [
             'NotificationSystem',
             'PackageManifest',
@@ -1642,11 +1709,11 @@ const ADDITIONAL_PAGE_CONFIGS = {
     // Cache Management
     'cache-management': {
         name: 'Cache Management',
-        packages: ['base', 'init-system'],
+        packages: ['base', 'logs', 'cache', 'init-system'],
         requiredGlobals: [
             'NotificationSystem',
-            'window.loadCacheManagement',
-            'window.CacheManager'
+            'window.cacheManagementPage',
+            'window.refreshCacheStats'
         ],
         description: 'ניהול מטמון מערכת - ניקוי, אופטימיזציה וניטור',
         lastModified: '2025-10-19',
@@ -1659,8 +1726,8 @@ const ADDITIONAL_PAGE_CONFIGS = {
         customInitializers: [
             async (pageConfig) => {
                 window.Logger.info('🗄️ Initializing Cache Management...', { page: "page-initialization-configs" });
-                if (typeof window.loadCacheManagement === 'function') {
-                    await window.loadCacheManagement();
+                if (typeof window.refreshCacheStats === 'function') {
+                    await window.refreshCacheStats();
                 }
             }
         ]

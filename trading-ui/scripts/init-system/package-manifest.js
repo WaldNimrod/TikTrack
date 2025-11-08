@@ -701,12 +701,6 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.ExternalDataSettingsService',
         description: 'הגדרות נתונים חיצוניים',
         required: true
-      },
-      {
-        file: 'external-data-dashboard.js',
-        globalCheck: 'window.ExternalDataDashboard',
-        description: 'דשבורד נתונים חיצוניים',
-        required: true
       }
     ],
     estimatedSize: '~200KB',
@@ -1096,14 +1090,14 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'background-tasks.js',
-        globalCheck: 'window.BackgroundTasksManager',
+        globalCheck: 'window.startScheduler',
         description: 'משימות רקע',
         required: true,
         loadOrder: 3
       },
       {
         file: 'system-management.js',
-        globalCheck: 'window.generateDetailedLog',
+        globalCheck: 'window.systemManagement',
         description: 'ניהול מערכת כללי',
         required: true,
         loadOrder: 4
@@ -1157,22 +1151,15 @@ const PACKAGE_MANIFEST = {
   filters: {
     id: 'filters',
     name: 'Filters Package',
-    description: 'מערכת סינון ופילטרים',
+    description: 'מערכת הפילטרים המשולבת (מוטמעת ב-header-system.js)',
     version: '2.0.0',
     critical: false,
     loadOrder: 15,
     dependencies: ['base', 'ui-advanced'],
-    scripts: [
-      {
-        file: 'filter-system.js',
-        globalCheck: 'window.FilterSystem',
-        description: 'מערכת סינון כללית',
-        required: true
-      },
-      // header-system.js removed from FILTERS package - already in BASE package
-    ],
-    estimatedSize: '~40KB',
-    initTime: '~25ms'
+    scripts: [],
+    estimatedSize: '~0KB',
+    initTime: '~0ms',
+    notes: 'המערכת פעילה דרך window.filterSystem שנוצר בתוך header-system.js; אין קובץ טעינה ייעודי.'
   },
 
   // 16. ADVANCED-NOTIFICATIONS PACKAGE - התראות מתקדמות
@@ -1268,28 +1255,6 @@ const PACKAGE_MANIFEST = {
     initTime: '~15ms'
   },
 
-  // 18. IMPORT PACKAGE - ייבוא נתונים
-  'import': {
-    id: 'import',
-    name: 'Import Package',
-    description: 'מערכת ייבוא נתוני משתמש (CSV)',
-    version: '1.0.0',
-    critical: false,
-    loadOrder: 18,
-    dependencies: ['base', 'services', 'crud', 'entity-services'],
-    scripts: [
-      {
-        file: 'import-user-data.js',
-        globalCheck: 'window.initializeImportUserDataModal',
-        description: 'מערכת ייבוא נתוני משתמש',
-        required: true,
-        loadOrder: 1
-      }
-    ],
-    estimatedSize: '~80KB',
-    initTime: '~50ms'
-  },
-
   // 19. INIT PACKAGE - אתחול
   'init-system': {
     id: 'init-system',
@@ -1298,7 +1263,7 @@ const PACKAGE_MANIFEST = {
     version: '2.0.0',
     critical: false,
     loadOrder: 19,
-    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'filters', 'advanced-notifications', 'entity-details', 'info-summary', 'import'],
+    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary'],
     scripts: [
       {
         file: 'init-system/package-manifest.js',

@@ -82,6 +82,8 @@ getFieldMapping(entityType) {
 }
 ```
 
+> עדכון 2025-11-07: קישור רשומות מזומנים וביצועים נתמך לטריידים בלבד. השדות `cashFlowTradePlan` ו-`trade_plan_id` מסומנים כLegacy ולא יבוצע בהם שימוש בהמשך. יש להשאיר אותם במיפוי לצורך תאימות נתונים ישנים בלבד.
+
 ### 2. תיקון `populateForm` להשתמש במיפוי
 
 **קובץ:** `trading-ui/scripts/modal-manager-v2.js`

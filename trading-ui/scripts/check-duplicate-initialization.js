@@ -16,7 +16,7 @@ class DuplicateInitializationChecker {
             'linter-realtime-monitor', 'notifications-center',
             'external-data-dashboard', 'crud-testing-dashboard',
             'conditions-test', 'db_extradata', 'constraints', 'background-tasks',
-            'page-scripts-matrix', 'css-management', 'dynamic-colors-display',
+            'css-management', 'dynamic-colors-display',
             'designs', 'chart-management', 'init-system-management'
         ];
         

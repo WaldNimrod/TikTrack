@@ -45,13 +45,12 @@ function setGlobalFavicon(iconPath = 'images/icons/favicon.ico', iconType = 'ima
  * Set favicon based on page type
  * מגדיר favicon לפי סוג העמוד
  * 
- * @param {string} pageType - Type of page (home, linter, js-map, etc.)
+ * @param {string} pageType - Type of page (home, linter, etc.)
  */
 function setPageSpecificFavicon(pageType = 'home') {
     const iconMap = {
         'home': 'images/icons/favicon.ico',
         'linter': 'images/icons/development.svg',
-        'js-map': 'images/icons/development.svg',
         'trading_accounts': 'images/icons/trading_accounts.svg',
         'accounts': 'images/icons/trading_accounts.svg', // Legacy support for old URLs
         'alerts': 'images/icons/alerts.svg',
@@ -78,7 +77,6 @@ function autoSetFavicon() {
     const pageTypeMap = {
         'index': 'home',
         'linter-realtime-monitor': 'linter',
-        'js-map': 'js-map',
         'trading_accounts': 'trading_accounts',
         'accounts': 'trading_accounts', // Legacy support for old URLs
         'alerts': 'alerts',

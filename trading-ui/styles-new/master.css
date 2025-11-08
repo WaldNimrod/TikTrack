@@ -83,7 +83,7 @@
 /* 07-trumps - Specific overrides (not page-specific) */
 @import '07-trumps/chart-management.css?v=1.0.0';
 @import '07-trumps/index-hero-section.css?v=1.0.0';
-@import '07-trumps/js-map-advanced.css?v=1.0.0';
+/* @import '07-trumps/page-scripts-matrix.css?v=1.0.0'; - Archived page (styles removed) */
 /* Note: _trades.css, _executions.css, _trade_plans.css moved to 06-components/_tables.css */
 
 /* 08-themes - Themes */

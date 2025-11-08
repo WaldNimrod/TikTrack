@@ -363,19 +363,6 @@ class CRUDEnhancedTester {
                 priority: 4
             },
             
-            'js-map': {
-                type: 'dev_tool',
-                displayName: 'מפת JavaScript',
-                apiUrl: null,
-                pageUrl: '/js-map',
-                hasCRUD: false,
-                testData: null,
-                expectedButtons: [],
-                tableSelector: null,
-                modalSelector: null,
-                priority: 4
-            },
-            
             'linter-realtime-monitor': {
                 type: 'dev_tool',
                 displayName: 'ניטור Linter',
@@ -485,19 +472,6 @@ class CRUDEnhancedTester {
                 displayName: 'גלריית עיצובים',
                 apiUrl: null,
                 pageUrl: '/designs',
-                hasCRUD: false,
-                testData: null,
-                expectedButtons: [],
-                tableSelector: null,
-                modalSelector: null,
-                priority: 4
-            },
-            
-            'page-scripts-matrix': {
-                type: 'dev_tool',
-                displayName: 'מטריצת סקריפטים',
-                apiUrl: null,
-                pageUrl: '/page-scripts-matrix',
                 hasCRUD: false,
                 testData: null,
                 expectedButtons: [],

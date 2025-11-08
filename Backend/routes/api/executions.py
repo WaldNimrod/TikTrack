@@ -23,13 +23,15 @@ class ExecutionService:
     def get_all(self, db: Session, filters=None):
         return db.query(Execution).options(
             joinedload(Execution.trading_account),
-            joinedload(Execution.ticker)
+            joinedload(Execution.ticker),
+            joinedload(Execution.trade)
         ).all()
     
     def get_by_id(self, db: Session, execution_id: int):
         return db.query(Execution).options(
             joinedload(Execution.trading_account),
-            joinedload(Execution.ticker)
+            joinedload(Execution.ticker),
+            joinedload(Execution.trade)
         ).filter(Execution.id == execution_id).first()
 
 # Initialize base API

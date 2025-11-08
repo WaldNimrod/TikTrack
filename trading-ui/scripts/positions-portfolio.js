@@ -418,9 +418,12 @@ function renderPositionsTable(positions) {
                     ${percentAccount.toFixed(2)}%
                 </td>
                 <td class="col-actions actions-cell">
-                    <button class="btn btn-sm btn-outline-primary" onclick="showPositionDetails(${position.trading_account_id}, ${position.ticker_id})" title="פרטים">
-                        <i class="bi bi-eye"></i>
-                    </button>
+                    <button class="btn actions-menu-item"
+                            data-button-type="VIEW"
+                            data-variant="small"
+                            data-onclick="window.showPositionDetails && window.showPositionDetails(${position.trading_account_id}, ${position.ticker_id})"
+                            title="פרטי פוזיציה"
+                            aria-label="פרטי פוזיציה"></button>
                 </td>
             </tr>
         `;
@@ -648,9 +651,12 @@ function renderPortfolioTable(positions) {
                     ${percentPortfolio.toFixed(2)}%
                 </td>
                 <td class="col-actions actions-cell">
-                    <button class="btn btn-sm btn-outline-primary" onclick="showPositionDetails(${position.trading_account_id}, ${position.ticker_id})" title="פרטים">
-                        <i class="bi bi-eye"></i>
-                    </button>
+                    <button class="btn actions-menu-item"
+                            data-button-type="VIEW"
+                            data-variant="small"
+                            data-onclick="window.showPositionDetails && window.showPositionDetails(${position.trading_account_id}, ${position.ticker_id})"
+                            title="פרטי פוזיציה"
+                            aria-label="פרטי פוזיציה"></button>
                 </td>
             </tr>
             `;
@@ -771,103 +777,42 @@ function renderPortfolioSummaryFallback(summary, size) {
  * @param {number} accountId - Trading account ID
  * @param {number} tickerId - Ticker ID
  */
-window.showPositionDetails = async function(accountId, tickerId) {
+window.showPositionDetails = function(accountId, tickerId) {
     try {
-        // Load position details from API
-        const cacheKey = `position-details-${accountId}-${tickerId}`;
-        
-        const positionData = await window.UnifiedCacheManager.get(cacheKey, {
-            fallback: async () => {
-                const response = await fetch(`/api/positions/${accountId}/${tickerId}/details`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const result = await response.json();
-                if (result.status === 'success' && result.data) {
-                    return result.data;
-                }
-                return null;
-            },
-            ttl: 300000, // 5 minutes
-            dependencies: ['executions', 'market_data_quotes']
-        });
-        
-        if (!positionData) {
+        if (!accountId || !tickerId) {
+            window.Logger?.error('showPositionDetails called without accountId/tickerId', { accountId, tickerId }, { page: "positions-portfolio" });
             if (window.showErrorNotification) {
-                window.showErrorNotification('שגיאה', 'פוזיציה לא נמצאה.');
+                window.showErrorNotification('שגיאה', 'חסרים נתונים להצגת פרטי פוזיציה.');
             }
             return;
         }
-        
-        // Use showDetailsModal for position details with custom title and close button
-        const modalTitle = `פרטי פוזיציה - ${positionData.ticker_symbol || tickerId}`;
-        const content = renderPositionDetailsContent(positionData, tickerId);
-        
-        // Get entity colors for trade
-        const tradeColor = window.getEntityColor ? window.getEntityColor('trade') : '#007bff';
-        const tradeBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
-        
-        // Create custom modal HTML with close button in header
-        const modalId = 'positionDetailsModal';
-        const modalHTML = `
-            <div class="modal fade entity-trade-modal" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content" style="border: 2px solid ${tradeColor};">
-                        <div class="modal-header" style="background-color: ${tradeBgColor}; border-bottom: 2px solid ${tradeColor};">
-                            <h5 class="modal-title" id="${modalId}Label" style="color: ${tradeColor}; font-weight: bold;">${modalTitle}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור" style="margin-inline-start: auto;"></button>
-                        </div>
-                        <div class="modal-body" style="background-color: ${tradeBgColor};">
-                            ${content}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Remove existing modal if exists
-        const existingModal = document.getElementById(modalId);
-        if (existingModal) {
-            existingModal.remove();
-        }
-        
-        // Add modal to body
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        
-        // Show modal
-        const modalElement = document.getElementById(modalId);
-        if (modalElement) {
-            const modal = new bootstrap.Modal(modalElement, {
-                backdrop: true,
-                keyboard: true
+
+        const compositeId = `${accountId}-${tickerId}`;
+        const sourceInfo = {
+            component: 'positions-portfolio',
+            accountId,
+            tickerId,
+            timestamp: Date.now()
+        };
+
+        if (window.showEntityDetails) {
+            window.showEntityDetails('position', compositeId, {
+                includeLinkedItems: true,
+                forceRefresh: false,
+                positionContext: { accountId, tickerId },
+                source: sourceInfo
             });
-            modal.show();
-            
-            // Clean up on close
-            modalElement.addEventListener('hidden.bs.modal', () => {
-                modalElement.remove();
-            }, { once: true });
-        } else {
-            // Last resort - notification
-            const FieldRenderer = window.FieldRendererService;
-            const sideHtml = FieldRenderer && FieldRenderer.renderSide ? 
-                FieldRenderer.renderSide(positionData.side) : 
-                positionData.side;
-            
-            window.showInfoNotification('פרטי פוזיציה', 
-                `חשבון: ${positionData.account_name || accountId}\n` +
-                `טיקר: ${positionData.ticker_symbol || tickerId}\n` +
-                `כמות: ${Math.abs(positionData.quantity || 0)}\n` +
-                `צד: ${sideHtml}\n` +
-                `מחיר ממוצע: $${(positionData.average_price_net || 0).toFixed(2)}\n` +
-                `שווי שוק: ${positionData.market_value ? `$${positionData.market_value.toFixed(2)}` : 'לא זמין'}\n` +
-                `ביצועים: ${positionData.executions?.length || 0}`
-            );
+            return;
+        }
+
+        window.Logger?.warn('EntityDetails system not available, falling back to notification', { page: "positions-portfolio" });
+        if (window.showInfoNotification) {
+            window.showInfoNotification('מערכת פרטי הישויות אינה זמינה. אנא רענן את העמוד ונסה שוב.');
         }
     } catch (error) {
-        window.Logger.error('❌ Error showing position details:', error, { page: "trading_accounts" });
+        window.Logger?.error('❌ Error delegating position details to entity modal:', error, { page: "positions-portfolio" });
         if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', 'שגיאה בטעינת פרטי פוזיציה.');
+            window.showErrorNotification('שגיאה', 'שגיאה בפתיחת פרטי פוזיציה.');
         }
     }
 };
@@ -877,229 +822,6 @@ window.showPositionDetails = async function(accountId, tickerId) {
  * @param {Object} positionData - Position data from API
  * @param {number} tickerId - Ticker ID for link
  * @returns {string} HTML content
- */
-function renderPositionDetailsContent(positionData, tickerId) {
-    const FieldRenderer = window.FieldRendererService;
-    
-    // Render side
-    const sideHtml = FieldRenderer && FieldRenderer.renderSide ? 
-        FieldRenderer.renderSide(positionData.side) : 
-        `<span class="badge badge-${positionData.side}">${positionData.side === 'long' ? 'לונג' : positionData.side === 'short' ? 'שורט' : 'סגור'}</span>`;
-    
-    // Render quantity with # and sign
-    const quantity = positionData.quantity || 0;
-    const quantitySign = quantity > 0 ? '+' : quantity < 0 ? '-' : '';
-    const quantityClass = quantity > 0 ? 'text-success' : quantity < 0 ? 'text-danger' : '';
-    const quantityHtml = `<span class="${quantityClass}">#${quantitySign}${Math.abs(quantity).toLocaleString()}</span>`;
-    
-    // Ticker symbol as link to ticker details
-    const tickerSymbolLink = tickerId ? 
-        `<a href="#" onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('ticker', ${tickerId}, { mode: 'view' }); return false; }" class="entity-trade-link">${positionData.ticker_symbol || 'N/A'}</a>` :
-        positionData.ticker_symbol || 'N/A';
-    
-    // Get entity colors for trade
-    const tradeColor = window.getEntityColor ? window.getEntityColor('trade') : '#007bff';
-    const tradeBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
-    const tradeBorderColor = window.getEntityBorderColor ? window.getEntityBorderColor('trade') : 'rgba(0, 123, 255, 0.3)';
-    
-    // Format currency with RTL support
-    const formatCurrency = (value, showSign = false) => {
-        if (value === null || value === undefined || isNaN(value)) return 'לא זמין';
-        const numValue = parseFloat(value);
-        const absValue = Math.abs(numValue);
-        const formatted = absValue.toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        const sign = showSign ? (numValue >= 0 ? '+' : '-') : (numValue < 0 ? '-' : '');
-        return `$${formatted}${sign}`;
-    };
-    
-    let html = `
-        <div class="position-details-content entity-trade-modal" style="background-color: ${tradeBgColor}; border: 1px solid ${tradeBorderColor}; border-radius: 8px; padding: 1.5rem;">
-            <!-- Header row: Symbol | Side | Account -->
-            <div class="row mb-3 pb-3" style="border-bottom: 2px solid ${tradeBorderColor};">
-                <div class="col-12 d-flex justify-content-between align-items-center">
-                    <div style="color: ${tradeColor}; font-weight: bold; font-size: 1.2rem;">
-                        ${tickerSymbolLink}
-                    </div>
-                    <div>
-                        ${sideHtml}
-                    </div>
-                    <div style="color: ${tradeColor}; font-weight: 500;">
-                        ${positionData.account_name || 'N/A'}
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Two columns layout -->
-            <div class="row">
-                <!-- Column 1 -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <strong>כמות:</strong> ${quantityHtml}
-                    </div>
-                    <div class="mb-3">
-                        <strong>מחיר ממוצע:</strong> 
-                        $${(positionData.average_price_gross || 0).toFixed(2)} 
-                        <span style="color: #6c757d; font-size: 0.9em;">(${(positionData.average_price_net || 0).toFixed(2)} נטו)</span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>סה"כ עלות:</strong> 
-                        ${formatCurrency(positionData.current_position_cost || 0)}
-                    </div>
-                    <div class="mb-3">
-                        <strong>שווי שוק:</strong> 
-                        ${positionData.market_value ? formatCurrency(positionData.market_value, false) : 'לא זמין'}
-                    </div>
-                    <div class="mb-3">
-                        <strong>אחוז מהחשבון:</strong> 
-                        ${(positionData.percent_of_account || 0).toFixed(2)}%
-                    </div>
-                </div>
-                
-                <!-- Column 2 -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <strong>P/L:</strong> 
-                        <span class="${(positionData.unrealized_pl || 0) >= 0 ? 'text-success' : 'text-danger'}">
-                            ${formatCurrency(positionData.unrealized_pl || 0, true)}
-                            ${positionData.unrealized_pl_percent ? `(${positionData.unrealized_pl_percent >= 0 ? '+' : ''}${positionData.unrealized_pl_percent.toFixed(2)}%)` : ''}
-                        </span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Rez. P/L:</strong> 
-                        <span class="${(positionData.realized_pl || 0) >= 0 ? 'text-success' : 'text-danger'}">
-                            ${formatCurrency(positionData.realized_pl || 0, true)}
-                            ${positionData.realized_pl_percent ? `(${positionData.realized_pl_percent >= 0 ? '+' : ''}${positionData.realized_pl_percent.toFixed(2)}%)` : ''}
-                        </span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>סה"כ P/L:</strong> 
-                        <span class="${((positionData.unrealized_pl || 0) + (positionData.realized_pl || 0) >= 0 ? 'text-success' : 'text-danger')}">
-                            ${formatCurrency((positionData.unrealized_pl || 0) + (positionData.realized_pl || 0), true)}
-                        </span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>סה"כ קניות:</strong> 
-                        ${(positionData.total_bought_quantity || 0).toLocaleString()} יחידות - ${formatCurrency(positionData.total_bought_amount || 0)}
-                    </div>
-                    <div class="mb-3">
-                        <strong>סה"כ מכירות:</strong> 
-                        ${(positionData.total_sold_quantity || 0).toLocaleString()} יחידות - ${formatCurrency(positionData.total_sold_amount || 0)}
-                    </div>
-                    <div class="mb-3">
-                        <strong>עמלות:</strong> 
-                        ${formatCurrency(positionData.total_fees || 0)}
-                    </div>
-                </div>
-            </div>
-    `;
-    
-    // Add executions table with sortable headers if available
-    if (positionData.executions && positionData.executions.length > 0) {
-        html += `
-            <div class="row mt-4">
-                <div class="col-12">
-                    <h5 style="color: ${tradeColor}; margin-bottom: 1rem;">ביצועים (${positionData.executions.length})</h5>
-                    <div class="table-responsive">
-                        <table class="table table-sm" id="positionExecutionsTable" data-table-type="position_executions">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.positionExecutionsData || [], 'position_executions', updatePositionExecutionsTable); }">תאריך <span class="sort-icon">↕</span></button>
-                                    </th>
-                                    <th>
-                                        <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.positionExecutionsData || [], 'position_executions', updatePositionExecutionsTable); }">פעולה <span class="sort-icon">↕</span></button>
-                                    </th>
-                                    <th>
-                                        <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(2, window.positionExecutionsData || [], 'position_executions', updatePositionExecutionsTable); }">כמות <span class="sort-icon">↕</span></button>
-                                    </th>
-                                    <th>
-                                        <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.positionExecutionsData || [], 'position_executions', updatePositionExecutionsTable); }">מחיר <span class="sort-icon">↕</span></button>
-                                    </th>
-                                    <th>
-                                        <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.positionExecutionsData || [], 'position_executions', updatePositionExecutionsTable); }">עמלה <span class="sort-icon">↕</span></button>
-                                    </th>
-                                    <th>
-                                        <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.positionExecutionsData || [], 'position_executions', updatePositionExecutionsTable); }">סה"כ <span class="sort-icon">↕</span></button>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-        `;
-        
-        // Store executions data for sorting
-        window.positionExecutionsData = positionData.executions.map(exec => ({
-            ...exec,
-            date: exec.date || exec.execution_date || exec.created_at,
-            total: (exec.quantity * exec.price) + (exec.fee || 0)
-        }));
-        
-        window.positionExecutionsData.forEach(execution => {
-            const action = execution.action === 'buy' ? 'קניה' : 'מכירה';
-            const actionClass = execution.action === 'buy' ? 'text-success' : 'text-danger';
-            const total = execution.total || ((execution.quantity * execution.price) + (execution.fee || 0));
-            
-            html += `
-                <tr>
-                    <td>${execution.date ? new Date(execution.date).toLocaleDateString('he-IL') : 'N/A'}</td>
-                    <td><span class="${actionClass}">${action}</span></td>
-                    <td>#${execution.quantity > 0 ? '+' : ''}${execution.quantity.toLocaleString()}</td>
-                    <td>$${execution.price.toFixed(2)}</td>
-                    <td>$${(execution.fee || 0).toFixed(2)}</td>
-                    <td>$${total.toFixed(2)}</td>
-                </tr>
-            `;
-        });
-        
-        html += `
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-    html += `</div>`;
-    
-    return html;
-}
-
-/**
- * Update position executions table (for sorting)
- * @param {Array} executions - Sorted executions array
- */
-function updatePositionExecutionsTable(executions) {
-    const tableBody = document.querySelector('#positionExecutionsTable tbody');
-    if (!tableBody) return;
-    
-    if (!executions || executions.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6" class="empty">אין ביצועים להצגה</td></tr>';
-        return;
-    }
-    
-    let html = '';
-    executions.forEach(execution => {
-        const action = execution.action === 'buy' ? 'קניה' : 'מכירה';
-        const actionClass = execution.action === 'buy' ? 'text-success' : 'text-danger';
-        const total = execution.total || ((execution.quantity * execution.price) + (execution.fee || 0));
-        
-        html += `
-            <tr>
-                <td>${execution.date ? new Date(execution.date).toLocaleDateString('he-IL') : 'N/A'}</td>
-                <td><span class="${actionClass}">${action}</span></td>
-                <td>#${execution.quantity > 0 ? '+' : ''}${execution.quantity.toLocaleString()}</td>
-                <td>$${execution.price.toFixed(2)}</td>
-                <td>$${(execution.fee || 0).toFixed(2)}</td>
-                <td>$${total.toFixed(2)}</td>
-            </tr>
-        `;
-    });
-    
-    tableBody.innerHTML = html;
-}
-
-/**
- * Clear positions table
  */
 function clearPositionsTable() {
     const tableBody = document.querySelector('#positionsTable tbody');

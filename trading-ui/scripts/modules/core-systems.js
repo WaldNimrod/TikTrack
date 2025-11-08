@@ -3776,22 +3776,6 @@ const PAGE_CONFIGS = {
         ]
     },
     
-    'js-map': {
-        name: 'JavaScript Map',
-        requiresFilters: false,
-        requiresValidation: false,
-        requiresTables: false,
-        customInitializers: [
-            async (pageConfig) => {
-                console.log('🗺️ Initializing JS Map...');
-                
-                if (typeof window.initializeJsMapPage === 'function') {
-                    window.initializeJsMapPage();
-                }
-            }
-        ]
-    },
-    
     'crud-testing-dashboard': {
         name: 'CRUD Testing',
         requiresFilters: false,

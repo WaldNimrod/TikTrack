@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from config.database import get_db
 from models.cash_flow import CashFlow
 from models.currency import Currency
+from models.trading_account import TradingAccount
 from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.cash_flow_service import CashFlowService as CashFlowHelperService
@@ -28,7 +29,8 @@ class CashFlowService:
     def get_all(self, db: Session, filters=None):
         cash_flows = db.query(CashFlow).options(
             joinedload(CashFlow.account),
-            joinedload(CashFlow.currency)
+            joinedload(CashFlow.currency),
+            joinedload(CashFlow.trade)
         ).all()
         
         # Enhance data with account and currency names
@@ -47,7 +49,8 @@ class CashFlowService:
     def get_by_id(self, db: Session, cash_flow_id: int):
         return db.query(CashFlow).options(
             joinedload(CashFlow.account),
-            joinedload(CashFlow.currency)
+            joinedload(CashFlow.currency),
+            joinedload(CashFlow.trade)
         ).filter(CashFlow.id == cash_flow_id).first()
 
 # Initialize base API
@@ -64,39 +67,108 @@ def get_cash_flows():
     
     # Enhance data with additional information and filter currency exchanges
     if response.get('status') == 'success' and response.get('data'):
-        enhanced_data = []
-        exchange_ids_seen = set()  # Track exchange IDs we've already included
+        processed_flows = []
+        exchange_pairs = {}
         
         for cf_dict in response['data']:
-            # Add additional fields if they exist
-            if 'account' in cf_dict and cf_dict['account']:
-                cf_dict['account_name'] = cf_dict['account'].get('name', '')
-            if 'currency' in cf_dict and cf_dict['currency']:
-                cf_dict['currency_symbol'] = cf_dict['currency'].get('symbol', '')
-                cf_dict['currency_name'] = cf_dict['currency'].get('name', '')
+            # Create a shallow copy so we don't mutate the original dict returned by base API
+            cf_entry = dict(cf_dict)
             
-            # Filter currency exchanges: only show other_negative flow (the "from" flow)
-            external_id = cf_dict.get('external_id')
+            # Add additional fields if they exist
+            account_info = cf_entry.pop('account', None)
+            if account_info:
+                cf_entry['account_name'] = account_info.get('name', '')
+            
+            currency_info = cf_entry.pop('currency', None)
+            if currency_info:
+                cf_entry['currency_symbol'] = currency_info.get('symbol', '')
+                cf_entry['currency_name'] = currency_info.get('name', '')
+            
+            external_id = cf_entry.get('external_id')
             if CashFlowHelperService.is_currency_exchange(external_id):
-                # This is part of a currency exchange
-                if external_id in exchange_ids_seen:
-                    # We've already included a flow from this exchange - skip
+                cf_entry['exchange_group_id'] = external_id
+                cf_entry['exchange_direction'] = 'from' if cf_entry.get('type') == 'other_negative' else 'to'
+                
+                pair = exchange_pairs.setdefault(external_id, {'from': None, 'to': None})
+                if cf_entry.get('type') == 'other_negative':
+                    pair['from'] = cf_entry
+                elif cf_entry.get('type') == 'other_positive':
+                    pair['to'] = cf_entry
+            processed_flows.append(cf_entry)
+        
+        # Ensure completeness for each exchange group (fetch missing flows directly from DB if needed)
+        db_session = getattr(g, 'db', None)
+        if isinstance(db_session, Session):
+            processed_by_id = {entry.get('id'): entry for entry in processed_flows if entry.get('id') is not None}
+            for exchange_id, pair in exchange_pairs.items():
+                if pair.get('from') and pair.get('to'):
+                    continue
+                try:
+                    db_flows = CashFlowHelperService.get_exchange_flows(db_session, exchange_id)
+                except Exception:
                     continue
                 
-                # Check if this is the other_negative flow (the one we want to show)
-                if cf_dict.get('type') == 'other_negative':
-                    # Mark this exchange as seen and include it
-                    exchange_ids_seen.add(external_id)
-                    enhanced_data.append(cf_dict)
-                else:
-                    # This is other_positive or fee - skip it (we'll show only other_negative)
-                    exchange_ids_seen.add(external_id)  # Mark as seen so we don't process other flows
-                    continue
-            else:
-                # Regular cash flow - include it
-                enhanced_data.append(cf_dict)
+                for flow in db_flows:
+                    if flow.id in processed_by_id:
+                        continue
+                    
+                    flow_dict = flow.to_dict()
+                    flow_entry = dict(flow_dict)
+                    
+                    if flow.account:
+                        flow_entry['account_name'] = flow.account.name
+                    if flow.currency:
+                        flow_entry['currency_symbol'] = flow.currency.symbol
+                        flow_entry['currency_name'] = flow.currency.name
+                    
+                    flow_entry['exchange_group_id'] = exchange_id
+                    flow_entry['exchange_direction'] = 'from' if flow.type == 'other_negative' else 'to'
+                    
+                    processed_flows.append(flow_entry)
+                    processed_by_id[flow.id] = flow_entry
+                    
+                    group = exchange_pairs.setdefault(exchange_id, {'from': None, 'to': None})
+                    if flow_entry['exchange_direction'] == 'from':
+                        group['from'] = flow_entry
+                    else:
+                        group['to'] = flow_entry
         
-        response['data'] = enhanced_data
+        # Enrich exchange flows with linkage details
+        for exchange_id, pair in exchange_pairs.items():
+            from_flow = pair.get('from')
+            to_flow = pair.get('to')
+            if from_flow and to_flow:
+                from_flow['linked_exchange_cash_flow_id'] = to_flow.get('id')
+                to_flow['linked_exchange_cash_flow_id'] = from_flow.get('id')
+                
+                from_flow['linked_exchange_summary'] = {
+                    "cash_flow_id": to_flow.get('id'),
+                    "amount": to_flow.get('amount'),
+                    "currency_id": to_flow.get('currency_id'),
+                    "currency_symbol": to_flow.get('currency_symbol'),
+                    "currency_name": to_flow.get('currency_name'),
+                    "usd_rate": to_flow.get('usd_rate'),
+                    "date": to_flow.get('date'),
+                    "type": to_flow.get('type')
+                }
+                to_flow['linked_exchange_summary'] = {
+                    "cash_flow_id": from_flow.get('id'),
+                    "amount": from_flow.get('amount'),
+                    "currency_id": from_flow.get('currency_id'),
+                    "currency_symbol": from_flow.get('currency_symbol'),
+                    "currency_name": from_flow.get('currency_name'),
+                    "usd_rate": from_flow.get('usd_rate'),
+                    "date": from_flow.get('date'),
+                    "type": from_flow.get('type')
+                }
+            else:
+                # If we only have one side, still expose linkage metadata without ID
+                if from_flow and not from_flow.get('linked_exchange_cash_flow_id'):
+                    from_flow['linked_exchange_cash_flow_id'] = to_flow.get('id') if to_flow else None
+                if to_flow and not to_flow.get('linked_exchange_cash_flow_id'):
+                    to_flow['linked_exchange_cash_flow_id'] = from_flow.get('id') if from_flow else None
+        
+        response['data'] = processed_flows
     
     return jsonify(response), status_code
 
@@ -159,6 +231,26 @@ def create_cash_flow():
             data['source'] = 'manual'
         if 'external_id' not in data:
             data['external_id'] = '0'
+
+        # Normalize fee amount - always store non-negative value in account base currency
+        raw_fee_amount = data.get('fee_amount', 0)
+        try:
+            fee_amount_value = float(raw_fee_amount) if raw_fee_amount not in (None, '') else 0.0
+        except (TypeError, ValueError):
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Invalid fee_amount. Fee must be a non-negative number."},
+                "version": "1.0"
+            }), 400
+
+        if fee_amount_value < 0:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Fee amount cannot be negative"},
+                "version": "1.0"
+            }), 400
+
+        data['fee_amount'] = fee_amount_value
         
         # Convert date string to date object
         if 'date' in data and data['date']:
@@ -177,6 +269,16 @@ def create_cash_flow():
         # Sanitize HTML content for description field
         if 'description' in data and data['description']:
             data['description'] = BaseEntityUtils.sanitize_rich_text(data['description'])
+        
+        # Handle trade_id - convert empty string or 0 to None
+        if 'trade_id' in data:
+            if data['trade_id'] == '' or data['trade_id'] == 0 or data['trade_id'] == '0':
+                data['trade_id'] = None
+            elif data['trade_id']:
+                try:
+                    data['trade_id'] = int(data['trade_id'])
+                except (ValueError, TypeError):
+                    data['trade_id'] = None
         
         # Validate data against constraints
         logger.info("Validating cash flow data before creation")
@@ -240,6 +342,29 @@ def update_cash_flow(cash_flow_id: int):
                 data['source'] = 'manual'
             if 'external_id' not in data:
                 data['external_id'] = '0'
+
+            # Normalize fee amount for updates (default to existing value)
+            if 'fee_amount' in data:
+                raw_fee_amount = data.get('fee_amount')
+                try:
+                    fee_amount_value = float(raw_fee_amount) if raw_fee_amount not in (None, '') else 0.0
+                except (TypeError, ValueError):
+                    return jsonify({
+                        "status": "error",
+                        "error": {"message": "Invalid fee_amount. Fee must be a non-negative number."},
+                        "version": "1.0"
+                    }), 400
+
+                if fee_amount_value < 0:
+                    return jsonify({
+                        "status": "error",
+                        "error": {"message": "Fee amount cannot be negative"},
+                        "version": "1.0"
+                    }), 400
+
+                data['fee_amount'] = fee_amount_value
+            else:
+                data['fee_amount'] = cash_flow.fee_amount if cash_flow.fee_amount is not None else 0.0
             
             # Convert date string to date object
             if 'date' in data and data['date']:
@@ -258,6 +383,16 @@ def update_cash_flow(cash_flow_id: int):
             # Sanitize HTML content for description field
             if 'description' in data and data['description']:
                 data['description'] = BaseEntityUtils.sanitize_rich_text(data['description'])
+            
+            # Handle trade_id - convert empty string or 0 to None
+            if 'trade_id' in data:
+                if data['trade_id'] == '' or data['trade_id'] == 0 or data['trade_id'] == '0':
+                    data['trade_id'] = None
+                elif data['trade_id']:
+                    try:
+                        data['trade_id'] = int(data['trade_id'])
+                    except (ValueError, TypeError):
+                        data['trade_id'] = None
             
             # Validate data against constraints
             logger.info("Validating cash flow data before update")
@@ -392,12 +527,11 @@ def delete_all_cash_flows():
 @invalidate_cache(['cash_flows', 'account-activity-*'])
 def create_currency_exchange():
     """
-    Create a currency exchange operation (atomic creation of 2-3 cash flows)
+    Create a currency exchange operation (atomic creation of two cash flows)
     
     Creates:
-    - From flow: type='other_negative', amount=-from_amount, currency_id=from_currency_id
+    - From flow: type='other_negative', amount=-from_amount, currency_id=from_currency_id, stores fee_amount
     - To flow: type='other_positive', amount=+to_amount, currency_id=to_currency_id
-    - Fee flow (optional): type='fee', amount=-fee_amount, currency_id=fee_currency_id
     
     All flows share the same external_id: 'exchange_<uuid>'
     """
@@ -426,9 +560,10 @@ def create_currency_exchange():
         from_amount = float(data['from_amount'])
         exchange_rate = float(data['exchange_rate'])
         fee_amount = float(data.get('fee_amount', 0)) if data.get('fee_amount') else 0
-        fee_currency_id = int(data.get('fee_currency_id', from_currency_id))
+        fee_currency_id = data.get('fee_currency_id')
         date_str = data['date']
         description = data.get('description', '')
+        source_value = data.get('source', 'manual')
         
         # Validate currencies are different
         if from_currency_id == to_currency_id:
@@ -459,7 +594,43 @@ def create_currency_exchange():
                 "error": {"message": "Fee amount cannot be negative"},
                 "version": "1.0"
             }), 400
+
+        if fee_amount < 0:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Fee amount cannot be negative"},
+                "version": "1.0"
+            }), 400
         
+        # Validate trading account and fee currency alignment
+        account = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+        if not account:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Trading account not found"},
+                "version": "1.0"
+            }), 404
+
+        account_currency_id = account.currency_id
+        if not account_currency_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Trading account base currency is missing"},
+                "version": "1.0"
+            }), 400
+
+        if fee_currency_id:
+            fee_currency_id = int(fee_currency_id)
+        else:
+            fee_currency_id = account_currency_id
+
+        if fee_currency_id != account_currency_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Fee currency must match trading account base currency"},
+                "version": "1.0"
+            }), 400
+
         # Convert date
         try:
             date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
@@ -467,18 +638,6 @@ def create_currency_exchange():
             return jsonify({
                 "status": "error",
                 "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
-                "version": "1.0"
-            }), 400
-        
-        # Check balance sufficiency
-        current_balance = AccountActivityService.calculate_balance_by_currency(
-            db, trading_account_id, from_currency_id
-        )
-        required_amount = from_amount + fee_amount
-        if current_balance < required_amount:
-            return jsonify({
-                "status": "error",
-                "error": {"message": f"Insufficient balance. Required: {required_amount}, Available: {current_balance}"},
                 "version": "1.0"
             }), 400
         
@@ -507,11 +666,12 @@ def create_currency_exchange():
                 trading_account_id=trading_account_id,
                 type='other_negative',
                 amount=-from_amount,
+                fee_amount=fee_amount,
                 currency_id=from_currency_id,
                 usd_rate=float(from_currency.usd_rate),
                 date=date_obj,
                 description=description,
-                source='manual',
+                source=source_value,
                 external_id=exchange_id
             )
             db.add(from_flow)
@@ -521,38 +681,15 @@ def create_currency_exchange():
                 trading_account_id=trading_account_id,
                 type='other_positive',
                 amount=to_amount,
+                fee_amount=0.0,
                 currency_id=to_currency_id,
                 usd_rate=float(to_currency.usd_rate),
                 date=date_obj,
                 description=description,
-                source='manual',
+                source=source_value,
                 external_id=exchange_id
             )
             db.add(to_flow)
-            
-            # Fee flow (optional)
-            fee_flow = None
-            if fee_amount > 0:
-                fee_currency = db.query(Currency).filter(Currency.id == fee_currency_id).first()
-                if not fee_currency:
-                    raise ValueError(f"Fee currency {fee_currency_id} not found")
-                
-                fee_description = f"המרת מטבע: {from_currency.symbol} -> {to_currency.symbol}, שער: {exchange_rate}"
-                if description:
-                    fee_description = f"{fee_description}, {description}"
-                
-                fee_flow = CashFlow(
-                    trading_account_id=trading_account_id,
-                    type='fee',
-                    amount=-fee_amount,
-                    currency_id=fee_currency_id,
-                    usd_rate=float(fee_currency.usd_rate),
-                    date=date_obj,
-                    description=fee_description,
-                    source='manual',
-                    external_id=exchange_id
-                )
-                db.add(fee_flow)
             
             # Commit transaction
             db.commit()
@@ -560,8 +697,6 @@ def create_currency_exchange():
             # Refresh to get IDs
             db.refresh(from_flow)
             db.refresh(to_flow)
-            if fee_flow:
-                db.refresh(fee_flow)
             
             # Return response
             result = {
@@ -569,7 +704,8 @@ def create_currency_exchange():
                 "exchange_external_id": exchange_id,
                 "from_flow": from_flow.to_dict(),
                 "to_flow": to_flow.to_dict(),
-                "fee_flow": fee_flow.to_dict() if fee_flow else None
+                "fee_amount": fee_amount,
+                "fee_currency_id": fee_currency_id
             }
             
             logger.info(f"✅ Currency exchange created successfully: {exchange_id}")
@@ -623,10 +759,11 @@ def get_currency_exchange(exchange_uuid: str):
         # Separate flows by type
         from_flow = next((f for f in flows if f.type == 'other_negative'), None)
         to_flow = next((f for f in flows if f.type == 'other_positive'), None)
-        fee_flow = next((f for f in flows if f.type == 'fee'), None)
         
         # Calculate exchange rate from amounts
         exchange_rate = abs(to_flow.amount / from_flow.amount) if from_flow and to_flow else 0
+        fee_amount = from_flow.fee_amount if from_flow else 0
+        fee_currency_id = from_flow.account.currency_id if from_flow and from_flow.account else None
         
         result = {
             "exchange_id": exchange_uuid,
@@ -634,7 +771,8 @@ def get_currency_exchange(exchange_uuid: str):
             "exchange_rate": exchange_rate,
             "from_flow": from_flow.to_dict() if from_flow else None,
             "to_flow": to_flow.to_dict() if to_flow else None,
-            "fee_flow": fee_flow.to_dict() if fee_flow else None
+            "fee_amount": fee_amount,
+            "fee_currency_id": fee_currency_id
         }
         
         return jsonify({
@@ -687,8 +825,6 @@ def update_currency_exchange(exchange_uuid: str):
         # Separate existing flows
         from_flow = next((f for f in flows if f.type == 'other_negative'), None)
         to_flow = next((f for f in flows if f.type == 'other_positive'), None)
-        existing_fee_flow = next((f for f in flows if f.type == 'fee'), None)
-        
         # Validate required fields
         required_fields = ['trading_account_id', 'from_currency_id', 'to_currency_id',
                           'from_amount', 'exchange_rate', 'date']
@@ -707,7 +843,7 @@ def update_currency_exchange(exchange_uuid: str):
         from_amount = float(data['from_amount'])
         exchange_rate = float(data['exchange_rate'])
         fee_amount = float(data.get('fee_amount', 0)) if data.get('fee_amount') else 0
-        fee_currency_id = int(data.get('fee_currency_id', from_currency_id))
+        fee_currency_id = data.get('fee_currency_id')
         date_str = data['date']
         description = data.get('description', '')
         
@@ -719,13 +855,55 @@ def update_currency_exchange(exchange_uuid: str):
                 "version": "1.0"
             }), 400
         
-        if from_amount <= 0 or exchange_rate <= 0:
+        if from_amount <= 0:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Amounts and exchange rate must be greater than 0"},
+                "error": {"message": "From amount must be greater than 0"},
+                "version": "1.0"
+            }), 400
+
+        if exchange_rate <= 0:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Exchange rate must be greater than 0"},
+                "version": "1.0"
+            }), 400
+
+        if fee_amount < 0:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Fee amount cannot be negative"},
                 "version": "1.0"
             }), 400
         
+        account = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+        if not account:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Trading account not found"},
+                "version": "1.0"
+            }), 404
+
+        account_currency_id = account.currency_id
+        if not account_currency_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Trading account base currency is missing"},
+                "version": "1.0"
+            }), 400
+
+        if fee_currency_id:
+            fee_currency_id = int(fee_currency_id)
+        else:
+            fee_currency_id = account_currency_id
+
+        if fee_currency_id != account_currency_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Fee currency must match trading account base currency"},
+                "version": "1.0"
+            }), 400
+
         # Convert date
         try:
             date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
@@ -738,7 +916,7 @@ def update_currency_exchange(exchange_uuid: str):
         
         # Check balance if amount increased
         old_from_amount = abs(from_flow.amount) if from_flow else 0
-        old_fee_amount = abs(existing_fee_flow.amount) if existing_fee_flow else 0
+        old_fee_amount = from_flow.fee_amount if from_flow and from_flow.fee_amount else 0
         if from_amount + fee_amount > old_from_amount + old_fee_amount:
             current_balance = AccountActivityService.calculate_balance_by_currency(
                 db, trading_account_id, from_currency_id
@@ -770,6 +948,7 @@ def update_currency_exchange(exchange_uuid: str):
             if from_flow:
                 from_flow.trading_account_id = trading_account_id
                 from_flow.amount = -from_amount
+                from_flow.fee_amount = fee_amount
                 from_flow.currency_id = from_currency_id
                 from_flow.usd_rate = float(from_currency.usd_rate)
                 from_flow.date = date_obj
@@ -779,46 +958,11 @@ def update_currency_exchange(exchange_uuid: str):
             if to_flow:
                 to_flow.trading_account_id = trading_account_id
                 to_flow.amount = to_amount
+                to_flow.fee_amount = 0.0
                 to_flow.currency_id = to_currency_id
                 to_flow.usd_rate = float(to_currency.usd_rate)
                 to_flow.date = date_obj
                 to_flow.description = description
-            
-            # Handle fee flow
-            if fee_amount > 0:
-                fee_currency = db.query(Currency).filter(Currency.id == fee_currency_id).first()
-                if not fee_currency:
-                    raise ValueError(f"Fee currency {fee_currency_id} not found")
-                
-                fee_description = f"המרת מטבע: {from_currency.symbol} -> {to_currency.symbol}, שער: {exchange_rate}"
-                if description:
-                    fee_description = f"{fee_description}, {description}"
-                
-                if existing_fee_flow:
-                    # Update existing fee flow
-                    existing_fee_flow.amount = -fee_amount
-                    existing_fee_flow.currency_id = fee_currency_id
-                    existing_fee_flow.usd_rate = float(fee_currency.usd_rate)
-                    existing_fee_flow.date = date_obj
-                    existing_fee_flow.description = fee_description
-                else:
-                    # Create new fee flow
-                    new_fee_flow = CashFlow(
-                        trading_account_id=trading_account_id,
-                        type='fee',
-                        amount=-fee_amount,
-                        currency_id=fee_currency_id,
-                        usd_rate=float(fee_currency.usd_rate),
-                        date=date_obj,
-                        description=fee_description,
-                        source='manual',
-                        external_id=exchange_id
-                    )
-                    db.add(new_fee_flow)
-            else:
-                # Remove fee flow if it exists
-                if existing_fee_flow:
-                    db.delete(existing_fee_flow)
             
             # Commit transaction
             db.commit()
@@ -828,19 +972,19 @@ def update_currency_exchange(exchange_uuid: str):
                 db.refresh(from_flow)
             if to_flow:
                 db.refresh(to_flow)
-            if existing_fee_flow:
-                db.refresh(existing_fee_flow)
             
             # Get updated flows
             updated_flows = CashFlowHelperService.get_exchange_flows(db, exchange_id)
-            fee_flow = next((f for f in updated_flows if f.type == 'fee'), None)
+            updated_from_flow = next((f for f in updated_flows if f.type == 'other_negative'), None)
+            updated_to_flow = next((f for f in updated_flows if f.type == 'other_positive'), None)
             
             result = {
                 "exchange_id": exchange_uuid,
                 "exchange_external_id": exchange_id,
-                "from_flow": from_flow.to_dict() if from_flow else None,
-                "to_flow": to_flow.to_dict() if to_flow else None,
-                "fee_flow": fee_flow.to_dict() if fee_flow else None
+                "from_flow": updated_from_flow.to_dict() if updated_from_flow else None,
+                "to_flow": updated_to_flow.to_dict() if updated_to_flow else None,
+                "fee_amount": fee_amount,
+                "fee_currency_id": fee_currency_id
             }
             
             logger.info(f"✅ Currency exchange updated successfully: {exchange_id}")

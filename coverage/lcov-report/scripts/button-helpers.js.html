@@ -831,8 +831,8 @@ function <span class="fstat-no" title="function not covered" >createCancelButton
 <span class="cstat-no" title="statement not covered" >    if (window.addDynamicButton) {</span>
 <span class="cstat-no" title="statement not covered" >        window.addDynamicButton(container, type, onclick, classes, attributes, '', `cancel-btn-${itemType}-${itemId}`);</span>
     } else {
-        // fallback - יצירת כפתור ישירות
-        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" onclick="${onclick}" ${attributes}&gt;</span>
+        // fallback - יצירת כפתור ישירות (עם data-onclick)
+        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" data-onclick="${onclick}" ${attributes}&gt;</span>
             &lt;span class="cancel-icon"&gt;${isCancelled ? '✓' : 'X'}&lt;/span&gt;
         &lt;/button&gt;`;
 <span class="cstat-no" title="statement not covered" >        container.insertAdjacentHTML('beforeend', buttonHtml);</span>
@@ -896,8 +896,8 @@ function <span class="fstat-no" title="function not covered" >createDeleteButton
 <span class="cstat-no" title="statement not covered" >    if (window.addDynamicButton) {</span>
 <span class="cstat-no" title="statement not covered" >        window.addDynamicButton(container, 'DELETE', onclick, classes, attributes, '', `delete-btn-${itemType}-${itemId}`);</span>
     } else {
-        // fallback - יצירת כפתור ישירות
-        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" onclick="${onclick}" ${attributes}&gt;</span>
+        // fallback - יצירת כפתור ישירות (עם data-onclick)
+        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" data-onclick="${onclick}" ${attributes}&gt;</span>
             &lt;span class="delete-icon"&gt;🗑️&lt;/span&gt;
         &lt;/button&gt;`;
 <span class="cstat-no" title="statement not covered" >        container.insertAdjacentHTML('beforeend', buttonHtml);</span>
@@ -916,8 +916,8 @@ function <span class="fstat-no" title="function not covered" >createEditButtonHe
 <span class="cstat-no" title="statement not covered" >    if (window.addDynamicButton) {</span>
 <span class="cstat-no" title="statement not covered" >        window.addDynamicButton(container, 'EDIT', onClick, classes, '', '', `edit-btn-${Date.now()}`);</span>
     } else {
-        // fallback
-        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" onclick="${onClick}" title="ערוך"&gt;</span>
+        // fallback (עם data-onclick)
+        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" data-onclick="${onClick}" title="ערוך"&gt;</span>
             &lt;span class="edit-icon"&gt;✏️&lt;/span&gt;
         &lt;/button&gt;`;
 <span class="cstat-no" title="statement not covered" >        container.insertAdjacentHTML('beforeend', buttonHtml);</span>
@@ -936,8 +936,8 @@ function <span class="fstat-no" title="function not covered" >createDeleteButton
 <span class="cstat-no" title="statement not covered" >    if (window.addDynamicButton) {</span>
 <span class="cstat-no" title="statement not covered" >        window.addDynamicButton(container, 'DELETE', onClick, classes, '', '', `delete-btn-${Date.now()}`);</span>
     } else {
-        // fallback
-        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" onclick="${onClick}" title="מחק"&gt;</span>
+        // fallback (עם data-onclick)
+        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" data-onclick="${onClick}" title="מחק"&gt;</span>
             &lt;span class="delete-icon"&gt;🗑️&lt;/span&gt;
         &lt;/button&gt;`;
 <span class="cstat-no" title="statement not covered" >        container.insertAdjacentHTML('beforeend', buttonHtml);</span>
@@ -956,8 +956,8 @@ function <span class="fstat-no" title="function not covered" >createLinkButtonHe
 <span class="cstat-no" title="statement not covered" >    if (window.addDynamicButton) {</span>
 <span class="cstat-no" title="statement not covered" >        window.addDynamicButton(container, 'LINK', onClick, classes, '', '', `link-btn-${Date.now()}`);</span>
     } else {
-        // fallback
-        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" onclick="${onClick}" title="קישור"&gt;</span>
+        // fallback (עם data-onclick)
+        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" data-onclick="${onClick}" title="קישור"&gt;</span>
             &lt;span class="link-icon"&gt;🔗&lt;/span&gt;
         &lt;/button&gt;`;
 <span class="cstat-no" title="statement not covered" >        container.insertAdjacentHTML('beforeend', buttonHtml);</span>
@@ -999,8 +999,8 @@ function <span class="fstat-no" title="function not covered" >createSortButtonHe
 <span class="cstat-no" title="statement not covered" >    if (window.addDynamicButton) {</span>
 <span class="cstat-no" title="statement not covered" >        window.addDynamicButton(container, 'SORT', onClick, classes, attributes, text, `sort-btn-${Date.now()}`);</span>
     } else {
-        // fallback
-        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" onclick="${onClick}" ${attributes} title="מיון"&gt;</span>
+        // fallback (עם data-onclick)
+        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" data-onclick="${onClick}" ${attributes} title="מיון"&gt;</span>
             ${text}↕️
         &lt;/button&gt;`;
 <span class="cstat-no" title="statement not covered" >        container.insertAdjacentHTML('beforeend', buttonHtml);</span>
@@ -1020,8 +1020,8 @@ function <span class="fstat-no" title="function not covered" >createToggleButton
 <span class="cstat-no" title="statement not covered" >    if (window.addDynamicButton) {</span>
 <span class="cstat-no" title="statement not covered" >        window.addDynamicButton(container, 'TOGGLE', onClick, classes, `title="${title}"`, '', `toggle-btn-${Date.now()}`);</span>
     } else {
-        // fallback
-        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" onclick="${onClick}" title="${title}"&gt;</span>
+        // fallback (עם data-onclick)
+        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" data-onclick="${onClick}" title="${title}"&gt;</span>
             &lt;span class="toggle-icon"&gt;▼&lt;/span&gt;
         &lt;/button&gt;`;
 <span class="cstat-no" title="statement not covered" >        container.insertAdjacentHTML('beforeend', buttonHtml);</span>
@@ -1042,8 +1042,8 @@ function <span class="fstat-no" title="function not covered" >createButtonHelper
 <span class="cstat-no" title="statement not covered" >    if (window.addDynamicButton) {</span>
 <span class="cstat-no" title="statement not covered" >        window.addDynamicButton(container, type, onClick, classes, additionalAttributes, '', `btn-${type}-${Date.now()}`);</span>
     } else {
-        // fallback
-        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" onclick="${onClick}" ${additionalAttributes} title="${type}"&gt;</span>
+        // fallback (עם data-onclick)
+        const buttonHtml = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn ${classes}" data-onclick="${onClick}" ${additionalAttributes} title="${type}"&gt;</span>
             &lt;span class="btn-icon"&gt;${type}&lt;/span&gt;
         &lt;/button&gt;`;
 <span class="cstat-no" title="statement not covered" >        container.insertAdjacentHTML('beforeend', buttonHtml);</span>
@@ -1069,7 +1069,7 @@ function <span class="fstat-no" title="function not covered" >createButtonHelper
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-25T01:53:55.576Z
+                at 2025-11-07T23:26:01.986Z
             </div>
         <script src="../prettify.js"></script>
         <script>

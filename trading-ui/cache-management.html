@@ -524,49 +524,111 @@
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js?v=0da3519a_20251102_104906"></script>
-    
-    <!-- System Scripts - Using New Modular Architecture -->
-    
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js?v=0da3519a_20251102_104906"></script>
-    
-    <!-- Stage 1: Core Modules -->
-    <script src="scripts/modules/core-systems.js?v=0da3519a_20251102_104906"></script>
-    <script src="scripts/modules/ui-basic.js?v=0da3519a_20251102_104906"></script>
-    <script src="scripts/modules/data-basic.js?v=0da3519a_20251102_104906"></script>
-    <script src="scripts/modules/ui-advanced.js?v=0da3519a_20251102_104906"></script>
-    <script src="scripts/modules/data-advanced.js?v=0da3519a_20251102_104906"></script>
-    <script src="scripts/modules/business-module.js?v=0da3519a_20251102_104906"></script>
-    <script src="scripts/modules/communication-module.js?v=0da3519a_20251102_104906"></script>
-    
-    <!-- Polling System -->
-    <script src="scripts/modules/polling-manager.js?v=0da3519a_20251102_104906"></script>
-    <script src="scripts/modules/localstorage-sync.js?v=0da3519a_20251102_104906"></script>
-    
-    <!-- Cache Module -->
-    <script src="scripts/modules/cache-module.js?v=0da3519a_20251102_104906"></script>
-    
-    <!-- Log System -->
-    <script src="scripts/unified-log-manager.js?v=0da3519a_20251102_104906"></script>
-    <script src="scripts/unified-log-display.js?v=0da3519a_20251102_104906"></script>
-    
-    <!-- Stage 2: Core Utilities -->
-    <script src="scripts/global-favicon.js?v=0da3519a_20251102_104906"></script>
-    <script src="scripts/page-utils.js?v=0da3519a_20251102_104906"></script>
-    
-    <!-- Socket.IO -->
-    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js?v=0da3519a_20251102_104906"></script>
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: cache-management | Generated: 2025-11-07T22:32:46.674Z -->
+    <!-- 📦 Packages: base, logs, cache, init-system -->
 
-    <!-- Page Script -->
-    <script src="scripts/cache-management.js?v=0da3519a_20251102_104906"></script>
-    
-    <!-- 14. Init System Check (Available on all pages) -->
-    <script src="scripts/init-system-check.js?v=0da3519a_20251102_104906"></script>
-    
-    <!-- 15. Monitoring Functions (Required for page checks) -->
-    <script src="scripts/monitoring-functions.js?v=0da3519a_20251102_104906"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/4: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
 
-    <script src="scripts/logger-service.js?v=0da3519a_20251102_104906"></script>
-    <script src="scripts/cache-sync-manager.js?v=0da3519a_20251102_104906"></script> <!-- מנהל סנכרון מטמון --> <!-- שירות לוגים מתקדם -->
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/4: LOGS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 9 | Description: מערכות לוגים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/unified-log-api.js?v=1.0.0"></script> <!-- API לוגים מאוחד -->
+    <!-- [17] Load Order: 17 -->
+    <script src="scripts/unified-log-manager.js?v=1.0.0"></script> <!-- מנהל לוגים מאוחד -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/unified-log-display.js?v=1.0.0"></script> <!-- תצוגת לוגים מאוחדת -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/4: CACHE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 9 | Description: מערכות מטמון -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/cache-policy-manager.js?v=1.0.0"></script> <!-- מנהל מדיניות מטמון -->
+    <!-- [20] Load Order: 20 -->
+    <script src="scripts/cache-management.js?v=1.0.0"></script> <!-- ניהול מטמון -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/4: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, import -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [23] Load Order: 23 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [25] Load Order: 25 -->
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+
+    <!-- =============================================================== -->
+    <!-- ===== END SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [26] Page-specific: cache-management -->
+    <script src="scripts/cache-management.js?v=1.0.0"></script> <!-- Page-specific script for cache-management -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 26 | Unique Scripts Loaded: 26 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("cache-management") -->
 </body>
 </html>

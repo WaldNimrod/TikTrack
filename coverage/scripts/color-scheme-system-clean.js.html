@@ -742,7 +742,12 @@
 <a name='L677'></a><a href='#L677'>677</a>
 <a name='L678'></a><a href='#L678'>678</a>
 <a name='L679'></a><a href='#L679'>679</a>
-<a name='L680'></a><a href='#L680'>680</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L680'></a><a href='#L680'>680</a>
+<a name='L681'></a><a href='#L681'>681</a>
+<a name='L682'></a><a href='#L682'>682</a>
+<a name='L683'></a><a href='#L683'>683</a>
+<a name='L684'></a><a href='#L684'>684</a>
+<a name='L685'></a><a href='#L685'>685</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -762,22 +767,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -807,7 +799,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1437,7 +1447,8 @@
 // ===== ENTITY TYPE DEFINITIONS =====
 const VALID_ENTITY_TYPES = <span class="cstat-no" title="statement not covered" >[</span>
   'trade', 'trade_plan', 'execution', 'account', 'cash_flow',
-  'ticker', 'alert', 'note', 'constraint', 'design', 'research', 'preference'
+  'ticker', 'alert', 'note', 'constraint', 'design', 'research', 'preference',
+  'position'
 ];
 &nbsp;
 // ===== COLOR DEFINITIONS =====
@@ -1453,7 +1464,8 @@ const ENTITY_COLORS = <span class="cstat-no" title="statement not covered" >{</s
   constraint: '#e83e8c',
   design: '#6f42c1',
   research: '#17a2b8',
-  preference: '#28a745'
+  preference: '#28a745',
+  position: '#0d6efd'
 };
 &nbsp;
 const ENTITY_BACKGROUND_COLORS = <span class="cstat-no" title="statement not covered" >{</span>
@@ -1468,7 +1480,8 @@ const ENTITY_BACKGROUND_COLORS = <span class="cstat-no" title="statement not cov
   constraint: 'rgba(232, 62, 140, 0.1)',
   design: 'rgba(111, 66, 193, 0.1)',
   research: 'rgba(23, 162, 184, 0.1)',
-  preference: 'rgba(40, 167, 69, 0.1)'
+  preference: 'rgba(40, 167, 69, 0.1)',
+  position: 'rgba(13, 110, 253, 0.12)'
 };
 &nbsp;
 const ENTITY_TEXT_COLORS = <span class="cstat-no" title="statement not covered" >{</span>
@@ -1483,7 +1496,8 @@ const ENTITY_TEXT_COLORS = <span class="cstat-no" title="statement not covered" 
   constraint: '#d91a72',
   design: '#59359a',
   research: '#117a8b',
-  preference: '#1e7e34'
+  preference: '#1e7e34',
+  position: '#0b5ed7'
 };
 &nbsp;
 const ENTITY_BORDER_COLORS = <span class="cstat-no" title="statement not covered" >{</span>
@@ -1498,7 +1512,8 @@ const ENTITY_BORDER_COLORS = <span class="cstat-no" title="statement not covered
   constraint: 'rgba(232, 62, 140, 0.3)',
   design: 'rgba(111, 66, 193, 0.3)',
   research: 'rgba(23, 162, 184, 0.3)',
-  preference: 'rgba(40, 167, 69, 0.3)'
+  preference: 'rgba(40, 167, 69, 0.3)',
+  position: 'rgba(13, 110, 253, 0.3)'
 };
 &nbsp;
 const STATUS_COLORS = <span class="cstat-no" title="statement not covered" >{</span>
@@ -2107,7 +2122,7 @@ function <span class="fstat-no" title="function not covered" >updateCSSVariables
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-25T01:53:55.349Z
+                at 2025-11-07T23:26:01.679Z
             </div>
         <script src="../prettify.js"></script>
         <script>

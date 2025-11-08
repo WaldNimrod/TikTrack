@@ -363,6 +363,50 @@ class ValidationService:
                 
                 logger.info(f"CUSTOM constraint passed: execution.ticker_id={execution_ticker_id} == trade.ticker_id={trade_ticker_id}")
                 return True
+            
+            elif constraint_type == 'CASH_FLOW_TRADE_TICKER_MATCH':
+                # Validate that if cash_flow has trade_id, the trade belongs to the same trading_account
+                
+                # Only validate for cash_flows table
+                if table_name != 'cash_flows':
+                    logger.warning(f"CUSTOM constraint CASH_FLOW_TRADE_TICKER_MATCH only applies to cash_flows table")
+                    return True
+                
+                cash_flow_trading_account_id = data.get('trading_account_id')
+                trade_id = data.get('trade_id')
+                
+                # If no trade_id, constraint passes (trade_id is optional)
+                if trade_id is None:
+                    logger.info(f"Cash flow has no trade_id, CUSTOM constraint passes")
+                    return True
+                
+                # If no trading_account_id, constraint passes (will be caught by NOT NULL)
+                if cash_flow_trading_account_id is None:
+                    logger.info(f"Cash flow has no trading_account_id, CUSTOM constraint passes")
+                    return True
+                
+                # Get trade's trading_account_id
+                trade_query = text("SELECT trading_account_id FROM trades WHERE id = :trade_id")
+                trade_result = db.execute(trade_query, {"trade_id": trade_id}).fetchone()
+                
+                if trade_result is None:
+                    logger.warning(f"Trade {trade_id} not found, CUSTOM constraint passes (FK will catch this)")
+                    return True
+                
+                trade_trading_account_id = trade_result[0]
+                
+                # If trade has no trading_account_id, constraint passes
+                if trade_trading_account_id is None:
+                    logger.info(f"Trade {trade_id} has no trading_account_id, CUSTOM constraint passes")
+                    return True
+                
+                # Check if trading_account_ids match
+                if cash_flow_trading_account_id != trade_trading_account_id:
+                    logger.error(f"CUSTOM constraint violation: cash_flow.trading_account_id={cash_flow_trading_account_id} != trade.trading_account_id={trade_trading_account_id}")
+                    return False
+                
+                logger.info(f"CUSTOM constraint passed: cash_flow.trading_account_id={cash_flow_trading_account_id} == trade.trading_account_id={trade_trading_account_id}")
+                return True
             else:
                 logger.warning(f"Unknown CUSTOM constraint type: {constraint_type}")
                 return True

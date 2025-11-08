@@ -76,6 +76,12 @@ class CashFlowService:
         """
         if not flows or len(flows) < 2:
             return False, "Currency exchange must have at least 2 cash flows (from and to)"
+
+        if len(flows) > 2:
+            legacy_fee_flow = next((f for f in flows if f.type == 'fee'), None)
+            if legacy_fee_flow:
+                return False, "Currency exchange should not include a separate fee flow (legacy structure detected)"
+            return False, "Currency exchange must include exactly 2 cash flows (from and to)"
         
         # Check for other_negative (from currency - outgoing)
         from_flow = next((f for f in flows if f.type == 'other_negative'), None)
@@ -87,9 +93,6 @@ class CashFlowService:
         if not to_flow:
             return False, "Currency exchange must have a 'to' flow with type 'other_positive'"
         
-        # Fee flow is optional (type='fee')
-        fee_flow = next((f for f in flows if f.type == 'fee'), None)
-        
         # Validate amounts
         if from_flow.amount >= 0:
             return False, "From flow amount must be negative (outgoing)"
@@ -97,14 +100,29 @@ class CashFlowService:
         if to_flow.amount <= 0:
             return False, "To flow amount must be positive (incoming)"
         
-        if fee_flow and fee_flow.amount >= 0:
-            return False, "Fee flow amount must be negative"
-        
         # Validate currencies are different
         if from_flow.currency_id == to_flow.currency_id:
             return False, "From and to currencies must be different"
+
+        # Validate fee data on from_flow
+        fee_amount = from_flow.fee_amount if hasattr(from_flow, 'fee_amount') else None
+        if fee_amount is None:
+            return False, "From flow must include fee_amount field"
+        if fee_amount < 0:
+            return False, "Fee amount must be non-negative"
+
+        # Target flow must not carry a fee amount
+        target_fee_amount = to_flow.fee_amount if hasattr(to_flow, 'fee_amount') else 0
+        if target_fee_amount not in (0, None):
+            return False, "Target flow fee_amount must be zero"
         
-        logger.info(f"Exchange validation passed: {len(flows)} flows (from: {from_flow.id}, to: {to_flow.id}, fee: {fee_flow.id if fee_flow else 'none'})")
+        logger.info(
+            "Exchange validation passed: %s flows (from: %s, to: %s, fee_amount: %s)",
+            len(flows),
+            from_flow.id,
+            to_flow.id,
+            fee_amount
+        )
         return True, None
     
     @staticmethod

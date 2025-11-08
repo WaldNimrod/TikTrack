@@ -119,8 +119,7 @@ if (typeof window.showSuccessNotification === 'function') {
 - `/dynamic-colors-display` - תצוגת צבעים דינמית
 - `/test-header-only` - בדיקת כותרת
 - `/designs` - עיצובים
-- `/page-scripts-matrix` - מיפוי סקריפטים
-- `/js-map` - מפת JS
+- `/page-scripts-matrix` - מיפוי סקריפטים _(הועבר לארכיון בנובמבר 2025)_
 
 ## 🚫 בעיות שנפתרו
 

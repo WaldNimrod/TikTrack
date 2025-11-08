@@ -128,7 +128,8 @@ class LinkedItemsService {
             account: '/trading-ui/images/icons/trading_accounts.svg',
             alert: '/trading-ui/images/icons/alerts.svg',
             cash_flow: '/trading-ui/images/icons/cash_flows.svg',
-            note: '/trading-ui/images/icons/notes.svg'
+            note: '/trading-ui/images/icons/notes.svg',
+            position: '/trading-ui/images/icons/trades.svg'
         };
         
         return iconMappings[entityType] || '/trading-ui/images/icons/home.svg';
@@ -169,6 +170,7 @@ class LinkedItemsService {
             'ticker': '#17a2b8',
             'alert': '#ffc107',
             'cash_flow': '#6c757d',
+            'position': '#0d6efd',
             'note': '#343a40'
         };
         
@@ -204,6 +206,7 @@ class LinkedItemsService {
             'ticker': 'טיקר',
             'alert': 'התראה',
             'cash_flow': 'תזרים מזומנים',
+            'position': 'פוזיציה',
             'note': 'הערה'
         };
         

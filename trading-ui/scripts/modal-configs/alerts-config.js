@@ -47,13 +47,12 @@ const alertsModalConfig = {
             label: 'סוג אובייקט מקושר',
             required: false,
             options: [
-                { value: '', label: 'ללא שיוך' },
                 { value: '1', label: 'חשבון מסחר' },
                 { value: '2', label: 'טרייד' },
                 { value: '3', label: 'תוכנית השקעה' },
                 { value: '4', label: 'טיקר' }
             ],
-            defaultValue: '',
+            defaultValue: '4',
             rowClass: 'row',
             colClass: 'col-md-6',
             description: 'אופציונלי - ניתן לשייך התראה לאובייקט ספציפי'
@@ -69,7 +68,43 @@ const alertsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
-        // שורה שלישית: שלושת שדות התנאי
+        // שורה שלישית: מצב משולב + תאריך יצירה + תאריך תפוגה
+        {
+            type: 'select',
+            id: 'alertStatusCombined',
+            name: 'alertStatusCombined',
+            label: 'מצב',
+            required: true,
+            options: [
+                { value: 'new', label: 'חדש' },  // open + false
+                { value: 'active', label: 'פעיל' },  // open + new
+                { value: 'unread', label: 'לא נקרא' },  // closed + new
+                { value: 'read', label: 'נקרא' },  // closed + true
+                { value: 'cancelled', label: 'מבוטל' }  // cancelled + false
+            ],
+            defaultValue: 'new',
+            rowClass: 'row',
+            colClass: 'col-md-4'
+        },
+        {
+            type: 'display',
+            id: 'alertCreatedAt',
+            label: 'תאריך יצירה',
+            required: false,
+            rowClass: 'row',
+            colClass: 'col-md-4'
+        },
+        {
+            type: 'date',
+            id: 'alertExpiryDate',
+            name: 'expiry_date',
+            label: 'תאריך תפוגה',
+            required: false,
+            rowClass: 'row',
+            colClass: 'col-md-4',
+            description: 'ברירת מחדל: שנה מהיום (ניתן לשינוי)'
+        },
+        // שורה רביעית: שדות התנאי
         {
             type: 'select',
             id: 'alertType',
@@ -116,42 +151,6 @@ const alertsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-4'
         },
-        // שורה רביעית: מצב משולב + תאריך יצירה + תאריך תפוגה
-        {
-            type: 'select',
-            id: 'alertStatusCombined',
-            name: 'alertStatusCombined',
-            label: 'מצב',
-            required: true,
-            options: [
-                { value: 'new', label: 'חדש' },  // open + false
-                { value: 'active', label: 'פעיל' },  // open + new
-                { value: 'unread', label: 'לא נקרא' },  // closed + new
-                { value: 'read', label: 'נקרא' },  // closed + true
-                { value: 'cancelled', label: 'מבוטל' }  // cancelled + false
-            ],
-            defaultValue: 'new',
-            rowClass: 'row',
-            colClass: 'col-md-4'
-        },
-        {
-            type: 'display',
-            id: 'alertCreatedAt',
-            label: 'תאריך יצירה',
-            required: false,
-            rowClass: 'row',
-            colClass: 'col-md-4'
-        },
-        {
-            type: 'date',
-            id: 'alertExpiryDate',
-            name: 'expiry_date',
-            label: 'תאריך תפוגה',
-            required: false,
-            rowClass: 'row',
-            colClass: 'col-md-4',
-            description: 'השאר ריק להתראה ללא תפוגה'
-        },
         // הודעה - בסוף אחרי סטטוס ותאריכים
         {
             type: 'rich-text',
@@ -174,21 +173,6 @@ const alertsModalConfig = {
                     ['clean']
                 ]
             }
-        },
-        // שדות נוספים (לא בשורות)
-        {
-            type: 'checkbox',
-            id: 'alertEmail',
-            label: 'שלח התראה במייל',
-            required: false,
-            defaultValue: false
-        },
-        {
-            type: 'checkbox',
-            id: 'alertSms',
-            label: 'שלח התראה ב-SMS',
-            required: false,
-            defaultValue: false
         }
     ],
     validation: {
@@ -214,12 +198,6 @@ const alertsModalConfig = {
             required: true
         },
         alertExpiryDate: {
-            required: false
-        },
-        alertEmail: {
-            required: false
-        },
-        alertSms: {
             required: false
         },
         alertNotes: {

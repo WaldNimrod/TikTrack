@@ -55,6 +55,10 @@ class AlertService:
             if 'is_triggered' not in alert_data:
                 alert_data['is_triggered'] = 'false'
             
+            # Ensure created_at exists (rounded to minute precision)
+            if not alert_data.get('created_at'):
+                alert_data['created_at'] = datetime.utcnow().replace(second=0, microsecond=0)
+            
             # Convert related_type to related_type_id
             if 'related_type' in alert_data:
                 related_type = alert_data.pop('related_type')

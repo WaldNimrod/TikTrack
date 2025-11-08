@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/140</span>
+                <span class='fraction'>0/143</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/112</span>
+                <span class='fraction'>0/120</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/134</span>
+                <span class='fraction'>0/137</span>
             </div>
         
             
@@ -743,12 +743,7 @@
 <a name='L678'></a><a href='#L678'>678</a>
 <a name='L679'></a><a href='#L679'>679</a>
 <a name='L680'></a><a href='#L680'>680</a>
-<a name='L681'></a><a href='#L681'>681</a>
-<a name='L682'></a><a href='#L682'>682</a>
-<a name='L683'></a><a href='#L683'>683</a>
-<a name='L684'></a><a href='#L684'>684</a>
-<a name='L685'></a><a href='#L685'>685</a>
-<a name='L686'></a><a href='#L686'>686</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L681'></a><a href='#L681'>681</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1337,28 +1332,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1368,9 +1361,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2020,42 +2010,37 @@ class SMCacheSection extends SMBaseSection {
   /**
    * Clear cache (static method for global access)
    * ניקוי מטמון (מתודה סטטית לגישה גלובלית)
+   * Uses existing UnifiedCacheManager functions to avoid duplication
    */
 <span class="fstat-no" title="function not covered" >  st</span>atic async clearCache(level) {
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      console.log(`🧹 Clearing cache level: ${level}`);</span>
+<span class="cstat-no" title="statement not covered" >      console.log(`🧹 Clearing cache level: ${level} via UnifiedCacheManager`);</span>
       
-      const response = <span class="cstat-no" title="statement not covered" >await fetch('/api/cache/clear', {</span>
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ level })
-      });
-&nbsp;
-<span class="cstat-no" title="statement not covered" >      if (!response.ok) {</span>
-<span class="cstat-no" title="statement not covered" >        throw new Error(`HTTP ${response.status}: ${response.statusText}`);</span>
-      }
-&nbsp;
-      const result = <span class="cstat-no" title="statement not covered" >await response.json();</span>
-      
-<span class="cstat-no" title="statement not covered" >      if (result.status === 'success') {</span>
-        // Show success notification
-<span class="cstat-no" title="statement not covered" >        if (window.showNotification) {</span>
-<span class="cstat-no" title="statement not covered" >          window.showNotification(result.message || 'מטמון נוקה בהצלחה', 'success');</span>
-        }
-        
-        // Refresh cache section if it exists
-        const cacheSection = <span class="cstat-no" title="statement not covered" >document.getElementById('sm-cache');</span>
-<span class="cstat-no" title="statement not covered" >        if (cacheSection) {</span>
-          const sectionInstance = <span class="cstat-no" title="statement not covered" >window.systemManagementMain?.sections?.get('sm-cache');</span>
-<span class="cstat-no" title="statement not covered" >          if (sectionInstance) {</span>
-<span class="cstat-no" title="statement not covered" >            await sectionInstance.refresh();</span>
-          }
-        }
+      // Use existing UnifiedCacheManager functions instead of duplicating
+<span class="cstat-no" title="statement not covered" >      if (level === 'light' &amp;&amp; typeof window.clearCacheLayer === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >        await window.clearCacheLayer('localStorage');</span>
+      } else <span class="cstat-no" title="statement not covered" >if (level === 'medium' &amp;&amp; typeof window.clearAllCacheAdvanced === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >        await window.clearAllCacheAdvanced();</span>
+      } else <span class="cstat-no" title="statement not covered" >if (level === 'full' &amp;&amp; typeof window.clearAllCacheAdvanced === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >        await window.clearAllCacheAdvanced();</span>
+      } else <span class="cstat-no" title="statement not covered" >if (level === 'nuclear' &amp;&amp; typeof window.clearCacheFull === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >        await window.clearCacheFull();</span>
       } else {
-<span class="cstat-no" title="statement not covered" >        throw new Error(result.message || 'Failed to clear cache');</span>
+        // Fallback to basic cache clearing
+<span class="cstat-no" title="statement not covered" >        if (typeof window.clearAllCacheAdvanced === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >          await window.clearAllCacheAdvanced();</span>
+        } else {
+<span class="cstat-no" title="statement not covered" >          throw new Error('No cache clearing functions available');</span>
+        }
+      }
+      
+      // Refresh cache section if it exists
+      const cacheSection = <span class="cstat-no" title="statement not covered" >document.getElementById('sm-cache');</span>
+<span class="cstat-no" title="statement not covered" >      if (cacheSection) {</span>
+        const sectionInstance = <span class="cstat-no" title="statement not covered" >window.systemManagementMain?.sections?.get('sm-cache');</span>
+<span class="cstat-no" title="statement not covered" >        if (sectionInstance) {</span>
+<span class="cstat-no" title="statement not covered" >          await sectionInstance.refresh();</span>
+        }
       }
       
     } catch (error) {
@@ -2125,7 +2110,7 @@ class SMCacheSection extends SMBaseSection {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-25T01:53:55.576Z
+                at 2025-11-07T23:26:01.986Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

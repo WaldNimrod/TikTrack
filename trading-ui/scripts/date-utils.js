@@ -88,12 +88,22 @@
  * @param {string|Date} dateString - Date string or Date object to format
  * @returns {string} Formatted date string (DD/MM/YYYY) or '-' for invalid dates
  */
-function formatDate(dateString) {
+function formatDate(dateString, includeTime = false) {
   if (!dateString) {return '-';}
 
   try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {return '-';}
+    const date = parseDate(dateString);
+    if (!date) {return '-';}
+
+    if (includeTime) {
+      return date.toLocaleString('he-IL', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
 
     return date.toLocaleDateString('he-IL', {
       day: '2-digit',
@@ -116,23 +126,7 @@ function formatDate(dateString) {
  * @returns {string} Formatted date and time string or '-' for invalid dates
  */
 function formatDateTime(dateString) {
-  if (!dateString) {return '-';}
-
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {return '-';}
-
-    return date.toLocaleString('he-IL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  } catch {
-    // console.warn('⚠️ Error formatting date time:', dateString, error);
-    return '-';
-  }
+  return formatDate(dateString, true);
 }
 
 /**
@@ -145,21 +139,7 @@ function formatDateTime(dateString) {
  * @returns {string} Formatted date string (DD/MM/YYYY) or '-' for invalid dates
  */
 function formatDateOnly(dateString) {
-  if (!dateString) {return '-';}
-
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {return '-';}
-
-    return date.toLocaleDateString('he-IL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  } catch {
-    // console.warn('⚠️ Error formatting date only:', dateString, error);
-    return '-';
-  }
+  return formatDate(dateString, false);
 }
 
 /**
@@ -174,8 +154,8 @@ function formatShortDate(dateString) {
   if (!dateString) {return '-';}
 
   try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {return '-';}
+    const date = parseDate(dateString);
+    if (!date) {return '-';}
 
     return date.toLocaleDateString('he-IL', {
       day: '2-digit',
@@ -200,8 +180,8 @@ function formatLongDate(dateString) {
   if (!dateString) {return '-';}
 
   try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {return '-';}
+    const date = parseDate(dateString);
+    if (!date) {return '-';}
 
     return date.toLocaleDateString('he-IL', {
       day: '2-digit',
@@ -227,8 +207,8 @@ function formatTimeOnly(dateString) {
   if (!dateString) {return '-';}
 
   try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {return '-';}
+    const date = parseDate(dateString);
+    if (!date) {return '-';}
 
     return date.toLocaleTimeString('he-IL', {
       hour: '2-digit',
@@ -277,7 +257,28 @@ function parseDate(dateString, options = {}) {
       return parsedDate;
     }
 
-    // Strategy 2: Handle Hebrew date format (DD/MM/YYYY)
+    // Strategy 2: Handle combined ISO date-time with space or T separator
+    const isoDateTimeMatch = cleanString.match(
+      /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,6}))?)?(Z|[+-]\d{2}:\d{2})?$/
+    );
+    if (isoDateTimeMatch) {
+      const [, year, month, day, hour, minute, second = '00', fractional = '', timezone = ''] = isoDateTimeMatch;
+      let isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}`;
+      if (fractional) {
+        // Convert microseconds to milliseconds by trimming/padding to 3 digits
+        const millis = fractional.padEnd(3, '0').slice(0, 3);
+        isoString += `.${millis}`;
+      }
+      if (timezone) {
+        isoString += timezone;
+      }
+      parsedDate = new Date(isoString);
+      if (!isNaN(parsedDate.getTime())) {
+        return parsedDate;
+      }
+    }
+
+    // Strategy 3: Handle Hebrew date format (DD/MM/YYYY)
     const hebrewDateMatch = cleanString.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if (hebrewDateMatch) {
       const [, day, month, year] = hebrewDateMatch;
@@ -288,7 +289,7 @@ function parseDate(dateString, options = {}) {
       }
     }
 
-    // Strategy 3: Handle YYYY-MM-DD format
+    // Strategy 4: Handle YYYY-MM-DD format
     const isoDateMatch = cleanString.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
     if (isoDateMatch) {
       const [, year, month, day] = isoDateMatch;
@@ -298,7 +299,7 @@ function parseDate(dateString, options = {}) {
       }
     }
 
-    // Strategy 4: Handle DD-MM-YYYY format
+    // Strategy 5: Handle DD-MM-YYYY format
     const europeanDateMatch = cleanString.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
     if (europeanDateMatch) {
       const [, day, month, year] = europeanDateMatch;
@@ -308,7 +309,7 @@ function parseDate(dateString, options = {}) {
       }
     }
 
-    // Strategy 5: Handle timestamp (milliseconds)
+    // Strategy 6: Handle timestamp (milliseconds)
     if (/^\d+$/.test(cleanString)) {
       const timestamp = parseInt(cleanString, 10);
       // Check if it's a reasonable timestamp (between 1970 and 2100)
@@ -320,7 +321,7 @@ function parseDate(dateString, options = {}) {
       }
     }
 
-    // Strategy 6: Try with custom format if provided
+    // Strategy 7: Try with custom format if provided
     if (options.format) {
       try {
         // This is a simplified custom format parser

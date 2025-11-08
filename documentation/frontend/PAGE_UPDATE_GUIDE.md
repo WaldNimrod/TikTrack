@@ -70,14 +70,12 @@ pagination.setData(myDataArray);
 | **⚙️ משימות רקע** | `/background-tasks` | 6 | ✅ עדכון מלא | ✅ יושם | 5 סקשני תוכן + 1 עליון |
 | **🖥️ ניטור שרת** | `/server-monitor` | 4 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 3 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **🔍 ניטור Linter** | `/linter-realtime-monitor` | 5 | ✅ סטנדרטיזציה מלאה + Pagination | ✅ toggleAllSections | 4 סקשני תוכן + 1 עליון - **מערכת Pagination חדשה** |
-| **🗺️ מפת JS** | `/js-map` | 5 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 4 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **🔒 מוניטור אילוצים** | `/constraints` | 5 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 4 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **🎨 תצוגת צבעים דינמית** | `/dynamic-colors-display` | 5 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 4 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **🎨 דוגמאות צבעים** | `/color-scheme-examples` | 4 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 3 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **🎨 עיצובים** | `/designs` | 4 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 3 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **📊 דשבורד נתונים חיצוניים** | `/external-data-dashboard` | 4 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 3 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **🧪 בדיקת זיכרון** | `/cache-test` | 5 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 4 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
-| **📋 מטריצת סקריפטים** | `/page-scripts-matrix` | 7 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 6 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **📋 בדיקת כותרת** | `/test-header-only` | 3 | ✅ סטנדרטיזציה מלאה | ✅ toggleTopSection | 2 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **🗂️ כלי בחירת עמודים** | `/complete-page-selection-tool` | 4 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 3 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **🎨 הדגמת סגנונות** | `/style_demonstration` | 11 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 10 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
@@ -2792,7 +2790,7 @@ mv trading-ui/dist trading-ui/external_data_integration_client "$BACKUP_DIR/"
 - עמודים ראשיים: `index.html`, `trade_plans.html`, `trades.html`, `research.html`
 - עמודי הגדרות: `alerts.html`, `notes.html`, `accounts.html`, `tickers.html`, `executions.html`, `cash_flows.html`, `preferences.html`
 - עמודי בסיס נתונים: `db_display.html`, `db_extradata.html`
-- כלי פיתוח: `system-management.html`, `server-monitor.html`, `notifications-center.html`, `constraints.html`, `css-management.html`, `numeric-value-colors-demo.html`, `style_demonstration.html`, `color-scheme-examples.html`, `designs.html`, `external-data-dashboard.html`, `linter-realtime-monitor.html`, `crud-testing-dashboard.html`, `cache-test.html`, `js-map.html`, `page-scripts-matrix.html`, `test-header-only.html`
+- כלי פיתוח: `system-management.html`, `server-monitor.html`, `notifications-center.html`, `constraints.html`, `css-management.html`, `numeric-value-colors-demo.html`, `style_demonstration.html`, `color-scheme-examples.html`, `designs.html`, `external-data-dashboard.html`, `linter-realtime-monitor.html`, `crud-testing-dashboard.html`, `cache-test.html`, `test-header-only.html`
 
 #### 25.5 בדיקת ניקוי מוצלח
 
@@ -2801,7 +2799,7 @@ mv trading-ui/dist trading-ui/external_data_integration_client "$BACKUP_DIR/"
 find trading-ui -name "*.backup" -o -name "*BACKUP*" -o -name "*OLD*" -o -name "*template*" | grep -v backups
 
 # בדוק שהקבצים הפעילים עדיין קיימים
-ls -la trading-ui/*.html | grep -E "(index|trade_plans|trades|research|alerts|notes|accounts|tickers|executions|cash_flows|preferences|db_display|db_extradata|system-management|server-monitor|notifications-center|constraints|css-management|numeric-value-colors-demo|style_demonstration|color-scheme-examples|designs|external-data-dashboard|linter-realtime-monitor|crud-testing-dashboard|cache-test|js-map|page-scripts-matrix|test-header-only)"
+ls -la trading-ui/*.html | grep -E "(index|trade_plans|trades|research|alerts|notes|accounts|tickers|executions|cash_flows|preferences|db_display|db_extradata|system-management|server-monitor|notifications-center|constraints|css-management|numeric-value-colors-demo|style_demonstration|color-scheme-examples|designs|external-data-dashboard|linter-realtime-monitor|crud-testing-dashboard|cache-test|test-header-only)"
 ```
 
 #### 25.6 כללים חשובים
@@ -2839,8 +2837,6 @@ ls -la trading-ui/*.html | grep -E "(index|trade_plans|trades|research|alerts|no
 # - linter-realtime-monitor.html
 # - crud-testing-dashboard.html
 # - cache-test.html
-# - js-map.html
-# - page-scripts-matrix.html
 # - test-header-only.html
 # - complete-page-selection-tool.html
 ```

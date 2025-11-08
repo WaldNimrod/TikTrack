@@ -37,19 +37,40 @@ color: var(--numeric-negative-medium) ;
   font-weight: 600;
 }
 
-.numeric-value-positive {
-color: var(--numeric-positive-medium) ;
+.numeric-value-positive,
+.numeric-value-negative,
+.numeric-value-zero,
+.numeric-value-neutral,
+.numeric-text-negative,
+.numeric-text-zero,
+.profit-positive,
+.profit-negative {
+  color: var(--text-color, #333);
+  font-weight: 500;
+  direction: ltr;
+  unicode-bidi: bidi-override;
+  text-align: right;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.numeric-value-positive,
+.profit-positive {
+  color: var(--numeric-positive-medium);
   font-weight: 600;
 }
 
-.numeric-value-negative {
-  color: var(--numeric-negative-medium) ;
-    font-weight: 600;
+.numeric-value-negative,
+.numeric-text-negative,
+.profit-negative {
+  color: var(--numeric-negative-medium);
+  font-weight: 600;
 }
 
-.numeric-value-neutral {
-  color: var(--text-color, #333) ;
-  font-weight: 500;
+.numeric-value-neutral,
+.numeric-text-zero {
+  color: var(--text-color, #333);
 }
 
 /* Badge Base Styles - סטנדרט אחיד לכל ה-badges */

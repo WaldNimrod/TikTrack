@@ -165,7 +165,12 @@ class TableSorter {
     
     // Set instance flag to prevent recursion from this source
     this._globalSortingFlag = true;
-    
+
+    const release = () => {
+      console.log(`[TableSorter.sort] Completed sort: tableType=${tableType}, columnIndex=${columnIndex}`);
+      this._globalSortingFlag = false;
+    };
+
     try {
       // CRITICAL: Always log to console to trace calls
       console.log('🔍 [TableSorter.sort] FUNCTION CALLED', { 
@@ -181,6 +186,7 @@ class TableSorter {
         if (window.Logger) {
           window.Logger.warn(`TableSorter.sort: Table type "${tableType}" not registered`, { page: "unified-table-system" });
         }
+        release();
         return null;
       }
 
@@ -190,10 +196,12 @@ class TableSorter {
         if (window.Logger) {
           window.Logger.warn(`TableSorter.sort: dataGetter for "${tableType}" did not return an array`, { page: "unified-table-system" });
         }
+        release();
         return null;
       }
 
       if (data.length === 0) {
+        release();
         return [];
       }
 
@@ -201,61 +209,70 @@ class TableSorter {
       // CRITICAL: Temporarily disable event handlers during sort to prevent recursion
       const originalUpdateFunction = config.updateFunction;
       const safeUpdateFunction = (sortedData) => {
-        // CRITICAL: Prevent recursion in updateFunction itself
         if (window._updateFunctionInProgress) {
           console.warn(`[TableSorter.sort] updateFunction already in progress for ${tableType}, skipping`);
           console.trace('[TableSorter.sort] Stack trace for updateFunction recursion');
           return;
         }
-        
+
         window._updateFunctionInProgress = true;
-        
-        try {
-          // Temporarily remove event listeners to prevent recursion
-          const table = document.querySelector(config.tableSelector);
-          if (table) {
-            const sortableHeaders = table.querySelectorAll('.sortable-header');
+
+        const table = document.querySelector(config.tableSelector);
+        const sortableHeaders = table ? Array.from(table.querySelectorAll('.sortable-header')) : [];
+        sortableHeaders.forEach(header => {
+          header.style.pointerEvents = 'none';
+        });
+
+        const release = () => {
+          setTimeout(() => {
             sortableHeaders.forEach(header => {
-              header.style.pointerEvents = 'none';
+              header.style.pointerEvents = '';
             });
-            
-            console.log(`[TableSorter.sort] Calling updateFunction for ${tableType} with ${sortedData?.length || 0} items`);
-            originalUpdateFunction(sortedData);
-            
-            // Re-enable event listeners after a short delay
-            setTimeout(() => {
-              sortableHeaders.forEach(header => {
-                header.style.pointerEvents = '';
-              });
-              window._updateFunctionInProgress = false;
-            }, 150);
-          } else {
-            console.log(`[TableSorter.sort] Table not found for ${tableType}, calling updateFunction directly`);
-            originalUpdateFunction(sortedData);
             window._updateFunctionInProgress = false;
+          }, 150);
+        };
+
+        try {
+          console.log(`[TableSorter.sort] Calling updateFunction for ${tableType} with ${sortedData?.length || 0} items`);
+          const result = originalUpdateFunction(sortedData);
+
+          if (result && typeof result.then === 'function') {
+            return result.finally(release);
           }
+
+          release();
+          return result;
         } catch (error) {
           console.error(`[TableSorter.sort] Error in updateFunction for ${tableType}:`, error);
-          window._updateFunctionInProgress = false;
+          release();
           throw error;
         }
       };
       
       if (typeof window.sortTableData === 'function') {
-        // Call window.sortTableData - it will set window._sortTableDataInProgress itself
-        const sortedData = window.sortTableData(columnIndex, data, tableType, safeUpdateFunction);
-        return sortedData;
+        const sortResult = window.sortTableData(columnIndex, data, tableType, safeUpdateFunction);
+        if (sortResult && typeof sortResult.then === 'function') {
+          return sortResult.then(result => {
+            release();
+            return result;
+          }).catch(error => {
+            release();
+            throw error;
+          });
+        }
+        release();
+        return sortResult;
       } else {
         if (window.Logger) {
           window.Logger.error('TableSorter.sort: window.sortTableData not available', { page: "unified-table-system" });
         }
+        window._updateFunctionInProgress = false;
+        release();
         return null;
       }
-    } finally {
-      // Clear instance flag after execution
-      // Note: window._sortTableDataInProgress is cleared by window.sortTableData in its finally block
-      console.log(`[TableSorter.sort] Completed sort: tableType=${tableType}, columnIndex=${columnIndex}`);
-      this._globalSortingFlag = false;
+    } catch (error) {
+      release();
+      throw error;
     }
   }
 

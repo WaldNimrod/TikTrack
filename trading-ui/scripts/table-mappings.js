@@ -76,9 +76,11 @@ const TABLE_COLUMN_MAPPINGS = {
 
   // טבלת פריטים מקושרים (Linked Items) - Entity Details Modal
   'linked_items': [
-    'linked_to',     // 0 - מקושר ל (משולב: type + name)
-    'status',         // 1 - סטטוס (Status)
-    'created_at',     // 2 - תאריך (Date)
+    'linked_to',        // 0 - מקושר ל (משולב: type + name)
+    'status',           // 1 - סטטוס (Status)
+    'side',             // 2 - צד (Long/Short)
+    'investment_type',  // 3 - סוג השקעה (Investment Type)
+    'created_at',       // 4 - תאריך יצירה
   ],
 
   // טבלת ביצועים (Executions) - Executions Page Structure (מוצג בפועל)
@@ -219,6 +221,26 @@ function getColumnValue(item, columnIndex, tableType) {
     return '';
   }
 
+  if (tableType === 'linked_items') {
+    if (fieldName === 'linked_to') {
+      return (item.linked_to || '').toString();
+    }
+    if (fieldName === 'status') {
+      return (item.status || '').toString();
+    }
+    if (fieldName === 'side') {
+      return (item.side || '').toString();
+    }
+    if (fieldName === 'investment_type') {
+      return (item.investment_type || '').toString();
+    }
+    if (fieldName === 'created_at') {
+      const dateValue = item.created_at || item.updated_at || '';
+      return dateValue ? new Date(dateValue).getTime() : 0;
+    }
+    return item[fieldName] || '';
+  }
+  
   // Database Display Page - Direct field mapping
   // Note: Some tables have calculated fields that need special handling
   if (tableType === 'positions' || tableType === 'portfolio') {

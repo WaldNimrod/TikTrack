@@ -463,7 +463,7 @@ function viewTickerDetails(tickerId) {
 function viewAccountDetails(accountId) {
   // צפייה בפרטי חשבון באמצעות מודל פרטי ישות
   if (typeof window.showEntityDetails === 'function') {
-    window.showEntityDetails('account', accountId, { mode: 'view' });
+    window.showEntityDetails('trading_account', accountId, { mode: 'view' });
   } else {
     if (typeof window.showInfoNotification === 'function') {
       window.showInfoNotification('מידע', 'פונקציונליות צפייה בפרטי חשבון תהיה זמינה בקרוב');

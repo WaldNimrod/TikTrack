@@ -426,11 +426,11 @@ class ModalManagerV2 {
                         case 'display':
                 // שדה תצוגה בלבד - לא input
                 return `
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="${field.id}" class="form-label">
                             ${field.label} ${requiredStar}
                         </label>
-                        <div id="${field.id}" class="form-control-plaintext" style="min-height: 38px; padding: 0.375rem 0.75rem;">                              
+                        <div id="${field.id}" class="form-control-plaintext py-1 px-2">                              
                             <!-- יתמלא דינמית -->
                         </div>
                         ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}                                          
@@ -798,6 +798,18 @@ class ModalManagerV2 {
             // איפוס טופס
             this.resetForm(modalElement);
             
+            const formElement = modalElement.querySelector('form');
+            if (formElement) {
+                formElement.dataset.modalMode = mode;
+            }
+            
+            if ((modalElement.id === 'alertsModal' || modalInfo.config?.entityType === 'alert') && mode === 'add') {
+                this.alertsContext = {
+                    ticker: null,
+                    linkedEntity: null
+                };
+            }
+            
             // הפעלת ולידציה
             this.initializeValidation(modalElement, modalInfo.config);
             
@@ -815,6 +827,10 @@ class ModalManagerV2 {
             // מילוי selects (חייב להיות לפני populateForm)
             // Note: populateSelects already handles defaultFromPreferences
             await this.populateSelects(modalElement, modalInfo.config);
+            
+            if (modalId === 'cashFlowModal' && typeof window.initializeExternalIdFields === 'function') {
+                window.initializeExternalIdFields();
+            }
             
             // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
             if (mode === 'edit' && entityData) {
@@ -1035,6 +1051,158 @@ class ModalManagerV2 {
                     });
                 }, 150); // Slightly longer delay to ensure DOM is fully ready
             }
+
+            // Special handlers for alerts modal - mimic notes behavior
+            if (modalElement.id === 'alertsModal' || modalInfo.config?.entityType === 'alert') {
+                const formDataForAlerts = entityData || null;
+                setTimeout(() => {
+                    const form = modalElement.querySelector('form');
+                    if (!form) {
+                        console.warn('⚠️ Form not found for alerts modal');
+                        return;
+                    }
+
+                    const alertRelatedTypeSelect = form.querySelector('#alertRelatedType');
+                    const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
+
+                    if (!alertRelatedTypeSelect || !alertRelatedObjectField) {
+                        console.warn('⚠️ Alerts modal elements not found:', {
+                            alertRelatedTypeSelect: !!alertRelatedTypeSelect,
+                            alertRelatedObjectField: !!alertRelatedObjectField
+                        });
+                        return;
+                    }
+
+                    const logInfo = (message, data = {}) => {
+                        window.Logger?.info?.(message, data, { page: 'modal-manager-v2' });
+                    };
+                    const logWarn = (message, data = {}) => {
+                        window.Logger?.warn?.(message, data, { page: 'modal-manager-v2' });
+                    };
+
+                    const handleAlertRelatedTypeChange = async (relatedTypeId) => {
+                        logInfo('🔁 [alertsModal] related type changed', { relatedTypeId });
+                        if (!alertRelatedObjectField) {
+                            logWarn('⚠️ [alertsModal] alertRelatedObject not found when handling type change');
+                            return;
+                        }
+
+                        if (relatedTypeId && relatedTypeId !== '') {
+                            alertRelatedObjectField.disabled = false;
+                            alertRelatedObjectField.removeAttribute('disabled');
+                            await this.populateAlertRelatedObjects(form, relatedTypeId);
+                            await this.updateAlertTickerDisplay(form, null);
+                            this.handleAlertLinkedEntityUpdate(null);
+                        } else {
+                            alertRelatedObjectField.disabled = true;
+                            alertRelatedObjectField.setAttribute('disabled', 'disabled');
+                            alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                            await this.updateAlertTickerDisplay(form, null);
+                            this.handleAlertLinkedEntityUpdate(null);
+                        }
+                        this.updateAlertDefaultMessage(form);
+                    };
+
+                    const handleAlertRelatedObjectChange = async (relatedId) => {
+                        const relatedTypeId = alertRelatedTypeSelect.value;
+                        logInfo('🔁 [alertsModal] related object changed', { relatedTypeId, relatedId });
+                        if (relatedTypeId && relatedId) {
+                            await this.updateAlertTickerFromRelatedObject(form, relatedTypeId, relatedId);
+                        } else {
+                            await this.updateAlertTickerDisplay(form, null);
+                            this.handleAlertLinkedEntityUpdate(null);
+                        }
+                    };
+
+                    // Initial state
+                    if (!alertRelatedTypeSelect.value) {
+                        alertRelatedObjectField.disabled = true;
+                        alertRelatedObjectField.setAttribute('disabled', 'disabled');
+                        alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                    } else {
+                        alertRelatedObjectField.disabled = false;
+                        alertRelatedObjectField.removeAttribute('disabled');
+                    }
+
+                    if (!alertRelatedTypeSelect.dataset.alertsHandlersAttached) {
+                        alertRelatedTypeSelect.addEventListener('change', async (event) => {
+                            await handleAlertRelatedTypeChange(event.target.value);
+                        });
+                        alertRelatedTypeSelect.addEventListener('input', async (event) => {
+                            await handleAlertRelatedTypeChange(event.target.value);
+                        });
+                        alertRelatedTypeSelect.dataset.alertsHandlersAttached = 'true';
+                    }
+
+                    if (!alertRelatedObjectField.dataset.alertsHandlersAttached) {
+                        alertRelatedObjectField.addEventListener('change', async (event) => {
+                            await handleAlertRelatedObjectChange(event.target.value);
+                        });
+                        alertRelatedObjectField.addEventListener('input', async (event) => {
+                            await handleAlertRelatedObjectChange(event.target.value);
+                        });
+                        alertRelatedObjectField.dataset.alertsHandlersAttached = 'true';
+                    }
+
+                    form.addEventListener('change', async (event) => {
+                        const { target } = event;
+                        if (!target || !target.id) {
+                            return;
+                        }
+                        if (target.id === 'alertRelatedType') {
+                            await handleAlertRelatedTypeChange(target.value);
+                        } else if (target.id === 'alertRelatedObject') {
+                            await handleAlertRelatedObjectChange(target.value);
+                        }
+                    });
+
+                    console.log('✅ Alerts related type/object handlers initialized', {
+                        alertRelatedTypeSelect: alertRelatedTypeSelect.id,
+                        alertRelatedObjectField: alertRelatedObjectField.id,
+                        initialDisabled: alertRelatedObjectField.disabled
+                    });
+
+                    // Ensure state is consistent when modal opens with existing selection
+                    if (alertRelatedTypeSelect.value) {
+                        handleAlertRelatedTypeChange(alertRelatedTypeSelect.value);
+                    }
+                    if (alertRelatedTypeSelect.value && alertRelatedObjectField.value) {
+                        handleAlertRelatedObjectChange(alertRelatedObjectField.value);
+                    }
+
+                    if (!formDataForAlerts) {
+                        this._applyAlertsInitialDefaults(form);
+                    }
+                    
+                    const alertTypeField = form.querySelector('#alertType');
+                    const alertConditionField = form.querySelector('#alertCondition');
+                    const alertValueField = form.querySelector('#alertValue');
+                    
+                    const messageUpdater = () => {
+                        this.updateAlertDefaultMessage(form);
+                    };
+                    
+                    if (alertTypeField && !alertTypeField.dataset.alertsHandlersAttached) {
+                        alertTypeField.addEventListener('change', messageUpdater);
+                        alertTypeField.dataset.alertsHandlersAttached = 'true';
+                    }
+                    
+                    if (alertConditionField && !alertConditionField.dataset.alertsHandlersAttached) {
+                        alertConditionField.addEventListener('change', messageUpdater);
+                        alertConditionField.dataset.alertsHandlersAttached = 'true';
+                    }
+                    
+                    if (alertValueField && !alertValueField.dataset.alertsHandlersAttached) {
+                        alertValueField.addEventListener('input', () => {
+                            messageUpdater();
+                        });
+                        alertValueField.addEventListener('change', messageUpdater);
+                        alertValueField.dataset.alertsHandlersAttached = 'true';
+                    }
+                    
+                    this.updateAlertDefaultMessage(form, { force: true });
+                }, 150);
+            }
             
             // עדכון מצב
             modalInfo.isActive = true;
@@ -1221,6 +1389,16 @@ class ModalManagerV2 {
                         const quill = window.RichTextEditorService.initEditor(field.id, editorOptions);
                         if (quill) {
                             console.log(`✅ Rich-text editor "${field.id}" initialized successfully`);
+                            quill.on('text-change', (delta, oldDelta, source) => {
+                                if (this._richTextUpdateGuards && this._richTextUpdateGuards.has(field.id)) {
+                                    return;
+                                }
+                                if (source === 'user') {
+                                    container.dataset.userModified = 'true';
+                                    delete container.dataset.autoMessage;
+                                    delete container.dataset.autoMessageText;
+                                }
+                            });
                         }
                     } else {
                         console.warn(`⚠️ Rich-text container "${field.id}" not found in modal`);
@@ -1272,16 +1450,30 @@ class ModalManagerV2 {
                 return;
             }
             
-            // Try direct match first
+            // Try direct match first (search in form and all tab panes)
             let field = form.querySelector(`#${key}, [name="${key}"]`);
+            if (!field) {
+                // Also search in entire modal (including all tab panes)
+                field = modalElement.querySelector(`#${key}, [name="${key}"]`);
+            }
             
             // If no direct match, try field mapping
             if (!field && fieldMapping[key]) {
-                field = form.querySelector(`#${fieldMapping[key]}, [name="${fieldMapping[key]}"]`);
+                const mappedFieldId = fieldMapping[key];
+                console.log(`🔍 Field mapping: ${key} -> ${mappedFieldId}`);
+                field = form.querySelector(`#${mappedFieldId}, [name="${mappedFieldId}"]`);
+                if (!field) {
+                    // Search in entire modal (including all tab panes)
+                    field = modalElement.querySelector(`#${mappedFieldId}, [name="${mappedFieldId}"]`);
+                }
             }
             
-                        if (field) {
-                console.log(`✅ Found field for ${key} (value: ${value})`);
+            if (!field) {
+                console.log(`⚠️ Field not found for ${key} (mapped to: ${fieldMapping[key] || 'N/A'})`);
+            }
+            
+            if (field) {
+                console.log(`✅ Found field for ${key} (value: ${value}, fieldId: ${field.id}, fieldName: ${field.name || 'N/A'})`);
                 
                 // Check if this is a display field (div with id but not an input)
                 if (field.tagName === 'DIV' && field.id && field.classList.contains('form-control-plaintext')) {
@@ -1312,13 +1504,30 @@ class ModalManagerV2 {
                     field.checked = Boolean(value);
                 } else if (field.tagName === 'SELECT') {
                     // For selects, set value directly
+                    const selectValue = value !== null && value !== undefined ? String(value) : '';
                     console.log(`🎯 Setting SELECT field ${field.id}:`, {
-                        tryingToSet: value,
+                        tryingToSet: selectValue,
+                        originalValue: value,
                         currentValue: field.value,
                         availableOptions: Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})),                                           
-                        hasOption: Array.from(field.options).some(opt => opt.value === value)                                                                   
+                        hasOption: Array.from(field.options).some(opt => opt.value === selectValue || opt.value === value)                                                                   
                     });
-                    field.value = value || '';
+                    // Try to set the value
+                    field.value = selectValue;
+                    // If value didn't set (option doesn't exist), try to find matching option
+                    if (field.value !== selectValue && selectValue) {
+                        const matchingOption = Array.from(field.options).find(opt => 
+                            opt.value === selectValue || 
+                            String(opt.value) === String(value) ||
+                            opt.text === value
+                        );
+                        if (matchingOption) {
+                            field.value = matchingOption.value;
+                            console.log(`✅ Found matching option: ${matchingOption.value} (${matchingOption.text})`);
+                        } else {
+                            console.warn(`⚠️ No matching option found for value: ${selectValue}`);
+                        }
+                    }
                     console.log(`🎯 After setting, field.value is: ${field.value}`);                                                                            
                 } else if (field.classList && field.classList.contains('rich-text-editor-container')) {
                     // Rich text editor - use RichTextEditorService
@@ -1425,6 +1634,385 @@ class ModalManagerV2 {
     }
     
     /**
+     * Handle updated ticker data for alerts modal
+     * @param {Object|null} tickerData
+     */
+    handleAlertTickerDataUpdate(tickerData) {
+        this.alertsContext.ticker = tickerData || null;
+        
+        if (tickerData && window.AlertConditionRenderer && typeof window.AlertConditionRenderer.updatePriceUnit === 'function') {
+            try {
+                window.AlertConditionRenderer.updatePriceUnit(tickerData.id);
+            } catch (error) {
+                console.warn('⚠️ Failed to update alert price unit:', error);
+            }
+        }
+        
+        const alertsModal = document.getElementById('alertsModal');
+        const form = alertsModal ? alertsModal.querySelector('form') : null;
+        if (form) {
+            this.updateAlertDefaultMessage(form);
+        }
+    }
+    
+    /**
+     * Handle linked entity updates for alerts modal
+     * @param {Object|null} linkedEntity
+     */
+    handleAlertLinkedEntityUpdate(linkedEntity) {
+        this.alertsContext.linkedEntity = linkedEntity || null;
+        const alertsModal = document.getElementById('alertsModal');
+        const form = alertsModal ? alertsModal.querySelector('form') : null;
+        if (form) {
+            this.updateAlertDefaultMessage(form);
+        }
+    }
+    
+    /**
+     * Internal helper to update rich-text editor content with suppression
+     * @param {string} editorId
+     * @param {string} html
+     * @param {Object} options
+     */
+    _setRichTextContent(editorId, html, options = {}) {
+        if (!window.RichTextEditorService || typeof window.RichTextEditorService.setContent !== 'function') {
+            return;
+        }
+        
+        const container = document.getElementById(editorId);
+        if (!container) {
+            return;
+        }
+        
+        if (!this._richTextUpdateGuards) {
+            this._richTextUpdateGuards = new Set();
+        }
+        
+        this._richTextUpdateGuards.add(editorId);
+        try {
+            window.RichTextEditorService.setContent(editorId, html);
+        } finally {
+            setTimeout(() => {
+                this._richTextUpdateGuards.delete(editorId);
+            }, 0);
+        }
+        
+        if (options.autoMessageText) {
+            container.dataset.autoMessage = 'true';
+            container.dataset.autoMessageText = options.autoMessageText;
+            delete container.dataset.userModified;
+        } else if (options.clearAutoMessage) {
+            delete container.dataset.autoMessage;
+            delete container.dataset.autoMessageText;
+        }
+    }
+    
+    /**
+     * Get plain text representation from rich-text editor
+     * @param {string} editorId
+     * @returns {string}
+     */
+    _getPlainTextFromEditor(editorId) {
+        if (window.RichTextEditorService && typeof window.RichTextEditorService.getEditorInstance === 'function') {
+            const editor = window.RichTextEditorService.getEditorInstance(editorId);
+            if (editor && typeof editor.getText === 'function') {
+                return editor.getText().trim();
+            }
+        }
+        
+        const container = document.getElementById(editorId);
+        if (!container) {
+            return '';
+        }
+        return (container.textContent || '').trim();
+    }
+    
+    /**
+     * Translate alert attribute key to message text
+     * @param {string} attribute
+     * @returns {string}
+     * @private
+     */
+    _getAlertAttributeText(attribute) {
+        const mapping = {
+            price: 'מחיר',
+            change: 'שינוי',
+            volume: 'נפח',
+            ma: 'ממוצע נע'
+        };
+        return mapping[attribute] || attribute || '';
+    }
+    
+    /**
+     * Translate alert operator key to message text
+     * @param {string} operator
+     * @returns {string}
+     * @private
+     */
+    _getAlertOperatorText(operator) {
+        const mapping = {
+            more_than: 'עובר מעל',
+            less_than: 'יורד מתחת ל',
+            equals: 'שווה ל',
+            change: 'משתנה ב',
+            change_up: 'עולה ב',
+            change_down: 'יורד ב',
+            cross: 'חוצה את',
+            cross_up: 'חוצה מעלה את',
+            cross_down: 'חוצה מטה את'
+        };
+        if (mapping[operator]) {
+            return mapping[operator];
+        }
+        if (window.AlertConditionRenderer && window.AlertConditionRenderer.operatorConfig?.[operator]?.label) {
+            return window.AlertConditionRenderer.operatorConfig[operator].label;
+        }
+        return operator || '';
+    }
+    
+    /**
+     * Resolve unit for alert value display
+     * @param {string} attribute
+     * @param {string} operator
+     * @param {Object|null} ticker
+     * @returns {string}
+     * @private
+     */
+    _resolveAlertUnit(attribute, operator, ticker) {
+        let unit = '';
+        if (window.AlertConditionRenderer && window.AlertConditionRenderer.attributeConfig?.[attribute]?.unit) {
+            unit = window.AlertConditionRenderer.attributeConfig[attribute].unit || '';
+        }
+        
+        const operatorTriggersPercent = ['change', 'change_up', 'change_down'];
+        if (operatorTriggersPercent.includes(operator)) {
+            return '%';
+        }
+        
+        if ((attribute === 'price' || attribute === 'ma') && ticker?.currency_symbol) {
+            return ticker.currency_symbol;
+        }
+        
+        return unit || '';
+    }
+    
+    /**
+     * Format alert value for message
+     * @param {string} attribute
+     * @param {string} operator
+     * @param {string|number} rawValue
+     * @param {Object|null} ticker
+     * @returns {string}
+     * @private
+     */
+    _formatAlertValue(attribute, operator, rawValue, ticker) {
+        if (rawValue === null || rawValue === undefined || rawValue === '') {
+            return '';
+        }
+        
+        const numericValue = Number(rawValue);
+        if (!Number.isFinite(numericValue)) {
+            return String(rawValue);
+        }
+        
+        let minimumFractionDigits = 0;
+        let maximumFractionDigits = 2;
+        
+        if (attribute === 'price' || attribute === 'ma') {
+            minimumFractionDigits = numericValue % 1 === 0 ? 0 : 2;
+            maximumFractionDigits = 2;
+        } else if (attribute === 'change' || operator === 'change' || operator === 'change_up' || operator === 'change_down') {
+            minimumFractionDigits = 0;
+            maximumFractionDigits = 2;
+        } else if (attribute === 'volume') {
+            minimumFractionDigits = 0;
+            maximumFractionDigits = 0;
+        }
+        
+        const formatted = numericValue.toLocaleString('he-IL', {
+            minimumFractionDigits,
+            maximumFractionDigits
+        });
+        
+        const unit = this._resolveAlertUnit(attribute, operator, ticker);
+        return `${formatted}${unit}`;
+    }
+    
+    /**
+     * Translate trade side to Hebrew text
+     * @param {string} side
+     * @returns {string}
+     * @private
+     */
+    _translateSide(side) {
+        if (!side) {
+            return '';
+        }
+        const lower = String(side).toLowerCase();
+        if (lower === 'long') {
+            return 'לונג';
+        }
+        if (lower === 'short') {
+            return 'שורט';
+        }
+        return side;
+    }
+    
+    /**
+     * Format date into short display (DD.MM)
+     * @param {string|Date} dateValue
+     * @returns {string}
+     * @private
+     */
+    _formatDateShort(dateValue) {
+        if (!dateValue) {
+            return '';
+        }
+        if (typeof window.formatShortDate === 'function') {
+            return window.formatShortDate(dateValue);
+        }
+        return '';
+    }
+    
+    /**
+     * Build second line text for linked entity
+     * @returns {string}
+     * @private
+     */
+    _buildAlertSecondLine() {
+        const linked = this.alertsContext?.linkedEntity;
+        if (!linked || !linked.type) {
+            return '';
+        }
+        
+        const entityLabel = (window.LinkedItemsService && typeof window.LinkedItemsService.getEntityLabel === 'function')
+            ? window.LinkedItemsService.getEntityLabel(linked.type) || ''
+            : linked.type;
+        
+        if (linked.type === 'trade' && linked.data) {
+            const sideText = this._translateSide(linked.data.side);
+            const dateText = this._formatDateShort(linked.data.opened_at || linked.data.created_at || linked.data.date);
+            const parts = [`ב${entityLabel}`];
+            if (sideText) {
+                parts.push(sideText);
+            }
+            if (dateText) {
+                parts.push(dateText);
+            }
+            return parts.filter(Boolean).join(' ');
+        }
+        
+        if (linked.type === 'trade_plan' && linked.data) {
+            const sideText = this._translateSide(linked.data.side);
+            const dateText = this._formatDateShort(linked.data.created_at || linked.data.date);
+            const parts = [`ב${entityLabel}`];
+            if (sideText) {
+                parts.push(sideText);
+            }
+            if (linked.data.investment_type) {
+                parts.push(linked.data.investment_type);
+            }
+            if (dateText) {
+                parts.push(dateText);
+            }
+            return parts.filter(Boolean).join(' ');
+        }
+        
+        if (linked.type === 'trading_account' && linked.data) {
+            const name = linked.data.name || linked.data.account_name;
+            if (name) {
+                return `ב${entityLabel} ${name}`;
+            }
+        }
+        
+        if (linked.type === 'ticker' && linked.data) {
+            const symbol = linked.data.symbol || linked.data.ticker_symbol;
+            if (symbol) {
+                return `בטיקר ${symbol}`;
+            }
+        }
+        
+        return '';
+    }
+    
+    /**
+     * Update default alert message (auto-generated)
+     * @param {HTMLFormElement} form
+     * @param {Object} options
+     */
+    updateAlertDefaultMessage(form, options = {}) {
+        if (!form || form.dataset.modalMode !== 'add') {
+            return;
+        }
+        
+        const messageContainer = form.querySelector('#alertName');
+        if (!messageContainer) {
+            return;
+        }
+        
+        if (!window.RichTextEditorService || typeof window.RichTextEditorService.getEditorInstance !== 'function') {
+            // Try later if editor not ready
+            setTimeout(() => this.updateAlertDefaultMessage(form, options), 150);
+            return;
+        }
+        
+        if (!options.force) {
+            if (messageContainer.dataset.userModified === 'true') {
+                return;
+            }
+        }
+        
+        const editorPlainText = this._getPlainTextFromEditor('alertName');
+        if (!options.force && editorPlainText && !messageContainer.dataset.autoMessage) {
+            return;
+        }
+        
+        const ticker = this.alertsContext?.ticker;
+        const symbol = (ticker?.symbol || form.querySelector('#alertTicker')?.textContent || '').trim();
+        if (!symbol) {
+            // Without ticker we cannot build meaningful message
+            return;
+        }
+        
+        const attributeField = form.querySelector('#alertType');
+        const operatorField = form.querySelector('#alertCondition');
+        const valueField = form.querySelector('#alertValue');
+        
+        const attribute = attributeField?.value || 'price';
+        const operator = operatorField?.value || 'more_than';
+        const rawValue = valueField?.value;
+        
+        const attributeText = this._getAlertAttributeText(attribute);
+        const operatorText = this._getAlertOperatorText(operator);
+        const formattedValue = this._formatAlertValue(attribute, operator, rawValue, ticker);
+        if (!formattedValue) {
+            return;
+        }
+        
+        const firstLineParts = [
+            'טיקר',
+            symbol.toUpperCase(),
+            attributeText,
+            operatorText,
+            formattedValue
+        ].filter(Boolean);
+        
+        if (firstLineParts.length < 4) {
+            return;
+        }
+        
+        const firstLine = firstLineParts.join(' ');
+        const secondLine = this._buildAlertSecondLine();
+        
+        const messageHtml = secondLine
+            ? `<p>${firstLine}</p><p>${secondLine}</p>`
+            : `<p>${firstLine}</p>`;
+        
+        const autoMessageText = secondLine ? `${firstLine}\n${secondLine}` : firstLine;
+        this._setRichTextContent('alertName', messageHtml, { autoMessageText });
+    }
+    
+    /**
      * Attach special event listeners for form fields
      * @private
      * @param {HTMLElement} form - The form element
@@ -1432,42 +2020,6 @@ class ModalManagerV2 {
      * @param {Object} config - The modal configuration (optional)
      */
     attachSpecialEventListeners(form, data = null, config = null) {
-        // Event listener ל-alertRelatedType - מילוי alertRelatedObject (עכשיו select)                                                                          
-        const alertRelatedTypeSelect = form.querySelector('#alertRelatedType');
-        if (alertRelatedTypeSelect) {
-            alertRelatedTypeSelect.addEventListener('change', async (e) => {
-                const relatedTypeId = e.target.value;
-                const alertRelatedObjectField = form.querySelector('#alertRelatedObject');                                                                      
-                if (alertRelatedObjectField) {
-                    if (relatedTypeId) {
-                        alertRelatedObjectField.disabled = false;
-                        await this.populateAlertRelatedObjects(form, relatedTypeId);                                                                            
-                        // ניקוי הטיקר עד לבחירת אובייקט
-                        await this.updateAlertTickerDisplay(form, null);
-                    } else {
-                        alertRelatedObjectField.disabled = true;
-                        alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
-                        // ניקוי הטיקר אם אין שיוך
-                        await this.updateAlertTickerDisplay(form, null);
-                    }
-                }
-            });
-        }
-        
-                // Event listener ל-alertRelatedObject - עדכון טיקר אוטומטי
-        const alertRelatedObjectField = form.querySelector('#alertRelatedObject');
-        if (alertRelatedObjectField) {
-            alertRelatedObjectField.addEventListener('change', async (e) => {
-                const relatedTypeId = alertRelatedTypeSelect?.value;
-                const relatedId = e.target.value;
-                if (relatedTypeId && relatedId) {
-                    await this.updateAlertTickerFromRelatedObject(form, relatedTypeId, relatedId);
-                } else {
-                    await this.updateAlertTickerDisplay(form, null);
-                }
-            });
-        }
-        
         // Event listener ל-alertStatusCombined - פיצול ל-status ו-is_triggered
         const alertStatusCombinedField = form.querySelector('#alertStatusCombined');
         if (alertStatusCombinedField) {
@@ -1744,6 +2296,60 @@ class ModalManagerV2 {
         }
         
         return null;
+    }
+    
+    /**
+     * Apply default values for alerts modal (creation/expiry dates)
+     * @param {HTMLFormElement} form
+     * @private
+     */
+    _applyAlertsInitialDefaults(form) {
+        if (!form) return;
+
+        const createdDisplay = form.querySelector('#alertCreatedAt');
+        const expiryInput = form.querySelector('#alertExpiryDate');
+
+        const now = new Date();
+
+        if (createdDisplay && (!createdDisplay.textContent || !createdDisplay.textContent.trim())) {
+            const formatted = this._formatDateForAlertsDisplay(now);
+            if (formatted) {
+                createdDisplay.textContent = formatted;
+                createdDisplay.dataset.defaultTimestamp = now.toISOString();
+            }
+        }
+
+        if (expiryInput && !expiryInput.value) {
+            const expiryDate = new Date(now);
+            expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+            expiryInput.value = expiryDate.toISOString().slice(0, 10);
+        }
+    }
+
+    /**
+     * Format date for alerts display fields using existing global utilities
+     * @param {Date|string} dateInput
+     * @returns {string}
+     * @private
+     */
+    _formatDateForAlertsDisplay(dateInput) {
+        if (!dateInput) return '';
+        const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+        if (Number.isNaN(date.getTime())) {
+            return '';
+        }
+        const isoString = date.toISOString();
+        if (typeof window.formatDateOnly === 'function') {
+            return window.formatDateOnly(isoString);
+        }
+        if (typeof window.formatDate === 'function') {
+            return window.formatDate(isoString);
+        }
+        return date.toLocaleDateString('he-IL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
     }
     
     /**
@@ -2149,21 +2755,41 @@ class ModalManagerV2 {
                 console.warn('⚠️ netAmountField not found');
             }
             
-            // Build description: "המרת 50$ ל150₪ לפי שער של 3.01 ואחרי עמלה של 5₪"
-            let description = `המרת ${fromAmount}${fromSymbol || ''} ל${calculatedToAmount.toFixed(2)}${toSymbol || ''} לפי שער של ${exchangeRate}`;
-            
+            // Build description with line breaks
+            const descriptionLines = [];
+            descriptionLines.push(`המרת ${formatWithSymbol(fromAmount, fromSymbol || '')} ל${formatWithSymbol(calculatedToAmount, toSymbol || '')}`);
+            descriptionLines.push(`לפי שער של ${exchangeRate}`);
+
             if (feeAmount > 0 && feeSymbol) {
-                description += ` ואחרי עמלה של ${feeAmount}${feeSymbol}`;
-                // Always show net amount if fee was subtracted
-                if (canCalculateNet && netInTargetCurrency !== calculatedToAmount && netInTargetCurrency > 0) {
-                    description += ` (סכום נטו: ${netInTargetCurrency.toFixed(2)}${toSymbol})`;
-                }
+                descriptionLines.push(`עמלה: ${formatWithSymbol(feeAmount, feeSymbol)}`);
+            } else if (feeAmount === 0) {
+                descriptionLines.push('ללא עמלה');
             }
-            
-            console.log('🔵 Generated description:', description);
+
+            if (feeAmount > 0 && !normalizedFeeSymbol) {
+                descriptionLines.push('מטבע העמלה לא זוהה');
+            }
+
+            if (canCalculateNet && netInTargetCurrency !== calculatedToAmount && netInTargetCurrency > 0) {
+                descriptionLines.push(`נטו במטבע המבוקש: ${formatWithSymbol(netInTargetCurrency, toSymbol || '')}`);
+            } else if (feeAmount > 0 && !canCalculateNet) {
+                descriptionLines.push('נטו במטבע המבוקש: לא ניתן לחשב (עמלה במטבע אחר)');
+            }
+
+            const descriptionPlain = descriptionLines.join('\n');
+            const descriptionHtml = descriptionLines.map(line => `<p>${line}</p>`).join('');
+            console.log('🔵 Generated description:', descriptionPlain);
             
             // Always update description (auto-generated)
-            descriptionField.value = description;
+            if (window.RichTextEditorService && typeof window.RichTextEditorService.setContent === 'function') {
+                window.RichTextEditorService.setContent('currencyExchangeDescription', descriptionHtml);
+            } else if (descriptionField) {
+                if ('value' in descriptionField) {
+                    descriptionField.value = descriptionPlain;
+                } else {
+                    descriptionField.innerText = descriptionPlain;
+                }
+            }
             console.log('✅ Description updated');
         };
         
@@ -2663,6 +3289,28 @@ class ModalManagerV2 {
                 });
             }
         }
+
+        if (modalId === 'cashFlowModal') {
+            const form = modalElement.querySelector('#cashFlowModalForm');
+            const mode = form?.dataset?.mode || modalElement.dataset?.mode || 'add';
+
+            if (mode !== 'edit') {
+                if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                    window.DefaultValueSetter.setCurrentDate('cashFlowDate');
+                    window.DefaultValueSetter.setCurrentDate('currencyExchangeDate');
+                } else {
+                    const addDateField = document.getElementById('cashFlowDate');
+                    const exchangeDateField = document.getElementById('currencyExchangeDate');
+                    const today = new Date().toISOString().slice(0, 10);
+                    if (addDateField && !addDateField.value) {
+                        addDateField.value = today;
+                    }
+                    if (exchangeDateField && !exchangeDateField.value) {
+                        exchangeDateField.value = today;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -2680,6 +3328,13 @@ class ModalManagerV2 {
         
         if (this.activeModal === modalId) {
             this.activeModal = null;
+        }
+        
+        if (modalId === 'alertsModal') {
+            this.alertsContext = {
+                ticker: null,
+                linkedEntity: null
+            };
         }
         
         // ניקוי rich-text editors
@@ -2903,6 +3558,7 @@ class ModalManagerV2 {
             // הפעלת select האובייקטים המקושרים
             if (alertRelatedObjectField) {
                 alertRelatedObjectField.disabled = false;
+                alertRelatedObjectField.removeAttribute('disabled');
                 // טעינת האובייקטים לפי סוג השיוך
                 await this.populateAlertRelatedObjects(form, data.related_type_id, data.related_id);
                 
@@ -2911,9 +3567,17 @@ class ModalManagerV2 {
                     await this.updateAlertTickerFromRelatedObject(form, data.related_type_id, data.related_id);
                 }
             }
-        } else if (alertTickerField && data.ticker_id) {
-            // אם יש ticker_id ישיר (ללא related object), עדיין נציג אותו
-            await this.updateAlertTickerDisplay(form, data.ticker_id);
+        } else {
+            if (alertRelatedObjectField) {
+                alertRelatedObjectField.disabled = true;
+                alertRelatedObjectField.setAttribute('disabled', 'disabled');
+                alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+            }
+
+            if (alertTickerField && data.ticker_id) {
+                // אם יש ticker_id ישיר (ללא related object), עדיין נציג אותו
+                await this.updateAlertTickerDisplay(form, data.ticker_id);
+            }
         }
         
                 // עדכון שדה מצב משולב (status + is_triggered) אם יש
@@ -2993,90 +3657,169 @@ class ModalManagerV2 {
      */
     async updateAlertTickerFromRelatedObject(form, relatedTypeId, relatedId) {
         try {
+            window.Logger?.info?.('🔎 [updateAlertTickerFromRelatedObject] start', {
+                relatedTypeId,
+                relatedId
+            }, { page: 'modal-manager-v2' });
+            
             let tickerId = null;
+            let linkedEntity = null;
             
             // שליפת ticker_id מהאובייקט המקושר
             if (relatedTypeId === '2' || relatedTypeId === 2) { // trade
                 const response = await fetch(`/api/trades/${relatedId}`);
                 if (response.ok) {
                     const result = await response.json();
-                    tickerId = result.data?.ticker_id;
+                    const tradeData = result.data || result;
+                    tickerId = tradeData?.ticker_id;
+                    linkedEntity = {
+                        type: 'trade',
+                        data: tradeData
+                    };
                 }
             } else if (relatedTypeId === '3' || relatedTypeId === 3) { // trade_plan
                 const response = await fetch(`/api/trade_plans/${relatedId}`);
                 if (response.ok) {
                     const result = await response.json();
-                    tickerId = result.data?.ticker_id;
+                    const planData = result.data || result;
+                    tickerId = planData?.ticker_id;
+                    linkedEntity = {
+                        type: 'trade_plan',
+                        data: planData
+                    };
                 }
             } else if (relatedTypeId === '4' || relatedTypeId === 4) { // ticker
                 tickerId = relatedId;
+                let tickerData = null;
+                if (window.tickersData && Array.isArray(window.tickersData)) {
+                    tickerData = window.tickersData.find(t => String(t.id) === String(relatedId)) || null;
+                }
+                linkedEntity = {
+                    type: 'ticker',
+                    data: tickerData || { id: relatedId }
+                };
+            } else if (relatedTypeId === '1' || relatedTypeId === 1) { // trading account
+                if (window.accountsData && Array.isArray(window.accountsData)) {
+                    const accountData = window.accountsData.find(acc => String(acc.id) === String(relatedId)) || null;
+                    linkedEntity = {
+                        type: 'trading_account',
+                        data: accountData || { id: relatedId }
+                    };
+                } else {
+                    linkedEntity = {
+                        type: 'trading_account',
+                        data: { id: relatedId }
+                    };
+                }
             }
+            
+            this.handleAlertLinkedEntityUpdate(linkedEntity);
+            
+            window.Logger?.info?.('🔎 [updateAlertTickerFromRelatedObject] resolved tickerId', {
+                tickerId
+            }, { page: 'modal-manager-v2' });
             
             // עדכון תצוגת הטיקר
             await this.updateAlertTickerDisplay(form, tickerId);
+            this.updateAlertDefaultMessage(form);
         } catch (error) {
             console.warn('⚠️ Error updating ticker from related object:', error);
+            window.Logger?.error?.('❌ [updateAlertTickerFromRelatedObject] failed', {
+                error: error?.message || error
+            }, { page: 'modal-manager-v2' });
             await this.updateAlertTickerDisplay(form, null);
+            this.handleAlertLinkedEntityUpdate(null);
         }
     }
     
     /**
-     * Update alert ticker display (both ticker name and price info)
+     * עדכון תצוגת הטיקר במודל התראות באמצעות המימוש הקיים במודול ההתראות
      * @private
      */
     async updateAlertTickerDisplay(form, tickerId) {
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('🔍 [updateAlertTickerDisplay] invoked', {
+                tickerId,
+                hasLoadFn: typeof window.loadAlertTickerInfo,
+                formHasTicker: !!form?.querySelector?.('#alertTicker'),
+                formHasInfo: !!form?.querySelector?.('#alertTickerInfo')
+            }, { page: 'modal-manager-v2' });
+        }
+        
         const tickerDisplay = form.querySelector('#alertTicker');
-        const tickerInfoDiv = form.querySelector('#alertTickerInfo');
+        const tickerInfo = form.querySelector('#alertTickerInfo');
         
-        if (!tickerDisplay) return;
-        
-        if (!tickerId) {
-            // ניקוי תצוגת הטיקר
-            tickerDisplay.textContent = '-';
-            if (tickerInfoDiv) {
-                tickerInfoDiv.innerHTML = '';
+        if (!tickerDisplay && !tickerInfo) {
+            if (window.Logger && typeof window.Logger.warn === 'function') {
+                window.Logger.warn('⚠️ [updateAlertTickerDisplay] Elements not found on form', {
+                    tickerId
+                }, { page: 'modal-manager-v2' });
             }
             return;
         }
         
+        if (!tickerId) {
+            tickerDisplay && (tickerDisplay.textContent = '-');
+            tickerInfo && (tickerInfo.innerHTML = '');
+            
+            if (typeof window.clearAlertTickerInfo === 'function') {
+                window.clearAlertTickerInfo();
+            }
+            window.Logger?.info?.('ℹ️ [updateAlertTickerDisplay] Cleared ticker display', {}, { page: 'modal-manager-v2' });
+            this.handleAlertTickerDataUpdate(null);
+            return;
+        }
+        
+        if (typeof window.loadAlertTickerInfo === 'function') {
+            window.Logger?.info?.('🔄 [updateAlertTickerDisplay] Delegating to loadAlertTickerInfo', { tickerId }, { page: 'modal-manager-v2' });
+            await window.loadAlertTickerInfo(tickerId);
+            return;
+        }
+        
+        // Fallback מקומי במידה והמודול הישן עדיין לא נטען
         try {
-            // טעינת פרטי הטיקר
             const response = await fetch(`/api/tickers/${tickerId}`);
-            if (response.ok) {
-                const result = await response.json();
-                const ticker = result.data;
-                if (ticker) {
-                    // עדכון תצוגת הטיקר (רק סימבול)
-                    const tickerSymbol = ticker.symbol || 'לא מוגדר';
-                    tickerDisplay.textContent = tickerSymbol;
-                    
-                    // עדכון פרטי מחיר
-                    if (tickerInfoDiv) {
-                        if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-                            tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
-                        } else {
-                            // Fallback
-                            tickerInfoDiv.innerHTML = `
-                                <div class="ticker-info-display">
-                                    <strong>${ticker.symbol || 'N/A'}</strong> - ${ticker.name || 'N/A'}<br>
-                                    <span class="fw-bold">$${(ticker.current_price || 0).toFixed(2)}</span>
-                                    <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
-                                        ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} 
-                                        ${(ticker.daily_change || 0).toFixed(2)} 
-                                        (${(ticker.daily_change_percent || 0).toFixed(2)}%)
-                                    </span>
-                                </div>
-                            `;
-                        }
-                    }
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ticker ${tickerId}`);
+            }
+            const result = await response.json();
+            const ticker = result.data || result;
+            this.handleAlertTickerDataUpdate(ticker);
+            
+            window.Logger?.info?.('✅ [updateAlertTickerDisplay] Fallback fetched ticker', {
+                tickerId: ticker?.id || tickerId,
+                symbol: ticker?.symbol,
+                hasRenderer: !!(window.FieldRendererService && window.FieldRendererService.renderTickerInfo)
+            }, { page: 'modal-manager-v2' });
+            
+            if (tickerDisplay) {
+                tickerDisplay.textContent = ticker.symbol || 'לא מוגדר';
+            }
+            if (tickerInfo) {
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderTickerInfo === 'function') {
+                    tickerInfo.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+                } else {
+                    tickerInfo.innerHTML = `
+                        <div class="ticker-info-display">
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <strong>${(ticker.currency_symbol || '$')}${(ticker.current_price || 0).toFixed(2)}</strong>
+                                <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
+                                    ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
+                                </span>
+                                <span class="text-muted small">נפח: ${(ticker.volume || 0).toLocaleString('he-IL')}</span>
+                            </div>
+                        </div>
+                    `;
                 }
             }
         } catch (error) {
-            console.warn('⚠️ Error loading ticker info:', error);
-            tickerDisplay.textContent = 'שגיאה בטעינת טיקר';
-            if (tickerInfoDiv) {
-                tickerInfoDiv.innerHTML = '<small class="text-muted">לא ניתן לטעון פרטי טיקר</small>';
-            }
+            console.warn('⚠️ Error loading ticker info (fallback):', error);
+            tickerDisplay && (tickerDisplay.textContent = 'שגיאה בטעינת טיקר');
+            tickerInfo && (tickerInfo.innerHTML = '<small class="text-muted">לא ניתן לטעון פרטי טיקר</small>');
+            window.Logger?.error?.('❌ [updateAlertTickerDisplay] Fallback failed', {
+                tickerId,
+                error: error?.message || error
+            }, { page: 'modal-manager-v2' });
         }
     }
     
@@ -3527,3 +4270,4 @@ document.addEventListener('DOMContentLoaded', () => {
         new ModalManagerV2();
     }
 });
+

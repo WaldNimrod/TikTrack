@@ -119,7 +119,7 @@
 10. designs.html
 11. executions.html
 12. external-data-dashboard.html
-13. js-map.html (תוקן)
+13. js-map.html (הועבר לארכיון בנובמבר 2025)
 14. notes.html
 15. notifications-center.html
 16. preferences.html
@@ -160,7 +160,6 @@ console.log('IndexedDB Ready:', window.UnifiedIndexedDB && window.UnifiedIndexed
 - `notes-init.js`
 - `tickers-init.js`
 - `trade-plans-init.js`
-- `js-map-init.js`
 
 ## קבצים נדרשים
 

@@ -527,6 +527,7 @@ function getEntityLabel(entityType) {
     'design': 'עיצוב',
     'research': 'מחקר',
     'preference': 'העדפה',
+    'position': 'פוזיציה'
   };
 
   return labels[normalizedType] || entityType;

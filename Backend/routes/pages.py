@@ -108,22 +108,6 @@ def constraints() -> Any:
     """Constraints management page"""
     return send_from_directory(UI_DIR, "constraints.html")
 
-@pages_bp.route('/js-map')
-def js_map() -> Any:
-    """JS Map page"""
-    return send_from_directory(UI_DIR, "js-map.html")
-
-
-
-@pages_bp.route('/page-scripts-matrix')
-def page_scripts_matrix() -> Any:
-    """Page scripts matrix page"""
-    return send_from_directory(UI_DIR, "page-scripts-matrix.html")
-
-
-
-
-
 @pages_bp.route('/test-header-only')
 def test_header_only() -> Any:
     """Test header only page"""

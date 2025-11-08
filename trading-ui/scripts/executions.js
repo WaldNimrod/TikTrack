@@ -429,16 +429,18 @@ async function _REMOVED_fillEditExecutionForm(execution, linkedObject, tickerId)
 
     // מילוי שדה ההערות
     const notesValue = execution.notes || '';
-    if (notesValue) {
-      const notesField = document.getElementById('editExecutionNotes');
+    const editNotesId = 'editExecutionNotes';
+    if (window.RichTextEditorService && typeof window.RichTextEditorService.setContent === 'function') {
+      window.RichTextEditorService.setContent(editNotesId, notesValue || '');
+      window.Logger.info('✅ [EDIT MODAL] שדה הערות (rich-text) מולא', { page: "executions", hasContent: !!notesValue });
+    } else {
+      const notesField = document.getElementById(editNotesId);
       if (notesField) {
-        notesField.value = notesValue;
-        window.Logger.info('✅ [EDIT MODAL] שדה הערות מולא:', notesValue, { page: "executions" });
+        notesField.value = notesValue || '';
+        window.Logger.info('✅ [EDIT MODAL] שדה הערות מולא (fallback):', notesValue, { page: "executions" });
       } else {
         window.Logger.info('❌ [EDIT MODAL] שדה הערות לא נמצא ב-DOM', { page: "executions" });
       }
-    } else {
-      window.Logger.info('⚠️ [EDIT MODAL] אין הערות לעסקה', { page: "executions" });
     }
 
     // הצגת כפתור קישור לטרייד/תכנון אם יש
@@ -541,7 +543,7 @@ async function saveExecution() {
             fee: { id: 'executionCommission', type: 'float', default: 0 }, // Map executionCommission to fee
             realized_pl: { id: 'executionRealizedPL', type: 'int', default: null },
             mtm_pl: { id: 'executionMTMPL', type: 'int', default: null },
-            notes: { id: 'executionNotes', type: 'text', default: null },
+            notes: { id: 'executionNotes', type: 'rich-text', default: null },
             source: { id: 'executionSource', type: 'text', default: 'manual' },
             external_id: { id: 'executionExternalId', type: 'text', default: null },
             trade_id: { id: 'trade_id', type: 'int', default: null }
@@ -587,6 +589,13 @@ async function saveExecution() {
         if (!executionData.date) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('executionDate', 'תאריך ושעה הם שדות חובה');
+            }
+            hasErrors = true;
+        }
+
+        if (executionData.notes && executionData.notes.length > 5000) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('executionNotes', 'הערות העסקה חורגות מהאורך המותר (5,000 תווים)');
             }
             hasErrors = true;
         }
@@ -679,7 +688,10 @@ async function _REMOVED_updateExecutionWrapper() {
   const price = document.getElementById('editExecutionPrice').value;
   const executionDate = document.getElementById('editExecutionDate').value;
   const commission = document.getElementById('editExecutionCommission').value;
-  const notes = document.getElementById('editExecutionNotes').value.trim();
+  const notesEditorId = 'editExecutionNotes';
+  const notes = window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function'
+    ? (window.RichTextEditorService.getContent(notesEditorId) || '').trim()
+    : (document.getElementById(notesEditorId)?.value || '').trim();
   const realizedPLValue = document.getElementById('executionRealizedPL')?.value;
   const mtmPLValue = document.getElementById('executionMTMPL')?.value;
 

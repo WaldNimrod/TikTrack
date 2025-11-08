@@ -253,6 +253,41 @@ class TradeSelectorModal {
         contentDiv.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>';
 
         try {
+            // Get filtering parameters from parent modal if available
+            let tradingAccountId = null;
+            let tickerId = null;
+            
+            if (window.modalNavigationManager && window.modalNavigationManager.modalHistory.length > 0) {
+                const parentModalInfo = window.modalNavigationManager.modalHistory[window.modalNavigationManager.modalHistory.length - 1];
+                const parentModal = parentModalInfo?.element;
+                const entityType = parentModalInfo?.info?.entityType;
+                
+                if (parentModal && entityType) {
+                    if (entityType === 'cash_flow') {
+                        // For cash flows: filter by trading_account_id only
+                        const accountField = parentModal.querySelector('#cashFlowAccount, #currencyExchangeAccount');
+                        if (accountField && accountField.value) {
+                            tradingAccountId = parseInt(accountField.value);
+                            console.log('🔵 [Cash Flow] Filtering trades by trading_account_id:', tradingAccountId);
+                        }
+                    } else if (entityType === 'execution') {
+                        // For executions: filter by both trading_account_id AND ticker_id
+                        const accountField = parentModal.querySelector('#executionAccount');
+                        const tickerField = parentModal.querySelector('#executionTicker');
+                        
+                        if (accountField && accountField.value) {
+                            tradingAccountId = parseInt(accountField.value);
+                            console.log('🔵 [Execution] Filtering trades by trading_account_id:', tradingAccountId);
+                        }
+                        
+                        if (tickerField && tickerField.value) {
+                            tickerId = parseInt(tickerField.value);
+                            console.log('🔵 [Execution] Filtering trades by ticker_id:', tickerId);
+                        }
+                    }
+                }
+            }
+
             // Load trades only (no trade plans)
             const tradesResponse = await fetch('/api/trades/');
 
@@ -261,7 +296,20 @@ class TradeSelectorModal {
             }
 
             const tradesData = await tradesResponse.json();
-            const trades = tradesData.data || tradesData || [];
+            let trades = tradesData.data || tradesData || [];
+
+            // Filter trades by trading_account_id if provided
+            if (tradingAccountId) {
+                trades = trades.filter(trade => trade.trading_account_id === tradingAccountId);
+                console.log(`🔵 Filtered to ${trades.length} trades for account ${tradingAccountId}`);
+            }
+            
+            // Filter trades by ticker_id if provided (for executions)
+            if (tickerId) {
+                const beforeCount = trades.length;
+                trades = trades.filter(trade => trade.ticker_id === tickerId);
+                console.log(`🔵 Filtered to ${trades.length} trades for ticker ${tickerId} (from ${beforeCount})`);
+            }
 
             // Store trades data for sorting
             this.tradesData = trades;

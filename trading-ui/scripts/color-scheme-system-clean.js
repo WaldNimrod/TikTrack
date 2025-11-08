@@ -14,7 +14,8 @@
 // ===== ENTITY TYPE DEFINITIONS =====
 const VALID_ENTITY_TYPES = [
   'trade', 'trade_plan', 'execution', 'account', 'cash_flow',
-  'ticker', 'alert', 'note', 'constraint', 'design', 'research', 'preference'
+  'ticker', 'alert', 'note', 'constraint', 'design', 'research', 'preference',
+  'position'
 ];
 
 // ===== COLOR DEFINITIONS =====
@@ -30,7 +31,8 @@ const ENTITY_COLORS = {
   constraint: '#e83e8c',
   design: '#6f42c1',
   research: '#17a2b8',
-  preference: '#28a745'
+  preference: '#28a745',
+  position: '#0d6efd'
 };
 
 const ENTITY_BACKGROUND_COLORS = {
@@ -45,7 +47,8 @@ const ENTITY_BACKGROUND_COLORS = {
   constraint: 'rgba(232, 62, 140, 0.1)',
   design: 'rgba(111, 66, 193, 0.1)',
   research: 'rgba(23, 162, 184, 0.1)',
-  preference: 'rgba(40, 167, 69, 0.1)'
+  preference: 'rgba(40, 167, 69, 0.1)',
+  position: 'rgba(13, 110, 253, 0.12)'
 };
 
 const ENTITY_TEXT_COLORS = {
@@ -60,7 +63,8 @@ const ENTITY_TEXT_COLORS = {
   constraint: '#d91a72',
   design: '#59359a',
   research: '#117a8b',
-  preference: '#1e7e34'
+  preference: '#1e7e34',
+  position: '#0b5ed7'
 };
 
 const ENTITY_BORDER_COLORS = {
@@ -75,7 +79,8 @@ const ENTITY_BORDER_COLORS = {
   constraint: 'rgba(232, 62, 140, 0.3)',
   design: 'rgba(111, 66, 193, 0.3)',
   research: 'rgba(23, 162, 184, 0.3)',
-  preference: 'rgba(40, 167, 69, 0.3)'
+  preference: 'rgba(40, 167, 69, 0.3)',
+  position: 'rgba(13, 110, 253, 0.3)'
 };
 
 const STATUS_COLORS = {

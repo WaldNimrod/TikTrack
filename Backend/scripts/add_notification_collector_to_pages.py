@@ -72,8 +72,6 @@ def main():
         'trading-ui/notifications-center.html',
         'trading-ui/background-tasks.html',
         'trading-ui/server-monitor.html',
-        'trading-ui/page-scripts-matrix.html',
-        'trading-ui/js-map.html',
         'trading-ui/linter-realtime-monitor.html',
         'trading-ui/css-management.html',
         'trading-ui/crud-testing-dashboard.html',

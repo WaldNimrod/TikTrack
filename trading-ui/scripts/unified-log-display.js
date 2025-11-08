@@ -750,7 +750,6 @@ class UnifiedLogDisplay {
             'db_display.html': '🗄️',
             'db_extradata.html': '📊',
             'cache-management.html': '⚙️',
-            'js-map.html': '🗺️',
             'linter-realtime-monitor.html': '🔍',
             'crud-testing-dashboard.html': '🧪',
             'external-data-dashboard.html': '🌐',

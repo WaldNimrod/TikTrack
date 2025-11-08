@@ -10,7 +10,7 @@
 // קונפיגורציה למודל חשבונות מסחר
 const tradingAccountsModalConfig = {
     id: 'tradingAccountsModal',
-    entityType: 'account',
+    entityType: 'trading_account',
     title: {
         add: 'הוספת חשבון מסחר',
         edit: 'עריכת חשבון מסחר'

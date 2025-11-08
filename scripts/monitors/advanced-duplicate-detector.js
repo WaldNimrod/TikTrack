@@ -600,6 +600,9 @@ class AdvancedDuplicateDetector {
         console.log(`   Similar Patterns: ${reportData.summary.similarPatterns}`);
         console.log(`   Potential Duplicates: ${reportData.summary.potentialDuplicates}`);
 
+        // Output structured data marker for API consumers
+        console.log(`__REPORT_JSON__${JSON.stringify(reportData)}`);
+
         return reportData;
     }
 

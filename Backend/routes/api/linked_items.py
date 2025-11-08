@@ -434,9 +434,13 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
     
     # Get trades
     cursor.execute("""
-        SELECT t.id, 'trade' as type, 'טרייד' as title, 
+        SELECT t.id, 'trade' as type, 'טרייד' as title,
                'טרייד ' || t.side || ' על ' || tk.symbol as description,
-               t.created_at, t.status
+               t.created_at,
+               t.updated_at,
+               t.status,
+               t.side,
+               t.investment_type
         FROM trades t
         JOIN tickers tk ON t.ticker_id = tk.id
         WHERE t.trading_account_id = ?
@@ -444,19 +448,26 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
     
     for row in cursor.fetchall():
         children.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3],
-            'created_at': row[4],
-            'status': row[5]
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': row['side'],
+            'investment_type': row['investment_type']
         })
     
     # Get trade plans
     cursor.execute("""
-        SELECT tp.id, 'trade_plan' as type, 'תוכנית מסחר' as title, 
+        SELECT tp.id, 'trade_plan' as type, 'תוכנית מסחר' as title,
                'תוכנית ' || tp.side || ' על ' || tk.symbol as description,
-               tp.created_at, tp.status
+               tp.created_at,
+               tp.updated_at,
+               tp.status,
+               tp.side,
+               tp.investment_type
         FROM trade_plans tp
         JOIN tickers tk ON tp.ticker_id = tk.id
         WHERE tp.trading_account_id = ?
@@ -464,50 +475,60 @@ def get_account_child_entities(cursor, trading_account_id: int) -> List[Dict[str
     
     for row in cursor.fetchall():
         children.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3],
-            'created_at': row[4],
-            'status': row[5]
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': row['side'],
+            'investment_type': row['investment_type']
         })
     
     # Get notes
     cursor.execute("""
-        SELECT n.id, 'note' as type, 'הערה' as title, 
+        SELECT n.id, 'note' as type, 'הערה' as title,
                substr(n.content, 1, 100) as description,
-               n.created_at, 'active' as status
+               n.created_at,
+               n.updated_at,
+               'active' as status
         FROM notes n
         WHERE n.related_type_id = 1 AND n.related_id = ?
     """, (trading_account_id,))
     
     for row in cursor.fetchall():
+        description = row['description'] if row['description'] is not None else ''
         children.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3] + ('...' if len(row[3]) == 100 else ''),
-            'created_at': row[4],
-            'status': row[5]
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': description + ('...' if len(description) == 100 else ''),
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status']
         })
     
     # Get alerts
     cursor.execute("""
-        SELECT a.id, 'alert' as type, 'התראה' as title, 
+        SELECT a.id, 'alert' as type, 'התראה' as title,
                'התראה: ' || a.message as description,
-               a.created_at, a.status
+               a.created_at,
+               a.updated_at,
+               a.status
         FROM alerts a
         WHERE a.related_type_id = 1 AND a.related_id = ?
     """, (trading_account_id,))
     
     for row in cursor.fetchall():
         children.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3],
-            'created_at': row[4],
-            'status': row[5]
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status']
         })
     
     return children
@@ -520,78 +541,99 @@ def get_ticker_child_entities(cursor, ticker_id: int) -> List[Dict[str, Any]]:
     
     # Get trades
     cursor.execute("""
-        SELECT t.id, 'trade' as type, 'טרייד' as title, 
+        SELECT t.id, 'trade' as type, 'טרייד' as title,
                'טרייד ' || t.side || ' - ' || t.investment_type as description,
-               t.created_at, t.status
+               t.created_at,
+               t.updated_at,
+               t.status,
+               t.side,
+               t.investment_type
         FROM trades t
         WHERE t.ticker_id = ?
     """, (ticker_id,))
     
     for row in cursor.fetchall():
         children.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3],
-            'created_at': row[4],
-            'status': row[5]
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': row['side'],
+            'investment_type': row['investment_type']
         })
     
     # Get trade plans
     cursor.execute("""
-        SELECT id, 'trade_plan' as type, 'תוכנית טרייד' as title, 
-               'תוכנית ' || side || ' - ' || investment_type as description,
-               created_at, status
-        FROM trade_plans 
-        WHERE ticker_id = ?
+        SELECT tp.id, 'trade_plan' as type, 'תוכנית טרייד' as title,
+               'תוכנית ' || tp.side || ' - ' || tp.investment_type as description,
+               tp.created_at,
+               tp.updated_at,
+               tp.status,
+               tp.side,
+               tp.investment_type
+        FROM trade_plans tp
+        WHERE tp.ticker_id = ?
     """, (ticker_id,))
     
     for row in cursor.fetchall():
         children.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3],
-            'created_at': row[4],
-            'status': row[5]
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status'],
+            'side': row['side'],
+            'investment_type': row['investment_type']
         })
     
     # Get alerts
     cursor.execute("""
-        SELECT id, 'alert' as type, 'התראה' as title, 
-               'התראה: ' || message as description,
-               created_at, status
-        FROM alerts 
-        WHERE related_type_id = 4 AND related_id = ?
+        SELECT a.id, 'alert' as type, 'התראה' as title,
+               'התראה: ' || a.message as description,
+               a.created_at,
+               a.updated_at,
+               a.status
+        FROM alerts a
+        WHERE a.related_type_id = 4 AND a.related_id = ?
     """, (ticker_id,))
     
     for row in cursor.fetchall():
         children.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3],
-            'created_at': row[4],
-            'status': row[5]
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': row['description'],
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status']
         })
     
     # Get notes
     cursor.execute("""
-        SELECT n.id, 'note' as type, 'הערה' as title, 
+        SELECT n.id, 'note' as type, 'הערה' as title,
                substr(n.content, 1, 100) as description,
-               n.created_at, 'active' as status
+               n.created_at,
+               n.updated_at,
+               'active' as status
         FROM notes n
         WHERE n.related_type_id = 4 AND n.related_id = ?
     """, (ticker_id,))
     
     for row in cursor.fetchall():
+        description = row['description'] if row['description'] is not None else ''
         children.append({
-            'id': row[0],
-            'type': row[1],
-            'title': row[2],
-            'description': row[3] + ('...' if len(row[3]) == 100 else ''),
-            'created_at': row[4],
-            'status': row[5]
+            'id': row['id'],
+            'type': row['type'],
+            'title': row['title'],
+            'description': description + ('...' if len(description) == 100 else ''),
+            'created_at': row['created_at'],
+            'updated_at': row['updated_at'],
+            'status': row['status']
         })
     
     return children
@@ -606,9 +648,11 @@ def get_trade_parent_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     # Get account
     try:
         cursor.execute("""
-            SELECT a.id, 'account' as type, 'חשבון' as title, 
+            SELECT a.id, 'trading_account' as type, 'חשבון מסחר' as title,
                    a.name as description,
-                   a.created_at, a.status
+                   a.created_at,
+                   a.updated_at,
+                   a.status
             FROM trades t
             JOIN trading_accounts a ON t.trading_account_id = a.id
             WHERE t.id = ?
@@ -617,12 +661,13 @@ def get_trade_parent_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
         row = cursor.fetchone()
         if row:
             parents.append({
-                'id': row[0],
-                'type': row[1],
-                'title': row[2],
-                'description': row[3],
-                'created_at': row[4],
-                'status': row[5]
+                'id': row['id'],
+                'type': row['type'],
+                'title': row['title'],
+                'description': row['description'],
+                'created_at': row['created_at'],
+                'updated_at': row['updated_at'],
+                'status': row['status']
             })
             logger.info(f"Found account parent: {parents[-1]}")
     except Exception as e:
@@ -642,12 +687,13 @@ def get_trade_parent_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
         row = cursor.fetchone()
         if row:
             parents.append({
-                'id': row[0],
-                'type': row[1],
-                'title': row[2],
-                'description': row[3],
-                'created_at': row[4],
-                'status': row[5]
+                'id': row['id'],
+                'type': row['type'],
+                'title': row['title'],
+                'description': row['description'],
+                'created_at': row['created_at'],
+                'updated_at': row['updated_at'],
+                'status': row['status']
             })
             logger.info(f"Found ticker parent: {parents[-1]}")
     except Exception as e:

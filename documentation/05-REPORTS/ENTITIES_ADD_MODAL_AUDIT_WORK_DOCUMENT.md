@@ -375,7 +375,7 @@ window.showAddExecutionModal = function() {
 - cashFlowSource ✅
 - cashFlowExternalId ✅
 - cashFlowTrade ✅
-- cashFlowTradePlan ✅
+- cashFlowTradePlan ✅ _(Legacy בלבד – אין יותר קישור לתוכניות)_
 
 **שדות ב-save:**
 - amount ✅ (cashFlowAmount)
@@ -388,7 +388,7 @@ window.showAddExecutionModal = function() {
 - external_id ✅ (cashFlowExternalId)
 
 **בעיות:**
-- ⚠️ `cashFlowTrade` ו-`cashFlowTradePlan` לא נשמרים ב-save
+- ⚠️ `cashFlowTrade` לא נשמר ב-save (יש להשלים); `cashFlowTradePlan` מסומן כ-Legacy ואינו נדרש למימוש עתידי
 
 ### ביצועים (executions)
 **Config:** ✅ קיים  

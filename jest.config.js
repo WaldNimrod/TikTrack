@@ -14,7 +14,6 @@ module.exports = {
     coverageReporters: ['html', 'text', 'lcov'],
     collectCoverageFrom: [
         'trading-ui/scripts/**/*.js',
-        '!trading-ui/scripts/import-user-data.js',
         '!trading-ui/scripts/**/*-old*.js',
         '!trading-ui/scripts/**/backup/**/*.js',
         '!trading-ui/scripts/**/archive/**/*.js',

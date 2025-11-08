@@ -80,8 +80,8 @@
 /* ===== Modal headers colored by entity type - אחידים ===== */
 /* כל הצבעים מהעדפות בלבד - צבע רקע מלא כמו כותרות סקשנים */
 .modal-header.entity-trade { 
-  background-color: var(--entity-trade-color); 
-  color: white;
+  background-color: color-mix(in srgb, var(--entity-trade-color) 15%, white); 
+  color: var(--entity-trade-color);
   border-bottom: 2px solid var(--entity-trade-color);
 }
 .modal-header.entity-ticker { 

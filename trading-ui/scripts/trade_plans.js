@@ -2874,7 +2874,7 @@ async function saveTradePlan() {
             take_profit: { id: 'tradePlanTakeProfit', type: 'float', default: null },
             entry_date: { id: 'tradePlanEntryDate', type: 'dateOnly', default: null },
             status: { id: 'tradePlanStatus', type: 'text' },
-            notes: { id: 'tradePlanNotes', type: 'text', default: null }
+            notes: { id: 'tradePlanNotes', type: 'rich-text', default: null }
         });
         
         // ולידציה מפורטת
@@ -2917,6 +2917,13 @@ async function saveTradePlan() {
         if (!tradePlanData.status) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanStatus', 'סטטוס הוא שדה חובה');
+            }
+            hasErrors = true;
+        }
+
+        if (tradePlanData.notes && tradePlanData.notes.length > 5000) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('tradePlanNotes', 'הערות התוכנית חורגות מהאורך המותר (5,000 תווים)');
             }
             hasErrors = true;
         }

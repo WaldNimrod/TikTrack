@@ -30,8 +30,19 @@ class CodeQualityDashboard {
             errorHandling: null,
             jsdoc: null,
             naming: null,
-            functionIndex: null
+            functionIndex: null,
+            duplicates: null
         };
+
+        this.duplicateItems = [];
+        this.filteredDuplicateItems = [];
+        this.activeDuplicateIndex = null;
+        this.duplicateFilters = {
+            type: 'all',
+            category: 'all',
+            minSimilarity: 0.7
+        };
+        this.duplicateCategories = new Set();
     }
 
     /**
@@ -69,6 +80,7 @@ class CodeQualityDashboard {
     initializeUI() {
         // Set up event listeners for buttons
         this.setupEventListeners();
+        this.setupDuplicateFilters();
         
         // Initialize empty states
         this.updateSummaryStats();
@@ -82,6 +94,43 @@ class CodeQualityDashboard {
         setInterval(() => {
             this.refreshDashboard();
         }, 300000);
+    }
+
+    /**
+     * Setup duplicate detection filters
+     */
+    setupDuplicateFilters() {
+        const typeSelect = document.getElementById('duplicateTypeFilter');
+        const categorySelect = document.getElementById('duplicateCategoryFilter');
+        const similarityRange = document.getElementById('duplicateSimilarityRange');
+
+        if (typeSelect) {
+            typeSelect.addEventListener('change', () => {
+                this.duplicateFilters.type = typeSelect.value;
+                this.renderDuplicateTable();
+            });
+        }
+
+        if (categorySelect) {
+            categorySelect.addEventListener('change', () => {
+                this.duplicateFilters.category = categorySelect.value;
+                this.renderDuplicateTable();
+            });
+        }
+
+        if (similarityRange) {
+            similarityRange.addEventListener('input', () => {
+                const value = parseInt(similarityRange.value, 10) || 70;
+                this.duplicateFilters.minSimilarity = value / 100;
+                this.updateSimilarityDisplay(value);
+            });
+
+            similarityRange.addEventListener('change', () => {
+                this.renderDuplicateTable();
+            });
+        }
+
+        this.updateSimilarityDisplay();
     }
 
     /**
@@ -113,15 +162,16 @@ class CodeQualityDashboard {
             }
 
             // Run all checks in parallel
-            const [errorHandling, jsdoc, naming, functionIndex] = await Promise.all([
+            const [errorHandling, jsdoc, naming, functionIndex, duplicates] = await Promise.all([
                 this.runErrorHandlingCheck(),
                 this.runJSDocCheck(),
                 this.runNamingCheck(),
-                this.runFunctionIndexCheck()
+                this.runFunctionIndexCheck(),
+                this.runDuplicateCheck()
             ]);
 
             // Update UI with results
-            this.updateAllResults(errorHandling, jsdoc, naming, functionIndex);
+            this.updateAllResults(errorHandling, jsdoc, naming, functionIndex, duplicates);
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('בדיקות איכות הושלמו');
@@ -250,6 +300,34 @@ class CodeQualityDashboard {
     }
 
     /**
+     * Run Duplicate Detection check
+     */
+    async runDuplicateCheck() {
+        try {
+            const response = await fetch('/api/quality-check/duplicates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            this.lastCheckResults.duplicates = data;
+            return data;
+
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error running Duplicate check:', error, { page: 'code-quality-dashboard' });
+            }
+            throw error;
+        }
+    }
+
+    /**
      * Generate Function Index for all files
      */
     async generateFunctionIndex() {
@@ -291,11 +369,12 @@ class CodeQualityDashboard {
     /**
      * Update all results in UI
      */
-    updateAllResults(errorHandling, jsdoc, naming, functionIndex) {
+    updateAllResults(errorHandling, jsdoc, naming, functionIndex, duplicates) {
         this.displayErrorHandlingResults(errorHandling);
         this.displayJSDocResults(jsdoc);
         this.displayNamingResults(naming);
         this.displayFunctionIndexResults(functionIndex);
+        this.displayDuplicateResults(duplicates);
         this.updateSummaryStats();
         this.updateLastUpdateTime();
     }
@@ -580,6 +659,318 @@ class CodeQualityDashboard {
     }
 
     /**
+     * Display duplicate detection results
+     */
+    displayDuplicateResults(data) {
+        if (!data || !data.data) {
+            this.lastCheckResults.duplicates = null;
+            this.duplicateItems = [];
+            this.filteredDuplicateItems = [];
+            this.updateDuplicateSummary();
+            this.updateDuplicateCategoryOptions();
+            this.renderDuplicateTable();
+            const duplicatesTotalElement = document.getElementById('duplicatesTotal');
+            if (duplicatesTotalElement) {
+                duplicatesTotalElement.textContent = '0';
+            }
+            return;
+        }
+
+        const payload = data.data;
+        const summary = payload.summary || {};
+        const duplicates = Array.isArray(payload.duplicates) ? payload.duplicates : [];
+
+        this.lastCheckResults.duplicates = data;
+        this.duplicateItems = duplicates;
+        this.duplicateCategories = new Set(
+            duplicates
+                .map(item => item.category)
+                .filter(category => category && category !== 'UNCATEGORIZED')
+        );
+
+        this.updateDuplicateSummary(summary);
+        this.updateDuplicateCategoryOptions();
+        this.renderDuplicateTable();
+    }
+
+    updateDuplicateSummary(summary = {}) {
+        const setText = (id, value) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        };
+
+        setText('duplicateTotalCount', summary.totalDuplicates ?? 0);
+        setText('duplicateExactCount', summary.exactDuplicates ?? 0);
+        setText('duplicateNearCount', summary.nearDuplicates ?? 0);
+        setText('duplicateSimilarCount', summary.similarPatterns ?? 0);
+        setText('duplicatePotentialCount', summary.potentialDuplicates ?? 0);
+
+        const categoryCount = summary.categories ? Object.keys(summary.categories).length : this.duplicateCategories.size;
+        setText('duplicateCategoryCount', categoryCount);
+    }
+
+    updateDuplicateCategoryOptions() {
+        const categorySelect = document.getElementById('duplicateCategoryFilter');
+        if (!categorySelect) {
+            return;
+        }
+
+        const currentValue = categorySelect.value;
+        const categories = Array.from(this.duplicateCategories).sort((a, b) => a.localeCompare(b, 'he'));
+
+        const options = ['<option value="all">הכל</option>'];
+        categories.forEach(category => {
+            options.push(`<option value="${category}">${category}</option>`);
+        });
+
+        categorySelect.innerHTML = options.join('');
+
+        if (categories.includes(currentValue)) {
+            categorySelect.value = currentValue;
+            this.duplicateFilters.category = currentValue;
+        } else {
+            categorySelect.value = 'all';
+            this.duplicateFilters.category = 'all';
+        }
+    }
+
+    getFilteredDuplicates() {
+        return this.duplicateItems.filter(item => {
+            if (!item) return false;
+
+            const typeMatch = this.duplicateFilters.type === 'all' || item.type?.toLowerCase() === this.duplicateFilters.type;
+            const categoryMatch = this.duplicateFilters.category === 'all' || item.category === this.duplicateFilters.category;
+            const similarityMatch = (item.similarity ?? 0) >= this.duplicateFilters.minSimilarity;
+
+            return typeMatch && categoryMatch && similarityMatch;
+        });
+    }
+
+    renderDuplicateTable() {
+        const tableBody = document.getElementById('duplicateTableBody');
+        if (!tableBody) {
+            return;
+        }
+
+        const filtered = this.getFilteredDuplicates();
+        this.filteredDuplicateItems = filtered;
+
+        if (filtered.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-muted">לא נמצאו כפילויות עבור המסננים שנבחרו</td>
+                </tr>
+            `;
+            this.renderDuplicateDetails();
+            return;
+        }
+
+        const rows = filtered.map((duplicate, index) => {
+            const confidenceClass = this.getConfidenceBadgeClass(duplicate.confidence);
+            return `
+                <tr data-duplicate-index="${index}">
+                    <td>${this.formatDuplicateType(duplicate.type)}</td>
+                    <td>${this.formatPercentage(duplicate.similarity)}</td>
+                    <td><span class="badge ${confidenceClass}">${this.formatPercentage(duplicate.confidence)}</span></td>
+                    <td>${this.formatFunctionLabel(duplicate.func1)}</td>
+                    <td>${this.formatFunctionLabel(duplicate.func2)}</td>
+                    <td>${this.formatDuplicateCategory(duplicate.category)}</td>
+                </tr>
+            `;
+        }).join('');
+
+        tableBody.innerHTML = rows;
+        this.bindDuplicateRowEvents();
+
+        // Ensure first item details are shown by default
+        if (filtered.length > 0) {
+            this.showDuplicateDetails(0);
+        }
+    }
+
+    bindDuplicateRowEvents() {
+        const tableBody = document.getElementById('duplicateTableBody');
+        if (!tableBody) {
+            return;
+        }
+
+        const rows = tableBody.querySelectorAll('[data-duplicate-index]');
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                const index = parseInt(row.getAttribute('data-duplicate-index'), 10);
+                this.showDuplicateDetails(index);
+            });
+        });
+    }
+
+    showDuplicateDetails(index) {
+        this.activeDuplicateIndex = index;
+
+        const tableBody = document.getElementById('duplicateTableBody');
+        if (tableBody) {
+            const rows = tableBody.querySelectorAll('[data-duplicate-index]');
+            rows.forEach(row => {
+                const rowIndex = parseInt(row.getAttribute('data-duplicate-index'), 10);
+                row.classList.toggle('table-active', rowIndex === index);
+            });
+        }
+
+        const duplicate = this.filteredDuplicateItems[index];
+        this.renderDuplicateDetails(duplicate);
+    }
+
+    renderDuplicateDetails(duplicate) {
+        const panel = document.getElementById('duplicateDetailsPanel');
+        if (!panel) {
+            return;
+        }
+
+        if (!duplicate) {
+            panel.innerHTML = '<div class="text-center text-muted">בחר רשומה כדי לראות פרטים מלאים</div>';
+            return;
+        }
+
+        const similarity = this.formatPercentage(duplicate.similarity);
+        const confidence = this.formatPercentage(duplicate.confidence);
+        const recommendation = duplicate.recommendation;
+
+        panel.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <h6 class="mb-2">פירוט כללי</h6>
+                            <p class="mb-1"><strong>סוג כפילות:</strong> ${this.formatDuplicateType(duplicate.type)}</p>
+                            <p class="mb-1"><strong>דמיון:</strong> ${similarity}</p>
+                            <p class="mb-1"><strong>ביטחון:</strong> ${confidence}</p>
+                            <p class="mb-1"><strong>קטגוריה:</strong> ${this.formatDuplicateCategory(duplicate.category)}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="mb-2">פונקציה 1</h6>
+                            <p class="mb-1"><strong>שם:</strong> ${this.escapeHtml(duplicate.func1?.name || '—')}</p>
+                            <p class="mb-1"><strong>קובץ:</strong> ${this.escapeHtml(duplicate.func1?.file || '—')}</p>
+                            <p class="mb-1"><strong>שורה:</strong> ${duplicate.func1?.startLine ?? '—'}</p>
+                            <div class="small text-muted mt-2">
+                                ${this.renderContentPreview(duplicate.func1?.content)}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="mb-2">פונקציה 2</h6>
+                            <p class="mb-1"><strong>שם:</strong> ${this.escapeHtml(duplicate.func2?.name || '—')}</p>
+                            <p class="mb-1"><strong>קובץ:</strong> ${this.escapeHtml(duplicate.func2?.file || '—')}</p>
+                            <p class="mb-1"><strong>שורה:</strong> ${duplicate.func2?.startLine ?? '—'}</p>
+                            <div class="small text-muted mt-2">
+                                ${this.renderContentPreview(duplicate.func2?.content)}
+                            </div>
+                        </div>
+                    </div>
+                    ${recommendation ? `
+                        <hr>
+                        <h6 class="mb-2">המלצה</h6>
+                        <p class="mb-1"><strong>עדיפות:</strong> ${recommendation.priority || '—'}</p>
+                        <p class="mb-1"><strong>פעולה:</strong> ${this.escapeHtml(recommendation.action || '—')}</p>
+                        <p class="mb-0">${this.escapeHtml(recommendation.description || '')}</p>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    updateSimilarityDisplay(rawValue) {
+        const slider = document.getElementById('duplicateSimilarityRange');
+        const display = document.getElementById('duplicateSimilarityValue');
+        const value = rawValue !== undefined ? rawValue : slider ? parseInt(slider.value, 10) : 70;
+
+        if (slider && rawValue === undefined) {
+            slider.value = value;
+        }
+
+        if (display) {
+            display.textContent = `${value}%`;
+        }
+    }
+
+    resetDuplicateFilters() {
+        this.duplicateFilters = {
+            type: 'all',
+            category: 'all',
+            minSimilarity: 0.7
+        };
+
+        const typeSelect = document.getElementById('duplicateTypeFilter');
+        const categorySelect = document.getElementById('duplicateCategoryFilter');
+        const similarityRange = document.getElementById('duplicateSimilarityRange');
+
+        if (typeSelect) typeSelect.value = 'all';
+        if (categorySelect) categorySelect.value = 'all';
+        if (similarityRange) similarityRange.value = 70;
+
+        this.updateSimilarityDisplay(70);
+        this.renderDuplicateTable();
+    }
+
+    formatDuplicateType(type) {
+        const map = {
+            exact: 'כפילות מדויקת',
+            near: 'כפילות קרובה',
+            similar: 'דפוס דומה',
+            potential: 'כפילות פוטנציאלית'
+        };
+        return map[type?.toLowerCase()] || type || '—';
+    }
+
+    formatDuplicateCategory(category) {
+        if (!category || category === 'UNCATEGORIZED') {
+            return 'ללא קטגוריה';
+        }
+        return category;
+    }
+
+    formatPercentage(value) {
+        if (value === undefined || value === null) {
+            return '0%';
+        }
+        return `${Math.round(value * 100)}%`;
+    }
+
+    formatFunctionLabel(func) {
+        if (!func) {
+            return '—';
+        }
+        const name = func.name || '—';
+        const file = func.file || '—';
+        return `${this.escapeHtml(name)} <span class="text-muted">(${this.escapeHtml(file)})</span>`;
+    }
+
+    getConfidenceBadgeClass(confidence) {
+        const percentage = (confidence ?? 0) * 100;
+        if (percentage >= 80) return 'bg-success';
+        if (percentage >= 60) return 'bg-warning text-dark';
+        return 'bg-danger';
+    }
+
+    renderContentPreview(content) {
+        if (!content) {
+            return '';
+        }
+        const trimmed = content.trim();
+        const preview = trimmed.substring(0, 400);
+        const suffix = trimmed.length > 400 ? '…' : '';
+        return this.escapeHtml(preview) + suffix;
+    }
+
+    escapeHtml(text) {
+        if (!text) {
+            return '';
+        }
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    /**
      * Update summary statistics
      */
     updateSummaryStats() {
@@ -587,6 +978,7 @@ class CodeQualityDashboard {
         const errorHandlingCoverageElement = document.getElementById('errorHandlingCoverage');
         const jsdocCoverageElement = document.getElementById('jsdocCoverage');
         const namingComplianceElement = document.getElementById('namingCompliance');
+        const duplicatesTotalElement = document.getElementById('duplicatesTotal');
 
         if (this.lastCheckResults.errorHandling && this.lastCheckResults.errorHandling.data) {
             if (totalFunctionsElement) totalFunctionsElement.textContent = this.lastCheckResults.errorHandling.data.summary.total;
@@ -601,6 +993,12 @@ class CodeQualityDashboard {
             const summary = this.lastCheckResults.naming.data.summary;
             const compliancePercentage = summary.total > 0 ? ((summary.compliant / summary.total) * 100).toFixed(2) : 0;
             if (namingComplianceElement) namingComplianceElement.textContent = compliancePercentage + '%';
+        }
+
+        if (this.lastCheckResults.duplicates && this.lastCheckResults.duplicates.data) {
+            if (duplicatesTotalElement) {
+                duplicatesTotalElement.textContent = this.lastCheckResults.duplicates.data.summary.totalDuplicates ?? 0;
+            }
         }
     }
 
@@ -618,26 +1016,36 @@ class CodeQualityDashboard {
      * Show loading state
      */
     showLoadingState() {
-        const sections = ['errorHandlingResults', 'jsdocResults', 'namingResults', 'functionIndexResults'];
+        const sections = ['errorHandlingResults', 'jsdocResults', 'namingResults', 'functionIndexResults', 'duplicateResults'];
         sections.forEach(sectionId => {
             const element = document.getElementById(sectionId);
             if (element) {
                 element.innerHTML = '<div class="text-center text-muted"><i class="fas fa-spinner fa-spin"></i> טוען...</div>';
             }
         });
+
+        const duplicateDetails = document.getElementById('duplicateDetailsPanel');
+        if (duplicateDetails) {
+            duplicateDetails.innerHTML = '<div class="text-center text-muted"><i class="fas fa-spinner fa-spin"></i> טוען כפילויות...</div>';
+        }
     }
 
     /**
      * Show error state
      */
     showErrorState(message) {
-        const sections = ['errorHandlingResults', 'jsdocResults', 'namingResults', 'functionIndexResults'];
+        const sections = ['errorHandlingResults', 'jsdocResults', 'namingResults', 'functionIndexResults', 'duplicateResults'];
         sections.forEach(sectionId => {
             const element = document.getElementById(sectionId);
             if (element) {
                 element.innerHTML = `<div class="text-center text-danger">❌ ${message}</div>`;
             }
         });
+
+        const duplicateDetails = document.getElementById('duplicateDetailsPanel');
+        if (duplicateDetails) {
+            duplicateDetails.innerHTML = `<div class="text-center text-danger">❌ ${message}</div>`;
+        }
     }
 
     /**
@@ -688,6 +1096,37 @@ window.runFunctionIndexCheck = async function() {
 window.generateFunctionIndex = async function() {
     if (window.codeQualityDashboard) {
         await window.codeQualityDashboard.generateFunctionIndex();
+    }
+};
+
+window.runDuplicateCheck = async function() {
+    if (window.codeQualityDashboard) {
+        await window.codeQualityDashboard.runDuplicateCheck().then(result => {
+            window.codeQualityDashboard.displayDuplicateResults(result);
+            window.codeQualityDashboard.updateSummaryStats();
+            window.codeQualityDashboard.updateLastUpdateTime();
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('בדיקת הכפילויות הסתיימה בהצלחה');
+            }
+        }).catch(() => {
+            const resultsElement = document.getElementById('duplicateResults');
+            if (resultsElement) {
+                resultsElement.innerHTML = '<div class="text-center text-danger">❌ שגיאה בהרצת בדיקת הכפילויות</div>';
+            }
+            const detailsElement = document.getElementById('duplicateDetailsPanel');
+            if (detailsElement) {
+                detailsElement.innerHTML = '<div class="text-center text-danger">❌ לא ניתן להציג פרטי כפילויות</div>';
+            }
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'בדיקת הכפילויות נכשלה');
+            }
+        });
+    }
+};
+
+window.resetDuplicateFilters = function() {
+    if (window.codeQualityDashboard) {
+        window.codeQualityDashboard.resetDuplicateFilters();
     }
 };
 

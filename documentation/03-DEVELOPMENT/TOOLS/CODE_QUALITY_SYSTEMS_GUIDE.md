@@ -29,7 +29,6 @@
 - **Inline styles:** 17 קבצי HTML עם styles מוטמעים
 
 #### **קבצים בעייתיים ביותר:**
-- `js-map.js`: 126 console.log + 43 כפילויות
 - `init-system-management.js`: 85 console.log + 57 פונקציות
 - `core-systems.js`: 187 console.log + 46 כפילויות
 - `import-user-data-old.js`: 79 console.log + 157 פונקציות
@@ -713,6 +712,8 @@ curl -X POST http://localhost:8080/api/metrics/collect
 - `html-duplicate-analyzer.py` - כפילויות HTML
 - `css-analyzer.py` - כפילויות CSS
 - `advanced-duplicate-detector.js` - זיהוי כפילויות מתקדם
+
+> החל מנובמבר 2025 תוצאות `advanced-duplicate-detector.js` מוצגות בסקשן "זיהוי כפילויות" בדשבורד איכות הקוד (`/code-quality-dashboard`) במקום העמוד הייעודי הישן.
 
 #### **בעיות איכות**:
 - `error-handling-monitor.js` - Error Handling

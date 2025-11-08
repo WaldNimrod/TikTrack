@@ -1147,8 +1147,22 @@ class EntityDetailsService:
                     'created_at': execution.created_at.isoformat() if execution.created_at else None
                 })
             
-            # Get the ticker
+            # Get the trading account (parent)
             trade = db.query(Trade).filter(Trade.id == trade_id).first()
+            if trade and trade.trading_account_id:
+                account = db.query(TradingAccount).filter(TradingAccount.id == trade.trading_account_id).first()
+                if account:
+                    linked_items.append({
+                        'id': account.id,
+                        'type': 'trading_account',
+                        'title': f"חשבון {account.name}",
+                        'name': account.name,
+                        'description': f"חשבון מסחר {account.name}",
+                        'status': account.status,
+                        'created_at': account.created_at.isoformat() if account.created_at else None
+                    })
+            
+            # Get the ticker (parent)
             if trade and trade.ticker_id:
                 ticker = db.query(Ticker).filter(Ticker.id == trade.ticker_id).first()
                 if ticker:
@@ -1156,6 +1170,8 @@ class EntityDetailsService:
                         'id': ticker.id,
                         'type': 'ticker',
                         'title': f"טיקר {ticker.symbol}",
+                        'name': ticker.symbol,
+                        'description': f"טיקר {ticker.symbol}",
                         'status': ticker.status,
                         'created_at': ticker.created_at.isoformat() if ticker.created_at else None
                     })
@@ -1185,8 +1201,23 @@ class EntityDetailsService:
         linked_items = []
         
         try:
-            # Get the ticker
             plan = db.query(TradePlan).filter(TradePlan.id == plan_id).first()
+            
+            # Get the trading account (parent)
+            if plan and plan.trading_account_id:
+                account = db.query(TradingAccount).filter(TradingAccount.id == plan.trading_account_id).first()
+                if account:
+                    linked_items.append({
+                        'id': account.id,
+                        'type': 'trading_account',
+                        'title': f"חשבון {account.name}",
+                        'name': account.name,
+                        'description': f"חשבון מסחר {account.name}",
+                        'status': account.status,
+                        'created_at': account.created_at.isoformat() if account.created_at else None
+                    })
+            
+            # Get the ticker (parent)
             if plan and plan.ticker_id:
                 ticker = db.query(Ticker).filter(Ticker.id == plan.ticker_id).first()
                 if ticker:
@@ -1194,6 +1225,8 @@ class EntityDetailsService:
                         'id': ticker.id,
                         'type': 'ticker',
                         'title': f"טיקר {ticker.symbol}",
+                        'name': ticker.symbol,
+                        'description': f"טיקר {ticker.symbol}",
                         'status': ticker.status,
                         'created_at': ticker.created_at.isoformat() if ticker.created_at else None
                     })

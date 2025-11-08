@@ -571,9 +571,14 @@
                 <div class="content-section" id="section6" data-group="colors_unified">
                     <div class="section-header">
                     <h2>🎨 צבעים</h2>
-                    <button class="btn btn-outline-warning" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-                    </button>
+                    <div style="display: flex; gap: 5px;">
+                        <button type="button" class="btn btn-success btn-sm" onclick="window.savePreferenceGroup('colors_unified')">
+                            <i class="bi bi-save"></i> שמור
+                        </button>
+                        <button class="btn btn-outline-warning" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
                     </div>
                 <div class="section-body" style="display:none;">
                 <!-- Basic System Colors -->
@@ -1195,6 +1200,8 @@
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
     <!-- [37] Load Order: 37 -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
+    <!-- [38] Load Order: 38 -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 6/8: VALIDATION PACKAGE ===== -->
@@ -1247,7 +1254,7 @@
     <!-- =============================================================== -->
 
     <!-- [47] Page-specific: preferences -->
-    <script src="scripts/preferences.js?v=1.0.0"></script> <!-- Page-specific script for preferences -->
+    <!-- Note: preferences.js removed - functionality moved to preferences-page.js and preferences-group-manager.js -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->

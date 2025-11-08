@@ -207,7 +207,14 @@ class PreferencesGroupManager {
         const inputs = section.querySelectorAll('input, select, textarea');
         
         inputs.forEach(input => {
-            const name = input.name || input.id;
+            // For color pickers, use data-color-key if available, otherwise use name or id
+            let name = null;
+            if (input.type === 'color' && input.dataset.colorKey) {
+                name = input.dataset.colorKey;
+            } else {
+                name = input.name || input.id;
+            }
+            
             if (!name) return;
             
             // Skip buttons, hidden fields, disabled fields

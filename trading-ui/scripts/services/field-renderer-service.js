@@ -646,15 +646,38 @@ class FieldRendererService {
         let previewHtml = '';
         if (previewEnabled) {
             if (meta.isImage) {
+                const previewTitle = this._escapeHtml(meta.displayName || fileName);
                 previewHtml = `
                     <div class="${options.imagePreviewWrapperClass || 'attachment-preview-image border rounded bg-light p-2 text-center mb-2'}">
-                        <img src="${downloadUrl}" alt="${this._escapeHtml(meta.displayName || fileName)}" class="${options.imageClass || 'img-fluid rounded'}" style="max-height: ${previewMaxHeight}px; object-fit: contain;" loading="lazy" decoding="async" />
+                        <button type="button"
+                                class="${options.imagePreviewButtonClass || 'attachment-preview-button border-0 bg-transparent p-0 w-100'}"
+                                data-attachment-preview="image"
+                                data-preview-src="${downloadUrl}"
+                                data-preview-title="${previewTitle}"
+                                aria-label="הצגת ${previewTitle} בתצוגה מוגדלת"
+                                style="cursor: zoom-in;">
+                            <img src="${downloadUrl}" alt="${previewTitle}" class="${options.imageClass || 'img-fluid rounded'}" style="max-height: ${previewMaxHeight}px; object-fit: contain;" loading="lazy" decoding="async" />
+                        </button>
                     </div>
                 `;
             } else if (meta.isPdf) {
+                const previewTitle = this._escapeHtml(meta.displayName || fileName);
+                const pdfButtonClass = options.pdfPreviewButtonClass || 'attachment-preview-pdf-button btn btn-outline-secondary w-100 text-start d-flex align-items-center justify-content-between gap-3';
+                const pdfIcon = `<span class="${options.iconClass || 'fs-5'}">${meta.icon}</span>`;
                 previewHtml = `
                     <div class="${options.pdfPreviewWrapperClass || 'attachment-preview-pdf border rounded bg-light p-2 mb-2'}">
-                        <embed src="${downloadUrl}" type="application/pdf" class="${options.pdfClass || 'w-100'}" style="height: ${pdfHeight}px;" />
+                        <button type="button"
+                                class="${pdfButtonClass}"
+                                data-attachment-preview="pdf"
+                                data-preview-src="${downloadUrl}"
+                                data-preview-title="${previewTitle}"
+                                data-preview-mime="application/pdf"
+                                aria-label="הצגת ${previewTitle} בתצוגה מוגדלת">
+                            <span class="d-flex align-items-center gap-2">
+                                ${pdfIcon}
+                                <span class="attachment-preview-label" dir="auto">לחץ לפתיחה</span>
+                            </span>
+                        </button>
                     </div>
                 `;
             } else if (typeof options.customPreview === 'function') {

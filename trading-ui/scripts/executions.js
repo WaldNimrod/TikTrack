@@ -1841,16 +1841,14 @@ async function loadTickersWithOpenOrClosedTradesAndPlans() {
     // Showing tickers in dropdown
 
     // עדכון שדות ה-select
-    window.tickerService.updateTickerSelect('addExecutionTicker', tickersToShow);
-    window.tickerService.updateTickerSelect('editExecutionTicker', tickersToShow);
+    window.tickerService.updateTickerSelect('executionTicker', tickersToShow);
 
   } catch (error) {
     handleApiError(error, 'טיקרים עם טריידים ותכנונים');
     // Fallback - טעינת כל הטיקרים
     try {
       const allTickers = await window.tickerService.getTickers();
-      window.tickerService.updateTickerSelect('addExecutionTicker', allTickers);
-      window.tickerService.updateTickerSelect('editExecutionTicker', allTickers);
+      window.tickerService.updateTickerSelect('executionTicker', allTickers);
     } catch (fallbackError) {
       handleApiError(fallbackError, 'טיקרים (גיבוי)');
     }
@@ -1903,9 +1901,8 @@ function enableAllFields(mode = 'add') {
 async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false) {
   window.Logger.info('🔄 טעינת טריידים לטיקר, מצב:', mode, 'הצג טריידים סגורים:', _showClosedTrades, { page: "executions" });
 
-  const tickerId = mode === 'add'
-    ? document.getElementById('executionTicker').value
-    : document.getElementById('editExecutionTicker').value;
+  const tickerSelect = document.getElementById('executionTicker');
+  const tickerId = tickerSelect ? tickerSelect.value : null;
 
   if (!tickerId) {
     window.Logger.info('🔄 אין טיקר נבחר', { page: "executions" });
@@ -2062,10 +2059,7 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
     // window.Logger.info('🔄 הצג טריידים סגורים:', showClosedTrades, { page: "executions" });
 
     // קבלת הטיקר הנבחר
-    const tickerSelect = mode === 'add'
-      ? document.getElementById('addExecutionTicker')
-      : document.getElementById('editExecutionTicker');
-
+    const tickerSelect = document.getElementById('executionTicker');
     const tickerId = tickerSelect?.value;
 
     // תמיד עדכן את רשימת הטיקרים כשהצ'קבוקס משתנה
@@ -3328,12 +3322,16 @@ function addExecutionForTicker(tickerId) {
 
   // בחירת הטיקר במודל
   setTimeout(() => {
-    const tickerSelect = document.getElementById('addExecutionTicker');
+    const tickerSelect = document.getElementById('executionTicker');
     if (tickerSelect) {
       tickerSelect.value = tickerId;
       // הפעלת שינוי הטיקר
       if (typeof updateTradesOnTickerChange === 'function') {
         updateTradesOnTickerChange('add');
+      }
+      // טעינת מידע על הטיקר
+      if (window.loadExecutionTickerInfo) {
+        window.loadExecutionTickerInfo(tickerId);
       }
     }
   }, 100);
@@ -3402,9 +3400,7 @@ async function updateTickersList(mode, showClosedTrades = false) {
     }
 
     // עדכון שדה הטיקר
-    const tickerSelect = mode === 'add'
-      ? document.getElementById('addExecutionTicker')
-      : document.getElementById('editExecutionTicker');
+    const tickerSelect = document.getElementById('executionTicker');
 
     if (tickerSelect) {
       tickerSelect.innerHTML = '<option value="">בחר טיקר...</option>';

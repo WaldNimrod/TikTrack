@@ -13,6 +13,7 @@ Date: August 2025
 """
 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import DatabaseError
 from models.ticker import Ticker
 from models.trade import Trade
 from models.trade_plan import TradePlan
@@ -83,9 +84,26 @@ class TickerService:
         
         # Add market data to each ticker
         for ticker in tickers:
-            latest_quote = db.query(MarketDataQuote).filter(
-                MarketDataQuote.ticker_id == ticker.id
-            ).order_by(MarketDataQuote.fetched_at.desc()).first()
+            try:
+                latest_quote = db.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == ticker.id
+                ).order_by(MarketDataQuote.fetched_at.desc()).first()
+            except DatabaseError as db_error:
+                logger.error(
+                    "Failed to load market data quote for ticker %s due to database error: %s",
+                    getattr(ticker, "symbol", ticker.id),
+                    db_error
+                )
+                # Important: rollback the failing transaction so the session remains usable
+                db.rollback()
+                continue
+            except Exception as unexpected_error:
+                logger.warning(
+                    "Unexpected error while loading market data for ticker %s: %s",
+                    getattr(ticker, "symbol", ticker.id),
+                    unexpected_error
+                )
+                continue
             
             if latest_quote:
                 # Add market data fields to ticker object

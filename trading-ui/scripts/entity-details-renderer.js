@@ -692,15 +692,6 @@ class EntityDetailsRenderer {
         const color = tradeColor || this.entityColors.trade || '#007bff';
         const FieldRenderer = window.FieldRendererService || null;
         
-        // Total P/L
-        const totalPL = tradeData.total_pl !== null && tradeData.total_pl !== undefined
-            ? (FieldRenderer?.renderAmount
-                ? FieldRenderer.renderAmount(tradeData.total_pl, '$', 2, true)
-                : (window.colorAmountByValue
-                    ? window.colorAmountByValue(tradeData.total_pl, `$${tradeData.total_pl.toFixed(2)}`)
-                    : `$${tradeData.total_pl.toFixed(2)}`))
-            : '-';
-        
         // Trade Plan Link
         const tradePlanId = tradeData.trade_plan_id || null;
         const tradePlanSymbol = tradeData.trade_plan_ticker_symbol ||
@@ -837,23 +828,77 @@ class EntityDetailsRenderer {
         }
         
         // חישוב Realized P/L, Unrealized P/L, MTM P/L מ-executions
+        // רק מ-executions שיש להם נתונים מפורשים - אין fallback או דמה!
         executions.forEach(exec => {
             const action = exec.action || '';
             
-            // Realized P/L - רק מ-sell executions
+            // Realized P/L - רק מ-sell executions (רק אם יש נתון מפורש)
             if ((action === 'sell' || action === 'sale') && exec.realized_pl !== null && exec.realized_pl !== undefined) {
                 realizedPL += parseFloat(exec.realized_pl || 0);
             }
             
-            // MTM P/L - מכל ה-executions
+            // MTM P/L - מכל ה-executions (רק אם יש נתון מפורש)
             if (exec.mtm_pl !== null && exec.mtm_pl !== undefined) {
                 mtmPL += parseFloat(exec.mtm_pl || 0);
             }
         });
         
         // חישוב Unrealized P/L = (מחיר נוכחי - מחיר ממוצע) * כמות נוכחית
+        // רק אם יש מחיר נוכחי ומחיר ממוצע תקינים
+        let unrealizedPLCalculated = false;
         if (positionQuantity !== 0 && currentPrice > 0 && positionAveragePrice > 0) {
             unrealizedPL = (currentPrice - positionAveragePrice) * positionQuantity;
+            unrealizedPLCalculated = true;
+        }
+        
+        // בדיקה: אם אין מכירות, Unrealized P/L צריך להיות שווה ל-Total P/L
+        const hasSales = totalSoldQuantity > 0;
+        const hasValidTotalPL = tradeData.total_pl !== null && tradeData.total_pl !== undefined;
+        const totalPLValue = hasValidTotalPL ? parseFloat(tradeData.total_pl || 0) : null;
+        
+        // אם אין מכירות ויש Unrealized P/L מחושב, Total P/L צריך להיות שווה לו
+        if (!hasSales && unrealizedPLCalculated) {
+            // אם Total P/L מה-backend שונה משמעותית מ-Unrealized P/L, נשתמש ב-Unrealized P/L המחושב
+            if (hasValidTotalPL) {
+                const diff = Math.abs(totalPLValue - unrealizedPL);
+                // אם ההפרש גדול מ-0.01, נשתמש ב-Unrealized P/L המחושב (יותר מדויק)
+                if (diff > 0.01) {
+                    // Total P/L מה-backend לא תואם - נשתמש ב-Unrealized P/L המחושב
+                    // Total P/L יעודכן להיות שווה ל-Unrealized P/L
+                }
+            }
+        }
+        
+        // חישוב Total P/L - לוגיקה נכונה:
+        // אם אין מכירות: Total P/L = Unrealized P/L
+        // אם יש מכירות: Total P/L = Realized P/L + Unrealized P/L
+        let calculatedTotalPL = null;
+        let totalPLDisplay = null;
+        let totalPLMessage = null;
+        
+        if (!hasSales) {
+            // אין מכירות - Total P/L צריך להיות שווה ל-Unrealized P/L
+            if (unrealizedPLCalculated) {
+                calculatedTotalPL = unrealizedPL;
+            } else {
+                // אין מחיר נוכחי - לא ניתן לחשב Unrealized P/L
+                calculatedTotalPL = null;
+                totalPLMessage = 'לא ניתן לחשב - חסר מחיר נוכחי';
+            }
+        } else {
+            // יש מכירות - Total P/L = Realized P/L + Unrealized P/L
+            calculatedTotalPL = realizedPL + unrealizedPL;
+        }
+        
+        // פורמט Total P/L
+        if (calculatedTotalPL !== null) {
+            totalPLDisplay = FieldRenderer?.renderAmount
+                ? FieldRenderer.renderAmount(calculatedTotalPL, '$', 2, true)
+                : (window.colorAmountByValue
+                    ? window.colorAmountByValue(calculatedTotalPL, `$${calculatedTotalPL.toFixed(2)}`)
+                    : `$${calculatedTotalPL.toFixed(2)}`);
+        } else {
+            totalPLDisplay = totalPLMessage || '<span class="text-muted">חסר נתונים</span>';
         }
         
         // חישוב אחוז מהחשבון - שימוש בנתונים מה-backend
@@ -867,11 +912,21 @@ class EntityDetailsRenderer {
         // פורמט כמות - ספרה אחת אחרי הנקודה
         const formatQuantity = (qty) => {
             if (qty === 0 || !qty) return '-';
-            return FieldRenderer?.renderShares 
-                ? FieldRenderer.renderShares(qty)
-                : (window.renderShares 
-                    ? window.renderShares(qty)
-                    : qty.toLocaleString('en-US', { maximumFractionDigits: 1, minimumFractionDigits: 0 }));
+            // עיגול לספרה אחת אחרי הנקודה
+            const roundedQty = parseFloat((Math.round(qty * 10) / 10).toFixed(1));
+            // פורמט עם ספרה אחת אחרי הנקודה
+            const formattedQty = roundedQty.toLocaleString('en-US', { maximumFractionDigits: 1, minimumFractionDigits: 0 });
+            // אם renderShares קיים, נשתמש בו אבל נחליף את המספר בפורמט הנכון
+            if (FieldRenderer?.renderShares) {
+                const sharesHtml = FieldRenderer.renderShares(roundedQty);
+                // החלפת המספר בפורמט הנכון (עם ספרה אחת אחרי הנקודה)
+                return sharesHtml.replace(/#[\d,]+\.?[\d]*/, `#${formattedQty}`);
+            } else if (window.renderShares) {
+                const sharesHtml = window.renderShares(roundedQty);
+                return sharesHtml.replace(/#[\d,]+\.?[\d]*/, `#${formattedQty}`);
+            } else {
+                return formattedQty;
+            }
         };
         
         // פורמט סכום
@@ -931,32 +986,6 @@ class EntityDetailsRenderer {
                             </tr>
                         </tbody>
                     </table>
-                    ${positionPercentOfAccount > 0 ? `
-                    <div class="mt-2 pt-2" style="border-top: 1px solid #e0e0e0;">
-                        <div class="d-flex align-items-center">
-                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">אחוז מהחשבון:</label>
-                            <span>${formatPercent(positionPercentOfAccount)}</span>
-                        </div>
-                    </div>
-                    ` : ''}
-                    <div class="mt-2 pt-2" style="border-top: 1px solid #e0e0e0;">
-                        <div class="d-flex align-items-center mb-2">
-                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">Realized P/L:</label>
-                            <span>${formatAmount(realizedPL)}</span>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">Unrealized P/L:</label>
-                            <span>${formatAmount(unrealizedPL)}</span>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">MTM P/L:</label>
-                            <span>${formatAmount(mtmPL)}</span>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">Total P/L:</label>
-                            <span>${totalPL}</span>
-                        </div>
-                    </div>
                     <div class="mt-2 pt-2" style="border-top: 1px solid #e0e0e0;">
                         <table class="table table-sm" style="border: none;">
                             <thead>
@@ -984,6 +1013,32 @@ class EntityDetailsRenderer {
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                    ${positionPercentOfAccount > 0 ? `
+                    <div class="mt-2 pt-2" style="border-top: 1px solid #e0e0e0;">
+                        <div class="d-flex align-items-center">
+                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">אחוז מהחשבון:</label>
+                            <span>${formatPercent(positionPercentOfAccount)}</span>
+                        </div>
+                    </div>
+                    ` : ''}
+                    <div class="mt-2 pt-2" style="border-top: 1px solid #e0e0e0;">
+                        <div class="d-flex align-items-center mb-2">
+                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">Realized P/L:</label>
+                            <span>${hasSales ? (hasRealizedPLData ? formatAmount(realizedPL) : '<span class="text-muted">אין נתונים ב-executions</span>') : '<span class="text-muted">אין מכירות</span>'}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">Unrealized P/L:</label>
+                            <span>${unrealizedPLCalculated ? formatAmount(unrealizedPL) : '<span class="text-muted">חסר מחיר נוכחי</span>'}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">MTM P/L:</label>
+                            <span>${hasMTMData ? formatAmount(mtmPL) : '<span class="text-muted">אין נתונים</span>'}</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">Total P/L:</label>
+                            <span>${totalPLDisplay}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4341,6 +4396,16 @@ class EntityDetailsRenderer {
                 ? FieldRenderer.renderType(entityData.investment_type || '')
                 : (entityData.investment_type || 'לא זמין');
 
+            const accountId = entityData.trading_account_id || entityData.account_id || entityData.account?.id || null;
+            const accountName = entityData.trading_account_name ||
+                entityData.account_name ||
+                entityData.account?.name ||
+                (accountId ? `חשבון #${accountId}` : null);
+
+            const accountDisplay = accountId
+                ? `<a href="#" onclick="window.showEntityDetails('trading_account', ${accountId}); return false;" class="entity-link" style="color: ${color};">${accountName || `חשבון #${accountId}`}</a>`
+                : (accountName ? `<span>${accountName}</span>` : null);
+
             html += `
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">צד:</label>
@@ -4351,6 +4416,13 @@ class EntityDetailsRenderer {
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סוג השקעה:</label>
                     <span>${investmentTypeDisplay}</span>
                 </div>
+
+                ${accountDisplay ? `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">חשבון מסחר:</label>
+                    ${accountDisplay}
+                </div>
+                ` : ''}
 
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך יצירה:</label>

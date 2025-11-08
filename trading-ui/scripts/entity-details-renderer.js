@@ -681,6 +681,210 @@ class EntityDetailsRenderer {
     }
 
     /**
+     * Render trade plan details - רנדור פרטי תכנית מסחר
+     *
+     * @param {Object} tradePlanData - נתוני תכנית המסחר
+     * @param {Object} options - אפשרויות רנדור
+     * @returns {string} - HTML מרונדר של התכנית
+     * @public
+     */
+    renderTradePlan(tradePlanData, options = {}) {
+        if (!tradePlanData) {
+            return this.renderError('לא נמצאו נתוני תכנית מסחר להצגה');
+        }
+
+        const FieldRenderer = window.FieldRendererService || null;
+        const entityColor = this.entityColors.trade_plan || this.entityColors.trade || '#26baac';
+
+        const tickerSymbol = tradePlanData.ticker_symbol ||
+            tradePlanData.ticker?.symbol ||
+            (tradePlanData.ticker_id ? `טיקר #${tradePlanData.ticker_id}` : 'לא זמין');
+
+        let tickerInfoHTML = '';
+        if (tradePlanData.ticker && FieldRenderer?.renderTickerInfo) {
+            const tickerData = {
+                symbol: tradePlanData.ticker.symbol || tickerSymbol,
+                name: tradePlanData.ticker.name || '',
+                current_price: tradePlanData.ticker.current_price || 0,
+                daily_change: tradePlanData.ticker.daily_change || tradePlanData.ticker.change_amount || 0,
+                daily_change_percent: tradePlanData.ticker.daily_change_percent || tradePlanData.ticker.change_percent || 0,
+                volume: tradePlanData.ticker.volume || 0,
+                currency_symbol: tradePlanData.ticker.currency_symbol || tradePlanData.currency_symbol || '$'
+            };
+
+            if (tickerData.current_price > 0 || tickerData.daily_change !== 0 || tickerData.volume > 0) {
+                tickerInfoHTML = FieldRenderer.renderTickerInfo(tickerData, 'mb-2');
+            }
+        }
+
+        const statusDisplay = FieldRenderer?.renderStatus
+            ? FieldRenderer.renderStatus(tradePlanData.status, 'trade_plan')
+            : (tradePlanData.status || 'לא זמין');
+
+        const sideDisplay = FieldRenderer?.renderSide
+            ? FieldRenderer.renderSide(tradePlanData.side)
+            : (tradePlanData.side || 'לא זמין');
+
+        const investmentDisplay = FieldRenderer?.renderType
+            ? FieldRenderer.renderType(tradePlanData.investment_type || '')
+            : (tradePlanData.investment_type || 'לא זמין');
+
+        return `
+            <div class="entity-details-container trade-plan-details">
+                <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom: 1px solid #e0e0e0; padding-bottom: 0.75rem;">
+                    <div class="d-flex align-items-center gap-2" style="min-width: 120px;">
+                        <strong>טיקר:</strong>
+                        <span class="fw-bold">${tickerSymbol}</span>
+                    </div>
+                    <div class="flex-grow-1" style="text-align: center;">
+                        ${tickerInfoHTML || ''}
+                    </div>
+                    <div class="d-flex align-items-center gap-3" style="min-width: 200px; justify-content: flex-end;">
+                        ${statusDisplay ? `<span class="d-inline-flex align-items-center gap-2"><strong>סטטוס:</strong> ${statusDisplay}</span>` : ''}
+                        ${sideDisplay ? `<span>${sideDisplay}</span>` : ''}
+                        ${investmentDisplay ? `<span>${investmentDisplay}</span>` : ''}
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        ${this.renderBasicInfo(tradePlanData, 'trade_plan')}
+                    </div>
+                    <div class="col-md-6">
+                        ${this.renderTradePlanSpecific(tradePlanData, entityColor)}
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-4">
+                    <div class="col-12">
+                        ${this.renderLinkedItems(tradePlanData.linked_items || [], this.entityColors.trade_plan || entityColor, 'trade_plan', tradePlanData.id, options?.sourceInfo || null, options)}
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-4">
+                    <div class="col-12">
+                        ${this.renderActionButtons('trade_plan', tradePlanData.id, tradePlanData, options?.sourceInfo || null)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render specific trade plan info - רנדור מידע ייעודי לתכנית מסחר
+     *
+     * @param {Object} tradePlanData - נתוני תכנית המסחר
+     * @param {string} entityColor - צבע הישות
+     * @returns {string} - HTML מרונדר
+     * @private
+     */
+    renderTradePlanSpecific(tradePlanData, entityColor = '#26baac') {
+        const FieldRenderer = window.FieldRendererService || null;
+        const currencySymbol = tradePlanData.currency_symbol ||
+            tradePlanData.account_currency_symbol ||
+            tradePlanData.trading_account?.currency_symbol ||
+            '$';
+
+        const renderAmount = (value, decimals = 2) => {
+            if (FieldRenderer?.renderAmount) {
+                return FieldRenderer.renderAmount(value || 0, currencySymbol, decimals, false);
+            }
+            const num = Number(value || 0);
+            return `<span dir="ltr">${currencySymbol}${num.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</span>`;
+        };
+
+        const renderPercent = (value) => {
+            if (FieldRenderer?.renderNumericValue) {
+                return FieldRenderer.renderNumericValue(value || 0, '%', true);
+            }
+            if (value === null || value === undefined || Number.isNaN(Number(value))) {
+                return '<span class="numeric-value-zero">-</span>';
+            }
+            const num = Number(value);
+            const sign = num > 0 ? '+' : (num < 0 ? '-' : '');
+            const cssClass = num > 0 ? 'numeric-value-positive' : (num < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+            return `<span class="${cssClass}" dir="ltr">${sign}${Math.abs(num).toFixed(2)}%</span>`;
+        };
+
+        const renderQuantity = (value) => {
+            if (FieldRenderer?.renderNumericValue) {
+                return FieldRenderer.renderNumericValue(value || 0, '', true);
+            }
+            if (value === null || value === undefined || Number.isNaN(Number(value))) {
+                return '<span class="numeric-value-zero">-</span>';
+            }
+            const num = Number(value);
+            const sign = num > 0 ? '+' : (num < 0 ? '-' : '');
+            const cssClass = num > 0 ? 'numeric-value-positive' : (num < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+            return `<span class="${cssClass}" dir="ltr">${sign}${Math.abs(num).toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>`;
+        };
+
+        const accountName = tradePlanData.trading_account_name ||
+            tradePlanData.account_name ||
+            tradePlanData.trading_account?.name ||
+            null;
+        let accountDisplay = '<span class="text-muted">לא זמין</span>';
+        if (tradePlanData.trading_account_id) {
+            const label = accountName || `חשבון #${tradePlanData.trading_account_id}`;
+            accountDisplay = FieldRenderer?.renderLinkedEntity
+                ? FieldRenderer.renderLinkedEntity('trading_account', tradePlanData.trading_account_id, label, {
+                    name: label,
+                    status: tradePlanData.trading_account?.status || null,
+                    currency_symbol: tradePlanData.trading_account?.currency_symbol || currencySymbol
+                })
+                : `<span>${label}</span>`;
+        } else if (accountName) {
+            accountDisplay = `<span>${accountName}</span>`;
+        }
+
+        const entryDate = this.formatDateTime(tradePlanData.entry_date) || 'לא הוגדר';
+
+        return `
+            <div class="trade-plan-specific">
+                <h6 class="border-bottom pb-2 mb-3" style="border-color: ${entityColor} !important;">פרטי תכנון</h6>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">חשבון מסחר</span>
+                        <span class="text-end d-flex justify-content-end">${accountDisplay}</span>
+                    </div>
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">כמות מתוכננת</span>
+                        <span>${renderQuantity(tradePlanData.quantity)}</span>
+                    </div>
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">סכום מתוכנן</span>
+                        <span>${renderAmount(tradePlanData.planned_amount, 2)}</span>
+                    </div>
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">מחיר כניסה</span>
+                        <span>${tradePlanData.entry_price ? renderAmount(tradePlanData.entry_price, 2) : '<span class="text-muted">לא הוגדר</span>'}</span>
+                    </div>
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">תאריך כניסה</span>
+                        <span class="text-muted">${entryDate}</span>
+                    </div>
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Stop Loss</span>
+                        <span>${tradePlanData.stop_loss ? renderAmount(tradePlanData.stop_loss, 2) : '<span class="text-muted">לא הוגדר</span>'}</span>
+                    </div>
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Take Profit</span>
+                        <span>${tradePlanData.take_profit ? renderAmount(tradePlanData.take_profit, 2) : '<span class="text-muted">לא הוגדר</span>'}</span>
+                    </div>
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">סטופ (%)</span>
+                        <span>${tradePlanData.stop_percentage ? renderPercent(tradePlanData.stop_percentage) : '<span class="text-muted">לא הוגדר</span>'}</span>
+                    </div>
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">יעד (%)</span>
+                        <span>${tradePlanData.target_percentage ? renderPercent(tradePlanData.target_percentage) : '<span class="text-muted">לא הוגדר</span>'}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
      * Render position details - רנדור פרטי פוזיציה מאוחדים
      * @param {Object} positionData
      * @param {Object} options

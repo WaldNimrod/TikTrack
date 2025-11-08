@@ -132,7 +132,7 @@
 - `tradePlanTakeProfit` (number) - מחיר Take Profit
 - `tradePlanStopLossPercent` (number) - אחוז סטופ יחסית למחיר הכניסה
 - `tradePlanTakeProfitPercent` (number) - אחוז יעד יחסית למחיר הכניסה
-- `tradePlanRiskSummaryCard` (display) - כרטיס סיכום (טיקר, צד, השקעה, כמות, סיכון, סיכוי, יחס)
+- `tradePlanRiskSummaryCard` (display) - כרטיס סיכום (טיקר, צד, השקעה, כמות, עמודת \"סיכון / סיכוי\" מאוחדת המציגה את שני הסכומים ואת היחס)
 - `tradePlanNotes` (rich-text) - הערות חופשיות על התוכנית
 
 **מורכבות**: מורכב מאוד - שילוב חישובי השקעה, אחוזי ריסק וכרטיס סיכום מרוכז
@@ -157,7 +157,7 @@
 - `tradeTakeProfit` (number) - מחיר Take Profit
 - `tradeStopLossPercent` (number) - אחוז סטופ מתוך מחיר הכניסה
 - `tradeTakeProfitPercent` (number) - אחוז יעד מתוך מחיר הכניסה
-- `tradeRiskSummaryCard` (display) - כרטיס סיכום (טיקר, צד, השקעה, כמות, סיכון, סיכוי, יחס)
+- `tradeRiskSummaryCard` (display) - כרטיס סיכום (טיקר, צד, השקעה, כמות, עמודת \"סיכון / סיכוי\" מאוחדת המציגה את שני הסכומים ואת היחס)
 - `tradeNotes` (rich-text) - הערות על הטרייד
 
 **מורכבות**: מורכב מאוד - חישובי השקעה בזמן אמת, אחוזי ריסק, כרטיס סיכום וולידציה משותפת

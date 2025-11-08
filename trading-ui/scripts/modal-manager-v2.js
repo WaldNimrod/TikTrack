@@ -732,9 +732,11 @@ class ModalManagerV2 {
                 // Check if this is a fee field that needs currency label
                 const feeCurrencyLabelHTML = field.feeCurrencyLabel ? 
                     `<small class="text-muted ms-2" id="${field.id}CurrencyLabel" style="font-size: 0.875rem;">-</small>` : '';
+                const labelClassAttr = field.labelClass ? ` ${field.labelClass}` : '';
+                const labelStyleAttr = field.labelStyle ? ` style="${field.labelStyle}"` : '';
                 return `
                     <div class="mb-3">
-                        <label for="${field.id}" class="form-label">
+                        <label for="${field.id}" class="form-label${labelClassAttr}"${labelStyleAttr}>
                             ${field.label} ${requiredStar}${feeCurrencyLabelHTML}
                         </label>
                         <input type="number" 
@@ -4920,4 +4922,187 @@ class ModalManagerV2 {
                     let tickerSymbol = 'לא מוגדר';
                     if (item.ticker?.symbol) {
                         tickerSymbol = item.ticker.symbol;
-                        console.log(`
+                        console.log(`🔍 [DEBUG] TradePlan ${index}: Using item.ticker.symbol = ${tickerSymbol}`);
+                    } else if (item.ticker_symbol) {
+                        tickerSymbol = item.ticker_symbol;
+                        console.log(`🔍 [DEBUG] TradePlan ${index}: Using ticker_symbol = ${tickerSymbol}`);
+                    } else if (item.ticker_id && window.tickersData) {
+                        // נסה למצוא את הטיקר מתוך window.tickersData
+                        const ticker = window.tickersData.find(t => t.id === item.ticker_id);
+                        if (ticker) {
+                            tickerSymbol = ticker.symbol || 'לא מוגדר';
+                            console.log(`🔍 [DEBUG] TradePlan ${index}: Found ticker in window.tickersData: ${tickerSymbol}`);
+                        } else {
+                            console.warn(`⚠️ [DEBUG] TradePlan ${index}: ticker_id=${item.ticker_id} but not found in window.tickersData`);
+                        }
+                    } else {
+                        console.warn(`⚠️ [DEBUG] TradePlan ${index}: No ticker symbol found. ticker_id=${item.ticker_id}, ticker_symbol=${item.ticker_symbol}, ticker=${item.ticker}`);
+                    }
+                    
+                    const side = item.side || 'לא מוגדר';
+                    const investmentType = item.investment_type || 'לא מוגדר';
+                    const date = item.created_at || item.date;
+                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    displayText = `תוכנית | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
+                    
+                    if (index < 3) { // Log only first 3 for debugging
+                        console.log(`🔍 [DEBUG] TradePlan ${index} display text: "${displayText}"`);
+                    }
+                } else if (typeId === 1) {
+                    // עבור חשבון - שם + מטבע
+                    // TradingAccount.to_dict() מחזיר: name, currency_symbol או currency
+                    const currency = item.currency_symbol || item.currency_name || item.currency?.symbol || item.currency || 'ILS';
+                    displayText = `${item.name || 'לא מוגדר'} (${currency})`;
+                } else if (typeId === 4) {
+                    // עבור טיקר - סימבול + שם
+                    const symbol = item.symbol || 'לא מוגדר';
+                    const name = item.name ? ` - ${item.name}` : '';
+                    displayText = `${symbol}${name}`;
+                } else {
+                    // Fallback
+                    displayText = item[textField] || `ID: ${item.id}`;
+                }
+                
+                option.textContent = displayText;
+                if (selectedRelatedId && item[valueField] == selectedRelatedId) {
+                    option.selected = true;
+                }
+                noteRelatedObjectField.appendChild(option);
+            });
+            
+            console.log(`✅ Populated noteRelatedObject with ${items.length} items for type ${relatedTypeId}`);
+            
+            // Debug: Check what was actually added to the select
+            const allOptions = noteRelatedObjectField.querySelectorAll('option');
+            console.log(`🔍 [DEBUG] Total options in select: ${allOptions.length}`);
+            console.log(`🔍 [DEBUG] First 3 options text:`, Array.from(allOptions).slice(0, 3).map(opt => opt.textContent));
+            
+            // Debug: Compare with what's displayed in the table
+            if (window.getRelatedObjectDisplay && relatedTypeId === 2) {
+                console.log(`🔍 [DEBUG] Comparing with table display for first trade...`);
+                const firstTrade = items[0];
+                if (firstTrade) {
+                    const tableDisplay = window.getRelatedObjectDisplay(
+                        { related_type_id: 2, related_id: firstTrade.id },
+                        { trades: [firstTrade], tickers: window.tickersData || [] },
+                        { showLink: true, format: 'full' }
+                    );
+                    console.log(`🔍 [DEBUG] Table display (with 🔗):`, tableDisplay.display);
+                    console.log(`🔍 [DEBUG] Dropdown display (first option):`, allOptions[1]?.textContent || 'N/A');
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ Error populating note related objects:', error);
+        }
+    }
+
+    /**
+     * Get modal info - קבלת מידע על מודל
+     * 
+     * @param {string} modalId - מזהה המודל
+     * @returns {Object|null} מידע על המודל
+     */
+    getModalInfo(modalId) {
+        return this.modals.get(modalId) || null;
+    }
+
+    /**
+     * Get active modal - קבלת המודל הפעיל
+     * 
+     * @returns {string|null} מזהה המודל הפעיל
+     */
+    getActiveModal() {
+        return this.activeModal;
+    }
+
+    /**
+     * Close active modal - סגירת המודל הפעיל
+     */
+    closeActiveModal() {
+        if (this.activeModal) {
+            const modalElement = document.getElementById(this.activeModal);
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        }
+    }
+
+    /**
+     * Destroy modal - השמדת מודל
+     * 
+     * @param {string} modalId - מזהה המודל
+     */
+    destroyModal(modalId) {
+        if (this.modals.has(modalId)) {
+            const modalInfo = this.modals.get(modalId);
+            
+            // הסרה מה-DOM
+            if (modalInfo.element && modalInfo.element.parentNode) {
+                modalInfo.element.parentNode.removeChild(modalInfo.element);
+            }
+            
+            // הסרה מהמפה
+            this.modals.delete(modalId);
+            
+            // עדכון מודל פעיל
+            if (this.activeModal === modalId) {
+                this.activeModal = null;
+            }
+        }
+    }
+}
+
+// Helper function for easier onclick handlers - created IMMEDIATELY when script loads (before DOMContentLoaded)
+// This ensures it's available for onclick handlers in HTML
+// showModalSafe helper function - only define if not already defined
+if (typeof window.showModalSafe === 'undefined') {
+    window.showModalSafe = async function(modalId, mode = 'add') {
+        try {
+            console.log(`🔍 [showModalSafe] Called with:`, { modalId, mode, ModalManagerV2Available: !!window.ModalManagerV2 });
+            
+            // אם ModalManagerV2 לא זמין, ננסה לחכות קצת
+            if (!window.ModalManagerV2) {
+                console.warn('⚠️ [showModalSafe] ModalManagerV2 not available, waiting...');
+                // נחכה עד 2 שניות ל-ModalManagerV2
+                for (let i = 0; i < 20; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    if (window.ModalManagerV2) {
+                        console.log(`✅ [showModalSafe] ModalManagerV2 became available after ${(i + 1) * 100}ms`);
+                        break;
+                    }
+                }
+            }
+            
+            if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
+                console.log(`✅ [showModalSafe] Calling ModalManagerV2.showModal`);
+                await window.ModalManagerV2.showModal(modalId, mode);
+                console.log(`✅ [showModalSafe] Modal shown successfully`);
+            } else {
+                console.error('❌ [showModalSafe] ModalManagerV2 not available after wait');
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+                }
+            }
+        } catch (error) {
+            console.error('❌ [showModalSafe] Error showing modal:', error);
+            console.error('   Error stack:', error.stack);
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל: ${error.message}`);
+            }
+        }
+    };
+    console.log('✅ [showModalSafe] Helper function created');
+} else {
+    console.log('✅ [showModalSafe] Helper function already exists - skipping duplicate definition');
+}
+
+// אתחול אוטומטי כאשר הדף נטען
+document.addEventListener('DOMContentLoaded', () => {
+    if (!window.ModalManagerV2) {
+        new ModalManagerV2();
+    }
+});
+

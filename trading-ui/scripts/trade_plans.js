@@ -3064,6 +3064,14 @@ async function saveTradePlan() {
         
         // ולידציה מפורטת
         let hasErrors = false;
+        
+        if (tradePlanData.side) {
+            const sideValue = String(tradePlanData.side).toLowerCase();
+            if (sideValue === 'long' || sideValue === 'short') {
+                tradePlanData.side = sideValue.charAt(0).toUpperCase() + sideValue.slice(1);
+            }
+        }
+        
         if (!tradePlanData.trading_account_id) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanAccount', 'חשבון מסחר הוא שדה חובה');

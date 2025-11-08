@@ -155,7 +155,6 @@
 - `tradeClosedAt` (datetime-local) - תאריך סגירה
 - `tradeQuantity` (number) - כמות
 - `tradeEntryPrice` (number) - מחיר כניסה
-- `tradeExitPrice` (number) - מחיר יציאה
 - `tradeStopLoss` (number) - הפסד מקסימלי
 - `tradeTakeProfit` (number) - רווח יעד
 - `tradeNotes` (textarea) - הערות

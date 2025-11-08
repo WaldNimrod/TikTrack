@@ -170,18 +170,6 @@ const tradesModalConfig = {
             colClass: 'col-md-6 col-sm-12',
             description: 'אחוז יעד יחסית למחיר הכניסה'
         },
-        // שורה שישית: מחיר יציאה (אופציונלי)
-        {
-            type: 'number',
-            id: 'tradeExitPrice',
-            label: 'מחיר יציאה',
-            required: false,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס מחיר יציאה...',
-            rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
-        },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
             type: 'rich-text',

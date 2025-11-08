@@ -486,6 +486,16 @@ class EntityDetailsService:
                     entity_dict['linked_items'] = []
                     entity_dict['linked_items_count'] = 0
             
+            if entity_type == 'alert':
+                try:
+                    linked_items = EntityDetailsService.get_linked_items(db, entity_type, entity_id)
+                    entity_dict['linked_items'] = linked_items
+                    entity_dict['linked_items_count'] = len(linked_items)
+                except Exception as linked_error:
+                    logger.error(f"Error loading linked items for alert {entity_id}: {linked_error}")
+                    entity_dict['linked_items'] = []
+                    entity_dict['linked_items_count'] = 0
+            
             if entity_type == 'trading_account':
                 try:
                     positions = PositionPortfolioService.calculate_all_account_positions(

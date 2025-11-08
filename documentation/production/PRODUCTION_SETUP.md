@@ -94,9 +94,16 @@ python3 Backend/scripts/create_production_db.py
 - `Backend/config/settings.prod.py` - הגדרות פרודקשן (לא בשימוש כרגע)
 
 ### סקריפטים
+
+#### סקריפטי הפעלה:
 - `start_server.sh` - הפעלת פיתוח (פורט 8080)
 - `start_production.sh` - הפעלת פרודקשן (פורט 5001)
-- `Backend/scripts/create_production_db.py` - יצירת DB פרודקשן
+
+#### סקריפטי פרודקשן:
+- `production/Backend/scripts/create_production_db.py` - יצירת DB פרודקשן (כולל מיגרציות אוטומטיות)
+- `production/Backend/scripts/backup_database.py` - גיבוי בסיס נתונים פרודקשן
+- `production/Backend/scripts/cleanup_import_sessions.py` - ניקוי סשני ייבוא ישנים (מעל 90 יום)
+- `scripts/run_production_migration.py` - הרצת מיגרציות ידנית על פרודקשן
 
 ### משתני סביבה
 
@@ -154,14 +161,48 @@ python3 Backend/scripts/backup_database.py --output-dir Backend/db/backups
 
 ### עדכון בסיס נתונים פרודקשן
 
-אם צריך להריץ migrations:
+#### מיגרציות אוטומטיות
+
+הסקריפט `create_production_db.py` מריץ מיגרציות אוטומטית אחרי יצירת המבנה. כדי להוסיף מיגרציה חדשה:
+
+1. פתח `production/Backend/scripts/create_production_db.py`
+2. הוסף את שם קובץ המיגרציה לרשימה `migrations_to_run` בפונקציה `run_migrations()`
+3. הסקריפט יזהה אם המיגרציה כבר רצה (לפי בדיקת מבנה)
+
+#### מיגרציות ידניות
+
+אם צריך להריץ מיגרציה ידנית:
+
+```bash
+# הרצת מיגרציה ספציפית על בסיס הנתונים של הפרודקשן
+python3 scripts/run_production_migration.py Backend/migrations/add_entry_price_to_trade_plans.py
+```
+
+**תהליך:**
 1. עצור את שרת הפרודקשן
-2. הרץ migrations ידנית על `TikTrack_DB.db`
+2. הרץ את המיגרציה (או השתמש ב-`run_production_migration.py`)
 3. הפעל מחדש את השרת
 
-### ניקוי לוגים
+### ניקוי תקופתי
 
-לוגים בפרודקשן נמצאים ב-`Backend/logs-production/`:
+#### ניקוי סשני ייבוא ישנים
+
+הרץ את הסקריפט לניקוי סשני ייבוא ישנים (מעל 90 יום):
+
+```bash
+python3 production/Backend/scripts/cleanup_import_sessions.py
+```
+
+הסקריפט:
+- מזהה סשני ייבוא ישנים יותר מ-90 יום
+- מוחק אותם אוטומטית
+- מדווח על מספר הסשנים שנמחקו
+
+**מומלץ להריץ פעם בחודש** או כחלק מתהליך תחזוקה תקופתי.
+
+#### ניקוי לוגים
+
+לוגים בפרודקשן נמצאים ב-`production/Backend/logs/`:
 - `app.log` - לוגים כלליים
 - `errors.log` - שגיאות בלבד
 - `performance.log` - ביצועים

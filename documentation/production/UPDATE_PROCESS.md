@@ -1,8 +1,10 @@
 # TikTrack Production Update Process - מדריך עדכון פרודקשן
 
-**תאריך:** 2025-11-08  
-**גרסה:** 1.0.0  
+**תאריך:** 2025-11-09  
+**גרסה:** 1.1.0  
 **מטרה:** תהליך מלא ומסודר לעדכון קוד הפרודקשן המקומי מול Git
+
+**⚠️ עדכון חשוב:** גרסה זו כוללת תיקונים קריטיים לבדיקת הגדרות production אחרי sync
 
 ---
 
@@ -57,8 +59,9 @@ git commit -m "Merge main into production: [תאריך/תיאור]"
 
 **⚠️ חשוב:**
 - אם יש קונפליקטים, פתור אותם בזהירות
+- **בקונפליקטים:** השתמש ב-`git checkout --theirs` עבור רוב הקבצים (לקחת מ-main)
 - ודא שהקבצים ב-`production/Backend/` לא נפגעו
-- בדוק שההגדרות ב-`production/Backend/config/settings.py` נשארו נכונות
+- **קריטי:** אחרי המיזוג, תמיד תקן את `production/Backend/config/settings.py` ו-`config/logging.py` (ראה שלב 3.5)
 
 ---
 
@@ -79,8 +82,52 @@ git checkout production
 
 **תוצאה צפויה:**
 ```
-✅ Backend sync completed: ~148 files copied
-✅ UI sync completed: ~488 files copied
+✅ Backend sync completed: ~157 files copied
+✅ UI sync completed: ~490 files copied
+```
+
+**⚠️ חשוב:** הסקריפט `sync_to_production.py` מעתיק את `config/settings.py` מ-Backend, אבל הקובץ ב-production צריך להיות hardcoded ל-production mode!
+
+---
+
+### שלב 3.5: תיקון הגדרות Production (קריטי!)
+
+**⚠️ שלב זה חובה!** אחרי sync, הקבצים `config/settings.py` ו-`config/logging.py` עלולים להיות לא נכונים.
+
+```bash
+# בדוק את ההגדרות
+cd production/Backend
+python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
+    print(f'UI: {UI_DIR}'); \
+    print(f'DB: {DB_PATH}'); \
+    print(f'Port: {PORT}'); \
+    print(f'Production: {IS_PRODUCTION}')"
+```
+
+**תוצאה צפויה:**
+```
+UI: /path/to/production/trading-ui
+DB: /path/to/production/Backend/db/TikTrack_DB.db
+Port: 5001
+Production: True
+```
+
+**אם התוצאה לא נכונה (Port=8080 או Production=False):**
+
+1. **תקן `production/Backend/config/settings.py`:**
+   - ודא ש-`IS_PRODUCTION = True` (hardcoded)
+   - ודא ש-`PORT = 5001` (hardcoded)
+   - ודא ש-`DB_PATH` מצביע על `TikTrack_DB.db`
+   - ודא ש-`UI_DIR` מצביע על `production/trading-ui`
+
+2. **תקן `production/Backend/config/logging.py`:**
+   - ודא ש-`log_dir = Path("logs")` (לא `logs-production`)
+
+**דוגמה לתיקון מהיר:**
+```bash
+# אם ההגדרות לא נכונות, ערוך את הקבצים:
+# production/Backend/config/settings.py - ודא hardcoded production
+# production/Backend/config/logging.py - ודא log_dir = Path("logs")
 ```
 
 ---
@@ -244,12 +291,34 @@ git commit -m "Resolve merge conflicts"
 ```bash
 # בדוק את ההגדרות
 cd production/Backend
-python3 -c "from config.settings import DB_PATH, UI_DIR; print(DB_PATH, UI_DIR)"
+python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
+    print(f'DB: {DB_PATH}'); \
+    print(f'UI: {UI_DIR}'); \
+    print(f'Port: {PORT}'); \
+    print(f'Production: {IS_PRODUCTION}')"
 
 # אם יש בעיה, תקן את config/settings.py
+# ודא ש-IS_PRODUCTION = True (hardcoded)
+# ודא ש-PORT = 5001 (hardcoded)
 # ודא ש-UI_DIR מצביע על production/trading-ui
 # ודא ש-DB_PATH מצביע על production/Backend/db/TikTrack_DB.db
 ```
+
+### בעיה: הגדרות production לא נכונות אחרי sync
+
+**זו בעיה נפוצה!** הסקריפט sync מעתיק את `config/settings.py` מ-Backend, אבל ב-production צריך hardcoded values.
+
+**פתרון:**
+1. פתח `production/Backend/config/settings.py`
+2. ודא שהקובץ מכיל:
+   ```python
+   IS_PRODUCTION = True  # Hardcoded!
+   PORT = 5001  # Hardcoded!
+   DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"
+   UI_DIR = BASE_DIR.parent / "trading-ui"
+   ```
+3. פתח `production/Backend/config/logging.py`
+4. ודא ש-`log_dir = Path("logs")` (לא `logs-production`)
 
 ### בעיה: שרת לא מתחיל
 
@@ -277,12 +346,14 @@ python3 -c "from config.settings import PORT, DB_PATH, UI_DIR; \
 
 - [ ] כל הבדיקות עברו בהצלחה
 - [ ] אין קבצי DB או logs ב-commit
-- [ ] ההגדרות ב-`production/Backend/config/settings.py` נכונות
+- [ ] **ההגדרות ב-`production/Backend/config/settings.py` נכונות (hardcoded production)**
+- [ ] **ההגדרות ב-`production/Backend/config/logging.py` נכונות (logs directory)**
 - [ ] UI_DIR מצביע על `production/trading-ui`
 - [ ] DB_PATH מצביע על `production/Backend/db/TikTrack_DB.db`
-- [ ] PORT = 5001
-- [ ] IS_PRODUCTION = True
+- [ ] PORT = 5001 (hardcoded)
+- [ ] IS_PRODUCTION = True (hardcoded)
 - [ ] ה-commit message ברור ומתאר את השינויים
+- [ ] אם יש מיגרציות חדשות, הן נוספו ל-`create_production_db.py`
 
 ---
 
@@ -308,6 +379,15 @@ echo "✅ Merged main into production"
 ./scripts/sync_to_production.py
 echo "✅ Code synced"
 
+# 3.5. תיקון הגדרות Production (קריטי!)
+cd production/Backend
+python3 -c "from config.settings import PORT, IS_PRODUCTION; \
+    assert PORT == 5001, f'Port should be 5001, got {PORT}'; \
+    assert IS_PRODUCTION == True, f'Should be production, got {IS_PRODUCTION}'; \
+    print('✅ Production settings verified')"
+cd ../..
+echo "✅ Production settings verified"
+
 # 4. בדיקות
 ./scripts/verify_production_isolation.sh
 ./scripts/verify_production.sh
@@ -330,7 +410,10 @@ echo "🎉 Production update completed successfully!"
 - `scripts/sync_ui_to_production.py` - סקריפט סינכרון UI
 - `scripts/verify_production_isolation.sh` - בדיקת הפרדה
 - `scripts/verify_production.sh` - בדיקת מבנה כללי
-- `production/Backend/config/settings.py` - הגדרות פרודקשן
+- `production/Backend/config/settings.py` - **הגדרות פרודקשן (חייב להיות hardcoded!)**
+- `production/Backend/config/logging.py` - הגדרות לוגים (חייב להיות hardcoded!)
+- `production/Backend/scripts/create_production_db.py` - יצירת DB פרודקשן (כולל מיגרציות)
+- `production/Backend/scripts/cleanup_import_sessions.py` - ניקוי סשני ייבוא ישנים
 - `production/start_production.sh` - הפעלת שרת
 
 ---
@@ -344,8 +427,15 @@ echo "🎉 Production update completed successfully!"
 
 ---
 
-**עודכן:** 2025-11-08  
-**גרסה:** 1.0.0  
+**עודכן:** 2025-11-09  
+**גרסה:** 1.1.0  
 **מטרה:** תהליך עדכון מסודר ומובנה
+
+## 📝 שינויים בגרסה 1.1.0
+
+- ✅ הוספת שלב 3.5: תיקון הגדרות Production (קריטי!)
+- ✅ עדכון פתרון בעיות עם תיקון הגדרות אחרי sync
+- ✅ עדכון checklist עם בדיקת הגדרות hardcoded
+- ✅ הוספת מידע על מיגרציות וסקריפטים חדשים
 
 

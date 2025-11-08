@@ -78,6 +78,14 @@ def create_execution():
         
         logger.info(f"Creating execution with data: {data}")
         
+        # Auto-fill ticker_id from trade if not provided but trade_id exists
+        if not data.get('ticker_id') and data.get('trade_id'):
+            from models.trade import Trade
+            trade = db.query(Trade).filter(Trade.id == data['trade_id']).first()
+            if trade and trade.ticker_id:
+                data['ticker_id'] = trade.ticker_id
+                logger.info(f"Auto-filled ticker_id {trade.ticker_id} from trade {data['trade_id']}")
+        
         # Convert date string to datetime object if provided
         if 'date' in data and data['date']:
             from datetime import datetime
@@ -137,6 +145,14 @@ def update_execution(execution_id: int):
                     data['date'] = datetime.fromisoformat(data['date'].replace('Z', '+00:00'))
                 except ValueError:
                     data['date'] = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S')
+            
+            # Auto-fill ticker_id from trade if not provided but trade_id exists
+            if not data.get('ticker_id') and data.get('trade_id'):
+                from models.trade import Trade
+                trade = db.query(Trade).filter(Trade.id == data['trade_id']).first()
+                if trade and trade.ticker_id:
+                    data['ticker_id'] = trade.ticker_id
+                    logger.info(f"Auto-filled ticker_id {trade.ticker_id} from trade {data['trade_id']}")
             
             # Sanitize HTML content for notes field
             if 'notes' in data and data['notes']:

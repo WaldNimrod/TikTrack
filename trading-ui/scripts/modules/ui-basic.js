@@ -1243,13 +1243,21 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
       finalConfig.showDelete
     );
 
+    // בדיקה אם כבר יש כפתורים - למנוע כפילות
+    if (actionsCell.querySelector('.actions-menu-wrapper')) {
+      console.warn(`⚠️ Actions menu already exists in row ${index}, skipping`);
+      return;
+    }
+    
     actionsCell.innerHTML = buttonsHtml;
   });
 
 }
 
-// Export the new function
-window.loadTableActionButtons = loadTableActionButtons;
+// Export the new function only if not already defined
+if (!window.loadTableActionButtons) {
+  window.loadTableActionButtons = loadTableActionButtons;
+}
 
 // Export demo functions for testing
 window.viewTickerDetails = viewTickerDetails;

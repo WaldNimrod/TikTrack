@@ -1,8 +1,9 @@
 # שילוב מערכת ההעדפות עם UnifiedCacheManager
 
 **תאריך:** 26 בינואר 2025  
-**גרסה:** 5.0  
-**סטטוס:** ✅ שולב מלא עם UnifiedCacheManager
+**גרסה:** 5.1  
+**עדכון אחרון:** 8 בנובמבר 2025  
+**סטטוס:** ✅ שולב מלא עם UnifiedCacheManager + תיקוני סנכרון פרופיל ומטמון
 
 ---
 
@@ -197,6 +198,106 @@ for (const key of prefKeys) {
 
 ---
 
+## 🔧 **תיקוני מטמון - גרסה 5.1 (8 בנובמבר 2025)**
+
+### **בעיות שזוהו ותוקנו:**
+
+#### **1. בעיית סנכרון פרופיל פעיל**
+**בעיה:** השמירה והטעינה היו משתמשות ב-`profile_id=0` במקום בפרופיל הפעיל האמיתי (`profile_id=2`), מה שגרם לשמירה לפרופיל הלא נכון ולטעינה של ערכים ישנים.
+
+**פתרון:**
+- סנכרון `PreferencesCore.currentProfileId` עם הפרופיל הפעיל לפני כל שמירה/טעינה
+- שימוש ב-`PreferencesUI.loadActiveProfile()` כדי לקבל את הפרופיל הפעיל האמיתי
+- עדכון כל הקריאות להעדפות להשתמש בפרופיל הנכון
+
+**קבצים שעודכנו:**
+- `preferences-group-manager.js` - סנכרון לפני שמירה וטעינה
+- `preferences-page.js` - סנכרון לפני טעינת חשבונות
+- `select-populator-service.js` - שימוש בפרופיל הפעיל
+- `unified-cache-manager.js` - ניקוי מטמון לפי הפרופיל הנכון
+
+#### **2. בעיית ניקוי מטמון לא מלא**
+**בעיה:** אחרי שמירה, המטמון בצד הלקוח נוקה אבל לא התעדכן בערכים החדשים מהשרת, מה שגרם לערכים ישנים להופיע גם אחרי שמירה.
+
+**פתרון:**
+- ניקוי מטמון מלא של כל המפתחות הרלוונטיים (קבוצות, העדפות בודדות, מפתחות מאוחדים)
+- טעינה מחדש מהשרת עם `forceReload=true` כדי לעקוף מטמון שרת
+- עדכון שדות הטופס עם הערכים החדשים מהשרת
+
+**קבצים שעודכנו:**
+- `preferences-group-manager.js` - טעינה מחדש אחרי שמירה
+- `preferences-core-new.js` - תמיכה ב-`forceReload` עם cache busting
+- `unified-cache-manager.js` - ניקוי מטמון מלא לפי פרופיל
+
+#### **3. בעיית מטמון שרת**
+**בעיה:** השרת החזיר ערכים ישנים מהמטמון שלו גם אחרי שמירה, מה שגרם לערכים ישנים להופיע גם אחרי ריענון רגיל.
+
+**פתרון:**
+- הוספת `use_cache=false` לבקשת ה-API כש-`forceReload=true`
+- השרת עוקף את המטמון שלו וטוען ישירות מהמסד הנתונים
+- הוספת cache busting parameters (`_t`, `_nocache`) לבקשות
+
+**קבצים שעודכנו:**
+- `preferences-core-new.js` - תמיכה ב-`forceReload` עם `use_cache=false`
+- `Backend/routes/api/preferences.py` - תמיכה ב-`use_cache` parameter
+
+### **תהליך שמירה משופר (גרסה 5.1):**
+
+```javascript
+// 1. סנכרון פרופיל פעיל
+const activeProfileId = await window.PreferencesUI.loadActiveProfile();
+await window.PreferencesCore.setCurrentProfile(1, activeProfileId);
+
+// 2. שמירה לשרת
+await window.PreferencesCore.saveGroupPreferences(groupName, formData);
+
+// 3. ניקוי מטמון לקוח (כולל פרופיל נכון)
+await window.UnifiedCacheManager.refreshUserPreferences(
+    activeProfileId,
+    groupName,
+    preferenceNames
+);
+
+// 4. טעינה מחדש מהשרת עם forceReload (עוקף מטמון שרת)
+const reloadedPreferences = await window.PreferencesCore.loadGroupPreferences(
+    groupName,
+    null,
+    null,
+    true  // forceReload=true
+);
+
+// 5. עדכון שדות הטופס
+this.populateGroupFields(sectionId, reloadedPreferences);
+
+// 6. עדכון מקורות מקומיים
+updateLocalPreferenceCaches(reloadedPreferences);
+```
+
+### **תהליך טעינה משופר (גרסה 5.1):**
+
+```javascript
+// 1. סנכרון פרופיל פעיל
+const activeProfileId = await window.PreferencesUI.loadActiveProfile();
+await window.PreferencesCore.setCurrentProfile(1, activeProfileId);
+
+// 2. טעינה עם cache (אם לא forceReload)
+const preferences = await window.PreferencesCore.loadGroupPreferences(
+    groupName,
+    null,
+    null,
+    false  // use cache if available
+);
+```
+
+### **שיפורים בביצועים:**
+- ✅ שמירה תמיד לפרופיל הנכון
+- ✅ טעינה תמיד מהפרופיל הנכון
+- ✅ ניקוי מטמון מלא אחרי שמירה
+- ✅ טעינה מחדש מהשרת עם ערכים עדכניים
+- ✅ עקיפת מטמון שרת כשצריך
+
+---
+
 ## ✅ **סיכום**
 
 השילוב עם UnifiedCacheManager הביא ל:
@@ -204,3 +305,8 @@ for (const key of prefKeys) {
 - **ביצועים:** טעינה מהירה יותר, פחות זיכרון
 - **אמינות:** ניהול cache מרכזי ואחיד
 - **תחזוקה:** קל יותר לתחזק ולשדרג
+
+**גרסה 5.1 הוסיפה:**
+- **דיוק:** סנכרון פרופיל פעיל לפני כל פעולה
+- **עדכניות:** טעינה מחדש מהשרת אחרי שמירה
+- **אמינות:** עקיפת מטמון שרת כשצריך

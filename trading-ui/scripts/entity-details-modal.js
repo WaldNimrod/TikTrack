@@ -624,7 +624,23 @@ class EntityDetailsModal {
             });
         }
         
-        const renderedContent = await window.entityDetailsRenderer.render(entityType, entityData, renderOptions);
+        // בדיקה שהרינדור זמין
+        if (!window.entityDetailsRenderer || typeof window.entityDetailsRenderer.render !== 'function') {
+            throw new Error('Entity Details Renderer לא זמין או לא מוגדר כראוי');
+        }
+
+        let renderedContent;
+        try {
+            renderedContent = await window.entityDetailsRenderer.render(entityType, entityData, renderOptions);
+            
+            // בדיקה שהתוכן הוחזר
+            if (!renderedContent || typeof renderedContent !== 'string') {
+                throw new Error('הרינדור החזיר תוכן לא תקין');
+            }
+        } catch (renderError) {
+            window.Logger.error('Error in render call:', renderError, { page: "entity-details-modal" });
+            throw new Error(`שגיאה ברנדור: ${renderError.message || renderError}`);
+        }
 
         // הצגת התוכן ברנדור
         this.showRenderedContent(renderedContent);

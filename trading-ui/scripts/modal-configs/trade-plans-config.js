@@ -18,7 +18,7 @@ const tradePlansModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
-        // שורה ראשונה: טיקר + צד + סוג השקעה + סטטוס
+        // שורה ראשונה: טיקר + נתוני שוק
         {
             type: 'select',
             id: 'tradePlanTicker',
@@ -36,6 +36,7 @@ const tradePlansModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
         },
+        // שורה שנייה: צד + סוג השקעה
         {
             type: 'select',
             id: 'tradePlanSide',
@@ -47,8 +48,20 @@ const tradePlansModalConfig = {
             ],
             defaultValue: 'long',
             rowClass: 'row',
-            colClass: 'col-md-3 col-sm-12',
+            colClass: 'col-md-6 col-sm-12',
             description: 'בחירת צד הפעולה המתוכננת'
+        },
+        {
+            type: 'select',
+            id: 'tradePlanAccount',
+            label: 'חשבון מסחר',
+            fieldName: 'trading_account_id',
+            required: true,
+            options: [],
+            placeholder: 'בחר חשבון מסחר...',
+            defaultFromPreferences: true,
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
         },
         {
             type: 'select',
@@ -63,8 +76,9 @@ const tradePlansModalConfig = {
             ],
             defaultValue: 'swing',
             rowClass: 'row',
-            colClass: 'col-md-3 col-sm-12'
+            colClass: 'col-md-6 col-sm-12'
         },
+        // שורה שלישית: סוג השקעה + סטטוס
         {
             type: 'select',
             id: 'tradePlanStatus',
@@ -77,19 +91,20 @@ const tradePlansModalConfig = {
             ],
             defaultValue: 'open',
             rowClass: 'row',
-            colClass: 'col-md-3 col-sm-12'
+            colClass: 'col-md-6 col-sm-12'
         },
-        // שורה שנייה: מחיר כניסה + תאריך כניסה
+        // שורה רביעית: מחיר כניסה + תאריך כניסה
         {
             type: 'number',
             id: 'tradePlanEntryPrice',
             label: 'מחיר כניסה מתוכנן',
-            required: false,
+            required: true,
             min: 0.01,
             step: 0.01,
             placeholder: 'הכנס מחיר כניסה...',
             rowClass: 'row',
-            colClass: 'col-md-6'
+            colClass: 'col-md-6 col-sm-12',
+            description: 'מחיר הכניסה המתוכנן - מתעדכן אוטומטית לאחר בחירת טיקר'
         },
         {
             type: 'datetime-local',
@@ -97,20 +112,8 @@ const tradePlansModalConfig = {
             label: 'תאריך כניסה מתוכנן',
             required: false,
             description: 'ברירת מחדל: היום',
-            colClass: 'col-md-6'
-        },
-        // שורה שלישית: כמות + סכום השקעה
-        {
-            type: 'number',
-            id: 'planAmount',
-            label: 'סכום השקעה מתוכנן ($)',
-            required: true,
-            min: 0.01,
-            step: 0.01,
-            placeholder: 'הכנס סכום השקעה...',
             rowClass: 'row',
-            colClass: 'col-md-6',
-            description: 'הסכום הכולל להשקעה בתכנון'
+            colClass: 'col-md-6 col-sm-12'
         },
         {
             type: 'number',
@@ -120,9 +123,23 @@ const tradePlansModalConfig = {
             min: 1,
             step: 0.1,
             placeholder: 'הכנס כמות...',
-            colClass: 'col-md-6'
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
         },
-        // שורה רביעית: סטופ + יעד
+        {
+            type: 'number',
+            id: 'planAmount',
+            label: 'סכום השקעה מתוכנן ($)',
+            required: true,
+            min: 0.01,
+            step: 0.01,
+            placeholder: 'הכנס סכום השקעה...',
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12',
+            description: 'הסכום הכולל להשקעה בתכנון'
+        },
+        // שורה חמישית: Stop Loss + Take Profit
+        // שורה שישית: Stop Loss + Take Profit
         {
             type: 'number',
             id: 'tradePlanStopLoss',
@@ -132,7 +149,7 @@ const tradePlansModalConfig = {
             step: 0.01,
             placeholder: 'הכנס מחיר Stop Loss...',
             rowClass: 'row',
-            colClass: 'col-md-6',
+            colClass: 'col-md-6 col-sm-12',
             labelStyle: 'color: var(--numeric-negative-medium);'
         },
         {
@@ -144,7 +161,7 @@ const tradePlansModalConfig = {
             step: 0.01,
             placeholder: 'הכנס מחיר Take Profit...',
             rowClass: 'row',
-            colClass: 'col-md-6',
+            colClass: 'col-md-6 col-sm-12',
             labelStyle: 'color: var(--numeric-positive-medium);'
         },
         {
@@ -156,7 +173,7 @@ const tradePlansModalConfig = {
             step: 0.01,
             placeholder: 'אחוז סטופ מתוכנן...',
             rowClass: 'row',
-            colClass: 'col-md-6',
+            colClass: 'col-md-6 col-sm-12',
             labelStyle: 'color: var(--numeric-negative-medium);',
             description: 'אחוז סטופ ביחס למחיר הכניסה'
         },
@@ -169,7 +186,7 @@ const tradePlansModalConfig = {
             step: 0.01,
             placeholder: 'אחוז יעד מתוכנן...',
             rowClass: 'row',
-            colClass: 'col-md-6',
+            colClass: 'col-md-6 col-sm-12',
             labelStyle: 'color: var(--numeric-positive-medium);',
             description: 'אחוז יעד ביחס למחיר הכניסה'
         },

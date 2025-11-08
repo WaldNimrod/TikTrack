@@ -110,6 +110,7 @@ class ModalNavigationManager {
          * @private
          */
         this.globalBackdrop = null;
+        this.handleBackdropClickBound = this.handleBackdropClick.bind(this);
         
         /**
          * סטטוס אתחול
@@ -1398,6 +1399,7 @@ class ModalNavigationManager {
                 this.globalBackdrop = document.createElement('div');
                 this.globalBackdrop.id = 'globalModalBackdrop';
                 this.globalBackdrop.className = 'modal-backdrop fade show global-modal-backdrop';
+                this.globalBackdrop.addEventListener('click', this.handleBackdropClickBound, { passive: true });
                 document.body.appendChild(this.globalBackdrop);
             }
             
@@ -1428,6 +1430,7 @@ class ModalNavigationManager {
         try {
             // הסרת ה-backdrop הגלובלי שלנו
             if (this.globalBackdrop) {
+                this.globalBackdrop.removeEventListener('click', this.handleBackdropClickBound);
                 this.globalBackdrop.remove();
                 this.globalBackdrop = null;
             }
@@ -1478,6 +1481,53 @@ class ModalNavigationManager {
         } catch (error) {
             if (window.Logger) {
                 window.Logger.error('❌ Error removing global backdrop:', error, { page: "modal-navigation-manager" });
+            }
+        }
+    }
+
+    /**
+     * Handle backdrop click - סגירת המודול העליון בלחיצה על הרקע
+     * 
+     * @param {MouseEvent} event - אירוע הלחיצה
+     * @private
+     */
+    handleBackdropClick(event) {
+        try {
+            if (!event || event.target !== this.globalBackdrop) {
+                return;
+            }
+
+            // איתור המודול העליון בתור ההיסטוריה או ברשימת המודולים הפתוחים בפועל
+            const currentModal = this.getCurrentModal();
+            let modalElement = currentModal?.element || null;
+
+            if (!modalElement) {
+                const openModals = Array.from(document.querySelectorAll('.modal.show'));
+                if (openModals.length > 0) {
+                    modalElement = openModals.reduce((topModal, modal) => {
+                        const modalZ = parseInt(window.getComputedStyle(modal).zIndex || '0', 10);
+                        const topZ = topModal ? parseInt(window.getComputedStyle(topModal).zIndex || '0', 10) : -Infinity;
+                        return modalZ >= topZ ? modal : topModal;
+                    }, null);
+                }
+            }
+
+            if (!modalElement) {
+                return;
+            }
+
+            if (window.Logger) {
+                window.Logger.info('🖱️ [ModalNavigationManager] Backdrop clicked - closing top modal', {
+                    modalId: modalElement.id || 'unknown',
+                    page: 'modal-navigation-manager'
+                });
+            }
+
+            const bsModal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+            bsModal.hide();
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('❌ Error handling backdrop click:', error, { page: 'modal-navigation-manager' });
             }
         }
     }

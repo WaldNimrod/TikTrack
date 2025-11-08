@@ -882,6 +882,7 @@ class EntityDetailsRenderer {
      * @public
      */
     renderTrade(tradeData, options = {}) {
+        try {
         const entityColor = this.entityColors.trade || '#007bff';
         
         // סטטוס - שימוש במערכת הרינדור הכללית
@@ -1011,10 +1012,661 @@ class EntityDetailsRenderer {
                         })()}
                     </div>
                 </div>
+            </div>
+        `;
+        } catch (error) {
+            window.Logger?.error('Error in renderTrade:', error, { page: "entity-details-renderer" });
+            return this.renderError(`שגיאה ברנדור טרייד: ${error.message || error}`);
+        }
+    }
+
+    /**
+     * Render trade specific information - רנדור מידע ספציפי לטרייד
+     *
+     * @param {Object} tradeData - נתוני טרייד
+     * @param {string} tradeColor - צבע הטרייד
+     * @returns {string} - HTML מרונדר
+     * @private
+     */
+    renderTradeSpecific(tradeData, tradeColor = null) {
+        try {
+            const color = tradeColor || this.entityColors.trade || '#007bff';
+            const FieldRenderer = window.FieldRendererService || null;
+        
+        // Trade Plan Link
+        const tradePlanId = tradeData.trade_plan_id || null;
+        const tradePlanSymbol = tradeData.trade_plan_ticker_symbol ||
+                               (tradeData.trade_plan && tradeData.trade_plan.ticker_symbol) ||
+                               '';
+        
+        // חישוב תכנון (מ-trade_plan)
+        let plannedQuantity = 0;
+        let plannedAmount = 0;
+        let plannedEntryPrice = 0;
+        if (tradeData.trade_plan) {
+            const plan = tradeData.trade_plan;
+            plannedAmount = plan.planned_amount || 0;
+            const targetPrice = plan.target_price || 0;
+            if (targetPrice > 0) {
+                plannedQuantity = plannedAmount / targetPrice;
+                // מחיר כניסה מתוכנן = מחיר יעד (או מחיר נוכחי אם יש)
+                plannedEntryPrice = targetPrice;
+            }
+            // אם אין target_price, ננסה לחשב מ-plannedQuantity אם יש
+            if (plannedEntryPrice === 0 && plannedQuantity > 0) {
+                plannedEntryPrice = plannedAmount / plannedQuantity;
+            }
+        }
+        
+        // חישוב פוזיציה - שימוש במערכת החישוב הקיימת מה-backend
+        let positionQuantity = 0;
+        let positionAmount = 0;
+        let positionAveragePrice = 0;
+        let positionMarketValue = 0;
+        let positionPercentOfAccount = 0;
+        
+        // חישוב P/L
+        let realizedPL = 0;
+        let unrealizedPL = 0;
+        let mtmPL = 0;
+        
+        // חישוב קניות ומכירות
+        let totalBoughtQuantity = 0;
+        let totalBoughtAmount = 0;
+        let totalBoughtAverage = 0;
+        let totalSoldQuantity = 0;
+        let totalSoldAmount = 0;
+        let totalSoldAverage = 0;
+        
+        // מחיר נוכחי של הטיקר
+        const currentPrice = tradeData.ticker?.current_price || 
+                           tradeData.ticker?.price || 
+                           0;
+        
+        // קבלת executions לחישובים
+        const executions = (tradeData.linked_items || []).filter(item => item.type === 'execution');
+        
+        // אם יש נתוני פוזיציה מה-backend (מחושבים ב-PositionCalculatorService)
+        if (tradeData.position) {
+            positionQuantity = tradeData.position.quantity || 0;
+            positionAveragePrice = tradeData.position.average_price || 0;
+            
+            // total_cost זה רק קניות כולל עמלות, אבל אנחנו רוצים סכום נטו
+            // נחשב סכום נטו: קניות - מכירות (אם יש מכירות)
+            const totalCost = tradeData.position.total_cost || 0;
+            totalBoughtQuantity = tradeData.position.total_bought || 0;
+            totalSoldQuantity = tradeData.position.total_sold || 0;
+            
+            // חישוב קניות
+            if (totalBoughtQuantity > 0) {
+                totalBoughtAmount = totalCost;
+                totalBoughtAverage = totalCost / totalBoughtQuantity;
+            }
+            
+            // חישוב מכירות
+            if (totalSoldQuantity > 0) {
+                let soldAmount = 0;
+                executions.forEach(exec => {
+                    const action = exec.action || '';
+                    if (action === 'sell' || action === 'sale') {
+                        const quantity = parseFloat(exec.quantity || 0);
+                        const price = parseFloat(exec.price || 0);
+                        const fee = parseFloat(exec.fee || 0);
+                        soldAmount += (quantity * price) - fee;
+                    }
+                });
+                totalSoldAmount = soldAmount;
+                totalSoldAverage = soldAmount / totalSoldQuantity;
+            }
+            
+            positionAmount = totalBoughtAmount - totalSoldAmount;
+            
+            // חישוב גודל פוזיציה (market value) = כמות * מחיר נוכחי
+            if (positionQuantity !== 0 && currentPrice > 0) {
+                positionMarketValue = Math.abs(positionQuantity) * currentPrice;
+            }
+        } 
+        // Fallback: חישוב ידני מ-executions ב-linked_items (אם אין נתונים מה-backend)
+        else {
+            if (executions.length > 0) {
+                let totalCost = 0;
+                
+                executions.forEach(exec => {
+                    const quantity = parseFloat(exec.quantity || 0);
+                    const price = parseFloat(exec.price || 0);
+                    const fee = parseFloat(exec.fee || 0);
+                    const action = exec.action || '';
+                    
+                    if (action === 'buy') {
+                        totalBoughtQuantity += quantity;
+                        totalBoughtAmount += (quantity * price) + fee;
+                        totalCost += (quantity * price) + fee;
+                    } else if (action === 'sell' || action === 'sale') {
+                        totalSoldQuantity += quantity;
+                        totalSoldAmount += (quantity * price) - fee;
+                    }
+                });
+                
+                positionQuantity = totalBoughtQuantity - totalSoldQuantity;
+                positionAmount = totalBoughtAmount - totalSoldAmount;
+                
+                // חישוב מחיר ממוצע
+                if (totalBoughtQuantity > 0) {
+                    positionAveragePrice = totalCost / totalBoughtQuantity;
+                    totalBoughtAverage = totalCost / totalBoughtQuantity;
+                }
+                
+                // חישוב מחיר ממוצע מכירות
+                if (totalSoldQuantity > 0) {
+                    totalSoldAverage = totalSoldAmount / totalSoldQuantity;
+                }
+                
+                // חישוב גודל פוזיציה
+                if (positionQuantity !== 0 && currentPrice > 0) {
+                    positionMarketValue = Math.abs(positionQuantity) * currentPrice;
+                }
+            }
+        }
+        
+        // חישוב Realized P/L, Unrealized P/L, MTM P/L מ-executions
+        // רק מ-executions שיש להם נתונים מפורשים - אין fallback או דמה!
+        let hasRealizedPLData = false;
+        let hasMTMData = false;
+        
+        executions.forEach(exec => {
+            const action = exec.action || '';
+            
+            // Realized P/L - רק מ-sell executions (רק אם יש נתון מפורש)
+            if ((action === 'sell' || action === 'sale') && exec.realized_pl !== null && exec.realized_pl !== undefined) {
+                realizedPL += parseFloat(exec.realized_pl || 0);
+                hasRealizedPLData = true;
+            }
+            
+            // MTM P/L - מכל ה-executions (רק אם יש נתון מפורש)
+            if (exec.mtm_pl !== null && exec.mtm_pl !== undefined) {
+                mtmPL += parseFloat(exec.mtm_pl || 0);
+                hasMTMData = true;
+            }
+        });
+        
+        // חישוב Unrealized P/L = (מחיר נוכחי - מחיר ממוצע) * כמות נוכחית
+        // רק אם יש מחיר נוכחי ומחיר ממוצע תקינים
+        let unrealizedPLCalculated = false;
+        if (positionQuantity !== 0 && currentPrice > 0 && positionAveragePrice > 0) {
+            unrealizedPL = (currentPrice - positionAveragePrice) * positionQuantity;
+            unrealizedPLCalculated = true;
+        }
+        
+        // בדיקה: אם אין מכירות, Unrealized P/L צריך להיות שווה ל-Total P/L
+        const hasSales = totalSoldQuantity > 0;
+        const hasValidTotalPL = tradeData.total_pl !== null && tradeData.total_pl !== undefined;
+        const totalPLValue = hasValidTotalPL ? parseFloat(tradeData.total_pl || 0) : null;
+        
+        // אם אין מכירות ויש Unrealized P/L מחושב, Total P/L צריך להיות שווה לו
+        if (!hasSales && unrealizedPLCalculated) {
+            // אם Total P/L מה-backend שונה משמעותית מ-Unrealized P/L, נשתמש ב-Unrealized P/L המחושב
+            if (hasValidTotalPL) {
+                const diff = Math.abs(totalPLValue - unrealizedPL);
+                // אם ההפרש גדול מ-0.01, נשתמש ב-Unrealized P/L המחושב (יותר מדויק)
+                if (diff > 0.01) {
+                    // Total P/L מה-backend לא תואם - נשתמש ב-Unrealized P/L המחושב
+                    // Total P/L יעודכן להיות שווה ל-Unrealized P/L
+                }
+            }
+        }
+        
+        // חישוב אחוזים עבור כל סוגי P/L
+        let realizedPLPercent = null;
+        let unrealizedPLPercent = null;
+        let mtmPLPercent = null;
+        let totalPLPercent = null;
+        
+        // Realized P/L אחוז - יחסית למחיר הממוצע של הקניות שנמכרו
+        // השלם: סכום הקניות שנמכרו (מחיר ממוצע קניות * כמות שנמכרה)
+        if (hasSales && hasRealizedPLData && totalBoughtAverage > 0 && totalSoldQuantity > 0) {
+            // חישוב: רווח/הפסד מוכר / (מחיר ממוצע קניות * כמות שנמכרה) * 100
+            const soldCostBasis = totalBoughtAverage * totalSoldQuantity;
+            if (soldCostBasis > 0) {
+                realizedPLPercent = (realizedPL / soldCostBasis) * 100;
+            }
+        }
+        
+        // Unrealized P/L אחוז - יחסית למחיר הממוצע של הפוזיציה
+        if (unrealizedPLCalculated && positionAveragePrice > 0) {
+            unrealizedPLPercent = ((currentPrice - positionAveragePrice) / positionAveragePrice) * 100;
+        }
+        
+        // MTM P/L אחוז - יחסית למחיר הממוצע של הפוזיציה
+        if (hasMTMData && positionAveragePrice > 0 && positionQuantity !== 0) {
+            const mtmPLPerShare = mtmPL / Math.abs(positionQuantity);
+            mtmPLPercent = (mtmPLPerShare / positionAveragePrice) * 100;
+        }
+        
+        // חישוב Total P/L - לוגיקה נכונה:
+        // אם אין מכירות: Total P/L = Unrealized P/L
+        // אם יש מכירות: Total P/L = Realized P/L + Unrealized P/L
+        let calculatedTotalPL = null;
+        let totalPLDisplay = null;
+        let totalPLMessage = null;
+        
+        if (!hasSales) {
+            // אין מכירות - Total P/L צריך להיות שווה ל-Unrealized P/L
+            if (unrealizedPLCalculated) {
+                calculatedTotalPL = unrealizedPL;
+                totalPLPercent = unrealizedPLPercent;
+            } else {
+                // אין מחיר נוכחי - לא ניתן לחשב Unrealized P/L
+                calculatedTotalPL = null;
+                totalPLMessage = 'לא ניתן לחשב - חסר מחיר נוכחי';
+            }
+        } else {
+            // יש מכירות - Total P/L = Realized P/L + Unrealized P/L
+            calculatedTotalPL = realizedPL + unrealizedPL;
+            
+            // חישוב אחוז Total P/L - יחסית לסכום ההשקעה הכולל
+            const totalInvestment = totalBoughtAmount;
+            if (totalInvestment > 0) {
+                totalPLPercent = (calculatedTotalPL / totalInvestment) * 100;
+            } else if (positionAveragePrice > 0 && positionQuantity !== 0) {
+                // Fallback: יחסית למחיר הממוצע
+                const totalCost = positionAveragePrice * Math.abs(positionQuantity);
+                if (totalCost > 0) {
+                    totalPLPercent = (calculatedTotalPL / totalCost) * 100;
+                }
+            }
+        }
+        
+        // פורמט Total P/L
+        if (calculatedTotalPL !== null) {
+            const totalPLFormatted = FieldRenderer?.renderAmount
+                ? FieldRenderer.renderAmount(calculatedTotalPL, '$', 2, true)
+                : (window.colorAmountByValue
+                    ? window.colorAmountByValue(calculatedTotalPL, `$${calculatedTotalPL.toFixed(2)}`)
+                    : `$${calculatedTotalPL.toFixed(2)}`);
+            
+            // הוספת אחוז אם יש
+            if (totalPLPercent !== null) {
+                totalPLDisplay = `${totalPLFormatted} <span class="text-muted">(${totalPLPercent >= 0 ? '+' : ''}${totalPLPercent.toFixed(2)}%)</span>`;
+            } else {
+                totalPLDisplay = totalPLFormatted;
+            }
+        } else {
+            totalPLDisplay = totalPLMessage || '<span class="text-muted">חסר נתונים</span>';
+        }
+        
+        // חישוב אחוז מהחשבון - שימוש בנתונים מה-backend
+        let accountTotalValue = tradeData.account_total_value || 0;
+        
+        // חישוב אחוז מהחשבון עבור פוזיציה בפועל
+        if (accountTotalValue > 0 && positionMarketValue > 0) {
+            positionPercentOfAccount = (positionMarketValue / accountTotalValue) * 100;
+        }
+        
+        // חישוב אחוז מהחשבון עבור תכנון
+        let plannedPercentOfAccount = 0;
+        if (accountTotalValue > 0 && plannedAmount > 0) {
+            plannedPercentOfAccount = (plannedAmount / accountTotalValue) * 100;
+        }
+        
+        // פורמט כמות - ספרה אחת אחרי הנקודה
+        const formatQuantity = (qty) => {
+            if (qty === 0 || !qty) return '-';
+            // עיגול לספרה אחת אחרי הנקודה
+            const roundedQty = parseFloat((Math.round(qty * 10) / 10).toFixed(1));
+            // פורמט עם ספרה אחת אחרי הנקודה
+            const formattedQty = roundedQty.toLocaleString('en-US', { maximumFractionDigits: 1, minimumFractionDigits: 0 });
+            // אם renderShares קיים, נשתמש בו אבל נחליף את המספר בפורמט הנכון
+            if (FieldRenderer?.renderShares) {
+                const sharesHtml = FieldRenderer.renderShares(roundedQty);
+                // החלפת המספר בפורמט הנכון (עם ספרה אחת אחרי הנקודה)
+                return sharesHtml.replace(/#[\d,]+\.?[\d]*/, `#${formattedQty}`);
+            } else if (window.renderShares) {
+                const sharesHtml = window.renderShares(roundedQty);
+                return sharesHtml.replace(/#[\d,]+\.?[\d]*/, `#${formattedQty}`);
+            } else {
+                return formattedQty;
+            }
+        };
+        
+        // פורמט סכום
+        const formatAmount = (amt) => {
+            if (amt === 0 || !amt) return '-';
+            return FieldRenderer?.renderAmount
+                ? FieldRenderer.renderAmount(amt, '$', 2, false)
+                : (window.renderAmount
+                    ? window.renderAmount(amt, '$', 2, false)
+                    : `$${amt.toFixed(2)}`);
+        };
+        
+        // פונקציה עזר לפורמט P/L עם אחוזים
+        const formatPLWithPercent = (plValue, plPercent, hasData) => {
+            if (!hasData) return formatAmount(plValue || 0);
+            if (plValue === null || plValue === undefined) return formatAmount(0);
+            
+            const plFormatted = formatAmount(plValue);
+            if (plPercent !== null && plPercent !== undefined && !isNaN(plPercent)) {
+                return `${plFormatted} <span class="text-muted">(${plPercent >= 0 ? '+' : ''}${plPercent.toFixed(2)}%)</span>`;
+            }
+            return plFormatted;
+        };
+        
+        // פורמט מחיר ממוצע
+        const formatAveragePrice = (price) => {
+            if (price === 0 || !price) return '-';
+            return FieldRenderer?.renderAmount
+                ? FieldRenderer.renderAmount(price, '$', 2, false)
+                : (window.renderAmount
+                    ? window.renderAmount(price, '$', 2, false)
+                    : `$${price.toFixed(2)}`);
+        };
+        
+        // פורמט אחוז
+        const formatPercent = (percent) => {
+            if (percent === 0 || !percent) return '-';
+            return `${percent.toFixed(2)}%`;
+        };
+        
+        return `
+            <div class="trade-specific">
+                <h6 class="border-bottom pb-2 mb-3">פרטי טרייד</h6>
+                
+                <div class="mb-3">
+                    <table class="table table-sm" style="border: none;">
+                        <thead>
+                            <tr>
+                                <th style="width: 33%; border: none; padding: 8px;"></th>
+                                <th style="width: 33%; border: none; padding: 8px;">תכנון</th>
+                                <th style="width: 34%; border: none; padding: 8px;">פוזיציה</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: none; padding: 8px;"><strong>כמות:</strong></td>
+                                <td style="border: none; padding: 8px;">${formatQuantity(plannedQuantity)}</td>
+                                <td style="border: none; padding: 8px;">${formatQuantity(positionQuantity)}</td>
+                            </tr>
+                            <tr>
+                                <td style="border: none; padding: 8px;"><strong>סכום:</strong></td>
+                                <td style="border: none; padding: 8px;">${formatAmount(plannedAmount)}</td>
+                                <td style="border: none; padding: 8px;">${formatAmount(positionMarketValue)}</td>
+                            </tr>
+                            <tr>
+                                <td style="border: none; padding: 8px;"><strong>אחוז מהחשבון:</strong></td>
+                                <td style="border: none; padding: 8px;">${plannedPercentOfAccount > 0 ? formatPercent(plannedPercentOfAccount) : '-'}</td>
+                                <td style="border: none; padding: 8px;">${positionPercentOfAccount > 0 ? formatPercent(positionPercentOfAccount) : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="border: none; padding: 8px;"><strong>מחיר כניסה:</strong></td>
+                                <td style="border: none; padding: 8px;">${formatAveragePrice(plannedEntryPrice)}</td>
+                                <td style="border: none; padding: 8px;">${formatAveragePrice(positionAveragePrice)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-2 pt-2" style="border-top: 1px solid #e0e0e0;">
+                        <table class="table table-sm" style="border: none;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 33%; border: none; padding: 8px;"></th>
+                                    <th style="width: 33%; border: none; padding: 8px;">קניות</th>
+                                    <th style="width: 34%; border: none; padding: 8px;">מכירות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: none; padding: 8px;"><strong>כמות:</strong></td>
+                                    <td style="border: none; padding: 8px;" class="text-success">${formatQuantity(totalBoughtQuantity)}</td>
+                                    <td style="border: none; padding: 8px;" class="text-danger">${formatQuantity(totalSoldQuantity)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 8px;"><strong>סכום כולל:</strong></td>
+                                    <td style="border: none; padding: 8px;" class="text-success">${formatAmount(totalBoughtAmount)}</td>
+                                    <td style="border: none; padding: 8px;" class="text-danger">${formatAmount(totalSoldAmount)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 8px;"><strong>סכום ממוצע:</strong></td>
+                                    <td style="border: none; padding: 8px;" class="text-success">${formatAveragePrice(totalBoughtAverage)}</td>
+                                    <td style="border: none; padding: 8px;" class="text-danger">${formatAveragePrice(totalSoldAverage)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-2 pt-2" style="border-top: 1px solid #e0e0e0;">
+                        <div class="d-flex align-items-center mb-2">
+                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">Realized P/L:</label>
+                            <span>${hasSales ? (hasRealizedPLData ? formatPLWithPercent(realizedPL, realizedPLPercent, true) || formatAmount(realizedPL) : '<span class="text-muted">אין נתונים ב-executions</span>') : '<span class="text-muted">אין מכירות</span>'}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">Unrealized P/L:</label>
+                            <span>${unrealizedPLCalculated ? formatPLWithPercent(unrealizedPL, unrealizedPLPercent, true) || formatAmount(unrealizedPL) : '<span class="text-muted">חסר מחיר נוכחי</span>'}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">MTM P/L:</label>
+                            <span>${hasMTMData ? formatPLWithPercent(mtmPL, mtmPLPercent, true) || formatAmount(mtmPL) : '<span class="text-muted">אין נתונים</span>'}</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">Total P/L:</label>
+                            <span>${totalPLDisplay}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        } catch (error) {
+            window.Logger?.error('Error in renderTradeSpecific:', error, { page: "entity-details-renderer" });
+            return `<div class="trade-specific">
+                <h6 class="border-bottom pb-2 mb-3">פרטי טרייד</h6>
+                <div class="alert alert-danger">
+                    שגיאה ברנדור: ${error.message || error}
+                </div>
+            </div>`;
+        }
+    }
+
+    /**
+     * Render trade plan details - רנדור פרטי תכנית מסחר
+     *
+     * @param {Object} tradePlanData - נתוני תכנית המסחר
+     * @param {Object} options - אפשרויות רנדור
+     * @returns {string} - HTML מרונדר של התכנית
+     * @public
+     */
+    renderTradePlan(tradePlanData, options = {}) {
+        if (!tradePlanData) {
+            return this.renderError('לא נמצאו נתוני תכנית מסחר להצגה');
+        }
+
+        const FieldRenderer = window.FieldRendererService || null;
+        const entityColor = this.entityColors.trade_plan || this.entityColors.trade || '#26baac';
+
+        const tickerSymbol = tradePlanData.ticker_symbol ||
+            tradePlanData.ticker?.symbol ||
+            (tradePlanData.ticker_id ? `טיקר #${tradePlanData.ticker_id}` : 'לא זמין');
+
+        let tickerInfoHTML = '';
+        if (tradePlanData.ticker && FieldRenderer?.renderTickerInfo) {
+            const tickerData = {
+                symbol: tradePlanData.ticker.symbol || tickerSymbol,
+                name: tradePlanData.ticker.name || '',
+                current_price: tradePlanData.ticker.current_price || 0,
+                daily_change: tradePlanData.ticker.daily_change || tradePlanData.ticker.change_amount || 0,
+                daily_change_percent: tradePlanData.ticker.daily_change_percent || tradePlanData.ticker.change_percent || 0,
+                volume: tradePlanData.ticker.volume || 0,
+                currency_symbol: tradePlanData.ticker.currency_symbol || tradePlanData.currency_symbol || '$'
+            };
+
+            if (tickerData.current_price > 0 || tickerData.daily_change !== 0 || tickerData.volume > 0) {
+                tickerInfoHTML = FieldRenderer.renderTickerInfo(tickerData, 'mb-2');
+            }
+        }
+
+        const statusDisplay = FieldRenderer?.renderStatus
+            ? FieldRenderer.renderStatus(tradePlanData.status, 'trade_plan')
+            : (tradePlanData.status || 'לא זמין');
+
+        return `
+            <div class="entity-details-container trade-plan-details">
+                <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom: 1px solid #e0e0e0; padding-bottom: 0.75rem;">
+                    <div class="d-flex align-items-center gap-2" style="min-width: 120px;">
+                        <strong>טיקר:</strong>
+                        <span class="fw-bold">${tickerSymbol}</span>
+                    </div>
+                    <div class="flex-grow-1" style="text-align: center;">
+                        ${tickerInfoHTML || ''}
+                    </div>
+                    <div class="d-flex align-items-center gap-3" style="min-width: 200px; justify-content: flex-end;">
+                        ${statusDisplay ? `<span class="d-inline-flex align-items-center gap-2"><strong>סטטוס:</strong> ${statusDisplay}</span>` : ''}
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        ${this.renderBasicInfo(tradePlanData, 'trade_plan')}
+                    </div>
+                    <div class="col-md-6">
+                        ${this.renderTradePlanSpecific(tradePlanData, entityColor)}
+                    </div>
+                </div>
                 
                 <div class="row g-3 mt-4">
                     <div class="col-12">
-                        ${this.renderActionButtons('trade', tradeData.id, tradeData, options?.sourceInfo || null)}
+                        ${this.renderLinkedItems(tradePlanData.linked_items || [], this.entityColors.trade_plan || entityColor, 'trade_plan', tradePlanData.id, options?.sourceInfo || null, options)}
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-4">
+                    <div class="col-12">
+                        ${this.renderActionButtons('trade_plan', tradePlanData.id, tradePlanData, options?.sourceInfo || null)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render specific trade plan info - רנדור מידע ייעודי לתכנית מסחר
+     *
+     * @param {Object} tradePlanData - נתוני תכנית המסחר
+     * @param {string} entityColor - צבע הישות
+     * @returns {string} - HTML מרונדר
+     * @private
+     */
+    renderTradePlanSpecific(tradePlanData, entityColor = '#26baac') {
+        const FieldRenderer = window.FieldRendererService || null;
+        const currencySymbol = tradePlanData.currency_symbol ||
+            tradePlanData.account_currency_symbol ||
+            tradePlanData.trading_account?.currency_symbol ||
+            '$';
+
+        const renderAmount = (value, decimals = 2) => {
+            if (FieldRenderer?.renderAmount) {
+                return FieldRenderer.renderAmount(value || 0, currencySymbol, decimals, false);
+            }
+            const num = Number(value || 0);
+            return `<span dir="ltr">${currencySymbol}${num.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</span>`;
+        };
+
+        const renderPercent = (value) => {
+            if (FieldRenderer?.renderNumericValue) {
+                return FieldRenderer.renderNumericValue(value || 0, '%', true);
+            }
+            if (value === null || value === undefined || Number.isNaN(Number(value))) {
+                return '<span class="numeric-value-zero">-</span>';
+            }
+            const num = Number(value);
+            const sign = num > 0 ? '+' : (num < 0 ? '-' : '');
+            const cssClass = num > 0 ? 'numeric-value-positive' : (num < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+            return `<span class="${cssClass}" dir="ltr">${sign}${Math.abs(num).toFixed(2)}%</span>`;
+        };
+
+        const renderQuantity = (value) => {
+            if (FieldRenderer?.renderNumericValue) {
+                return FieldRenderer.renderNumericValue(value || 0, '', true);
+            }
+            if (value === null || value === undefined || Number.isNaN(Number(value))) {
+                return '<span class="numeric-value-zero">-</span>';
+            }
+            const num = Number(value);
+            const sign = num > 0 ? '+' : (num < 0 ? '-' : '');
+            const cssClass = num > 0 ? 'numeric-value-positive' : (num < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+            return `<span class="${cssClass}" dir="ltr">${sign}${Math.abs(num).toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>`;
+        };
+
+        // Calculate stop_price and target_price if not provided but percentages exist
+        const entryPrice = Number(tradePlanData.entry_price || 0);
+        let stopPrice = tradePlanData.stop_price || null;
+        let targetPrice = tradePlanData.target_price || null;
+        
+        if (!stopPrice && entryPrice > 0 && tradePlanData.stop_percentage) {
+            // Calculate stop_price from entry_price and stop_percentage
+            const stopPercent = Number(tradePlanData.stop_percentage) / 100;
+            const side = tradePlanData.side?.toLowerCase() || 'long';
+            if (side === 'long') {
+                stopPrice = entryPrice * (1 - stopPercent);
+            } else {
+                stopPrice = entryPrice * (1 + stopPercent);
+            }
+        }
+        
+        if (!targetPrice && entryPrice > 0 && tradePlanData.target_percentage) {
+            // Calculate target_price from entry_price and target_percentage
+            const targetPercent = Number(tradePlanData.target_percentage) / 100;
+            const side = tradePlanData.side?.toLowerCase() || 'long';
+            if (side === 'long') {
+                targetPrice = entryPrice * (1 + targetPercent);
+            } else {
+                targetPrice = entryPrice * (1 - targetPercent);
+            }
+        }
+
+        // Render Stop Loss with percentage and amount in one line (negative color)
+        const renderStopLossCombined = () => {
+            if (!stopPrice && !tradePlanData.stop_percentage) {
+                return '<span class="text-muted">לא הוגדר</span>';
+            }
+            // Render amount with negative color
+            const amountValue = stopPrice ? Number(stopPrice) : 0;
+            const amountHtml = stopPrice 
+                ? `<span class="numeric-value-negative" dir="ltr">${currencySymbol}${Math.abs(amountValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`
+                : '<span class="text-muted">-</span>';
+            // Render percentage with negative color (always negative for stop loss)
+            let percentHtml = '<span class="text-muted">-</span>';
+            if (tradePlanData.stop_percentage) {
+                const stopPercent = Number(tradePlanData.stop_percentage);
+                percentHtml = `<span class="numeric-value-negative" dir="ltr">-${Math.abs(stopPercent).toFixed(2)}%</span>`;
+            }
+            return `<span dir="ltr">${amountHtml} ${percentHtml}</span>`;
+        };
+
+        // Render Take Profit with percentage and amount in one line (positive color)
+        const renderTakeProfitCombined = () => {
+            if (!targetPrice && !tradePlanData.target_percentage) {
+                return '<span class="text-muted">לא הוגדר</span>';
+            }
+            // Render amount with positive color
+            const amountValue = targetPrice ? Number(targetPrice) : 0;
+            const amountHtml = targetPrice 
+                ? `<span class="numeric-value-positive" dir="ltr">${currencySymbol}${Math.abs(amountValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`
+                : '<span class="text-muted">-</span>';
+            // Render percentage with positive color
+            const percentHtml = tradePlanData.target_percentage ? renderPercent(tradePlanData.target_percentage) : '<span class="text-muted">-</span>';
+            return `<span dir="ltr">${amountHtml} ${percentHtml}</span>`;
+        };
+
+        return `
+            <div class="trade-plan-specific">
+                <h6 class="border-bottom pb-2 mb-3" style="border-color: ${entityColor} !important;">פרטי תכנון</h6>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">מחיר כניסה מתוכנן</span>
+                        <span>${tradePlanData.entry_price ? renderAmount(tradePlanData.entry_price, 2) : '<span class="text-muted">לא הוגדר</span>'}</span>
+                    </div>
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Stop Loss</span>
+                        ${renderStopLossCombined()}
+                    </div>
+                    <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Take Profit</span>
+                        ${renderTakeProfitCombined()}
                     </div>
                 </div>
             </div>
@@ -1438,6 +2090,15 @@ class EntityDetailsRenderer {
     renderLinkedItems(linkedItems = [], entityColor = '#6c757d', parentEntityType = 'entity', parentEntityId = '0', sourceInfo = null, options = {}) {
         try {
             const items = Array.isArray(linkedItems) ? linkedItems.filter(Boolean) : [];
+            window.Logger?.info('🔍 [renderLinkedItems] Starting render', { 
+                itemsCount: items.length, 
+                parentEntityType, 
+                parentEntityId,
+                items: items.slice(0, 3), // Show first 3 items for debugging
+                itemsIsArray: Array.isArray(items),
+                itemsType: typeof items
+            }, { page: 'entity-details-renderer' });
+            
             console.log('🔍 [renderLinkedItems] Starting render', { 
                 itemsCount: items.length, 
                 parentEntityType, 
@@ -1590,6 +2251,18 @@ class EntityDetailsRenderer {
             const tbodyContent = tbodyIndex >= 0 && tbodyEndIndex > tbodyIndex 
                 ? html.substring(tbodyIndex + 7, tbodyEndIndex) 
                 : 'NOT FOUND';
+            window.Logger?.info('🔍 [renderLinkedItems] After creating HTML template', {
+                htmlLength: html.length,
+                tbodyFound: tbodyIndex >= 0,
+                tbodyContentLength: tbodyContent.length,
+                tbodyContentPreview: tbodyContent.substring(0, 200),
+                tbodyContentMatchesRowsHtml: tbodyContent.trim() === rowsHtml.trim(),
+                enrichedItemsCount: enrichedItems.length,
+                tableId: tableId,
+                hasTableInHTML: html.includes(`id="${tableId}"`),
+                htmlIncludesLinkedItemsTable: html.includes('linkedItemsTable_')
+            }, { page: 'entity-details-renderer' });
+            
             console.log('🔍 [renderLinkedItems] After creating HTML template', {
                 htmlLength: html.length,
                 tbodyFound: tbodyIndex >= 0,
@@ -4029,8 +4702,8 @@ class EntityDetailsRenderer {
                 <h6 class="border-bottom pb-2 mb-3" style="border-color: ${color} !important;">מידע בסיסי</h6>
         `;
         
-        // תאריך יצירה מוצג רק עבור ישויות שאינן ticker (עבור ticker הוא מועבר לעמודה השנייה)
-        if (entityType !== 'ticker' && entityType !== 'cash_flow') {
+        // תאריך יצירה מוצג רק עבור ישויות שאינן ticker או trade (עבור trade הוא מוצג אחרי סוג השקעה)
+        if (entityType !== 'ticker' && entityType !== 'cash_flow' && entityType !== 'trade' && entityType !== 'trade_plan') {
             html += `
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך יצירה:</label>
@@ -4208,6 +4881,92 @@ class EntityDetailsRenderer {
                     currency_object: entityData.currency
                 });
             }
+        } else if (entityType === 'trade_plan') {
+            const FieldRenderer = window.FieldRendererService || null;
+            const sideDisplay = FieldRenderer?.renderSide
+                ? FieldRenderer.renderSide(entityData.side)
+                : (entityData.side || 'לא זמין');
+
+            const investmentTypeDisplay = FieldRenderer?.renderType
+                ? FieldRenderer.renderType(entityData.investment_type || '')
+                : (entityData.investment_type || 'לא זמין');
+
+            const accountId = entityData.trading_account_id || entityData.account_id || entityData.account?.id || null;
+            const accountName = entityData.trading_account_name ||
+                entityData.account_name ||
+                entityData.account?.name ||
+                (accountId ? `חשבון #${accountId}` : null);
+
+            const accountDisplay = accountId
+                ? `<a href="#" onclick="window.showEntityDetails('trading_account', ${accountId}); return false;" class="entity-link" style="color: ${color};">${accountName || `חשבון #${accountId}`}</a>`
+                : (accountName ? `<span>${accountName}</span>` : null);
+
+            // Calculate quantity from planned_amount and entry_price
+            const plannedAmount = Number(entityData.planned_amount || 0);
+            const entryPrice = Number(entityData.entry_price || 0);
+            const calculatedQuantity = (entryPrice > 0 && plannedAmount > 0) ? plannedAmount / entryPrice : 0;
+            const quantity = (entityData.quantity && Number(entityData.quantity) > 0) ? Number(entityData.quantity) : calculatedQuantity;
+
+            // Render quantity and amount without positive/negative colors
+            const renderQuantityNeutral = (value) => {
+                if (value === null || value === undefined || Number.isNaN(Number(value)) || value === 0) {
+                    return '<span class="text-muted">לא הוגדר</span>';
+                }
+                const num = Number(value);
+                return `<span dir="ltr">${num.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>`;
+            };
+
+            const currencySymbol = entityData.currency_symbol ||
+                entityData.account_currency_symbol ||
+                entityData.trading_account?.currency_symbol ||
+                '$';
+
+            const renderAmountNeutral = (value, decimals = 2) => {
+                if (value === null || value === undefined || Number.isNaN(Number(value)) || value === 0) {
+                    return '<span class="text-muted">לא הוגדר</span>';
+                }
+                const num = Number(value || 0);
+                return `<span dir="ltr">${currencySymbol}${num.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</span>`;
+            };
+
+            html += `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">צד:</label>
+                    <span>${sideDisplay}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סוג השקעה:</label>
+                    <span>${investmentTypeDisplay}</span>
+                </div>
+
+                ${accountDisplay ? `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">חשבון מסחר:</label>
+                    ${accountDisplay}
+                </div>
+                ` : ''}
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך יצירה:</label>
+                    <span class="text-muted">${createdAt}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך כניסה:</label>
+                    <span class="text-muted">${this.formatDateTime(entityData.entry_date || entityData.created_at) || 'לא הוגדר'}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">כמות מתוכננת:</label>
+                    <span>${renderQuantityNeutral(quantity)}</span>
+                </div>
+
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סכום מתוכנן:</label>
+                    <span>${renderAmountNeutral(entityData.planned_amount, 2)}</span>
+                </div>
+            `;
         } else if (entityType === 'execution') {
             // טיקר - תמיכה ב-symbol (מ-to_dict) וגם ticker_symbol
             const tickerSymbol = entityData.ticker_symbol || 
@@ -4257,6 +5016,99 @@ class EntityDetailsRenderer {
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מחיר:</label>
                     <span class="fw-bold">${price}</span>
                 </div>
+            `;
+        } else if (entityType === 'trade') {
+            const FieldRenderer = window.FieldRendererService || null;
+            const color = this.entityColors.trade || '#007bff';
+            
+            // Side (Long/Short)
+            const sideDisplay = FieldRenderer?.renderSide
+                ? FieldRenderer.renderSide(entityData.side)
+                : (entityData.side || 'לא זמין');
+            
+            // Investment Type
+            const investmentTypeDisplay = FieldRenderer?.renderType
+                ? FieldRenderer.renderType(entityData.investment_type || '')
+                : (entityData.investment_type || 'לא זמין');
+            
+            // Trade Plan Link - לפני התאריכים
+            const tradePlanId = entityData.trade_plan_id || null;
+            const tradePlanSymbol = entityData.trade_plan_ticker_symbol ||
+                                   (entityData.trade_plan && entityData.trade_plan.ticker_symbol) ||
+                                   '';
+            
+            // Closed Date - מוצג אם יש תאריך סגירה
+            const closedAtDisplay = (entityData.closed_at && entityData.closed_at !== null && entityData.closed_at !== '')
+                ? this.formatDateTime(entityData.closed_at)
+                : null;
+            
+            // Cancelled Date - מוצג רק אם הטרייד בוטל ויש תאריך ביטול
+            const cancelledAtDisplay = (entityData.status === 'cancelled' && entityData.cancelled_at)
+                ? this.formatDateTime(entityData.cancelled_at)
+                : null;
+            
+            // Cancel Reason - מוצג רק אם הטרייד בוטל
+            const cancelReason = (entityData.status === 'cancelled' && entityData.cancel_reason) 
+                ? entityData.cancel_reason 
+                : null;
+            
+            // Notes
+            const notes = entityData.notes || null;
+            
+            html += `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">צד:</label>
+                    <span>${sideDisplay}</span>
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">סוג השקעה:</label>
+                    <span>${investmentTypeDisplay}</span>
+                </div>
+                
+                ${tradePlanId ? `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תכנית מסחר:</label>
+                    <span>
+                        <a href="#" onclick="window.showEntityDetails('trade_plan', ${tradePlanId}); return false;" class="entity-link" style="color: ${color};">
+                            תכנית #${tradePlanId}${tradePlanSymbol ? ` (${tradePlanSymbol})` : ''}
+                        </a>
+                    </span>
+                </div>
+                ` : ''}
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך יצירה:</label>
+                    <span class="text-muted">${createdAt}</span>
+                </div>
+                
+                ${closedAtDisplay ? `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך סגירה:</label>
+                    <span>${closedAtDisplay}</span>
+                </div>
+                ` : ''}
+                
+                ${cancelledAtDisplay ? `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך ביטול:</label>
+                    <span>${cancelledAtDisplay}</span>
+                </div>
+                ` : ''}
+                
+                ${cancelReason ? `
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1 d-block">סיבת ביטול:</label>
+                    <p class="mb-0">${FieldRenderer?.renderTextPreview ? FieldRenderer.renderTextPreview(cancelReason, { maxLength: 500 }) : cancelReason}</p>
+                </div>
+                ` : ''}
+                
+                ${notes ? `
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1 d-block">הערות:</label>
+                    <p class="mb-0">${FieldRenderer?.renderTextPreview ? FieldRenderer.renderTextPreview(notes, { maxLength: 500 }) : notes}</p>
+                </div>
+                ` : ''}
             `;
         }
         

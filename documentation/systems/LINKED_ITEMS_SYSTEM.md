@@ -1,8 +1,22 @@
 # Linked Items System Documentation
 
+**Version**: 2.0.0  
+**Architecture**: Configuration-Based Schema  
+**Last Updated**: 2025-11-08
+
 ## System Overview
 
 The Linked Items System is a core component of TikTrack that manages relationships between different entities (trades, accounts, tickers, alerts, etc.). It provides a unified interface for checking dependencies before performing critical operations like cancellation or deletion.
+
+### Architecture
+
+The system uses a **Configuration-Based Schema Architecture** that replaces the previous Strategy Pattern approach:
+
+- **Central Schema** (`entity_relationship_schema.py`) - Single source of truth for all relationships
+- **Generic Resolver** (`entity_relationship_resolver.py`) - Interprets schema and builds queries dynamically
+- **Service Layer** (`EntityDetailsService.get_linked_items()`) - Public API for accessing linked items
+
+See `documentation/developers/ENTITY_RELATIONSHIP_SCHEMA.md` for detailed schema documentation.
 
 ### Purpose and Role
 
@@ -128,9 +142,9 @@ The Linked Items System is a core component of TikTrack that manages relationshi
 | `trade_plan` | `/api/linked-items/trade_plan/{id}` | Investment plans |
 | `account` | `/api/linked-items/account/{id}` | Trading accounts |
 | `alert` | `/api/linked-items/alert/{id}` | Price alerts |
-| `execution` | `/api/linked-items/execution/{id}` | Trade executions |
+| `execution` | `/api/linked-items/execution/{id}` | Trade executions (always linked to trading_account and ticker, optionally to trade) |
 | `note` | `/api/linked-items/note/{id}` | Notes and comments |
-| `cash_flow` | `/api/linked-items/cash_flow/{id}` | Cash flow records |
+| `cash_flow` | `/api/linked-items/cash_flow/{id}` | Cash flow records (always linked to trading_account, optionally to trade and ticker via trade) |
 
 ## Integration Guide for Developers
 

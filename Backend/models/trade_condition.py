@@ -139,6 +139,3 @@ class TradeCondition(BaseModel):
 
 
 
-
-
-

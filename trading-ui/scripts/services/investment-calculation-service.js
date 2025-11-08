@@ -209,7 +209,6 @@
 
         const currencySymbol = options.currencySymbol || DEFAULT_OPTIONS.currencySymbol;
         const decimals = Number.isInteger(options.amountDecimals) ? options.amountDecimals : DEFAULT_OPTIONS.amountDecimals;
-
         const showPositiveSign = variant !== 'neutral';
 
         if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
@@ -223,7 +222,9 @@
         } else if (showPositiveSign && signedValue > 0) {
             sign = '+';
         }
-        const cssClass = signedValue > 0 ? 'numeric-value-positive' : (signedValue < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+        const cssClass = signedValue > 0
+            ? 'numeric-value-positive'
+            : (signedValue < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
         const display = sign ? `${sign}${formatted}` : formatted;
         return `<span class="${cssClass}" dir="ltr">${display}</span>`;
     }
@@ -498,7 +499,12 @@
         }
 
         const currencySymbol = context.options.currencySymbol || DEFAULT_OPTIONS.currencySymbol;
-        const amountDecimals = Number.isInteger(context.options.amountDecimals) ? context.options.amountDecimals : DEFAULT_OPTIONS.amountDecimals;
+        const amountDecimals = Number.isInteger(context.options.amountDecimals)
+            ? context.options.amountDecimals
+            : DEFAULT_OPTIONS.amountDecimals;
+        const quantityText = summaryData.quantity !== null
+            ? formatQuantityDisplay(summaryData.quantity, context.options)
+            : '-';
         const ratioText = formatRatioDisplay(summaryData.ratio);
         const sideDisplay = renderSideDisplay(summaryData.sideNormalized, summaryData.sideLabel);
 
@@ -508,9 +514,22 @@
         const summaryFields = [
             { label: 'טיקר', value: tickerDisplay, valueType: 'text' },
             { label: 'צד', value: sideDisplay, valueType: 'html' },
-            { label: 'סה\"כ השקעה', value: summaryData.totalInvestment, valueType: 'amount', direction: 'ltr' },
-            { label: 'מספר מניות', value: summaryData.quantity !== null ? formatQuantityDisplay(summaryData.quantity, context.options) : '-', valueType: 'text', direction: 'ltr' },
-            { label: 'סיכון / סיכוי', valueType: 'riskRewardSummary', direction: 'ltr' }
+            {
+                label: 'סה"כ השקעה',
+                value: summaryData.totalInvestment,
+                valueType: 'amount'
+            },
+            {
+                label: 'מספר מניות',
+                value: quantityText,
+                valueType: 'text',
+                direction: 'ltr'
+            },
+            {
+                label: 'סיכון / סיכוי',
+                valueType: 'riskRewardSummary',
+                direction: 'ltr'
+            }
         ];
 
         context.summaryElement.innerHTML = '';
@@ -526,7 +545,7 @@
         }
 
         const table = document.createElement('table');
-        table.classList.add('risk-summary-card__table');
+        table.classList.add('risk-summary-card__table', 'table', 'table-sm');
         table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
         table.style.tableLayout = 'fixed';
@@ -546,13 +565,13 @@
             th.style.fontWeight = '600';
             th.style.fontSize = '0.75rem';
             th.style.padding = '6px 10px';
-            th.style.textAlign = 'center';
+            th.style.textAlign = 'right';
             th.style.whiteSpace = 'nowrap';
-            if (index === summaryFields.length - 1) {
-                th.style.color = 'var(--text-color, #1d1d1f)';
-            } else {
-                th.style.color = 'var(--text-muted, #6c757d)';
-            }
+            th.style.color = field.labelVariant === 'negative'
+                ? 'var(--numeric-negative-medium)'
+                : (field.labelVariant === 'positive'
+                    ? 'var(--numeric-positive-medium)'
+                    : 'var(--text-muted, #6c757d)');
             if (index < summaryFields.length - 1) {
                 th.style.borderLeft = '1px solid var(--border-color, #e0e0e0)';
             }
@@ -579,23 +598,39 @@
                     const riskHtml = renderAmountWithVariant(summaryData.riskAmount, { currencySymbol, amountDecimals }, 'negative');
                     const rewardHtml = renderAmountWithVariant(summaryData.rewardAmount, { currencySymbol, amountDecimals }, 'positive');
                     const ratioHtml = escapeHtmlText(ratioText);
+
                     td.innerHTML = `
-                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
-                            <div style="display: flex; gap: 12px; align-items: center;">
+                        <div class="risk-summary-card__risk-reward" style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+                            <div class="risk-summary-card__risk-reward-row" style="display: flex; gap: 12px; align-items: center; justify-content: center;">
                                 <span>${riskHtml}</span>
                                 <span style="color: var(--text-muted, #6c757d);">/</span>
                                 <span>${rewardHtml}</span>
                             </div>
-                            <div style="font-size: 0.85rem; color: var(--text-muted, #6c757d);">
+                            <div class="risk-summary-card__risk-reward-ratio" style="font-size: 0.85rem; color: var(--text-muted, #6c757d);" dir="ltr">
                                 ${ratioHtml}
                             </div>
                         </div>
                     `;
                     break;
                 }
-                default:
-                    td.textContent = field.value === null || field.value === undefined || field.value === '' ? '-' : String(field.value);
+                case 'text': {
+                    const safeValue = field.value === null || field.value === undefined || field.value === ''
+                        ? '-'
+                        : field.value;
+                    if (field.direction === 'ltr') {
+                        td.innerHTML = `<span dir="ltr">${escapeHtmlText(safeValue)}</span>`;
+                    } else {
+                        td.textContent = safeValue;
+                    }
                     break;
+                }
+                default: {
+                    const safeValue = field.value === null || field.value === undefined || field.value === ''
+                        ? '-'
+                        : field.value;
+                    td.textContent = safeValue;
+                    break;
+                }
             }
 
             dataRow.appendChild(td);

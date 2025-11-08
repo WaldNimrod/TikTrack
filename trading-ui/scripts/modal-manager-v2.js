@@ -732,14 +732,11 @@ class ModalManagerV2 {
                 // Check if this is a fee field that needs currency label
                 const feeCurrencyLabelHTML = field.feeCurrencyLabel ? 
                     `<small class="text-muted ms-2" id="${field.id}CurrencyLabel" style="font-size: 0.875rem;">-</small>` : '';
-                const numberLabelClasses = ['form-label'];
-                if (field.labelClass) {
-                    numberLabelClasses.push(field.labelClass);
-                }
-                const numberLabelStyle = field.labelStyle ? ` style="${field.labelStyle}"` : '';
+                const labelClassAttr = field.labelClass ? ` ${field.labelClass}` : '';
+                const labelStyleAttr = field.labelStyle ? ` style="${field.labelStyle}"` : '';
                 return `
                     <div class="mb-3">
-                        <label for="${field.id}" class="${numberLabelClasses.join(' ')}"${numberLabelStyle}>
+                        <label for="${field.id}" class="form-label${labelClassAttr}"${labelStyleAttr}>
                             ${field.label} ${requiredStar}${feeCurrencyLabelHTML}
                         </label>
                         <input type="number" 
@@ -1064,18 +1061,12 @@ class ModalManagerV2 {
             this.updateModalTitle(modalElement, modalInfo.config, mode);
             
             const formElement = modalElement.querySelector('form');
+            if (formElement) {
+                formElement.dataset.modalMode = mode;
+            }
             
             // איפוס טופס
             this.resetForm(modalElement);
-            
-            if (formElement) {
-                this._setFormStateAttributes(
-                    formElement,
-                    mode,
-                    modalInfo.config?.entityType,
-                    mode === 'edit' ? entityData : null
-                );
-            }
             
             if (modalElement.id === 'alertsModal' || modalInfo.config?.entityType === 'alert') {
                 if (!this.alertsContext) {
@@ -1111,14 +1102,6 @@ class ModalManagerV2 {
             // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
             if (mode === 'edit' && entityData) {
                 await this.populateForm(modalElement, entityData);
-                if (formElement) {
-                    this._setFormStateAttributes(
-                        formElement,
-                        mode,
-                        modalInfo.config?.entityType,
-                        entityData
-                    );
-                }
             }
             // In add mode, defaults are applied by populateSelects for fields with defaultFromPreferences
             // Additional defaults (date, source) are handled below after modal shows
@@ -1754,14 +1737,20 @@ class ModalManagerV2 {
                 // Fields to ignore (metadata/relationship fields)
         const fieldsToIgnore = ['id', 'updated_at', 'account_name', 'currency_name', 'currency_symbol', 'usd_rate'];
         
-        // Don't ignore created_at if it has a field mapping (e.g., alerts)
-        const ignoreCreatedAt = !fieldMapping || !fieldMapping['created_at'];
+        // Don't ignore created_at/opened_at if they have field mappings (e.g., trade entry date)
+        const ignoreCreatedAt = !fieldMapping || (!fieldMapping['created_at'] && !fieldMapping['opened_at']);
         
         // מילוי שדות רגילים
         for (const [key, value] of Object.entries(data)) {
-            // Ignore metadata fields (but allow created_at if mapped)
+            // Ignore metadata fields (but allow created_at/opened_at if mapped)
             if (fieldsToIgnore.includes(key) || (key === 'created_at' && ignoreCreatedAt)) {
                 console.log(`⏭️ Skipping ${key} (metadata field)`);
+                continue;
+            }
+            
+            // Skip opened_at if it's the same as created_at (to avoid duplicate)
+            if (key === 'opened_at' && data['created_at'] && data['created_at'] === value && fieldMapping['created_at']) {
+                console.log(`⏭️ Skipping ${key} (same as created_at)`);
                 continue;
             }
             
@@ -2531,6 +2520,9 @@ class ModalManagerV2 {
             'ticker': {
                 'symbol': 'tickerSymbol',
                 'name': 'tickerName',
+                'type': 'tickerType',
+                'currency_id': 'tickerCurrency',
+                'remarks': 'tickerRemarks',
                 'sector': 'tickerSector',
                 'industry': 'tickerIndustry'
             },
@@ -2539,16 +2531,28 @@ class ModalManagerV2 {
                 'ticker_id': 'tradeTicker',
                 'side': 'tradeSide',
                 'status': 'tradeStatus',
-                'notes': 'tradeNotes'
+                'notes': 'tradeNotes',
+                'investment_type': 'tradeType',
+                'entry_price': 'tradeEntryPrice',
+                'quantity': 'tradeQuantity',
+                'created_at': 'tradeEntryDate',
+                'opened_at': 'tradeEntryDate',
+                'stop_price': 'tradeStopLoss',
+                'target_price': 'tradeTakeProfit'
             },
             'trade_plan': {
                 'trading_account_id': 'tradePlanAccount',
-                'ticker_id': 'planTicker',
+                'ticker_id': 'tradePlanTicker', // Fixed: was 'planTicker', should be 'tradePlanTicker'
                 'side': 'tradePlanSide',
                 'investment_type': 'tradePlanType', // Map investment_type to tradePlanType field
+                'status': 'tradePlanStatus',
                 'planned_amount': 'planAmount',
-                'stop_loss': 'planStopLoss',
-                'target_price': 'planTargetPrice'
+                'entry_price': 'tradePlanEntryPrice', // Map entry_price to tradePlanEntryPrice field
+                'created_at': 'tradePlanEntryDate', // Map created_at to tradePlanEntryDate field
+                'entry_date': 'tradePlanEntryDate', // Alias for created_at (if exists in API response)
+                'stop_price': 'tradePlanStopLoss', // Map stop_price to tradePlanStopLoss field
+                'target_price': 'tradePlanTakeProfit', // Map target_price to tradePlanTakeProfit field
+                'notes': 'tradePlanNotes' // Map notes to tradePlanNotes field
             },
                         'alert': {
                 'message': 'alertName',
@@ -2571,7 +2575,7 @@ class ModalManagerV2 {
                 'trading_account_id': 'executionAccount',
                 'action': 'executionType',
                 'type': 'executionType', // Alias for action
-                'side': 'executionSide',
+                // 'side' removed - not in config and not in database model
                 'quantity': 'executionQuantity',
                 'price': 'executionPrice',
                 'date': 'executionDate',
@@ -2593,7 +2597,8 @@ class ModalManagerV2 {
             'note': {
                 'content': 'noteContent',
                 'related_type_id': 'noteRelatedType',
-                'related_id': 'noteRelatedObject'
+                'related_id': 'noteRelatedObject',
+                'attachment': 'noteAttachment' // Map attachment to noteAttachment field
             }
         };
         
@@ -4345,111 +4350,6 @@ class ModalManagerV2 {
     }
 
     /**
-     * Update form dataset attributes to reflect modal state and entity id
-     * @param {HTMLFormElement} formElement
-     * @param {string} mode - add | edit | view
-     * @param {string} entityType
-     * @param {Object|null} entityData
-     * @private
-     */
-    _setFormStateAttributes(formElement, mode, entityType, entityData) {
-        if (!formElement) {
-            return;
-        }
-
-        const effectiveMode = mode || 'add';
-        formElement.dataset.modalMode = effectiveMode;
-        formElement.dataset.mode = effectiveMode;
-
-        const aliasMap = {
-            trading_account: 'accountId',
-            trade: 'tradeId',
-            trade_plan: 'tradePlanId',
-            execution: 'executionId',
-            cash_flow: 'cashFlowId',
-            alert: 'alertId',
-            note: 'noteId',
-            ticker: 'tickerId'
-        };
-
-        const entityIdRaw =
-            entityData &&
-            (entityData.id ??
-                entityData.entity_id ??
-                (entityType ? entityData[`${entityType}_id`] : undefined) ??
-                (entityType ? entityData[`${entityType}Id`] : undefined));
-        const entityId = entityIdRaw !== undefined && entityIdRaw !== null ? String(entityIdRaw) : null;
-
-        if (entityId) {
-            formElement.dataset.entityId = entityId;
-        } else {
-            delete formElement.dataset.entityId;
-        }
-
-        const aliasKey = entityType ? aliasMap[entityType] : undefined;
-        if (aliasKey) {
-            if (entityId) {
-                formElement.dataset[aliasKey] = entityId;
-            } else {
-                delete formElement.dataset[aliasKey];
-            }
-        }
-
-        if (entityType) {
-            const camelKey = entityType
-                .toLowerCase()
-                .replace(/_([a-z0-9])/g, (_, char) => char.toUpperCase())
-                .replace(/[^a-zA-Z0-9]/g, '');
-
-            if (camelKey) {
-                const attrName = `${camelKey}Id`;
-                if (entityId) {
-                    formElement.dataset[attrName] = entityId;
-                } else {
-                    delete formElement.dataset[attrName];
-                }
-            }
-        }
-
-        if (effectiveMode !== 'edit' && aliasKey && !entityId) {
-            delete formElement.dataset[aliasKey];
-        }
-
-        if (entityType === 'trading_account') {
-            if (entityData && entityData.currency_id !== undefined && entityData.currency_id !== null) {
-                formElement.dataset.originalCurrencyId = String(entityData.currency_id);
-            } else {
-                delete formElement.dataset.originalCurrencyId;
-            }
-
-            const currencySelect = formElement.querySelector('#accountCurrency');
-            if (currencySelect) {
-                if (effectiveMode === 'edit') {
-                    const resolvedValue = entityData && entityData.currency_id !== undefined && entityData.currency_id !== null
-                        ? String(entityData.currency_id)
-                        : currencySelect.dataset.originalValue || currencySelect.value;
-                    if (resolvedValue !== undefined && resolvedValue !== null) {
-                        currencySelect.value = String(resolvedValue);
-                    }
-                    currencySelect.dataset.originalValue = currencySelect.value;
-                    currencySelect.disabled = true;
-                    currencySelect.classList.add('disabled');
-                    currencySelect.setAttribute('aria-disabled', 'true');
-                    currencySelect.setAttribute('title', 'מטבע בסיס של חשבון קיים אינו ניתן לעדכון');
-                } else {
-                    currencySelect.disabled = false;
-                    currencySelect.classList.remove('disabled');
-                    currencySelect.removeAttribute('aria-disabled');
-                    currencySelect.removeAttribute('title');
-                    delete currencySelect.dataset.originalValue;
-                }
-            }
-        } else {
-            delete formElement.dataset.originalCurrencyId;
-        }
-    }
-
-    /**
      * Initialize modal systems - אתחול מערכות המודל
      * 
      * @param {HTMLElement} modalElement - אלמנט המודל
@@ -5007,7 +4907,7 @@ class ModalManagerV2 {
                 if (typeId === 2) {
                     // עבור טרייד - צריך להתאים בדיוק לפורמט בטבלה: טרייד | טיקר | צד | סוג השקעה | תאריך
                     // הפורמט בטבלה הוא: טרייד | AAPL | Long | swing | 15.8.2025 (בלי אייקון 🔗)
-                    // צריך לקבל את הטיקר מתוך item.ticker_id או item.tיקר
+                    // צריך לקבל את הטיקר מתוך item.ticker_id או item.ticker
                     let tickerSymbol = 'לא מוגדר';
                     if (item.ticker_symbol) {
                         tickerSymbol = item.ticker_symbol;
@@ -5049,6 +4949,7 @@ class ModalManagerV2 {
                         tickerSymbol = item.ticker_symbol;
                         console.log(`🔍 [DEBUG] TradePlan ${index}: Using ticker_symbol = ${tickerSymbol}`);
                     } else if (item.ticker_id && window.tickersData) {
+                        // נסה למצוא את הטיקר מתוך window.tickersData
                         const ticker = window.tickersData.find(t => t.id === item.ticker_id);
                         if (ticker) {
                             tickerSymbol = ticker.symbol || 'לא מוגדר';
@@ -5059,34 +4960,46 @@ class ModalManagerV2 {
                     } else {
                         console.warn(`⚠️ [DEBUG] TradePlan ${index}: No ticker symbol found. ticker_id=${item.ticker_id}, ticker_symbol=${item.ticker_symbol}, ticker=${item.ticker}`);
                     }
+                    
                     const side = item.side || 'לא מוגדר';
                     const investmentType = item.investment_type || 'לא מוגדר';
                     const date = item.created_at || item.date;
                     const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
                     displayText = `תוכנית | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
-                    if (index < 3) {
+                    
+                    if (index < 3) { // Log only first 3 for debugging
                         console.log(`🔍 [DEBUG] TradePlan ${index} display text: "${displayText}"`);
                     }
                 } else if (typeId === 1) {
+                    // עבור חשבון - שם + מטבע
+                    // TradingAccount.to_dict() מחזיר: name, currency_symbol או currency
                     const currency = item.currency_symbol || item.currency_name || item.currency?.symbol || item.currency || 'ILS';
                     displayText = `${item.name || 'לא מוגדר'} (${currency})`;
                 } else if (typeId === 4) {
+                    // עבור טיקר - סימבול + שם
                     const symbol = item.symbol || 'לא מוגדר';
                     const name = item.name ? ` - ${item.name}` : '';
                     displayText = `${symbol}${name}`;
                 } else {
+                    // Fallback
                     displayText = item[textField] || `ID: ${item.id}`;
                 }
+                
                 option.textContent = displayText;
                 if (selectedRelatedId && item[valueField] == selectedRelatedId) {
                     option.selected = true;
                 }
                 noteRelatedObjectField.appendChild(option);
             });
+            
             console.log(`✅ Populated noteRelatedObject with ${items.length} items for type ${relatedTypeId}`);
+            
+            // Debug: Check what was actually added to the select
             const allOptions = noteRelatedObjectField.querySelectorAll('option');
             console.log(`🔍 [DEBUG] Total options in select: ${allOptions.length}`);
             console.log(`🔍 [DEBUG] First 3 options text:`, Array.from(allOptions).slice(0, 3).map(opt => opt.textContent));
+            
+            // Debug: Compare with what's displayed in the table
             if (window.getRelatedObjectDisplay && relatedTypeId === 2) {
                 console.log(`🔍 [DEBUG] Comparing with table display for first trade...`);
                 const firstTrade = items[0];
@@ -5147,10 +5060,16 @@ class ModalManagerV2 {
     destroyModal(modalId) {
         if (this.modals.has(modalId)) {
             const modalInfo = this.modals.get(modalId);
+            
+            // הסרה מה-DOM
             if (modalInfo.element && modalInfo.element.parentNode) {
                 modalInfo.element.parentNode.removeChild(modalInfo.element);
             }
+            
+            // הסרה מהמפה
             this.modals.delete(modalId);
+            
+            // עדכון מודל פעיל
             if (this.activeModal === modalId) {
                 this.activeModal = null;
             }
@@ -5165,8 +5084,11 @@ if (typeof window.showModalSafe === 'undefined') {
     window.showModalSafe = async function(modalId, mode = 'add') {
         try {
             console.log(`🔍 [showModalSafe] Called with:`, { modalId, mode, ModalManagerV2Available: !!window.ModalManagerV2 });
+            
+            // אם ModalManagerV2 לא זמין, ננסה לחכות קצת
             if (!window.ModalManagerV2) {
                 console.warn('⚠️ [showModalSafe] ModalManagerV2 not available, waiting...');
+                // נחכה עד 2 שניות ל-ModalManagerV2
                 for (let i = 0; i < 20; i++) {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     if (window.ModalManagerV2) {
@@ -5175,6 +5097,7 @@ if (typeof window.showModalSafe === 'undefined') {
                     }
                 }
             }
+            
             if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
                 console.log(`✅ [showModalSafe] Calling ModalManagerV2.showModal`);
                 await window.ModalManagerV2.showModal(modalId, mode);
@@ -5204,3 +5127,4 @@ document.addEventListener('DOMContentLoaded', () => {
         new ModalManagerV2();
     }
 });
+

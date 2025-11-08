@@ -46,7 +46,10 @@ class Execution(BaseModel):
         
         if hasattr(self, 'ticker') and self.ticker:
             result['symbol'] = self.ticker.symbol
+            result['ticker_symbol'] = self.ticker.symbol  # Also include ticker_symbol for frontend compatibility
         else:
-            result['symbol'] = f'Ticker_{self.ticker_id}' if self.ticker_id else 'לא מוגדר'
+            symbol_value = f'Ticker_{self.ticker_id}' if self.ticker_id else 'לא מוגדר'
+            result['symbol'] = symbol_value
+            result['ticker_symbol'] = symbol_value  # Also include ticker_symbol for frontend compatibility
         
         return result

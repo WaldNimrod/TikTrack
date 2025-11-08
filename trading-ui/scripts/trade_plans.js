@@ -3047,16 +3047,18 @@ async function saveTradePlan() {
             throw new Error('Trade Plan form not found');
         }
         
+        const isEdit = form.dataset.mode === 'edit';
+        const tradePlanId = form.dataset.tradePlanId;
+        
         const tradePlanData = DataCollectionService.collectFormData({
             trading_account_id: { id: 'tradePlanAccount', type: 'int' }, // Backend expects trading_account_id
             ticker_id: { id: 'tradePlanTicker', type: 'int' },
             side: { id: 'tradePlanSide', type: 'text' },
             investment_type: { id: 'tradePlanType', type: 'text' }, // Map tradePlanType field to investment_type column
             planned_amount: { id: 'planAmount', type: 'float' },
-            quantity: { id: 'tradePlanQuantity', type: 'float' },
-            entry_price: { id: 'tradePlanEntryPrice', type: 'float', default: null },
-            stop_loss: { id: 'tradePlanStopLoss', type: 'float', default: null },
-            take_profit: { id: 'tradePlanTakeProfit', type: 'float', default: null },
+            entry_price: { id: 'tradePlanEntryPrice', type: 'float' }, // Required field - entry price
+            stop_price: { id: 'tradePlanStopLoss', type: 'float', default: null },
+            target_price: { id: 'tradePlanTakeProfit', type: 'float', default: null },
             entry_date: { id: 'tradePlanEntryDate', type: 'dateOnly', default: null },
             status: { id: 'tradePlanStatus', type: 'text' },
             notes: { id: 'tradePlanNotes', type: 'rich-text', default: null }
@@ -3064,6 +3066,30 @@ async function saveTradePlan() {
         
         // ולידציה מפורטת
         let hasErrors = false;
+        const quantityInput = document.getElementById('tradePlanQuantity');
+        const parseNumericInput = (inputElement) => {
+            if (!inputElement) {
+                return null;
+            }
+            const rawValue = (inputElement.value || '').toString().trim();
+            if (rawValue === '' || rawValue === '.' || rawValue === '-' || rawValue === '-.') {
+                return null;
+            }
+            const numericValue = Number(rawValue.replace(/,/g, ''));
+            return Number.isFinite(numericValue) ? numericValue : null;
+        };
+
+        const quantityValue = parseNumericInput(quantityInput);
+        const stopPercentValue = parseNumericInput(document.getElementById('tradePlanStopLossPercent'));
+        const targetPercentValue = parseNumericInput(document.getElementById('tradePlanTakeProfitPercent'));
+        
+        if (tradePlanData.side) {
+            const sideValue = String(tradePlanData.side).toLowerCase();
+            if (sideValue === 'long' || sideValue === 'short') {
+                tradePlanData.side = sideValue.charAt(0).toUpperCase() + sideValue.slice(1);
+            }
+        }
+        
         if (!tradePlanData.trading_account_id) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanAccount', 'חשבון מסחר הוא שדה חובה');
@@ -3078,6 +3104,14 @@ async function saveTradePlan() {
             hasErrors = true;
         }
         
+        // Validate entry_price - required field
+        if (!tradePlanData.entry_price || tradePlanData.entry_price <= 0) {
+            if (window.showValidationWarning) {
+                window.showValidationWarning('tradePlanEntryPrice', 'מחיר כניסה הוא שדה חובה וחייב להיות גדול מ-0');
+            }
+            hasErrors = true;
+        }
+        
         if (!tradePlanData.investment_type) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanType', 'סוג השקעה הוא שדה חובה');
@@ -3085,7 +3119,7 @@ async function saveTradePlan() {
             hasErrors = true;
         }
         
-        if (!tradePlanData.quantity || tradePlanData.quantity <= 0) {
+        if (quantityValue === null || quantityValue <= 0) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanQuantity', 'כמות חייבת להיות גדולה מ-0');
             }
@@ -3099,6 +3133,28 @@ async function saveTradePlan() {
             hasErrors = true;
         }
 
+        // Assign percentage values to payload (nullable)
+        if (stopPercentValue !== null) {
+            tradePlanData.stop_percentage = stopPercentValue;
+        } else {
+            delete tradePlanData.stop_percentage;
+        }
+
+        if (targetPercentValue !== null) {
+            tradePlanData.target_percentage = targetPercentValue;
+        } else {
+            delete tradePlanData.target_percentage;
+        }
+
+        // Convert entry date -> created_at (DB column) if provided, then remove entry_date
+        if (tradePlanData.entry_date) {
+            const parsedEntryDate = new Date(tradePlanData.entry_date);
+            if (!Number.isNaN(parsedEntryDate.valueOf()) && !isEdit) {
+                tradePlanData.created_at = parsedEntryDate.toISOString();
+            }
+        }
+        delete tradePlanData.entry_date;
+
         if (tradePlanData.notes && tradePlanData.notes.length > 5000) {
             if (window.showValidationWarning) {
                 window.showValidationWarning('tradePlanNotes', 'הערות התוכנית חורגות מהאורך המותר (5,000 תווים)');
@@ -3109,10 +3165,6 @@ async function saveTradePlan() {
         if (hasErrors) {
             return;
         }
-        
-        // Determine if this is add or edit
-        const isEdit = form.dataset.mode === 'edit';
-        const tradePlanId = form.dataset.tradePlanId;
         
         // Prepare API call
         const url = isEdit ? `/api/trade_plans/${tradePlanId}` : '/api/trade_plans';

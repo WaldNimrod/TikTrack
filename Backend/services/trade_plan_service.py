@@ -3,7 +3,7 @@ from models.trade_plan import TradePlan
 from services.validation_service import ValidationService
 from typing import List, Optional, Dict, Any
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +49,31 @@ class TradePlanService:
     def create(db: Session, data: Dict[str, Any]) -> TradePlan:
         """Create new trade plan"""
         try:
+            # Convert string dates to datetime objects where needed
+            if 'created_at' in data and isinstance(data['created_at'], str):
+                try:
+                    created_at = datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
+                except ValueError:
+                    try:
+                        created_at = datetime.strptime(data['created_at'], '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        raise ValueError(f"Invalid date format for created_at: {data['created_at']}")
+                if created_at.tzinfo is not None:
+                    created_at = created_at.astimezone(timezone.utc).replace(tzinfo=None)
+                data['created_at'] = created_at
+
+            if 'cancelled_at' in data and isinstance(data['cancelled_at'], str):
+                try:
+                    cancelled_at = datetime.fromisoformat(data['cancelled_at'].replace('Z', '+00:00'))
+                except ValueError:
+                    try:
+                        cancelled_at = datetime.strptime(data['cancelled_at'], '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        raise ValueError(f"Invalid date format for cancelled_at: {data['cancelled_at']}")
+                if cancelled_at.tzinfo is not None:
+                    cancelled_at = cancelled_at.astimezone(timezone.utc).replace(tzinfo=None)
+                data['cancelled_at'] = cancelled_at
+
             # Validate data against constraints
             logger.info("Validating trade plan data before creation")
             is_valid, errors = ValidationService.validate_data(db, 'trade_plans', data)
@@ -76,6 +101,31 @@ class TradePlanService:
             if not plan:
                 logger.warning(f"Trade plan {plan_id} not found for update")
                 return None
+
+            # Convert string dates to datetime objects where needed
+            if 'created_at' in data and isinstance(data['created_at'], str):
+                try:
+                    created_at = datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
+                except ValueError:
+                    try:
+                        created_at = datetime.strptime(data['created_at'], '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        raise ValueError(f"Invalid date format for created_at: {data['created_at']}")
+                if created_at.tzinfo is not None:
+                    created_at = created_at.astimezone(timezone.utc).replace(tzinfo=None)
+                data['created_at'] = created_at
+
+            if 'cancelled_at' in data and isinstance(data['cancelled_at'], str):
+                try:
+                    cancelled_at = datetime.fromisoformat(data['cancelled_at'].replace('Z', '+00:00'))
+                except ValueError:
+                    try:
+                        cancelled_at = datetime.strptime(data['cancelled_at'], '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        raise ValueError(f"Invalid date format for cancelled_at: {data['cancelled_at']}")
+                if cancelled_at.tzinfo is not None:
+                    cancelled_at = cancelled_at.astimezone(timezone.utc).replace(tzinfo=None)
+                data['cancelled_at'] = cancelled_at
             
             # Check if status is being changed to cancelled
             if 'status' in data and data['status'] == 'cancelled':

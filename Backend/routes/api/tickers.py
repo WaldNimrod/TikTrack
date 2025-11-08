@@ -105,20 +105,26 @@ def get_ticker(ticker_id: int):
         ticker = TickerService.get_by_id(db, ticker_id)
         if ticker:
             # Add market data like in get_all method
-            from models.external_data import MarketDataQuote
-            latest_quote = db.query(MarketDataQuote).filter(
-                MarketDataQuote.ticker_id == ticker.id
-            ).order_by(MarketDataQuote.fetched_at.desc()).first()
-            
             ticker_dict = ticker.to_dict()
             
-            if latest_quote:
-                ticker_dict['current_price'] = latest_quote.price
-                ticker_dict['change_percent'] = latest_quote.change_pct_day
-                ticker_dict['change_amount'] = latest_quote.change_amount_day
-                ticker_dict['volume'] = latest_quote.volume
-                ticker_dict['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
-                ticker_dict['data_source'] = latest_quote.source
+            # Try to get market data, but don't fail if database is corrupted
+            try:
+                from models.external_data import MarketDataQuote
+                latest_quote = db.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == ticker.id
+                ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                
+                if latest_quote:
+                    ticker_dict['current_price'] = latest_quote.price
+                    ticker_dict['change_percent'] = latest_quote.change_pct_day
+                    ticker_dict['change_amount'] = latest_quote.change_amount_day
+                    ticker_dict['volume'] = latest_quote.volume
+                    ticker_dict['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
+                    ticker_dict['data_source'] = latest_quote.source
+            except Exception as market_data_error:
+                # Log but don't fail - market data is optional
+                logger.warning(f"Could not load market data for ticker {ticker_id}: {str(market_data_error)}")
+                # Continue without market data
             
             return jsonify({
                 "status": "success",
@@ -133,6 +139,14 @@ def get_ticker(ticker_id: int):
         }), 404
     except Exception as e:
         logger.error(f"Error getting ticker {ticker_id}: {str(e)}")
+        # Check if it's a database corruption error
+        error_msg = str(e).lower()
+        if 'database disk image is malformed' in error_msg or 'malformed' in error_msg:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Database corruption detected. Please contact support."},
+                "version": "1.0"
+            }), 500
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve ticker"},

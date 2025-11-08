@@ -18,7 +18,7 @@ const tradesModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
-        // שדה תצוגה לנתוני שוק לפני כל השדות
+        // שורה ראשונה: טיקר + נתוני שוק
         {
             type: 'select',
             id: 'tradeTicker',
@@ -36,7 +36,7 @@ const tradesModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
         },
-        // שורה שנייה: צד + סוג השקעה
+        // שורה שנייה: צד + חשבון מסחר
         {
             type: 'select',
             id: 'tradeSide',
@@ -53,6 +53,18 @@ const tradesModalConfig = {
         },
         {
             type: 'select',
+            id: 'tradeAccount',
+            label: 'חשבון מסחר',
+            required: true,
+            options: [], // יטען דינמית מ-API
+            placeholder: 'בחר חשבון מסחר...',
+            defaultFromPreferences: true, // ברירת מחדל מהעדפות
+            rowClass: 'row',
+            colClass: 'col-md-6 col-sm-12'
+        },
+        // שורה שלישית: סוג השקעה + סטטוס
+        {
+            type: 'select',
             id: 'tradeType',
             label: 'סוג השקעה',
             required: true,
@@ -65,18 +77,6 @@ const tradesModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12',
             description: 'המערכת תומכת בשלושת סוגי ההשקעה המאוחדים: Swing, Investment, Passive'
-        },
-        // שורה שלישית: חשבון מסחר + סטטוס
-        {
-            type: 'select',
-            id: 'tradeAccount',
-            label: 'חשבון מסחר',
-            required: true,
-            options: [], // יטען דינמית מ-API
-            placeholder: 'בחר חשבון מסחר...',
-            defaultFromPreferences: true, // ברירת מחדל מהעדפות
-            rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
         },
         {
             type: 'select',
@@ -92,7 +92,7 @@ const tradesModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6 col-sm-12'
         },
-        // שורה שלישית: מחיר כניסה + תאריך כניסה
+        // שורה רביעית: מחיר כניסה + תאריך כניסה
         {
             type: 'number',
             id: 'tradeEntryPrice',

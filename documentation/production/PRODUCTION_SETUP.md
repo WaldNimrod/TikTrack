@@ -3,6 +3,32 @@
 **תאריך:** 2025-01-16  
 **גרסה:** 1.0
 
+## 🚀 עדכון פרודקשן - תהליך מהיר
+
+**לעדכון מלא ומפורט, ראה:** [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md)
+
+### תהליך עדכון מהיר:
+
+```bash
+# 1. עדכון ומיזוג
+git checkout main && git pull origin main
+git checkout production && git pull origin production
+git merge main
+
+# 2. סינכרון קוד
+./scripts/sync_to_production.py
+
+# 3. בדיקות
+./scripts/verify_production_isolation.sh
+
+# 4. Commit & Push
+git add production/ scripts/ documentation/production/
+git commit -m "feat: Update production from main"
+git push origin production
+```
+
+---
+
 ## סקירה כללית
 
 מדריך זה מסביר כיצד להקים ולהפעיל את סביבת הפרודקשן של TikTrack לצד סביבת הפיתוח.
@@ -82,26 +108,41 @@ python3 Backend/scripts/create_production_db.py
 
 ## עדכון קוד לפרודקשן
 
-### גישה מומלצת: Tagged Releases
+**📖 למדריך מפורט ומלא:** [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md)
 
-1. **עבודה על פיתוח:**
+### תהליך עדכון מומלץ:
+
+1. **עדכון Main Branch:**
    ```bash
    git checkout main
-   # עבודה על שינויים...
-   git commit -m "Feature: ..."
+   git pull origin main
    ```
 
-2. **יצירת tag לגרסה יציבה:**
+2. **מיזוג ל-Production:**
    ```bash
-   git tag v1.0.1
-   git push origin v1.0.1
+   git checkout production
+   git pull origin production
+   git merge main
    ```
 
-3. **עדכון פרודקשן:**
+3. **סינכרון קוד:**
    ```bash
-   git checkout v1.0.1
-   ./start_production.sh
+   ./scripts/sync_to_production.py
    ```
+
+4. **בדיקות:**
+   ```bash
+   ./scripts/verify_production_isolation.sh
+   ```
+
+5. **Commit & Push:**
+   ```bash
+   git add production/ scripts/ documentation/production/
+   git commit -m "feat: Update production from main"
+   git push origin production
+   ```
+
+**⚠️ חשוב:** ראה [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md) לפרטים מלאים, פתרון בעיות, ו-checklist.
 
 ## תחזוקה
 

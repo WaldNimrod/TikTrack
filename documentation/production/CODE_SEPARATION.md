@@ -4,6 +4,49 @@
 **גרסה:** 1.0.0  
 **מטרה:** מדריך מפורט להפרדת קוד פרודקשן מסביבת הפיתוח
 
+---
+
+## 🚀 עדכון פרודקשן - תהליך מהיר
+
+**לעדכון מלא ומפורט, ראה:** [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md)
+
+### תהליך עדכון מהיר:
+
+```bash
+# 1. עדכון ומיזוג
+git checkout main && git pull origin main
+git checkout production && git pull origin production
+git merge main
+
+# 2. סינכרון קוד
+./scripts/sync_to_production.py
+
+# 3. בדיקות
+./scripts/verify_production_isolation.sh
+
+# 4. Commit & Push
+git add production/ scripts/ documentation/production/
+git commit -m "feat: Update production from main"
+git push origin production
+```
+
+---
+
+## 📋 תוכן עניינים
+
+1. [סקירה כללית](#סקירה-כללית)
+2. [מבנה תקיות](#מבנה-תקיות)
+3. [קבצים בפרודקשן](#קבצים-בפרודקשן)
+4. [תהליך עדכון פרודקשן](#תהליך-עדכון-פרודקשן)
+5. [תיקון נתיבים](#תיקון-נתיבים)
+6. [בסיס נתונים](#בסיס-נתונים)
+7. [הפעלת שרת פרודקשן](#הפעלת-שרת-פרודקשן)
+8. [אימות סביבה](#אימות-סביבה)
+9. [Git Branches](#git-branches)
+10. [הפרדה בין הסביבות](#הפרדה-בין-הסביבות)
+
+---
+
 ## סקירה כללית
 
 סביבת הפרודקשן מופרדת לחלוטין מסביבת הפיתוח:
@@ -83,29 +126,43 @@ TikTrackApp/
 
 ## תהליך עדכון פרודקשן
 
-### עדכון מקוד פיתוח
+**📖 למדריך מפורט ומלא:** [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md)
 
+### תהליך עדכון מלא (5 שלבים):
+
+#### שלב 1: עדכון Main Branch
 ```bash
-# 1. עבודה על פיתוח הושלמה
 git checkout main
 git pull origin main
-
-# 2. העתקת קוד פעיל לפרודקשן
-./scripts/sync_to_production.py
-
-# 3. אימות שהכל תקין
-./scripts/verify_production.sh
-
-# 4. Commit ב-production branch
-git checkout production
-git add production/
-git commit -m "Update production: [version]"
-git push origin production
-
-# 5. הפעלת פרודקשן
-cd production
-./start_production.sh
 ```
+
+#### שלב 2: מיזוג Main → Production
+```bash
+git checkout production
+git pull origin production
+git merge main
+# פתור קונפליקטים אם יש
+```
+
+#### שלב 3: סינכרון קוד
+```bash
+./scripts/sync_to_production.py
+```
+
+#### שלב 4: בדיקות ואימות
+```bash
+./scripts/verify_production_isolation.sh
+./scripts/verify_production.sh
+```
+
+#### שלב 5: Commit & Push
+```bash
+git add production/ scripts/ documentation/production/
+git commit -m "feat: Update production from main - [תאריך]"
+git push origin production
+```
+
+**⚠️ חשוב:** ראה [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md) לפרטים מלאים, פתרון בעיות, ו-checklist.
 
 ### סקריפט Sync
 

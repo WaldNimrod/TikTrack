@@ -396,18 +396,24 @@ function renderMovementRow(movement, runningBalance) {
     );
     row.setAttribute('data-movement-amount', amountForStats.toString());
     
-    row.setAttribute('data-movement-date', movement.date || '');
+    const movementDateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(movement.date) : null;
+    const movementDateValue = movementDateEnvelope?.utc || movementDateEnvelope?.local || movement.date || '';
+    row.setAttribute('data-movement-date', movementDateValue);
     row.setAttribute('data-movement-id', movement.id || '');
     row.setAttribute('data-currency-symbol', movement.currency_symbol || 'USD');
     
     // Date - using FieldRendererService.renderDate
     const dateCell = document.createElement('td');
     dateCell.className = 'col-date';
-    dateCell.setAttribute('data-date', movement.date || '');
+    dateCell.setAttribute('data-date', movementDateValue);
     if (window.FieldRendererService && window.FieldRendererService.renderDate) {
-        dateCell.innerHTML = window.FieldRendererService.renderDate(movement.date);
+        dateCell.innerHTML = window.FieldRendererService.renderDate(movementDateEnvelope || movement.date);
     } else {
-        dateCell.textContent = movement.date ? formatDate(movement.date) : '-';
+        if (movementDateEnvelope && window.dateUtils?.formatDate) {
+            dateCell.textContent = window.dateUtils.formatDate(movementDateEnvelope);
+        } else {
+            dateCell.textContent = movementDateValue ? new Date(movementDateValue).toLocaleDateString('he-IL') : '-';
+        }
     }
     row.appendChild(dateCell);
     
@@ -560,7 +566,10 @@ function updateActivitySummary(data) {
         if (window.accountActivityState && window.accountActivityState.selectedAccountId && window.trading_accountsData) {
             const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
             if (account && account.created_at) {
-                accountOpeningDate = new Date(account.created_at);
+                const parsed = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(account.created_at) : new Date(account.created_at);
+                if (parsed && !Number.isNaN(parsed.getTime())) {
+                    accountOpeningDate = parsed;
+                }
             }
         }
         
@@ -577,15 +586,16 @@ function updateActivitySummary(data) {
         // Format date range for title
         let dateRangeDisplay = '';
         if (startDate && endDate) {
-            const startDateFormatted = typeof window.formatDate === 'function' 
-                ? window.formatDate(startDate) 
+            const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
+            const startDateFormatted = typeof formatDateFn === 'function'
+                ? formatDateFn(startDate)
                 : startDate.toLocaleDateString('he-IL', { 
                     year: 'numeric', 
                     month: '2-digit', 
                     day: '2-digit' 
                 });
-            const endDateFormatted = typeof window.formatDate === 'function' 
-                ? window.formatDate(endDate) 
+            const endDateFormatted = typeof formatDateFn === 'function'
+                ? formatDateFn(endDate)
                 : endDate.toLocaleDateString('he-IL', { 
                     year: 'numeric', 
                     month: '2-digit', 
@@ -596,8 +606,8 @@ function updateActivitySummary(data) {
                     day: '2-digit' 
                 })
                     ? 'היום'
-                    : typeof window.formatDate === 'function' 
-                        ? window.formatDate(endDate) 
+                    : typeof formatDateFn === 'function'
+                        ? formatDateFn(endDate)
                         : endDate.toLocaleDateString('he-IL', { 
                             year: 'numeric', 
                             month: '2-digit', 
@@ -641,7 +651,10 @@ function updateActivitySummary(data) {
         if (window.accountActivityState && window.accountActivityState.selectedAccountId && window.trading_accountsData) {
             const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
             if (account && account.created_at) {
-                accountOpeningDate = new Date(account.created_at);
+                const parsed = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(account.created_at) : new Date(account.created_at);
+                if (parsed && !Number.isNaN(parsed.getTime())) {
+                    accountOpeningDate = parsed;
+                }
             }
         }
         
@@ -658,11 +671,12 @@ function updateActivitySummary(data) {
         // Format dates and calculate days
         if (startDate && endDate) {
             const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-            const startDateFormatted = typeof window.formatDate === 'function' 
-                ? window.formatDate(startDate) 
+            const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
+            const startDateFormatted = typeof formatDateFn === 'function'
+                ? formatDateFn(startDate)
                 : startDate.toLocaleDateString('he-IL');
-            const endDateFormatted = typeof window.formatDate === 'function' 
-                ? window.formatDate(endDate) 
+            const endDateFormatted = typeof formatDateFn === 'function'
+                ? formatDateFn(endDate)
                 : endDate.toLocaleDateString('he-IL');
             
             dateRangeText = ` | ${startDateFormatted} - ${endDateFormatted} (${daysDiff} ימים)`;
@@ -959,7 +973,10 @@ function calculateActivityStatistics() {
     if (window.accountActivityState.selectedAccountId && window.trading_accountsData) {
         const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
         if (account && account.created_at) {
-            accountOpeningDate = new Date(account.created_at);
+            const parsed = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(account.created_at) : new Date(account.created_at);
+            if (parsed && !Number.isNaN(parsed.getTime())) {
+                accountOpeningDate = parsed;
+            }
         }
     }
     

@@ -239,6 +239,17 @@ const TABLE_COLUMN_SORT_TYPES = {
   cash_flows: {
     date: 'date'
   },
+  tickers: {
+    symbol: 'string',
+    current_price: 'numeric',
+    change_percent: 'numeric',
+    volume: 'numeric',
+    status: 'string',
+    type: 'string',
+    name: 'string',
+    currency_id: 'string',
+    yahoo_updated_at: 'dateEnvelope'
+  },
   alerts: {
     created_at: 'date',
     expiry_date: 'date'
@@ -526,19 +537,82 @@ function getColumnValue(item, columnIndex, tableType) {
   // Tickers table - special handling for calculated/display fields
   if (tableType === 'tickers') {
     if (fieldName === 'symbol') {
-      return item.symbol || '';
+      return (item.symbol || '').toString();
     }
     if (fieldName === 'current_price') {
-      return item.current_price || item.price || 0;
+      const rawValue = item.current_price ?? item.price ?? item.latest_price ?? null;
+      if (typeof rawValue === 'number') {
+        return Number.isFinite(rawValue) ? rawValue : 0;
+      }
+      if (typeof rawValue === 'string') {
+        const cleaned = rawValue.replace(/[^0-9.\-]/g, '');
+        const parsed = parseFloat(cleaned);
+        if (!Number.isNaN(parsed)) {
+          return parsed;
+        }
+      }
+      return 0;
     }
     if (fieldName === 'change_percent') {
-      return item.change_percent || item.daily_change || 0;
+      const rawValue = item.change_percent
+        ?? item.change_pct_day
+        ?? item.daily_change_percent
+        ?? item.daily_change
+        ?? null;
+      if (typeof rawValue === 'number') {
+        return Number.isFinite(rawValue) ? rawValue : 0;
+      }
+      if (typeof rawValue === 'string') {
+        const cleaned = rawValue.replace(/[^0-9.\-]/g, '');
+        const parsed = parseFloat(cleaned);
+        if (!Number.isNaN(parsed)) {
+          return parsed;
+        }
+      }
+      return 0;
     }
     if (fieldName === 'volume') {
-      return item.volume || 0;
+      const rawValue = item.volume ?? item.daily_volume ?? item.latest_volume ?? null;
+      if (typeof rawValue === 'number') {
+        return Number.isFinite(rawValue) ? rawValue : 0;
+      }
+      if (typeof rawValue === 'string') {
+        const cleaned = rawValue.replace(/[^0-9.\-]/g, '');
+        const parsed = parseInt(cleaned, 10);
+        if (!Number.isNaN(parsed)) {
+          return parsed;
+        }
+      }
+      return 0;
+    }
+    if (fieldName === 'currency_id') {
+      if (item.currency && (item.currency.symbol || item.currency.code)) {
+        return item.currency.symbol || item.currency.code;
+      }
+      if (item.currency_symbol) {
+        return item.currency_symbol;
+      }
+      if (item.currency_code) {
+        return item.currency_code;
+      }
+      const currencyId = item.currency_id;
+      if (currencyId === 0) {
+        return '0';
+      }
+      return currencyId !== undefined && currencyId !== null ? currencyId.toString() : '';
+    }
+    if (fieldName === 'status') {
+      return (item.status || '').toString();
+    }
+    if (fieldName === 'type') {
+      return (item.type || '').toString();
+    }
+    if (fieldName === 'name') {
+      return item.name || '';
     }
     if (fieldName === 'yahoo_updated_at') {
-      return item.yahoo_updated_at || item.updated_at || '';
+      const dateValue = item.yahoo_updated_at || item.updated_at || item.last_price_update || null;
+      return buildDateEnvelope(dateValue);
     }
     // For other fields, return directly
     return item[fieldName] || '';

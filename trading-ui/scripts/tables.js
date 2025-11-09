@@ -120,7 +120,15 @@ function resolveColumnValue(item, columnIndex, tableType) {
       'id', 'symbol', 'side', 'investment_type', 'status', 'account_name', 'created_at', 'amount',
     ],
     'tickers': [
-      'symbol', 'status', 'active_trades', 'current_price', 'change_percent', 'type', 'name', 'remarks', 'yahoo_updated_at',
+      'symbol',
+      'current_price',
+      'change_percent',
+      'volume',
+      'status',
+      'type',
+      'name',
+      'currency_id',
+      'yahoo_updated_at',
     ],
     'trade_plans': [
       'id', 'symbol', 'side', 'investment_type', 'status', 'target_price', 'stop_loss', 'created_at',
@@ -180,18 +188,20 @@ function resolveColumnValue(item, columnIndex, tableType) {
  * @returns {number|null} Custom sort result or null
  */
 function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
+  const columnKey = (window.tableMappings && typeof window.tableMappings.getColumnKey === 'function')
+    ? window.tableMappings.getColumnKey(tableType, columnIndex)
+    : null;
+
   // Custom sorting for tickers table
   if (tableType === 'tickers') {
-    // Status column (index 1) - פתוח > סגור > מבוטל
-    if (columnIndex === 1) {
+    if (columnKey === 'status') {
       const statusOrder = { 'open': 1, 'closed': 2, 'cancelled': 3 };
       const aOrder = statusOrder[aValue] || 999;
       const bOrder = statusOrder[bValue] || 999;
       return aOrder - bOrder;
     }
 
-    // Active trades column (index 2) - יש טריידים (true) > אין טריידים (false)
-    if (columnIndex === 2) {
+    if (columnKey === 'active_trades') {
       const aHasTrades = aValue === true || aValue === 1 || aValue === 'true' || aValue === '1';
       const bHasTrades = bValue === true || bValue === 1 || bValue === 'true' || bValue === '1';
       if (aHasTrades && !bHasTrades) return -1;
@@ -199,26 +209,21 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
       return 0;
     }
 
-    // Change percent column (index 4) - ערכים חיוביים ראשון, אחר כך שליליים
-    if (columnIndex === 4) {
-      const aNum = parseFloat(aValue) || 0;
-      const bNum = parseFloat(bValue) || 0;
-      
-      // אם אחד חיובי ואחד שלילי
+    if (columnKey === 'change_percent') {
+      const aNum = typeof aValue === 'number' ? aValue : parseFloat(aValue) || 0;
+      const bNum = typeof bValue === 'number' ? bValue : parseFloat(bValue) || 0;
+
       if (aNum > 0 && bNum < 0) return -1;
       if (aNum < 0 && bNum > 0) return 1;
-      
-      // אם שניהם באותו סימן, סדר לפי הערך
+
       return aNum - bNum;
     }
   }
 
   // Custom sorting for alerts table
   if (tableType === 'alerts') {
-    // Condition column (index 1) - Hebrew alphabetical sorting
-    if (columnIndex === 1) {
-      // Use Hebrew locale for proper alphabetical sorting
-      return aValue.localeCompare(bValue, 'he-IL');
+    if (columnKey === 'condition') {
+      return (aValue || '').toString().localeCompare((bValue || '').toString(), 'he-IL');
     }
   }
 

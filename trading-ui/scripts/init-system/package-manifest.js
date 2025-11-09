@@ -436,67 +436,74 @@ const PACKAGE_MANIFEST = {
         loadOrder: 11
       },
       {
+        file: 'import-user-data.js',
+        globalCheck: 'window.openImportUserDataModal',
+        description: 'מודל ייבוא נתוני עסקאות',
+        required: true,
+        loadOrder: 12
+      },
+      {
         file: 'modal-configs/trading-accounts-config.js',
         globalCheck: 'window.tradingAccountsModalConfig',
         description: 'קונפיגורציית מודל חשבונות מסחר',
         required: false,
-        loadOrder: 12
+        loadOrder: 13
       },
       {
         file: 'modal-configs/alerts-config.js',
         globalCheck: 'window.alertsModalConfig',
         description: 'קונפיגורציית מודל התראות',
         required: false,
-        loadOrder: 13
+        loadOrder: 14
       },
       {
         file: 'modal-configs/trades-config.js',
         globalCheck: 'window.tradesModalConfig',
         description: 'קונפיגורציית מודל טריידים',
         required: true,
-        loadOrder: 14
+        loadOrder: 15
       },
       {
         file: 'modal-configs/executions-config.js',
         globalCheck: 'window.executionsModalConfig',
         description: 'קונפיגורציית מודל ביצועים',
         required: false,
-        loadOrder: 15
+        loadOrder: 16
       },
       {
         file: 'modal-configs/trade-plans-config.js',
         globalCheck: 'window.tradePlansModalConfig',
         description: 'קונפיגורציית מודל תוכניות מסחר',
         required: true,
-        loadOrder: 16
+        loadOrder: 17
       },
       {
         file: 'modal-configs/tickers-config.js',
         globalCheck: 'window.tickersModalConfig',
         description: 'קונפיגורציית מודל טיקרים',
         required: false,
-        loadOrder: 17
+        loadOrder: 18
       },
       {
         file: 'modal-configs/cash-flows-config.js',
         globalCheck: 'window.cashFlowModalConfig',
         description: 'קונפיגורציית מודל תזרימי מזומנים',
         required: false,
-        loadOrder: 18
+        loadOrder: 19
       },
       {
         file: 'modal-configs/notes-config.js',
         globalCheck: 'window.notesModalConfig',
         description: 'קונפיגורציית מודל הערות',
         required: false,
-        loadOrder: 19
+        loadOrder: 20
       },
       {
         file: 'trade-selector-modal.js',
         globalCheck: 'window.tradeSelectorModal',
         description: 'מודל בחירת טרייד',
         required: false,
-        loadOrder: 20
+        loadOrder: 21
       }
     ],
     estimatedSize: '~250KB',

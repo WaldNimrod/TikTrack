@@ -256,9 +256,12 @@ class DateNormalizationService:
             return None
         value = value.strip()
 
-        try:
-            if self._ISO_DATETIME_WITH_OFFSET.match(value):
+        if self._ISO_DATETIME_WITH_OFFSET.match(value):
+            try:
                 dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            except ValueError:
+                dt = None
+            if dt is not None:
                 if dt.tzinfo is None:
                     if assume_utc and not localize_user:
                         return dt.replace(tzinfo=timezone.utc)
@@ -269,10 +272,6 @@ class DateNormalizationService:
                 if assume_utc:
                     return dt.astimezone(timezone.utc)
                 return dt
-        except ValueError:
-            dt = None
-        else:
-            return dt
 
         try:
             if self._ISO_DATE_ONLY.match(value):

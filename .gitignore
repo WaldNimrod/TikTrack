@@ -1,3 +1,6 @@
+# TikTrack production and development logs
+Backend/logs/*.log
+production/Backend/logs/*.log
 # Log files (data only, not code)
 *.log
 logs/

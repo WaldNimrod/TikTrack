@@ -20,9 +20,13 @@ set -e
 
 # Configuration
 SCRIPT_NAME="TikTrack Server Startup"
-VERSION="1.0.0"
-SERVER_FILE="Backend/app.py"
-LOCK_MANAGER="Backend/utils/server_lock_manager.py"
+VERSION="1.1.0"
+ENVIRONMENT="development"
+SERVER_DIR="Backend"
+SERVER_FILE="$SERVER_DIR/app.py"
+LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
+SERVER_PORT=8080
+DB_PATH="$SERVER_DIR/db/simpleTrade_new.db"
 
 # Colors for output
 RED='\033[0;31m'
@@ -65,11 +69,16 @@ show_help() {
     echo "  -h, --help     Show this help message"
     echo "  --check-only   Only check for conflicts, don't start server"
     echo "  --force        Force start even if conflicts detected (DANGEROUS)"
+    echo "  --env <env>    Environment to run (development | production)"
+    echo "                 Shorthand: --prod, --production"
     echo ""
     echo "Description:"
-    echo "  Starts TikTrack server with automatic conflict detection"
-    echo "  Prevents multiple server instances from running simultaneously"
-    echo "  Provides detailed error messages and resolution guidance"
+    echo "  Starts TikTrack server with automatic conflict detection."
+    echo "  Supported environments:"
+    echo "    development (default) → Backend/app.py on port 8080"
+    echo "    production            → production/Backend/app.py on port 5001"
+    echo "  Prevents multiple server instances from running simultaneously."
+    echo "  Provides detailed error messages and resolution guidance."
     echo ""
     echo "Examples:"
     echo "  $0                    # Start server normally"
@@ -100,6 +109,14 @@ check_files() {
         exit 1
     fi
     
+    if [ -n "$DB_PATH" ] && [ ! -f "$DB_PATH" ]; then
+        log_warning "Database file not found: $DB_PATH"
+        if [ "$ENVIRONMENT" = "production" ]; then
+            log_warning "Please run: cd $SERVER_DIR && python3 scripts/create_production_db.py"
+            exit 1
+        fi
+    fi
+    
     log_info "All required files found"
 }
 
@@ -107,8 +124,8 @@ check_files() {
 check_conflicts() {
     log_header "Checking for existing server processes..."
     
-    # Run the lock manager to check for conflicts on development port (8080)
-    if python3 "$LOCK_MANAGER" --port 8080 --check; then
+    # Run the lock manager to check for conflicts on target port
+    if python3 "$LOCK_MANAGER" --port "$SERVER_PORT" --check; then
         log_success "No conflicts found - server can start safely"
         return 0
     else
@@ -121,22 +138,31 @@ check_conflicts() {
 start_server() {
     log_header "Starting TikTrack Server..."
     
-    # Change to Backend directory
-    cd Backend
+    # Change to server directory
+    cd "$SERVER_DIR"
     
     log_info "Working directory: $(pwd)"
-    log_info "Server file: $SERVER_FILE"
+    log_info "Server file: $(basename "$SERVER_FILE")"
+    log_info "Environment: $(echo "$ENVIRONMENT" | tr '[:lower:]' '[:upper:]')"
+    log_info "Port: $SERVER_PORT"
+    if [ -n "$DB_PATH" ]; then
+        log_info "Database: $(basename "$DB_PATH")"
+    fi
     log_info "Starting server in foreground mode..."
     echo ""
     
     # Display server startup information
     echo "🌐 TikTrack Server Starting..."
-    echo "📍 URL: http://127.0.0.1:8080"
+    echo "📍 URL: http://127.0.0.1:$SERVER_PORT"
     echo "📁 Working Directory: $(pwd)"
-    echo "🗄️  Database: simpleTrade_new.db (Development)"
-    echo "📝 Logs: logs/"
+    if [ -n "$DB_PATH" ]; then
+        echo "🗄️  Database: $(basename "$DB_PATH")"
+    fi
+    if [ -d "logs" ]; then
+        echo "📝 Logs: logs/"
+    fi
     echo "📅 Started: $(date)"
-    echo "🔄 Mode: Development (Foreground)"
+    echo "🔄 Mode: $(echo "$ENVIRONMENT" | tr '[:lower:]' '[:upper:]') (Foreground)"
     echo ""
     echo "Press Ctrl+C to stop the server"
     echo "=========================================="
@@ -167,6 +193,22 @@ main() {
                 show_help
                 exit 0
                 ;;
+            --env)
+                if [ -z "$2" ]; then
+                    log_error "Missing value for --env option"
+                    exit 1
+                fi
+                ENVIRONMENT="$2"
+                shift 2
+                ;;
+            --env=*)
+                ENVIRONMENT="${1#*=}"
+                shift
+                ;;
+            --production|--prod)
+                ENVIRONMENT="production"
+                shift
+                ;;
             --force)
                 FORCE_START=true
                 log_warning "Force start enabled - conflicts will be ignored"
@@ -184,11 +226,37 @@ main() {
         esac
     done
     
+    # Normalize environment configuration
+    case "$ENVIRONMENT" in
+        production|prod|PRODUCTION|Prod)
+            ENVIRONMENT="production"
+            SERVER_DIR="production/Backend"
+            SERVER_FILE="$SERVER_DIR/app.py"
+            LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
+            SERVER_PORT=5001
+            DB_PATH="$SERVER_DIR/db/TikTrack_DB.db"
+            ;;
+        development|dev|DEVELOPMENT|Dev|"")
+            ENVIRONMENT="development"
+            SERVER_DIR="Backend"
+            SERVER_FILE="$SERVER_DIR/app.py"
+            LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
+            SERVER_PORT=8080
+            DB_PATH="$SERVER_DIR/db/simpleTrade_new.db"
+            ;;
+        *)
+            log_error "Unknown environment: $ENVIRONMENT"
+            echo "Supported environments: development, production"
+            exit 1
+            ;;
+    esac
+    
     # Header
     echo "🚀 $SCRIPT_NAME v$VERSION"
     echo "===================================="
     echo "📅 Started at: $(date '+%H:%M:%S')"
     echo "🎯 Purpose: Safe server startup with conflict detection"
+    echo "🛠️ Environment: $(echo "$ENVIRONMENT" | tr '[:lower:]' '[:upper:]')"
     echo ""
     
     # Pre-flight checks

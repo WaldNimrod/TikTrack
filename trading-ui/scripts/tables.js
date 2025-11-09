@@ -287,21 +287,97 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
                         'asc';
     await window.saveSortState(tableType, columnIndex, newDirection);
 
-    const sortedData = [...data].sort((a, b) => {
-      let aValue = resolveColumnValue(a, columnIndex, tableType);
-      let bValue = resolveColumnValue(b, columnIndex, tableType);
+    const adapterAvailable = typeof window.TableSortValueAdapter?.getSortValue === 'function';
+    const sortType = typeof window.getColumnSortType === 'function'
+      ? window.getColumnSortType(tableType, columnIndex)
+      : null;
+    const isNumericSort = ['numeric', 'numeric-string', 'number'].includes(sortType);
+    const isDateSort = ['dateEnvelope', 'date'].includes(sortType);
 
-      const customSortResult = getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue);
+    const sortedData = [...data].sort((a, b) => {
+      const rawAValue = resolveColumnValue(a, columnIndex, tableType);
+      const rawBValue = resolveColumnValue(b, columnIndex, tableType);
+
+      const customSortResult = getCustomSortValue(a, b, columnIndex, tableType, rawAValue, rawBValue);
       if (customSortResult !== null) {
         const primaryResult = newDirection === 'asc' ? customSortResult : -customSortResult;
         if (primaryResult !== 0) return primaryResult;
       } else {
-        if (!isNaN(aValue) && !isNaN(bValue)) {
+        let aValue = rawAValue;
+        let bValue = rawBValue;
+
+        const columnKey = (window.tableMappings && typeof window.tableMappings.getColumnKey === 'function')
+          ? window.tableMappings.getColumnKey(tableType, columnIndex)
+          : null;
+
+        const aEnvelope = columnKey && a ? a[`${columnKey}_envelope`] : null;
+        const bEnvelope = columnKey && b ? b[`${columnKey}_envelope`] : null;
+
+        const getEpoch = (input) => {
+          if (!input && input !== 0) {
+            return null;
+          }
+          if (window.getEpochMilliseconds) {
+            const epoch = window.getEpochMilliseconds(input);
+            if (typeof epoch === 'number' && !Number.isNaN(epoch)) {
+              return epoch;
+            }
+          }
+          if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+            const epoch = window.dateUtils.getEpochMilliseconds(input);
+            if (typeof epoch === 'number' && !Number.isNaN(epoch)) {
+              return epoch;
+            }
+          }
+          return null;
+        };
+
+        if (aEnvelope || bEnvelope) {
+          const epochA = getEpoch(aEnvelope || rawAValue);
+          const epochB = getEpoch(bEnvelope || rawBValue);
+
+          if (epochA !== null) {
+            aValue = epochA;
+          }
+          if (epochB !== null) {
+            bValue = epochB;
+          }
+        }
+
+        if (adapterAvailable && sortType) {
+          const adaptedA = window.TableSortValueAdapter.getSortValue({ value: rawAValue, type: sortType });
+          const adaptedB = window.TableSortValueAdapter.getSortValue({ value: rawBValue, type: sortType });
+          if (adaptedA !== null && adaptedA !== undefined) {
+            aValue = adaptedA;
+          }
+          if (adaptedB !== null && adaptedB !== undefined) {
+            bValue = adaptedB;
+          }
+        } else if (sortType === 'dateEnvelope') {
+          aValue = rawAValue?.epochMs ?? rawAValue?.utc ?? rawAValue;
+          bValue = rawBValue?.epochMs ?? rawBValue?.utc ?? rawBValue;
+        }
+
+        if (isNumericSort) {
+          const parsedA = Number(aValue);
+          const parsedB = Number(bValue);
+          if (!Number.isNaN(parsedA) && !Number.isNaN(parsedB)) {
+            aValue = parsedA;
+            bValue = parsedB;
+          }
+        } else if (!sortType && !isNaN(aValue) && !isNaN(bValue)) {
           aValue = parseFloat(aValue);
           bValue = parseFloat(bValue);
         }
 
-        if (isDateValue(aValue) && isDateValue(bValue)) {
+        if (isDateSort) {
+          const parsedA = aValue instanceof Date ? aValue : new Date(aValue);
+          const parsedB = bValue instanceof Date ? bValue : new Date(bValue);
+          if (!Number.isNaN(parsedA.getTime()) && !Number.isNaN(parsedB.getTime())) {
+            aValue = parsedA;
+            bValue = parsedB;
+          }
+        } else if (!sortType && isDateValue(aValue) && isDateValue(bValue)) {
           aValue = new Date(aValue);
           bValue = new Date(bValue);
         }

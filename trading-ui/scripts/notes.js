@@ -146,7 +146,7 @@ window.loadNotesData = async function() {
     // Restore page state (filters, sort, sections, entity filters)
     await restorePageState('notes');
 
-    window.Logger.info('✅ loadNotesData הושלם בהצלחה', { page: "notes" });
+    window.Logger.info('✅ loadNotesData הושלם בהצלחה', { page: "notes", keepInfo: true });
 
   } catch (error) {
     window.Logger.error('❌ שגיאה ב-loadNotesData:', error, { page: "notes" });
@@ -679,7 +679,7 @@ function updateNotesTable(notes) {
       }).join('');
 
       tbody.innerHTML = rows;
-      window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes" });
+      window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes", keepInfo: true });
       window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
 
       // עדכון table-count ו-info-summary

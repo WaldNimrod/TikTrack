@@ -209,6 +209,31 @@
                     </div>
                 </div>
             </div>
+
+            <!-- UI Content Section 2 Start-->
+            <!-- Executions trade assignment suggestions area - content-section -->
+            <div class="content-section" id="suggestions" data-section="suggestions">
+                <!-- Suggestions header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/executions.svg" alt="המלצות שיוך" class="section-icon">
+                        המלצות שיוך לטריידים
+                    </div>
+                    <div class="table-count" id="suggestionsCount">טוען...</div>
+                    <div class="table-actions">
+                        <button data-button-type="PRIMARY" data-variant="full" data-onclick="acceptAllSuggestions()" data-text="קבל הכל" title="קבל את כל ההמלצות"></button>
+                        <button data-button-type="SECONDARY" data-variant="full" data-onclick="rejectAllSuggestions()" data-text="דחה הכל" title="דחה את כל ההמלצות"></button>
+                        <button data-button-type="SAVE" data-variant="full" data-onclick="applySelectedSuggestions()" data-text="שייך נבחרים" title="שייך את ההמלצות המסומנות"></button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('suggestions')" data-text="הצג/הסתר"></button>
+                    </div>
+                </div>
+
+                <!-- Suggestions content -->
+                <div class="section-body">
+                    <div id="tradeSuggestionsContainer"></div>
+                </div>
+            </div>
+            <!-- UI Content Section 2 End-->
         </div>
 
         <!-- Bottom page spacing -->

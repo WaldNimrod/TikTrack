@@ -10,6 +10,7 @@ This directory contains all implementation plans, work plans, and task lists for
 Contains detailed plans for implementing new features and system improvements.
 
 **Files:**
+- `CACHE_STAGE_B_LITE_SUMMARY.md`
 - `CENTRAL_TASKS_TODO.md`
 - `CSS_ARCHITECTURE_IMPLEMENTATION_WORKPLAN.md`
 - `CSS_UNIFICATION_AND_CLEANUP_WORKPLAN_20250908.md`
@@ -34,6 +35,7 @@ Contains detailed plans for implementing new features and system improvements.
 - Testing System Plans
 
 ### Future Features
+- Cache Stage B-Lite (interim cache rollout)
 - Triggers and Future Features
 - Global UI Improvements
 - Migration Plans
@@ -45,4 +47,4 @@ Contains detailed plans for implementing new features and system improvements.
 - [Development Guides](../guides/README.md)
 
 ---
-**Last Updated**: September 20, 2025
+**Last Updated**: November 9, 2025

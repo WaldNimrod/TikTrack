@@ -479,6 +479,80 @@ class PreferencesUI {
         
         this.currentUserId = 1; // Nimrod
         this.currentProfileId = null; // Will be loaded from server
+        this.state = {
+            activeProfileId: 0,
+            activeProfileName: 'ברירת מחדל',
+            isFallback: true,
+            fallbackMessage: null,
+            warnings: []
+        };
+        window.PreferencesState = { ...this.state };
+    }
+    
+    updateGlobalPreferences(context = null) {
+        const resolvedContext = context || (window.PreferencesCore ? window.PreferencesCore.getProfileContext() : null);
+        if (!resolvedContext) {
+            return;
+        }
+        
+        const activeProfileId = Number.isFinite(resolvedContext.id) ? resolvedContext.id : parseInt(resolvedContext.id ?? '0', 10) || 0;
+        const activeProfileName = resolvedContext.name || (activeProfileId === 0 ? 'ברירת מחדל' : `פרופיל #${activeProfileId}`);
+        const fallbackMessage = resolvedContext.fallbackMessage || null;
+        const isFallback = Boolean(resolvedContext.isFallback);
+        const warnings = Array.isArray(resolvedContext.warnings) ? resolvedContext.warnings : [];
+        
+        this.state = {
+            activeProfileId,
+            activeProfileName,
+            isFallback,
+            fallbackMessage,
+            warnings
+        };
+        this.currentProfileId = activeProfileId;
+        window.PreferencesState = { ...this.state };
+        
+        if (window.PreferencesCore && typeof window.PreferencesCore.updateProfileContext === 'function') {
+            window.PreferencesCore.updateProfileContext({
+                id: activeProfileId,
+                name: activeProfileName,
+                isFallback,
+                fallbackMessage,
+                warnings
+            });
+        }
+        
+        const activeProfileNameElement = document.getElementById('activeProfileName');
+        const activeProfileCardName = document.getElementById('activeProfileName_display');
+        const activeProfileDescription = document.getElementById('activeProfileDescription_display');
+        const activeProfileSummary = document.getElementById('activeProfileInfo');
+        
+        if (activeProfileNameElement) {
+            activeProfileNameElement.textContent = activeProfileName;
+        }
+        if (activeProfileSummary) {
+            activeProfileSummary.textContent = activeProfileName;
+        }
+        if (activeProfileCardName) {
+            activeProfileCardName.textContent = activeProfileName;
+        }
+        if (activeProfileDescription) {
+            activeProfileDescription.textContent = isFallback ? 'מציג נתוני ברירת מחדל' : 'פרופיל משתמש פעיל';
+        }
+        
+        const banner = document.getElementById('preferencesFallbackBanner');
+        if (banner) {
+            if (isFallback && fallbackMessage) {
+                banner.textContent = fallbackMessage;
+                banner.classList.remove('d-none');
+                banner.style.display = 'block';
+            } else {
+                banner.textContent = '';
+                banner.classList.add('d-none');
+                banner.style.display = 'none';
+            }
+        }
+        
+        window.Logger.info('🔄 PreferencesUI state updated', this.state, { page: "preferences-ui" });
     }
     
     /**
@@ -498,51 +572,35 @@ class PreferencesUI {
                 throw new Error(result.error || 'Failed to load profiles');
             }
             
-            const profiles = result.data.profiles;
-            window.Logger.info(`🔍 Loaded ${profiles.length} profiles from server`, { page: "preferences-ui" });
+            const profiles = result.data.profiles || [];
+            this.profilesCache = profiles;
             
-            // Find active profile
-            const activeProfile = profiles.find(p => p.active === true);
+            const context = {
+                id: result.data.active_profile_id ?? 0,
+                name: result.data.active_profile_name || (result.data.active_profile_id === 0 ? 'ברירת מחדל' : null),
+                isFallback: Boolean(result.data.is_fallback_profile),
+                fallbackMessage: result.data.fallback_message || null,
+                warnings: Array.isArray(result.data.profile_warnings) ? result.data.profile_warnings : []
+            };
             
-            // If no active profile found, use default profile (ID: 0)
-            if (!activeProfile) {
-                window.Logger.info('✅ No active profile found - using default profile (ID: 0)', { page: "preferences-ui" });
-                this.currentProfileId = 0;
-                return 0;
+            if (!context.fallbackMessage && context.isFallback) {
+                context.fallbackMessage = `אין פרופיל פעיל עבור משתמש #${this.currentUserId} – מוצגים נתוני ברירת מחדל`;
             }
             
-            // Check if active profile is default system profile (ID: 0)
-            if (activeProfile.id === 0) {
-                window.Logger.info('✅ Active profile is system default profile (ID: 0)', { page: "preferences-ui" });
-                this.currentProfileId = 0;
-                return 0;
-            }
-            
-            // Check if active profile has is_default flag
-            if (activeProfile.is_default || activeProfile.default) {
-                // If it's a user profile marked as default, still check if ID is 0
-                if (activeProfile.id === 0 || activeProfile.user_id === 0) {
-                    window.Logger.info('✅ Active profile is default system profile (ID: 0, user_id: 0)', { page: "preferences-ui" });
-                    this.currentProfileId = 0;
-                    return 0;
-                } else {
-                    // User profile marked as default - use it as-is
-                    this.currentProfileId = activeProfile.id;
-                    window.Logger.info(`✅ Active profile loaded: ${activeProfile.name} (ID: ${activeProfile.id})`, { page: "preferences-ui" });
-                    return activeProfile.id;
-                }
-            }
-            
-            // Regular user profile
-            this.currentProfileId = activeProfile.id;
-            window.Logger.info(`✅ Active profile loaded: ${activeProfile.name} (ID: ${activeProfile.id})`, { page: "preferences-ui" });
-            return activeProfile.id;
+            this.updateGlobalPreferences(context);
+            window.Logger.info(`✅ Active profile resolved: ${this.state.activeProfileName} (ID: ${this.state.activeProfileId})`, { page: "preferences-ui" });
+            return this.state.activeProfileId;
             
         } catch (error) {
             window.Logger.error('❌ Error loading active profile:', error, { page: "preferences-ui" });
             // Fallback to default profile (ID: 0)
-            this.currentProfileId = 0;
-            window.Logger.info('✅ Falling back to default profile (ID: 0)', { page: "preferences-ui" });
+            this.updateGlobalPreferences({
+                id: 0,
+                name: 'ברירת מחדל',
+                isFallback: true,
+                fallbackMessage: `שגיאה בזיהוי פרופיל פעיל עבור משתמש #${this.currentUserId} – מוצגים נתוני ברירת מחדל`,
+                warnings: ['load_active_profile_error']
+            });
             return 0;
         }
     }
@@ -608,6 +666,7 @@ class PreferencesUI {
                 window.Logger.info(`🔍 PREFERENCES UI DEBUG: Calling PreferencesCore.getAllPreferences(userId=${finalUserId}, profileId=${finalProfileId})`, { page: "preferences-ui" });
                 
                 const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, finalProfileId);
+                this.updateGlobalPreferences(window.PreferencesCore.getProfileContext());
                 window.Logger.info(`✅ Loaded ${Object.keys(allPreferences, { page: "preferences-ui" }).length} preferences from API`);
                 
                 // Load colors separately for color pickers
@@ -637,6 +696,7 @@ class PreferencesUI {
                     finalUserId, 
                     finalProfileId
                 );
+                this.updateGlobalPreferences(window.PreferencesCore.getProfileContext());
                 
                 // Load color preferences
                 if (window.ColorManager) {
@@ -1311,7 +1371,7 @@ window.loadProfilesToDropdown = async function(userId = 1) {
             throw new Error(result.error || 'Failed to load profiles');
         }
         
-        const profiles = result.data.profiles;
+        const profiles = result.data.profiles || [];
         const profileSelect = document.getElementById('profileSelect');
         
         if (!profileSelect) {
@@ -1319,109 +1379,64 @@ window.loadProfilesToDropdown = async function(userId = 1) {
             return false;
         }
         
+        const context = {
+            id: result.data.active_profile_id ?? 0,
+            name: result.data.active_profile_name || (result.data.active_profile_id === 0 ? 'ברירת מחדל' : null),
+            isFallback: Boolean(result.data.is_fallback_profile),
+            fallbackMessage: result.data.fallback_message || null,
+            warnings: Array.isArray(result.data.profile_warnings) ? result.data.profile_warnings : []
+        };
+        
+        if (window.PreferencesUI) {
+            window.PreferencesUI.profilesCache = profiles;
+            window.PreferencesUI.updateGlobalPreferences(context);
+        }
+        
         // Clear existing options
         profileSelect.innerHTML = '';
         
-        if (profiles && profiles.length > 0) {
-            // Add all profiles (including default profile if it exists)
+        if (profiles.length > 0) {
             profiles.forEach(profile => {
                 const option = document.createElement('option');
-                option.value = profile.name;
-                option.textContent = profile.name;
-                if (profile.active) {
+                option.value = profile.id;
+                option.textContent = profile.name || `פרופיל #${profile.id}`;
+                option.dataset.profileName = profile.name || '';
+                option.dataset.profileDescription = profile.description || '';
+                if (profile.id === window.PreferencesUI.state.activeProfileId) {
                     option.selected = true;
                 }
                 profileSelect.appendChild(option);
             });
-            
-            // Find and select the active profile
-            const activeProfile = profiles.find(p => p.active);
-            window.Logger.info(`🔍 PROFILE DEBUG: Found active profile:`, activeProfile, { page: "preferences-ui" });
-            
-            if (activeProfile) {
-                // Update PreferencesUI currentProfileId
-                if (window.PreferencesUI) {
-                    window.PreferencesUI.currentProfileId = activeProfile.id;
-                    window.Logger.info(`✅ PreferencesUI currentProfileId updated to: ${activeProfile.id}`, { page: "preferences-ui" });
-                }
-                
-                // Select the active profile in dropdown
-                const activeOption = profileSelect.querySelector(`option[value="${activeProfile.name}"]`);
-                if (activeOption) {
-                    activeOption.selected = true;
-                    window.Logger.info(`🔍 UI DEBUG: Selected active profile in dropdown: ${activeProfile.name}`, { page: "preferences-ui" });
-                } else {
-                    window.Logger.warn(`⚠️ Active profile option not found in dropdown: ${activeProfile.name}`, { page: "preferences-ui" });
-                }
-            } else {
-                // No active profile found, select default
-                const defaultOption = profileSelect.querySelector('option[value="ברירת מחדל"]');
-                if (defaultOption) {
-                    defaultOption.selected = true;
-                    window.Logger.info(`🔍 UI DEBUG: No active profile found, selected default`, { page: "preferences-ui" });
-                }
-            }
-            
-            window.Logger.info(`✅ Loaded ${profiles.length} profiles to dropdown`, { page: "preferences-ui" });
-            
-            // Update active profile info in the new card format
-            const activeProfileName = document.getElementById('activeProfileName');
-            const activeProfileDescription = document.getElementById('activeProfileDescription');
-            const activeProfileInfo = document.getElementById('activeProfileInfo'); // Summary element
-            
-            if (activeProfile) {
-                if (activeProfileName) {
-                    activeProfileName.textContent = activeProfile.name;
-                }
-                if (activeProfileDescription) {
-                    activeProfileDescription.textContent = activeProfile.description || 'פרופיל משתמש';
-                }
-                if (activeProfileInfo) {
-                    activeProfileInfo.textContent = activeProfile.name;
-                }
-                window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ${activeProfile.name}`, { page: "preferences-ui" });
-                
-                // Check if this is the default profile and disable all preferences
-                // Default profile is: ID = 0, or is_default = true, or name matches
-                const isDefaultProfile = activeProfile.id === 0 || 
-                                       activeProfile.is_default === true || 
-                                       activeProfile.default === true ||
-                                       activeProfile.name === 'ברירת מחדל' || 
-                                       activeProfile.name === 'פרופיל ברירת מחדל';
-                
-                window.Logger.info(`🔍 Profile check: ID=${activeProfile.id}, is_default=${activeProfile.is_default}, name="${activeProfile.name}", isDefaultProfile=${isDefaultProfile}`, { page: "preferences-ui" });
-                
-                if (isDefaultProfile) {
-                    window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-ui" });
-                    window.disableAllPreferencesInterface();
-                } else {
-                    window.Logger.info('✅ User profile active - enabling all preferences interface', { page: "preferences-ui" });
-                    window.enableAllPreferencesInterface();
-                }
-            } else {
-                if (activeProfileName) {
-                    activeProfileName.textContent = 'ברירת מחדל';
-                }
-                if (activeProfileDescription) {
-                    activeProfileDescription.textContent = 'פרופיל ברירת מחדל של המערכת';
-                }
-                if (activeProfileInfo) {
-                    activeProfileInfo.textContent = 'ברירת מחדל';
-                }
-                window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ברירת מחדל (no active profile)`, { page: "preferences-ui" });
-                
-                // Default profile is active - disable all preferences
-                window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-ui" });
-                window.disableAllPreferencesInterface();
-            }
-            
-            return true;
         } else {
-            window.Logger.info('⚠️ No profiles found, using default', { page: "preferences-ui" });
-            return false;
+            const option = document.createElement('option');
+            option.value = 0;
+            option.textContent = 'ברירת מחדל';
+            option.selected = true;
+            profileSelect.appendChild(option);
         }
+        
+        if (window.PreferencesUI.state.activeProfileId === 0 && window.PreferencesUI.state.isFallback) {
+            window.Logger.info('🔒 Fallback/default profile active - disabling interface', { page: "preferences-ui" });
+            window.disableAllPreferencesInterface();
+        } else {
+            window.Logger.info('✅ User profile active - enabling interface', { page: "preferences-ui" });
+            window.enableAllPreferencesInterface();
+        }
+        
+        window.Logger.info(`✅ Loaded ${profiles.length} profiles to dropdown`, { page: "preferences-ui" });
+        return true;
     } catch (error) {
         window.Logger.error('❌ Error loading profiles to dropdown:', error, { page: "preferences-ui" });
+        if (window.PreferencesUI) {
+            window.PreferencesUI.updateGlobalPreferences({
+                id: 0,
+                name: 'ברירת מחדל',
+                isFallback: true,
+                fallbackMessage: `שגיאה בטעינת פרופילים עבור משתמש #${userId} – מוצגים נתוני ברירת מחדל`,
+                warnings: ['load_profiles_dropdown_error']
+            });
+        }
+        window.disableAllPreferencesInterface();
         return false;
     }
 };

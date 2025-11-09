@@ -24,6 +24,8 @@ class PreferencesGroupManager {
             'section6': 'colors_unified',
             'section7': 'chart_settings_unified'
         };
+        this.currentUserId = 1;
+        this.currentProfileId = null;
     }
     
     /**
@@ -105,6 +107,14 @@ class PreferencesGroupManager {
             this.populateGroupFields(sectionId, preferences);
             this.markGroupAsLoaded(sectionId);
             
+            if (window.PreferencesCore) {
+                this.currentUserId = window.PreferencesCore.currentUserId || this.currentUserId;
+                this.currentProfileId = window.PreferencesCore.currentProfileId ?? this.currentProfileId;
+            } else if (window.PreferencesUI) {
+                this.currentUserId = window.PreferencesUI.currentUserId || this.currentUserId;
+                this.currentProfileId = window.PreferencesUI.currentProfileId ?? this.currentProfileId;
+            }
+            
             window.Logger?.info(`✅ Loaded ${Object.keys(preferences).length} preferences for group ${groupName}`, { page: "preferences-group-manager" });
         } catch (error) {
             window.Logger?.error(`Failed to load group ${groupName}:`, error, { page: "preferences-group-manager" });
@@ -180,11 +190,19 @@ class PreferencesGroupManager {
             
             // שמירה
             const results = await window.PreferencesCore.saveGroupPreferences(groupName, formData);
+            const userId = window.PreferencesCore?.currentUserId || window.PreferencesUI?.currentUserId || this.currentUserId || 1;
+            const profileId = window.PreferencesCore?.currentProfileId || window.PreferencesUI?.currentProfileId || this.currentProfileId || 0;
+            const savedKeys = Object.keys(formData);
             
             // ניקוי cache של הקבוצה
             if (window.UnifiedCacheManager && window.UnifiedCacheManager.refreshUserPreferences) {
-                await window.UnifiedCacheManager.refreshUserPreferences(null, groupName);
+                await window.UnifiedCacheManager.refreshUserPreferences(profileId, groupName, {
+                    userId,
+                    preferenceNames: savedKeys
+                });
             }
+            
+            await this.refreshGroupState(groupName, savedKeys);
             
             // הודעת הצלחה
             const displayName = this.getGroupDisplayName(groupName);
@@ -266,6 +284,133 @@ class PreferencesGroupManager {
         const section = document.getElementById(sectionId);
         if (section) {
             section.dataset.loaded = 'true';
+        }
+    }
+    
+    /**
+     * רענון מצב הקבוצה והעדפות גלובליות אחרי שמירה
+     * @param {string} groupName - Group name
+     * @param {Array<string>} savedKeys - Saved preference keys
+     */
+    async refreshGroupState(groupName, savedKeys = []) {
+        try {
+            const userId = window.PreferencesCore?.currentUserId || window.PreferencesUI?.currentUserId || this.currentUserId || 1;
+            let profileId = window.PreferencesCore?.currentProfileId;
+            
+            if (profileId === null || profileId === undefined) {
+                if (window.PreferencesUI?.currentProfileId !== null && window.PreferencesUI?.currentProfileId !== undefined) {
+                    profileId = window.PreferencesUI.currentProfileId;
+                } else if (typeof window.PreferencesUI?.loadActiveProfile === 'function') {
+                    profileId = await window.PreferencesUI.loadActiveProfile();
+                } else if (this.currentProfileId !== null && this.currentProfileId !== undefined) {
+                    profileId = this.currentProfileId;
+                } else {
+                    profileId = 0;
+                }
+            }
+            
+            this.currentUserId = userId;
+            this.currentProfileId = profileId;
+            
+            if (!window.PreferencesCore?.loadGroupPreferences) {
+                window.Logger?.warn('PreferencesCore.loadGroupPreferences unavailable - skipping refresh', { page: "preferences-group-manager" });
+                return;
+            }
+            
+            const refreshedGroup = await window.PreferencesCore.loadGroupPreferences(groupName, userId, profileId);
+            const latestContext = window.PreferencesCore?.getLatestProfileContext?.() || window.PreferencesUI?.profileContext || null;
+            if (!refreshedGroup || typeof refreshedGroup !== 'object') {
+                window.Logger?.warn(`No refreshed data returned for group ${groupName}`, { page: "preferences-group-manager" });
+                return;
+            }
+            
+            let combinedPreferences = {};
+            if (window.PreferencesUI?.cachedPreferences && Object.keys(window.PreferencesUI.cachedPreferences).length > 0) {
+                combinedPreferences = { ...window.PreferencesUI.cachedPreferences, ...refreshedGroup };
+            } else if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+                combinedPreferences = { ...window.currentPreferences, ...refreshedGroup };
+            } else {
+                combinedPreferences = { ...refreshedGroup };
+            }
+            
+            if (window.PreferencesUI && typeof window.PreferencesUI.updateGlobalPreferences === 'function') {
+                window.PreferencesUI.updateGlobalPreferences(combinedPreferences, userId, profileId, latestContext);
+            } else {
+                window.currentPreferences = { ...(window.currentPreferences || {}), ...refreshedGroup };
+                window.userPreferences = { ...(window.userPreferences || {}), ...refreshedGroup };
+                
+                if (window.PreferencesSystem?.manager) {
+                    window.PreferencesSystem.manager.currentPreferences = {
+                        ...(window.PreferencesSystem.manager.currentPreferences || {}),
+                        ...refreshedGroup
+                    };
+                    if (typeof window.PreferencesSystem.manager.setActiveProfile === 'function') {
+                        window.PreferencesSystem.manager.setActiveProfile(profileId);
+                    } else {
+                        window.PreferencesSystem.manager.currentProfile = profileId;
+                    }
+                }
+
+                if (window.PreferencesUI) {
+                    window.PreferencesUI.cachedPreferences = combinedPreferences;
+                    window.PreferencesUI.currentUserId = userId;
+                    window.PreferencesUI.currentProfileId = profileId;
+                }
+                
+                if (typeof window.updateCSSVariablesFromPreferences === 'function') {
+                    window.updateCSSVariablesFromPreferences(window.currentPreferences);
+                } else if (window.ColorSchemeSystem?.updateCSSVariablesFromPreferences) {
+                    window.ColorSchemeSystem.updateCSSVariablesFromPreferences(window.currentPreferences);
+                } else if (window.colorSchemeSystem?.updateCSSVariablesFromPreferences) {
+                    window.colorSchemeSystem.updateCSSVariablesFromPreferences(window.currentPreferences);
+                }
+                
+            }
+
+            if (typeof window.dispatchEvent === 'function') {
+                window.dispatchEvent(new CustomEvent('preferences:group-updated', {
+                    detail: {
+                        groupName,
+                        userId,
+                        profileId,
+                        updatedKeys: savedKeys,
+                        preferenceCount: Object.keys(refreshedGroup).length
+                    }
+                }));
+            }
+            
+            // Update color-related systems if needed
+            if (groupName === 'colors_unified') {
+                if (window.ColorPickerManager) {
+                    window.ColorPickerManager.loadColors(refreshedGroup);
+                }
+                if (window.ColorManager && window.ColorManager.colorCache instanceof Map) {
+                    Object.keys(refreshedGroup).forEach(key => {
+                        if (window.ColorManager.defaultColors && Object.prototype.hasOwnProperty.call(window.ColorManager.defaultColors, key)) {
+                            window.ColorManager.colorCache.set(key, refreshedGroup[key]);
+                        }
+                    });
+                }
+            }
+            
+            // Re-populate UI fields with refreshed values
+            const sectionId = Object.keys(this.groupsMap).find(id => this.groupsMap[id] === groupName);
+            if (sectionId) {
+                this.populateGroupFields(sectionId, refreshedGroup);
+            }
+            
+            if (groupName === 'basic_settings' && typeof window.loadAccountsForPreferences === 'function') {
+                await window.loadAccountsForPreferences();
+            }
+            
+            window.Logger?.info(`✅ Group ${groupName} state refreshed successfully`, {
+                page: "preferences-group-manager",
+                profileId,
+                userId,
+                updatedKeysCount: savedKeys.length
+            });
+        } catch (error) {
+            window.Logger?.warn(`⚠️ Failed to refresh group ${groupName} after save`, error, { page: "preferences-group-manager" });
         }
     }
 }

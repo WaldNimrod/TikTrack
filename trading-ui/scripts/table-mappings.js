@@ -84,12 +84,12 @@ const TABLE_COLUMN_MAPPINGS = {
 
   // טבלת ביצועים (Executions) - Executions Page Structure (מוצג בפועל)
   'executions': [
-    'ticker_symbol',         // 0 - טיקר
-    'action',                // 1 - פעולה
-    'account_name',          // 2 - חשבון מסחר
-    'quantity',              // 3 - כמות
-    'price',                 // 4 - מחיר
-    'pl',                    // 5 - P&L
+    'trade_id',              // 0 - טרייד משויך
+    'ticker_symbol',         // 1 - טיקר
+    'action',                // 2 - פעולה (קניה/מכירה)
+    'account_name',          // 3 - חשבון מסחר
+    'quantity',              // 4 - כמות
+    'price',                 // 5 - מחיר
     'realized_pl',           // 6 - Realized P/L
     'mtm_pl',                // 7 - MTM P/L
     'date',                  // 8 - תאריך
@@ -200,19 +200,162 @@ const TABLE_COLUMN_MAPPINGS = {
 
   // טבלת המלצות שיוך לטריידים (Trade Suggestions) - Executions Page
   'trade_suggestions': [
-    'checkbox',                // 0 - בחירה (לא ניתן למיין)
-    'score',                   // 1 - ציון התאמה
-    'execution_id',            // 2 - מזהה ביצוע (להצגת כרטיס ביצוע)
-    'trade_id',                // 3 - מזהה טרייד (להצגת כרטיס טרייד)
-    'account_name',            // 4 - חשבון מסחר
-    'created_at',              // 5 - תאריך פתיחת הטרייד
-    'status',                  // 6 - סטטוס טרייד
-    'side',                    // 7 - צד (Long/Short)
-    'investment_type',         // 8 - סוג השקעה
-    'match_reasons_text',      // 9 - סיבות התאמה (טקסט חופשי)
-    'actions',                 // 10 - פעולות (לא ניתן למיין)
+    { key: 'checkbox', sortable: false },               // 0 - בחירה (לא ניתן למיין)
+    { key: 'score', sortType: 'numeric' },              // 1 - ציון התאמה
+    { key: 'execution_id', sortType: 'numeric' },       // 2 - מזהה ביצוע (להצגת כרטיס ביצוע)
+    { key: 'trade_id', sortType: 'numeric' },           // 3 - מזהה טרייד (להצגת כרטיס טרייד)
+    { key: 'account_name', sortType: 'string' },        // 4 - חשבון מסחר
+    { key: 'trade_created_at', sortType: 'dateEnvelope' }, // 5 - תאריך טרייד (Envelope)
+    { key: 'status', sortType: 'string' },              // 6 - סטטוס טרייד
+    { key: 'side', sortType: 'string' },                // 7 - צד (Long/Short)
+    { key: 'investment_type', sortType: 'string' },     // 8 - סוג השקעה
+    { key: 'match_reasons_text', sortType: 'string' },  // 9 - סיבות התאמה (טקסט חופשי)
+    { key: 'actions', sortable: false },                // 10 - פעולות (לא ניתן למיין)
   ],
 };
+
+const TABLE_COLUMN_SORT_TYPES = {
+  trade_suggestions: {
+    score: 'numeric',
+    execution_id: 'numeric',
+    trade_id: 'numeric',
+    account_name: 'string',
+    trade_created_at: 'dateEnvelope',
+    status: 'string',
+    side: 'string',
+    investment_type: 'string',
+    match_reasons_text: 'string'
+  },
+  executions: {
+    date: 'date'
+  },
+  trades: {
+    created_at: 'date',
+    closed_at: 'date'
+  },
+  trade_plans: {
+    created_at: 'date'
+  },
+  cash_flows: {
+    date: 'date'
+  },
+  alerts: {
+    created_at: 'date',
+    expiry_date: 'date'
+  },
+  notes: {
+    created_at: 'date'
+  },
+  linked_items: {
+    created_at: 'date'
+  }
+};
+
+function normalizeColumnEntry(entry) {
+  if (!entry) {
+    return { key: null };
+  }
+  if (typeof entry === 'string') {
+    return { key: entry };
+  }
+  if (typeof entry === 'object') {
+    if (entry.key) {
+      return { ...entry };
+    }
+    if (entry.name) {
+      return { ...entry, key: entry.name };
+    }
+  }
+  return { key: null };
+}
+
+const TABLE_COLUMN_KEYS = Object.fromEntries(
+  Object.entries(TABLE_COLUMN_MAPPINGS).map(([tableType, columns]) => {
+    const keys = columns.map(entry => normalizeColumnEntry(entry).key).filter(key => key !== null);
+    return [tableType, keys];
+  })
+);
+
+function resolveUserTimezone() {
+  if (window.currentPreferences && window.currentPreferences.timezone) {
+    if (typeof window.setUserTimezone === 'function') {
+      window.setUserTimezone(window.currentPreferences.timezone);
+    }
+    return window.currentPreferences.timezone;
+  }
+  if (window.PreferencesSystem?.manager?.currentPreferences?.timezone) {
+    if (typeof window.setUserTimezone === 'function') {
+      window.setUserTimezone(window.PreferencesSystem.manager.currentPreferences.timezone);
+    }
+    return window.PreferencesSystem.manager.currentPreferences.timezone;
+  }
+  try {
+    const fallbackTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+    if (typeof window.setUserTimezone === 'function') {
+      window.setUserTimezone(fallbackTimezone);
+    }
+    return fallbackTimezone;
+  } catch (error) {
+    console.warn('⚠️ Unable to resolve user timezone, falling back to UTC', error);
+    return 'UTC';
+  }
+}
+
+function buildDateEnvelope(rawValue, options = {}) {
+  if (!rawValue && rawValue !== 0) {
+    return null;
+  }
+
+  if (typeof rawValue === 'object' && (rawValue.epochMs !== undefined || rawValue.utc || rawValue.local)) {
+    return rawValue;
+  }
+
+  let epochMs = null;
+  let sourceString = null;
+
+  if (typeof rawValue === 'number' && Number.isFinite(rawValue)) {
+    epochMs = rawValue;
+  } else if (rawValue instanceof Date) {
+    epochMs = rawValue.getTime();
+    sourceString = rawValue.toISOString();
+  } else if (typeof rawValue === 'string') {
+    const trimmed = rawValue.trim();
+    if (trimmed) {
+      const parsed = Date.parse(trimmed);
+      if (!Number.isNaN(parsed)) {
+        epochMs = parsed;
+        sourceString = trimmed;
+      }
+    }
+  }
+
+  if (epochMs === null) {
+    return null;
+  }
+
+  const utc = new Date(epochMs).toISOString();
+  const timezone = options.timezone || resolveUserTimezone();
+  const local = sourceString || utc;
+  let display = '-';
+
+  try {
+    if (typeof window.formatDate === 'function') {
+      display = window.formatDate(local);
+    } else {
+      display = new Date(epochMs).toLocaleDateString('he-IL');
+    }
+  } catch {
+    display = new Date(epochMs).toISOString().split('T')[0];
+  }
+
+  return {
+    utc,
+    epochMs,
+    local,
+    timezone,
+    display
+  };
+}
 
 /**
  * פונקציה לקבלת ערך עמודה מפריט נתונים
@@ -228,7 +371,43 @@ const TABLE_COLUMN_MAPPINGS = {
  */
 function getColumnValue(item, columnIndex, tableType) {
   const columns = TABLE_COLUMN_MAPPINGS[tableType] || [];
-  const fieldName = columns[columnIndex];
+  const columnMeta = normalizeColumnEntry(columns[columnIndex]);
+  const fieldName = columnMeta.key;
+
+  const parseSortDateValue = (rawValue) => {
+    if (!rawValue && rawValue !== 0) {
+      return 0;
+    }
+    if (rawValue instanceof Date) {
+      return rawValue.getTime();
+    }
+    if (typeof rawValue === 'number' && Number.isFinite(rawValue)) {
+      return rawValue;
+    }
+    if (typeof rawValue === 'string') {
+      const trimmed = rawValue.trim();
+      if (!trimmed) {
+        return 0;
+      }
+
+      const dateMatch = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+      if (dateMatch) {
+        const datePart = dateMatch[1];
+        const timestamp = Date.parse(`${datePart}T00:00:00Z`);
+        if (!Number.isNaN(timestamp)) {
+          return timestamp;
+        }
+      }
+
+      const parsed = Date.parse(trimmed);
+      if (!Number.isNaN(parsed)) {
+        const normalized = new Date(parsed);
+        normalized.setHours(0, 0, 0, 0);
+        return normalized.getTime();
+      }
+    }
+    return 0;
+  };
 
   if (!fieldName) {
     // No column mapping found for table type and column index
@@ -587,8 +766,13 @@ function getColumnValue(item, columnIndex, tableType) {
       // Score is a number - return as number for proper sorting
       return item.score || 0;
     }
-    if (fieldName === 'execution_id') {
-      return item.execution_id || 0;
+    if (fieldName === 'execution_date') {
+      const envelopeCandidate = item.execution_date;
+      if (envelopeCandidate && typeof envelopeCandidate === 'object') {
+        return envelopeCandidate;
+      }
+      const directValue = item.execution_date || (item.execution && item.execution.date);
+      return buildDateEnvelope(directValue);
     }
     if (fieldName === 'trade_id') {
       return item.trade_id || 0;
@@ -596,10 +780,15 @@ function getColumnValue(item, columnIndex, tableType) {
     if (fieldName === 'account_name') {
       return item.account_name || '';
     }
-    if (fieldName === 'created_at') {
-      // Return timestamp for date sorting
-      const dateValue = item.created_at || '';
-      return dateValue ? new Date(dateValue).getTime() : 0;
+    if (fieldName === 'trade_created_at') {
+      const envelopeCandidate = item.trade_created_at;
+      if (envelopeCandidate && typeof envelopeCandidate === 'object') {
+        return envelopeCandidate;
+      }
+      const dateValue = item.trade_created_at
+        || (item.suggestion && (item.suggestion.created_at || item.suggestion.opened_at || item.suggestion.open_date || item.suggestion.start_date))
+        || null;
+      return buildDateEnvelope(dateValue);
     }
     if (fieldName === 'status') {
       return item.status || '';
@@ -641,7 +830,7 @@ function getColumnValue(item, columnIndex, tableType) {
  * @returns {Array} מערך שמות השדות / Array of field names
  */
 function getTableMapping(tableType) {
-  return TABLE_COLUMN_MAPPINGS[tableType] || [];
+  return TABLE_COLUMN_KEYS[tableType] || [];
 }
 
 /**
@@ -754,18 +943,19 @@ function getColumnDefinition(tableName, columnName) {
   let columnIndex = -1;
   let fieldName = '';
 
-  // Handle both string column names and numeric indices
   if (typeof columnName === 'string') {
-    columnIndex = tableMapping.indexOf(columnName);
+    columnIndex = tableMapping.findIndex(entry => normalizeColumnEntry(entry).key === columnName);
     fieldName = columnName;
   } else if (typeof columnName === 'number') {
     columnIndex = columnName;
-    fieldName = tableMapping[columnName];
+    fieldName = normalizeColumnEntry(tableMapping[columnName]).key;
   }
 
   if (columnIndex === -1 || !fieldName) {
     return null;
   }
+
+  const resolvedSortType = getColumnSortType(tableName, columnIndex) || 'string';
 
   // Default column definition
   const defaultDefinition = {
@@ -776,57 +966,86 @@ function getColumnDefinition(tableName, columnName) {
     searchable: true,
     type: 'string',
     display: 'text',
-    width: 'auto'
+    width: 'auto',
+    sortType: resolvedSortType
   };
 
   // Column-specific definitions
   const columnDefinitions = {
     // Date columns
-    'created_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
-    'updated_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
-    'opened_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
-    'closed_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
-    'cancelled_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
-    'date': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
-    'triggered_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date' },
+    'created_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date', sortType: resolvedSortType || 'date' },
+    'updated_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date', sortType: resolvedSortType || 'date' },
+    'opened_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date', sortType: resolvedSortType || 'date' },
+    'closed_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date', sortType: resolvedSortType || 'date' },
+    'cancelled_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date', sortType: resolvedSortType || 'date' },
+    'date': { ...defaultDefinition, type: 'date', sortable: true, display: 'date', sortType: resolvedSortType || 'date' },
+    'triggered_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date', sortType: resolvedSortType || 'date' },
+    'trade_created_at': { ...defaultDefinition, type: 'date', sortable: true, display: 'date', sortType: resolvedSortType || 'dateEnvelope' },
 
     // Numeric columns
-    'id': { ...defaultDefinition, type: 'number', sortable: true, display: 'number', width: '80px' },
-    'quantity': { ...defaultDefinition, type: 'number', sortable: true, display: 'number' },
-    'price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
-    'amount': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
-    'fee': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
-    'total_pl': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    'id': { ...defaultDefinition, type: 'number', sortable: true, display: 'number', width: '80px', sortType: resolvedSortType || 'numeric' },
+    'quantity': { ...defaultDefinition, type: 'number', sortable: true, display: 'number', sortType: resolvedSortType || 'numeric' },
+    'price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
+    'amount': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
+    'fee': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
+    'total_pl': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
     // 'cash_balance' removed - calculated in real-time via AccountActivityService
-    'total_value': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
-    'planned_amount': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
-    'stop_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
-    'target_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency' },
+    'total_value': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
+    'planned_amount': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
+    'stop_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
+    'target_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
 
     // Status columns
-    'status': { ...defaultDefinition, type: 'status', sortable: true, display: 'status', filterable: true },
-    'investment_type': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true },
-    'side': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true },
-    'type': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true },
-    'action': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true },
+    'status': { ...defaultDefinition, type: 'status', sortable: true, display: 'status', filterable: true, sortType: resolvedSortType || 'string' },
+    'investment_type': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true, sortType: resolvedSortType || 'string' },
+    'side': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true, sortType: resolvedSortType || 'string' },
+    'type': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true, sortType: resolvedSortType || 'string' },
+    'action': { ...defaultDefinition, type: 'enum', sortable: true, display: 'badge', filterable: true, sortType: resolvedSortType || 'string' },
 
     // Boolean columns
-    'is_triggered': { ...defaultDefinition, type: 'boolean', sortable: true, display: 'boolean', filterable: true },
-    'active_trades': { ...defaultDefinition, type: 'boolean', sortable: true, display: 'boolean', filterable: true },
+    'is_triggered': { ...defaultDefinition, type: 'boolean', sortable: true, display: 'boolean', filterable: true, sortType: resolvedSortType || 'boolean' },
+    'active_trades': { ...defaultDefinition, type: 'boolean', sortable: true, display: 'boolean', filterable: true, sortType: resolvedSortType || 'boolean' },
 
     // Text columns (non-sortable)
-    'notes': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
-    'message': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
-    'description': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
-    'content': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
-    'reasons': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
-    'entry_conditions': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text' },
+    'notes': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text', sortType: resolvedSortType || 'string' },
+    'message': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text', sortType: resolvedSortType || 'string' },
+    'description': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text', sortType: resolvedSortType || 'string' },
+    'content': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text', sortType: resolvedSortType || 'string' },
+    'reasons': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text', sortType: resolvedSortType || 'string' },
+    'entry_conditions': { ...defaultDefinition, sortable: false, filterable: true, searchable: true, display: 'text', sortType: resolvedSortType || 'string' },
 
     // Action columns (non-sortable, non-filterable)
-    'actions': { ...defaultDefinition, sortable: false, filterable: false, searchable: false, display: 'actions', width: '120px' }
+    'actions': { ...defaultDefinition, sortable: false, filterable: false, searchable: false, display: 'actions', width: '120px', sortType: null }
   };
 
   return columnDefinitions[fieldName] || defaultDefinition;
+}
+
+function getColumnSortType(tableType, column) {
+  const mappings = TABLE_COLUMN_MAPPINGS[tableType] || [];
+  if (typeof column === 'number') {
+    const entry = normalizeColumnEntry(mappings[column]);
+    return entry.sortType || (TABLE_COLUMN_SORT_TYPES[tableType] ? TABLE_COLUMN_SORT_TYPES[tableType][entry.key] : null) || null;
+  }
+  if (typeof column === 'string') {
+    const entry = mappings.find(item => normalizeColumnEntry(item).key === column);
+    if (!entry) {
+      return TABLE_COLUMN_SORT_TYPES[tableType] ? TABLE_COLUMN_SORT_TYPES[tableType][column] : null;
+    }
+    const normalized = normalizeColumnEntry(entry);
+    return normalized.sortType || (TABLE_COLUMN_SORT_TYPES[tableType] ? TABLE_COLUMN_SORT_TYPES[tableType][normalized.key] : null) || null;
+  }
+  return null;
+}
+
+function getColumnKey(tableType, columnIndex) {
+  const mappings = TABLE_COLUMN_MAPPINGS[tableType] || [];
+  const entry = mappings[columnIndex];
+  if (!entry) {
+    return null;
+  }
+  const normalized = normalizeColumnEntry(entry);
+  return normalized.key || null;
 }
 
 // ===== ייצוא הפונקציות והמיפויים =====
@@ -836,21 +1055,28 @@ function getColumnDefinition(tableName, columnName) {
 // All table-related scripts depend on these functions being available.
 
 console.log('🔵 [table-mappings.js] About to export TABLE_COLUMN_MAPPINGS');
-console.log('🔵 [table-mappings.js] TABLE_COLUMN_MAPPINGS keys:', Object.keys(TABLE_COLUMN_MAPPINGS));
+console.log('🔵 [table-mappings.js] TABLE_COLUMN_MAPPINGS keys:', Object.keys(TABLE_COLUMN_KEYS));
 
-window.TABLE_COLUMN_MAPPINGS = TABLE_COLUMN_MAPPINGS;
+window.TABLE_COLUMN_MAPPINGS = TABLE_COLUMN_KEYS;
 window.getColumnValue = getColumnValue;
 window.getTableMapping = getTableMapping;
 window.isTableSupported = isTableSupported;
 window.getTableConfig = getTableConfig;
 window.getColumnDefinition = getColumnDefinition;
+window.getColumnSortType = getColumnSortType;
+window.getColumnKey = getColumnKey;
 
 // ייצוא המודול עצמו
 window.tableMappings = {
   TABLE_COLUMN_MAPPINGS,
+  TABLE_COLUMN_KEYS,
   getColumnValue,
   getTableMapping,
   isTableSupported,
+  getColumnDefinition,
+  getColumnSortType,
+  buildDateEnvelope,
+  getColumnKey,
 };
 
 console.log('🔵 [table-mappings.js] Exported to window.TABLE_COLUMN_MAPPINGS');

@@ -35,6 +35,12 @@
 - [ ] הפרופיל הפעיל מסומן נכון ב-dropdown
 - [ ] כרטיס הפרופיל הפעיל מציג את המידע הנכון
 
+### 1.4 מצב ללא פרופיל פעיל (Fallback)
+- [ ] סימולציה ללא פרופיל פעיל (עדכון `is_active=0` ב-DB) → קריאה ל-`/api/preferences/user` מחזירה `no_active_profile=true`
+- [ ] באנר fallback מוצג בחלק העליון עם טקסט: "אין פרופיל פעיל עבור <שם המשתמש> (user #<id>) – מציגים נתוני ברירת מחדל"
+- [ ] `window.PreferencesCore.currentProfileId` מוגדר ל-`0` ו-`PreferencesUI.state.isFallback=true`
+- [ ] החזרת פרופיל פעיל → הבאנר נעלם וה-state חוזר לערכי הפרופיל הייעודי
+
 ---
 
 ## ✅ שלב 2: בדיקות החלפת פרופיל
@@ -72,21 +78,26 @@
 ### 3.1 ניקוי מטמון אחרי החלפת פרופיל
 - [ ] פתיחת Developer Tools > Application > Local Storage
 - [ ] החלפת פרופיל
-- [ ] בדיקה שכל המפתחות `preference_*` נמחקו
-- [ ] בדיקה שכל המפתחות `all_preferences_*` נמחקו
-- [ ] בדיקה ש-`active_profile_info` נמחק
+- [ ] בדיקה שכל המפתחות `tiktrack_preference_*__profile_<id>` של הפרופיל הקודם נמחקו
+- [ ] בדיקה שכל המפתחות `all_preferences_*__profile_<id>` נמחקו
+- [ ] בדיקה ש-`preferences-active-profile` מכיל `{ id, name, isFallback }` עבור הפרופיל החדש
 - [ ] בדיקה ש-`profile_summary` נמחק
 - [ ] בדיקה ש-`user_profiles` נמחק
 
 ### 3.2 טעינה מחדש אחרי ניקוי מטמון
 - [ ] אחרי החלפת פרופיל, בדיקה שהנתונים נטענים מהשרת
 - [ ] בדיקה שהמטמון מתמלא מחדש עם ערכים נכונים
-- [ ] בדיקה ש-`preference_{name}_{userId}_{profileId}` נוצרים נכון
+- [ ] בדיקה שמפתחות `tiktrack_preference_<name>__profile_<id>` נוצרים עבור הפרופיל החדש
 
 ### 3.3 Cache Keys עקביים
-- [ ] בדיקה שכל המפתחות עוקבים אחרי הפורמט: `preference_{name}_{userId}_{profileId}`
+- [ ] בדיקה שכל המפתחות עוקבים אחרי הפורמט: `tiktrack_preference_<name>__profile_<id>`
 - [ ] בדיקה שאין מפתחות ישנים או לא עקביים
 - [ ] בדיקה שמפתחות משתמשים ב-`userId` ו-`profileId` נכונים
+
+### 3.4 Lazy Loader אחרי Fallback
+- [ ] השבתת פרופיל פעיל → `PreferencesLazyLoader` מבצע קריאה מלאה עם `{ userId, profileId: 0 }`
+- [ ] אחרי שחזור הפרופיל, מפתחות `__profile_0` נמחקים אוטומטית ומוחלפים בערכים של הפרופיל הפעיל
+- [ ] בדיקה ש-`window.currentPreferences` מכיל נתונים לאחר כל טעינה (לא נשאר אובייקט ריק)
 
 ---
 

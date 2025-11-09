@@ -17089,3 +17089,672 @@ sqlalchemy.exc.DatabaseError: (sqlite3.DatabaseError) database disk image is mal
 2025-11-08 18:35:26,927 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:32b67cdd290972561b6a13202c59c5e1
 2025-11-08 18:36:23,886 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:99a46b8e1eff84edff727f9da4714c89
 2025-11-08 18:36:23,886 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:99a46b8e1eff84edff727f9da4714c89
+2025-11-09 12:11:33,676 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:9f3d2208f601540741fb82caf4c8ad9b
+2025-11-09 12:40:31,377 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:b938847bc0995b44b1167ba09889e8ac
+2025-11-09 12:52:12,579 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-09 12:52:12,580 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-09 12:52:12,580 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-09 12:52:12,580 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-09 12:52:12,580 - root - INFO - 🗄️ Initializing database...
+2025-11-09 12:52:12,580 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-09 12:52:12,583 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-11-09 12:52:12,583 - root - INFO - ✅ Database initialized successfully
+2025-11-09 12:52:12,806 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-09 12:52:12,806 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-09 12:52:12,806 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-09 12:52:12,806 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-09 12:52:12,806 - root - INFO - 🗄️ Initializing database...
+2025-11-09 12:52:12,806 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-09 12:52:12,810 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-11-09 12:52:12,810 - root - INFO - ✅ Database initialized successfully
+2025-11-09 12:52:13,588 - utils.performance_monitor - INFO - System metrics: CPU: 15.6%, Memory: 56.7%, Disk: 4.4%
+2025-11-09 12:52:13,589 - root - INFO - ✅ Database initialized successfully
+2025-11-09 12:52:13,589 - root - INFO - ✅ Server initialization completed
+2025-11-09 12:52:13,639 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-09 12:52:13,647 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-09 12:52:13,647 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 12:52:13,647 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 12:52:13,647 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-09 12:52:13,648 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-09 12:52:13,648 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-09 12:52:13,648 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 12:52:13,648 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 12:52:13,648 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-09 12:52:13,648 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-09 12:52:13,648 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-09 12:52:13,648 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-09 12:52:13,648 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-09 12:52:13,648 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-09 12:52:13,648 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-09 12:52:13,648 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-09 12:52:13,649 - services.background_tasks - INFO - Background task scheduler started
+2025-11-09 12:52:13,649 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-09 12:52:13,678 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:b87bc773755dad5679e4607a94f9c807
+2025-11-09 12:52:13,678 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:b87bc773755dad5679e4607a94f9c807
+2025-11-09 12:52:13,678 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-09 12:52:13,679 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-09 12:52:13,680 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-09 12:52:13,815 - utils.performance_monitor - INFO - System metrics: CPU: 17.3%, Memory: 56.7%, Disk: 4.4%
+2025-11-09 12:52:13,815 - root - INFO - ✅ Database initialized successfully
+2025-11-09 12:52:13,815 - root - INFO - ✅ Server initialization completed
+2025-11-09 12:52:13,860 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-09 12:52:13,868 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-09 12:52:13,868 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 12:52:13,868 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 12:52:13,868 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-09 12:52:13,868 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-09 12:52:13,868 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-09 12:52:13,868 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 12:52:13,869 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 12:52:13,869 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-09 12:52:13,869 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-09 12:52:13,869 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-09 12:52:13,869 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-09 12:52:13,869 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-09 12:52:13,869 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-09 12:52:13,869 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-09 12:52:13,869 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-09 12:52:13,869 - services.background_tasks - INFO - Background task scheduler started
+2025-11-09 12:52:13,869 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-09 12:52:13,898 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:d60da8099b357e065606d2b78e74dea6
+2025-11-09 12:52:13,898 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:d60da8099b357e065606d2b78e74dea6
+2025-11-09 12:52:13,899 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-09 12:52:13,900 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-09 12:52:13,901 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-09 12:52:14,526 - services.user_data_import.connector_registry - WARNING - Connectors directory not found: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/connectors/user_data_import
+2025-11-09 12:52:14,526 - services.user_data_import.connector_registry - INFO - 🔍 Detecting connector for file: demo.csv
+2025-11-09 12:52:14,526 - services.user_data_import.connector_registry - WARNING - ❌ No connector detected for file: demo.csv
+2025-11-09 12:52:14,527 - services.user_data_import.connector_registry - WARNING - Connectors directory not found: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/connectors/user_data_import
+2025-11-09 12:52:14,527 - services.user_data_import.connector_registry - INFO - 🔍 Detecting connector for file: activity.csv
+2025-11-09 12:52:14,527 - services.user_data_import.connector_registry - WARNING - ❌ No connector detected for file: activity.csv
+2025-11-09 12:52:14,527 - services.user_data_import.connector_registry - WARNING - Connectors directory not found: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/connectors/user_data_import
+2025-11-09 12:52:14,527 - services.user_data_import.connector_registry - INFO - 🔍 Detecting connector for file: unknown.txt
+2025-11-09 12:52:14,528 - services.user_data_import.connector_registry - WARNING - ❌ No connector detected for file: unknown.txt
+2025-11-09 12:52:14,529 - services.user_data_import.file_storage_service - INFO - ✅ Saved file for session 124: 53 bytes, hash: b7e5835f8454b327...
+2025-11-09 12:52:14,529 - services.user_data_import.file_storage_service - INFO - ✅ Deleted 2 files for session 124
+2025-11-09 12:52:14,529 - services.user_data_import.file_storage_service - WARNING - File not found for session 124
+2025-11-09 12:52:14,529 - services.user_data_import.file_storage_service - WARNING - File not found for session 999
+2025-11-09 12:52:14,530 - services.user_data_import.file_storage_service - INFO - ✅ Saved file for session 123: 53 bytes, hash: b7e5835f8454b327...
+2025-11-09 12:52:14,531 - services.user_data_import.validation_service - INFO - 🔍 _check_missing_tickers called with 3 records
+2025-11-09 12:52:14,531 - services.user_data_import.validation_service - INFO - 📊 Found 3 unique symbols: ['AAPL', 'TSLA', 'UNKNOWN']...
+2025-11-09 12:52:14,531 - services.user_data_import.validation_service - INFO - 🔍 Using ticker cache for 3 symbols
+2025-11-09 12:52:14,531 - services.user_data_import.validation_service - INFO - ✅ Found 1 missing tickers: ['UNKNOWN']
+2025-11-09 12:52:14,535 - services.user_data_import.validation_service - INFO - 🔄 Loading ticker cache from database...
+2025-11-09 12:52:14,535 - services.user_data_import.validation_service - INFO - ✅ Loaded 2 tickers into cache
+2025-11-09 12:52:14,537 - services.user_data_import.duplicate_detection_service - INFO - Querying executions for symbols ['AAPL', 'TSLA'] between 2024-12-31 00:00:00 and 2025-01-03 00:00:00
+2025-11-09 12:52:14,538 - services.user_data_import.duplicate_detection_service - ERROR - Failed to query existing executions: '>=' not supported between instances of 'MagicMock' and 'datetime.datetime'
+2025-11-09 12:52:14,540 - services.user_data_import.import_processor - INFO - 🔄 Starting file processing for session 123
+2025-11-09 12:52:14,540 - services.user_data_import.import_processor - INFO - ✅ File processing completed for session 123
+2025-11-09 12:52:14,541 - services.user_data_import.import_orchestrator - INFO - 🔍 [File Analysis] Starting file analysis
+2025-11-09 12:52:14,542 - services.user_data_import.import_orchestrator - INFO - ✅ Session found: <Mock name='db_session.query().filter().first().id' id='4593177504'>, status: <Mock name='db_session.query().filter().first().status' id='4593177552'>
+2025-11-09 12:52:14,542 - services.user_data_import.import_orchestrator - ERROR - 💥 [File Analysis] Analysis failed
+Traceback (most recent call last):
+  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/user_data_import/import_orchestrator.py", line 257, in analyze_file
+    logger.info(f"📄 File content length: {len(file_content) if file_content else 0}, connector: {connector_type}")
+TypeError: object of type 'Mock' has no len()
+2025-11-09 12:52:14,549 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-09 12:52:14,550 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-09 12:52:14,551 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-09 12:52:14,552 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-09 12:52:14,553 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-09 12:52:14,554 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-09 12:52:14,556 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-09 12:52:14,557 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-09 12:52:14,558 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-09 12:52:14,722 - services.user_data_import.connector_registry - WARNING - Connectors directory not found: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/connectors/user_data_import
+2025-11-09 12:52:14,722 - services.user_data_import.connector_registry - INFO - 🔍 Detecting connector for file: demo.csv
+2025-11-09 12:52:14,722 - services.user_data_import.connector_registry - WARNING - ❌ No connector detected for file: demo.csv
+2025-11-09 12:52:14,723 - services.user_data_import.connector_registry - WARNING - Connectors directory not found: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/connectors/user_data_import
+2025-11-09 12:52:14,723 - services.user_data_import.connector_registry - INFO - 🔍 Detecting connector for file: activity.csv
+2025-11-09 12:52:14,723 - services.user_data_import.connector_registry - WARNING - ❌ No connector detected for file: activity.csv
+2025-11-09 12:52:14,723 - services.user_data_import.connector_registry - WARNING - Connectors directory not found: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/connectors/user_data_import
+2025-11-09 12:52:14,723 - services.user_data_import.connector_registry - INFO - 🔍 Detecting connector for file: unknown.txt
+2025-11-09 12:52:14,723 - services.user_data_import.connector_registry - WARNING - ❌ No connector detected for file: unknown.txt
+2025-11-09 12:52:14,724 - services.user_data_import.file_storage_service - INFO - ✅ Saved file for session 124: 53 bytes, hash: b7e5835f8454b327...
+2025-11-09 12:52:14,725 - services.user_data_import.file_storage_service - INFO - ✅ Deleted 2 files for session 124
+2025-11-09 12:52:14,725 - services.user_data_import.file_storage_service - WARNING - File not found for session 124
+2025-11-09 12:52:14,725 - services.user_data_import.file_storage_service - WARNING - File not found for session 999
+2025-11-09 12:52:14,726 - services.user_data_import.file_storage_service - INFO - ✅ Saved file for session 123: 53 bytes, hash: b7e5835f8454b327...
+2025-11-09 12:52:14,727 - services.user_data_import.validation_service - INFO - 🔍 _check_missing_tickers called with 3 records
+2025-11-09 12:52:14,727 - services.user_data_import.validation_service - INFO - 📊 Found 3 unique symbols: ['AAPL', 'TSLA', 'UNKNOWN']...
+2025-11-09 12:52:14,727 - services.user_data_import.validation_service - INFO - 🔍 Using ticker cache for 3 symbols
+2025-11-09 12:52:14,727 - services.user_data_import.validation_service - INFO - ✅ Found 1 missing tickers: ['UNKNOWN']
+2025-11-09 12:52:14,731 - services.user_data_import.validation_service - INFO - 🔄 Loading ticker cache from database...
+2025-11-09 12:52:14,731 - services.user_data_import.validation_service - INFO - ✅ Loaded 2 tickers into cache
+2025-11-09 12:52:14,733 - services.user_data_import.duplicate_detection_service - INFO - Querying executions for symbols ['AAPL', 'TSLA'] between 2024-12-31 00:00:00 and 2025-01-03 00:00:00
+2025-11-09 12:52:14,734 - services.user_data_import.duplicate_detection_service - ERROR - Failed to query existing executions: '>=' not supported between instances of 'MagicMock' and 'datetime.datetime'
+2025-11-09 12:52:14,735 - services.user_data_import.import_processor - INFO - 🔄 Starting file processing for session 123
+2025-11-09 12:52:14,736 - services.user_data_import.import_processor - INFO - ✅ File processing completed for session 123
+2025-11-09 12:52:14,737 - services.user_data_import.import_orchestrator - INFO - 🔍 [File Analysis] Starting file analysis
+2025-11-09 12:52:14,737 - services.user_data_import.import_orchestrator - INFO - ✅ Session found: <Mock name='db_session.query().filter().first().id' id='4360437920'>, status: <Mock name='db_session.query().filter().first().status' id='4360437968'>
+2025-11-09 12:52:14,737 - services.user_data_import.import_orchestrator - ERROR - 💥 [File Analysis] Analysis failed
+Traceback (most recent call last):
+  File "/Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/user_data_import/import_orchestrator.py", line 257, in analyze_file
+    logger.info(f"📄 File content length: {len(file_content) if file_content else 0}, connector: {connector_type}")
+TypeError: object of type 'Mock' has no len()
+2025-11-09 12:52:14,744 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-09 12:52:14,745 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-09 12:52:14,746 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-09 12:52:14,746 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-09 12:52:14,747 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-09 12:52:14,748 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-09 12:52:14,751 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-09 12:52:14,751 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-09 12:52:14,752 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-09 12:52:16,770 - services.user_data_import.validation_service - INFO - 🔍 Starting missing tickers check for 0 valid records
+2025-11-09 12:52:16,770 - services.user_data_import.validation_service - INFO - 🔍 _check_missing_tickers called with 0 records
+2025-11-09 12:52:16,770 - services.user_data_import.validation_service - WARNING - No database session provided - skipping ticker validation
+2025-11-09 12:52:16,770 - services.user_data_import.validation_service - INFO - 📊 Missing tickers result: []
+2025-11-09 12:52:16,958 - services.user_data_import.validation_service - INFO - 🔍 Starting missing tickers check for 0 valid records
+2025-11-09 12:52:16,958 - services.user_data_import.validation_service - INFO - 🔍 _check_missing_tickers called with 0 records
+2025-11-09 12:52:16,958 - services.user_data_import.validation_service - WARNING - No database session provided - skipping ticker validation
+2025-11-09 12:52:16,958 - services.user_data_import.validation_service - INFO - 📊 Missing tickers result: []
+2025-11-09 12:52:17,041 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping delete_alert, auto_commit=True
+2025-11-09 12:52:17,041 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-09 12:52:17,041 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling delete_alert
+2025-11-09 12:52:17,041 - services.advanced_cache_service - INFO - 🔄 INVALIDATE_CACHE DECORATOR: Wrapping delete_alert, will invalidate ['alerts']
+2025-11-09 12:52:17,041 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: Calling delete_alert
+2025-11-09 12:52:17,041 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: delete_alert completed
+2025-11-09 12:52:17,041 - services.advanced_cache_service - INFO - 🧹 INVALIDATE_CACHE: Starting cache invalidation for dependencies ['alerts']
+2025-11-09 12:52:17,041 - services.advanced_cache_service - INFO - ✅ INVALIDATE_CACHE: Cache invalidated for dependencies ['alerts']: 0 entries removed
+2025-11-09 12:52:17,041 - root - INFO - 🟢 HANDLE_DB_SESSION: delete_alert completed
+2025-11-09 12:52:17,042 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-09 12:52:17,042 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-09 12:52:17,050 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping update_alert, auto_commit=True
+2025-11-09 12:52:17,050 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-09 12:52:17,050 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling update_alert
+2025-11-09 12:52:17,051 - services.advanced_cache_service - INFO - 🔄 INVALIDATE_CACHE DECORATOR: Wrapping update_alert, will invalidate ['alerts']
+2025-11-09 12:52:17,051 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: Calling update_alert
+2025-11-09 12:52:17,051 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: update_alert completed
+2025-11-09 12:52:17,051 - services.advanced_cache_service - INFO - 🧹 INVALIDATE_CACHE: Starting cache invalidation for dependencies ['alerts']
+2025-11-09 12:52:17,051 - services.advanced_cache_service - INFO - ✅ INVALIDATE_CACHE: Cache invalidated for dependencies ['alerts']: 0 entries removed
+2025-11-09 12:52:17,051 - root - INFO - 🟢 HANDLE_DB_SESSION: update_alert completed
+2025-11-09 12:52:17,051 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-09 12:52:17,051 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-09 12:52:17,135 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,135 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,135 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-09 12:52:17,136 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,136 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,136 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,136 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>!
+2025-11-09 12:52:17,136 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-09 12:52:17,136 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>?
+2025-11-09 12:52:17,136 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4596100064'>
+2025-11-09 12:52:17,137 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'> (via trading_account_id)
+2025-11-09 12:52:17,137 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'> - checking database directly...
+2025-11-09 12:52:17,137 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,138 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-09 12:52:17,138 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-09 12:52:17,139 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4597838800'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-09 12:52:17,140 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,140 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,140 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-09 12:52:17,140 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,140 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,140 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,140 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>!
+2025-11-09 12:52:17,140 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-09 12:52:17,140 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>?
+2025-11-09 12:52:17,140 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4596100064'>
+2025-11-09 12:52:17,141 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'> (via trading_account_id)
+2025-11-09 12:52:17,141 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'> - checking database directly...
+2025-11-09 12:52:17,141 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,141 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-09 12:52:17,141 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-09 12:52:17,141 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4597838800'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-09 12:52:17,141 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4591472064'>
+2025-11-09 12:52:17,142 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-09 12:52:17,147 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-09 12:52:17,151 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-09 12:52:17,152 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:1c2ca8dc043bb611e424a01658127012
+2025-11-09 12:52:17,152 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:1c2ca8dc043bb611e424a01658127012
+2025-11-09 12:52:17,152 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-09 12:52:17,153 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-09 12:52:17,153 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:1c2ca8dc043bb611e424a01658127012
+2025-11-09 12:52:17,153 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:1c2ca8dc043bb611e424a01658127012
+2025-11-09 12:52:17,153 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:1c2ca8dc043bb611e424a01658127012
+2025-11-09 12:52:17,153 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:1c2ca8dc043bb611e424a01658127012
+2025-11-09 12:52:17,154 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-09 12:52:17,231 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping delete_alert, auto_commit=True
+2025-11-09 12:52:17,231 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-09 12:52:17,231 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling delete_alert
+2025-11-09 12:52:17,231 - services.advanced_cache_service - INFO - 🔄 INVALIDATE_CACHE DECORATOR: Wrapping delete_alert, will invalidate ['alerts']
+2025-11-09 12:52:17,231 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: Calling delete_alert
+2025-11-09 12:52:17,231 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: delete_alert completed
+2025-11-09 12:52:17,231 - services.advanced_cache_service - INFO - 🧹 INVALIDATE_CACHE: Starting cache invalidation for dependencies ['alerts']
+2025-11-09 12:52:17,231 - services.advanced_cache_service - INFO - ✅ INVALIDATE_CACHE: Cache invalidated for dependencies ['alerts']: 0 entries removed
+2025-11-09 12:52:17,231 - root - INFO - 🟢 HANDLE_DB_SESSION: delete_alert completed
+2025-11-09 12:52:17,231 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-09 12:52:17,232 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-09 12:52:17,239 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping update_alert, auto_commit=True
+2025-11-09 12:52:17,239 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-09 12:52:17,239 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling update_alert
+2025-11-09 12:52:17,239 - services.advanced_cache_service - INFO - 🔄 INVALIDATE_CACHE DECORATOR: Wrapping update_alert, will invalidate ['alerts']
+2025-11-09 12:52:17,239 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: Calling update_alert
+2025-11-09 12:52:17,240 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: update_alert completed
+2025-11-09 12:52:17,240 - services.advanced_cache_service - INFO - 🧹 INVALIDATE_CACHE: Starting cache invalidation for dependencies ['alerts']
+2025-11-09 12:52:17,240 - services.advanced_cache_service - INFO - ✅ INVALIDATE_CACHE: Cache invalidated for dependencies ['alerts']: 0 entries removed
+2025-11-09 12:52:17,240 - root - INFO - 🟢 HANDLE_DB_SESSION: update_alert completed
+2025-11-09 12:52:17,240 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-09 12:52:17,240 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-09 12:52:17,262 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping delete_trade, auto_commit=True
+2025-11-09 12:52:17,262 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-09 12:52:17,262 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling delete_trade
+2025-11-09 12:52:17,262 - services.advanced_cache_service - INFO - 🔄 INVALIDATE_CACHE DECORATOR: Wrapping delete_trade, will invalidate ['trades', 'tickers', 'dashboard']
+2025-11-09 12:52:17,262 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: Calling delete_trade
+2025-11-09 12:52:17,264 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: delete_trade completed
+2025-11-09 12:52:17,264 - services.advanced_cache_service - INFO - 🧹 INVALIDATE_CACHE: Starting cache invalidation for dependencies ['trades', 'tickers', 'dashboard']
+2025-11-09 12:52:17,264 - services.advanced_cache_service - INFO - ✅ INVALIDATE_CACHE: Cache invalidated for dependencies ['trades', 'tickers', 'dashboard']: 0 entries removed
+2025-11-09 12:52:17,264 - root - INFO - 🟢 HANDLE_DB_SESSION: delete_trade completed
+2025-11-09 12:52:17,265 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-09 12:52:17,265 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-09 12:52:17,272 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping get_trade, auto_commit=True
+2025-11-09 12:52:17,272 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-09 12:52:17,272 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling get_trade
+2025-11-09 12:52:17,273 - routes.api.base_entity.trades - INFO - Getting trades record with ID: 1
+2025-11-09 12:52:17,273 - root - INFO - 🟢 HANDLE_DB_SESSION: get_trade completed
+2025-11-09 12:52:17,273 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-09 12:52:17,274 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-09 12:52:17,286 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping update_trade, auto_commit=True
+2025-11-09 12:52:17,286 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-09 12:52:17,286 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling update_trade
+2025-11-09 12:52:17,286 - services.advanced_cache_service - INFO - 🔄 INVALIDATE_CACHE DECORATOR: Wrapping update_trade, will invalidate ['trades', 'tickers', 'dashboard']
+2025-11-09 12:52:17,286 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: Calling update_trade
+2025-11-09 12:52:17,287 - routes.api.trades - INFO - Transaction committed for trade 1
+2025-11-09 12:52:17,287 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: update_trade completed
+2025-11-09 12:52:17,287 - services.advanced_cache_service - INFO - 🧹 INVALIDATE_CACHE: Starting cache invalidation for dependencies ['trades', 'tickers', 'dashboard']
+2025-11-09 12:52:17,287 - services.advanced_cache_service - INFO - ✅ INVALIDATE_CACHE: Cache invalidated for dependencies ['trades', 'tickers', 'dashboard']: 0 entries removed
+2025-11-09 12:52:17,287 - root - INFO - 🟢 HANDLE_DB_SESSION: update_trade completed
+2025-11-09 12:52:17,287 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-09 12:52:17,287 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-09 12:52:17,297 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-09 12:52:17,322 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,322 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,322 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-09 12:52:17,322 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,323 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,323 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,323 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>!
+2025-11-09 12:52:17,323 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-09 12:52:17,323 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>?
+2025-11-09 12:52:17,323 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4359657600'>
+2025-11-09 12:52:17,323 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'> (via trading_account_id)
+2025-11-09 12:52:17,323 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'> - checking database directly...
+2025-11-09 12:52:17,324 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,325 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-09 12:52:17,325 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-09 12:52:17,326 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4363313264'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-09 12:52:17,327 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,327 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,327 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-09 12:52:17,327 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,327 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,327 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,328 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>!
+2025-11-09 12:52:17,328 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-09 12:52:17,328 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>?
+2025-11-09 12:52:17,328 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4359657600'>
+2025-11-09 12:52:17,328 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'> (via trading_account_id)
+2025-11-09 12:52:17,328 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'> - checking database directly...
+2025-11-09 12:52:17,328 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,328 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-09 12:52:17,329 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-09 12:52:17,329 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4363313264'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-09 12:52:17,329 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4356716720'>
+2025-11-09 12:52:17,329 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-09 12:52:17,333 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-09 12:52:17,337 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-09 12:52:17,338 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:b6ccb0c34eebb4a4dbad6721e56fdd77
+2025-11-09 12:52:17,338 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:b6ccb0c34eebb4a4dbad6721e56fdd77
+2025-11-09 12:52:17,338 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-09 12:52:17,339 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-09 12:52:17,339 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:b6ccb0c34eebb4a4dbad6721e56fdd77
+2025-11-09 12:52:17,339 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:b6ccb0c34eebb4a4dbad6721e56fdd77
+2025-11-09 12:52:17,339 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:b6ccb0c34eebb4a4dbad6721e56fdd77
+2025-11-09 12:52:17,339 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:b6ccb0c34eebb4a4dbad6721e56fdd77
+2025-11-09 12:52:17,340 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-09 12:52:17,380 - services.trade_service - INFO - Loading trades with joinedload for account and ticker
+2025-11-09 12:52:17,450 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping delete_trade, auto_commit=True
+2025-11-09 12:52:17,450 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-09 12:52:17,450 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling delete_trade
+2025-11-09 12:52:17,450 - services.advanced_cache_service - INFO - 🔄 INVALIDATE_CACHE DECORATOR: Wrapping delete_trade, will invalidate ['trades', 'tickers', 'dashboard']
+2025-11-09 12:52:17,450 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: Calling delete_trade
+2025-11-09 12:52:17,452 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: delete_trade completed
+2025-11-09 12:52:17,452 - services.advanced_cache_service - INFO - 🧹 INVALIDATE_CACHE: Starting cache invalidation for dependencies ['trades', 'tickers', 'dashboard']
+2025-11-09 12:52:17,452 - services.advanced_cache_service - INFO - ✅ INVALIDATE_CACHE: Cache invalidated for dependencies ['trades', 'tickers', 'dashboard']: 0 entries removed
+2025-11-09 12:52:17,452 - root - INFO - 🟢 HANDLE_DB_SESSION: delete_trade completed
+2025-11-09 12:52:17,452 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-09 12:52:17,452 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-09 12:52:17,459 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping get_trade, auto_commit=True
+2025-11-09 12:52:17,459 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-09 12:52:17,459 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling get_trade
+2025-11-09 12:52:17,461 - routes.api.base_entity.trades - INFO - Getting trades record with ID: 1
+2025-11-09 12:52:17,461 - root - INFO - 🟢 HANDLE_DB_SESSION: get_trade completed
+2025-11-09 12:52:17,461 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-09 12:52:17,461 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-09 12:52:17,473 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping update_trade, auto_commit=True
+2025-11-09 12:52:17,473 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
+2025-11-09 12:52:17,473 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling update_trade
+2025-11-09 12:52:17,473 - services.advanced_cache_service - INFO - 🔄 INVALIDATE_CACHE DECORATOR: Wrapping update_trade, will invalidate ['trades', 'tickers', 'dashboard']
+2025-11-09 12:52:17,473 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: Calling update_trade
+2025-11-09 12:52:17,474 - routes.api.trades - INFO - Transaction committed for trade 1
+2025-11-09 12:52:17,474 - services.advanced_cache_service - INFO - 🟢 INVALIDATE_CACHE: update_trade completed
+2025-11-09 12:52:17,474 - services.advanced_cache_service - INFO - 🧹 INVALIDATE_CACHE: Starting cache invalidation for dependencies ['trades', 'tickers', 'dashboard']
+2025-11-09 12:52:17,474 - services.advanced_cache_service - INFO - ✅ INVALIDATE_CACHE: Cache invalidated for dependencies ['trades', 'tickers', 'dashboard']: 0 entries removed
+2025-11-09 12:52:17,474 - root - INFO - 🟢 HANDLE_DB_SESSION: update_trade completed
+2025-11-09 12:52:17,474 - root - INFO - 🔵 COMMIT: About to commit database transaction
+2025-11-09 12:52:17,474 - root - INFO - ✅ COMMIT: Database transaction committed successfully
+2025-11-09 12:52:17,484 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-09 12:52:17,567 - services.trade_service - INFO - Loading trades with joinedload for account and ticker
+2025-11-09 12:54:40,267 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-09 12:54:40,267 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-09 12:54:40,267 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-09 12:54:40,267 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-09 12:54:40,268 - root - INFO - 🗄️ Initializing database...
+2025-11-09 12:54:40,268 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-09 12:54:40,271 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-11-09 12:54:40,271 - root - INFO - ✅ Database initialized successfully
+2025-11-09 12:54:41,277 - utils.performance_monitor - INFO - System metrics: CPU: 10.5%, Memory: 56.5%, Disk: 4.4%
+2025-11-09 12:54:41,277 - root - INFO - ✅ Database initialized successfully
+2025-11-09 12:54:41,278 - root - INFO - ✅ Server initialization completed
+2025-11-09 12:54:41,353 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-09 12:54:41,361 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-09 12:54:41,361 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 12:54:41,361 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 12:54:41,362 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-09 12:54:41,362 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-09 12:54:41,362 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-09 12:54:41,362 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 12:54:41,362 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 12:54:41,362 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-09 12:54:41,362 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-09 12:54:41,362 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-09 12:54:41,362 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-09 12:54:41,362 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-09 12:54:41,362 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-09 12:54:41,362 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-09 12:54:41,362 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-09 12:54:41,363 - services.background_tasks - INFO - Background task scheduler started
+2025-11-09 12:54:41,363 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-09 12:54:41,389 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:a5b81f73cf796f115ddc7c29160640b7
+2025-11-09 12:54:41,389 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:a5b81f73cf796f115ddc7c29160640b7
+2025-11-09 12:54:41,389 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-09 12:54:41,390 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-09 12:54:41,392 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-09 12:55:10,347 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-09 12:55:10,348 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-09 12:55:10,348 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-09 12:55:10,348 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-09 12:55:10,348 - root - INFO - 🗄️ Initializing database...
+2025-11-09 12:55:10,348 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-09 12:55:10,351 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-11-09 12:55:10,351 - root - INFO - ✅ Database initialized successfully
+2025-11-09 12:55:11,356 - utils.performance_monitor - INFO - System metrics: CPU: 10.5%, Memory: 56.8%, Disk: 4.4%
+2025-11-09 12:55:11,358 - root - INFO - ✅ Database initialized successfully
+2025-11-09 12:55:11,358 - root - INFO - ✅ Server initialization completed
+2025-11-09 12:55:11,433 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-09 12:55:11,440 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-09 12:55:11,441 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 12:55:11,441 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 12:55:11,441 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-09 12:55:11,441 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-09 12:55:11,441 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-09 12:55:11,441 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 12:55:11,441 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 12:55:11,441 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-09 12:55:11,441 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-09 12:55:11,441 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-09 12:55:11,441 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-09 12:55:11,442 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-09 12:55:11,442 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-09 12:55:11,442 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-09 12:55:11,442 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-09 12:55:11,442 - services.background_tasks - INFO - Background task scheduler started
+2025-11-09 12:55:11,442 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-09 12:55:11,468 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:1091281fcf36f0a30c955467b6eb9474
+2025-11-09 12:55:11,468 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:1091281fcf36f0a30c955467b6eb9474
+2025-11-09 12:55:11,468 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-09 12:55:11,469 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-09 12:55:11,470 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-09 12:55:11,678 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-09 12:55:11,679 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-09 12:55:11,680 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-09 12:55:11,681 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-09 12:55:11,681 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-09 12:55:11,682 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-09 12:55:11,685 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-09 12:55:11,686 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-09 12:55:11,687 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-09 12:55:13,783 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,783 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,784 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-09 12:55:13,784 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,784 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,784 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,784 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>!
+2025-11-09 12:55:13,784 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-09 12:55:13,784 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>?
+2025-11-09 12:55:13,785 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4423063872'>
+2025-11-09 12:55:13,785 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'> (via trading_account_id)
+2025-11-09 12:55:13,785 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'> - checking database directly...
+2025-11-09 12:55:13,785 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,787 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-09 12:55:13,787 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-09 12:55:13,787 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4422325008'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-09 12:55:13,788 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,788 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,788 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-09 12:55:13,788 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,788 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,788 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,788 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>!
+2025-11-09 12:55:13,789 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-09 12:55:13,789 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>?
+2025-11-09 12:55:13,789 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4423063872'>
+2025-11-09 12:55:13,789 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'> (via trading_account_id)
+2025-11-09 12:55:13,789 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'> - checking database directly...
+2025-11-09 12:55:13,789 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,789 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-09 12:55:13,789 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-09 12:55:13,790 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4422325008'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-09 12:55:13,790 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4427088080'>
+2025-11-09 12:55:13,790 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-09 12:55:13,795 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-09 12:55:13,799 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-09 12:55:13,800 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:90db69578db417762d4bfd573fa89507
+2025-11-09 12:55:13,800 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:90db69578db417762d4bfd573fa89507
+2025-11-09 12:55:13,800 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-09 12:55:13,801 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-09 12:55:13,801 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:90db69578db417762d4bfd573fa89507
+2025-11-09 12:55:13,801 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:90db69578db417762d4bfd573fa89507
+2025-11-09 12:55:13,801 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:90db69578db417762d4bfd573fa89507
+2025-11-09 12:55:13,801 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:90db69578db417762d4bfd573fa89507
+2025-11-09 12:55:13,801 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-09 12:55:13,811 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-09 12:56:06,987 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-09 12:56:06,988 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-09 12:56:06,988 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-09 12:56:06,988 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-09 12:56:06,988 - root - INFO - 🗄️ Initializing database...
+2025-11-09 12:56:06,988 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-09 12:56:06,991 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-11-09 12:56:06,991 - root - INFO - ✅ Database initialized successfully
+2025-11-09 12:56:07,997 - utils.performance_monitor - INFO - System metrics: CPU: 7.9%, Memory: 56.1%, Disk: 4.4%
+2025-11-09 12:56:07,998 - root - INFO - ✅ Database initialized successfully
+2025-11-09 12:56:07,998 - root - INFO - ✅ Server initialization completed
+2025-11-09 12:56:08,073 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-09 12:56:08,081 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-09 12:56:08,081 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 12:56:08,081 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 12:56:08,081 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-09 12:56:08,081 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-09 12:56:08,082 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-09 12:56:08,082 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 12:56:08,082 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 12:56:08,082 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-09 12:56:08,082 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-09 12:56:08,082 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-09 12:56:08,082 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-09 12:56:08,082 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-09 12:56:08,082 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-09 12:56:08,082 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-09 12:56:08,082 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-09 12:56:08,082 - services.background_tasks - INFO - Background task scheduler started
+2025-11-09 12:56:08,082 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-09 12:56:08,108 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:1b2b373a1e6ad72cd963478980f706b6
+2025-11-09 12:56:08,108 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:1b2b373a1e6ad72cd963478980f706b6
+2025-11-09 12:56:08,108 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-09 12:56:08,109 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-09 12:56:08,109 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-09 12:56:08,153 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-09 12:56:08,154 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-09 12:56:08,155 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-09 12:56:08,156 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-09 12:56:08,157 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-09 12:56:08,158 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-09 12:56:08,160 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-09 12:56:08,161 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-09 12:56:08,162 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-09 12:56:08,186 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,186 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,186 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-09 12:56:08,187 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,187 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,187 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,187 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>!
+2025-11-09 12:56:08,187 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-09 12:56:08,187 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>?
+2025-11-09 12:56:08,187 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4388103552'>
+2025-11-09 12:56:08,188 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'> (via trading_account_id)
+2025-11-09 12:56:08,188 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'> - checking database directly...
+2025-11-09 12:56:08,188 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,189 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-09 12:56:08,189 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-09 12:56:08,190 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4388306224'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-09 12:56:08,206 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,206 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,206 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-09 12:56:08,207 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,207 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,207 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,207 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>!
+2025-11-09 12:56:08,207 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-09 12:56:08,207 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>?
+2025-11-09 12:56:08,207 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4388103552'>
+2025-11-09 12:56:08,207 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'> (via trading_account_id)
+2025-11-09 12:56:08,207 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'> - checking database directly...
+2025-11-09 12:56:08,208 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,208 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-09 12:56:08,208 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-09 12:56:08,208 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4388306224'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-09 12:56:08,208 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4386841120'>
+2025-11-09 12:56:08,209 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-09 12:56:08,212 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-09 12:56:08,217 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-09 12:56:08,217 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:8c3e1b7b55f88a64f0076e122e63eb24
+2025-11-09 12:56:08,217 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:8c3e1b7b55f88a64f0076e122e63eb24
+2025-11-09 12:56:08,217 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-09 12:56:08,218 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-09 12:56:08,219 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:8c3e1b7b55f88a64f0076e122e63eb24
+2025-11-09 12:56:08,219 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:8c3e1b7b55f88a64f0076e122e63eb24
+2025-11-09 12:56:08,219 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:8c3e1b7b55f88a64f0076e122e63eb24
+2025-11-09 12:56:08,219 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:8c3e1b7b55f88a64f0076e122e63eb24
+2025-11-09 12:56:08,219 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-09 12:56:08,229 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-09 13:19:29,409 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-09 13:19:29,409 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-09 13:19:29,410 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-09 13:19:29,410 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-09 13:19:29,410 - root - INFO - 🗄️ Initializing database...
+2025-11-09 13:19:29,410 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-09 13:19:29,413 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-11-09 13:19:29,413 - root - INFO - ✅ Database initialized successfully
+2025-11-09 13:19:30,419 - utils.performance_monitor - INFO - System metrics: CPU: 5.9%, Memory: 55.4%, Disk: 4.4%
+2025-11-09 13:19:30,420 - root - INFO - ✅ Database initialized successfully
+2025-11-09 13:19:30,421 - root - INFO - ✅ Server initialization completed
+2025-11-09 13:19:30,494 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-09 13:19:30,501 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-09 13:19:30,501 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 13:19:30,501 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-09 13:19:30,501 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-09 13:19:30,502 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-09 13:19:30,502 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-09 13:19:30,502 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 13:19:30,502 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-09 13:19:30,502 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-09 13:19:30,502 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-09 13:19:30,502 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-09 13:19:30,502 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-09 13:19:30,502 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-09 13:19:30,502 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-09 13:19:30,502 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-09 13:19:30,502 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-09 13:19:30,503 - services.background_tasks - INFO - Background task scheduler started
+2025-11-09 13:19:30,503 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-09 13:19:30,528 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:a9bef783d720c465390e2263643881e6
+2025-11-09 13:19:30,528 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:a9bef783d720c465390e2263643881e6
+2025-11-09 13:19:30,528 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-09 13:19:30,529 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-09 13:19:30,529 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-09 13:19:30,572 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-09 13:19:30,573 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-09 13:19:30,573 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-09 13:19:30,574 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-09 13:19:30,575 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-09 13:19:30,576 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-09 13:19:30,579 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-09 13:19:30,579 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-09 13:19:30,580 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-09 13:19:30,597 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,597 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,597 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-09 13:19:30,597 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,598 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,598 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,598 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>!
+2025-11-09 13:19:30,598 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-09 13:19:30,598 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>?
+2025-11-09 13:19:30,598 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4415649392'>
+2025-11-09 13:19:30,599 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'> (via trading_account_id)
+2025-11-09 13:19:30,599 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'> - checking database directly...
+2025-11-09 13:19:30,599 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,600 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-09 13:19:30,600 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-09 13:19:30,600 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4415852064'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-09 13:19:30,601 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,601 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,601 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-09 13:19:30,602 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,602 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,602 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,602 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>!
+2025-11-09 13:19:30,602 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-09 13:19:30,602 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>?
+2025-11-09 13:19:30,602 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4415649392'>
+2025-11-09 13:19:30,602 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'> (via trading_account_id)
+2025-11-09 13:19:30,602 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'> - checking database directly...
+2025-11-09 13:19:30,603 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,603 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-09 13:19:30,603 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-09 13:19:30,603 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4415852064'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-09 13:19:30,603 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4414372880'>
+2025-11-09 13:19:30,619 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-09 13:19:30,621 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-09 13:19:30,626 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-09 13:19:30,627 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:ab888137e3c309cc44a92b2d92afdf08
+2025-11-09 13:19:30,627 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:ab888137e3c309cc44a92b2d92afdf08
+2025-11-09 13:19:30,627 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-09 13:19:30,628 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-09 13:19:30,628 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:ab888137e3c309cc44a92b2d92afdf08
+2025-11-09 13:19:30,628 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:ab888137e3c309cc44a92b2d92afdf08
+2025-11-09 13:19:30,628 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:ab888137e3c309cc44a92b2d92afdf08
+2025-11-09 13:19:30,628 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:ab888137e3c309cc44a92b2d92afdf08
+2025-11-09 13:19:30,628 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-09 13:19:30,636 - services.alert_service - INFO - נטענו 1 התראות

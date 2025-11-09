@@ -100,12 +100,14 @@ def get_user_group_preferences() -> Any:
         user_id = request.args.get('user_id', 1, type=int)
         profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        profile_context = preferences_service.get_profile_context(user_id=user_id, profile_id=profile_id)
+        effective_profile_id = profile_context['resolved_profile_id']
         
         # קבלת העדפות הקבוצה
         group_preferences = preferences_service.get_group_preferences(
             user_id=user_id,
             group_name=group_name,
-            profile_id=profile_id,
+            profile_id=effective_profile_id,
             use_cache=use_cache
         )
         
@@ -113,7 +115,13 @@ def get_user_group_preferences() -> Any:
             'success': True,
             'data': {
                 'user_id': user_id,
-                'profile_id': profile_id,
+                'requested_profile_id': profile_id,
+                'profile_id': effective_profile_id,
+                'active_profile_id': profile_context['resolved_profile_id'],
+                'active_profile_name': profile_context['profile_name'],
+                'is_fallback_profile': profile_context['is_fallback'],
+                'fallback_message': profile_context['fallback_message'],
+                'profile_warnings': profile_context['warnings'],
                 'group_name': group_name,
                 'preferences': group_preferences
             },
@@ -151,12 +159,14 @@ def get_user_preference() -> Any:
         user_id = request.args.get('user_id', 1, type=int)
         profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        profile_context = preferences_service.get_profile_context(user_id=user_id, profile_id=profile_id)
+        effective_profile_id = profile_context['resolved_profile_id']
         
         # קבלת ההעדפה
         preference_value = preferences_service.get_preference(
             user_id=user_id,
             preference_name=preference_name,
-            profile_id=profile_id,
+            profile_id=effective_profile_id,
             use_cache=use_cache
         )
         
@@ -164,7 +174,13 @@ def get_user_preference() -> Any:
             'success': True,
             'data': {
                 'user_id': user_id,
-                'profile_id': profile_id,
+                'requested_profile_id': profile_id,
+                'profile_id': effective_profile_id,
+                'active_profile_id': profile_context['resolved_profile_id'],
+                'active_profile_name': profile_context['profile_name'],
+                'is_fallback_profile': profile_context['is_fallback'],
+                'fallback_message': profile_context['fallback_message'],
+                'profile_warnings': profile_context['warnings'],
                 'preference_name': preference_name,
                 'value': preference_value
             },
@@ -192,23 +208,27 @@ def get_user_preferences() -> Any:
         user_id = request.args.get('user_id', 1, type=int)  # ברירת מחדל: משתמש 1
         profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        profile_context = preferences_service.get_profile_context(user_id=user_id, profile_id=profile_id)
+        effective_profile_id = profile_context['resolved_profile_id']
         
         # קבלת כל ההעדפות
         preferences = preferences_service.get_all_user_preferences(
             user_id=user_id,
-            profile_id=profile_id,
+            profile_id=effective_profile_id,
             use_cache=use_cache
         )
-        
-        # קבלת הפרופיל שנבחר (אם לא צוין)
-        if profile_id is None:
-            profile_id = preferences_service._get_active_profile_id(user_id)
-        
+
         return jsonify({
             "success": True,
             "data": {
                 "user_id": user_id,
-                "profile_id": profile_id,
+                "requested_profile_id": profile_id,
+                "profile_id": effective_profile_id,
+                "active_profile_id": profile_context['resolved_profile_id'],
+                "active_profile_name": profile_context['profile_name'],
+                "is_fallback_profile": profile_context['is_fallback'],
+                "fallback_message": profile_context['fallback_message'],
+                "profile_warnings": profile_context['warnings'],
                 "preferences": preferences,
                 "count": len(preferences)
             },
@@ -298,6 +318,8 @@ def get_single_preference() -> Any:
         preference_name = request.args.get('preference_name')
         profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        profile_context = preferences_service.get_profile_context(user_id=user_id, profile_id=profile_id)
+        effective_profile_id = profile_context['resolved_profile_id']
         
         if not preference_name:
             return jsonify({
@@ -310,7 +332,7 @@ def get_single_preference() -> Any:
         value = preferences_service.get_preference(
             user_id=user_id,
             preference_name=preference_name,
-            profile_id=profile_id,
+            profile_id=effective_profile_id,
             use_cache=use_cache
         )
         
@@ -330,8 +352,14 @@ def get_single_preference() -> Any:
                             "user_id": user_id,
                             "preference_name": preference_name,
                             "value": None,
-                            "profile_id": profile_id,
-                            "is_default": False
+                            "requested_profile_id": profile_id,
+                            "profile_id": effective_profile_id,
+                            "is_default": False,
+                            "active_profile_id": profile_context['resolved_profile_id'],
+                            "active_profile_name": profile_context['profile_name'],
+                            "is_fallback_profile": profile_context['is_fallback'],
+                            "fallback_message": profile_context['fallback_message'],
+                            "profile_warnings": profile_context['warnings']
                         },
                         "timestamp": datetime.now().isoformat()
                     }), 404
@@ -345,8 +373,14 @@ def get_single_preference() -> Any:
                 "user_id": user_id,
                 "preference_name": preference_name,
                 "value": value,
-                "profile_id": profile_id,
-                "is_default": value is not None
+                "requested_profile_id": profile_id,
+                "profile_id": effective_profile_id,
+                "is_default": effective_profile_id == 0,
+                "active_profile_id": profile_context['resolved_profile_id'],
+                "active_profile_name": profile_context['profile_name'],
+                "is_fallback_profile": profile_context['is_fallback'],
+                "fallback_message": profile_context['fallback_message'],
+                "profile_warnings": profile_context['warnings']
             },
             "timestamp": datetime.now().isoformat()
         }), 200
@@ -457,24 +491,16 @@ def get_multiple_preferences() -> Any:
         
         # קבלת העדפות מרובות
         logger.info(f"API: Getting preferences for user {user_id}, profile {profile_id}, use_cache={use_cache}")
+        profile_context = preferences_service.get_profile_context(user_id=user_id, profile_id=profile_id)
+        effective_profile_id = profile_context['resolved_profile_id']
+        
         preferences = preferences_service.get_preferences_by_names(
             user_id=user_id,
             preference_names=preference_names,
-            profile_id=profile_id,
+            profile_id=effective_profile_id,
             use_cache=use_cache
         )
         logger.info(f"API: Got preferences: {preferences}")
-        
-        # קבלת הפרופיל שנבחר בפועל (אם לא צוין, יחזיר את הפרופיל הפעיל)
-        if profile_id is None:
-            try:
-                active_profile_info = preferences_service.get_active_profile_info(user_id)
-                actual_profile_id = active_profile_info['profile_id']
-            except Exception as e:
-                logger.warning(f"Could not get active profile for user {user_id}: {e}")
-                actual_profile_id = None
-        else:
-            actual_profile_id = profile_id
         
         return jsonify({
             "success": True,
@@ -483,8 +509,13 @@ def get_multiple_preferences() -> Any:
                 "preference_names": preference_names,
                 "preferences": preferences,
                 "count": len(preferences),
-                "profile_id": profile_id,
-                "actual_profile_id": actual_profile_id
+                "requested_profile_id": profile_id,
+                "profile_id": effective_profile_id,
+                "active_profile_id": profile_context['resolved_profile_id'],
+                "active_profile_name": profile_context['profile_name'],
+                "is_fallback_profile": profile_context['is_fallback'],
+                "fallback_message": profile_context['fallback_message'],
+                "profile_warnings": profile_context['warnings']
             },
             "timestamp": datetime.now().isoformat()
         }), 200
@@ -511,13 +542,19 @@ def get_user_profiles() -> Any:
         
         # קבלת פרופילים
         profiles = preferences_service.get_user_profiles(user_id)
+        profile_context = preferences_service.get_profile_context(user_id=user_id)
         
         return jsonify({
             "success": True,
             "data": {
                 "user_id": user_id,
                 "profiles": profiles,
-                "count": len(profiles)
+                "count": len(profiles),
+                "active_profile_id": profile_context['resolved_profile_id'],
+                "active_profile_name": profile_context['profile_name'],
+                "is_fallback_profile": profile_context['is_fallback'],
+                "fallback_message": profile_context['fallback_message'],
+                "profile_warnings": profile_context['warnings']
             },
             "timestamp": datetime.now().isoformat()
         }), 200
@@ -725,16 +762,16 @@ def get_preference_types() -> Any:
     קבלת סוגי העדפות (Admin)
     """
     try:
-        # קבלת סוגי העדפות מהשירות
-        # זה דורש הרחבה של השירות
+        preference_types = preferences_service.get_all_preference_types()
         return jsonify({
             "success": True,
             "data": {
-                "message": "Admin endpoint - to be implemented"
+                "preference_types": preference_types,
+                "count": len(preference_types)
             },
             "timestamp": datetime.now().isoformat()
         }), 200
-        
+    
     except Exception as e:
         logger.error(f"Error getting preference types: {e}")
         return jsonify({

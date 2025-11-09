@@ -1,0 +1,9 @@
+{
+  "session_id": 123,
+  "user_id": 1,
+  "original_filename": "test.csv",
+  "file_size": 53,
+  "file_hash": "b7e5835f8454b327e57259b81cb04c693108a4f4774007ca6bd03228f583c54d",
+  "saved_at": "2025-11-09T12:52:14.726641",
+  "file_path": "user_1/session_123/original.csv"
+}

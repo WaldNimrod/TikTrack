@@ -4,7 +4,6 @@ API endpoints for trade conditions management
 """
 
 from flask import Blueprint, request, jsonify
-from datetime import datetime
 import logging
 import json
 from typing import Dict, Any
@@ -13,9 +12,16 @@ from models.trade_condition import TradeCondition
 from models.trade import Trade
 from models.plan_condition import PlanCondition
 from services.conditions_validation_service import ConditionsValidationService
+from services.preferences_service import PreferencesService
 from config.database import get_db
+from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
+preferences_service = PreferencesService()
+
+
+def _get_date_normalizer():
+    return BaseEntityUtils.get_request_normalizer(request, preferences_service=preferences_service)
 
 # Create blueprint
 trade_conditions_bp = Blueprint('trade_conditions', __name__, url_prefix='/api/trade-conditions')
@@ -28,14 +34,17 @@ def get_trade_conditions(trade_id):
         db_session = next(get_db())
         
         try:
+            normalizer = _get_date_normalizer()
+
             # Check if trade exists
             trade = db_session.query(Trade).filter(Trade.id == trade_id).first()
             if not trade:
-                return jsonify({
-                    'status': 'error',
-                    'message': f'Trade with ID {trade_id} not found',
-                    'error_code': 'TRADE_NOT_FOUND'
-                }), 404
+                payload = BaseEntityUtils.create_error_payload(
+                    normalizer,
+                    f'Trade with ID {trade_id} not found',
+                    {"code": "TRADE_NOT_FOUND"}
+                )
+                return jsonify(payload), 404
             
             # Get conditions
             conditions = db_session.query(TradeCondition).filter(
@@ -48,24 +57,27 @@ def get_trade_conditions(trade_id):
                 condition_dict = condition.to_dict()
                 result.append(condition_dict)
             
-            return jsonify({
-                'status': 'success',
-                'data': result,
-                'count': len(result),
-                'trade_id': trade_id,
-                'timestamp': datetime.now().isoformat()
-            }), 200
+            payload = BaseEntityUtils.create_success_payload(
+                normalizer,
+                result,
+                extra={
+                    'count': len(result),
+                    'trade_id': trade_id
+                }
+            )
+            return jsonify(payload), 200
             
         finally:
             db_session.close()
             
     except Exception as e:
         logger.error(f"Error getting trade conditions for trade {trade_id}: {e}")
-        return jsonify({
-            'status': 'error',
-            'error': str(e),
-            'timestamp': datetime.now().isoformat()
-        }), 500
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 500
 
 @trade_conditions_bp.route('/trades/<int:trade_id>/conditions', methods=['POST'])
 def create_trade_condition(trade_id):
@@ -73,11 +85,13 @@ def create_trade_condition(trade_id):
     try:
         data = request.get_json()
         if not data:
-            return jsonify({
-                'status': 'error',
-                'message': 'No data provided',
-                'error_code': 'NO_DATA'
-            }), 400
+            normalizer = _get_date_normalizer()
+            payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                'No data provided',
+                {"code": "NO_DATA"}
+            )
+            return jsonify(payload), 400
         
         # Add trade_id to data
         data['trade_id'] = trade_id
@@ -86,37 +100,45 @@ def create_trade_condition(trade_id):
         db_session = next(get_db())
         
         try:
+            normalizer = _get_date_normalizer()
             # Check if trade exists
             trade = db_session.query(Trade).filter(Trade.id == trade_id).first()
             if not trade:
-                return jsonify({
-                    'status': 'error',
-                    'message': f'Trade with ID {trade_id} not found',
-                    'error_code': 'TRADE_NOT_FOUND'
-                }), 404
+                payload = BaseEntityUtils.create_error_payload(
+                    normalizer,
+                    f'Trade with ID {trade_id} not found',
+                    {"code": "TRADE_NOT_FOUND"}
+                )
+                return jsonify(payload), 404
             
             # Validate data
             validator = ConditionsValidationService(db_session)
-            is_valid, validation_result = validator.validate_condition_data(data, 'trade')
+            normalized_payload = BaseEntityUtils.normalize_input(normalizer, data)
+            is_valid, validation_result = validator.validate_condition_data(normalized_payload, 'trade')
             
             if not is_valid:
-                return jsonify(validation_result), 400
+                errors = validation_result.get('errors', {})
+                payload = BaseEntityUtils.create_error_payload(
+                    normalizer,
+                    errors.get('general', 'Validation failed'),
+                    {"fields": errors.get('fields')}
+                )
+                return jsonify(payload), 400
             
             # Create condition
             # Convert parameters_json to string if it's a dict
-            parameters_json = data['parameters_json']
+            parameters_json = normalized_payload['parameters_json']
             if isinstance(parameters_json, dict):
-                import json
                 parameters_json = json.dumps(parameters_json, ensure_ascii=False)
             
             condition = TradeCondition(
                 trade_id=trade_id,
-                method_id=data['method_id'],
-                condition_group=data.get('condition_group', 0),
+                method_id=normalized_payload['method_id'],
+                condition_group=normalized_payload.get('condition_group', 0),
                 parameters_json=parameters_json,
-                logical_operator=data.get('logical_operator', 'NONE'),
-                inherited_from_plan_condition_id=data.get('inherited_from_plan_condition_id'),
-                is_active=data.get('is_active', True)
+                logical_operator=normalized_payload.get('logical_operator', 'NONE'),
+                inherited_from_plan_condition_id=normalized_payload.get('inherited_from_plan_condition_id'),
+                is_active=normalized_payload.get('is_active', True)
             )
             
             db_session.add(condition)
@@ -125,12 +147,12 @@ def create_trade_condition(trade_id):
             # Return created condition
             condition_dict = condition.to_dict()
             
-            return jsonify({
-                'status': 'success',
-                'data': condition_dict,
-                'message': 'Trade condition created successfully',
-                'timestamp': datetime.now().isoformat()
-            }), 201
+            payload = BaseEntityUtils.create_success_payload(
+                normalizer,
+                condition_dict,
+                "Trade condition created successfully"
+            )
+            return jsonify(payload), 201
             
         except Exception as e:
             db_session.rollback()
@@ -140,11 +162,12 @@ def create_trade_condition(trade_id):
             
     except Exception as e:
         logger.error(f"Error creating trade condition for trade {trade_id}: {e}")
-        return jsonify({
-            'status': 'error',
-            'error': str(e),
-            'timestamp': datetime.now().isoformat()
-        }), 500
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 500
 
 @trade_conditions_bp.route('/<int:condition_id>', methods=['GET'])
 def get_trade_condition(condition_id):
@@ -154,36 +177,39 @@ def get_trade_condition(condition_id):
         db_session = next(get_db())
         
         try:
+            normalizer = _get_date_normalizer()
             condition = db_session.query(TradeCondition).filter(
                 TradeCondition.id == condition_id
             ).first()
             
             if not condition:
-                return jsonify({
-                    'status': 'error',
-                    'message': f'Trade condition with ID {condition_id} not found',
-                    'error_code': 'CONDITION_NOT_FOUND'
-                }), 404
+                payload = BaseEntityUtils.create_error_payload(
+                    normalizer,
+                    f'Trade condition with ID {condition_id} not found',
+                    {"code": "CONDITION_NOT_FOUND"}
+                )
+                return jsonify(payload), 404
             
             # Convert to dictionary
             condition_dict = condition.to_dict()
             
-            return jsonify({
-                'status': 'success',
-                'data': condition_dict,
-                'timestamp': datetime.now().isoformat()
-            }), 200
+            payload = BaseEntityUtils.create_success_payload(
+                normalizer,
+                condition_dict
+            )
+            return jsonify(payload), 200
             
         finally:
             db_session.close()
             
     except Exception as e:
         logger.error(f"Error getting trade condition {condition_id}: {e}")
-        return jsonify({
-            'status': 'error',
-            'error': str(e),
-            'timestamp': datetime.now().isoformat()
-        }), 500
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 500
 
 @trade_conditions_bp.route('/<int:condition_id>', methods=['PUT'])
 def update_trade_condition(condition_id):

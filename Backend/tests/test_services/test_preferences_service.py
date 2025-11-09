@@ -1,53 +1,44 @@
-#!/usr/bin/env python3
-"""
-Preferences Service Tests - TikTrack
-
-בדיקות מקיפות ל-Preferences Service
-
-Author: TikTrack Development Team
-Date: January 2025
-"""
-
-import sys
-import os
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, patch
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
-
-from services.preferences_service import PreferencesService
-from models.preferences import Preference
+from services.date_normalization_service import DateNormalizationService
 
 
-class TestPreferencesService(unittest.TestCase):
-    """Test suite for PreferencesService"""
-    
-    def setUp(self):
-        self.mock_db = Mock()
-        self.mock_preference = Mock(spec=Preference)
-        self.mock_preference.key = 'test-key'
-        self.mock_preference.value = 'test-value'
-    
-    def test_get_preference(self):
-        """Test getting a preference"""
-        self.mock_db.query.return_value.filter.return_value.first.return_value = self.mock_preference
-        preference = PreferencesService.get_preference(self.mock_db, 'test-key')
-        self.assertIsNotNone(preference)
-    
-    def test_set_preference(self):
-        """Test setting a preference"""
-        with patch.object(PreferencesService, 'set_preference') as mock_set:
-            mock_set.return_value = self.mock_preference
-            result = mock_set(self.mock_db, 'test-key', 'test-value')
-            self.assertIsNotNone(result)
-    
-    def test_get_all_preferences(self):
-        """Test getting all preferences"""
-        self.mock_db.query.return_value.all.return_value = [self.mock_preference]
-        preferences = PreferencesService.get_all(self.mock_db)
-        self.assertIsInstance(preferences, list)
+class TestPreferencesTimezoneIntegration(unittest.TestCase):
+    """Ensure timezone resolution consults the preferences service."""
+
+    def test_resolve_timezone_uses_preferences(self):
+        mock_request = MagicMock()
+        mock_request.args.get.return_value = None
+        mock_request.is_json = False
+
+        mock_preferences = MagicMock()
+        mock_preferences.get_preference.return_value = "Asia/Jerusalem"
+
+        timezone = DateNormalizationService.resolve_timezone(
+            mock_request,
+            preferences_service=mock_preferences,
+            fallback_user_id=99
+        )
+
+        self.assertEqual(timezone, "Asia/Jerusalem")
+        mock_preferences.get_preference.assert_called_once_with(99, "timezone")
+
+    def test_resolve_timezone_falls_back_to_utc(self):
+        mock_request = MagicMock()
+        mock_request.args.get.return_value = None
+        mock_request.is_json = False
+
+        mock_preferences = MagicMock()
+        mock_preferences.get_preference.side_effect = Exception("DB unavailable")
+
+        timezone = DateNormalizationService.resolve_timezone(
+            mock_request,
+            preferences_service=mock_preferences
+        )
+        self.assertEqual(timezone, "UTC")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
 

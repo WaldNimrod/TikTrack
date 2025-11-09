@@ -303,6 +303,11 @@ const PAGE_CONFIGS = {
                     window.loadDefaultColors();
                 }
                 
+                // Render preference types audit table
+                if (typeof window.renderPreferenceTypesAuditTable === 'function') {
+                    await window.renderPreferenceTypesAuditTable();
+                }
+                
                 // Setup preference change handlers (function not implemented yet)
                 // if (typeof window.setupPreferenceHandlers === 'function') {
                 //     window.setupPreferenceHandlers();

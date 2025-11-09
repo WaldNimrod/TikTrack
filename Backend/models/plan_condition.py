@@ -47,8 +47,8 @@ class PlanCondition(BaseModel):
             'logical_operator': self.logical_operator,
             'is_active': self.is_active,
             'auto_generate_alerts': self.auto_generate_alerts,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
-            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
         }
         
         # Add parsed parameters
@@ -161,7 +161,7 @@ class ConditionAlertMapping(BaseModel):
             'alert_id': self.alert_id,
             'auto_created': self.auto_created,
             'is_active': self.is_active,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None
+            'created_at': self.created_at
         }
         
         # Add alert information if loaded

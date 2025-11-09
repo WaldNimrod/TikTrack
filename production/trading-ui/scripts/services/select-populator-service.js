@@ -259,7 +259,9 @@ class SelectPopulatorService {
         try {
             // טעינת חשבונות פעילים בלבד מ-API
             // אם רוצים כל החשבונות, יש להשתמש ב-filterFn או להגדיר includeAll: true
-            const endpoint = options.includeAll ? '/api/trading-accounts/' : '/api/trading-accounts/open';
+            const baseEndpoint = options.includeAll ? '/api/trading-accounts/' : '/api/trading-accounts/open';
+            // Add cache busting to prevent stale cache issues in production
+            const endpoint = `${baseEndpoint}?_t=${Date.now()}`;
             const response = await fetch(endpoint);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

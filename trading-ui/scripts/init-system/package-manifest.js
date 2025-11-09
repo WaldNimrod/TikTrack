@@ -263,18 +263,25 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7
       },
       {
+        file: 'services/table-sort-value-adapter.js',
+        globalCheck: 'window.TableSortValueAdapter',
+        description: 'Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy)',
+        required: true,
+        loadOrder: 8
+      },
+      {
         file: 'services/alert-condition-renderer.js',
         globalCheck: 'window.AlertConditionRenderer',
         description: 'מציג תנאי התראות',
         required: false,
-        loadOrder: 8
+        loadOrder: 9
       },
       {
         file: 'https://cdn.quilljs.com/1.3.7/quill.min.js',
         globalCheck: 'window.Quill',
         description: 'Quill.js - Rich Text Editor Library',
         required: true,
-        loadOrder: 9,
+        loadOrder: 10,
         external: true
       },
       {
@@ -282,7 +289,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.DOMPurify',
         description: 'DOMPurify - HTML Sanitizer',
         required: true,
-        loadOrder: 10,
+        loadOrder: 11,
         external: true
       },
       {
@@ -290,7 +297,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.RichTextEditorService',
         description: 'שירות עורך טקסט עשיר',
         required: true,
-        loadOrder: 11
+        loadOrder: 12
       }
     ],
     estimatedSize: '~180KB',

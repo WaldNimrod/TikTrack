@@ -236,6 +236,198 @@ class PreferencesService:
             # In case of error, return default profile
             return 0
     
+    def _get_user_identity(self, user_id: int) -> Dict[str, Any]:
+        """קבלת נתוני משתמש בסיסיים עבור הודעות"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT id, username, COALESCE(NULLIF(TRIM(full_name), ''), TRIM(first_name || ' ' || last_name)), email
+                FROM users
+                WHERE id = ?
+            ''', (user_id,))
+            row = cursor.fetchone()
+            conn.close()
+            
+            if not row:
+                raise UserNotFoundError(f"User {user_id} not found")
+            
+            user_id_db, username, full_name, email = row
+            display_name = full_name if full_name else username or f"User#{user_id_db}"
+            return {
+                "id": user_id_db,
+                "username": username,
+                "full_name": full_name,
+                "email": email,
+                "display_name": display_name
+            }
+        except Exception as e:
+            logger.error(f"Error getting identity for user {user_id}: {e}")
+            return {
+                "id": user_id,
+                "username": None,
+                "full_name": None,
+                "email": None,
+                "display_name": f"User#{user_id}"
+            }
+    
+    def _get_profile_record(self, user_id: int, profile_id: int) -> Optional[Dict[str, Any]]:
+        """קבלת פרטי פרופיל עבור משתמש"""
+        if profile_id == 0:
+            return {
+                "id": 0,
+                "name": "פרופיל ברירת מחדל",
+                "description": "פרופיל ברירת מחדל של המערכת",
+                "active": False,
+                "default": True,
+                "user_id": 0,
+                "last_used": None,
+                "usage_count": None,
+                "created_at": None,
+            }
+        
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT id, profile_name, description, is_active, is_default, last_used_at, usage_count, created_at
+                FROM preference_profiles
+                WHERE user_id = ? AND id = ?
+            ''', (user_id, profile_id))
+            row = cursor.fetchone()
+            conn.close()
+            
+            if not row:
+                return None
+            
+            (pid, name, description, is_active, is_default, last_used,
+             usage_count, created_at) = row
+            
+            return {
+                "id": pid,
+                "name": name,
+                "description": description,
+                "active": bool(is_active),
+                "default": bool(is_default),
+                "user_id": user_id,
+                "last_used": last_used,
+                "usage_count": usage_count,
+                "created_at": created_at
+            }
+        except Exception as e:
+            logger.error(f"Error getting profile {profile_id} for user {user_id}: {e}")
+            return None
+    
+    def build_profile_context(self, user_id: int, requested_profile_id: Optional[int] = None) -> Dict[str, Any]:
+        """
+        בניית הקשר מלא של פרופילים עבור המשתמש
+        
+        Args:
+            user_id: מזהה משתמש
+            requested_profile_id: פרופיל שביקש הלקוח (אופציונלי)
+        
+        Returns:
+            מילון עם נתוני משתמש, פרופיל פעיל, פרופיל שנבחר ומידע נוסף
+        """
+        identity = self._get_user_identity(user_id)
+        profiles = self.get_user_profiles(user_id)
+        warnings: List[str] = []
+        
+        active_profiles = [p for p in profiles if p.get('active')]
+        if len(active_profiles) > 1:
+            warnings.append("זוהו מספר פרופילים עם סטטוס פעיל. מומלץ לבדוק את נתוני preference_profiles.")
+        
+        inconsistent_profiles = [
+            p for p in profiles
+            if p.get('id') not in (0, None) and not p.get('active') and p.get('last_used')
+        ]
+        for profile in inconsistent_profiles:
+            warnings.append(
+                f"פרופיל {profile.get('name')} (#{profile.get('id')}) מסומן כלא פעיל אך last_used קיים ({profile.get('last_used')})."
+            )
+        
+        active_profile_id = active_profiles[0]['id'] if active_profiles else 0
+        active_profile = self._get_profile_record(user_id, active_profile_id)
+        
+        requested_profile = None
+        requested_profile_found = False
+        if requested_profile_id is not None:
+            if requested_profile_id == 0:
+                requested_profile = self._get_profile_record(user_id, 0)
+                requested_profile_found = True
+            else:
+                requested_profile = next((p for p in profiles if p['id'] == requested_profile_id), None)
+                requested_profile_found = requested_profile is not None
+                if requested_profile_found:
+                    requested_profile = self._get_profile_record(user_id, requested_profile_id)
+                else:
+                    warnings.append(
+                        f"פרופיל #{requested_profile_id} לא נמצא עבור המשתמש {identity['display_name']} (#{user_id})."
+                    )
+        
+        if requested_profile_found:
+            resolved_profile_id = requested_profile_id
+        elif requested_profile_id is not None and active_profile_id not in (None, -1):
+            resolved_profile_id = active_profile_id if active_profile_id != 0 else 0
+        else:
+            resolved_profile_id = active_profile_id
+        
+        if resolved_profile_id not in (0, None):
+            resolved_profile = self._get_profile_record(user_id, resolved_profile_id)
+            if not resolved_profile:
+                warnings.append(
+                    f"פרופיל #{resolved_profile_id} לא זמין – חזרה לנתוני ברירת מחדל."
+                )
+                resolved_profile_id = 0
+                resolved_profile = self._get_profile_record(user_id, 0)
+        else:
+            resolved_profile_id = 0
+            resolved_profile = self._get_profile_record(user_id, 0)
+        
+        using_default_profile = resolved_profile_id == 0
+        has_active_profile = active_profile_id not in (0, None)
+        
+        if not has_active_profile:
+            status = "no_active_profile"
+            message = (
+                f"⚠️ אין פרופיל פעיל עבור {identity['display_name']} (משתמש #{user_id}) – "
+                "מוצגים נתוני ברירת מחדל של המערכת."
+            )
+        elif requested_profile_id is None or resolved_profile_id == active_profile_id:
+            status = "active_profile"
+            message = (
+                f"מציגים את הפרופיל הפעיל {active_profile.get('name')} "
+                f"(#{active_profile_id}) עבור {identity['display_name']}."
+            )
+        else:
+            if using_default_profile:
+                status = "fallback_default_profile"
+                message = (
+                    f"⚠️ פרופיל #{requested_profile_id} לא זמין עבור {identity['display_name']} "
+                    "– מוצגים נתוני ברירת מחדל של המערכת."
+                )
+            else:
+                status = "requested_profile"
+                message = (
+                    f"מציגים את הפרופיל המבוקש {resolved_profile.get('name')} "
+                    f"(#{resolved_profile_id}) עבור {identity['display_name']}."
+                )
+        
+        return {
+            "user": identity,
+            "active_profile": active_profile,
+            "resolved_profile": resolved_profile,
+            "requested_profile": requested_profile if requested_profile_found else None,
+            "requested_profile_id": requested_profile_id,
+            "active_profile_id": active_profile_id,
+            "resolved_profile_id": resolved_profile_id,
+            "has_active_profile": has_active_profile,
+            "using_default_profile": using_default_profile,
+            "status": status,
+            "message": message,
+            "warnings": warnings
+        }
+    
     def _get_preference_type_id(self, preference_name: str) -> int:
         """קבלת מזהה סוג העדפה"""
         try:
@@ -988,11 +1180,16 @@ class PreferencesService:
             logger.error(f"Error getting preference groups: {e}")
             raise
 
-    def activate_profile(self, user_id: int, profile_id: int) -> bool:
-        """הפעלת פרופיל
+    def activate_profile(self, user_id: int, profile_id: int, activated_by: int = None) -> bool:
+        """הפעלת פרופיל משתמש
         
-        לפרופיל ברירת מחדל (ID: 0) - לא משנה את המסד הנתונים, רק מחזיר True
-        לפרופיל רגיל - מפעיל במסד הנתונים
+        Args:
+            user_id: מזהה משתמש
+            profile_id: מזהה פרופיל
+            activated_by: מזהה משתמש שהפעיל את הפרופיל (אופציונלי)
+        
+        Returns:
+            True אם הפעלה בוצעה בהצלחה, False אחרת
         """
         try:
             # Handle default profile (ID: 0) - special system profile
@@ -1051,7 +1248,55 @@ class PreferencesService:
         except Exception as e:
             logger.error(f"Error activating profile {profile_id} for user {user_id}: {e}")
             return False
-    
+
+    def get_all_preference_types(self) -> List[Dict[str, Any]]:
+        """Fetch all preference types with their group metadata."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+
+            cursor.execute(
+                '''
+                SELECT
+                    pt.id,
+                    pt.preference_name,
+                    pt.data_type,
+                    pt.description,
+                    pt.default_value,
+                    pt.is_required,
+                    pt.is_active,
+                    pt.group_id,
+                    pg.group_name
+                FROM preference_types pt
+                LEFT JOIN preference_groups pg ON pt.group_id = pg.id
+                ORDER BY pt.id ASC
+                '''
+            )
+
+            rows = cursor.fetchall()
+            conn.close()
+
+            preference_types = []
+            for row in rows:
+                preference_types.append({
+                    "id": row["id"],
+                    "preference_name": row["preference_name"],
+                    "data_type": row["data_type"],
+                    "description": row["description"],
+                    "default_value": row["default_value"],
+                    "is_required": bool(row["is_required"]),
+                    "is_active": bool(row["is_active"]),
+                    "group_id": row["group_id"],
+                    "group_name": row["group_name"]
+                })
+
+            return preference_types
+
+        except Exception as e:
+            logger.error(f"Error fetching preference types: {e}")
+            raise
+
     def check_preference_type_exists(self, preference_name: str) -> bool:
         """
         בדיקת קיום סוג העדפה במסד הנתונים

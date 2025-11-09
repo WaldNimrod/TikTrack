@@ -559,6 +559,18 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   
   // Get dynamic colors from color scheme system
   const getNotificationColor = (type) => {
+    const preferences = window.currentPreferences || {};
+    const customColorMap = {
+      success: preferences.notificationSuccessColor,
+      error: preferences.notificationErrorColor,
+      warning: preferences.notificationWarningColor,
+      info: preferences.notificationInfoColor
+    };
+
+    if (customColorMap[type]) {
+      return customColorMap[type];
+    }
+
     if (typeof window.getEntityColor === 'function') {
       switch (type) {
         case 'success': return window.getEntityColor('account') || '#28a745';

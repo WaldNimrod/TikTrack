@@ -72,6 +72,34 @@ class PreferencesAPIClient {
     constructor(baseURL = '/api/preferences') {
         this.baseURL = baseURL;
         this.defaultUserId = 1;  // Nimrod - currently the only user
+        this.lastProfileContext = null;
+    }
+    
+    extractProfileContext(data) {
+        if (!data || (data.active_profile_id === undefined &&
+                      data.profile_id === undefined &&
+                      data.is_fallback_profile === undefined &&
+                      data.fallback_message === undefined)) {
+            return null;
+        }
+        
+        const context = {
+            id: data.active_profile_id ?? data.profile_id ?? null,
+            name: data.active_profile_name ?? data.profile_name ?? null,
+            isFallback: Boolean(data.is_fallback_profile),
+            fallbackMessage: data.fallback_message ?? null,
+            warnings: Array.isArray(data.profile_warnings) ? data.profile_warnings : []
+        };
+        
+        if (context.id === null && data.requested_profile_id !== undefined) {
+            context.id = data.requested_profile_id;
+        }
+        
+        if (context.id === null) {
+            return null;
+        }
+        
+        return context;
     }
     
     /**
@@ -161,6 +189,7 @@ class PreferencesAPIClient {
         window.Logger.debug(`🔍 API DEBUG: Requesting preference with params:`, params, { page: "preferences-core-new" });
         
         const result = await this.get('/user/single', params);
+        this.lastProfileContext = this.extractProfileContext(result?.data);
         return result.data?.value;
     }
     
@@ -184,6 +213,7 @@ class PreferencesAPIClient {
         }
         
         const result = await this.get('/user', params);
+        this.lastProfileContext = this.extractProfileContext(result?.data);
         return result.data?.preferences || {};
     }
     
@@ -209,6 +239,7 @@ class PreferencesAPIClient {
         }
         
         const result = await this.get('/user/group', params);
+        this.lastProfileContext = this.extractProfileContext(result?.data);
         return result.data?.preferences || {};
     }
     
@@ -377,6 +408,41 @@ class PreferencesCore {
         
         this.currentUserId = 1; // Nimrod
         this.currentProfileId = null; // Will be loaded from server
+        this.profileContext = {
+            id: 0,
+            name: 'Default Profile',
+            isFallback: true,
+            fallbackMessage: null,
+            warnings: []
+        };
+    }
+    
+    updateProfileContext(rawContext) {
+        if (!rawContext) {
+            return this.profileContext;
+        }
+        
+        const resolvedId = Number.isFinite(rawContext.id) ? rawContext.id : parseInt(rawContext.id ?? '0', 10);
+        const normalized = {
+            id: Number.isFinite(resolvedId) ? resolvedId : 0,
+            name: rawContext.name || (Number.isFinite(resolvedId) && resolvedId !== 0 ? `Profile #${resolvedId}` : 'Default Profile'),
+            isFallback: Boolean(rawContext.isFallback),
+            fallbackMessage: rawContext.fallbackMessage || null,
+            warnings: Array.isArray(rawContext.warnings) ? rawContext.warnings : []
+        };
+        
+        if (normalized.id === 0 && rawContext.isFallback === undefined) {
+            normalized.isFallback = true;
+        }
+        
+        this.profileContext = normalized;
+        this.currentProfileId = normalized.id;
+        window.Logger.info('🔄 PreferencesCore profile context updated', normalized, { page: "preferences-core-new" });
+        return normalized;
+    }
+    
+    getProfileContext() {
+        return { ...this.profileContext };
     }
     
     /**
@@ -416,7 +482,8 @@ class PreferencesCore {
         const finalUserId = userId || this.currentUserId;
         const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
         
-        const cacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
+        const cacheKey = `tiktrack_preference_${preferenceName}__profile_${finalProfileId}`;
+        this.currentProfileId = finalProfileId;
         
         // Use UnifiedCacheManager with fallback to localStorage if not initialized
         if (window.UnifiedCacheManager) {
@@ -471,6 +538,11 @@ class PreferencesCore {
                     }
                     
                     const allPreferences = result.data.preferences;
+                    const context = this.apiClient.extractProfileContext(result.data);
+                    if (context) {
+                        this.apiClient.lastProfileContext = context;
+                        this.updateProfileContext(context);
+                    }
                     const value = allPreferences[preferenceName];
                     
                     // Save to UnifiedCacheManager
@@ -496,6 +568,9 @@ class PreferencesCore {
                 finalUserId, 
                 finalProfileId
             );
+            if (this.apiClient.lastProfileContext) {
+                this.updateProfileContext(this.apiClient.lastProfileContext);
+            }
             
             // Save to UnifiedCacheManager
             if (window.UnifiedCacheManager) {
@@ -526,7 +601,8 @@ class PreferencesCore {
         const finalUserId = userId || this.currentUserId;
         const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
         
-        const cacheKey = `all_preferences_${finalUserId}_${finalProfileId}`;
+        const cacheKey = `all_preferences__profile_${finalProfileId}`;
+        this.currentProfileId = finalProfileId;
         
         // Check cache first via UnifiedCacheManager
         if (window.UnifiedCacheManager) {
@@ -554,6 +630,9 @@ class PreferencesCore {
                 finalUserId, 
                 finalProfileId
             );
+            if (this.apiClient.lastProfileContext) {
+                this.updateProfileContext(this.apiClient.lastProfileContext);
+            }
             
             // Merge critical preferences
             const result = { ...allPreferences, ...criticalPreferences };

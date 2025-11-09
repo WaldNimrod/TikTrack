@@ -36,6 +36,13 @@ const BUTTON_SYSTEM_CONFIG = {
     }
 };
 
+const BUTTON_TOOLTIP_DEBUG_ENABLED = window.ButtonTooltipDebugMode === true;
+const buttonTooltipDebugLog = (...args) => {
+    if (BUTTON_TOOLTIP_DEBUG_ENABLED) {
+        console.log(...args);
+    }
+};
+
 class ButtonSystemLogger {
     constructor(config) {
         this.config = config;
@@ -336,7 +343,7 @@ class AdvancedButtonSystem {
             return;
         }
 
-        console.log('🔍 [Tooltip Debug] initializeTooltips called', {
+        buttonTooltipDebugLog('🔍 [Tooltip Debug] initializeTooltips called', {
             container: container.id || container.className || 'unknown',
             containerTag: container.tagName
         });
@@ -347,7 +354,7 @@ class AdvancedButtonSystem {
                 // Find all buttons with data-tooltip attribute (supports both button system buttons and custom buttons)
                 const buttonsWithTooltips = container.querySelectorAll('[data-tooltip]');
                 
-                console.log('🔍 [Tooltip Debug] Searching for buttons with data-tooltip', {
+                buttonTooltipDebugLog('🔍 [Tooltip Debug] Searching for buttons with data-tooltip', {
                     container: container.id || container.className || 'unknown',
                     found: buttonsWithTooltips.length
                 });
@@ -358,14 +365,14 @@ class AdvancedButtonSystem {
                 }
 
                 this.logger.debug(`initializeTooltips: Found ${buttonsWithTooltips.length} buttons with tooltips`);
-                console.log(`🔍 [Tooltip Debug] Found ${buttonsWithTooltips.length} buttons with tooltips`);
+                buttonTooltipDebugLog(`🔍 [Tooltip Debug] Found ${buttonsWithTooltips.length} buttons with tooltips`);
 
                 buttonsWithTooltips.forEach((button, index) => {
                     // Get tooltip config from data attributes
                     const tooltipText = button.getAttribute('data-tooltip');
                     const buttonId = button.id || `button-${index}`;
                     
-                    console.log(`🔍 [Tooltip Debug] Processing button ${index + 1}/${buttonsWithTooltips.length}`, {
+                    buttonTooltipDebugLog(`🔍 [Tooltip Debug] Processing button ${index + 1}/${buttonsWithTooltips.length}`, {
                         buttonId: buttonId,
                         tooltipText: tooltipText,
                         hasDataBsToggle: button.hasAttribute('data-bs-toggle'),
@@ -379,10 +386,10 @@ class AdvancedButtonSystem {
 
                     // Get configuration from data attributes
                     const config = this._getTooltipConfig(button);
-                    console.log(`🔍 [Tooltip Debug] Config for button ${buttonId}:`, config);
+                    buttonTooltipDebugLog(`🔍 [Tooltip Debug] Config for button ${buttonId}:`, config);
                     
                     if (config) {
-                        console.log(`🔍 [Tooltip Debug] Initializing tooltip for button ${buttonId}`);
+                        buttonTooltipDebugLog(`🔍 [Tooltip Debug] Initializing tooltip for button ${buttonId}`);
                         this._initializeTooltip(button, config);
                     } else {
                         console.warn(`🔍 [Tooltip Debug] No config returned for button ${buttonId}`);
@@ -603,7 +610,7 @@ class AdvancedButtonSystem {
         const elementId = element.id || 'unknown';
         const tooltipText = element.getAttribute('data-tooltip');
         
-        console.log(`🔍 [Tooltip Debug] _getTooltipConfig called for element ${elementId}`, {
+        buttonTooltipDebugLog(`🔍 [Tooltip Debug] _getTooltipConfig called for element ${elementId}`, {
             tooltipText: tooltipText,
             hasDataTooltip: element.hasAttribute('data-tooltip')
         });
@@ -630,7 +637,7 @@ class AdvancedButtonSystem {
             offset: offset || '0,0'
         };
         
-        console.log(`🔍 [Tooltip Debug] Config created for element ${elementId}:`, config);
+        buttonTooltipDebugLog(`🔍 [Tooltip Debug] Config created for element ${elementId}:`, config);
         
         return config;
     }
@@ -643,7 +650,7 @@ class AdvancedButtonSystem {
      */
     _initializeTooltip(button, config) {
         const buttonId = button.id || 'unknown';
-        console.log(`🔍 [Tooltip Debug] _initializeTooltip called for button ${buttonId}`, {
+        buttonTooltipDebugLog(`🔍 [Tooltip Debug] _initializeTooltip called for button ${buttonId}`, {
             config: config,
             bootstrapAvailable: typeof bootstrap !== 'undefined',
             TooltipAvailable: typeof bootstrap !== 'undefined' && !!bootstrap.Tooltip
@@ -659,7 +666,7 @@ class AdvancedButtonSystem {
         // Destroy existing tooltip if exists
         const existingTooltip = bootstrap.Tooltip.getInstance(button);
         if (existingTooltip) {
-            console.log(`🔍 [Tooltip Debug] Disposing existing tooltip for button ${buttonId}`);
+            buttonTooltipDebugLog(`🔍 [Tooltip Debug] Disposing existing tooltip for button ${buttonId}`);
             existingTooltip.dispose();
         }
 
@@ -685,7 +692,7 @@ class AdvancedButtonSystem {
                 tooltipOptions.offset = [x || 0, y || 0];
             }
 
-            console.log(`🔍 [Tooltip Debug] Creating Bootstrap Tooltip for button ${buttonId}`, {
+            buttonTooltipDebugLog(`🔍 [Tooltip Debug] Creating Bootstrap Tooltip for button ${buttonId}`, {
                 options: tooltipOptions,
                 button: button
             });
@@ -693,7 +700,7 @@ class AdvancedButtonSystem {
             // Initialize Bootstrap tooltip
             const tooltipInstance = new bootstrap.Tooltip(button, tooltipOptions);
             
-            console.log(`🔍 [Tooltip Debug] ✅ Tooltip created successfully for button ${buttonId}`, {
+            buttonTooltipDebugLog(`🔍 [Tooltip Debug] ✅ Tooltip created successfully for button ${buttonId}`, {
                 instance: tooltipInstance,
                 enabled: tooltipInstance._isEnabled,
                 config: tooltipInstance._config

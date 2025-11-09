@@ -75,7 +75,7 @@ async function populateAccountSelector(autoSelectDefault = false) {
         });
     }
     
-    window.Logger.info(`✅ Account selector populated with ${selector.options.length - 1} accounts`, { page: "trading_accounts" });
+    window.Logger.info(`✅ Account selector populated with ${selector.options.length - 1} accounts`, { page: "trading_accounts", keepInfo: true });
     
     // Auto-select default account from preferences if requested and no account is currently selected
     if (autoSelectDefault && selector.options.length > 1) {
@@ -375,7 +375,7 @@ function populateAccountActivityTable(data) {
     // Update statistics card
     updateActivityStatistics();
     
-    window.Logger.info(`✅ טבלה עודכנה עם ${allMovements.length} תנועות`, { page: "trading_accounts" });
+    window.Logger.info(`✅ טבלה עודכנה עם ${allMovements.length} תנועות`, { page: "trading_accounts", keepInfo: true });
 }
 
 /**
@@ -2512,5 +2512,5 @@ window.loadAccountActivity = loadAccountActivity;
 window.populateAccountSelector = populateAccountSelector;
 window.populateAccountActivityTable = populateAccountActivityTable; // Export for UnifiedTableSystem
 
-window.Logger.info('✅ account-activity.js נטען בהצלחה', { page: "trading_accounts" });
+window.Logger.info('✅ account-activity.js נטען בהצלחה', { page: "trading_accounts", keepInfo: true });
 

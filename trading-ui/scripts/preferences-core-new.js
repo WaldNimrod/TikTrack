@@ -148,14 +148,9 @@ class PreferencesAPIClient {
             user_id: userId || this.defaultUserId
         };
         
-        // For default profile, explicitly use profile_id=0
         if (profileId !== null && profileId !== undefined) {
             params.profile_id = profileId;
             window.Logger.debug(`🔍 API DEBUG: getPreference(${preferenceName}) - using provided profileId: ${profileId}`, { page: "preferences-core-new" });
-        } else {
-            // Default profile (ID: 0)
-            params.profile_id = 0;
-            window.Logger.debug(`🔍 API DEBUG: getPreference(${preferenceName}) - profileId is null/undefined, using default: 0`, { page: "preferences-core-new" });
         }
         
         window.Logger.debug(`🔍 API DEBUG: Requesting preference with params:`, params, { page: "preferences-core-new" });
@@ -175,16 +170,19 @@ class PreferencesAPIClient {
             user_id: userId || this.defaultUserId
         };
         
-        // For default profile, explicitly use profile_id=0
         if (profileId !== null && profileId !== undefined) {
             params.profile_id = profileId;
-        } else {
-            // Default profile (ID: 0)
-            params.profile_id = 0;
         }
         
         const result = await this.get('/user', params);
-        return result.data?.preferences || {};
+        const data = result?.data || {};
+        
+        return {
+            preferences: data.preferences || {},
+            profileContext: data.profile_context || null,
+            requestedProfileId: data.requested_profile_id ?? null,
+            resolvedProfileId: data.profile_id ?? null
+        };
     }
     
     /**
@@ -200,16 +198,17 @@ class PreferencesAPIClient {
             user_id: userId || this.defaultUserId
         };
         
-        // For default profile, explicitly use profile_id=0
         if (profileId !== null && profileId !== undefined) {
             params.profile_id = profileId;
-        } else {
-            // Default profile (ID: 0)
-            params.profile_id = 0;
         }
         
         const result = await this.get('/user/group', params);
-        return result.data?.preferences || {};
+        return {
+            preferences: result.data?.preferences || {},
+            profileContext: result.data?.profile_context || null,
+            requestedProfileId: result.data?.requested_profile_id ?? null,
+            resolvedProfileId: result.data?.profile_id ?? null
+        };
     }
     
     /**
@@ -377,6 +376,15 @@ class PreferencesCore {
         
         this.currentUserId = 1; // Nimrod
         this.currentProfileId = null; // Will be loaded from server
+        this.latestProfileContext = null;
+    }
+    
+    /**
+     * Get latest profile context metadata
+     * @returns {Object|null} Profile context
+     */
+    getLatestProfileContext() {
+        return this.latestProfileContext;
     }
     
     /**
@@ -550,17 +558,38 @@ class PreferencesCore {
             }
             
             // Load all preferences
-            const allPreferences = await this.apiClient.getAllPreferences(
+            const apiResult = await this.apiClient.getAllPreferences(
                 finalUserId, 
                 finalProfileId
             );
+            const allPreferences = apiResult.preferences || {};
+            const profileContext = apiResult.profileContext || null;
+            const effectiveProfileId = (profileContext && profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined)
+                ? profileContext.resolved_profile_id
+                : finalProfileId;
+            
+            if (profileContext) {
+                this.latestProfileContext = profileContext;
+                if (profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined) {
+                    this.currentProfileId = profileContext.resolved_profile_id;
+                }
+                if (profileContext.user?.id) {
+                    this.currentUserId = profileContext.user.id;
+                } else {
+                    this.currentUserId = finalUserId;
+                }
+            } else {
+                this.currentProfileId = effectiveProfileId;
+                this.currentUserId = finalUserId;
+            }
             
             // Merge critical preferences
             const result = { ...allPreferences, ...criticalPreferences };
             
             // Cache the result via UnifiedCacheManager
             if (window.UnifiedCacheManager) {
-                await window.UnifiedCacheManager.save(cacheKey, result, {
+                const cacheKeyForSave = `all_preferences_${finalUserId}_${effectiveProfileId}`;
+                await window.UnifiedCacheManager.save(cacheKeyForSave, result, {
                     layer: 'localStorage',
                     ttl: 300000
                 });
@@ -765,15 +794,31 @@ class PreferencesCore {
         
         // Load from server
         window.Logger.info(`📥 Loading group ${groupName} from server...`, { page: "preferences-core-new" });
-        const preferences = await this.apiClient.getGroupPreferences(
+        const groupResponse = await this.apiClient.getGroupPreferences(
             groupName, 
             finalUserId, 
             finalProfileId
         );
+        const preferences = groupResponse.preferences || {};
+        const groupProfileContext = groupResponse.profileContext || null;
+        const effectiveProfileId = (groupProfileContext && groupProfileContext.resolved_profile_id !== null && groupProfileContext.resolved_profile_id !== undefined)
+            ? groupProfileContext.resolved_profile_id
+            : finalProfileId;
+        
+        if (groupProfileContext) {
+            this.latestProfileContext = groupProfileContext;
+            if (groupProfileContext.resolved_profile_id !== null && groupProfileContext.resolved_profile_id !== undefined) {
+                this.currentProfileId = groupProfileContext.resolved_profile_id;
+            }
+            if (groupProfileContext.user?.id) {
+                this.currentUserId = groupProfileContext.user.id;
+            }
+        }
         
         // Save to cache
         if (window.UnifiedCacheManager) {
-            await window.UnifiedCacheManager.save(cacheKey, preferences, {
+            const cacheKeyForSave = `preference_group_${groupName}_${finalUserId}_${effectiveProfileId}`;
+            await window.UnifiedCacheManager.save(cacheKeyForSave, preferences, {
                 layer: 'localStorage',
                 ttl: 300000
             });
@@ -958,15 +1003,15 @@ window.initializePreferencesWithLazyLoading = async function(userId = null, prof
  * @param {number} profileId - Profile ID
  */
 window.initializePreferences = async function(userId = null, profileId = null) {
-    if (typeof window.initializePreferencesWithLazyLoading === 'function') {
-        return await window.initializePreferencesWithLazyLoading(userId, profileId);
-    }
-    
     if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
         return await window.PreferencesUI.loadAllPreferences(
             userId ?? window.PreferencesCore?.currentUserId ?? 1,
-            profileId ?? window.PreferencesCore?.currentProfileId ?? 0
+            profileId
         );
+    }
+    
+    if (typeof window.initializePreferencesWithLazyLoading === 'function') {
+        return await window.initializePreferencesWithLazyLoading(userId, profileId);
     }
     
     return await window.PreferencesCore.getAllPreferences(userId, profileId);

@@ -27,9 +27,9 @@ CREATE TABLE "executions" (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     
     -- Flexible Association Fields
-    ticker_id INTEGER NULL,                    -- FK לטיקר (מצב זמני)
-    trade_id INTEGER NULL,                     -- FK לטרייד (מצב מלא)
-    trading_account_id INTEGER NULL,           -- FK לחשבון (חובה רק עם trade_id)
+    ticker_id INTEGER NOT NULL,                -- FK לטיקר (חובה - כל ביצוע חייב טיקר)
+    trade_id INTEGER NULL,                     -- FK לטרייד (אופציונלי - שיוך לטרייד)
+    trading_account_id INTEGER NULL,           -- FK לחשבון (אופציונלי)
     
     -- Business Fields
     action VARCHAR(20) NOT NULL DEFAULT 'buy', -- קניה/מכירה
@@ -53,11 +53,8 @@ CREATE TABLE "executions" (
     FOREIGN KEY (trade_id) REFERENCES trades (id),
     FOREIGN KEY (trading_account_id) REFERENCES trading_accounts (id),
     
-    -- Business Logic Constraint
-    CHECK (
-        (ticker_id IS NOT NULL AND trade_id IS NULL) OR 
-        (ticker_id IS NULL AND trade_id IS NOT NULL)
-    )
+    -- Note: No CHECK constraint - ticker_id is always required, trade_id is optional
+    -- If trade_id exists, its ticker_id must match execution's ticker_id (enforced in application logic)
 );
 ```
 
@@ -71,11 +68,11 @@ CHECK (
 )
 ```
 
-**המשמעות:**
-- ✅ `ticker_id=5, trade_id=NULL` - חוקי (מצב זמני)
-- ✅ `ticker_id=NULL, trade_id=10` - חוקי (מצב מלא)
-- ❌ `ticker_id=5, trade_id=10` - לא חוקי (שני שיוכים)
-- ❌ `ticker_id=NULL, trade_id=NULL` - לא חוקי (ללא שיוך)
+**המשמעות (עודכן 2025-01-29):**
+- ✅ `ticker_id=5, trade_id=NULL` - חוקי (ביצוע עם טיקר בלבד)
+- ✅ `ticker_id=5, trade_id=10` - חוקי (ביצוע משויך לטרייד, אם ticker_id של הטרייד = 5)
+- ❌ `ticker_id=NULL` - לא חוקי (ticker_id הוא חובה)
+- ⚠️ אם `trade_id` קיים, `ticker_id` של הביצוע חייב להתאים ל-`ticker_id` של הטרייד
 
 #### אילוצי עסקיים
 1. **חשבון:** `trading_account_id` חובה רק כאשר יש `trade_id`
@@ -95,8 +92,8 @@ class Execution(BaseModel):
     __tablename__ = "executions"
     
     # Flexible association fields
-    ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
-    trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)
+    ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)  # Required - every execution must have a ticker
+    trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)  # Optional - execution can exist without trade
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=True)
     
     # Business fields

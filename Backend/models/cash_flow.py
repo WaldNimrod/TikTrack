@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
 from .base import BaseModel
 from typing import Dict, Any, Optional
+from datetime import datetime, date
 
 class CashFlow(BaseModel):
     __tablename__ = "cash_flows"
@@ -29,12 +30,11 @@ class CashFlow(BaseModel):
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary"""
         result: Dict[str, Any] = {}
-        for c in self.__table__.columns:
-            value = getattr(self, c.name)
-            if hasattr(value, 'strftime'):  # If it's a date
-                result[c.name] = value.strftime('%Y-%m-%d') if value else None
-            else:
-                result[c.name] = value
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, date) and not isinstance(value, datetime):
+                value = datetime.combine(value, datetime.min.time())
+            result[column.name] = value
         
         # Use loaded relationships if available
         if hasattr(self, 'account') and self.account:

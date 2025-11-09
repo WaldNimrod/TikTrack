@@ -81,6 +81,16 @@ class Logger {
         this.isLogging = false;
         this.maxContextSize = 1000; // מקסימום 1KB ל-context
         this.duplicateLogs = new Set(); // מניעת לוגים כפולים
+        this.consolePreferenceCache = new Map();
+        this.consolePreferenceCacheTimestamps = new Map();
+        this.consolePreferenceCacheTTL = 5 * 60 * 1000;
+        this.consolePreferenceFetchPromises = new Map();
+        this.verboseLoggingEnabled = Logger.DEBUG_MODE;
+        this.preferenceLoadInProgress = null;
+        this.preferencesApplied = false;
+        this.preferenceListenersRegistered = false;
+        
+        this.registerPreferenceListeners();
         
         this.init();
     }
@@ -94,11 +104,13 @@ class Logger {
         'unified-app-initializer': 'initialization',
         'button-system': 'ui_components',
         'actions-menu': 'ui_components',
+        'actions-menu-system': 'ui_components',
         'notification-system': 'notifications',
         'cache': 'cache',
         'preferences': 'system',
         'ui-utils': 'ui_components',
         'color-scheme': 'ui_components',
+        'logger-service': 'system',
         'monitoring': 'system',
         'init-check': 'initialization',
         'cache-sync': 'cache',
@@ -114,12 +126,218 @@ class Logger {
         'notes': 'business'
     };
 
+    registerPreferenceListeners() {
+        if (this.preferenceListenersRegistered || typeof window === 'undefined' || typeof window.addEventListener !== 'function') {
+            return;
+        }
+        const handler = () => {
+            this.consolePreferenceCache.clear();
+            this.consolePreferenceCacheTimestamps.clear();
+            this.applyLoggingPreferences();
+        };
+        window.addEventListener('preferences:loaded', handler);
+        window.addEventListener('preferences:updated', handler);
+        this.preferenceListenersRegistered = true;
+    }
+
+    async applyLoggingPreferences() {
+        if (this.preferenceLoadInProgress) {
+            try {
+                return await this.preferenceLoadInProgress;
+            } catch {
+                return;
+            }
+        }
+
+        this.preferenceLoadInProgress = (async () => {
+            try {
+                const logLevelPref = await this.resolvePreferenceValue('logLevel');
+                this.applyLogLevelPreference(logLevelPref);
+
+                const verbosePref = await this.resolvePreferenceValue('verboseLogging');
+                const normalizedVerbose = this.normalizeBoolean(verbosePref);
+                if (Logger.DEBUG_MODE) {
+                    this.verboseLoggingEnabled = true;
+                } else if (normalizedVerbose !== undefined) {
+                    this.verboseLoggingEnabled = normalizedVerbose;
+                } else if (!this.preferencesApplied) {
+                    this.verboseLoggingEnabled = false;
+                }
+
+                this.preferencesApplied = true;
+            } finally {
+                this.preferenceLoadInProgress = null;
+            }
+        })();
+
+        return this.preferenceLoadInProgress;
+    }
+
+    async resolvePreferenceValue(preferenceName) {
+        const cachedValue = this.readPreferenceFromSources(preferenceName);
+        if (cachedValue !== undefined) {
+            return cachedValue;
+        }
+        return await this.safeGetPreference(preferenceName);
+    }
+
+    readPreferenceFromSources(preferenceName) {
+        const sources = [
+            typeof window !== 'undefined' ? window.currentPreferences : undefined,
+            typeof window !== 'undefined' ? window.userPreferences : undefined,
+            typeof window !== 'undefined' && window.PreferencesSystem ? window.PreferencesSystem.manager?.currentPreferences : undefined
+        ];
+
+        for (const source of sources) {
+            if (source && Object.prototype.hasOwnProperty.call(source, preferenceName)) {
+                return source[preferenceName];
+            }
+            if (!source) {
+                continue;
+            }
+            if (preferenceName === 'logLevel') {
+                if (source.console && Object.prototype.hasOwnProperty.call(source.console, 'logLevel')) {
+                    return source.console.logLevel;
+                }
+            }
+            if (preferenceName === 'verboseLogging') {
+                if (source.console && Object.prototype.hasOwnProperty.call(source.console, 'verboseLogging')) {
+                    return source.console.verboseLogging;
+                }
+            }
+            if (preferenceName.startsWith('console_logs_')) {
+                if (source.categories && Object.prototype.hasOwnProperty.call(source.categories, preferenceName)) {
+                    return source.categories[preferenceName];
+                }
+                if (source.console && source.console.categories && Object.prototype.hasOwnProperty.call(source.console.categories, preferenceName)) {
+                    return source.console.categories[preferenceName];
+                }
+                if (source.notifications && source.notifications.categories && Object.prototype.hasOwnProperty.call(source.notifications.categories, preferenceName)) {
+                    return source.notifications.categories[preferenceName];
+                }
+            }
+        }
+        return undefined;
+    }
+
+    async safeGetPreference(preferenceName) {
+        if (typeof window === 'undefined' || typeof window.getPreference !== 'function') {
+            return undefined;
+        }
+        try {
+            return await window.getPreference(preferenceName);
+        } catch (error) {
+            if (Logger.DEBUG_MODE) {
+                console.warn(`LoggerService: failed to get preference "${preferenceName}"`, error);
+            }
+            return undefined;
+        }
+    }
+
+    applyLogLevelPreference(prefValue) {
+        if (prefValue === undefined || prefValue === null) {
+            if (!this.preferencesApplied) {
+                this.resetLogLevelToDefault();
+            }
+            return;
+        }
+
+        const normalized = String(prefValue).trim().toUpperCase();
+        const levelMap = {
+            DEBUG: Logger.LogLevel.DEBUG,
+            INFO: Logger.LogLevel.INFO,
+            WARN: Logger.LogLevel.WARN,
+            ERROR: Logger.LogLevel.ERROR,
+            CRITICAL: Logger.LogLevel.CRITICAL
+        };
+
+        if (levelMap.hasOwnProperty(normalized)) {
+            this.currentLevel = levelMap[normalized];
+        } else if (!this.preferencesApplied) {
+            this.resetLogLevelToDefault();
+        }
+    }
+
+    resetLogLevelToDefault() {
+        this.currentLevel = Logger.DEBUG_MODE ? Logger.LogLevel.INFO : Logger.LogLevel.WARN;
+    }
+
+    normalizeBoolean(value) {
+        if (value === null || value === undefined) {
+            return undefined;
+        }
+        if (typeof value === 'boolean') {
+            return value;
+        }
+        const normalized = String(value).trim().toLowerCase();
+        if (['true', '1', 'yes', 'on'].includes(normalized)) {
+            return true;
+        }
+        if (['false', '0', 'no', 'off'].includes(normalized)) {
+            return false;
+        }
+        return undefined;
+    }
+
+    shouldEmitVerboseLogs() {
+        return Logger.DEBUG_MODE || this.verboseLoggingEnabled === true;
+    }
+
+    cacheConsolePreference(key, value) {
+        this.consolePreferenceCache.set(key, value);
+        this.consolePreferenceCacheTimestamps.set(key, Date.now());
+    }
+
+    isConsolePreferenceCached(key) {
+        if (!this.consolePreferenceCacheTimestamps.has(key)) {
+            return false;
+        }
+        const timestamp = this.consolePreferenceCacheTimestamps.get(key);
+        return Date.now() - timestamp <= this.consolePreferenceCacheTTL;
+    }
+
+    fetchConsolePreference(preferenceKey) {
+        if (this.consolePreferenceCache.has(preferenceKey) && this.isConsolePreferenceCached(preferenceKey)) {
+            return this.consolePreferenceCache.get(preferenceKey);
+        }
+
+        if (this.consolePreferenceFetchPromises.has(preferenceKey)) {
+            return this.consolePreferenceFetchPromises.get(preferenceKey);
+        }
+
+        if (typeof window === 'undefined' || typeof window.getPreference !== 'function') {
+            const cached = this.consolePreferenceCache.get(preferenceKey);
+            return cached !== undefined ? cached : true;
+        }
+
+        const promise = window.getPreference(preferenceKey)
+            .then(value => {
+                const boolValue = this.normalizeBoolean(value);
+                const finalValue = boolValue !== undefined ? boolValue : false;
+                this.cacheConsolePreference(preferenceKey, finalValue);
+                return finalValue;
+            })
+            .catch(error => {
+                if (Logger.DEBUG_MODE) {
+                    console.warn(`LoggerService: failed to fetch preference "${preferenceKey}"`, error);
+                }
+                this.cacheConsolePreference(preferenceKey, true);
+                return true;
+            })
+            .finally(() => {
+                this.consolePreferenceFetchPromises.delete(preferenceKey);
+            });
+
+        this.consolePreferenceFetchPromises.set(preferenceKey, promise);
+        return promise;
+    }
+
     /**
      * אתחול מערכת הלוגים
      */
     async init() {
         try {
-            console.log('📝 Initializing Logger Service...');
+            this.info('📝 Initializing Logger Service...', { page: "logger-service" });
             
             // Load saved logs from localStorage
             this.loadPendingLogs();
@@ -130,8 +348,11 @@ class Logger {
             // Performance monitoring
             this.setupPerformanceMonitoring();
             
+            // Apply user preferences for logging
+            await this.applyLoggingPreferences();
+            
             this.initialized = true;
-            console.log('✅ Logger Service initialized successfully');
+            this.info('✅ Logger Service initialized successfully', { page: "logger-service" });
             
             return true;
         } catch (error) {
@@ -354,7 +575,9 @@ class Logger {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
-                console.log(`✅ Sent ${batch.length} logs to server`);
+                if (this.shouldEmitVerboseLogs()) {
+                    console.log(`✅ Sent ${batch.length} logs to server`);
+                }
                 
                 // Remove sent logs from pending
                 this.pendingLogs = this.pendingLogs.filter(log => !batch.includes(log));
@@ -436,7 +659,9 @@ class Logger {
             }
 
             const result = await response.json();
-            console.log(`✅ Sent ${logsToSend.length} logs to server`);
+            if (this.shouldEmitVerboseLogs()) {
+                console.log(`✅ Sent ${logsToSend.length} logs to server`);
+            }
             
             // Clear localStorage after successful send
             this.clearPendingLogs();
@@ -535,7 +760,9 @@ class Logger {
             const saved = localStorage.getItem('tiktrack_pending_logs');
             if (saved) {
                 this.pendingLogs = JSON.parse(saved);
-                console.log(`📝 Loaded ${this.pendingLogs.length} pending logs from localStorage`);
+                if (this.shouldEmitVerboseLogs()) {
+                    console.log(`📝 Loaded ${this.pendingLogs.length} pending logs from localStorage`);
+                }
             }
         } catch (error) {
             console.warn('⚠️ Failed to load logs from localStorage:', error);
@@ -554,36 +781,82 @@ class Logger {
     }
 
     /**
-     * בדוק אם צריך לוג לקונסול - זמנית: רק שגיאות
+     * בדוק אם צריך לוג לקונסול לפי העדפות המשתמש
      */
     shouldLogToConsole(category) {
-        // במצב DEBUG - מציגים לוגים
-        if (Logger.DEBUG_MODE) {
+        if (Logger.DEBUG_MODE || this.verboseLoggingEnabled === true) {
             return true;
         }
-        
-        // במצב ייצור - רק שגיאות
-        return false;
+
+        const preferenceKey = `console_logs_${category}_enabled`;
+
+        if (this.consolePreferenceCache.has(preferenceKey) && this.isConsolePreferenceCached(preferenceKey)) {
+            return this.consolePreferenceCache.get(preferenceKey);
+        }
+
+        const cachedValue = this.readPreferenceFromSources(preferenceKey);
+        if (cachedValue !== undefined) {
+            const boolValue = this.normalizeBoolean(cachedValue);
+            const finalValue = boolValue !== undefined ? boolValue : false;
+            this.cacheConsolePreference(preferenceKey, finalValue);
+            return finalValue;
+        }
+
+        if (!this.preferencesApplied) {
+            return true;
+        }
+
+        if (typeof window !== 'undefined' && typeof window.shouldLogToConsole === 'function') {
+            try {
+                const result = window.shouldLogToConsole(category);
+                if (result && typeof result.then === 'function') {
+                    return result.then(value => {
+                        const boolValue = this.normalizeBoolean(value);
+                        const finalValue = boolValue !== undefined ? boolValue : false;
+                        this.cacheConsolePreference(preferenceKey, finalValue);
+                        return finalValue;
+                    }).catch(() => true);
+                }
+                const boolValue = this.normalizeBoolean(result);
+                const finalValue = boolValue !== undefined ? boolValue : false;
+                this.cacheConsolePreference(preferenceKey, finalValue);
+                return finalValue;
+            } catch (error) {
+                if (Logger.DEBUG_MODE) {
+                    console.warn('LoggerService: shouldLogToConsole fallback error', error);
+                }
+            }
+        }
+
+        return this.fetchConsolePreference(preferenceKey);
     }
 
     /**
-     * פלט לקונסול - פישוט
+     * פלט לקונסול בהתאם להעדפות
      */
-    outputToConsole(level, message, context) {
-        // Extract category from context.page
+    outputToConsole(level, message, context = {}) {
         const page = context?.page || 'system';
         const category = Logger.CATEGORY_MAPPING[page] || 'system';
-        
-        // בדיקה פשוטה אם צריך להדפיס לוג
-        if (!this.shouldLogToConsole(category)) {
-            return;
+        const decision = this.shouldLogToConsole(category);
+
+        if (decision && typeof decision.then === 'function') {
+            decision.then(shouldLog => {
+                if (shouldLog) {
+                    this.printToConsole(level, message, context);
+                }
+            }).catch(() => {
+                this.printToConsole(level, message, context);
+            });
+        } else if (decision) {
+            this.printToConsole(level, message, context);
         }
-        
+    }
+
+    printToConsole(level, message, context) {
         const timestamp = new Date().toLocaleTimeString();
         const levelName = this.getLevelName(level);
-        
         const logMessage = `[${timestamp}] ${levelName}: ${message}`;
-        
+
         switch (level) {
             case Logger.LogLevel.DEBUG:
                 console.debug(logMessage, context);
@@ -648,7 +921,9 @@ class Logger {
      */
     setLevel(level) {
         this.currentLevel = level;
-        console.log(`📝 Logger level set to: ${this.getLevelName(level)}`);
+        if (this.shouldEmitVerboseLogs()) {
+            console.log(`📝 Logger level set to: ${this.getLevelName(level)}`);
+        }
     }
 
     /**
@@ -657,7 +932,9 @@ class Logger {
     clear() {
         this.pendingLogs = [];
         this.clearPendingLogs();
-        console.log('🧹 Logger cleared all logs');
+        if (this.shouldEmitVerboseLogs()) {
+            console.log('🧹 Logger cleared all logs');
+        }
     }
 }
 
@@ -753,4 +1030,6 @@ if (window.UnifiedInitializationSystem) {
     });
 }
 
-console.log('📝 Logger Service loaded');
+if (Logger.DEBUG_MODE) {
+    console.log('📝 Logger Service loaded');
+}

@@ -220,6 +220,21 @@ const PAGE_CONFIGS = {
             async (pageConfig) => {
                 // window.Logger.info('📊 Initializing Dashboard...', { page: "page-initialization-configs" });
                 
+                // Load trading accounts data if needed for portfolio
+                if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
+                    try {
+                        await window.loadTradingAccountsDataForTradingAccountsPage();
+                    } catch (error) {
+                        window.Logger?.warn('⚠️ Error loading trading accounts data:', error, { page: "page-initialization-configs" });
+                    }
+                } else if (typeof window.loadAccountsData === 'function') {
+                    try {
+                        await window.loadAccountsData();
+                    } catch (error) {
+                        window.Logger?.warn('⚠️ Error loading accounts data:', error, { page: "page-initialization-configs" });
+                    }
+                }
+                
                 // Use the new unified initialization function
                 if (typeof window.initializeIndexPage === 'function') {
                     await window.initializeIndexPage();
@@ -233,6 +248,15 @@ const PAGE_CONFIGS = {
                     // Load dashboard data
                     if (typeof window.loadDashboardData === 'function') {
                         await window.loadDashboardData();
+                    }
+                }
+                
+                // Initialize positions & portfolio system
+                if (typeof window.initPositionsPortfolio === 'function') {
+                    try {
+                        await window.initPositionsPortfolio(false); // Don't auto-select account on home page
+                    } catch (error) {
+                        window.Logger?.warn('⚠️ Error initializing positions portfolio:', error, { page: "page-initialization-configs" });
                     }
                 }
             }
@@ -301,6 +325,11 @@ const PAGE_CONFIGS = {
                 // Load default colors if not set
                 if (typeof window.loadDefaultColors === 'function') {
                     window.loadDefaultColors();
+                }
+                
+                // Render preference types audit table
+                if (typeof window.renderPreferenceTypesAuditTable === 'function') {
+                    await window.renderPreferenceTypesAuditTable();
                 }
                 
                 // Setup preference change handlers (function not implemented yet)

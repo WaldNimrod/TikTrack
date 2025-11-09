@@ -1,54 +1,47 @@
-#!/usr/bin/env python3
-"""
-Preferences Routes API Tests - TikTrack
-
-בדיקות מקיפות ל-API endpoints של Preferences
-
-Author: TikTrack Development Team
-Date: January 2025
-"""
-
-import sys
-import os
 import unittest
-from unittest.mock import Mock, patch
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
+from unittest.mock import MagicMock, patch
 
 from flask import Flask
+
 from routes.api.preferences import preferences_bp
 
 
 class TestPreferencesRoutes(unittest.TestCase):
-    """Test suite for Preferences API routes"""
-    
+    """Validate that preferences endpoints emit enveloped timestamps."""
+
     def setUp(self):
         self.app = Flask(__name__)
-        self.app.config['TESTING'] = True
+        self.app.config["TESTING"] = True
         self.app.register_blueprint(preferences_bp)
-        self.mock_db = Mock()
-    
-    def test_get_preferences_endpoint(self):
-        """Test GET /api/preferences endpoint"""
-        with self.app.test_client() as client:
-            with patch('routes.api.preferences.get_db') as mock_get_db:
-                mock_get_db.return_value.__enter__ = Mock(return_value=self.mock_db)
-                mock_get_db.return_value.__exit__ = Mock(return_value=False)
-                response = client.get('/api/preferences')
-                self.assertIn(response.status_code, [200, 500])
-    
-    def test_update_preference_endpoint(self):
-        """Test PUT /api/preferences/<key> endpoint"""
-        with self.app.test_client() as client:
-            with patch('routes.api.preferences.get_db') as mock_get_db:
-                mock_get_db.return_value.__enter__ = Mock(return_value=self.mock_db)
-                mock_get_db.return_value.__exit__ = Mock(return_value=False)
-                response = client.put('/api/preferences/test-key',
-                                    json={'value': 'test-value'},
-                                    content_type='application/json')
-                self.assertIn(response.status_code, [200, 404, 400, 500])
+        self.client = self.app.test_client()
+
+        pref_patcher = patch("routes.api.preferences.BaseEntityUtils.get_request_normalizer")
+        self.mock_get_normalizer = pref_patcher.start()
+        self.addCleanup(pref_patcher.stop)
+
+        self.normalizer = MagicMock()
+        self.normalizer.now_envelope.return_value = {
+            "utc": "2025-01-01T00:00:00Z",
+            "epochMs": 1735689600000,
+            "local": "2025-01-01T00:00:00+00:00",
+            "timezone": "UTC",
+            "display": "01/01/2025 00:00"
+        }
+        self.normalizer.normalize_output.side_effect = lambda payload: payload
+        self.mock_get_normalizer.return_value = self.normalizer
+
+    @patch("routes.api.preferences.PreferencesService.get_group_preferences")
+    def test_user_group_preferences_returns_timestamp(self, mock_get_group_preferences):
+        mock_get_group_preferences.return_value = {"theme": "dark"}
+
+        response = self.client.get("/api/preferences/user/group?group=ui")
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        self.assertTrue(payload["success"])
+        self.assertIn("timestamp", payload)
+        self.assertIn("utc", payload["timestamp"])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
 

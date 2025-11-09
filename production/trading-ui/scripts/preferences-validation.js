@@ -324,12 +324,6 @@ class ConstraintValidator {
             type: 'number'
         });
         
-        this.constraints.set('tablePageSize', {
-            min: 10,
-            max: 100,
-            type: 'number'
-        });
-        
         // Commission constraints
         this.constraints.set('defaultCommission', {
             min: 0,

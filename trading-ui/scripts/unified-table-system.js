@@ -299,6 +299,57 @@ class TableSorter {
       window.saveSortState(tableType, columnIndex, direction);
     }
   }
+
+  /**
+   * Apply default sort for a table if no saved state exists
+   * @param {string} tableType - סוג הטבלה
+   * @returns {Promise<Array|null>} Sorted data or null if not applicable
+   */
+  async applyDefaultSort(tableType) {
+    if (!tableType || typeof tableType !== 'string') {
+      return null;
+    }
+
+    const config = this.registry.getConfig(tableType);
+    if (!config) {
+      return null;
+    }
+
+    // Check if table has defaultSort configuration
+    if (!config.defaultSort || typeof config.defaultSort !== 'object') {
+      return null;
+    }
+
+    // Check if there's a saved sort state
+    if (window.getSortState && typeof window.getSortState === 'function') {
+      try {
+        const savedState = await window.getSortState(tableType);
+        // If there's a saved state with valid column index, don't apply default
+        if (savedState && savedState.columnIndex >= 0) {
+          return null;
+        }
+      } catch (err) {
+        if (window.Logger) {
+          window.Logger.warn(`TableSorter.applyDefaultSort: Failed to check saved state for "${tableType}"`, err, { page: "unified-table-system" });
+        }
+      }
+    }
+
+    // Apply default sort
+    const { columnIndex, direction } = config.defaultSort;
+    if (typeof columnIndex !== 'number' || columnIndex < 0) {
+      return null;
+    }
+
+    // Use the sort method with the default column and direction
+    // First, save the default sort state
+    if (window.saveSortState && typeof window.saveSortState === 'function') {
+      await window.saveSortState(tableType, columnIndex, direction);
+    }
+
+    // Then apply the sort
+    return this.sort(tableType, columnIndex);
+  }
 }
 
 // ===== TABLE RENDERER =====
@@ -412,57 +463,67 @@ class TableStateManager {
    * @param {string} tableType - סוג הטבלה
    * @param {Object} state - מצב לשמירה
    */
-  save(tableType, state) {
+  async save(tableType, state) {
     if (!tableType || typeof tableType !== 'string') {
       return;
     }
 
-    // שמירה ב-localStorage
-    try {
-      localStorage.setItem(`tableState_${tableType}`, JSON.stringify(state));
-    } catch (e) {
-      console.error(`TableStateManager.save: Failed to save state for "${tableType}"`, e);
+    // שמירה רק דרך UnifiedCacheManager
+    if (!window.UnifiedCacheManager) {
+      if (window.Logger) {
+        window.Logger.warn(`TableStateManager.save: UnifiedCacheManager not available for "${tableType}"`, { page: "unified-table-system" });
+      }
+      return;
     }
 
-    // שמירה ב-UnifiedCacheManager אם זמין
-    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.set === 'function') {
-      window.UnifiedCacheManager.set(`tableState_${tableType}`, state, { dependencies: ['tables'] })
-        .catch(err => {
-          console.error(`TableStateManager.save: Cache save failed for "${tableType}"`, err);
-        });
+    try {
+      const cacheKey = `tableState_${tableType}`;
+      await window.UnifiedCacheManager.save(cacheKey, state, {
+        layer: 'localStorage',
+        ttl: null, // persistent
+        syncToBackend: false
+      });
+    } catch (err) {
+      if (window.Logger) {
+        window.Logger.error(`TableStateManager.save: Cache save failed for "${tableType}"`, err, { page: "unified-table-system" });
+      } else {
+        console.error(`TableStateManager.save: Cache save failed for "${tableType}"`, err);
+      }
     }
   }
 
   /**
    * טעינת מצב טבלה
    * @param {string} tableType - סוג הטבלה
-   * @returns {Object|null} מצב או null אם לא נמצא
+   * @returns {Promise<Object|null>} מצב או null אם לא נמצא
    */
-  load(tableType) {
+  async load(tableType) {
     if (!tableType || typeof tableType !== 'string') {
       return null;
     }
 
-    // טעינה מ-localStorage
-    try {
-      const saved = localStorage.getItem(`tableState_${tableType}`);
-      if (saved) {
-        return JSON.parse(saved);
+    // טעינה רק דרך UnifiedCacheManager
+    if (!window.UnifiedCacheManager) {
+      if (window.Logger) {
+        window.Logger.warn(`TableStateManager.load: UnifiedCacheManager not available for "${tableType}"`, { page: "unified-table-system" });
       }
-    } catch (e) {
-      console.error(`TableStateManager.load: Failed to load state for "${tableType}"`, e);
+      return null;
     }
 
-    // טעינה מ-UnifiedCacheManager אם זמין
-    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.get === 'function') {
-      return window.UnifiedCacheManager.get(`tableState_${tableType}`, { dependencies: ['tables'] })
-        .catch(err => {
-          console.error(`TableStateManager.load: Cache load failed for "${tableType}"`, err);
-          return null;
-        });
+    try {
+      const cacheKey = `tableState_${tableType}`;
+      const state = await window.UnifiedCacheManager.get(cacheKey, {
+        layer: 'localStorage'
+      });
+      return state || null;
+    } catch (err) {
+      if (window.Logger) {
+        window.Logger.error(`TableStateManager.load: Cache load failed for "${tableType}"`, err, { page: "unified-table-system" });
+      } else {
+        console.error(`TableStateManager.load: Cache load failed for "${tableType}"`, err);
+      }
+      return null;
     }
-
-    return null;
   }
 }
 

@@ -25,7 +25,9 @@ PORT = 5001
 
 # Production mode settings - always production
 DEVELOPMENT_MODE = False
-CACHE_DISABLED = False  # Cache enabled in production for performance
+# Temporarily align production server behaviour with development by disabling server-side cache.
+# Can be re-enabled by setting TIKTRACK_CACHE_DISABLED=false.
+CACHE_DISABLED = os.getenv('TIKTRACK_CACHE_DISABLED', 'true').lower() == 'true'
 
 # Cache settings
 # In production, cache is always enabled and uses default TTL

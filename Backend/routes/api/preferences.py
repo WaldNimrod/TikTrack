@@ -98,14 +98,20 @@ def get_user_group_preferences() -> Any:
             }), 400
         
         user_id = request.args.get('user_id', 1, type=int)
-        profile_id = request.args.get('profile_id', type=int)
+        requested_profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        
+        profile_context = preferences_service.build_profile_context(
+            user_id=user_id,
+            requested_profile_id=requested_profile_id
+        )
+        resolved_profile_id = profile_context['resolved_profile_id']
         
         # קבלת העדפות הקבוצה
         group_preferences = preferences_service.get_group_preferences(
             user_id=user_id,
             group_name=group_name,
-            profile_id=profile_id,
+            profile_id=resolved_profile_id,
             use_cache=use_cache
         )
         
@@ -113,9 +119,11 @@ def get_user_group_preferences() -> Any:
             'success': True,
             'data': {
                 'user_id': user_id,
-                'profile_id': profile_id,
+                'requested_profile_id': requested_profile_id,
+                'profile_id': resolved_profile_id,
                 'group_name': group_name,
-                'preferences': group_preferences
+                'preferences': group_preferences,
+                'profile_context': profile_context
             },
             'timestamp': datetime.now().isoformat()
         })
@@ -149,14 +157,20 @@ def get_user_preference() -> Any:
             }), 400
         
         user_id = request.args.get('user_id', 1, type=int)
-        profile_id = request.args.get('profile_id', type=int)
+        requested_profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        
+        profile_context = preferences_service.build_profile_context(
+            user_id=user_id,
+            requested_profile_id=requested_profile_id
+        )
+        resolved_profile_id = profile_context['resolved_profile_id']
         
         # קבלת ההעדפה
         preference_value = preferences_service.get_preference(
             user_id=user_id,
             preference_name=preference_name,
-            profile_id=profile_id,
+            profile_id=resolved_profile_id,
             use_cache=use_cache
         )
         
@@ -164,9 +178,11 @@ def get_user_preference() -> Any:
             'success': True,
             'data': {
                 'user_id': user_id,
-                'profile_id': profile_id,
+                'requested_profile_id': requested_profile_id,
+                'profile_id': resolved_profile_id,
                 'preference_name': preference_name,
-                'value': preference_value
+                'value': preference_value,
+                'profile_context': profile_context
             },
             'timestamp': datetime.now().isoformat()
         })
@@ -190,27 +206,31 @@ def get_user_preferences() -> Any:
     """
     try:
         user_id = request.args.get('user_id', 1, type=int)  # ברירת מחדל: משתמש 1
-        profile_id = request.args.get('profile_id', type=int)
+        requested_profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
         
-        # קבלת כל ההעדפות
+        profile_context = preferences_service.build_profile_context(
+            user_id=user_id,
+            requested_profile_id=requested_profile_id
+        )
+        resolved_profile_id = profile_context['resolved_profile_id']
+        
+        # קבלת כל ההעדפות לפי הפרופיל שנבחר בפועל
         preferences = preferences_service.get_all_user_preferences(
             user_id=user_id,
-            profile_id=profile_id,
+            profile_id=resolved_profile_id,
             use_cache=use_cache
         )
-        
-        # קבלת הפרופיל שנבחר (אם לא צוין)
-        if profile_id is None:
-            profile_id = preferences_service._get_active_profile_id(user_id)
         
         return jsonify({
             "success": True,
             "data": {
                 "user_id": user_id,
-                "profile_id": profile_id,
+                "requested_profile_id": requested_profile_id,
+                "profile_id": resolved_profile_id,
                 "preferences": preferences,
-                "count": len(preferences)
+                "count": len(preferences),
+                "profile_context": profile_context
             },
             "timestamp": datetime.now().isoformat()
         }), 200
@@ -296,7 +316,7 @@ def get_single_preference() -> Any:
     try:
         user_id = request.args.get('user_id', 1, type=int)
         preference_name = request.args.get('preference_name')
-        profile_id = request.args.get('profile_id', type=int)
+        requested_profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
         
         if not preference_name:
@@ -306,11 +326,17 @@ def get_single_preference() -> Any:
                 "timestamp": datetime.now().isoformat()
             }), 400
         
+        profile_context = preferences_service.build_profile_context(
+            user_id=user_id,
+            requested_profile_id=requested_profile_id
+        )
+        resolved_profile_id = profile_context['resolved_profile_id']
+        
         # קבלת העדפה
         value = preferences_service.get_preference(
             user_id=user_id,
             preference_name=preference_name,
-            profile_id=profile_id,
+            profile_id=resolved_profile_id,
             use_cache=use_cache
         )
         
@@ -345,8 +371,10 @@ def get_single_preference() -> Any:
                 "user_id": user_id,
                 "preference_name": preference_name,
                 "value": value,
-                "profile_id": profile_id,
-                "is_default": value is not None
+                "requested_profile_id": requested_profile_id,
+                "profile_id": resolved_profile_id,
+                "is_default": value is not None,
+                "profile_context": profile_context
             },
             "timestamp": datetime.now().isoformat()
         }), 200
@@ -511,13 +539,15 @@ def get_user_profiles() -> Any:
         
         # קבלת פרופילים
         profiles = preferences_service.get_user_profiles(user_id)
+        profile_context = preferences_service.build_profile_context(user_id=user_id)
         
         return jsonify({
             "success": True,
             "data": {
                 "user_id": user_id,
                 "profiles": profiles,
-                "count": len(profiles)
+                "count": len(profiles),
+                "profile_context": profile_context
             },
             "timestamp": datetime.now().isoformat()
         }), 200
@@ -725,16 +755,16 @@ def get_preference_types() -> Any:
     קבלת סוגי העדפות (Admin)
     """
     try:
-        # קבלת סוגי העדפות מהשירות
-        # זה דורש הרחבה של השירות
+        preference_types = preferences_service.get_all_preference_types()
         return jsonify({
             "success": True,
             "data": {
-                "message": "Admin endpoint - to be implemented"
+                "preference_types": preference_types,
+                "count": len(preference_types)
             },
             "timestamp": datetime.now().isoformat()
         }), 200
-        
+    
     except Exception as e:
         logger.error(f"Error getting preference types: {e}")
         return jsonify({

@@ -45,8 +45,8 @@ class TradingMethod(BaseModel):
             'icon_class': self.icon_class,
             'is_active': self.is_active,
             'sort_order': self.sort_order,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
-            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
         }
         
         # Add parameters if loaded
@@ -115,8 +115,8 @@ class MethodParameter(BaseModel):
             'sort_order': self.sort_order,
             'help_text_en': self.help_text_en,
             'help_text_he': self.help_text_he,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
-            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
         }
     
     def get_display_name(self, language: str = 'he') -> str:

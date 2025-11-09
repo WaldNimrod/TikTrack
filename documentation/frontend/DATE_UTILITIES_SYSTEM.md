@@ -14,6 +14,14 @@ The Date Utilities System provides comprehensive date and time manipulation capa
 - **Locale Support:** Support for multiple locales
 - **Performance Optimized:** Optimized date operations
 
+### 🆕 February 2026 Update – DateEnvelope Everywhere
+
+- **DateEnvelope First:** כל הפונקציות (`formatDate`, `formatDateTime`, `parseDate`, `isPastDate` וכו') יודעות לקבל אובייקט DateEnvelope, מחרוזת ISO או מספר Epoch. הערך המוחזר תמיד מבוסס על איזור הזמן של המשתמש.
+- **המרת תגובות אוטומטית:** `Response.prototype.json` נעטף כך שכל תגובת API עוברת דרך `dateUtils.adaptDateEnvelopes()`. בכל שדה תאריך נוצר שדה נלווה `<field>_envelope` עם מבנה DateEnvelope, והערך המקורי מוחלף במחרוזת תצוגה. שדה `timestamp` נשאר אובייקט DateEnvelope מלא.
+- **ניהול איזורי זמן:** `dateUtils.setUserTimezone()` מסונכרן אוטומטית עם העדפות המשתמש (דרך `table-mappings.resolveUserTimezone`) ומאפשר החלפה דינמית של האיזור בכל עמוד.
+- **כלי עזר חדשים:** פונקציות חדשות כגון `ensureDateEnvelope`, `getEpochMilliseconds`, `toDateObject` ו-`adaptDateEnvelopes` זמינות ב-`window.dateUtils` ומשתלבות במנוע המיון המשותף, במערכת המטמון ובמערכת האתחול.
+- **Table Sorting משודרג:** מערכת המיון הכללית (`tables.js`) משתמשת בערכי `_envelope` וב-`dateUtils.getEpochMilliseconds()` כדי להבטיח סדר כרונולוגי תקין עבור כל העמודות (כולל טבלאות ו-Header Filters).
+
 ### 🏗️ **Architecture**
 
 | Component | Description | File |
@@ -33,6 +41,15 @@ The Date Utilities System provides comprehensive date and time manipulation capa
 | `addDays(date, days)` | Add days to date | `date` (Date), `days` (number) | `Date` |
 | `subtractDays(date, days)` | Subtract days from date | `date` (Date), `days` (number) | `Date` |
 | `compareDates(date1, date2)` | Compare two dates | `date1` (Date), `date2` (Date) | `number` |
+
+#### 📦 DateEnvelope Helpers (2026)
+
+| Function | Description | Notes |
+|----------|-------------|-------|
+| `ensureDateEnvelope(value)` | מחזיר מבנה DateEnvelope מלא עבור מחרוזת/Date/מספר | מוסיף שדה `display` ו-`timezone` לפי המשתמש |
+| `getEpochMilliseconds(value)` | מפיק ערך epoch (מספר) מתוך Envelope או ערך גולמי | בשימוש ע״י מנוע המיון ורענון מטמון |
+| `adaptDateEnvelopes(payload)` | ממפה תגובת API (Object/Array) כך ששדות התאריך יקבלו ערך תצוגה + `<key>_envelope` | נקרא אוטומטית ע״י `Response.prototype.json` |
+| `setUserTimezone(timezone)` / `getUserTimezone()` | מנהלות את איזור הזמן הפעיל בצד הלקוח | מסונכרן עם העדפות (`currentPreferences.timezone`) |
 
 ### 🔧 **Implementation Details**
 

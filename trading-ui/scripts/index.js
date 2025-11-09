@@ -469,6 +469,13 @@ window.initializeIndexPage = async function() {
         // window.Logger.info('📊 Initializing home page charts...', { page: "index" });
         await refreshAllCharts();
     }, 1000);
+    
+    // Initialize pending executions widget
+    if (typeof window.initializePendingExecutionsWidget === 'function') {
+        setTimeout(() => {
+            window.initializePendingExecutionsWidget();
+        }, 1500);
+    }
 };
 
 // Note: initializeIndexPage() is now called via PAGE_CONFIGS.index.customInitializers

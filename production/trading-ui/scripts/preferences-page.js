@@ -179,22 +179,24 @@ async function switchActiveProfile() {
             throw new Error('Profile select element not found');
         }
         
-        const selectedProfileName = profileSelect.value;
-        if (!selectedProfileName) {
+        const selectedOption = profileSelect.selectedOptions[0];
+        if (!selectedOption) {
             throw new Error('Please select a profile');
         }
         
-        // Get all profiles to find profile ID
-        const profiles = await window.getUserProfiles();
-        if (!profiles || profiles.length === 0) {
-            throw new Error('No profiles available');
+        const profileId = parseInt(selectedOption.value, 10);
+        if (!Number.isFinite(profileId)) {
+            throw new Error('Invalid profile selected');
         }
         
-        // Find profile by name
-        const profile = profiles.find(p => p.name === selectedProfileName);
-        if (!profile) {
-            throw new Error(`Profile "${selectedProfileName}" not found`);
-        }
+        const profileName = selectedOption.dataset.profileName || selectedOption.textContent;
+        const profileDescription = selectedOption.dataset.profileDescription || '';
+        const profile = {
+            id: profileId,
+            name: profileName,
+            description: profileDescription,
+            is_default: profileId === 0
+        };
         
         // Use ProfileManager to switch profile
         const success = await window.switchProfile(profile.id, 1);
@@ -481,6 +483,270 @@ async function copyDetailedLogLocal() {
         return `Error generating log: ${error.message}`;
     }
 }
+
+const PreferenceTypesAudit = (() => {
+    const escapeSelector = (value) => {
+        if (!value) {
+            return '';
+        }
+        if (window.CSS && typeof window.CSS.escape === 'function') {
+            return window.CSS.escape(value);
+        }
+        return String(value).replace(/([\0-\x1f\x7f-\x9f\s!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
+    };
+
+    const resolvePreferenceFieldDetails = (preferenceName) => {
+        const details = {
+            sectionTitle: 'לא נמצא בעמוד',
+            sectionId: '',
+            htmlIdentifier: 'לא נמצא',
+            element: null
+        };
+
+        if (!preferenceName) {
+            return details;
+        }
+
+        const candidateSelectors = [
+            `[data-preference-name="${preferenceName}"]`,
+            `[data-color-key="${preferenceName}"]`,
+            `[data-preference="${preferenceName}"]`,
+            `[data-setting="${preferenceName}"]`,
+            `[data-key="${preferenceName}"]`,
+            `[name="${preferenceName}"]`
+        ];
+
+        let element = null;
+        for (const selector of candidateSelectors) {
+            const node = document.querySelector(selector);
+            if (node) {
+                element = node;
+                break;
+            }
+        }
+
+        if (!element) {
+            const escaped = escapeSelector(preferenceName);
+            if (escaped) {
+                element = document.getElementById(preferenceName) ||
+                    document.querySelector(`#${escaped}`) ||
+                    document.querySelector(`[name="${escaped}"]`);
+            }
+        }
+
+        details.element = element;
+
+        if (element) {
+            const identifier = element.id || element.getAttribute('name') || element.getAttribute('data-color-key') || element.getAttribute('data-preference-name') || element.getAttribute('data-key');
+            details.htmlIdentifier = identifier || '—';
+
+            const sectionEl = element.closest('.content-section');
+            if (sectionEl) {
+                const headerEl = sectionEl.querySelector('.section-header h2');
+                const headerText = headerEl ? headerEl.textContent.trim() : '';
+                const dataGroup = sectionEl.dataset.group ? ` (${sectionEl.dataset.group})` : '';
+                details.sectionTitle = headerText ? `${headerText}${dataGroup}` : (sectionEl.id || sectionEl.dataset.group || '—');
+                details.sectionId = sectionEl.id || '';
+            }
+        }
+
+        return details;
+    };
+
+    const annotateFieldLabel = (element, preferenceId) => {
+        if (!element || !preferenceId) {
+            return;
+        }
+
+        let label = null;
+        if (element.id) {
+            const escaped = escapeSelector(element.id);
+            label = document.querySelector(`label[for="${element.id}"]`) || document.querySelector(`label[for="${escaped}"]`);
+        }
+
+        if (!label && element.previousElementSibling && element.previousElementSibling.tagName === 'LABEL') {
+            label = element.previousElementSibling;
+        }
+
+        if (!label && element.parentElement) {
+            const parentLabel = element.parentElement.querySelector(`label[for="${element.id}"]`);
+            if (parentLabel) {
+                label = parentLabel;
+            }
+        }
+
+        if (!label) {
+            return;
+        }
+
+        if (label.dataset.preferenceIdAppended === 'true') {
+            return;
+        }
+
+        const baseText = label.textContent.trim();
+        label.dataset.preferenceIdAppended = 'true';
+        label.textContent = `${baseText} (ID ${preferenceId})`;
+    };
+
+    const renderPreferenceTypesAuditTable = async () => {
+         const container = document.getElementById('preferenceTypesAuditContainer');
+         const tableBody = document.getElementById('preferenceTypesAuditTableBody');
+ 
+         if (!container || !tableBody) {
+             window.Logger?.warn('⚠️ Preference types audit container not found', { page: 'preferences-page' });
+             return;
+         }
+ 
+         tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">טוען נתונים...</td></tr>';
+ 
+         try {
+             const response = await fetch('/api/preferences/admin/types', { credentials: 'same-origin' });
+             if (!response.ok) {
+                 throw new Error(`HTTP ${response.status}`);
+             }
+ 
+             const payload = await response.json();
+             if (!payload.success) {
+                 throw new Error(payload.error || 'Unknown error');
+             }
+ 
+             const extractTypes = (data) => {
+                 if (!data) {
+                     return [];
+                 }
+ 
+                 if (Array.isArray(data.preference_types)) {
+                     return data.preference_types;
+                 }
+ 
+                 if (Array.isArray(data.data?.preference_types)) {
+                     return data.data.preference_types;
+                 }
+ 
+                 if (Array.isArray(data.data)) {
+                     return data.data;
+                 }
+ 
+                 if (Array.isArray(data.results)) {
+                     return data.results;
+                 }
+ 
+                 return [];
+             };
+ 
+             const types = extractTypes(payload);
+ 
+             window.Logger?.info('📋 Preference types audit payload received', {
+                 page: 'preferences-page',
+                 hasDataKey: Boolean(payload.data),
+                 total: types.length
+             });
+ 
+             const normalizeGroupName = (type) => {
+                const name = (type.group_name || '').toString().trim().toLowerCase();
+                return name;
+            };
+
+            types.sort((a, b) => {
+                const groupA = normalizeGroupName(a);
+                const groupB = normalizeGroupName(b);
+
+                if (groupA && !groupB) {
+                    return -1;
+                }
+
+                if (!groupA && groupB) {
+                    return 1;
+                }
+
+                if (groupA < groupB) {
+                    return -1;
+                }
+
+                if (groupA > groupB) {
+                    return 1;
+                }
+
+                const groupIdA = typeof a.group_id === 'number' ? a.group_id : Number.MAX_SAFE_INTEGER;
+                const groupIdB = typeof b.group_id === 'number' ? b.group_id : Number.MAX_SAFE_INTEGER;
+
+                if (groupIdA !== groupIdB) {
+                    return groupIdA - groupIdB;
+                }
+
+                return (a.id || 0) - (b.id || 0);
+            });
+ 
+             if (!types.length) {
+                 tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">לא נמצאו סוגי העדפות.</td></tr>';
+                 return;
+             }
+ 
+             const fragment = document.createDocumentFragment();
+ 
+             types.forEach((type, index) => {
+                 const details = resolvePreferenceFieldDetails(type.preference_name);
+                 if (details.element) {
+                     annotateFieldLabel(details.element, type.id);
+                 }
+ 
+                 const row = document.createElement('tr');
+ 
+                 const numberCell = document.createElement('td');
+                 numberCell.className = 'text-center';
+                 numberCell.textContent = index + 1;
+                 row.appendChild(numberCell);
+
+                 const idCell = document.createElement('td');
+                 idCell.className = 'text-nowrap';
+                 idCell.textContent = `#${type.id}`;
+                 row.appendChild(idCell);
+ 
+                 const groupCell = document.createElement('td');
+                 groupCell.textContent = type.group_name || 'ללא קבוצה';
+                 row.appendChild(groupCell);
+ 
+                 const nameCell = document.createElement('td');
+                 nameCell.className = 'font-monospace';
+                 nameCell.textContent = type.preference_name;
+                 row.appendChild(nameCell);
+ 
+                 const sectionCell = document.createElement('td');
+                 sectionCell.textContent = details.sectionTitle;
+                 if (!details.element) {
+                     sectionCell.classList.add('text-danger');
+                 }
+                 row.appendChild(sectionCell);
+ 
+                 const htmlCell = document.createElement('td');
+                 htmlCell.textContent = details.htmlIdentifier || '—';
+                 if (!details.element) {
+                     htmlCell.classList.add('text-danger');
+                 }
+                 row.appendChild(htmlCell);
+ 
+                 fragment.appendChild(row);
+             });
+ 
+             tableBody.innerHTML = '';
+             tableBody.appendChild(fragment);
+ 
+             window.Logger?.info('✅ Preference types audit table rendered', {
+                 page: 'preferences-page',
+                 total: types.length
+             });
+         } catch (error) {
+             window.Logger?.error('❌ Failed to render preference types audit table', error, { page: 'preferences-page' });
+             tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת הנתונים: ${error.message}</td></tr>`;
+         }
+     };
+
+    return {
+        renderPreferenceTypesAuditTable
+    };
+})();
+
+window.renderPreferenceTypesAuditTable = PreferenceTypesAudit.renderPreferenceTypesAuditTable;
 
 /**
  * Initialize page-specific functionality

@@ -217,7 +217,7 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
     // Restore page state (filters, sort, sections, entity filters)
     await restorePageState('trading_accounts');
 
-    window.Logger.info('✅ loadTradingAccountsDataForTradingAccountsPage הושלם בהצלחה', { page: "trading_accounts" });
+    window.Logger.info('✅ loadTradingAccountsDataForTradingAccountsPage הושלם בהצלחה', { page: "trading_accounts", keepInfo: true });
 
   } catch (error) {
     window.Logger.error('❌ שגיאה ב-loadTradingAccountsDataForTradingAccountsPage:', error, { page: "trading_accounts" });
@@ -731,7 +731,7 @@ function updateTradingAccountsTable(trading_accounts) {
       window.hideLoadingState();
     }
 
-    window.Logger.info('✅ טבלת חשבונות עודכנה בהצלחה עם', trading_accounts.length, 'חשבונות', { page: "trading_accounts" });
+    window.Logger.info('✅ טבלת חשבונות עודכנה בהצלחה עם', trading_accounts.length, 'חשבונות', { page: "trading_accounts", keepInfo: true });
     window.Logger.info('🔍 tbody.innerHTML אחרי עדכון:', tbody.innerHTML.length, 'תווים', { page: "trading_accounts" });
     window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "trading_accounts" });
   } catch (error) {
@@ -1977,7 +1977,7 @@ function updateTradingAccount(tradingAccountId, tradingAccountData) {
       return response.json();
     })
     .then(data => {
-      window.Logger.info('✅ חשבון מסחר עודכן בהצלחה:', data, { page: "trading_accounts" });
+      window.Logger.info('✅ חשבון מסחר עודכן בהצלחה:', data, { page: "trading_accounts", keepInfo: true });
       
       // רענון הטבלה
       loadTradingAccountsFromServer();
@@ -2081,7 +2081,7 @@ setTimeout(() => {
   }
 }, 2000);
 
-window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "trading_accounts" });
+window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "trading_accounts", keepInfo: true });
 
 // ===== Sorting system - adapted for trading_accounts =====
 

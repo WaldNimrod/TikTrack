@@ -213,11 +213,11 @@ class PreferencesService:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # Search for active user profile
             cursor.execute('''
-                SELECT id FROM preference_profiles 
-                WHERE user_id = ? AND is_active = TRUE 
-                ORDER BY is_default DESC, last_used_at DESC 
+                SELECT id, profile_name, is_active, is_default, last_used_at
+                FROM preference_profiles 
+                WHERE user_id = ?
+                ORDER BY is_active DESC, is_default DESC, last_used_at DESC
                 LIMIT 1
             ''', (user_id,))
             
@@ -225,16 +225,147 @@ class PreferencesService:
             conn.close()
             
             if result:
-                return result[0]
-            else:
-                # No active user profile - return default profile
-                logger.info(f"No active profile found for user {user_id}, using default profile (ID: 0)")
-                return 0
+                profile_id, profile_name, is_active, is_default, last_used_at = result
+                if not is_active:
+                    if last_used_at:
+                        logger.warning(
+                            "Profile %s for user %s marked inactive but has last_used_at=%s – fallback to default profile",
+                            profile_id,
+                            user_id,
+                            last_used_at
+                        )
+                    else:
+                        logger.info(
+                            "Profile %s for user %s is inactive – fallback to default profile",
+                            profile_id,
+                            user_id
+                        )
+                    return 0
+                
+                logger.info(
+                    "Active profile resolved for user %s → %s (ID: %s, default=%s)",
+                    user_id,
+                    profile_name,
+                    profile_id,
+                    bool(is_default)
+                )
+                return profile_id
             
+            logger.info(f"No active profile found for user {user_id}, using default profile (ID: 0)")
+            return 0
+        
         except Exception as e:
             logger.error(f"Error getting active profile for user {user_id}: {e}")
             # In case of error, return default profile
             return 0
+
+    def get_profile_context(self, user_id: int, profile_id: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Resolve effective profile context, including fallback metadata and warnings.
+        """
+        context: Dict[str, Any] = {
+            "user_id": user_id,
+            "requested_profile_id": profile_id,
+            "resolved_profile_id": None,
+            "profile_name": None,
+            "is_fallback": False,
+            "fallback_reason": None,
+            "fallback_message": None,
+            "warnings": []
+        }
+        
+        requested_profile_id = profile_id
+        resolved_profile_id = profile_id if profile_id is not None else self._get_active_profile_id(user_id)
+        
+        def build_fallback_message(reason: str) -> str:
+            if reason == "profile_missing":
+                return f"פרופיל {requested_profile_id} לא זמין עבור משתמש #{user_id} – מוצגים נתוני ברירת מחדל"
+            if reason == "profile_inactive":
+                return f"פרופיל {requested_profile_id} אינו פעיל עבור משתמש #{user_id} – מוצגים נתוני ברירת מחדל"
+            return f"אין פרופיל פעיל עבור משתמש #{user_id} – מוצגים נתוני ברירת מחדל"
+        
+        # Default assumptions
+        context["resolved_profile_id"] = resolved_profile_id
+        
+        try:
+            if resolved_profile_id == 0:
+                context["profile_name"] = "Default Profile"
+                # If the caller explicitly requested profile 0, this is not considered fallback
+                if requested_profile_id not in (None, 0):
+                    context["is_fallback"] = True
+                    context["fallback_reason"] = "profile_missing"
+                    context["fallback_message"] = build_fallback_message("profile_missing")
+                    logger.warning(
+                        "Requested profile %s for user %s missing – using default profile (ID: 0)",
+                        requested_profile_id,
+                        user_id
+                    )
+                elif requested_profile_id is None:
+                    context["is_fallback"] = True
+                    context["fallback_reason"] = "no_active_profile"
+                    context["fallback_message"] = build_fallback_message("no_active_profile")
+                return context
+            
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT id, profile_name, is_active, is_default, last_used_at
+                FROM preference_profiles
+                WHERE user_id = ? AND id = ?
+                LIMIT 1
+            ''', (user_id, resolved_profile_id))
+            row = cursor.fetchone()
+            conn.close()
+            
+            if not row:
+                context["resolved_profile_id"] = 0
+                context["profile_name"] = "Default Profile"
+                context["is_fallback"] = True
+                context["fallback_reason"] = "profile_missing"
+                context["fallback_message"] = build_fallback_message("profile_missing")
+                context["warnings"].append("requested_profile_missing")
+                logger.warning(
+                    "Profile %s for user %s not found in database – using default profile",
+                    resolved_profile_id,
+                    user_id
+                )
+                return context
+            
+            profile_id_db, profile_name, is_active, is_default, last_used_at = row
+            context["profile_name"] = profile_name
+            
+            if not is_active:
+                context["resolved_profile_id"] = 0
+                context["profile_name"] = "Default Profile"
+                context["is_fallback"] = True
+                context["fallback_reason"] = "profile_inactive"
+                context["fallback_message"] = build_fallback_message("profile_inactive")
+                context["warnings"].append("profile_inactive")
+                if last_used_at:
+                    context["warnings"].append("profile_inactive_with_last_used")
+                logger.warning(
+                    "Profile %s for user %s is inactive (last_used_at=%s) – using default profile",
+                    profile_id_db,
+                    user_id,
+                    last_used_at
+                )
+                return context
+            
+            # No fallback – ensure message cleared
+            context["is_fallback"] = False
+            context["fallback_reason"] = None
+            context["fallback_message"] = None
+            return context
+        
+        except Exception as exc:
+            context["resolved_profile_id"] = 0
+            context["profile_name"] = "Default Profile"
+            context["is_fallback"] = True
+            context["fallback_reason"] = "error"
+            context["fallback_message"] = f"שגיאה בזיהוי פרופיל פעיל עבור משתמש #{user_id} – מוצגים נתוני ברירת מחדל"
+            context["warnings"].append("profile_resolution_error")
+            logger.error("Failed resolving profile context for user %s: %s", user_id, exc)
+            return context
     
     def _get_preference_type_id(self, preference_name: str) -> int:
         """קבלת מזהה סוג העדפה"""
@@ -988,8 +1119,9 @@ class PreferencesService:
             logger.error(f"Error getting preference groups: {e}")
             raise
 
-    def activate_profile(self, user_id: int, profile_id: int) -> bool:
-        """הפעלת פרופיל
+    def activate_profile(self, user_id: int, profile_id: int, activated_by: int = None) -> bool:
+        """
+        הפעלת פרופיל משתמש
         
         לפרופיל ברירת מחדל (ID: 0) - לא משנה את המסד הנתונים, רק מחזיר True
         לפרופיל רגיל - מפעיל במסד הנתונים
@@ -1051,7 +1183,55 @@ class PreferencesService:
         except Exception as e:
             logger.error(f"Error activating profile {profile_id} for user {user_id}: {e}")
             return False
-    
+
+    def get_all_preference_types(self) -> List[Dict[str, Any]]:
+        """Fetch all preference types with their group metadata."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+
+            cursor.execute(
+                '''
+                SELECT
+                    pt.id,
+                    pt.preference_name,
+                    pt.data_type,
+                    pt.description,
+                    pt.default_value,
+                    pt.is_required,
+                    pt.is_active,
+                    pt.group_id,
+                    pg.group_name
+                FROM preference_types pt
+                LEFT JOIN preference_groups pg ON pt.group_id = pg.id
+                ORDER BY pt.id ASC
+                '''
+            )
+
+            rows = cursor.fetchall()
+            conn.close()
+
+            preference_types = []
+            for row in rows:
+                preference_types.append({
+                    "id": row["id"],
+                    "preference_name": row["preference_name"],
+                    "data_type": row["data_type"],
+                    "description": row["description"],
+                    "default_value": row["default_value"],
+                    "is_required": bool(row["is_required"]),
+                    "is_active": bool(row["is_active"]),
+                    "group_id": row["group_id"],
+                    "group_name": row["group_name"]
+                })
+
+            return preference_types
+
+        except Exception as e:
+            logger.error(f"Error fetching preference types: {e}")
+            raise
+
     def check_preference_type_exists(self, preference_name: str) -> bool:
         """
         בדיקת קיום סוג העדפה במסד הנתונים

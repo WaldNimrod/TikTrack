@@ -265,9 +265,10 @@
                                     </div>
                                 </div>
                             </div>
-                    </div>
-                </div> <!-- End account activity summary section -->
-
+                        </div>
+                    </div> <!-- End account activity summary section-body -->
+            </div> <!-- End account activity summary section -->
+        
                 <!-- Account Activity Table area - content-section -->
                 <div class="content-section" data-section="account-activity-table">
                     <div class="section-header">
@@ -378,7 +379,7 @@
                                             <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 5)">שווי שוק <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-unrealized-pl">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 6)">רווח/הפסד לא מוכר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 6)">P/L <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-percent-account">
                                             <button class="btn btn-link sortable-header" data-onclick="window.sortTable('positions', 7)">אחוז מהחשבון <span class="sort-icon">↕</span></button>
@@ -395,109 +396,6 @@
                         </div>
                     </div>
                 </div> <!-- End positions section -->
-                
-                <!-- Full Portfolio area - content-section -->
-                <div class="content-section" data-section="full-portfolio">
-                    <!-- Portfolio header -->
-                    <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/trading_accounts.svg" alt="פורטפוליו מלא" class="section-icon">
-                            פורטפוליו מלא
-                        </div>
-                        <div class="table-count" id="portfolioCount">טוען...</div>
-                        <div class="table-actions">
-                            <!-- Filters -->
-                            <select id="portfolioAccountFilter" class="form-select form-select-sm" style="margin-inline-end: 0.5rem; min-width: 200px;">
-                                <option value="">כל החשבונות</option>
-                            </select>
-                            <select id="portfolioSideFilter" class="form-select form-select-sm" style="margin-inline-end: 0.5rem; min-width: 120px;">
-                                <option value="">הכל</option>
-                                <option value="long">לונג</option>
-                                <option value="short">שורט</option>
-                            </select>
-                            <label class="form-check-label" style="margin-inline-end: 0.5rem;">
-                                <input type="checkbox" id="portfolioIncludeClosed" class="form-check-input">
-                                הצג פוזיציות סגורות
-                            </label>
-                            <label class="form-check-label" style="margin-inline-end: 0.5rem;">
-                                <input type="checkbox" id="portfolioUnifyAccounts" class="form-check-input">
-                                אחד פוזיציות בין חשבונות
-                            </label>
-                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('full-portfolio')" data-text="הצג/הסתר" style="order: 999;"></button>
-                        </div>
-                    </div>
-
-                    <!-- Portfolio body -->
-                    <div class="section-body" style="display: none;">
-                        <div class="table-responsive" id="portfolioContainer">
-                            <table class="table" id="portfolioTable" data-table-type="portfolio">
-                                <thead>
-                                    <tr>
-                                        <th class="col-account">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 0)">חשבון <span class="sort-icon">↕</span></button>
-                                        </th>
-                                        <th class="col-symbol">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 1)">סימבול <span class="sort-icon">↕</span></button>
-                                        </th>
-                                        <th class="col-ticker">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 2)">נוכחי <span class="sort-icon">↕</span></button>
-                                        </th>
-                                        <th class="col-quantity">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 3)">כמות <span class="sort-icon">↕</span></button>
-                                        </th>
-                                        <th class="col-side">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 4)">צד <span class="sort-icon">↕</span></button>
-                                        </th>
-                                        <th class="col-avg-price">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 5)">מחיר ממוצע <span class="sort-icon">↕</span></button>
-                                        </th>
-                                        <th class="col-market-value">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 6)">שווי שוק <span class="sort-icon">↕</span></button>
-                                        </th>
-                                        <th class="col-unrealized-pl">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 7)">רווח/הפסד לא מוכר <span class="sort-icon">↕</span></button>
-                                        </th>
-                                        <th class="col-percent-portfolio">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('portfolio', 8)">אחוז מהפורטפוליו <span class="sort-icon">↕</span></button>
-                                        </th>
-                                        <th class="col-actions actions-cell actions-1-item">פעולות</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="10" class="loading">טוען פורטפוליו...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div> <!-- End portfolio section -->
-                
-                <!-- Portfolio Summary Wizard area - content-section -->
-                <div class="content-section" data-section="portfolio-summary">
-                    <!-- Summary header -->
-                    <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/trading_accounts.svg" alt="סיכום פורטפוליו" class="section-icon">
-                            סיכום פורטפוליו
-                        </div>
-                        <div class="table-actions">
-                            <button id="portfolioSummaryToggleSize" class="btn btn-sm btn-outline-secondary" style="margin-inline-end: 0.5rem;" data-onclick="togglePortfolioSummarySize()">
-                                הצג מינימאלי
-                            </button>
-                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('portfolio-summary')" data-text="הצג/הסתר"></button>
-                        </div>
-                    </div>
-
-                    <!-- Summary body -->
-                    <div class="section-body" style="display: none;">
-                        <div id="portfolioSummaryContent">
-                            <div class="info-summary" id="portfolioSummaryStats">
-                                <div>טוען סיכום...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- End summary section -->
             </div>
         </div>
 

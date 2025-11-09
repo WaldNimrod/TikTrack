@@ -263,18 +263,25 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7
       },
       {
+        file: 'services/table-sort-value-adapter.js',
+        globalCheck: 'window.TableSortValueAdapter',
+        description: 'Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy)',
+        required: true,
+        loadOrder: 8
+      },
+      {
         file: 'services/alert-condition-renderer.js',
         globalCheck: 'window.AlertConditionRenderer',
         description: 'מציג תנאי התראות',
         required: false,
-        loadOrder: 8
+        loadOrder: 9
       },
       {
         file: 'https://cdn.quilljs.com/1.3.7/quill.min.js',
         globalCheck: 'window.Quill',
         description: 'Quill.js - Rich Text Editor Library',
         required: true,
-        loadOrder: 9,
+        loadOrder: 10,
         external: true
       },
       {
@@ -282,7 +289,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.DOMPurify',
         description: 'DOMPurify - HTML Sanitizer',
         required: true,
-        loadOrder: 10,
+        loadOrder: 11,
         external: true
       },
       {
@@ -290,7 +297,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.RichTextEditorService',
         description: 'שירות עורך טקסט עשיר',
         required: true,
-        loadOrder: 11
+        loadOrder: 12
       }
     ],
     estimatedSize: '~180KB',
@@ -429,67 +436,74 @@ const PACKAGE_MANIFEST = {
         loadOrder: 11
       },
       {
+        file: 'import-user-data.js',
+        globalCheck: 'window.openImportUserDataModal',
+        description: 'מודל ייבוא נתוני עסקאות',
+        required: true,
+        loadOrder: 12
+      },
+      {
         file: 'modal-configs/trading-accounts-config.js',
         globalCheck: 'window.tradingAccountsModalConfig',
         description: 'קונפיגורציית מודל חשבונות מסחר',
         required: false,
-        loadOrder: 12
+        loadOrder: 13
       },
       {
         file: 'modal-configs/alerts-config.js',
         globalCheck: 'window.alertsModalConfig',
         description: 'קונפיגורציית מודל התראות',
         required: false,
-        loadOrder: 13
+        loadOrder: 14
       },
       {
         file: 'modal-configs/trades-config.js',
         globalCheck: 'window.tradesModalConfig',
         description: 'קונפיגורציית מודל טריידים',
         required: true,
-        loadOrder: 14
+        loadOrder: 15
       },
       {
         file: 'modal-configs/executions-config.js',
         globalCheck: 'window.executionsModalConfig',
         description: 'קונפיגורציית מודל ביצועים',
         required: false,
-        loadOrder: 15
+        loadOrder: 16
       },
       {
         file: 'modal-configs/trade-plans-config.js',
         globalCheck: 'window.tradePlansModalConfig',
         description: 'קונפיגורציית מודל תוכניות מסחר',
         required: true,
-        loadOrder: 16
+        loadOrder: 17
       },
       {
         file: 'modal-configs/tickers-config.js',
         globalCheck: 'window.tickersModalConfig',
         description: 'קונפיגורציית מודל טיקרים',
         required: false,
-        loadOrder: 17
+        loadOrder: 18
       },
       {
         file: 'modal-configs/cash-flows-config.js',
         globalCheck: 'window.cashFlowModalConfig',
         description: 'קונפיגורציית מודל תזרימי מזומנים',
         required: false,
-        loadOrder: 18
+        loadOrder: 19
       },
       {
         file: 'modal-configs/notes-config.js',
         globalCheck: 'window.notesModalConfig',
         description: 'קונפיגורציית מודל הערות',
         required: false,
-        loadOrder: 19
+        loadOrder: 20
       },
       {
         file: 'trade-selector-modal.js',
         globalCheck: 'window.tradeSelectorModal',
         description: 'מודל בחירת טרייד',
         required: false,
-        loadOrder: 20
+        loadOrder: 21
       }
     ],
     estimatedSize: '~250KB',
@@ -586,9 +600,9 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'preferences-page.js',
-        globalCheck: 'window.disableFrontendCacheForSession',
-        description: 'פונקציות ספציפיות לעמוד העדפות (דיבאג מטמון, פרופילים)',
-        required: true,
+        globalCheck: 'window.loadAccountsForPreferences',
+        description: 'פונקציות ספציפיות לעמוד העדפות',
+        required: false,
         loadOrder: 7
       },
       {

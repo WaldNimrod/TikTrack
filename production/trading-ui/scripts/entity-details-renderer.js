@@ -1526,7 +1526,7 @@ class EntityDetailsRenderer {
                         ${this.renderTradePlanSpecific(tradePlanData, entityColor)}
                     </div>
                 </div>
-                
+
                 <div class="row g-3 mt-4">
                     <div class="col-12">
                         ${this.renderLinkedItems(tradePlanData.linked_items || [], this.entityColors.trade_plan || entityColor, 'trade_plan', tradePlanData.id, options?.sourceInfo || null, options)}
@@ -2187,9 +2187,17 @@ class EntityDetailsRenderer {
             const tableHeaders = this._getLinkedItemsTableHeaders(enrichedItems, makeSortButton);
 
             if (showFilter) {
-                setTimeout(() => {
+                setTimeout(async () => {
                     if (window.entityDetailsRenderer && window.entityDetailsRenderer._initializeFilterTooltips) {
                         window.entityDetailsRenderer._initializeFilterTooltips(tableId);
+                    }
+                    
+                    // טעינת מצב פילטר שמור
+                    const pageName = (typeof window.getCurrentPageName === 'function') ? window.getCurrentPageName() : 'default';
+                    const savedFilterType = await loadEntityFilterState(pageName, tableId);
+                    if (savedFilterType && savedFilterType !== 'all') {
+                        // הפעלת הפילטר השמור
+                        await window.filterLinkedItemsByType(tableId, savedFilterType);
                     }
                 }, 250);
             }
@@ -3016,6 +3024,8 @@ class EntityDetailsRenderer {
             : (currencyName || '-');
         const baseCurrencyHtml = this.formatFieldValue(baseCurrencyLabelText, 'text', accountColor, 'base_currency', formattingContext);
         const defaultAccountHtml = this.formatFieldValue(isDefaultAccount, 'boolean', accountColor, 'is_default_trading_account', accountData);
+        const openingBalance = Number(accountData.opening_balance ?? accountData.openingBalance ?? 0);
+        const openingBalanceHtml = this.formatFieldValue(openingBalance, 'currency', accountColor, 'opening_balance', formattingContext);
         const positionsValueHtml = this.formatFieldValue(positionsValue, 'currency', accountColor, 'positions_total_value', formattingContext);
         const totalAccountValueHtml = this.formatFieldValue(totalAccountValue, 'currency', accountColor, 'total_account_value', formattingContext);
         const baseCurrencyTotalHtml = this.formatFieldValue(baseCurrencyTotalValue, 'currency', accountColor, 'base_currency_total', formattingContext);
@@ -3091,6 +3101,10 @@ class EntityDetailsRenderer {
                                     <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
                                         <span class="text-muted">מטבע ראשי</span>
                                         ${baseCurrencyHtml}
+                        </div>
+                                    <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">יתרת פתיחה</span>
+                                        ${openingBalanceHtml}
                         </div>
                                     <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center">
                                         <span class="text-muted">חשבון ברירת מחדל</span>
@@ -4293,6 +4307,19 @@ class EntityDetailsRenderer {
         // Initialize tooltips for filter buttons
         this._initializeFilterTooltips(tableId);
         
+        // טעינת מצב פילטר שמור
+        const pageName = (typeof window.getCurrentPageName === 'function') ? window.getCurrentPageName() : 'default';
+        loadEntityFilterState(pageName, tableId).then(async (savedFilterType) => {
+            if (savedFilterType && savedFilterType !== 'all') {
+                // הפעלת הפילטר השמור
+                await window.filterLinkedItemsByType(tableId, savedFilterType);
+            }
+        }).catch(err => {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ Failed to load entity filter state', err, { page: "entity-details-renderer" });
+            }
+        });
+        
         // Initialize buttons for action buttons
         setTimeout(() => {
             if (window.initializeButtons && typeof window.initializeButtons === 'function') {
@@ -5325,15 +5352,87 @@ class EntityDetailsRenderer {
 // ===== GLOBAL FILTER FUNCTION FOR LINKED ITEMS TABLE =====
 
 /**
+ * Save entity filter state for a specific table
+ * @param {string} pageName - Page name
+ * @param {string} tableId - Table ID
+ * @param {string} selectedType - Selected entity type filter
+ */
+async function saveEntityFilterState(pageName, tableId, selectedType) {
+    if (!pageName || !tableId || !selectedType) {
+        return;
+    }
+    
+    // שמירה דרך PageStateManager אם זמין
+    if (window.PageStateManager && window.PageStateManager.initialized) {
+        try {
+            const currentState = await window.PageStateManager.loadEntityFilters(pageName);
+            currentState[tableId] = selectedType;
+            await window.PageStateManager.saveEntityFilters(pageName, currentState);
+            if (window.Logger) {
+                window.Logger.debug(`💾 Saved entity filter state via PageStateManager: ${tableId} = "${selectedType}"`, { page: "entity-details-renderer" });
+            }
+        } catch (err) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ Failed to save entity filter state via PageStateManager, using localStorage fallback', err, { page: "entity-details-renderer" });
+            }
+            // Fallback ל-localStorage
+            const key = `entityFilter_${pageName}_${tableId}`;
+            localStorage.setItem(key, selectedType);
+        }
+    } else {
+        // Fallback ל-localStorage רק אם PageStateManager לא זמין
+        const key = `entityFilter_${pageName}_${tableId}`;
+        localStorage.setItem(key, selectedType);
+    }
+}
+
+/**
+ * Load entity filter state for a specific table
+ * @param {string} pageName - Page name
+ * @param {string} tableId - Table ID
+ * @returns {Promise<string|null>} Selected entity type or null if not found
+ */
+async function loadEntityFilterState(pageName, tableId) {
+    if (!pageName || !tableId) {
+        return null;
+    }
+    
+    // טעינה דרך PageStateManager אם זמין
+    if (window.PageStateManager && window.PageStateManager.initialized) {
+        try {
+            const entityFilters = await window.PageStateManager.loadEntityFilters(pageName);
+            if (entityFilters && entityFilters.hasOwnProperty(tableId)) {
+                if (window.Logger) {
+                    window.Logger.debug(`💾 Loaded entity filter state via PageStateManager: ${tableId} = "${entityFilters[tableId]}"`, { page: "entity-details-renderer" });
+                }
+                return entityFilters[tableId];
+            }
+        } catch (err) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ Failed to load entity filter state via PageStateManager, trying localStorage fallback', err, { page: "entity-details-renderer" });
+            }
+        }
+    }
+    
+    // Fallback ל-localStorage רק אם PageStateManager לא זמין או אין מצב שמור
+    const key = `entityFilter_${pageName}_${tableId}`;
+    return localStorage.getItem(key);
+}
+
+/**
  * Filter linked items table by entity type
  * @param {string} tableId - Table ID
  * @param {string} type - Entity type to filter by ('all' to show all)
  */
-window.filterLinkedItemsByType = function(tableId, type) {
+window.filterLinkedItemsByType = async function(tableId, type) {
     if (!tableId || !type) {
         console.warn('[filterLinkedItemsByType] Missing parameters:', { tableId, type });
         return;
     }
+    
+    // שמירת מצב פילטר
+    const pageName = (typeof window.getCurrentPageName === 'function') ? window.getCurrentPageName() : 'default';
+    await saveEntityFilterState(pageName, tableId, type);
     
     // Update button states
     const filterContainer = document.getElementById(`linkedItemsFilter_${tableId}`);

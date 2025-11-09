@@ -18,23 +18,10 @@ import sys
 import shutil
 from pathlib import Path
 from datetime import datetime
-from typing import Optional
 
 # Add Backend directory to path
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
-
-def _resolve_preferences_table(cursor) -> Optional[str]:
-    """Return the active user preferences table name (v3 preferred)."""
-    for table_name in ("user_preferences_v3", "user_preferences"):
-        cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-            (table_name,),
-        )
-        if cursor.fetchone():
-            return table_name
-    return None
-
 
 def get_default_trading_account_id(source_db_path: str) -> int:
     """
@@ -49,19 +36,15 @@ def get_default_trading_account_id(source_db_path: str) -> int:
     try:
         # Try to get default_trading_account preference
         # Join with preference_types to get preference_name
-        preferences_table = _resolve_preferences_table(cursor)
-        if preferences_table:
-            cursor.execute(f"""
-                SELECT up.saved_value 
-                FROM {preferences_table} up
-                JOIN preference_types pt ON up.preference_id = pt.id
-                WHERE pt.preference_name = 'default_trading_account'
-                ORDER BY up.id DESC
-                LIMIT 1
-            """)
-            result = cursor.fetchone()
-        else:
-            result = None
+        cursor.execute("""
+            SELECT up.saved_value 
+            FROM user_preferences up
+            JOIN preference_types pt ON up.preference_id = pt.id
+            WHERE pt.preference_name = 'default_trading_account'
+            ORDER BY up.id DESC
+            LIMIT 1
+        """)
+        result = cursor.fetchone()
         
         if result and result[0]:
             try:
@@ -140,10 +123,7 @@ def create_production_database():
     """Create production database from development database"""
     
     # Paths
-    # Source: development database (in Backend/db/, not production/Backend/db/)
-    project_root = backend_dir.parent.parent  # Go from production/Backend/ to TikTrackApp/
-    dev_backend = project_root / "Backend"  # Backend/ (development)
-    source_db = dev_backend / "db" / "simpleTrade_new.db"
+    source_db = backend_dir / "db" / "simpleTrade_new.db"
     target_db = backend_dir / "db" / "TikTrack_DB.db"
     
     # Check if source database exists
@@ -193,21 +173,7 @@ def create_production_database():
             WHERE type='table' AND name NOT LIKE 'sqlite_%'
             ORDER BY name
         """)
-        legacy_tables_to_skip = {'user_preferences'}
-        all_tables = [
-            row[0]
-            for row in source_cursor.fetchall()
-            if row[0] not in legacy_tables_to_skip
-        ]
-
-        preferences_table = (
-            "user_preferences_v3"
-            if "user_preferences_v3" in all_tables
-            else "user_preferences"
-            if "user_preferences" in all_tables
-            else None
-        )
-
+        all_tables = [row[0] for row in source_cursor.fetchall()]
         print(f"  Found {len(all_tables)} tables")
         print()
         
@@ -228,12 +194,7 @@ def create_production_database():
             'preference_groups',
             'preference_types',
             'preference_profiles',  # Must be before user_preferences
-        ]
-
-        if preferences_table:
-            helper_tables_ordered.append(preferences_table)
-
-        helper_tables_ordered += [
+            'user_preferences',  # Depends on preference_profiles and preference_types
             'system_setting_groups',
             'system_setting_types',
             'system_settings',
@@ -250,34 +211,6 @@ def create_production_database():
         for table_name in helper_tables_ordered:
             if table_name in all_tables:
                 copy_table_data(source_conn, target_conn, table_name)
-        target_conn.commit()
-        print()
-
-        print("Step 4b: Aligning sqlite_sequence for preference tables...")
-        sequence_tables = ['preference_groups', 'preference_types']
-        if preferences_table:
-            sequence_tables.append(preferences_table)
-
-        target_cursor = target_conn.cursor()
-        for table_name in sequence_tables:
-            if table_name not in all_tables:
-                continue
-
-            try:
-                target_cursor.execute("DELETE FROM sqlite_sequence WHERE name = ?", (table_name,))
-                target_cursor.execute(f"SELECT MAX(id) FROM {table_name}")
-                max_id = target_cursor.fetchone()[0]
-                if max_id is not None:
-                    target_cursor.execute(
-                        "INSERT INTO sqlite_sequence (name, seq) VALUES (?, ?)",
-                        (table_name, max_id),
-                    )
-                    print(f"  ✅ sqlite_sequence updated for {table_name} (seq={max_id})")
-                else:
-                    print(f"  ✅ sqlite_sequence cleared for {table_name} (no rows)")
-            except Exception as seq_error:
-                print(f"  ⚠️  Could not update sqlite_sequence for {table_name}: {seq_error}")
-
         target_conn.commit()
         print()
         
@@ -316,10 +249,6 @@ def create_production_database():
         indexes = source_cursor.fetchall()
         for index_sql in indexes:
             if index_sql[0]:
-                # Skip legacy user_preferences indexes (table removed in production copy)
-                if 'user_preferences' in index_sql[0] and 'user_preferences_v3' not in index_sql[0]:
-                    print("  ⚠️  Skipping legacy index for user_preferences")
-                    continue
                 try:
                     target_conn.execute(index_sql[0])
                     print(f"  ✅ Created index")

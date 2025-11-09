@@ -62,7 +62,10 @@ class HeaderSystem {
     
     // יצירת מערכת הפילטרים
     if (typeof HeaderSystem.createFilterSystem === 'function') {
-      HeaderSystem.createFilterSystem();
+      // קריאה async בתוך setTimeout כדי לא לעצור את האתחול
+      setTimeout(async () => {
+        await HeaderSystem.createFilterSystem();
+      }, 0);
     }
     
     // טעינת חשבונות לפילטר - עם עיכוב קצר לוודא שה-HTML נוצר
@@ -1206,7 +1209,7 @@ class HeaderSystem {
   // ===== SIMPLE FILTER SYSTEM =====
   
   // מערכת פילטרים פשוטה ויעילה
-  static createFilterSystem() {
+  static async createFilterSystem() {
     if (!window.filterSystem) {
       window.filterSystem = {
         currentFilters: {
@@ -1218,19 +1221,64 @@ class HeaderSystem {
         },
         
         // שמירת פילטרים
-        saveFilters() {
-          localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
+        async saveFilters() {
+          // שמירה דרך PageStateManager אם זמין
+          if (window.PageStateManager && window.PageStateManager.initialized) {
+            const pageName = (typeof window.getCurrentPageName === 'function') ? window.getCurrentPageName() : 'default';
+            try {
+              await window.PageStateManager.saveFilters(pageName, this.currentFilters);
+              if (window.Logger) {
+                window.Logger.debug('🔧 Saved filters via PageStateManager', { page: "header-system" });
+              }
+            } catch (err) {
+              if (window.Logger) {
+                window.Logger.warn('⚠️ Failed to save filters via PageStateManager, using localStorage fallback', err, { page: "header-system" });
+              }
+              // Fallback ל-localStorage
+              localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
+            }
+          } else {
+            // Fallback ל-localStorage רק אם PageStateManager לא זמין
+            if (window.Logger) {
+              window.Logger.debug('⚠️ PageStateManager not available, using localStorage fallback', { page: "header-system" });
+            }
+            localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
+          }
         },
         
         // טעינת פילטרים
-        loadFilters() {
+        async loadFilters() {
+          // טעינה דרך PageStateManager אם זמין
+          if (window.PageStateManager && window.PageStateManager.initialized) {
+            const pageName = (typeof window.getCurrentPageName === 'function') ? window.getCurrentPageName() : 'default';
+            try {
+              const savedFilters = await window.PageStateManager.loadFilters(pageName);
+              if (savedFilters) {
+                this.currentFilters = { ...this.currentFilters, ...savedFilters };
+                if (window.Logger) {
+                  window.Logger.info('🔧 Loaded saved filters via PageStateManager:', this.currentFilters, { page: "header-system" });
+                }
+                return;
+              }
+            } catch (err) {
+              if (window.Logger) {
+                window.Logger.warn('⚠️ Failed to load filters via PageStateManager, trying localStorage fallback', err, { page: "header-system" });
+              }
+            }
+          }
+          
+          // Fallback ל-localStorage רק אם PageStateManager לא זמין או אין מצב שמור
           const saved = localStorage.getItem('headerFilters');
           if (saved) {
             try {
               this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
-              window.Logger.info('🔧 Loaded saved filters:', this.currentFilters, { page: "header-system" });
+              if (window.Logger) {
+                window.Logger.info('🔧 Loaded saved filters from localStorage:', this.currentFilters, { page: "header-system" });
+              }
             } catch (e) {
-              window.Logger.info('⚠️ Error loading saved filters:', e, { page: "header-system" });
+              if (window.Logger) {
+                window.Logger.info('⚠️ Error loading saved filters:', e, { page: "header-system" });
+              }
             }
           }
         },
@@ -1542,7 +1590,7 @@ class HeaderSystem {
         }
       };
       
-      window.filterSystem.loadFilters();
+      await window.filterSystem.loadFilters();
     }
     return window.filterSystem;
   }

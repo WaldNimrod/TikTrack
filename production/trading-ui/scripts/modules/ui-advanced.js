@@ -1782,6 +1782,14 @@ function updateCSSVariablesFromPreferences(preferences) {
     if (preferences.inputBackground) {
       document.documentElement.style.setProperty('--input-background', preferences.inputBackground);
     }
+    if (preferences.backgroundColor) {
+      document.documentElement.style.setProperty('--background-color', preferences.backgroundColor);
+    }
+    if (preferences.linkColor) {
+      document.documentElement.style.setProperty('--link-color', preferences.linkColor);
+      const linkHoverColor = darkenColor(preferences.linkColor, 12);
+      document.documentElement.style.setProperty('--link-hover-color', linkHoverColor);
+    }
     if (preferences.textColor) {
       document.documentElement.style.setProperty('--text-color', preferences.textColor);
     }

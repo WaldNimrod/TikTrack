@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_plan_service import TradePlanService
 from services.advanced_cache_service import cache_for, invalidate_cache
+from services.preferences_service import PreferencesService
 import logging
 
 # Import base classes
@@ -16,6 +17,11 @@ trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/trade_plans
 
 # Initialize base API
 base_api = BaseEntityAPI('trade_plans', TradePlanService, 'trade_plans')
+preferences_service = PreferencesService()
+
+
+def _get_date_normalizer():
+    return BaseEntityUtils.get_request_normalizer(request, preferences_service=preferences_service)
 
 @trade_plans_bp.route('/', methods=['GET'])
 @handle_database_session()
@@ -40,19 +46,21 @@ def get_trade_plans_by_account(trading_account_id: int):
     try:
         db: Session = next(get_db())
         plans = TradePlanService.get_by_account(db, trading_account_id)
-        return jsonify({
-            "status": "success",
-            "data": [plan.to_dict() for plan in plans],
-            "message": "TradingAccount trade plans retrieved successfully",
-            "version": "1.0"
-        })
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            [plan.to_dict() for plan in plans],
+            "TradingAccount trade plans retrieved successfully"
+        )
+        return jsonify(payload)
     except Exception as e:
         logger.error(f"Error getting trade plans for account {trading_account_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "שגיאה בטעינת תכנונים לחשבון"},
-            "version": "1.0"
-        }), 500
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            "שגיאה בטעינת תכנונים לחשבון"
+        )
+        return jsonify(payload), 500
     finally:
         db.close()
 
@@ -62,25 +70,28 @@ def get_trade_plans_by_account(trading_account_id: int):
 def create_trade_plan():
     """Create new trade plan"""
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         # Sanitize HTML content for notes field
         if 'notes' in data and data['notes']:
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         db: Session = g.db
-        plan = TradePlanService.create(db, data)
-        return jsonify({
-            "status": "success",
-            "data": plan.to_dict(),
-            "message": "Trade plan created successfully",
-            "version": "1.0"
-        }), 201
+        normalizer = _get_date_normalizer()
+        normalized_payload = BaseEntityUtils.normalize_input(normalizer, data)
+        plan = TradePlanService.create(db, normalized_payload)
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            plan.to_dict(),
+            "Trade plan created successfully"
+        )
+        return jsonify(payload), 201
     except Exception as e:
         logger.error(f"Error creating trade plan: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": str(e)},
-            "version": "1.0"
-        }), 400
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 400
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['PUT'])
 @handle_database_session(auto_commit=True, auto_close=True)
@@ -88,8 +99,9 @@ def create_trade_plan():
 def update_trade_plan(plan_id: int):
     """Update trade plan"""
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         db: Session = g.db
+        normalizer = _get_date_normalizer()
         
         # בדיקה אם המשתמש רוצה לסגור או לבטל את התכנית
         new_status = data.get('status')
@@ -101,6 +113,7 @@ def update_trade_plan(plan_id: int):
                     "question": "האם לבטל גם התראות תנאים?",
                     "question_type": "confirm_cancel_alerts",
                     "message": "התכנית תיסגר. האם לבטל גם התראות תנאים?",
+                    "timestamp": BaseEntityUtils.envelope_timestamp(normalizer),
                     "version": "1.0"
                 })
             elif new_status == 'cancelled':
@@ -109,6 +122,7 @@ def update_trade_plan(plan_id: int):
                     "question": "האם למחוק גם התראות תנאים?",
                     "question_type": "confirm_delete_alerts",
                     "message": "התכנית תבוטל. האם למחוק גם התראות תנאים?",
+                    "timestamp": BaseEntityUtils.envelope_timestamp(normalizer),
                     "version": "1.0"
                 })
         
@@ -117,33 +131,36 @@ def update_trade_plan(plan_id: int):
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         
         # עדכון רגיל של התכנית
-        plan = TradePlanService.update(db, plan_id, data)
+        normalized_payload = BaseEntityUtils.normalize_input(normalizer, data)
+        plan = TradePlanService.update(db, plan_id, normalized_payload)
         if plan:
-            return jsonify({
-                "status": "success",
-                "data": plan.to_dict(),
-                "message": "Trade plan updated successfully",
-                "version": "1.0"
-            })
-        return jsonify({
-            "status": "error",
-            "error": {"message": "תכנון לא נמצא"},
-            "version": "1.0"
-        }), 404
+            payload = BaseEntityUtils.create_success_payload(
+                normalizer,
+                plan.to_dict(),
+                "Trade plan updated successfully"
+            )
+            return jsonify(payload)
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            "תכנון לא נמצא"
+        )
+        return jsonify(payload), 404
     except Exception as e:
         logger.error(f"Error updating trade plan {plan_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": str(e)},
-            "version": "1.0"
-        }), 400
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 400
 
 @trade_plans_bp.route('/<int:plan_id>/confirm-status-change', methods=['POST'])
 def confirm_status_change(plan_id: int):
     """Confirm status change with user response"""
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         db: Session = next(get_db())
+        normalizer = _get_date_normalizer()
         
         new_status = data.get('status')
         user_response = data.get('user_response', False)
@@ -168,20 +185,21 @@ def confirm_status_change(plan_id: int):
         else:
             message = f"Trade plan {new_status} successfully"
         
-        return jsonify({
-            "status": "success",
-            "data": plan.to_dict(),
-            "message": message,
-            "version": "1.0"
-        })
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            plan.to_dict(),
+            message
+        )
+        return jsonify(payload)
         
     except Exception as e:
         logger.error(f"Error confirming status change for trade plan {plan_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": str(e)},
-            "version": "1.0"
-        }), 400
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 400
     finally:
         db.close()
 
@@ -195,24 +213,27 @@ def cancel_trade_plan(plan_id: int):
         db: Session = next(get_db())
         plan = TradePlanService.cancel_plan(db, plan_id, cancel_reason)
         if plan:
-            return jsonify({
-                "status": "success",
-                "data": plan.to_dict(),
-                "message": "Trade plan cancelled successfully",
-                "version": "1.0"
-            })
-        return jsonify({
-            "status": "error",
-            "error": {"message": "תכנון לא נמצא או שכבר מבוטל"},
-            "version": "1.0"
-        }), 404
+            normalizer = _get_date_normalizer()
+            payload = BaseEntityUtils.create_success_payload(
+                normalizer,
+                plan.to_dict(),
+                "Trade plan cancelled successfully"
+            )
+            return jsonify(payload)
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            "תכנון לא נמצא או שכבר מבוטל"
+        )
+        return jsonify(payload), 404
     except Exception as e:
         logger.error(f"Error cancelling trade plan {plan_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": str(e)},
-            "version": "1.0"
-        }), 400
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 400
     finally:
         if db:
             db.close()
@@ -224,24 +245,27 @@ def activate_trade_plan(plan_id: int):
         db: Session = next(get_db())
         plan = TradePlanService.activate_plan(db, plan_id)
         if plan:
-            return jsonify({
-                "status": "success",
-                "data": plan.to_dict(),
-                "message": "Trade plan activated successfully",
-                "version": "1.0"
-            })
-        return jsonify({
-            "status": "error",
-            "error": {"message": "תכנון לא נמצא או שכבר פעיל"},
-            "version": "1.0"
-        }), 404
+            normalizer = _get_date_normalizer()
+            payload = BaseEntityUtils.create_success_payload(
+                normalizer,
+                plan.to_dict(),
+                "Trade plan activated successfully"
+            )
+            return jsonify(payload)
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            "תכנון לא נמצא או שכבר פעיל"
+        )
+        return jsonify(payload), 404
     except Exception as e:
         logger.error(f"Error activating trade plan {plan_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": str(e)},
-            "version": "1.0"
-        }), 400
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 400
     finally:
         db.close()
 
@@ -252,19 +276,21 @@ def get_trade_plan_summary():
         trading_account_id = request.args.get('trading_account_id', type=int)
         db: Session = next(get_db())
         summary = TradePlanService.get_plan_summary(db, trading_account_id)
-        return jsonify({
-            "status": "success",
-            "data": summary,
-            "message": "Trade plan summary retrieved successfully",
-            "version": "1.0"
-        })
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            summary,
+            "Trade plan summary retrieved successfully"
+        )
+        return jsonify(payload)
     except Exception as e:
         logger.error(f"Error getting trade plan summary: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "שגיאה בטעינת סיכום תכנונים"},
-            "version": "1.0"
-        }), 500
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            "שגיאה בטעינת סיכום תכנונים"
+        )
+        return jsonify(payload), 500
     finally:
         db.close()
 
@@ -274,19 +300,21 @@ def can_cancel_trade_plan(plan_id: int):
     try:
         db: Session = next(get_db())
         cancel_check = TradePlanService.can_cancel_plan(db, plan_id)
-        return jsonify({
-            "status": "success",
-            "data": cancel_check,
-            "message": "Trade plan cancellation check completed",
-            "version": "1.0"
-        })
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            cancel_check,
+            "Trade plan cancellation check completed"
+        )
+        return jsonify(payload)
     except Exception as e:
         logger.error(f"Error checking if trade plan {plan_id} can be cancelled: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": str(e)},
-            "version": "1.0"
-        }), 400
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 400
     finally:
         db.close()
 
@@ -301,24 +329,26 @@ def delete_trade_plan(plan_id: int):
         db: Session = g.db
         success = TradePlanService.delete(db, plan_id)
         if success:
-            return jsonify({
-                "status": "success",
-                "message": "Trade plan deleted successfully",
-                "version": "1.0"
-            })
+            normalizer = _get_date_normalizer()
+            payload = BaseEntityUtils.create_success_payload(
+                normalizer,
+                None,
+                "Trade plan deleted successfully"
+            )
+            return jsonify(payload)
         
         # If deletion failed, it means there are linked items or plan not found
-        return jsonify({
-            "status": "error",
-            "error": {
-                "message": "לא ניתן למחוק תכנון זה - יש פריטים מקושרים אליו"
-            },
-            "version": "1.0"
-        }), 400
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            "לא ניתן למחוק תכנון זה - יש פריטים מקושרים אליו"
+        )
+        return jsonify(payload), 400
     except Exception as e:
         logger.error(f"Error deleting trade plan {plan_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": str(e)},
-            "version": "1.0"
-        }), 400
+        normalizer = _get_date_normalizer()
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 400

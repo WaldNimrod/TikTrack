@@ -78,10 +78,11 @@ class FieldRendererService {
         
         const sideNormalized = side.toLowerCase();
         const isLong = sideNormalized === 'long';
-        const sideHebrew = isLong ? 'לונג' : 'שורט';
+        // Use arrow icons instead of text - up arrow for long (positive), down arrow for short (negative)
+        const sideIcon = isLong ? '↑' : '↓';
         const sideClass = isLong ? 'badge-long' : 'badge-short';
         
-        return `<span class="badge ${sideClass}">${sideHebrew}</span>`;
+        return `<span class="badge ${sideClass}" title="${isLong ? 'לונג' : 'שורט'}">${sideIcon}</span>`;
     }
 
     /**
@@ -479,9 +480,10 @@ class FieldRendererService {
 
         let dateShort = '';
         if (metaObj && metaObj.date) {
+            const dateValue = metaObj.date;
             dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
-                ? FieldRendererService.renderDateShort(metaObj.date)
-                : FieldRendererService._formatDateDdMm(metaObj.date);
+                ? FieldRendererService.renderDateShort(dateValue)
+                : FieldRendererService._formatDateDdMm(dateValue);
         }
 
         if (renderMode === 'notes-table') {
@@ -569,9 +571,10 @@ class FieldRendererService {
             }
             // Show only day and month for trade plans
             if (metaObj && metaObj.date) {
+                const dateValue = metaObj.date;
                 dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
-                    ? FieldRendererService.renderDateShort(metaObj.date)
-                    : FieldRendererService._formatDateDdMm(metaObj.date);
+                    ? FieldRendererService.renderDateShort(dateValue)
+                    : FieldRendererService._formatDateDdMm(dateValue);
             }
         }
         
@@ -581,7 +584,8 @@ class FieldRendererService {
                 console.log('🔍 renderLinkedEntity DEBUG:', { metaObj, planned_amount: metaObj?.planned_amount, date: metaObj?.date });
                 const amount = metaObj && metaObj.planned_amount ? `$${Number(metaObj.planned_amount).toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '';
                 // Force DD/MM format for testing
-                const date = metaObj && metaObj.date ? FieldRendererService._formatDateDdMm(metaObj.date) : '';
+                const dateValue = metaObj && metaObj.date ? metaObj.date : null;
+                const date = dateValue ? FieldRendererService._formatDateDdMm(dateValue) : '';
                 console.log('🔍 renderLinkedEntity RESULT:', { amount, date, result: `${amount} ${date}`.trim() });
                 return `<a href="#" onclick="if (window.showEntityDetails) { showEntityDetails('trade_plan', ${relatedId}); } return false;" class="plan-link" data-plan-id="${relatedId}">${amount} ${date}</a>`.trim();
             }
@@ -810,10 +814,49 @@ class FieldRendererService {
     }
 
     static _formatDateDdMm(date) {
+        if (date === null || date === undefined || date === '') {
+            return '';
+        }
+
+        let resolvedDate = null;
+
         try {
-            const d = new Date(date);
-            const dd = String(d.getDate()).padStart(2, '0');
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            if (typeof window !== 'undefined' && window.dateUtils) {
+                const envelope = typeof window.dateUtils.ensureDateEnvelope === 'function'
+                    ? window.dateUtils.ensureDateEnvelope(date)
+                    : null;
+
+                if (envelope) {
+                    resolvedDate = typeof window.dateUtils.toDateObject === 'function'
+                        ? window.dateUtils.toDateObject(envelope)
+                        : (envelope.utc ? new Date(envelope.utc) : null);
+                }
+            }
+
+            if (!resolvedDate) {
+                if (date instanceof Date) {
+                    resolvedDate = date;
+                } else if (typeof date === 'object' && date !== null) {
+                    if (date.utc) {
+                        resolvedDate = new Date(date.utc);
+                    } else if (date.epochMs !== undefined) {
+                        resolvedDate = new Date(date.epochMs);
+                    } else if (date.local) {
+                        resolvedDate = new Date(date.local);
+                    }
+                }
+            }
+
+            if (!resolvedDate) {
+                resolvedDate = new Date(date);
+            }
+
+            if (!(resolvedDate instanceof Date) || Number.isNaN(resolvedDate.getTime())) {
+                return '';
+            }
+
+            const dd = String(resolvedDate.getDate()).padStart(2, '0');
+            const mm = String(resolvedDate.getMonth() + 1).padStart(2, '0');
             return `${dd}.${mm}`;
         } catch (e) {
             return '';
@@ -998,23 +1041,47 @@ class FieldRendererService {
      * const html2 = FieldRendererService.renderDate('2025-01-10T14:30:00', true);
      */
     static renderDate(date, includeTime = false) {
-        if (!date) return '-';
-        
-        // אם יש date-utils.js - השתמש בו
-        if (window.formatDate) {
+        if (!date && date !== 0) {
+            return '-';
+        }
+
+        const fmt = (envelope, fallback) => {
+            if (!envelope) {
+                return fallback;
+            }
+            if (typeof window.dateUtils?.formatEnvelope === 'function') {
+                return window.dateUtils.formatEnvelope(envelope, { includeTime });
+            }
+            if (typeof window.formatDate === 'function') {
+                return window.formatDate(envelope.local || envelope.utc || fallback, includeTime);
+            }
+            return fallback;
+        };
+
+        if (typeof date === 'object' && (date.epochMs || date.utc || date.local)) {
+            return fmt(date, date.display || '-');
+        }
+
+        const isoCandidate = typeof date === 'string' ? date : null;
+        if (isoCandidate && window.dateUtils?.parseEnvelope) {
+            const envelope = window.dateUtils.parseEnvelope({ utc: isoCandidate });
+            return fmt(envelope, isoCandidate);
+        }
+
+        if (typeof window.dateUtils?.formatDate === 'function') {
+            return window.dateUtils.formatDate(date, { includeTime });
+        }
+        if (typeof window.formatDate === 'function') {
             return window.formatDate(date, includeTime);
         }
-        
-        // Fallback
+
         try {
             const dateObj = new Date(date);
-            return dateObj.toLocaleDateString('he-IL', {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit'
-            });
-        } catch (e) {
-            return date;
+            return includeTime
+                ? dateObj.toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                : dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        } catch (error) {
+            return isoCandidate || '-';
         }
     }
 
@@ -1036,8 +1103,33 @@ class FieldRendererService {
      * // Output: '<span class="execution-date">15/01/24 | 14:30</span>'
      */
     static renderExecutionDate(date) {
-        if (!date) return '-';
-        
+        if (!date && date !== 0) {
+            return '-';
+        }
+
+        const fmt = (envelope, fallback) => {
+            if (!envelope) {
+                return fallback;
+            }
+        if (typeof window.dateUtils?.formatDate === 'function') {
+            return `<span class="execution-date">${window.dateUtils.formatDate(envelope, { includeTime: true, twoDigitYear: true })}</span>`;
+            }
+            if (typeof window.renderDate === 'function') {
+                return `<span class="execution-date">${window.renderDate(envelope.local || envelope.utc || fallback, true)}</span>`;
+            }
+            return fallback;
+        };
+
+        if (typeof date === 'object' && (date.epochMs || date.utc || date.local)) {
+            return fmt(date, date.display || '-');
+        }
+
+        const isoCandidate = typeof date === 'string' ? date : null;
+        if (isoCandidate && window.dateUtils?.parseEnvelope) {
+            const envelope = window.dateUtils.parseEnvelope({ utc: isoCandidate });
+            return fmt(envelope, isoCandidate);
+        }
+
         try {
             const dateObj = new Date(date);
             const dateStr = dateObj.toLocaleDateString('he-IL', {
@@ -1051,8 +1143,8 @@ class FieldRendererService {
                 hour12: false
             });
             return `<span class="execution-date">${dateStr} | ${timeStr}</span>`;
-        } catch (e) {
-            return date;
+        } catch (error) {
+            return isoCandidate || '-';
         }
     }
 

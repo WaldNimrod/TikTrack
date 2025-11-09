@@ -45,7 +45,7 @@ No connection to testing system!
 ================================================
 """
 
-from flask import Flask, jsonify, request, send_from_directory, g
+from flask import Flask, jsonify, request, send_from_directory, g, Request
 from flask_cors import CORS
 import sqlite3
 import os
@@ -54,6 +54,9 @@ from typing import Dict, Any, Optional, List
 import time
 import sys # Added for sys.exit
 import psutil
+import json
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 # Add Backend directory to Python path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -74,10 +77,12 @@ from config.settings import (
 
 # Import new architecture components
 from config.database import init_db
+from config import database as database_config
 from config.logging import setup_logging
 from utils.performance_monitor import log_system_metrics, PerformanceTracker
 from utils.error_handlers import ErrorHandler
 from services.advanced_cache_service import advanced_cache_service
+from services.date_normalization_service import DateNormalizationService
 from services.health_service import health_service
 from services.metrics_collector import metrics_collector
 from services.database_optimizer import database_optimizer
@@ -148,10 +153,96 @@ from routes.api.external_data_providers import external_data_providers_bp
 from routes.api.quotes_last import quotes_last_bp
 from routes.api.plan_conditions_list import plan_conditions_list_bp
 from routes.api.user_preferences_list import user_preferences_list_bp
+from routes.api.base_entity_utils import BaseEntityUtils
+
+# Patch Flask's Request.get_json to auto-normalize incoming payloads
+_original_get_json = Request.get_json
+
+
+def _normalized_get_json(self, *args, **kwargs):
+    data = _original_get_json(self, *args, **kwargs)
+    if data is None:
+        return data
+
+    try:
+        normalizer = getattr(g, 'date_normalizer', DateNormalizationService("UTC"))
+    except RuntimeError:
+        normalizer = DateNormalizationService("UTC")
+
+    return BaseEntityUtils.normalize_input(normalizer, data)
+
+
+Request.get_json = _normalized_get_json
+
+# Legacy compatibility layer for Flask-SQLAlchemy style tests
+class LegacyDBProxy:
+    """
+    Lightweight compatibility layer that exposes a subset of the Flask-SQLAlchemy API.
+
+    The historical test-suite expects `db.session`, `db.create_all()`, and friends.
+    This proxy reuses the project's SQLAlchemy configuration while allowing tests to
+    override the connection URI (e.g., to use an in-memory SQLite database).
+    """
+
+    def __init__(self, flask_app: Flask):
+        self.app = flask_app
+        self._engine = database_config.engine
+        self._session_factory = database_config.SessionLocal
+        self._scoped_session = scoped_session(self._session_factory)
+        self._current_uri = self._detect_current_uri()
+
+    def _detect_current_uri(self) -> str:
+        override = self.app.config.get('SQLALCHEMY_DATABASE_URI')
+        if override:
+            return override
+        return database_config.DATABASE_URL
+
+    def _reconfigure(self, uri: str) -> None:
+        connect_args = {"check_same_thread": False} if uri.startswith("sqlite") else {}
+        new_engine = create_engine(uri, connect_args=connect_args)
+        new_session_factory = sessionmaker(autocommit=False, autoflush=False, bind=new_engine)
+
+        self._scoped_session.remove()
+        self._scoped_session = scoped_session(new_session_factory)
+
+        database_config.engine = new_engine
+        database_config.SessionLocal = new_session_factory
+
+        self._engine = new_engine
+        self._session_factory = new_session_factory
+        self._current_uri = uri
+
+    def _ensure_bound(self) -> None:
+        uri = self.app.config.get('SQLALCHEMY_DATABASE_URI')
+        if uri and uri != self._current_uri:
+            self._reconfigure(uri)
+
+    def ensure(self) -> None:
+        self._ensure_bound()
+
+    @property
+    def session(self):
+        self._ensure_bound()
+        return self._scoped_session
+
+    def create_all(self) -> None:
+        self._ensure_bound()
+        from models.base import Base
+        Base.metadata.create_all(bind=self._engine)
+
+    def drop_all(self) -> None:
+        self._ensure_bound()
+        from models.base import Base
+        Base.metadata.drop_all(bind=self._engine)
+
+    def remove(self) -> None:
+        self._scoped_session.remove()
+
+    def dispose(self) -> None:
+        self._engine.dispose()
 
 # Import CRUD testing modules
 import subprocess
-import json
 from pathlib import Path
 
 # External Data Integration blueprints
@@ -163,6 +254,26 @@ from routes.pages import pages_bp
 
 app = Flask(__name__)
 CORS(app)
+
+# Legacy SQLAlchemy compatibility layer for tests
+db = LegacyDBProxy(app)
+
+
+@app.teardown_appcontext
+def _cleanup_scoped_session(exception: Optional[BaseException] = None) -> None:
+    db.remove()
+
+
+def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
+    """
+    Factory used by integration tests to override configuration (e.g. in-memory SQLite).
+    Reuses the existing application instance and rebinds the SQLAlchemy engine/session
+    when the database URI changes.
+    """
+    if test_config:
+        app.config.update(test_config)
+    db.ensure()
+    return app
 
 # Initialize Background Task Manager without real-time notifications
 background_task_manager = BackgroundTaskManager()
@@ -204,7 +315,7 @@ try:
     with PerformanceTracker("Database initialization"):
         init_db()
     logger.info("✅ Database initialized successfully")
-    
+
     # Log initial system metrics
     log_system_metrics()
     logger.info("✅ Database initialized successfully")
@@ -216,6 +327,101 @@ except Exception as e:
     sys.exit(1)
 
 logger.info("✅ Server initialization completed")
+
+# -----------------------------------------------------------------------------
+# Legacy testing compatibility (Flask app + SQLAlchemy-style DB proxy)
+# -----------------------------------------------------------------------------
+
+
+class LegacyDBProxy:
+    """
+    Lightweight compatibility layer that mimics the minimal Flask-SQLAlchemy API
+    expected by the legacy test-suite (`db.session`, `db.create_all()`, etc.).
+    It reuses the project's SQLAlchemy models and updates the global database
+    engine/session factory when tests switch to an in-memory database.
+    """
+
+    def __init__(self, flask_app: Flask):
+        self.app = flask_app
+        self._engine = database_config.engine
+        self._session_factory = database_config.SessionLocal
+        self._scoped_session = scoped_session(self._session_factory)
+        self._current_uri = self._detect_current_uri()
+
+    def _detect_current_uri(self) -> str:
+        override = self.app.config.get('SQLALCHEMY_DATABASE_URI')
+        if override:
+            return override
+        return database_config.DATABASE_URL
+
+    def _reconfigure(self, uri: str) -> None:
+        connect_args = {"check_same_thread": False} if uri.startswith("sqlite") else {}
+        new_engine = create_engine(uri, connect_args=connect_args)
+        new_session_factory = sessionmaker(autocommit=False, autoflush=False, bind=new_engine)
+
+        # Replace scoped session
+        self._scoped_session.remove()
+        self._scoped_session = scoped_session(new_session_factory)
+
+        # Update module-level references so routes/services pick up the new engine
+        database_config.engine = new_engine
+        database_config.SessionLocal = new_session_factory
+
+        self._engine = new_engine
+        self._session_factory = new_session_factory
+        self._current_uri = uri
+
+    def _ensure_bound(self) -> None:
+        uri = self.app.config.get('SQLALCHEMY_DATABASE_URI')
+        if uri and uri != self._current_uri:
+            self._reconfigure(uri)
+
+    def ensure(self) -> None:
+        self._ensure_bound()
+
+    @property
+    def session(self):
+        self._ensure_bound()
+        return self._scoped_session
+
+    def create_all(self) -> None:
+        self._ensure_bound()
+        from models.base import Base
+        Base.metadata.create_all(bind=self._engine)
+
+    def drop_all(self) -> None:
+        self._ensure_bound()
+        from models.base import Base
+        Base.metadata.drop_all(bind=self._engine)
+
+    def remove(self) -> None:
+        self._scoped_session.remove()
+
+    def dispose(self) -> None:
+        self._engine.dispose()
+
+
+db = LegacyDBProxy(app)
+
+
+@app.teardown_appcontext
+def _cleanup_scoped_session(exception: Optional[BaseException] = None) -> None:
+    db.remove()
+
+
+def create_app(test_config: Optional[Dict[str, Any]] = None) -> Flask:
+    """
+    Factory used by the legacy test-suite.
+
+    The existing application instance is reused, but configuration overrides
+    (like in-memory SQLite URIs) trigger a rebind of the Session/engine so
+    tests operate on isolated databases.
+    """
+    if test_config:
+        app.config.update(test_config)
+    db.ensure()
+    return app
+
 
 # Register blueprints
 app.register_blueprint(account_activity_bp)
@@ -421,6 +627,31 @@ def optimize_response(response):
             cache_type=ResponseOptimizer.determine_cache_type(request.path),
             start_time=start_time
         )
+
+        if (
+            optimized_response.mimetype == 'application/json'
+            and not optimized_response.direct_passthrough
+        ):
+            try:
+                payload = optimized_response.get_json(silent=True)
+            except Exception:
+                payload = None
+
+            if payload is not None:
+                normalizer = getattr(g, 'date_normalizer', DateNormalizationService("UTC"))
+                normalized_payload = BaseEntityUtils.normalize_output(normalizer, payload)
+
+                if isinstance(normalized_payload, dict):
+                    timestamp_value = normalized_payload.get('timestamp')
+                    required_keys = {'utc', 'epochMs', 'local', 'timezone'}
+                    if not isinstance(timestamp_value, dict) or not required_keys.issubset(timestamp_value.keys()):
+                        normalized_payload['timestamp'] = BaseEntityUtils.envelope_timestamp(normalizer)
+                    normalized_payload.setdefault('version', '1.0')
+
+                optimized_response.direct_passthrough = False
+                optimized_response.set_data(json.dumps(normalized_payload))
+                optimized_response.mimetype = 'application/json'
+                optimized_response.headers['Content-Length'] = str(len(optimized_response.get_data()))
         
         return optimized_response
     except Exception as e:
@@ -431,6 +662,10 @@ def optimize_response(response):
 def before_request():
     """Set request start time"""
     g.request_start_time = time.time()
+    try:
+        g.date_normalizer = BaseEntityUtils.get_request_normalizer(request)
+    except Exception:
+        g.date_normalizer = DateNormalizationService("UTC")
 
 @app.route("/api/health", methods=["GET"])
 @rate_limit_api(requests_per_minute=100)

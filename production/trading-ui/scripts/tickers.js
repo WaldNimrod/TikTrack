@@ -705,6 +705,7 @@ async function saveTicker() {
   // איסוף נתונים מהטופס באמצעות DataCollectionService
   // השדות תואמים לקונפיגורציה החדשה ב-tickers-config.js
   const tickerData = DataCollectionService.collectFormData({
+    id: { id: 'tickerId', type: 'text' }, // שדה ID נסתר שנוסף בעריכה
     symbol: { id: 'tickerSymbol', type: 'text' },
     name: { id: 'tickerName', type: 'text' },
     type: { id: 'tickerType', type: 'text' },
@@ -712,13 +713,20 @@ async function saveTicker() {
     remarks: { id: 'tickerRemarks', type: 'text' }
   });
 
+  const tickerId = tickerData.id ? parseInt(tickerData.id) : null;
   const symbol = tickerData.symbol?.trim().toUpperCase();
   const name = tickerData.name?.trim();
   const type = tickerData.type;
   const currency_id = tickerData.currency_id;
   const remarks = tickerData.remarks?.trim();
 
-  // ולידציה בסיסית
+  // בדיקה אם זה מצב עריכה - אם כן, קרא ל-updateTicker
+  if (tickerId) {
+    // זה מצב עריכה - קרא ל-updateTicker
+    return await updateTicker();
+  }
+
+  // ולידציה בסיסית (רק למצב הוספה)
   if (!symbol || symbol.length === 0) {
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאת וולידציה', 'סמל הטיקר הוא שדה חובה');
@@ -747,7 +755,7 @@ async function saveTicker() {
     return;
   }
 
-  // בדיקה אם הסמל כבר קיים במערכת
+  // בדיקה אם הסמל כבר קיים במערכת (רק למצב הוספה)
   const existingTicker = (window.tickersData || []).find(t => t.symbol.toUpperCase() === symbol.toUpperCase());
   if (existingTicker) {
     if (window.showErrorNotification) {
@@ -807,29 +815,61 @@ async function saveTicker() {
 async function updateTicker() {
   
   // ניקוי מטמון לפני פעולת CRUD - עריכה  // שימוש ב-DataCollectionService לאיסוף נתונים
+  // שימוש בשדות החדשים מהטופס (ModalManagerV2)
   const tickerData = DataCollectionService.collectFormData({
-    id: { id: 'editTickerId', type: 'text' },
-    symbol: { id: 'editTickerSymbol', type: 'text' },
-    name: { id: 'editTickerName', type: 'text' },
-    type: { id: 'editTickerType', type: 'text' },
-    currency_id: { id: 'editTickerCurrency', type: 'int' },
-    status: { id: 'editTickerStatus', type: 'text' },
-    remarks: { id: 'editTickerRemarks', type: 'text' }
+    id: { id: 'tickerId', type: 'text' }, // שדה ID נסתר שנוסף בעריכה
+    symbol: { id: 'tickerSymbol', type: 'text' },
+    name: { id: 'tickerName', type: 'text' },
+    type: { id: 'tickerType', type: 'text' },
+    currency_id: { id: 'tickerCurrency', type: 'int' },
+    remarks: { id: 'tickerRemarks', type: 'text' }
   });
 
-  const { id, symbol, name, type, currency_id, status, remarks } = tickerData;
-
-  // ולידציה גלובלית
-  if (window.validateForm) {
-    if (!window.validateForm('editTickerForm')) {
-      return;
+  const { id, symbol, name, type, currency_id, remarks } = tickerData;
+  
+  // קבלת הסטטוס מהטיקר הקיים (הטופס החדש לא כולל שדה סטטוס)
+  const originalTicker = (window.tickersData || []).find(t => t.id === parseInt(id));
+  if (!originalTicker) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
     }
+    return;
+  }
+  const status = originalTicker.status; // שמירה על הסטטוס הקיים
+
+  // ולידציה בסיסית (הסרת ולידציה גלובלית ישנה - הטופס החדש לא משתמש ב-editTickerForm)
+  if (!symbol || symbol.length === 0) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'סמל הטיקר הוא שדה חובה');
+    }
+    return;
+  }
+
+  if (!name || name.length < 2) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'שם החברה חייב להכיל לפחות 2 תווים');
+    }
+    return;
+  }
+
+  if (!type) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'סוג הטיקר הוא שדה חובה');
+    }
+    return;
+  }
+
+  if (!currency_id) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'מטבע הוא שדה חובה');
+    }
+    return;
   }
 
   // בדיקה אם הסמל כבר קיים בטיקרים אחרים (לא בטיקר הנוכחי)
   const existingTicker = (window.tickersData || []).find(t =>
     t.symbol.toUpperCase() === symbol.toUpperCase() &&
-        t.id !== id,
+        t.id !== parseInt(id),
   );
   if (existingTicker) {
     if (window.showErrorNotification) {
@@ -845,7 +885,7 @@ async function updateTicker() {
   let finalStatus = status;
   if (status === 'not_cancelled') {
     // בדיקה אם יש טריידים או תכנונים פתוחים לטיקר זה
-    const ticker = (window.tickersData || []).find(t => t.id === id);
+    const ticker = (window.tickersData || []).find(t => t.id === parseInt(id));
     if (ticker) {
       // אם יש טריידים או תכנונים פתוחים - סטטוס "open", אחרת "closed"
       finalStatus = ticker.active_trades ? 'open' : 'closed';
@@ -855,14 +895,14 @@ async function updateTicker() {
   }
 
   // בדיקה אם הסטטוס השתנה ל"מבוטל" - אם כן, בדוק פריטים מקושרים
-  const originalTicker = tickersData.find(t => t.id === id);
+  // (originalTicker כבר הוגדר למעלה)
   if (originalTicker && status === 'cancelled' && originalTicker.status !== 'cancelled') {
 
     // בדיקת פריטים מקושרים באמצעות המערכת הכללית
     try {
 
       // שימוש ב-API הכללי לקבלת פריטים מקושרים
-      const response = await fetch(`/api/linked-items/ticker/${id}`);
+      const response = await fetch(`/api/linked-items/ticker/${parseInt(id)}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -887,10 +927,10 @@ async function updateTicker() {
         if (window.showLinkedItemsModal) {
           // טעינת נתוני פריטים מקושרים
           try {
-            const response = await fetch(`/api/linked-items/ticker/${id}`);
+            const response = await fetch(`/api/linked-items/ticker/${parseInt(id)}`);
             if (response.ok) {
               const data = await response.json();
-              window.showLinkedItemsModal(data, 'ticker', id);
+              window.showLinkedItemsModal(data, 'ticker', parseInt(id));
             } else {
               throw new Error('Failed to load linked items data');
             }
@@ -932,7 +972,7 @@ async function updateTicker() {
       remarks: remarks || null,
     };
 
-    const response = await fetch(`/api/tickers/${id}`, {
+    const response = await fetch(`/api/tickers/${parseInt(id)}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -942,7 +982,7 @@ async function updateTicker() {
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleUpdateResponse(response, {
-      modalId: 'editTickerModal',
+      modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
       apiUrl: '/api/tickers/',
       entityName: 'טיקר',
@@ -1622,7 +1662,14 @@ async function loadTickersData() {
 
     // עדכון סטטיסטיקות סיכום
     updateTickersSummaryStats(tickersData);
+    
+    // Register table with UnifiedTableSystem after data is loaded
+    if (typeof window.registerTickersTables === 'function') {
+      window.registerTickersTables();
+    }
 
+    // Restore page state (filters, sort, sections, entity filters)
+    await restorePageState('tickers');
 
   } catch (error) {
     handleApiError(error, 'טעינת נתוני טיקרים');
@@ -1736,38 +1783,24 @@ function updateTickersTable(tickers) {
                             <strong>${ticker.symbol || 'N/A'}</strong>
                         </span>
                     </td>
-                    <td title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${formattedPrice}</td>
-                    <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${changeDisplay}</td>
-                    <td title="${volume !== 'N/A' ? `נפח: ${volume}` : 'אין נתוני נפח'}" style="text-align: center; direction: ltr;">${window.renderVolume ? window.renderVolume(volume, true) : volume}</td>
+                    <td class="table-cell-center numeric-ltr" title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor};" dir="ltr">${formattedPrice}</td>
+                    <td class="table-cell-center numeric-ltr" title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor};" dir="ltr">${changeDisplay}</td>
+                    <td class="table-cell-center numeric-ltr" title="${volume !== 'N/A' ? `נפח: ${volume}` : 'אין נתוני נפח'}" dir="ltr">${window.renderVolume ? window.renderVolume(volume, true) : volume}</td>
                     <td class="status-cell" data-status="${ticker.status || ''}" title="${statusLabel}">
-                        <span style="background-color: ${statusStyle.backgroundColor}; 
-                                     color: ${statusStyle.color}; 
-                                     padding: ${statusStyle.padding}; 
-                                     border-radius: ${statusStyle.borderRadius}; 
-                                     font-size: ${statusStyle.fontSize}; 
-                                     font-weight: ${statusStyle.fontWeight}; 
-                                     display: ${statusStyle.display}; 
-                                     text-align: ${statusStyle.textAlign};">
+                        <span class="status-badge entity-badge-base" style="background-color: ${statusStyle.backgroundColor}; color: ${statusStyle.color};">
                             ${statusLabel}
                         </span>
                     </td>
                     <td class="type-cell" data-type="${ticker.type || ''}" title="${typeLabel}">
-                        <span style="background-color: ${typeStyle.backgroundColor}; 
-                                     color: ${typeStyle.color}; 
-                                     padding: ${typeStyle.padding}; 
-                                     border-radius: ${typeStyle.borderRadius}; 
-                                     font-size: ${typeStyle.fontSize}; 
-                                     font-weight: ${typeStyle.fontWeight}; 
-                                     display: ${typeStyle.display}; 
-                                     text-align: ${typeStyle.textAlign};">
+                        <span class="badge-type entity-badge-base" style="background-color: ${typeStyle.backgroundColor}; color: ${typeStyle.color};">
                             ${typeLabel}
                         </span>
                     </td>
                     <td title="${ticker.name || 'N/A'}">${ticker.name || 'N/A'}</td>
-                    <td title="${ticker.currency_id ? `מטבע: ${getCurrencySymbol(ticker.currency_id)}` : 'אין נתוני מטבע'}" style="text-align: center;">
+                    <td class="table-cell-center" title="${ticker.currency_id ? `מטבע: ${getCurrencySymbol(ticker.currency_id)}` : 'אין נתוני מטבע'}">
                         ${window.renderCurrency ? window.renderCurrency(ticker.currency_id, ticker.currency_name, getCurrencySymbol(ticker.currency_id)) : getCurrencySymbol(ticker.currency_id)}
                     </td>
-                    <td class="date-cell" data-date="${ticker.yahoo_updated_at ? new Date(ticker.yahoo_updated_at).toISOString().split('T')[0] : ''}" title="${ticker.yahoo_updated_at ? `עודכן: ${new Date(ticker.yahoo_updated_at).toLocaleString('he-IL')}` : 'אין נתוני עדכון'}" style="text-align: center;">
+                    <td class="date-cell table-cell-center" data-date="${ticker.yahoo_updated_at ? new Date(ticker.yahoo_updated_at).toISOString().split('T')[0] : ''}" title="${ticker.yahoo_updated_at ? `עודכן: ${new Date(ticker.yahoo_updated_at).toLocaleString('he-IL')}` : 'אין נתוני עדכון'}">
                         ${ticker.yahoo_updated_at ? (window.formatShortDate ? window.formatShortDate(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleDateString('he-IL')) + ' ' + (window.formatTimeOnly ? window.formatTimeOnly(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleTimeString('he-IL', {hour: '2-digit', minute: '2-digit'})) : 'N/A'}
                     </td>
                     <td class="actions-cell">
@@ -1775,7 +1808,6 @@ function updateTickersTable(tickers) {
                           if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
                           const result = window.createActionsMenu([
                             { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
-                            { type: 'LINK', onclick: `window.viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
                             { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})`, title: 'ערוך' },
                             { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' },
                             { type: 'DELETE', onclick: `deleteTicker(${ticker.id})`, title: 'מחק' }
@@ -1787,9 +1819,6 @@ function updateTickersTable(tickers) {
                             <button data-button-type="VIEW" data-variant="small" 
                                     data-onclick="window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })" 
                                     data-text="" title="צפה בפרטי טיקר"></button>
-                            <button data-button-type="LINK" data-variant="small" 
-                                    data-onclick="window.viewLinkedItemsForTicker(${ticker.id})" 
-                                    data-text="" title="פריטים מקושרים"></button>
                             <button data-button-type="EDIT" data-variant="small" 
                                     data-onclick="window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})" 
                                     data-text="" title="ערוך"></button>
@@ -2095,6 +2124,105 @@ window.loadColorsAndApplyToHeaders = loadColorsAndApplyToHeaders;
 window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
 window.toggleSection = toggleSection;
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('tickers', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('tickers');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register tickers table with UnifiedTableSystem
+ * This function registers the tickers table for unified sorting and filtering
+ */
+window.registerTickersTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "tickers" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register tickers table
+    window.UnifiedTableSystem.registry.register('tickers', {
+        dataGetter: () => {
+            return window.tickersData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateTickersTableMain === 'function') {
+                window.updateTickersTableMain(data);
+            } else if (typeof window.updateTickersTable === 'function') {
+                window.updateTickersTable(data);
+            }
+        },
+        tableSelector: 'table[data-table-type="tickers"]',
+        columns: getColumns('tickers'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};
 // REMOVED: window.toggleTickersSection - use window.toggleSection('tickers') directly
 // REMOVED: window.showAddTickerModal - use window.ModalManagerV2.showModal('tickersModal', 'add') directly
 // REMOVED: window.showEditTickerModal - use window.ModalManagerV2.showEditModal('tickersModal', 'ticker', id) directly

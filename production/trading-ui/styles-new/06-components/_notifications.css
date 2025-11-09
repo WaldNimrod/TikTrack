@@ -8,12 +8,24 @@
  * @lastUpdated January 5, 2025
  */
 
+/*
+ * Notification styles rewritten for Apple-like UI
+ * מבוסס על הסגנונות הקיימים ב-notification-system.css
+ */
+
+:root {
+  --notification-success-color: #28a745;
+  --notification-error-color: #dc3545;
+  --notification-warning-color: #ffc107;
+  --notification-info-color: #17a2b8;
+}
+
 /* קונטיינר התראות */
 .notification-container {
   position: fixed;
-  top: 20px;
+  top: 80px;
+  right: 20px;
   inset-inline-end: 20px;
-  right: 20px; /* fallback for older browsers */
   z-index: 1000000002;
   max-width: 400px;
   width: auto;
@@ -31,13 +43,13 @@
   position: fixed !important;
   top: 20px !important;
   right: 20px !important;
-  background: #28a745 !important;
+  background: var(--notification-success-color, #28a745) !important;
   color: white !important;
   padding: 10px 20px !important;
   border-radius: 5px !important;
   z-index: 9999 !important;
   font-size: 14px !important;
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--notification-success-color, #28a745) 30%, transparent) !important;
   animation: slideInRight 0.3s ease-out !important;
 }
 
@@ -125,35 +137,35 @@
 
 /* סוגי התראות ספציפיים */
 .notification-success {
-  border-left: 4px solid #28a745 !important;
+  border-left: 4px solid var(--notification-success-color, #28a745) !important;
 }
 
 .notification-success .notification-icon {
-  color: #28a745 !important;
+  color: var(--notification-success-color, #28a745) !important;
 }
 
 .notification-error {
-  border-left: 4px solid #dc3545 !important;
+  border-left: 4px solid var(--notification-error-color, #dc3545) !important;
 }
 
 .notification-error .notification-icon {
-  color: #dc3545 !important;
+  color: var(--notification-error-color, #dc3545) !important;
 }
 
 .notification-warning {
-  border-left: 4px solid #ffc107 !important;
+  border-left: 4px solid var(--notification-warning-color, #ffc107) !important;
 }
 
 .notification-warning .notification-icon {
-  color: #ffc107 !important;
+  color: var(--notification-warning-color, #ffc107) !important;
 }
 
 .notification-info {
-  border-left: 4px solid #17a2b8 !important;
+  border-left: 4px solid var(--notification-info-color, #17a2b8) !important;
 }
 
 .notification-info .notification-icon {
-  color: #17a2b8 !important;
+  color: var(--notification-info-color, #17a2b8) !important;
 }
 
 .notification-close {
@@ -180,11 +192,11 @@
 
 /* סוגי התראות */
 .notification.success {
-  border-color: #28a745 !important;
+  border-color: var(--notification-success-color, #28a745) !important;
 }
 
 .notification.success .notification-icon {
-  color: #28a745 !important;
+  color: var(--notification-success-color, #28a745) !important;
 }
 
 .notification.success .notification-title {
@@ -196,11 +208,11 @@
 }
 
 .notification.error {
-  border-color: #dc3545 !important;
+  border-color: var(--notification-error-color, #dc3545) !important;
 }
 
 .notification.error .notification-icon {
-  color: #dc3545 !important;
+  color: var(--notification-error-color, #dc3545) !important;
 }
 
 .notification.error .notification-title {
@@ -212,11 +224,11 @@
 }
 
 .notification.warning {
-  border-color: #ffc107 !important;
+  border-color: var(--notification-warning-color, #ffc107) !important;
 }
 
 .notification.warning .notification-icon {
-  color: #ffc107 !important;
+  color: var(--notification-warning-color, #ffc107) !important;
 }
 
 .notification.warning .notification-title {
@@ -228,11 +240,11 @@
 }
 
 .notification.info {
-  border-color: #007bff !important;
+  border-color: var(--notification-info-color, #17a2b8) !important;
 }
 
 .notification.info .notification-icon {
-  color: #007bff !important;
+  color: var(--notification-info-color, #17a2b8) !important;
 }
 
 .notification.info .notification-title {

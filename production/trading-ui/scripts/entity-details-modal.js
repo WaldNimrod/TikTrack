@@ -198,6 +198,10 @@ class EntityDetailsModal {
             this.currentEntityType = entityType;
             this.currentEntityId = entityId;
 
+            // עדכון צבע כותרת המודל לפי סוג הישות (לפני טעינת הנתונים)
+            // זה מבטיח שהצבעים יהיו נכונים מיד בפתיחת המודול
+            this.updateModalHeaderColor(entityType);
+
             // עדכון כותרת המודל (זמנית עד לטעינת הנתונים)
             const titleElement = document.getElementById(`${this.modalId}Label`);
             if (titleElement) {
@@ -272,6 +276,9 @@ class EntityDetailsModal {
                         if (historyItem.info?.sourceInfo) {
                             this.sourceInfo = historyItem.info.sourceInfo;
                         }
+                        
+                        // עדכון צבע כותרת המודל לפי סוג הישות (גם כשמשתמשים בתוכן שמור)
+                        this.updateModalHeaderColor(entityType);
                         
                         // עדכון כותרת וניווט
                         this.updateModalTitle(entityType, null); // יעודכן מה-content
@@ -1027,23 +1034,40 @@ class EntityDetailsModal {
         if (!headerElement || !modalElement) return;
 
         // הסרת כל המחלקות הישנות של ישויות
-        const validEntityTypes = ['trade', 'ticker', 'trading_account', 'alert', 'cash_flow', 'cash-flow', 'note', 'trade_plan', 'trade-plan', 'execution', 'preference', 'research', 'design', 'constraint', 'development', 'position'];
+        // רשימה מלאה של כל סוגי הישויות במערכת
+        const validEntityTypes = [
+            'trade', 'ticker', 'trading_account', 'alert', 'cash_flow', 'cash-flow', 
+            'note', 'trade_plan', 'trade-plan', 'execution', 'preference', 'research', 
+            'design', 'constraint', 'development', 'position', 'account'
+        ];
         validEntityTypes.forEach(type => {
+            const normalizedType = type.replace('_', '-').toLowerCase();
+            headerElement.classList.remove(`entity-${normalizedType}`);
             headerElement.classList.remove(`entity-${type}`);
         });
         
         // הוספת מחלקת ישות חדשה - CSS ידאג לצבעים מההעדפות!
         if (entityType) {
-            const normalizedType = entityType.replace('_', '-').toLowerCase();
-            headerElement.classList.add(`entity-${normalizedType}`);
+            // נירמול סוג הישות (תמיכה גם ב-account ישן)
+            let normalizedType = entityType.replace('_', '-').toLowerCase();
             
-            // הוספת data-entity-type למודול (אם לא קיים)
-            if (!modalElement.hasAttribute('data-entity-type')) {
-                modalElement.setAttribute('data-entity-type', entityType);
+            // מיפוי account ישן ל-trading_account
+            if (normalizedType === 'account') {
+                normalizedType = 'trading-account';
+                entityType = 'trading_account';
             }
             
+            headerElement.classList.add(`entity-${normalizedType}`);
+            
+            // הוספת data-entity-type למודול (תמיד מעדכן כדי לשמור על סינכרון)
+            modalElement.setAttribute('data-entity-type', entityType);
+            
             if (window.Logger) {
-                window.Logger.info(`🎨 Applied entity class to modal header: entity-${normalizedType}`, { page: "entity-details-modal" });
+                window.Logger.info(`🎨 Applied entity class to modal header: entity-${normalizedType} (entityType: ${entityType})`, { 
+                    entityType,
+                    normalizedType,
+                    page: "entity-details-modal" 
+                });
             }
         }
     }

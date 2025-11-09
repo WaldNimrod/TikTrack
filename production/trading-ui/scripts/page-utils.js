@@ -107,12 +107,12 @@
  * @param {string} pageName - Page name
  * @returns {void}
  */
-function initializePageFilters(pageName) {
+async function initializePageFilters(pageName) {
   // Initializing filters for page
 
   try {
     // Load saved filter state
-    const savedFilters = loadPageState(pageName);
+    const savedFilters = await loadPageState(pageName);
     if (savedFilters && savedFilters.filters) {
       // Restoring saved filters
       applySavedFilters(savedFilters.filters);
@@ -156,11 +156,14 @@ function setupSortableHeaders(pageName) {
     });
 
     // Restore previous sort state
-    const savedState = loadPageState(pageName);
-    if (savedState && savedState.sort) {
-      // Restoring sort state
-      restoreSortState(pageName, savedState.sort);
-    }
+    loadPageState(pageName).then(savedState => {
+      if (savedState && savedState.sort) {
+        // Restoring sort state
+        restoreSortState(pageName, savedState.sort);
+      }
+    }).catch(() => {
+      // Error loading sort state
+    });
 
     // Sortable headers setup for page
   } catch {
@@ -219,10 +222,10 @@ function updateTableStats(pageName, data = null) {
  * @param {string} pageName - Page name
  * @returns {void}
  */
-function debugSavedFilters(pageName) {
+async function debugSavedFilters(pageName) {
   // Debugging saved filters for page
 
-  const savedState = loadPageState(pageName);
+  const savedState = await loadPageState(pageName);
   // Saved state
 
   if (savedState && savedState.filters) {
@@ -279,12 +282,12 @@ function restoreDesignsSectionState() {
  * @param {string} pageName - Page name
  * @returns {void}
  */
-function initializePage(pageName) {
+async function initializePage(pageName) {
   // Initializing page
 
   try {
     // Initialize page filters
-    initializePageFilters(pageName);
+    await initializePageFilters(pageName);
 
     // Setup sortable headers
     setupSortableHeaders(pageName);
@@ -331,10 +334,17 @@ function initializePage(pageName) {
  * @function savePageState
  * @param {string} pageName - Page name
  * @param {Object} state - Page state
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function savePageState(pageName, state) {
+async function savePageState(pageName, state) {
   try {
+    // שמירה דרך PageStateManager אם זמין
+    if (window.PageStateManager && window.PageStateManager.initialized) {
+      await window.PageStateManager.savePageState(pageName, state);
+      return;
+    }
+    
+    // Fallback ל-localStorage רק אם PageStateManager לא זמין
     const key = `pageState_${pageName}`;
     const stateToSave = {
       ...state,
@@ -362,10 +372,19 @@ function savePageState(pageName, state) {
  * Load page state
  * @function loadPageState
  * @param {string} pageName - Page name
- * @returns {Object|null} Saved page state
+ * @returns {Promise<Object|null>} Saved page state
  */
-function loadPageState(pageName) {
+async function loadPageState(pageName) {
   try {
+    // טעינה דרך PageStateManager אם זמין
+    if (window.PageStateManager && window.PageStateManager.initialized) {
+      const state = await window.PageStateManager.loadPageState(pageName);
+      if (state) {
+        return state;
+      }
+    }
+    
+    // Fallback ל-localStorage רק אם PageStateManager לא זמין או אין מצב שמור
     const key = `pageState_${pageName}`;
     const savedState = localStorage.getItem(key);
 
@@ -393,10 +412,17 @@ function loadPageState(pageName) {
  * Clear page state
  * @function clearPageState
  * @param {string} pageName - Page name
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function clearPageState(pageName) {
+async function clearPageState(pageName) {
   try {
+    // מחיקה דרך PageStateManager אם זמין
+    if (window.PageStateManager && window.PageStateManager.initialized) {
+      await window.PageStateManager.clearPageState(pageName);
+      return;
+    }
+    
+    // Fallback ל-localStorage רק אם PageStateManager לא זמין
     const key = `pageState_${pageName}`;
     localStorage.removeItem(key);
     // Page state cleared for page

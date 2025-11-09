@@ -67,7 +67,7 @@ def get_table_schema(table_name: str):
             'currencies', 'users', 'external_data_providers',
             'market_data_quotes', 'intraday_data_slots',
             'entity_relation_types', 'preference_types',
-            'preference_groups', 'preference_profiles', 'user_preferences_v3'
+            'preference_groups', 'preference_profiles', 'user_preferences'
         ]
         
         if table_name not in valid_tables:
@@ -127,7 +127,7 @@ def get_table_data_with_schema(table_name: str):
             'currencies', 'users', 'external_data_providers',
             'market_data_quotes', 'intraday_data_slots',
             'entity_relation_types', 'preference_types',
-            'preference_groups', 'preference_profiles', 'user_preferences_v3'
+            'preference_groups', 'preference_profiles', 'user_preferences'
         ]
         
         if table_name not in valid_tables:

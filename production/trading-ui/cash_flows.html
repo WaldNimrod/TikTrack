@@ -132,23 +132,26 @@
                             <table class="table table-hover" id="cashFlowsTable" data-table-type="cash_flows">
                                 <thead>
                                     <tr>
+                                        <th class="col-trade">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 0)">טרייד <span class="sort-icon">↕</span></button>
+                                        </th>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 0)">חשבון מסחר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 1)">חשבון מסחר <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-type">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 1)">סוג <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 2)">סוג <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-amount">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 2)">סכום <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 3)">סכום <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-date">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 3)">תאריך <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 4)">תאריך <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-description">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 4)">תיאור <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 5)">תיאור <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-source">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 5)">מקור <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('cash_flows', 6)">מקור <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-4-items">
                                         </th>
@@ -156,7 +159,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="7" class="loading">טוען תזרימי מזומנים...</td>
+                                        <td colspan="8" class="loading">טוען תזרימי מזומנים...</td>
                                     </tr>
                                 </tbody>
                             </table>

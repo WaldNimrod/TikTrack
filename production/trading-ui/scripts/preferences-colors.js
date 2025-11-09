@@ -140,7 +140,7 @@ class ColorManager {
      * @param {number} profileId - Profile ID
      * @returns {Promise<Object>} Color preferences object
      */
-    async loadAllColors(userId = 1, profileId = 3) {
+    async loadAllColors(userId = 1, profileId = null) {
         try {
             window.Logger.info('🎨 Loading all color preferences...', { page: "preferences-colors" });
             
@@ -156,10 +156,23 @@ class ColorManager {
             
             const allColors = {};
             
+            const finalUserId = (userId !== null && userId !== undefined)
+                ? userId
+                : (window.PreferencesCore?.currentUserId || window.PreferencesUI?.currentUserId || 1);
+            const finalProfileId = (profileId !== null && profileId !== undefined)
+                ? profileId
+                : (window.PreferencesCore?.currentProfileId ?? window.PreferencesUI?.currentProfileId ?? null);
+            
             for (const batch of batches) {
                 const batchPromises = batch.map(async (colorName) => {
                     try {
-                        const response = await fetch(`/api/preferences/user/single?preference_name=${colorName}&user_id=${userId}&profile_id=${profileId}`);
+                        const url = new URL('/api/preferences/user/single', window.location.origin);
+                        url.searchParams.append('preference_name', colorName);
+                        url.searchParams.append('user_id', finalUserId);
+                        if (finalProfileId !== null && finalProfileId !== undefined) {
+                            url.searchParams.append('profile_id', finalProfileId);
+                        }
+                        const response = await fetch(url);
                         if (response.ok) {
                             const result = await response.json();
                             return { name: colorName, value: result.data?.value || this.defaultColors[colorName] };
@@ -193,17 +206,30 @@ class ColorManager {
      * @param {number} profileId - Profile ID
      * @returns {Promise<Object>} Group colors
      */
-    async loadColorGroup(groupName, userId = 1, profileId = 3) {
+    async loadColorGroup(groupName, userId = 1, profileId = null) {
         const groupColors = this.colorGroups[groupName] || [];
         if (groupColors.length === 0) {
             window.Logger.warn(`⚠️ Unknown color group: ${groupName}`, { page: "preferences-colors" });
             return {};
         }
         
+        const finalUserId = (userId !== null && userId !== undefined)
+            ? userId
+            : (window.PreferencesCore?.currentUserId || window.PreferencesUI?.currentUserId || 1);
+        const finalProfileId = (profileId !== null && profileId !== undefined)
+            ? profileId
+            : (window.PreferencesCore?.currentProfileId ?? window.PreferencesUI?.currentProfileId ?? null);
+        
         const groupData = {};
         for (const colorName of groupColors) {
             try {
-                const response = await fetch(`/api/preferences/user/single?preference_name=${colorName}&user_id=${userId}&profile_id=${profileId}`);
+                const url = new URL('/api/preferences/user/single', window.location.origin);
+                url.searchParams.append('preference_name', colorName);
+                url.searchParams.append('user_id', finalUserId);
+                if (finalProfileId !== null && finalProfileId !== undefined) {
+                    url.searchParams.append('profile_id', finalProfileId);
+                }
+                const response = await fetch(url);
                 if (response.ok) {
                     const result = await response.json();
                     groupData[colorName] = result.data?.value || this.defaultColors[colorName];
@@ -227,11 +253,27 @@ class ColorManager {
      * @param {number} profileId - Profile ID
      * @returns {Promise<boolean>} Success status
      */
-    async saveColor(colorName, colorValue, userId = 1, profileId = 3) {
+    async saveColor(colorName, colorValue, userId = 1, profileId = null) {
         try {
             // Validate color format
             if (!this.validateColorFormat(colorValue)) {
                 throw new Error(`Invalid color format: ${colorValue}`);
+            }
+            
+            const finalUserId = (userId !== null && userId !== undefined)
+                ? userId
+                : (window.PreferencesCore?.currentUserId || window.PreferencesUI?.currentUserId || 1);
+            const finalProfileId = (profileId !== null && profileId !== undefined)
+                ? profileId
+                : (window.PreferencesCore?.currentProfileId ?? window.PreferencesUI?.currentProfileId ?? null);
+            
+            const payload = {
+                preference_name: colorName,
+                value: colorValue,
+                user_id: finalUserId
+            };
+            if (finalProfileId !== null && finalProfileId !== undefined) {
+                payload.profile_id = finalProfileId;
             }
             
             const response = await fetch('/api/preferences/user/single', {
@@ -239,12 +281,7 @@ class ColorManager {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    preference_name: colorName,
-                    value: colorValue,
-                    user_id: userId,
-                    profile_id: profileId
-                })
+                body: JSON.stringify(payload)
             });
             
             if (response.ok) {

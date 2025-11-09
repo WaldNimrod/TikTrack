@@ -1169,6 +1169,14 @@ async function loadExecutionsData() {
 
       // עדכון הטבלה
       updateExecutionsTableMain(executionsData);
+      
+      // Register table with UnifiedTableSystem after data is loaded
+      if (typeof window.registerExecutionsTables === 'function') {
+        window.registerExecutionsTables();
+      }
+
+      // Restore page state (filters, sort, sections, entity filters)
+      await restorePageState('executions');
 
     } else {
       const errorText = await response.text();
@@ -1184,7 +1192,44 @@ async function loadExecutionsData() {
 /**
  * עדכון טבלת עסקעות
  */
-async function updateExecutionsTableMain(executions) {
+function handleExecutionsPagination(allExecutions) {
+    if (!window.createPagination) {
+        return false;
+    }
+
+    const dataArray = Array.isArray(allExecutions) ? allExecutions : [];
+    window.executionsData = dataArray;
+
+    if (!executionsPaginationInstance) {
+        executionsPaginationInstance = window.createPagination('executionsTable', {
+            showPageSizeSelector: true,
+            showNavigation: true,
+            onPageChange: (pageData) => {
+                updateExecutionsTableMain(pageData, { skipPagination: true });
+            },
+            onPageSizeChange: () => {
+                if (executionsPaginationInstance) {
+                    const currentPageData = executionsPaginationInstance.getCurrentPageData();
+                    updateExecutionsTableMain(currentPageData, { skipPagination: true });
+                }
+            }
+        });
+    }
+
+    executionsPaginationInstance.setData(dataArray);
+    const currentPageData = executionsPaginationInstance.getCurrentPageData();
+    updateExecutionsTableMain(currentPageData, { skipPagination: true });
+    return true;
+}
+
+async function updateExecutionsTableMain(executions, options = {}) {
+  if (!options.skipPagination) {
+    if (handleExecutionsPagination(executions)) {
+      return;
+    }
+  }
+
+  executions = Array.isArray(executions) ? executions : [];
   // updateExecutionsTableMain called with executions
   const tbody = document.querySelector('#executionsTable tbody');
   if (!tbody) {
@@ -1207,7 +1252,7 @@ async function updateExecutionsTableMain(executions) {
     .filter(id => !existingExecutionIds.has(id));
 
   if (executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center">לא נמצאו עסקעות</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="text-center">לא נמצאו עסקעות</td></tr>';
     return;
   }
 
@@ -1316,57 +1361,67 @@ async function updateExecutionsTableMain(executions) {
     // תמיד להשתמש בחשבון ישירות מהרשומה, או מהטרייד אם אין ישיר
     const accountName = execution.account_name || (trade ? trade.account_name : 'לא מוגדר');
 
-    // Add trade link indicator if trade_id exists
-    const tradeLinkIndicator = execution.trade_id 
-      ? ` <span class="badge bg-info" title="מקושר לטרייד #${execution.trade_id}${symbol && symbol !== 'לא מוגדר' ? ' (' + symbol + ')' : ''}" style="font-size: 0.75em; margin-inline-start: 4px;">🔗</span>`
-      : '';
+    // Trade column - show trade ID with link button if exists
+    const tradeCell = execution.trade_id 
+      ? `<div class="table-cell-flex-small">
+           <button class="btn btn-sm btn-outline-primary table-btn-small" 
+                   onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${execution.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${execution.trade_id}, 'view'); }" 
+                   title="פתח פרטי טרייד">
+             🔗
+           </button>
+           <span>#${execution.trade_id}</span>
+         </div>`
+      : '-';
 
     return `
             <tr data-execution-id="${execution.id}" class="execution-row">
-                                   <td class="ticker-cell">
-                       <div style="display: flex; align-items: center; gap: 8px;">
-                           <strong style="cursor: pointer; color: ${positiveColor};" 
-                             onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
-                             title="פתח פרטי סימבול">${symbol}</strong>${tradeLinkIndicator}
-                       </div>
-                   </td>
+                <td class="trade-cell" data-trade-id="${execution.trade_id || ''}">
+                    ${tradeCell}
+                </td>
+                <td class="ticker-cell">
+                    <div class="table-cell-flex">
+                        <strong class="table-link-positive" 
+                          onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
+                          title="פתח פרטי סימבול">${symbol}</strong>
+                    </div>
+                </td>
                 <td class="type-cell" data-type="${typeForFilter}">
                     ${window.renderAction ? window.renderAction(execution.action || execution.type) : 
                       `<span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
                         ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
                       </span>`}
                 </td>
-                <td data-account="${accountName}" style="cursor: pointer;" 
+                <td class="table-cell-clickable" data-account="${accountName}" 
                   onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                   title="פתח פרטי חשבון מסחר">${accountName}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
-                <td>$${execution.price}</td>
-                <td class="pl-cell">$0</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.price) : (execution.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-')}</td>
                 <td class="realized-pl-cell" data-realized-pl="${execution.realized_pl || ''}">
                     ${execution.realized_pl !== null && execution.realized_pl !== undefined ? 
                         (execution.realized_pl >= 0 ? 
-                            `<span class="numeric-ltr" style="color: ${positiveColor}">$${execution.realized_pl}</span>` : 
-                            `<span class="numeric-ltr" style="color: ${negativeColor}">-$${Math.abs(execution.realized_pl)}</span>`) : 
+                            `<span class="numeric-ltr numeric-value-positive">$${execution.realized_pl}</span>` : 
+                            `<span class="numeric-ltr numeric-value-negative">-$${Math.abs(execution.realized_pl)}</span>`) : 
                         '-'}
                 </td>
                 <td class="mtm-pl-cell" data-mtm-pl="${execution.mtm_pl || ''}">
                     ${execution.mtm_pl !== null && execution.mtm_pl !== undefined ? 
                         (execution.mtm_pl >= 0 ? 
-                            `<span class="numeric-ltr" style="color: ${positiveColor}">$${execution.mtm_pl}</span>` : 
-                            `<span class="numeric-ltr" style="color: ${negativeColor}">-$${Math.abs(execution.mtm_pl)}</span>`) : 
+                            `<span class="numeric-ltr numeric-value-positive">$${execution.mtm_pl}</span>` : 
+                            `<span class="numeric-ltr numeric-value-negative">-$${Math.abs(execution.mtm_pl)}</span>`) : 
                         '-'}
                 </td>
-                <td data-date="${execution.date || execution.execution_date}">${window.renderExecutionDate ? window.renderExecutionDate(execution.date || execution.execution_date) : (execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-')}</td>
-                <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
+                <td data-date="${execution.execution_date?.utc || execution.execution_date || execution.date || ''}">
+                    ${window.renderExecutionDate ? window.renderExecutionDate(execution.execution_date || execution.date) : window.renderDate ? window.renderDate(execution.execution_date || execution.date, true) : ((execution.execution_date || execution.date) ? new Date(execution.execution_date || execution.date).toLocaleDateString('he-IL') : '-')}
+                </td>
+                <td class="numeric-ltr" dir="ltr">${execution.source || '-'}</td>
                 <td class="actions-cell">
-                    <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
+                    <div class="d-flex gap-1 justify-content-center align-items-center table-flex-nowrap">
                       ${(() => {
                         if (!window.createActionsMenu) {
                           return '<!-- Actions menu not available -->';
                         }
                         const result = window.createActionsMenu([
                           { type: 'VIEW', onclick: `window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })`, title: 'צפה בפרטי עסקה' },
-                          { type: 'LINK', onclick: `viewLinkedItemsForExecution(${execution.id})`, title: 'פריטים מקושרים' },
                           { type: 'EDIT', onclick: `editExecution(${execution.id})`, title: 'ערוך' },
                           { type: 'DELETE', onclick: `deleteExecution(${execution.id})`, title: 'מחק' }
                         ]);
@@ -1394,22 +1449,18 @@ async function updateExecutionsTableMain(executions) {
       style.textContent = `
         .execution-row.newly-added {
           background-color: rgba(40, 167, 69, 0.2) !important;
-          border-left: 4px solid #28a745 !important;
           animation: fadeNewExecution 3s ease-out forwards;
         }
         
         @keyframes fadeNewExecution {
           0% {
             background-color: rgba(40, 167, 69, 0.3);
-            border-left-color: #28a745;
           }
           50% {
             background-color: rgba(40, 167, 69, 0.15);
-            border-left-color: #28a745;
           }
           100% {
             background-color: transparent;
-            border-left-color: transparent;
           }
         }
       `;
@@ -1764,6 +1815,13 @@ window.initializeExecutionsPage = async function() {
   if (editExecutionType) {
     editExecutionType.addEventListener('change', () => updateRealizedPLField('edit'));
   }
+
+  // Load trade suggestions after page initialization
+  setTimeout(async () => {
+    if (typeof loadTradeSuggestionsForAll === 'function') {
+      await loadTradeSuggestionsForAll();
+    }
+  }, 2000); // Wait 2 seconds for page to fully load
 
   // עדכון אוטומטי כל 30 שניות - הושבת זמנית למניעת לופים
   // setInterval(() => {
@@ -2569,9 +2627,9 @@ function updateExecutionsTableForTradeModal(executions) {
                 <td>${window.renderExecutionDate ? window.renderExecutionDate(execution.date) : execution.date}</td>
                 <td>${typeBadge}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
-                <td>$${execution.price.toFixed(2)}</td>
-                <td>$${execution.commission.toFixed(2)}</td>
-                <td>$${execution.total.toFixed(2)}</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.price) : (execution.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-')}</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.commission) : (execution.commission ? `$${parseFloat(execution.commission).toFixed(2)}` : '-')}</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.total) : (execution.total ? `$${parseFloat(execution.total).toFixed(2)}` : '-')}</td>
                 <td>${statusBadge}</td>
             `;
 
@@ -3455,7 +3513,7 @@ async function deleteExecution(executionId) {
                                window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
                                ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
             const quantity = execution.quantity || '0';
-            const price = execution.price ? `$${execution.price}` : '$0';
+            const price = execution.price ? (window.formatPrice ? window.formatPrice(execution.price) : `$${parseFloat(execution.price).toFixed(2)}`) : '$0';
             const date = execution.date || execution.execution_date ? 
                          new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : 
                          'לא מוגדר';
@@ -3521,3 +3579,958 @@ async function performExecutionDeletion(executionId) {
 
 // Export functions to window for global access
 // Note: saveExecution already exported above
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('executions', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('executions');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register executions table with UnifiedTableSystem
+ * This function registers the executions table for unified sorting and filtering
+ */
+window.registerExecutionsTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "executions" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register executions table
+    window.UnifiedTableSystem.registry.register('executions', {
+        dataGetter: () => {
+            return window.executionsData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateExecutionsTableMain === 'function') {
+                window.updateExecutionsTableMain(data);
+            }
+        },
+        tableSelector: '#executionsTable',
+        columns: getColumns('executions'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+    
+    // Register trade suggestions table
+    window.UnifiedTableSystem.registry.register('trade_suggestions', {
+        dataGetter: () => {
+            if (tradeSuggestionsFlatList && tradeSuggestionsFlatList.length > 0) {
+                return tradeSuggestionsFlatList.map(item => ({ ...item }));
+            }
+            return buildTradeSuggestionsFlatList(tradeSuggestionsData);
+        },
+        updateFunction: (data) => {
+            if (Array.isArray(data)) {
+                updateTradeSuggestionsTable(data);
+            }
+        },
+        tableSelector: '#tradeSuggestionsTable',
+        columns: getColumns('trade_suggestions'),
+        sortable: true,
+        filterable: false,
+        defaultSort: { columnIndex: 1, direction: 'desc' }
+    });
+};
+
+// ========================================
+// Trade Suggestions Functions
+// ========================================
+
+/**
+ * Global variable to store suggestions data
+ */
+let tradeSuggestionsData = {};
+let tradeSuggestionsFlatList = [];
+let tradeSuggestionsPaginationInstance = null;
+let executionsPaginationInstance = null;
+
+/**
+ * Load trade suggestions for all pending executions
+ */
+async function loadTradeSuggestionsForAll() {
+    try {
+        window.Logger?.info('🔄 Loading trade suggestions for all pending executions...', { page: "executions" });
+        
+        // Get pending executions
+        const pendingResponse = await fetch('/api/executions/pending-assignment');
+        if (!pendingResponse.ok) {
+            throw new Error(`HTTP ${pendingResponse.status}: ${pendingResponse.statusText}`);
+        }
+        
+        const pendingResult = await pendingResponse.json();
+        const pendingExecutions = pendingResult.data || [];
+        
+        if (pendingExecutions.length === 0) {
+            // No pending executions - hide section or show message
+            tradeSuggestionsData = {};
+            tradeSuggestionsFlatList = [];
+            renderTradeSuggestionsSection({});
+            updateSuggestionsCount(0);
+            return;
+        }
+        
+        // Load suggestions for each execution
+        const suggestionsPromises = pendingExecutions.map(async (execution) => {
+            try {
+                const suggestResponse = await fetch(`/api/executions/${execution.id}/suggest-trades`);
+                if (!suggestResponse.ok) {
+                    window.Logger?.warn(`⚠️ Failed to load suggestions for execution ${execution.id}`, { page: "executions" });
+                    return { execution_id: execution.id, suggestions: [] };
+                }
+                
+                const suggestResult = await suggestResponse.json();
+                return {
+                    execution_id: execution.id,
+                    execution: execution,
+                    suggestions: suggestResult.data || []
+                };
+            } catch (error) {
+                window.Logger?.error(`❌ Error loading suggestions for execution ${execution.id}:`, error, { page: "executions" });
+                return { execution_id: execution.id, execution: execution, suggestions: [] };
+            }
+        });
+        
+        const suggestionsResults = await Promise.all(suggestionsPromises);
+        
+        // Build suggestions data structure
+        const suggestionsData = {};
+        suggestionsResults.forEach(result => {
+            if (result.suggestions && result.suggestions.length > 0) {
+                suggestionsData[result.execution_id] = {
+                    execution: result.execution,
+                    suggestions: result.suggestions
+                };
+            }
+        });
+        
+        tradeSuggestionsData = suggestionsData;
+        tradeSuggestionsFlatList = buildTradeSuggestionsFlatList(suggestionsData);
+        
+        // Render suggestions section
+        renderTradeSuggestionsSection(suggestionsData, tradeSuggestionsFlatList);
+        updateSuggestionsCount(Object.keys(suggestionsData).length);
+        
+        window.Logger?.info(`✅ Loaded suggestions for ${Object.keys(suggestionsData).length} executions`, { page: "executions" });
+        
+    } catch (error) {
+        window.Logger?.error('❌ Error loading trade suggestions:', error, { page: "executions" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת המלצות שיוך', error.message);
+        }
+    }
+}
+
+/**
+ * Update suggestions count display
+ */
+function updateSuggestionsCount(count) {
+    const countElement = document.getElementById('suggestionsCount');
+    if (countElement) {
+        countElement.textContent = count > 0 ? `${count} ביצועים עם המלצות` : 'אין המלצות';
+    }
+}
+
+/**
+ * Render trade suggestions section
+ */
+function renderTradeSuggestionsSection(suggestionsData, flatList = null) {
+    const container = document.getElementById('tradeSuggestionsContainer');
+    if (!container) {
+        window.Logger?.warn('⚠️ tradeSuggestionsContainer not found', { page: "executions" });
+        return;
+    }
+
+    if (window.destroyPagination) {
+        window.destroyPagination('tradeSuggestionsTable');
+    }
+    tradeSuggestionsPaginationInstance = null;
+    
+    const effectiveRows = Array.isArray(flatList) ? flatList : (
+        tradeSuggestionsFlatList.length > 0
+            ? tradeSuggestionsFlatList
+            : buildTradeSuggestionsFlatList(suggestionsData)
+    );
+    tradeSuggestionsFlatList = effectiveRows ? effectiveRows.map(item => ({ ...item })) : [];
+    
+    if (!tradeSuggestionsFlatList || tradeSuggestionsFlatList.length === 0) {
+        tradeSuggestionsFlatList = [];
+        container.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>אין המלצות זמינות</strong><br>
+                כל הביצועים משוייכים לטריידים או שאין טריידים מתאימים.
+            </div>
+        `;
+        return;
+    }
+    
+    // Render table
+    const html = `
+        <div class="table-responsive">
+            <table class="table table-hover" id="tradeSuggestionsTable" data-table-type="trade_suggestions">
+                <thead>
+                    <tr>
+                        <th class="col-checkbox">
+                            <input type="checkbox" id="selectAllSuggestions" title="בחר הכל" onchange="toggleAllSuggestions(this.checked)">
+                        </th>
+                        <th class="col-score">
+                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 1)">
+                                ציון התאמה <span class="sort-icon">↕</span>
+                            </button>
+                        </th>
+                        <th class="col-execution">
+                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 2)">
+                                ביצוע <span class="sort-icon">↕</span>
+                            </button>
+                        </th>
+                        <th class="col-trade">
+                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 3)">
+                                טרייד <span class="sort-icon">↕</span>
+                            </button>
+                        </th>
+                        <th class="col-account">
+                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 4)">
+                                חשבון <span class="sort-icon">↕</span>
+                            </button>
+                        </th>
+                        <th class="col-date">
+                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 5)">
+                                תאריך טרייד <span class="sort-icon">↕</span>
+                            </button>
+                        </th>
+                        <th class="col-status">
+                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 6)">
+                                סטטוס <span class="sort-icon">↕</span>
+                            </button>
+                        </th>
+                        <th class="col-side">
+                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 7)">
+                                צד <span class="sort-icon">↕</span>
+                            </button>
+                        </th>
+                        <th class="col-type">
+                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 8)">
+                                סוג <span class="sort-icon">↕</span>
+                            </button>
+                        </th>
+                        <th class="col-match">
+                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 9)">
+                                סיבות התאמה <span class="sort-icon">↕</span>
+                            </button>
+                        </th>
+                        <th class="col-actions actions-cell">פעולות</th>
+                    </tr>
+                </thead>
+                <tbody id="tradeSuggestionsTableBody">
+                    <tr><td colspan="11" class="text-center text-muted">טוען נתונים...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+    
+    // Ensure table is registered with unified system
+    if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry && typeof window.registerExecutionsTables === 'function') {
+        try {
+            if (!window.UnifiedTableSystem.registry.isRegistered('trade_suggestions')) {
+                window.registerExecutionsTables();
+            }
+        } catch (error) {
+            window.Logger?.warn('⚠️ Failed to register trade_suggestions table:', error, { page: "executions" });
+        }
+    }
+    
+    // Setup select all checkbox handler
+    const selectAllCheckbox = document.getElementById('selectAllSuggestions');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function(e) {
+            toggleAllSuggestions(e.target.checked);
+        });
+    }
+
+    initializeTradeSuggestionsPagination(tradeSuggestionsFlatList);
+}
+
+/**
+ * Build single trade suggestion table row
+ */
+function buildTradeSuggestionRow(executionId, execution, suggestion, showExecutionInfo) {
+    const FieldRenderer = window.FieldRendererService;
+    
+    const executionSymbol = execution?.ticker_symbol || execution?.symbol || 'לא מוגדר';
+    const executionDateValue = execution?.execution_date || execution?.date || execution?.created_at || null;
+    const executionDate = FieldRenderer?.renderExecutionDate
+        ? FieldRenderer.renderExecutionDate(executionDateValue)
+        : (FieldRenderer?.renderDate
+            ? FieldRenderer.renderDate(executionDateValue, true)
+            : (executionDateValue ? new Date(executionDateValue).toLocaleDateString('he-IL') : '-'));
+    const executionPrice = FieldRenderer?.renderAmount ? FieldRenderer.renderAmount(execution?.price, '$', 2, false) : (execution?.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-');
+    const executionQuantity = FieldRenderer?.renderShares ? FieldRenderer.renderShares(execution?.quantity) : (execution?.quantity || '-');
+    const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (execution?.action === 'buy' ? 'קניה' : 'מכירה');
+    
+    const scoreCategory = suggestion.score >= 100 ? 'open' : 
+                          suggestion.score >= 70 ? 'warning' : 'info';
+    const scoreBadge = `<span class="status-badge" data-status-category="${scoreCategory}">${suggestion.score}</span>`;
+    
+    const tradeEnvelope = suggestion.trade_created_at || suggestion.created_at;
+    const tradeLocalValue = tradeEnvelope?.local || tradeEnvelope?.utc || tradeEnvelope?.display || suggestion.created_at;
+    const tradeDate = FieldRenderer?.renderDate ? FieldRenderer.renderDate(tradeLocalValue) : (tradeLocalValue ? new Date(tradeLocalValue).toLocaleDateString('he-IL') : '-');
+    const tradeSortValue = tradeEnvelope?.epochMs ?? suggestion.trade_created_at_epoch ?? tradeEnvelope?.utc ?? tradeLocalValue ?? '';
+    const tradeStatus = FieldRenderer?.renderStatus ? FieldRenderer.renderStatus(suggestion.status, 'trade') : (suggestion.status === 'open' || suggestion.status === 'active' ? 'פעיל' : suggestion.status === 'closed' ? 'סגור' : suggestion.status);
+    const tradeSide = FieldRenderer?.renderSide ? FieldRenderer.renderSide(suggestion.side) : (suggestion.side || '-');
+    const investmentType = FieldRenderer?.renderType ? FieldRenderer.renderType(suggestion.investment_type) : (suggestion.investment_type || '-');
+    const matchReasons = suggestion.match_reasons ? suggestion.match_reasons.join(', ') : '-';
+    
+    const executionInfo = showExecutionInfo
+        ? `<div class="table-cell-flex">
+             <strong class="table-link-positive" 
+               onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('execution', ${executionId}, 'view'); }"
+               title="פתח פרטי ביצוע">
+               #${executionId}
+             </strong>
+             <span class="text-muted">${executionSymbol}</span>
+           </div>
+           <div class="text-muted small">
+             ${executionAction} | ${executionDate} | ${executionQuantity} | ${executionPrice}
+           </div>`
+        : '';
+    
+    return `
+        <tr class="suggestion-row" data-execution-id="${executionId}" data-trade-id="${suggestion.trade_id}" data-score="${suggestion.score}" data-account-name="${suggestion.account_name || ''}" data-date="${suggestion.created_at || ''}" data-status="${suggestion.status || ''}" data-side="${suggestion.side || ''}" data-type="${suggestion.investment_type || ''}">
+            <td class="col-checkbox">
+                <input type="checkbox" 
+                       class="suggestion-checkbox" 
+                       data-execution-id="${executionId}" 
+                       data-trade-id="${suggestion.trade_id}"
+                       id="suggestion_${executionId}_${suggestion.trade_id}">
+            </td>
+            <td class="col-score" data-sort-value="${suggestion.score}">
+                ${scoreBadge}
+            </td>
+            <td class="col-execution">
+                ${executionInfo}
+            </td>
+            <td class="col-trade">
+                <div class="table-cell-flex">
+                    <button class="btn btn-sm btn-outline-primary table-btn-small" 
+                            onclick="openTradeDetailsModal(${suggestion.trade_id})"
+                            title="פתח פרטי טרייד">
+                        🔗
+                    </button>
+                    <strong>#${suggestion.trade_id}</strong>
+                </div>
+                <div class="text-muted small">${suggestion.ticker_symbol || ''}</div>
+            </td>
+            <td class="col-account" data-sort-value="${suggestion.account_name || ''}">
+                ${suggestion.account_name || '-'}
+            </td>
+            <td class="col-date" data-date="${tradeLocalValue || ''}" data-sort-value="${tradeSortValue || ''}">
+                ${tradeDate}
+            </td>
+            <td class="col-status" data-sort-value="${suggestion.status || ''}">
+                ${tradeStatus}
+            </td>
+            <td class="col-side" data-sort-value="${suggestion.side || ''}">
+                ${tradeSide}
+            </td>
+            <td class="col-type" data-sort-value="${suggestion.investment_type || ''}">
+                ${investmentType}
+            </td>
+            <td class="col-match">
+                <span class="text-muted small">${matchReasons}</span>
+            </td>
+            <td class="col-actions actions-cell">
+                <div class="table-cell-flex-small">
+                    <button class="btn btn-sm btn-outline-success table-btn-small" 
+                            onclick="acceptSuggestion(${executionId}, ${suggestion.trade_id})"
+                            title="קבל המלצה">
+                        ✓
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger table-btn-small" 
+                            onclick="rejectSuggestion(${executionId}, ${suggestion.trade_id})"
+                            title="דחה המלצה">
+                        ✗
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+/**
+ * Toggle all suggestions checkbox
+ */
+function toggleAllSuggestions(checked) {
+    const checkboxes = document.querySelectorAll('.suggestion-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = checked;
+    });
+}
+
+/**
+ * Accept a single suggestion
+ */
+async function acceptSuggestion(executionId, tradeId) {
+    try {
+        window.Logger?.info(`✅ Accepting suggestion: execution ${executionId} -> trade ${tradeId}`, { page: "executions" });
+        
+        const response = await fetch(`/api/executions/${executionId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                trade_id: tradeId
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || 'Failed to assign execution to trade');
+        }
+        
+        // Show success notification
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('השיוך בוצע בהצלחה', `ביצוע #${executionId} שויך לטרייד #${tradeId}`);
+        }
+        
+        // Reload suggestions
+        await loadTradeSuggestionsForAll();
+        
+        // Reload executions table
+        if (typeof window.loadExecutionsData === 'function') {
+            await window.loadExecutionsData();
+        }
+        
+    } catch (error) {
+        window.Logger?.error(`❌ Error accepting suggestion:`, error, { page: "executions" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בשיוך', error.message);
+        }
+    }
+}
+
+/**
+ * Reject a single suggestion
+ */
+function rejectSuggestion(executionId, tradeId) {
+    window.Logger?.info(`❌ Rejecting suggestion: execution ${executionId} -> trade ${tradeId}`, { page: "executions" });
+    
+    // Remove the suggestion row from UI
+    const suggestionRow = document.querySelector(
+        `.suggestion-row[data-execution-id="${executionId}"][data-trade-id="${tradeId}"]`
+    );
+    
+    if (suggestionRow) {
+        suggestionRow.classList.add('rejected', 'd-none');
+    }
+    
+    // Remove from data
+    if (tradeSuggestionsData[executionId]) {
+        tradeSuggestionsData[executionId].suggestions = tradeSuggestionsData[executionId].suggestions.filter(
+            s => s.trade_id !== tradeId
+        );
+        
+        // If no more suggestions for this execution, remove it
+        if (tradeSuggestionsData[executionId].suggestions.length === 0) {
+            delete tradeSuggestionsData[executionId];
+        }
+    }
+    
+    // Re-render table
+    renderTradeSuggestionsSection(tradeSuggestionsData);
+    updateSuggestionsCount(Object.keys(tradeSuggestionsData).length);
+}
+
+/**
+ * Accept all suggestions
+ */
+async function acceptAllSuggestions() {
+    try {
+        window.Logger?.info('✅ Accepting all suggestions...', { page: "executions" });
+        
+        const assignments = [];
+        Object.keys(tradeSuggestionsData).forEach(executionId => {
+            const data = tradeSuggestionsData[executionId];
+            // Get the highest score suggestion for each execution
+            if (data.suggestions && data.suggestions.length > 0) {
+                const bestSuggestion = data.suggestions[0]; // Already sorted by score
+                assignments.push({
+                    execution_id: parseInt(executionId),
+                    trade_id: bestSuggestion.trade_id
+                });
+            }
+        });
+        
+        if (assignments.length === 0) {
+            if (typeof window.showInfoNotification === 'function') {
+                window.showInfoNotification('אין המלצות', 'אין המלצות זמינות לאישור');
+            }
+            return;
+        }
+        
+        // Batch assign
+        const response = await fetch('/api/executions/batch-assign', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ assignments })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || 'Failed to assign executions');
+        }
+        
+        const result = await response.json();
+        
+        // Show success notification
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification(
+                'שיוך הושלם',
+                `שויכו ${result.summary.success} ביצועים מתוך ${result.summary.total}`
+            );
+        }
+        
+        // Reload suggestions
+        await loadTradeSuggestionsForAll();
+        
+        // Reload executions table
+        if (typeof window.loadExecutionsData === 'function') {
+            await window.loadExecutionsData();
+        }
+        
+    } catch (error) {
+        window.Logger?.error('❌ Error accepting all suggestions:', error, { page: "executions" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בשיוך מרוכז', error.message);
+        }
+    }
+}
+
+/**
+ * Reject all suggestions
+ */
+function rejectAllSuggestions() {
+    window.Logger?.info('❌ Rejecting all suggestions...', { page: "executions" });
+    
+    // Clear all suggestions
+    tradeSuggestionsData = {};
+    tradeSuggestionsFlatList = [];
+    renderTradeSuggestionsSection({});
+    updateSuggestionsCount(0);
+    
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('המלצות נדחו', 'כל ההמלצות נדחו');
+    }
+}
+
+/**
+ * Apply selected suggestions
+ */
+async function applySelectedSuggestions() {
+    try {
+        window.Logger?.info('✅ Applying selected suggestions...', { page: "executions" });
+        
+        // Get all checked suggestions
+        const checkedBoxes = document.querySelectorAll('.suggestion-checkbox:checked');
+        
+        if (checkedBoxes.length === 0) {
+            if (typeof window.showInfoNotification === 'function') {
+                window.showInfoNotification('אין בחירות', 'אנא סמן המלצות לשיוך');
+            }
+            return;
+        }
+        
+        const assignments = [];
+        checkedBoxes.forEach(checkbox => {
+            const executionId = parseInt(checkbox.getAttribute('data-execution-id'));
+            const tradeId = parseInt(checkbox.getAttribute('data-trade-id'));
+            assignments.push({
+                execution_id: executionId,
+                trade_id: tradeId
+            });
+        });
+        
+        // Batch assign
+        const response = await fetch('/api/executions/batch-assign', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ assignments })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || 'Failed to assign executions');
+        }
+        
+        const result = await response.json();
+        
+        // Show success notification
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification(
+                'שיוך הושלם',
+                `שויכו ${result.summary.success} ביצועים מתוך ${result.summary.total}`
+            );
+        }
+        
+        // Reload suggestions
+        await loadTradeSuggestionsForAll();
+        
+        // Reload executions table
+        if (typeof window.loadExecutionsData === 'function') {
+            await window.loadExecutionsData();
+        }
+        
+    } catch (error) {
+        window.Logger?.error('❌ Error applying selected suggestions:', error, { page: "executions" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בשיוך נבחרים', error.message);
+        }
+    }
+}
+
+// Export functions to global scope
+/**
+ * Open trade details modal
+ * Helper function to open trade details modal from suggestion table
+ */
+function openTradeDetailsModal(tradeId) {
+    if (window.entityDetailsModal && window.entityDetailsModal.show) {
+        window.entityDetailsModal.show('trade', tradeId, { mode: 'view' });
+    } else if (window.showEntityDetailsModal) {
+        window.showEntityDetailsModal('trade', tradeId, { mode: 'view' });
+    } else if (window.showEntityDetails) {
+        window.showEntityDetails('trade', tradeId, { mode: 'view' });
+    } else {
+        window.Logger?.warn('No entity details modal function available', { page: "executions" });
+    }
+}
+
+/**
+ * Get flat data array for sorting
+ * Converts the nested suggestionsData structure to a flat array of rows
+ * This function creates a flat array where each item represents one row in the table
+ */
+function getTradeSuggestionsFlatData() {
+    if (tradeSuggestionsFlatList && tradeSuggestionsFlatList.length > 0) {
+        return tradeSuggestionsFlatList.map(item => ({ ...item }));
+    }
+    tradeSuggestionsFlatList = buildTradeSuggestionsFlatList(tradeSuggestionsData);
+    return tradeSuggestionsFlatList.map(item => ({ ...item }));
+}
+
+/**
+ * Sort trade suggestions table
+ * Wrapper for sortTableData with custom column value resolution
+ */
+async function sortTradeSuggestionsTable(columnIndex, data, tableType, updateFunction) {
+    // Use the standard sortTableData function
+    if (window.sortTableData) {
+        return await window.sortTableData(columnIndex, data, tableType, updateFunction);
+    }
+    return data;
+}
+
+/**
+ * Update trade suggestions table after sorting
+ */
+function updateTradeSuggestionsTable(sortedData) {
+    // Convert flat sorted data back to nested structure while preserving order
+    const newSuggestionsData = {};
+    sortedData.forEach(item => {
+        const executionId = item.execution_id.toString();
+        if (!newSuggestionsData[executionId]) {
+            newSuggestionsData[executionId] = {
+                execution: item.execution,
+                suggestions: []
+            };
+        }
+        newSuggestionsData[executionId].suggestions.push(item.suggestion);
+    });
+    
+    // Update global data representations
+    tradeSuggestionsData = newSuggestionsData;
+    tradeSuggestionsFlatList = sortedData.map(item => ({ ...item }));
+    
+    // Re-render table in the sorted order
+    renderTradeSuggestionsSection(newSuggestionsData, sortedData);
+}
+
+window.loadTradeSuggestionsForAll = loadTradeSuggestionsForAll;
+window.renderTradeSuggestionsSection = renderTradeSuggestionsSection;
+window.toggleAllSuggestions = toggleAllSuggestions;
+window.acceptSuggestion = acceptSuggestion;
+window.rejectSuggestion = rejectSuggestion;
+window.getTradeSuggestionsFlatData = getTradeSuggestionsFlatData;
+window.sortTradeSuggestionsTable = sortTradeSuggestionsTable;
+window.updateTradeSuggestionsTable = updateTradeSuggestionsTable;
+window.openTradeDetailsModal = openTradeDetailsModal;
+window.acceptAllSuggestions = acceptAllSuggestions;
+window.rejectAllSuggestions = rejectAllSuggestions;
+window.applySelectedSuggestions = applySelectedSuggestions;
+
+/**
+ * Initialize pagination for trade suggestions table
+ */
+function initializeTradeSuggestionsPagination(data) {
+    const suggestionsArray = Array.isArray(data) ? data : [];
+
+    if (!window.createPagination) {
+        renderTradeSuggestionsPageRows(suggestionsArray);
+        return;
+    }
+
+    if (!tradeSuggestionsPaginationInstance) {
+        tradeSuggestionsPaginationInstance = window.createPagination('tradeSuggestionsTable', {
+            showPageSizeSelector: true,
+            showNavigation: true,
+            onPageChange: (pageData) => {
+                renderTradeSuggestionsPageRows(pageData);
+            },
+            onPageSizeChange: () => {
+                if (tradeSuggestionsPaginationInstance) {
+                    renderTradeSuggestionsPageRows(tradeSuggestionsPaginationInstance.getCurrentPageData());
+                }
+            }
+        });
+    }
+
+    tradeSuggestionsPaginationInstance.setData(suggestionsArray);
+    const currentPageData = tradeSuggestionsPaginationInstance.getCurrentPageData();
+    renderTradeSuggestionsPageRows(currentPageData);
+}
+
+/**
+ * Render table rows for current pagination page
+ */
+function renderTradeSuggestionsPageRows(pageData) {
+    const table = document.getElementById('tradeSuggestionsTable');
+    if (!table) {
+        return;
+    }
+    const tbody = table.querySelector('#tradeSuggestionsTableBody') || table.querySelector('tbody');
+    if (!tbody) {
+        return;
+    }
+
+    const selectAllCheckbox = document.getElementById('selectAllSuggestions');
+
+    if (!Array.isArray(pageData) || pageData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted">אין המלצות זמינות</td></tr>';
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+        }
+        return;
+    }
+
+    const rows = [];
+    let lastExecutionId = null;
+    pageData.forEach(item => {
+        const executionId = item.execution_id;
+        const execution = item.execution || (tradeSuggestionsData[executionId]?.execution ?? {});
+        const suggestion = item.suggestion;
+        if (!suggestion) {
+            return;
+        }
+        const showExecutionInfo = executionId !== lastExecutionId;
+        rows.push(buildTradeSuggestionRow(executionId, execution, suggestion, showExecutionInfo));
+        lastExecutionId = executionId;
+    });
+
+    tbody.innerHTML = rows.join('');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = false;
+    }
+}
+
+/**
+ * Build flat list of trade suggestions with sorting fields
+ */
+function buildTradeSuggestionsFlatList(sourceData) {
+    const parseDateToTimestamp = (value) => {
+        if (!value && value !== 0) {
+            return null;
+        }
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            return value;
+        }
+        if (value instanceof Date) {
+            return value.getTime();
+        }
+        if (typeof value === 'string') {
+            const trimmed = value.trim();
+            if (!trimmed) {
+                return null;
+            }
+
+            const dateMatch = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+            if (dateMatch) {
+                const datePart = dateMatch[1];
+                const timestamp = Date.parse(`${datePart}T00:00:00Z`);
+                if (!Number.isNaN(timestamp)) {
+                    return timestamp;
+                }
+            }
+
+            const parsed = Date.parse(trimmed);
+            if (!Number.isNaN(parsed)) {
+                const normalized = new Date(parsed);
+                normalized.setHours(0, 0, 0, 0);
+                return normalized.getTime();
+            }
+
+            return null;
+        }
+        return null;
+    };
+
+    const resolveTimezone = () => {
+        if (window.currentPreferences?.timezone) {
+            return window.currentPreferences.timezone;
+        }
+        if (window.PreferencesSystem?.manager?.currentPreferences?.timezone) {
+            return window.PreferencesSystem.manager.currentPreferences.timezone;
+        }
+        try {
+            return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+        } catch {
+            return 'UTC';
+        }
+    };
+
+    const createDateEnvelope = (value) => {
+        if (window.tableMappings?.buildDateEnvelope) {
+            return window.tableMappings.buildDateEnvelope(value, { timezone: resolveTimezone() });
+        }
+
+        const timestamp = parseDateToTimestamp(value);
+        if (timestamp === null) {
+            return null;
+        }
+        const utc = new Date(timestamp).toISOString();
+        const timezone = resolveTimezone();
+        const local = typeof value === 'string' && value.trim() ? value : utc;
+        let display = '-';
+        try {
+            if (typeof window.formatDate === 'function') {
+                display = window.formatDate(local);
+            } else {
+                display = new Date(timestamp).toLocaleDateString('he-IL');
+            }
+        } catch {
+            display = new Date(timestamp).toISOString().split('T')[0];
+        }
+        return {
+            utc,
+            epochMs: timestamp,
+            local,
+            timezone,
+            display
+        };
+    };
+
+    const flatData = [];
+    if (!sourceData) {
+        return flatData;
+    }
+    Object.keys(sourceData).forEach(executionId => {
+        const data = sourceData[executionId];
+        if (data?.suggestions && Array.isArray(data.suggestions)) {
+            const executionEnvelope = createDateEnvelope(data.execution?.date);
+            data.suggestions.forEach(suggestion => {
+                const tradeDateRaw = suggestion.created_at ||
+                    suggestion.opened_at ||
+                    suggestion.open_date ||
+                    suggestion.start_date;
+                const tradeEnvelope = createDateEnvelope(tradeDateRaw);
+                flatData.push({
+                    execution_id: parseInt(executionId, 10),
+                    execution: data.execution,
+                    suggestion,
+                    // Fields for sorting (must match TABLE_COLUMN_MAPPINGS)
+                    score: suggestion.score || 0,
+                    execution_date: executionEnvelope,
+                    trade_id: suggestion.trade_id || 0,
+                    account_name: suggestion.account_name || '',
+                    trade_created_at: tradeEnvelope,
+                    trade_created_at_epoch: tradeEnvelope?.epochMs ?? null,
+                    status: suggestion.status || '',
+                    side: suggestion.side || '',
+                    investment_type: suggestion.investment_type || '',
+                    match_reasons_text: Array.isArray(suggestion.match_reasons) ? suggestion.match_reasons.join(', ') : (suggestion.match_reasons || '')
+                });
+            });
+        }
+    });
+    return flatData;
+}

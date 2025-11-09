@@ -137,8 +137,16 @@ window.loadNotesData = async function() {
     if (countElement) {
       countElement.textContent = `${window.notesData.length} הערות`;
     }
+    
+    // Register table with UnifiedTableSystem after data is loaded
+    if (typeof window.registerNotesTables === 'function') {
+      window.registerNotesTables();
+    }
 
-    window.Logger.info('✅ loadNotesData הושלם בהצלחה', { page: "notes" });
+    // Restore page state (filters, sort, sections, entity filters)
+    await restorePageState('notes');
+
+    window.Logger.info('✅ loadNotesData הושלם בהצלחה', { page: "notes", keepInfo: true });
 
   } catch (error) {
     window.Logger.error('❌ שגיאה ב-loadNotesData:', error, { page: "notes" });
@@ -287,7 +295,28 @@ async function deleteNote(id) {
       const contentPreview = note.content ? 
         note.content.replace(/<[^>]*>/g, '').substring(0, 100) + (note.content.length > 100 ? '...' : '') :
         'ללא תוכן';
-      const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(note.created_at)
+        : note.created_at;
+      const date = createdEnvelope
+        ? (window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(createdEnvelope, { includeTime: false })
+            : window.FieldRendererService?.renderDate
+              ? window.FieldRendererService.renderDate(createdEnvelope)
+              : (function fallbackDateDisplay(value) {
+                  try {
+                    const parsed = new Date(
+                      value?.utc || value?.local || value
+                    );
+                    if (!Number.isNaN(parsed.getTime())) {
+                      return parsed.toLocaleDateString('he-IL');
+                    }
+                  } catch (err) {
+                    window.Logger?.warn('⚠️ fallbackDateDisplay failed', { err, value }, { page: 'notes' });
+                  }
+                  return 'לא מוגדר';
+                })(createdEnvelope))
+        : 'לא מוגדר';
       const attachment = note.attachment ? `📎 ${note.attachment}` : 'ללא קובץ מצורף';
       
       noteDetails = `${relatedDisplay} - תוכן: ${contentPreview}, תאריך: ${date}, ${attachment}`;
@@ -478,7 +507,27 @@ function updateNotesTable(notes) {
 
       // בניית שורות הטבלה
       const rows = notes.map(note => {
-        const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+        const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+          ? window.dateUtils.ensureDateEnvelope(note.created_at)
+          : note.created_at;
+        const dateDisplay = window.FieldRendererService?.renderDate
+          ? window.FieldRendererService.renderDate(createdEnvelope || note.created_at)
+          : window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(createdEnvelope || note.created_at, { includeTime: false })
+            : (() => {
+                try {
+                  const parsed = new Date(createdEnvelope?.utc || createdEnvelope?.local || note.created_at);
+                  if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleDateString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ notes table date fallback failed', { error, noteId: note?.id }, { page: 'notes' });
+                }
+                return 'לא מוגדר';
+              })();
+        const dateSortValue = window.dateUtils?.getEpochMilliseconds
+          ? window.dateUtils.getEpochMilliseconds(createdEnvelope || note.created_at)
+          : (createdEnvelope?.epochMs || createdEnvelope?.utc || createdEnvelope?.local || note.created_at || '');
 
         // הצגת תוכן HTML עם הגבלה ל-20 תווים
         const contentDisplay = (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function')
@@ -650,17 +699,16 @@ function updateNotesTable(notes) {
       }
 
         return `
-          <tr style='cursor: pointer;'>
+          <tr class="table-cell-clickable">
           <td class="related-cell">${relatedCellHtml}</td>
             <td>${contentDisplay}</td>
-            <td data-date='${note.created_at}'>${date}</td>
+            <td data-date='${dateSortValue}'>${dateDisplay}</td>
             <td>${attachmentDisplay}</td>
             <td class='actions-cell'>
               ${(() => {
                 if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
                 const result = window.createActionsMenu([
                   { type: 'VIEW', onclick: `window.showEntityDetails('note', ${note.id}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
-                  { type: 'LINK', onclick: `viewLinkedItemsForNote(${note.id})`, title: 'צפה בפריטים מקושרים' },
                   { type: 'EDIT', onclick: `editNote(${note.id})`, title: 'ערוך הערה' },
                   { type: 'DELETE', onclick: `deleteNote(${note.id})`, title: 'מחק הערה' }
                 ]);
@@ -672,7 +720,7 @@ function updateNotesTable(notes) {
       }).join('');
 
       tbody.innerHTML = rows;
-      window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes" });
+      window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes", keepInfo: true });
       window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
 
       // עדכון table-count ו-info-summary
@@ -800,13 +848,43 @@ function populateSelect(selectId, data, field, prefix = '') {
       // עבור טרייד: סימבול + תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
       const date = item.created_at || item.date;
-      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(date) : date;
+      const formattedDate = dateEnvelope
+        ? (window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(dateEnvelope, { includeTime: false })
+            : (() => {
+                try {
+                  const parsed = new Date(dateEnvelope?.utc || dateEnvelope?.local || date);
+                  if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleDateString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ populateSelect trade date fallback failed', { error, itemId: item?.id }, { page: 'notes' });
+                }
+                return 'לא מוגדר';
+              })())
+        : 'לא מוגדר';
       displayText = `${symbol} - ${formattedDate}`;
     } else if (prefix === 'תכנון') {
       // עבור תכנון: סימבול + תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
       const date = item.created_at || item.date;
-      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(date) : date;
+      const formattedDate = dateEnvelope
+        ? (window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(dateEnvelope, { includeTime: false })
+            : (() => {
+                try {
+                  const parsed = new Date(dateEnvelope?.utc || dateEnvelope?.local || date);
+                  if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleDateString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ populateSelect plan date fallback failed', { error, itemId: item?.id }, { page: 'notes' });
+                }
+                return 'לא מוגדר';
+              })())
+        : 'לא מוגדר';
       displayText = `${symbol} - ${formattedDate}`;
     } else {
       // עבור טיקר: רק סימבול
@@ -1989,7 +2067,27 @@ async function loadNoteForViewing(noteId) {
     // מילוי המודל
     document.getElementById('viewNoteRelated').textContent = getNoteRelatedDisplay(note);
     document.getElementById('viewNoteContent').innerHTML = note.content || 'ללא תוכן';
-    document.getElementById('viewNoteCreated').textContent = note.created_at ? new Date(note.created_at).toLocaleString('he-IL') : 'לא מוגדר';
+    const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(note.created_at)
+      : note.created_at;
+    const createdDisplay = createdEnvelope
+      ? (window.dateUtils?.formatDateTime
+          ? window.dateUtils.formatDateTime(createdEnvelope)
+          : window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(createdEnvelope, { includeTime: true })
+            : (() => {
+                try {
+                  const parsed = new Date(createdEnvelope?.utc || createdEnvelope?.local || note.created_at);
+                  if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ viewNote created fallback failed', { error, noteId }, { page: 'notes' });
+                }
+                return 'לא מוגדר';
+              })())
+      : 'לא מוגדר';
+    document.getElementById('viewNoteCreated').textContent = createdDisplay;
 
     // הצגת קובץ מצורף
     const attachmentElement = document.getElementById('viewNoteAttachment');
@@ -2258,6 +2356,103 @@ function replaceCurrentAttachment() {
 window.editNote = editNote;
 // Note: deleteNote and saveNote removed - using ModalManagerV2 and confirmDeleteNote instead
 // REMOVED: window.viewLinkedItems - use window.viewLinkedItems or window.viewLinkedItemsForNote from linked-items.js instead
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('notes', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('notes');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register notes table with UnifiedTableSystem
+ * This function registers the notes table for unified sorting and filtering
+ */
+window.registerNotesTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "notes" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register notes table
+    window.UnifiedTableSystem.registry.register('notes', {
+        dataGetter: () => {
+            return window.notesData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateNotesTable === 'function') {
+                window.updateNotesTable(data);
+            }
+        },
+        tableSelector: '#notesTable',
+        columns: getColumns('notes'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};
 window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (שורה 2240)', { page: "notes" });
 // ייצוא ישיר של הפונקציה המקורית - ללא wrapper כדי למנוע רקורסיה
 window.updateNotesTable = updateNotesTable;

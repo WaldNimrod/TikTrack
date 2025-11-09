@@ -121,7 +121,6 @@
                         <div class="table-count" id="tradesCount">טוען...</div>
                         <div class="table-actions">
                             <button data-button-type="ADD" data-entity-type="trade" data-variant="full" data-onclick="window.showModalSafe('tradesModal','add')" data-text="הוסף טרייד" title="הוסף טרייד חדש"></button>
-                            <button data-button-type="REFRESH" data-variant="small" data-onclick="refreshPositions()" data-text="רענן פוזיציות" title="רענן נתוני פוזיציה מהשרת"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר אזור הטריידים שלי"></button>
                         </div>
                     </div>
@@ -159,17 +158,14 @@
                                         <th class="col-side">
                                             <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trades', 8)">צד <span class="sort-icon">↕</span></button>
                                         </th>
-                                        <th class="col-plan">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trades', 9)">תוכנית <span class="sort-icon">↕</span></button>
-                                        </th>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trades', 10)">חשבון מסחר <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trades', 9)">חשבון מסחר <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trades', 11)">נוצר ב <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trades', 10)">נוצר ב <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-closed">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trades', 12)">נסגר ב <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trades', 11)">נסגר ב <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-items">
                                         </th>

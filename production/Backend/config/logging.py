@@ -8,10 +8,16 @@ from typing import Optional
 def setup_logging() -> logging.Logger:
     """Setup logging system"""
     
-    # Production environment - always use logs directory (not logs-production)
-    # This file is in production/Backend/, so we're always in production mode
-    # Logs directory is relative to Backend/ directory
-    log_dir = Path("logs")
+    # Determine log directory based on environment
+    import os
+    ENVIRONMENT = os.getenv('TIKTRACK_ENV', 'development').lower()
+    IS_PRODUCTION = ENVIRONMENT == 'production'
+    
+    # Create logs directory - different for production vs development
+    if IS_PRODUCTION:
+        log_dir = Path("logs-production")
+    else:
+        log_dir = Path("logs")
     
     log_dir.mkdir(exist_ok=True)
     
@@ -98,9 +104,15 @@ def get_cache_logger() -> logging.Logger:
     
     # Only add handler if it doesn't exist
     if not cache_logger.handlers:
-        # Production environment - always use logs directory
-        # This file is in production/Backend/, so we're always in production mode
-        log_dir = Path("logs")
+        # Determine log directory based on environment
+        import os
+        ENVIRONMENT = os.getenv('TIKTRACK_ENV', 'development').lower()
+        IS_PRODUCTION = ENVIRONMENT == 'production'
+        
+        if IS_PRODUCTION:
+            log_dir = Path("logs-production")
+        else:
+            log_dir = Path("logs")
         
         log_dir.mkdir(exist_ok=True)
         

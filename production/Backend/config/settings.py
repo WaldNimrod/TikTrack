@@ -1,37 +1,48 @@
 import os
 from pathlib import Path
 
-# Production environment - always production mode when in production/Backend/
-# This file is in production/Backend/, so we're always in production mode
-IS_PRODUCTION = True
-ENVIRONMENT = 'production'
+# Environment detection - check if production mode is requested
+ENVIRONMENT = os.getenv('TIKTRACK_ENV', 'development').lower()  # 'development' or 'production'
+IS_PRODUCTION = ENVIRONMENT == 'production'
 
 # Paths
-BASE_DIR = Path(__file__).parent.parent  # production/Backend/
+BASE_DIR = Path(__file__).parent.parent
 
-# Database path - always production database
-DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"
+# Database path - different for production vs development
+if IS_PRODUCTION:
+    DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"  # Production database
+else:
+    DB_PATH = BASE_DIR / "db" / "simpleTrade_new.db"  # Development database
 
-# UI directory - production has its own trading-ui directory
-# Go up from production/Backend/ to production/, then to trading-ui
 UI_DIR = BASE_DIR.parent / "trading-ui"
 
 # Flask settings
 DEBUG = False
 HOST = '127.0.0.1'
 
-# Port - always production port
-PORT = 5001
+# Port - different for production vs development
+if IS_PRODUCTION:
+    PORT = 5001  # Production port
+else:
+    PORT = 8080  # Development port
 
-# Production mode settings - always production
-DEVELOPMENT_MODE = False
-# Temporarily align production server behaviour with development by disabling server-side cache.
-# Can be re-enabled by setting TIKTRACK_CACHE_DISABLED=false.
-CACHE_DISABLED = os.getenv('TIKTRACK_CACHE_DISABLED', 'true').lower() == 'true'
+# Development/Production settings
+if IS_PRODUCTION:
+    # Production mode settings
+    DEVELOPMENT_MODE = False
+    CACHE_DISABLED = False  # Cache enabled in production for performance
+else:
+    # Development mode settings
+    DEVELOPMENT_MODE = os.getenv('TIKTRACK_DEV_MODE', 'true').lower() == 'true'
+    CACHE_DISABLED = os.getenv('TIKTRACK_CACHE_DISABLED', 'true').lower() == 'true'
 
 # Cache settings
-# In production, cache is always enabled and uses default TTL
-DEFAULT_CACHE_TTL = 300  # 5 minutes - standard production cache
+if DEVELOPMENT_MODE:
+    # מצב פיתוח - Cache מופחת
+    DEFAULT_CACHE_TTL = 10  # 10 שניות במקום 300
+else:
+    # מצב ייצור - Cache רגיל
+    DEFAULT_CACHE_TTL = 300  # 5 דקות
 
 # Cache enabled/disabled setting applies to both modes
 CACHE_ENABLED = not CACHE_DISABLED

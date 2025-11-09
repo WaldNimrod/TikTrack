@@ -356,6 +356,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
 
   // בדיקת פריטים מקושרים לפני הביטול
   try {
+    // Use relative URL to work with both development (8080) and production (5001)
     const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
 
     if (response.ok) {
@@ -401,6 +402,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
  */
 async function performItemCancellation(itemType, itemId, _itemName) {
   try {
+    // Use relative URL to work with both development (8080) and production (5001)
     let response;
     const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
       ? window.LinkedItemsService.getEntityLabel(itemType) 

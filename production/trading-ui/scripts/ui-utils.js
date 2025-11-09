@@ -383,6 +383,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
 
   // בדיקת פריטים מקושרים לפני הביטול
   try {
+    // Use relative URL to work with both development (8080) and production (5001)
     const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
 
     if (response.ok) {
@@ -428,6 +429,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
  */
 async function performItemCancellation(itemType, itemId, _itemName) {
   try {
+    // Use relative URL to work with both development (8080) and production (5001)
     let response;
     const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
       ? window.LinkedItemsService.getEntityLabel(itemType) 
@@ -952,8 +954,21 @@ window.toggleSection = function (sectionId) {
                 // Save state for other sections too
                 const otherSectionId = otherSection.getAttribute('data-section') || otherSection.id;
                 if (otherSectionId) {
-                  const otherStorageKey = `${pageName}_${otherSectionId}_SectionHidden`;
-                  localStorage.setItem(otherStorageKey, 'true');
+                  // Save state via PageStateManager if available
+                  if (window.PageStateManager && window.PageStateManager.initialized) {
+                    window.PageStateManager.loadSections(pageName).then(async (sections) => {
+                      sections[otherSectionId] = true;
+                      await window.PageStateManager.saveSections(pageName, sections);
+                    }).catch(() => {
+                      // Fallback ל-localStorage
+                      const otherStorageKey = `${pageName}_${otherSectionId}_SectionHidden`;
+                      localStorage.setItem(otherStorageKey, 'true');
+                    });
+                  } else {
+                    // Fallback ל-localStorage
+                    const otherStorageKey = `${pageName}_${otherSectionId}_SectionHidden`;
+                    localStorage.setItem(otherStorageKey, 'true');
+                  }
                 }
               }
             }
@@ -981,12 +996,31 @@ window.toggleSection = function (sectionId) {
         }
       }
 
-      // Save state with page-specific key
+      // Save state via PageStateManager if available
       const isHidden = sectionBody.style.display === 'none';
-      const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-      localStorage.setItem(storageKey, isHidden.toString());
-      if (DEBUG_MODE) {
-        console.debug(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`);
+      if (window.PageStateManager && window.PageStateManager.initialized) {
+        // טעינת מצב נוכחי ועדכון
+        window.PageStateManager.loadSections(pageName).then(async (sections) => {
+          sections[sectionId] = isHidden;
+          await window.PageStateManager.saveSections(pageName, sections);
+          if (DEBUG_MODE) {
+            console.debug(`💾 State saved via PageStateManager: ${sectionId} = "${isHidden}"`);
+          }
+        }).catch(err => {
+          // Fallback ל-localStorage
+          const storageKey = `${pageName}_${sectionId}_SectionHidden`;
+          localStorage.setItem(storageKey, isHidden.toString());
+          if (DEBUG_MODE) {
+            console.debug(`💾 State saved to localStorage (fallback): ${storageKey} = "${isHidden}"`);
+          }
+        });
+      } else {
+        // Fallback ל-localStorage רק אם PageStateManager לא זמין
+        const storageKey = `${pageName}_${sectionId}_SectionHidden`;
+        localStorage.setItem(storageKey, isHidden.toString());
+        if (DEBUG_MODE) {
+          console.debug(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`);
+        }
       }
       
     } else {
@@ -1017,7 +1051,7 @@ window.toggleSection = function (sectionId) {
  * Works with the unified section toggle system
  * UPDATED: Now uses page-specific localStorage keys
  */
-window.restoreAllSectionStates = function () {
+window.restoreAllSectionStates = async function () {
   if (window.Logger) {
     window.Logger.debug('🔧 restoreAllSectionStates called', { page: 'ui-utils' });
   }
@@ -1030,6 +1064,22 @@ window.restoreAllSectionStates = function () {
   const pageName = getCurrentPageName();
   if (window.Logger) {
     window.Logger.debug(`🔧 restoreAllSectionStates called for page: "${pageName}"`, { page: 'ui-utils' });
+  }
+  
+  // טעינת מצב סקשנים דרך PageStateManager אם זמין
+  let sectionsState = {};
+  if (window.PageStateManager && window.PageStateManager.initialized) {
+    try {
+      sectionsState = await window.PageStateManager.loadSections(pageName);
+      if (window.Logger) {
+        window.Logger.debug(`💾 Loaded sections state via PageStateManager for "${pageName}":`, sectionsState, { page: "ui-utils" });
+      }
+    } catch (err) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ Failed to load sections via PageStateManager, using localStorage fallback', err, { page: "ui-utils" });
+      }
+      // Fallback ל-localStorage - נטען בהמשך
+    }
   }
   
   // Check for accordion mode (only one section open at a time)
@@ -1070,22 +1120,27 @@ window.restoreAllSectionStates = function () {
     if (window.Logger) { window.Logger.debug(`🔧 Processing section ${index + 1}/${sections.length}: ID="${sectionId}"`, { page: "ui-utils" }); }
 
     if (sectionBody && sectionId) {
-      // Check localStorage for saved state with page-specific key
-      const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-      const isHidden = localStorage.getItem(storageKey) === 'true';
-      if (window.Logger) { window.Logger.debug(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isHidden}`, { page: "ui-utils" }); }
+      // בדיקת מצב שמור - קודם מ-PageStateManager, אחר כך fallback ל-localStorage
+      let isHidden = false;
+      if (sectionsState && sectionsState.hasOwnProperty(sectionId)) {
+        isHidden = sectionsState[sectionId] === true;
+        if (window.Logger) { window.Logger.debug(`💾 Retrieved state from PageStateManager for "${sectionId}": hidden=${isHidden}`, { page: "ui-utils" }); }
+      } else {
+        // Fallback ל-localStorage
+        const storageKey = `${pageName}_${sectionId}_SectionHidden`;
+        isHidden = localStorage.getItem(storageKey) === 'true';
+        if (window.Logger) { window.Logger.debug(`💾 Retrieved state from localStorage for "${sectionId}": hidden=${isHidden}`, { page: "ui-utils" }); }
+      }
 
       if (accordionMode) {
         // In accordion mode, only one section should be open
         // If no state is saved (null), respect HTML default (closed)
-        const storageKeyValue = localStorage.getItem(storageKey);
-        const hasSavedState = storageKeyValue !== null;
+        const hasSavedState = sectionsState && sectionsState.hasOwnProperty(sectionId) || localStorage.getItem(`${pageName}_${sectionId}_SectionHidden`) !== null;
         const shouldBeOpen = hasSavedState && isHidden === false;
         
         if (window.Logger) {
           window.Logger.debug(`🔍 ACCORDION DEBUG for "${sectionId}":`, { 
             page: "ui-utils",
-            storageKeyValue: storageKeyValue,
             hasSavedState: hasSavedState,
             isHidden: isHidden,
             shouldBeOpen: shouldBeOpen,
@@ -1124,8 +1179,7 @@ window.restoreAllSectionStates = function () {
         }
       } else {
         // Normal mode - restore each section independently
-        const storageKeyValue = localStorage.getItem(storageKey);
-        const hasSavedStateInNormalMode = storageKeyValue !== null;
+        const hasSavedStateInNormalMode = sectionsState && sectionsState.hasOwnProperty(sectionId) || localStorage.getItem(`${pageName}_${sectionId}_SectionHidden`) !== null;
         
         if (hasSavedStateInNormalMode) {
           // Has saved state - restore it
@@ -1519,11 +1573,33 @@ function toggleTopSection(sectionId = 'top-section') {
     if (window.Logger) { window.Logger.debug(`📁 Collapsed section: ${sectionId}`, { page: "ui-utils" }); }
   }
   
-  // Save state to localStorage with page-specific key
+  // Save state via PageStateManager if available
   const pageName = getCurrentPageName();
-  const storageKey = `${pageName}_${sectionId}_collapsed`;
-  localStorage.setItem(storageKey, (!isCollapsed).toString());
-  if (window.Logger) { window.Logger.debug(`💾 Top section state saved: ${storageKey} = "${!isCollapsed}"`, { page: "ui-utils" }); }
+  const isHidden = !isCollapsed;
+  if (window.PageStateManager && window.PageStateManager.initialized) {
+    // טעינת מצב נוכחי ועדכון
+    window.PageStateManager.loadSections(pageName).then(async (sections) => {
+      sections[sectionId] = isHidden;
+      await window.PageStateManager.saveSections(pageName, sections);
+      if (window.Logger) {
+        window.Logger.debug(`💾 Top section state saved via PageStateManager: ${sectionId} = "${isHidden}"`, { page: "ui-utils" });
+      }
+    }).catch(err => {
+      // Fallback ל-localStorage
+      const storageKey = `${pageName}_${sectionId}_collapsed`;
+      localStorage.setItem(storageKey, (!isCollapsed).toString());
+      if (window.Logger) {
+        window.Logger.debug(`💾 Top section state saved to localStorage (fallback): ${storageKey} = "${!isCollapsed}"`, { page: "ui-utils" });
+      }
+    });
+  } else {
+    // Fallback ל-localStorage רק אם PageStateManager לא זמין
+    const storageKey = `${pageName}_${sectionId}_collapsed`;
+    localStorage.setItem(storageKey, (!isCollapsed).toString());
+    if (window.Logger) {
+      window.Logger.debug(`💾 Top section state saved to localStorage: ${storageKey} = "${!isCollapsed}"`, { page: "ui-utils" });
+    }
+  }
 }
 
 // toggleSection function removed - use toggleSection('main') instead
@@ -1638,11 +1714,32 @@ function toggleAllSections() {
         if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" COLLAPSED`, { page: "ui-utils" }); }
       }
       
-      // Save state with page-specific key
+      // Save state via PageStateManager if available
       const isHidden = sectionBody.style.display === 'none';
-      const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-      localStorage.setItem(storageKey, isHidden.toString());
-      if (window.Logger) { window.Logger.debug(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`, { page: "ui-utils" }); }
+      if (window.PageStateManager && window.PageStateManager.initialized) {
+        // טעינת מצב נוכחי ועדכון
+        window.PageStateManager.loadSections(pageName).then(async (sections) => {
+          sections[sectionId] = isHidden;
+          await window.PageStateManager.saveSections(pageName, sections);
+          if (window.Logger) {
+            window.Logger.debug(`💾 State saved via PageStateManager: ${sectionId} = "${isHidden}"`, { page: "ui-utils" });
+          }
+        }).catch(err => {
+          // Fallback ל-localStorage
+          const storageKey = `${pageName}_${sectionId}_SectionHidden`;
+          localStorage.setItem(storageKey, isHidden.toString());
+          if (window.Logger) {
+            window.Logger.debug(`💾 State saved to localStorage (fallback): ${storageKey} = "${isHidden}"`, { page: "ui-utils" });
+          }
+        });
+      } else {
+        // Fallback ל-localStorage רק אם PageStateManager לא זמין
+        const storageKey = `${pageName}_${sectionId}_SectionHidden`;
+        localStorage.setItem(storageKey, isHidden.toString());
+        if (window.Logger) {
+          window.Logger.debug(`💾 State saved to localStorage: ${storageKey} = "${isHidden}"`, { page: "ui-utils" });
+        }
+      }
     } else {
       if (window.Logger) { window.Logger.debug(`⚠️ No section body found for section "${sectionId}"`, { page: "ui-utils" }); }
     }
@@ -1655,9 +1752,9 @@ function toggleAllSections() {
 /**
  * Load section states from localStorage
  * Called on page load to restore previous section states
- * UPDATED: Now uses page-specific localStorage keys
+ * UPDATED: Now uses PageStateManager with localStorage fallback
  */
-function loadSectionStates() {
+async function loadSectionStates() {
   // if (window.Logger) { window.Logger.debug(`🔧 loadSectionStates called`, { page: "ui-utils" }); }
   
   const pageName = getCurrentPageName();
@@ -1668,10 +1765,29 @@ function loadSectionStates() {
   
   let restoredCount = 0;
   
+  // טעינת מצב סקשנים דרך PageStateManager אם זמין
+  let sectionsState = {};
+  if (window.PageStateManager && window.PageStateManager.initialized) {
+    try {
+      sectionsState = await window.PageStateManager.loadSections(pageName);
+      // if (window.Logger) { window.Logger.debug(`💾 Loaded sections state via PageStateManager for "${pageName}"`, { page: "ui-utils" }); }
+    } catch (err) {
+      // Fallback ל-localStorage - נטען בהמשך
+    }
+  }
+  
   sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
-    const storageKey = `${pageName}_${sectionId}_SectionHidden`;
-    const isCollapsed = localStorage.getItem(storageKey) === 'true';
+    
+    // בדיקת מצב שמור - קודם מ-PageStateManager, אחר כך fallback ל-localStorage
+    let isCollapsed = false;
+    if (sectionsState && sectionsState.hasOwnProperty(sectionId)) {
+      isCollapsed = sectionsState[sectionId] === true;
+    } else {
+      // Fallback ל-localStorage
+      const storageKey = `${pageName}_${sectionId}_SectionHidden`;
+      isCollapsed = localStorage.getItem(storageKey) === 'true';
+    }
     
     // if (window.Logger) { window.Logger.debug(`💾 Retrieved state for "${sectionId}" on page "${pageName}": hidden=${isCollapsed}`, { page: "ui-utils" }); }
     

@@ -2,8 +2,6 @@
 """
 Import Sessions Cleanup Task
 Cleans up old import sessions (older than 90 days)
-
-This script is production-ready and uses config.settings for database path.
 """
 
 import os
@@ -15,9 +13,6 @@ from pathlib import Path
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
-# Import config settings for production database path
-from config.settings import DB_PATH
-
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from models.import_session import ImportSession
@@ -25,8 +20,8 @@ from models.import_session import ImportSession
 def cleanup_old_import_sessions():
     """Clean up import sessions older than 90 days"""
     
-    # Use production database path from config
-    db_path = DB_PATH
+    # Database path
+    db_path = backend_dir / "db" / "simpleTrade_new.db"
     
     if not db_path.exists():
         print(f"❌ Database not found at: {db_path}")
@@ -74,29 +69,9 @@ def cleanup_old_import_sessions():
         
     except Exception as e:
         print(f"❌ Error cleaning up import sessions: {e}")
-        import traceback
-        traceback.print_exc()
         return False
 
 if __name__ == "__main__":
-    print("=" * 60)
-    print("TikTrack Import Sessions Cleanup")
-    print("=" * 60)
-    print(f"Database: {DB_PATH}")
-    print(f"Cutoff date: {datetime.now() - timedelta(days=90)}")
-    print()
-    
-    success = cleanup_old_import_sessions()
-    
-    if success:
-        print()
-        print("=" * 60)
-        print("✅ Cleanup completed successfully")
-        print("=" * 60)
-    else:
-        print()
-        print("=" * 60)
-        print("❌ Cleanup failed")
-        print("=" * 60)
-        sys.exit(1)
+    cleanup_old_import_sessions()
+
 

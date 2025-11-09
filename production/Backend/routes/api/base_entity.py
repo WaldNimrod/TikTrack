@@ -23,6 +23,9 @@ from flask import jsonify, request
 import logging
 from datetime import datetime
 
+from services.date_normalization_service import DateNormalizationService
+from services.preferences_service import PreferencesService
+
 
 class BaseEntityAPI:
     """
@@ -43,6 +46,7 @@ class BaseEntityAPI:
         self.service_class = service_class
         self.blueprint_name = blueprint_name
         self.logger = logging.getLogger(f"{__name__}.{entity_name}")
+        self.preferences_service = PreferencesService()
     
     # ===== CRUD Operations =====
     
@@ -61,6 +65,7 @@ class BaseEntityAPI:
         See: Cache Architecture Simplification Plan
         """
         try:
+            normalizer = self._get_date_normalizer()
             self.logger.info(f"Getting all {self.entity_name} records")
             
             # Get records from service directly (no cache for CRUD tables)
@@ -85,7 +90,8 @@ class BaseEntityAPI:
                 records = db.query(self.service_class.model).all()
                 data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
             
-            response = self._success_response(data, f"Retrieved {len(data)} {self.entity_name} records")
+            data = normalizer.normalize_output(data)
+            response = self._success_response(normalizer, data, f"Retrieved {len(data)} {self.entity_name} records")
             
             return response, 200
             
@@ -104,6 +110,7 @@ class BaseEntityAPI:
             Tuple of (response_dict, status_code)
         """
         try:
+            normalizer = self._get_date_normalizer()
             self.logger.info(f"Getting {self.entity_name} record with ID: {entity_id}")
             
             # Get record from service
@@ -116,12 +123,13 @@ class BaseEntityAPI:
                 ).first()
             
             if not record:
-                return self._error_response(f"{self.entity_name.title()} with ID {entity_id} not found"), 404
+                return self._error_response(f"{self.entity_name.title()} with ID {entity_id} not found", normalizer), 404
             
             # Convert to dict format
             data = record.to_dict() if hasattr(record, 'to_dict') else record
+            data = normalizer.normalize_output(data)
             
-            return self._success_response(data, f"Retrieved {self.entity_name} record"), 200
+            return self._success_response(normalizer, data, f"Retrieved {self.entity_name} record"), 200
             
         except Exception as e:
             return self._handle_error(e, f"get_by_id_{self.entity_name}")
@@ -138,30 +146,33 @@ class BaseEntityAPI:
             Tuple of (response_dict, status_code)
         """
         try:
+            normalizer = self._get_date_normalizer()
             self.logger.info(f"Creating new {self.entity_name} record")
             
             # Validate required fields
             required_fields = getattr(self.service_class, 'required_fields', [])
             if not self._validate_required_fields(data, required_fields):
-                return self._error_response("Missing required fields"), 400
+                return self._error_response("Missing required fields", normalizer), 400
             
             # Sanitize input
             sanitized_data = self._sanitize_input(data)
+            normalized_data = normalizer.normalize_input_payload(sanitized_data)
             
             # Create record via service
             if hasattr(self.service_class, 'create'):
-                record = self.service_class.create(db, sanitized_data)
+                record = self.service_class.create(db, normalized_data)
             else:
                 # Fallback to direct creation
-                record = self.service_class.model(**sanitized_data)
+                record = self.service_class.model(**normalized_data)
                 db.add(record)
                 db.commit()
                 db.refresh(record)
             
             # Convert to dict format
             result_data = record.to_dict() if hasattr(record, 'to_dict') else record
+            result_data = normalizer.normalize_output(result_data)
             
-            return self._success_response(result_data, f"Created {self.entity_name} record successfully"), 201
+            return self._success_response(normalizer, result_data, f"Created {self.entity_name} record successfully"), 201
             
         except Exception as e:
             db.rollback()
@@ -180,6 +191,7 @@ class BaseEntityAPI:
             Tuple of (response_dict, status_code)
         """
         try:
+            normalizer = self._get_date_normalizer()
             self.logger.info(f"Updating {self.entity_name} record with ID: {entity_id}")
             
             # Check if record exists
@@ -191,17 +203,18 @@ class BaseEntityAPI:
                 ).first()
             
             if not existing_record:
-                return self._error_response(f"{self.entity_name.title()} with ID {entity_id} not found"), 404
+                return self._error_response(f"{self.entity_name.title()} with ID {entity_id} not found", normalizer), 404
             
             # Sanitize input
             sanitized_data = self._sanitize_input(data)
+            normalized_data = normalizer.normalize_input_payload(sanitized_data)
             
             # Update record via service
             if hasattr(self.service_class, 'update'):
-                record = self.service_class.update(db, entity_id, sanitized_data)
+                record = self.service_class.update(db, entity_id, normalized_data)
             else:
                 # Fallback to direct update
-                for key, value in sanitized_data.items():
+                for key, value in normalized_data.items():
                     if hasattr(existing_record, key):
                         setattr(existing_record, key, value)
                 db.commit()
@@ -211,7 +224,9 @@ class BaseEntityAPI:
             # Convert to dict format
             result_data = record.to_dict() if hasattr(record, 'to_dict') else record
             
-            return self._success_response(result_data, f"Updated {self.entity_name} record successfully"), 200
+            result_data = normalizer.normalize_output(result_data)
+            
+            return self._success_response(normalizer, result_data, f"Updated {self.entity_name} record successfully"), 200
             
         except Exception as e:
             db.rollback()
@@ -229,6 +244,7 @@ class BaseEntityAPI:
             Tuple of (response_dict, status_code)
         """
         try:
+            normalizer = self._get_date_normalizer()
             self.logger.info(f"Deleting {self.entity_name} record with ID: {entity_id}")
             
             # Check if record exists
@@ -240,7 +256,7 @@ class BaseEntityAPI:
                 ).first()
             
             if not existing_record:
-                return self._error_response(f"{self.entity_name.title()} with ID {entity_id} not found"), 404
+                return self._error_response(f"{self.entity_name.title()} with ID {entity_id} not found", normalizer), 404
             
             # Delete record via service
             if hasattr(self.service_class, 'delete'):
@@ -250,8 +266,10 @@ class BaseEntityAPI:
                 db.delete(existing_record)
                 db.commit()
             
+            response_payload = normalizer.normalize_output({"deleted_id": entity_id})
             return self._success_response(
-                {"deleted_id": entity_id}, 
+                normalizer,
+                response_payload, 
                 f"Deleted {self.entity_name} record successfully"
             ), 200
             
@@ -274,6 +292,7 @@ class BaseEntityAPI:
             Tuple of (response_dict, status_code)
         """
         try:
+            normalizer = self._get_date_normalizer()
             self.logger.info(f"Searching {self.entity_name} records with query: {query}")
             
             # Use service search if available
@@ -289,8 +308,9 @@ class BaseEntityAPI:
                 data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
             else:
                 data = []
+            data = normalizer.normalize_output(data)
             
-            return self._success_response(data, f"Found {len(data)} {self.entity_name} records"), 200
+            return self._success_response(normalizer, data, f"Found {len(data)} {self.entity_name} records"), 200
             
         except Exception as e:
             return self._handle_error(e, f"search_{self.entity_name}")
@@ -307,14 +327,17 @@ class BaseEntityAPI:
             Tuple of (response_dict, status_code)
         """
         try:
+            normalizer = self._get_date_normalizer()
             self.logger.info(f"Filtering {self.entity_name} records with filters: {filters}")
             
             # Use service filter if available
             if hasattr(self.service_class, 'filter'):
-                records = self.service_class.filter(db, filters)
+                normalized_filters = normalizer.normalize_input_payload(filters)
+                records = self.service_class.filter(db, normalized_filters)
             else:
                 # Fallback to get_all with filters
-                records = self.service_class.get_all(db, filters) if hasattr(self.service_class, 'get_all') else []
+                normalized_filters = normalizer.normalize_input_payload(filters)
+                records = self.service_class.get_all(db, normalized_filters) if hasattr(self.service_class, 'get_all') else []
             
             # Convert to dict format
             if records:
@@ -322,7 +345,8 @@ class BaseEntityAPI:
             else:
                 data = []
             
-            return self._success_response(data, f"Filtered {len(data)} {self.entity_name} records"), 200
+            data = normalizer.normalize_output(data)
+            return self._success_response(normalizer, data, f"Filtered {len(data)} {self.entity_name} records"), 200
             
         except Exception as e:
             return self._handle_error(e, f"filter_{self.entity_name}")
@@ -340,6 +364,7 @@ class BaseEntityAPI:
             Tuple of (response_dict, status_code)
         """
         try:
+            normalizer = self._get_date_normalizer()
             self.logger.info(f"Getting paginated {self.entity_name} records - page {page}, per_page {per_page}")
             
             # Use service pagination if available
@@ -366,7 +391,7 @@ class BaseEntityAPI:
                 data = []
             
             response_data = {
-                'data': data,
+                'data': normalizer.normalize_output(data),
                 'pagination': {
                     'total': result.get('total', 0),
                     'page': result.get('page', page),
@@ -374,13 +399,24 @@ class BaseEntityAPI:
                     'pages': result.get('pages', 0)
                 }
             }
+            response_data = normalizer.normalize_output(response_data)
             
-            return self._success_response(response_data, f"Retrieved {len(data)} {self.entity_name} records"), 200
+            return self._success_response(normalizer, response_data, f"Retrieved {len(data)} {self.entity_name} records"), 200
             
         except Exception as e:
             return self._handle_error(e, f"list_with_pagination_{self.entity_name}")
     
     # ===== Utility Methods =====
+    
+    def _get_date_normalizer(self) -> DateNormalizationService:
+        try:
+            timezone_name = DateNormalizationService.resolve_timezone(
+                request,
+                preferences_service=self.preferences_service
+            )
+        except Exception:
+            timezone_name = "UTC"
+        return DateNormalizationService(timezone_name)
     
     def _handle_error(self, error: Exception, operation: str) -> Tuple[Dict, int]:
         """
@@ -406,9 +442,15 @@ class BaseEntityAPI:
         else:
             status_code = 500
         
-        return self._error_response(f"Failed to {operation}: {error_message}"), status_code
+        normalizer = None
+        try:
+            normalizer = self._get_date_normalizer()
+        except Exception:
+            normalizer = None
+        
+        return self._error_response(f"Failed to {operation}: {error_message}", normalizer), status_code
     
-    def _success_response(self, data: Any, message: str) -> Dict:
+    def _success_response(self, normalizer: Optional[DateNormalizationService], data: Any, message: str) -> Dict:
         """
         Create standardized success response
         
@@ -419,15 +461,20 @@ class BaseEntityAPI:
         Returns:
             Standardized response dictionary
         """
+        timestamp_envelope = None
+        if normalizer:
+            timestamp_envelope = normalizer.now_envelope()
+        else:
+            timestamp_envelope = DateNormalizationService().now_envelope()
         return {
             "status": "success",
             "data": data,
             "message": message,
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": timestamp_envelope,
             "version": "1.0"
         }
     
-    def _error_response(self, message: str) -> Dict:
+    def _error_response(self, message: str, normalizer: Optional[DateNormalizationService] = None) -> Dict:
         """
         Create standardized error response
         
@@ -437,10 +484,14 @@ class BaseEntityAPI:
         Returns:
             Standardized error response dictionary
         """
+        if normalizer:
+            timestamp_envelope = normalizer.now_envelope()
+        else:
+            timestamp_envelope = DateNormalizationService().now_envelope()
         return {
             "status": "error",
             "error": {"message": message},
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": timestamp_envelope,
             "version": "1.0"
         }
     

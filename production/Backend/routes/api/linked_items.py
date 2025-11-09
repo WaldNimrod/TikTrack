@@ -53,11 +53,14 @@ linked_items_bp = Blueprint('linked_items', __name__, url_prefix='/api/linked-it
 # Initialize base API (linked_items is complex, so we'll use it selectively)
 
 def get_db_connection():
-    """Get database connection - uses production DB path from config"""
+    """Get database connection"""
+    import os
     import sqlite3
-    from config.settings import DB_PATH  # Use production DB path
     
-    conn = sqlite3.connect(str(DB_PATH))
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+    
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -187,12 +190,22 @@ def get_linked_items(entity_type: str, entity_id: str) -> Dict[str, Any]:
             # Get list of child types from schema
             child_types = set()
             if 'children' in entity_schema:
-                child_types = set(entity_schema['children'].keys())
+                children = entity_schema['children']
+                if isinstance(children, dict):
+                    child_types = set(children.keys())
+                elif isinstance(children, list):
+                    # If children is a list, it's empty (no children)
+                    child_types = set()
             
             # Get list of parent types from schema
             parent_types = set()
             if 'parents' in entity_schema:
-                parent_types = set(entity_schema['parents'].keys())
+                parents = entity_schema['parents']
+                if isinstance(parents, dict):
+                    parent_types = set(parents.keys())
+                elif isinstance(parents, list):
+                    # If parents is a list, it's empty (no parents)
+                    parent_types = set()
             
             # Separate linked items
             for item in linked_items:

@@ -3,6 +3,8 @@ from config.database import get_db
 from models.note import Note
 from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, invalidate_cache
+from services.date_normalization_service import DateNormalizationService
+from services.preferences_service import PreferencesService
 import logging
 import os
 import uuid
@@ -115,6 +117,19 @@ def cleanup_orphaned_files() -> int:
     finally:
         db.close()
 
+
+def _get_notes_normalizer() -> DateNormalizationService:
+    """Resolve timezone and create a DateNormalizationService for notes endpoints."""
+    try:
+        timezone_name = DateNormalizationService.resolve_timezone(
+            request,
+            preferences_service=PreferencesService()
+        )
+    except Exception as tz_error:
+        logger.warning("⚠️ Unable to resolve timezone in notes endpoint, defaulting to UTC: %s", tz_error)
+        timezone_name = "UTC"
+    return DateNormalizationService(timezone_name)
+
 @notes_bp.route('/', methods=['GET'])
 def get_notes():
     """Get all notes"""
@@ -163,10 +178,14 @@ def get_notes():
                 "version": "1.0"
             }), 500
             
+        normalizer = _get_notes_normalizer()
+        normalized_notes = normalizer.normalize_output(notes_list)
+
         return jsonify({
             "status": "success",
-            "data": notes_list,
+            "data": normalized_notes,
             "message": "Notes retrieved successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except Exception as e:
@@ -189,10 +208,13 @@ def get_note(note_id: int):
         db = next(get_db())
         note = db.query(Note).filter(Note.id == note_id).first()
         if note:
+            normalizer = _get_notes_normalizer()
+            payload = normalizer.normalize_output(note.to_dict())
             return jsonify({
                 "status": "success",
-                "data": note.to_dict(),
+                "data": payload,
                 "message": "Note retrieved successfully",
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             })
         return jsonify({
@@ -302,10 +324,13 @@ def create_note():
         db.add(note)
         db.commit()
         db.refresh(note)
+        normalizer = _get_notes_normalizer()
+        payload = normalizer.normalize_output(note.to_dict())
         return jsonify({
             "status": "success",
-            "data": note.to_dict(),
+            "data": payload,
             "message": "Note created successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 201
     except Exception as e:
@@ -471,10 +496,13 @@ def update_note(note_id: int):
             db.commit()
             db.refresh(note)
             logger.info("✅ Note updated successfully")
+            normalizer = _get_notes_normalizer()
+            payload = normalizer.normalize_output(note.to_dict())
             return jsonify({
                 "status": "success",
-                "data": note.to_dict(),
+                "data": payload,
                 "message": "Note updated successfully",
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             })
         logger.error(f"❌ Note not found: {note_id}")
@@ -517,9 +545,11 @@ def delete_note(note_id: int):
             # Delete note from database
             db.delete(note)
             db.commit()
+            normalizer = _get_notes_normalizer()
             return jsonify({
                 "status": "success",
                 "message": "Note deleted successfully",
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             })
         return jsonify({

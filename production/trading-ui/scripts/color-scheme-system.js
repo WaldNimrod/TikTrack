@@ -41,6 +41,7 @@ const ENTITY_COLORS = {
   design: '#6f42c1',
   research: '#17a2b8',
   preference: '#adb5bd',
+  development: '#26baac',
   position: '#0d6efd'
 };
 
@@ -58,6 +59,7 @@ const ENTITY_BACKGROUND_COLORS = {
   design: 'rgba(111, 66, 193, 0.1)',
   research: 'rgba(23, 162, 184, 0.1)',
   preference: 'rgba(173, 181, 189, 0.1)',
+  development: 'rgba(38, 186, 172, 0.1)',
   position: 'rgba(13, 110, 253, 0.12)'
 };
 
@@ -75,6 +77,7 @@ const ENTITY_TEXT_COLORS = {
   design: '#59359a',
   research: '#117a8b',
   preference: '#6c757d',
+  development: '#1a8f83',
   position: '#0b5ed7'
 };
 
@@ -92,6 +95,7 @@ const ENTITY_BORDER_COLORS = {
   design: 'rgba(111, 66, 193, 0.3)',
   research: 'rgba(23, 162, 184, 0.3)',
   preference: 'rgba(173, 181, 189, 0.3)',
+  development: 'rgba(38, 186, 172, 0.3)',
   position: 'rgba(13, 110, 253, 0.3)'
 };
 
@@ -109,6 +113,7 @@ const ENTITY_LIGHT_COLORS = {
   design: '#e2d9f3',
   research: '#bee5eb',
   preference: 'rgba(173, 181, 189, 0.1)',
+  development: '#6ed8ca',
   position: '#d7e3ff'
 };
 
@@ -126,6 +131,7 @@ const ENTITY_DARK_COLORS = {
   design: '#383d41',
   research: '#0c5460',
   preference: '#6c757d',
+  development: '#1a8f83',
   position: '#0a58ca'
 };
 

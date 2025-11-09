@@ -479,80 +479,9 @@ class PreferencesUI {
         
         this.currentUserId = 1; // Nimrod
         this.currentProfileId = null; // Will be loaded from server
-        this.state = {
-            activeProfileId: 0,
-            activeProfileName: 'ברירת מחדל',
-            isFallback: true,
-            fallbackMessage: null,
-            warnings: []
-        };
-        window.PreferencesState = { ...this.state };
-    }
-    
-    updateGlobalPreferences(context = null) {
-        const resolvedContext = context || (window.PreferencesCore ? window.PreferencesCore.getProfileContext() : null);
-        if (!resolvedContext) {
-            return;
-        }
-        
-        const activeProfileId = Number.isFinite(resolvedContext.id) ? resolvedContext.id : parseInt(resolvedContext.id ?? '0', 10) || 0;
-        const activeProfileName = resolvedContext.name || (activeProfileId === 0 ? 'ברירת מחדל' : `פרופיל #${activeProfileId}`);
-        const fallbackMessage = resolvedContext.fallbackMessage || null;
-        const isFallback = Boolean(resolvedContext.isFallback);
-        const warnings = Array.isArray(resolvedContext.warnings) ? resolvedContext.warnings : [];
-        
-        this.state = {
-            activeProfileId,
-            activeProfileName,
-            isFallback,
-            fallbackMessage,
-            warnings
-        };
-        this.currentProfileId = activeProfileId;
-        window.PreferencesState = { ...this.state };
-        
-        if (window.PreferencesCore && typeof window.PreferencesCore.updateProfileContext === 'function') {
-            window.PreferencesCore.updateProfileContext({
-                id: activeProfileId,
-                name: activeProfileName,
-                isFallback,
-                fallbackMessage,
-                warnings
-            });
-        }
-        
-        const activeProfileNameElement = document.getElementById('activeProfileName');
-        const activeProfileCardName = document.getElementById('activeProfileName_display');
-        const activeProfileDescription = document.getElementById('activeProfileDescription_display');
-        const activeProfileSummary = document.getElementById('activeProfileInfo');
-        
-        if (activeProfileNameElement) {
-            activeProfileNameElement.textContent = activeProfileName;
-        }
-        if (activeProfileSummary) {
-            activeProfileSummary.textContent = activeProfileName;
-        }
-        if (activeProfileCardName) {
-            activeProfileCardName.textContent = activeProfileName;
-        }
-        if (activeProfileDescription) {
-            activeProfileDescription.textContent = isFallback ? 'מציג נתוני ברירת מחדל' : 'פרופיל משתמש פעיל';
-        }
-        
-        const banner = document.getElementById('preferencesFallbackBanner');
-        if (banner) {
-            if (isFallback && fallbackMessage) {
-                banner.textContent = fallbackMessage;
-                banner.classList.remove('d-none');
-                banner.style.display = 'block';
-            } else {
-                banner.textContent = '';
-                banner.classList.add('d-none');
-                banner.style.display = 'none';
-            }
-        }
-        
-        window.Logger.info('🔄 PreferencesUI state updated', this.state, { page: "preferences-ui" });
+        this.cachedPreferences = {};
+        this.profileContext = null;
+        this.lastResolvedProfileId = null;
     }
     
     /**
@@ -572,37 +501,314 @@ class PreferencesUI {
                 throw new Error(result.error || 'Failed to load profiles');
             }
             
-            const profiles = result.data.profiles || [];
-            this.profilesCache = profiles;
+            const profiles = result.data.profiles;
+            window.Logger.info(`🔍 Loaded ${profiles.length} profiles from server`, { page: "preferences-ui" });
             
-            const context = {
-                id: result.data.active_profile_id ?? 0,
-                name: result.data.active_profile_name || (result.data.active_profile_id === 0 ? 'ברירת מחדל' : null),
-                isFallback: Boolean(result.data.is_fallback_profile),
-                fallbackMessage: result.data.fallback_message || null,
-                warnings: Array.isArray(result.data.profile_warnings) ? result.data.profile_warnings : []
-            };
-            
-            if (!context.fallbackMessage && context.isFallback) {
-                context.fallbackMessage = `אין פרופיל פעיל עבור משתמש #${this.currentUserId} – מוצגים נתוני ברירת מחדל`;
+            const profileContext = result.data?.profile_context || null;
+            if (profileContext) {
+                await this.updateProfileContext(profileContext);
+                const resolvedId = profileContext.resolved_profile_id;
+                if (resolvedId !== null && resolvedId !== undefined) {
+                    this.currentProfileId = resolvedId;
+                    if (window.PreferencesCore) {
+                        window.PreferencesCore.currentProfileId = resolvedId;
+                        if (typeof window.PreferencesCore.latestProfileContext !== 'undefined') {
+                            window.PreferencesCore.latestProfileContext = profileContext;
+                        }
+                    }
+                    if (profileContext.user?.id) {
+                        this.currentUserId = profileContext.user.id;
+                        if (window.PreferencesCore) {
+                            window.PreferencesCore.currentUserId = profileContext.user.id;
+                        }
+                    }
+                    return resolvedId;
+                }
             }
             
-            this.updateGlobalPreferences(context);
-            window.Logger.info(`✅ Active profile resolved: ${this.state.activeProfileName} (ID: ${this.state.activeProfileId})`, { page: "preferences-ui" });
-            return this.state.activeProfileId;
+            // Find active profile
+            const activeProfile = profiles.find(p => p.active === true);
+            
+            // If no active profile found, use default profile (ID: 0)
+            if (!activeProfile) {
+                window.Logger.info('✅ No active profile found - using default profile (ID: 0)', { page: "preferences-ui" });
+                this.currentProfileId = 0;
+                if (window.PreferencesCore) {
+                    window.PreferencesCore.currentProfileId = 0;
+                    window.PreferencesCore.latestProfileContext = profileContext || window.PreferencesCore.latestProfileContext || null;
+                }
+                if (profileContext) {
+                    await this.updateProfileContext({
+                        ...profileContext,
+                        resolved_profile_id: 0
+                    });
+                }
+                return 0;
+            }
+            
+            // Check if active profile is default system profile (ID: 0)
+            if (activeProfile.id === 0) {
+                window.Logger.info('✅ Active profile is system default profile (ID: 0)', { page: "preferences-ui" });
+                this.currentProfileId = 0;
+                if (window.PreferencesCore) {
+                    window.PreferencesCore.currentProfileId = 0;
+                    window.PreferencesCore.latestProfileContext = profileContext || window.PreferencesCore.latestProfileContext || null;
+                }
+                if (profileContext) {
+                    await this.updateProfileContext({
+                        ...profileContext,
+                        resolved_profile_id: 0
+                    });
+                }
+                return 0;
+            }
+            
+            // Check if active profile has is_default flag
+            if (activeProfile.is_default || activeProfile.default) {
+                // If it's a user profile marked as default, still check if ID is 0
+                if (activeProfile.id === 0 || activeProfile.user_id === 0) {
+                    window.Logger.info('✅ Active profile is default system profile (ID: 0, user_id: 0)', { page: "preferences-ui" });
+                    this.currentProfileId = 0;
+                    return 0;
+                } else {
+                    // User profile marked as default - use it as-is
+                    this.currentProfileId = activeProfile.id;
+                    window.Logger.info(`✅ Active profile loaded: ${activeProfile.name} (ID: ${activeProfile.id})`, { page: "preferences-ui" });
+                    return activeProfile.id;
+                }
+            }
+            
+            // Regular user profile
+            this.currentProfileId = activeProfile.id;
+            if (window.PreferencesCore) {
+                window.PreferencesCore.currentProfileId = activeProfile.id;
+                if (!profileContext) {
+                    window.PreferencesCore.latestProfileContext = window.PreferencesCore.latestProfileContext || null;
+                }
+            }
+            window.Logger.info(`✅ Active profile loaded: ${activeProfile.name} (ID: ${activeProfile.id})`, { page: "preferences-ui" });
+            if (profileContext) {
+                await this.updateProfileContext({
+                    ...profileContext,
+                    resolved_profile_id: activeProfile.id
+                });
+            }
+            return activeProfile.id;
             
         } catch (error) {
             window.Logger.error('❌ Error loading active profile:', error, { page: "preferences-ui" });
             // Fallback to default profile (ID: 0)
-            this.updateGlobalPreferences({
-                id: 0,
-                name: 'ברירת מחדל',
-                isFallback: true,
-                fallbackMessage: `שגיאה בזיהוי פרופיל פעיל עבור משתמש #${this.currentUserId} – מוצגים נתוני ברירת מחדל`,
-                warnings: ['load_active_profile_error']
-            });
+            this.currentProfileId = 0;
+            window.Logger.info('✅ Falling back to default profile (ID: 0)', { page: "preferences-ui" });
+            if (window.PreferencesCore) {
+                window.PreferencesCore.currentProfileId = 0;
+            }
+            this.updateActiveUserDisplay(null);
+            this.updateActiveProfileDisplay(null);
+            this.renderProfileBanner(); // Hide banner if necessary
             return 0;
         }
+    }
+    
+    /**
+     * Update profile context and render banner
+     * @param {Object|null} context - Profile context metadata
+     */
+    updateProfileContext(context = null) {
+        let refreshPromise = Promise.resolve();
+        const previousResolvedId = this.profileContext?.resolved_profile_id ?? this.lastResolvedProfileId ?? null;
+        const userInfo = context?.user || null;
+        const resolvedProfile = context?.resolved_profile || null;
+        if (window.Logger) {
+            window.Logger.info('🔁 updateProfileContext invoked', {
+                page: "preferences-ui",
+                hasContext: !!context,
+                requestedProfileId: context?.requested_profile_id ?? null,
+                resolvedProfileId: context?.resolved_profile_id ?? null,
+                activeProfileId: context?.active_profile_id ?? null,
+                userId: context?.user?.id ?? null,
+                previousResolvedId
+            });
+        }
+        if (context) {
+            this.profileContext = { ...context };
+            if (context.user?.id) {
+                this.currentUserId = context.user.id;
+            }
+            if (context.resolved_profile_id !== null && context.resolved_profile_id !== undefined) {
+                this.currentProfileId = context.resolved_profile_id;
+                if (window.PreferencesCore) {
+                    window.PreferencesCore.currentProfileId = context.resolved_profile_id;
+                }
+            }
+            if (window.PreferencesCore) {
+                window.PreferencesCore.latestProfileContext = { ...context };
+                if (context.user?.id) {
+                    window.PreferencesCore.currentUserId = context.user.id;
+                }
+            }
+            this.updateActiveUserDisplay(userInfo);
+            this.updateActiveProfileDisplay(resolvedProfile);
+            if (window.UnifiedCacheManager?.refreshUserPreferences && context.resolved_profile_id !== null && context.resolved_profile_id !== undefined) {
+                if (previousResolvedId !== null && previousResolvedId !== context.resolved_profile_id) {
+                    refreshPromise = window.UnifiedCacheManager.refreshUserPreferences(context.resolved_profile_id, null, {
+                        userId: context.user?.id ?? this.currentUserId ?? 1,
+                        previousProfileId: previousResolvedId
+                    }).catch((cacheError) => {
+                        window.Logger?.warn('⚠️ Failed to refresh cache after profile change', cacheError, { page: "preferences-ui" });
+                    });
+                }
+            }
+            this.lastResolvedProfileId = context.resolved_profile_id ?? this.lastResolvedProfileId;
+        } else {
+            this.profileContext = null;
+            this.lastResolvedProfileId = null;
+            this.updateActiveUserDisplay(null);
+            this.updateActiveProfileDisplay(null);
+        }
+        if (window.Logger) {
+            window.Logger.info('✅ updateProfileContext completed', {
+                page: "preferences-ui",
+                currentProfileId: this.currentProfileId,
+                currentUserId: this.currentUserId,
+                hasProfileContext: !!this.profileContext
+            });
+        }
+        this.renderProfileBanner();
+        return refreshPromise;
+    }
+    
+    /**
+     * Render profile context banner UI
+     */
+    renderProfileBanner() {
+        const banner = document.getElementById('profileContextBanner');
+        if (!banner) {
+            return;
+        }
+        
+        if (!this.profileContext) {
+            banner.classList.add('d-none');
+            banner.setAttribute('aria-hidden', 'true');
+            banner.innerHTML = '';
+            return;
+        }
+        
+        const context = this.profileContext;
+        banner.classList.remove('d-none');
+        banner.setAttribute('aria-hidden', 'false');
+        
+        banner.className = 'alert profile-context-banner mb-3';
+        if (['no_active_profile', 'fallback_default_profile'].includes(context.status)) {
+            banner.classList.add('alert-warning');
+        } else {
+            banner.classList.add('alert-info');
+        }
+        
+        banner.innerHTML = '';
+        
+        const messageEl = document.createElement('div');
+        messageEl.className = 'profile-context-message fw-semibold';
+        messageEl.textContent = context.message || 'מוצגים נתוני פרופיל';
+        banner.appendChild(messageEl);
+        
+        if (Array.isArray(context.warnings) && context.warnings.length > 0) {
+            const warningsTitle = document.createElement('div');
+            warningsTitle.className = 'profile-context-warning-title mt-2';
+            warningsTitle.textContent = 'אזהרות:';
+            banner.appendChild(warningsTitle);
+            
+            const warningsList = document.createElement('ul');
+            warningsList.className = 'profile-context-warning-list mb-0';
+            context.warnings.forEach((warning) => {
+                const li = document.createElement('li');
+                li.textContent = warning;
+                warningsList.appendChild(li);
+            });
+            banner.appendChild(warningsList);
+        }
+        
+        if (context.resolved_profile && context.resolved_profile.name) {
+            const details = document.createElement('div');
+            details.className = 'profile-context-details mt-2 small text-muted';
+            const profileName = context.resolved_profile.name;
+            const profileId = context.resolved_profile.id ?? '0';
+            details.textContent = `פרופיל מוצג: ${profileName} (ID ${profileId})`;
+            banner.appendChild(details);
+        }
+    }
+    
+    /**
+     * Update active user display elements in summary and card
+     * @param {Object|null} userInfo - Active user information
+     */
+    updateActiveUserDisplay(userInfo = null) {
+        const displayName = (userInfo?.display_name?.trim?.() ||
+            userInfo?.full_name?.trim?.() ||
+            userInfo?.username?.trim?.() ||
+            'לא זמין');
+        const hasId = userInfo?.id !== undefined && userInfo?.id !== null;
+        const idText = hasId ? `#${userInfo.id}` : '';
+        const summaryNameEl = document.getElementById('activeUserName');
+        const summaryIdEl = document.getElementById('activeUserId');
+        const cardNameEl = document.getElementById('activeUserName_display');
+        const cardIdEl = document.getElementById('activeUserId_display');
+        
+        if (summaryNameEl) {
+            summaryNameEl.textContent = displayName;
+        }
+        if (summaryIdEl) {
+            summaryIdEl.textContent = hasId ? `(${idText})` : '';
+        }
+        if (cardNameEl) {
+            cardNameEl.textContent = displayName;
+        }
+        if (cardIdEl) {
+            cardIdEl.textContent = idText;
+        }
+        
+        if (hasId) {
+            this.currentUserId = userInfo.id;
+        }
+        
+        window.Logger?.info('👤 Active user display updated', {
+            page: "preferences-ui",
+            displayName,
+            userId: hasId ? userInfo.id : null
+        });
+    }
+    
+    /**
+     * Update active profile display elements in summary and card
+     * @param {Object|null} profile - Active profile data
+     */
+    updateActiveProfileDisplay(profile = null) {
+        const profileName = profile?.name || 'ברירת מחדל';
+        const profileDescription = profile?.description || (profile?.id === 0 ? 'פרופיל ברירת מחדל של המערכת' : 'פרופיל משתמש');
+        
+        const summaryNameEl = document.getElementById('activeProfileName');
+        const cardNameEl = document.getElementById('activeProfileName_display');
+        const cardDescriptionEl = document.getElementById('activeProfileDescription_display');
+        const summaryInfoEl = document.getElementById('activeProfileInfo');
+        
+        if (summaryNameEl) {
+            summaryNameEl.textContent = profileName;
+        }
+        if (cardNameEl) {
+            cardNameEl.textContent = profileName;
+        }
+        if (cardDescriptionEl) {
+            cardDescriptionEl.textContent = profileDescription;
+        }
+        if (summaryInfoEl) {
+            summaryInfoEl.textContent = profileName;
+        }
+        
+        window.Logger?.info('📘 Active profile display updated', {
+            page: "preferences-ui",
+            profileName,
+            profileId: profile?.id ?? null
+        });
     }
     
     /**
@@ -626,36 +832,35 @@ class PreferencesUI {
                 profileId = await this.loadActiveProfile();
             }
             
-            // For default profile, ensure we use 0 explicitly
             const finalUserId = userId || this.currentUserId;
-            const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
+            let resolvedProfileId = (this.currentProfileId !== null && this.currentProfileId !== undefined)
+                ? this.currentProfileId
+                : (profileId !== null && profileId !== undefined ? profileId : 0);
             
-            // Update currentProfileId to match the loaded profile
-            this.currentProfileId = finalProfileId;
-            window.Logger.info(`✅ PreferencesUI currentProfileId updated to: ${finalProfileId}`, { page: "preferences-ui" });
+            window.Logger.info(`✅ PreferencesUI currentProfileId updated to: ${resolvedProfileId}`, { page: "preferences-ui" });
 
             // Ensure PreferencesCore works with the same profile (required for saves)
             if (window.PreferencesCore) {
                 if (typeof window.PreferencesCore.setCurrentProfile === 'function') {
-                    await window.PreferencesCore.setCurrentProfile(finalUserId, finalProfileId);
-                    window.Logger.info(`✅ PreferencesCore currentProfileId synced to: ${finalProfileId}`, { page: "preferences-ui" });
+                    await window.PreferencesCore.setCurrentProfile(finalUserId, resolvedProfileId);
+                    window.Logger.info(`✅ PreferencesCore currentProfileId synced to: ${resolvedProfileId}`, { page: "preferences-ui" });
                 } else {
                     window.PreferencesCore.currentUserId = finalUserId;
-                    window.PreferencesCore.currentProfileId = finalProfileId;
-                    window.Logger.info(`✅ PreferencesCore currentProfileId manually set to: ${finalProfileId}`, { page: "preferences-ui" });
+                    window.PreferencesCore.currentProfileId = resolvedProfileId;
+                    window.Logger.info(`✅ PreferencesCore currentProfileId manually set to: ${resolvedProfileId}`, { page: "preferences-ui" });
                 }
             }
             
             // 🔍 Cache & Profile Debug Logging
-            window.Logger.info(`🔍 CACHE DEBUG: Loading preferences for user ${finalUserId}, profile ${finalProfileId}`, { page: "preferences-ui" });
+            window.Logger.info(`🔍 CACHE DEBUG: Loading preferences for user ${finalUserId}, profile ${resolvedProfileId}`, { page: "preferences-ui" });
             
             // Initialize lazy loading if available
             if (window.LazyLoader) {
-                window.Logger.info(`🔍 PREFERENCES UI DEBUG: Calling LazyLoader.initialize(userId=${finalUserId}, profileId=${finalProfileId})`, { page: "preferences-ui" });
+                window.Logger.info(`🔍 PREFERENCES UI DEBUG: Calling LazyLoader.initialize(userId=${finalUserId}, profileId=${resolvedProfileId})`, { page: "preferences-ui" });
                 
                 await window.LazyLoader.initialize(
                     finalUserId, 
-                    finalProfileId
+                    resolvedProfileId
                 );
                 
                 // Get loading stats
@@ -663,19 +868,24 @@ class PreferencesUI {
                 window.Logger.info(`🔍 CACHE DEBUG: Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%, { page: "preferences-ui" })`);
                 
                 // Load ALL preferences at once from API
-                window.Logger.info(`🔍 PREFERENCES UI DEBUG: Calling PreferencesCore.getAllPreferences(userId=${finalUserId}, profileId=${finalProfileId})`, { page: "preferences-ui" });
+                window.Logger.info(`🔍 PREFERENCES UI DEBUG: Calling PreferencesCore.getAllPreferences(userId=${finalUserId}, profileId=${resolvedProfileId})`, { page: "preferences-ui" });
                 
-                const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, finalProfileId);
-                this.updateGlobalPreferences(window.PreferencesCore.getProfileContext());
+                const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, resolvedProfileId);
                 window.Logger.info(`✅ Loaded ${Object.keys(allPreferences, { page: "preferences-ui" }).length} preferences from API`);
                 
                 // Load colors separately for color pickers
                 if (window.ColorManager && window.ColorPickerManager) {
-                    const colors = await window.ColorManager.loadAllColors(finalUserId, finalProfileId);
+                    const colors = await window.ColorManager.loadAllColors(finalUserId, resolvedProfileId);
                     window.ColorPickerManager.loadColors(colors);
                     // Merge colors into allPreferences for populateForm
                     Object.assign(allPreferences, colors);
                 }
+
+                const latestContext = window.PreferencesCore?.getLatestProfileContext?.() || this.profileContext;
+                if (latestContext?.resolved_profile_id !== null && latestContext?.resolved_profile_id !== undefined) {
+                    resolvedProfileId = latestContext.resolved_profile_id;
+                }
+                this.updateGlobalPreferences(allPreferences, finalUserId, resolvedProfileId, latestContext);
                 
                 // Populate form with ALL preferences
                 this.formManager.populateForm(allPreferences);
@@ -694,15 +904,14 @@ class PreferencesUI {
                 // Load non-color preferences
                 const preferences = await window.PreferencesCore.getAllPreferences(
                     finalUserId, 
-                    finalProfileId
+                    resolvedProfileId
                 );
-                this.updateGlobalPreferences(window.PreferencesCore.getProfileContext());
                 
                 // Load color preferences
                 if (window.ColorManager) {
                     const colors = await window.ColorManager.loadAllColors(
                         finalUserId, 
-                        finalProfileId
+                        resolvedProfileId
                     );
                     Object.assign(preferences, colors);
                     
@@ -711,6 +920,12 @@ class PreferencesUI {
                         window.ColorPickerManager.loadColors(colors);
                     }
                 }
+
+                const latestContext = window.PreferencesCore?.getLatestProfileContext?.() || this.profileContext;
+                if (latestContext?.resolved_profile_id !== null && latestContext?.resolved_profile_id !== undefined) {
+                    resolvedProfileId = latestContext.resolved_profile_id;
+                }
+                this.updateGlobalPreferences(preferences, finalUserId, resolvedProfileId, latestContext);
                 
                 // Populate form
                 this.formManager.populateForm(preferences);
@@ -730,6 +945,109 @@ class PreferencesUI {
             this.loadingManager.stopLoading(loaderId, false, 'שגיאה בטעינת העדפות');
             this.uiManager.showError('שגיאה בטעינת העדפות: ' + error.message);
         }
+    }
+
+    /**
+     * Update global preference stores and notify systems
+     * @param {Object} preferences - Preferences object
+     * @param {number} userId - User ID
+     * @param {number} profileId - Profile ID
+     */
+    updateGlobalPreferences(preferences, userId, profileId, profileContext = null) {
+        const normalized = preferences ? { ...preferences } : {};
+        
+        // Update local cache
+        this.cachedPreferences = normalized;
+        this.currentUserId = userId;
+        this.currentProfileId = profileId;
+        
+        const effectiveContext = profileContext || (window.PreferencesCore?.getLatestProfileContext?.() ?? null);
+        if (effectiveContext) {
+            if (effectiveContext.user?.id) {
+                this.currentUserId = effectiveContext.user.id;
+            }
+            if (effectiveContext.resolved_profile_id !== null && effectiveContext.resolved_profile_id !== undefined) {
+                this.currentProfileId = effectiveContext.resolved_profile_id;
+            }
+        }
+        
+        // Update global references
+        window.__latestPrefs = { ...normalized };
+        window.currentPreferences = { ...normalized };
+        window.userPreferences = { ...normalized };
+        
+        // Sync PreferencesSystem manager if available
+        if (window.PreferencesSystem?.manager) {
+            window.PreferencesSystem.manager.currentPreferences = { ...normalized };
+            if (typeof window.PreferencesSystem.manager.setActiveProfile === 'function') {
+                window.PreferencesSystem.manager.setActiveProfile(profileId);
+            } else {
+                window.PreferencesSystem.manager.currentProfile = profileId;
+            }
+        }
+        
+        // Sync PreferencesCore globals
+        if (window.PreferencesCore) {
+            window.PreferencesCore.currentUserId = this.currentUserId;
+            window.PreferencesCore.currentProfileId = this.currentProfileId;
+            window.PreferencesCore.latestProfileContext = effectiveContext || window.PreferencesCore.latestProfileContext || null;
+        }
+        
+        // Sync PreferencesGroupManager state
+        if (window.PreferencesGroupManager) {
+            window.PreferencesGroupManager.currentUserId = this.currentUserId;
+            window.PreferencesGroupManager.currentProfileId = this.currentProfileId;
+        }
+        
+        // Keep ColorManager cache aligned
+        if (window.ColorManager && window.ColorManager.colorCache instanceof Map) {
+            Object.keys(normalized).forEach(key => {
+                if (window.ColorManager.defaultColors && Object.prototype.hasOwnProperty.call(window.ColorManager.defaultColors, key)) {
+                    window.ColorManager.colorCache.set(key, normalized[key]);
+                }
+            });
+        }
+        
+        // Apply color schemes if systems available
+        if (typeof window.updateCSSVariablesFromPreferences === 'function') {
+            window.updateCSSVariablesFromPreferences(window.currentPreferences);
+        } else if (window.ColorSchemeSystem?.updateCSSVariablesFromPreferences) {
+            window.ColorSchemeSystem.updateCSSVariablesFromPreferences(window.currentPreferences);
+        } else if (window.colorSchemeSystem?.updateCSSVariablesFromPreferences) {
+            window.colorSchemeSystem.updateCSSVariablesFromPreferences(window.currentPreferences);
+        }
+        
+        // Dispatch global event
+        if (typeof window.dispatchEvent === 'function') {
+            window.dispatchEvent(new CustomEvent('preferences:updated', {
+                detail: {
+                    source: 'preferences-ui',
+                    userId: this.currentUserId,
+                    profileId: this.currentProfileId,
+                    preferenceCount: Object.keys(normalized).length
+                }
+            }));
+        }
+        
+        if (effectiveContext) {
+            const contextPromise = this.updateProfileContext(effectiveContext);
+            if (contextPromise && typeof contextPromise.then === 'function') {
+                contextPromise.catch((contextError) => {
+                    window.Logger?.warn('⚠️ Failed updating profile context after global preferences sync', contextError, { page: "preferences-ui" });
+                });
+            }
+        } else {
+            this.updateActiveUserDisplay(null);
+            this.updateActiveProfileDisplay(null);
+            this.renderProfileBanner();
+        }
+        
+        window.Logger?.info('✅ Global preferences updated successfully', {
+            page: "preferences-ui",
+            userId: this.currentUserId,
+            profileId: this.currentProfileId,
+            preferenceCount: Object.keys(normalized).length
+        });
     }
     
     /**
@@ -785,7 +1103,11 @@ class PreferencesUI {
             }
             
             window.Logger.info(`📊 Found ${Object.keys(changedPreferences).length} changed preferences`);
-            console.log('🔍 DEBUG: Changed preferences:', changedPreferences);
+            window.Logger?.info('🔍 Changed preferences captured', {
+                page: "preferences-ui",
+                changedCount: Object.keys(changedPreferences).length,
+                changedKeys: Object.keys(changedPreferences)
+            });
             
             // Validate all changed preferences
             for (let [name, value] of Object.entries(changedPreferences)) {
@@ -812,14 +1134,15 @@ class PreferencesUI {
             const finalUserId = userId || window.PreferencesCore?.currentUserId || 1;
             const finalProfileId = profileId || window.PreferencesCore?.currentProfileId || null;
             
-            console.log('🔍 DEBUG: Profile IDs before save:', {
+            window.Logger?.info('🔍 Profile IDs before save', {
+                page: "preferences-ui",
                 userId_param: userId,
                 profileId_param: profileId,
                 PreferencesCore_currentUserId: window.PreferencesCore?.currentUserId,
                 PreferencesCore_currentProfileId: window.PreferencesCore?.currentProfileId,
                 PreferencesUI_currentProfileId: this.currentProfileId,
-                finalUserId: finalUserId,
-                finalProfileId: finalProfileId
+                finalUserId,
+                finalProfileId
             });
             
             // Save to backend
@@ -829,7 +1152,10 @@ class PreferencesUI {
                 preferences: changedPreferences
             };
             
-            console.log('🔍 DEBUG: Sending to server:', requestData);
+            window.Logger?.info('🔍 Sending save request to server', {
+                page: "preferences-ui",
+                payload: requestData
+            });
             
             const response = await fetch('/api/preferences/user', {
                 method: 'POST',
@@ -837,16 +1163,22 @@ class PreferencesUI {
                 body: JSON.stringify(requestData)
             });
             
-            console.log('🔍 DEBUG: Server response status:', response.status);
+            window.Logger?.info('🔍 Save response status', {
+                page: "preferences-ui",
+                status: response.status
+            });
             
             if (!response.ok) {
                 const errorText = await response.text();
-                console.log('❌ DEBUG: Server error response:', errorText);
+                window.Logger?.error('❌ Save response returned error text', errorText, { page: "preferences-ui" });
                 throw new Error(`Server error: ${response.status} - ${errorText}`);
             }
             
             const result = await response.json();
-            console.log('🔍 DEBUG: Server response:', result);
+            window.Logger?.info('🔍 Save server response parsed', {
+                page: "preferences-ui",
+                result
+            });
             
             // Show success notification
             if (typeof window.showSuccessNotification === 'function') {
@@ -859,37 +1191,44 @@ class PreferencesUI {
             
             // Clear preferences cache and reload using UnifiedCacheManager.refreshUserPreferences
             // This is the CORRECT way according to the architecture
-            console.log('🧹 ===== CACHE CLEARING DEBUG START =====');
+            window.Logger?.info('🧹 Cache clearing debug start', { page: "preferences-ui" });
             window.Logger.info('🧹 Clearing preferences cache and reloading from backend...', { page: "preferences-ui" });
             
             // DEBUG: Check localStorage before clearing
             const allKeysBefore = Object.keys(localStorage);
-            const prefKeysBefore = allKeysBefore.filter(k => 
+            const prefKeysBefore = allKeysBefore.filter(k =>
                 k.includes('preference') || k.includes('all_preferences')
             );
-            console.log('🔍 DEBUG: localStorage keys BEFORE clearing:', prefKeysBefore);
-            console.log('🔍 DEBUG: Total localStorage keys before:', allKeysBefore.length);
+            window.Logger?.info('🔍 localStorage keys before clearing', {
+                page: "preferences-ui",
+                totalKeys: allKeysBefore.length,
+                preferenceKeys: prefKeysBefore
+            });
             
             try {
                 // Use the official refreshUserPreferences method which:
                 // 1. Clears all preference cache keys
                 // 2. Reloads preferences from backend via PreferencesCore
                 // 3. Updates the UI automatically via LazyLoader
-                console.log('🔍 DEBUG: Checking UnifiedCacheManager:', {
-                    exists: !!window.UnifiedCacheManager,
-                    hasRefreshMethod: !!window.UnifiedCacheManager?.refreshUserPreferences
-                });
+                    window.Logger?.info('🔍 Checking UnifiedCacheManager availability', {
+                        page: "preferences-ui",
+                        exists: !!window.UnifiedCacheManager,
+                        hasRefreshMethod: !!window.UnifiedCacheManager?.refreshUserPreferences
+                    });
                 
                 if (window.UnifiedCacheManager && window.UnifiedCacheManager.refreshUserPreferences) {
-                    console.log('✅ DEBUG: Calling UnifiedCacheManager.refreshUserPreferences()...');
+                    window.Logger?.info('✅ Calling UnifiedCacheManager.refreshUserPreferences()', { page: "preferences-ui" });
                     
                     // CRITICAL: Use the same profileId that was used for saving
                     // Otherwise we'll reload the wrong profile's preferences
                     const saveProfileId = finalProfileId;
-                    console.log('🔍 DEBUG: Will reload preferences for profileId:', saveProfileId);
+                    window.Logger?.info('🔍 Will reload preferences for profileId', { page: "preferences-ui", profileId: saveProfileId });
                     
-                    await window.UnifiedCacheManager.refreshUserPreferences(saveProfileId);
-                    console.log('✅ DEBUG: refreshUserPreferences completed');
+                    await window.UnifiedCacheManager.refreshUserPreferences(saveProfileId, null, {
+                        userId: finalUserId,
+                        preferenceNames: Object.keys(changedPreferences)
+                    });
+                    window.Logger?.info('✅ refreshUserPreferences completed', { page: "preferences-ui" });
                     window.Logger.info('✅ Preferences cache cleared and reloaded from backend', { page: "preferences-ui" });
                     
                     // DEBUG: Check localStorage after clearing
@@ -897,8 +1236,11 @@ class PreferencesUI {
                     const prefKeysAfter = allKeysAfter.filter(k => 
                         k.includes('preference') || k.includes('all_preferences')
                     );
-                    console.log('🔍 DEBUG: localStorage keys AFTER clearing:', prefKeysAfter);
-                    console.log('🔍 DEBUG: Keys removed:', prefKeysBefore.length - prefKeysAfter.length);
+                    window.Logger?.info('🔍 localStorage keys after clearing', {
+                        page: "preferences-ui",
+                        preferenceKeys: prefKeysAfter,
+                        removedCount: prefKeysBefore.length - prefKeysAfter.length
+                    });
                     
                     // NOTE: refreshUserPreferences already calls initializeWithLazyLoading which loads preferences
                     // We just need to reload the form with the already-loaded preferences
@@ -906,7 +1248,7 @@ class PreferencesUI {
                     await this.loadAllPreferences();
                     window.Logger.info('✅ Preferences form updated with new values', { page: "preferences-ui" });
                     
-                    console.log('🧹 ===== CACHE CLEARING DEBUG END =====');
+                    window.Logger?.info('🧹 Cache clearing debug end', { page: "preferences-ui" });
                 } else {
                     // Fallback to manual clearing if refreshUserPreferences not available
                     window.Logger.warn('⚠️ refreshUserPreferences not available, using manual clearing', { page: "preferences-ui" });
@@ -1107,10 +1449,6 @@ window.PreferencesUI = new PreferencesUI();
  * @param {number} userId - User ID
  * @param {number} profileId - Profile ID
  */
-window.loadAllPreferences = async function(userId = null, profileId = null) {
-    return await window.PreferencesUI.loadAllPreferences(userId, profileId);
-};
-
 /**
  * Save all preferences (backward compatibility)
  * @param {number} userId - User ID
@@ -1134,40 +1472,47 @@ window.saveAllPreferences = async function(userId = null, profileId = null) {
  * @function debugPreferencesCacheSystem
  */
 window.debugPreferencesCacheSystem = function() {
-    console.log('🔍 === PREFERENCES CACHE SYSTEM DEBUG ===');
+    window.Logger?.info('🔍 Preferences cache system debug start', { page: "preferences-ui" });
     
     // Check if required functions exist
-    console.log('📋 Function availability:');
-    console.log('  - window.clearCacheQuick:', typeof window.clearCacheQuick);
-    console.log('  - window.UnifiedCacheManager:', typeof window.UnifiedCacheManager);
-    console.log('  - window.CRUDResponseHandler:', typeof window.CRUDResponseHandler);
-    console.log('  - window.PreferencesCore:', typeof window.PreferencesCore);
-    console.log('  - window.PreferencesUI:', typeof window.PreferencesUI);
+    window.Logger?.info('📋 Function availability', {
+        page: "preferences-ui",
+        clearCacheQuick: typeof window.clearCacheQuick,
+        UnifiedCacheManager: typeof window.UnifiedCacheManager,
+        CRUDResponseHandler: typeof window.CRUDResponseHandler,
+        PreferencesCore: typeof window.PreferencesCore,
+        PreferencesUI: typeof window.PreferencesUI
+    });
     
     // Check current profile
-    console.log('👤 Current profile:');
-    console.log('  - User ID:', window.PreferencesCore?.currentUserId || 'undefined');
-    console.log('  - Profile ID:', window.PreferencesCore?.currentProfileId || 'undefined');
+    window.Logger?.info('👤 Current profile snapshot', {
+        page: "preferences-ui",
+        currentUserId: window.PreferencesCore?.currentUserId || null,
+        currentProfileId: window.PreferencesCore?.currentProfileId || null
+    });
     
     // Check cache state
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-        console.log('💾 Cache state:');
-        console.log('  - Initialized:', window.UnifiedCacheManager.initialized);
-        console.log('  - Cache keys count:', window.UnifiedCacheManager.getAllKeys ? 'Available' : 'Not available');
+        window.Logger?.info('💾 Cache manager state', {
+            page: "preferences-ui",
+            initialized: window.UnifiedCacheManager.initialized,
+            hasGetAllKeys: typeof window.UnifiedCacheManager.getAllKeys === 'function'
+        });
     } else {
-        console.log('❌ UnifiedCacheManager not available or not initialized');
+        window.Logger?.warn('❌ UnifiedCacheManager not available or not initialized', { page: "preferences-ui" });
     }
     
     // Test clearCacheQuick function
-    console.log('🧪 Testing clearCacheQuick function:');
     if (typeof window.clearCacheQuick === 'function') {
-        console.log('  - Function exists: ✅');
-        console.log('  - Function type:', typeof window.clearCacheQuick);
+        window.Logger?.info('🧪 clearCacheQuick available', {
+            page: "preferences-ui",
+            type: typeof window.clearCacheQuick
+        });
     } else {
-        console.log('  - Function exists: ❌');
+        window.Logger?.warn('🧪 clearCacheQuick not available', { page: "preferences-ui" });
     }
     
-    console.log('🔍 === END DEBUG ===');
+    window.Logger?.info('🔍 Preferences cache system debug end', { page: "preferences-ui" });
 };
 
 /**
@@ -1175,35 +1520,36 @@ window.debugPreferencesCacheSystem = function() {
  * @function testPreferencesSaveWithMonitoring
  */
 window.testPreferencesSaveWithMonitoring = async function() {
-    console.log('🧪 === TESTING PREFERENCES SAVE WITH MONITORING ===');
+    window.Logger?.info('🧪 Testing preferences save with monitoring', { page: "preferences-ui" });
     
     try {
         // Test cache clearing with auto-reload disabled
-        console.log('🔄 Testing cache clearing with auto-reload disabled...');
+        window.Logger?.info('🔄 Testing cache clearing without auto-reload', { page: "preferences-ui" });
         
         if (typeof window.clearCacheQuick === 'function') {
-            // Call clearCacheQuick with autoRefresh disabled
             await window.clearCacheQuick(null, { autoRefresh: false });
-            console.log('✅ Cache cleared successfully (no auto-reload)');
+            window.Logger?.info('✅ Cache cleared via clearCacheQuick (no auto-reload)', { page: "preferences-ui" });
         } else if (window.UnifiedCacheManager && window.UnifiedCacheManager.clearAllCacheQuick) {
-            // Fallback to direct call
             const result = await window.UnifiedCacheManager.clearAllCacheQuick({ autoRefresh: false });
-            console.log('✅ Cache cleared successfully (no auto-reload):', result);
+            window.Logger?.info('✅ Cache cleared via UnifiedCacheManager.clearAllCacheQuick (no auto-reload)', {
+                page: "preferences-ui",
+                result
+            });
         } else {
-            console.log('❌ No cache clearing function available');
+            window.Logger?.warn('❌ No cache clearing function available for monitoring test', { page: "preferences-ui" });
         }
         
         // Test preferences reload
-        console.log('🔄 Testing preferences reload...');
+        window.Logger?.info('🔄 Testing preferences reload after cache clear', { page: "preferences-ui" });
         if (window.PreferencesUI && window.PreferencesUI.loadAllPreferences) {
             await window.PreferencesUI.loadAllPreferences();
-            console.log('✅ Preferences reloaded successfully');
+            window.Logger?.info('✅ Preferences reloaded successfully during monitoring test', { page: "preferences-ui" });
         }
         
-        console.log('🧪 === TEST COMPLETED ===');
+        window.Logger?.info('🧪 Preferences save monitoring test completed', { page: "preferences-ui" });
         
     } catch (error) {
-        console.error('❌ Test failed:', error);
+        window.Logger?.error('❌ Preferences save monitoring test failed', error, { page: "preferences-ui" });
     }
 };
 
@@ -1212,28 +1558,30 @@ window.testPreferencesSaveWithMonitoring = async function() {
  * @function forceRefreshPreferences
  */
 window.forceRefreshPreferences = async function() {
-    console.log('🔄 === FORCE REFRESHING PREFERENCES ===');
+    window.Logger?.info('🔄 Force refreshing preferences...', { page: "preferences-ui" });
     
     try {
         // Clear cache first
         if (typeof window.clearCacheQuick === 'function') {
-            console.log('🧹 Clearing cache...');
+            window.Logger?.info('🧹 Clearing cache via clearCacheQuick', { page: "preferences-ui" });
             await window.clearCacheQuick(null, { autoRefresh: false });
         } else if (window.UnifiedCacheManager && window.UnifiedCacheManager.clearAllCacheQuick) {
-            console.log('🧹 Clearing cache (fallback)...');
+            window.Logger?.info('🧹 Clearing cache via UnifiedCacheManager.clearAllCacheQuick', { page: "preferences-ui" });
             await window.UnifiedCacheManager.clearAllCacheQuick({ autoRefresh: false });
+        } else {
+            window.Logger?.warn('⚠️ No cache clear method available for forceRefreshPreferences', { page: "preferences-ui" });
         }
         
         // Reload preferences and UI
         if (window.PreferencesUI && window.PreferencesUI.loadAllPreferences) {
-            console.log('🔄 Reloading preferences and UI...');
+            window.Logger?.info('🔄 Reloading preferences and UI after cache clear', { page: "preferences-ui" });
             await window.PreferencesUI.loadAllPreferences();
         }
         
-        console.log('✅ Force refresh completed');
+        window.Logger?.info('✅ Force refresh completed', { page: "preferences-ui" });
         
     } catch (error) {
-        console.error('❌ Force refresh failed:', error);
+        window.Logger?.error('❌ Force refresh failed', error, { page: "preferences-ui" });
     }
 };
 
@@ -1242,25 +1590,34 @@ window.forceRefreshPreferences = async function() {
  * @function checkCacheAndPreferencesState
  */
 window.checkCacheAndPreferencesState = async function() {
-    console.log('🔍 === CHECKING CACHE AND PREFERENCES STATE ===');
+    window.Logger?.info('🔍 Checking cache and preferences state...', { page: "preferences-ui" });
     
     try {
         // Check cache state
         if (window.UnifiedCacheManager && window.UnifiedCacheManager.getAllKeys) {
             const keys = await window.UnifiedCacheManager.getAllKeys();
             const prefKeys = keys.filter(k => k.includes('preference'));
-            console.log('💾 Cache state:');
-            console.log('  - Total cache keys:', keys.length);
-            console.log('  - Preference keys:', prefKeys.length);
-            console.log('  - Preference keys:', prefKeys);
+            window.Logger?.info('💾 Cache state snapshot', {
+                page: "preferences-ui",
+                totalKeys: keys.length,
+                preferenceKeysCount: prefKeys.length,
+                preferenceKeys: prefKeys
+            });
+        } else {
+            window.Logger?.warn('⚠️ UnifiedCacheManager.getAllKeys unavailable', { page: "preferences-ui" });
         }
         
         // Check current preferences
         if (window.PreferencesCore && window.PreferencesCore.getAllPreferences) {
             const prefs = await window.PreferencesCore.getAllPreferences();
-            console.log('⚙️ Current preferences:');
-            console.log('  - Total preferences:', Object.keys(prefs).length);
-            console.log('  - Sample preferences:', Object.keys(prefs).slice(0, 5));
+            window.Logger?.info('⚙️ Current preferences snapshot', {
+                page: "preferences-ui",
+                preferenceCount: Object.keys(prefs).length,
+                sample: Object.keys(prefs).slice(0, 10).reduce((acc, key) => {
+                    acc[key] = prefs[key];
+                    return acc;
+                }, {})
+            });
         }
         
         // Check UI state
@@ -1273,16 +1630,98 @@ window.checkCacheAndPreferencesState = async function() {
                     formPrefs[key] = value;
                 }
             }
-            console.log('🖥️ Form state:');
-            console.log('  - Form preferences:', Object.keys(formPrefs).length);
-            console.log('  - Sample form values:', Object.keys(formPrefs).slice(0, 5));
+            window.Logger?.info('🖥️ Form state snapshot', {
+                page: "preferences-ui",
+                formPreferenceCount: Object.keys(formPrefs).length,
+                sampleValues: Object.keys(formPrefs).slice(0, 10).reduce((acc, key) => {
+                    acc[key] = formPrefs[key];
+                    return acc;
+                }, {})
+            });
         }
         
-        console.log('🔍 === STATE CHECK COMPLETED ===');
+        window.Logger?.info('🔍 State check completed', { page: "preferences-ui" });
         
     } catch (error) {
-        console.error('❌ State check failed:', error);
+        window.Logger?.error('❌ State check failed', error, { page: "preferences-ui" });
     }
+};
+
+/**
+ * Preferences debugger utilities
+ */
+window.PreferencesDebugger = {
+    logProfileContext() {
+        const context = window.PreferencesUI?.profileContext || null;
+        const summary = {
+            hasContext: !!context,
+            requestedProfileId: context?.requested_profile_id ?? null,
+            resolvedProfileId: context?.resolved_profile_id ?? null,
+            activeProfileId: context?.active_profile_id ?? null,
+            userId: context?.user?.id ?? null
+        };
+        window.Logger?.info('🧭 PreferencesDebugger.logProfileContext', {
+            page: "preferences-ui",
+            summary,
+            context
+        });
+    },
+    logDropdownState() {
+        const select = document.getElementById('profileSelect');
+        if (!select) {
+            window.Logger?.warn('🧭 PreferencesDebugger.logDropdownState: profileSelect not found', { page: "preferences-ui" });
+            return;
+        }
+        const options = Array.from(select.options || []).map(opt => ({
+            value: opt.value,
+            text: opt.textContent,
+            selected: opt.selected
+        }));
+        window.Logger?.info('🧭 PreferencesDebugger.logDropdownState', {
+            page: "preferences-ui",
+            selectedValue: select.value,
+            optionsCount: options.length,
+            options
+        });
+    },
+    async logCacheState() {
+        if (!window.UnifiedCacheManager || typeof window.UnifiedCacheManager.getAllKeys !== 'function') {
+            window.Logger?.warn('🧭 PreferencesDebugger.logCacheState: UnifiedCacheManager unavailable', { page: "preferences-ui" });
+            return;
+        }
+        try {
+            const keys = await window.UnifiedCacheManager.getAllKeys();
+            const preferenceKeys = keys.filter(key => key.includes('preference'));
+            window.Logger?.info('🧭 PreferencesDebugger.logCacheState', {
+                page: "preferences-ui",
+                totalKeys: keys.length,
+                preferenceKeysCount: preferenceKeys.length,
+                preferenceKeys
+            });
+        } catch (error) {
+            window.Logger?.error('🧭 PreferencesDebugger.logCacheState failed', error, { page: "preferences-ui" });
+        }
+    },
+    async logFullState() {
+        window.Logger?.info('🧭 PreferencesDebugger.logFullState starting', { page: "preferences-ui" });
+        this.logProfileContext();
+        this.logDropdownState();
+        await this.logCacheState();
+        const prefs = window.currentPreferences || {};
+        window.Logger?.info('🧭 PreferencesDebugger.logFullState: currentPreferences snapshot', {
+            page: "preferences-ui",
+            preferenceCount: Object.keys(prefs).length,
+            samplePreferences: Object.keys(prefs).slice(0, 15).reduce((acc, key) => {
+                acc[key] = prefs[key];
+                return acc;
+            }, {})
+        });
+        window.Logger?.info('🧭 PreferencesDebugger.logFullState completed', { page: "preferences-ui" });
+    }
+};
+
+window.logPreferencesDebug = function() {
+    return window.PreferencesDebugger.logFullState();
 };
 window.saveIndividualPreference = async function(preferenceName, value, userId = null, profileId = null) {
     try {
@@ -1358,7 +1797,7 @@ if (!window.toggleSection) {
  */
 window.loadProfilesToDropdown = async function(userId = 1) {
     try {
-        window.Logger.info('📂 Loading profiles to dropdown...', { page: "preferences-ui" });
+        window.Logger.info('📂 Loading profiles to dropdown...', { page: "preferences-ui", userId });
         
         // Get profiles from API
         const response = await fetch(`/api/preferences/profiles?user_id=${userId}`);
@@ -1371,7 +1810,14 @@ window.loadProfilesToDropdown = async function(userId = 1) {
             throw new Error(result.error || 'Failed to load profiles');
         }
         
-        const profiles = result.data.profiles || [];
+        const profiles = Array.isArray(result.data?.profiles) ? result.data.profiles : [];
+        const profileContext = result.data?.profile_context || null;
+        window.Logger.info('📋 Profiles API response', {
+            page: "preferences-ui",
+            profilesCount: profiles.length,
+            resolvedProfileId: profileContext?.resolved_profile_id ?? null,
+            activeProfileId: profileContext?.active_profile_id ?? null
+        });
         const profileSelect = document.getElementById('profileSelect');
         
         if (!profileSelect) {
@@ -1379,64 +1825,180 @@ window.loadProfilesToDropdown = async function(userId = 1) {
             return false;
         }
         
-        const context = {
-            id: result.data.active_profile_id ?? 0,
-            name: result.data.active_profile_name || (result.data.active_profile_id === 0 ? 'ברירת מחדל' : null),
-            isFallback: Boolean(result.data.is_fallback_profile),
-            fallbackMessage: result.data.fallback_message || null,
-            warnings: Array.isArray(result.data.profile_warnings) ? result.data.profile_warnings : []
-        };
-        
         if (window.PreferencesUI) {
-            window.PreferencesUI.profilesCache = profiles;
-            window.PreferencesUI.updateGlobalPreferences(context);
+            try {
+                if (profileContext) {
+                    await window.PreferencesUI.updateProfileContext(profileContext);
+                } else {
+                    window.PreferencesUI.updateActiveUserDisplay(null);
+                    window.PreferencesUI.updateActiveProfileDisplay(null);
+                }
+            } catch (contextError) {
+                window.Logger?.warn('⚠️ Failed to sync profile context while loading profiles', contextError, { page: "preferences-ui" });
+            }
         }
         
         // Clear existing options
         profileSelect.innerHTML = '';
         
-        if (profiles.length > 0) {
+        if (profiles && profiles.length > 0) {
+            // Add all profiles (including default profile if it exists)
             profiles.forEach(profile => {
                 const option = document.createElement('option');
-                option.value = profile.id;
-                option.textContent = profile.name || `פרופיל #${profile.id}`;
+                const optionValue = String(profile.id);
+                option.value = optionValue;
                 option.dataset.profileName = profile.name || '';
-                option.dataset.profileDescription = profile.description || '';
-                if (profile.id === window.PreferencesUI.state.activeProfileId) {
+                option.textContent = profile.name || `פרופיל #${profile.id}`;
+                if (profile.active) {
                     option.selected = true;
                 }
                 profileSelect.appendChild(option);
             });
+            
+            // Determine active profile
+            const activeProfile = (profileContext?.resolved_profile && typeof profileContext.resolved_profile === 'object')
+                ? {
+                    ...profileContext.resolved_profile,
+                    active: true
+                }
+                : profiles.find(p => p.active);
+            
+            window.Logger.info(`🔍 PROFILE DEBUG: Found active profile:`, activeProfile, { page: "preferences-ui" });
+            
+            if (activeProfile) {
+                // Update PreferencesUI currentProfileId
+                if (window.PreferencesUI) {
+                    window.PreferencesUI.currentProfileId = activeProfile.id;
+                    window.Logger.info(`✅ PreferencesUI currentProfileId updated to: ${activeProfile.id}`, { page: "preferences-ui" });
+                }
+                
+                // Select the active profile in dropdown
+                const activeOption = profileSelect.querySelector(`option[value="${String(activeProfile.id)}"]`);
+                if (activeOption) {
+                    activeOption.selected = true;
+                    profileSelect.value = activeOption.value;
+                    window.Logger.info(`🔍 UI DEBUG: Selected active profile in dropdown: ${activeProfile.name}`, { page: "preferences-ui" });
+                } else {
+                    window.Logger.warn(`⚠️ Active profile option not found in dropdown: ${activeProfile.name}`, { page: "preferences-ui" });
+                }
+            } else {
+                // No active profile found, select default
+                const defaultOption = profileSelect.querySelector('option[value="0"]');
+                if (defaultOption) {
+                    defaultOption.selected = true;
+                    profileSelect.value = defaultOption.value;
+                    window.Logger.info(`🔍 UI DEBUG: No active profile found, selected default`, { page: "preferences-ui" });
+                }
+            }
+            
+            window.Logger.info(`✅ Loaded ${profiles.length} profiles to dropdown`, {
+                page: "preferences-ui",
+                activeProfileId: activeProfile?.id ?? null
+            });
+            
+            // Update active profile info in the new card format
+            const activeProfileName = document.getElementById('activeProfileName');
+            const activeProfileDescription = document.getElementById('activeProfileDescription');
+            const activeProfileInfo = document.getElementById('activeProfileInfo'); // Summary element
+            const activeUserNameSummary = document.getElementById('activeUserName');
+            const activeUserIdSummary = document.getElementById('activeUserId');
+            const activeUserNameDisplay = document.getElementById('activeUserName_display');
+            const activeUserIdDisplay = document.getElementById('activeUserId_display');
+            
+            if (activeProfile) {
+                if (activeProfileName) {
+                    activeProfileName.textContent = activeProfile.name;
+                }
+                if (activeProfileDescription) {
+                    activeProfileDescription.textContent = activeProfile.description || 'פרופיל משתמש';
+                }
+                if (activeProfileInfo) {
+                    activeProfileInfo.textContent = activeProfile.name;
+                }
+                const userInfo = profileContext?.user || null;
+                if (window.PreferencesUI) {
+                    window.PreferencesUI.updateActiveUserDisplay(userInfo);
+                    window.PreferencesUI.updateActiveProfileDisplay(activeProfile);
+                } else {
+                    const displayName = userInfo?.display_name || userInfo?.full_name || userInfo?.username || 'לא זמין';
+                    const idText = userInfo?.id !== undefined && userInfo?.id !== null ? `(#${userInfo.id})` : '';
+                    if (activeUserNameSummary) {
+                        activeUserNameSummary.textContent = displayName;
+                    }
+                    if (activeUserIdSummary) {
+                        activeUserIdSummary.textContent = idText;
+                    }
+                    if (activeUserNameDisplay) {
+                        activeUserNameDisplay.textContent = displayName;
+                    }
+                    if (activeUserIdDisplay) {
+                        activeUserIdDisplay.textContent = idText;
+                    }
+                }
+                window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ${activeProfile.name}`, {
+                    page: "preferences-ui",
+                    profileId: activeProfile.id
+                });
+                
+                // Check if this is the default profile and disable all preferences
+                // Default profile is: ID = 0, or is_default = true, or name matches
+                const isDefaultProfile = activeProfile.id === 0 || 
+                                       activeProfile.is_default === true || 
+                                       activeProfile.default === true ||
+                                       activeProfile.name === 'ברירת מחדל' || 
+                                       activeProfile.name === 'פרופיל ברירת מחדל';
+                
+                window.Logger.info(`🔍 Profile check: ID=${activeProfile.id}, is_default=${activeProfile.is_default}, name="${activeProfile.name}", isDefaultProfile=${isDefaultProfile}`, { page: "preferences-ui" });
+                
+                if (isDefaultProfile) {
+                    window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-ui" });
+                    window.disableAllPreferencesInterface();
+                } else {
+                    window.Logger.info('✅ User profile active - enabling all preferences interface', { page: "preferences-ui" });
+                    window.enableAllPreferencesInterface();
+                }
+            } else {
+                if (activeProfileName) {
+                    activeProfileName.textContent = 'ברירת מחדל';
+                }
+                if (activeProfileDescription) {
+                    activeProfileDescription.textContent = 'פרופיל ברירת מחדל של המערכת';
+                }
+                if (activeProfileInfo) {
+                    activeProfileInfo.textContent = 'ברירת מחדל';
+                }
+                if (window.PreferencesUI) {
+                    window.PreferencesUI.updateActiveUserDisplay(profileContext?.user || null);
+                    window.PreferencesUI.updateActiveProfileDisplay(null);
+                }
+                window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ברירת מחדל (no active profile)`, { page: "preferences-ui" });
+                
+                // Default profile is active - disable all preferences
+                window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: "preferences-ui" });
+                window.disableAllPreferencesInterface();
+            }
+            
+            return true;
         } else {
-            const option = document.createElement('option');
-            option.value = 0;
-            option.textContent = 'ברירת מחדל';
-            option.selected = true;
-            profileSelect.appendChild(option);
-        }
-        
-        if (window.PreferencesUI.state.activeProfileId === 0 && window.PreferencesUI.state.isFallback) {
-            window.Logger.info('🔒 Fallback/default profile active - disabling interface', { page: "preferences-ui" });
+            window.Logger.info('⚠️ No profiles found, using default', { page: "preferences-ui" });
+            
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '0';
+            defaultOption.textContent = 'ברירת מחדל';
+            defaultOption.selected = true;
+            profileSelect.appendChild(defaultOption);
+            
+            if (window.PreferencesUI) {
+                window.PreferencesUI.currentProfileId = 0;
+                window.PreferencesUI.updateActiveUserDisplay(profileContext?.user || null);
+                window.PreferencesUI.updateActiveProfileDisplay(null);
+            }
+            
             window.disableAllPreferencesInterface();
-        } else {
-            window.Logger.info('✅ User profile active - enabling interface', { page: "preferences-ui" });
-            window.enableAllPreferencesInterface();
+            return true;
         }
-        
-        window.Logger.info(`✅ Loaded ${profiles.length} profiles to dropdown`, { page: "preferences-ui" });
-        return true;
     } catch (error) {
         window.Logger.error('❌ Error loading profiles to dropdown:', error, { page: "preferences-ui" });
-        if (window.PreferencesUI) {
-            window.PreferencesUI.updateGlobalPreferences({
-                id: 0,
-                name: 'ברירת מחדל',
-                isFallback: true,
-                fallbackMessage: `שגיאה בטעינת פרופילים עבור משתמש #${userId} – מוצגים נתוני ברירת מחדל`,
-                warnings: ['load_profiles_dropdown_error']
-            });
-        }
-        window.disableAllPreferencesInterface();
         return false;
     }
 };
@@ -1467,13 +2029,22 @@ window.getUserProfiles = async function(userId = 1) {
 
 // Note: switchProfile is now in preferences-profiles.js - ProfileManager.switchProfile()
 
+window.loadAllPreferences = async function(userId = 1, profileId = null) {
+    window.Logger?.info('🔄 loadAllPreferences wrapper invoked', {
+        page: "preferences-ui",
+        userId,
+        profileId
+    });
+    return await window.PreferencesUI.loadAllPreferences(userId, profileId);
+};
+
 /**
  * Load preferences (backward compatibility)
  * @param {number} userId - User ID
  * @param {number} profileId - Profile ID
  * @returns {Promise<boolean>} Success status
  */
-window.loadPreferences = async function(userId = 1, profileId = 3) {
+window.loadPreferences = async function(userId = 1, profileId = null) {
     try {
         window.Logger.info(`🔄 Loading preferences for user ${userId}, profile ${profileId}`, { page: "preferences-ui" });
         

@@ -2959,115 +2959,165 @@ UnifiedCacheManager.prototype.getKeyPolicy = function(key) {
  * @async
  * @returns {Promise<void>}
  */
-UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProfileId = null, groupName = null) {
-    console.log('🔍 DEBUG: refreshUserPreferences() called with targetProfileId:', targetProfileId, 'groupName:', groupName);
+UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProfileId = null, groupName = null, options = {}) {
+    const opts = (Array.isArray(options) ? { preferenceNames: options } : (options || {}));
+    console.log('🔍 DEBUG: refreshUserPreferences() called with targetProfileId:', targetProfileId, 'groupName:', groupName, 'options:', opts);
     
     try {
-        // Clear all preferences cache keys OR specific group keys
-        // NOTE: getAllKeys() returns keys WITH prefix (e.g., 'tiktrack_preference_...')
-        // But we also need to check localStorage directly for keys without prefix
+        const userId =
+            opts.userId ??
+            window.PreferencesCore?.currentUserId ??
+            window.PreferencesUI?.currentUserId ??
+            1;
+        
+        const profileIds = new Set();
+        if (targetProfileId !== null && targetProfileId !== undefined) {
+            profileIds.add(targetProfileId);
+        }
+        if (opts.resolvedProfileId !== null && opts.resolvedProfileId !== undefined) {
+            profileIds.add(opts.resolvedProfileId);
+        }
+        if (opts.previousProfileId !== null && opts.previousProfileId !== undefined) {
+            profileIds.add(opts.previousProfileId);
+        }
+        if (Array.isArray(opts.profileIds)) {
+            opts.profileIds.forEach((pid) => {
+                if (pid !== null && pid !== undefined) {
+                    profileIds.add(pid);
+                }
+            });
+        }
+        
+        if (profileIds.size === 0) {
+            const fallbackProfile =
+                window.PreferencesCore?.currentProfileId ??
+                window.PreferencesUI?.currentProfileId;
+            if (fallbackProfile !== null && fallbackProfile !== undefined) {
+                profileIds.add(fallbackProfile);
+            }
+        }
+        
+        const profileIdList = Array.from(profileIds);
+        const preferenceNames = Array.isArray(opts.preferenceNames) ? opts.preferenceNames : [];
+        
+        console.log('🔍 DEBUG: refreshUserPreferences resolved userId:', userId, 'profileIdList:', profileIdList);
+        
+        const normalizeKey = (key) =>
+            key.startsWith('tiktrack_') ? key.substring('tiktrack_'.length) : key;
+        
+        const matchesCategory = (normalizedKey) => {
+            if (normalizedKey === 'user-preferences') {
+                return true;
+            }
+            return (
+                normalizedKey.startsWith('preference_') ||
+                normalizedKey.startsWith('all_preferences_') ||
+                normalizedKey.startsWith('preference_group_')
+            );
+        };
+        
+        const matchesGroup = (normalizedKey) => {
+            if (!groupName) {
+                return true;
+            }
+            return normalizedKey.startsWith(`preference_group_${groupName}_`);
+        };
+        
+        const matchesPreferenceName = (normalizedKey) => {
+            if (preferenceNames.length === 0) {
+                return true;
+            }
+            return preferenceNames.some((name) =>
+                normalizedKey.startsWith(`preference_${name}_`)
+            );
+        };
+        
+        const matchesProfile = (normalizedKey) => {
+            if (normalizedKey === 'user-preferences') {
+                return true;
+            }
+            if (profileIdList.length === 0) {
+                return true;
+            }
+            return profileIdList.some(
+                (pid) =>
+                    normalizedKey.endsWith(`_${userId}_${pid}`) ||
+                    normalizedKey === `all_preferences_${userId}_${pid}`
+            );
+        };
+        
+        const shouldRemove = (normalizedKey) =>
+            matchesCategory(normalizedKey) &&
+            matchesGroup(normalizedKey) &&
+            matchesPreferenceName(normalizedKey) &&
+            matchesProfile(normalizedKey);
+        
         console.log('🔍 DEBUG: Getting all keys from UnifiedCacheManager...');
         const keys = await this.getAllKeys();
         console.log('🔍 DEBUG: getAllKeys() returned:', keys.length, 'keys');
-        console.log('🔍 DEBUG: Sample keys from UnifiedCacheManager:', keys.slice(0, 5));
         
         console.log('🔍 DEBUG: Getting keys directly from localStorage...');
         const localStorageKeys = Object.keys(localStorage);
         console.log('🔍 DEBUG: localStorage has', localStorageKeys.length, 'total keys');
         
-        const prefKeys = [];
+        const keysToRemove = new Set();
         
-        // If groupName is specified, only clear that group's cache
-        if (groupName) {
-            const groupPattern = `preference_group_${groupName}_`;
-            console.log(`🔍 DEBUG: Filtering for specific group: ${groupPattern}`);
-            
-            // Add keys from UnifiedCacheManager (with prefix)
-            keys.forEach(key => {
-                if (key.includes(groupPattern)) {
-                    prefKeys.push(key);
-                }
-            });
-            
-            // Add keys directly from localStorage (without prefix)
-            localStorageKeys.forEach(key => {
-                if (key.includes(groupPattern)) {
-                    prefKeys.push(key);
-                }
-            });
-            
-            console.log('🔍 DEBUG: Found', prefKeys.length, `keys for group ${groupName}`);
-        } else {
-            // Clear all preferences cache keys
-            console.log('🔍 DEBUG: Filtering ALL preference keys...');
-            
-            // Add keys from UnifiedCacheManager (with prefix)
-            keys.forEach(key => {
-                if (key.startsWith('tiktrack_preference_') || 
-                    key.startsWith('tiktrack_all_preferences_') ||
-                    key.startsWith('tiktrack_preference_group_') ||
-                    key === 'tiktrack_user-preferences') {
-                    prefKeys.push(key);
-                }
-            });
-            console.log('🔍 DEBUG: Found', prefKeys.length, 'keys from UnifiedCacheManager');
-            
-            // Add keys directly from localStorage (without prefix)
-            localStorageKeys.forEach(key => {
-                if (key.startsWith('preference_') || 
-                    key.startsWith('all_preferences_') ||
-                    key.startsWith('preference_group_') ||
-                    key === 'user-preferences') {
-                    prefKeys.push(key);
-                }
-            });
-            console.log('🔍 DEBUG: Total preference keys to remove:', prefKeys.length);
-        }
+        keys.forEach((key) => {
+            const normalized = normalizeKey(key);
+            if (shouldRemove(normalized)) {
+                keysToRemove.add(normalized);
+            }
+        });
         
-        window.Logger.info(`🔄 Refreshing user preferences${groupName ? ` for group ${groupName}` : ''} - clearing ${prefKeys.length} keys`, { page: "unified-cache-manager" });
-        if (prefKeys.length > 0) {
-            window.Logger.info(`🔍 Preference keys found:`, prefKeys.slice(0, 10), { page: "unified-cache-manager" });
+        localStorageKeys.forEach((key) => {
+            const normalized = normalizeKey(key);
+            if (shouldRemove(normalized)) {
+                keysToRemove.add(normalized);
+            }
+        });
+        
+        window.Logger.info(
+            `🔄 Refreshing user preferences${groupName ? ` for group ${groupName}` : ''} - clearing ${keysToRemove.size} unique keys`,
+            { page: "unified-cache-manager" }
+        );
+        if (keysToRemove.size > 0) {
+            window.Logger.info(
+                `🔍 Preference keys found:`,
+                Array.from(keysToRemove).slice(0, 10),
+                { page: "unified-cache-manager" }
+            );
         }
         
         let removedCount = 0;
-        for (const key of prefKeys) {
+        for (const normalizedKey of keysToRemove) {
             try {
-                console.log(`🗑️ DEBUG: Processing key: ${key}`);
+                console.log(`🗑️ DEBUG: Processing normalized key: ${normalizedKey}`);
                 
-                // Remove directly from localStorage (simplest and most reliable)
-                if (localStorage.getItem(key) !== null) {
-                    localStorage.removeItem(key);
+                const prefixedKey = `tiktrack_${normalizedKey}`;
+                
+                if (localStorage.getItem(normalizedKey) !== null) {
+                    localStorage.removeItem(normalizedKey);
                     removedCount++;
-                    console.log(`✅ DEBUG: Removed ${key} from localStorage directly`);
-                    window.Logger.debug(`🗑️ Removed ${key} from localStorage`, { page: "unified-cache-manager" });
-                } else {
-                    console.log(`⚠️ DEBUG: Key ${key} not found in localStorage (already removed?)`);
+                    console.log(`✅ DEBUG: Removed ${normalizedKey} from localStorage`);
+                    window.Logger.debug(`🗑️ Removed ${normalizedKey} from localStorage`, { page: "unified-cache-manager" });
                 }
                 
-                // Also try removing via UnifiedCacheManager (which will try all layers)
-                // This handles the key both with and without prefix
-                if (key.startsWith('tiktrack_')) {
-                    // Key has prefix, remove without prefix for UnifiedCacheManager
-                    const keyWithoutPrefix = key.replace('tiktrack_', '');
-                    console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${keyWithoutPrefix}")`);
-                    await this.remove(keyWithoutPrefix);
-                } else {
-                    // Key without prefix
-                    console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${key}")`);
-                    await this.remove(key);
+                if (localStorage.getItem(prefixedKey) !== null) {
+                    localStorage.removeItem(prefixedKey);
+                    removedCount++;
+                    console.log(`✅ DEBUG: Removed ${prefixedKey} from localStorage`);
+                    window.Logger.debug(`🗑️ Removed ${prefixedKey} from localStorage`, { page: "unified-cache-manager" });
                 }
+                
+                console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${normalizedKey}")`);
+                await this.remove(normalizedKey);
             } catch (removeError) {
-                console.error(`❌ DEBUG: Failed to remove key ${key}:`, removeError);
-                window.Logger.warn(`⚠️ Failed to remove key ${key}:`, removeError, { page: "unified-cache-manager" });
+                console.error(`❌ DEBUG: Failed to remove key ${normalizedKey}:`, removeError);
+                window.Logger.warn(`⚠️ Failed to remove key ${normalizedKey}:`, removeError, { page: "unified-cache-manager" });
             }
         }
         
-        console.log(`✅ DEBUG: Successfully removed ${removedCount} keys from localStorage`);
-        
-        // NOTE: We do NOT reload preferences here anymore
-        // The caller (PreferencesUI.saveAllPreferences) should handle reloading the form
-        // This prevents double-loading and rate limiting issues
-        
+        console.log(`✅ DEBUG: Successfully removed ${removedCount} key entries from localStorage`);
         console.log('✅ DEBUG: Cache cleared successfully - preferences will be reloaded by caller');
         
     } catch (error) {

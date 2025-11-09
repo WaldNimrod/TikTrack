@@ -71,6 +71,7 @@ class ProfileManager {
      */
     async switchProfile(profileId, userId = 1) {
         try {
+            const previousProfileId = window.PreferencesCore?.currentProfileId ?? window.PreferencesUI?.currentProfileId ?? null;
             window.Logger.info(`🔄 Switching to profile ID: ${profileId}`, { page: "preferences-profiles" });
             
             // Update current profile ID immediately
@@ -125,7 +126,10 @@ class ProfileManager {
             // Step 3: Invalidate cache using CacheSyncManager (if available) + UnifiedCacheManager
             // First clear local cache, then sync with backend
             if (window.UnifiedCacheManager) {
-                await window.UnifiedCacheManager.refreshUserPreferences();
+                await window.UnifiedCacheManager.refreshUserPreferences(profileId, null, {
+                    userId,
+                    previousProfileId
+                });
                 window.Logger.info('✅ Local cache cleared via UnifiedCacheManager', { page: "preferences-profiles" });
             }
             

@@ -78,6 +78,232 @@
  * @refactoringPhase 6 - Modular Architecture
  */
 
+const DEFAULT_LOCALE = 'he-IL';
+let userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+
+function getUserTimezone() {
+  return userTimezone;
+}
+
+function setUserTimezone(timezone) {
+  if (timezone && typeof timezone === 'string') {
+    userTimezone = timezone;
+  }
+}
+
+function isDateEnvelope(value) {
+  return value && typeof value === 'object' && 'epochMs' in value && 'utc' in value;
+}
+
+function toDateObject(value) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return new Date(value.getTime());
+  }
+
+  if (isDateEnvelope(value)) {
+    if (value.utc) {
+      const parsedUtc = Date.parse(value.utc);
+      if (!Number.isNaN(parsedUtc)) {
+        return new Date(parsedUtc);
+      }
+    }
+    if (typeof value.epochMs === 'number' && Number.isFinite(value.epochMs)) {
+      return new Date(value.epochMs);
+    }
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return new Date(value);
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return null;
+    }
+    let parsed = Date.parse(trimmed);
+    if (!Number.isNaN(parsed)) {
+      return new Date(parsed);
+    }
+
+    const isoMatch = trimmed.match(
+      /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,6}))?)?(Z|[+-]\d{2}:\d{2})?$/
+    );
+    if (isoMatch) {
+      const [, year, month, day, hour, minute, second = '00', fractional = '', timezone = ''] = isoMatch;
+      let isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}`;
+      if (fractional) {
+        const millis = fractional.padEnd(3, '0').slice(0, 3);
+        isoString += `.${millis}`;
+      }
+      if (timezone) {
+        isoString += timezone;
+      }
+      parsed = Date.parse(isoString);
+      if (!Number.isNaN(parsed)) {
+        return new Date(parsed);
+      }
+    }
+
+    const dateOnlyMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (dateOnlyMatch) {
+      const [, year, month, day] = dateOnlyMatch;
+      parsed = Date.parse(`${year}-${month}-${day}T00:00:00Z`);
+      if (!Number.isNaN(parsed)) {
+        return new Date(parsed);
+      }
+    }
+
+    const hebrewDateTimeMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/);
+    if (hebrewDateTimeMatch) {
+      const [, day, month, year, hour, minute] = hebrewDateTimeMatch;
+      parsed = Date.parse(
+        `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00Z`
+      );
+      if (!Number.isNaN(parsed)) {
+        return new Date(parsed);
+      }
+    }
+
+    const hebrewDateTimePipeMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*\|\s*(\d{1,2}):(\d{2})$/);
+    if (hebrewDateTimePipeMatch) {
+      const [, day, month, year, hour, minute] = hebrewDateTimePipeMatch;
+      parsed = Date.parse(
+        `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00Z`
+      );
+      if (!Number.isNaN(parsed)) {
+        return new Date(parsed);
+      }
+    }
+
+    const hebrewMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (hebrewMatch) {
+      const [, day, month, year] = hebrewMatch;
+      parsed = Date.parse(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00:00Z`);
+      if (!Number.isNaN(parsed)) {
+        return new Date(parsed);
+      }
+    }
+  }
+
+  return null;
+}
+
+function getEpochMilliseconds(value) {
+  if (isDateEnvelope(value)) {
+    if (typeof value.epochMs === 'number') {
+      return value.epochMs;
+    }
+    if (value.utc) {
+      const parsedUtc = Date.parse(value.utc);
+      if (!Number.isNaN(parsedUtc)) {
+        return parsedUtc;
+      }
+    }
+  }
+
+  const dateObj = toDateObject(value);
+  return dateObj ? dateObj.getTime() : null;
+}
+
+function buildDisplayString(dateObj, { includeTime = true, twoDigitYear = false } = {}) {
+  if (!(dateObj instanceof Date) || Number.isNaN(dateObj.getTime())) {
+    return '-';
+  }
+
+  const options = {
+    timeZone: userTimezone,
+    day: '2-digit',
+    month: '2-digit',
+    year: twoDigitYear ? '2-digit' : 'numeric',
+  };
+
+  if (includeTime) {
+    options.hour = '2-digit';
+    options.minute = '2-digit';
+    options.hour12 = false;
+  }
+
+  const formatted = dateObj.toLocaleString(DEFAULT_LOCALE, options);
+  if (!includeTime) {
+    return formatted.replace(',', '').trim();
+  }
+
+  const segments = formatted.split(',');
+  if (segments.length >= 2) {
+    const datePart = segments[0].trim();
+    const timePart = segments.slice(1).join(',').trim();
+    return `${datePart} | ${timePart}`;
+  }
+
+  return formatted.replace(',', ' | ').trim();
+}
+
+function ensureDateEnvelope(value) {
+  if (!value && value !== 0) {
+    return null;
+  }
+
+  if (isDateEnvelope(value)) {
+    const envelope = { ...value };
+    envelope.timezone = envelope.timezone || userTimezone;
+
+    const dateObjFromEnvelope = toDateObject(envelope);
+    if (dateObjFromEnvelope) {
+      if (!envelope.display) {
+        envelope.display = buildDisplayString(dateObjFromEnvelope, { includeTime: true });
+      }
+      if (!envelope.local) {
+        envelope.local = buildDisplayString(dateObjFromEnvelope, { includeTime: true });
+      }
+    }
+
+    return envelope;
+  }
+
+  const dateObj = toDateObject(value);
+  if (!dateObj) {
+    return null;
+  }
+
+  return {
+    utc: dateObj.toISOString(),
+    epochMs: dateObj.getTime(),
+    local: buildDisplayString(dateObj, { includeTime: true }),
+    timezone: userTimezone,
+    display: buildDisplayString(dateObj, { includeTime: true }),
+  };
+}
+
+function parseEnvelope(value) {
+  return ensureDateEnvelope(value);
+}
+
+function formatEnvelope(value, options = {}) {
+  const envelope = ensureDateEnvelope(value);
+  if (!envelope) {
+    return '-';
+  }
+  return formatDate(envelope, options);
+}
+
+function formatWithIntl(date, options = {}) {
+  if (!date) {
+    return '';
+  }
+
+  const baseOptions = {
+    timeZone: userTimezone,
+    ...options,
+  };
+
+  return date.toLocaleString(DEFAULT_LOCALE, baseOptions);
+}
+
 // ===== DATE FORMATTING FUNCTIONS =====
 /**
  * Format date to standard display format
@@ -88,32 +314,30 @@
  * @param {string|Date} dateString - Date string or Date object to format
  * @returns {string} Formatted date string (DD/MM/YYYY) or '-' for invalid dates
  */
-function formatDate(dateString, includeTime = false) {
-  if (!dateString) {return '-';}
+function formatDate(value, options = {}) {
+  let includeTime = false;
+  let twoDigitYear = false;
 
-  try {
-    const date = parseDate(dateString);
-    if (!date) {return '-';}
+  if (typeof options === 'boolean') {
+    includeTime = options;
+  } else if (options && typeof options === 'object') {
+    includeTime = Boolean(options.includeTime);
+    twoDigitYear = Boolean(options.twoDigitYear);
+  }
 
-    if (includeTime) {
-      return date.toLocaleString('he-IL', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    }
-
-    return date.toLocaleDateString('he-IL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  } catch {
-    // console.warn('⚠️ Error formatting date:', dateString, error);
+  const envelope = ensureDateEnvelope(value);
+  if (!envelope) {
     return '-';
   }
+
+  const dateObj = toDateObject(envelope);
+  if (!dateObj) {
+    return '-';
+  }
+
+  return includeTime
+    ? buildDisplayString(dateObj, { includeTime: true, twoDigitYear })
+    : buildDisplayString(dateObj, { includeTime: false, twoDigitYear });
 }
 
 /**
@@ -125,8 +349,8 @@ function formatDate(dateString, includeTime = false) {
  * @param {string|Date} dateString - Date string or Date object to format
  * @returns {string} Formatted date and time string or '-' for invalid dates
  */
-function formatDateTime(dateString) {
-  return formatDate(dateString, true);
+function formatDateTime(value) {
+  return formatDate(value, { includeTime: true });
 }
 
 /**
@@ -151,20 +375,14 @@ function formatDateOnly(dateString) {
  * @returns {string} Short formatted date string or '-' for invalid dates
  */
 function formatShortDate(dateString) {
-  if (!dateString) {return '-';}
+  const envelope = ensureDateEnvelope(dateString);
+  const dateObj = toDateObject(envelope);
+  if (!dateObj) {return '-';}
 
-  try {
-    const date = parseDate(dateString);
-    if (!date) {return '-';}
-
-    return date.toLocaleDateString('he-IL', {
-      day: '2-digit',
-      month: '2-digit',
-    });
-  } catch {
-    // console.warn('⚠️ Error formatting short date:', dateString, error);
-    return '-';
-  }
+  return formatWithIntl(dateObj, {
+    day: '2-digit',
+    month: '2-digit',
+  });
 }
 
 /**
@@ -177,21 +395,15 @@ function formatShortDate(dateString) {
  * @returns {string} Long formatted date string or '-' for invalid dates
  */
 function formatLongDate(dateString) {
-  if (!dateString) {return '-';}
+  const envelope = ensureDateEnvelope(dateString);
+  const dateObj = toDateObject(envelope);
+  if (!dateObj) {return '-';}
 
-  try {
-    const date = parseDate(dateString);
-    if (!date) {return '-';}
-
-    return date.toLocaleDateString('he-IL', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-  } catch {
-    // console.warn('⚠️ Error formatting long date:', dateString, error);
-    return '-';
-  }
+  return formatWithIntl(dateObj, {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 /**
@@ -204,20 +416,14 @@ function formatLongDate(dateString) {
  * @returns {string} Formatted time string (HH:MM) or '-' for invalid dates
  */
 function formatTimeOnly(dateString) {
-  if (!dateString) {return '-';}
+  const envelope = ensureDateEnvelope(dateString);
+  const dateObj = toDateObject(envelope);
+  if (!dateObj) {return '-';}
 
-  try {
-    const date = parseDate(dateString);
-    if (!date) {return '-';}
-
-    return date.toLocaleTimeString('he-IL', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  } catch {
-    // console.warn('⚠️ Error formatting time:', dateString, error);
-    return '-';
-  }
+  return formatWithIntl(dateObj, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 // ===== DATE CONVERSION UTILITIES =====
@@ -235,6 +441,10 @@ function parseDate(dateString, options = {}) {
   if (!dateString) {return null;}
 
   try {
+    if (isDateEnvelope(dateString)) {
+      return toDateObject(dateString);
+    }
+
     // Handle different input types
     if (dateString instanceof Date) {
       return isNaN(dateString.getTime()) ? null : dateString;
@@ -378,10 +588,8 @@ function toISOString(date) {
   if (!date) {return null;}
 
   try {
-    const dateObj = new Date(date);
-    if (isNaN(dateObj.getTime())) {return null;}
-
-    return dateObj.toISOString();
+    const envelope = ensureDateEnvelope(date);
+    return envelope ? envelope.utc : null;
   } catch {
     // console.warn('⚠️ Error converting to ISO string:', date, error);
     return null;
@@ -401,10 +609,7 @@ function toDate(date) {
   if (!date) {return null;}
 
   try {
-    const dateObj = new Date(date);
-    if (isNaN(dateObj.getTime())) {return null;}
-
-    return dateObj;
+    return toDateObject(date);
   } catch {
     // console.warn('⚠️ Error converting to Date:', date, error);
     return null;
@@ -443,7 +648,7 @@ function isPastDate(date) {
   if (!date) {return false;}
 
   try {
-    const dateObj = new Date(date);
+    const dateObj = toDateObject(date);
     if (isNaN(dateObj.getTime())) {return false;}
 
     return dateObj < new Date();
@@ -465,7 +670,7 @@ function isFutureDate(date) {
   if (!date) {return false;}
 
   try {
-    const dateObj = new Date(date);
+    const dateObj = toDateObject(date);
     if (isNaN(dateObj.getTime())) {return false;}
 
     return dateObj > new Date();
@@ -490,8 +695,8 @@ function daysDifference(startDate, endDate) {
   if (!startDate || !endDate) {return null;}
 
   try {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const start = toDateObject(startDate);
+    const end = toDateObject(endDate);
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {return null;}
 
@@ -518,7 +723,7 @@ function addDays(date, days) {
   if (!date || typeof days !== 'number') {return null;}
 
   try {
-    const dateObj = new Date(date);
+    const dateObj = toDateObject(date);
     if (isNaN(dateObj.getTime())) {return null;}
 
     dateObj.setDate(dateObj.getDate() + days);
@@ -542,7 +747,7 @@ function addMonths(date, months) {
   if (!date || typeof months !== 'number') {return null;}
 
   try {
-    const dateObj = new Date(date);
+    const dateObj = toDateObject(date);
     if (isNaN(dateObj.getTime())) {return null;}
 
     dateObj.setMonth(dateObj.getMonth() + months);
@@ -551,6 +756,45 @@ function addMonths(date, months) {
     // console.warn('⚠️ Error adding months:', error);
     return null;
   }
+}
+
+function adaptDateEnvelopes(payload) {
+  if (Array.isArray(payload)) {
+    return payload.map(item => adaptDateEnvelopes(item));
+  }
+
+  if (!payload || typeof payload !== 'object') {
+    return payload;
+  }
+
+  if (isDateEnvelope(payload)) {
+    return ensureDateEnvelope(payload);
+  }
+
+  Object.keys(payload).forEach((key) => {
+    if (key.endsWith('_envelope')) {
+      return;
+    }
+
+    const value = payload[key];
+
+    if (isDateEnvelope(value)) {
+      if (key === 'timestamp') {
+        payload[key] = ensureDateEnvelope(value);
+        return;
+      }
+      const envelope = ensureDateEnvelope(value);
+      payload[`${key}_envelope`] = envelope;
+      payload[key] = envelope.display || formatDateTime(envelope);
+      return;
+    }
+
+    if (Array.isArray(value) || (value && typeof value === 'object')) {
+      payload[key] = adaptDateEnvelopes(value);
+    }
+  });
+
+  return payload;
 }
 
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
@@ -573,6 +817,12 @@ window.isFutureDate = isFutureDate;
 window.daysDifference = daysDifference;
 window.addDays = addDays;
 window.addMonths = addMonths;
+window.getEpochMilliseconds = getEpochMilliseconds;
+window.ensureDateEnvelope = ensureDateEnvelope;
+window.isDateEnvelope = isDateEnvelope;
+window.setUserTimezone = setUserTimezone;
+window.getUserTimezone = getUserTimezone;
+window.adaptDateEnvelopes = adaptDateEnvelopes;
 
 // ===== DATE RANGE TRANSLATION =====
 /**
@@ -748,13 +998,41 @@ window.dateUtils = {
   parseDate,
   toISOString,
   toDate,
+  toDateObject,
   isValidDate,
   isPastDate,
   isFutureDate,
   daysDifference,
   addDays,
   addMonths,
+  getEpochMilliseconds,
+  ensureDateEnvelope,
+  isDateEnvelope,
+  parseEnvelope,
+  formatEnvelope,
+  setUserTimezone,
+  getUserTimezone,
+  adaptDateEnvelopes,
 };
 
 // Export translateDateRangeToDates to global scope
 window.translateDateRangeToDates = translateDateRangeToDates;
+
+if (!Response.prototype.__dateEnvelopePatched) {
+  const originalResponseJson = Response.prototype.json;
+
+  Response.prototype.json = async function patchedJson(...args) {
+    const data = await originalResponseJson.call(this, ...args);
+    return adaptDateEnvelopes(data);
+  };
+
+  Object.defineProperty(Response.prototype, '__dateEnvelopePatched', {
+    value: true,
+    configurable: false,
+    writable: false,
+  });
+}
+
+if (window.currentPreferences?.timezone) {
+  setUserTimezone(window.currentPreferences.timezone);
+}

@@ -437,6 +437,59 @@
 
 /* Outline Variants - REMOVED - Using data-button-type instead */
 
+/* ===== Portfolio Side Filter Buttons ===== */
+.portfolio-side-filter-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.portfolio-side-filter-btn .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    padding: 0.45rem 0.9rem;
+    min-width: 2.9rem;
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.portfolio-side-filter-btn:hover .badge {
+    transform: translateY(-1px);
+}
+
+.portfolio-side-filter-btn:focus-visible .badge {
+    outline: 3px solid rgba(79, 124, 254, 0.35);
+    outline-offset: 2px;
+}
+
+.portfolio-side-filter-btn.active .badge {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+}
+
+.portfolio-side-filter-btn[data-side="long"].active .badge-long {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--numeric-positive-medium, #28a745) 25%, transparent);
+}
+
+.portfolio-side-filter-btn[data-side="short"].active .badge-short {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--numeric-negative-medium, #dc3545) 25%, transparent);
+}
+
+.portfolio-side-filter-btn[data-side=""].active .badge-neutral {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--value-neutral-color, #6c757d) 25%, transparent);
+}
+
+.btn-group .portfolio-side-filter-btn:not(:first-child) {
+    margin-inline-start: 0.35rem;
+}
+
 /* ===== סגנונות בסיסיים של Bootstrap ===== */
 
 /* כרטיסים בסגנון אפל - הועבר ל-_cards.css */

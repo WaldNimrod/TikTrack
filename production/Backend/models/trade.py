@@ -40,7 +40,7 @@ class Trade(BaseModel):
         logger = logging.getLogger(__name__)
         
         try:
-            # Return all necessary fields for the frontend
+            # Return all necessary fields for the frontend while leaving datetime objects intact.
             result = {
                 "id": self.id,
                 "trading_account_id": self.trading_account_id,
@@ -50,53 +50,38 @@ class Trade(BaseModel):
                 "investment_type": self.investment_type,
                 "side": self.side,
                 "notes": self.notes,
-                "opened_at": self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
-                "closed_at": self.closed_at.strftime('%Y-%m-%d %H:%M:%S') if self.closed_at else None,
-                "created_at": self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
-                "total_pl": getattr(self, 'total_pl', 0)
+                "opened_at": self.created_at,
+                "closed_at": self.closed_at,
+                "created_at": self.created_at,
+                "cancelled_at": getattr(self, "cancelled_at", None),
+                "cancel_reason": getattr(self, "cancel_reason", None),
+                "total_pl": getattr(self, 'total_pl', 0),
             }
-            
+
             # Add trade plan data if available
-            logger.info(f"Trade {self.id}: Checking trade_plan relationship...")
-            logger.info(f"Trade {self.id}: hasattr(self, 'trade_plan'): {hasattr(self, 'trade_plan')}")
-            if hasattr(self, 'trade_plan'):
-                logger.info(f"Trade {self.id}: self.trade_plan: {self.trade_plan}")
-                if self.trade_plan:
-                    logger.info(f"Trade {self.id}: trade_plan is not None, adding data...")
-                    result.update({
-                        "trade_plan_created_at": self.trade_plan.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.trade_plan.created_at else None,
-                        "trade_plan_planned_amount": self.trade_plan.planned_amount,
-                        "trade_plan_status": self.trade_plan.status
-                    })
-                else:
-                    logger.info(f"Trade {self.id}: trade_plan is None")
-            else:
-                logger.info(f"Trade {self.id}: No trade_plan attribute")
-            
+            if hasattr(self, 'trade_plan') and self.trade_plan:
+                result.update({
+                    "trade_plan_created_at": self.trade_plan.created_at,
+                    "trade_plan_planned_amount": self.trade_plan.planned_amount,
+                    "trade_plan_status": self.trade_plan.status,
+                })
+
             # Use loaded relationships if available
             if hasattr(self, 'account') and self.account:
                 result["account_name"] = self.account.name
-                logger.info(f"Trade {self.id}: Using loaded account name: {self.account.name}")
             else:
-                result["account_name"] = f'TradingAccount_{self.trading_account_id}' if self.trading_account_id else 'Unknown TradingAccount'
-                logger.info(f"Trade {self.id}: Using fallback account name: {result['account_name']}")
-            
+                result["account_name"] = (
+                    f'TradingAccount_{self.trading_account_id}'
+                    if self.trading_account_id else 'Unknown TradingAccount'
+                )
+
             if hasattr(self, 'ticker') and self.ticker:
                 result["ticker_symbol"] = self.ticker.symbol
-                logger.info(f"Trade {self.id}: Using loaded ticker symbol: {self.ticker.symbol}")
             else:
-                result["ticker_symbol"] = f'Ticker_{self.ticker_id}' if self.ticker_id else 'Unknown Ticker'
-                logger.info(f"Trade {self.id}: Using fallback ticker symbol: {result['ticker_symbol']}")
-            
-            # Add any additional fields that might be needed
-            for field in ['cancelled_at', 'cancel_reason']:
-                if hasattr(self, field):
-                    value = getattr(self, field)
-                    if hasattr(value, 'strftime'):
-                        result[field] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
-                    else:
-                        result[field] = value
-            
+                result["ticker_symbol"] = (
+                    f'Ticker_{self.ticker_id}' if self.ticker_id else 'Unknown Ticker'
+                )
+
             logger.info(f"Trade {self.id} to_dict result: {result}")
             return result
         except Exception as e:

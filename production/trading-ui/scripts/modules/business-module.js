@@ -790,7 +790,7 @@ async function _REMOVED_loadEditTradeModalData(trade) {
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
     const accountSelect = document.getElementById('editTradeAccountId');
     if (accountSelect) {
-      accountSelect.innerHTML = '<option value="">בחר חשבון</option>';
+      accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
       const openAccounts = accounts.data.filter(account => account.status === 'open');
       openAccounts.forEach(account => {
         const option = document.createElement('option');
@@ -1427,7 +1427,7 @@ async function loadModalData() {
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
     const accountSelect = document.getElementById('addTradeAccountId');
     if (accountSelect) {
-      accountSelect.innerHTML = '<option value="">בחר חשבון</option>';
+      accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
       const openAccounts = accounts.data.filter(account => account.status === 'open');
       openAccounts.forEach(account => {
         const option = document.createElement('option');
@@ -2215,6 +2215,7 @@ async function validateTradePlanChange(newTradePlanId, tradeData) {
 
   try {
     // קבלת פרטי התוכנית החדשה
+    // Use relative URL to work with both development (8080) and production (5001)
     const url = `/api/trade_plans/${newTradePlanId}`;
     const response = await fetch(url);
 
@@ -2654,6 +2655,7 @@ async function reactivateTrade(tradeId) {
       throw new Error('טרייד לא נמצא');
     }
 
+    // Use relative URL to work with both development (8080) and production (5001)
     const response = await fetch(`/api/trades/${tradeId}`, {
       method: 'PUT',
       headers: {

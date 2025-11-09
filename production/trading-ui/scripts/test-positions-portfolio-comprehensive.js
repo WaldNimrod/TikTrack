@@ -229,7 +229,7 @@ window.testPositionsPortfolioSystem = async function() {
   if (countText) {
     const countTextValue = countText.textContent.trim();
     test('positions count text exists', () => countTextValue.length > 0);
-    test('positions count text is not "בחר חשבון..."', () => countTextValue !== 'בחר חשבון...', `Current: "${countTextValue}"`);
+    test('positions count text is not "בחר חשבון מסחר..."', () => countTextValue !== 'בחר חשבון מסחר...', `Current: "${countTextValue}"`);
   }
   
   const totalValue = document.getElementById('positionsTotalValue');

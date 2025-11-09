@@ -228,7 +228,8 @@ function formatDailyChange(dailyChange) {
   
   const color = isPositive ? colors.positive : colors.negative;
   
-  return `<span style="color: ${color}; font-weight: bold;">${formattedValue}</span>`;
+  const colorClass = isPositive ? 'numeric-value-positive' : 'numeric-value-negative';
+  return `<span class="${colorClass}">${formattedValue}</span>`;
   } catch (error) {
     window.Logger.error('Error in formatDailyChange:', error, { dailyChange, page: "trades" });
     return '-';
@@ -371,6 +372,14 @@ async function loadTradesData() {
     } else if (typeof window.updatePageSummaryStats === 'function') {
       window.updatePageSummaryStats('trades', window.tradesData);
     }
+    
+    // Register table with UnifiedTableSystem after data is loaded
+    if (typeof window.registerTradesTables === 'function') {
+      window.registerTradesTables();
+    }
+
+    // Restore page state (filters, sort, sections, entity filters)
+    await restorePageState('trades');
 
   } catch (error) {
     if (typeof handleDataLoadError === 'function') {
@@ -591,22 +600,91 @@ async function updateTradesTable(trades) {
   window.Logger.info('✅ Found tbody, proceeding with HTML generation', { page: "trades" });
 
   const tableHTML = trades.map(trade => {
+    const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(
+          trade.created_at_envelope ||
+          trade.createdAtEnvelope ||
+          trade.created_at ||
+          trade.createdAt ||
+          null
+        )
+      : (
+          trade.created_at_envelope ||
+          trade.createdAtEnvelope ||
+          trade.created_at ||
+          trade.createdAt ||
+          null
+        );
+
+    const openedEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(
+          trade.opened_at_envelope ||
+          trade.openedAtEnvelope ||
+          trade.opened_at ||
+          trade.openedAt ||
+          createdEnvelope ||
+          null
+        )
+      : (
+          trade.opened_at_envelope ||
+          trade.openedAtEnvelope ||
+          trade.opened_at ||
+          trade.openedAt ||
+          createdEnvelope ||
+          null
+        );
+
+    const closedEnvelopeRaw =
+      trade.closed_at_envelope ||
+      trade.closedAtEnvelope ||
+      trade.closed_at ||
+      trade.closedAt ||
+      trade.cancelled_at_envelope ||
+      trade.cancelledAtEnvelope ||
+      trade.cancelled_at ||
+      trade.cancelledAt ||
+      null;
+
+    const closedEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(closedEnvelopeRaw)
+      : closedEnvelopeRaw;
+
+    const createdMs = window.dateUtils?.getEpochMilliseconds
+      ? window.dateUtils.getEpochMilliseconds(createdEnvelope)
+      : (() => {
+          try {
+            if (!createdEnvelope) {return null;}
+            const createdDateObj = createdEnvelope instanceof Date ? createdEnvelope : new Date(createdEnvelope);
+            return createdDateObj.getTime();
+          } catch {
+            return null;
+          }
+        })();
+
+    const closedMs = window.dateUtils?.getEpochMilliseconds
+      ? window.dateUtils.getEpochMilliseconds(closedEnvelope)
+      : (() => {
+          try {
+            if (!closedEnvelope) {return null;}
+            const closedDateObj = closedEnvelope instanceof Date ? closedEnvelope : new Date(closedEnvelope);
+            return closedDateObj.getTime();
+          } catch {
+            return null;
+          }
+        })();
+
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = trade.investment_type || '';
 
     // שימוש ב-FieldRendererService לרינדור שדות
     const tickerDisplay = trade.ticker_symbol || getTickerSymbol(trade.ticker_id) || 'טיקר לא ידוע';
-    const tickerLink = `<button class="btn btn-sm btn-outline-secondary" onclick="viewTickerDetails('${trade.ticker_id}')" title="פרטי טיקר" style="padding: 2px 6px; font-size: 12px;">🔗</button>`;
 
     return `
     <tr>
       <td class="ticker-cell">
-        <div style="display: flex; align-items: center; gap: 6px;">
-          ${tickerLink}
-          <span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
-            ${tickerDisplay}
-          </span>
-        </div>
+        <strong><span class="entity-trade-badge entity-badge-base">
+          ${tickerDisplay}
+        </span></strong>
       </td>
       <td class="price-cell">${(() => {
         const tickerData = tickerDataMap[trade.ticker_id];
@@ -636,7 +714,7 @@ async function updateTradesTable(trades) {
       <td class="position-quantity-cell">
         ${(() => {
           if (!trade.position || trade.position.quantity === 0) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">אין ביצועים</span>';
+            return '<span class="numeric-value-zero">0</span>';
           }
           const qty = trade.position.quantity;
           const avgPrice = trade.position.average_price || 0;
@@ -646,14 +724,14 @@ async function updateTradesTable(trades) {
       <td class="position-pl-percent-cell">
         ${(() => {
           if (!trade.position || !trade.position.average_price) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>';
+            return '<span class="numeric-value-zero entity-badge-medium">-</span>';
           }
           const tickerData = tickerDataMap[trade.ticker_id];
           const currentPrice = tickerData?.current_price || 0;
           const avgPrice = trade.position.average_price;
           
           if (currentPrice === 0 || avgPrice === 0) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>';
+            return '<span class="numeric-value-zero entity-badge-medium">-</span>';
           }
           
           const plPercent = ((currentPrice - avgPrice) / avgPrice) * 100;
@@ -663,7 +741,7 @@ async function updateTradesTable(trades) {
       <td class="position-pl-value-cell">
         ${(() => {
           if (!trade.position || !trade.position.quantity) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>';
+            return '<span class="numeric-value-zero entity-badge-medium">-</span>';
           }
           const tickerData = tickerDataMap[trade.ticker_id];
           const currentPrice = tickerData?.current_price || 0;
@@ -671,7 +749,7 @@ async function updateTradesTable(trades) {
           const qty = trade.position.quantity;
           
           if (currentPrice === 0 || avgPrice === 0) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">חסר מחיר</span>';
+            return '<span class="numeric-value-zero entity-badge-medium">חסר מחיר</span>';
           }
           
           const plValue = (currentPrice - avgPrice) * qty;
@@ -680,29 +758,56 @@ async function updateTradesTable(trades) {
       </td>
       <td class="status-cell" data-status="${trade.status || ''}">${window.FieldRendererService ? window.FieldRendererService.renderStatus(trade.status, 'trade') : `<span class="status-badge status-${trade.status || 'open'}">${trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח'}</span>`}</td>
       <td class="type-cell" data-type="${typeForFilter}">
-        ${window.FieldRendererService ? window.FieldRendererService.renderType(trade.investment_type) : `<span class='investment-type-badge' style='background-color: ${getInvestmentTypeColor(trade.investment_type)}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 500;'>${window.translateTradeType ? window.translateTradeType(trade.investment_type) : trade.investment_type || '-'}</span>`}
+        ${window.FieldRendererService ? window.FieldRendererService.renderType(trade.investment_type) : `<span class='investment-type-badge badge-type' data-type='${trade.investment_type || ''}' style='background-color: ${getInvestmentTypeColor(trade.investment_type)};'>${window.translateTradeType ? window.translateTradeType(trade.investment_type) : trade.investment_type || '-'}</span>`}
       </td>
       <td class="side-cell" data-side="${trade.side || 'Long'}">
         ${window.FieldRendererService ? window.FieldRendererService.renderSide(trade.side) : `<span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>`}
       </td>
-      <td class="plan-cell">${trade.trade_plan_id ? (window.FieldRendererService ? (() => {
-        window.Logger.info('🔍 trades.js DEBUG:', { 
-          trade_plan_id: trade.trade_plan_id, 
-          trade_plan_planned_amount: trade.trade_plan_planned_amount, 
-          trade_plan_created_at: trade.trade_plan_created_at 
-        }, { page: "trades" });
-        const result = window.FieldRendererService.renderLinkedEntity('trade_plan', trade.trade_plan_id, trade.trade_plan_planned_amount || '', { 
-          ticker: trade.ticker_symbol, 
-          date: trade.trade_plan_created_at, 
-          planned_amount: trade.trade_plan_planned_amount, 
-          short: true 
-        });
-        window.Logger.info('🔍 trades.js RESULT:', result, { page: "trades" });
-        return result;
-      })() : `<span class="text-danger">❌ FieldRendererService לא זמין</span>`) : '-'}</td>
-      <td><strong><a href="#" onclick="viewAccountDetails('${trade.trading_account_id}')" class="account-link">${trade.account_name || trade.trading_account_id || 'חשבון מסחר לא ידוע'}</a></strong></td>
-      <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר'}</td>
-      <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : ''}</td>
+      <td>${trade.account_name || trade.trading_account_id || 'חשבון מסחר לא ידוע'}</td>
+      <td data-date="${createdMs || ''}">
+        ${(() => {
+          if (!createdEnvelope) {
+            return '<span class="date-text">לא מוגדר</span>';
+          }
+          if (window.FieldRendererService?.renderDate) {
+            return `<span class="date-text">${window.FieldRendererService.renderDate(createdEnvelope, false)}</span>`;
+          }
+          if (window.dateUtils?.formatDate) {
+            return `<span class="date-text">${window.dateUtils.formatDate(createdEnvelope, { includeTime: false })}</span>`;
+          }
+          try {
+            const dateObj = createdEnvelope instanceof Date ? createdEnvelope : new Date(createdEnvelope);
+            if (!Number.isNaN(dateObj.getTime())) {
+              return `<span class="date-text">${dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' })}</span>`;
+            }
+          } catch (error) {
+            window.Logger?.warn('⚠️ trades created_at fallback failed', { error, tradeId: trade?.id }, { page: 'trades' });
+          }
+          return '<span class="date-text">לא מוגדר</span>';
+        })()}
+      </td>
+      <td data-date="${closedMs || ''}">
+        ${(() => {
+          if (!closedEnvelope) {
+            return '<span class="date-text"></span>';
+          }
+          if (window.FieldRendererService?.renderDate) {
+            return `<span class="date-text">${window.FieldRendererService.renderDate(closedEnvelope, false)}</span>`;
+          }
+          if (window.dateUtils?.formatDate) {
+            return `<span class="date-text">${window.dateUtils.formatDate(closedEnvelope, { includeTime: false })}</span>`;
+          }
+          try {
+            const dateObj = closedEnvelope instanceof Date ? closedEnvelope : new Date(closedEnvelope);
+            if (!Number.isNaN(dateObj.getTime())) {
+              return `<span class="date-text">${dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' })}</span>`;
+            }
+          } catch (error) {
+            window.Logger?.warn('⚠️ trades closed_at fallback failed', { error, tradeId: trade?.id }, { page: 'trades' });
+          }
+          return '<span class="date-text"></span>';
+        })()}
+      </td>
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
           ${(() => {
@@ -711,7 +816,6 @@ async function updateTradesTable(trades) {
             }
             const result = window.createActionsMenu([
               { type: 'VIEW', onclick: `window.showEntityDetails('trade', ${trade.id}, { mode: 'view' })`, title: 'צפה בפרטים' },
-              { type: 'LINK', onclick: `viewLinkedItemsForTrade(${trade.id})`, title: 'קישור' },
               { type: 'EDIT', onclick: `editTradeRecord('${trade.id}')`, title: 'ערוך' },
               { type: 'CANCEL', onclick: `cancelTradeRecord('${trade.id}')`, title: 'בטל' },
               { type: 'DELETE', onclick: `deleteTradeRecord('${trade.id}')`, title: 'מחק' }
@@ -873,23 +977,47 @@ function viewTradePlanDetails(tradePlanId) {
  */
 function editTradeRecord(tradeId) {
   try {
-  // עריכת טרייד
-  // מציאת הטרייד במערך
-  const trade = tradesData.find(t => t.id === tradeId);
-  if (trade) {
-    // Use ModalManagerV2 directly
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-      window.ModalManagerV2.showEditModal('tradesModal', 'trade', trade.id);
+    // עריכת טרייד
+    // מציאת הטרייד במערך - שימוש ב-window.tradesData (גלובלי) ולא tradesData (מקומי)
+    const trade = window.tradesData?.find(t => t.id === tradeId || t.id === parseInt(tradeId));
+    if (trade) {
+      // Use ModalManagerV2 directly
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('tradesModal', 'trade', trade.id);
+      } else {
+        window.Logger?.error('ModalManagerV2 לא זמין', { page: "trades" });
+        // Fallback: try to load trade data directly from API
+        if (window.EntityDetailsAPI && typeof window.EntityDetailsAPI.getEntityDetails === 'function') {
+          window.EntityDetailsAPI.getEntityDetails('trade', tradeId).then(entityData => {
+            if (entityData && window.ModalManagerV2) {
+              window.ModalManagerV2.showModal('tradesModal', 'edit', entityData);
+            }
+          }).catch(err => {
+            window.Logger?.error('Failed to load trade data for edit', { error: err, tradeId, page: "trades" });
+            window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני הטרייד');
+          });
+        }
+      }
     } else {
-      window.Logger?.error('ModalManagerV2 לא זמין', { page: "trades" });
-    }
-  } else {
-    if (typeof handleElementNotFound === 'function') {
-      handleElementNotFound('trade', 'CRITICAL');
-    } else {
-        // window.Logger.error('trade not found', { page: "trades" });
-    }
-    window.showErrorNotification('שגיאה', 'טרייד לא נמצא', 6000, 'system');
+      // Try to load trade data directly from API if not found locally
+      if (window.EntityDetailsAPI && typeof window.EntityDetailsAPI.getEntityDetails === 'function') {
+        window.Logger?.info('Trade not found locally, loading from API...', { tradeId, page: "trades" });
+        window.EntityDetailsAPI.getEntityDetails('trade', tradeId).then(entityData => {
+          if (entityData && window.ModalManagerV2) {
+            window.ModalManagerV2.showModal('tradesModal', 'edit', entityData);
+          } else {
+            window.showErrorNotification('שגיאה', 'טרייד לא נמצא', 6000, 'system');
+          }
+        }).catch(err => {
+          window.Logger?.error('Failed to load trade data for edit', { error: err, tradeId, page: "trades" });
+          window.showErrorNotification('שגיאה', 'טרייד לא נמצא', 6000, 'system');
+        });
+      } else {
+        if (typeof handleElementNotFound === 'function') {
+          handleElementNotFound('trade', 'CRITICAL');
+        }
+        window.showErrorNotification('שגיאה', 'טרייד לא נמצא', 6000, 'system');
+      }
     }
   } catch (error) {
     window.Logger.error('Error in editTradeRecord:', error, { tradeId, page: "trades" });
@@ -1065,7 +1193,40 @@ async function deleteTradeRecord(tradeId) {
       }
       entryPrice = entryPrice ? `$${entryPrice}` : 'לא מוגדר';
       
-      const date = trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const openedEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(
+            trade.opened_at_envelope ||
+            trade.openedAtEnvelope ||
+            trade.opened_at ||
+            trade.openedAt ||
+            trade.created_at_envelope ||
+            trade.created_at ||
+            null
+          )
+        : (
+            trade.opened_at_envelope ||
+            trade.openedAtEnvelope ||
+            trade.opened_at ||
+            trade.openedAt ||
+            trade.created_at_envelope ||
+            trade.created_at ||
+            null
+          );
+      let date = 'לא מוגדר';
+      if (openedEnvelope) {
+        if (window.dateUtils?.formatDate) {
+          date = window.dateUtils.formatDate(openedEnvelope, { includeTime: false });
+        } else {
+          try {
+            const dateObj = openedEnvelope instanceof Date ? openedEnvelope : new Date(openedEnvelope);
+            if (!Number.isNaN(dateObj.getTime())) {
+              date = dateObj.toLocaleDateString('he-IL');
+            }
+          } catch {
+            date = 'לא מוגדר';
+          }
+        }
+      }
       
       tradeDetails = `${ticker} - ${sideText}, ${quantity} יחידות ב-${entryPrice}, תאריך פתיחה: ${date}`;
     }
@@ -1211,6 +1372,70 @@ function addEditReminder() {
 /**
  * פונקציה להצגת מודל עריכת טרייד
  */
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('trades', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('trades');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for HTML onclick attributes
@@ -2256,6 +2481,7 @@ async function validateTradePlanChange(newTradePlanId, tradeData) {
 
   try {
     // קבלת פרטי התוכנית החדשה
+    // Use relative URL to work with both development (8080) and production (5001)
     const url = `/api/trade_plans/${newTradePlanId}`;
     const response = await fetch(url);
 
@@ -2282,11 +2508,22 @@ async function validateTradePlanChange(newTradePlanId, tradeData) {
     }
 
     // בדיקה 3: תאריך יצירת התוכנית לא מאוחר מתאריך פתיחת הטרייד
-    if (tradePlan.data.created_at && tradeData.opened_at) {
-      const planCreatedAt = new Date(tradePlan.data.created_at);
-      const tradeOpenedAt = new Date(tradeData.opened_at);
+    if ((tradePlan.data.created_at || tradePlan.data.created_at_envelope) && (tradeData.opened_at || tradeData.opened_at_envelope)) {
+      const planCreatedEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(tradePlan.data.created_at_envelope || tradePlan.data.created_at)
+        : (tradePlan.data.created_at_envelope || tradePlan.data.created_at);
+      const tradeOpenedEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(tradeData.opened_at_envelope || tradeData.opened_at)
+        : (tradeData.opened_at_envelope || tradeData.opened_at);
 
-      if (planCreatedAt > tradeOpenedAt) {
+      const planCreatedAt = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(planCreatedEnvelope)
+        : (planCreatedEnvelope ? new Date(planCreatedEnvelope) : null);
+      const tradeOpenedAt = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(tradeOpenedEnvelope)
+        : (tradeOpenedEnvelope ? new Date(tradeOpenedEnvelope) : null);
+
+      if (planCreatedAt && tradeOpenedAt && planCreatedAt > tradeOpenedAt) {
         return {
           isValid: false,
           message: `תאריך יצירת התוכנית (${planCreatedAt.toLocaleDateString('he-IL')}) מאוחר מתאריך פתיחת הטרייד (${tradeOpenedAt.toLocaleDateString('he-IL')}). לא ניתן לקשר תוכנית שנוצרה אחרי פתיחת הטרייד.`,
@@ -2351,11 +2588,22 @@ async function validateTradeChanges(originalTrade, updatedTrade) {
   }
 
   // בדיקת תאריכים - תאריך סגירה לא יכול להיות לפני תאריך יצירה
-  if (updatedTrade.opened_at && updatedTrade.closed_at) {
-    const openedAt = new Date(updatedTrade.opened_at);
-    const closedAt = new Date(updatedTrade.closed_at);
+  if ((updatedTrade.opened_at || updatedTrade.opened_at_envelope) && (updatedTrade.closed_at || updatedTrade.closed_at_envelope)) {
+    const openedEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(updatedTrade.opened_at_envelope || updatedTrade.opened_at)
+      : (updatedTrade.opened_at_envelope || updatedTrade.opened_at);
+    const closedEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(updatedTrade.closed_at_envelope || updatedTrade.closed_at)
+      : (updatedTrade.closed_at_envelope || updatedTrade.closed_at);
 
-    if (closedAt < openedAt) {
+    const openedAt = window.dateUtils?.toDateObject
+      ? window.dateUtils.toDateObject(openedEnvelope)
+      : (openedEnvelope ? new Date(openedEnvelope) : null);
+    const closedAt = window.dateUtils?.toDateObject
+      ? window.dateUtils.toDateObject(closedEnvelope)
+      : (closedEnvelope ? new Date(closedEnvelope) : null);
+
+    if (openedAt && closedAt && closedAt < openedAt) {
       validations.push(`תאריך סגירה (${closedAt.toLocaleDateString('he-IL')}) לא יכול להיות לפני תאריך יצירה (${openedAt.toLocaleDateString('he-IL')})`);
     }
   }
@@ -2720,6 +2968,7 @@ async function reactivateTrade(tradeId) {
       throw new Error('טרייד לא נמצא');
     }
 
+    // Use relative URL to work with both development (8080) and production (5001)
     const response = await fetch(`/api/trades/${tradeId}`, {
       method: 'PUT',
       headers: {
@@ -3274,4 +3523,37 @@ window.showEditTradeModal = function(tradeId) {
 window.saveTrade = saveTrade;
 window.deleteTrade = deleteTrade;
 window.performTradeDeletion = performTradeDeletion;
+
+/**
+ * Register trades table with UnifiedTableSystem
+ * This function registers the trades table for unified sorting and filtering
+ */
+window.registerTradesTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "trades" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register trades table
+    window.UnifiedTableSystem.registry.register('trades', {
+        dataGetter: () => {
+            return window.tradesData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateTradesTable === 'function') {
+                window.updateTradesTable(data);
+            }
+        },
+        tableSelector: '#tradesTable',
+        columns: getColumns('trades'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};
 

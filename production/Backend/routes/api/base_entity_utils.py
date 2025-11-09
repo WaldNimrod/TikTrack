@@ -22,6 +22,8 @@ from datetime import datetime
 import re
 import logging
 
+from services.date_normalization_service import DateNormalizationService
+
 
 try:
     import bleach  # type: ignore
@@ -196,6 +198,87 @@ class BaseEntityUtils:
             html_content = re.sub(r"on\w+='[^']*'", '', html_content, flags=re.IGNORECASE)
             return html_content
 
+    # ------------------------------------------------------------------
+    # Date normalization helpers
+    # ------------------------------------------------------------------
+    @staticmethod
+    def get_request_normalizer(request_obj, preferences_service=None, fallback_user_id: Optional[int] = None) -> DateNormalizationService:
+        """
+        Resolve the user's timezone from the request object and create a DateNormalizationService.
+        Falls back to UTC on resolution failure.
+        """
+        try:
+            timezone_name = DateNormalizationService.resolve_timezone(
+                request_obj,
+                preferences_service=preferences_service,
+                fallback_user_id=fallback_user_id,
+            )
+        except Exception:
+            timezone_name = "UTC"
+        return DateNormalizationService(timezone_name)
+
+    @staticmethod
+    def normalize_input(normalizer: Optional[DateNormalizationService], payload: Any) -> Any:
+        """Normalize incoming payload (user timezone → UTC)."""
+        if normalizer is None:
+            return payload
+        return normalizer.normalize_input_payload(payload)
+
+    @staticmethod
+    def normalize_output(normalizer: Optional[DateNormalizationService], payload: Any) -> Any:
+        """Normalize outgoing payload (attach DateEnvelope structures)."""
+        if normalizer is None:
+            return payload
+        return normalizer.normalize_output(payload)
+
+    @staticmethod
+    def envelope_timestamp(normalizer: Optional[DateNormalizationService] = None) -> Dict[str, Any]:
+        """Create DateEnvelope timestamp via the provided normalizer (UTC fallback)."""
+        if normalizer:
+            return normalizer.now_envelope()
+        return DateNormalizationService().now_envelope()
+
+    @staticmethod
+    def create_success_payload(
+        normalizer: Optional[DateNormalizationService],
+        data: Any = None,
+        message: str = "",
+        extra: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Build standardized success payload with DateEnvelope timestamp."""
+        payload: Dict[str, Any] = {
+            "status": "success",
+            "timestamp": BaseEntityUtils.envelope_timestamp(normalizer),
+            "version": "1.0",
+        }
+        if data is not None:
+            payload["data"] = BaseEntityUtils.normalize_output(normalizer, data)
+        if message:
+            payload["message"] = message
+        if extra:
+            payload.update(extra)
+        return payload
+
+    @staticmethod
+    def create_error_payload(
+        normalizer: Optional[DateNormalizationService],
+        message: str,
+        error_details: Optional[Dict[str, Any]] = None,
+        extra: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Build standardized error payload with DateEnvelope timestamp."""
+        payload: Dict[str, Any] = {
+            "status": "error",
+            "error": {"message": message},
+            "timestamp": BaseEntityUtils.envelope_timestamp(normalizer),
+            "version": "1.0",
+        }
+        if error_details:
+            payload["error"].update(error_details)
+        if extra:
+            payload.update(extra)
+        return payload
+
         # When bleach is available, use curated allowlists
         allowed_tags = [
             'p', 'br', 'strong', 'em', 'u', 's', 'h2', 'h3',
@@ -242,57 +325,28 @@ class BaseEntityUtils:
     @staticmethod
     def format_response(data: Any, message: str = None, status: str = "success") -> Dict:
         """
-        Format standardized API response
-        
-        Args:
-            data: Response data
-            message: Optional message
-            status: Response status (success/error)
-            
-        Returns:
-            Formatted response dictionary
+        Format standardized API response.
+        NOTE: Prefer create_success_payload with explicit normalizer when possible.
         """
-        response = {
-            "status": status,
-            "data": data,
-            "timestamp": datetime.now().isoformat(),
-            "version": "1.0"
-        }
-        
-        if message:
-            response["message"] = message
-        
-        return response
+        normalizer = None
+        payload = BaseEntityUtils.create_success_payload(normalizer, data, message)
+        if status != "success":
+            payload["status"] = status
+        return payload
     
     @staticmethod
     def format_error_response(message: str, error_code: str = None, details: Dict = None) -> Dict:
         """
-        Format standardized error response
-        
-        Args:
-            message: Error message
-            error_code: Optional error code
-            details: Optional error details
-            
-        Returns:
-            Formatted error response dictionary
+        Format standardized error response.
+        NOTE: Prefer create_error_payload with explicit normalizer when possible.
         """
-        error_response = {
-            "status": "error",
-            "error": {
-                "message": message,
-                "timestamp": datetime.now().isoformat()
-            },
-            "version": "1.0"
-        }
-        
+        normalizer = None
+        payload = BaseEntityUtils.create_error_payload(normalizer, message)
         if error_code:
-            error_response["error"]["code"] = error_code
-        
+            payload["error"]["code"] = error_code
         if details:
-            error_response["error"]["details"] = details
-        
-        return error_response
+            payload["error"]["details"] = details
+        return payload
     
     @staticmethod
     def paginate_data(data: List[Any], page: int = 1, per_page: int = 20) -> Dict:

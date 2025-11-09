@@ -26,7 +26,8 @@ class ConstraintManager {
    * @constructor
    */
   constructor() {
-    this.apiBase = '/api/constraints';
+        // Use relative URL to work with both development (8080) and production (5001)
+        this.apiBase = '/api/constraints';
     this.currentConstraint = null;
     this.constraints = [];
     this.tables = [];

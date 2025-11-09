@@ -212,6 +212,7 @@ class ActiveAlertsComponent extends HTMLElement {
 
     this.isLoading = true;
     try {
+      // Use relative URL to work with both development (8080) and production (5001)
       const response = await fetch('/api/alerts/unread');
       if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
 
@@ -450,6 +451,7 @@ class ActiveAlertsComponent extends HTMLElement {
       btn.style.opacity = '0.5';
     }
     try {
+      // Use relative URL to work with both development (8080) and production (5001)
       const res = await fetch(
         `/api/alerts/${alertId}/mark-read`,
         {

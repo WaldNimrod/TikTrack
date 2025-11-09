@@ -13,6 +13,7 @@ let constraintsMonitor;
 // ===== CONSTRAINTS MONITOR CLASS =====
 class ConstraintsMonitor {
     constructor() {
+        // Use relative URL to work with both development (8080) and production (5001)
         this.apiBase = '/api/constraints';
         this.constraints = [];
         this.tables = [];

@@ -235,6 +235,11 @@
   color: white;
   border-bottom: 2px solid var(--entity-development-color);
 }
+.modal-header.entity-position { 
+  background-color: var(--entity-position-color, var(--entity-trade-color)); 
+  color: white;
+  border-bottom: 2px solid var(--entity-position-color, var(--entity-trade-color));
+}
 
 /* Header actions (export/close) inherit entity text color */
 #linkedItemsModal .modal-header .export-btn {

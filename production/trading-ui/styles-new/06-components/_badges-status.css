@@ -178,17 +178,23 @@ background-color: var(--status-closed-color);
 background-color: var(--status-pending-color);
 }
 
-/* צד טרייד - רק צבעים */
+/* צד טרייד - רק צבעים חיוביים/שליליים (לא צבע ישות) */
 .badge-long {
-  background-color: color-mix(in srgb, var(--user-status-positive-color, #28a745) 10%, transparent);
-  color: var(--user-status-positive-color, #28a745);
-  border: 1px solid var(--user-status-positive-color, #28a745);
+  background-color: color-mix(in srgb, var(--numeric-positive-medium, #28a745) 10%, transparent);
+  color: var(--numeric-positive-medium, #28a745);
+  border: 1px solid var(--numeric-positive-medium, #28a745);
 }
 
 .badge-short {
-  background-color: color-mix(in srgb, var(--user-status-negative-color, #dc3545) 10%, transparent);
-  color: var(--user-status-negative-color, #dc3545);
-  border: 1px solid var(--user-status-negative-color, #dc3545);
+  background-color: color-mix(in srgb, var(--numeric-negative-medium, #dc3545) 10%, transparent);
+  color: var(--numeric-negative-medium, #dc3545);
+  border: 1px solid var(--numeric-negative-medium, #dc3545);
+}
+
+.badge-neutral {
+  background-color: color-mix(in srgb, var(--value-neutral-color, #6c757d) 10%, transparent);
+  color: var(--value-neutral-color, #6c757d);
+  border: 1px solid var(--value-neutral-color, #6c757d);
 }
 
 /* סוג טרייד - רק צבעים */

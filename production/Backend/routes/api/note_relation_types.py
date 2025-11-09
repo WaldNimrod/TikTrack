@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
-from config.settings import DB_PATH  # Use production DB path
 from models.note_relation_type import NoteRelationType
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
@@ -21,8 +20,11 @@ note_relation_types_bp = Blueprint('note_relation_types', __name__, url_prefix='
 # Initialize base API (note_relation_types uses direct SQLite, so we'll use it selectively)
 
 def get_db_connection():
-    """Get database connection - uses production DB path from config"""
-    conn = sqlite3.connect(str(DB_PATH))
+    """Get database connection"""
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+    
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 

@@ -19,8 +19,9 @@ Last Updated: 2025-01-16
 import csv
 import io
 from typing import List, Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from .base_connector import BaseConnector
+from services.date_normalization_service import DateNormalizationService
 
 class IBKRConnector(BaseConnector):
     """
@@ -183,7 +184,9 @@ class IBKRConnector(BaseConnector):
             code = str(raw_record.get('Code', '')).strip()
             
             # Parse date and time
-            date = self._parse_ibkr_datetime(date_time)
+            date_value = self._parse_ibkr_datetime(date_time)
+            normalizer = DateNormalizationService("UTC")
+            date_envelope = normalizer.normalize_output(date_value)
             
             # Determine action based on quantity
             if quantity > 0:
@@ -204,7 +207,7 @@ class IBKRConnector(BaseConnector):
             return {
                 'symbol': symbol,
                 'action': action,
-                'date': date,
+                'date': date_envelope,
                 'quantity': quantity,
                 'price': price,
                 'fee': fee,
@@ -293,7 +296,7 @@ class IBKRConnector(BaseConnector):
         except (ValueError, TypeError):
             return 0.0
     
-    def _parse_ibkr_datetime(self, date_time_str: str) -> str:
+    def _parse_ibkr_datetime(self, date_time_str: str) -> datetime:
         """
         Parse IBKR datetime string to ISO format.
         
@@ -320,7 +323,11 @@ class IBKRConnector(BaseConnector):
                 # Combine and parse
                 iso_str = f"{date_part}T{time_part}"
                 dt = datetime.fromisoformat(iso_str)
-                return dt.isoformat()
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                else:
+                    dt = dt.astimezone(timezone.utc)
+                return dt
             
             # Try other common formats
             date_formats = [
@@ -334,13 +341,17 @@ class IBKRConnector(BaseConnector):
             for fmt in date_formats:
                 try:
                     dt = datetime.strptime(cleaned, fmt)
-                    return dt.isoformat()
+                    return dt.replace(tzinfo=timezone.utc)
                 except ValueError:
                     continue
             
             # If all else fails, try ISO parsing
             dt = datetime.fromisoformat(cleaned.replace('Z', '+00:00'))
-            return dt.isoformat()
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            else:
+                dt = dt.astimezone(timezone.utc)
+            return dt
             
         except Exception as e:
             raise ValueError(f"Unable to parse IBKR datetime: {date_time_str} - {str(e)}")

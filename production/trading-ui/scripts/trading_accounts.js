@@ -105,32 +105,7 @@ window.loadTradingAccountsDataForTradingAccountsPage = window.loadTradingAccount
 };
 
 // הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
-// Flag to prevent multiple simultaneous calls
-window._tradingAccountsLoadingInProgress = false;
-window._lastTradingAccountsLoadTime = 0;
-const TRADING_ACCOUNTS_LOAD_DEBOUNCE_MS = 2000; // Minimum 2 seconds between loads
-
 window.loadTradingAccountsDataForTradingAccountsPage = async function() {
-  // Debounce: Prevent multiple calls within short time
-  const now = Date.now();
-  if (window._tradingAccountsLoadingInProgress) {
-    window.Logger.warn('⚠️ קריאה ל-loadTradingAccountsDataForTradingAccountsPage נחסמה - טעינה כבר מתבצעת', { page: "trading_accounts" });
-    return;
-  }
-  
-  if (now - window._lastTradingAccountsLoadTime < TRADING_ACCOUNTS_LOAD_DEBOUNCE_MS) {
-    const timeSinceLastLoad = now - window._lastTradingAccountsLoadTime;
-    const waitTime = TRADING_ACCOUNTS_LOAD_DEBOUNCE_MS - timeSinceLastLoad;
-    window.Logger.warn(`⚠️ קריאה ל-loadTradingAccountsDataForTradingAccountsPage נדחתה - ממתין ${waitTime}ms`, { page: "trading_accounts" });
-    setTimeout(() => {
-      window.loadTradingAccountsDataForTradingAccountsPage();
-    }, waitTime);
-    return;
-  }
-  
-  window._tradingAccountsLoadingInProgress = true;
-  window._lastTradingAccountsLoadTime = now;
-  
   console.log('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀');
   window.Logger.info('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀', { page: "trading_accounts" });
   window.Logger.info('🔍 בדיקת זמינות פונקציות:', { page: "trading_accounts" });
@@ -239,20 +214,13 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
       countElement.textContent = `${filteredTradingAccounts.length} חשבונות מסחר`;
     }
 
-    window.Logger.info('✅ loadTradingAccountsDataForTradingAccountsPage הושלם בהצלחה', { page: "trading_accounts" });
+    // Restore page state (filters, sort, sections, entity filters)
+    await restorePageState('trading_accounts');
+
+    window.Logger.info('✅ loadTradingAccountsDataForTradingAccountsPage הושלם בהצלחה', { page: "trading_accounts", keepInfo: true });
 
   } catch (error) {
     window.Logger.error('❌ שגיאה ב-loadTradingAccountsDataForTradingAccountsPage:', error, { page: "trading_accounts" });
-    
-    // Check if it's a rate limit error
-    if (error.message && error.message.includes('RATE_LIMIT')) {
-      window.Logger.error('🚫 Rate limit exceeded - waiting before retry', { page: "trading_accounts" });
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('יותר מדי בקשות - ממתין לפני ניסיון חוזר', 'נסה שוב בעוד כמה שניות');
-      }
-      // Wait longer before allowing next call
-      window._lastTradingAccountsLoadTime = Date.now() + 10000; // Wait 10 seconds
-    }
     
     // הצגת הודעת שגיאה למשתמש
     if (typeof window.showErrorNotification === 'function') {
@@ -262,9 +230,6 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
     } else {
       alert('שגיאה בטעינת נתוני חשבונות מסחר: ' + error.message);
     }
-  } finally {
-    // Always reset the loading flag
-    window._tradingAccountsLoadingInProgress = false;
   }
 };
 
@@ -403,32 +368,7 @@ async function generateCurrencyOptions(tradingAccount = null) {
 }
 
 // פונקציה לטעינת חשבונות מהשרת
-// Flag to prevent multiple simultaneous calls to loadTradingAccountsFromServer
-window._loadTradingAccountsFromServerInProgress = false;
-window._lastLoadTradingAccountsFromServerTime = 0;
-const LOAD_TRADING_ACCOUNTS_DEBOUNCE_MS = 3000; // Minimum 3 seconds between loads
-
 async function loadTradingAccountsFromServer() {
-  // Debounce: Prevent multiple calls within short time
-  const now = Date.now();
-  if (window._loadTradingAccountsFromServerInProgress) {
-    window.Logger.warn('⚠️ קריאה ל-loadTradingAccountsFromServer נחסמה - טעינה כבר מתבצעת', { page: "trading_accounts" });
-    return window.trading_accountsData || [];
-  }
-  
-  if (now - window._lastLoadTradingAccountsFromServerTime < LOAD_TRADING_ACCOUNTS_DEBOUNCE_MS) {
-    const timeSinceLastLoad = now - window._lastLoadTradingAccountsFromServerTime;
-    window.Logger.warn(`⚠️ קריאה ל-loadTradingAccountsFromServer נדחתה - ממתין ${LOAD_TRADING_ACCOUNTS_DEBOUNCE_MS - timeSinceLastLoad}ms`, { page: "trading_accounts" });
-    // Return cached data if available
-    if (window.trading_accountsData && window.trading_accountsData.length > 0) {
-      return window.trading_accountsData;
-    }
-    return [];
-  }
-  
-  window._loadTradingAccountsFromServerInProgress = true;
-  window._lastLoadTradingAccountsFromServerTime = now;
-  
   window.Logger.info('🚀🚀🚀 loadTradingAccountsFromServer התחיל 🚀🚀🚀', { page: "trading_accounts" });
   try {
     // בדיקה אם יש token שמור
@@ -479,49 +419,13 @@ async function loadTradingAccountsFromServer() {
       // החזרת הנתונים לטעינה חוזרת
       return openTradingAccounts;
     } else {
-      // Check for rate limit error
-      if (response.status === 429) {
-        const errorData = await response.json().catch(() => ({}));
-        window.Logger.error('🚫 Rate limit exceeded in loadTradingAccountsFromServer', { page: "trading_accounts" });
-        if (typeof window.showErrorNotification === 'function') {
-          window.showErrorNotification('יותר מדי בקשות - ממתין לפני ניסיון חוזר', 'נסה שוב בעוד כמה שניות');
-        }
-        // Wait longer before allowing next call
-        window._lastLoadTradingAccountsFromServerTime = Date.now() + 10000; // Wait 10 seconds
-        // Return cached data if available
-        if (window.trading_accountsData && window.trading_accountsData.length > 0) {
-          return window.trading_accountsData;
-        }
-        return [];
-      }
       window.Logger.warn('⚠️ תגובת שרת לא תקינה:', response.status, { page: "trading_accounts" });
       loadDefaultTradingAccounts();
-      return [];
     }
 
   } catch (error) {
     window.Logger.error('❌ שגיאה בטעינת חשבונות מהשרת:', error, { page: "trading_accounts" });
-    
-    // Check if it's a rate limit error
-    if (error.message && error.message.includes('RATE_LIMIT')) {
-      window.Logger.error('🚫 Rate limit exceeded - waiting before retry', { page: "trading_accounts" });
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('יותר מדי בקשות - ממתין לפני ניסיון חוזר', 'נסה שוב בעוד כמה שניות');
-      }
-      // Wait longer before allowing next call
-      window._lastLoadTradingAccountsFromServerTime = Date.now() + 10000; // Wait 10 seconds
-      // Return cached data if available
-      if (window.trading_accountsData && window.trading_accountsData.length > 0) {
-        return window.trading_accountsData;
-      }
-      return [];
-    }
-    
     loadDefaultTradingAccounts();
-    return [];
-  } finally {
-    // Always reset the loading flag
-    window._loadTradingAccountsFromServerInProgress = false;
   }
 }
 
@@ -604,35 +508,7 @@ function loadDefaultTradingAccounts() {
 // }
 
 // פונקציה לטעינת נתוני חשבונות מסחר מהשרת
-// Flag to prevent multiple simultaneous calls to loadTradingAccountsData
-window._loadTradingAccountsDataInProgress = false;
-window._lastLoadTradingAccountsDataTime = 0;
-const LOAD_TRADING_ACCOUNTS_DATA_DEBOUNCE_MS = 2000; // Minimum 2 seconds between loads
-
 async function loadTradingAccountsData() {
-  // Debounce: Prevent multiple calls within short time
-  const now = Date.now();
-  if (window._loadTradingAccountsDataInProgress) {
-    window.Logger.warn('⚠️ קריאה ל-loadTradingAccountsData נחסמה - טעינה כבר מתבצעת', { page: "trading_accounts" });
-    // Return cached data if available
-    if (window.trading_accountsData && window.trading_accountsData.length > 0) {
-      return window.trading_accountsData;
-    }
-    return [];
-  }
-  
-  if (now - window._lastLoadTradingAccountsDataTime < LOAD_TRADING_ACCOUNTS_DATA_DEBOUNCE_MS) {
-    window.Logger.warn(`⚠️ קריאה ל-loadTradingAccountsData נדחתה - ממתין`, { page: "trading_accounts" });
-    // Return cached data if available
-    if (window.trading_accountsData && window.trading_accountsData.length > 0) {
-      return window.trading_accountsData;
-    }
-    return [];
-  }
-  
-  window._loadTradingAccountsDataInProgress = true;
-  window._lastLoadTradingAccountsDataTime = now;
-  
   window.Logger.info('Loading trading accounts data (bypass cache)', { page: "trading_accounts" });
   try {
     // קריאה ישירה לשרת עם timestamp למניעת cache
@@ -645,21 +521,6 @@ async function loadTradingAccountsData() {
     });
     
     if (!response.ok) {
-      // Check for rate limit error
-      if (response.status === 429) {
-        const errorData = await response.json().catch(() => ({}));
-        window.Logger.error('🚫 Rate limit exceeded in loadTradingAccountsData', { page: "trading_accounts" });
-        if (typeof window.showErrorNotification === 'function') {
-          window.showErrorNotification('יותר מדי בקשות - ממתין לפני ניסיון חוזר', 'נסה שוב בעוד כמה שניות');
-        }
-        // Wait longer before allowing next call
-        window._lastLoadTradingAccountsDataTime = Date.now() + 10000; // Wait 10 seconds
-        // Return cached data if available
-        if (window.trading_accountsData && window.trading_accountsData.length > 0) {
-          return window.trading_accountsData;
-        }
-        return [];
-      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
@@ -673,29 +534,10 @@ async function loadTradingAccountsData() {
     return trading_accounts;
   } catch (error) {
     window.Logger.error('Error loading trading accounts data', error, { page: "trading_accounts" });
-    
-    // Check for rate limit error
-    if (error.message && error.message.includes('RATE_LIMIT')) {
-      window.Logger.error('🚫 Rate limit exceeded - waiting before retry', { page: "trading_accounts" });
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('יותר מדי בקשות - ממתין לפני ניסיון חוזר', 'נסה שוב בעוד כמה שניות');
-      }
-      // Wait longer before allowing next call
-      window._lastLoadTradingAccountsDataTime = Date.now() + 10000; // Wait 10 seconds
-      // Return cached data if available
-      if (window.trading_accountsData && window.trading_accountsData.length > 0) {
-        return window.trading_accountsData;
-      }
-      return [];
-    }
-    
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני חשבונות מסחר', error.message);
     }
     throw error;
-  } finally {
-    // Always reset the loading flag
-    window._loadTradingAccountsDataInProgress = false;
   }
 }
 
@@ -842,14 +684,14 @@ function updateTradingAccountsTable(trading_accounts) {
       return `
       <tr data-trading-account-id="${tradingAccount.id}">
         <td class="ticker-cell" data-tradingAccount="${tradingAccount.name || '-'}">
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="table-cell-flex">
             <button class="btn actions-menu-item"
                     data-button-type="VIEW"
                     data-variant="small"
                     data-onclick="window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })"
                     title="פרטי חשבון מסחר"
                     aria-label="פרטי חשבון מסחר"></button>
-            <span class="entity-trading-account-badge" style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+            <span class="entity-trading-account-badge entity-badge-base">
               ${tradingAccount.name || '-'}
             </span>
           </div>
@@ -866,13 +708,11 @@ function updateTradingAccountsTable(trading_accounts) {
         <td class="actions-cell">
           ${window.createActionsMenu ? window.createActionsMenu([
             { type: 'VIEW', onclick: `window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })`, title: 'צפה בפרטי חשבון מסחר' },
-            { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${tradingAccount.id})`, title: 'פריטים מקושרים' },
             { type: 'EDIT', onclick: `window.showEditTradingAccountModalById(${tradingAccount.id})`, title: 'ערוך' },
             { type: tradingAccount.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account && window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account(${tradingAccount.id})`, title: tradingAccount.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
             { type: 'DELETE', onclick: `window.deleteTradingAccountWithLinkedItemsCheck && window.deleteTradingAccountWithLinkedItemsCheck(${tradingAccount.id})`, title: 'מחק' }
           ]) : `
           <button data-button-type="VIEW" data-variant="small" data-onclick="window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })" title="צפה בפרטי חשבון מסחר"></button>
-          <button data-button-type="LINK" data-variant="small" data-onclick="window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${tradingAccount.id})" title="פריטים מקושרים"></button>
           <button data-button-type="EDIT" data-variant="small" data-onclick="window.showEditTradingAccountModalById(${tradingAccount.id})" title="ערוך"></button>
           <button data-button-type="${tradingAccount.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL'}" data-variant="small" data-onclick="window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account && window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account(${tradingAccount.id})" title="${tradingAccount.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}"></button>
           <button data-button-type="DELETE" data-variant="small" data-onclick="window.deleteTradingAccountWithLinkedItemsCheck && window.deleteTradingAccountWithLinkedItemsCheck(${tradingAccount.id})" title="מחק"></button>
@@ -891,7 +731,7 @@ function updateTradingAccountsTable(trading_accounts) {
       window.hideLoadingState();
     }
 
-    window.Logger.info('✅ טבלת חשבונות עודכנה בהצלחה עם', trading_accounts.length, 'חשבונות', { page: "trading_accounts" });
+    window.Logger.info('✅ טבלת חשבונות עודכנה בהצלחה עם', trading_accounts.length, 'חשבונות', { page: "trading_accounts", keepInfo: true });
     window.Logger.info('🔍 tbody.innerHTML אחרי עדכון:', tbody.innerHTML.length, 'תווים', { page: "trading_accounts" });
     window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "trading_accounts" });
   } catch (error) {
@@ -1098,41 +938,18 @@ window.updateTradingAccountsTable = updateTradingAccountsTable;
 window.updateTradingAccountsSummary = updateTradingAccountsSummary;
 window.loadTradingAccounts = loadTradingAccounts;
 
-// Flag to prevent multiple simultaneous calls to refreshTradingAccountFilterMenu
-window._refreshTradingAccountFilterMenuInProgress = false;
-window._lastRefreshTradingAccountFilterMenuTime = 0;
-const REFRESH_FILTER_MENU_DEBOUNCE_MS = 2000; // Minimum 2 seconds between refreshes
-
 // פונקציה גלובלית לעדכון ידני של תפריט החשבונות
 window.refreshTradingAccountFilterMenu = function () {
-  // Debounce: Prevent multiple calls within short time
-  const now = Date.now();
-  if (window._refreshTradingAccountFilterMenuInProgress) {
-    return;
-  }
-  
-  if (now - window._lastRefreshTradingAccountFilterMenuTime < REFRESH_FILTER_MENU_DEBOUNCE_MS) {
-    return; // Skip if called too soon
-  }
-  
-  window._refreshTradingAccountFilterMenuInProgress = true;
-  window._lastRefreshTradingAccountFilterMenuTime = now;
-  
   try {
     if (window.trading_accountsData && window.trading_accountsData.length > 0) {
       if (typeof window.updateTradingAccountFilterMenu === 'function') {
         window.updateTradingAccountFilterMenu(window.trading_accountsData);
       }
     } else {
-      // Only load if we don't have data and not already loading
-      if (!window._loadTradingAccountsFromServerInProgress) {
-        loadTradingAccountsFromServer();
-      }
+      loadTradingAccountsFromServer();
     }
   } catch (error) {
     console.error('refreshTradingAccountFilterMenu failed:', error);
-  } finally {
-    window._refreshTradingAccountFilterMenuInProgress = false;
   }
 };
 
@@ -1236,19 +1053,15 @@ window.debugTradingAccountsFilter = function () {
     });
   }
 
-  // ניסיון לעדכן תפריט - עם debouncing מובנה בפונקציה
-  // Remove the nested setTimeout to prevent multiple rapid calls
+  // ניסיון לעדכן תפריט
   setTimeout(() => {
     if (typeof window.refreshTradingAccountFilterMenu === 'function') {
       window.refreshTradingAccountFilterMenu();
-    }
-    // Check status after a longer delay to avoid rapid calls
-    setTimeout(() => {
-      if (typeof window.checkTradingAccountsStatus === 'function') {
+      setTimeout(() => {
         window.checkTradingAccountsStatus();
-      }
-    }, 2000); // Increased from 500ms to 2000ms
-  }, 2000); // Increased from 1000ms to 2000ms
+      }, 500);
+    }
+  }, 1000);
 };
 
 // טעינת מטבעות בתחילת הטעינה
@@ -2164,7 +1977,7 @@ function updateTradingAccount(tradingAccountId, tradingAccountData) {
       return response.json();
     })
     .then(data => {
-      window.Logger.info('✅ חשבון מסחר עודכן בהצלחה:', data, { page: "trading_accounts" });
+      window.Logger.info('✅ חשבון מסחר עודכן בהצלחה:', data, { page: "trading_accounts", keepInfo: true });
       
       // רענון הטבלה
       loadTradingAccountsFromServer();
@@ -2227,16 +2040,9 @@ function showTradingAccountDetails(tradingAccountId) {
 window.showTradingAccountDetails = showTradingAccountDetails;
 
 // הוספת timeout לאתחול - אחרי שהפונקציות מיוצאות
-// Increased timeout to prevent conflicts with other initialization code
 setTimeout(() => {
-  window.Logger.info('⏰ Timeout 3 שניות - מתחיל אתחול', { page: "trading_accounts" });
+  window.Logger.info('⏰ Timeout 2 שניות - מתחיל אתחול', { page: "trading_accounts" });
   if (window.location.pathname.includes('/trading_accounts')) {
-    // Check if already loading to prevent duplicate calls
-    if (window._tradingAccountsLoadingInProgress) {
-      window.Logger.warn('⚠️ טעינה כבר מתבצעת - מדלג על אתחול כפול', { page: "trading_accounts" });
-      return;
-    }
-    
     window.Logger.info('🎯 נמצאים בדף החשבונות - מתחיל טעינת נתונים', { page: "trading_accounts" });
     window.Logger.info('🔍 בדיקת זמינות פונקציות:', { page: "trading_accounts" });
     window.Logger.info('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage, { page: "trading_accounts" });
@@ -2273,9 +2079,9 @@ setTimeout(() => {
       }
     }
   }
-}, 3000); // Increased from 2000ms to 3000ms to prevent conflicts
+}, 2000);
 
-window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "trading_accounts" });
+window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "trading_accounts", keepInfo: true });
 
 // ===== Sorting system - adapted for trading_accounts =====
 
@@ -2380,13 +2186,18 @@ async function saveTradingAccount() {
             throw new Error('Trading Account form not found');
         }
         
+        // Collect form data including hidden ID field (added in edit mode)
         const accountData = DataCollectionService.collectFormData({
+            id: { id: 'tradingAccountId', type: 'text' }, // Hidden ID field added in edit mode
             name: { id: 'accountName', type: 'text' },
             currency_id: { id: 'accountCurrency', type: 'int' }, // currency_id הוא integer - ID של מטבע
             opening_balance: { id: 'accountOpeningBalance', type: 'float', default: 0 },
             status: { id: 'accountStatus', type: 'text' },
             notes: { id: 'accountNotes', type: 'rich-text', default: null }
         });
+        
+        const accountId = accountData.id ? parseInt(accountData.id) : null;
+        const isEdit = !!accountId;
         
         // ולידציה מפורטת
         let hasErrors = false;
@@ -2431,17 +2242,13 @@ async function saveTradingAccount() {
             return;
         }
         
-        // Determine if this is add or edit
-        const formMode = form.dataset.modalMode || form.dataset.mode;
-        const isEdit = formMode === 'edit';
-        const accountId = form.dataset.accountId || form.dataset.entityId;
-        if (isEdit && !accountId) {
-            throw new Error('Missing trading account ID for update operation');
-        }
+        // In edit mode, preserve the original currency_id (cannot be changed)
         if (isEdit) {
-            const originalCurrencyId = form.dataset.originalCurrencyId;
-            if (originalCurrencyId) {
-                accountData.currency_id = parseInt(originalCurrencyId, 10);
+            // Get original account data to preserve currency_id
+            const originalAccount = (window.trading_accountsData || []).find(acc => acc.id === accountId);
+            if (originalAccount && originalAccount.currency_id) {
+                accountData.currency_id = parseInt(originalAccount.currency_id, 10);
+                console.log(`✅ Preserving original currency_id: ${accountData.currency_id} for account ${accountId}`);
             } else if (typeof accountData.currency_id !== 'undefined' && accountData.currency_id !== null) {
                 accountData.currency_id = parseInt(accountData.currency_id, 10);
             }
@@ -2451,13 +2258,16 @@ async function saveTradingAccount() {
         const url = isEdit ? `/api/trading-accounts/${accountId}` : '/api/trading-accounts';
         const method = isEdit ? 'PUT' : 'POST';
         
+        // Remove id from payload (not needed in API request body)
+        const { id, ...payload } = accountData;
+        
         // Send to API
         const response = await fetch(url, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(accountData)
+            body: JSON.stringify(payload)
         });
         
         // Use CRUDResponseHandler for consistent response handling
@@ -2596,6 +2406,70 @@ window.confirmDeleteTradingAccount = confirmDeleteTradingAccount;
 window.showOpenTradesWarning = showOpenTradesWarning;
 
 // ===== UNIFIED TABLE SYSTEM REGISTRATION =====
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('trading_accounts', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('trading_accounts');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
 /**
  * Register trading_accounts page tables with UnifiedTableSystem
  * This should be called after all scripts are loaded

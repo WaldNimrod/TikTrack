@@ -100,26 +100,51 @@ class EntityRelationshipResolver:
         
         # Fetch parents
         if 'parents' in entity_schema:
-            for parent_type, parent_config in entity_schema['parents'].items():
-                parent_items = self._fetch_relationship(
-                    db, entity_type, entity_id, parent_type, parent_config, is_parent=True
-                )
-                linked_items.extend(parent_items)
+            parents = entity_schema['parents']
+            if isinstance(parents, dict):
+                logger.info(f"Fetching parents for {entity_type} {entity_id}: {list(parents.keys())}")
+                for parent_type, parent_config in parents.items():
+                    logger.debug(f"Fetching parent {parent_type} for {entity_type} {entity_id}")
+                    parent_items = self._fetch_relationship(
+                        db, entity_type, entity_id, parent_type, parent_config, is_parent=True
+                    )
+                    logger.debug(f"Found {len(parent_items)} parent items of type {parent_type} for {entity_type} {entity_id}")
+                    linked_items.extend(parent_items)
+                    
+                    # Handle legacy_support in parents config (e.g., alert -> trade via legacy)
+                    if 'legacy_support' in parent_config:
+                        logger.debug(f"Fetching legacy parent {parent_type} for {entity_type} {entity_id}")
+                        legacy_items = self._fetch_relationship(
+                            db, entity_type, entity_id, parent_type, parent_config['legacy_support'], is_parent=True
+                        )
+                        logger.debug(f"Found {len(legacy_items)} legacy parent items of type {parent_type} for {entity_type} {entity_id}")
+                        linked_items.extend(legacy_items)
+            elif isinstance(parents, list):
+                # If parents is a list, it's empty (no parents)
+                logger.debug(f"No parents defined for {entity_type} {entity_id} (empty list)")
         
         # Fetch children
         if 'children' in entity_schema:
-            for child_type, child_config in entity_schema['children'].items():
-                child_items = self._fetch_relationship(
-                    db, entity_type, entity_id, child_type, child_config, is_parent=False
-                )
-                linked_items.extend(child_items)
-                
-                # Handle legacy_support in children config (e.g., alert -> trade_plan via legacy)
-                if 'legacy_support' in child_config:
-                    legacy_items = self._fetch_relationship(
-                        db, entity_type, entity_id, child_type, child_config['legacy_support'], is_parent=False
+            children = entity_schema['children']
+            if isinstance(children, dict):
+                logger.info(f"Fetching children for {entity_type} {entity_id}: {list(children.keys())}")
+                for child_type, child_config in children.items():
+                    logger.debug(f"Fetching child {child_type} for {entity_type} {entity_id}")
+                    child_items = self._fetch_relationship(
+                        db, entity_type, entity_id, child_type, child_config, is_parent=False
                     )
-                    linked_items.extend(legacy_items)
+                    logger.debug(f"Found {len(child_items)} child items of type {child_type} for {entity_type} {entity_id}")
+                    linked_items.extend(child_items)
+                    
+                    # Handle legacy_support in children config (e.g., alert -> trade_plan via legacy)
+                    if 'legacy_support' in child_config:
+                        legacy_items = self._fetch_relationship(
+                            db, entity_type, entity_id, child_type, child_config['legacy_support'], is_parent=False
+                        )
+                        linked_items.extend(legacy_items)
+            elif isinstance(children, list):
+                # If children is a list, it's empty (no children)
+                logger.debug(f"No children defined for {entity_type} {entity_id} (empty list)")
         
         # Handle cascades (e.g., execution -> trade -> ticker)
         linked_items = self._apply_cascades(db, linked_items, entity_type, entity_id)
@@ -191,9 +216,9 @@ class EntityRelationshipResolver:
             return []
         
         try:
-            # Special case: alert -> trade via ticker_id
+            # Special case: alert -> trade via ticker_id (for children only)
             # Both alert and trade have ticker_id, we want trades with same ticker as alert
-            if source_type == 'alert' and target_type == 'trade' and field == 'ticker_id':
+            if source_type == 'alert' and target_type == 'trade' and field == 'ticker_id' and not is_parent:
                 # Get alert's ticker_id
                 source_model = MODEL_MAP.get(source_type)
                 source_entity = db.query(source_model).filter(source_model.id == source_id).first()
@@ -203,18 +228,55 @@ class EntityRelationshipResolver:
                 # Find trades with same ticker_id
                 query = db.query(target_model).filter(getattr(target_model, field) == source_entity.ticker_id)
                 entities = query.all()
+            elif is_parent:
+                # For parents: Get source entity, read its field, query target entity by that ID
+                # Example: execution.trading_account_id -> trading_account.id
+                # 1. Get execution (source_entity) where id == source_id
+                # 2. Read execution.trading_account_id (e.g., 5)
+                # 3. Query TradingAccount where id == 5
+                logger.debug(f"Fetching parent {target_type} for {source_type} {source_id} via field {field}")
+                source_model = MODEL_MAP.get(source_type)
+                if not source_model:
+                    logger.warning(f"Unknown source model: {source_type}")
+                    return []
+                
+                source_entity = db.query(source_model).filter(source_model.id == source_id).first()
+                if not source_entity:
+                    logger.debug(f"Source entity {source_type} {source_id} not found")
+                    return []
+                
+                # Get the field value from source entity (e.g., execution.trading_account_id)
+                target_id = getattr(source_entity, field, None)
+                # Check for None explicitly - 0 is a valid ID (though unlikely, but we should handle it)
+                if target_id is None:
+                    logger.debug(f"Field {field} is None for {source_type} {source_id}")
+                    return []
+                # Also check if it's 0 or 0.0 (invalid ID)
+                if target_id == 0 or target_id == 0.0:
+                    logger.debug(f"Field {field} is 0 for {source_type} {source_id}, skipping")
+                    return []
+                
+                logger.debug(f"Found {field}={target_id} for {source_type} {source_id}, querying {target_type}")
+                # Query target entity by ID
+                target_entity = db.query(target_model).filter(target_model.id == target_id).first()
+                if target_entity:
+                    logger.debug(f"Found parent {target_type} {target_id} for {source_type} {source_id}")
+                else:
+                    logger.warning(f"Parent {target_type} {target_id} not found for {source_type} {source_id}")
+                entities = [target_entity] if target_entity else []
             else:
-                # Standard direct relationship: target.field == source_id (for children)
-                # For parents, this would be reversed, but we handle parents differently
+                # For children: Standard direct relationship: target.field == source_id
+                # Example: execution.trade_id == trade.id -> find executions where trade_id == source_id
                 query = db.query(target_model).filter(getattr(target_model, field) == source_id)
                 entities = query.all()
             
             # Format results
             results = []
             for entity in entities:
-                item = self._format_entity(entity, target_type, db)
-                if item and self._should_add_item(target_type, item['id'], config):
-                    results.append(item)
+                if entity:  # Check if entity exists (important for parent case where we might have None)
+                    item = self._format_entity(entity, target_type, db)
+                    if item and self._should_add_item(target_type, item['id'], config):
+                        results.append(item)
             
             return results
             
@@ -280,7 +342,13 @@ class EntityRelationshipResolver:
                 # Get through_id from source (e.g., alert.plan_condition_id)
                 through_field = config.get('field')  # e.g., 'plan_condition_id'
                 through_id = getattr(source_entity, through_field, None)
-                if not through_id:
+                # Check for None explicitly - 0 is invalid ID
+                if through_id is None:
+                    logger.debug(f"No {through_field} found for {source_type} {source_id}, conditional relationship returns empty")
+                    return []
+                # Also check if it's 0 or 0.0 (invalid ID)
+                if through_id == 0 or through_id == 0.0:
+                    logger.debug(f"{through_field} is 0 for {source_type} {source_id}, conditional relationship returns empty")
                     return []
                 
                 # Get through entity
@@ -291,7 +359,8 @@ class EntityRelationshipResolver:
                 # Get target_id from through entity (e.g., PlanCondition.trade_plan_id)
                 target_field = config.get('target_query')  # e.g., 'PlanCondition.trade_plan_id'
                 target_id = getattr(through_entity, self._extract_target_field(target_field))
-                if not target_id:
+                # Check for None explicitly - 0 is invalid ID
+                if target_id is None or target_id == 0 or target_id == 0.0:
                     return []
                 
                 # Get target entity
@@ -380,16 +449,33 @@ class EntityRelationshipResolver:
                 
                 # Check if source entity points to target type
                 if hasattr(source_entity, 'related_type_id') and hasattr(source_entity, 'related_id'):
-                    if getattr(source_entity, 'related_type_id') == relation_type_id:
-                        target_id = getattr(source_entity, 'related_id')
-                        if target_id:
-                            target_model = MODEL_MAP.get(target_type)
-                            if target_model:
-                                target_entity = db.query(target_model).filter(target_model.id == target_id).first()
-                                if target_entity:
-                                    item = self._format_entity(target_entity, target_type, db)
-                                    if item and self._should_add_item(target_type, item['id'], config):
-                                        return [item]
+                    source_related_type_id = getattr(source_entity, 'related_type_id')
+                    source_related_id = getattr(source_entity, 'related_id')
+                    logger.debug(f"Legacy parent check: {source_type} {source_id} has related_type_id={source_related_type_id}, related_id={source_related_id}, looking for relation_type_id={relation_type_id}")
+                    if source_related_type_id == relation_type_id:
+                        target_id = source_related_id
+                        # Check for None explicitly - 0 is invalid ID
+                        if target_id is None:
+                            logger.debug(f"Legacy parent check: related_id is None for {source_type} {source_id}")
+                            return []
+                        # Also check if it's 0 or 0.0 (invalid ID)
+                        if target_id == 0 or target_id == 0.0:
+                            logger.debug(f"Legacy parent check: related_id is 0 for {source_type} {source_id}, skipping")
+                            return []
+                        target_model = MODEL_MAP.get(target_type)
+                        if target_model:
+                            target_entity = db.query(target_model).filter(target_model.id == target_id).first()
+                            if target_entity:
+                                logger.debug(f"Found legacy parent {target_type} {target_id} for {source_type} {source_id}")
+                                item = self._format_entity(target_entity, target_type, db)
+                                if item and self._should_add_item(target_type, item['id'], config):
+                                    return [item]
+                            else:
+                                logger.debug(f"Legacy parent {target_type} {target_id} not found in database")
+                    else:
+                        logger.debug(f"Legacy parent check failed: related_type_id {source_related_type_id} != {relation_type_id}")
+                else:
+                    logger.debug(f"Legacy parent check failed: {source_type} {source_id} does not have related_type_id/related_id attributes")
                 
                 return []
             else:
@@ -439,59 +525,63 @@ class EntityRelationshipResolver:
         
         # Check parents for cascade rules
         if 'parents' in entity_schema:
-            for parent_type, parent_config in entity_schema['parents'].items():
-                if parent_config.get('cascade_ticker'):
-                    # Find parent items of this type
-                    parent_items = [item for item in linked_items if item.get('type') == parent_type]
-                    for parent_item in parent_items:
-                        # Cascade to ticker
-                        if parent_type == 'trade':
-                            # Get ticker from trade
-                            trade = db.query(Trade).options(joinedload(Trade.ticker)).filter(
-                                Trade.id == parent_item['id']
-                            ).first()
-                            if trade and trade.ticker:
-                                ticker_item = self._format_entity(trade.ticker, 'ticker', db)
-                                if ticker_item and self._should_add_item('ticker', ticker_item['id'], {}):
-                                    cascaded_items.append(ticker_item)
-                
-                if parent_config.get('cascade_account'):
-                    # Find parent items and cascade to trading_account
-                    parent_items = [item for item in linked_items if item.get('type') == parent_type]
-                    for parent_item in parent_items:
-                        if parent_type == 'trade_plan':
-                            trade_plan = db.query(TradePlan).filter(TradePlan.id == parent_item['id']).first()
-                            if trade_plan and trade_plan.trading_account_id:
-                                account = db.query(TradingAccount).filter(
-                                    TradingAccount.id == trade_plan.trading_account_id
+            parents = entity_schema['parents']
+            if isinstance(parents, dict):
+                for parent_type, parent_config in parents.items():
+                    if parent_config.get('cascade_ticker'):
+                        # Find parent items of this type
+                        parent_items = [item for item in linked_items if item.get('type') == parent_type]
+                        for parent_item in parent_items:
+                            # Cascade to ticker
+                            if parent_type == 'trade':
+                                # Get ticker from trade
+                                trade = db.query(Trade).options(joinedload(Trade.ticker)).filter(
+                                    Trade.id == parent_item['id']
                                 ).first()
-                                if account:
-                                    account_item = self._format_entity(account, 'trading_account', db)
-                                    if account_item and self._should_add_item('trading_account', account_item['id'], parent_config):
-                                        cascaded_items.append(account_item)
-                        elif parent_type == 'trade':
-                            trade = db.query(Trade).filter(Trade.id == parent_item['id']).first()
-                            if trade and trade.trading_account_id:
-                                account = db.query(TradingAccount).filter(
-                                    TradingAccount.id == trade.trading_account_id
-                                ).first()
-                                if account:
-                                    account_item = self._format_entity(account, 'trading_account', db)
-                                    if account_item and self._should_add_item('trading_account', account_item['id'], parent_config):
-                                        cascaded_items.append(account_item)
-                
-                if parent_config.get('cascade_plan'):
-                    # Find trade items and cascade to trade_plan
-                    parent_items = [item for item in linked_items if item.get('type') == parent_type]
-                    for parent_item in parent_items:
-                        if parent_type == 'trade':
-                            trade = db.query(Trade).filter(Trade.id == parent_item['id']).first()
-                            if trade and trade.trade_plan_id:
-                                trade_plan = db.query(TradePlan).filter(TradePlan.id == trade.trade_plan_id).first()
-                                if trade_plan:
-                                    plan_item = self._format_entity(trade_plan, 'trade_plan', db)
-                                    if plan_item and self._should_add_item('trade_plan', plan_item['id'], parent_config):
-                                        cascaded_items.append(plan_item)
+                                if trade and trade.ticker:
+                                    ticker_item = self._format_entity(trade.ticker, 'ticker', db)
+                                    # Use ticker config from schema if exists (for prevent_duplicates)
+                                    ticker_config = entity_schema.get('parents', {}).get('ticker', {})
+                                    if ticker_item and self._should_add_item('ticker', ticker_item['id'], ticker_config):
+                                        cascaded_items.append(ticker_item)
+                    
+                    if parent_config.get('cascade_account'):
+                        # Find parent items and cascade to trading_account
+                        parent_items = [item for item in linked_items if item.get('type') == parent_type]
+                        for parent_item in parent_items:
+                            if parent_type == 'trade_plan':
+                                trade_plan = db.query(TradePlan).filter(TradePlan.id == parent_item['id']).first()
+                                if trade_plan and trade_plan.trading_account_id is not None and trade_plan.trading_account_id != 0:
+                                    account = db.query(TradingAccount).filter(
+                                        TradingAccount.id == trade_plan.trading_account_id
+                                    ).first()
+                                    if account:
+                                        account_item = self._format_entity(account, 'trading_account', db)
+                                        if account_item and self._should_add_item('trading_account', account_item['id'], parent_config):
+                                            cascaded_items.append(account_item)
+                            elif parent_type == 'trade':
+                                trade = db.query(Trade).filter(Trade.id == parent_item['id']).first()
+                                if trade and trade.trading_account_id is not None and trade.trading_account_id != 0:
+                                    account = db.query(TradingAccount).filter(
+                                        TradingAccount.id == trade.trading_account_id
+                                    ).first()
+                                    if account:
+                                        account_item = self._format_entity(account, 'trading_account', db)
+                                        if account_item and self._should_add_item('trading_account', account_item['id'], parent_config):
+                                            cascaded_items.append(account_item)
+                    
+                    if parent_config.get('cascade_plan'):
+                        # Find trade items and cascade to trade_plan
+                        parent_items = [item for item in linked_items if item.get('type') == parent_type]
+                        for parent_item in parent_items:
+                            if parent_type == 'trade':
+                                trade = db.query(Trade).filter(Trade.id == parent_item['id']).first()
+                                if trade and trade.trade_plan_id is not None and trade.trade_plan_id != 0:
+                                    trade_plan = db.query(TradePlan).filter(TradePlan.id == trade.trade_plan_id).first()
+                                    if trade_plan:
+                                        plan_item = self._format_entity(trade_plan, 'trade_plan', db)
+                                        if plan_item and self._should_add_item('trade_plan', plan_item['id'], parent_config):
+                                            cascaded_items.append(plan_item)
         
         # Combine original items with cascaded items
         all_items = linked_items + cascaded_items
@@ -530,30 +620,42 @@ class EntityRelationshipResolver:
                 'never': []
             })
             
-            # Build base item
+            # Build base item - only add fields that exist or are required
             item = {
                 'id': getattr(entity, 'id', None),
-                'type': entity_type,
-                'status': getattr(entity, 'status', 'active'),
-                'created_at': self._format_datetime(getattr(entity, 'created_at', None)),
-                'updated_at': self._format_datetime(getattr(entity, 'updated_at', None))
+                'type': entity_type
             }
             
-            # Add required fields
+            # Add status only if it exists in entity or is required
+            if 'status' in field_defs.get('required', []) or hasattr(entity, 'status'):
+                item['status'] = getattr(entity, 'status', 'active')
+            
+            # Add created_at and updated_at if they exist or are required
+            if 'created_at' in field_defs.get('required', []) or hasattr(entity, 'created_at'):
+                item['created_at'] = self._format_datetime(getattr(entity, 'created_at', None))
+            if 'updated_at' in field_defs.get('optional', []) or hasattr(entity, 'updated_at'):
+                item['updated_at'] = self._format_datetime(getattr(entity, 'updated_at', None))
+            
+            # Add required fields - always add them, even if None
             for field in field_defs.get('required', []):
                 if field not in item:
                     value = getattr(entity, field, None)
-                    if value is not None:
-                        item[field] = value
-            
-            # Add optional fields if present
-            for field in field_defs.get('optional', []):
-                value = getattr(entity, field, None)
-                if value is not None:
-                    if hasattr(value, 'isoformat'):  # datetime
+                    # Format datetime if needed
+                    if value is not None and hasattr(value, 'isoformat'):
                         item[field] = value.isoformat()
                     else:
-                        item[field] = value
+                        item[field] = value  # Include even if None
+            
+            # Add optional fields - always add them if they exist in entity, even if None
+            for field in field_defs.get('optional', []):
+                if field not in item:
+                    # Check if field exists in entity (even if None)
+                    if hasattr(entity, field):
+                        value = getattr(entity, field, None)
+                        if value is not None and hasattr(value, 'isoformat'):  # datetime
+                            item[field] = value.isoformat()
+                        else:
+                            item[field] = value  # Include even if None
             
             # Entity-specific formatting
             if entity_type == 'trade':
@@ -589,6 +691,12 @@ class EntityRelationshipResolver:
                 item['description'] = f"תכנית השקעה #{item['id']}"
             
             elif entity_type == 'execution':
+                # Add action and quantity to item first
+                if hasattr(entity, 'action'):
+                    item['action'] = getattr(entity, 'action', '')
+                if hasattr(entity, 'quantity'):
+                    item['quantity'] = getattr(entity, 'quantity', None)
+                
                 # Add ticker symbol
                 if hasattr(entity, 'ticker') and entity.ticker:
                     item['ticker_symbol'] = entity.ticker.symbol
@@ -602,7 +710,7 @@ class EntityRelationshipResolver:
                 
                 # Format name and title
                 action = item.get('action', '')
-                quantity = getattr(entity, 'quantity', None) or ''
+                quantity = item.get('quantity', None) or ''
                 ticker_symbol = item.get('ticker_symbol', '')
                 item['name'] = f"ביצוע {action} {quantity} יחידות {ticker_symbol}".strip() if ticker_symbol else f"ביצוע {action} #{item['id']}"
                 item['title'] = item['name']
@@ -685,12 +793,14 @@ class EntityRelationshipResolver:
     
     def _format_datetime(self, value: Any) -> Optional[str]:
         """Format datetime to ISO string."""
-        if not value:
+        if value is None:
             return None
         try:
-            return value.isoformat()
-        except AttributeError:
-            return str(value)
+            if hasattr(value, 'isoformat'):
+                return value.isoformat()
+            return str(value) if value else None
+        except (AttributeError, ValueError, TypeError):
+            return None
     
     def _should_add_item(self, entity_type: str, entity_id: int, config: Dict[str, Any]) -> bool:
         """

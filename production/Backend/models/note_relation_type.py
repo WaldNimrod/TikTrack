@@ -12,11 +12,4 @@ class NoteRelationType(BaseModel):
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary"""
-        result: Dict[str, Any] = {}
-        for c in self.__table__.columns:
-            value = getattr(self, c.name)
-            if hasattr(value, 'strftime'):  # If it's a date
-                result[c.name] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
-            else:
-                result[c.name] = value
-        return result
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}

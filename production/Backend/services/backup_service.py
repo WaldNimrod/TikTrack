@@ -125,8 +125,7 @@ class BackupService:
     def _backup_database(self, backup_path: Path) -> Dict[str, Any]:
         """Backup SQLite database"""
         try:
-            from config.settings import DB_PATH
-            db_path = DB_PATH
+            db_path = Path("Backend/db/simpleTrade_new.db")
             if not db_path.exists():
                 return {'status': 'error', 'error': 'Database file not found'}
             
@@ -397,8 +396,7 @@ class BackupService:
                 return {'status': 'error', 'error': 'Database backup not found'}
             
             # Backup current database
-            from config.settings import DB_PATH
-            current_db_path = DB_PATH
+            current_db_path = Path("Backend/db/simpleTrade_new.db")
             if current_db_path.exists():
                 backup_current_path = current_db_path.parent / f"{current_db_path.stem}_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
                 shutil.copy2(current_db_path, backup_current_path)

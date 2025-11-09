@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_service import TradeService
 from services.position_calculator_service import PositionCalculatorService
+from services.date_normalization_service import DateNormalizationService
+from services.preferences_service import PreferencesService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 import logging
 
@@ -20,6 +22,15 @@ base_api = BaseEntityAPI('trades', TradeService, 'trades')
 
 # Initialize position calculator
 position_calculator = PositionCalculatorService()
+preferences_service = PreferencesService()
+
+
+def _get_date_normalizer():
+    timezone_name = DateNormalizationService.resolve_timezone(
+        request,
+        preferences_service=preferences_service
+    )
+    return DateNormalizationService(timezone_name)
 
 @trades_bp.route('/', methods=['GET'])
 @handle_database_session()
@@ -32,6 +43,7 @@ def get_trades():
     status = request.args.get('status')
     
     try:
+        normalizer = _get_date_normalizer()
         # If there are filtering parameters, use appropriate function
         if trading_account_id and status:
             logger.info(f"Filtering trades by trading_account_id={trading_account_id} and status={status}")
@@ -90,19 +102,24 @@ def get_trades():
         if trade_dicts:
             logger.info(f"First trade data: {trade_dicts[0]}")
         
+        trade_dicts = normalizer.normalize_output(trade_dicts)
+        
         return jsonify({
             "status": "success",
             "data": trade_dicts,
             "message": "Trades retrieved successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except Exception as e:
         import traceback
         error_trace = traceback.format_exc()
         logger.error(f"Error getting trades: {str(e)}\nTraceback:\n{error_trace}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": f"Failed to retrieve trades: {str(e)}"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
 
@@ -121,17 +138,22 @@ def get_trades_by_account(trading_account_id: int):
     try:
         db: Session = next(get_db())
         trades = TradeService.get_by_account(db, trading_account_id)
+        normalizer = _get_date_normalizer()
+        data = normalizer.normalize_output([trade.to_dict() for trade in trades])
         return jsonify({
             "status": "success",
-            "data": [trade.to_dict() for trade in trades],
+            "data": data,
             "message": "TradingAccount trades retrieved successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting trades for account {trading_account_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve account trades"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
     finally:
@@ -143,7 +165,8 @@ def get_trades_by_account(trading_account_id: int):
 def create_trade():
     """Create a new trade"""
     try:
-        data = request.get_json()
+        normalizer = _get_date_normalizer()
+        data = request.get_json() or {}
         
         # Handle backward compatibility for type field
         if 'type' in data:
@@ -158,18 +181,23 @@ def create_trade():
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         
         db: Session = g.db
-        trade = TradeService.create(db, data)
+        normalized_payload = normalizer.normalize_input_payload(data)
+        trade = TradeService.create(db, normalized_payload)
+        trade_dict = normalizer.normalize_output(trade.to_dict() if hasattr(trade, 'to_dict') else {})
         return jsonify({
             "status": "success",
-            "data": trade.to_dict(),
+            "data": trade_dict,
             "message": "Trade created successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 201
     except Exception as e:
         logger.error(f"Error creating trade: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
 
@@ -179,7 +207,8 @@ def create_trade():
 def update_trade(trade_id: int):
     """Update trade"""
     try:
-        data = request.get_json()
+        normalizer = _get_date_normalizer()
+        data = request.get_json() or {}
         
         # Handle backward compatibility for type field
         if 'type' in data:
@@ -194,17 +223,19 @@ def update_trade(trade_id: int):
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         
         db: Session = g.db
-        trade = TradeService.update(db, trade_id, data)
+        normalized_payload = normalizer.normalize_input_payload(data)
+        trade = TradeService.update(db, trade_id, normalized_payload)
         if trade:
             # Commit the transaction
             db.commit()
             logger.info(f"Transaction committed for trade {trade_id}")
             try:
-                trade_dict = trade.to_dict()
+                trade_dict = normalizer.normalize_output(trade.to_dict())
                 return jsonify({
                     "status": "success",
                     "data": trade_dict,
                     "message": "Trade updated successfully",
+                    "timestamp": normalizer.now_envelope(),
                     "version": "1.0"
                 })
             except Exception as e:
@@ -222,22 +253,27 @@ def update_trade(trade_id: int):
                     "closed_at": trade.closed_at.strftime('%Y-%m-%d %H:%M:%S') if trade.closed_at else None,
                     "notes": trade.notes
                 }
+                basic_data = normalizer.normalize_output(basic_data)
                 return jsonify({
                     "status": "success",
                     "data": basic_data,
                     "message": "Trade updated successfully (basic data only)",
+                    "timestamp": normalizer.now_envelope(),
                     "version": "1.0"
                 })
         return jsonify({
             "status": "error",
             "error": {"message": "Trade not found"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error updating trade {trade_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
 
@@ -247,26 +283,33 @@ def update_trade(trade_id: int):
 def close_trade(trade_id: int):
     """Close trade"""
     try:
+        normalizer = _get_date_normalizer()
         data = request.get_json() if request.is_json else {}
+        normalized_payload = normalizer.normalize_input_payload(data)
         db: Session = g.db
-        trade = TradeService.close_trade(db, trade_id, data)
+        trade = TradeService.close_trade(db, trade_id, normalized_payload or {})
         if trade:
+            trade_dict = normalizer.normalize_output(trade.to_dict())
             return jsonify({
                 "status": "success",
-                "data": trade.to_dict(),
+                "data": trade_dict,
                 "message": "Trade closed successfully",
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Trade not found or already closed"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error closing trade {trade_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
 
@@ -276,27 +319,33 @@ def close_trade(trade_id: int):
 def cancel_trade(trade_id: int):
     """Cancel trade"""
     try:
+        normalizer = _get_date_normalizer()
         data = request.get_json() if request.is_json else {}
         cancel_reason = data.get('cancel_reason', 'Cancelled by user')
         db: Session = g.db
         trade = TradeService.cancel_trade(db, trade_id, cancel_reason)
         if trade:
+            trade_dict = normalizer.normalize_output(trade.to_dict())
             return jsonify({
                 "status": "success",
-                "data": trade.to_dict(),
+                "data": trade_dict,
                 "message": "Trade cancelled successfully",
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Trade not found or already cancelled"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error cancelling trade {trade_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
 
@@ -306,12 +355,14 @@ def cancel_trade(trade_id: int):
 def delete_trade(trade_id: int):
     """Delete trade"""
     try:
+        normalizer = _get_date_normalizer()
         db: Session = g.db
         success = TradeService.delete(db, trade_id)
         if success:
             return jsonify({
                 "status": "success",
                 "message": "Trade deleted successfully",
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             })
         
@@ -321,13 +372,16 @@ def delete_trade(trade_id: int):
             "error": {
                 "message": "Cannot delete trade - it has linked executions or other items"
             },
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
     except Exception as e:
         logger.error(f"Error deleting trade {trade_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
 
@@ -335,6 +389,7 @@ def delete_trade(trade_id: int):
 def get_trade_summary():
     """Get trade summary"""
     try:
+        normalizer = _get_date_normalizer()
         trading_account_id = request.args.get('trading_account_id', type=int)
         db: Session = next(get_db())
         summary = TradeService.get_trade_summary(db, trading_account_id)
@@ -342,13 +397,16 @@ def get_trade_summary():
             "status": "success",
             "data": summary,
             "message": "Trade summary retrieved successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting trade summary: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve trade summary"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
     finally:

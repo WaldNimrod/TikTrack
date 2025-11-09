@@ -168,6 +168,14 @@ window.loadAlertsData = async function() {
       } else {
         window.Logger.warn('⚠️ updateAlertsSummary לא זמין', { page: "alerts" });
       }
+      
+      // Register table with UnifiedTableSystem after data is loaded
+      if (typeof window.registerAlertsTables === 'function') {
+        window.registerAlertsTables();
+      }
+
+      // Restore page state (filters, sort, sections, entity filters)
+      await restorePageState('alerts');
 
       window.Logger.info('✅ loadAlertsData הושלם בהצלחה', { page: "alerts" });
     } catch (error) {
@@ -506,12 +514,29 @@ function updateAlertsTable(alerts) {
               return null;
             })();
             const tickerSymbol = tradeTicker || `טרייד ${alert.related_id}`;
-            const tradeDate = trade?.created_at || trade?.opened_at || trade?.date || '';
+            const tradeDateEnvelope = window.dateUtils?.ensureDateEnvelope
+              ? window.dateUtils.ensureDateEnvelope(
+                  trade?.created_at_envelope ||
+                  trade?.createdAtEnvelope ||
+                  trade?.created_at ||
+                  trade?.opened_at ||
+                  trade?.date ||
+                  null
+                )
+              : (
+                  trade?.created_at_envelope ||
+                  trade?.createdAtEnvelope ||
+                  trade?.created_at ||
+                  trade?.opened_at ||
+                  trade?.date ||
+                  null
+                );
             displayName = tickerSymbol;
             metaForEntity = {
               renderMode: 'notes-table',
               ticker: tickerSymbol,
-              date: tradeDate,
+              date: tradeDateEnvelope,
+              date_envelope: tradeDateEnvelope,
               status: trade?.status || '',
               side: trade?.side || '',
               investment_type: trade?.investment_type || ''
@@ -528,15 +553,31 @@ function updateAlertsTable(alerts) {
               return null;
             })();
             const tickerSymbol = planTicker || `תוכנית ${alert.related_id}`;
-            const planDate = plan?.created_at || plan?.date || '';
+            const planDateEnvelope = window.dateUtils?.ensureDateEnvelope
+              ? window.dateUtils.ensureDateEnvelope(
+                  plan?.created_at_envelope ||
+                  plan?.createdAtEnvelope ||
+                  plan?.created_at ||
+                  plan?.date ||
+                  null
+                )
+              : (
+                  plan?.created_at_envelope ||
+                  plan?.createdAtEnvelope ||
+                  plan?.created_at ||
+                  plan?.date ||
+                  null
+                );
             displayName = tickerSymbol;
             metaForEntity = {
               renderMode: 'notes-table',
               ticker: tickerSymbol,
-              date: planDate,
+              date: planDateEnvelope,
+              date_envelope: planDateEnvelope,
               status: plan?.status || '',
               side: plan?.side || '',
-              investment_type: plan?.investment_type || ''
+              investment_type: plan?.investment_type || '',
+              planned_amount: plan?.planned_amount || plan?.plannedAmount || null
             };
             break;
           }
@@ -587,46 +628,121 @@ function updateAlertsTable(alerts) {
       const symbolDisplay = window.getRelatedObjectSymbol ? 
         window.getRelatedObjectSymbol(alert, dataSources) : '-';
 
-      const createdAtRawCandidates = [
-        alert.created_at,
-        alert.createdAt,
-        alert.created_at_utc,
-        alert.createdAtUtc,
-        alert.created_at_iso,
-        alert.createdAtIso,
-        alert.created_at_local,
-        alert.createdAtLocal
-      ];
-      const createdAtRaw = createdAtRawCandidates.find(value => {
-        if (!value) {return false;}
-        const normalized = String(value).trim();
-        return normalized && normalized.toLowerCase() !== 'none' && normalized.toLowerCase() !== 'null';
-      }) || '';
-
-      const createdDateObj = createdAtRaw
-        ? (window.parseDate ? window.parseDate(createdAtRaw) : new Date(createdAtRaw))
-        : null;
-
-      const createdAtDisplay = createdAtRaw
+      const createdRawEnvelope =
+        alert.created_at_envelope ||
+        alert.createdAtEnvelope ||
+        alert.created_atEnvelope ||
+        alert.createdAt_envelope ||
+        null;
+      const createdSource =
+        createdRawEnvelope ||
+        alert.created_at ||
+        alert.createdAt ||
+        alert.created_at_utc ||
+        alert.createdAtUtc ||
+        alert.created_at_iso ||
+        alert.createdAtIso ||
+        alert.created_at_local ||
+        alert.createdAtLocal ||
+        null;
+      const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(createdSource)
+        : createdSource;
+      const createdDateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(createdEnvelope || null)
+        : (createdEnvelope ? new Date(createdEnvelope) : null);
+      const createdAtDisplay = createdEnvelope
         ? (
             window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function'
-              ? window.FieldRendererService.renderDate(createdAtRaw, true)
-              : window.formatDate
-                ? window.formatDate(createdAtRaw, true)
-                : (createdDateObj && !isNaN(createdDateObj.getTime()))
-                  ? createdDateObj.toLocaleString('he-IL', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })
-                  : 'לא מוגדר'
+              ? window.FieldRendererService.renderDate(createdEnvelope, true)
+              : window.dateUtils?.formatDate
+                ? window.dateUtils.formatDate(createdEnvelope, { includeTime: true })
+                : (() => {
+                    try {
+                      if (createdDateObj && !Number.isNaN(createdDateObj.getTime())) {
+                        return createdDateObj.toLocaleString('he-IL', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        });
+                      }
+                    } catch (error) {
+                      window.Logger?.warn('⚠️ createdAt fallback formatting failed', { error, alertId: alert?.id }, { page: 'alerts' });
+                    }
+                    return 'לא מוגדר';
+                  })()
           )
         : 'לא מוגדר';
-      const createdAtDataAttr = createdDateObj && !isNaN(createdDateObj?.getTime())
-        ? createdDateObj.toISOString()
-        : (createdAtRaw || '');
+      const createdAtDataAttr = window.dateUtils?.getEpochMilliseconds
+        ? window.dateUtils.getEpochMilliseconds(createdEnvelope)
+        : (() => {
+            if (!createdDateObj || Number.isNaN(createdDateObj.getTime())) {return '';}
+            try {
+              return createdDateObj.getTime();
+            } catch {
+              return '';
+            }
+          })();
+
+      const triggeredRawEnvelope =
+        alert.triggered_at_envelope ||
+        alert.triggeredAtEnvelope ||
+        alert.triggered_atEnvelope ||
+        alert.triggeredAt_envelope ||
+        null;
+      const triggeredSource =
+        triggeredRawEnvelope ||
+        alert.triggered_at ||
+        alert.triggeredAt ||
+        alert.triggered_at_utc ||
+        alert.triggeredAtUtc ||
+        alert.triggered_at_iso ||
+        alert.triggeredAtIso ||
+        alert.triggered_at_local ||
+        alert.triggeredAtLocal ||
+        null;
+      const triggeredEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(triggeredSource)
+        : triggeredSource;
+      const triggeredDateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(triggeredEnvelope || null)
+        : (triggeredEnvelope ? new Date(triggeredEnvelope) : null);
+      const triggeredAtDisplay = triggeredEnvelope
+        ? (
+            window.FieldRendererService?.renderDate
+              ? window.FieldRendererService.renderDate(triggeredEnvelope, true)
+              : window.dateUtils?.formatDate
+                ? window.dateUtils.formatDate(triggeredEnvelope, { includeTime: true })
+                : (() => {
+                    try {
+                      if (triggeredDateObj && !Number.isNaN(triggeredDateObj.getTime())) {
+                        return triggeredDateObj.toLocaleString('he-IL', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        });
+                      }
+                    } catch (error) {
+                      window.Logger?.warn('⚠️ triggeredAt fallback formatting failed', { error, alertId: alert?.id }, { page: 'alerts' });
+                    }
+                    return '-';
+                  })()
+          )
+        : '-';
+      const triggeredAtDataAttr = window.dateUtils?.getEpochMilliseconds
+        ? window.dateUtils.getEpochMilliseconds(triggeredEnvelope)
+        : (() => {
+            if (!triggeredDateObj || Number.isNaN(triggeredDateObj.getTime())) {return '';}
+            try {
+              return triggeredDateObj.getTime();
+            } catch {
+              return '';
+            }
+          })();
 
       // המרת סטטוס לעברית להצגה
       // לפי הדוקומנטציה: open=פעיל, closed=הופעל, cancelled=בוטל
@@ -677,8 +793,50 @@ function updateAlertsTable(alerts) {
         triggeredBorderColor = '#6c757d';
       }
 
+      const expiryRawEnvelope =
+        alert.expiry_date_envelope ||
+        alert.expiryDateEnvelope ||
+        alert.expiry_dateEnvelope ||
+        alert.expiryDate_envelope ||
+        null;
+      const expirySource = expiryRawEnvelope || alert.expiry_date || alert.expiryDate || null;
+      const expiryEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(expirySource)
+        : expirySource;
+      const expiryDateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(expiryEnvelope || null)
+        : (expiryEnvelope ? new Date(expiryEnvelope) : null);
+      const expiryDisplay = expiryEnvelope
+        ? (
+            window.FieldRendererService?.renderDate
+              ? window.FieldRendererService.renderDate(expiryEnvelope, false)
+              : window.dateUtils?.formatDate
+                ? window.dateUtils.formatDate(expiryEnvelope, { includeTime: false })
+                : (() => {
+                    try {
+                      if (expiryDateObj && !Number.isNaN(expiryDateObj.getTime())) {
+                        return expiryDateObj.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                      }
+                    } catch (error) {
+                      window.Logger?.warn('⚠️ expiry date fallback failed', { error, alertId: alert?.id }, { page: 'alerts' });
+                    }
+                    return '-';
+                  })()
+          )
+        : '-';
+      const expiryDataAttr = window.dateUtils?.getEpochMilliseconds
+        ? window.dateUtils.getEpochMilliseconds(expiryEnvelope)
+        : (() => {
+            if (!expiryDateObj || Number.isNaN(expiryDateObj.getTime())) {return '';}
+            try {
+              return expiryDateObj.getTime();
+            } catch {
+              return '';
+            }
+          })();
+
       return `
-        <tr data-status="${alert.status || ''}" data-date="${alert.created_at || ''}">
+        <tr data-status="${alert.status || ''}" data-date="${createdAtDataAttr || ''}">
           <td class="related-cell">
             ${relatedCellHtml}
           </td>
@@ -714,14 +872,14 @@ function updateAlertsTable(alerts) {
           <td class="text-center">
             ${getConditionSourceDisplay(alert)}
           </td>
-          <td data-date="${createdAtDataAttr}"><span class="date-text">${createdAtDisplay}</span></td>
-          <td data-date="${alert.expiry_date || ''}"><span class="date-text">${alert.expiry_date ? new Date(alert.expiry_date).toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '-'}</span></td>
+          <td data-date="${createdAtDataAttr || ''}"><span class="date-text">${createdAtDisplay}</span></td>
+          <td data-date="${triggeredAtDataAttr || ''}"><span class="date-text">${triggeredAtDisplay}</span></td>
+          <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${(() => {
               if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
               const result = window.createActionsMenu([
                 { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
-                { type: 'LINK', onclick: `viewLinkedItemsForAlert(${alert.id})`, title: 'צפה בפריטים מקושרים' },
                 { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
                 { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
                 { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
@@ -1017,16 +1175,66 @@ function populateSelect(selectId, data, field, prefix = '') {
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
       const side = item.side || 'לא מוגדר';
       const investmentType = item.investment_type || 'לא מוגדר';
-      const date = item.created_at || item.date;
-      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const dateRawEnvelope =
+        item.created_at_envelope ||
+        item.createdAtEnvelope ||
+        item.created_atEnvelope ||
+        item.createdAt_envelope ||
+        item.date_envelope ||
+        item.dateEnvelope ||
+        null;
+      const dateSource = dateRawEnvelope || item.created_at || item.date || null;
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateSource) : dateSource;
+      const dateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(dateEnvelope || null)
+        : (dateEnvelope ? new Date(dateEnvelope) : null);
+      const formattedDate = dateEnvelope
+        ? (window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(dateEnvelope, { includeTime: false })
+            : (() => {
+                try {
+                  if (dateObj && !Number.isNaN(dateObj.getTime())) {
+                    return dateObj.toLocaleDateString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ populateSelect trade date fallback failed', { error, itemId: item?.id }, { page: 'alerts' });
+                }
+                return 'לא מוגדר';
+              })())
+        : 'לא מוגדר';
       displayText = `${symbol} | ${side} | ${investmentType} | ${formattedDate}`;
     } else if (prefix === 'תכנון') {
       // עבור תכנון: סימבול + צד + סוג השקעה + תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
       const side = item.side || 'לא מוגדר';
       const investmentType = item.investment_type || 'לא מוגדר';
-      const date = item.created_at || item.date;
-      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const dateRawEnvelopePlan =
+        item.created_at_envelope ||
+        item.createdAtEnvelope ||
+        item.created_atEnvelope ||
+        item.createdAt_envelope ||
+        item.date_envelope ||
+        item.dateEnvelope ||
+        null;
+      const planDateSource = dateRawEnvelopePlan || item.created_at || item.date || null;
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(planDateSource) : planDateSource;
+      const dateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(dateEnvelope || null)
+        : (dateEnvelope ? new Date(dateEnvelope) : null);
+      const formattedDate = dateEnvelope
+        ? (window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(dateEnvelope, { includeTime: false })
+            : (() => {
+                try {
+                  if (dateObj && !Number.isNaN(dateObj.getTime())) {
+                    return dateObj.toLocaleDateString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ populateSelect plan date fallback failed', { error, itemId: item?.id }, { page: 'alerts' });
+                }
+                return 'לא מוגדר';
+              })())
+        : 'לא מוגדר';
       displayText = `${symbol} | ${side} | ${investmentType} | ${formattedDate}`;
     } else {
       // עבור טיקר: רק סימבול
@@ -2597,18 +2805,63 @@ function updateAlertsSummary(alerts) {
   const newAlerts = alerts.filter(alert => alert.is_triggered === 'new').length;
   
   // התראות היום
-  const today = new Date().toDateString();
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfTomorrow = new Date(startOfToday);
+  startOfTomorrow.setDate(startOfToday.getDate() + 1);
+  const weekAgo = new Date(startOfToday);
+  weekAgo.setDate(weekAgo.getDate() - 7);
+
+  const getCreatedMs = (alert) => {
+    const createdRawEnvelope =
+      alert.created_at_envelope ||
+      alert.createdAtEnvelope ||
+      alert.created_atEnvelope ||
+      alert.createdAt_envelope ||
+      null;
+    const createdSource =
+      createdRawEnvelope ||
+      alert.created_at ||
+      alert.createdAt ||
+      alert.created_at_utc ||
+      alert.createdAtUtc ||
+      alert.created_at_iso ||
+      alert.createdAtIso ||
+      alert.created_at_local ||
+      alert.createdAtLocal ||
+      null;
+    const envelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(createdSource)
+      : createdSource;
+    if (!envelope) {return null;}
+    const ms = window.dateUtils?.getEpochMilliseconds
+      ? window.dateUtils.getEpochMilliseconds(envelope)
+      : null;
+    if (ms || ms === 0) {
+      return ms;
+    }
+    const dateObj = window.dateUtils?.toDateObject
+      ? window.dateUtils.toDateObject(envelope)
+      : (envelope ? new Date(envelope) : null);
+    if (!dateObj || Number.isNaN(dateObj.getTime())) {
+      return null;
+    }
+    return dateObj.getTime();
+  };
+
   const todayAlerts = alerts.filter(alert => {
-    if (!alert.created_at) return false;
-    return new Date(alert.created_at).toDateString() === today;
+    const createdMs = getCreatedMs(alert);
+    if (createdMs === null) {return false;}
+    const createdDate = new Date(createdMs);
+    return createdDate >= startOfToday && createdDate < startOfTomorrow;
   }).length;
   
   // התראות השבוע
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
   const weekAlerts = alerts.filter(alert => {
-    if (!alert.created_at) return false;
-    return new Date(alert.created_at) >= weekAgo;
+    const createdMs = getCreatedMs(alert);
+    if (createdMs === null) {return false;}
+    const createdDate = new Date(createdMs);
+    return createdDate >= weekAgo;
   }).length;
 
   // עדכון האלמנטים
@@ -3363,5 +3616,102 @@ function clearAlertTickerInfo() {
 // REMOVED: window.showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', id) directly
 window.loadAlertTickerInfo = loadAlertTickerInfo;
 window.displayAlertTickerInfo = displayAlertTickerInfo;
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('alerts', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('alerts');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register alerts table with UnifiedTableSystem
+ * This function registers the alerts table for unified sorting and filtering
+ */
+window.registerAlertsTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "alerts" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register alerts table
+    window.UnifiedTableSystem.registry.register('alerts', {
+        dataGetter: () => {
+            return window.alertsData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateAlertsTable === 'function') {
+                window.updateAlertsTable(data);
+            }
+        },
+        tableSelector: '#alertsTable',
+        columns: getColumns('alerts'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};
 window.clearAlertTickerInfo = clearAlertTickerInfo;
 // Note: saveAlert and deleteAlert removed - using ModalManagerV2 and confirmDeleteAlert instead

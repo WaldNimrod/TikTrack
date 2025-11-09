@@ -33,7 +33,7 @@ window.positionsPortfolioState = {
 
 /**
  * Initialize positions & portfolio system
- * @param {boolean} autoSelectDefault - Auto-select default account from preferences
+ * @param {boolean} autoSelectDefault - Auto-select default trading account from preferences
  */
 window.initPositionsPortfolio = async function(autoSelectDefault = false) {
     window.Logger.info('🔧 אתחול מערכת פוזיציות ופורטפוליו', { page: "trading_accounts" });
@@ -59,7 +59,7 @@ window.initPositionsPortfolio = async function(autoSelectDefault = false) {
         return;
     }
     
-    // Populate account selector when accounts are loaded
+    // Populate trading account selector when trading accounts are loaded
     if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
         await populatePositionsAccountSelector(autoSelectDefault);
     }
@@ -70,16 +70,22 @@ window.initPositionsPortfolio = async function(autoSelectDefault = false) {
         positionsSelector.addEventListener('change', handlePositionsAccountSelection);
     }
     
-    // Populate portfolio account selector
+    // Populate portfolio trading account selector
     await populatePortfolioAccountSelector();
     
     // Setup portfolio filters
     setupPortfolioFilters();
     
+    // Set default active state for side filter buttons (if they exist)
+    const allSideBtn = document.querySelector('.portfolio-side-filter-btn[data-side=""]');
+    if (allSideBtn && !document.querySelector('.portfolio-side-filter-btn.active')) {
+        allSideBtn.classList.add('active');
+    }
+    
     // Setup summary toggle
     setupSummaryToggle();
     
-    // Listen for account data updates
+    // Listen for trading account data updates
     if (window.addEventListener) {
         window.addEventListener('accountsLoaded', async () => {
             await populatePositionsAccountSelector(true);
@@ -87,14 +93,25 @@ window.initPositionsPortfolio = async function(autoSelectDefault = false) {
         });
     }
     
-    // Load portfolio on init (if no account selector dependency)
+    // Load portfolio on init (if no trading account selector dependency)
     await loadPortfolio();
     await loadPortfolioSummary();
+
+    if (typeof window.registerPortfolioTable === 'function') {
+        const registered = window.registerPortfolioTable();
+        if (!registered) {
+            setTimeout(() => {
+                if (typeof window.registerPortfolioTable === 'function') {
+                    window.registerPortfolioTable();
+                }
+            }, 500);
+        }
+    }
 };
 
 /**
- * Populate positions account selector dropdown
- * @param {boolean} autoSelectDefault - Auto-select default account from preferences
+ * Populate positions trading account selector dropdown
+ * @param {boolean} autoSelectDefault - Auto-select default trading account from preferences
  */
 async function populatePositionsAccountSelector(autoSelectDefault = false) {
     const selector = document.getElementById('positionsAccountSelector');
@@ -105,19 +122,19 @@ async function populatePositionsAccountSelector(autoSelectDefault = false) {
         selector.remove(1);
     }
     
-    // Add accounts - reuse logic from account-activity.js
+    // Add trading accounts - reuse logic from account-activity.js
     if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
-        window.trading_accountsData.forEach(account => {
+        window.trading_accountsData.forEach(tradingAccount => {
             const option = document.createElement('option');
-            option.value = account.id;
-            option.textContent = account.name || `חשבון ${account.id}`;
+            option.value = tradingAccount.id;
+            option.textContent = tradingAccount.name || `חשבון מסחר ${tradingAccount.id}`;
             selector.appendChild(option);
         });
     }
     
-    window.Logger.info(`✅ Positions account selector populated with ${selector.options.length - 1} accounts`, { page: "trading_accounts" });
+    window.Logger.info(`✅ Positions trading account selector populated with ${selector.options.length - 1} trading accounts`, { page: "trading_accounts" });
     
-    // Auto-select default account from preferences (same logic as account-activity)
+    // Auto-select default trading account from preferences (same logic as account-activity)
     if (autoSelectDefault && selector.options.length > 1) {
         const currentValue = selector.value;
         if (!currentValue || currentValue === '') {
@@ -132,9 +149,9 @@ async function populatePositionsAccountSelector(autoSelectDefault = false) {
                         if (!isNaN(parsed)) {
                             defaultAccountId = parsed;
                         } else {
-                            const account = window.trading_accountsData.find(acc => acc.name === prefValue);
-                            if (account) {
-                                defaultAccountId = account.id;
+                            const tradingAccount = window.trading_accountsData.find(acc => acc.name === prefValue);
+                            if (tradingAccount) {
+                                defaultAccountId = tradingAccount.id;
                             }
                         }
                     }
@@ -147,7 +164,7 @@ async function populatePositionsAccountSelector(autoSelectDefault = false) {
                 selector.value = defaultAccountId;
                 handlePositionsAccountSelection({ target: selector });
             } catch (error) {
-                window.Logger.error('❌ Error getting default account:', error, { page: "trading_accounts" });
+                window.Logger.error('❌ Error getting default trading account:', error, { page: "trading_accounts" });
                 const firstAccountId = selector.options[1].value;
                 selector.value = firstAccountId;
                 handlePositionsAccountSelection({ target: selector });
@@ -157,7 +174,7 @@ async function populatePositionsAccountSelector(autoSelectDefault = false) {
 }
 
 /**
- * Handle positions account selection change
+ * Handle positions trading account selection change
  */
 async function handlePositionsAccountSelection(event) {
     const accountId = parseInt(event.target.value);
@@ -175,12 +192,12 @@ async function handlePositionsAccountSelection(event) {
         sectionBody.style.display = 'block';
     }
     
-    // Load positions for selected account
+    // Load positions for selected trading account
     await loadAccountPositions(accountId);
 }
 
 /**
- * Load account positions from API with cache
+ * Load trading account positions from API with cache
  * @param {number} accountId - Trading account ID
  */
 async function loadAccountPositions(accountId) {
@@ -220,7 +237,7 @@ async function loadAccountPositions(accountId) {
         // Calculate totals - sum of all market values
         const totalPositionsValue = data.reduce((sum, p) => sum + (p.market_value || 0), 0);
         
-        // Get account cash balance for total account value
+        // Get trading account cash balance for total trading account value
         let accountTotalValue = totalPositionsValue;
         try {
             const balanceResponse = await fetch(`/api/account-activity/${accountId}/balances`);
@@ -232,7 +249,7 @@ async function loadAccountPositions(accountId) {
                 }
             }
         } catch (e) {
-            window.Logger.warn('Error getting account balance:', e, { page: "trading_accounts" });
+            window.Logger.warn('Error getting trading account balance:', e, { page: "trading_accounts" });
         }
         
         // Update count and totals
@@ -274,7 +291,7 @@ async function loadAccountPositions(accountId) {
         renderPositionsTable(data);
         
     } catch (error) {
-        window.Logger.error('❌ Error loading account positions:', error, { page: "trading_accounts" });
+        window.Logger.error('❌ Error loading trading account positions:', error, { page: "trading_accounts" });
         if (tableBody) {
             tableBody.innerHTML = '<tr><td colspan="8" class="error">שגיאה בטעינת פוזיציות</td></tr>';
         }
@@ -347,6 +364,11 @@ function renderPositionsTable(positions) {
     // Use FieldRendererService for consistent rendering
     const FieldRenderer = window.FieldRendererService;
     
+    const isIndexPage = window.location.pathname.includes('index') ||
+        document.body.classList.contains('index-page') ||
+        window.location.pathname === '/' ||
+        window.location.pathname === '/index.html';
+    
     let html = '';
     positions.forEach(position => {
         const side = position.side || 'closed';
@@ -363,13 +385,19 @@ function renderPositionsTable(positions) {
         }
         if (FieldRenderer && FieldRenderer.renderTickerInfo) {
             try {
-                tickerHtml = FieldRenderer.renderTickerInfo({
+                let renderedTicker = FieldRenderer.renderTickerInfo({
                     symbol: position.ticker_symbol,
                     name: position.ticker_name,
                     current_price: position.market_price,
                     daily_change: null, // Not available in position data
                     daily_change_percent: null
                 }, 'ticker-info-compact');
+
+                if (isIndexPage && typeof renderedTicker === 'string') {
+                    renderedTicker = renderedTicker.replace(/<span class="text-muted small">[\s\S]*?<\/span>/, '');
+                }
+
+                tickerHtml = renderedTicker;
             } catch (e) {
                 window.Logger.warn('Error rendering ticker info:', e, { page: "trading_accounts" });
             }
@@ -409,9 +437,10 @@ function renderPositionsTable(positions) {
                 </td>
                 <td class="col-unrealized-pl">
                     ${marketValue ? `
-                        <span class="${unrealizedPl >= 0 ? 'text-success' : 'text-danger'}">
-                            ${formatCurrencyHebrew(unrealizedPl, true, true)} (${unrealizedPlPercent.toFixed(2)}%${unrealizedPlPercent >= 0 ? '+' : '-'})
-                        </span>
+                        <div class="portfolio-pl-value ${unrealizedPl >= 0 ? 'text-success' : 'text-danger'}">
+                            <div class="pl-amount">${formatCurrencyHebrew(unrealizedPl, true, true)}</div>
+                            <div class="pl-percent">${unrealizedPlPercent.toFixed(2)}%${unrealizedPlPercent >= 0 ? '+' : '-'}</div>
+                        </div>
                     ` : 'לא זמין'}
                 </td>
                 <td class="col-percent-account">
@@ -434,36 +463,83 @@ function renderPositionsTable(positions) {
 }
 
 /**
- * Populate portfolio account selector dropdown
+ * Populate portfolio trading account selector dropdown
  */
 async function populatePortfolioAccountSelector() {
     const selector = document.getElementById('portfolioAccountFilter');
     if (!selector) return;
-    
-    // Clear existing options (except first)
+
+    const previousValue = selector.value;
+
+    if (window.SelectPopulatorService?.populateAccountsSelect) {
+        try {
+            await window.SelectPopulatorService.populateAccountsSelect(selector, {
+                includeAll: true,
+                includeEmpty: true,
+                emptyText: 'כל חשבונות המסחר',
+                defaultValue: previousValue ? parseInt(previousValue, 10) || previousValue : null
+            });
+
+            if (previousValue) {
+                selector.value = previousValue;
+            }
+
+            window.Logger?.info('✅ Portfolio account selector populated via SelectPopulatorService', { page: "positions-portfolio" });
+            return;
+        } catch (error) {
+            window.Logger?.warn('⚠️ SelectPopulatorService.populateAccountsSelect failed, falling back to cached data', error, { page: "positions-portfolio" });
+        }
+    }
+
+    // Fallback: use cached trading_accountsData if available
     while (selector.options.length > 1) {
         selector.remove(1);
     }
     
-    // Add accounts - reuse logic from positions selector
     if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
-        window.trading_accountsData.forEach(account => {
+        window.trading_accountsData.forEach(tradingAccount => {
             const option = document.createElement('option');
-            option.value = account.id;
-            option.textContent = account.name || `חשבון ${account.id}`;
+            option.value = tradingAccount.id;
+            option.textContent = tradingAccount.name || `חשבון מסחר ${tradingAccount.id}`;
             selector.appendChild(option);
         });
     }
+
+    if (previousValue) {
+        selector.value = previousValue;
+    }
     
-    window.Logger.info(`✅ Portfolio account selector populated with ${selector.options.length - 1} accounts`, { page: "trading_accounts" });
+    window.Logger?.info(`✅ Portfolio trading account selector populated with ${selector.options.length - 1} trading accounts (fallback)`, { page: "positions-portfolio" });
 }
+
+/**
+ * Handle portfolio side filter button click
+ * @param {string} side - Side value: '', 'long', or 'short'
+ */
+window.handlePortfolioSideFilter = function(side) {
+    // Update button states - CSS handles colors automatically
+    const buttons = document.querySelectorAll('.portfolio-side-filter-btn');
+    buttons.forEach(btn => {
+        const btnSide = btn.getAttribute('data-side') || '';
+        if (btnSide === side) {
+            btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
+        } else {
+            btn.classList.remove('active');
+            btn.setAttribute('aria-pressed', 'false');
+        }
+    });
+    
+    // Reload portfolio with new filter
+    loadPortfolio();
+};
 
 /**
  * Setup portfolio filters
  */
 function setupPortfolioFilters() {
     const accountFilter = document.getElementById('portfolioAccountFilter');
-    const sideFilter = document.getElementById('portfolioSideFilter');
+    const sideFilterButtons = document.querySelectorAll('.portfolio-side-filter-btn');
     const includeClosed = document.getElementById('portfolioIncludeClosed');
     const unifyAccounts = document.getElementById('portfolioUnifyAccounts');
     
@@ -471,8 +547,25 @@ function setupPortfolioFilters() {
         accountFilter.addEventListener('change', () => loadPortfolio());
     }
     
-    if (sideFilter) {
-        sideFilter.addEventListener('change', () => loadPortfolio());
+    // Setup side filter buttons - CSS handles colors automatically
+    if (sideFilterButtons && sideFilterButtons.length > 0) {
+        // Set default active state to "הכל" (empty)
+        const allBtn = document.querySelector('.portfolio-side-filter-btn[data-side=""]');
+        if (allBtn) {
+            allBtn.classList.add('active');
+            allBtn.setAttribute('aria-pressed', 'true');
+        }
+        sideFilterButtons.forEach(btn => {
+            if (!btn.classList.contains('active')) {
+                btn.setAttribute('aria-pressed', 'false');
+            }
+        });
+    } else {
+        // Fallback to old select element (if exists)
+        const sideFilter = document.getElementById('portfolioSideFilter');
+        if (sideFilter) {
+            sideFilter.addEventListener('change', () => loadPortfolio());
+        }
     }
     
     if (includeClosed) {
@@ -499,7 +592,20 @@ async function loadPortfolio() {
         
         // Get filter values
         const accountFilter = document.getElementById('portfolioAccountFilter')?.value || '';
-        const sideFilter = document.getElementById('portfolioSideFilter')?.value || '';
+        
+        // Get side filter from buttons (new design) or select (old design)
+        let sideFilter = '';
+        const activeSideButton = document.querySelector('.portfolio-side-filter-btn.active');
+        if (activeSideButton) {
+            sideFilter = activeSideButton.getAttribute('data-side') || '';
+        } else {
+            // Fallback to old select element
+            const sideFilterSelect = document.getElementById('portfolioSideFilter');
+            if (sideFilterSelect) {
+                sideFilter = sideFilterSelect.value || '';
+            }
+        }
+        
         const includeClosed = document.getElementById('portfolioIncludeClosed')?.checked || false;
         const unifyAccounts = document.getElementById('portfolioUnifyAccounts')?.checked || false;
         
@@ -581,6 +687,10 @@ function renderPortfolioTable(positions) {
     }
     
     const FieldRenderer = window.FieldRendererService;
+    const isIndexPage = window.location.pathname.includes('index') ||
+        document.body.classList.contains('index-page') ||
+        window.location.pathname === '/' ||
+        window.location.pathname === '/index.html';
     
     let html = '';
     positions.forEach(position => {
@@ -591,17 +701,27 @@ function renderPortfolioTable(positions) {
         const unrealizedPlPercent = position.unrealized_pl_percent || 0;
         const percentPortfolio = position.percent_of_portfolio || 0;
         
-        // Render ticker info using FieldRendererService
+        // Render ticker info
         let tickerHtml = `<strong>${position.ticker_symbol || 'N/A'}</strong>`;
+        if (position.ticker_name) {
+            tickerHtml += `<br><small>${position.ticker_name}</small>`;
+        }
+        
         if (FieldRenderer && FieldRenderer.renderTickerInfo) {
             try {
-                tickerHtml = FieldRenderer.renderTickerInfo({
+                let renderedTicker = FieldRenderer.renderTickerInfo({
                     symbol: position.ticker_symbol,
                     name: position.ticker_name,
                     current_price: position.market_price,
                     daily_change: null,
                     daily_change_percent: null
                 }, 'ticker-info-compact');
+
+                if (isIndexPage && typeof renderedTicker === 'string') {
+                    renderedTicker = renderedTicker.replace(/<span class="text-muted small">[\s\S]*?<\/span>/, '');
+                }
+
+                tickerHtml = renderedTicker;
             } catch (e) {
                 window.Logger.warn('Error rendering ticker info:', e, { page: "trading_accounts" });
             }
@@ -627,13 +747,16 @@ function renderPortfolioTable(positions) {
         const quantityClass = quantity > 0 ? 'text-success' : quantity < 0 ? 'text-danger' : '';
         const quantityDisplay = `<span class="${quantityClass}">#${quantitySign}${Math.abs(quantity).toLocaleString()}</span>`;
         
+        const accountLink = position.trading_account_id ?
+            `<a href="#" onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('trading_account', ${position.trading_account_id}, { mode: 'view' }); return false; }" class="entity-trade-link">${position.account_name || 'N/A'}</a>` :
+            position.account_name || 'N/A';
+        
         html += `
             <tr data-position-id="${position.ticker_id}" data-account-id="${position.trading_account_id}">
-                <td class="col-account">${position.account_name || 'N/A'}</td>
+                <td class="col-side">${sideHtml}</td>
                 <td class="col-symbol"><strong>${tickerLink}</strong></td>
                 <td class="col-ticker">${tickerHtml}</td>
                 <td class="col-quantity">${quantityDisplay}</td>
-                <td class="col-side">${sideHtml}</td>
                 <td class="col-avg-price">
                     ${position.average_price_net ? `$${position.average_price_net.toFixed(2)}` : 'N/A'}
                 </td>
@@ -647,6 +770,7 @@ function renderPortfolioTable(positions) {
                         </span>
                     ` : 'לא זמין'}
                 </td>
+                <td class="col-account">${accountLink}</td>
                 <td class="col-percent-portfolio">
                     ${percentPortfolio.toFixed(2)}%
                 </td>
@@ -679,17 +803,43 @@ function setupSummaryToggle() {
 }
 
 /**
+ * Update portfolio summary toggle button state (icon, tooltip, accessibility)
+ */
+function updatePortfolioSummaryToggleButton() {
+    const toggleBtn = document.getElementById('portfolioSummaryToggleSize');
+    if (!toggleBtn) {
+        return;
+    }
+
+    const currentSize = window.positionsPortfolioState.summarySize || 'minimal';
+    const isMinimal = currentSize === 'minimal';
+    const nextActionLabel = isMinimal ? 'הצג סיכום מלא' : 'הצג סיכום מצומצם';
+    const expandIcon = window.BUTTON_ICONS?.VIEW || '👁️';
+    const collapseIcon = window.BUTTON_ICONS?.CLOSE || '✖️';
+
+    toggleBtn.textContent = isMinimal ? expandIcon : collapseIcon;
+    toggleBtn.setAttribute('title', nextActionLabel);
+    toggleBtn.setAttribute('aria-label', nextActionLabel);
+    toggleBtn.setAttribute('data-tooltip', nextActionLabel);
+    toggleBtn.setAttribute('data-bs-original-title', nextActionLabel);
+
+    if (window.bootstrap?.Tooltip) {
+        const tooltipInstance = window.bootstrap.Tooltip.getInstance(toggleBtn);
+        if (tooltipInstance) {
+            tooltipInstance.setContent({ '.tooltip-inner': nextActionLabel });
+        }
+    }
+}
+
+/**
  * Toggle portfolio summary size (minimal/full)
  * Called via data-onclick attribute
  */
 window.togglePortfolioSummarySize = function() {
-    const toggleBtn = document.getElementById('portfolioSummaryToggleSize');
-    if (!toggleBtn) return;
-    
-    const currentSize = window.positionsPortfolioState.summarySize;
+    const currentSize = window.positionsPortfolioState.summarySize || 'minimal';
     const newSize = currentSize === 'minimal' ? 'full' : 'minimal';
     window.positionsPortfolioState.summarySize = newSize;
-    toggleBtn.textContent = newSize === 'minimal' ? 'הצג מלא' : 'הצג מינימאלי';
+    updatePortfolioSummaryToggleButton();
     loadPortfolioSummary();
 };
 
@@ -697,6 +847,7 @@ window.togglePortfolioSummarySize = function() {
  * Load portfolio summary
  */
 async function loadPortfolioSummary() {
+    updatePortfolioSummaryToggleButton();
     const summaryElement = document.getElementById('portfolioSummaryStats');
     if (!summaryElement) return;
     
@@ -826,7 +977,7 @@ window.showPositionDetails = function(accountId, tickerId) {
 function clearPositionsTable() {
     const tableBody = document.querySelector('#positionsTable tbody');
     if (tableBody) {
-        tableBody.innerHTML = '<tr><td colspan="9" class="loading">בחר חשבון להצגת פוזיציות...</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="9" class="loading">בחר חשבון מסחר להצגת פוזיציות...</td></tr>';
     }
     
     // Reset count and totals display
@@ -837,7 +988,7 @@ function clearPositionsTable() {
     const accountTotalElement = document.getElementById('positionsAccountTotalValue');
     
     if (countTextElement) {
-        countTextElement.textContent = 'בחר חשבון...';
+        countTextElement.textContent = 'בחר חשבון מסחר...';
     }
     if (separatorElement) separatorElement.style.display = 'none';
     if (totalValueElement) totalValueElement.style.display = 'none';

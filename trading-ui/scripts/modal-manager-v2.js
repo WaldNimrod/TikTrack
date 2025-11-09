@@ -1809,8 +1809,14 @@ class ModalManagerV2 {
                 } else if (field.tagName === 'SELECT') {
                     // For selects, set value directly
                     const selectValue = value !== null && value !== undefined ? String(value) : '';
+                    // Check if this is a dynamic select (Account, Currency, Ticker, TradePlan)
+                    // Note: cashFlowAccount includes 'Account', so it will be detected
                     const isDynamicSelect = field.id.includes('Ticker') || field.id.includes('Account') || 
-                                            field.id.includes('Currency') || field.id.includes('TradePlan');
+                                            field.id.includes('Currency') || field.id.includes('TradePlan') ||
+                                            field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency' ||
+                                            field.id === 'executionAccount' || field.id === 'executionTicker' ||
+                                            field.id === 'tradeAccount' || field.id === 'tradeTicker' ||
+                                            field.id === 'tradePlanAccount' || field.id === 'tradePlanTicker';
                     
                     console.log(`🎯 Setting SELECT field ${field.id}:`, {
                         tryingToSet: selectValue,
@@ -1825,7 +1831,68 @@ class ModalManagerV2 {
                     // Wait a bit if select has no options yet (might still be loading dynamically)
                     // For dynamic selects, wait until we have more than just the empty option
                     if (isDynamicSelect && field.options.length <= 1) {
-                        console.log(`⏳ Select ${field.id} has no options yet (dynamic select), waiting...`);
+                        console.log(`⏳ Select ${field.id} has no options yet (dynamic select), attempting to populate...`);
+                        console.log(`   Key: ${key}, Value: ${value}, SelectValue: ${selectValue}`);
+                        
+                        // Try to populate the select if it's a dynamic select that hasn't been populated yet
+                        if (window.SelectPopulatorService) {
+                            try {
+                                // Check field config to determine what to populate
+                                const modalInfoForConfig = this.modals.get(modalElement.id);
+                                const config = modalInfoForConfig?.config;
+                                const allFields = [];
+                                if (config?.fields && Array.isArray(config.fields)) {
+                                    allFields.push(...config.fields);
+                                }
+                                if (config?.tabs && Array.isArray(config.tabs)) {
+                                    config.tabs.forEach(tab => {
+                                        if (tab.fields && Array.isArray(tab.fields)) {
+                                            allFields.push(...tab.fields);
+                                        }
+                                    });
+                                }
+                                
+                                const fieldConfig = allFields.find(f => f.id === field.id);
+                                console.log(`   Field config found:`, !!fieldConfig, `Field ID: ${field.id}`);
+                                
+                                // Populate based on field type - explicitly check for cashFlowAccount
+                                // IMPORTANT: Pass the value as defaultValue so it's set correctly during population
+                                // Convert empty string to null for defaultValue (empty string means "no selection")
+                                const defaultValueForSelect = (selectValue === '' || selectValue === null || selectValue === undefined) ? null : selectValue;
+                                
+                                if (field.id === 'cashFlowAccount' || field.id.includes('Account') || field.id.includes('account')) {
+                                    console.log(`   Populating accounts select ${field.id} with defaultValue: ${defaultValueForSelect} (from selectValue: ${selectValue})...`);
+                                    await window.SelectPopulatorService.populateAccountsSelect(field, {
+                                        includeEmpty: true,
+                                        emptyText: 'בחר חשבון מסחר...',
+                                        defaultFromPreferences: false, // Don't use default in edit mode
+                                        defaultValue: defaultValueForSelect // Pass the value we want to set
+                                    });
+                                    console.log(`✅ Populated accounts select ${field.id} (${field.options.length} options), value set to: ${field.value}`);
+                                } else if (field.id === 'cashFlowCurrency' || field.id.includes('Currency') || field.id.includes('currency')) {
+                                    console.log(`   Populating currencies select ${field.id} with defaultValue: ${defaultValueForSelect} (from selectValue: ${selectValue})...`);
+                                    await window.SelectPopulatorService.populateCurrenciesSelect(field, {
+                                        includeEmpty: true,
+                                        emptyText: 'בחר מטבע...',
+                                        defaultFromPreferences: false, // Don't use default in edit mode
+                                        defaultValue: defaultValueForSelect // Pass the value we want to set
+                                    });
+                                    console.log(`✅ Populated currencies select ${field.id} (${field.options.length} options), value set to: ${field.value}`);
+                                } else if (field.id.includes('Ticker') || field.id.includes('ticker')) {
+                                    console.log(`   Populating tickers select ${field.id} with defaultValue: ${defaultValueForSelect} (from selectValue: ${selectValue})...`);
+                                    await window.SelectPopulatorService.populateTickersSelect(field, {
+                                        includeEmpty: true,
+                                        defaultValue: defaultValueForSelect // Pass the value we want to set
+                                    });
+                                    console.log(`✅ Populated tickers select ${field.id} (${field.options.length} options), value set to: ${field.value}`);
+                                }
+                            } catch (populateError) {
+                                console.error(`❌ Failed to populate select ${field.id}:`, populateError);
+                            }
+                        } else {
+                            console.error(`❌ SelectPopulatorService not available for ${field.id}`);
+                        }
+                        
                         // Retry up to 10 times (1 second total) if select is still loading
                         for (let retry = 0; retry < 10 && field.options.length <= 1; retry++) {
                             await new Promise(resolve => setTimeout(resolve, 100));
@@ -1836,7 +1903,7 @@ class ModalManagerV2 {
                             }
                         }
                         if (field.options.length <= 1) {
-                            console.warn(`⚠️ Select ${field.id} still has no options after retries - may need manual population`);
+                            console.error(`❌ Select ${field.id} still has no options after retries - cannot set value ${selectValue}`);
                         }
                     }
                     
@@ -1864,8 +1931,15 @@ class ModalManagerV2 {
                         }
                     }
                     
-                    // Try to set the value
-                    field.value = selectValue;
+                    // Check if value was already set correctly by populateAccountsSelect/populateCurrenciesSelect/populateTickersSelect
+                    const valueAlreadySet = (isDynamicSelect && field.value === selectValue && selectValue);
+                    
+                    // Try to set the value (skip if already set correctly by populate function)
+                    if (!valueAlreadySet) {
+                        field.value = selectValue;
+                    } else {
+                        console.log(`✅ Value ${selectValue} already set correctly by populate function for ${field.id}`);
+                    }
                     
                     // If value didn't set (option doesn't exist), try to find matching option or add it dynamically
                     if (field.value !== selectValue && selectValue) {
@@ -1908,7 +1982,30 @@ class ModalManagerV2 {
                     } else if (field.value === selectValue) {
                         console.log(`✅ Successfully set ${field.id} to ${selectValue}`);
                     }
-                    console.log(`🎯 After setting, field.value is: ${field.value}`);                                                                            
+                    
+                    // Detailed logging after setting value
+                    const selectedOption = field.options[field.selectedIndex];
+                    const selectedText = selectedOption ? selectedOption.text : 'N/A';
+                    console.log(`🎯 After setting, field.value is: ${field.value}`);
+                    console.log(`📊 Field state for ${field.id}:`, {
+                        value: field.value,
+                        selectedIndex: field.selectedIndex,
+                        selectedText: selectedText,
+                        optionsCount: field.options.length,
+                        allOptions: Array.from(field.options).map((opt, idx) => ({
+                            index: idx,
+                            value: opt.value,
+                            text: opt.text,
+                            selected: opt.selected
+                        }))
+                    });
+                    
+                    // Verify the value is actually set correctly
+                    if (field.value !== selectValue && selectValue) {
+                        console.error(`❌ MISMATCH: field.value (${field.value}) !== selectValue (${selectValue}) for ${field.id}`);
+                    } else if (selectValue && field.value === selectValue) {
+                        console.log(`✅ VERIFIED: field.value matches selectValue (${selectValue}) for ${field.id}`);
+                    }                                                                            
                 } else if (field.classList && field.classList.contains('rich-text-editor-container')) {
                     // Rich text editor - use RichTextEditorService
                     if (window.RichTextEditorService && typeof window.RichTextEditorService.getEditorInstance === 'function') {
@@ -3676,16 +3773,94 @@ class ModalManagerV2 {
      * @param {HTMLElement} modalElement - The modal element
      * @private
      */
+    /**
+     * Helper function to preserve and restore select value after cloning
+     * This is critical for edit mode where values are already populated
+     * 
+     * @param {HTMLSelectElement} selectElement - The select element to clone
+     * @param {HTMLSelectElement} newSelectElement - The cloned select element
+     * @param {string} fieldName - Name of the field for logging
+     * @private
+     */
+    _restoreSelectValueAfterClone(selectElement, newSelectElement, fieldName) {
+        // Save the current value before cloning (important for edit mode!)
+        const currentValue = selectElement.value;
+        const currentSelectedIndex = selectElement.selectedIndex;
+        const currentSelectedText = selectElement.options[selectElement.selectedIndex]?.text;
+        
+        if (!currentValue || currentValue === '') {
+            // No value to restore
+            return;
+        }
+        
+        console.log(`🔄 Cloning select ${fieldName}, preserving value: ${currentValue} (${currentSelectedText})`);
+        
+        // Restore the value after cloning (critical for edit mode!)
+        // cloneNode(true) copies options but not the selected value, so we need to restore it
+        // Try to set immediately (options should be copied by cloneNode)
+        newSelectElement.value = currentValue;
+        
+        // If value didn't set (might be type mismatch or option not found), try to find matching option
+        if (newSelectElement.value !== currentValue) {
+            // Find matching option by value (handle type mismatches)
+            const matchingOption = Array.from(newSelectElement.options).find(opt => 
+                opt.value === currentValue || 
+                String(opt.value) === String(currentValue) ||
+                parseInt(opt.value) === parseInt(currentValue)
+            );
+            
+            if (matchingOption) {
+                newSelectElement.value = matchingOption.value;
+                console.log(`✅ Restored ${fieldName} value after clone: ${matchingOption.value} (${matchingOption.text})`);
+            } else {
+                // If still not found, wait a bit (options might be repopulated dynamically)
+                const restoreValue = () => {
+                    if (newSelectElement.options.length <= 1) {
+                        // Options not loaded yet, retry
+                        setTimeout(restoreValue, 50);
+                        return;
+                    }
+                    
+                    const match = Array.from(newSelectElement.options).find(opt => 
+                        opt.value === currentValue || 
+                        String(opt.value) === String(currentValue) ||
+                        parseInt(opt.value) === parseInt(currentValue)
+                    );
+                    
+                    if (match) {
+                        newSelectElement.value = match.value;
+                        console.log(`✅ Restored ${fieldName} value after clone (delayed): ${match.value} (${match.text})`);
+                    } else {
+                        console.warn(`⚠️ Could not restore ${fieldName} value: ${currentValue} (option not found)`);
+                        console.warn(`   Available options:`, Array.from(newSelectElement.options).map(opt => ({value: opt.value, text: opt.text})));
+                    }
+                };
+                
+                // Retry restoration
+                setTimeout(restoreValue, 50);
+            }
+        } else {
+            console.log(`✅ Restored ${fieldName} value after clone: ${currentValue}`);
+        }
+    }
+
     initializeSpecialHandlers(modalElement) {
         const modalId = modalElement.id;
         
-        // For Executions modal - handle ticker selection
+        // For Executions modal - handle ticker and account selection
         if (modalId === 'executionsModal') {
+            // Handle ticker selection
             const tickerSelect = modalElement.querySelector('#executionTicker');
             if (tickerSelect) {
+                // Save original before cloning
+                const originalTickerSelect = tickerSelect;
+                
                 // Remove existing listeners
                 const newTickerSelect = tickerSelect.cloneNode(true);
                 tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Restore value after clone (critical for edit mode!)
+                this._restoreSelectValueAfterClone(originalTickerSelect, newTickerSelect, 'executionTicker');
                 
                 // Add change listener
                 newTickerSelect.addEventListener('change', async (e) => {
@@ -3694,6 +3869,20 @@ class ModalManagerV2 {
                         await window.loadExecutionTickerInfo(tickerId);
                     }
                 });
+            }
+            
+            // Handle account selection - preserve value after any potential cloning
+            const accountSelect = modalElement.querySelector('#executionAccount');
+            if (accountSelect && accountSelect.value && accountSelect.value !== '') {
+                // If account select gets cloned elsewhere, ensure value is preserved
+                // This is a safeguard - the select might not be cloned here, but could be elsewhere
+                const currentValue = accountSelect.value;
+                setTimeout(() => {
+                    if (accountSelect.value !== currentValue && currentValue) {
+                        accountSelect.value = currentValue;
+                        console.log(`✅ Restored executionAccount value: ${currentValue}`);
+                    }
+                }, 100);
             }
         }
         
@@ -3785,6 +3974,20 @@ class ModalManagerV2 {
                     await triggerRiskDefaults(false);
                 });
                 tickerSelect.dataset.autocalcBound = 'true';
+            }
+            
+            // Handle account selection - preserve value after any potential cloning
+            const accountSelect = modalElement.querySelector('#tradePlanAccount');
+            if (accountSelect && accountSelect.value && accountSelect.value !== '') {
+                // If account select gets cloned elsewhere, ensure value is preserved
+                // This is a safeguard - the select might not be cloned here, but could be elsewhere
+                const currentValue = accountSelect.value;
+                setTimeout(() => {
+                    if (accountSelect.value !== currentValue && currentValue) {
+                        accountSelect.value = currentValue;
+                        console.log(`✅ Restored tradePlanAccount value: ${currentValue}`);
+                    }
+                }, 100);
             }
 
             const entryDateInput = modalElement.querySelector('#tradePlanEntryDate');
@@ -3948,11 +4151,18 @@ class ModalManagerV2 {
                     finalizeTradeInitialization();
                 }
             };
+            // Handle ticker selection
             const tickerSelect = modalElement.querySelector('#tradeTicker');
             if (tickerSelect) {
+                // Save original before cloning
+                const originalTickerSelect = tickerSelect;
+                
                 // Remove existing listeners
                 const newTickerSelect = tickerSelect.cloneNode(true);
                 tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Restore value after clone (critical for edit mode!)
+                this._restoreSelectValueAfterClone(originalTickerSelect, newTickerSelect, 'tradeTicker');
                 
                 // Add change listener
                 newTickerSelect.addEventListener('change', async (e) => {
@@ -3963,6 +4173,20 @@ class ModalManagerV2 {
                     await runTradeResync(true);
                     await triggerTradeRiskDefaults(false);
                 });
+            }
+            
+            // Handle account selection - preserve value after any potential cloning
+            const accountSelect = modalElement.querySelector('#tradeAccount');
+            if (accountSelect && accountSelect.value && accountSelect.value !== '') {
+                // If account select gets cloned elsewhere, ensure value is preserved
+                // This is a safeguard - the select might not be cloned here, but could be elsewhere
+                const currentValue = accountSelect.value;
+                setTimeout(() => {
+                    if (accountSelect.value !== currentValue && currentValue) {
+                        accountSelect.value = currentValue;
+                        console.log(`✅ Restored tradeAccount value: ${currentValue}`);
+                    }
+                }, 100);
             }
 
             if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.bindForm === 'function') {
@@ -4064,9 +4288,15 @@ class ModalManagerV2 {
         if (modalId === 'alertsModal') {
             const tickerSelect = modalElement.querySelector('#alertTicker');
             if (tickerSelect) {
+                // Save original before cloning
+                const originalTickerSelect = tickerSelect;
+                
                 // Remove existing listeners
                 const newTickerSelect = tickerSelect.cloneNode(true);
                 tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                
+                // Restore value after clone (critical for edit mode!)
+                this._restoreSelectValueAfterClone(originalTickerSelect, newTickerSelect, 'alertTicker');
                 
                 // Add change listener
                 newTickerSelect.addEventListener('change', async (e) => {
@@ -4107,9 +4337,15 @@ class ModalManagerV2 {
             
             accountSelects.forEach(accountSelect => {
                 if (accountSelect) {
+                    // Save value BEFORE cloning (critical!)
+                    const originalSelect = accountSelect;
+                    
                     // Remove existing listeners
                     const newAccountSelect = accountSelect.cloneNode(true);
                     accountSelect.parentNode.replaceChild(newAccountSelect, accountSelect);
+                    
+                    // Restore the value after cloning (critical for edit mode!)
+                    this._restoreSelectValueAfterClone(originalSelect, newAccountSelect, originalSelect.id);
                     
                     // Add change listener
                     newAccountSelect.addEventListener('change', async (e) => {

@@ -790,7 +790,7 @@ async function _REMOVED_loadEditTradeModalData(trade) {
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
     const accountSelect = document.getElementById('editTradeAccountId');
     if (accountSelect) {
-      accountSelect.innerHTML = '<option value="">בחר חשבון</option>';
+      accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
       const openAccounts = accounts.data.filter(account => account.status === 'open');
       openAccounts.forEach(account => {
         const option = document.createElement('option');
@@ -1427,7 +1427,7 @@ async function loadModalData() {
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
     const accountSelect = document.getElementById('addTradeAccountId');
     if (accountSelect) {
-      accountSelect.innerHTML = '<option value="">בחר חשבון</option>';
+      accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
       const openAccounts = accounts.data.filter(account => account.status === 'open');
       openAccounts.forEach(account => {
         const option = document.createElement('option');

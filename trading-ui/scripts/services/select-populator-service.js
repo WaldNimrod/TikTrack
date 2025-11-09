@@ -627,7 +627,22 @@ class SelectPopulatorService {
         
         // סימון ברירת מחדל לפי value או לפי טקסט
         if (config.defaultValue !== undefined && config.defaultValue !== null) {
+            // Try to set the value directly first
             select.value = config.defaultValue;
+            
+            // If value didn't set (type mismatch or option doesn't exist), try to find matching option
+            if (select.value !== String(config.defaultValue)) {
+                const options = Array.from(select.options);
+                const match = options.find(opt => 
+                    opt.value === String(config.defaultValue) ||
+                    opt.value === config.defaultValue ||
+                    String(opt.value) === String(config.defaultValue) ||
+                    parseInt(opt.value) === parseInt(config.defaultValue)
+                );
+                if (match) {
+                    select.value = match.value;
+                }
+            }
         } else if (config.defaultText) {
             const options = Array.from(select.options);
             const match = options.find(opt => (opt.textContent || '').trim() === String(config.defaultText).trim());

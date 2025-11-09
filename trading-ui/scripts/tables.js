@@ -254,21 +254,37 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
     }
 
     // קבלת מצב סידור נוכחי דרך UnifiedCacheManager
-    let currentColumnState = null;
+    // בודקים את המצב הכללי של הטבלה כדי לראות אם העמודה הנוכחית כבר מסודרת
+    let currentTableState = null;
+    let isCurrentColumn = false;
+    let currentDirection = 'asc';
+    
     if (window.UnifiedCacheManager) {
       try {
-        const columnStateKey = `sortState_${tableType}_col_${columnIndex}`;
-        currentColumnState = await window.UnifiedCacheManager.get(columnStateKey, {
+        // בודקים את המצב הכללי של הטבלה
+        const tableStateKey = `sortState_${tableType}`;
+        currentTableState = await window.UnifiedCacheManager.get(tableStateKey, {
           layer: 'localStorage'
         });
+        
+        // אם יש מצב כללי והעמודה הנוכחית היא העמודה שכבר מסודרת
+        if (currentTableState && 
+            typeof currentTableState.columnIndex === 'number' && 
+            currentTableState.columnIndex === columnIndex) {
+          isCurrentColumn = true;
+          currentDirection = currentTableState.direction || 'asc';
+        }
       } catch (err) {
         if (window.Logger) {
-          window.Logger.warn(`sortTableData: Failed to get column state for "${tableType}" column ${columnIndex}`, err, { page: "tables" });
+          window.Logger.warn(`sortTableData: Failed to get table state for "${tableType}"`, err, { page: "tables" });
         }
       }
     }
 
-    const newDirection = currentColumnState && currentColumnState.direction === 'asc' ? 'desc' : 'asc';
+    // אם זו העמודה שכבר מסודרת, הופכים את הכיוון. אחרת, מתחילים עם 'asc'
+    const newDirection = isCurrentColumn && currentDirection === 'asc' ? 'desc' : 
+                        isCurrentColumn && currentDirection === 'desc' ? 'asc' : 
+                        'asc';
     await window.saveSortState(tableType, columnIndex, newDirection);
 
     const sortedData = [...data].sort((a, b) => {

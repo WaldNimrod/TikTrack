@@ -1102,6 +1102,263 @@ class ModalManagerV2 {
             // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
             if (mode === 'edit' && entityData) {
                 await this.populateForm(modalElement, entityData);
+                
+                // After populating form, update external_id field state for executions modal
+                if (modalId === 'executionsModal') {
+                    const sourceSelect = modalElement.querySelector('#executionSource');
+                    const externalIdField = modalElement.querySelector('#executionExternalId');
+                    if (sourceSelect && externalIdField) {
+                        const sourceValue = sourceSelect.value;
+                        if (sourceValue === 'manual') {
+                            externalIdField.disabled = true;
+                            externalIdField.classList.add('form-control-disabled');
+                        } else {
+                            externalIdField.disabled = false;
+                            externalIdField.classList.remove('form-control-disabled');
+                        }
+                        console.log(`✅ Updated executionExternalId state after populate (source: ${sourceValue})`);
+                    }
+                }
+                
+                // After populating form, disable currency field for trading accounts modal in edit mode
+                if (modalId === 'tradingAccountsModal') {
+                    const currencyField = modalElement.querySelector('#accountCurrency');
+                    if (currencyField) {
+                        currencyField.disabled = true;
+                        currencyField.classList.add('form-control-disabled');
+                        console.log(`✅ Disabled accountCurrency field in edit mode`);
+                    }
+                }
+                
+                // After populating form, enable related object fields if related_type_id exists
+                if (modalId === 'notesModal') {
+                    const noteRelatedTypeField = modalElement.querySelector('#noteRelatedType');
+                    const noteRelatedObjectField = modalElement.querySelector('#noteRelatedObject');
+                    if (noteRelatedTypeField && noteRelatedObjectField && entityData?.related_type_id) {
+                        const relatedTypeId = String(entityData.related_type_id);
+                        if (relatedTypeId && relatedTypeId !== '') {
+                            noteRelatedObjectField.disabled = false;
+                            noteRelatedObjectField.removeAttribute('disabled');
+                            console.log(`✅ Enabled noteRelatedObject field in edit mode (related_type_id: ${relatedTypeId})`);
+                        }
+                    }
+                }
+                
+                // After populating form, enable alertRelatedObject field if related_type_id exists
+                if (modalId === 'alertsModal') {
+                    const alertRelatedTypeField = modalElement.querySelector('#alertRelatedType');
+                    const alertRelatedObjectField = modalElement.querySelector('#alertRelatedObject');
+                    if (alertRelatedTypeField && alertRelatedObjectField && entityData?.related_type_id) {
+                        const relatedTypeId = String(entityData.related_type_id);
+                        if (relatedTypeId && relatedTypeId !== '') {
+                            alertRelatedObjectField.disabled = false;
+                            alertRelatedObjectField.removeAttribute('disabled');
+                            console.log(`✅ Enabled alertRelatedObject field in edit mode (related_type_id: ${relatedTypeId})`);
+                        }
+                    }
+                }
+                
+                // After populating form, update trade plan summary card (risk/reward calculation) and load market data
+                if (modalId === 'tradePlansModal') {
+                    console.log('🔍 [TradePlan Edit] Starting post-populateForm updates...');
+                    
+                    // Log current field values
+                    const logFieldValues = () => {
+                        const fields = {
+                            ticker: modalElement.querySelector('#tradePlanTicker')?.value,
+                            price: modalElement.querySelector('#tradePlanEntryPrice')?.value,
+                            quantity: modalElement.querySelector('#tradePlanQuantity')?.value,
+                            amount: modalElement.querySelector('#planAmount')?.value,
+                            stop: modalElement.querySelector('#tradePlanStopLoss')?.value,
+                            target: modalElement.querySelector('#tradePlanTakeProfit')?.value,
+                            side: modalElement.querySelector('#tradePlanSide')?.value
+                        };
+                        console.log('📋 [TradePlan Edit] Current field values:', fields);
+                        return fields;
+                    };
+                    
+                    logFieldValues();
+                    
+                    // Wait a bit for all fields to be populated and DOM to be ready
+                    setTimeout(async () => {
+                        console.log('⏱️ [TradePlan Edit] After 300ms delay...');
+                        logFieldValues();
+                        
+                        // Load ticker market data if ticker is selected
+                        const tickerSelect = modalElement.querySelector('#tradePlanTicker');
+                        if (tickerSelect && tickerSelect.value && window.loadTradePlanTickerInfo) {
+                            try {
+                                console.log(`🔄 [TradePlan Edit] Loading ticker market data for ticker: ${tickerSelect.value}`);
+                                await window.loadTradePlanTickerInfo(tickerSelect.value);
+                                console.log(`✅ [TradePlan Edit] Loaded trade plan ticker market data`);
+                                logFieldValues();
+                            } catch (error) {
+                                window.Logger?.warn('⚠️ Failed to load trade plan ticker market data after populateForm', { error, page: 'modal-manager-v2' });
+                            }
+                        }
+                        
+                        // Calculate percentages from prices (like in add mode)
+                        // This ensures stop/target percentages are calculated from existing prices
+                        // bindForm is called in initializeSpecialHandlers before showModal, so it should be ready
+                        // But we wait a bit to ensure all DOM updates are complete
+                        if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.resync === 'function') {
+                            try {
+                                console.log('🔄 [TradePlan Edit] Calling resync...');
+                                
+                                // Wait a bit more to ensure bindForm is complete and DOM is ready
+                                await new Promise(resolve => setTimeout(resolve, 100));
+                                
+                                logFieldValues();
+                                
+                                // Now resync which will calculate percentages from prices via updatePercentFromPrices
+                                // and update summary card with risk/reward calculations
+                                await window.InvestmentCalculationService.resync(modalElement, { force: true });
+                                console.log(`✅ [TradePlan Edit] Updated trade plan summary card and calculated percentages`);
+                                
+                                // Check summary card content
+                                const summaryCard = modalElement.querySelector('#tradePlanRiskSummaryCard');
+                                if (summaryCard) {
+                                    const riskRewardDiv = summaryCard.querySelector('.risk-summary-card__risk-reward');
+                                    if (riskRewardDiv) {
+                                        console.log('📊 [TradePlan Edit] Summary card HTML:', riskRewardDiv.innerHTML);
+                                    } else {
+                                        console.warn('⚠️ [TradePlan Edit] risk-reward div not found in summary card');
+                                    }
+                                } else {
+                                    console.warn('⚠️ [TradePlan Edit] Summary card element not found');
+                                }
+                                
+                                // Call resync again after a short delay to ensure all fields are populated
+                                // This is important for edit mode where fields might load asynchronously
+                                setTimeout(async () => {
+                                    try {
+                                        console.log('🔄 [TradePlan Edit] Calling resync again after 200ms...');
+                                        logFieldValues();
+                                        await window.InvestmentCalculationService.resync(modalElement, { force: true });
+                                        console.log(`✅ [TradePlan Edit] Re-updated trade plan summary card`);
+                                        
+                                        // Check summary card content again
+                                        const summaryCard2 = modalElement.querySelector('#tradePlanRiskSummaryCard');
+                                        if (summaryCard2) {
+                                            const riskRewardDiv2 = summaryCard2.querySelector('.risk-summary-card__risk-reward');
+                                            if (riskRewardDiv2) {
+                                                console.log('📊 [TradePlan Edit] Summary card HTML after second resync:', riskRewardDiv2.innerHTML);
+                                            }
+                                        }
+                                    } catch (error) {
+                                        window.Logger?.warn('⚠️ Failed to re-update trade plan summary card', { error, page: 'modal-manager-v2' });
+                                    }
+                                }, 200);
+                            } catch (error) {
+                                console.error('❌ [TradePlan Edit] Error in resync:', error);
+                                window.Logger?.warn('⚠️ Failed to update trade plan summary card after populateForm', { error, page: 'modal-manager-v2' });
+                            }
+                        } else {
+                            console.error('❌ [TradePlan Edit] InvestmentCalculationService.resync not available');
+                        }
+                    }, 300);
+                }
+                
+                // After populating form, load trade ticker market data and update summary card
+                if (modalId === 'tradesModal') {
+                    console.log('🔍 [Trade Edit] Starting post-populateForm updates...');
+                    
+                    // Log current field values
+                    const logFieldValues = () => {
+                        const fields = {
+                            ticker: modalElement.querySelector('#tradeTicker')?.value,
+                            price: modalElement.querySelector('#tradeEntryPrice')?.value,
+                            quantity: modalElement.querySelector('#tradeQuantity')?.value,
+                            amount: modalElement.querySelector('#tradeTotalInvestment')?.value,
+                            stop: modalElement.querySelector('#tradeStopLoss')?.value,
+                            target: modalElement.querySelector('#tradeTakeProfit')?.value,
+                            side: modalElement.querySelector('#tradeSide')?.value
+                        };
+                        console.log('📋 [Trade Edit] Current field values:', fields);
+                        return fields;
+                    };
+                    
+                    logFieldValues();
+                    
+                    // Wait a bit for all fields to be populated and DOM to be ready
+                    setTimeout(async () => {
+                        console.log('⏱️ [Trade Edit] After 300ms delay...');
+                        logFieldValues();
+                        
+                        // Load ticker market data if ticker is selected
+                        const tickerSelect = modalElement.querySelector('#tradeTicker');
+                        if (tickerSelect && tickerSelect.value && window.loadTradeTickerInfo) {
+                            try {
+                                console.log(`🔄 [Trade Edit] Loading ticker market data for ticker: ${tickerSelect.value}`);
+                                await window.loadTradeTickerInfo(tickerSelect.value);
+                                console.log(`✅ [Trade Edit] Loaded trade ticker market data`);
+                                logFieldValues();
+                            } catch (error) {
+                                window.Logger?.warn('⚠️ Failed to load trade ticker market data after populateForm', { error, page: 'modal-manager-v2' });
+                            }
+                        }
+                        
+                        // Calculate percentages from prices (like in add mode)
+                        // This ensures stop/target percentages are calculated from existing prices
+                        // bindForm is called in initializeSpecialHandlers before showModal, so it should be ready
+                        // But we wait a bit to ensure all DOM updates are complete
+                        if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.resync === 'function') {
+                            try {
+                                console.log('🔄 [Trade Edit] Calling resync...');
+                                
+                                // Wait a bit more to ensure bindForm is complete and DOM is ready
+                                await new Promise(resolve => setTimeout(resolve, 100));
+                                
+                                logFieldValues();
+                                
+                                // Now resync which will calculate percentages from prices via updatePercentFromPrices
+                                // and update summary card with risk/reward calculations
+                                await window.InvestmentCalculationService.resync(modalElement, { force: true });
+                                console.log(`✅ [Trade Edit] Updated trade summary card and calculated percentages`);
+                                
+                                // Check summary card content
+                                const summaryCard = modalElement.querySelector('#tradeRiskSummaryCard');
+                                if (summaryCard) {
+                                    const riskRewardDiv = summaryCard.querySelector('.risk-summary-card__risk-reward');
+                                    if (riskRewardDiv) {
+                                        console.log('📊 [Trade Edit] Summary card HTML:', riskRewardDiv.innerHTML);
+                                    } else {
+                                        console.warn('⚠️ [Trade Edit] risk-reward div not found in summary card');
+                                    }
+                                } else {
+                                    console.warn('⚠️ [Trade Edit] Summary card element not found');
+                                }
+                                
+                                // Call resync again after a short delay to ensure all fields are populated
+                                // This is important for edit mode where fields might load asynchronously
+                                setTimeout(async () => {
+                                    try {
+                                        console.log('🔄 [Trade Edit] Calling resync again after 200ms...');
+                                        logFieldValues();
+                                        await window.InvestmentCalculationService.resync(modalElement, { force: true });
+                                        console.log(`✅ [Trade Edit] Re-updated trade summary card`);
+                                        
+                                        // Check summary card content again
+                                        const summaryCard2 = modalElement.querySelector('#tradeRiskSummaryCard');
+                                        if (summaryCard2) {
+                                            const riskRewardDiv2 = summaryCard2.querySelector('.risk-summary-card__risk-reward');
+                                            if (riskRewardDiv2) {
+                                                console.log('📊 [Trade Edit] Summary card HTML after second resync:', riskRewardDiv2.innerHTML);
+                                            }
+                                        }
+                                    } catch (error) {
+                                        window.Logger?.warn('⚠️ Failed to re-update trade summary card', { error, page: 'modal-manager-v2' });
+                                    }
+                                }, 200);
+                            } catch (error) {
+                                console.error('❌ [Trade Edit] Error in resync:', error);
+                                window.Logger?.warn('⚠️ Failed to update trade summary card after populateForm', { error, page: 'modal-manager-v2' });
+                            }
+                        } else {
+                            console.error('❌ [Trade Edit] InvestmentCalculationService.resync not available');
+                        }
+                    }, 300);
+                }
             }
             // In add mode, defaults are applied by populateSelects for fields with defaultFromPreferences
             // Additional defaults (date, source) are handled below after modal shows
@@ -1254,7 +1511,7 @@ class ModalManagerV2 {
             // Special handlers for notes modal - enable/disable related object select
             // Must be called AFTER modal is shown to ensure elements exist
             if (modalElement.id === 'notesModal' || modalInfo.config?.entityType === 'note') {
-                setTimeout(() => {
+                setTimeout(async () => {
                     const form = modalElement.querySelector('form');
                     if (!form) {
                         console.warn('⚠️ Form not found for notes modal');
@@ -1302,8 +1559,29 @@ class ModalManagerV2 {
                         }
                     };
                     
-                    // Initial state - disable related object field
-                    noteRelatedObjectField.disabled = true;
+                    // Initial state - check if there's already a value (edit mode)
+                    // Check both the select value and if the object field already has a value
+                    const currentRelatedType = noteRelatedTypeSelect.value;
+                    const currentRelatedObject = noteRelatedObjectField.value;
+                    const isEditMode = currentRelatedType && currentRelatedType !== '' || currentRelatedObject && currentRelatedObject !== '';
+                    
+                    if (isEditMode && currentRelatedType && currentRelatedType !== '') {
+                        // In edit mode with existing related type - enable the field
+                        noteRelatedObjectField.disabled = false;
+                        noteRelatedObjectField.removeAttribute('disabled');
+                        console.log(`✅ noteRelatedObject enabled (edit mode, type: ${currentRelatedType}, object: ${currentRelatedObject})`);
+                        // Populate the related objects for the existing type (if not already populated)
+                        if (noteRelatedObjectField.options.length <= 1) {
+                            await this.populateNoteRelatedObjects(form, currentRelatedType);
+                        }
+                    } else if (!isEditMode) {
+                        // In add mode or no type selected - disable the field
+                        noteRelatedObjectField.disabled = true;
+                        console.log('⚠️ noteRelatedObject disabled (add mode or no type selected)');
+                    } else {
+                        // Field might be enabled by populateForm - don't disable it
+                        console.log(`ℹ️ noteRelatedObject state preserved (type: ${currentRelatedType || 'none'}, object: ${currentRelatedObject || 'none'})`);
+                    }
                     
                     // Add event listener directly (no need to clone/replace)
                     noteRelatedTypeSelect.addEventListener('change', handleRelatedTypeChange.bind(this));
@@ -1314,6 +1592,7 @@ class ModalManagerV2 {
                     console.log('✅ Notes related type/object handlers initialized', {
                         noteRelatedTypeSelect: noteRelatedTypeSelect.id,
                         noteRelatedObjectField: noteRelatedObjectField.id,
+                        currentRelatedType: currentRelatedType,
                         initialDisabled: noteRelatedObjectField.disabled
                     });
                 }, 150); // Slightly longer delay to ensure DOM is fully ready
@@ -1387,14 +1666,26 @@ class ModalManagerV2 {
                         }
                     };
 
-                    // Initial state
-                    if (!alertRelatedTypeSelect.value) {
+                    // Initial state - check if there's already a value (edit mode)
+                    // Check both the select value and if the object field already has a value
+                    const currentAlertRelatedType = alertRelatedTypeSelect.value;
+                    const currentAlertRelatedObject = alertRelatedObjectField.value;
+                    const isAlertEditMode = currentAlertRelatedType && currentAlertRelatedType !== '' || currentAlertRelatedObject && currentAlertRelatedObject !== '';
+                    
+                    if (isAlertEditMode && currentAlertRelatedType && currentAlertRelatedType !== '') {
+                        // In edit mode with existing related type - enable the field
+                        alertRelatedObjectField.disabled = false;
+                        alertRelatedObjectField.removeAttribute('disabled');
+                        console.log(`✅ alertRelatedObject enabled (edit mode, type: ${currentAlertRelatedType}, object: ${currentAlertRelatedObject})`);
+                    } else if (!isAlertEditMode) {
+                        // In add mode or no type selected - disable the field
                         alertRelatedObjectField.disabled = true;
                         alertRelatedObjectField.setAttribute('disabled', 'disabled');
                         alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                        console.log('⚠️ alertRelatedObject disabled (add mode or no type selected)');
                     } else {
-                        alertRelatedObjectField.disabled = false;
-                        alertRelatedObjectField.removeAttribute('disabled');
+                        // Field might be enabled by populateForm - don't disable it
+                        console.log(`ℹ️ alertRelatedObject state preserved (type: ${currentAlertRelatedType || 'none'}, object: ${currentAlertRelatedObject || 'none'})`);
                     }
 
                     if (!alertRelatedTypeSelect.dataset.alertsHandlersAttached) {
@@ -2043,6 +2334,45 @@ class ModalManagerV2 {
                     }
                     field.value = formattedDate;
                     console.log(`📅 Set datetime-local field ${field.id} to: ${field.value} (from: ${value})`);
+                } else if (field.type === 'file') {
+                    // File inputs cannot have their value set programmatically for security reasons
+                    // Only empty string is allowed. Instead, we can show the current filename in a label or text field
+                    console.log(`📎 Skipping file input ${field.id} - cannot set value programmatically (security restriction)`);
+                    console.log(`   Current attachment filename: ${value || 'none'}`);
+                    
+                    // Show current filename if editing and file exists
+                    if (value && String(value).trim()) {
+                        // Try to find or create a display element for the current filename
+                        const fileDisplayId = `${field.id}_current`;
+                        let fileDisplay = modalElement.querySelector(`#${fileDisplayId}`);
+                        
+                        if (!fileDisplay) {
+                            // Create a small text element to show current filename
+                            fileDisplay = document.createElement('div');
+                            fileDisplay.id = fileDisplayId;
+                            fileDisplay.className = 'text-muted small mt-1';
+                            fileDisplay.style.fontSize = '0.875rem';
+                            
+                            // Insert after the file input's parent container or after the input itself
+                            const fieldContainer = field.closest('.mb-3') || field.parentElement;
+                            if (fieldContainer) {
+                                fieldContainer.appendChild(fileDisplay);
+                            } else {
+                                field.parentNode.insertBefore(fileDisplay, field.nextSibling);
+                            }
+                        }
+                        
+                        fileDisplay.textContent = `קובץ נוכחי: ${value}`;
+                        fileDisplay.style.display = 'block';
+                        console.log(`📎 Displayed current filename: ${value}`);
+                    } else {
+                        // Hide display if no file
+                        const fileDisplayId = `${field.id}_current`;
+                        const fileDisplay = modalElement.querySelector(`#${fileDisplayId}`);
+                        if (fileDisplay) {
+                            fileDisplay.style.display = 'none';
+                        }
+                    }
                 } else {
                     field.value = value || '';
                     console.log(`✏️ Set ${field.tagName}/${field.type || 'input'} field ${field.id} to: ${field.value}`);
@@ -2063,6 +2393,83 @@ class ModalManagerV2 {
         
         // עדכון linkButton fields (trade/plan selectors)
         await this.updateLinkButtonFields(form, data);
+        
+        // Special handling for trade entity: populate quantity and amount from position or trade_plan
+        if (config?.entityType === 'trade') {
+            console.log('🔍 [Trade Edit] Checking for quantity and amount fields...');
+            console.log('🔍 [Trade Edit] Available data keys:', Object.keys(data));
+            console.log('🔍 [Trade Edit] position_quantity:', data.position_quantity);
+            console.log('🔍 [Trade Edit] position_amount:', data.position_amount);
+            console.log('🔍 [Trade Edit] trade_plan:', data.trade_plan);
+            console.log('🔍 [Trade Edit] trade_plan_planned_amount:', data.trade_plan_planned_amount);
+            console.log('🔍 [Trade Edit] entry_price:', data.entry_price);
+            
+            // Check if entry_price was already populated in the form
+            const entryPriceField = form.querySelector('#tradeEntryPrice');
+            const entryPrice = data.entry_price || (entryPriceField ? parseFloat(entryPriceField.value) || 0 : 0);
+            console.log('🔍 [Trade Edit] entryPrice (from data or field):', entryPrice);
+            
+            // Try to populate quantity from position_quantity or trade_plan
+            const quantityField = form.querySelector('#tradeQuantity');
+            if (quantityField) {
+                console.log(`🔍 [Trade Edit] quantityField found, current value: "${quantityField.value}"`);
+                if (!quantityField.value || quantityField.value === '') {
+                    // Try position_quantity first (actual position)
+                    if (data.position_quantity && data.position_quantity !== 0) {
+                        quantityField.value = data.position_quantity;
+                        console.log(`✅ Set tradeQuantity from position_quantity: ${data.position_quantity}`);
+                    }
+                    // If still empty, try to calculate from trade_plan if available
+                    else {
+                        // Check both nested and flat formats
+                        const plannedAmount = (data.trade_plan && data.trade_plan.planned_amount) || data.trade_plan_planned_amount;
+                        // Get entry_price from data or from already-populated field
+                        const entryPriceValue = entryPrice || 0;
+                        
+                        if (plannedAmount && entryPriceValue && entryPriceValue !== 0) {
+                            const calculatedQuantity = plannedAmount / entryPriceValue;
+                            if (calculatedQuantity > 0) {
+                                quantityField.value = calculatedQuantity.toFixed(2);
+                                console.log(`✅ Set tradeQuantity from trade_plan calculation: ${calculatedQuantity.toFixed(2)} (planned_amount: ${plannedAmount}, entry_price: ${entryPriceValue})`);
+                            }
+                        } else {
+                            console.log(`⚠️ Cannot calculate quantity - plannedAmount: ${plannedAmount}, entryPrice: ${entryPriceValue}`);
+                        }
+                    }
+                } else {
+                    console.log(`⏭️ quantityField already has value: "${quantityField.value}", skipping`);
+                }
+            } else {
+                console.error('❌ quantityField (#tradeQuantity) not found!');
+            }
+            
+            // Try to populate amount from position_amount or trade_plan.planned_amount
+            const amountField = form.querySelector('#tradeTotalInvestment');
+            if (amountField) {
+                console.log(`🔍 [Trade Edit] amountField found, current value: "${amountField.value}"`);
+                if (!amountField.value || amountField.value === '') {
+                    // Try position_amount first (actual position cost)
+                    if (data.position_amount && data.position_amount !== 0) {
+                        amountField.value = data.position_amount;
+                        console.log(`✅ Set tradeTotalInvestment from position_amount: ${data.position_amount}`);
+                    }
+                    // If still empty, try trade_plan.planned_amount (both nested and flat formats)
+                    else {
+                        const plannedAmount = (data.trade_plan && data.trade_plan.planned_amount) || data.trade_plan_planned_amount;
+                        if (plannedAmount && plannedAmount !== 0) {
+                            amountField.value = plannedAmount;
+                            console.log(`✅ Set tradeTotalInvestment from trade_plan.planned_amount: ${plannedAmount}`);
+                        } else {
+                            console.log(`⚠️ Cannot set amount - plannedAmount: ${plannedAmount}`);
+                        }
+                    }
+                } else {
+                    console.log(`⏭️ amountField already has value: "${amountField.value}", skipping`);
+                }
+            } else {
+                console.error('❌ amountField (#tradeTotalInvestment) not found!');
+            }
+        }
         
         // הוספת event listeners לשדות מיוחדים
         this.attachSpecialEventListeners(form, data, config);
@@ -3783,10 +4190,24 @@ class ModalManagerV2 {
      * @private
      */
     _restoreSelectValueAfterClone(selectElement, newSelectElement, fieldName) {
+        // Validate inputs
+        if (!selectElement || !newSelectElement) {
+            console.warn(`⚠️ _restoreSelectValueAfterClone: Invalid elements for ${fieldName}`);
+            return;
+        }
+        
+        // Check if selectElement has options property (might be detached from DOM)
+        if (!selectElement.options || selectElement.options.length === 0) {
+            console.warn(`⚠️ _restoreSelectValueAfterClone: No options available for ${fieldName}`);
+            return;
+        }
+        
         // Save the current value before cloning (important for edit mode!)
         const currentValue = selectElement.value;
         const currentSelectedIndex = selectElement.selectedIndex;
-        const currentSelectedText = selectElement.options[selectElement.selectedIndex]?.text;
+        const currentSelectedText = (currentSelectedIndex >= 0 && selectElement.options[currentSelectedIndex]) 
+            ? selectElement.options[currentSelectedIndex].text 
+            : '';
         
         if (!currentValue || currentValue === '') {
             // No value to restore
@@ -3883,6 +4304,40 @@ class ModalManagerV2 {
                         console.log(`✅ Restored executionAccount value: ${currentValue}`);
                     }
                 }, 100);
+            }
+            
+            // Handle source field - enable/disable external_id field based on source value
+            const sourceSelect = modalElement.querySelector('#executionSource');
+            const externalIdField = modalElement.querySelector('#executionExternalId');
+            
+            if (sourceSelect && externalIdField) {
+                // Function to update external_id field state
+                const updateExternalIdField = () => {
+                    const sourceValue = sourceSelect.value;
+                    if (sourceValue === 'manual') {
+                        // Disable external_id field for manual source
+                        externalIdField.disabled = true;
+                        externalIdField.classList.add('form-control-disabled');
+                        // Clear value if it's the default '0'
+                        if (externalIdField.value === '0' || externalIdField.value === '') {
+                            externalIdField.value = '';
+                        }
+                        console.log(`🔒 Disabled executionExternalId (source: ${sourceValue})`);
+                    } else {
+                        // Enable external_id field for non-manual sources
+                        externalIdField.disabled = false;
+                        externalIdField.classList.remove('form-control-disabled');
+                        console.log(`🔓 Enabled executionExternalId (source: ${sourceValue})`);
+                    }
+                };
+                
+                // Set initial state
+                updateExternalIdField();
+                
+                // Add change listener
+                sourceSelect.addEventListener('change', updateExternalIdField);
+                
+                console.log('✅ Added source field listener for executionExternalId');
             }
         }
         
@@ -4035,6 +4490,7 @@ class ModalManagerV2 {
                     syncPreference: 'auto',
                     forceRiskOnBind: mode === 'add',
                     forceSyncOnBind: mode === 'add',
+                    skipInitialSummaryUpdate: mode === 'edit', // Skip initial summary update in edit mode - will be updated after populateForm
                     stopPreferenceKey: 'defaultStopLoss',
                     targetPreferenceKey: 'defaultTargetPrice'
                 });
@@ -4209,6 +4665,7 @@ class ModalManagerV2 {
                     syncPreference: 'auto',
                     forceRiskOnBind: tradesMode === 'add',
                     forceSyncOnBind: tradesMode === 'add',
+                    skipInitialSummaryUpdate: tradesMode === 'edit', // Skip initial summary update in edit mode - will be updated after populateForm
                     stopPreferenceKey: 'defaultStopLoss',
                     targetPreferenceKey: 'defaultTargetPrice'
                 });
@@ -4287,7 +4744,8 @@ class ModalManagerV2 {
         // For Alerts modal - handle ticker selection
         if (modalId === 'alertsModal') {
             const tickerSelect = modalElement.querySelector('#alertTicker');
-            if (tickerSelect) {
+            // Only process if it's a select element (alertTicker might be a display field)
+            if (tickerSelect && tickerSelect.tagName === 'SELECT') {
                 // Save original before cloning
                 const originalTickerSelect = tickerSelect;
                 
@@ -4305,6 +4763,21 @@ class ModalManagerV2 {
                         await window.loadAlertTickerInfo(tickerId);
                     }
                 });
+            }
+        }
+
+        // For Trading Accounts modal - disable currency field in edit mode
+        if (modalId === 'tradingAccountsModal') {
+            const form = modalElement.querySelector('#tradingAccountsModalForm');
+            const mode = form?.dataset?.mode || modalElement.dataset?.mode || 'add';
+            
+            if (mode === 'edit') {
+                const currencyField = modalElement.querySelector('#accountCurrency');
+                if (currencyField) {
+                    currencyField.disabled = true;
+                    currencyField.classList.add('form-control-disabled');
+                    console.log(`✅ Disabled accountCurrency field in edit mode (initializeSpecialHandlers)`);
+                }
             }
         }
 
@@ -4623,13 +5096,23 @@ class ModalManagerV2 {
         // מילוי noteRelatedType ו-noteRelatedObject אם קיימים
         if (noteRelatedTypeField && data.related_type_id) {
             noteRelatedTypeField.value = data.related_type_id;
-            // טריגר event כדי למלא את noteRelatedObject
-            noteRelatedTypeField.dispatchEvent(new Event('change'));
-            // מילוי noteRelatedObject אחרי טעינת האובייקטים
+            
+            // הפעלת השדה אם יש related_type_id
+            if (noteRelatedObjectField) {
+                noteRelatedObjectField.disabled = false;
+                noteRelatedObjectField.removeAttribute('disabled');
+            }
+            
+            // מילוי ישיר של noteRelatedObject עם האופציות המלאות
+            // לא נסמוך על event כי ה-handler עדיין לא רשום
             if (noteRelatedObjectField && data.related_id) {
-                setTimeout(() => {
-                    noteRelatedObjectField.value = data.related_id;
-                }, 100);
+                // קרא ישירות ל-populateNoteRelatedObjects עם ה-related_id
+                await this.populateNoteRelatedObjects(form, data.related_type_id, data.related_id);
+                console.log(`✅ Populated noteRelatedObject with options for type ${data.related_type_id}, selected: ${data.related_id}`);
+            } else if (noteRelatedObjectField) {
+                // גם אם אין related_id, עדיין נמלא את האופציות
+                await this.populateNoteRelatedObjects(form, data.related_type_id, null);
+                console.log(`✅ Populated noteRelatedObject with options for type ${data.related_type_id}`);
             }
         }
         

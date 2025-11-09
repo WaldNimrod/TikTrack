@@ -230,28 +230,17 @@
                         <button
                             data-button-type="APPROVE"
                             data-variant="small"
+                            data-classes="btn btn-sm btn-outline-success table-btn-small"
                             data-text="אשר שיוך"
                             data-onclick="PendingExecutionsHighlights.acceptSuggestion(${execution.id}, ${primarySuggestion?.trade_id || 'null'})"
                             ${primarySuggestion ? '' : 'disabled'}
                         ></button>
                         <button
-                            data-button-type="DECLINE"
-                            data-variant="ghost"
+                            data-button-type="REJECT"
+                            data-variant="small"
+                            data-classes="btn btn-sm btn-outline-danger table-btn-small"
                             data-text="דחה"
                             data-onclick="PendingExecutionsHighlights.rejectSuggestion(${execution.id})"
-                        ></button>
-                        <button
-                            data-button-type="VIEW"
-                            data-variant="ghost"
-                            data-text="פרטי ביצוע"
-                            data-onclick="PendingExecutionsHighlights.openExecutionDetails(${execution.id})"
-                        ></button>
-                        <button
-                            data-button-type="VIEW"
-                            data-variant="ghost"
-                            data-text="פרטי טרייד"
-                            data-onclick="PendingExecutionsHighlights.openTradeDetails(${primarySuggestion?.trade_id || 'null'})"
-                            ${primarySuggestion ? '' : 'disabled'}
                         ></button>
                     </div>
                 </li>

@@ -11,10 +11,12 @@ Last Updated: 2025-01-16
 """
 
 from typing import List, Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 logger = logging.getLogger(__name__)
+
+from services.date_normalization_service import DateNormalizationService
 
 class NormalizationService:
     """
@@ -31,6 +33,7 @@ class NormalizationService:
             'symbol', 'action', 'date', 'quantity', 'price', 'fee',
             'external_id', 'source', 'currency'
         ]
+        self.date_normalizer = DateNormalizationService()
     
     def normalize_records(self, raw_records: List[Dict[str, Any]], 
                          connector) -> List[Dict[str, Any]]:
@@ -126,12 +129,12 @@ class NormalizationService:
             str: Fallback external ID
         """
         symbol = record.get('symbol', 'UNKNOWN')
-        date = record.get('date', '')
+        date = record.get('date')
         quantity = record.get('quantity', 0)
         price = record.get('price', 0)
-        
-        # Create a simple fallback ID
-        date_str = str(date)[:10] if date else 'unknown'
+
+        date_iso = self._coerce_date_to_iso(date)
+        date_str = date_iso[:10] if date_iso else 'unknown'
         return f"fallback_{symbol}_{date_str}_{quantity}_{price}"
     
     def _ensure_data_types(self, record: Dict[str, Any]) -> Dict[str, Any]:
@@ -172,6 +175,38 @@ class NormalizationService:
                 corrected['date'] = str(corrected['date'])
         
         return corrected
+
+    def _coerce_date_to_iso(self, value: Any) -> Optional[str]:
+        """
+        Convert supported date inputs (ISO string or DateEnvelope) into ISO string.
+        """
+        if value is None:
+            return None
+
+        if isinstance(value, datetime):
+            dt = value
+        else:
+            try:
+                normalized = self.date_normalizer.normalize_input_payload({'date': value})
+                dt = normalized.get('date') if isinstance(normalized, dict) else None
+            except Exception:
+                dt = None
+
+        if isinstance(dt, datetime):
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt.isoformat().replace('+00:00', 'Z')
+
+        if isinstance(value, dict):
+            if value.get('utc'):
+                return str(value['utc'])
+            if value.get('local'):
+                return str(value['local'])
+
+        if isinstance(value, str):
+            return value
+
+        return str(value)
     
     def get_normalization_stats(self, result: Dict[str, Any]) -> Dict[str, Any]:
         """

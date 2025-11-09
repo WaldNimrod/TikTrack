@@ -201,11 +201,12 @@ class ValidationService:
     
     @staticmethod
     def _validate_enum(db: Session, constraint_id: int, value: Any) -> bool:
-        """Validate ENUM constraint"""
+        """Validate ENUM constraint - only checks active enum values"""
         try:
-            enum_query = text("SELECT value FROM enum_values WHERE constraint_id = :constraint_id")
+            enum_query = text("SELECT value FROM enum_values WHERE constraint_id = :constraint_id AND is_active = 1")
             enum_values = db.execute(enum_query, {"constraint_id": constraint_id}).fetchall()
             valid_values = [row[0] for row in enum_values]
+            logger.info(f"Validating ENUM value '{value}' against active values: {valid_values}")
             return str(value) in valid_values
             
         except Exception as e:

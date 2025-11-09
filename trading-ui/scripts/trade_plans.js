@@ -2072,6 +2072,14 @@ async function loadTradePlansData() {
 
       // Update the table
       updateTradePlansTable(data);
+      
+      // Register table with UnifiedTableSystem after data is loaded
+      if (typeof window.registerTradePlansTables === 'function') {
+        window.registerTradePlansTables();
+      }
+
+      // Restore page state (filters, sort, sections, entity filters)
+      await restorePageState('trade_plans');
 
       return data;
     } else {
@@ -2101,6 +2109,14 @@ async function loadTradePlansData() {
       // Update the table
       window.Logger.info(`🔄 Updating table with ${data.length} trade plans...`, { page: "trade_plans" });
       updateTradePlansTable(data);
+      
+      // Register table with UnifiedTableSystem after data is loaded
+      if (typeof window.registerTradePlansTables === 'function') {
+        window.registerTradePlansTables();
+      }
+
+      // Restore page state (filters, sort, sections, entity filters)
+      await restorePageState('trade_plans');
       
       window.Logger.info(`✅ Loaded ${data.length} trade plans`, { page: "trade_plans" });
       return data;
@@ -2338,9 +2354,8 @@ function updateTradePlansTable(trade_plans) {
     const currentDisplay = formatCurrency(design.current || 0);
     const statusDisplay = window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status;
 
-    // Displaying ticker symbol or name with Entity Details link
+    // Displaying ticker symbol or name
     const tickerDisplay = design.ticker ? design.ticker.symbol || design.ticker.name || 'לא מוגדר' : 'לא מוגדר';
-    const tickerLink = design.id ? `<button class="btn btn-sm" onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('trade_plan', ${design.id}); }" title="קישור">🔗</button>` : '';
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = design.investment_type || '';
@@ -2349,12 +2364,9 @@ function updateTradePlansTable(trade_plans) {
     return `
       <tr>
         <td class="ticker-cell">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            ${tickerLink}
-            <span class="entity-trade-plan-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
-              ${tickerDisplay}
-            </span>
-          </div>
+          <span class="entity-trade-plan-badge entity-badge-base">
+            ${tickerDisplay}
+          </span>
         </td>
         <td data-date="${design.created_at}">${(() => {
           if (design.created_at) {
@@ -2373,13 +2385,18 @@ function updateTradePlansTable(trade_plans) {
           }
           return `<span class="date-text">-</span>`;
         })()}</td>
+        <td class="status-cell" data-status="${statusForFilter}">
+          ${(window.FieldRendererService && window.FieldRendererService.renderStatus) 
+            ? window.FieldRendererService.renderStatus(design.status, 'trade_plan') 
+            : (window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge entity-badge-base">${statusDisplay}</span>`)}
+        </td>
         <td class="type-cell" data-type="${typeForFilter}">
           ${(window.FieldRendererService && window.FieldRendererService.renderType) 
             ? window.FieldRendererService.renderType(design.investment_type) 
-            : (window.renderType ? window.renderType(design.investment_type) : `<span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${typeDisplay}</span>`)}
+            : (window.renderType ? window.renderType(design.investment_type) : `<span class="entity-trade-badge entity-badge-base">${typeDisplay}</span>`)}
         </td>
         <td class="side-cell" data-side="${design.side}">
-          ${window.renderSide ? window.renderSide(design.side) : `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${sideDisplay}</span>`}
+          ${window.renderSide ? window.renderSide(design.side) : `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'} entity-badge-base">${sideDisplay}</span>`}
         </td>
         <td class="quantity-cell">
           ${(() => {
@@ -2390,14 +2407,14 @@ function updateTradePlansTable(trade_plans) {
             
             if (calculatedQuantity > 0) {
               const formatted = calculatedQuantity.toFixed(1);
-              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">#${formatted}</span>`;
+              return `<span class="numeric-value-positive entity-badge-medium">#${formatted}</span>`;
             } else {
-              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+              return `<span class="numeric-value-positive entity-badge-medium">-</span>`;
             }
           })()}
         </td>
         <td class="price-cell">
-          <span class="target-text" style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'};">
+          <span class="target-text numeric-value-positive">
             ${(() => {
               const targetPrice = design.target_price || 0;
               const formatted = targetPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -2412,11 +2429,6 @@ function updateTradePlansTable(trade_plans) {
             return `<span class="amount-display">$${formatted}</span>`;
           })()}
         </td>
-        <td class="status-cell" data-status="${statusForFilter}">
-          ${(window.FieldRendererService && window.FieldRendererService.renderStatus) 
-            ? window.FieldRendererService.renderStatus(design.status, 'trade_plan') 
-            : (window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${statusDisplay}</span>`)}
-        </td>
         <td class="reward-cell">
           ${(() => {
             // חישוב סיכוי (רווח פוטנציאלי)
@@ -2428,9 +2440,9 @@ function updateTradePlansTable(trade_plans) {
               const quantity = plannedAmount / targetPrice;
               const potentialProfit = quantity * (targetPrice - currentPrice);
               const profitFormatted = Math.round(potentialProfit).toLocaleString('en-US');
-              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">$${profitFormatted}</span>`;
+              return `<span class="numeric-value-positive entity-badge-medium">$${profitFormatted}</span>`;
             } else {
-              return `<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+              return `<span class="numeric-value-zero entity-badge-medium">-</span>`;
             }
           })()}
         </td>
@@ -2446,9 +2458,9 @@ function updateTradePlansTable(trade_plans) {
               const quantity = plannedAmount / targetPrice;
               const potentialLoss = quantity * (currentPrice - stopPrice);
               const lossFormatted = Math.round(Math.abs(potentialLoss)).toLocaleString('en-US');
-              return `<span class="numeric-value-negative" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">$${lossFormatted}</span>`;
+              return `<span class="numeric-value-negative entity-badge-medium">$${lossFormatted}</span>`;
             } else {
-              return `<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+              return `<span class="numeric-value-zero entity-badge-medium">-</span>`;
             }
           })()}
         </td>
@@ -2471,14 +2483,14 @@ function updateTradePlansTable(trade_plans) {
                 
                 // צביעה: סיכוי בירוק, סיכון באדום
                 return `
-                  <div style="font-size: 0.85em;">
-                    <span class="numeric-value-positive" style="margin-right: 4px;">${ratioFormatted}</span>
+                  <div class="entity-badge-base table-cell-flex-small">
+                    <span class="numeric-value-positive">${ratioFormatted}</span>
                     <span class="numeric-value-negative">1</span>
                   </div>
                 `;
               }
             }
-            return `<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+            return `<span class="numeric-value-zero entity-badge-medium">-</span>`;
           })()}
         </td>
         <td class="actions-cell">
@@ -2491,7 +2503,6 @@ function updateTradePlansTable(trade_plans) {
             try {
               const result = window.createActionsMenu([
                 { type: 'VIEW', onclick: `window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })`, title: 'צפה בפרטי תכנון' },
-                { type: 'LINK', onclick: `if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }`, title: 'קישור' },
                 { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', ${design.id})`, title: 'ערוך' },
                 { type: 'CANCEL', onclick: `if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }`, title: 'בטל' },
                 { type: 'DELETE', onclick: `if (typeof window.deleteTradePlan === 'function') { window.deleteTradePlan(${design.id}); }`, title: 'מחק' }
@@ -3294,3 +3305,100 @@ async function performTradePlanDeletion(tradePlanId) {
 // Note: saveTradePlan already exported above
 window.loadTradePlanTickerInfo = loadTradePlanTickerInfo;
 window.displayTradePlanTickerInfo = displayTradePlanTickerInfo;
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('trade_plans', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('trade_plans');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register trade_plans table with UnifiedTableSystem
+ * This function registers the trade_plans table for unified sorting and filtering
+ */
+window.registerTradePlansTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "trade_plans" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register trade_plans table
+    window.UnifiedTableSystem.registry.register('trade_plans', {
+        dataGetter: () => {
+            return window.tradePlansData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateTradePlansTable === 'function') {
+                window.updateTradePlansTable(data);
+            }
+        },
+        tableSelector: '#trade_plansTable',
+        columns: getColumns('trade_plans'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};

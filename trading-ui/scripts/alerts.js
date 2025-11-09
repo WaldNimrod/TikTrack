@@ -168,6 +168,14 @@ window.loadAlertsData = async function() {
       } else {
         window.Logger.warn('⚠️ updateAlertsSummary לא זמין', { page: "alerts" });
       }
+      
+      // Register table with UnifiedTableSystem after data is loaded
+      if (typeof window.registerAlertsTables === 'function') {
+        window.registerAlertsTables();
+      }
+
+      // Restore page state (filters, sort, sections, entity filters)
+      await restorePageState('alerts');
 
       window.Logger.info('✅ loadAlertsData הושלם בהצלחה', { page: "alerts" });
     } catch (error) {
@@ -721,7 +729,6 @@ function updateAlertsTable(alerts) {
               if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
               const result = window.createActionsMenu([
                 { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
-                { type: 'LINK', onclick: `viewLinkedItemsForAlert(${alert.id})`, title: 'צפה בפריטים מקושרים' },
                 { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
                 { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
                 { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
@@ -3363,5 +3370,102 @@ function clearAlertTickerInfo() {
 // REMOVED: window.showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', id) directly
 window.loadAlertTickerInfo = loadAlertTickerInfo;
 window.displayAlertTickerInfo = displayAlertTickerInfo;
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('alerts', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('alerts');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register alerts table with UnifiedTableSystem
+ * This function registers the alerts table for unified sorting and filtering
+ */
+window.registerAlertsTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "alerts" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register alerts table
+    window.UnifiedTableSystem.registry.register('alerts', {
+        dataGetter: () => {
+            return window.alertsData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateAlertsTable === 'function') {
+                window.updateAlertsTable(data);
+            }
+        },
+        tableSelector: '#alertsTable',
+        columns: getColumns('alerts'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};
 window.clearAlertTickerInfo = clearAlertTickerInfo;
 // Note: saveAlert and deleteAlert removed - using ModalManagerV2 and confirmDeleteAlert instead

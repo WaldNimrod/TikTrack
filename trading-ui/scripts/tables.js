@@ -229,7 +229,7 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
   return null; // No custom logic applies
 }
 
-window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
+window.sortTableData = async function (columnIndex, data, tableType, updateFunction) {
   if (window._sortTableDataInProgress) {
     console.warn(`[sortTableData] Recursion detected: sort already in progress for ${tableType} column ${columnIndex}, returning original data`);
     console.trace('[sortTableData] Stack trace for rejected call');
@@ -253,19 +253,39 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
       return Array.isArray(data) ? [] : data;
     }
 
-    const columnStateKey = `sortState_${tableType}_col_${columnIndex}`;
-    const savedColumnState = localStorage.getItem(columnStateKey);
-    let currentColumnState = null;
-    if (savedColumnState) {
+    // קבלת מצב סידור נוכחי דרך UnifiedCacheManager
+    // בודקים את המצב הכללי של הטבלה כדי לראות אם העמודה הנוכחית כבר מסודרת
+    let currentTableState = null;
+    let isCurrentColumn = false;
+    let currentDirection = 'asc';
+    
+    if (window.UnifiedCacheManager) {
       try {
-        currentColumnState = JSON.parse(savedColumnState);
-      } catch {
-        currentColumnState = null;
+        // בודקים את המצב הכללי של הטבלה
+        const tableStateKey = `sortState_${tableType}`;
+        currentTableState = await window.UnifiedCacheManager.get(tableStateKey, {
+          layer: 'localStorage'
+        });
+        
+        // אם יש מצב כללי והעמודה הנוכחית היא העמודה שכבר מסודרת
+        if (currentTableState && 
+            typeof currentTableState.columnIndex === 'number' && 
+            currentTableState.columnIndex === columnIndex) {
+          isCurrentColumn = true;
+          currentDirection = currentTableState.direction || 'asc';
+        }
+      } catch (err) {
+        if (window.Logger) {
+          window.Logger.warn(`sortTableData: Failed to get table state for "${tableType}"`, err, { page: "tables" });
+        }
       }
     }
 
-    const newDirection = currentColumnState && currentColumnState.direction === 'asc' ? 'desc' : 'asc';
-    window.saveSortState(tableType, columnIndex, newDirection);
+    // אם זו העמודה שכבר מסודרת, הופכים את הכיוון. אחרת, מתחילים עם 'asc'
+    const newDirection = isCurrentColumn && currentDirection === 'asc' ? 'desc' : 
+                        isCurrentColumn && currentDirection === 'desc' ? 'asc' : 
+                        'asc';
+    await window.saveSortState(tableType, columnIndex, newDirection);
 
     const sortedData = [...data].sort((a, b) => {
       let aValue = resolveColumnValue(a, columnIndex, tableType);
@@ -415,15 +435,69 @@ function isDateValue(value) {
  * @param {number} columnIndex - Column index
  * @param {string} direction - Sort direction (asc/desc)
  */
-window.saveSortState = function (tableType, columnIndex, direction) {
+window.saveSortState = async function (tableType, columnIndex, direction) {
   const sortState = {
     columnIndex,
     direction,
     timestamp: Date.now(),
   };
-  // Save state for both table type (current column) and specific column
-  localStorage.setItem(`sortState_${tableType}`, JSON.stringify(sortState));
-  localStorage.setItem(`sortState_${tableType}_col_${columnIndex}`, JSON.stringify(sortState));
+  
+  // שמירה רק דרך UnifiedCacheManager
+  if (!window.UnifiedCacheManager) {
+    if (window.Logger) {
+      window.Logger.warn(`saveSortState: UnifiedCacheManager not available for "${tableType}"`, { page: "tables" });
+    }
+    return;
+  }
+
+  try {
+    // שמירת מצב כללי לטבלה דרך UnifiedCacheManager
+    const tableStateKey = `sortState_${tableType}`;
+    await window.UnifiedCacheManager.save(tableStateKey, sortState, {
+      layer: 'localStorage',
+      ttl: null, // persistent
+      syncToBackend: false
+    });
+    
+    // שמירת מצב ספציפי לעמודה דרך UnifiedCacheManager
+    const columnStateKey = `sortState_${tableType}_col_${columnIndex}`;
+    await window.UnifiedCacheManager.save(columnStateKey, sortState, {
+      layer: 'localStorage',
+      ttl: null, // persistent
+      syncToBackend: false
+    });
+
+    // שמירה גם דרך PageStateManager אם זמין
+    if (window.PageStateManager && window.PageStateManager.initialized) {
+      try {
+        // קבלת שם העמוד הנוכחי
+        const pageName = (typeof window.getCurrentPageName === 'function') 
+          ? window.getCurrentPageName() 
+          : tableType; // Fallback ל-tableType אם אין getCurrentPageName
+        
+        // שמירת מצב סידור דרך PageStateManager
+        await window.PageStateManager.saveSort(pageName, {
+          columnIndex,
+          direction
+        });
+        
+        if (window.Logger) {
+          window.Logger.debug(`saveSortState: Saved sort state via PageStateManager for "${pageName}"`, { page: "tables" });
+        }
+      } catch (pageStateErr) {
+        // לא נכשל אם PageStateManager לא עובד - רק נשמור דרך UnifiedCacheManager
+        if (window.Logger) {
+          window.Logger.warn(`saveSortState: Failed to save via PageStateManager, using UnifiedCacheManager only`, pageStateErr, { page: "tables" });
+        }
+      }
+    }
+  } catch (err) {
+    if (window.Logger) {
+      window.Logger.error(`saveSortState: Failed to save sort state for "${tableType}"`, err, { page: "tables" });
+    } else {
+      console.error(`saveSortState: Failed to save sort state for "${tableType}"`, err);
+    }
+  }
 };
 
 /**
@@ -432,13 +506,34 @@ window.saveSortState = function (tableType, columnIndex, direction) {
  * @param {string} tableType - Type of table
  * @returns {Object} Sort state object with columnIndex, direction, timestamp
  */
-window.getSortState = function (tableType) {
-  const savedState = localStorage.getItem(`sortState_${tableType}`);
-  if (savedState) {
-    try {
-      return JSON.parse(savedState);
-    } catch {
-      // Invalid sort state for ${tableType}
+window.getSortState = async function (tableType) {
+  // טעינה רק דרך UnifiedCacheManager
+  if (!window.UnifiedCacheManager) {
+    if (window.Logger) {
+      window.Logger.warn(`getSortState: UnifiedCacheManager not available for "${tableType}"`, { page: "tables" });
+    }
+    // Return default state
+    return {
+      columnIndex: -1,
+      direction: 'asc',
+      timestamp: Date.now(),
+    };
+  }
+
+  try {
+    const cacheKey = `sortState_${tableType}`;
+    const savedState = await window.UnifiedCacheManager.get(cacheKey, {
+      layer: 'localStorage'
+    });
+    
+    if (savedState && typeof savedState === 'object') {
+      return savedState;
+    }
+  } catch (err) {
+    if (window.Logger) {
+      window.Logger.error(`getSortState: Failed to load sort state for "${tableType}"`, err, { page: "tables" });
+    } else {
+      console.error(`getSortState: Failed to load sort state for "${tableType}"`, err);
     }
   }
 
@@ -546,89 +641,33 @@ window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, upd
       return result;
     }
     
-    // ===== FALLBACK TO OLD SYSTEM =====
-    // This code is for backward compatibility with tables not yet registered with UnifiedTableSystem
-    // Once all tables are migrated to UnifiedTableSystem, this fallback code can be removed
-    // Get the table data from the current page
-    let tableData = [];
-    let updateFn = null;
+    // ===== TABLE NOT REGISTERED - SHOW WARNING =====
+    // If table is not registered with UnifiedTableSystem, show warning and log error
+    const warningMessage = `הטבלה "${tableType}" לא רשומה במערכת המיון המאוחדת. נא לרשום את הטבלה ב-UnifiedTableSystem.`;
     
-    // Try to get data from page-specific functions (OLD APPROACH)
-    if (tableType === 'executions' && window.executionsData) {
-      tableData = window.executionsData;
-      updateFn = (sortedData) => window.updateExecutionsTableMain(sortedData);
-    } else if (tableType === 'tickers' && window.tickersData) {
-      tableData = window.tickersData;
-      updateFn = (sortedData) => window.updateTickersTableMain(sortedData);
-    } else if (tableType === 'trading_accounts') {
-      // Get trading accounts data
-      if (window.trading_accountsData) {
-        tableData = window.trading_accountsData;
-        updateFn = (sortedData) => {
-          if (typeof window.updateTradingAccountsTable === 'function') {
-            window.updateTradingAccountsTable(sortedData);
-          }
-        };
-      } else {
-        return;
-      }
-    } else if (tableType === 'cash_flows' && window.cashFlowsData) {
-      tableData = window.cashFlowsData;
-      updateFn = (sortedData) => window.updateCashFlowsTable(sortedData);
-    } else if (tableType === 'alerts' && window.alertsData) {
-      tableData = window.alertsData;
-      updateFn = (sortedData) => window.updateAlertsTable(sortedData);
-    } else if (tableType === 'notes' && window.notesData) {
-      tableData = window.notesData;
-      updateFn = (sortedData) => window.updateNotesTable(sortedData);
-    } else if (tableType === 'trades' && window.tradesData) {
-      tableData = window.tradesData;
-      updateFn = (sortedData) => window.updateTradesTable(sortedData);
-    } else if (tableType === 'trade_plans' && window.tradePlansData) {
-      tableData = window.tradePlansData;
-      updateFn = (sortedData) => window.updateTradePlansTable(sortedData);
-    } 
-    // ===== OLD CODE - REPLACED BY UnifiedTableSystem =====
-    // NOTE: positions and portfolio tables are now handled by UnifiedTableSystem (registered in trading_accounts.js)
-    // This code is commented out to prevent conflicts - it should never execute for registered tables
-    // The UnifiedTableSystem check above (line 487) will catch these tables before this fallback code runs
-    // This code is kept here for reference only and can be removed after full system-wide migration
-    /*
-    else if (tableType === 'positions') {
-      // OLD CODE - positions table is now registered with UnifiedTableSystem
-      // This code should never execute because UnifiedTableSystem handles it first
-      if (window.positionsPortfolioState && window.positionsPortfolioState.positionsData) {
-        tableData = window.positionsPortfolioState.positionsData;
-        updateFn = (sortedData) => window.updatePositionsTable(sortedData);
-      } else {
-        return;
-      }
-    } else if (tableType === 'portfolio') {
-      // OLD CODE - portfolio table is now registered with UnifiedTableSystem
-      // This code should never execute because UnifiedTableSystem handles it first
-      if (window.positionsPortfolioState && window.positionsPortfolioState.portfolioData && window.positionsPortfolioState.portfolioData.positions) {
-        tableData = window.positionsPortfolioState.portfolioData.positions;
-        updateFn = (sortedData) => window.updatePortfolioTable(sortedData);
-      } else {
-        return;
-      }
-    } 
-    */
-    else {
-      return;
+    // Show warning notification
+    if (typeof window.showWarningNotification === 'function') {
+      window.showWarningNotification(
+        'טבלה לא רשומה',
+        warningMessage,
+        6000,
+        'system'
+      );
     }
     
-    // Validate data before sorting
-    if (!Array.isArray(tableData)) {
-      return;
+    // Log to console
+    if (window.Logger) {
+      window.Logger.warn(`[sortTable] Table "${tableType}" is not registered with UnifiedTableSystem`, { 
+        page: "tables",
+        tableType: tableType,
+        columnIndex: columnIndex
+      });
+    } else {
+      console.warn(`⚠️ [sortTable] Table "${tableType}" is not registered with UnifiedTableSystem`);
     }
     
-    if (tableData.length === 0) {
-      return;
-    }
-    
-    const result = window.sortTableData(columnIndex, tableData, tableType, updateFn);
-    return result;
+    // Return empty array (no sorting performed)
+    return [];
   }
   
   // Handle new call with all parameters (explicit call with data array)
@@ -647,11 +686,30 @@ window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, upd
  * @param {Array} data - Data to sort
  * @param {Function} updateFunction - Function to update table
  */
-window.restoreAnyTableSort = function (tableType, data, updateFunction) {
-  const sortState = window.getSortState(tableType);
-  if (sortState.columnIndex >= 0) {
+window.restoreAnyTableSort = async function (tableType, data, updateFunction) {
+  // Use UnifiedTableSystem if available
+  if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+    const sortState = await window.getSortState(tableType);
+    if (sortState && sortState.columnIndex >= 0) {
+      // Use UnifiedTableSystem sorter
+      if (window.UnifiedTableSystem.sorter && typeof window.UnifiedTableSystem.sorter.sort === 'function') {
+        return await window.UnifiedTableSystem.sorter.sort(tableType, sortState.columnIndex);
+      }
+    } else {
+      // No saved state, try to apply default sort
+      if (window.UnifiedTableSystem.sorter && typeof window.UnifiedTableSystem.sorter.applyDefaultSort === 'function') {
+        return await window.UnifiedTableSystem.sorter.applyDefaultSort(tableType);
+      }
+    }
+  }
+  
+  // Fallback: use old method
+  const sortState = await window.getSortState(tableType);
+  if (sortState && sortState.columnIndex >= 0) {
     // Restoring sort state for table
-    window.sortTableData(sortState.columnIndex, data, tableType, updateFunction);
+    if (data && updateFunction) {
+      await window.sortTableData(sortState.columnIndex, data, tableType, updateFunction);
+    }
   }
 };
 
@@ -663,11 +721,21 @@ window.restoreAnyTableSort = function (tableType, data, updateFunction) {
  * @param {Array} data - Data to sort
  * @param {Function} updateFunction - Function to update table
  */
-window.applyDefaultSort = function (tableType, data, updateFunction) {
-  const sortState = window.getSortState(tableType);
-  if (!sortState || sortState.columnIndex === null || sortState.columnIndex === undefined) {
+window.applyDefaultSort = async function (tableType, data, updateFunction) {
+  // Use UnifiedTableSystem if available
+  if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+    if (window.UnifiedTableSystem.sorter && typeof window.UnifiedTableSystem.sorter.applyDefaultSort === 'function') {
+      return await window.UnifiedTableSystem.sorter.applyDefaultSort(tableType);
+    }
+  }
+  
+  // Fallback: check saved state and apply default if needed
+  const sortState = await window.getSortState(tableType);
+  if (!sortState || sortState.columnIndex === null || sortState.columnIndex === undefined || sortState.columnIndex < 0) {
     // Apply default sort by first column (index 0)
-    window.sortTableData(0, data, tableType, updateFunction);
+    if (data && updateFunction) {
+      await window.sortTableData(0, data, tableType, updateFunction);
+    }
   }
 };
 

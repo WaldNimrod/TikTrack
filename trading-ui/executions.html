@@ -137,7 +137,6 @@
                         <div class="table-actions">
                             <button data-button-type="ADD" data-entity-type="execution" data-variant="full" data-onclick="window.showModalSafe('executionsModal','add')" data-text="הוסף ביצוע" id="addExecutionBtn" title="הוסף ביצוע חדש"></button>
                             <button data-button-type="IMPORT" data-variant="full" data-onclick="openImportUserDataModal()" data-text="📥 ייבוא נתוני משתמש" title="ייבוא ביצועים מקובץ CSV"></button>
-                            <button data-button-type="CLEAR" data-variant="small" data-onclick="clearNewExecutionHighlights()" data-text="🧹 נקה הדגשה" title="נקה הדגשת רשומות חדשות" style="display: none;" id="clearHighlightsBtn"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
                     </div>
@@ -148,34 +147,34 @@
                             <table class="table table-hover" id="executionsTable" data-table-type="executions">
                                 <thead>
                                     <tr>
-                                        <th class="col-ticker">
+                                        <th class="col-trade">
                                             <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 0)">
+                                                טרייד <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-ticker">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 1)">
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-action">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 1)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 2)">
                                                 פעולה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 2)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 3)">
                                                 חשבון מסחר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-quantity">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 3)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 4)">
                                                 כמות <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-price">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 4)">
-                                                מחיר <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
-                                        <th class="col-pnl">
                                             <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 5)">
-                                                P&L <span class="sort-icon">↕</span>
+                                                מחיר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-realized-pl">

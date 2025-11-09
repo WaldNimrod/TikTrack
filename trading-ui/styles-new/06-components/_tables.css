@@ -208,6 +208,110 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+/* ===== מחלקות סטנדרטיות לתאי טבלה ===== */
+/* מחלקות אלה משמשות להחלפת סגנונות אינליין */
+
+/* תא עם flex layout - gap 8px (סטנדרט) */
+.table-cell-flex {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* תא עם flex layout - gap 6px (קטן יותר) */
+.table-cell-flex-small {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* יישור למרכז */
+.table-cell-center {
+    text-align: center;
+}
+
+/* יישור לסוף */
+.table-cell-end {
+    text-align: end;
+}
+
+/* ===== מחלקות סטנדרטיות ל-Entity Badges ===== */
+/* מחלקות אלה משמשות להחלפת סגנונות אינליין של badges */
+
+/* Entity badge בסיסי - סטנדרט */
+.entity-badge-base {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 500;
+    display: inline-block;
+}
+
+/* Entity badge קטן */
+.entity-badge-small {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: 500;
+    display: inline-block;
+}
+
+/* Entity badge עם גודל פונט 0.9em */
+.entity-badge-medium {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 500;
+    display: inline-block;
+}
+
+/* ===== מחלקות סטנדרטיות לכפתורים קטנים בטבלאות ===== */
+/* כפתור קטן בטבלה - סטנדרט */
+.table-btn-small {
+    padding: 2px 6px;
+    font-size: 0.75em;
+}
+
+/* כפתור קטן בטבלה - גודל פונט 12px */
+.table-btn-small-12 {
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+/* ===== מחלקות סטנדרטיות לקישורים וטקסט בטבלאות ===== */
+/* קישור בטבלה עם צבע חיובי */
+.table-link-positive {
+    cursor: pointer;
+    color: var(--numeric-positive-medium, #28a745);
+}
+
+/* קישור בטבלה עם צבע שלילי */
+.table-link-negative {
+    cursor: pointer;
+    color: var(--numeric-negative-medium, #dc3545);
+}
+
+/* תא עם cursor pointer */
+.table-cell-clickable {
+    cursor: pointer;
+}
+
+/* Flex container ללא wrap */
+.table-flex-nowrap {
+    flex-wrap: nowrap;
+}
+
+/* ===== Investment Type Badge ===== */
+/* מחלקה ל-investment-type-badge עם סגנון אחיד */
+.investment-type-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 500;
+    display: inline-block;
+    color: white;
+}
+
 /* ===== Trade Plans Table Columns ===== */
 /* Trade Plans Page - Column Widths for 10 columns layout */
 

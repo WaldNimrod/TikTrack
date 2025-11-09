@@ -762,7 +762,7 @@ function openMovementDetails(movementId, movementType) {
 function clearActivityTable() {
     const tbody = document.querySelector('#accountActivityTable tbody');
     if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="8" class="loading">בחר חשבון להצגת תנועות...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="loading">בחר חשבון מסחר להצגת תנועות...</td></tr>';
     }
     
     const footer = document.getElementById('accountActivityFooter');
@@ -772,7 +772,7 @@ function clearActivityTable() {
     
     const tableCount = document.getElementById('accountActivityCount');
     if (tableCount) {
-        tableCount.textContent = 'בחר חשבון...';
+        tableCount.textContent = 'בחר חשבון מסחר...';
     }
 }
 

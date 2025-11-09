@@ -418,6 +418,20 @@
     }
 
     function computeSummaryData(context) {
+        if (!context) {
+            window.Logger?.warn('⚠️ computeSummaryData: context is null', { source: 'InvestmentCalculationService' });
+            return {
+                tickerLabel: '-',
+                sideNormalized: null,
+                sideLabel: '-',
+                totalInvestment: null,
+                quantity: null,
+                riskAmount: null,
+                rewardAmount: null,
+                ratio: null
+            };
+        }
+
         const tickerLabel = getSelectedOptionText(context.tickerInput);
         const sideRaw = context.sideInput ? context.sideInput.value : '';
         const sideNormalized = normalizeSide(sideRaw);
@@ -429,41 +443,77 @@
         const stopPrice = parseInputValue(context.stopInput);
         const targetPrice = parseInputValue(context.targetInput);
 
-        const quantity = Number.isFinite(quantityValue) && quantityValue > 0 ? quantityValue : null;
+        // Debug logging
+        window.Logger?.debug('🔍 computeSummaryData:', {
+            entryPrice,
+            quantityValue,
+            amountValue,
+            stopPrice,
+            targetPrice,
+            sideNormalized,
+            priceInput: context.priceInput?.value,
+            priceDisplay: context.priceDisplay?.textContent,
+            quantityInput: context.quantityInput?.value,
+            amountInput: context.amountInput?.value,
+            stopInput: context.stopInput?.value,
+            targetInput: context.targetInput?.value
+        }, { source: 'InvestmentCalculationService' });
+
+        let quantity = Number.isFinite(quantityValue) && quantityValue > 0 ? quantityValue : null;
         const amount = Number.isFinite(amountValue) && amountValue > 0 ? amountValue : null;
+
+        // Calculate quantity from amount and price if quantity is not available
+        // This is important for edit mode where quantity might not be loaded yet
+        if (quantity === null && amount !== null && isPositiveNumber(entryPrice)) {
+            const { quantity: calculatedQuantity } = computeQuantityFromInvestment(amount, entryPrice, context.options);
+            if (calculatedQuantity !== null && calculatedQuantity > 0) {
+                quantity = calculatedQuantity;
+                window.Logger?.debug('✅ Calculated quantity from amount and price:', calculatedQuantity, { source: 'InvestmentCalculationService' });
+            }
+        }
 
         let totalInvestment = amount;
         if ((!totalInvestment || totalInvestment <= 0) && quantity !== null && isPositiveNumber(entryPrice)) {
             totalInvestment = quantity * entryPrice;
         }
 
+        // Calculate risk and reward per unit (doesn't require quantity)
+        // For Short: Risk is when price goes UP (above entry), Reward is when price goes DOWN (below entry)
+        // For Long: Risk is when price goes DOWN (below entry), Reward is when price goes UP (above entry)
+        // Note: stop and target can be in either direction, so we use absolute values
         let riskPerUnit = null;
-        if (quantity !== null && isPositiveNumber(entryPrice) && isPositiveNumber(stopPrice)) {
-            if (sideNormalized === 'short') {
-                const diff = stopPrice - entryPrice;
-                riskPerUnit = diff > 0 ? diff : null;
-            } else {
-                const diff = entryPrice - stopPrice;
-                riskPerUnit = diff > 0 ? diff : null;
-            }
+        if (isPositiveNumber(entryPrice) && isPositiveNumber(stopPrice)) {
+            // Risk is always the absolute difference between entry and stop
+            // The direction determines if it's a loss (risk) or profit (reward)
+            const diff = Math.abs(entryPrice - stopPrice);
+            riskPerUnit = diff > 0 ? diff : null;
         }
 
         let rewardPerUnit = null;
-        if (quantity !== null && isPositiveNumber(entryPrice) && isPositiveNumber(targetPrice)) {
-            if (sideNormalized === 'short') {
-                const diff = entryPrice - targetPrice;
-                rewardPerUnit = diff > 0 ? diff : null;
-            } else {
-                const diff = targetPrice - entryPrice;
-                rewardPerUnit = diff > 0 ? diff : null;
-            }
+        if (isPositiveNumber(entryPrice) && isPositiveNumber(targetPrice)) {
+            // Reward is always the absolute difference between entry and target
+            // The direction determines if it's a profit (reward) or loss (risk)
+            const diff = Math.abs(entryPrice - targetPrice);
+            rewardPerUnit = diff > 0 ? diff : null;
         }
 
+        // Calculate risk and reward amounts (requires quantity)
+        // Use calculated quantity if available
         const riskAmount = riskPerUnit !== null && quantity !== null ? riskPerUnit * quantity : null;
         const rewardAmount = rewardPerUnit !== null && quantity !== null ? rewardPerUnit * quantity : null;
         const ratio = riskAmount !== null && riskAmount > 0 && rewardAmount !== null && rewardAmount > 0
             ? rewardAmount / riskAmount
             : null;
+
+        // Debug logging for results
+        window.Logger?.debug('📊 computeSummaryData results:', {
+            quantity,
+            riskPerUnit,
+            rewardPerUnit,
+            riskAmount,
+            rewardAmount,
+            ratio
+        }, { source: 'InvestmentCalculationService' });
 
         return {
             tickerLabel,
@@ -647,11 +697,37 @@
 
     function updateSummary(context) {
         if (!context || !context.summaryElement) {
+            window.Logger?.warn('⚠️ updateSummary: context or summaryElement is missing', {
+                hasContext: !!context,
+                hasSummaryElement: !!context?.summaryElement,
+                source: 'InvestmentCalculationService'
+            });
             return;
         }
 
+        window.Logger?.debug('🔄 updateSummary called', {
+            priceInput: context.priceInput?.value,
+            quantityInput: context.quantityInput?.value,
+            amountInput: context.amountInput?.value,
+            stopInput: context.stopInput?.value,
+            targetInput: context.targetInput?.value,
+            sideInput: context.sideInput?.value,
+            tickerInput: context.tickerInput?.value,
+            source: 'InvestmentCalculationService'
+        }, { source: 'InvestmentCalculationService' });
+
         const summaryData = computeSummaryData(context);
+        
+        window.Logger?.debug('📊 updateSummary: summaryData computed', summaryData, { source: 'InvestmentCalculationService' });
+        
         renderSummaryCard(context, summaryData);
+        
+        window.Logger?.debug('✅ updateSummary: summary card rendered', {
+            riskAmount: summaryData.riskAmount,
+            rewardAmount: summaryData.rewardAmount,
+            ratio: summaryData.ratio,
+            source: 'InvestmentCalculationService'
+        }, { source: 'InvestmentCalculationService' });
     }
 
     function getRiskCacheKey(options) {
@@ -739,6 +815,7 @@
             }
 
             updatePercentFromPrices(context);
+            updateSummary(context);
         });
     }
 
@@ -797,6 +874,7 @@
         }
 
         updatePercentFromPrices(context);
+        updateSummary(context);
     }
 
     function updateFromQuantity(context) {
@@ -824,6 +902,7 @@
         }
 
         updatePercentFromPrices(context);
+        updateSummary(context);
     }
 
     function syncValues(context, options = {}) {
@@ -885,6 +964,7 @@
         }
 
         updatePercentFromPrices(context);
+        updateSummary(context);
     }
 
     function attachListeners(context) {
@@ -922,6 +1002,7 @@
                     const updated = updatePriceFromPercent(context, 'stop');
                     if (updated) {
                         updatePercentFromPrices(context, { systemGenerated: false });
+                        updateSummary(context);
                     }
                 });
             };
@@ -942,6 +1023,7 @@
                     const updated = updatePriceFromPercent(context, 'target');
                     if (updated) {
                         updatePercentFromPrices(context, { systemGenerated: false });
+                        updateSummary(context);
                     }
                 });
             };
@@ -972,6 +1054,7 @@
                 }
 
                 updatePercentFromPrices(context);
+                updateSummary(context);
             };
 
             priceInput.addEventListener('input', handler);
@@ -983,18 +1066,22 @@
         if (context.stopInput && !context.stopInput.dataset.investmentCalcPercentBound) {
             const syncStopPercent = () => {
                 updatePercentFromPrices(context);
+                updateSummary(context);
             };
             context.stopInput.addEventListener('change', syncStopPercent);
             context.stopInput.addEventListener('blur', syncStopPercent);
+            context.stopInput.addEventListener('input', syncStopPercent);
             context.stopInput.dataset.investmentCalcPercentBound = 'true';
         }
 
         if (context.targetInput && !context.targetInput.dataset.investmentCalcPercentBound) {
             const syncTargetPercent = () => {
                 updatePercentFromPrices(context);
+                updateSummary(context);
             };
             context.targetInput.addEventListener('change', syncTargetPercent);
             context.targetInput.addEventListener('blur', syncTargetPercent);
+            context.targetInput.addEventListener('input', syncTargetPercent);
             context.targetInput.dataset.investmentCalcPercentBound = 'true';
         }
 
@@ -1098,7 +1185,11 @@
                 context.summaryElement = resolveElement(modalElement, context.options.summaryField || context.options.summarySelector);
                 attachListeners(context);
                 updatePercentFromPrices(context);
-                updateSummary(context);
+                // Only update summary immediately if not in edit mode (where fields are populated later)
+                // In edit mode, summary will be updated after populateForm completes
+                if (config.skipInitialSummaryUpdate !== true) {
+                    updateSummary(context);
+                }
             } else {
                 context = createContext(modalElement, config);
                 if (!context) {
@@ -1107,7 +1198,11 @@
                 boundContexts.set(modalElement, context);
                 attachListeners(context);
                 updatePercentFromPrices(context);
-                updateSummary(context);
+                // Only update summary immediately if not in edit mode (where fields are populated later)
+                // In edit mode, summary will be updated after populateForm completes
+                if (config.skipInitialSummaryUpdate !== true) {
+                    updateSummary(context);
+                }
             }
 
             const forceSync = Boolean(context.options.forceSyncOnBind || context.options.forceRiskOnBind);
@@ -1117,6 +1212,20 @@
                 riskPromise.catch(error => {
                     window.Logger?.warn?.('⚠️ Error applying risk levels on bind', { error, source: 'InvestmentCalculationService' });
                 });
+            }
+            // Update summary after risk levels are applied
+            // But skip if skipInitialSummaryUpdate is true (edit mode - will be updated after populateForm)
+            if (riskPromise && typeof riskPromise.then === 'function') {
+                return riskPromise.then(() => {
+                    if (config.skipInitialSummaryUpdate !== true) {
+                        updateSummary(context);
+                    }
+                    return Promise.resolve();
+                });
+            }
+            // If riskPromise is not a promise, update summary immediately (unless skipInitialSummaryUpdate is true)
+            if (config.skipInitialSummaryUpdate !== true) {
+                updateSummary(context);
             }
             return riskPromise || Promise.resolve();
         },
@@ -1128,10 +1237,18 @@
 
             syncValues(context, { force: Boolean(options.force) });
             updatePercentFromPrices(context);
+            updateSummary(context);
             const riskPromise = applyDefaultRiskLevels(context, { force: Boolean(options.force) });
             if (riskPromise && typeof riskPromise.catch === 'function') {
                 riskPromise.catch(error => {
                     window.Logger?.warn?.('⚠️ Error applying risk levels on resync', { error, source: 'InvestmentCalculationService' });
+                });
+            }
+            // Update summary again after risk levels are applied
+            if (riskPromise && typeof riskPromise.then === 'function') {
+                return riskPromise.then(() => {
+                    updateSummary(context);
+                    return Promise.resolve();
                 });
             }
             return riskPromise || Promise.resolve();

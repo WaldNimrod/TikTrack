@@ -826,7 +826,7 @@ window.showPositionDetails = function(accountId, tickerId) {
 function clearPositionsTable() {
     const tableBody = document.querySelector('#positionsTable tbody');
     if (tableBody) {
-        tableBody.innerHTML = '<tr><td colspan="9" class="loading">בחר חשבון להצגת פוזיציות...</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="9" class="loading">בחר חשבון מסחר להצגת פוזיציות...</td></tr>';
     }
     
     // Reset count and totals display
@@ -837,7 +837,7 @@ function clearPositionsTable() {
     const accountTotalElement = document.getElementById('positionsAccountTotalValue');
     
     if (countTextElement) {
-        countTextElement.textContent = 'בחר חשבון...';
+        countTextElement.textContent = 'בחר חשבון מסחר...';
     }
     if (separatorElement) separatorElement.style.display = 'none';
     if (totalValueElement) totalValueElement.style.display = 'none';

@@ -147,6 +147,14 @@ async function loadCashFlowsData() {
     // עדכון הסטטיסטיקות
     updatePageSummaryStats();
     
+    // Register table with UnifiedTableSystem after data is loaded
+    if (typeof window.registerCashFlowsTables === 'function') {
+      window.registerCashFlowsTables();
+    }
+
+    // Restore page state (filters, sort, sections, entity filters)
+    await restorePageState('cash_flows');
+    
     console.log('✅ loadCashFlowsData: Loaded', data.length, 'cash flows');
     window.Logger.info(`✅ Loaded ${data.length} cash flows`, { page: 'cash_flows' });
   } catch (error) {
@@ -757,7 +765,7 @@ async function renderCashFlowsTable() {
   tbody.innerHTML = '';
 
   if (!cashFlowsData || cashFlowsData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="11" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
     return;
   }
 
@@ -779,11 +787,17 @@ async function renderCashFlowsTable() {
     // קבלת סוג עם צבע
     let typeDisplay = isExchange ? '🔄 ' + getCashFlowTypeWithColor(cashFlow.type) : getCashFlowTypeWithColor(cashFlow.type);
     
-    // Add trade link indicator if trade_id exists
-    if (cashFlow.trade_id) {
-      const tradeSymbol = cashFlow.trade_ticker_symbol || '';
-      typeDisplay += ` <span class="badge bg-info" title="מקושר לטרייד #${cashFlow.trade_id}${tradeSymbol ? ' (' + tradeSymbol + ')' : ''}" style="font-size: 0.75em; margin-inline-start: 4px;">🔗</span>`;
-    }
+    // Trade column - show trade ID with link button if exists
+    const tradeCell = cashFlow.trade_id 
+      ? `<div class="table-cell-flex-small">
+           <button class="btn btn-sm btn-outline-primary table-btn-small" 
+                   onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${cashFlow.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${cashFlow.trade_id}, 'view'); }" 
+                   title="פתח פרטי טרייד">
+             🔗
+           </button>
+           <span>#${cashFlow.trade_id}</span>
+         </div>`
+      : '-';
 
     // עיצוב סכום עם יישור נכון וצביעה
     // For exchanges, we need to show both amounts (from -> to)
@@ -804,7 +818,6 @@ async function renderCashFlowsTable() {
         if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
         const result = window.createActionsMenu([
           { type: 'VIEW', onclick: `showEntityDetails('cash_flow', ${cashFlow.id})`, title: 'הצג פרטי המרה' },
-          { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, title: 'צפה בפריטים מקושרים' },
           { type: 'EDIT', onclick: `window.loadCurrencyExchange && window.loadCurrencyExchange('${exchangeId}').then(() => { window.ModalManagerV2 && window.ModalManagerV2.showModal('cashFlowModal', 'edit'); })`, title: 'ערוך המרת מטבע' },
           { type: 'DELETE', onclick: `window.deleteCurrencyExchange && window.deleteCurrencyExchange('${exchangeId}')`, title: 'מחק המרת מטבע' }
         ]);
@@ -814,7 +827,6 @@ async function renderCashFlowsTable() {
         if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
         const result = window.createActionsMenu([
           { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, title: 'הצג פרטי תזרים' },
-          { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, title: 'צפה בפריטים מקושרים' },
           { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${cashFlow.id})`, title: 'ערוך תזרים' },
           { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, title: 'מחק תזרים' }
         ]);
@@ -839,16 +851,12 @@ async function renderCashFlowsTable() {
         })();
 
             row.innerHTML = `
+            <td class="trade-cell" data-trade-id="${cashFlow.trade_id || ''}">
+                ${tradeCell}
+            </td>
             <td class="col-account ticker-cell" data-account="${cashFlow.trading_account_id || accountName || ''}">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="btn btn-sm" 
-                      onclick="showEntityDetails('cash_flow', ${cashFlow.id})" 
-                      title="פרטי תזרים" 
-                      style="background-color: white; font-size: 0.8em;">
-                        🔗
-                    </button>
-                    <span class="entity-trading_account-badge entity-account-badge" 
-                          style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+                <div class="table-cell-flex">
+                    <span class="entity-trading_account-badge entity-account-badge entity-badge-base">
                         ${accountName}
                     </span>
                 </div>
@@ -857,7 +865,7 @@ async function renderCashFlowsTable() {
             <td class="col-amount text-end">
                 ${amountDisplay}
             </td>
-            <td class="col-date" data-date="${cashFlow.date || ''}" style="text-align: center;">${formatDate(cashFlow.date)}</td>
+            <td class="col-date table-cell-center" data-date="${cashFlow.date || ''}">${formatDate(cashFlow.date)}</td>
             <td class="col-description">${descriptionDisplay}</td>
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :
@@ -978,7 +986,7 @@ function getCashFlowTypeWithColor(type) {
       color = colors.secondary;
     }
     
-    return `<span style="color: ${color}; font-weight: 600;">${typeTranslation}</span>`;
+    return `<span class="numeric-value-positive" style="color: ${color}; font-weight: 600;">${typeTranslation}</span>`;
   }
 
   // fallback למערכת הצביעה הישנה
@@ -1000,7 +1008,7 @@ function getCashFlowTypeWithColor(type) {
     cssClass = 'numeric-value-zero';
   }
 
-  return `<span class="${cssClass}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;"><strong>${typeTranslation}</strong></span>`;
+  return `<span class="${cssClass} entity-badge-base"><strong>${typeTranslation}</strong></span>`;
   
   } catch (error) {
     window.Logger.error('שגיאה בקבלת סוג תזרים עם צבע:', error, { page: "cash_flows" });
@@ -2633,3 +2641,100 @@ window.initializeExternalIdFields = initializeExternalIdFields;
 window.manageExternalIdField = manageExternalIdField;
 
 window.Logger.info('Cash Flows: All functions exported to global scope', { page: 'cash_flows' });
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('cash_flows', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('cash_flows');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register cash_flows table with UnifiedTableSystem
+ * This function registers the cash_flows table for unified sorting and filtering
+ */
+window.registerCashFlowsTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "cash_flows" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register cash_flows table
+    window.UnifiedTableSystem.registry.register('cash_flows', {
+        dataGetter: () => {
+            return window.cashFlowsData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateCashFlowsTable === 'function') {
+                window.updateCashFlowsTable(data);
+            }
+        },
+        tableSelector: '#cashFlowsTable',
+        columns: getColumns('cash_flows'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};

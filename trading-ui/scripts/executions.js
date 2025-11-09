@@ -1169,6 +1169,14 @@ async function loadExecutionsData() {
 
       // עדכון הטבלה
       updateExecutionsTableMain(executionsData);
+      
+      // Register table with UnifiedTableSystem after data is loaded
+      if (typeof window.registerExecutionsTables === 'function') {
+        window.registerExecutionsTables();
+      }
+
+      // Restore page state (filters, sort, sections, entity filters)
+      await restorePageState('executions');
 
     } else {
       const errorText = await response.text();
@@ -1207,7 +1215,7 @@ async function updateExecutionsTableMain(executions) {
     .filter(id => !existingExecutionIds.has(id));
 
   if (executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center">לא נמצאו עסקעות</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="text-center">לא נמצאו עסקעות</td></tr>';
     return;
   }
 
@@ -1316,57 +1324,65 @@ async function updateExecutionsTableMain(executions) {
     // תמיד להשתמש בחשבון ישירות מהרשומה, או מהטרייד אם אין ישיר
     const accountName = execution.account_name || (trade ? trade.account_name : 'לא מוגדר');
 
-    // Add trade link indicator if trade_id exists
-    const tradeLinkIndicator = execution.trade_id 
-      ? ` <span class="badge bg-info" title="מקושר לטרייד #${execution.trade_id}${symbol && symbol !== 'לא מוגדר' ? ' (' + symbol + ')' : ''}" style="font-size: 0.75em; margin-inline-start: 4px;">🔗</span>`
-      : '';
+    // Trade column - show trade ID with link button if exists
+    const tradeCell = execution.trade_id 
+      ? `<div class="table-cell-flex-small">
+           <button class="btn btn-sm btn-outline-primary table-btn-small" 
+                   onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${execution.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${execution.trade_id}, 'view'); }" 
+                   title="פתח פרטי טרייד">
+             🔗
+           </button>
+           <span>#${execution.trade_id}</span>
+         </div>`
+      : '-';
 
     return `
             <tr data-execution-id="${execution.id}" class="execution-row">
-                                   <td class="ticker-cell">
-                       <div style="display: flex; align-items: center; gap: 8px;">
-                           <strong style="cursor: pointer; color: ${positiveColor};" 
-                             onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
-                             title="פתח פרטי סימבול">${symbol}</strong>${tradeLinkIndicator}
-                       </div>
-                   </td>
+                <td class="trade-cell" data-trade-id="${execution.trade_id || ''}">
+                    ${tradeCell}
+                </td>
+                <td class="ticker-cell">
+                    <div class="table-cell-flex">
+                        <strong class="table-link-positive" 
+                          onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
+                          title="פתח פרטי סימבול">${symbol}</strong>
+                    </div>
+                </td>
                 <td class="type-cell" data-type="${typeForFilter}">
                     ${window.renderAction ? window.renderAction(execution.action || execution.type) : 
                       `<span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
                         ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
                       </span>`}
                 </td>
-                <td data-account="${accountName}" style="cursor: pointer;" 
+                <td class="table-cell-clickable" data-account="${accountName}" 
                   onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                   title="פתח פרטי חשבון מסחר">${accountName}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
-                <td>$${execution.price}</td>
-                <td class="pl-cell">$0</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.price) : (execution.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-')}</td>
                 <td class="realized-pl-cell" data-realized-pl="${execution.realized_pl || ''}">
                     ${execution.realized_pl !== null && execution.realized_pl !== undefined ? 
                         (execution.realized_pl >= 0 ? 
-                            `<span class="numeric-ltr" style="color: ${positiveColor}">$${execution.realized_pl}</span>` : 
-                            `<span class="numeric-ltr" style="color: ${negativeColor}">-$${Math.abs(execution.realized_pl)}</span>`) : 
+                            `<span class="numeric-ltr numeric-value-positive">$${execution.realized_pl}</span>` : 
+                            `<span class="numeric-ltr numeric-value-negative">-$${Math.abs(execution.realized_pl)}</span>`) : 
                         '-'}
                 </td>
                 <td class="mtm-pl-cell" data-mtm-pl="${execution.mtm_pl || ''}">
                     ${execution.mtm_pl !== null && execution.mtm_pl !== undefined ? 
                         (execution.mtm_pl >= 0 ? 
-                            `<span class="numeric-ltr" style="color: ${positiveColor}">$${execution.mtm_pl}</span>` : 
-                            `<span class="numeric-ltr" style="color: ${negativeColor}">-$${Math.abs(execution.mtm_pl)}</span>`) : 
+                            `<span class="numeric-ltr numeric-value-positive">$${execution.mtm_pl}</span>` : 
+                            `<span class="numeric-ltr numeric-value-negative">-$${Math.abs(execution.mtm_pl)}</span>`) : 
                         '-'}
                 </td>
                 <td data-date="${execution.date || execution.execution_date}">${window.renderExecutionDate ? window.renderExecutionDate(execution.date || execution.execution_date) : (execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-')}</td>
-                <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
+                <td class="numeric-ltr" dir="ltr">${execution.source || '-'}</td>
                 <td class="actions-cell">
-                    <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
+                    <div class="d-flex gap-1 justify-content-center align-items-center table-flex-nowrap">
                       ${(() => {
                         if (!window.createActionsMenu) {
                           return '<!-- Actions menu not available -->';
                         }
                         const result = window.createActionsMenu([
                           { type: 'VIEW', onclick: `window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })`, title: 'צפה בפרטי עסקה' },
-                          { type: 'LINK', onclick: `window.viewLinkedItemsForExecution && window.viewLinkedItemsForExecution(${execution.id})`, title: 'פריטים מקושרים' },
                           { type: 'EDIT', onclick: `editExecution(${execution.id})`, title: 'ערוך' },
                           { type: 'DELETE', onclick: `deleteExecution(${execution.id})`, title: 'מחק' }
                         ]);
@@ -1394,22 +1410,18 @@ async function updateExecutionsTableMain(executions) {
       style.textContent = `
         .execution-row.newly-added {
           background-color: rgba(40, 167, 69, 0.2) !important;
-          border-left: 4px solid #28a745 !important;
           animation: fadeNewExecution 3s ease-out forwards;
         }
         
         @keyframes fadeNewExecution {
           0% {
             background-color: rgba(40, 167, 69, 0.3);
-            border-left-color: #28a745;
           }
           50% {
             background-color: rgba(40, 167, 69, 0.15);
-            border-left-color: #28a745;
           }
           100% {
             background-color: transparent;
-            border-left-color: transparent;
           }
         }
       `;
@@ -2569,9 +2581,9 @@ function updateExecutionsTableForTradeModal(executions) {
                 <td>${window.renderExecutionDate ? window.renderExecutionDate(execution.date) : execution.date}</td>
                 <td>${typeBadge}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
-                <td>$${execution.price.toFixed(2)}</td>
-                <td>$${execution.commission.toFixed(2)}</td>
-                <td>$${execution.total.toFixed(2)}</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.price) : (execution.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-')}</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.commission) : (execution.commission ? `$${parseFloat(execution.commission).toFixed(2)}` : '-')}</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.total) : (execution.total ? `$${parseFloat(execution.total).toFixed(2)}` : '-')}</td>
                 <td>${statusBadge}</td>
             `;
 
@@ -3455,7 +3467,7 @@ async function deleteExecution(executionId) {
                                window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
                                ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
             const quantity = execution.quantity || '0';
-            const price = execution.price ? `$${execution.price}` : '$0';
+            const price = execution.price ? (window.formatPrice ? window.formatPrice(execution.price) : `$${parseFloat(execution.price).toFixed(2)}`) : '$0';
             const date = execution.date || execution.execution_date ? 
                          new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : 
                          'לא מוגדר';
@@ -3521,3 +3533,100 @@ async function performExecutionDeletion(executionId) {
 
 // Export functions to window for global access
 // Note: saveExecution already exported above
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('executions', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('executions');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register executions table with UnifiedTableSystem
+ * This function registers the executions table for unified sorting and filtering
+ */
+window.registerExecutionsTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "executions" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register executions table
+    window.UnifiedTableSystem.registry.register('executions', {
+        dataGetter: () => {
+            return window.executionsData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateExecutionsTableMain === 'function') {
+                window.updateExecutionsTableMain(data);
+            }
+        },
+        tableSelector: '#executionsTable',
+        columns: getColumns('executions'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};

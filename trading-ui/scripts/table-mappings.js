@@ -23,12 +23,12 @@ const TABLE_COLUMN_MAPPINGS = {
   'trade_plans': [
     'ticker_symbol',         // 0 - טיקר (מחושב)
     'created_at',            // 1 - תאריך
-    'investment_type',       // 2 - סוג
-    'side',                  // 3 - צד
-    'quantity',              // 4 - כמות (מחושב)
-    'target_price',          // 5 - מחיר
-    'planned_amount',        // 6 - השקעה
-    'status',                // 7 - סטטוס
+    'status',                // 2 - סטטוס
+    'investment_type',       // 3 - סוג
+    'side',                  // 4 - צד
+    'quantity',              // 5 - כמות (מחושב)
+    'target_price',          // 6 - מחיר
+    'planned_amount',        // 7 - השקעה
     'reward',                // 8 - סיכוי (מחושב)
     'risk',                  // 9 - סיכון (מחושב)
     'ratio',                 // 10 - יחס (מחושב)
@@ -45,10 +45,9 @@ const TABLE_COLUMN_MAPPINGS = {
     'status',                // 6 - סטטוס
     'investment_type',       // 7 - סוג
     'side',                  // 8 - צד
-    'trade_plan_id',         // 9 - תוכנית
-    'account_name',          // 10 - חשבון מסחר
-    'created_at',            // 11 - נוצר ב
-    'closed_at',             // 12 - נסגר ב
+    'account_name',          // 9 - חשבון מסחר
+    'created_at',            // 10 - נוצר ב
+    'closed_at',             // 11 - נסגר ב
   ],
 
   // טבלת חשבונות מסחר (Trading Accounts) - Trading Accounts Page Structure (מוצג בפועל)

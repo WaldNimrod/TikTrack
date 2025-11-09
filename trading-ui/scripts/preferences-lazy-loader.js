@@ -51,6 +51,8 @@ class PreferenceClassifier {
                 // Essential notifications
                 'enableNotifications',
                 'enableRealtimeNotifications',
+                'notificationSound',
+                'notificationPopup',
                 
                 // Core colors (most used)
                 'primaryColor',
@@ -99,7 +101,11 @@ class PreferenceClassifier {
                 'enableBackgroundTaskNotifications',
                 'enableDataUpdateNotifications',
                 'enableExternalDataNotifications',
-                'enableSystemEventNotifications'
+                'enableSystemEventNotifications',
+                'notifyOnTradeExecuted',
+                'notifyOnStopLoss',
+                'notificationDuration',
+                'notificationMaxHistory'
             ],
             
             // MEDIUM - Load on user interaction
@@ -140,9 +146,11 @@ class PreferenceClassifier {
             low: [
                 // Console logs
                 'console_logs_initialization_enabled',
+                'console_logs_development_enabled',
                 'console_logs_business_enabled',
                 'console_logs_performance_enabled',
                 'console_logs_system_enabled',
+                'console_logs_ui_enabled',
                 'console_logs_ui_components_enabled',
                 'console_logs_cache_enabled',
                 'console_logs_notifications_enabled',

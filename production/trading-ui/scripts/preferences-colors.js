@@ -42,11 +42,12 @@ class ColorManager {
         this.colorCache = new Map();
         this.colorGroups = {
             'chart': ['chartBackgroundColor', 'chartBorderColor', 'chartGridColor', 'chartPointColor', 'chartPrimaryColor', 'chartTextColor'],
-            'entity': ['entityAlertColor', 'entityAlertColorDark', 'entityAlertColorLight', 'entityInfoColor', 'entityInfoColorDark', 'entityInfoColorLight', 'entityNoteColor', 'entityNoteColorDark', 'entityNoteColorLight', 'entityTradeColor', 'entityTradeColorDark', 'entityTradeColorLight', 'entityTickerColor', 'entityTickerColorDark', 'entityTickerColorLight', 'entityExecutionColor', 'entityExecutionColorDark', 'entityExecutionColorLight', 'entityTradingAccountColor', 'entityTradingAccountColorDark', 'entityTradingAccountColorLight', 'entityTradePlanColor', 'entityTradePlanColorDark', 'entityTradePlanColorLight', 'entityCashFlowColor', 'entityCashFlowColorDark', 'entityCashFlowColorLight', 'entityPreferencesColor', 'entityPreferencesColorDark', 'entityPreferencesColorLight', 'entityResearchColor', 'entityResearchColorDark', 'entityResearchColorLight', 'entityDevelopmentColor', 'entityDevelopmentColorDark', 'entityDevelopmentColorLight'],
+            'entity': ['entityAlertColor', 'entityAlertColorDark', 'entityAlertColorLight', 'entityInfoColor', 'entityInfoColorDark', 'entityInfoColorLight', 'entityNoteColor', 'entityNoteColorDark', 'entityNoteColorLight', 'entityTradeColor', 'entityTradeColorDark', 'entityTradeColorLight', 'entityTickerColor', 'entityTickerColorDark', 'entityTickerColorLight', 'entityExecutionColor', 'entityExecutionColorDark', 'entityExecutionColorLight', 'entityTradingAccountColor', 'entityTradingAccountColorDark', 'entityTradingAccountColorLight', 'entityTradePlanColor', 'entityTradePlanColorDark', 'entityTradePlanColorLight', 'entityCashFlowColor', 'entityCashFlowColorDark', 'entityCashFlowColorLight', 'entityPreferencesColor', 'entityPreferencesColorDark', 'entityPreferencesColorLight', 'entityResearchColor', 'entityResearchColorDark', 'entityResearchColorLight'],
             'status': ['statusOpenColor', 'statusClosedColor', 'statusCancelledColor'],
             'value': ['valuePositiveColor', 'valueNegativeColor', 'valueNeutralColor', 'valuePositiveColorLight', 'valuePositiveColorDark', 'valueNegativeColorLight', 'valueNegativeColorDark', 'valueNeutralColorLight', 'valueNeutralColorDark'],
             'theme': ['primaryColor', 'secondaryColor', 'successColor', 'dangerColor', 'warningColor', 'infoColor'],
-            'ui': ['backgroundColor', 'textColor', 'borderColor', 'shadowColor', 'highlightColor']
+            'ui': ['backgroundColor', 'textColor', 'linkColor', 'borderColor', 'shadowColor', 'highlightColor'],
+            'notifications': ['notificationSuccessColor', 'notificationErrorColor', 'notificationWarningColor', 'notificationInfoColor']
         };
         
         this.defaultColors = {
@@ -116,13 +117,20 @@ class ColorManager {
             'dangerColor': '#dc3545',
             'warningColor': '#ffc107',
             'infoColor': '#17a2b8',
+            'linkColor': '#26baac',
             
             // UI colors
             'backgroundColor': '#ffffff',
             'textColor': '#333333',
             'borderColor': '#dee2e6',
             'shadowColor': '#666666',
-            'highlightColor': '#007bff'
+            'highlightColor': '#007bff',
+            
+            // Notification colors
+            'notificationSuccessColor': '#28a745',
+            'notificationErrorColor': '#dc3545',
+            'notificationWarningColor': '#ffc107',
+            'notificationInfoColor': '#17a2b8'
         };
     }
     

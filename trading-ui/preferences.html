@@ -206,6 +206,13 @@
                                     </select>
                                 </div>
                             </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">גודל עמוד ברירת מחדל</label>
+                            <input type="number" id="pagination_size_default" name="pagination_size_default" class="form-control control-narrow" min="10" max="100" step="5">
+                            <small class="form-text text-muted">ערך מותר בין 10 ל-100 רשומות בעמוד</small>
+                        </div>
+                    </div>
                         </div>
                     </div>
                 </div>
@@ -463,6 +470,100 @@
                             </div>
                         </div>
                         
+                        <!-- הגדרות כלליות והתנהגות התראות -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="bi bi-sliders me-2"></i>
+                                            הגדרות כלליות להתראות
+                                        </h6>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="enableNotifications" name="enableNotifications" checked>
+                                            <label class="form-check-label" for="enableNotifications">
+                                                הפעלת מערכת ההתראות
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="notificationSound" name="notificationSound" checked>
+                                            <label class="form-check-label" for="notificationSound">
+                                                השמעת צליל בעת הופעת התראה
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="notificationPopup" name="notificationPopup" checked>
+                                            <label class="form-check-label" for="notificationPopup">
+                                                הצגת חלון קופץ להתראות חשובות
+                                            </label>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">משך הצגת התראה (שניות)</label>
+                                                <input type="number" class="form-control control-narrow" id="notificationDuration" name="notificationDuration" min="1" max="60" step="1">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">כמות מקסימלית בהיסטוריה</label>
+                                                <input type="number" class="form-control control-narrow" id="notificationMaxHistory" name="notificationMaxHistory" min="10" max="5000" step="10">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="bi bi-broadcast-pin me-2"></i>
+                                            ערוצי משלוח והתראות חכמות
+                                        </h6>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="enableRealtimeNotifications" name="enableRealtimeNotifications" checked>
+                                            <label class="form-check-label" for="enableRealtimeNotifications">
+                                                קבלת התראות בזמן אמת
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="enableBackgroundTaskNotifications" name="enableBackgroundTaskNotifications" checked>
+                                            <label class="form-check-label" for="enableBackgroundTaskNotifications">
+                                                התראות עבור משימות רקע
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="enableDataUpdateNotifications" name="enableDataUpdateNotifications" checked>
+                                            <label class="form-check-label" for="enableDataUpdateNotifications">
+                                                התראות על עדכון נתונים
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="enableExternalDataNotifications" name="enableExternalDataNotifications" checked>
+                                            <label class="form-check-label" for="enableExternalDataNotifications">
+                                                התראות על נתונים ממקורות חיצוניים
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="enableSystemEventNotifications" name="enableSystemEventNotifications" checked>
+                                            <label class="form-check-label" for="enableSystemEventNotifications">
+                                                התראות על אירועי מערכת
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="notifyOnTradeExecuted" name="notifyOnTradeExecuted" checked>
+                                            <label class="form-check-label" for="notifyOnTradeExecuted">
+                                                התראה על ביצוע טרייד
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notifyOnStopLoss" name="notifyOnStopLoss" checked>
+                                            <label class="form-check-label" for="notifyOnStopLoss">
+                                                התראה על הפעלת Stop Loss
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <!-- קטגוריות התראות ולוגים -->
                         <div class="row mt-4">
                             <div class="col-md-12">
@@ -527,6 +628,12 @@
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="console_logs_development_enabled">
+                                                        <label class="form-check-label" for="console_logs_development_enabled">
+                                                            לוגי פיתוח
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="console_logs_system_enabled">
                                                         <label class="form-check-label" for="console_logs_system_enabled">
                                                             לוגי מערכת כלליים
@@ -542,6 +649,12 @@
                                                         <input class="form-check-input" type="checkbox" id="console_logs_performance_enabled">
                                                         <label class="form-check-label" for="console_logs_performance_enabled">
                                                             לוגי ביצועים
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="console_logs_ui_enabled">
+                                                        <label class="form-check-label" for="console_logs_ui_enabled">
+                                                            לוגי ממשק משתמש
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
@@ -676,18 +789,6 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <!-- Development -->
-                        <div class="mb-3">
-                            <label class="form-label">כלי פיתוח:</label>
-                            <div class="d-flex gap-2 align-items-center">
-                                <label class="form-label mb-0">רגיל:</label>
-                                <input type="color" id="entityDevelopmentColor" class="form-control form-control-color color-picker" data-color-key="entityDevelopmentColor">
-                                <label class="form-label mb-0">בהיר:</label>
-                                <input type="color" id="entityDevelopmentColorLight" class="form-control form-control-color color-picker" data-color-key="entityDevelopmentColorLight">
-                                <label class="form-label mb-0">כהה:</label>
-                                <input type="color" id="entityDevelopmentColorDark" class="form-control form-control-color color-picker" data-color-key="entityDevelopmentColorDark">
-                            </div>
-                        </div>
                         <!-- Trade Plans -->
                         <div class="mb-3">
                             <label class="form-label">תכנוני טריידים:</label>
@@ -1168,9 +1269,46 @@
                          </div>
                  </div>
                      <!-- UI Content Section 7 End--> 
-                    
-    <!-- Preferences Form End -->
-    </form>
+
+        <!-- UI Content Section 8 Start - Preference Types Audit -->
+        <div class="content-section mt-4" id="section-preference-types" data-group="preference_types_audit">
+            <div class="section-header">
+                <h2>🧾 רשימת סוגי העדפות</h2>
+                <div style="display: flex; gap: 5px;">
+                    <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section-preference-types')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
+            </div>
+            <div class="section-body" style="display:none;">
+                <div class="alert alert-info" role="alert">
+                    הטבלה מציגה את כל סוגי ההעדפות הקיימים במסד הנתונים, משויכים לסקשן ולרכיב ה-HTML בעמוד הנוכחי. הנתונים מסודרים לפי מזהה.
+                </div>
+                <div id="preferenceTypesAuditContainer" class="table-responsive">
+                    <table class="table table-sm table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">מס'</th>
+                                <th scope="col"># מזהה</th>
+                                <th scope="col">קבוצה</th>
+                                <th scope="col">שם במסד נתונים</th>
+                                <th scope="col">סקשן בעמוד</th>
+                                <th scope="col">מזהה ב-HTML</th>
+                            </tr>
+                        </thead>
+                        <tbody id="preferenceTypesAuditTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">טוען נתונים...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- UI Content Section 8 End -->
+                     
+     <!-- Preferences Form End -->
+     </form>
 
             
             

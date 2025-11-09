@@ -42,7 +42,7 @@ class ColorManager {
         this.colorCache = new Map();
         this.colorGroups = {
             'chart': ['chartBackgroundColor', 'chartBorderColor', 'chartGridColor', 'chartPointColor', 'chartPrimaryColor', 'chartTextColor'],
-            'entity': ['entityAlertColor', 'entityAlertColorDark', 'entityAlertColorLight', 'entityInfoColor', 'entityInfoColorDark', 'entityInfoColorLight', 'entityNoteColor', 'entityNoteColorDark', 'entityNoteColorLight', 'entityTradeColor', 'entityTradeColorDark', 'entityTradeColorLight', 'entityTickerColor', 'entityTickerColorDark', 'entityTickerColorLight', 'entityExecutionColor', 'entityExecutionColorDark', 'entityExecutionColorLight', 'entityTradingAccountColor', 'entityTradingAccountColorDark', 'entityTradingAccountColorLight', 'entityTradePlanColor', 'entityTradePlanColorDark', 'entityTradePlanColorLight', 'entityCashFlowColor', 'entityCashFlowColorDark', 'entityCashFlowColorLight', 'entityPreferencesColor', 'entityPreferencesColorDark', 'entityPreferencesColorLight', 'entityResearchColor', 'entityResearchColorDark', 'entityResearchColorLight', 'entityDevelopmentColor', 'entityDevelopmentColorDark', 'entityDevelopmentColorLight'],
+            'entity': ['entityAlertColor', 'entityAlertColorDark', 'entityAlertColorLight', 'entityInfoColor', 'entityInfoColorDark', 'entityInfoColorLight', 'entityNoteColor', 'entityNoteColorDark', 'entityNoteColorLight', 'entityTradeColor', 'entityTradeColorDark', 'entityTradeColorLight', 'entityTickerColor', 'entityTickerColorDark', 'entityTickerColorLight', 'entityExecutionColor', 'entityExecutionColorDark', 'entityExecutionColorLight', 'entityTradingAccountColor', 'entityTradingAccountColorDark', 'entityTradingAccountColorLight', 'entityTradePlanColor', 'entityTradePlanColorDark', 'entityTradePlanColorLight', 'entityCashFlowColor', 'entityCashFlowColorDark', 'entityCashFlowColorLight', 'entityPreferencesColor', 'entityPreferencesColorDark', 'entityPreferencesColorLight', 'entityResearchColor', 'entityResearchColorDark', 'entityResearchColorLight'],
             'status': ['statusOpenColor', 'statusClosedColor', 'statusCancelledColor'],
             'value': ['valuePositiveColor', 'valueNegativeColor', 'valueNeutralColor', 'valuePositiveColorLight', 'valuePositiveColorDark', 'valueNegativeColorLight', 'valueNegativeColorDark', 'valueNeutralColorLight', 'valueNeutralColorDark'],
             'theme': ['primaryColor', 'secondaryColor', 'successColor', 'dangerColor', 'warningColor', 'infoColor'],
@@ -93,9 +93,6 @@ class ColorManager {
             'entityResearchColor': '#9c27b0',
             'entityResearchColorDark': '#7b1fa2',
             'entityResearchColorLight': '#ba68c8',
-            'entityDevelopmentColor': '#26baac',
-            'entityDevelopmentColorDark': '#1a8f83',
-            'entityDevelopmentColorLight': '#6ed8ca',
             
             // Status colors
             'statusOpenColor': '#28a745',

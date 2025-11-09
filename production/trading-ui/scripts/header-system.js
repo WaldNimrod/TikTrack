@@ -1872,11 +1872,12 @@ function updateFilterSelections(filters) {
   // Map backend preference values (English keys) to UI values (Hebrew labels)
   const mapToUi = {
     // generic
-    all: 'הכול',
+    all: 'הכל',
     // status values
     open: 'פתוח',
     closed: 'סגור',
-    cancelled: 'בוטל',
+    cancelled: 'מבוטל',
+    canceled: 'מבוטל',
     // type values (case insensitive)
     swing: 'סווינג',
     Swing: 'סווינג',
@@ -1885,19 +1886,21 @@ function updateFilterSelections(filters) {
     passive: 'פסיבי',
     Passive: 'פסיבי',
     // date ranges
-    all_time: 'כל זמן',
-    any: 'כל זמן',
-    everything: 'כל זמן',
+    all_time: 'כל הזמן',
+    any: 'כל הזמן',
+    everything: 'כל הזמן',
     today: 'היום',
     yesterday: 'אתמול',
     this_week: 'השבוע',
-    last_7_days: 'שבוע',
+    last_week: 'השבוע שעבר',
     this_month: 'החודש',
+    last_month: 'החודש שעבר',
     this_year: 'השנה',
-    last_year: 'שנה קודמת',
-    last_month: 'חודש קודם',
-    last_week: 'שבוע קודם',
-    last_30_days: 'שנה' // נשתמש ב-365 ימים (שנה) כקרוב ביותר ל-30 ימים
+    last_year: 'השנה שעברה',
+    last_7_days: '7 ימים אחרונים',
+    last_30_days: '30 ימים אחרונים',
+    last_90_days: '90 ימים אחרונים',
+    custom: 'מותאם אישית'
   };
 
   const normalizeMulti = (val) => {

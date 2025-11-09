@@ -158,6 +158,28 @@ function toDateObject(value) {
       }
     }
 
+    const hebrewDateTimeMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/);
+    if (hebrewDateTimeMatch) {
+      const [, day, month, year, hour, minute] = hebrewDateTimeMatch;
+      parsed = Date.parse(
+        `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00Z`
+      );
+      if (!Number.isNaN(parsed)) {
+        return new Date(parsed);
+      }
+    }
+
+    const hebrewDateTimePipeMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*\|\s*(\d{1,2}):(\d{2})$/);
+    if (hebrewDateTimePipeMatch) {
+      const [, day, month, year, hour, minute] = hebrewDateTimePipeMatch;
+      parsed = Date.parse(
+        `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00Z`
+      );
+      if (!Number.isNaN(parsed)) {
+        return new Date(parsed);
+      }
+    }
+
     const hebrewMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if (hebrewMatch) {
       const [, day, month, year] = hebrewMatch;

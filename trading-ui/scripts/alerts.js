@@ -595,19 +595,26 @@ function updateAlertsTable(alerts) {
       const symbolDisplay = window.getRelatedObjectSymbol ? 
         window.getRelatedObjectSymbol(alert, dataSources) : '-';
 
+      const createdRawEnvelope =
+        alert.created_at_envelope ||
+        alert.createdAtEnvelope ||
+        alert.created_atEnvelope ||
+        alert.createdAt_envelope ||
+        null;
+      const createdSource =
+        createdRawEnvelope ||
+        alert.created_at ||
+        alert.createdAt ||
+        alert.created_at_utc ||
+        alert.createdAtUtc ||
+        alert.created_at_iso ||
+        alert.createdAtIso ||
+        alert.created_at_local ||
+        alert.createdAtLocal ||
+        null;
       const createdEnvelope = window.dateUtils?.ensureDateEnvelope
-        ? window.dateUtils.ensureDateEnvelope(
-            alert.created_at ||
-            alert.createdAt ||
-            alert.created_at_utc ||
-            alert.createdAtUtc ||
-            alert.created_at_iso ||
-            alert.createdAtIso ||
-            alert.created_at_local ||
-            alert.createdAtLocal ||
-            null
-          )
-        : (alert.created_at || alert.createdAt || null);
+        ? window.dateUtils.ensureDateEnvelope(createdSource)
+        : createdSource;
       const createdDateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(createdEnvelope || null)
         : (createdEnvelope ? new Date(createdEnvelope) : null);
@@ -646,19 +653,26 @@ function updateAlertsTable(alerts) {
             }
           })();
 
+      const triggeredRawEnvelope =
+        alert.triggered_at_envelope ||
+        alert.triggeredAtEnvelope ||
+        alert.triggered_atEnvelope ||
+        alert.triggeredAt_envelope ||
+        null;
+      const triggeredSource =
+        triggeredRawEnvelope ||
+        alert.triggered_at ||
+        alert.triggeredAt ||
+        alert.triggered_at_utc ||
+        alert.triggeredAtUtc ||
+        alert.triggered_at_iso ||
+        alert.triggeredAtIso ||
+        alert.triggered_at_local ||
+        alert.triggeredAtLocal ||
+        null;
       const triggeredEnvelope = window.dateUtils?.ensureDateEnvelope
-        ? window.dateUtils.ensureDateEnvelope(
-            alert.triggered_at ||
-            alert.triggeredAt ||
-            alert.triggered_at_utc ||
-            alert.triggeredAtUtc ||
-            alert.triggered_at_iso ||
-            alert.triggeredAtIso ||
-            alert.triggered_at_local ||
-            alert.triggeredAtLocal ||
-            null
-          )
-        : (alert.triggered_at || alert.triggeredAt || null);
+        ? window.dateUtils.ensureDateEnvelope(triggeredSource)
+        : triggeredSource;
       const triggeredDateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(triggeredEnvelope || null)
         : (triggeredEnvelope ? new Date(triggeredEnvelope) : null);
@@ -746,9 +760,16 @@ function updateAlertsTable(alerts) {
         triggeredBorderColor = '#6c757d';
       }
 
+      const expiryRawEnvelope =
+        alert.expiry_date_envelope ||
+        alert.expiryDateEnvelope ||
+        alert.expiry_dateEnvelope ||
+        alert.expiryDate_envelope ||
+        null;
+      const expirySource = expiryRawEnvelope || alert.expiry_date || alert.expiryDate || null;
       const expiryEnvelope = window.dateUtils?.ensureDateEnvelope
-        ? window.dateUtils.ensureDateEnvelope(alert.expiry_date)
-        : alert.expiry_date;
+        ? window.dateUtils.ensureDateEnvelope(expirySource)
+        : expirySource;
       const expiryDateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(expiryEnvelope || null)
         : (expiryEnvelope ? new Date(expiryEnvelope) : null);
@@ -1121,8 +1142,16 @@ function populateSelect(selectId, data, field, prefix = '') {
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
       const side = item.side || 'לא מוגדר';
       const investmentType = item.investment_type || 'לא מוגדר';
-      const date = item.created_at || item.date;
-      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(date) : date;
+      const dateRawEnvelope =
+        item.created_at_envelope ||
+        item.createdAtEnvelope ||
+        item.created_atEnvelope ||
+        item.createdAt_envelope ||
+        item.date_envelope ||
+        item.dateEnvelope ||
+        null;
+      const dateSource = dateRawEnvelope || item.created_at || item.date || null;
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateSource) : dateSource;
       const dateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(dateEnvelope || null)
         : (dateEnvelope ? new Date(dateEnvelope) : null);
@@ -1146,8 +1175,16 @@ function populateSelect(selectId, data, field, prefix = '') {
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
       const side = item.side || 'לא מוגדר';
       const investmentType = item.investment_type || 'לא מוגדר';
-      const date = item.created_at || item.date;
-      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(date) : date;
+      const dateRawEnvelopePlan =
+        item.created_at_envelope ||
+        item.createdAtEnvelope ||
+        item.created_atEnvelope ||
+        item.createdAt_envelope ||
+        item.date_envelope ||
+        item.dateEnvelope ||
+        null;
+      const planDateSource = dateRawEnvelopePlan || item.created_at || item.date || null;
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(planDateSource) : planDateSource;
       const dateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(dateEnvelope || null)
         : (dateEnvelope ? new Date(dateEnvelope) : null);
@@ -2743,19 +2780,26 @@ function updateAlertsSummary(alerts) {
   weekAgo.setDate(weekAgo.getDate() - 7);
 
   const getCreatedMs = (alert) => {
+    const createdRawEnvelope =
+      alert.created_at_envelope ||
+      alert.createdAtEnvelope ||
+      alert.created_atEnvelope ||
+      alert.createdAt_envelope ||
+      null;
+    const createdSource =
+      createdRawEnvelope ||
+      alert.created_at ||
+      alert.createdAt ||
+      alert.created_at_utc ||
+      alert.createdAtUtc ||
+      alert.created_at_iso ||
+      alert.createdAtIso ||
+      alert.created_at_local ||
+      alert.createdAtLocal ||
+      null;
     const envelope = window.dateUtils?.ensureDateEnvelope
-      ? window.dateUtils.ensureDateEnvelope(
-          alert.created_at ||
-          alert.createdAt ||
-          alert.created_at_utc ||
-          alert.createdAtUtc ||
-          alert.created_at_iso ||
-          alert.createdAtIso ||
-          alert.created_at_local ||
-          alert.createdAtLocal ||
-          null
-        )
-      : (alert.created_at || alert.createdAt || null);
+      ? window.dateUtils.ensureDateEnvelope(createdSource)
+      : createdSource;
     if (!envelope) {return null;}
     const ms = window.dateUtils?.getEpochMilliseconds
       ? window.dateUtils.getEpochMilliseconds(envelope)

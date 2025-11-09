@@ -11,9 +11,11 @@ Last Updated: 2025-01-16
 
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import hashlib
 import re
+
+from services.date_normalization_service import DateNormalizationService
 
 class BaseConnector(ABC):
     """
@@ -27,6 +29,7 @@ class BaseConnector(ABC):
         """Initialize the connector"""
         self.provider_name = self.get_provider_name()
         self.source_value = self.get_source_value()
+        self._date_normalizer = DateNormalizationService()
     
     @abstractmethod
     def detect_format(self, file_content: str) -> bool:
@@ -133,26 +136,22 @@ class BaseConnector(ABC):
         Returns:
             str: Formatted date string
         """
-        if isinstance(date_value, datetime):
-            return date_value.strftime('%Y-%m-%d')
-        elif isinstance(date_value, str):
-            # Try to parse common date formats
-            try:
-                # Try ISO format first
-                dt = datetime.fromisoformat(date_value.replace('Z', '+00:00'))
-                return dt.strftime('%Y-%m-%d')
-            except ValueError:
-                # Try other common formats
-                for fmt in ['%Y-%m-%d', '%Y/%m/%d', '%d/%m/%Y', '%m/%d/%Y']:
-                    try:
-                        dt = datetime.strptime(date_value, fmt)
-                        return dt.strftime('%Y-%m-%d')
-                    except ValueError:
-                        continue
-                # If all else fails, use the string as-is (cleaned)
-                return re.sub(r'[^a-zA-Z0-9_-]', '_', str(date_value))
-        else:
-            return str(date_value)
+        normalized_dt = self._coerce_to_datetime(date_value)
+        if normalized_dt:
+            if normalized_dt.tzinfo is None:
+                normalized_dt = normalized_dt.replace(tzinfo=timezone.utc)
+            return normalized_dt.isoformat().replace('+00:00', 'Z')
+
+        if isinstance(date_value, dict):
+            if date_value.get('utc'):
+                return re.sub(r'[^a-zA-Z0-9_-]', '_', str(date_value['utc']))
+            if date_value.get('local'):
+                return re.sub(r'[^a-zA-Z0-9_-]', '_', str(date_value['local']))
+
+        if isinstance(date_value, str):
+            return re.sub(r'[^a-zA-Z0-9_-]', '_', date_value)
+
+        return re.sub(r'[^a-zA-Z0-9_-]', '_', str(date_value))
     
     def validate_record(self, record: Dict[str, Any]) -> List[str]:
         """
@@ -199,13 +198,31 @@ class BaseConnector(ABC):
         
         # Validate date
         if 'date' in record and record['date']:
-            try:
-                if isinstance(record['date'], str):
-                    datetime.fromisoformat(record['date'].replace('Z', '+00:00'))
-            except ValueError:
-                errors.append(f"Invalid date format: {record['date']}")
+            if self._coerce_to_datetime(record['date']) is None:
+                errors.append("Invalid date value: expected ISO string or DateEnvelope")
         
         return errors
+
+    def _coerce_to_datetime(self, value: Any) -> Optional[datetime]:
+        """
+        Convert supported date inputs (ISO string or DateEnvelope) into datetime.
+        """
+        if value is None:
+            return None
+
+        if isinstance(value, datetime):
+            return value
+
+        try:
+            normalized = self._date_normalizer.normalize_input_payload({'date': value})
+            if isinstance(normalized, dict):
+                candidate = normalized.get('date')
+                if isinstance(candidate, datetime):
+                    return candidate
+        except Exception:
+            return None
+
+        return None
     
     def process_file(self, file_content: str) -> Dict[str, Any]:
         """

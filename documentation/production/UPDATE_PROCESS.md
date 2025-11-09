@@ -414,6 +414,9 @@ echo "🎉 Production update completed successfully!"
 - `scripts/verify_production.sh` - בדיקת מבנה כללי
 - `production/Backend/config/settings.py` - **הגדרות פרודקשן (חייב להיות hardcoded!)**
 - `production/Backend/config/logging.py` - הגדרות לוגים (חייב להיות hardcoded!)
+- `production/Backend/routes/api/currencies.py` - **Endpoint מטבעות (משתמש ב-production DB)**
+- `production/trading-ui/scripts/trading_accounts.js` - **Rate limiting ו-debouncing**
+- `production/trading-ui/scripts/api-config.js` - הגדרות API מרכזיות
 - `production/Backend/scripts/create_production_db.py` - יצירת DB פרודקשן (כולל מיגרציות)
 - `production/Backend/scripts/cleanup_import_sessions.py` - ניקוי סשני ייבוא ישנים
 - `production/start_production.sh` - הפעלת שרת

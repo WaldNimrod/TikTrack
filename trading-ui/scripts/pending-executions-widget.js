@@ -179,8 +179,9 @@
                 ? primarySuggestion.match_reasons.join(' • ')
                 : '';
 
+            const scoreTooltip = 'טיקר תואם • חשבון מסחר תואם • תאריך בטווח הטרייד';
             const scoreBadge = typeof score === 'number'
-                ? `<span class="badge entity-trade">${score}</span>`
+                ? `<span class="badge entity-trade" data-tooltip="${scoreTooltip}" data-tooltip-placement="top" data-tooltip-trigger="hover">${score}</span>`
                 : '';
 
             const additionalText = additionalSuggestions > 0

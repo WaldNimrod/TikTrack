@@ -200,10 +200,6 @@
                 ? FieldRenderer.renderDate(primarySuggestion.created_at, false)
                 : (primarySuggestion?.created_at || '-');
 
-            const matchReasons = primarySuggestion?.match_reasons
-                ? primarySuggestion.match_reasons.join(' • ')
-                : '';
-
             const scoreTooltip = 'טיקר תואם • חשבון מסחר תואם • תאריך בטווח הטרייד';
             const scoreBadge = typeof score === 'number'
                 ? `<span class="badge entity-trade" data-tooltip="${scoreTooltip}" data-tooltip-placement="top" data-tooltip-trigger="hover">${score}</span>`

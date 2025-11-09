@@ -605,36 +605,55 @@ function updateAlertsTable(alerts) {
         alert.created_at_local,
         alert.createdAtLocal
       ];
-      const createdAtRaw = createdAtRawCandidates.find(value => {
+      const createdAtCandidate = createdAtRawCandidates.find(value => {
         if (!value) {return false;}
-        const normalized = String(value).trim();
-        return normalized && normalized.toLowerCase() !== 'none' && normalized.toLowerCase() !== 'null';
-      }) || '';
-
-      const createdDateObj = createdAtRaw
-        ? (window.parseDate ? window.parseDate(createdAtRaw) : new Date(createdAtRaw))
-        : null;
-
-      const createdAtDisplay = createdAtRaw
+        if (typeof value === 'string') {
+          const normalized = value.trim();
+          if (!normalized) {return false;}
+          const lower = normalized.toLowerCase();
+          return lower !== 'none' && lower !== 'null' && lower !== 'undefined';
+        }
+        return true;
+      }) || null;
+      const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(createdAtCandidate)
+        : createdAtCandidate;
+      const createdAtDisplay = createdEnvelope
         ? (
             window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function'
-              ? window.FieldRendererService.renderDate(createdAtRaw, true)
-              : window.formatDate
-                ? window.formatDate(createdAtRaw, true)
-                : (createdDateObj && !isNaN(createdDateObj.getTime()))
-                  ? createdDateObj.toLocaleString('he-IL', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })
-                  : 'לא מוגדר'
+              ? window.FieldRendererService.renderDate(createdEnvelope, true)
+              : window.dateUtils?.formatDate
+                ? window.dateUtils.formatDate(createdEnvelope, { includeTime: true })
+                : (() => {
+                    try {
+                      const parsed = new Date(createdEnvelope?.utc || createdEnvelope?.local || createdAtCandidate);
+                      if (!Number.isNaN(parsed.getTime())) {
+                        return parsed.toLocaleString('he-IL', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        });
+                      }
+                    } catch (error) {
+                      window.Logger?.warn('⚠️ createdAt fallback formatting failed', { error, alertId: alert?.id }, { page: 'alerts' });
+                    }
+                    return 'לא מוגדר';
+                  })()
           )
         : 'לא מוגדר';
-      const createdAtDataAttr = createdDateObj && !isNaN(createdDateObj?.getTime())
-        ? createdDateObj.toISOString()
-        : (createdAtRaw || '');
+      const createdAtDataAttr = window.dateUtils?.getEpochMilliseconds
+        ? window.dateUtils.getEpochMilliseconds(createdEnvelope || createdAtCandidate)
+        : (() => {
+            if (!createdAtCandidate) {return '';}
+            try {
+              const parsed = new Date(createdAtCandidate?.utc || createdAtCandidate?.local || createdAtCandidate);
+              return Number.isNaN(parsed.getTime()) ? '' : parsed.getTime();
+            } catch {
+              return '';
+            }
+          })();
 
       // המרת סטטוס לעברית להצגה
       // לפי הדוקומנטציה: open=פעיל, closed=הופעל, cancelled=בוטל
@@ -685,8 +704,42 @@ function updateAlertsTable(alerts) {
         triggeredBorderColor = '#6c757d';
       }
 
+      const expiryEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(alert.expiry_date)
+        : alert.expiry_date;
+      const expiryDisplay = expiryEnvelope
+        ? (
+            window.FieldRendererService?.renderDate
+              ? window.FieldRendererService.renderDate(expiryEnvelope, false)
+              : window.dateUtils?.formatDate
+                ? window.dateUtils.formatDate(expiryEnvelope, { includeTime: false })
+                : (() => {
+                    try {
+                      const parsed = new Date(expiryEnvelope?.utc || expiryEnvelope?.local || alert.expiry_date);
+                      if (!Number.isNaN(parsed.getTime())) {
+                        return parsed.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                      }
+                    } catch (error) {
+                      window.Logger?.warn('⚠️ expiry date fallback failed', { error, alertId: alert?.id }, { page: 'alerts' });
+                    }
+                    return '-';
+                  })()
+          )
+        : '-';
+      const expiryDataAttr = window.dateUtils?.getEpochMilliseconds
+        ? window.dateUtils.getEpochMilliseconds(expiryEnvelope || alert.expiry_date)
+        : (() => {
+            if (!alert.expiry_date) {return '';}
+            try {
+              const parsed = new Date(expiryEnvelope?.utc || expiryEnvelope?.local || alert.expiry_date);
+              return Number.isNaN(parsed.getTime()) ? '' : parsed.getTime();
+            } catch {
+              return '';
+            }
+          })();
+
       return `
-        <tr data-status="${alert.status || ''}" data-date="${alert.created_at || ''}">
+        <tr data-status="${alert.status || ''}" data-date="${createdAtDataAttr || ''}">
           <td class="related-cell">
             ${relatedCellHtml}
           </td>
@@ -722,8 +775,8 @@ function updateAlertsTable(alerts) {
           <td class="text-center">
             ${getConditionSourceDisplay(alert)}
           </td>
-          <td data-date="${createdAtDataAttr}"><span class="date-text">${createdAtDisplay}</span></td>
-          <td data-date="${alert.expiry_date || ''}"><span class="date-text">${alert.expiry_date ? new Date(alert.expiry_date).toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '-'}</span></td>
+          <td data-date="${createdAtDataAttr || ''}"><span class="date-text">${createdAtDisplay}</span></td>
+          <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${(() => {
               if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
@@ -1025,7 +1078,22 @@ function populateSelect(selectId, data, field, prefix = '') {
       const side = item.side || 'לא מוגדר';
       const investmentType = item.investment_type || 'לא מוגדר';
       const date = item.created_at || item.date;
-      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(date) : date;
+      const formattedDate = dateEnvelope
+        ? (window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(dateEnvelope, { includeTime: false })
+            : (() => {
+                try {
+                  const parsed = new Date(dateEnvelope?.utc || dateEnvelope?.local || date);
+                  if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleDateString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ populateSelect trade date fallback failed', { error, itemId: item?.id }, { page: 'alerts' });
+                }
+                return 'לא מוגדר';
+              })())
+        : 'לא מוגדר';
       displayText = `${symbol} | ${side} | ${investmentType} | ${formattedDate}`;
     } else if (prefix === 'תכנון') {
       // עבור תכנון: סימבול + צד + סוג השקעה + תאריך
@@ -1033,7 +1101,22 @@ function populateSelect(selectId, data, field, prefix = '') {
       const side = item.side || 'לא מוגדר';
       const investmentType = item.investment_type || 'לא מוגדר';
       const date = item.created_at || item.date;
-      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(date) : date;
+      const formattedDate = dateEnvelope
+        ? (window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(dateEnvelope, { includeTime: false })
+            : (() => {
+                try {
+                  const parsed = new Date(dateEnvelope?.utc || dateEnvelope?.local || date);
+                  if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleDateString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ populateSelect plan date fallback failed', { error, itemId: item?.id }, { page: 'alerts' });
+                }
+                return 'לא מוגדר';
+              })())
+        : 'לא מוגדר';
       displayText = `${symbol} | ${side} | ${investmentType} | ${formattedDate}`;
     } else {
       // עבור טיקר: רק סימבול
@@ -2604,18 +2687,61 @@ function updateAlertsSummary(alerts) {
   const newAlerts = alerts.filter(alert => alert.is_triggered === 'new').length;
   
   // התראות היום
-  const today = new Date().toDateString();
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfTomorrow = new Date(startOfToday);
+  startOfTomorrow.setDate(startOfToday.getDate() + 1);
+  const weekAgo = new Date(startOfToday);
+  weekAgo.setDate(weekAgo.getDate() - 7);
+
+  const getCreatedMs = (alert) => {
+    const candidates = [
+      alert.created_at,
+      alert.createdAt,
+      alert.created_at_utc,
+      alert.createdAtUtc,
+      alert.created_at_iso,
+      alert.createdAtIso,
+      alert.created_at_local,
+      alert.createdAtLocal
+    ];
+    const candidate = candidates.find(value => {
+      if (!value) {return false;}
+      if (typeof value === 'string') {
+        const normalized = value.trim();
+        if (!normalized) {return false;}
+        const lower = normalized.toLowerCase();
+        return lower !== 'none' && lower !== 'null' && lower !== 'undefined';
+      }
+      return true;
+    }) || null;
+    const envelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(candidate) : candidate;
+    if (window.dateUtils?.getEpochMilliseconds) {
+      const ms = window.dateUtils.getEpochMilliseconds(envelope || candidate);
+      return (ms || ms === 0) ? ms : null;
+    }
+    if (!candidate) {return null;}
+    try {
+      const parsed = new Date(envelope?.utc || envelope?.local || candidate);
+      return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
+    } catch {
+      return null;
+    }
+  };
+
   const todayAlerts = alerts.filter(alert => {
-    if (!alert.created_at) return false;
-    return new Date(alert.created_at).toDateString() === today;
+    const createdMs = getCreatedMs(alert);
+    if (createdMs === null) {return false;}
+    const createdDate = new Date(createdMs);
+    return createdDate >= startOfToday && createdDate < startOfTomorrow;
   }).length;
   
   // התראות השבוע
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
   const weekAlerts = alerts.filter(alert => {
-    if (!alert.created_at) return false;
-    return new Date(alert.created_at) >= weekAgo;
+    const createdMs = getCreatedMs(alert);
+    if (createdMs === null) {return false;}
+    const createdDate = new Date(createdMs);
+    return createdDate >= weekAgo;
   }).length;
 
   // עדכון האלמנטים

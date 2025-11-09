@@ -78,10 +78,11 @@ class FieldRendererService {
         
         const sideNormalized = side.toLowerCase();
         const isLong = sideNormalized === 'long';
-        const sideHebrew = isLong ? 'לונג' : 'שורט';
+        // Use arrow icons instead of text - up arrow for long (positive), down arrow for short (negative)
+        const sideIcon = isLong ? '↑' : '↓';
         const sideClass = isLong ? 'badge-long' : 'badge-short';
         
-        return `<span class="badge ${sideClass}">${sideHebrew}</span>`;
+        return `<span class="badge ${sideClass}" title="${isLong ? 'לונג' : 'שורט'}">${sideIcon}</span>`;
     }
 
     /**
@@ -998,23 +999,47 @@ class FieldRendererService {
      * const html2 = FieldRendererService.renderDate('2025-01-10T14:30:00', true);
      */
     static renderDate(date, includeTime = false) {
-        if (!date) return '-';
-        
-        // אם יש date-utils.js - השתמש בו
-        if (window.formatDate) {
+        if (!date && date !== 0) {
+            return '-';
+        }
+
+        const fmt = (envelope, fallback) => {
+            if (!envelope) {
+                return fallback;
+            }
+            if (typeof window.dateUtils?.formatEnvelope === 'function') {
+                return window.dateUtils.formatEnvelope(envelope, { includeTime });
+            }
+            if (typeof window.formatDate === 'function') {
+                return window.formatDate(envelope.local || envelope.utc || fallback, includeTime);
+            }
+            return fallback;
+        };
+
+        if (typeof date === 'object' && (date.epochMs || date.utc || date.local)) {
+            return fmt(date, date.display || '-');
+        }
+
+        const isoCandidate = typeof date === 'string' ? date : null;
+        if (isoCandidate && window.dateUtils?.parseEnvelope) {
+            const envelope = window.dateUtils.parseEnvelope({ utc: isoCandidate });
+            return fmt(envelope, isoCandidate);
+        }
+
+        if (typeof window.dateUtils?.formatDate === 'function') {
+            return window.dateUtils.formatDate(date, { includeTime });
+        }
+        if (typeof window.formatDate === 'function') {
             return window.formatDate(date, includeTime);
         }
-        
-        // Fallback
+
         try {
             const dateObj = new Date(date);
-            return dateObj.toLocaleDateString('he-IL', {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit'
-            });
-        } catch (e) {
-            return date;
+            return includeTime
+                ? dateObj.toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                : dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        } catch (error) {
+            return isoCandidate || '-';
         }
     }
 
@@ -1036,8 +1061,33 @@ class FieldRendererService {
      * // Output: '<span class="execution-date">15/01/24 | 14:30</span>'
      */
     static renderExecutionDate(date) {
-        if (!date) return '-';
-        
+        if (!date && date !== 0) {
+            return '-';
+        }
+
+        const fmt = (envelope, fallback) => {
+            if (!envelope) {
+                return fallback;
+            }
+        if (typeof window.dateUtils?.formatDate === 'function') {
+            return `<span class="execution-date">${window.dateUtils.formatDate(envelope, { includeTime: true, twoDigitYear: true })}</span>`;
+            }
+            if (typeof window.renderDate === 'function') {
+                return `<span class="execution-date">${window.renderDate(envelope.local || envelope.utc || fallback, true)}</span>`;
+            }
+            return fallback;
+        };
+
+        if (typeof date === 'object' && (date.epochMs || date.utc || date.local)) {
+            return fmt(date, date.display || '-');
+        }
+
+        const isoCandidate = typeof date === 'string' ? date : null;
+        if (isoCandidate && window.dateUtils?.parseEnvelope) {
+            const envelope = window.dateUtils.parseEnvelope({ utc: isoCandidate });
+            return fmt(envelope, isoCandidate);
+        }
+
         try {
             const dateObj = new Date(date);
             const dateStr = dateObj.toLocaleDateString('he-IL', {
@@ -1051,8 +1101,8 @@ class FieldRendererService {
                 hour12: false
             });
             return `<span class="execution-date">${dateStr} | ${timeStr}</span>`;
-        } catch (e) {
-            return date;
+        } catch (error) {
+            return isoCandidate || '-';
         }
     }
 

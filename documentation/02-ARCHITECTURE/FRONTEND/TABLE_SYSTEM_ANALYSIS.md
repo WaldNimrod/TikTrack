@@ -2,7 +2,10 @@
 ## ניתוח מקיף של מערכת הטבלאות
 
 **תאריך:** 2025-01-27  
+**עודכן:** 2025-01-27 - הושלמה מיגרציה למערכת מיון מאוחדת  
 **מטרה:** מיפוי מלא של כל הטבלאות במערכת לצורך יצירת מערכת טבלאות מרכזית מאוחדת
+
+**סטטוס:** ✅ כל הטבלאות המרכזיות רשומות ב-UnifiedTableSystem
 
 ---
 
@@ -82,11 +85,18 @@
 - `getSortState(tableType)` - קבלת מצב סידור
 - `updateSortIcons(tableType, columnIndex, direction)` - עדכון אייקוני סידור
 
-**בעיות זוהו:**
-1. רשימת if/else ארוכה (שורות 484-538) לכל טבלה - צריך לעדכן ידנית
-2. תלות במשתנים גלובליים (`window.cashFlowsData`, `window.alertsData`, וכו')
-3. תלות בפונקציות עדכון ידניות (`window.updateCashFlowsTable`, וכו')
-4. חתימות מרובות מבלבלות של `window.sortTable`
+**בעיות זוהו (תוקנו בינואר 2025):**
+1. ✅ **תוקן** - רשימת if/else ארוכה הוסרה, כל הטבלאות רשומות ב-UnifiedTableSystem
+2. ✅ **תוקן** - כל הטבלאות משתמשות ב-UnifiedTableSystem עם dataGetter
+3. ✅ **תוקן** - כל הטבלאות משתמשות ב-UnifiedTableSystem עם updateFunction
+4. ✅ **תוקן** - fallback code הוסר, אם טבלה לא רשומה מוצגת הודעת אזהרה
+
+**שינויים שבוצעו:**
+- כל 8 הטבלאות המרכזיות רשומות ב-UnifiedTableSystem
+- הסרת fallback code לחלוטין
+- הוספת הודעות אזהרה אם טבלה לא רשומה
+- שימוש רק ב-UnifiedCacheManager לשמירת מצב
+- תמיכה בסידור ברירת מחדל לכל טבלה
 
 **קוד בעייתי:**
 ```javascript
@@ -194,6 +204,34 @@ if (tableType === 'executions' && window.executionsData) {
 - `UnifiedCacheManager` - מטמון מאוחד
 
 **בעיה:** אין ניהול מצב מרכזי לטבלאות - מצב מפוזר על פני מספר מקומות
+
+### 2.8 DateEnvelope & Sort Value Adapter
+
+**קבצים:**  
+- `trading-ui/scripts/services/table-sort-value-adapter.js` (חדש)  
+- `trading-ui/scripts/table-mappings.js`  
+- `trading-ui/scripts/tables.js`
+
+**מטרה:** לגשר בין ה-DateEnvelope האחיד שמגיע מהשרת (UTC + epochMs + local) לבין ערכי המיון שהטבלאות מצפות לקבל.
+
+**עקרונות:**
+- כל שדה תאריך/זמן במיפויי הטבלה מקבל `sortType` המציין אם מדובר ב־`dateEnvelope`, `date`, `numeric` וכו'.
+- ה־Adapter ממיר Envelope ל־`epochMs` יציב, ומטפל גם בערכי legacy (מחרוזות ISO, timestamps).
+- `TableSorter` מפעיל fallback אוטומטי: אם העמודה מחזירה Envelope או אובייקט דומה, הוא משתמש ב־Adapter בלי צורך בלוגיקה פרטנית לכל טבלה.
+
+**זרימת עבודה:**  
+1. ה־API מחזיר `DateEnvelope` מלא (על פי `DATE_ENVELOPE_BLUEPRINT.md`) הכולל `utc`, `epochMs`, `local`, ו־`display`.  
+2. מיפוי העמודה מציין `sortType: 'dateEnvelope'` ושומר את הערך כפי שהתקבל.  
+3. בעת המיון `TableSortValueAdapter.getSortValue()` מחלץ את `epochMs` (או fallback רלוונטי) ומחזיר מספר יחיד ל־`TableSorter`.  
+4. ה־UI משתמש בשדה `display`/`local` להצגה, ללא צורך בהמרות חוזרות או `Date.parse` בשכבות אחרות.  
+5. במקרה של נתונים legacy (מחרוזות ISO), אותו Adapter מספק התנהגות עקבית עד להשלמת המעבר ל־Envelope.
+
+**יתרונות:**
+1. חיבור ישיר למסמך DATE_ENVELOPE_BLUEPRINT – אין יותר `Date.parse` אד-הוק.
+2. בקלות נוכל להרחיב לטיפוסים נוספים (למשל סכומים, אחוזים) תוך שמירה על API אחיד.
+3. מאפשר לנו להטמיע Envelope בכל ה־Endpoints בהדרגה, בלי לשבור טבלאות קיימות.
+
+**TODO קשור:** לעדכן את רשימת ה־sortTypes במיפויים ולעקוב אחרי הטמעה לכל הטבלאות (executions, trades, cash_flows וכו').
 
 ---
 

@@ -25,6 +25,35 @@ sortTableData(2, tradesData, 'trades', updateTradesTable);
 sortTableData(0, accountsData, 'accounts', updateAccountsTable);
 ```
 
+#### שימוש ב־TableSortValueAdapter
+
+בעת עבודה עם DateEnvelope (לפי DATE_ENVELOPE_BLUEPRINT) או פורמטים legacy, יש להשתמש ב־Adapter כדי להפיק sort key יציב:
+
+```javascript
+import { getSortValue } from '../../scripts/services/table-sort-value-adapter.js';
+
+const sortKey = getSortValue({
+  value: suggestion.trade_envelope,
+  type: 'dateEnvelope'
+});
+
+// sortKey מחזיר מספר (לרוב epochMs) שאותו נוכל להעביר ל-sortTableData
+sortTableData(5, data, 'trade_suggestions', updateTradeSuggestionsTable);
+```
+
+אם השרת עדיין מחזיר מחרוזות ISO ישנות, ניתן להעביר `type: 'date'` עד להשלמת המעבר ל־Envelope.
+
+> **הערה:** החל מגרסת 2.0.8 כל הגדרות העמודות ב־`table-mappings.js` כוללות `sortType`.  
+> - `sortType: 'dateEnvelope'` → ה־Adapter מצפה לאובייקט Envelope עם שדה `epochMs`.  
+> - `sortType: 'date'` → פורמט ISO legacy (מומר באמצעות `Date.parse`).  
+> - `sortType: 'numeric' | 'numeric-string' | 'boolean'` → מאפשר אחידות גם לערכים שאינם תאריכים.
+
+האינטגרציה בין Envelope ל־TableSorter מתבצעת כך:
+1. השירות בצד השרת עוטף כל שדה תאריך ב־Envelope.  
+2. המיפוי מציין `sortType` ומעביר את הערך כפי שהתקבל.  
+3. `getSortValue()` מחלץ sort key מספרי יציב (`epochMs` או fallback אחר).  
+4. שאר שכבות ה־UI מסתמכות על שדה `display` להצגה, ללא המרות נוספות.
+
 ### `sortTable(columnIndex, tableId)`
 מיון טבלה קיימת
 

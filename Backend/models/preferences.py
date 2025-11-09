@@ -111,3 +111,19 @@ class UserPreference(BaseModel):
 
 
 # UserPreferences model removed - using new dynamic preferences system
+
+
+class Preference(BaseModel):
+    """
+    Legacy compatibility model used by the historical test-suite.
+    Stores simple key/value preference pairs while reusing the shared BaseModel.
+    """
+    __tablename__ = 'preferences_legacy'
+
+    key = Column(String(150), nullable=False, unique=True)
+    value = Column(Text, nullable=True)
+    description = Column(Text, nullable=True)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    def __repr__(self):
+        return f"<Preference(key='{self.key}', value='{self.value}')>"

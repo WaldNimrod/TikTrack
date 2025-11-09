@@ -25,6 +25,7 @@
 | Select Populator Service | `trading-ui/scripts/services/select-populator-service.js` | [SELECT_POPULATOR_SERVICE.md](../02-ARCHITECTURE/FRONTEND/SELECT_POPULATOR_SERVICE.md) | מילוי Selectים מבוססי API כולל caching, fallback ושמירת העדפות |
 | Default Value Setter | `trading-ui/scripts/services/default-value-setter.js` | [SERVICES_INTEGRATION_COMPLETION_REPORT.md](SERVICES_INTEGRATION_COMPLETION_REPORT.md) | ברירות מחדל לטפסים (תאריך/שעה/העדפות) וטעינה מרוכזת |
 | Field Renderer Service | `trading-ui/scripts/services/field-renderer-service.js` | [field-renderer-service.md](../03-API_REFERENCE/field-renderer-service.md) | רינדור Status/Amount/Date/Badges אחיד לכל הטבלאות |
+| Table Sort Value Adapter | `trading-ui/scripts/services/table-sort-value-adapter.js` | [TABLE_SORTING_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/TABLE_SORTING_SYSTEM.md) | המרת DateEnvelope/ISO/מספרים לערכי מיון יציבים עבור UnifiedTableSystem |
 | Linked Items Service | `trading-ui/scripts/services/linked-items-service.js` | [LINKED_ITEMS_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/LINKED_ITEMS_SYSTEM.md) | רשימות פריטים מקושרים, פורמט תצוגה וכפתורי פעולה אחידים |
 | Alert Condition Renderer | `trading-ui/scripts/services/alert-condition-renderer.js` | [ALERT_CONDITION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/ALERT_CONDITION_SYSTEM.md) | רינדור תנאי התראות כולל תמיכה בשיטות המסחר |
 
@@ -49,6 +50,7 @@
 ### ♻️ מטמון, ביצועים וסנכרון
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
+| Cache Stage B-Lite (תצורה זמנית) | `trading-ui/scripts/unified-cache-manager.js`<br>`trading-ui/scripts/cache-clear-menu.js` (TODO) | [CACHE_STAGE_B_LITE.md](../03-DEVELOPMENT/CACHE_STAGE_B_LITE.md) | שכבות Memory/LocalStorage/IndexedDB פעילות, מטמון שרת כבוי (`CACHE_DISABLED=true`), כולל כפתורי ניקוי בתפריט המפתחים, ניהול מפתחות פרופיל (active profile / fallback) והנחיות לרענון נתונים |
 | Unified Cache Manager | `trading-ui/scripts/unified-cache-manager.js` | [CACHE_IMPLEMENTATION_GUIDE.md](../02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md) | בחירת שכבת מטמון (Memory/LocalStorage/IndexedDB/Backend) והחזרות TTL |
 | Cache Sync Manager | `trading-ui/scripts/cache-sync-manager.js` | [CACHE_IMPLEMENTATION_GUIDE.md](../02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md) | סנכרון Frontend ↔ Backend, ניהול invalidation והפעלת reload חובה |
 | Cache Policy Manager | `trading-ui/scripts/cache-policy-manager.js` | [CACHE_IMPLEMENTATION_GUIDE.md](../02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md) | כלל אחיד למדיניות מטמון לפי סוג נתון ותוקף |
@@ -70,8 +72,8 @@
 | Memory Optimizer (גרסה קודמת) | `trading-ui/scripts/memory-optimizer.js.backup` | כלול רק כגיבוי, ההגדרות מוזגו ל-Cache Policy |
 
 ### ✅ סיכום
-- **סה״כ מערכות פעילות מתועדות:** 27 (לפי הטבלאות לעיל).
+- **סה״כ מערכות פעילות מתועדות:** 28 (לפי הטבלאות לעיל).
 - **חובת שימוש:** לפני כל פיתוח חדש יש לבדוק התאמה למערכת קיימת ולהשתמש בה דרך ה-API המתועד.
-- **עדכון אחרון:** 7 בנובמבר 2025 (בהתאם למיפוי מאותו היום).
+- **עדכון אחרון:** 9 בנובמבר 2025 (בהתאם למיפוי מאותו היום).
 - **אחריות המשך:** כל מערכת חדשה שנכנסת לפרויקט חייבת להוסיף שורה בטבלה הרלוונטית + לינק לדוקומנטציה מעודכנת.
 

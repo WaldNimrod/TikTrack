@@ -197,18 +197,18 @@
             return `
                 <li class="list-group-item pending-highlight-item" ${itemIdAttr}>
                     <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-                        <div class="d-flex flex-column gap-1">
-                            <div class="d-flex align-items-center flex-wrap gap-2">
-                                ${executionLink}
-                                ${actionBadge}
-                                ${tickerLink}
-                                ${quantityDisplay}
-                            </div>
-                            <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
-                                <span>${executionDate}</span>
-                                ${accountLabel}
-                            </div>
+                    <div class="d-flex flex-column gap-1">
+                        <div class="d-flex align-items-center flex-wrap gap-2">
+                            ${executionLink}
+                            ${actionBadge}
+                            ${tickerLink}
+                            ${quantityDisplay}
                         </div>
+                        <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
+                            <span>${executionDate}</span>
+                            ${accountLabel}
+                        </div>
+                    </div>
                         <div class="d-flex flex-column align-items-end gap-1">
                             ${scoreBadge}
                             ${additionalText}

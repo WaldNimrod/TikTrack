@@ -63,7 +63,8 @@ def upload_and_preview():
         # Create database session
         from sqlalchemy import create_engine
         from sqlalchemy.orm import sessionmaker
-        engine = create_engine('sqlite:///db/simpleTrade_new.db')
+        from config.settings import DB_PATH  # Use production DB path
+        engine = create_engine(f'sqlite:///{DB_PATH}')
         Session = sessionmaker(bind=engine)
         db_session = Session()
         

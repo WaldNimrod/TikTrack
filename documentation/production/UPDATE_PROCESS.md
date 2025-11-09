@@ -414,6 +414,9 @@ echo "🎉 Production update completed successfully!"
 - `scripts/verify_production.sh` - בדיקת מבנה כללי
 - `production/Backend/config/settings.py` - **הגדרות פרודקשן (חייב להיות hardcoded!)**
 - `production/Backend/config/logging.py` - הגדרות לוגים (חייב להיות hardcoded!)
+- `production/Backend/routes/api/currencies.py` - **Endpoint מטבעות (משתמש ב-production DB)**
+- `production/trading-ui/scripts/trading_accounts.js` - **Rate limiting ו-debouncing**
+- `production/trading-ui/scripts/api-config.js` - הגדרות API מרכזיות
 - `production/Backend/scripts/create_production_db.py` - יצירת DB פרודקשן (כולל מיגרציות)
 - `production/Backend/scripts/cleanup_import_sessions.py` - ניקוי סשני ייבוא ישנים
 - `production/start_production.sh` - הפעלת שרת
@@ -430,8 +433,15 @@ echo "🎉 Production update completed successfully!"
 ---
 
 **עודכן:** 2025-11-09  
-**גרסה:** 1.2.0  
+**גרסה:** 1.3.0  
 **מטרה:** תהליך עדכון מסודר ומובנה
+
+## 📝 שינויים בגרסה 1.3.0
+
+- ✅ **תיקון Rate Limiting:** הוספת debouncing למניעת קריאות API מרובות ב-`trading_accounts.js`
+- ✅ **תיקון Currencies Endpoint:** תיקון נתיב DB ב-`currencies.py` לשימוש ב-production DB
+- ✅ **מניעת קריאות כפולות:** הוספת flags למניעת קריאות סימולטניות
+- ✅ **טיפול בשגיאות Rate Limit:** הוספת טיפול אוטומטי בשגיאות 429 עם retry logic
 
 ## 📝 שינויים בגרסה 1.2.0
 

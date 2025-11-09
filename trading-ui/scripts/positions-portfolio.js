@@ -468,13 +468,34 @@ function renderPositionsTable(positions) {
 async function populatePortfolioAccountSelector() {
     const selector = document.getElementById('portfolioAccountFilter');
     if (!selector) return;
-    
-    // Clear existing options (except first)
+
+    const previousValue = selector.value;
+
+    if (window.SelectPopulatorService?.populateAccountsSelect) {
+        try {
+            await window.SelectPopulatorService.populateAccountsSelect(selector, {
+                includeAll: true,
+                includeEmpty: true,
+                emptyText: 'כל חשבונות המסחר',
+                defaultValue: previousValue ? parseInt(previousValue, 10) || previousValue : null
+            });
+
+            if (previousValue) {
+                selector.value = previousValue;
+            }
+
+            window.Logger?.info('✅ Portfolio account selector populated via SelectPopulatorService', { page: "positions-portfolio" });
+            return;
+        } catch (error) {
+            window.Logger?.warn('⚠️ SelectPopulatorService.populateAccountsSelect failed, falling back to cached data', error, { page: "positions-portfolio" });
+        }
+    }
+
+    // Fallback: use cached trading_accountsData if available
     while (selector.options.length > 1) {
         selector.remove(1);
     }
     
-    // Add trading accounts - reuse logic from positions selector
     if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
         window.trading_accountsData.forEach(tradingAccount => {
             const option = document.createElement('option');
@@ -483,8 +504,12 @@ async function populatePortfolioAccountSelector() {
             selector.appendChild(option);
         });
     }
+
+    if (previousValue) {
+        selector.value = previousValue;
+    }
     
-    window.Logger.info(`✅ Portfolio trading account selector populated with ${selector.options.length - 1} trading accounts`, { page: "trading_accounts" });
+    window.Logger?.info(`✅ Portfolio trading account selector populated with ${selector.options.length - 1} trading accounts (fallback)`, { page: "positions-portfolio" });
 }
 
 /**
@@ -778,17 +803,43 @@ function setupSummaryToggle() {
 }
 
 /**
+ * Update portfolio summary toggle button state (icon, tooltip, accessibility)
+ */
+function updatePortfolioSummaryToggleButton() {
+    const toggleBtn = document.getElementById('portfolioSummaryToggleSize');
+    if (!toggleBtn) {
+        return;
+    }
+
+    const currentSize = window.positionsPortfolioState.summarySize || 'minimal';
+    const isMinimal = currentSize === 'minimal';
+    const nextActionLabel = isMinimal ? 'הצג סיכום מלא' : 'הצג סיכום מצומצם';
+    const expandIcon = window.BUTTON_ICONS?.VIEW || '👁️';
+    const collapseIcon = window.BUTTON_ICONS?.CLOSE || '✖️';
+
+    toggleBtn.textContent = isMinimal ? expandIcon : collapseIcon;
+    toggleBtn.setAttribute('title', nextActionLabel);
+    toggleBtn.setAttribute('aria-label', nextActionLabel);
+    toggleBtn.setAttribute('data-tooltip', nextActionLabel);
+    toggleBtn.setAttribute('data-bs-original-title', nextActionLabel);
+
+    if (window.bootstrap?.Tooltip) {
+        const tooltipInstance = window.bootstrap.Tooltip.getInstance(toggleBtn);
+        if (tooltipInstance) {
+            tooltipInstance.setContent({ '.tooltip-inner': nextActionLabel });
+        }
+    }
+}
+
+/**
  * Toggle portfolio summary size (minimal/full)
  * Called via data-onclick attribute
  */
 window.togglePortfolioSummarySize = function() {
-    const toggleBtn = document.getElementById('portfolioSummaryToggleSize');
-    if (!toggleBtn) return;
-    
-    const currentSize = window.positionsPortfolioState.summarySize;
+    const currentSize = window.positionsPortfolioState.summarySize || 'minimal';
     const newSize = currentSize === 'minimal' ? 'full' : 'minimal';
     window.positionsPortfolioState.summarySize = newSize;
-    toggleBtn.textContent = newSize === 'minimal' ? 'הצג מלא' : 'הצג מינימאלי';
+    updatePortfolioSummaryToggleButton();
     loadPortfolioSummary();
 };
 
@@ -796,6 +847,7 @@ window.togglePortfolioSummarySize = function() {
  * Load portfolio summary
  */
 async function loadPortfolioSummary() {
+    updatePortfolioSummaryToggleButton();
     const summaryElement = document.getElementById('portfolioSummaryStats');
     if (!summaryElement) return;
     

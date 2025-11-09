@@ -480,9 +480,10 @@ class FieldRendererService {
 
         let dateShort = '';
         if (metaObj && metaObj.date) {
+            const dateValue = metaObj.date;
             dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
-                ? FieldRendererService.renderDateShort(metaObj.date)
-                : FieldRendererService._formatDateDdMm(metaObj.date);
+                ? FieldRendererService.renderDateShort(dateValue)
+                : FieldRendererService._formatDateDdMm(dateValue);
         }
 
         if (renderMode === 'notes-table') {
@@ -570,9 +571,10 @@ class FieldRendererService {
             }
             // Show only day and month for trade plans
             if (metaObj && metaObj.date) {
+                const dateValue = metaObj.date;
                 dateShort = (typeof FieldRendererService !== 'undefined' && FieldRendererService.renderDateShort)
-                    ? FieldRendererService.renderDateShort(metaObj.date)
-                    : FieldRendererService._formatDateDdMm(metaObj.date);
+                    ? FieldRendererService.renderDateShort(dateValue)
+                    : FieldRendererService._formatDateDdMm(dateValue);
             }
         }
         
@@ -582,7 +584,8 @@ class FieldRendererService {
                 console.log('🔍 renderLinkedEntity DEBUG:', { metaObj, planned_amount: metaObj?.planned_amount, date: metaObj?.date });
                 const amount = metaObj && metaObj.planned_amount ? `$${Number(metaObj.planned_amount).toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '';
                 // Force DD/MM format for testing
-                const date = metaObj && metaObj.date ? FieldRendererService._formatDateDdMm(metaObj.date) : '';
+                const dateValue = metaObj && metaObj.date ? metaObj.date : null;
+                const date = dateValue ? FieldRendererService._formatDateDdMm(dateValue) : '';
                 console.log('🔍 renderLinkedEntity RESULT:', { amount, date, result: `${amount} ${date}`.trim() });
                 return `<a href="#" onclick="if (window.showEntityDetails) { showEntityDetails('trade_plan', ${relatedId}); } return false;" class="plan-link" data-plan-id="${relatedId}">${amount} ${date}</a>`.trim();
             }
@@ -811,10 +814,49 @@ class FieldRendererService {
     }
 
     static _formatDateDdMm(date) {
+        if (date === null || date === undefined || date === '') {
+            return '';
+        }
+
+        let resolvedDate = null;
+
         try {
-            const d = new Date(date);
-            const dd = String(d.getDate()).padStart(2, '0');
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            if (typeof window !== 'undefined' && window.dateUtils) {
+                const envelope = typeof window.dateUtils.ensureDateEnvelope === 'function'
+                    ? window.dateUtils.ensureDateEnvelope(date)
+                    : null;
+
+                if (envelope) {
+                    resolvedDate = typeof window.dateUtils.toDateObject === 'function'
+                        ? window.dateUtils.toDateObject(envelope)
+                        : (envelope.utc ? new Date(envelope.utc) : null);
+                }
+            }
+
+            if (!resolvedDate) {
+                if (date instanceof Date) {
+                    resolvedDate = date;
+                } else if (typeof date === 'object' && date !== null) {
+                    if (date.utc) {
+                        resolvedDate = new Date(date.utc);
+                    } else if (date.epochMs !== undefined) {
+                        resolvedDate = new Date(date.epochMs);
+                    } else if (date.local) {
+                        resolvedDate = new Date(date.local);
+                    }
+                }
+            }
+
+            if (!resolvedDate) {
+                resolvedDate = new Date(date);
+            }
+
+            if (!(resolvedDate instanceof Date) || Number.isNaN(resolvedDate.getTime())) {
+                return '';
+            }
+
+            const dd = String(resolvedDate.getDate()).padStart(2, '0');
+            const mm = String(resolvedDate.getMonth() + 1).padStart(2, '0');
             return `${dd}.${mm}`;
         } catch (e) {
             return '';

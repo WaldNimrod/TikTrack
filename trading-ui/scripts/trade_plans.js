@@ -2354,9 +2354,8 @@ function updateTradePlansTable(trade_plans) {
     const currentDisplay = formatCurrency(design.current || 0);
     const statusDisplay = window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status;
 
-    // Displaying ticker symbol or name with Entity Details link
+    // Displaying ticker symbol or name
     const tickerDisplay = design.ticker ? design.ticker.symbol || design.ticker.name || 'לא מוגדר' : 'לא מוגדר';
-    const tickerLink = design.id ? `<button class="btn btn-sm" onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('trade_plan', ${design.id}); }" title="קישור">🔗</button>` : '';
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = design.investment_type || '';
@@ -2365,12 +2364,9 @@ function updateTradePlansTable(trade_plans) {
     return `
       <tr>
         <td class="ticker-cell">
-          <div class="table-cell-flex-small">
-            ${tickerLink}
-            <span class="entity-trade-plan-badge entity-badge-base">
-              ${tickerDisplay}
-            </span>
-          </div>
+          <span class="entity-trade-plan-badge entity-badge-base">
+            ${tickerDisplay}
+          </span>
         </td>
         <td data-date="${design.created_at}">${(() => {
           if (design.created_at) {
@@ -2389,6 +2385,11 @@ function updateTradePlansTable(trade_plans) {
           }
           return `<span class="date-text">-</span>`;
         })()}</td>
+        <td class="status-cell" data-status="${statusForFilter}">
+          ${(window.FieldRendererService && window.FieldRendererService.renderStatus) 
+            ? window.FieldRendererService.renderStatus(design.status, 'trade_plan') 
+            : (window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge entity-badge-base">${statusDisplay}</span>`)}
+        </td>
         <td class="type-cell" data-type="${typeForFilter}">
           ${(window.FieldRendererService && window.FieldRendererService.renderType) 
             ? window.FieldRendererService.renderType(design.investment_type) 
@@ -2427,11 +2428,6 @@ function updateTradePlansTable(trade_plans) {
             const formatted = amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             return `<span class="amount-display">$${formatted}</span>`;
           })()}
-        </td>
-        <td class="status-cell" data-status="${statusForFilter}">
-          ${(window.FieldRendererService && window.FieldRendererService.renderStatus) 
-            ? window.FieldRendererService.renderStatus(design.status, 'trade_plan') 
-            : (window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge entity-badge-base">${statusDisplay}</span>`)}
         </td>
         <td class="reward-cell">
           ${(() => {

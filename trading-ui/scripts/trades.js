@@ -605,17 +605,13 @@ async function updateTradesTable(trades) {
 
     // שימוש ב-FieldRendererService לרינדור שדות
     const tickerDisplay = trade.ticker_symbol || getTickerSymbol(trade.ticker_id) || 'טיקר לא ידוע';
-    const tickerLink = `<button class="btn btn-sm btn-outline-secondary table-btn-small-12" onclick="viewTickerDetails('${trade.ticker_id}')" title="פרטי טיקר">🔗</button>`;
 
     return `
     <tr>
       <td class="ticker-cell">
-        <div class="table-cell-flex-small">
-          ${tickerLink}
-          <span class="entity-trade-badge entity-badge-base">
-            ${tickerDisplay}
-          </span>
-        </div>
+        <strong><span class="entity-trade-badge entity-badge-base">
+          ${tickerDisplay}
+        </span></strong>
       </td>
       <td class="price-cell">${(() => {
         const tickerData = tickerDataMap[trade.ticker_id];
@@ -645,7 +641,7 @@ async function updateTradesTable(trades) {
       <td class="position-quantity-cell">
         ${(() => {
           if (!trade.position || trade.position.quantity === 0) {
-            return '<span class="numeric-value-zero entity-badge-medium">אין ביצועים</span>';
+            return '<span class="numeric-value-zero">0</span>';
           }
           const qty = trade.position.quantity;
           const avgPrice = trade.position.average_price || 0;
@@ -694,22 +690,7 @@ async function updateTradesTable(trades) {
       <td class="side-cell" data-side="${trade.side || 'Long'}">
         ${window.FieldRendererService ? window.FieldRendererService.renderSide(trade.side) : `<span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>`}
       </td>
-      <td class="plan-cell">${trade.trade_plan_id ? (window.FieldRendererService ? (() => {
-        window.Logger.info('🔍 trades.js DEBUG:', { 
-          trade_plan_id: trade.trade_plan_id, 
-          trade_plan_planned_amount: trade.trade_plan_planned_amount, 
-          trade_plan_created_at: trade.trade_plan_created_at 
-        }, { page: "trades" });
-        const result = window.FieldRendererService.renderLinkedEntity('trade_plan', trade.trade_plan_id, trade.trade_plan_planned_amount || '', { 
-          ticker: trade.ticker_symbol, 
-          date: trade.trade_plan_created_at, 
-          planned_amount: trade.trade_plan_planned_amount, 
-          short: true 
-        });
-        window.Logger.info('🔍 trades.js RESULT:', result, { page: "trades" });
-        return result;
-      })() : `<span class="text-danger">❌ FieldRendererService לא זמין</span>`) : '-'}</td>
-      <td><strong><a href="#" onclick="viewAccountDetails('${trade.trading_account_id}')" class="account-link">${trade.account_name || trade.trading_account_id || 'חשבון מסחר לא ידוע'}</a></strong></td>
+      <td>${trade.account_name || trade.trading_account_id || 'חשבון מסחר לא ידוע'}</td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : ''}</td>
       <td class="actions-cell">

@@ -144,7 +144,7 @@ async function confirmDeleteCurrency() {
       }
     }
 
-    const response = await fetch(`http://localhost:8080/api/currencies/${id}`, {
+    const response = await fetch(`/api/currencies/${id}`, {
       method: 'DELETE',
     });
 

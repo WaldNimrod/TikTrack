@@ -54,8 +54,10 @@
                         </div>
                     </div>
                     <div class="section-body">
+                        <div id="profileContextBanner" class="alert profile-context-banner mb-3 d-none" role="status" aria-live="polite"></div>
                         <div class="info-summary" id="infoSummary">
-                            <div>פרופיפרופיל פעיל: <strong id="activeProfileName">טוען...</strong></div>
+                            <div>פרופיל פעיל: <strong id="activeProfileName">טוען...</strong></div>                                                           
+                            <div>משתמש פעיל: <strong id="activeUserName">טוען...</strong> <span class="text-muted small" id="activeUserId"></span></div>      
                             <div>מספר העדפות: <strong id="preferencesCount">טוען...</strong></div>
                             <div>מספר פרופילים: <strong id="profilesCount">טוען...</strong></div>
                             <div>מספר קבוצות: <strong id="groupsCount">טוען...</strong></div>
@@ -87,6 +89,10 @@
                                             <div class="flex-grow-1">
                                                 <h5 class="mb-1" id="activeProfileName_display">טוען...</h5>
                                                 <p class="text-muted mb-1 small" id="activeProfileDescription_display">טוען תיאור פרופיל...</p>
+                                                <div class="text-muted small">
+                                                    משתמש פעיל: <span id="activeUserName_display">טוען...</span>
+                                                    <span class="text-muted" id="activeUserId_display"></span>
+                                                </div>
                                                 <div class="badge bg-success small">פעיל</div>
                                             </div>
                                         </div>
@@ -583,6 +589,12 @@
                 <div class="section-body" style="display:none;">
                 <!-- Basic System Colors -->
                 <div class="row">
+                    <div class="col-12">
+                        <h5>צבעי בסיס</h5>
+                        <small class="text-muted">צבעים כלליים לממשק, רקע, טקסט וקישורים</small>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">צבע ראשי:</label>
@@ -593,9 +605,11 @@
                             <input type="color" id="secondaryColor" class="form-control form-control-color color-picker" data-color-key="secondaryColor">
                         </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">הצלחה:</label>
-                            <input type="color" id="successColor" class="form-control form-control-color color-picker" data-color-key="successColor">
+                            <label class="form-label mb-0 w-25">קישורים:</label>
+                            <input type="color" id="linkColor" class="form-control form-control-color color-picker" data-color-key="linkColor">
                         </div>
+                    </div>
+                    <div class="col-md-6">
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">רקע:</label>
                             <input type="color" id="backgroundColor" class="form-control form-control-color color-picker" data-color-key="backgroundColor">
@@ -605,7 +619,22 @@
                             <input type="color" id="textColor" class="form-control form-control-color color-picker" data-color-key="textColor">
                         </div>
                     </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <h5>צבעי מערכת מורחבים</h5>
+                        <small class="text-muted">צבעי עזר לכפתורים, מצבים ורכיבי UI</small>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 w-25">הצלחה:</label>
+                            <input type="color" id="successColor" class="form-control form-control-color color-picker" data-color-key="successColor">
+                        </div>
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">אזהרה:</label>
                             <input type="color" id="warningColor" class="form-control form-control-color color-picker" data-color-key="warningColor">
@@ -614,6 +643,8 @@
                             <label class="form-label mb-0 w-25">סכנה:</label>
                             <input type="color" id="dangerColor" class="form-control form-control-color color-picker" data-color-key="dangerColor">
                         </div>
+                    </div>
+                    <div class="col-md-6">
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label class="form-label mb-0 w-25">מידע:</label>
                             <input type="color" id="infoColor" class="form-control form-control-color color-picker" data-color-key="infoColor">
@@ -645,6 +676,18 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
+                        <!-- Development -->
+                        <div class="mb-3">
+                            <label class="form-label">כלי פיתוח:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <label class="form-label mb-0">רגיל:</label>
+                                <input type="color" id="entityDevelopmentColor" class="form-control form-control-color color-picker" data-color-key="entityDevelopmentColor">
+                                <label class="form-label mb-0">בהיר:</label>
+                                <input type="color" id="entityDevelopmentColorLight" class="form-control form-control-color color-picker" data-color-key="entityDevelopmentColorLight">
+                                <label class="form-label mb-0">כהה:</label>
+                                <input type="color" id="entityDevelopmentColorDark" class="form-control form-control-color color-picker" data-color-key="entityDevelopmentColorDark">
+                            </div>
+                        </div>
                         <!-- Trade Plans -->
                         <div class="mb-3">
                             <label class="form-label">תכנוני טריידים:</label>
@@ -795,27 +838,21 @@
                   </div>
                   <div class="row">
                       <div class="col-md-3">
-                          <div class="mb-3">
-                              <label class="form-label">פתוח:</label>
+                          <div class="mb-3 d-flex align-items-center gap-2">
+                              <label class="form-label mb-0 w-50">פתוחות:</label>
                               <input type="color" id="statusOpenColor" class="form-control form-control-color color-picker" data-color-key="statusOpenColor">
                           </div>
                       </div>
                       <div class="col-md-3">
-                          <div class="mb-3">
-                              <label class="form-label">סגור:</label>
+                          <div class="mb-3 d-flex align-items-center gap-2">
+                              <label class="form-label mb-0 w-50">סגורות:</label>
                               <input type="color" id="statusClosedColor" class="form-control form-control-color color-picker" data-color-key="statusClosedColor">
                           </div>
                       </div>
                       <div class="col-md-3">
-                          <div class="mb-3">
-                              <label class="form-label">מבוטל:</label>
+                          <div class="mb-3 d-flex align-items-center gap-2">
+                              <label class="form-label mb-0 w-50">מבוטלות:</label>
                               <input type="color" id="statusCancelledColor" class="form-control form-control-color color-picker" data-color-key="statusCancelledColor">
-                          </div>
-                      </div>
-                      <div class="col-md-3">
-                          <div class="mb-3">
-                              <label class="form-label">בהמתנה:</label>
-                              <input type="color" id="statusPendingColor" class="form-control form-control-color color-picker" data-color-key="statusPendingColor">
                           </div>
                       </div>
                   </div>
@@ -871,197 +908,266 @@
                       </div>
                   </div>
 
+                  <div class="section-divider"></div>
+                  
+                  <!-- Notification Colors -->
+                  <div class="row">
+                      <div class="col-12">
+                          <h5>צבעי התראות מערכת</h5>
+                          <small class="text-muted">צבעים לגבולות ולאייקונים של התראות הצלחה, שגיאה, אזהרה ומידע</small>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="mb-3 d-flex align-items-center gap-2">
+                              <label class="form-label mb-0 w-50">הצלחה:</label>
+                              <input type="color" id="notificationSuccessColor" class="form-control form-control-color color-picker" data-color-key="notificationSuccessColor">
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="mb-3 d-flex align-items-center gap-2">
+                              <label class="form-label mb-0 w-50">שגיאה:</label>
+                              <input type="color" id="notificationErrorColor" class="form-control form-control-color color-picker" data-color-key="notificationErrorColor">
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="mb-3 d-flex align-items-center gap-2">
+                              <label class="form-label mb-0 w-50">אזהרה:</label>
+                              <input type="color" id="notificationWarningColor" class="form-control form-control-color color-picker" data-color-key="notificationWarningColor">
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="mb-3 d-flex align-items-center gap-2">
+                              <label class="form-label mb-0 w-50">מידע:</label>
+                              <input type="color" id="notificationInfoColor" class="form-control form-control-color color-picker" data-color-key="notificationInfoColor">
+                          </div>
+                      </div>
+                  </div>
 
+             </div>
+ 
+                 <div class="section-divider"></div>
 
-
-                    </div>
-
-
-
-            
         <!-- UI Content Section 6 End--> 
       
-        <!-- UI Content Section 7 Start-->
-        <div class="content-section" id="section7" data-group="chart_settings_unified">
+        <!-- Preference Types Audit Section Start -->
+        <div class="content-section mt-4" id="section-preference-types" data-group="preference_types_audit">
             <div class="section-header">
-                <h2>📊 הגדרות גרפים</h2>
+                <h2>🧾 רשימת סוגי העדפות</h2>
                 <div style="display: flex; gap: 5px;">
-                    <button type="button" class="btn btn-success btn-sm" onclick="window.savePreferenceGroup('chart_settings_unified')">
-                        <i class="bi bi-save"></i> שמור
-                    </button>
-                    <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
+                    <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section-preference-types')" title="הצג/הסתר סקשן">
                         <span class="section-toggle-icon">▼</span>
                     </button>
                 </div>
             </div>
             <div class="section-body" style="display:none;">
-                <div class="row">
-                    <div class="col-12">
-                        <h5>צבעי גרפים</h5>
-                        <small class="text-muted">צבעים מיוחדים למערכת הגרפים</small>
-              </div>
-                    </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע ראשי לגרפים:</label>
-                            <input type="color" id="chartPrimaryColor" class="form-control form-control-color color-picker" data-color-key="chartPrimaryColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע רקע גרפים:</label>
-                            <input type="color" id="chartBackgroundColor" class="form-control form-control-color color-picker" data-color-key="chartBackgroundColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע טקסט גרפים:</label>
-                            <input type="color" id="chartTextColor" class="form-control form-control-color color-picker" data-color-key="chartTextColor">
-                  </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע רשת גרפים:</label>
-                            <input type="color" id="chartGridColor" class="form-control form-control-color color-picker" data-color-key="chartGridColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע גבול גרפים:</label>
-                            <input type="color" id="chartBorderColor" class="form-control form-control-color color-picker" data-color-key="chartBorderColor">
-                  </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 w-25">צבע נקודות גרפים:</label>
-                            <input type="color" id="chartPointColor" class="form-control form-control-color color-picker" data-color-key="chartPointColor">
-                  </div>
-              </div>
+                <div class="alert alert-info" role="alert">
+                    הטבלה מציגה את כל סוגי ההעדפות הקיימים במסד הנתונים, משויכים לסקשן ולרכיב ה-HTML בעמוד הנוכחי. הנתונים מסודרים לפי מזהה.
+                </div>
+                <div id="preferenceTypesAuditContainer" class="table-responsive">
+                    <table class="table table-sm table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">מס'</th>
+                                <th scope="col"># מזהה</th>
+                                <th scope="col">קבוצה</th>
+                                <th scope="col">שם במסד נתונים</th>
+                                <th scope="col">סקשן בעמוד</th>
+                                <th scope="col">מזהה ב-HTML</th>
+                            </tr>
+                        </thead>
+                        <tbody id="preferenceTypesAuditTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">טוען נתונים...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            
-                <div class="section-divider"></div>
-                
-                <!-- Chart Settings -->
-                <div class="row">
-                    <div class="col-12">
-                        <h5>הגדרות גרפים</h5>
-                        <small class="text-muted">הגדרות כלליות למערכת הגרפים</small>
-              </div>
-                  </div>
-                <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                            <label class="form-label">ריענון אוטומטי:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="chartAutoRefresh" checked>
-                                <label class="form-check-label" for="chartAutoRefresh">
-                                    הפעל ריענון אוטומטי של גרפים
-                                </label>
-                  </div>
-                </div>
-                        <div class="mb-3">
-                            <label class="form-label">מרווח ריענון (שניות):</label>
-                            <select id="chartRefreshInterval" class="form-select control-narrow">
-                                <option value="30">30 שניות</option>
-                                <option value="60" selected>1 דקה</option>
-                                <option value="300">5 דקות</option>
-                                <option value="600">10 דקות</option>
-                                <option value="1800">30 דקות</option>
-                </select>
-              </div>
-                        <div class="mb-3">
-                            <label class="form-label">איכות גרפים:</label>
-                            <select id="chartQuality" class="form-select control-narrow">
-                                <option value="low">נמוכה (מהיר)</option>
-                                <option value="medium" selected>בינונית</option>
-                                <option value="high">גבוהה (איטי)</option>
-                </select>
-                        </div>
-                    </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                            <label class="form-label">אנימציות גרפים:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="chartAnimations" checked>
-                                <label class="form-check-label" for="chartAnimations">
-                                    הפעל אנימציות בגרפים
-                                </label>
-                        </div>
-                    </div>
-                        <div class="mb-3">
-                            <label class="form-label">מצב אינטראקטיבי:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="chartInteractive" checked>
-                                <label class="form-check-label" for="chartInteractive">
-                                    הפעל מצב אינטראקטיבי
-                                </label>
-                  </div>
-                </div>
-                        <div class="mb-3">
-                            <label class="form-label">הצג כלי עזר:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="chartShowTooltips" checked>
-                                <label class="form-check-label" for="chartShowTooltips">
-                                    הצג כלי עזר (tooltips)
-                                </label>
-                  </div>
-                </div>
-                    </div>
-                  </div>
-            
-                <div class="section-divider"></div>
-                
-                <!-- Export Settings -->
-                <div class="row">
-                    <div class="col-12">
-                        <h5>הגדרות ייצוא</h5>
-                        <small class="text-muted">הגדרות ברירת מחדל לייצוא גרפים</small>
-              </div>
-                </div>
-                <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                            <label class="form-label">פורמט ברירת מחדל:</label>
-                            <select id="chartExportFormat" class="form-select control-narrow">
-                                <option value="png" selected>PNG</option>
-                                <option value="jpg">JPG</option>
-                                <option value="pdf">PDF</option>
-                                <option value="svg">SVG</option>
-                </select>
-              </div>
-                        <div class="mb-3">
-                            <label class="form-label">איכות ברירת מחדל:</label>
-                            <select id="chartExportQuality" class="form-select control-narrow">
-                                <option value="low">נמוכה</option>
-                                <option value="medium" selected>בינונית</option>
-                                <option value="high">גבוהה</option>
-                                <option value="ultra">אולטרה</option>
-                        </select>
-                    </div>
-                    </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                            <label class="form-label">רזולוציה ברירת מחדל:</label>
-                            <select id="chartExportResolution" class="form-select control-narrow">
-                                <option value="1x" selected>1x (רגיל)</option>
-                                <option value="2x">2x (רזולוציה גבוהה)</option>
-                                <option value="3x">3x (רזולוציה גבוהה מאוד)</option>
-                                <option value="4x">4x (רזולוציה גבוהה מאוד מאוד)</option>
-                                <option value="5x">5x (רזולוציה גבוהה מאוד מאוד מאוד)</option>
-                                <option value="6x">6x (רזולוציה גבוהה מאוד מאוד מאוד מאוד)</option>
-                                <option value="7x">7x (רזולוציה גבוהה מאוד מאוד מאוד מאוד מאוד)</option>
-                                <option value="8x">8x (רזולוציה גבוהה מאוד מאוד מאוד מאוד מאוד מאוד)</option>
-                                <option value="9x">9x (רזולוציה גבוהה מאוד מאוד מאוד מאוד מאוד מאוד מאוד)</option>
-                                <option value="10x">10x (רזולוציה גבוהה מאוד מאוד מאוד מאוד מאוד מאוד מאוד מאוד)</option>
-                        </select>
-                    </div>
-                        <div class="mb-3">
-                            <label class="form-label">כולל רקע:</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="chartExportBackground" checked>
-                                <label class="form-check-label" for="chartExportBackground">
-                                    כלול רקע בייצוא
-                                </label>
-                </div>
-                        </div>
-                        </div>
-                    </div>
-                        </div>
-                </div>
-                    <!-- UI Content Section 7 End--> 
+        </div>
+        <!-- Preference Types Audit Section End -->
+ 
+         <!-- UI Content Section 7 Start-->
+         <div class="content-section" id="section7" data-group="chart_settings_unified">
+             <div class="section-header">
+                 <h2>📊 הגדרות גרפים</h2>
+                 <div style="display: flex; gap: 5px;">
+                     <button type="button" class="btn btn-success btn-sm" onclick="window.savePreferenceGroup('chart_settings_unified')">
+                         <i class="bi bi-save"></i> שמור
+                     </button>
+                     <button type="button" class="btn btn-outline-warning" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
+                         <span class="section-toggle-icon">▼</span>
+                     </button>
+                 </div>
+             </div>
+             <div class="section-body" style="display:none;">
+                 <div class="row">
+                     <div class="col-12">
+                         <h5>צבעי גרפים</h5>
+                         <small class="text-muted">צבעים מיוחדים למערכת הגרפים</small>
+               </div>
+                     </div>
+                 <div class="row">
+                     <div class="col-md-6">
+                         <div class="mb-3 d-flex align-items-center gap-2">
+                             <label class="form-label mb-0 w-25">צבע ראשי לגרפים:</label>
+                             <input type="color" id="chartPrimaryColor" class="form-control form-control-color color-picker" data-color-key="chartPrimaryColor">
+               </div>
+                         <div class="mb-3 d-flex align-items-center gap-2">
+                             <label class="form-label mb-0 w-25">צבע רקע גרפים:</label>
+                             <input type="color" id="chartBackgroundColor" class="form-control form-control-color color-picker" data-color-key="chartBackgroundColor">
+               </div>
+                         <div class="mb-3 d-flex align-items-center gap-2">
+                             <label class="form-label mb-0 w-25">צבע טקסט גרפים:</label>
+                             <input type="color" id="chartTextColor" class="form-control form-control-color color-picker" data-color-key="chartTextColor">
+               </div>
+                     </div>
+                     <div class="col-md-6">
+                         <div class="mb-3 d-flex align-items-center gap-2">
+                             <label class="form-label mb-0 w-25">צבע רשת גרפים:</label>
+                             <input type="color" id="chartGridColor" class="form-control form-control-color color-picker" data-color-key="chartGridColor">
+               </div>
+                         <div class="mb-3 d-flex align-items-center gap-2">
+                             <label class="form-label mb-0 w-25">צבע גבול גרפים:</label>
+                             <input type="color" id="chartBorderColor" class="form-control form-control-color color-picker" data-color-key="chartBorderColor">
+               </div>
+                         <div class="mb-3 d-flex align-items-center gap-2">
+                             <label class="form-label mb-0 w-25">צבע נקודות גרפים:</label>
+                             <input type="color" id="chartPointColor" class="form-control form-control-color color-picker" data-color-key="chartPointColor">
+               </div>
+                 </div>
+             </div>
+         
+                 <div class="section-divider"></div>
+                 
+                 <!-- Chart Settings -->
+                 <div class="row">
+                     <div class="col-12">
+                         <h5>הגדרות גרפים</h5>
+                         <small class="text-muted">הגדרות כלליות למערכת הגרפים</small>
+               </div>
+                     </div>
+                 <div class="row">
+                                 <div class="col-md-6">
+                                     <div class="mb-3">
+                             <label class="form-label">ריענון אוטומטי:</label>
+                             <div class="form-check">
+                                 <input class="form-check-input" type="checkbox" id="chartAutoRefresh" checked>
+                                 <label class="form-check-label" for="chartAutoRefresh">
+                                     הפעל ריענון אוטומטי של גרפים
+                                 </label>
+                   </div>
+                 </div>
+                         <div class="mb-3">
+                             <label class="form-label">מרווח ריענון (שניות):</label>
+                             <select id="chartRefreshInterval" class="form-select control-narrow">
+                                 <option value="30">30 שניות</option>
+                                 <option value="60" selected>1 דקה</option>
+                                 <option value="300">5 דקות</option>
+                                 <option value="600">10 דקות</option>
+                                 <option value="1800">30 דקות</option>
+             </select>
+                   </div>
+                         <div class="mb-3">
+                             <label class="form-label">איכות גרפים:</label>
+                             <select id="chartQuality" class="form-select control-narrow">
+                                 <option value="low">נמוכה (מהיר)</option>
+                                 <option value="medium" selected>בינונית</option>
+                                 <option value="high">גבוהה (איטי)</option>
+             </select>
+                     </div>
+                     </div>
+                                 <div class="col-md-6">
+                                     <div class="mb-3">
+                             <label class="form-label">אנימציות גרפים:</label>
+                             <div class="form-check">
+                                 <input class="form-check-input" type="checkbox" id="chartAnimations" checked>
+                                 <label class="form-check-label" for="chartAnimations">
+                                     הפעל אנימציות בגרפים
+                                 </label>
+                         </div>
+                     </div>
+                         <div class="mb-3">
+                             <label class="form-label">מצב אינטראקטיבי:</label>
+                             <div class="form-check">
+                                 <input class="form-check-input" type="checkbox" id="chartInteractive" checked>
+                                 <label class="form-check-label" for="chartInteractive">
+                                     הפעל מצב אינטראקטיבי
+                                 </label>
+                   </div>
+                 </div>
+                         <div class="mb-3">
+                             <label class="form-label">הצג כלי עזר:</label>
+                             <div class="form-check">
+                                 <input class="form-check-input" type="checkbox" id="chartShowTooltips" checked>
+                                 <label class="form-check-label" for="chartShowTooltips">
+                                     הצג כלי עזר (tooltips)
+                                 </label>
+                   </div>
+                 </div>
+                     </div>
+                   </div>
+             
+                 <div class="section-divider"></div>
+                 
+                 <!-- Export Settings -->
+                 <div class="row">
+                     <div class="col-12">
+                         <h5>הגדרות ייצוא</h5>
+                         <small class="text-muted">הגדרות ברירת מחדל לייצוא גרפים</small>
+               </div>
+                     </div>
+                 <div class="row">
+                                 <div class="col-md-6">
+                                     <div class="mb-3">
+                             <label class="form-label">פורמט ברירת מחדל:</label>
+                             <select id="chartExportFormat" class="form-select control-narrow">
+                                 <option value="png" selected>PNG</option>
+                                 <option value="jpg">JPG</option>
+                                 <option value="pdf">PDF</option>
+                                 <option value="svg">SVG</option>
+             </select>
+                   </div>
+                         <div class="mb-3">
+                             <label class="form-label">איכות ברירת מחדל:</label>
+                             <select id="chartExportQuality" class="form-select control-narrow">
+                                 <option value="low">נמוכה</option>
+                                 <option value="medium" selected>בינונית</option>
+                                 <option value="high">גבוהה</option>
+                                 <option value="ultra">אולטרה</option>
+                     </select>
+                 </div>
+                         </div>
+                                 <div class="col-md-6">
+                                     <div class="mb-3">
+                             <label class="form-label">רזולוציה ברירת מחדל:</label>
+                             <select id="chartExportResolution" class="form-select control-narrow">
+                                 <option value="1x" selected>1x (רגיל)</option>
+                                 <option value="2x">2x (רזולוציה גבוהה)</option>
+                                 <option value="3x">3x (רזולוציה גבוהה מאוד)</option>
+                                 <option value="4x">4x (רזולוציה גבוהה מאוד מאוד)</option>
+                                 <option value="5x">5x (רזולוציה גבוהה מאוד מאוד מאוד)</option>
+                                 <option value="6x">6x (רזולוציה גבוהה מאוד מאוד מאוד מאוד)</option>
+                                 <option value="7x">7x (רזולוציה גבוהה מאוד מאוד מאוד מאוד מאוד)</option>
+                                 <option value="8x">8x (רזולוציה גבוהה מאוד מאוד מאוד מאוד מאוד מאוד)</option>
+                                 <option value="9x">9x (רזולוציה גבוהה מאוד מאוד מאוד מאוד מאוד מאוד מאוד)</option>
+                                 <option value="10x">10x (רזולוציה גבוהה מאוד מאוד מאוד מאוד מאוד מאוד מאוד מאוד)</option>
+                     </select>
+                 </div>
+                         <div class="mb-3">
+                             <label class="form-label">כולל רקע:</label>
+                             <div class="form-check">
+                                 <input class="form-check-input" type="checkbox" id="chartExportBackground" checked>
+                                 <label class="form-check-label" for="chartExportBackground">
+                                     כלול רקע בייצוא
+                                 </label>
+             </div>
+                             </div>
+                         </div>
+                     </div>
+                         </div>
+                 </div>
+                     <!-- UI Content Section 7 End--> 
                     
     <!-- Preferences Form End -->
     </form>
@@ -1255,6 +1361,7 @@
 
     <!-- [47] Page-specific: preferences -->
     <!-- Note: preferences.js removed - functionality moved to preferences-page.js and preferences-group-manager.js -->
+    <script src="scripts/preferences-page.js?v=1.0.0"></script>
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->

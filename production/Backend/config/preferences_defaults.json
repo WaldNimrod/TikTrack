@@ -33,20 +33,14 @@
   },
   
   "ui": {
-    "theme": "light",
-    "compactMode": false,
-    "showAnimations": true,
     "sidebarPosition": "right",
     "defaultPage": "dashboard",
     "table": {
-      "pageSize": 25,
       "showIcons": true,
       "autoRefresh": false,
       "refreshInterval": 30
     },
     "pagination": {
-      "pageSize_logs": 25,
-      "pageSize_unified-log-table": 25,
       "pageSize_default": 25
     },
     "charts": {

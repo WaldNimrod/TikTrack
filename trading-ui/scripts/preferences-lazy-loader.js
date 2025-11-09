@@ -46,8 +46,6 @@ class PreferenceClassifier {
                 'defaultTargetPrice',
                 
                 // Core display
-                'compactMode',
-                'tablePageSize',
                 'pagination_size_default',
                 
                 // Essential notifications
@@ -56,8 +54,10 @@ class PreferenceClassifier {
                 
                 // Core colors (most used)
                 'primaryColor',
+                'secondaryColor',
                 'backgroundColor',
                 'textColor',
+                'linkColor',
                 'dangerColor',
                 'successColor',
                 'warningColor',
@@ -77,7 +77,12 @@ class PreferenceClassifier {
                 'statusOpenColor',
                 'statusClosedColor',
                 'statusCancelledColor',
-                'statusPendingColor',
+                
+                // Notification colors
+                'notificationSuccessColor',
+                'notificationErrorColor',
+                'notificationWarningColor',
+                'notificationInfoColor',
                 
                 // Value colors
                 'valuePositiveColor',
@@ -147,14 +152,11 @@ class PreferenceClassifier {
                 'chartQuality',
                 
                 // UI preferences
-                'showAnimations',
-                'theme',
                 
                 // Advanced colors
                 'borderColor',
                 'shadowColor',
-                'highlightColor',
-                'secondaryColor'
+                'highlightColor'
             ]
         };
         
@@ -220,6 +222,8 @@ class LazyLoader {
         this.loadedPreferences = new Set();
         this.loadingPromises = new Map();
         this.backgroundLoader = null;
+        this.currentUserId = 1;
+        this.currentProfileId = 0;
         
         this.loadingStats = {
             critical: { loaded: 0, total: 0 },
@@ -247,6 +251,15 @@ class LazyLoader {
         const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : 0;
         window.Logger.info(`🔍 LAZY LOADER DEBUG: Using finalProfileId=${finalProfileId}`, { page: "preferences-lazy-loader" });
         
+        if (this.currentProfileId !== undefined && this.currentProfileId !== null && this.currentProfileId !== finalProfileId) {
+            window.Logger.info(`🔄 LAZY LOADER DEBUG: Profile changed from ${this.currentProfileId} to ${finalProfileId} - clearing internal state`, { page: "preferences-lazy-loader" });
+            this.loadedPreferences.clear();
+            this.loadingPromises.clear();
+        }
+        
+        this.currentUserId = userId;
+        this.currentProfileId = finalProfileId;
+        
         // Load critical preferences immediately
         await this.loadCriticalPreferences(userId, finalProfileId);
         
@@ -269,7 +282,12 @@ class LazyLoader {
         
         try {
             // Load all preferences at once from API
-            const response = await fetch(`/api/preferences/user?user_id=${userId}&profile_id=${profileId}`);
+            const url = new URL('/api/preferences/user', window.location.origin);
+            url.searchParams.append('user_id', userId);
+            if (profileId !== null && profileId !== undefined) {
+                url.searchParams.append('profile_id', profileId);
+            }
+            const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }

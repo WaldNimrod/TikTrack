@@ -43,7 +43,7 @@ class ColorManager {
         this.colorGroups = {
             'chart': ['chartBackgroundColor', 'chartBorderColor', 'chartGridColor', 'chartPointColor', 'chartPrimaryColor', 'chartTextColor'],
             'entity': ['entityAlertColor', 'entityAlertColorDark', 'entityAlertColorLight', 'entityInfoColor', 'entityInfoColorDark', 'entityInfoColorLight', 'entityNoteColor', 'entityNoteColorDark', 'entityNoteColorLight', 'entityTradeColor', 'entityTradeColorDark', 'entityTradeColorLight', 'entityTickerColor', 'entityTickerColorDark', 'entityTickerColorLight', 'entityExecutionColor', 'entityExecutionColorDark', 'entityExecutionColorLight', 'entityTradingAccountColor', 'entityTradingAccountColorDark', 'entityTradingAccountColorLight', 'entityTradePlanColor', 'entityTradePlanColorDark', 'entityTradePlanColorLight', 'entityCashFlowColor', 'entityCashFlowColorDark', 'entityCashFlowColorLight', 'entityPreferencesColor', 'entityPreferencesColorDark', 'entityPreferencesColorLight', 'entityResearchColor', 'entityResearchColorDark', 'entityResearchColorLight', 'entityDevelopmentColor', 'entityDevelopmentColorDark', 'entityDevelopmentColorLight'],
-            'status': ['statusOpenColor', 'statusClosedColor', 'statusCancelledColor', 'statusPendingColor'],
+            'status': ['statusOpenColor', 'statusClosedColor', 'statusCancelledColor'],
             'value': ['valuePositiveColor', 'valueNegativeColor', 'valueNeutralColor', 'valuePositiveColorLight', 'valuePositiveColorDark', 'valueNegativeColorLight', 'valueNegativeColorDark', 'valueNeutralColorLight', 'valueNeutralColorDark'],
             'theme': ['primaryColor', 'secondaryColor', 'successColor', 'dangerColor', 'warningColor', 'infoColor'],
             'ui': ['backgroundColor', 'textColor', 'borderColor', 'shadowColor', 'highlightColor']
@@ -97,7 +97,6 @@ class ColorManager {
             'statusOpenColor': '#28a745',
             'statusClosedColor': '#6c757d',
             'statusCancelledColor': '#dc3545',
-            'statusPendingColor': '#ffc107',
             
             // Value colors
             'valuePositiveColor': '#28a745',

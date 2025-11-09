@@ -1782,6 +1782,14 @@ function updateCSSVariablesFromPreferences(preferences) {
     if (preferences.inputBackground) {
       document.documentElement.style.setProperty('--input-background', preferences.inputBackground);
     }
+    if (preferences.backgroundColor) {
+      document.documentElement.style.setProperty('--background-color', preferences.backgroundColor);
+    }
+    if (preferences.linkColor) {
+      document.documentElement.style.setProperty('--link-color', preferences.linkColor);
+      const linkHoverColor = darkenColor(preferences.linkColor, 12);
+      document.documentElement.style.setProperty('--link-hover-color', linkHoverColor);
+    }
     if (preferences.textColor) {
       document.documentElement.style.setProperty('--text-color', preferences.textColor);
     }
@@ -2148,7 +2156,7 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
         const statusOpen = prefs.statusOpenColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-open-color') || '#28a745';
         const statusClosed = prefs.statusClosedColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-closed-color') || '#6c757d';
         const statusCancelled = prefs.statusCancelledColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-cancelled-color') || '#dc3545';
-        const statusPending = prefs.statusPendingColor || prefs.warningColor || getComputedStyle(document.documentElement).getPropertyValue('--warning-color') || '#ffc107';
+        const statusPending = prefs.warningColor || getComputedStyle(document.documentElement).getPropertyValue('--warning-color') || '#ffc107';
         docStyle.setProperty('--status-open-color', String(statusOpen).trim());
         docStyle.setProperty('--status-closed-color', String(statusClosed).trim());
         docStyle.setProperty('--status-cancelled-color', String(statusCancelled).trim());

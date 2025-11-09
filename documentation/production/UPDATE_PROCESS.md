@@ -430,8 +430,15 @@ echo "🎉 Production update completed successfully!"
 ---
 
 **עודכן:** 2025-11-09  
-**גרסה:** 1.2.0  
+**גרסה:** 1.3.0  
 **מטרה:** תהליך עדכון מסודר ומובנה
+
+## 📝 שינויים בגרסה 1.3.0
+
+- ✅ **תיקון Rate Limiting:** הוספת debouncing למניעת קריאות API מרובות ב-`trading_accounts.js`
+- ✅ **תיקון Currencies Endpoint:** תיקון נתיב DB ב-`currencies.py` לשימוש ב-production DB
+- ✅ **מניעת קריאות כפולות:** הוספת flags למניעת קריאות סימולטניות
+- ✅ **טיפול בשגיאות Rate Limit:** הוספת טיפול אוטומטי בשגיאות 429 עם retry logic
 
 ## 📝 שינויים בגרסה 1.2.0
 

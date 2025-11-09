@@ -59,8 +59,7 @@ async function loadTradePlansData() {
   try {
     // Loading trade plans data from server...
 
-    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const url = `${base}/api/trade_plans/`;
+    const url = '/api/trade_plans/';
 
     const response = await fetch(url);
 

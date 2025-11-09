@@ -1095,7 +1095,7 @@ class ExternalDataDashboard {
         systemInfo: {
           version: '2.0.5',
           environment: 'development',
-          server: 'localhost:8080'
+          server: window.location.host || 'localhost'
         },
         providers: [
           { name: 'Yahoo Finance', status: 'active', records: 1250, lastUpdate: new Date().toISOString() },

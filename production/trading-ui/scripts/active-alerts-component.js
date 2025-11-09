@@ -212,8 +212,7 @@ class ActiveAlertsComponent extends HTMLElement {
 
     this.isLoading = true;
     try {
-      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const response = await fetch(`${base}/api/alerts/unread`);
+      const response = await fetch('/api/alerts/unread');
       if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
 
       const apiData = await response.json();
@@ -451,9 +450,8 @@ class ActiveAlertsComponent extends HTMLElement {
       btn.style.opacity = '0.5';
     }
     try {
-      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const res = await fetch(
-        `${base}/api/alerts/${alertId}/mark-read`,
+        `/api/alerts/${alertId}/mark-read`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },

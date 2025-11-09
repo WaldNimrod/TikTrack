@@ -105,7 +105,32 @@ window.loadTradingAccountsDataForTradingAccountsPage = window.loadTradingAccount
 };
 
 // הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
+// Flag to prevent multiple simultaneous calls
+window._tradingAccountsLoadingInProgress = false;
+window._lastTradingAccountsLoadTime = 0;
+const TRADING_ACCOUNTS_LOAD_DEBOUNCE_MS = 2000; // Minimum 2 seconds between loads
+
 window.loadTradingAccountsDataForTradingAccountsPage = async function() {
+  // Debounce: Prevent multiple calls within short time
+  const now = Date.now();
+  if (window._tradingAccountsLoadingInProgress) {
+    window.Logger.warn('⚠️ קריאה ל-loadTradingAccountsDataForTradingAccountsPage נחסמה - טעינה כבר מתבצעת', { page: "trading_accounts" });
+    return;
+  }
+  
+  if (now - window._lastTradingAccountsLoadTime < TRADING_ACCOUNTS_LOAD_DEBOUNCE_MS) {
+    const timeSinceLastLoad = now - window._lastTradingAccountsLoadTime;
+    const waitTime = TRADING_ACCOUNTS_LOAD_DEBOUNCE_MS - timeSinceLastLoad;
+    window.Logger.warn(`⚠️ קריאה ל-loadTradingAccountsDataForTradingAccountsPage נדחתה - ממתין ${waitTime}ms`, { page: "trading_accounts" });
+    setTimeout(() => {
+      window.loadTradingAccountsDataForTradingAccountsPage();
+    }, waitTime);
+    return;
+  }
+  
+  window._tradingAccountsLoadingInProgress = true;
+  window._lastTradingAccountsLoadTime = now;
+  
   console.log('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀');
   window.Logger.info('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀', { page: "trading_accounts" });
   window.Logger.info('🔍 בדיקת זמינות פונקציות:', { page: "trading_accounts" });
@@ -219,6 +244,16 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
   } catch (error) {
     window.Logger.error('❌ שגיאה ב-loadTradingAccountsDataForTradingAccountsPage:', error, { page: "trading_accounts" });
     
+    // Check if it's a rate limit error
+    if (error.message && error.message.includes('RATE_LIMIT')) {
+      window.Logger.error('🚫 Rate limit exceeded - waiting before retry', { page: "trading_accounts" });
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('יותר מדי בקשות - ממתין לפני ניסיון חוזר', 'נסה שוב בעוד כמה שניות');
+      }
+      // Wait longer before allowing next call
+      window._lastTradingAccountsLoadTime = Date.now() + 10000; // Wait 10 seconds
+    }
+    
     // הצגת הודעת שגיאה למשתמש
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני חשבונות מסחר', error.message);
@@ -227,6 +262,9 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
     } else {
       alert('שגיאה בטעינת נתוני חשבונות מסחר: ' + error.message);
     }
+  } finally {
+    // Always reset the loading flag
+    window._tradingAccountsLoadingInProgress = false;
   }
 };
 
@@ -365,7 +403,32 @@ async function generateCurrencyOptions(tradingAccount = null) {
 }
 
 // פונקציה לטעינת חשבונות מהשרת
+// Flag to prevent multiple simultaneous calls to loadTradingAccountsFromServer
+window._loadTradingAccountsFromServerInProgress = false;
+window._lastLoadTradingAccountsFromServerTime = 0;
+const LOAD_TRADING_ACCOUNTS_DEBOUNCE_MS = 3000; // Minimum 3 seconds between loads
+
 async function loadTradingAccountsFromServer() {
+  // Debounce: Prevent multiple calls within short time
+  const now = Date.now();
+  if (window._loadTradingAccountsFromServerInProgress) {
+    window.Logger.warn('⚠️ קריאה ל-loadTradingAccountsFromServer נחסמה - טעינה כבר מתבצעת', { page: "trading_accounts" });
+    return window.trading_accountsData || [];
+  }
+  
+  if (now - window._lastLoadTradingAccountsFromServerTime < LOAD_TRADING_ACCOUNTS_DEBOUNCE_MS) {
+    const timeSinceLastLoad = now - window._lastLoadTradingAccountsFromServerTime;
+    window.Logger.warn(`⚠️ קריאה ל-loadTradingAccountsFromServer נדחתה - ממתין ${LOAD_TRADING_ACCOUNTS_DEBOUNCE_MS - timeSinceLastLoad}ms`, { page: "trading_accounts" });
+    // Return cached data if available
+    if (window.trading_accountsData && window.trading_accountsData.length > 0) {
+      return window.trading_accountsData;
+    }
+    return [];
+  }
+  
+  window._loadTradingAccountsFromServerInProgress = true;
+  window._lastLoadTradingAccountsFromServerTime = now;
+  
   window.Logger.info('🚀🚀🚀 loadTradingAccountsFromServer התחיל 🚀🚀🚀', { page: "trading_accounts" });
   try {
     // בדיקה אם יש token שמור
@@ -416,13 +479,49 @@ async function loadTradingAccountsFromServer() {
       // החזרת הנתונים לטעינה חוזרת
       return openTradingAccounts;
     } else {
+      // Check for rate limit error
+      if (response.status === 429) {
+        const errorData = await response.json().catch(() => ({}));
+        window.Logger.error('🚫 Rate limit exceeded in loadTradingAccountsFromServer', { page: "trading_accounts" });
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('יותר מדי בקשות - ממתין לפני ניסיון חוזר', 'נסה שוב בעוד כמה שניות');
+        }
+        // Wait longer before allowing next call
+        window._lastLoadTradingAccountsFromServerTime = Date.now() + 10000; // Wait 10 seconds
+        // Return cached data if available
+        if (window.trading_accountsData && window.trading_accountsData.length > 0) {
+          return window.trading_accountsData;
+        }
+        return [];
+      }
       window.Logger.warn('⚠️ תגובת שרת לא תקינה:', response.status, { page: "trading_accounts" });
       loadDefaultTradingAccounts();
+      return [];
     }
 
   } catch (error) {
     window.Logger.error('❌ שגיאה בטעינת חשבונות מהשרת:', error, { page: "trading_accounts" });
+    
+    // Check if it's a rate limit error
+    if (error.message && error.message.includes('RATE_LIMIT')) {
+      window.Logger.error('🚫 Rate limit exceeded - waiting before retry', { page: "trading_accounts" });
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('יותר מדי בקשות - ממתין לפני ניסיון חוזר', 'נסה שוב בעוד כמה שניות');
+      }
+      // Wait longer before allowing next call
+      window._lastLoadTradingAccountsFromServerTime = Date.now() + 10000; // Wait 10 seconds
+      // Return cached data if available
+      if (window.trading_accountsData && window.trading_accountsData.length > 0) {
+        return window.trading_accountsData;
+      }
+      return [];
+    }
+    
     loadDefaultTradingAccounts();
+    return [];
+  } finally {
+    // Always reset the loading flag
+    window._loadTradingAccountsFromServerInProgress = false;
   }
 }
 
@@ -505,7 +604,35 @@ function loadDefaultTradingAccounts() {
 // }
 
 // פונקציה לטעינת נתוני חשבונות מסחר מהשרת
+// Flag to prevent multiple simultaneous calls to loadTradingAccountsData
+window._loadTradingAccountsDataInProgress = false;
+window._lastLoadTradingAccountsDataTime = 0;
+const LOAD_TRADING_ACCOUNTS_DATA_DEBOUNCE_MS = 2000; // Minimum 2 seconds between loads
+
 async function loadTradingAccountsData() {
+  // Debounce: Prevent multiple calls within short time
+  const now = Date.now();
+  if (window._loadTradingAccountsDataInProgress) {
+    window.Logger.warn('⚠️ קריאה ל-loadTradingAccountsData נחסמה - טעינה כבר מתבצעת', { page: "trading_accounts" });
+    // Return cached data if available
+    if (window.trading_accountsData && window.trading_accountsData.length > 0) {
+      return window.trading_accountsData;
+    }
+    return [];
+  }
+  
+  if (now - window._lastLoadTradingAccountsDataTime < LOAD_TRADING_ACCOUNTS_DATA_DEBOUNCE_MS) {
+    window.Logger.warn(`⚠️ קריאה ל-loadTradingAccountsData נדחתה - ממתין`, { page: "trading_accounts" });
+    // Return cached data if available
+    if (window.trading_accountsData && window.trading_accountsData.length > 0) {
+      return window.trading_accountsData;
+    }
+    return [];
+  }
+  
+  window._loadTradingAccountsDataInProgress = true;
+  window._lastLoadTradingAccountsDataTime = now;
+  
   window.Logger.info('Loading trading accounts data (bypass cache)', { page: "trading_accounts" });
   try {
     // קריאה ישירה לשרת עם timestamp למניעת cache
@@ -518,6 +645,21 @@ async function loadTradingAccountsData() {
     });
     
     if (!response.ok) {
+      // Check for rate limit error
+      if (response.status === 429) {
+        const errorData = await response.json().catch(() => ({}));
+        window.Logger.error('🚫 Rate limit exceeded in loadTradingAccountsData', { page: "trading_accounts" });
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('יותר מדי בקשות - ממתין לפני ניסיון חוזר', 'נסה שוב בעוד כמה שניות');
+        }
+        // Wait longer before allowing next call
+        window._lastLoadTradingAccountsDataTime = Date.now() + 10000; // Wait 10 seconds
+        // Return cached data if available
+        if (window.trading_accountsData && window.trading_accountsData.length > 0) {
+          return window.trading_accountsData;
+        }
+        return [];
+      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
@@ -531,10 +673,29 @@ async function loadTradingAccountsData() {
     return trading_accounts;
   } catch (error) {
     window.Logger.error('Error loading trading accounts data', error, { page: "trading_accounts" });
+    
+    // Check for rate limit error
+    if (error.message && error.message.includes('RATE_LIMIT')) {
+      window.Logger.error('🚫 Rate limit exceeded - waiting before retry', { page: "trading_accounts" });
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('יותר מדי בקשות - ממתין לפני ניסיון חוזר', 'נסה שוב בעוד כמה שניות');
+      }
+      // Wait longer before allowing next call
+      window._lastLoadTradingAccountsDataTime = Date.now() + 10000; // Wait 10 seconds
+      // Return cached data if available
+      if (window.trading_accountsData && window.trading_accountsData.length > 0) {
+        return window.trading_accountsData;
+      }
+      return [];
+    }
+    
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני חשבונות מסחר', error.message);
     }
     throw error;
+  } finally {
+    // Always reset the loading flag
+    window._loadTradingAccountsDataInProgress = false;
   }
 }
 
@@ -937,18 +1098,41 @@ window.updateTradingAccountsTable = updateTradingAccountsTable;
 window.updateTradingAccountsSummary = updateTradingAccountsSummary;
 window.loadTradingAccounts = loadTradingAccounts;
 
+// Flag to prevent multiple simultaneous calls to refreshTradingAccountFilterMenu
+window._refreshTradingAccountFilterMenuInProgress = false;
+window._lastRefreshTradingAccountFilterMenuTime = 0;
+const REFRESH_FILTER_MENU_DEBOUNCE_MS = 2000; // Minimum 2 seconds between refreshes
+
 // פונקציה גלובלית לעדכון ידני של תפריט החשבונות
 window.refreshTradingAccountFilterMenu = function () {
+  // Debounce: Prevent multiple calls within short time
+  const now = Date.now();
+  if (window._refreshTradingAccountFilterMenuInProgress) {
+    return;
+  }
+  
+  if (now - window._lastRefreshTradingAccountFilterMenuTime < REFRESH_FILTER_MENU_DEBOUNCE_MS) {
+    return; // Skip if called too soon
+  }
+  
+  window._refreshTradingAccountFilterMenuInProgress = true;
+  window._lastRefreshTradingAccountFilterMenuTime = now;
+  
   try {
     if (window.trading_accountsData && window.trading_accountsData.length > 0) {
       if (typeof window.updateTradingAccountFilterMenu === 'function') {
         window.updateTradingAccountFilterMenu(window.trading_accountsData);
       }
     } else {
-      loadTradingAccountsFromServer();
+      // Only load if we don't have data and not already loading
+      if (!window._loadTradingAccountsFromServerInProgress) {
+        loadTradingAccountsFromServer();
+      }
     }
   } catch (error) {
     console.error('refreshTradingAccountFilterMenu failed:', error);
+  } finally {
+    window._refreshTradingAccountFilterMenuInProgress = false;
   }
 };
 
@@ -1052,15 +1236,19 @@ window.debugTradingAccountsFilter = function () {
     });
   }
 
-  // ניסיון לעדכן תפריט
+  // ניסיון לעדכן תפריט - עם debouncing מובנה בפונקציה
+  // Remove the nested setTimeout to prevent multiple rapid calls
   setTimeout(() => {
     if (typeof window.refreshTradingAccountFilterMenu === 'function') {
       window.refreshTradingAccountFilterMenu();
-      setTimeout(() => {
-        window.checkTradingAccountsStatus();
-      }, 500);
     }
-  }, 1000);
+    // Check status after a longer delay to avoid rapid calls
+    setTimeout(() => {
+      if (typeof window.checkTradingAccountsStatus === 'function') {
+        window.checkTradingAccountsStatus();
+      }
+    }, 2000); // Increased from 500ms to 2000ms
+  }, 2000); // Increased from 1000ms to 2000ms
 };
 
 // טעינת מטבעות בתחילת הטעינה
@@ -2039,9 +2227,16 @@ function showTradingAccountDetails(tradingAccountId) {
 window.showTradingAccountDetails = showTradingAccountDetails;
 
 // הוספת timeout לאתחול - אחרי שהפונקציות מיוצאות
+// Increased timeout to prevent conflicts with other initialization code
 setTimeout(() => {
-  window.Logger.info('⏰ Timeout 2 שניות - מתחיל אתחול', { page: "trading_accounts" });
+  window.Logger.info('⏰ Timeout 3 שניות - מתחיל אתחול', { page: "trading_accounts" });
   if (window.location.pathname.includes('/trading_accounts')) {
+    // Check if already loading to prevent duplicate calls
+    if (window._tradingAccountsLoadingInProgress) {
+      window.Logger.warn('⚠️ טעינה כבר מתבצעת - מדלג על אתחול כפול', { page: "trading_accounts" });
+      return;
+    }
+    
     window.Logger.info('🎯 נמצאים בדף החשבונות - מתחיל טעינת נתונים', { page: "trading_accounts" });
     window.Logger.info('🔍 בדיקת זמינות פונקציות:', { page: "trading_accounts" });
     window.Logger.info('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage, { page: "trading_accounts" });
@@ -2078,7 +2273,7 @@ setTimeout(() => {
       }
     }
   }
-}, 2000);
+}, 3000); // Increased from 2000ms to 3000ms to prevent conflicts
 
 window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "trading_accounts" });
 

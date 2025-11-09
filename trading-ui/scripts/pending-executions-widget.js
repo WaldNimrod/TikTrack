@@ -153,7 +153,28 @@
             const actionBadge = FieldRenderer?.renderAction?.(execution.action) || `<span class="badge bg-secondary">${execution.action || '-'}</span>`;
             const quantityDisplay = FieldRenderer?.renderShares?.(execution.quantity) || `<span class="text-muted">${execution.quantity ?? '-'}</span>`;
             const executionDate = FieldRenderer?.renderExecutionDate?.(execution.date) || (FieldRenderer?.renderDate?.(execution.date, true) || '-');
-            const accountLabel = execution.account_name ? `<span class="badge rounded-pill bg-body-secondary text-body">${execution.account_name}</span>` : '';
+            const sharedAccount = execution.trading_account_id || primarySuggestion?.trading_account_id
+                ? FieldRenderer?.renderLinkedEntity(
+                    'trading_account',
+                    execution.trading_account_id || primarySuggestion?.trading_account_id,
+                    execution.account_name || primarySuggestion?.account_name,
+                    { short: true }
+                  )
+                : (execution.account_name || primarySuggestion?.account_name
+                    ? `<span class="badge rounded-pill bg-body-secondary text-body">${execution.account_name || primarySuggestion?.account_name}</span>`
+                    : '');
+            const sharedTickerRow = `
+                <div class="d-flex align-items-center flex-wrap gap-3 text-muted small">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted">טיקר:</span>
+                        ${tickerLink}
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted">חשבון:</span>
+                        ${sharedAccount || '<span class="text-muted">לא מוגדר</span>'}
+                    </div>
+                </div>
+            `;
 
             const tradeLink = primarySuggestion
                 ? (FieldRenderer?.renderLinkedEntity('trade', primarySuggestion.trade_id, `#${primarySuggestion.trade_id}`, { short: true }) || `#${primarySuggestion.trade_id}`)
@@ -196,17 +217,16 @@
 
             return `
                 <li class="list-group-item pending-highlight-item" ${itemIdAttr}>
+                    ${sharedTickerRow}
                     <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
                     <div class="d-flex flex-column gap-1">
                         <div class="d-flex align-items-center flex-wrap gap-2">
                             ${executionLink}
                             ${actionBadge}
-                            ${tickerLink}
                             ${quantityDisplay}
                         </div>
                         <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
                             <span>${executionDate}</span>
-                            ${accountLabel}
                         </div>
                     </div>
                         <div class="d-flex flex-column align-items-end gap-1">
@@ -223,7 +243,6 @@
                         </div>
                         <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
                             <span>${tradeDate}</span>
-                            ${primarySuggestion?.account_name ? `<span>${primarySuggestion.account_name}</span>` : ''}
                         </div>
                         ${reasonsHtml}
                     </div>

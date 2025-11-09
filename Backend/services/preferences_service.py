@@ -535,14 +535,14 @@ class PreferencesService:
                     # Return None instead of raising exception - let API handle it
                     return None
             
-            # Regular profile - query user_preferences
+            # Regular profile - query user_preferences_v3
             cursor.execute('''
                 SELECT up.saved_value, pt.data_type, pt.default_value
                 FROM preference_types pt
                 LEFT JOIN (
                     SELECT preference_id, saved_value, 
                            ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
-                    FROM user_preferences 
+                    FROM user_preferences_v3 
                     WHERE user_id = ? AND profile_id = ?
                 ) up ON pt.id = up.preference_id AND up.rn = 1
                 WHERE pt.preference_name = ? AND pt.is_active = TRUE
@@ -653,7 +653,7 @@ class PreferencesService:
                     LEFT JOIN (
                         SELECT preference_id, saved_value, 
                                ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
-                        FROM user_preferences 
+                        FROM user_preferences_v3 
                         WHERE user_id = ? AND profile_id = ?
                     ) up ON pt.id = up.preference_id AND up.rn = 1
                     WHERE pt.group_id = ? AND pt.is_active = TRUE
@@ -727,7 +727,7 @@ class PreferencesService:
                         LEFT JOIN (
                             SELECT preference_id, saved_value, 
                                    ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
-                            FROM user_preferences 
+                            FROM user_preferences_v3 
                             WHERE user_id = ? AND profile_id = ?
                         ) up ON pt.id = up.preference_id AND up.rn = 1
                         WHERE pt.preference_name IN ({placeholders}) AND pt.is_active = TRUE
@@ -818,7 +818,7 @@ class PreferencesService:
                     LEFT JOIN (
                         SELECT preference_id, saved_value, 
                                ROW_NUMBER() OVER (PARTITION BY preference_id ORDER BY id DESC) as rn
-                        FROM user_preferences 
+                        FROM user_preferences_v3 
                         WHERE user_id = ? AND profile_id = ?
                     ) up ON pt.id = up.preference_id AND up.rn = 1
                     WHERE pt.is_active = TRUE
@@ -878,7 +878,7 @@ class PreferencesService:
             
             # Check if preference already exists
             cursor.execute('''
-                SELECT id FROM user_preferences 
+                SELECT id FROM user_preferences_v3 
                 WHERE user_id = ? AND profile_id = ? AND preference_id = ?
             ''', (user_id, profile_id, preference_id))
             
@@ -887,14 +887,14 @@ class PreferencesService:
             if existing:
                 # Update existing preference
                 cursor.execute('''
-                    UPDATE user_preferences 
-                    SET saved_value = ?, updated_at = CURRENT_TIMESTAMP
+                    UPDATE user_preferences_v3 
+                    SET saved_value = ?
                     WHERE user_id = ? AND profile_id = ? AND preference_id = ?
                 ''', (string_value, user_id, profile_id, preference_id))
             else:
                 # Insert new preference
                 cursor.execute('''
-                    INSERT INTO user_preferences 
+                    INSERT INTO user_preferences_v3 
                     (user_id, profile_id, preference_id, saved_value)
                     VALUES (?, ?, ?, ?)
                 ''', (user_id, profile_id, preference_id, string_value))
@@ -942,7 +942,7 @@ class PreferencesService:
                     
                     # Check if preference already exists
                     cursor.execute('''
-                        SELECT id FROM user_preferences 
+                        SELECT id FROM user_preferences_v3 
                         WHERE user_id = ? AND profile_id = ? AND preference_id = ?
                     ''', (user_id, profile_id, preference_id))
                     
@@ -951,14 +951,14 @@ class PreferencesService:
                     if existing:
                         # Update existing preference
                         cursor.execute('''
-                            UPDATE user_preferences 
-                            SET saved_value = ?, updated_at = CURRENT_TIMESTAMP
+                            UPDATE user_preferences_v3 
+                            SET saved_value = ?
                             WHERE user_id = ? AND profile_id = ? AND preference_id = ?
                         ''', (string_value, user_id, profile_id, preference_id))
                     else:
                         # Insert new preference
                         cursor.execute('''
-                            INSERT INTO user_preferences 
+                            INSERT INTO user_preferences_v3 
                             (user_id, profile_id, preference_id, saved_value)
                             VALUES (?, ?, ?, ?)
                         ''', (user_id, profile_id, preference_id, string_value))

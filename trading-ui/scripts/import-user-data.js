@@ -2206,46 +2206,76 @@ function formatFileSize(bytes) {
 /**
  * Unified notification helper for import modal
  */
+const IMPORT_NOTIFICATION_DEFAULTS = {
+    title: 'ייבוא נתונים',
+    category: 'import-user-data',
+    duration: 6000
+};
+
+let importNotificationGuard = false;
+
+function resolveImportNotificationDelegate() {
+    if (window.notificationSystem?.showNotification && window.notificationSystem.showNotification !== showImportUserDataNotification) {
+        return window.notificationSystem.showNotification.bind(window.notificationSystem);
+    }
+
+    if (typeof window.showNotification === 'function' && window.showNotification !== showImportUserDataNotification) {
+        return window.showNotification.bind(window);
+    }
+
+    if (window.NotificationSystem?.show && window.NotificationSystem.show !== showImportUserDataNotification) {
+        return window.NotificationSystem.show.bind(window.NotificationSystem);
+    }
+
+    return null;
+}
+
 function showImportUserDataNotification(message, type = 'info', title = '', options = {}) {
     if (typeof message !== 'string') {
         message = String(message ?? '');
     }
 
-    const globalShowNotificationFn = (typeof window !== 'undefined'
-        && typeof window.showNotification === 'function'
-        && window.showNotification !== showImportUserDataNotification)
-        ? window.showNotification
-        : null;
+    const normalizedType = typeof type === 'string' ? type.toLowerCase() : 'info';
+    const finalTitle = title || IMPORT_NOTIFICATION_DEFAULTS.title;
+    const finalOptions = {
+        ...options,
+        category: options.category || IMPORT_NOTIFICATION_DEFAULTS.category,
+        functionName: options.functionName || 'showImportUserDataNotification'
+    };
+    const duration = typeof options.duration === 'number'
+        ? options.duration
+        : IMPORT_NOTIFICATION_DEFAULTS.duration;
 
-    if (globalShowNotificationFn) {
-        return globalShowNotificationFn(message, type, title, undefined, null, options);
+    const delegate = resolveImportNotificationDelegate();
+
+    if (delegate && !importNotificationGuard) {
+        try {
+            importNotificationGuard = true;
+            return delegate(message, normalizedType, finalTitle, duration, finalOptions.category, finalOptions);
+        } catch (error) {
+            window.Logger?.warn('[Import Modal] Notification delegate failed', {
+                error: error?.message,
+                page: 'import-user-data'
+            });
+        } finally {
+            importNotificationGuard = false;
+        }
     }
 
-    const baseNotificationSystem = (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function')
-        ? window.notificationSystem
-        : null;
-    const globalNotificationSystem = (window.NotificationSystem && typeof window.NotificationSystem.show === 'function')
-        ? window.NotificationSystem
-        : null;
-
-    if (baseNotificationSystem && baseNotificationSystem.showNotification !== showImportUserDataNotification) {
-        return baseNotificationSystem.showNotification.call(baseNotificationSystem, message, type, title, undefined, null, options);
-    }
-
-    if (globalNotificationSystem && globalNotificationSystem.show !== showImportUserDataNotification) {
-        return globalNotificationSystem.show.call(globalNotificationSystem, message, type, title, undefined, null, options);
-    }
-
-    const prefix = title ? `${title}: ` : '';
-    window.Logger?.info(`[Import Modal] ${prefix}${message}`, { type, title, options, page: 'import-user-data' });
+    const prefix = finalTitle ? `${finalTitle}: ` : '';
+    const logMethod = normalizedType === 'error'
+        ? 'error'
+        : normalizedType === 'warning'
+            ? 'warn'
+            : 'info';
+    window.Logger?.[logMethod](`[Import Modal] ${prefix}${message}`, {
+        type: normalizedType,
+        title: finalTitle,
+        options: finalOptions,
+        page: 'import-user-data',
+        fallback: true
+    });
     return Promise.resolve(false);
-}
-
-/**
- * Backward compatible wrapper
- */
-function showNotification(message, type = 'info', title = '', options = {}) {
-    return showImportUserDataNotification(message, type, title, options);
 }
 
 /**

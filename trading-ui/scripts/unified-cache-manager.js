@@ -2307,6 +2307,42 @@ UnifiedCacheManager.prototype.clearAllCacheDetailed = async function(options = {
                     'system'
                 );
             }
+
+            // Auto refresh / hard reload if requested (Stage B-Lite requirement)
+            const shouldAutoRefresh = options.autoRefresh !== false;
+            if (shouldAutoRefresh) {
+                const delayMs = Number.isFinite(options.reloadDelayMs)
+                    ? options.reloadDelayMs
+                    : (options.hardReload ? 2000 : 1500);
+
+                window.Logger.info('🔄 Scheduling page reload after cache clear', {
+                    delayMs,
+                    hardReload: options.hardReload !== false,
+                    page: 'unified-cache-manager'
+                });
+
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification(
+                        `המטמון נוקה בהצלחה. העמוד ירוענן בעוד ${(delayMs / 1000).toFixed(1)} שניות...`,
+                        'info',
+                        'ריענון עמוד',
+                        delayMs + 500,
+                        'system'
+                    );
+                }
+
+                setTimeout(() => {
+                    try {
+                        if (options.hardReload !== false && typeof window.hardReload === 'function') {
+                            window.hardReload();
+                        } else {
+                            window.location.reload();
+                        }
+                    } catch (reloadError) {
+                        window.Logger.error('❌ Failed to reload page after cache clear', reloadError, { page: 'unified-cache-manager' });
+                    }
+                }, delayMs);
+            }
         } else {
             // Show error notification
             if (typeof window.showNotification === 'function') {

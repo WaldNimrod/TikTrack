@@ -600,6 +600,79 @@ async function updateTradesTable(trades) {
   window.Logger.info('✅ Found tbody, proceeding with HTML generation', { page: "trades" });
 
   const tableHTML = trades.map(trade => {
+    const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(
+          trade.created_at_envelope ||
+          trade.createdAtEnvelope ||
+          trade.created_at ||
+          trade.createdAt ||
+          null
+        )
+      : (
+          trade.created_at_envelope ||
+          trade.createdAtEnvelope ||
+          trade.created_at ||
+          trade.createdAt ||
+          null
+        );
+
+    const openedEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(
+          trade.opened_at_envelope ||
+          trade.openedAtEnvelope ||
+          trade.opened_at ||
+          trade.openedAt ||
+          createdEnvelope ||
+          null
+        )
+      : (
+          trade.opened_at_envelope ||
+          trade.openedAtEnvelope ||
+          trade.opened_at ||
+          trade.openedAt ||
+          createdEnvelope ||
+          null
+        );
+
+    const closedEnvelopeRaw =
+      trade.closed_at_envelope ||
+      trade.closedAtEnvelope ||
+      trade.closed_at ||
+      trade.closedAt ||
+      trade.cancelled_at_envelope ||
+      trade.cancelledAtEnvelope ||
+      trade.cancelled_at ||
+      trade.cancelledAt ||
+      null;
+
+    const closedEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(closedEnvelopeRaw)
+      : closedEnvelopeRaw;
+
+    const createdMs = window.dateUtils?.getEpochMilliseconds
+      ? window.dateUtils.getEpochMilliseconds(createdEnvelope)
+      : (() => {
+          try {
+            if (!createdEnvelope) {return null;}
+            const createdDateObj = createdEnvelope instanceof Date ? createdEnvelope : new Date(createdEnvelope);
+            return createdDateObj.getTime();
+          } catch {
+            return null;
+          }
+        })();
+
+    const closedMs = window.dateUtils?.getEpochMilliseconds
+      ? window.dateUtils.getEpochMilliseconds(closedEnvelope)
+      : (() => {
+          try {
+            if (!closedEnvelope) {return null;}
+            const closedDateObj = closedEnvelope instanceof Date ? closedEnvelope : new Date(closedEnvelope);
+            return closedDateObj.getTime();
+          } catch {
+            return null;
+          }
+        })();
+
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = trade.investment_type || '';
 
@@ -691,8 +764,50 @@ async function updateTradesTable(trades) {
         ${window.FieldRendererService ? window.FieldRendererService.renderSide(trade.side) : `<span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>`}
       </td>
       <td>${trade.account_name || trade.trading_account_id || 'חשבון מסחר לא ידוע'}</td>
-      <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר'}</td>
-      <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : ''}</td>
+      <td data-date="${createdMs || ''}">
+        ${(() => {
+          if (!createdEnvelope) {
+            return '<span class="date-text">לא מוגדר</span>';
+          }
+          if (window.FieldRendererService?.renderDate) {
+            return `<span class="date-text">${window.FieldRendererService.renderDate(createdEnvelope, false)}</span>`;
+          }
+          if (window.dateUtils?.formatDate) {
+            return `<span class="date-text">${window.dateUtils.formatDate(createdEnvelope, { includeTime: false })}</span>`;
+          }
+          try {
+            const dateObj = createdEnvelope instanceof Date ? createdEnvelope : new Date(createdEnvelope);
+            if (!Number.isNaN(dateObj.getTime())) {
+              return `<span class="date-text">${dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' })}</span>`;
+            }
+          } catch (error) {
+            window.Logger?.warn('⚠️ trades created_at fallback failed', { error, tradeId: trade?.id }, { page: 'trades' });
+          }
+          return '<span class="date-text">לא מוגדר</span>';
+        })()}
+      </td>
+      <td data-date="${closedMs || ''}">
+        ${(() => {
+          if (!closedEnvelope) {
+            return '<span class="date-text"></span>';
+          }
+          if (window.FieldRendererService?.renderDate) {
+            return `<span class="date-text">${window.FieldRendererService.renderDate(closedEnvelope, false)}</span>`;
+          }
+          if (window.dateUtils?.formatDate) {
+            return `<span class="date-text">${window.dateUtils.formatDate(closedEnvelope, { includeTime: false })}</span>`;
+          }
+          try {
+            const dateObj = closedEnvelope instanceof Date ? closedEnvelope : new Date(closedEnvelope);
+            if (!Number.isNaN(dateObj.getTime())) {
+              return `<span class="date-text">${dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' })}</span>`;
+            }
+          } catch (error) {
+            window.Logger?.warn('⚠️ trades closed_at fallback failed', { error, tradeId: trade?.id }, { page: 'trades' });
+          }
+          return '<span class="date-text"></span>';
+        })()}
+      </td>
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
           ${(() => {
@@ -1078,7 +1193,40 @@ async function deleteTradeRecord(tradeId) {
       }
       entryPrice = entryPrice ? `$${entryPrice}` : 'לא מוגדר';
       
-      const date = trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const openedEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(
+            trade.opened_at_envelope ||
+            trade.openedAtEnvelope ||
+            trade.opened_at ||
+            trade.openedAt ||
+            trade.created_at_envelope ||
+            trade.created_at ||
+            null
+          )
+        : (
+            trade.opened_at_envelope ||
+            trade.openedAtEnvelope ||
+            trade.opened_at ||
+            trade.openedAt ||
+            trade.created_at_envelope ||
+            trade.created_at ||
+            null
+          );
+      let date = 'לא מוגדר';
+      if (openedEnvelope) {
+        if (window.dateUtils?.formatDate) {
+          date = window.dateUtils.formatDate(openedEnvelope, { includeTime: false });
+        } else {
+          try {
+            const dateObj = openedEnvelope instanceof Date ? openedEnvelope : new Date(openedEnvelope);
+            if (!Number.isNaN(dateObj.getTime())) {
+              date = dateObj.toLocaleDateString('he-IL');
+            }
+          } catch {
+            date = 'לא מוגדר';
+          }
+        }
+      }
       
       tradeDetails = `${ticker} - ${sideText}, ${quantity} יחידות ב-${entryPrice}, תאריך פתיחה: ${date}`;
     }
@@ -2360,11 +2508,22 @@ async function validateTradePlanChange(newTradePlanId, tradeData) {
     }
 
     // בדיקה 3: תאריך יצירת התוכנית לא מאוחר מתאריך פתיחת הטרייד
-    if (tradePlan.data.created_at && tradeData.opened_at) {
-      const planCreatedAt = new Date(tradePlan.data.created_at);
-      const tradeOpenedAt = new Date(tradeData.opened_at);
+    if ((tradePlan.data.created_at || tradePlan.data.created_at_envelope) && (tradeData.opened_at || tradeData.opened_at_envelope)) {
+      const planCreatedEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(tradePlan.data.created_at_envelope || tradePlan.data.created_at)
+        : (tradePlan.data.created_at_envelope || tradePlan.data.created_at);
+      const tradeOpenedEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(tradeData.opened_at_envelope || tradeData.opened_at)
+        : (tradeData.opened_at_envelope || tradeData.opened_at);
 
-      if (planCreatedAt > tradeOpenedAt) {
+      const planCreatedAt = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(planCreatedEnvelope)
+        : (planCreatedEnvelope ? new Date(planCreatedEnvelope) : null);
+      const tradeOpenedAt = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(tradeOpenedEnvelope)
+        : (tradeOpenedEnvelope ? new Date(tradeOpenedEnvelope) : null);
+
+      if (planCreatedAt && tradeOpenedAt && planCreatedAt > tradeOpenedAt) {
         return {
           isValid: false,
           message: `תאריך יצירת התוכנית (${planCreatedAt.toLocaleDateString('he-IL')}) מאוחר מתאריך פתיחת הטרייד (${tradeOpenedAt.toLocaleDateString('he-IL')}). לא ניתן לקשר תוכנית שנוצרה אחרי פתיחת הטרייד.`,
@@ -2429,11 +2588,22 @@ async function validateTradeChanges(originalTrade, updatedTrade) {
   }
 
   // בדיקת תאריכים - תאריך סגירה לא יכול להיות לפני תאריך יצירה
-  if (updatedTrade.opened_at && updatedTrade.closed_at) {
-    const openedAt = new Date(updatedTrade.opened_at);
-    const closedAt = new Date(updatedTrade.closed_at);
+  if ((updatedTrade.opened_at || updatedTrade.opened_at_envelope) && (updatedTrade.closed_at || updatedTrade.closed_at_envelope)) {
+    const openedEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(updatedTrade.opened_at_envelope || updatedTrade.opened_at)
+      : (updatedTrade.opened_at_envelope || updatedTrade.opened_at);
+    const closedEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(updatedTrade.closed_at_envelope || updatedTrade.closed_at)
+      : (updatedTrade.closed_at_envelope || updatedTrade.closed_at);
 
-    if (closedAt < openedAt) {
+    const openedAt = window.dateUtils?.toDateObject
+      ? window.dateUtils.toDateObject(openedEnvelope)
+      : (openedEnvelope ? new Date(openedEnvelope) : null);
+    const closedAt = window.dateUtils?.toDateObject
+      ? window.dateUtils.toDateObject(closedEnvelope)
+      : (closedEnvelope ? new Date(closedEnvelope) : null);
+
+    if (openedAt && closedAt && closedAt < openedAt) {
       validations.push(`תאריך סגירה (${closedAt.toLocaleDateString('he-IL')}) לא יכול להיות לפני תאריך יצירה (${openedAt.toLocaleDateString('he-IL')})`);
     }
   }

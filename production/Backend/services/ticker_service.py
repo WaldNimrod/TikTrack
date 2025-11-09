@@ -443,8 +443,7 @@ class TickerService:
             import os
             
             # Get database connection for linked_items
-            BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+            from config.settings import DB_PATH
             
             conn = sqlite3.connect(DB_PATH)
             conn.row_factory = sqlite3.Row
@@ -551,8 +550,7 @@ class TickerService:
         
         try:
             # Get database connection for linked_items
-            BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+            from config.settings import DB_PATH
             
             conn = sqlite3.connect(DB_PATH)
             conn.row_factory = sqlite3.Row

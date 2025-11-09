@@ -6,7 +6,7 @@ from typing import Dict, Any, Optional
 class Execution(BaseModel):
     __tablename__ = "executions"
     
-    ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
+    ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)  # Required - every execution must have a ticker
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=True)
     trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)  # Make nullable - executions can exist without trades
     action = Column(String(20), nullable=False, default='buy')  # ENUM: buy, sale
@@ -31,12 +31,8 @@ class Execution(BaseModel):
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary"""
         result: Dict[str, Any] = {}
-        for c in self.__table__.columns:
-            value = getattr(self, c.name)
-            if hasattr(value, 'strftime'):  # If it's a date
-                result[c.name] = value.strftime('%Y-%m-%d %H:%M:%S') if value else None
-            else:
-                result[c.name] = value
+        for column in self.__table__.columns:
+            result[column.name] = getattr(self, column.name)
         
         # Add related data if available
         if hasattr(self, 'trading_account') and self.trading_account:

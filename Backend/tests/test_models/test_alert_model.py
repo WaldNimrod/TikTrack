@@ -11,8 +11,7 @@ Date: January 2025
 import sys
 import os
 import unittest
-from unittest.mock import Mock
-from datetime import datetime
+from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
@@ -20,42 +19,44 @@ from models.alert import Alert
 
 
 class TestAlertModel(unittest.TestCase):
-    """Test suite for Alert model"""
-    
+    """Tests for the updated Alert model using the new condition fields."""
+
     def setUp(self):
-        """Set up test environment"""
         self.alert_data = {
-            'id': 1,
             'ticker_id': 1,
-            'condition': 'price > 100',
-            'status': 'active',
-            'created_at': datetime.now()
+            'message': 'Price crossed threshold',
+            'status': 'open',
+            'condition_attribute': 'price',
+            'condition_operator': 'more_than',
+            'condition_number': '100',
+            'related_type_id': 2,
+            'related_id': 5,
+            'created_at': datetime.now(timezone.utc),
+            'triggered_at': None
         }
-    
+
     def test_alert_creation(self):
-        """Test creating an Alert instance"""
         alert = Alert(**self.alert_data)
-        
-        self.assertEqual(alert.id, 1)
-        self.assertEqual(alert.status, 'active')
-        self.assertEqual(alert.condition, 'price > 100')
-    
-    def test_alert_to_dict(self):
-        """Test converting Alert to dictionary"""
+
+        self.assertEqual(alert.ticker_id, 1)
+        self.assertEqual(alert.status, 'open')
+        self.assertEqual(alert.condition_attribute, 'price')
+        self.assertEqual(alert.condition_operator, 'more_than')
+        self.assertEqual(alert.condition_number, '100')
+
+    def test_alert_to_dict_retains_datetimes(self):
         alert = Alert(**self.alert_data)
-        
-        if hasattr(alert, 'to_dict'):
-            alert_dict = alert.to_dict()
-            self.assertIsInstance(alert_dict, dict)
-            self.assertIn('id', alert_dict)
-            self.assertIn('status', alert_dict)
-    
-    def test_alert_validation(self):
-        """Test alert data validation"""
-        valid_alert = Alert(**self.alert_data)
-        self.assertIsNotNone(valid_alert)
+        alert_dict = alert.to_dict()
+
+        self.assertIn('created_at', alert_dict)
+        self.assertIsInstance(alert_dict['created_at'], datetime)
+        self.assertEqual(alert_dict['condition_attribute'], 'price')
+        self.assertIn('condition_display_text', alert_dict)
+
+    def test_condition_display_text(self):
+        alert = Alert(**self.alert_data)
+        self.assertIn('יותר מ', alert.get_condition_display_text())
 
 
 if __name__ == '__main__':
     unittest.main()
-

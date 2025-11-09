@@ -20,8 +20,9 @@ Last Updated: 2025-01-16
 import csv
 import io
 from typing import List, Dict, Any, List
-from datetime import datetime
+from datetime import datetime, timezone
 from .base_connector import BaseConnector
+from services.date_normalization_service import DateNormalizationService
 
 class DemoConnector(BaseConnector):
     """
@@ -130,7 +131,9 @@ class DemoConnector(BaseConnector):
             fee = self._parse_float(raw_record.get('Fee', raw_record.get('fee', 0)))
             
             # Parse date
-            date = self._parse_date(date_str)
+            date_value = self._parse_date(date_str)
+            normalizer = DateNormalizationService("UTC")
+            date_envelope = normalizer.normalize_output(date_value)
             
             # Determine action based on quantity sign
             if quantity < 0:
@@ -143,12 +146,12 @@ class DemoConnector(BaseConnector):
             return {
                 'symbol': symbol,
                 'action': action,
-                'date': date,
+                'date': date_envelope,
                 'quantity': quantity,
                 'price': price,
                 'fee': fee,
                 'currency': 'USD',  # Demo connector defaults to USD
-                'external_id': self._generate_external_id(symbol, action, date, quantity, price),
+                'external_id': self._generate_external_id(symbol, action, date_value, quantity, price),
                 'source': 'demo_import',
                 'row_number': raw_record.get('_row_number', 0)
             }
@@ -219,7 +222,7 @@ class DemoConnector(BaseConnector):
         except (ValueError, TypeError):
             return 0.0
     
-    def _parse_date(self, date_str: str) -> str:
+    def _parse_date(self, date_str: str) -> datetime:
         """
         Parse date string to ISO format.
         
@@ -227,7 +230,7 @@ class DemoConnector(BaseConnector):
             date_str: Date string to parse
             
         Returns:
-            str: ISO formatted date string
+            datetime: UTC datetime object
         """
         if not date_str:
             raise ValueError("Date is required")
@@ -245,14 +248,18 @@ class DemoConnector(BaseConnector):
         for fmt in date_formats:
             try:
                 dt = datetime.strptime(date_str, fmt)
-                return dt.isoformat()
+                return dt.replace(tzinfo=timezone.utc)
             except ValueError:
                 continue
         
         # If no format matches, try to parse as ISO
         try:
             dt = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-            return dt.isoformat()
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            else:
+                dt = dt.astimezone(timezone.utc)
+            return dt
         except ValueError:
             raise ValueError(f"Unable to parse date: {date_str}")
     

@@ -104,19 +104,19 @@ class Alert(BaseModel):
             'id': self.id,
             'message': self.message,
             'ticker_id': self.ticker_id,
-            'triggered_at': self.triggered_at.strftime('%Y-%m-%d %H:%M:%S') if self.triggered_at else None,
+            'triggered_at': self.triggered_at,
             'status': self.status,
             'is_triggered': self.is_triggered,
             'related_type_id': self.related_type_id,
             'related_id': self.related_id,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
+            'created_at': self.created_at,
             'condition_attribute': self.condition_attribute,
             'condition_operator': self.condition_operator,
             'condition_number': self.condition_number,
             'condition_display_text': self.get_condition_display_text(),
             'plan_condition_id': self.plan_condition_id,
             'trade_condition_id': self.trade_condition_id,
-            'expiry_date': self.expiry_date  # DATE in YYYY-MM-DD format, NULL if no expiration
+            'expiry_date': self.expiry_date  # Stored as YYYY-MM-DD string if present
         }
         
         # Determine related_type based on related_type_id

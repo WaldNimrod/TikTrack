@@ -11,6 +11,7 @@ Date: January 2025
 import sys
 import os
 import unittest
+import datetime
 from unittest.mock import Mock, patch
 
 # Add Backend directory to path
@@ -33,6 +34,12 @@ class TestAlertsRoutes(unittest.TestCase):
         
         # Mock database session
         self.mock_db = Mock()
+        self.patcher_preferences = patch('routes.api.alerts.preferences_service')
+        self.mock_preferences = self.patcher_preferences.start()
+        self.mock_preferences.get_preference.return_value = 'UTC'
+
+    def tearDown(self):
+        self.patcher_preferences.stop()
     
     def test_get_alerts_endpoint_exists(self):
         """Test that GET /api/alerts endpoint exists"""
@@ -44,7 +51,7 @@ class TestAlertsRoutes(unittest.TestCase):
                 with patch('routes.api.alerts.AlertService.get_all') as mock_get_all:
                     mock_get_all.return_value = []
                     
-                    response = client.get('/api/alerts')
+                    response = client.get('/api/alerts/')
                     
                     self.assertIn(response.status_code, [200, 500])
     
@@ -58,9 +65,25 @@ class TestAlertsRoutes(unittest.TestCase):
                 with patch('routes.api.alerts.AlertService.create') as mock_create:
                     mock_create.return_value = Mock(id=1, to_dict=lambda: {'id': 1})
                     
-                    response = client.post('/api/alerts',
-                                         json={'ticker_id': 1, 'condition': 'price > 100'},
-                                         content_type='application/json')
+                    mock_create.return_value = Mock(
+                        id=1,
+                        to_dict=lambda: {
+                            'id': 1,
+                            'ticker_id': 1,
+                            'created_at': datetime.datetime.now(datetime.timezone.utc)
+                        }
+                    )
+
+                    response = client.post(
+                        '/api/alerts/',
+                        json={
+                            'ticker_id': 1,
+                            'condition_attribute': 'price',
+                            'condition_operator': 'more_than',
+                            'condition_number': '100'
+                        },
+                        content_type='application/json'
+                    )
                     
                     self.assertIn(response.status_code, [200, 201, 400, 500])
     
@@ -74,7 +97,7 @@ class TestAlertsRoutes(unittest.TestCase):
                 with patch('routes.api.alerts.AlertService.update') as mock_update:
                     mock_update.return_value = Mock(id=1, to_dict=lambda: {'id': 1})
                     
-                    response = client.put('/api/alerts/1',
+                    response = client.put('/api/alerts/1/',
                                         json={'status': 'active'},
                                         content_type='application/json')
                     
@@ -90,7 +113,7 @@ class TestAlertsRoutes(unittest.TestCase):
                 with patch('routes.api.alerts.AlertService.delete') as mock_delete:
                     mock_delete.return_value = True
                     
-                    response = client.delete('/api/alerts/1')
+                    response = client.delete('/api/alerts/1/')
                     
                     self.assertIn(response.status_code, [200, 204, 404, 500])
 

@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from config.database import get_db
 from services.alert_service import AlertService
 from services.advanced_cache_service import cache_for, invalidate_cache
+from services.date_normalization_service import DateNormalizationService
+from services.preferences_service import PreferencesService
 import logging
 
 # Import base classes
@@ -16,6 +18,15 @@ alerts_bp = Blueprint('alerts', __name__, url_prefix='/api/alerts')
 
 # Initialize base API
 base_api = BaseEntityAPI('alerts', AlertService, 'alerts')
+preferences_service = PreferencesService()
+
+
+def _get_date_normalizer() -> DateNormalizationService:
+    timezone_name = DateNormalizationService.resolve_timezone(
+        request,
+        preferences_service=preferences_service
+    )
+    return DateNormalizationService(timezone_name)
 
 @alerts_bp.route('/', methods=['GET'])
 @handle_database_session()
@@ -48,17 +59,22 @@ def create_alert():
             data['message'] = BaseEntityUtils.sanitize_rich_text(data['message'])
         db: Session = g.db
         alert = AlertService.create(db, data)
+        normalizer = _get_date_normalizer()
+        alert_payload = normalizer.normalize_output(alert.to_dict())
         return jsonify({
             "status": "success",
-            "data": alert.to_dict(),
+            "data": alert_payload,
             "message": "Alert created successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 201
     except Exception as e:
         logger.error(f"Error creating alert: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
 
@@ -74,24 +90,31 @@ def update_alert(alert_id: int):
             data['message'] = BaseEntityUtils.sanitize_rich_text(data['message'])
         db: Session = g.db
         alert = AlertService.update(db, alert_id, data)
+        normalizer = _get_date_normalizer()
+        alert_payload = normalizer.normalize_output(alert.to_dict())
         return jsonify({
             "status": "success",
-            "data": alert.to_dict(),
+            "data": alert_payload,
             "message": "Alert updated successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error updating alert {alert_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
 
@@ -103,25 +126,31 @@ def delete_alert(alert_id: int):
     try:
         db: Session = g.db
         AlertService.delete(db, alert_id)
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",
             "message": "Alert deleted successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error deleting alert {alert_id}: {str(e)}")
         logger.error(f"Error type: {type(e).__name__}")
         logger.error(f"Error details: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": f"Failed to delete alert: {str(e)}"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
 
@@ -131,24 +160,30 @@ def mark_as_triggered(alert_id: int):
     try:
         db: Session = next(get_db())
         alert = AlertService.mark_as_triggered(db, alert_id)
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",
-            "data": alert.to_dict(),
+            "data": normalizer.normalize_output(alert.to_dict()),
             "message": "Alert triggered successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error triggering alert {alert_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
     finally:
@@ -160,17 +195,21 @@ def get_unread_alerts():
     try:
         db: Session = next(get_db())
         alerts = AlertService.get_unread_alerts_with_symbols(db)
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",
-            "data": alerts,
+            "data": normalizer.normalize_output(alerts),
             "message": "Unread alerts retrieved successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting unread alerts: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve unread alerts"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
     finally:
@@ -184,24 +223,30 @@ def mark_read(alert_id: int):
     try:
         db: Session = next(get_db())
         alert = AlertService.mark_as_read(db, alert_id)
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",
-            "data": alert.to_dict(),
+            "data": normalizer.normalize_output(alert.to_dict()),
             "message": "Alert marked as read successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error marking alert {alert_id} as read: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
     finally:
@@ -213,24 +258,30 @@ def reactivate_alert(alert_id: int):
     try:
         db: Session = next(get_db())
         alert = AlertService.reactivate(db, alert_id)
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",
-            "data": alert.to_dict(),
+            "data": normalizer.normalize_output(alert.to_dict()),
             "message": "Alert reactivated successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error reactivating alert {alert_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
     finally:
@@ -242,24 +293,30 @@ def cancel_alert(alert_id: int):
     try:
         db: Session = next(get_db())
         alert = AlertService.cancel(db, alert_id)
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",
-            "data": alert.to_dict(),
+            "data": normalizer.normalize_output(alert.to_dict()),
             "message": "Alert cancelled successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error cancelling alert {alert_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
     finally:
@@ -272,24 +329,30 @@ def get_alerts_by_entity(entity_type: str, entity_id: int):
     try:
         db: Session = next(get_db())
         alerts = AlertService.get_alerts_by_entity(db, entity_type, entity_id)
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",
-            "data": [alert.to_dict() for alert in alerts],
+            "data": normalizer.normalize_output([alert.to_dict() for alert in alerts]),
             "message": f"Alerts for {entity_type} {entity_id} retrieved successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Entity not found {entity_type} {entity_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error getting alerts for {entity_type} {entity_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
     finally:

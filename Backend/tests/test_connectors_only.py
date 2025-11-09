@@ -106,6 +106,7 @@ Trades,Total,Stocks,2,150,150,5000,3.50,5003.50,0,0"""
         self.assertEqual(normalized['price'], 150.25)
         self.assertEqual(normalized['fee'], 1.50)
         self.assertEqual(normalized['currency'], 'USD')
+        self.assertIn('utc', normalized['date'])
         
         # Test sell record normalization
         sell_record = {
@@ -131,6 +132,7 @@ Trades,Total,Stocks,2,150,150,5000,3.50,5003.50,0,0"""
         self.assertEqual(normalized['quantity'], 50.0)  # Should be positive
         self.assertEqual(normalized['price'], 200.75)
         self.assertEqual(normalized['fee'], 2.00)
+        self.assertIn('utc', normalized['date'])
     
     def test_demo_connector(self):
         """Test Demo connector functionality"""
@@ -143,13 +145,15 @@ Trades,Total,Stocks,2,150,150,5000,3.50,5003.50,0,0"""
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0]['symbol'], 'AAPL')
         self.assertEqual(records[0]['action'], 'buy')
-        
+
         # Test normalization
         normalized = self.demo_connector.normalize_record(records[0])
         self.assertEqual(normalized['symbol'], 'AAPL')
         self.assertEqual(normalized['action'], 'buy')
         self.assertEqual(normalized['quantity'], 100.0)
         self.assertEqual(normalized['price'], 150.25)
+        self.assertIsInstance(normalized['date'], dict)
+        self.assertIn('utc', normalized['date'])
     
     def test_ibkr_connector_with_real_file(self):
         """Test IBKR connector with real sample file"""
@@ -175,6 +179,7 @@ Trades,Total,Stocks,2,150,150,5000,3.50,5003.50,0,0"""
                     self.assertIn('action', normalized)
                     self.assertIn('quantity', normalized)
                     self.assertIn('price', normalized)
+                    self.assertIn('utc', normalized['date'])
                     print(f"✅ Successfully normalized record: {normalized['symbol']} - {normalized['action']} - {normalized['quantity']}")
                 except Exception as e:
                     self.fail(f"Failed to normalize record: {e}")

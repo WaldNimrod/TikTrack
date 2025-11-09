@@ -295,7 +295,28 @@ async function deleteNote(id) {
       const contentPreview = note.content ? 
         note.content.replace(/<[^>]*>/g, '').substring(0, 100) + (note.content.length > 100 ? '...' : '') :
         'ללא תוכן';
-      const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(note.created_at)
+        : note.created_at;
+      const date = createdEnvelope
+        ? (window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(createdEnvelope, { includeTime: false })
+            : window.FieldRendererService?.renderDate
+              ? window.FieldRendererService.renderDate(createdEnvelope)
+              : (function fallbackDateDisplay(value) {
+                  try {
+                    const parsed = new Date(
+                      value?.utc || value?.local || value
+                    );
+                    if (!Number.isNaN(parsed.getTime())) {
+                      return parsed.toLocaleDateString('he-IL');
+                    }
+                  } catch (err) {
+                    window.Logger?.warn('⚠️ fallbackDateDisplay failed', { err, value }, { page: 'notes' });
+                  }
+                  return 'לא מוגדר';
+                })(createdEnvelope))
+        : 'לא מוגדר';
       const attachment = note.attachment ? `📎 ${note.attachment}` : 'ללא קובץ מצורף';
       
       noteDetails = `${relatedDisplay} - תוכן: ${contentPreview}, תאריך: ${date}, ${attachment}`;
@@ -486,7 +507,27 @@ function updateNotesTable(notes) {
 
       // בניית שורות הטבלה
       const rows = notes.map(note => {
-        const date = note.created_at ? new Date(note.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+        const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+          ? window.dateUtils.ensureDateEnvelope(note.created_at)
+          : note.created_at;
+        const dateDisplay = window.FieldRendererService?.renderDate
+          ? window.FieldRendererService.renderDate(createdEnvelope || note.created_at)
+          : window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(createdEnvelope || note.created_at, { includeTime: false })
+            : (() => {
+                try {
+                  const parsed = new Date(createdEnvelope?.utc || createdEnvelope?.local || note.created_at);
+                  if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleDateString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ notes table date fallback failed', { error, noteId: note?.id }, { page: 'notes' });
+                }
+                return 'לא מוגדר';
+              })();
+        const dateSortValue = window.dateUtils?.getEpochMilliseconds
+          ? window.dateUtils.getEpochMilliseconds(createdEnvelope || note.created_at)
+          : (createdEnvelope?.epochMs || createdEnvelope?.utc || createdEnvelope?.local || note.created_at || '');
 
         // הצגת תוכן HTML עם הגבלה ל-20 תווים
         const contentDisplay = (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function')
@@ -661,7 +702,7 @@ function updateNotesTable(notes) {
           <tr class="table-cell-clickable">
           <td class="related-cell">${relatedCellHtml}</td>
             <td>${contentDisplay}</td>
-            <td data-date='${note.created_at}'>${date}</td>
+            <td data-date='${dateSortValue}'>${dateDisplay}</td>
             <td>${attachmentDisplay}</td>
             <td class='actions-cell'>
               ${(() => {
@@ -807,13 +848,43 @@ function populateSelect(selectId, data, field, prefix = '') {
       // עבור טרייד: סימבול + תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
       const date = item.created_at || item.date;
-      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(date) : date;
+      const formattedDate = dateEnvelope
+        ? (window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(dateEnvelope, { includeTime: false })
+            : (() => {
+                try {
+                  const parsed = new Date(dateEnvelope?.utc || dateEnvelope?.local || date);
+                  if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleDateString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ populateSelect trade date fallback failed', { error, itemId: item?.id }, { page: 'notes' });
+                }
+                return 'לא מוגדר';
+              })())
+        : 'לא מוגדר';
       displayText = `${symbol} - ${formattedDate}`;
     } else if (prefix === 'תכנון') {
       // עבור תכנון: סימבול + תאריך
       const symbol = item.symbol || item.ticker_symbol || item.ticker?.symbol || 'לא מוגדר';
       const date = item.created_at || item.date;
-      const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(date) : date;
+      const formattedDate = dateEnvelope
+        ? (window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(dateEnvelope, { includeTime: false })
+            : (() => {
+                try {
+                  const parsed = new Date(dateEnvelope?.utc || dateEnvelope?.local || date);
+                  if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleDateString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ populateSelect plan date fallback failed', { error, itemId: item?.id }, { page: 'notes' });
+                }
+                return 'לא מוגדר';
+              })())
+        : 'לא מוגדר';
       displayText = `${symbol} - ${formattedDate}`;
     } else {
       // עבור טיקר: רק סימבול
@@ -1996,7 +2067,27 @@ async function loadNoteForViewing(noteId) {
     // מילוי המודל
     document.getElementById('viewNoteRelated').textContent = getNoteRelatedDisplay(note);
     document.getElementById('viewNoteContent').innerHTML = note.content || 'ללא תוכן';
-    document.getElementById('viewNoteCreated').textContent = note.created_at ? new Date(note.created_at).toLocaleString('he-IL') : 'לא מוגדר';
+    const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(note.created_at)
+      : note.created_at;
+    const createdDisplay = createdEnvelope
+      ? (window.dateUtils?.formatDateTime
+          ? window.dateUtils.formatDateTime(createdEnvelope)
+          : window.dateUtils?.formatDate
+            ? window.dateUtils.formatDate(createdEnvelope, { includeTime: true })
+            : (() => {
+                try {
+                  const parsed = new Date(createdEnvelope?.utc || createdEnvelope?.local || note.created_at);
+                  if (!Number.isNaN(parsed.getTime())) {
+                    return parsed.toLocaleString('he-IL');
+                  }
+                } catch (error) {
+                  window.Logger?.warn('⚠️ viewNote created fallback failed', { error, noteId }, { page: 'notes' });
+                }
+                return 'לא מוגדר';
+              })())
+      : 'לא מוגדר';
+    document.getElementById('viewNoteCreated').textContent = createdDisplay;
 
     // הצגת קובץ מצורף
     const attachmentElement = document.getElementById('viewNoteAttachment');

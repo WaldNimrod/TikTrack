@@ -123,7 +123,10 @@ def create_production_database():
     """Create production database from development database"""
     
     # Paths
-    source_db = backend_dir / "db" / "simpleTrade_new.db"
+    # Source: development database (in Backend/db/, not production/Backend/db/)
+    project_root = backend_dir.parent.parent  # Go from production/Backend/ to TikTrackApp/
+    dev_backend = project_root / "Backend"  # Backend/ (development)
+    source_db = dev_backend / "db" / "simpleTrade_new.db"
     target_db = backend_dir / "db" / "TikTrack_DB.db"
     
     # Check if source database exists

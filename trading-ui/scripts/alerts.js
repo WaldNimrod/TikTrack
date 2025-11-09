@@ -646,6 +646,57 @@ function updateAlertsTable(alerts) {
             }
           })();
 
+      const triggeredEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(
+            alert.triggered_at ||
+            alert.triggeredAt ||
+            alert.triggered_at_utc ||
+            alert.triggeredAtUtc ||
+            alert.triggered_at_iso ||
+            alert.triggeredAtIso ||
+            alert.triggered_at_local ||
+            alert.triggeredAtLocal ||
+            null
+          )
+        : (alert.triggered_at || alert.triggeredAt || null);
+      const triggeredDateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(triggeredEnvelope || null)
+        : (triggeredEnvelope ? new Date(triggeredEnvelope) : null);
+      const triggeredAtDisplay = triggeredEnvelope
+        ? (
+            window.FieldRendererService?.renderDate
+              ? window.FieldRendererService.renderDate(triggeredEnvelope, true)
+              : window.dateUtils?.formatDate
+                ? window.dateUtils.formatDate(triggeredEnvelope, { includeTime: true })
+                : (() => {
+                    try {
+                      if (triggeredDateObj && !Number.isNaN(triggeredDateObj.getTime())) {
+                        return triggeredDateObj.toLocaleString('he-IL', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        });
+                      }
+                    } catch (error) {
+                      window.Logger?.warn('⚠️ triggeredAt fallback formatting failed', { error, alertId: alert?.id }, { page: 'alerts' });
+                    }
+                    return '-';
+                  })()
+          )
+        : '-';
+      const triggeredAtDataAttr = window.dateUtils?.getEpochMilliseconds
+        ? window.dateUtils.getEpochMilliseconds(triggeredEnvelope)
+        : (() => {
+            if (!triggeredDateObj || Number.isNaN(triggeredDateObj.getTime())) {return '';}
+            try {
+              return triggeredDateObj.getTime();
+            } catch {
+              return '';
+            }
+          })();
+
       // המרת סטטוס לעברית להצגה
       // לפי הדוקומנטציה: open=פעיל, closed=הופעל, cancelled=בוטל
       let statusDisplay;
@@ -768,6 +819,7 @@ function updateAlertsTable(alerts) {
             ${getConditionSourceDisplay(alert)}
           </td>
           <td data-date="${createdAtDataAttr || ''}"><span class="date-text">${createdAtDisplay}</span></td>
+          <td data-date="${triggeredAtDataAttr || ''}"><span class="date-text">${triggeredAtDisplay}</span></td>
           <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${(() => {

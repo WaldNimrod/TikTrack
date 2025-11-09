@@ -115,7 +115,8 @@ const TABLE_COLUMN_MAPPINGS = {
     'is_triggered',          // 4 - הופעל
     'condition_source',      // 5 - תנאי (מקור)
     'created_at',            // 6 - נוצר ב
-    'expiry_date',           // 7 - תאריך תפוגה
+    'triggered_at',          // 7 - הופעל ב
+    'expiry_date',           // 8 - תאריך תפוגה
   ],
 
   // טבלת הערות (Notes) - Notes Page Structure (מוצג בפועל)
@@ -215,6 +216,13 @@ const TABLE_COLUMN_MAPPINGS = {
 };
 
 const TABLE_COLUMN_SORT_TYPES = {
+  alerts: {
+    created_at: 'dateEnvelope',
+    triggered_at: 'dateEnvelope',
+    expiry_date: 'dateEnvelope',
+    status: 'string',
+    is_triggered: 'string'
+  },
   trade_suggestions: {
     score: 'numeric',
     execution_id: 'numeric',
@@ -251,8 +259,9 @@ const TABLE_COLUMN_SORT_TYPES = {
     yahoo_updated_at: 'dateEnvelope'
   },
   alerts: {
-    created_at: 'date',
-    expiry_date: 'date'
+    created_at: 'dateEnvelope',
+    triggered_at: 'dateEnvelope',
+    expiry_date: 'dateEnvelope'
   },
   notes: {
     created_at: 'date'

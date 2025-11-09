@@ -1257,9 +1257,18 @@ class PreferencesUI {
                     const finalProfileId = profileId || window.PreferencesCore.currentProfileId;
                     
                     const allKeys = Object.keys(localStorage);
+                    const targetProfile = (finalProfileId === null || finalProfileId === undefined)
+                        ? 'default'
+                        : String(finalProfileId);
                     const prefKeys = allKeys.filter(key => 
-                        (key.startsWith(`preference_`) && key.includes(`_${finalUserId}_${finalProfileId}`)) ||
-                        (key.startsWith(`tiktrack_preference_`) && key.includes(`_${finalUserId}_${finalProfileId}`)) ||
+                        // Stage B-Lite keys
+                        (key.startsWith('preference_') && key.includes(`__profile_${targetProfile}`)) ||
+                        (key.startsWith('tiktrack_preference_') && key.includes(`__profile_${targetProfile}`)) ||
+                        key === `all_preferences__profile_${targetProfile}` ||
+                        key === `tiktrack_all_preferences__profile_${targetProfile}` ||
+                        // Legacy keys (user/profile suffix)
+                        (key.startsWith('preference_') && key.includes(`_${finalUserId}_${finalProfileId}`)) ||
+                        (key.startsWith('tiktrack_preference_') && key.includes(`_${finalUserId}_${finalProfileId}`)) ||
                         key === `all_preferences_${finalUserId}_${finalProfileId}` ||
                         key === `tiktrack_all_preferences_${finalUserId}_${finalProfileId}` ||
                         key === 'user-preferences' ||
@@ -1740,9 +1749,21 @@ window.saveIndividualPreference = async function(preferenceName, value, userId =
         
         if (success) {
             // Clear cache for this preference
-            const cacheKey = `preference_${preferenceName}_${userId || window.PreferencesCore.currentUserId}_${profileId || window.PreferencesCore.currentProfileId}`;
+            const targetProfileId = profileId !== null && profileId !== undefined
+                ? profileId
+                : (window.PreferencesCore.currentProfileId !== null ? window.PreferencesCore.currentProfileId : 0);
+            const targetUserId = userId || window.PreferencesCore.currentUserId || 1;
+            const cacheKey = window.PreferencesCore?.buildPreferenceCacheKey
+                ? window.PreferencesCore.buildPreferenceCacheKey(preferenceName, targetProfileId)
+                : (window.UnifiedCacheManager?.buildPreferenceCacheKey
+                    ? window.UnifiedCacheManager.buildPreferenceCacheKey(preferenceName, targetProfileId)
+                    : `preference_${preferenceName}__profile_${String(targetProfileId)}`);
+            const legacyKey = `preference_${preferenceName}_${targetUserId}_${targetProfileId}`;
             if (window.UnifiedCacheManager) {
                 await window.UnifiedCacheManager.remove(cacheKey);
+                if (legacyKey !== cacheKey) {
+                    await window.UnifiedCacheManager.remove(legacyKey);
+                }
             }
             
             // Show success

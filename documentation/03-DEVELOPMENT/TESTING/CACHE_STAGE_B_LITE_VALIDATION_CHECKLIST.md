@@ -18,12 +18,12 @@
 
 | Action | Expected Result | Env |
 |--------|-----------------|-----|
-| Clear Memory Cache | In-memory datasets (e.g., `accounts-data`) reset; page reload fetches fresh data | Dev / Prod |
-| Clear Storage Cache | `localStorage` entries prefixed with `ls:` removed; preferences reload | Dev / Prod |
+| Clear Memory Cache | In-memory datasets (e.g., `trade-data`, `dashboard-data`) reset; next interaction fetches fresh data | Dev / Prod |
+| Clear Storage Cache | `localStorage` entries with prefix `tiktrack_` removed; preferences reload | Dev / Prod |
 | Clear IndexedDB Cache | IndexedDB stores (cache namespace) emptied; no errors in console | Dev / Prod |
 | Full Clear + Refresh | All layers cleared, page performs hard reload, data fetched anew | Dev / Prod |
 
-- [ ] Each action generates entry in `cache.log` with user/time.
+- [ ] Each action generates entry in `cache.log` **and** POST `/api/cache/log` returns `status=success`.
 
 ---
 
@@ -50,6 +50,7 @@
 - [ ] `LoggerService` entries appear for cache hits/misses when enabled.
 - [ ] Monitoring widgets reflect cache availability (UnifiedCacheManager status = green).
 - [ ] No console errors related to cache clearing or access.
+- [ ] `/api/cache/log` contains latest action metadata (`action`, `layers`, `profileId`, `page`).
 
 ---
 

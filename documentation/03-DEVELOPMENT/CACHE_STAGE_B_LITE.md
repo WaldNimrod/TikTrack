@@ -1,10 +1,10 @@
 # Stage B-Lite Cache Strategy
 # ============================
 
-**Status:** Draft – Interim cache approach  
+**Status:** Active – Interim cache approach  
 **Scope:** Development & Production environments  
 **Author:** TikTrack Dev Team  
-**Date:** <!-- TODO: set date on completion -->
+**Date:** 2025-02-11
 
 ---
 
@@ -25,9 +25,9 @@
 
 | Layer | Purpose | Implementation Notes |
 |-------|---------|-----------------------|
-| Memory (`UnifiedCacheManager`) | Temporary UI state | Keys prefixed with `memory:` |
-| localStorage (`UnifiedCacheManager`) | Preferences, light data | Keys prefixed with `ls:` |
-| IndexedDB (`UnifiedCacheManager`) | Heavy/offline data | Keys prefixed with `idb:` |
+| Memory (`UnifiedCacheManager`) | Temporary UI state | Short TTL keys (`trade-data`, `dashboard-data`, etc.) |
+| localStorage (`UnifiedCacheManager`) | Preferences, light data | Saved with unified prefix `tiktrack_` + key |
+| IndexedDB (`UnifiedCacheManager`) | Heavy/offline data | Schema versioned (`UnifiedCacheDB` v2) |
 | Backend Cache | **Disabled** (Stage B-Lite) | `CACHE_DISABLED=true` in all environments |
 
 ### 2.2 Data Flow
@@ -51,16 +51,19 @@
 
 ### 3.2 Developer Tooling
 
-- Header cache menu includes:
+- Header cache menu powered by `CacheControlMenu` (`cache-clear-menu.js`):
   1. `Clear Memory Cache`
   2. `Clear localStorage Entries`
   3. `Clear IndexedDB`
   4. `Full Clear + Hard Refresh`
-- Each option logs to `cache.log`.
+- Each option:
+  - Fires `CacheControlMenu.triggerAction`
+  - Calls `/api/cache/log` (POST) with action metadata
+  - Displays unified notifications via `NotificationSystem`
 
 ### 3.3 Integration Touchpoints
 
-- `UnifiedAppInitializer` ensures cache layer initialization before page logic.
+- `UnifiedAppInitializer` ensures cache layers initialize before page logic.
 - `LoggerService` captures cache operations.
 - `Monitoring functions` display cache status (hit/miss).
 - Preferences, Table Systems, Notifications: use centralized cache methods only.
@@ -79,8 +82,9 @@
    - All select/populator consumers (e.g., `SelectPopulatorService.populateAccountsSelect`) request data with the current profile ID and respect fallback messaging.
 
 3. **Cache Namespacing**
-   - All preference cache keys include the profile ID suffix (`tiktrack_preference_<name>__profile_<id>`).
-   - Cache clear operations must remove both the active profile keys and legacy keys (`*_0`, `*_undefined`).
+   - All preference cache keys include the profile ID suffix (`preference_<name>__profile_<id>` stored as `tiktrack_preference_<name>__profile_<id>` in storage).
+   - Cache clear operations must remove both the Stage B-Lite keys and legacy keys (`preference_<name>_<userId>_<profileId>`).
+   - `PreferencesCore.buildPreferenceCacheKey`, `UnifiedCacheManager.buildPreferenceCacheKey`, and `SelectPopulatorService` share the same builder.
    - `PreferencesLazyLoader` accepts explicit `{ userId, profileId }`, clears stale keys when profile changes, and triggers a full fetch when post-load state is empty.
 
 4. **Post-Save Sync**
@@ -93,7 +97,7 @@
 |-------------|-------|---------------|-------|
 | `accounts-data` | Memory/localStorage | `trading_accounts.js` | Replaces `window.trading_accountsData` |
 | `preferences-active-profile` | Memory/localStorage | `preferences-core-new.js` | Stores `{ id, name, isFallback }` |
-| `tiktrack_preference_*__profile_<id>` | localStorage | `preferences-lazy-loader.js` | Key per preference + profile; clears on profile change |
+| `tiktrack_preference_*__profile_<id>` | localStorage | `preferences-core-new.js`, `preferences-lazy-loader.js` | Key per preference + profile; cleared via `refreshUserPreferences` |
 | `preferences-groups__profile_<id>` | Memory/localStorage | `preferences-group-manager.js` | Keeps group listings scoped to profile |
 | `preferences-color-cache__profile_<id>` | Memory | `preferences-colors.js` | Color sets derived per profile; fallback noted |
 | `positions-account-*` | Memory | `positions-portfolio.js` | Updated on account change |
@@ -109,14 +113,15 @@
 
 | Button | Action | Layers | Confirm Dialog |
 |--------|--------|--------|----------------|
-| Clear Memory Cache | `UnifiedCacheManager.clear({ layer: 'memory' })` | Memory | No |
-| Clear Storage Cache | `UnifiedCacheManager.clear({ layer: 'localStorage' })` | localStorage | Yes |
-| Clear IndexedDB Cache | `UnifiedCacheManager.clear({ layer: 'indexedDB' })` | IndexedDB | Yes |
-| Full Clear + Refresh | `UnifiedCacheManager.clearAllCache()` | All | Yes + countdown |
+| Clear Memory Cache | `CacheControlMenu.triggerAction('memory')` → `UnifiedCacheManager.clear('memory')` | Memory | No |
+| Clear Storage Cache | `CacheControlMenu.triggerAction('local-storage')` → `UnifiedCacheManager.clearAllCache({ layers: ['localStorage'] })` | localStorage | Yes |
+| Clear IndexedDB Cache | `CacheControlMenu.triggerAction('indexeddb')` → `UnifiedCacheManager.clearAllCache({ layers: ['indexedDB'] })` | IndexedDB | Yes |
+| Full Clear + Refresh | `CacheControlMenu.triggerAction('full')` → `UnifiedCacheManager.clearAllCacheDetailed({ autoRefresh: true })` | All | Yes + countdown |
 
 Each action:
 - Emits `cache:clear` event.
 - Logs entry with timestamp, user action.
+- Reports metadata (`profileId`, `userId`, `page`) to `/api/cache/log`.
 
 ---
 
@@ -136,9 +141,9 @@ All environments share identical frontend cache configuration files.
 > ראה גם [CHECKLIST מפורט](TESTING/CACHE_STAGE_B_LITE_VALIDATION_CHECKLIST.md) לבדיקות צעד-אחר-צעד.
 
 1. **Global Cache Controls**  
-   - [ ] Buttons exist in header menu on every page (dev/prod).  
-   - [ ] Each action logs entry in `cache.log`.  
-   - [ ] After “Full Clear + Refresh” data loads fresh.
+- [ ] Buttons exist in header menu on every page (dev/prod).  
+- [ ] Each action logs entry in `cache.log` and `/api/cache/log`.  
+- [ ] After “Full Clear + Refresh” data loads fresh.
 
 2. **Page Data Refresh**  
    - [ ] Trading Accounts page updates list after create/update/delete.  
@@ -147,8 +152,8 @@ All environments share identical frontend cache configuration files.
    - [ ] Positions & Portfolio respect TTL upon navigation.
 
 3. **No Non-central Cache**  
-   - [ ] No `window.*Data` assignments left.  
-   - [ ] `localStorage` access only via `UnifiedCacheManager`.
+- [ ] No `window.*Data` assignments left or they are mirrored into `UnifiedCacheManager`.  
+- [ ] `localStorage` access only via `UnifiedCacheManager`.
 
 ---
 

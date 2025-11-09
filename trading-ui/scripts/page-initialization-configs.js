@@ -221,15 +221,17 @@ const PAGE_CONFIGS = {
                 // window.Logger.info('📊 Initializing Dashboard...', { page: "page-initialization-configs" });
                 
                 // Load trading accounts data if needed for portfolio
-                if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
+                const loadAccounts =
+                    typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function'
+                        ? window.loadTradingAccountsDataForTradingAccountsPage
+                        : window.loadAccountsData;
+                if (typeof loadAccounts === 'function') {
                     try {
-                        await window.loadTradingAccountsDataForTradingAccountsPage();
-                    } catch (error) {
-                        window.Logger?.warn('⚠️ Error loading trading accounts data:', error, { page: "page-initialization-configs" });
-                    }
-                } else if (typeof window.loadAccountsData === 'function') {
-                    try {
-                        await window.loadAccountsData();
+                        if (window.CacheTTLGuard?.ensure) {
+                            await window.CacheTTLGuard.ensure('accounts-data', loadAccounts);
+                        } else {
+                            await loadAccounts();
+                        }
                     } catch (error) {
                         window.Logger?.warn('⚠️ Error loading accounts data:', error, { page: "page-initialization-configs" });
                     }
@@ -247,7 +249,11 @@ const PAGE_CONFIGS = {
                     
                     // Load dashboard data
                     if (typeof window.loadDashboardData === 'function') {
-                        await window.loadDashboardData();
+                        if (window.CacheTTLGuard?.ensure) {
+                            await window.CacheTTLGuard.ensure('dashboard-data', window.loadDashboardData);
+                        } else {
+                            await window.loadDashboardData();
+                        }
                     }
                 }
                 
@@ -394,7 +400,11 @@ const PAGE_CONFIGS = {
                 } else {
                     // Fallback to old method
                     if (typeof window.loadTradesData === 'function') {
-                        await window.loadTradesData();
+                        if (window.CacheTTLGuard?.ensure) {
+                            await window.CacheTTLGuard.ensure('trade-data', window.loadTradesData);
+                        } else {
+                            await window.loadTradesData();
+                        }
                     }
                 }
             },
@@ -475,7 +485,11 @@ const PAGE_CONFIGS = {
                 }
                 
                 if (typeof window.loadExecutionsData === 'function') {
-                    await window.loadExecutionsData();
+                    if (window.CacheTTLGuard?.ensure) {
+                        await window.CacheTTLGuard.ensure('executions-data', window.loadExecutionsData);
+                    } else {
+                        await window.loadExecutionsData();
+                    }
                 }
                 
                 // Initialize import modal
@@ -525,7 +539,11 @@ const PAGE_CONFIGS = {
                 
                 // Load trade plans data directly
                 if (typeof window.loadTradePlansData === 'function') {
-                    await window.loadTradePlansData();
+                    if (window.CacheTTLGuard?.ensure) {
+                        await window.CacheTTLGuard.ensure('trade-plans-data', window.loadTradePlansData);
+                    } else {
+                        await window.loadTradePlansData();
+                    }
                 } else {
                     window.Logger.warn('⚠️ loadTradePlansData function not available', { page: "page-initialization-configs" });
                 }
@@ -585,7 +603,11 @@ const PAGE_CONFIGS = {
                 window.Logger.info('🔔 Initializing Alerts...', { page: "page-initialization-configs" });
                 
                 if (typeof window.loadAlertsData === 'function') {
-                    await window.loadAlertsData();
+                    if (window.CacheTTLGuard?.ensure) {
+                        await window.CacheTTLGuard.ensure('alerts-data', window.loadAlertsData);
+                    } else {
+                        await window.loadAlertsData();
+                    }
                 }
                 
                 // Setup alert-specific handlers (function not implemented yet)
@@ -655,14 +677,18 @@ const PAGE_CONFIGS = {
                 window.Logger.info('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage, { page: "page-initialization-configs" });
                 window.Logger.info('  - loadAccountsData:', typeof window.loadAccountsData, { page: "page-initialization-configs" });
                 
-                if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
-                    console.log('📡 Calling loadTradingAccountsDataForTradingAccountsPage...');
-                    window.Logger.info('📡 Calling loadTradingAccountsDataForTradingAccountsPage...', { page: "page-initialization-configs" });
-                    await window.loadTradingAccountsDataForTradingAccountsPage();
-                } else if (typeof window.loadAccountsData === 'function') {
-                    console.log('📡 Calling loadAccountsData...');
-                    window.Logger.info('📡 Calling loadAccountsData...', { page: "page-initialization-configs" });
-                    await window.loadAccountsData();
+                const loadTradingAccounts =
+                    typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function'
+                        ? window.loadTradingAccountsDataForTradingAccountsPage
+                        : window.loadAccountsData;
+                if (typeof loadTradingAccounts === 'function') {
+                    console.log('📡 Calling trading accounts loader via CacheTTLGuard...');
+                    window.Logger.info('📡 Calling trading accounts loader via CacheTTLGuard...', { page: "page-initialization-configs" });
+                    if (window.CacheTTLGuard?.ensure) {
+                        await window.CacheTTLGuard.ensure('accounts-data', loadTradingAccounts);
+                    } else {
+                        await loadTradingAccounts();
+                    }
                 } else {
                     console.warn('⚠️ No suitable function found for loading trading accounts data');
                     window.Logger.info('⚠️ No suitable function found for loading trading accounts data', { page: "page-initialization-configs" });
@@ -723,7 +749,11 @@ const PAGE_CONFIGS = {
                 }
                 
                 if (typeof window.loadCashFlowsData === 'function') {
-                    await window.loadCashFlowsData();
+                    if (window.CacheTTLGuard?.ensure) {
+                        await window.CacheTTLGuard.ensure('cash_flows-data', window.loadCashFlowsData);
+                    } else {
+                        await window.loadCashFlowsData();
+                    }
                 }
             }
         ]
@@ -771,7 +801,11 @@ const PAGE_CONFIGS = {
                 window.Logger.info('📊 Initializing Tickers...', { page: "page-initialization-configs" });
                 
                 if (typeof window.loadTickersData === 'function') {
-                    await window.loadTickersData();
+                    if (window.CacheTTLGuard?.ensure) {
+                        await window.CacheTTLGuard.ensure('tickers-data', window.loadTickersData);
+                    } else {
+                        await window.loadTickersData();
+                    }
                 }
             }
         ]
@@ -829,9 +863,13 @@ const PAGE_CONFIGS = {
                         console.warn('⚠️ [page-initialization-configs] loadData is not a function, trying fallback...');
                         // Fallback to direct function call if general system doesn't have it
                         if (typeof window.loadNotesData === 'function') {
-                            console.log('📝 [page-initialization-configs] Initializing Notes (fallback to loadNotesData)...');
+                            console.log('📝 [page-initialization-configs] Initializing Notes (fallback to loadNotesData via TTL guard)...');
                             try {
-                                await window.loadNotesData();
+                                if (window.CacheTTLGuard?.ensure) {
+                                    await window.CacheTTLGuard.ensure('notes-data', window.loadNotesData);
+                                } else {
+                                    await window.loadNotesData();
+                                }
                                 console.log('✅ [page-initialization-configs] Notes data loaded successfully (fallback)');
                             } catch (error) {
                                 console.error('❌ [page-initialization-configs] Error in loadNotesData:', error);
@@ -844,9 +882,13 @@ const PAGE_CONFIGS = {
                     console.warn('⚠️ [page-initialization-configs] getPageDataFunctions not found, trying direct loadNotesData...');
                     // Fallback if getPageDataFunctions doesn't exist
                     if (typeof window.loadNotesData === 'function') {
-                        console.log('📝 [page-initialization-configs] Initializing Notes (direct loadNotesData)...');
+                        console.log('📝 [page-initialization-configs] Initializing Notes (direct loadNotesData via TTL guard)...');
                         try {
-                            await window.loadNotesData();
+                            if (window.CacheTTLGuard?.ensure) {
+                                await window.CacheTTLGuard.ensure('notes-data', window.loadNotesData);
+                            } else {
+                                await window.loadNotesData();
+                            }
                             console.log('✅ [page-initialization-configs] Notes data loaded successfully (direct)');
                         } catch (error) {
                             console.error('❌ [page-initialization-configs] Error in loadNotesData:', error);
@@ -1851,6 +1893,17 @@ const ADDITIONAL_PAGE_CONFIGS = {
 
 // Merge additional configs
 Object.assign(PAGE_CONFIGS, ADDITIONAL_PAGE_CONFIGS);
+
+const CACHE_CONTROL_GLOBAL = 'window.CacheControlMenu';
+Object.values(PAGE_CONFIGS).forEach((config) => {
+    if (Array.isArray(config.requiredGlobals)) {
+        if (!config.requiredGlobals.includes(CACHE_CONTROL_GLOBAL)) {
+            config.requiredGlobals.push(CACHE_CONTROL_GLOBAL);
+        }
+    } else {
+        config.requiredGlobals = [CACHE_CONTROL_GLOBAL];
+    }
+});
 
 window.PAGE_CONFIGS = PAGE_CONFIGS;
 window.PAGE_CONFIGS.__SOURCE = 'page-initialization-configs';

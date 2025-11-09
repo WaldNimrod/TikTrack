@@ -125,6 +125,37 @@ const TTL_VALUES = {
     'long': 24 * 60 * 60 * 1000      // 24 hours
 };
 
+/**
+ * Resolve whether backend cache should be considered disabled.
+ * Stage B-Lite specification requires backend cache to remain off.
+ */
+function isBackendCacheDisabled() {
+    try {
+        if (typeof window !== 'undefined') {
+            const candidates = [
+                window.SERVER_ENV?.CACHE_DISABLED,
+                window.SERVER_ENV?.cacheDisabled,
+                window.SERVER_STATUS?.CACHE_DISABLED,
+                window.SERVER_STATUS?.cacheDisabled,
+                window.SERVER_MODE?.CACHE_DISABLED,
+                window.SERVER_MODE?.cacheDisabled,
+                window.__TIKTRACK_CACHE_DISABLED__
+            ];
+            for (const value of candidates) {
+                if (typeof value !== 'undefined') {
+                    return Boolean(value);
+                }
+            }
+        }
+    } catch (resolutionError) {
+        if (typeof window !== 'undefined' && window.Logger) {
+            window.Logger.warn('⚠️ Unable to resolve backend cache flag, defaulting to disabled', resolutionError, { page: "unified-cache-manager" });
+        }
+    }
+    // Stage B-Lite default: backend cache stays disabled unless explicitly re-enabled.
+    return true;
+}
+
 class UnifiedCacheManager {
     constructor() {
         this.initialized = false;
@@ -133,6 +164,7 @@ class UnifiedCacheManager {
         this.db = null;
         this.hits = 0;
         this.responseTimes = [];
+        this.backendEnabled = !isBackendCacheDisabled();
         this.stats = {
             operations: {
                 save: 0,
@@ -144,7 +176,7 @@ class UnifiedCacheManager {
                 memory: { entries: 0, size: 0 },
                 localStorage: { entries: 0, size: 0 },
                 indexedDB: { entries: 0, size: 0 },
-                backend: { entries: 0, size: 0 }
+                backend: { entries: 0, size: 0, disabled: !this.backendEnabled }
             },
             performance: {
                 avgResponseTime: 0,
@@ -154,6 +186,7 @@ class UnifiedCacheManager {
         };
         
         // מדיניות מטמון ברירת מחדל
+        const backendPreferredLayer = this.backendEnabled ? 'backend' : 'memory';
         this.defaultPolicies = {
             'user-preferences': { layer: 'localStorage', ttl: null, compress: false },
             'preference_*': { layer: 'localStorage', ttl: 300000, compress: false }, // 5 דקות
@@ -164,16 +197,16 @@ class UnifiedCacheManager {
             'file-mappings': { layer: 'indexedDB', ttl: null, compress: true },
             'linter-results': { layer: 'indexedDB', ttl: 86400000, compress: true },
             'js-analysis': { layer: 'indexedDB', ttl: 86400000, compress: true },
-            'market-data': { layer: 'backend', ttl: 30000, compress: false },
-            'trade-data': { layer: 'backend', ttl: 30000, compress: false },
-            'dashboard-data': { layer: 'backend', ttl: 300000, compress: false },
+            'market-data': { layer: backendPreferredLayer, ttl: 30000, compress: false },
+            'trade-data': { layer: backendPreferredLayer, ttl: 30000, compress: false },
+            'dashboard-data': { layer: backendPreferredLayer, ttl: 300000, compress: false },
             'trade-positions': { layer: 'memory', ttl: 300000, compress: false, maxSize: 500 * 1024, validate: true, syncToBackend: false },
-            'account-activity-data': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
-            'account-activity-*': { layer: 'backend', ttl: 60000, compress: false },
-            'account-balance-*': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
-            'positions-account-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
-            'portfolio-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
-            'portfolio-summary-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] }
+            'account-activity-data': { layer: backendPreferredLayer, ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
+            'account-activity-*': { layer: backendPreferredLayer, ttl: 60000, compress: false },
+            'account-balance-*': { layer: backendPreferredLayer, ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
+            'positions-account-*': { layer: backendPreferredLayer, ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
+            'portfolio-*': { layer: backendPreferredLayer, ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
+            'portfolio-summary-*': { layer: backendPreferredLayer, ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] }
         };
         
         // ממשקי שכבות מטמון
@@ -181,7 +214,7 @@ class UnifiedCacheManager {
             memory: new MemoryLayer(),
             localStorage: new LocalStorageLayer(),
             indexedDB: null, // יאותחל מאוחר יותר
-            backend: new BackendCacheLayer()
+            backend: new BackendCacheLayer({ disabled: !this.backendEnabled })
         };
     }
 
@@ -335,7 +368,9 @@ class UnifiedCacheManager {
         
         try {
             // חיפוש בכל השכבות לפי סדר עדיפות
-            const searchOrder = ['memory', 'localStorage', 'indexedDB', 'backend'];
+            const searchOrder = this.backendEnabled
+                ? ['memory', 'localStorage', 'indexedDB', 'backend']
+                : ['memory', 'localStorage', 'indexedDB'];
             
             for (const layer of searchOrder) {
                 if (this.layers[layer]) {
@@ -752,6 +787,38 @@ class UnifiedCacheManager {
     }
 
     /**
+     * Build unified preference cache key (Stage B-Lite format)
+     * @param {string} preferenceName
+     * @param {number|string|null} profileId
+     * @returns {string}
+     */
+    buildPreferenceCacheKey(preferenceName, profileId) {
+        const normalizedProfile = profileId === null || profileId === undefined ? 'default' : String(profileId);
+        return `preference_${preferenceName}__profile_${normalizedProfile}`;
+    }
+
+    /**
+     * Build unified preference group cache key
+     * @param {string} groupName
+     * @param {number|string|null} profileId
+     * @returns {string}
+     */
+    buildPreferenceGroupCacheKey(groupName, profileId) {
+        const normalizedProfile = profileId === null || profileId === undefined ? 'default' : String(profileId);
+        return `preference_group_${groupName}__profile_${normalizedProfile}`;
+    }
+
+    /**
+     * Build unified all preferences snapshot cache key
+     * @param {number|string|null} profileId
+     * @returns {string}
+     */
+    buildPreferencesSnapshotKey(profileId) {
+        const normalizedProfile = profileId === null || profileId === undefined ? 'default' : String(profileId);
+        return `all_preferences__profile_${normalizedProfile}`;
+    }
+
+    /**
      * בחירת שכבה אוטומטית לפי קריטריונים
      * @param {any} data - הנתונים
      * @param {Object} policy - מדיניות מטמון
@@ -760,6 +827,9 @@ class UnifiedCacheManager {
     selectLayer(data, policy) {
         // אם מדיניות מגדירה שכבה ספציפית
         if (policy.layer) {
+            if (policy.layer === 'backend' && !this.backendEnabled) {
+                return 'memory';
+            }
             return policy.layer;
         }
         
@@ -788,18 +858,26 @@ class UnifiedCacheManager {
         // חיפוש מדיניות לפי מפתח
         for (const [pattern, policy] of Object.entries(this.defaultPolicies)) {
             if (key.includes(pattern)) {
-                return { ...policy, ...options };
+                const resolvedPolicy = { ...policy, ...options };
+                if (!this.backendEnabled && resolvedPolicy.layer === 'backend') {
+                    resolvedPolicy.layer = 'memory';
+                }
+                return resolvedPolicy;
             }
         }
         
         // מדיניות ברירת מחדל
-        return {
+        const fallbackPolicy = {
             layer: null, // בחירה אוטומטית
             ttl: 3600000, // שעה
             compress: false,
             syncToBackend: false,
             ...options
         };
+        if (!this.backendEnabled && fallbackPolicy.layer === 'backend') {
+            fallbackPolicy.layer = 'memory';
+        }
+        return fallbackPolicy;
     }
 
     /**
@@ -1270,17 +1348,34 @@ class IndexedDBLayer {
  * Backend Cache Layer - שכבה 4: נתונים קריטיים
  */
 class BackendCacheLayer {
-    constructor() {
+    constructor({ disabled = false } = {}) {
         this.cache = new Map();
+        this.disabled = disabled;
+        this.initialized = false;
     }
 
     async initialize() {
         this.cache.clear();
-                // window.Logger.info('✅ Backend Cache Layer initialized', { page: "unified-cache-manager" });
+        this.initialized = true;
+        if (this.disabled) {
+            if (typeof window !== 'undefined' && window.Logger) {
+                window.Logger.info('ℹ️ Backend cache layer disabled (Stage B-Lite)', { page: "unified-cache-manager" });
+            }
+            return true;
+        }
+        // window.Logger.info('✅ Backend Cache Layer initialized', { page: "unified-cache-manager" });
     }
 
     async save(key, data, policy) {
+        if (this.disabled) {
+            if (typeof window !== 'undefined' && window.Logger?.debug) {
+                window.Logger.debug(`ℹ️ Backend cache disabled - skipping save for ${key}`, { page: "unified-cache-manager" });
+            }
+        }
         try {
+            if (this.disabled) {
+                return true;
+            }
             this.cache.set(key, {
                 data,
                 timestamp: Date.now(),
@@ -1294,6 +1389,9 @@ class BackendCacheLayer {
     }
 
     async get(key, options) {
+        if (this.disabled) {
+            return null;
+        }
         try {
             const entry = this.cache.get(key);
             if (!entry) return null;
@@ -1312,6 +1410,9 @@ class BackendCacheLayer {
     }
 
     async remove(key, options) {
+        if (this.disabled) {
+            return true;
+        }
         try {
             return this.cache.delete(key);
         } catch (error) {
@@ -1321,6 +1422,9 @@ class BackendCacheLayer {
     }
 
     async clear(options) {
+        if (this.disabled) {
+            return true;
+        }
         try {
             this.cache.clear();
             return true;
@@ -1331,6 +1435,13 @@ class BackendCacheLayer {
     }
 
     getStats() {
+        if (this.disabled) {
+            return {
+                entries: 0,
+                size: 0,
+                disabled: true
+            };
+        }
         return {
             entries: this.cache.size,
             size: 0 // לא ניתן לחשב בקליינט
@@ -1338,6 +1449,9 @@ class BackendCacheLayer {
     }
     
     async getAllKeys() {
+        if (this.disabled) {
+            return [];
+        }
         return Array.from(this.cache.keys());
     }
 
@@ -3032,14 +3146,19 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
             );
         };
         
+        const profileIdStrings = profileIdList.map(pid => String(pid));
         const matchesProfile = (normalizedKey) => {
             if (normalizedKey === 'user-preferences') {
                 return true;
             }
-            if (profileIdList.length === 0) {
+            if (profileIdStrings.length === 0) {
                 return true;
             }
-            return profileIdList.some(
+            if (normalizedKey.includes('__profile_')) {
+                const profilePart = normalizedKey.split('__profile_').pop();
+                return profileIdStrings.includes(profilePart);
+            }
+            return profileIdStrings.some(
                 (pid) =>
                     normalizedKey.endsWith(`_${userId}_${pid}`) ||
                     normalizedKey === `all_preferences_${userId}_${pid}`
@@ -3061,18 +3180,26 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
         console.log('🔍 DEBUG: localStorage has', localStorageKeys.length, 'total keys');
         
         const keysToRemove = new Set();
+        const registerKeyVariants = (storageKey) => {
+            keysToRemove.add(storageKey);
+            if (storageKey.startsWith('tiktrack_')) {
+                keysToRemove.add(storageKey.substring('tiktrack_'.length));
+            } else {
+                keysToRemove.add(`tiktrack_${storageKey}`);
+            }
+        };
         
         keys.forEach((key) => {
             const normalized = normalizeKey(key);
             if (shouldRemove(normalized)) {
-                keysToRemove.add(normalized);
+                registerKeyVariants(key);
             }
         });
         
         localStorageKeys.forEach((key) => {
             const normalized = normalizeKey(key);
             if (shouldRemove(normalized)) {
-                keysToRemove.add(normalized);
+                registerKeyVariants(key);
             }
         });
         
@@ -3089,31 +3216,35 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
         }
         
         let removedCount = 0;
-        for (const normalizedKey of keysToRemove) {
+        for (const cacheKey of keysToRemove) {
             try {
-                console.log(`🗑️ DEBUG: Processing normalized key: ${normalizedKey}`);
+                console.log(`🗑️ DEBUG: Processing cache key: ${cacheKey}`);
                 
-                const prefixedKey = `tiktrack_${normalizedKey}`;
-                
-                if (localStorage.getItem(normalizedKey) !== null) {
-                    localStorage.removeItem(normalizedKey);
+                if (localStorage.getItem(cacheKey) !== null) {
+                    localStorage.removeItem(cacheKey);
                     removedCount++;
-                    console.log(`✅ DEBUG: Removed ${normalizedKey} from localStorage`);
-                    window.Logger.debug(`🗑️ Removed ${normalizedKey} from localStorage`, { page: "unified-cache-manager" });
+                    console.log(`✅ DEBUG: Removed ${cacheKey} from localStorage`);
+                    window.Logger.debug(`🗑️ Removed ${cacheKey} from localStorage`, { page: "unified-cache-manager" });
                 }
                 
-                if (localStorage.getItem(prefixedKey) !== null) {
-                    localStorage.removeItem(prefixedKey);
-                    removedCount++;
-                    console.log(`✅ DEBUG: Removed ${prefixedKey} from localStorage`);
-                    window.Logger.debug(`🗑️ Removed ${prefixedKey} from localStorage`, { page: "unified-cache-manager" });
+                if (cacheKey.startsWith('tiktrack_')) {
+                    const legacyKey = cacheKey.substring('tiktrack_'.length);
+                    if (localStorage.getItem(legacyKey) !== null) {
+                        localStorage.removeItem(legacyKey);
+                        removedCount++;
+                        console.log(`✅ DEBUG: Removed legacy key ${legacyKey} from localStorage`);
+                        window.Logger.debug(`🗑️ Removed legacy key ${legacyKey} from localStorage`, { page: "unified-cache-manager" });
+                    }
                 }
                 
-                console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${normalizedKey}")`);
-                await this.remove(normalizedKey);
+                console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${cacheKey}")`);
+                await this.remove(cacheKey);
+                if (cacheKey.startsWith('tiktrack_')) {
+                    await this.remove(cacheKey.substring('tiktrack_'.length));
+                }
             } catch (removeError) {
-                console.error(`❌ DEBUG: Failed to remove key ${normalizedKey}:`, removeError);
-                window.Logger.warn(`⚠️ Failed to remove key ${normalizedKey}:`, removeError, { page: "unified-cache-manager" });
+                console.error(`❌ DEBUG: Failed to remove key ${cacheKey}:`, removeError);
+                window.Logger.warn(`⚠️ Failed to remove key ${cacheKey}:`, removeError, { page: "unified-cache-manager" });
             }
         }
         

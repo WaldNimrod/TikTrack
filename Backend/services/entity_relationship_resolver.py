@@ -247,8 +247,13 @@ class EntityRelationshipResolver:
                 
                 # Get the field value from source entity (e.g., execution.trading_account_id)
                 target_id = getattr(source_entity, field, None)
-                if not target_id:
-                    logger.debug(f"Field {field} is None or empty for {source_type} {source_id}")
+                # Check for None explicitly - 0 is a valid ID (though unlikely, but we should handle it)
+                if target_id is None:
+                    logger.debug(f"Field {field} is None for {source_type} {source_id}")
+                    return []
+                # Also check if it's 0 or 0.0 (invalid ID)
+                if target_id == 0 or target_id == 0.0:
+                    logger.debug(f"Field {field} is 0 for {source_type} {source_id}, skipping")
                     return []
                 
                 logger.debug(f"Found {field}={target_id} for {source_type} {source_id}, querying {target_type}")
@@ -337,8 +342,13 @@ class EntityRelationshipResolver:
                 # Get through_id from source (e.g., alert.plan_condition_id)
                 through_field = config.get('field')  # e.g., 'plan_condition_id'
                 through_id = getattr(source_entity, through_field, None)
-                if not through_id:
+                # Check for None explicitly - 0 is invalid ID
+                if through_id is None:
                     logger.debug(f"No {through_field} found for {source_type} {source_id}, conditional relationship returns empty")
+                    return []
+                # Also check if it's 0 or 0.0 (invalid ID)
+                if through_id == 0 or through_id == 0.0:
+                    logger.debug(f"{through_field} is 0 for {source_type} {source_id}, conditional relationship returns empty")
                     return []
                 
                 # Get through entity
@@ -349,7 +359,8 @@ class EntityRelationshipResolver:
                 # Get target_id from through entity (e.g., PlanCondition.trade_plan_id)
                 target_field = config.get('target_query')  # e.g., 'PlanCondition.trade_plan_id'
                 target_id = getattr(through_entity, self._extract_target_field(target_field))
-                if not target_id:
+                # Check for None explicitly - 0 is invalid ID
+                if target_id is None or target_id == 0 or target_id == 0.0:
                     return []
                 
                 # Get target entity
@@ -443,17 +454,24 @@ class EntityRelationshipResolver:
                     logger.debug(f"Legacy parent check: {source_type} {source_id} has related_type_id={source_related_type_id}, related_id={source_related_id}, looking for relation_type_id={relation_type_id}")
                     if source_related_type_id == relation_type_id:
                         target_id = source_related_id
-                        if target_id:
-                            target_model = MODEL_MAP.get(target_type)
-                            if target_model:
-                                target_entity = db.query(target_model).filter(target_model.id == target_id).first()
-                                if target_entity:
-                                    logger.debug(f"Found legacy parent {target_type} {target_id} for {source_type} {source_id}")
-                                    item = self._format_entity(target_entity, target_type, db)
-                                    if item and self._should_add_item(target_type, item['id'], config):
-                                        return [item]
-                                else:
-                                    logger.debug(f"Legacy parent {target_type} {target_id} not found in database")
+                        # Check for None explicitly - 0 is invalid ID
+                        if target_id is None:
+                            logger.debug(f"Legacy parent check: related_id is None for {source_type} {source_id}")
+                            return []
+                        # Also check if it's 0 or 0.0 (invalid ID)
+                        if target_id == 0 or target_id == 0.0:
+                            logger.debug(f"Legacy parent check: related_id is 0 for {source_type} {source_id}, skipping")
+                            return []
+                        target_model = MODEL_MAP.get(target_type)
+                        if target_model:
+                            target_entity = db.query(target_model).filter(target_model.id == target_id).first()
+                            if target_entity:
+                                logger.debug(f"Found legacy parent {target_type} {target_id} for {source_type} {source_id}")
+                                item = self._format_entity(target_entity, target_type, db)
+                                if item and self._should_add_item(target_type, item['id'], config):
+                                    return [item]
+                            else:
+                                logger.debug(f"Legacy parent {target_type} {target_id} not found in database")
                     else:
                         logger.debug(f"Legacy parent check failed: related_type_id {source_related_type_id} != {relation_type_id}")
                 else:
@@ -533,7 +551,7 @@ class EntityRelationshipResolver:
                         for parent_item in parent_items:
                             if parent_type == 'trade_plan':
                                 trade_plan = db.query(TradePlan).filter(TradePlan.id == parent_item['id']).first()
-                                if trade_plan and trade_plan.trading_account_id:
+                                if trade_plan and trade_plan.trading_account_id is not None and trade_plan.trading_account_id != 0:
                                     account = db.query(TradingAccount).filter(
                                         TradingAccount.id == trade_plan.trading_account_id
                                     ).first()
@@ -543,7 +561,7 @@ class EntityRelationshipResolver:
                                             cascaded_items.append(account_item)
                             elif parent_type == 'trade':
                                 trade = db.query(Trade).filter(Trade.id == parent_item['id']).first()
-                                if trade and trade.trading_account_id:
+                                if trade and trade.trading_account_id is not None and trade.trading_account_id != 0:
                                     account = db.query(TradingAccount).filter(
                                         TradingAccount.id == trade.trading_account_id
                                     ).first()
@@ -558,7 +576,7 @@ class EntityRelationshipResolver:
                         for parent_item in parent_items:
                             if parent_type == 'trade':
                                 trade = db.query(Trade).filter(Trade.id == parent_item['id']).first()
-                                if trade and trade.trade_plan_id:
+                                if trade and trade.trade_plan_id is not None and trade.trade_plan_id != 0:
                                     trade_plan = db.query(TradePlan).filter(TradePlan.id == trade.trade_plan_id).first()
                                     if trade_plan:
                                         plan_item = self._format_entity(trade_plan, 'trade_plan', db)

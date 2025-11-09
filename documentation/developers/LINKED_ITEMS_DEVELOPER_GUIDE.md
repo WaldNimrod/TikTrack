@@ -4,7 +4,7 @@
 
 Complete guide for developers working with the Linked Items system in TikTrack.
 
-**Version**: 2.1.0  
+**Version**: 2.2.0  
 **Date**: 2025-01-12  
 **Architecture**: Configuration-Based Schema
 
@@ -482,6 +482,24 @@ for item in linked_items:
 2. **Robust DateTime Formatting**
    - Improved `_format_datetime` to handle `None` values and various exceptions
    - Returns `None` gracefully instead of raising exceptions
+
+### Recent Changes (v2.2.0 - 2025-01-12)
+
+1. **Fixed Null/Zero ID Handling**
+   - **Issue**: The resolver was using `if not target_id:` which incorrectly treated `0` and `0.0` as falsy, preventing valid lookups
+   - **Fix**: Updated all ID checks to explicitly check for `None` and `0`/`0.0` separately
+   - **Affected Functions**:
+     - `_fetch_direct_relationship()` - Now checks `target_id is None` and `target_id == 0 or target_id == 0.0`
+     - `_fetch_through_relationship()` - Now checks `through_id` and `target_id` explicitly
+     - `_fetch_legacy_relationship()` - Now checks `target_id` explicitly
+     - `_apply_cascades()` - Now checks `trading_account_id` and `trade_plan_id` explicitly
+   - **Impact**: Cash flows and executions with `trade_id = 0` or `None` are now handled correctly
+   - **Example**: Cash flow with `trade_id = None` no longer attempts to fetch non-existent trade
+
+2. **Improved Validation for All Relationship Types**
+   - All direct, through, conditional, and legacy relationships now properly validate IDs
+   - Prevents unnecessary database queries for invalid IDs
+   - Better logging for debugging ID validation issues
 
 ---
 

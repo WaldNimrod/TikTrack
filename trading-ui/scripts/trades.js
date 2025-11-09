@@ -228,7 +228,8 @@ function formatDailyChange(dailyChange) {
   
   const color = isPositive ? colors.positive : colors.negative;
   
-  return `<span style="color: ${color}; font-weight: bold;">${formattedValue}</span>`;
+  const colorClass = isPositive ? 'numeric-value-positive' : 'numeric-value-negative';
+  return `<span class="${colorClass}">${formattedValue}</span>`;
   } catch (error) {
     window.Logger.error('Error in formatDailyChange:', error, { dailyChange, page: "trades" });
     return '-';
@@ -596,14 +597,14 @@ async function updateTradesTable(trades) {
 
     // שימוש ב-FieldRendererService לרינדור שדות
     const tickerDisplay = trade.ticker_symbol || getTickerSymbol(trade.ticker_id) || 'טיקר לא ידוע';
-    const tickerLink = `<button class="btn btn-sm btn-outline-secondary" onclick="viewTickerDetails('${trade.ticker_id}')" title="פרטי טיקר" style="padding: 2px 6px; font-size: 12px;">🔗</button>`;
+    const tickerLink = `<button class="btn btn-sm btn-outline-secondary table-btn-small-12" onclick="viewTickerDetails('${trade.ticker_id}')" title="פרטי טיקר">🔗</button>`;
 
     return `
     <tr>
       <td class="ticker-cell">
-        <div style="display: flex; align-items: center; gap: 6px;">
+        <div class="table-cell-flex-small">
           ${tickerLink}
-          <span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+          <span class="entity-trade-badge entity-badge-base">
             ${tickerDisplay}
           </span>
         </div>
@@ -636,7 +637,7 @@ async function updateTradesTable(trades) {
       <td class="position-quantity-cell">
         ${(() => {
           if (!trade.position || trade.position.quantity === 0) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">אין ביצועים</span>';
+            return '<span class="numeric-value-zero entity-badge-medium">אין ביצועים</span>';
           }
           const qty = trade.position.quantity;
           const avgPrice = trade.position.average_price || 0;
@@ -646,14 +647,14 @@ async function updateTradesTable(trades) {
       <td class="position-pl-percent-cell">
         ${(() => {
           if (!trade.position || !trade.position.average_price) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>';
+            return '<span class="numeric-value-zero entity-badge-medium">-</span>';
           }
           const tickerData = tickerDataMap[trade.ticker_id];
           const currentPrice = tickerData?.current_price || 0;
           const avgPrice = trade.position.average_price;
           
           if (currentPrice === 0 || avgPrice === 0) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>';
+            return '<span class="numeric-value-zero entity-badge-medium">-</span>';
           }
           
           const plPercent = ((currentPrice - avgPrice) / avgPrice) * 100;
@@ -663,7 +664,7 @@ async function updateTradesTable(trades) {
       <td class="position-pl-value-cell">
         ${(() => {
           if (!trade.position || !trade.position.quantity) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>';
+            return '<span class="numeric-value-zero entity-badge-medium">-</span>';
           }
           const tickerData = tickerDataMap[trade.ticker_id];
           const currentPrice = tickerData?.current_price || 0;
@@ -671,7 +672,7 @@ async function updateTradesTable(trades) {
           const qty = trade.position.quantity;
           
           if (currentPrice === 0 || avgPrice === 0) {
-            return '<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">חסר מחיר</span>';
+            return '<span class="numeric-value-zero entity-badge-medium">חסר מחיר</span>';
           }
           
           const plValue = (currentPrice - avgPrice) * qty;
@@ -680,7 +681,7 @@ async function updateTradesTable(trades) {
       </td>
       <td class="status-cell" data-status="${trade.status || ''}">${window.FieldRendererService ? window.FieldRendererService.renderStatus(trade.status, 'trade') : `<span class="status-badge status-${trade.status || 'open'}">${trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח'}</span>`}</td>
       <td class="type-cell" data-type="${typeForFilter}">
-        ${window.FieldRendererService ? window.FieldRendererService.renderType(trade.investment_type) : `<span class='investment-type-badge' style='background-color: ${getInvestmentTypeColor(trade.investment_type)}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 500;'>${window.translateTradeType ? window.translateTradeType(trade.investment_type) : trade.investment_type || '-'}</span>`}
+        ${window.FieldRendererService ? window.FieldRendererService.renderType(trade.investment_type) : `<span class='investment-type-badge badge-type' data-type='${trade.investment_type || ''}' style='background-color: ${getInvestmentTypeColor(trade.investment_type)};'>${window.translateTradeType ? window.translateTradeType(trade.investment_type) : trade.investment_type || '-'}</span>`}
       </td>
       <td class="side-cell" data-side="${trade.side || 'Long'}">
         ${window.FieldRendererService ? window.FieldRendererService.renderSide(trade.side) : `<span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>`}

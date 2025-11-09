@@ -2349,9 +2349,9 @@ function updateTradePlansTable(trade_plans) {
     return `
       <tr>
         <td class="ticker-cell">
-          <div style="display: flex; align-items: center; gap: 6px;">
+          <div class="table-cell-flex-small">
             ${tickerLink}
-            <span class="entity-trade-plan-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+            <span class="entity-trade-plan-badge entity-badge-base">
               ${tickerDisplay}
             </span>
           </div>
@@ -2376,10 +2376,10 @@ function updateTradePlansTable(trade_plans) {
         <td class="type-cell" data-type="${typeForFilter}">
           ${(window.FieldRendererService && window.FieldRendererService.renderType) 
             ? window.FieldRendererService.renderType(design.investment_type) 
-            : (window.renderType ? window.renderType(design.investment_type) : `<span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${typeDisplay}</span>`)}
+            : (window.renderType ? window.renderType(design.investment_type) : `<span class="entity-trade-badge entity-badge-base">${typeDisplay}</span>`)}
         </td>
         <td class="side-cell" data-side="${design.side}">
-          ${window.renderSide ? window.renderSide(design.side) : `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${sideDisplay}</span>`}
+          ${window.renderSide ? window.renderSide(design.side) : `<span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'} entity-badge-base">${sideDisplay}</span>`}
         </td>
         <td class="quantity-cell">
           ${(() => {
@@ -2390,14 +2390,14 @@ function updateTradePlansTable(trade_plans) {
             
             if (calculatedQuantity > 0) {
               const formatted = calculatedQuantity.toFixed(1);
-              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">#${formatted}</span>`;
+              return `<span class="numeric-value-positive entity-badge-medium">#${formatted}</span>`;
             } else {
-              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+              return `<span class="numeric-value-positive entity-badge-medium">-</span>`;
             }
           })()}
         </td>
         <td class="price-cell">
-          <span class="target-text" style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'};">
+          <span class="target-text numeric-value-positive">
             ${(() => {
               const targetPrice = design.target_price || 0;
               const formatted = targetPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -2415,7 +2415,7 @@ function updateTradePlansTable(trade_plans) {
         <td class="status-cell" data-status="${statusForFilter}">
           ${(window.FieldRendererService && window.FieldRendererService.renderStatus) 
             ? window.FieldRendererService.renderStatus(design.status, 'trade_plan') 
-            : (window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">${statusDisplay}</span>`)}
+            : (window.renderStatus ? window.renderStatus(design.status, 'trade_plan') : `<span class="status-${design.status}-badge entity-badge-base">${statusDisplay}</span>`)}
         </td>
         <td class="reward-cell">
           ${(() => {
@@ -2428,9 +2428,9 @@ function updateTradePlansTable(trade_plans) {
               const quantity = plannedAmount / targetPrice;
               const potentialProfit = quantity * (targetPrice - currentPrice);
               const profitFormatted = Math.round(potentialProfit).toLocaleString('en-US');
-              return `<span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">$${profitFormatted}</span>`;
+              return `<span class="numeric-value-positive entity-badge-medium">$${profitFormatted}</span>`;
             } else {
-              return `<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+              return `<span class="numeric-value-zero entity-badge-medium">-</span>`;
             }
           })()}
         </td>
@@ -2446,9 +2446,9 @@ function updateTradePlansTable(trade_plans) {
               const quantity = plannedAmount / targetPrice;
               const potentialLoss = quantity * (currentPrice - stopPrice);
               const lossFormatted = Math.round(Math.abs(potentialLoss)).toLocaleString('en-US');
-              return `<span class="numeric-value-negative" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">$${lossFormatted}</span>`;
+              return `<span class="numeric-value-negative entity-badge-medium">$${lossFormatted}</span>`;
             } else {
-              return `<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+              return `<span class="numeric-value-zero entity-badge-medium">-</span>`;
             }
           })()}
         </td>
@@ -2471,14 +2471,14 @@ function updateTradePlansTable(trade_plans) {
                 
                 // צביעה: סיכוי בירוק, סיכון באדום
                 return `
-                  <div style="font-size: 0.85em;">
-                    <span class="numeric-value-positive" style="margin-right: 4px;">${ratioFormatted}</span>
+                  <div class="entity-badge-base table-cell-flex-small">
+                    <span class="numeric-value-positive">${ratioFormatted}</span>
                     <span class="numeric-value-negative">1</span>
                   </div>
                 `;
               }
             }
-            return `<span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">-</span>`;
+            return `<span class="numeric-value-zero entity-badge-medium">-</span>`;
           })()}
         </td>
         <td class="actions-cell">

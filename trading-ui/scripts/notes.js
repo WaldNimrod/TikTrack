@@ -650,7 +650,7 @@ function updateNotesTable(notes) {
       }
 
         return `
-          <tr style='cursor: pointer;'>
+          <tr class="table-cell-clickable">
           <td class="related-cell">${relatedCellHtml}</td>
             <td>${contentDisplay}</td>
             <td data-date='${note.created_at}'>${date}</td>

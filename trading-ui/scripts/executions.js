@@ -1318,11 +1318,10 @@ async function updateExecutionsTableMain(executions) {
 
     // Trade column - show trade ID with link button if exists
     const tradeCell = execution.trade_id 
-      ? `<div style="display: flex; align-items: center; gap: 6px;">
-           <button class="btn btn-sm btn-outline-primary" 
+      ? `<div class="table-cell-flex-small">
+           <button class="btn btn-sm btn-outline-primary table-btn-small" 
                    onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${execution.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${execution.trade_id}, 'view'); }" 
-                   title="פתח פרטי טרייד"
-                   style="padding: 2px 6px; font-size: 0.75em;">
+                   title="פתח פרטי טרייד">
              🔗
            </button>
            <span>#${execution.trade_id}</span>
@@ -1335,8 +1334,8 @@ async function updateExecutionsTableMain(executions) {
                     ${tradeCell}
                 </td>
                 <td class="ticker-cell">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <strong style="cursor: pointer; color: ${positiveColor};" 
+                    <div class="table-cell-flex">
+                        <strong class="table-link-positive" 
                           onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                           title="פתח פרטי סימבול">${symbol}</strong>
                     </div>
@@ -1347,7 +1346,7 @@ async function updateExecutionsTableMain(executions) {
                         ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
                       </span>`}
                 </td>
-                <td data-account="${accountName}" style="cursor: pointer;" 
+                <td class="table-cell-clickable" data-account="${accountName}" 
                   onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                   title="פתח פרטי חשבון מסחר">${accountName}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
@@ -1355,21 +1354,21 @@ async function updateExecutionsTableMain(executions) {
                 <td class="realized-pl-cell" data-realized-pl="${execution.realized_pl || ''}">
                     ${execution.realized_pl !== null && execution.realized_pl !== undefined ? 
                         (execution.realized_pl >= 0 ? 
-                            `<span class="numeric-ltr" style="color: ${positiveColor}">$${execution.realized_pl}</span>` : 
-                            `<span class="numeric-ltr" style="color: ${negativeColor}">-$${Math.abs(execution.realized_pl)}</span>`) : 
+                            `<span class="numeric-ltr numeric-value-positive">$${execution.realized_pl}</span>` : 
+                            `<span class="numeric-ltr numeric-value-negative">-$${Math.abs(execution.realized_pl)}</span>`) : 
                         '-'}
                 </td>
                 <td class="mtm-pl-cell" data-mtm-pl="${execution.mtm_pl || ''}">
                     ${execution.mtm_pl !== null && execution.mtm_pl !== undefined ? 
                         (execution.mtm_pl >= 0 ? 
-                            `<span class="numeric-ltr" style="color: ${positiveColor}">$${execution.mtm_pl}</span>` : 
-                            `<span class="numeric-ltr" style="color: ${negativeColor}">-$${Math.abs(execution.mtm_pl)}</span>`) : 
+                            `<span class="numeric-ltr numeric-value-positive">$${execution.mtm_pl}</span>` : 
+                            `<span class="numeric-ltr numeric-value-negative">-$${Math.abs(execution.mtm_pl)}</span>`) : 
                         '-'}
                 </td>
                 <td data-date="${execution.date || execution.execution_date}">${window.renderExecutionDate ? window.renderExecutionDate(execution.date || execution.execution_date) : (execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-')}</td>
-                <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
+                <td class="numeric-ltr" dir="ltr">${execution.source || '-'}</td>
                 <td class="actions-cell">
-                    <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
+                    <div class="d-flex gap-1 justify-content-center align-items-center table-flex-nowrap">
                       ${(() => {
                         if (!window.createActionsMenu) {
                           return '<!-- Actions menu not available -->';

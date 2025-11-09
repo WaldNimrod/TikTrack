@@ -781,11 +781,10 @@ async function renderCashFlowsTable() {
     
     // Trade column - show trade ID with link button if exists
     const tradeCell = cashFlow.trade_id 
-      ? `<div style="display: flex; align-items: center; gap: 6px;">
-           <button class="btn btn-sm btn-outline-primary" 
+      ? `<div class="table-cell-flex-small">
+           <button class="btn btn-sm btn-outline-primary table-btn-small" 
                    onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${cashFlow.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${cashFlow.trade_id}, 'view'); }" 
-                   title="פתח פרטי טרייד"
-                   style="padding: 2px 6px; font-size: 0.75em;">
+                   title="פתח פרטי טרייד">
              🔗
            </button>
            <span>#${cashFlow.trade_id}</span>
@@ -848,9 +847,8 @@ async function renderCashFlowsTable() {
                 ${tradeCell}
             </td>
             <td class="col-account ticker-cell" data-account="${cashFlow.trading_account_id || accountName || ''}">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span class="entity-trading_account-badge entity-account-badge" 
-                          style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+                <div class="table-cell-flex">
+                    <span class="entity-trading_account-badge entity-account-badge entity-badge-base">
                         ${accountName}
                     </span>
                 </div>
@@ -859,7 +857,7 @@ async function renderCashFlowsTable() {
             <td class="col-amount text-end">
                 ${amountDisplay}
             </td>
-            <td class="col-date" data-date="${cashFlow.date || ''}" style="text-align: center;">${formatDate(cashFlow.date)}</td>
+            <td class="col-date table-cell-center" data-date="${cashFlow.date || ''}">${formatDate(cashFlow.date)}</td>
             <td class="col-description">${descriptionDisplay}</td>
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :
@@ -980,7 +978,7 @@ function getCashFlowTypeWithColor(type) {
       color = colors.secondary;
     }
     
-    return `<span style="color: ${color}; font-weight: 600;">${typeTranslation}</span>`;
+    return `<span class="numeric-value-positive" style="color: ${color}; font-weight: 600;">${typeTranslation}</span>`;
   }
 
   // fallback למערכת הצביעה הישנה
@@ -1002,7 +1000,7 @@ function getCashFlowTypeWithColor(type) {
     cssClass = 'numeric-value-zero';
   }
 
-  return `<span class="${cssClass}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;"><strong>${typeTranslation}</strong></span>`;
+  return `<span class="${cssClass} entity-badge-base"><strong>${typeTranslation}</strong></span>`;
   
   } catch (error) {
     window.Logger.error('שגיאה בקבלת סוג תזרים עם צבע:', error, { page: "cash_flows" });

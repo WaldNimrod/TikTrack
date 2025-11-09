@@ -681,14 +681,14 @@ function updateTradingAccountsTable(trading_accounts) {
       return `
       <tr data-trading-account-id="${tradingAccount.id}">
         <td class="ticker-cell" data-tradingAccount="${tradingAccount.name || '-'}">
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="table-cell-flex">
             <button class="btn actions-menu-item"
                     data-button-type="VIEW"
                     data-variant="small"
                     data-onclick="window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })"
                     title="פרטי חשבון מסחר"
                     aria-label="פרטי חשבון מסחר"></button>
-            <span class="entity-trading-account-badge" style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+            <span class="entity-trading-account-badge entity-badge-base">
               ${tradingAccount.name || '-'}
             </span>
           </div>

@@ -26,7 +26,7 @@ class ConstraintManager {
    * @constructor
    */
   constructor() {
-    this.apiBase = 'http://localhost:8080/api/constraints';
+    this.apiBase = '/api/constraints';
     this.currentConstraint = null;
     this.constraints = [];
     this.tables = [];

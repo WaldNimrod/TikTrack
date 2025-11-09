@@ -2215,8 +2215,7 @@ async function validateTradePlanChange(newTradePlanId, tradeData) {
 
   try {
     // קבלת פרטי התוכנית החדשה
-    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const url = `${base}/api/trade_plans/${newTradePlanId}`;
+    const url = `/api/trade_plans/${newTradePlanId}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -2655,8 +2654,7 @@ async function reactivateTrade(tradeId) {
       throw new Error('טרייד לא נמצא');
     }
 
-    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/trades/${tradeId}`, {
+    const response = await fetch(`/api/trades/${tradeId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
+from config.settings import DB_PATH  # Use production DB path
 from services.currency_service import CurrencyService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 import logging
@@ -20,19 +21,17 @@ currencies_bp = Blueprint('currencies', __name__, url_prefix='/api/currencies')
 # Initialize base API (currencies uses direct SQLite, so we'll use it selectively)
 
 def get_db_connection():
-    """Get database connection"""
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
-    
-    conn = sqlite3.connect(DB_PATH)
+    """Get database connection - uses production DB path from config"""
+    # Use DB_PATH from config.settings (production database: TikTrack_DB.db)
+    conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     return conn
 
 @currencies_bp.route('/', methods=['GET'])
 @api_endpoint(cache_ttl=3600, rate_limit=60)
-@handle_database_session()
 @cache_with_deps(ttl=3600, dependencies=['currencies'])  # Cache for 1 hour - static data
 def get_currencies():
+    # Note: Not using @handle_database_session() because we use direct sqlite3 connection
     """Get all currencies using base API patterns"""
     try:
         conn = get_db_connection()

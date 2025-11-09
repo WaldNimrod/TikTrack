@@ -17,7 +17,8 @@ let currentUser = null;
 
 // פונקציות התחברות
 async function login(username, password) {
-  const response = await fetch('http://127.0.0.1:8080/api/auth/login', {
+  // Use relative URL to work with both development (8080) and production (5001)
+  const response = await fetch('/api/auth/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -4,8 +4,8 @@
 
 The Entity Relationship Schema is a centralized, configuration-based system for managing relationships between entities in the TikTrack system. It replaces the previous Strategy Pattern approach with a unified, maintainable architecture.
 
-**Version**: 1.0.0  
-**Date**: 2025-11-08  
+**Version**: 1.1.0  
+**Date**: 2025-01-12  
 **Status**: Production Ready
 
 ---
@@ -41,8 +41,10 @@ Canonical Linked Items Array
 ### Entity Definition
 
 Each entity in the schema has:
-- **`parents`**: Dictionary of parent relationships
-- **`children`**: Dictionary of child relationships
+- **`parents`**: Dictionary of parent relationships (or empty list `[]` if no parents)
+- **`children`**: Dictionary of child relationships (or empty list `[]` if no children)
+
+**Note**: The resolver handles both dictionary and list formats. Empty lists `[]` are used to explicitly indicate no relationships, while dictionaries contain the actual relationship definitions.
 
 ### Relationship Types
 
@@ -281,20 +283,43 @@ When execution has a trade, also add the trade's ticker:
 
 ### Legacy Support
 
-Some relationships support both new and legacy linking:
+Some relationships support both new and legacy linking. Legacy support can be used for both **parents** and **children**:
 
+**For Children** (e.g., alert → note):
 ```python
-'alert': {
+'note': {
     'type': RELATIONSHIP_CONDITIONAL,
     # ... new relationship
     'legacy_support': {
         'type': RELATIONSHIP_LEGACY,
         'field': 'related_type_id',
-        'value': NOTE_RELATION_TYPE_TRADE_PLAN,
+        'value': NOTE_RELATION_TYPE_ALERT,
         # ... legacy relationship
     }
 }
 ```
+
+**For Parents** (e.g., alert → trade):
+```python
+'trade': {
+    'type': RELATIONSHIP_CONDITIONAL,
+    'field': 'trade_condition_id',
+    # ... new relationship via TradeCondition
+    'legacy_support': {
+        'type': RELATIONSHIP_LEGACY,
+        'field': 'related_type_id',
+        'value': NOTE_RELATION_TYPE_TRADE,  # 2
+        'query': 'Alert.related_type_id == {relation_type_id} AND Alert.related_id == {entity_id}',
+        'required': False
+    }
+}
+```
+
+**How Legacy Support Works**:
+1. The resolver first attempts the primary relationship (e.g., conditional via `trade_condition_id`)
+2. If the primary relationship returns no results (e.g., `trade_condition_id` is NULL), it falls back to legacy support
+3. Legacy support uses `related_type_id` and `related_id` fields to find relationships
+4. Both results are combined, with duplicates prevented by `prevent_duplicates` flag
 
 ---
 
@@ -327,6 +352,7 @@ Some relationships support both new and legacy linking:
 2. Verify relationship configuration
 3. Check database for actual relationships
 4. Review resolver logs for errors
+5. **Check if `parents` or `children` are empty lists** - The resolver handles both dictionaries and empty lists `[]`
 
 ### Duplicate Items
 
@@ -337,8 +363,8 @@ Some relationships support both new and legacy linking:
 ### Missing Fields
 
 1. Check `LINKED_ITEM_FIELDS` definition
-2. Verify `_format_entity` method
-3. Review canonical schema requirements
+2. Verify `_format_entity` method ensures all required fields exist (even if `None`)
+3. Review canonical schema requirements - all required fields must exist in the item dictionary
 
 ### Performance Issues
 
@@ -346,6 +372,15 @@ Some relationships support both new and legacy linking:
 2. Review query logs
 3. Consider adding indexes
 4. Review cascade logic complexity
+
+### AttributeError: 'list' object has no attribute 'keys'
+
+**Fixed in v1.1.0**: The resolver now checks if `parents` or `children` are dictionaries or lists before calling `.keys()`. Empty lists `[]` are handled gracefully.
+
+**If you see this error**:
+1. Check the schema definition - ensure `parents` and `children` are either dictionaries or empty lists
+2. Verify the resolver code is up to date (v1.1.0+)
+3. Check server logs for the exact entity type causing the issue
 
 ---
 

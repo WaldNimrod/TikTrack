@@ -1350,8 +1350,8 @@ async function reactivateTradePlan(tradePlanId) {
       throw new Error('תכנון לא נמצא');
     }
 
-    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/trade_plans/${tradePlanId}`, {
+    // Use relative URL to work with both development (8080) and production (5001)
+    const response = await fetch(`/api/trade_plans/${tradePlanId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

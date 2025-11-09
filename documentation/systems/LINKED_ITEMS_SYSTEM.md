@@ -1,8 +1,8 @@
 # Linked Items System Documentation
 
-**Version**: 2.0.0  
+**Version**: 2.1.0  
 **Architecture**: Configuration-Based Schema  
-**Last Updated**: 2025-11-08
+**Last Updated**: 2025-01-12
 
 ## System Overview
 

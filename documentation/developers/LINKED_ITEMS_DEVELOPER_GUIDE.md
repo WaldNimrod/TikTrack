@@ -4,8 +4,8 @@
 
 Complete guide for developers working with the Linked Items system in TikTrack.
 
-**Version**: 2.0.0  
-**Date**: 2025-11-08  
+**Version**: 2.1.0  
+**Date**: 2025-01-12  
 **Architecture**: Configuration-Based Schema
 
 ---
@@ -440,6 +440,48 @@ for item in linked_items:
     assert 'type' in item
     assert 'name' in item
 ```
+
+---
+
+## Recent Changes (v2.1.0 - 2025-01-12)
+
+### Bug Fixes
+
+1. **Fixed AttributeError for Empty Lists**
+   - **Issue**: `AttributeError: 'list' object has no attribute 'keys'` when `parents` or `children` were empty lists `[]`
+   - **Fix**: Resolver now checks if `parents`/`children` are dictionaries or lists before calling `.keys()`
+   - **Affected**: All entities with no parents/children (e.g., `trading_account`, `ticker`)
+
+2. **Legacy Support for Parents**
+   - **Issue**: Legacy support was only available for children, not parents
+   - **Fix**: Added support for `legacy_support` in parent relationships
+   - **Example**: `alert → trade` via `related_type_id=2` and `related_id` now works as a parent relationship
+
+3. **Field Standardization**
+   - **Issue**: Frontend expected all required fields to exist, even if `None`
+   - **Fix**: `_format_entity` now ensures all required and optional fields exist in the item dictionary, even if their value is `None`
+   - **Affected**: All linked items now have consistent structure
+
+### Schema Updates
+
+1. **Alert → Trade Legacy Support**
+   - Added `legacy_support` to `alert` → `trade` parent relationship
+   - Supports both conditional (via `TradeCondition`) and legacy (via `related_type_id`) relationships
+
+2. **Execution → Ticker Required**
+   - Updated `execution` → `ticker` parent relationship to `required: True`
+   - Ensures all executions have a ticker parent
+
+### Validation Improvements
+
+1. **Enhanced Validation Logging**
+   - Added detailed logging to `validate_linked_item` function
+   - Logs warnings for missing required fields or invalid values
+   - Helps debug validation failures
+
+2. **Robust DateTime Formatting**
+   - Improved `_format_datetime` to handle `None` values and various exceptions
+   - Returns `None` gracefully instead of raising exceptions
 
 ---
 

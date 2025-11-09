@@ -383,8 +383,8 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
 
   // בדיקת פריטים מקושרים לפני הביטול
   try {
-    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/linked-items/${itemType}/${itemId}`);
+    // Use relative URL to work with both development (8080) and production (5001)
+    const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
 
     if (response.ok) {
       const linkedItemsData = await response.json();
@@ -429,7 +429,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
  */
 async function performItemCancellation(itemType, itemId, _itemName) {
   try {
-    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+    // Use relative URL to work with both development (8080) and production (5001)
     let response;
     const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
       ? window.LinkedItemsService.getEntityLabel(itemType) 
@@ -438,7 +438,7 @@ async function performItemCancellation(itemType, itemId, _itemName) {
 
     switch (itemType) {
     case 'trade_plan':
-      response = await fetch(`${base}/api/trade_plans/${itemId}`, {
+      response = await fetch(`/api/trade_plans/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),
@@ -446,7 +446,7 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       break;
 
     case 'trade':
-      response = await fetch(`${base}/api/trades/${itemId}/cancel`, {
+      response = await fetch(`/api/trades/${itemId}/cancel`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cancel_reason: 'בוטל על ידי המשתמש' }),
@@ -454,7 +454,7 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       break;
 
     case 'ticker':
-      response = await fetch(`${base}/api/tickers/${itemId}`, {
+      response = await fetch(`/api/tickers/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),
@@ -462,7 +462,7 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       break;
 
     case 'alert':
-      response = await fetch(`${base}/api/alerts/${itemId}`, {
+      response = await fetch(`/api/alerts/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),
@@ -470,7 +470,7 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       break;
 
     case 'account':
-      response = await fetch(`${base}/api/trading-accounts/${itemId}`, {
+      response = await fetch(`/api/trading-accounts/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),

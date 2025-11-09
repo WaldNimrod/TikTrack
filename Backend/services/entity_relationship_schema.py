@@ -23,6 +23,9 @@ Usage:
 """
 
 from typing import Dict, Any, List, Optional, Literal
+import logging
+
+logger = logging.getLogger(__name__)
 
 # ===== RELATIONSHIP TYPE DEFINITIONS =====
 
@@ -238,7 +241,7 @@ ENTITY_RELATIONSHIPS: Dict[str, Dict[str, Any]] = {
                 'type': RELATIONSHIP_DIRECT,
                 'field': 'ticker_id',
                 'query': 'Execution.ticker_id == {entity_id}',
-                'required': False,
+                'required': True,  # Ticker is mandatory for execution
                 'prevent_duplicates': True  # May also be linked through trade
             },
             'trade': {
@@ -296,7 +299,14 @@ ENTITY_RELATIONSHIPS: Dict[str, Dict[str, Any]] = {
                 'target_query': 'TradeCondition.trade_id == {entity_id}',
                 'required': False,
                 'cascade_account': True,  # If trade exists, also add its trading_account
-                'cascade_plan': True  # If trade exists and has trade_plan_id, also add trade_plan
+                'cascade_plan': True,  # If trade exists and has trade_plan_id, also add trade_plan
+                'legacy_support': {
+                    'type': RELATIONSHIP_LEGACY,
+                    'field': 'related_type_id',
+                    'value': NOTE_RELATION_TYPE_TRADE,
+                    'query': 'Alert.related_type_id == {relation_type_id} AND Alert.related_id == {entity_id}',
+                    'required': False
+                }
             },
             'trading_account': {
                 'type': RELATIONSHIP_LEGACY,
@@ -464,6 +474,24 @@ def get_field_formatter(field_name: str, entity_type: str):
 
 def validate_linked_item(item: Dict[str, Any]) -> bool:
     """Validate that a linked item matches the canonical schema"""
+    # Check that required fields exist (can be None, but must exist)
     required_fields = ['id', 'type', 'name', 'title', 'status', 'created_at']
-    return all(field in item for field in required_fields)
+    has_all_fields = all(field in item for field in required_fields)
+    
+    # Also check that id and type are not None
+    if not has_all_fields:
+        logger.warning(f"Linked item missing required fields. Item: {item}, Missing: {[f for f in required_fields if f not in item]}")
+        return False
+    
+    if item.get('id') is None:
+        logger.warning(f"Linked item has None id. Item: {item}")
+        return False
+    
+    if not item.get('type'):
+        logger.warning(f"Linked item has empty type. Item: {item}")
+        return False
+    
+    # created_at can be None (for entities without timestamps)
+    # But we still require the field to exist
+    return True
 

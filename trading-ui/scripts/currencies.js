@@ -94,7 +94,8 @@ function showDeleteCurrencyModal(id) {
 async function loadCurrencies() {
   try {
 
-    const response = await fetch('http://localhost:8080/api/currencies/');
+    // Use relative URL to work with both development (8080) and production (5001)
+    const response = await fetch('/api/currencies/');
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -144,7 +145,8 @@ async function confirmDeleteCurrency() {
       }
     }
 
-    const response = await fetch(`http://localhost:8080/api/currencies/${id}`, {
+    // Use relative URL to work with both development (8080) and production (5001)
+    const response = await fetch(`/api/currencies/${id}`, {
       method: 'DELETE',
     });
 

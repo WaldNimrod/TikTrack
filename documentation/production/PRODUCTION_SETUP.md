@@ -43,8 +43,8 @@ git push origin production
 
 ### סביבת פרודקשן (Production)
 - **פורט:** 5001
-- **בסיס נתונים:** `Backend/db/TikTrack_DB.db`
-- **לוגים:** `Backend/logs-production/`
+- **בסיס נתונים:** `production/Backend/db/TikTrack_DB.db`
+- **לוגים:** `production/Backend/logs/`
 - **הפעלה:** `./start_production.sh`
 
 ## דרישות מוקדמות
@@ -77,8 +77,8 @@ python3 Backend/scripts/create_production_db.py
 ```
 
 השרת יתחיל על פורט 5001 עם:
-- בסיס נתונים: `TikTrack_DB.db`
-- לוגים: `logs-production/`
+- בסיס נתונים: `production/Backend/db/TikTrack_DB.db`
+- לוגים: `production/Backend/logs/`
 - סביבה: Production
 
 ### שלב 3: בדיקת הפעלה

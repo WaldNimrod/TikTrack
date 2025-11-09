@@ -12,9 +12,17 @@
 The TikTrack API provides a comprehensive RESTful interface for managing trading operations, accounts, alerts, and system configuration. All endpoints return JSON responses and follow standard HTTP status codes.
 
 ## Base URL
-```
-http://localhost:8080/api
-```
+
+**Important:** The frontend uses relative URLs (`/api/...`) that automatically work with any port.
+
+- **Development:** `http://localhost:8080/api` (or relative `/api/...`)
+- **Production:** `http://localhost:5001/api` (or relative `/api/...`)
+
+**Frontend Configuration:**
+- All frontend code uses relative URLs (`/api/...`) 
+- Configuration is centralized in `trading-ui/scripts/api-config.js`
+- The `window.API_BASE_URL` variable is available but defaults to empty string (relative URLs)
+- No hardcoded URLs are used - all URLs are relative and work with both environments
 
 ## Authentication
 Currently, the API uses session-based authentication. All requests should include session cookies.

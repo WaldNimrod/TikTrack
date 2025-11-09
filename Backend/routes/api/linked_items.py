@@ -190,12 +190,22 @@ def get_linked_items(entity_type: str, entity_id: str) -> Dict[str, Any]:
             # Get list of child types from schema
             child_types = set()
             if 'children' in entity_schema:
-                child_types = set(entity_schema['children'].keys())
+                children = entity_schema['children']
+                if isinstance(children, dict):
+                    child_types = set(children.keys())
+                elif isinstance(children, list):
+                    # If children is a list, it's empty (no children)
+                    child_types = set()
             
             # Get list of parent types from schema
             parent_types = set()
             if 'parents' in entity_schema:
-                parent_types = set(entity_schema['parents'].keys())
+                parents = entity_schema['parents']
+                if isinstance(parents, dict):
+                    parent_types = set(parents.keys())
+                elif isinstance(parents, list):
+                    # If parents is a list, it's empty (no parents)
+                    parent_types = set()
             
             # Separate linked items
             for item in linked_items:

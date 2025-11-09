@@ -1366,7 +1366,7 @@ async function updateExecutionsTableMain(executions) {
                         }
                         const result = window.createActionsMenu([
                           { type: 'VIEW', onclick: `window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })`, title: 'צפה בפרטי עסקה' },
-                          { type: 'LINK', onclick: `viewLinkedItemsForExecution(${execution.id})`, title: 'פריטים מקושרים' },
+                          { type: 'LINK', onclick: `window.viewLinkedItemsForExecution && window.viewLinkedItemsForExecution(${execution.id})`, title: 'פריטים מקושרים' },
                           { type: 'EDIT', onclick: `editExecution(${execution.id})`, title: 'ערוך' },
                           { type: 'DELETE', onclick: `deleteExecution(${execution.id})`, title: 'מחק' }
                         ]);

@@ -20,11 +20,35 @@ from config.database import get_db
 from services.user_data_import import ImportOrchestrator
 from models.import_session import ImportSession
 from models.trading_account import TradingAccount
+from services.date_normalization_service import DateNormalizationService
+from services.preferences_service import PreferencesService
 
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 user_data_import_bp = Blueprint('user_data_import', __name__, url_prefix='/api/user-data-import')
+
+_preferences_service = PreferencesService()
+_utc_storage_normalizer = DateNormalizationService("UTC")
+
+
+def _get_date_normalizer():
+    timezone_name = DateNormalizationService.resolve_timezone(
+        request,
+        preferences_service=_preferences_service
+    )
+    return DateNormalizationService(timezone_name)
+
+
+def _project_storage_payload(payload):
+    if payload is None:
+        return None
+    try:
+        raw_payload = _utc_storage_normalizer.normalize_input_payload(payload)
+    except Exception:
+        raw_payload = payload
+    normalizer = _get_date_normalizer()
+    return normalizer.normalize_output(raw_payload)
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'csv', 'txt'}
@@ -74,10 +98,14 @@ def upload_and_preview():
         session_id = session_data['session_id']
         
         # Analyze the file
-        analysis_data = orchestrator.analyze_file(session_id)
+        analysis_data_raw = orchestrator.analyze_file(session_id)
         
         # Generate preview
-        preview_data = orchestrator.generate_preview(session_id)
+        preview_data_raw = orchestrator.generate_preview(session_id)
+
+        normalizer = _get_date_normalizer()
+        analysis_data = normalizer.normalize_output(analysis_data_raw)
+        preview_data = normalizer.normalize_output(preview_data_raw)
         
         # Combine results
         result = {
@@ -197,20 +225,22 @@ def upload_file():
             
             # Analyze file
             logger.info("🔍 Starting file analysis...")
-            analysis_result = orchestrator.analyze_file(result['session_id'])
-            logger.info(f"📊 Analysis result: {analysis_result}")
+            analysis_result_raw = orchestrator.analyze_file(result['session_id'])
+            logger.info(f"📊 Analysis result: {analysis_result_raw}")
             
-            if not analysis_result['success']:
-                logger.error(f"❌ File analysis failed: {analysis_result['error']}")
+            if not analysis_result_raw['success']:
+                logger.error(f"❌ File analysis failed: {analysis_result_raw['error']}")
                 return jsonify({
                     'success': False,
-                    'error': analysis_result['error']
+                    'error': analysis_result_raw['error']
                 }), 500
             
             logger.info("✅ File analysis completed successfully")
             
             # Note: analyze_file already saves the results to session and commits
             # No need to save again here
+            normalizer = _get_date_normalizer()
+            analysis_result = normalizer.normalize_output(analysis_result_raw)
             
             response_data = {
                 'success': True,
@@ -247,13 +277,16 @@ def analyze_session(session_id: int):
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result = orchestrator.analyze_file(session_id)
+            result_raw = orchestrator.analyze_file(session_id)
             
-            if not result['success']:
+            if not result_raw['success']:
                 return jsonify({
                     'status': 'error',
-                    'message': result['error']
+                    'message': result_raw['error']
                 }), 400
+
+            normalizer = _get_date_normalizer()
+            result = normalizer.normalize_output(result_raw)
             
             return jsonify({
                 'status': 'success',
@@ -314,7 +347,7 @@ def get_session(session_id: int):
             
             session_dict = session.to_dict()
             if summary_data:
-                session_dict['summary_data'] = summary_data
+                session_dict['summary_data'] = _project_storage_payload(summary_data)
             
             return jsonify({
                 'status': 'success',
@@ -346,13 +379,16 @@ def get_preview(session_id: int):
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result = orchestrator.generate_preview(session_id)
+            result_raw = orchestrator.generate_preview(session_id)
             
-            if not result['success']:
+            if not result_raw['success']:
                 return jsonify({
                     'status': 'error',
-                    'message': result['error']
+                    'message': result_raw['error']
                 }), 400
+
+            normalizer = _get_date_normalizer()
+            result = normalizer.normalize_output(result_raw)
             
             return jsonify({
                 'status': 'success',
@@ -396,15 +432,18 @@ def update_ticker(session_id: int):
             orchestrator = ImportOrchestrator(db_session)
             
             # Regenerate preview data with the new ticker
-            result = orchestrator.generate_preview(session_id)
+            result_raw = orchestrator.generate_preview(session_id)
             
-            if not result['success']:
+            if not result_raw['success']:
                 return jsonify({
                     'status': 'error',
-                    'message': result['error']
+                    'message': result_raw['error']
                 }), 400
             
             logger.info(f"✅ Preview recalculated for session {session_id} after adding ticker {ticker_symbol}")
+
+            normalizer = _get_date_normalizer()
+            result = normalizer.normalize_output(result_raw)
             
             return jsonify({
                 'status': 'success',
@@ -570,9 +609,11 @@ def refresh_preview(session_id):
             orchestrator = ImportOrchestrator(db_session)
             
             # Generate fresh preview
-            result = orchestrator.generate_preview(session_id)
+            result_raw = orchestrator.generate_preview(session_id)
             
-            if result['success']:
+            if result_raw['success']:
+                normalizer = _get_date_normalizer()
+                result = normalizer.normalize_output(result_raw)
                 return jsonify({
                     'success': True,
                     'preview_data': result['preview_data']
@@ -580,7 +621,7 @@ def refresh_preview(session_id):
             else:
                 return jsonify({
                     'success': False,
-                    'error': result['error']
+                    'error': result_raw['error']
                 }), 400
                 
         finally:
@@ -634,7 +675,7 @@ def allow_existing_record(session_id):
             session.preview_data = preview_data
             db.session.commit()
         
-        return jsonify({'status': 'success', 'preview_data': preview_data})
+        return jsonify({'status': 'success', 'preview_data': _project_storage_payload(preview_data)})
         
     except Exception as e:
         logger.error(f"Error allowing existing record: {str(e)}")

@@ -23,6 +23,277 @@ let selectedAccount = null;
 let selectedConnector = null;
 let analysisResults = null;
 let previewData = null;
+let currencyCacheByCode = null;
+let tickersModalConfigPromise = null;
+
+function renderImportDate(value, fallback = '') {
+    try {
+        if (typeof window.dateUtils?.ensureDateEnvelope === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope(value);
+            if (window.FieldRendererService?.renderDate) {
+                return window.FieldRendererService.renderDate(envelope) || fallback;
+            }
+            if (envelope && typeof envelope === 'object') {
+                return envelope.display || envelope.local || envelope.utc || fallback;
+            }
+        }
+        if (value && typeof value === 'object') {
+            return value.display || value.local || value.utc || fallback;
+        }
+        if (value) {
+            return value;
+        }
+    } catch (error) {
+        if (window.Logger?.warn) {
+            window.Logger.warn('[Import Modal] Failed to render date value', { value, error: error.message });
+        }
+    }
+    return fallback;
+}
+
+function setInputValue(inputElement, value) {
+    if (!inputElement || value === undefined || value === null) {
+        return;
+    }
+    inputElement.value = value;
+    inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+    inputElement.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function setSelectValue(selectElement, value) {
+    if (!selectElement || value === undefined || value === null) {
+        return;
+    }
+    if (selectElement.value !== value) {
+        selectElement.value = value;
+        selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
+
+function getScriptVersionSuffix(referencePattern = 'import-user-data.js') {
+    const referenceScript = document.querySelector(`script[src*="${referencePattern}"]`);
+    if (referenceScript) {
+        const src = referenceScript.getAttribute('src') || '';
+        const queryIndex = src.indexOf('?');
+        if (queryIndex !== -1) {
+            return src.substring(queryIndex);
+        }
+    }
+    return '?v=1.0.0';
+}
+
+async function setCurrencySelectValue(selectElement, currencyCode) {
+    if (!selectElement || !currencyCode) {
+        return;
+    }
+
+    const targetCode = currencyCode.trim().toUpperCase();
+
+    const findOption = () => Array.from(selectElement.options || []).find((option) => {
+        const optionCode = (option.dataset?.code || option.text || '').trim().toUpperCase();
+        return optionCode === targetCode;
+    });
+
+    let option = findOption();
+    let attempt = 0;
+
+    while (!option && attempt < 6) {
+        await new Promise((resolve) => setTimeout(resolve, 150));
+        option = findOption();
+        attempt++;
+    }
+
+    if (option) {
+        selectElement.value = option.value;
+        selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
+
+async function loadCurrencyCache() {
+    if (currencyCacheByCode) {
+        return currencyCacheByCode;
+    }
+
+    try {
+        const response = await fetch('/api/currencies/');
+        if (!response.ok) {
+            throw new Error(`HTTP error ${response.status}`);
+        }
+        const data = await response.json();
+        const list = data.data || data || [];
+        currencyCacheByCode = list.reduce((acc, item) => {
+            if (item?.code) {
+                acc[item.code.toUpperCase()] = item;
+            }
+            if (item?.symbol) {
+                acc[item.symbol.toUpperCase()] = item;
+            }
+            return acc;
+        }, {});
+        return currencyCacheByCode;
+    } catch (error) {
+        window.Logger?.warn('[Import Modal] Failed to load currencies cache', { error: error.message });
+        currencyCacheByCode = {};
+        return currencyCacheByCode;
+    }
+}
+
+async function ensureTickersModalConfigLoaded() {
+    if (window.tickersModalConfig && typeof window.tickersModalConfig === 'object') {
+        return true;
+    }
+
+    if (tickersModalConfigPromise) {
+        return tickersModalConfigPromise;
+    }
+
+    tickersModalConfigPromise = (async () => {
+        const manifestEntry = window.PACKAGE_MANIFEST?.modules?.scripts?.find((script) => script.file === 'modal-configs/tickers-config.js');
+        const scriptPath = manifestEntry?.file || 'modal-configs/tickers-config.js';
+        const versionSuffix = getScriptVersionSuffix('modal-configs/trade-plans-config.js');
+
+        const ensureScriptTag = () => {
+            let script = document.querySelector('script[data-modal-config="tickers"]');
+            if (!script) {
+                script = document.querySelector('script[src*="modal-configs/tickers-config.js"]');
+            }
+
+            if (!script) {
+                script = document.createElement('script');
+                script.src = `scripts/${scriptPath}${versionSuffix || ''}`;
+                script.async = false;
+                script.setAttribute('data-modal-config', 'tickers');
+                document.head.appendChild(script);
+            }
+
+            return script;
+        };
+
+        const scriptElement = ensureScriptTag();
+
+        return await new Promise((resolve) => {
+            const complete = (success) => {
+                clearInterval(pollInterval);
+                clearTimeout(timeoutId);
+                resolve(success);
+            };
+
+            const checkReady = () => window.tickersModalConfig && typeof window.tickersModalConfig === 'object';
+
+            if (checkReady()) {
+                complete(true);
+                return;
+            }
+
+            const pollInterval = setInterval(() => {
+                if (checkReady()) {
+                    complete(true);
+                }
+            }, 100);
+
+            const timeoutId = setTimeout(() => {
+                complete(checkReady());
+            }, 4000);
+
+            scriptElement.addEventListener('load', () => {
+                if (checkReady()) {
+                    complete(true);
+                }
+            }, { once: true });
+
+            scriptElement.addEventListener('error', () => {
+                complete(false);
+            }, { once: true });
+        });
+    })();
+
+    const loaded = await tickersModalConfigPromise;
+    if (!loaded) {
+        tickersModalConfigPromise = null;
+        window.Logger?.warn('[Import Modal] Unable to load tickers modal configuration', { page: 'import-user-data' });
+    }
+    return loaded;
+}
+
+async function quickAddTicker(symbol, name, currencyCode = 'USD') {
+    const trimmedSymbol = symbol?.trim();
+    const trimmedName = name?.trim();
+    if (!trimmedSymbol || !trimmedName) {
+        showImportUserDataNotification('נא למלא את כל השדות', 'error');
+        return;
+    }
+
+    try {
+        const currencies = await loadCurrencyCache();
+        const currency = currencies[currencyCode.toUpperCase()];
+        const currencyId = currency?.id || 1;
+
+        const response = await fetch('/api/tickers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                symbol: trimmedSymbol,
+                name: trimmedName,
+                type: 'stock',
+                currency_id: currencyId,
+                status: 'closed',
+            }),
+        });
+
+        const result = await response.json();
+        if (response.ok && (result?.success !== false)) {
+            showImportUserDataNotification(`טיקר ${trimmedSymbol} נוסף בהצלחה`, 'success');
+            refreshPreviewData();
+            if (typeof window.loadTickersData === 'function') {
+                window.loadTickersData();
+            }
+        } else {
+            const message = result?.error?.message || result?.error || 'שגיאה בהוספת טיקר';
+            showImportUserDataNotification(`שגיאה בהוספת טיקר: ${message}`, 'error');
+        }
+    } catch (error) {
+        window.Logger?.error('Quick add ticker error:', error);
+        showImportUserDataNotification('שגיאה בהוספת טיקר', 'error');
+    }
+}
+
+function ensureTickerSaveHook(retry = 0) {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    const saveFn = window.saveTicker;
+    if (typeof saveFn !== 'function') {
+        if (retry < 6) {
+            setTimeout(() => ensureTickerSaveHook(retry + 1), 250);
+        } else {
+            window.Logger?.warn('[Import Modal] saveTicker not available - cannot register refresh hook', { page: 'import-user-data' });
+        }
+        return;
+    }
+
+    if (saveFn.__importUserDataWrapper) {
+        return;
+    }
+
+    const wrapped = async function(...args) {
+        const result = await saveFn.apply(this, args);
+        if (currentSessionId && result) {
+            try {
+                refreshPreviewData();
+            } catch (error) {
+                window.Logger?.warn('[Import Modal] Failed to refresh preview after ticker save', { error: error.message });
+            }
+        }
+        return result;
+    };
+
+    wrapped.__importUserDataWrapper = true;
+    window.saveTicker = wrapped;
+    window.Logger?.debug('[Import Modal] Wrapped saveTicker to refresh preview data', { page: 'import-user-data' });
+}
 
 /**
  * Initialize import user data modal - called by unified system
@@ -373,7 +644,7 @@ function handleFileDrop(event) {
         if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
             handleFileSelect({ target: { files: [file] } });
         } else {
-            showNotification('אנא בחר קובץ CSV בלבד', 'error');
+            showImportUserDataNotification('אנא בחר קובץ CSV בלבד', 'error');
         }
     }
 }
@@ -403,7 +674,7 @@ function loadConfirmationData() {
  */
 function loadProblemResolution() {
     if (!currentSessionId) {
-        showNotification('לא נמצא מזהה סשן', 'error');
+        showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
         return;
     }
     
@@ -416,12 +687,12 @@ function loadProblemResolution() {
             previewData = data.preview_data;
             displayProblemResolutionDetailed(data.preview_data);
         } else {
-            showNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
+            showImportUserDataNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
         }
     })
     .catch(error => {
         window.Logger.error('Problem resolution error:', error);
-        showNotification('שגיאה בטעינת נתוני בעיות', 'error');
+        showImportUserDataNotification('שגיאה בטעינת נתוני בעיות', 'error');
     });
 }
 
@@ -554,7 +825,7 @@ function importExistingRecord(index) {
     window.Logger.info('[Import Modal] Importing existing record', { index, page: 'import-user-data' });
     
     // TODO: Implement logic to force import this specific record
-    showNotification('ייבוא רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
+    showImportUserDataNotification('ייבוא רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
 }
 
 /**
@@ -564,7 +835,7 @@ function skipExistingRecord(index) {
     window.Logger.info('[Import Modal] Skipping existing record', { index, page: 'import-user-data' });
     
     // TODO: Implement logic to skip this specific record
-    showNotification('דילוג על רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
+    showImportUserDataNotification('דילוג על רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
 }
 
 /**
@@ -886,7 +1157,7 @@ function validateAllRequiredFields() {
         if (connectorValidation !== true) {
             isValid = false;
             window.Logger.warn('[Import Modal] Connector validation failed', { error: connectorValidation, page: 'import-user-data' });
-            showNotification('שגיאה', connectorValidation, 'error');
+            showImportUserDataNotification('שגיאה', connectorValidation, 'error');
         }
     }
     
@@ -894,7 +1165,7 @@ function validateAllRequiredFields() {
     if (!selectedFile) {
         isValid = false;
         window.Logger.warn('[Import Modal] No file selected', { page: 'import-user-data' });
-        showNotification('שגיאה', 'חובה לבחור קובץ', 'error');
+        showImportUserDataNotification('שגיאה', 'חובה לבחור קובץ', 'error');
     }
     
     // Validate account selection using central validation system
@@ -960,12 +1231,12 @@ function validateAllRequiredFields() {
         if (accountValidation !== true) {
             isValid = false;
             window.Logger.warn('[Import Modal] Account validation failed', { error: accountValidation, page: 'import-user-data' });
-            showNotification('שגיאה', accountValidation, 'error');
+            showImportUserDataNotification('שגיאה', accountValidation, 'error');
         }
     } else {
         isValid = false;
         window.Logger.error('[Import Modal] Account select element not found for validation', { page: 'import-user-data' });
-        showNotification('שגיאה', 'שדה חשבון מסחר לא נמצא', 'error');
+        showImportUserDataNotification('שגיאה', 'שדה חשבון מסחר לא נמצא', 'error');
     }
     
     // Note: We don't need to check selectedAccount variable anymore
@@ -1094,7 +1365,7 @@ function loadAccountsFallback() {
         })
         .catch(error => {
             window.Logger.error('[Import Modal] Error loading accounts via fallback', { error: error.message, page: 'import-user-data' });
-            showNotification('שגיאה בטעינת חשבונות', 'error');
+            showImportUserDataNotification('שגיאה בטעינת חשבונות', 'error');
         });
 }
 
@@ -1126,7 +1397,7 @@ function analyzeFile() {
             accountValue: accountValue,
             page: 'import-user-data'
         });
-        showNotification('אנא מלא את כל השדות הנדרשים', 'error');
+        showImportUserDataNotification('אנא מלא את כל השדות הנדרשים', 'error');
         return;
     }
     
@@ -1173,12 +1444,12 @@ function analyzeFile() {
             // Go to next step
             setTimeout(() => goToStep(2), 1000);
     } else {
-            showNotification(`שגיאה בניתוח הקובץ: ${data.error}`, 'error');
+            showImportUserDataNotification(`שגיאה בניתוח הקובץ: ${data.error}`, 'error');
         }
     })
     .catch(error => {
         window.Logger.error('Analysis error:', error);
-        showNotification('שגיאה בניתוח הקובץ', 'error');
+        showImportUserDataNotification('שגיאה בניתוח הקובץ', 'error');
     });
 }
 
@@ -1247,7 +1518,7 @@ function displayAnalysisResults(results) {
  */
 function loadProblemResolution() {
     if (!currentSessionId) {
-        showNotification('לא נמצא מזהה סשן', 'error');
+        showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
         return;
     }
     
@@ -1260,12 +1531,12 @@ function loadProblemResolution() {
             previewData = data.preview_data;
             displayProblemResolutionDetailed(data.preview_data);
     } else {
-            showNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
+            showImportUserDataNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
         }
     })
     .catch(error => {
         window.Logger.error('Problem resolution error:', error);
-        showNotification('שגיאה בטעינת נתוני בעיות', 'error');
+        showImportUserDataNotification('שגיאה בטעינת נתוני בעיות', 'error');
     });
 }
 
@@ -1367,7 +1638,7 @@ function loadPreviewData() {
     
     if (!currentSessionId) {
         window.Logger.error('[Import Modal] No session ID for preview', { page: 'import-user-data' });
-        showNotification('שגיאה: אין מזהה הפעלה', 'error');
+        showImportUserDataNotification('שגיאה: אין מזהה הפעלה', 'error');
         return;
     }
     
@@ -1390,12 +1661,12 @@ function loadPreviewData() {
                 error: data.error, 
                 page: 'import-user-data' 
             });
-            showNotification(`שגיאה בטעינת תצוגה מקדימה: ${data.error}`, 'error');
+            showImportUserDataNotification(`שגיאה בטעינת תצוגה מקדימה: ${data.error}`, 'error');
         }
     })
     .catch(error => {
         window.Logger.error('[Import Modal] Preview data error:', error);
-        showNotification('שגיאה בטעינת תצוגה מקדימה', 'error');
+        showImportUserDataNotification('שגיאה בטעינת תצוגה מקדימה', 'error');
     });
 }
 
@@ -1580,16 +1851,16 @@ function acceptDuplicate(index, type) {
     .then(response => response.json())
     .then(data => {
         if (data.success || data.status === 'success') {
-            showNotification('כפילות אושרה', 'success');
+            showImportUserDataNotification('כפילות אושרה', 'success');
             // Refresh preview data
             refreshPreviewData();
         } else {
-            showNotification(`שגיאה באישור כפילות: ${data.error}`, 'error');
+            showImportUserDataNotification(`שגיאה באישור כפילות: ${data.error}`, 'error');
         }
     })
     .catch(error => {
         window.Logger.error('Accept duplicate error:', error);
-        showNotification('שגיאה באישור כפילות', 'error');
+        showImportUserDataNotification('שגיאה באישור כפילות', 'error');
     });
 }
 
@@ -1612,107 +1883,82 @@ function rejectDuplicate(index, type) {
     .then(response => response.json())
     .then(data => {
         if (data.success || data.status === 'success') {
-            showNotification('כפילות נדחתה', 'success');
+            showImportUserDataNotification('כפילות נדחתה', 'success');
             // Refresh preview data
             refreshPreviewData();
         } else {
-            showNotification(`שגיאה בדחיית כפילות: ${data.error}`, 'error');
+            showImportUserDataNotification(`שגיאה בדחיית כפילות: ${data.error}`, 'error');
         }
     })
     .catch(error => {
         window.Logger.error('Reject duplicate error:', error);
-        showNotification('שגיאה בדחיית כפילות', 'error');
+        showImportUserDataNotification('שגיאה בדחיית כפילות', 'error');
     });
 }
 
 /**
  * Open add ticker modal
  */
-function openAddTickerModal(symbol, currency = 'USD') {
-    const modal = document.getElementById('addTickerModal');
-    const symbolInput = document.getElementById('tickerSymbol');
-    const nameInput = document.getElementById('tickerName');
-    const currencySelect = document.getElementById('tickerCurrency');
-    
-    if (modal && symbolInput && nameInput) {
-        symbolInput.value = symbol;
-        nameInput.value = symbol; // Default name to symbol
-        
-        // Set currency based on imported data
-        if (currencySelect) {
-            const currencyMap = {
-                'USD': '1',
-                'EUR': '2', 
-                'ILS': '3'
-            };
-            const currencyId = currencyMap[currency] || '1'; // Default to USD
-            currencySelect.value = currencyId;
-        }
-        
-        modal.style.display = 'block';
-        modal.classList.add('show');
-        modal.setAttribute('aria-hidden', 'false');
-    } else {
-        // Fallback to prompt
-        const tickerName = prompt(`הזן שם לטיקר ${symbol}:`, symbol);
-        if (tickerName) {
-            saveTickerFromModal(symbol, tickerName);
-        }
-    }
-}
+async function openAddTickerModal(symbol, currency = 'USD') {
+    const normalizedSymbol = (symbol || '').toUpperCase().trim();
+    const normalizedCurrency = (currency || 'USD').toUpperCase().trim();
 
-/**
- * Save ticker from modal
- */
-function saveTickerFromModal(symbol, name) {
-    if (!symbol) {
-        symbol = document.getElementById('tickerSymbol')?.value;
-    }
-    if (!name) {
-        name = document.getElementById('tickerName')?.value;
-    }
-    
-    if (!symbol || !name) {
-        showNotification('נא למלא את כל השדות', 'error');
-        return;
-    }
-    
-    // Close modal
-    const modal = document.getElementById('addTickerModal');
-    if (modal) {
-        modal.style.display = 'none';
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
-    }
-    
-    // Make API call to add ticker
-    fetch('/api/tickers', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            symbol: symbol,
-            name: name,
-            type: document.getElementById('tickerType')?.value || 'stock',
-            currency_id: parseInt(document.getElementById('tickerCurrency')?.value || '1')
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success || data.status === 'success') {
-            showNotification(`טיקר ${symbol} נוסף בהצלחה`, 'success');
-            // Refresh preview data
-            refreshPreviewData();
-        } else {
-            const errorMsg = data.error?.message || data.error || 'שגיאה לא ידועה';
-            showNotification(`שגיאה בהוספת טיקר: ${errorMsg}`, 'error');
+    ensureTickerSaveHook();
+
+    const showModal = window.showModalSafe || (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function'
+        ? window.ModalManagerV2.showModal.bind(window.ModalManagerV2)
+        : null);
+
+    let canUseModal = Boolean(showModal);
+
+    if (canUseModal) {
+        const configLoaded = await ensureTickersModalConfigLoaded();
+        if (!configLoaded) {
+            canUseModal = false;
+            window.Logger?.error('[Import Modal] Tickers modal configuration failed to load', { page: 'import-user-data' });
+            showImportUserDataNotification('שגיאה בטעינת מודול הטיקר הכללי', 'error');
         }
-    })
-    .catch(error => {
-        window.Logger.error('Add ticker error:', error);
-        showNotification('שגיאה בהוספת טיקר', 'error');
-    });
+    }
+
+    if (canUseModal) {
+        try {
+            await showModal('tickersModal', 'add');
+
+            const modalElement = document.getElementById('tickersModal');
+            if (modalElement) {
+                const symbolInput = modalElement.querySelector('#tickerSymbol');
+                const nameInput = modalElement.querySelector('#tickerName');
+                const typeSelect = modalElement.querySelector('#tickerType');
+                const currencySelect = modalElement.querySelector('#tickerCurrency');
+                const remarksField = modalElement.querySelector('#tickerRemarks');
+
+                if (symbolInput) {
+                    setInputValue(symbolInput, normalizedSymbol);
+                }
+                if (nameInput && !nameInput.value) {
+                    setInputValue(nameInput, normalizedSymbol);
+                }
+                if (typeSelect) {
+                    setSelectValue(typeSelect, 'stock');
+                }
+                if (currencySelect) {
+                    await setCurrencySelectValue(currencySelect, normalizedCurrency);
+                }
+                if (remarksField) {
+                    remarksField.value = '';
+                }
+            }
+            return;
+        } catch (error) {
+            window.Logger?.error('[Import Modal] Failed to open tickers modal via ModalManager', { error: error.message });
+            showImportUserDataNotification('שגיאה בפתיחת מודול הטיקר', 'error');
+        }
+    }
+
+    const fallbackName = prompt(`הזן שם לטיקר ${normalizedSymbol}:`, normalizedSymbol);
+    if (fallbackName) {
+        await quickAddTicker(normalizedSymbol, fallbackName, normalizedCurrency);
+    }
 }
 
 /**
@@ -1720,7 +1966,7 @@ function saveTickerFromModal(symbol, name) {
  */
 function generatePreview() {
     if (!currentSessionId) {
-        showNotification('לא נמצא מזהה סשן', 'error');
+        showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
         return;
     }
     
@@ -1736,12 +1982,12 @@ function generatePreview() {
             // Go to next step
             setTimeout(() => goToStep(5), 1000);
         } else {
-            showNotification(`שגיאה ביצירת תצוגה מקדימה: ${data.error}`, 'error');
+            showImportUserDataNotification(`שגיאה ביצירת תצוגה מקדימה: ${data.error}`, 'error');
         }
     })
     .catch(error => {
         window.Logger.error('Preview error:', error);
-        showNotification('שגיאה ביצירת תצוגה מקדימה', 'error');
+        showImportUserDataNotification('שגיאה ביצירת תצוגה מקדימה', 'error');
     });
 }
 
@@ -1898,11 +2144,11 @@ function executeImportWithReport() {
  */
 function performImport(generateReport = false) {
     if (!currentSessionId) {
-        showNotification('לא נמצא מזהה סשן', 'error');
+        showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
         return;
     }
     
-    showNotification('מתחיל ייבוא נתונים...', 'info');
+    showImportUserDataNotification('מתחיל ייבוא נתונים...', 'info');
     
     fetch(`/api/user-data-import/session/${currentSessionId}/execute`, {
         method: 'POST',
@@ -1916,7 +2162,7 @@ function performImport(generateReport = false) {
     .then(response => response.json())
     .then(data => {
         if (data.success || data.status === 'success') {
-            showNotification('ייבוא הנתונים הושלם בהצלחה!', 'success');
+            showImportUserDataNotification('ייבוא הנתונים הושלם בהצלחה!', 'success');
             closeImportUserDataModal();
             
             // Clear cache to show new data - use centralized cache clearing
@@ -1927,7 +2173,7 @@ function performImport(generateReport = false) {
             }
             
             if (generateReport && data.report_url) {
-                showNotification('דוח ייבוא זמין להורדה', 'info');
+                showImportUserDataNotification('דוח ייבוא זמין להורדה', 'info');
             }
             
             // Refresh executions table if exists
@@ -1935,12 +2181,12 @@ function performImport(generateReport = false) {
                 window.loadExecutionsData();
             }
     } else {
-            showNotification(`שגיאה בייבוא: ${data.error}`, 'error');
+            showImportUserDataNotification(`שגיאה בייבוא: ${data.error}`, 'error');
         }
     })
     .catch(error => {
         window.Logger.error('Import error:', error);
-        showNotification('שגיאה בייבוא הנתונים', 'error');
+        showImportUserDataNotification('שגיאה בייבוא הנתונים', 'error');
     });
 }
 
@@ -1958,14 +2204,48 @@ function formatFileSize(bytes) {
 }
 
 /**
- * Show notification
+ * Unified notification helper for import modal
  */
-function showNotification(message, type = 'info') {
-    if (window.NotificationSystem) {
-        window.NotificationSystem.show(message, type);
-    } else {
-        window.Logger.info(`[Import Modal] ${message}`, { type, page: 'import-user-data' });
+function showImportUserDataNotification(message, type = 'info', title = '', options = {}) {
+    if (typeof message !== 'string') {
+        message = String(message ?? '');
     }
+
+    const globalShowNotificationFn = (typeof window !== 'undefined'
+        && typeof window.showNotification === 'function'
+        && window.showNotification !== showImportUserDataNotification)
+        ? window.showNotification
+        : null;
+
+    if (globalShowNotificationFn) {
+        return globalShowNotificationFn(message, type, title, undefined, null, options);
+    }
+
+    const baseNotificationSystem = (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function')
+        ? window.notificationSystem
+        : null;
+    const globalNotificationSystem = (window.NotificationSystem && typeof window.NotificationSystem.show === 'function')
+        ? window.NotificationSystem
+        : null;
+
+    if (baseNotificationSystem && baseNotificationSystem.showNotification !== showImportUserDataNotification) {
+        return baseNotificationSystem.showNotification.call(baseNotificationSystem, message, type, title, undefined, null, options);
+    }
+
+    if (globalNotificationSystem && globalNotificationSystem.show !== showImportUserDataNotification) {
+        return globalNotificationSystem.show.call(globalNotificationSystem, message, type, title, undefined, null, options);
+    }
+
+    const prefix = title ? `${title}: ` : '';
+    window.Logger?.info(`[Import Modal] ${prefix}${message}`, { type, title, options, page: 'import-user-data' });
+    return Promise.resolve(false);
+}
+
+/**
+ * Backward compatible wrapper
+ */
+function showNotification(message, type = 'info', title = '', options = {}) {
+    return showImportUserDataNotification(message, type, title, options);
 }
 
 /**
@@ -2180,12 +2460,12 @@ function refreshPreviewData() {
                 displayPreview(data.preview_data);
             }
         } else {
-            showNotification(`שגיאה ברענון התצוגה: ${data.error}`, 'error');
+            showImportUserDataNotification(`שגיאה ברענון התצוגה: ${data.error}`, 'error');
         }
     })
     .catch(error => {
         window.Logger.error('Refresh preview error:', error);
-        showNotification('שגיאה ברענון התצוגה', 'error');
+        showImportUserDataNotification('שגיאה ברענון התצוגה', 'error');
     });
 }
 
@@ -2200,7 +2480,7 @@ function confirmImport(withReport = false) {
     });
     
     if (!currentSessionId) {
-        showNotification('לא נמצא מזהה סשן לייבוא', 'error');
+        showImportUserDataNotification('לא נמצא מזהה סשן לייבוא', 'error');
         return;
     }
     
@@ -2222,12 +2502,11 @@ window.analyzeFile = analyzeFile;
 window.acceptDuplicate = acceptDuplicate;
 window.rejectDuplicate = rejectDuplicate;
 window.openAddTickerModal = openAddTickerModal;
-window.saveTickerFromModal = saveTickerFromModal;
 window.showConfirmationModal = showConfirmationModal;
 window.closeConfirmationModal = closeConfirmationModal;
 window.executeImport = executeImport;
 window.executeImportWithReport = executeImportWithReport;
 window.performImport = performImport;
-window.showNotification = showNotification;
+window.showImportUserDataNotification = showImportUserDataNotification;
 window.resetFile = resetFile;
 window.confirmImport = confirmImport;

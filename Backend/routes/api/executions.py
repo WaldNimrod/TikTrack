@@ -249,6 +249,40 @@ def get_pending_assignment_executions():
         error_payload = BaseEntityUtils.create_error_payload(normalizer, str(e))
         return jsonify(error_payload), 500
 
+@executions_bp.route('/pending-assignment/highlights', methods=['GET'])
+@handle_database_session()
+def get_pending_assignment_highlights():
+    """Get highlight cards for pending executions."""
+    normalizer = None
+    try:
+        db: Session = g.db
+        normalizer = _get_date_normalizer()
+
+        items_limit = request.args.get('limit', default=5, type=int)
+        suggestions_limit = request.args.get('suggestions', default=5, type=int)
+
+        if not items_limit or items_limit <= 0:
+            items_limit = 5
+        if not suggestions_limit or suggestions_limit <= 0:
+            suggestions_limit = 5
+
+        highlights = ExecutionTradeMatchingService.get_pending_execution_highlights(
+            db,
+            max_items=items_limit,
+            max_suggestions_per_execution=suggestions_limit
+        )
+
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            data=highlights,
+            extra={"count": len(highlights)}
+        )
+        return jsonify(payload), 200
+    except Exception as e:
+        logger.error(f"Error getting pending execution highlights: {str(e)}")
+        error_payload = BaseEntityUtils.create_error_payload(normalizer, str(e))
+        return jsonify(error_payload), 500
+
 @executions_bp.route('/<int:execution_id>/suggest-trades', methods=['GET'])
 @handle_database_session()
 def suggest_trades_for_execution(execution_id: int):

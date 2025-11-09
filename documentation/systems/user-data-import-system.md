@@ -277,39 +277,7 @@ class BaseImportConnector(ABC):
 ### מודל הוספת טיקר
 
 ```html
-<div class="modal" id="addTickerModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">הוספת טיקר חדש</h5>
-            </div>
-            <div class="modal-body">
-                <form id="addTickerForm">
-                    <div class="mb-3">
-                        <label for="tickerSymbol">סמל הטיקר</label>
-                        <input type="text" id="tickerSymbol" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="tickerName">שם הטיקר</label>
-                        <input type="text" id="tickerName" placeholder="הזן שם הטיקר">
-                    </div>
-                    <div class="mb-3">
-                        <label for="tickerType">סוג הטיקר</label>
-                        <select id="tickerType">
-                            <option value="stock">מניה</option>
-                            <option value="etf">קרן נסחרת</option>
-                            <option value="bond">אג"ח</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" onclick="saveTickerFromModal()">שמור טיקר</button>
-            </div>
-        </div>
-    </div>
-</div>
-```
+המודל להוספת טיקר איננו קוד מקומי – הוא משתמש במערכת המכלול של **ModalManagerV2** עם הקונפיגורציה הכללית `tickersModal`. הקריאה מתבצעת דרך `showModalSafe('tickersModal', 'add')`, ערכי ברירת המחדל מתמלאים אוטומטית (סמל, שם, סוג, מטבע) והפעולה נשענת על `saveTicker` של מודול הטיקרים הכללי. לאחר שמירה מוצלחת, `CRUDResponseHandler` סוגר את המודל והייבוא מרענן את ה-Preview מחדש.
 
 ### פונקציות JavaScript
 
@@ -328,11 +296,14 @@ class BaseImportConnector(ABC):
 #### `rejectDuplicate(index, type)`
 דוחה כפילות ומעדכן את התצוגה.
 
-#### `openAddTickerModal(symbol)`
-פותח מודל להוספת טיקר חדש.
+#### `openAddTickerModal(symbol, currency)`
+פותח את `tickersModal` דרך ModalManagerV2, ממלא מראש את הסמל והמטבע (כולל ניסיון להתאים קוד מטבע לערך הקיים ברשימת המטבעות) ומוודא שהקריאה ל-`saveTicker` של המערכת הכללית תוביל לרענון אוטומטי של תצוגת הייבוא.
 
-#### `saveTickerFromModal(symbol, name)`
-שומר טיקר חדש ומעדכן את התצוגה.
+#### `ensureTickerSaveHook()`
+עוטף את `saveTicker` הכללי בקריאה חד-פעמית שמרעננת את תצוגת הייבוא (`refreshPreviewData`) לאחר שמירה מוצלחת של טיקר חדש.
+
+#### `ensureTickersModalConfigLoaded()`
+טוען דינמית את `modal-configs/tickers-config.js` מתוך `PACKAGE_MANIFEST` במקרה שהקובץ לא נטען מראש בעמוד, מאזין להצלחת הטעינה ומדווח על כשל לפני מעבר לפתרון fallback.
 
 #### `refreshPreviewData()`
 מרענן את התצוגה לאחר פעולות המשתמש.

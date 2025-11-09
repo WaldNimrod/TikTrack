@@ -589,9 +589,26 @@ window.tickerService = {
 
 // ===== CRUD OPERATIONS =====
 
+function resolveFieldId(candidateIds, fallbackId) {
+  if (Array.isArray(candidateIds)) {
+    for (const candidate of candidateIds) {
+      if (candidate && document.getElementById(candidate)) {
+        return candidate;
+      }
+    }
+    return candidateIds[0] || fallbackId;
+  }
+
+  if (typeof candidateIds === 'string') {
+    return candidateIds;
+  }
+
+  return fallbackId;
+}
+
 /**
  * שמירת טיקר חדש
- * 
+ *
  * Note: updated_at field is NOT set during creation - it's reserved for future pricing system updates
  */
 /**
@@ -601,13 +618,19 @@ window.tickerService = {
  * @returns {Promise<void>}
  */
 async function saveTicker() {
+  const symbolFieldId = resolveFieldId(['tickerSymbol', 'addTickerSymbol']);
+  const nameFieldId = resolveFieldId(['tickerName', 'addTickerName']);
+  const typeFieldId = resolveFieldId(['tickerType', 'addTickerType']);
+  const currencyFieldId = resolveFieldId(['tickerCurrency', 'addTickerCurrency']);
+  const remarksFieldId = resolveFieldId(['tickerRemarks', 'addTickerRemarks']);
+
   // איסוף נתונים מהטופס באמצעות DataCollectionService
   const tickerData = DataCollectionService.collectFormData({
-    symbol: { id: 'addTickerSymbol', type: 'text' },
-    name: { id: 'addTickerName', type: 'text' },
-    type: { id: 'addTickerType', type: 'text' },
-    currency_id: { id: 'addTickerCurrency', type: 'int' },
-    remarks: { id: 'addTickerRemarks', type: 'text' }
+    symbol: { id: symbolFieldId, type: 'text' },
+    name: { id: nameFieldId, type: 'text' },
+    type: { id: typeFieldId, type: 'text' },
+    currency_id: { id: currencyFieldId, type: 'int' },
+    remarks: { id: remarksFieldId, type: 'text' }
   });
 
   const symbol = tickerData.symbol?.trim().toUpperCase() || '';

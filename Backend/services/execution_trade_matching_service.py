@@ -236,3 +236,51 @@ class ExecutionTradeMatchingService:
         logger.info(f"Generated suggestions for {len(result)} executions")
         return result
 
+    @staticmethod
+    def get_pending_execution_highlights(
+        db: Session,
+        max_items: int = 5,
+        max_suggestions_per_execution: int = 5
+    ) -> List[Dict[str, Any]]:
+        """
+        Build highlight data for pending executions with best trade suggestions.
+
+        Args:
+            db: Database session
+            max_items: Maximum number of highlight cards to return
+            max_suggestions_per_execution: Suggestions evaluated per execution
+
+        Returns:
+            List of highlight dictionaries sorted by score (descending)
+        """
+        pending_executions = ExecutionTradeMatchingService.get_pending_executions(db)
+        highlights: List[Dict[str, Any]] = []
+
+        for execution in pending_executions:
+            suggestions = ExecutionTradeMatchingService.suggest_trades_for_execution(
+                db,
+                execution,
+                max_suggestions=max_suggestions_per_execution
+            )
+
+            if not suggestions:
+                continue
+
+            primary_suggestion = suggestions[0]
+            highlight: Dict[str, Any] = {
+                "execution_id": execution.id,
+                "execution": execution.to_dict(),
+                "primary_suggestion": primary_suggestion,
+                "suggestions": suggestions,
+                "suggestion_count": len(suggestions),
+                "additional_suggestions": max(len(suggestions) - 1, 0),
+                "best_score": primary_suggestion.get("score"),
+            }
+            highlights.append(highlight)
+
+        highlights.sort(key=lambda item: item.get("best_score", 0) or 0, reverse=True)
+
+        if max_items and max_items > 0:
+            return highlights[:max_items]
+        return highlights
+

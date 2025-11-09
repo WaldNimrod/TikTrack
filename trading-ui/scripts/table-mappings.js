@@ -177,14 +177,14 @@ const TABLE_COLUMN_MAPPINGS = {
 
   // טבלת פורטפוליו (Portfolio) - Full Portfolio Table
   'portfolio': [
-    'account_name',            // 0 - חשבון
+    'side',                    // 0 - צד
     'ticker_symbol',           // 1 - סימבול
     'ticker_name',             // 2 - נוכחי (שם הטיקר)
     'quantity',                // 3 - כמות
-    'side',                     // 4 - צד
-    'average_price_net',        // 5 - מחיר ממוצע
-    'market_value',            // 6 - שווי שוק
-    'unrealized_pl',           // 7 - רווח/הפסד לא מוכר
+    'average_price_net',       // 4 - מחיר ממוצע
+    'market_value',            // 5 - שווי שוק
+    'unrealized_pl',           // 6 - רווח/הפסד לא מוכר
+    'account_name',            // 7 - חשבון
     'percent_of_portfolio',    // 8 - אחוז מהפורטפוליו
   ],
 
@@ -196,6 +196,21 @@ const TABLE_COLUMN_MAPPINGS = {
     'price',                   // 3 - מחיר
     'fee',                     // 4 - עמלה
     'total',                   // 5 - סה"כ
+  ],
+
+  // טבלת המלצות שיוך לטריידים (Trade Suggestions) - Executions Page
+  'trade_suggestions': [
+    'checkbox',                // 0 - בחירה (לא ניתן למיין)
+    'score',                   // 1 - ציון התאמה
+    'execution_id',            // 2 - מזהה ביצוע (להצגת כרטיס ביצוע)
+    'trade_id',                // 3 - מזהה טרייד (להצגת כרטיס טרייד)
+    'account_name',            // 4 - חשבון מסחר
+    'created_at',              // 5 - תאריך פתיחת הטרייד
+    'status',                  // 6 - סטטוס טרייד
+    'side',                    // 7 - צד (Long/Short)
+    'investment_type',         // 8 - סוג השקעה
+    'match_reasons_text',      // 9 - סיבות התאמה (טקסט חופשי)
+    'actions',                 // 10 - פעולות (לא ניתן למיין)
   ],
 };
 
@@ -563,6 +578,45 @@ function getColumnValue(item, columnIndex, tableType) {
       return item.closed_at || item.cancelled_at || '';
     }
     // For other fields, return directly
+    return item[fieldName] || '';
+  }
+
+  // Trade Suggestions table - special handling for flat data structure
+  if (tableType === 'trade_suggestions') {
+    if (fieldName === 'score') {
+      // Score is a number - return as number for proper sorting
+      return item.score || 0;
+    }
+    if (fieldName === 'execution_id') {
+      return item.execution_id || 0;
+    }
+    if (fieldName === 'trade_id') {
+      return item.trade_id || 0;
+    }
+    if (fieldName === 'account_name') {
+      return item.account_name || '';
+    }
+    if (fieldName === 'created_at') {
+      // Return timestamp for date sorting
+      const dateValue = item.created_at || '';
+      return dateValue ? new Date(dateValue).getTime() : 0;
+    }
+    if (fieldName === 'status') {
+      return item.status || '';
+    }
+    if (fieldName === 'side') {
+      return item.side || '';
+    }
+    if (fieldName === 'investment_type') {
+      return item.investment_type || '';
+    }
+    if (fieldName === 'match_reasons_text') {
+      return item.match_reasons_text || '';
+    }
+    // For non-sortable columns, return empty string
+    if (['checkbox', 'actions'].includes(fieldName)) {
+      return '';
+    }
     return item[fieldName] || '';
   }
 

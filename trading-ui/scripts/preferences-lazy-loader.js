@@ -59,6 +59,7 @@ class PreferenceClassifier {
                 'secondaryColor',
                 'backgroundColor',
                 'textColor',
+                'timezone',
                 'linkColor',
                 'dangerColor',
                 'successColor',

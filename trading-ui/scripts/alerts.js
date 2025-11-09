@@ -595,29 +595,22 @@ function updateAlertsTable(alerts) {
       const symbolDisplay = window.getRelatedObjectSymbol ? 
         window.getRelatedObjectSymbol(alert, dataSources) : '-';
 
-      const createdAtRawCandidates = [
-        alert.created_at,
-        alert.createdAt,
-        alert.created_at_utc,
-        alert.createdAtUtc,
-        alert.created_at_iso,
-        alert.createdAtIso,
-        alert.created_at_local,
-        alert.createdAtLocal
-      ];
-      const createdAtCandidate = createdAtRawCandidates.find(value => {
-        if (!value) {return false;}
-        if (typeof value === 'string') {
-          const normalized = value.trim();
-          if (!normalized) {return false;}
-          const lower = normalized.toLowerCase();
-          return lower !== 'none' && lower !== 'null' && lower !== 'undefined';
-        }
-        return true;
-      }) || null;
       const createdEnvelope = window.dateUtils?.ensureDateEnvelope
-        ? window.dateUtils.ensureDateEnvelope(createdAtCandidate)
-        : createdAtCandidate;
+        ? window.dateUtils.ensureDateEnvelope(
+            alert.created_at ||
+            alert.createdAt ||
+            alert.created_at_utc ||
+            alert.createdAtUtc ||
+            alert.created_at_iso ||
+            alert.createdAtIso ||
+            alert.created_at_local ||
+            alert.createdAtLocal ||
+            null
+          )
+        : (alert.created_at || alert.createdAt || null);
+      const createdDateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(createdEnvelope || null)
+        : (createdEnvelope ? new Date(createdEnvelope) : null);
       const createdAtDisplay = createdEnvelope
         ? (
             window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function'
@@ -626,9 +619,8 @@ function updateAlertsTable(alerts) {
                 ? window.dateUtils.formatDate(createdEnvelope, { includeTime: true })
                 : (() => {
                     try {
-                      const parsed = new Date(createdEnvelope?.utc || createdEnvelope?.local || createdAtCandidate);
-                      if (!Number.isNaN(parsed.getTime())) {
-                        return parsed.toLocaleString('he-IL', {
+                      if (createdDateObj && !Number.isNaN(createdDateObj.getTime())) {
+                        return createdDateObj.toLocaleString('he-IL', {
                           year: 'numeric',
                           month: '2-digit',
                           day: '2-digit',
@@ -644,12 +636,11 @@ function updateAlertsTable(alerts) {
           )
         : 'לא מוגדר';
       const createdAtDataAttr = window.dateUtils?.getEpochMilliseconds
-        ? window.dateUtils.getEpochMilliseconds(createdEnvelope || createdAtCandidate)
+        ? window.dateUtils.getEpochMilliseconds(createdEnvelope)
         : (() => {
-            if (!createdAtCandidate) {return '';}
+            if (!createdDateObj || Number.isNaN(createdDateObj.getTime())) {return '';}
             try {
-              const parsed = new Date(createdAtCandidate?.utc || createdAtCandidate?.local || createdAtCandidate);
-              return Number.isNaN(parsed.getTime()) ? '' : parsed.getTime();
+              return createdDateObj.getTime();
             } catch {
               return '';
             }
@@ -707,6 +698,9 @@ function updateAlertsTable(alerts) {
       const expiryEnvelope = window.dateUtils?.ensureDateEnvelope
         ? window.dateUtils.ensureDateEnvelope(alert.expiry_date)
         : alert.expiry_date;
+      const expiryDateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(expiryEnvelope || null)
+        : (expiryEnvelope ? new Date(expiryEnvelope) : null);
       const expiryDisplay = expiryEnvelope
         ? (
             window.FieldRendererService?.renderDate
@@ -715,9 +709,8 @@ function updateAlertsTable(alerts) {
                 ? window.dateUtils.formatDate(expiryEnvelope, { includeTime: false })
                 : (() => {
                     try {
-                      const parsed = new Date(expiryEnvelope?.utc || expiryEnvelope?.local || alert.expiry_date);
-                      if (!Number.isNaN(parsed.getTime())) {
-                        return parsed.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                      if (expiryDateObj && !Number.isNaN(expiryDateObj.getTime())) {
+                        return expiryDateObj.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
                       }
                     } catch (error) {
                       window.Logger?.warn('⚠️ expiry date fallback failed', { error, alertId: alert?.id }, { page: 'alerts' });
@@ -727,12 +720,11 @@ function updateAlertsTable(alerts) {
           )
         : '-';
       const expiryDataAttr = window.dateUtils?.getEpochMilliseconds
-        ? window.dateUtils.getEpochMilliseconds(expiryEnvelope || alert.expiry_date)
+        ? window.dateUtils.getEpochMilliseconds(expiryEnvelope)
         : (() => {
-            if (!alert.expiry_date) {return '';}
+            if (!expiryDateObj || Number.isNaN(expiryDateObj.getTime())) {return '';}
             try {
-              const parsed = new Date(expiryEnvelope?.utc || expiryEnvelope?.local || alert.expiry_date);
-              return Number.isNaN(parsed.getTime()) ? '' : parsed.getTime();
+              return expiryDateObj.getTime();
             } catch {
               return '';
             }
@@ -1079,14 +1071,16 @@ function populateSelect(selectId, data, field, prefix = '') {
       const investmentType = item.investment_type || 'לא מוגדר';
       const date = item.created_at || item.date;
       const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(date) : date;
+      const dateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(dateEnvelope || null)
+        : (dateEnvelope ? new Date(dateEnvelope) : null);
       const formattedDate = dateEnvelope
         ? (window.dateUtils?.formatDate
             ? window.dateUtils.formatDate(dateEnvelope, { includeTime: false })
             : (() => {
                 try {
-                  const parsed = new Date(dateEnvelope?.utc || dateEnvelope?.local || date);
-                  if (!Number.isNaN(parsed.getTime())) {
-                    return parsed.toLocaleDateString('he-IL');
+                  if (dateObj && !Number.isNaN(dateObj.getTime())) {
+                    return dateObj.toLocaleDateString('he-IL');
                   }
                 } catch (error) {
                   window.Logger?.warn('⚠️ populateSelect trade date fallback failed', { error, itemId: item?.id }, { page: 'alerts' });
@@ -1102,14 +1096,16 @@ function populateSelect(selectId, data, field, prefix = '') {
       const investmentType = item.investment_type || 'לא מוגדר';
       const date = item.created_at || item.date;
       const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(date) : date;
+      const dateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(dateEnvelope || null)
+        : (dateEnvelope ? new Date(dateEnvelope) : null);
       const formattedDate = dateEnvelope
         ? (window.dateUtils?.formatDate
             ? window.dateUtils.formatDate(dateEnvelope, { includeTime: false })
             : (() => {
                 try {
-                  const parsed = new Date(dateEnvelope?.utc || dateEnvelope?.local || date);
-                  if (!Number.isNaN(parsed.getTime())) {
-                    return parsed.toLocaleDateString('he-IL');
+                  if (dateObj && !Number.isNaN(dateObj.getTime())) {
+                    return dateObj.toLocaleDateString('he-IL');
                   }
                 } catch (error) {
                   window.Logger?.warn('⚠️ populateSelect plan date fallback failed', { error, itemId: item?.id }, { page: 'alerts' });
@@ -2695,38 +2691,33 @@ function updateAlertsSummary(alerts) {
   weekAgo.setDate(weekAgo.getDate() - 7);
 
   const getCreatedMs = (alert) => {
-    const candidates = [
-      alert.created_at,
-      alert.createdAt,
-      alert.created_at_utc,
-      alert.createdAtUtc,
-      alert.created_at_iso,
-      alert.createdAtIso,
-      alert.created_at_local,
-      alert.createdAtLocal
-    ];
-    const candidate = candidates.find(value => {
-      if (!value) {return false;}
-      if (typeof value === 'string') {
-        const normalized = value.trim();
-        if (!normalized) {return false;}
-        const lower = normalized.toLowerCase();
-        return lower !== 'none' && lower !== 'null' && lower !== 'undefined';
-      }
-      return true;
-    }) || null;
-    const envelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(candidate) : candidate;
-    if (window.dateUtils?.getEpochMilliseconds) {
-      const ms = window.dateUtils.getEpochMilliseconds(envelope || candidate);
-      return (ms || ms === 0) ? ms : null;
+    const envelope = window.dateUtils?.ensureDateEnvelope
+      ? window.dateUtils.ensureDateEnvelope(
+          alert.created_at ||
+          alert.createdAt ||
+          alert.created_at_utc ||
+          alert.createdAtUtc ||
+          alert.created_at_iso ||
+          alert.createdAtIso ||
+          alert.created_at_local ||
+          alert.createdAtLocal ||
+          null
+        )
+      : (alert.created_at || alert.createdAt || null);
+    if (!envelope) {return null;}
+    const ms = window.dateUtils?.getEpochMilliseconds
+      ? window.dateUtils.getEpochMilliseconds(envelope)
+      : null;
+    if (ms || ms === 0) {
+      return ms;
     }
-    if (!candidate) {return null;}
-    try {
-      const parsed = new Date(envelope?.utc || envelope?.local || candidate);
-      return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
-    } catch {
+    const dateObj = window.dateUtils?.toDateObject
+      ? window.dateUtils.toDateObject(envelope)
+      : (envelope ? new Date(envelope) : null);
+    if (!dateObj || Number.isNaN(dateObj.getTime())) {
       return null;
     }
+    return dateObj.getTime();
   };
 
   const todayAlerts = alerts.filter(alert => {

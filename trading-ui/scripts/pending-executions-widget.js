@@ -166,11 +166,15 @@
             const sharedTickerRow = `
                 <div class="d-flex align-items-center flex-wrap gap-3 text-muted small">
                     <div class="d-flex align-items-center gap-2">
-                        <span class="text-muted">טיקר:</span>
+                        <span class="entity-icon-circle">
+                            <img src="images/icons/tickers.svg" alt="טיקר" />
+                        </span>
                         ${tickerLink}
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <span class="text-muted">חשבון:</span>
+                        <span class="entity-icon-circle">
+                            <img src="images/icons/trading_accounts.svg" alt="חשבון מסחר" />
+                        </span>
                         ${sharedAccount || '<span class="text-muted">לא מוגדר</span>'}
                     </div>
                 </div>
@@ -219,19 +223,38 @@
                 <li class="list-group-item pending-highlight-item" ${itemIdAttr}>
                     ${sharedTickerRow}
                     <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-                    <div class="d-flex flex-column gap-1">
-                        <div class="d-flex align-items-center flex-wrap gap-2">
-                            ${executionLink}
-                            ${actionBadge}
-                            ${quantityDisplay}
+                        <div class="d-flex flex-column gap-1">
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                ${executionLink}
+                                ${actionBadge}
+                                ${quantityDisplay}
+                            </div>
+                            <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
+                                <span>${executionDate}</span>
+                            </div>
                         </div>
-                        <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
-                            <span>${executionDate}</span>
-                        </div>
-                    </div>
-                        <div class="d-flex flex-column align-items-end gap-1">
-                            ${scoreBadge}
-                            ${additionalText}
+                        <div class="d-flex flex-column align-items-end gap-2">
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                ${scoreBadge}
+                                ${additionalText}
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                <button
+                                    data-button-type="APPROVE"
+                                    data-variant="small"
+                                    data-classes="btn btn-sm btn-outline-success table-btn-small"
+                                    data-text="אשר שיוך"
+                                    data-onclick="PendingExecutionsHighlights.acceptSuggestion(${execution.id}, ${primarySuggestion?.trade_id || 'null'})"
+                                    ${primarySuggestion ? '' : 'disabled'}
+                                ></button>
+                                <button
+                                    data-button-type="REJECT"
+                                    data-variant="small"
+                                    data-classes="btn btn-sm btn-outline-danger table-btn-small"
+                                    data-text="דחה"
+                                    data-onclick="PendingExecutionsHighlights.rejectSuggestion(${execution.id})"
+                                ></button>
+                            </div>
                         </div>
                     </div>
                     <div class="bg-body-tertiary rounded-3 mt-3 p-3 d-flex flex-column gap-2">
@@ -245,23 +268,6 @@
                             <span>${tradeDate}</span>
                         </div>
                         ${reasonsHtml}
-                    </div>
-                    <div class="d-flex flex-wrap gap-2 mt-3">
-                        <button
-                            data-button-type="APPROVE"
-                            data-variant="small"
-                            data-classes="btn btn-sm btn-outline-success table-btn-small"
-                            data-text="אשר שיוך"
-                            data-onclick="PendingExecutionsHighlights.acceptSuggestion(${execution.id}, ${primarySuggestion?.trade_id || 'null'})"
-                            ${primarySuggestion ? '' : 'disabled'}
-                        ></button>
-                        <button
-                            data-button-type="REJECT"
-                            data-variant="small"
-                            data-classes="btn btn-sm btn-outline-danger table-btn-small"
-                            data-text="דחה"
-                            data-onclick="PendingExecutionsHighlights.rejectSuggestion(${execution.id})"
-                        ></button>
                     </div>
                 </li>
             `;

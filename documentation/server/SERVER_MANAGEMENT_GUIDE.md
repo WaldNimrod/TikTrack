@@ -19,22 +19,35 @@
 
 ---
 
-## 🚀 **How to Start the Server (הדרך היחידה)**
+## 🚀 **הפעלה לפי סביבה**
 
-### **הפעלה רגילה (הדרך היחידה):**
-```bash
-./start_server.sh
-```
+### 🧪 **שרת פיתוח (פורט ‎8080)**
+- שימוש: בדיקות מקומיות, עבודה עם DB פיתוח (`Backend/db/simpleTrade_new.db`)
+- סקריפט:  
+  ```bash
+  ./start_server.sh
+  ```
+- פקודות נוספות:  
+  ```bash
+  ./start_server.sh --check-only   # בדיקת קונפליקטים
+  ./start_server.sh --force        # הפעלה למרות קונפליקט (לא מומלץ)
+  ```
 
-### **בדיקת תהליכים בלבד:**
-```bash
-./start_server.sh --check-only
-```
-
-### **הפעלה כפויה (לא מומלץ):**
-```bash
-./start_server.sh --force
-```
+### 🏭 **שרת פרודקשן מקומי (פורט ‎5001)**
+- שימוש: סימולציה של סביבת הייצור מול `production/Backend` ו־`production/trading-ui`
+- סקריפט מומלץ:  
+  ```bash
+  production/start_production.sh
+  ```
+  (עוטף את `./start_server.sh --env production` ומגדיר את `TIKTRACK_ENV=production`)
+- לאחר סנכרון קוד יש להריץ, במידת הצורך, יצירת DB:
+  ```bash
+  python3 production/Backend/scripts/create_production_db.py --confirm
+  ```
+- להבטחת תחילת נקייה:  
+  ```bash
+  lsof -ti :5001 | xargs kill -9 2>/dev/null || true
+  ```
 
 ## 📁 **קבצי השרת הפעילים (רק אלה)**
 
@@ -56,8 +69,8 @@
 ### **מה קורה כשמריצים את הסקריפט:**
 1. **בדיקת Python** - וידוא ש-Python3 זמין
 2. **בדיקת קבצים** - וידוא שכל הקבצים הנדרשים קיימים
-3. **בדיקת תהליכים** - זיהוי תהליכי TikTrack קיימים על פורט 8080
-4. **הפעלת השרת** - הפעלה ב-foreground עם לוגים חיים
+3. **בדיקת תהליכים** - זיהוי תהליכי TikTrack קיימים על הפורט המתאים (8080 לפיתוח, ‎5001 לפרודקשן)
+4. **הפעלת השרת** - הפעלה ב־foreground עם לוגים חיים לפי הסביבה
 5. **טיפול בעצירה** - עצירה מסודרת עם Ctrl+C
 
 ---

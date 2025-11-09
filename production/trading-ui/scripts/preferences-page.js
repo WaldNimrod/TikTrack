@@ -408,6 +408,222 @@ window.debugProfileLoading = async function() {
         console.error('❌ Error in debugProfileLoading:', error);
     }
 };
+
+/**
+ * Disable frontend cache (UnifiedCacheManager + LazyLoader) for current session
+ * Usage:
+ *   await disableFrontendCacheForSession();
+ *   await debugProfileLoading();
+ */
+window.disableFrontendCacheForSession = async function() {
+    const logger = window.Logger || console;
+    const unified = window.UnifiedCacheManager;
+    
+    if (!unified) {
+        logger.warn('⚠️ UnifiedCacheManager not available – make sure base packages finished loading');
+        return;
+    }
+
+    if (!window.__frontendCacheBackup) {
+        window.__frontendCacheBackup = {};
+    }
+
+    if (window.__frontendCacheBackup.active) {
+        logger.info('ℹ️ Frontend cache bypass already active – skipping reinitialization');
+        return;
+    }
+
+    // Ensure initialization finished before patching
+    if (!unified.initialized && typeof unified.initialize === 'function') {
+        logger.info('🔄 Initializing UnifiedCacheManager before cache bypass...');
+        await unified.initialize();
+    }
+
+    // Backup original methods
+    window.__frontendCacheBackup.get = unified.get?.bind(unified);
+    window.__frontendCacheBackup.getMultiple = unified.getMultiple?.bind(unified);
+    window.__frontendCacheBackup.save = unified.save?.bind(unified);
+    window.__frontendCacheBackup.remove = unified.remove?.bind(unified);
+    window.__frontendCacheBackup.clear = unified.clear?.bind(unified);
+    window.__frontendCacheBackup.active = true;
+
+    logger.info('🧹 Clearing existing cache layers before bypass...');
+    try {
+        if (typeof unified.clearAllCache === 'function') {
+            await unified.clearAllCache({ autoRefresh: false });
+        }
+    } catch (clearError) {
+        logger.warn('⚠️ Failed to execute clearAllCache()', clearError);
+    }
+
+    // Remove localStorage keys related to preferences
+    const removedKeys = [];
+    if (typeof window.localStorage !== 'undefined') {
+        const removalPatterns = [
+            'tiktrack_preference_',
+            'tiktrack_all_preferences__profile_',
+            'preference_',
+            'preferences-active-profile',
+            'preferences-groups__profile_',
+            'preferences-color-cache__profile_'
+        ];
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (removalPatterns.some(pattern => key.startsWith(pattern))) {
+                removedKeys.push(key);
+            }
+        }
+
+        removedKeys.forEach(key => localStorage.removeItem(key));
+        localStorage.setItem('cache_mode', 'no-cache');
+    }
+
+    window.cacheMode = 'no-cache';
+
+    // Override UnifiedCacheManager methods to force API usage
+    unified.get = async function(key, options = {}) {
+        logger.debug?.(`🚫 Cache bypass (get): ${key}`, { page: 'preferences-cache-bypass' });
+        if (options && typeof options.fallback === 'function') {
+            return await options.fallback();
+        }
+        return null;
+    };
+
+    unified.getMultiple = async function(keys = [], options = {}) {
+        logger.debug?.('🚫 Cache bypass (getMultiple)', { keys, page: 'preferences-cache-bypass' });
+        const results = {};
+        if (Array.isArray(keys)) {
+            for (const key of keys) {
+                results[key] = null;
+            }
+        }
+        return results;
+    };
+
+    unified.save = async function(key, value, options = {}) {
+        logger.debug?.(`🚫 Cache bypass (save): ${key}`, { page: 'preferences-cache-bypass' });
+        return true;
+    };
+
+    if (typeof unified.remove === 'function') {
+        unified.remove = async function(key) {
+            logger.debug?.(`🚫 Cache bypass (remove): ${key}`, { page: 'preferences-cache-bypass' });
+            return true;
+        };
+    }
+
+    // Reset LazyLoader internal caches
+    if (window.LazyLoader) {
+        try {
+            window.LazyLoader.loadedPreferences?.clear?.();
+            window.LazyLoader.loadingPromises?.clear?.();
+            logger.info('🧹 LazyLoader caches cleared');
+        } catch (lazyError) {
+            logger.warn('⚠️ Failed to clear LazyLoader state', lazyError);
+        }
+    }
+
+    logger.info('✅ Frontend cache bypass enabled for this session', {
+        removedKeys,
+        page: 'preferences-cache-bypass'
+    });
+
+    return { removedKeys, message: 'Frontend cache bypass enabled' };
+};
+
+/**
+ * Restore the original cache behaviour after disableFrontendCacheForSession()
+ * Usage:
+ *   restoreFrontendCache();
+ */
+window.restoreFrontendCache = function() {
+    const logger = window.Logger || console;
+    const unified = window.UnifiedCacheManager;
+    const backup = window.__frontendCacheBackup;
+
+    if (!backup?.active || !unified) {
+        logger.warn('⚠️ Cache bypass is not active – nothing to restore');
+        return;
+    }
+
+    if (backup.get) {
+        unified.get = backup.get;
+    }
+    if (backup.getMultiple) {
+        unified.getMultiple = backup.getMultiple;
+    }
+    if (backup.save) {
+        unified.save = backup.save;
+    }
+    if (backup.remove) {
+        unified.remove = backup.remove;
+    }
+    if (backup.clear) {
+        unified.clear = backup.clear;
+    }
+
+    backup.active = false;
+    window.cacheMode = 'preserve';
+    if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('cache_mode');
+    }
+
+    logger.info('✅ Frontend cache restored – run PreferencesUI.loadAllPreferences() to warm caches', {
+        page: 'preferences-cache-bypass'
+    });
+};
+
+/**
+ * Inspect preference cache keys and verify profile suffix usage
+ * Usage:
+ *   inspectPreferenceCacheKeys();
+ */
+window.inspectPreferenceCacheKeys = function() {
+    const logger = window.Logger || console;
+
+    if (typeof localStorage === 'undefined') {
+        logger.warn('⚠️ localStorage not available');
+        return [];
+    }
+
+    const relevantPatterns = [
+        'tiktrack_preference_',
+        'tiktrack_all_preferences__profile_',
+        'tiktrack_preference_group_',
+        'preference_',
+        'all_preferences_',
+        'preference_group_'
+    ];
+
+    const results = [];
+    const keys = Object.keys(localStorage);
+
+    for (const rawKey of keys) {
+        if (!relevantPatterns.some(pattern => rawKey.startsWith(pattern))) {
+            continue;
+        }
+
+        const normalizedKey = rawKey.startsWith('tiktrack_') ? rawKey.replace('tiktrack_', '') : rawKey;
+        const profileMatch = normalizedKey.match(/__profile_(\d+)$/);
+        results.push({
+            rawKey,
+            normalizedKey,
+            hasProfileSuffix: Boolean(profileMatch),
+            profileId: profileMatch ? Number(profileMatch[1]) : null,
+            valueLength: (localStorage.getItem(rawKey) || '').length
+        });
+    }
+
+    if (results.length === 0) {
+        logger.info('ℹ️ No preference cache keys found in localStorage');
+    } else {
+        console.table(results);
+        logger.info(`📊 Found ${results.length} preference-related cache keys`);
+    }
+
+    return results;
+};
 async function copyDetailedLogLocal() {
     try {
         const log = [];

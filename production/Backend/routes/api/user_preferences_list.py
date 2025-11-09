@@ -30,7 +30,7 @@ def get_user_preferences():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        cursor.execute("SELECT * FROM user_preferences ORDER BY id")
+        cursor.execute("SELECT * FROM user_preferences_v3 ORDER BY id")
         preferences = cursor.fetchall()
         
         conn.close()
@@ -42,7 +42,7 @@ def get_user_preferences():
         
         return jsonify({
             'status': 'success',
-            'message': f'Retrieved {len(result)} user_preferences records',
+            'message': f'Retrieved {len(result)} user_preferences_v3 records',
             'data': result,
             'count': len(result),
             'version': '1.0'

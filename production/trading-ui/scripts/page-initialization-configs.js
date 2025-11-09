@@ -259,7 +259,9 @@ const PAGE_CONFIGS = {
             'DataUtils',
             'window.Logger',
             'window.CacheSyncManager',
-            'window.initializePreferences'
+            'window.initializePreferences',
+            'window.disableFrontendCacheForSession',
+            'window.inspectPreferenceCacheKeys'
         ],
         
         // ← NEW: מטאדאטה

@@ -586,9 +586,9 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'preferences-page.js',
-        globalCheck: 'window.loadAccountsForPreferences',
-        description: 'פונקציות ספציפיות לעמוד העדפות',
-        required: false,
+        globalCheck: 'window.disableFrontendCacheForSession',
+        description: 'פונקציות ספציפיות לעמוד העדפות (דיבאג מטמון, פרופילים)',
+        required: true,
         loadOrder: 7
       },
       {

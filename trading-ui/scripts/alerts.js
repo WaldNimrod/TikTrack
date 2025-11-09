@@ -514,12 +514,29 @@ function updateAlertsTable(alerts) {
               return null;
             })();
             const tickerSymbol = tradeTicker || `טרייד ${alert.related_id}`;
-            const tradeDate = trade?.created_at || trade?.opened_at || trade?.date || '';
+            const tradeDateEnvelope = window.dateUtils?.ensureDateEnvelope
+              ? window.dateUtils.ensureDateEnvelope(
+                  trade?.created_at_envelope ||
+                  trade?.createdAtEnvelope ||
+                  trade?.created_at ||
+                  trade?.opened_at ||
+                  trade?.date ||
+                  null
+                )
+              : (
+                  trade?.created_at_envelope ||
+                  trade?.createdAtEnvelope ||
+                  trade?.created_at ||
+                  trade?.opened_at ||
+                  trade?.date ||
+                  null
+                );
             displayName = tickerSymbol;
             metaForEntity = {
               renderMode: 'notes-table',
               ticker: tickerSymbol,
-              date: tradeDate,
+              date: tradeDateEnvelope,
+              date_envelope: tradeDateEnvelope,
               status: trade?.status || '',
               side: trade?.side || '',
               investment_type: trade?.investment_type || ''
@@ -536,15 +553,31 @@ function updateAlertsTable(alerts) {
               return null;
             })();
             const tickerSymbol = planTicker || `תוכנית ${alert.related_id}`;
-            const planDate = plan?.created_at || plan?.date || '';
+            const planDateEnvelope = window.dateUtils?.ensureDateEnvelope
+              ? window.dateUtils.ensureDateEnvelope(
+                  plan?.created_at_envelope ||
+                  plan?.createdAtEnvelope ||
+                  plan?.created_at ||
+                  plan?.date ||
+                  null
+                )
+              : (
+                  plan?.created_at_envelope ||
+                  plan?.createdAtEnvelope ||
+                  plan?.created_at ||
+                  plan?.date ||
+                  null
+                );
             displayName = tickerSymbol;
             metaForEntity = {
               renderMode: 'notes-table',
               ticker: tickerSymbol,
-              date: planDate,
+              date: planDateEnvelope,
+              date_envelope: planDateEnvelope,
               status: plan?.status || '',
               side: plan?.side || '',
-              investment_type: plan?.investment_type || ''
+              investment_type: plan?.investment_type || '',
+              planned_amount: plan?.planned_amount || plan?.plannedAmount || null
             };
             break;
           }

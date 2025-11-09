@@ -4,9 +4,11 @@ from config.database import get_db
 from models.note_relation_type import NoteRelationType
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
-import os
 import sqlite3
 import re
+from pathlib import Path
+
+from config.settings import DB_PATH as CONFIG_DB_PATH
 
 # Import base classes
 from .base_entity import BaseEntityAPI
@@ -21,10 +23,9 @@ note_relation_types_bp = Blueprint('note_relation_types', __name__, url_prefix='
 
 def get_db_connection():
     """Get database connection"""
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+    db_path = Path(CONFIG_DB_PATH)
     
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 

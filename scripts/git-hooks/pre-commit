@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# TikTrack branch guard pre-commit hook
+# -------------------------------------
+# Enforces separation between development (main) and production branches,
+# prevents tracked archives/backups/logs from being committed, and keeps
+# documentation updates permitted everywhere.
+
+set -euo pipefail
+
+# Allow bypass when explicitly requested (e.g., SKIP_BRANCH_HOOK=1 git commit ...)
+if [[ "${SKIP_BRANCH_HOOK:-}" == "1" ]]; then
+    exit 0
+fi
+
+current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "HEAD")
+
+# Skip checks for detached HEAD (e.g., during rebases) – developer must verify manually.
+if [[ "${current_branch}" == "HEAD" ]]; then
+    exit 0
+fi
+
+# Gather staged changes; terminate early if nothing staged.
+if ! git diff --cached --quiet --exit-code; then
+    :
+else
+    exit 0
+fi
+
+blocked_paths_regex='^(archive/|backup/|logs/)'
+allowed_prod_prefixes=('production/' 'documentation/' 'scripts/git-hooks/')
+
+error_messages=()
+
+while IFS=$'\t' read -r status path_a path_b; do
+    # Determine the effective path for the change.
+    file_path=""
+    case "${status}" in
+        D*)  # Deleted file; ignore path checks.
+            continue
+            ;;
+        R*|C*)
+            file_path="${path_b}"
+            ;;
+        *)
+            file_path="${path_a}"
+            ;;
+    esac
+
+    # Normalize redundant prefixes (just in case).
+    file_path="${file_path#./}"
+
+    # Ignore empty paths (should not happen, but guard anyway).
+    if [[ -z "${file_path}" ]]; then
+        continue
+    fi
+
+    # 1. Disallow archive/backup/logs directories and *.log files.
+    if [[ "${file_path}" =~ ${blocked_paths_regex} ]] || [[ "${file_path}" == *.log ]]; then
+        error_messages+=("⛔ אסור לכלול בקומיט קבצים מתוך archive/, backup/, logs/ או קבצי .log (נמצא: ${file_path})")
+        continue
+    fi
+
+    # 2. Branch-specific rules.
+    if [[ "${current_branch}" == "production" ]]; then
+        allowed=false
+        for prefix in "${allowed_prod_prefixes[@]}"; do
+            if [[ "${file_path}" == "${prefix}"* ]]; then
+                allowed=true
+                break
+            fi
+        done
+        if [[ "${allowed}" == false ]]; then
+            error_messages+=("⛔ בענף production מותר לשנות רק קבצים תחת production/ או documentation/ (נמצא: ${file_path})")
+        fi
+    elif [[ "${current_branch}" == "main" ]]; then
+        if [[ "${file_path}" == production/* ]]; then
+            error_messages+=("⛔ בענף main אסור לבצע שינויים בתיקיית production/ (נמצא: ${file_path})")
+        fi
+    fi
+done < <(git diff --cached --name-status)
+
+if [[ "${#error_messages[@]}" -gt 0 ]]; then
+    printf '%s\n' "${error_messages[@]}" >&2
+    printf '%s\n' "🛑 הקומיט נעצר. עדכן את הענף או את הקבצים לפי הכללים." >&2
+    exit 1
+fi
+
+exit 0
+

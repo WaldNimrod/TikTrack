@@ -16,12 +16,13 @@ sys.path.insert(0, str(backend_dir))
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from models.import_session import ImportSession
+from config.settings import DB_PATH as CONFIG_DB_PATH
 
 def cleanup_old_import_sessions():
     """Clean up import sessions older than 90 days"""
     
     # Database path
-    db_path = backend_dir / "db" / "simpleTrade_new.db"
+    db_path = Path(CONFIG_DB_PATH)
     
     if not db_path.exists():
         print(f"❌ Database not found at: {db_path}")

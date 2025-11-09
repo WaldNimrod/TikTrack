@@ -18,6 +18,9 @@ from typing import Dict, List, Optional, Any, Union
 from datetime import datetime, timedelta
 import os
 import sys
+from pathlib import Path
+
+from config.settings import DB_PATH as CONFIG_DB_PATH
 
 # Add constraint service
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -57,10 +60,7 @@ class PreferencesService:
     def __init__(self, db_path: str = None):
         """אתחול השירות"""
         if db_path is None:
-            # Default database path
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            db_path = os.path.join(current_dir, "..", "db", "simpleTrade_new.db")
-
+            db_path = str(Path(CONFIG_DB_PATH))
         self.db_path = db_path
         self.cache = {}  # מטמון פנימי
         self.cache_ttl = 24 * 60 * 60  # 24 שעות

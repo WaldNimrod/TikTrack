@@ -21,6 +21,9 @@ import os
 import logging
 from typing import Dict, Any, Optional, Tuple
 from datetime import datetime
+from pathlib import Path
+
+from config.settings import DB_PATH as CONFIG_DB_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -231,9 +234,7 @@ def get_wal_manager(db_path: str = None) -> WALManager:
     
     if _wal_manager is None or (db_path and _wal_manager.db_path != db_path):
         if db_path is None:
-            # Use default database path
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            db_path = os.path.join(base_dir, "db", "simpleTrade_new.db")
+            db_path = str(Path(CONFIG_DB_PATH))
         
         _wal_manager = WALManager(db_path)
     

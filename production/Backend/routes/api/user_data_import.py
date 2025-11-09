@@ -15,8 +15,10 @@ import os
 import logging
 from datetime import datetime
 from typing import Dict, Any
+from pathlib import Path
 
 from config.database import get_db
+from config.settings import DB_PATH as CONFIG_DB_PATH
 from services.user_data_import import ImportOrchestrator
 from models.import_session import ImportSession
 from models.trading_account import TradingAccount
@@ -63,7 +65,8 @@ def upload_and_preview():
         # Create database session
         from sqlalchemy import create_engine
         from sqlalchemy.orm import sessionmaker
-        engine = create_engine('sqlite:///db/simpleTrade_new.db')
+        database_url = f"sqlite:///{Path(CONFIG_DB_PATH)}"
+        engine = create_engine(database_url)
         Session = sessionmaker(bind=engine)
         db_session = Session()
         

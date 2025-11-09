@@ -38,6 +38,11 @@ from services.advanced_cache_service import cache_for, invalidate_cache
 from services.currency_service import CurrencyService
 from services.entity_details_service import EntityDetailsService
 import logging
+from pathlib import Path
+
+from config.settings import DB_PATH as CONFIG_DB_PATH
+# Initialize base API (linked_items is complex, so we'll use it selectively)
+DB_PATH_STR = str(Path(CONFIG_DB_PATH))
 
 # Import base classes
 from .base_entity import BaseEntityAPI
@@ -57,8 +62,7 @@ def get_db_connection():
     import os
     import sqlite3
     
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+    DB_PATH = DB_PATH_STR
     
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row

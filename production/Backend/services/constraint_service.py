@@ -11,6 +11,9 @@ import re
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
 import logging
+from pathlib import Path
+
+from config.settings import DB_PATH as CONFIG_DB_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +32,7 @@ class ConstraintService:
     def __init__(self, db_path: str = None):
         """Initialize the constraint service"""
         if db_path is None:
-            # Default database path
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            db_path = os.path.join(current_dir, "..", "db", "simpleTrade_new.db")
+            db_path = str(Path(CONFIG_DB_PATH))
         
         self.db_path = db_path
         logger.info(f"ConstraintService initialized with database: {db_path}")

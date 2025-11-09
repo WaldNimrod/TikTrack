@@ -8,8 +8,10 @@ Description: API routes for listing all user preferences from database table
 from flask import Blueprint, request, jsonify
 from typing import Dict, Any
 import logging
-import os
 import sqlite3
+from pathlib import Path
+
+from config.settings import DB_PATH as CONFIG_DB_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -18,10 +20,9 @@ user_preferences_list_bp = Blueprint('user_preferences_list', __name__, url_pref
 
 def get_db_connection():
     """Get database connection"""
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+    db_path = Path(CONFIG_DB_PATH)
     
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 

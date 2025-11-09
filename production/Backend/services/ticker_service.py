@@ -26,6 +26,10 @@ from services.advanced_cache_service import cache_for, cache_with_deps, invalida
 from typing import List, Optional, Dict, Any, Union
 import logging
 import time
+from pathlib import Path
+
+from config.settings import DB_PATH as CONFIG_DB_PATH
+DB_PATH_STR = str(Path(CONFIG_DB_PATH))
 
 logger = logging.getLogger(__name__)
 
@@ -443,8 +447,7 @@ class TickerService:
             import os
             
             # Get database connection for linked_items
-            BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+            DB_PATH = DB_PATH_STR
             
             conn = sqlite3.connect(DB_PATH)
             conn.row_factory = sqlite3.Row
@@ -551,8 +554,7 @@ class TickerService:
         
         try:
             # Get database connection for linked_items
-            BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+            DB_PATH = DB_PATH_STR
             
             conn = sqlite3.connect(DB_PATH)
             conn.row_factory = sqlite3.Row

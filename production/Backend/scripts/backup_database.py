@@ -18,6 +18,8 @@ from pathlib import Path
 from datetime import datetime
 import argparse
 
+from config.settings import DB_PATH as CONFIG_DB_PATH
+
 def get_db_info(db_path):
     """קבלת מידע על בסיס הנתונים"""
     conn = sqlite3.connect(db_path)
@@ -211,7 +213,7 @@ def create_backup(db_path, output_dir=None, include_wal=False):
 def main():
     parser = argparse.ArgumentParser(description='יצירת גיבוי מקיף לבסיס הנתונים')
     parser.add_argument('--db-path', type=str, default=None,
-                       help='נתיב לבסיס הנתונים (default: Backend/db/simpleTrade_new.db)')
+                       help='נתיב לבסיס הנתונים (default: נתיב סביבתי מתוך config.settings)')
     parser.add_argument('--output-dir', type=str, default=None,
                        help='תיקיית יעד לגיבוי (default: Backend/db/backups)')
     parser.add_argument('--include-wal', action='store_true',
@@ -223,8 +225,7 @@ def main():
     if args.db_path:
         db_path = Path(args.db_path)
     else:
-        script_dir = Path(__file__).parent.parent
-        db_path = script_dir / "db" / "simpleTrade_new.db"
+        db_path = Path(CONFIG_DB_PATH)
     
     if not db_path.exists():
         print(f"❌ בסיס הנתונים לא נמצא: {db_path}")

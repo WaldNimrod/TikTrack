@@ -14,6 +14,7 @@ backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
 from services.background_tasks import BackgroundTaskManager
+from config.settings import DB_PATH as CONFIG_DB_PATH
 
 def register_import_sessions_cleanup_task(task_manager: BackgroundTaskManager):
     """Register import sessions cleanup task"""
@@ -25,7 +26,7 @@ def register_import_sessions_cleanup_task(task_manager: BackgroundTaskManager):
             from sqlalchemy.orm import sessionmaker
             
             # Database path
-            db_path = backend_dir / "db" / "simpleTrade_new.db"
+            db_path = Path(CONFIG_DB_PATH)
             
             if not db_path.exists():
                 print(f"❌ Database not found at: {db_path}")

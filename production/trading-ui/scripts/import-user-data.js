@@ -24,6 +24,31 @@ let selectedConnector = null;
 let analysisResults = null;
 let previewData = null;
 
+function renderImportDate(value, fallback = '') {
+    try {
+        if (typeof window.dateUtils?.ensureDateEnvelope === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope(value);
+            if (window.FieldRendererService?.renderDate) {
+                return window.FieldRendererService.renderDate(envelope) || fallback;
+            }
+            if (envelope && typeof envelope === 'object') {
+                return envelope.display || envelope.local || envelope.utc || fallback;
+            }
+        }
+        if (value && typeof value === 'object') {
+            return value.display || value.local || value.utc || fallback;
+        }
+        if (value) {
+            return value;
+        }
+    } catch (error) {
+        if (window.Logger?.warn) {
+            window.Logger.warn('[Import Modal] Failed to render date value', { value, error: error.message });
+        }
+    }
+    return fallback;
+}
+
 /**
  * Initialize import user data modal - called by unified system
  */
@@ -524,7 +549,7 @@ function displayExistingRecords(existingRecords) {
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">תאריך:</span>
-                        <span class="detail-value">${record.date || 'לא זמין'}</span>
+                        <span class="detail-value">${renderImportDate(record.date, 'לא זמין')}</span>
                     </div>
                 </div>
                 <div class="problem-card-actions">
@@ -1315,7 +1340,7 @@ function displayPreviewData(data) {
                 <td>${record.fee || record.commission || 'N/A'}</td>
                 <td>${realizedPL}</td>
                 <td>${mtmPL}</td>
-                <td>${record.date || 'N/A'}</td>
+                <td>${renderImportDate(record.date, 'N/A')}</td>
             `;
             importTableBody.appendChild(row);
         });
@@ -1341,7 +1366,7 @@ function displayPreviewData(data) {
                 <td>${record.fee || record.commission || 'N/A'}</td>
                 <td>${realizedPL}</td>
                 <td>${mtmPL}</td>
-                <td>${record.date || 'N/A'}</td>
+                <td>${renderImportDate(record.date, 'N/A')}</td>
                 <td>${record.reason || 'N/A'}</td>
             `;
             skipTableBody.appendChild(row);
@@ -1525,7 +1550,7 @@ function displayProblemResolution(data) {
                         <div class="problem-card existing-record-card">
                             <div class="problem-card-header">
                                 <i class="fas fa-database"></i>
-                                <span>${record.symbol} - ${record.date}</span>
+                                <span>${record.symbol} - ${renderImportDate(record.date, 'לא זמין')}</span>
                             </div>
                             <div class="problem-card-body">
                                 <div class="problem-card-details">
@@ -1788,7 +1813,7 @@ function displayPreview(data) {
                                 ${data.records_to_import?.map(record => `
                                     <tr>
                 <td>${record.symbol}</td>
-                                        <td>${record.date}</td>
+                                        <td>${renderImportDate(record.date, 'N/A')}</td>
                 <td>${record.quantity}</td>
                                         <td>${record.price}</td>
                                         <td>${record.fee}</td>
@@ -1816,7 +1841,7 @@ function displayPreview(data) {
                                 ${data.records_to_skip?.map(record => `
                                     <tr>
                 <td>${record.symbol}</td>
-                                        <td>${record.date}</td>
+                                        <td>${renderImportDate(record.date, 'N/A')}</td>
                 <td>${record.quantity}</td>
                                         <td>${record.price}</td>
                                         <td>${record.reason}</td>
@@ -1960,12 +1985,75 @@ function formatFileSize(bytes) {
 /**
  * Show notification
  */
-function showNotification(message, type = 'info') {
-    if (window.NotificationSystem) {
-        window.NotificationSystem.show(message, type);
-    } else {
-        window.Logger.info(`[Import Modal] ${message}`, { type, page: 'import-user-data' });
+function showImportUserDataNotification(arg1, arg2 = undefined, arg3 = undefined, arg4 = undefined) {
+    let title = 'מערכת';
+    let message = arg1;
+    let type = 'info';
+    let options = {};
+
+    const normalizeType = (value) => {
+        if (typeof value !== 'string') {
+            return null;
+        }
+        const normalized = value.toLowerCase();
+        return ['success', 'error', 'warning', 'info'].includes(normalized) ? normalized : null;
+    };
+
+    const argsLength = arguments.length;
+
+    if (argsLength === 1) {
+        // message only
+    } else if (argsLength === 2) {
+        const detectedType = normalizeType(arg2);
+        if (detectedType) {
+            type = detectedType;
+        } else if (typeof arg2 === 'string') {
+            message = arg2;
+        } else if (arg2 && typeof arg2 === 'object') {
+            options = arg2;
+        }
+    } else if (argsLength >= 3) {
+        if (typeof arg1 === 'string') {
+            title = arg1;
+        }
+        message = arg2;
+        const detectedType = normalizeType(arg3);
+        if (detectedType) {
+            type = detectedType;
+            if (argsLength >= 4 && arg4 && typeof arg4 === 'object') {
+                options = arg4;
+            }
+        } else if (arg3 && typeof arg3 === 'object') {
+            options = arg3;
+        }
     }
+
+    if (typeof message !== 'string') {
+        message = String(message ?? '');
+    }
+
+    const baseNotificationSystem = (window.notificationSystem && typeof window.notificationSystem.showNotification === 'function')
+        ? window.notificationSystem
+        : null;
+    const globalNotificationSystem = (window.NotificationSystem && typeof window.NotificationSystem.show === 'function')
+        ? window.NotificationSystem
+        : null;
+
+    if (baseNotificationSystem && baseNotificationSystem.showNotification !== showImportUserDataNotification) {
+        return baseNotificationSystem.showNotification.call(baseNotificationSystem, message, type, title, undefined, null, options);
+    }
+
+    if (globalNotificationSystem && globalNotificationSystem.show !== showImportUserDataNotification) {
+        return globalNotificationSystem.show.call(globalNotificationSystem, message, type, title, undefined, null, options);
+    }
+
+    const prefix = title ? `${title}: ` : '';
+    window.Logger.info(`[Import Modal] ${prefix}${message}`, { type, title, options, page: 'import-user-data' });
+    return Promise.resolve(false);
+}
+
+function showNotification(...args) {
+    return showImportUserDataNotification(...args);
 }
 
 /**
@@ -2104,6 +2192,7 @@ function renderMissingTickerCard(ticker) {
 function renderDuplicateCard(duplicate, type, index) {
     const confidence = duplicate.confidence_score || 0;
     const confidenceClass = getConfidenceClass(confidence);
+    const dateDisplay = renderImportDate(duplicate.date, 'לא ידוע');
     
     return `
         <div class="problem-card ${type === 'within_file' ? 'within-file-duplicate' : 'existing-record-card'}">
@@ -2127,7 +2216,7 @@ function renderDuplicateCard(duplicate, type, index) {
                     </div>
                     <div class="problem-card-detail">
                         <span class="problem-card-detail-label">תאריך:</span>
-                        <span class="problem-card-detail-value">${duplicate.date || 'לא ידוע'}</span>
+                        <span class="problem-card-detail-value">${dateDisplay}</span>
                     </div>
                 </div>
                 <div class="problem-card-confidence ${confidenceClass}">
@@ -2228,6 +2317,7 @@ window.closeConfirmationModal = closeConfirmationModal;
 window.executeImport = executeImport;
 window.executeImportWithReport = executeImportWithReport;
 window.performImport = performImport;
+window.showImportUserDataNotification = showImportUserDataNotification;
 window.showNotification = showNotification;
 window.resetFile = resetFile;
 window.confirmImport = confirmImport;

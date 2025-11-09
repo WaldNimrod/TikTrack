@@ -380,6 +380,39 @@ class PreferencesCore {
     }
     
     /**
+     * Build Stage B-Lite cache key for single preference
+     */
+    buildPreferenceCacheKey(preferenceName, profileId) {
+        if (window.UnifiedCacheManager?.buildPreferenceCacheKey) {
+            return window.UnifiedCacheManager.buildPreferenceCacheKey(preferenceName, profileId);
+        }
+        const normalizedProfile = profileId === null || profileId === undefined ? 'default' : String(profileId);
+        return `preference_${preferenceName}__profile_${normalizedProfile}`;
+    }
+
+    /**
+     * Build Stage B-Lite cache key for group preference payloads
+     */
+    buildPreferenceGroupCacheKey(groupName, profileId) {
+        if (window.UnifiedCacheManager?.buildPreferenceGroupCacheKey) {
+            return window.UnifiedCacheManager.buildPreferenceGroupCacheKey(groupName, profileId);
+        }
+        const normalizedProfile = profileId === null || profileId === undefined ? 'default' : String(profileId);
+        return `preference_group_${groupName}__profile_${normalizedProfile}`;
+    }
+
+    /**
+     * Build Stage B-Lite cache key for full preference snapshots
+     */
+    buildAllPreferencesCacheKey(profileId) {
+        if (window.UnifiedCacheManager?.buildPreferencesSnapshotKey) {
+            return window.UnifiedCacheManager.buildPreferencesSnapshotKey(profileId);
+        }
+        const normalizedProfile = profileId === null || profileId === undefined ? 'default' : String(profileId);
+        return `all_preferences__profile_${normalizedProfile}`;
+    }
+
+    /**
      * Get latest profile context metadata
      * @returns {Object|null} Profile context
      */
@@ -424,7 +457,8 @@ class PreferencesCore {
         const finalUserId = userId || this.currentUserId;
         const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
         
-        const cacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
+        const cacheKey = this.buildPreferenceCacheKey(preferenceName, finalProfileId);
+        const legacyCacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
         
         // Use UnifiedCacheManager with fallback to localStorage if not initialized
         if (window.UnifiedCacheManager) {
@@ -440,12 +474,25 @@ class PreferencesCore {
             } else {
                 // Fallback to localStorage directly if UnifiedCacheManager not initialized
                 try {
-                    const stored = localStorage.getItem(cacheKey);
-                    if (stored !== null) {
-                        const parsed = JSON.parse(stored);
-                        // Check if cache is still valid (if has timestamp)
-                        if (parsed && (!parsed.timestamp || (Date.now() - parsed.timestamp) < 300000)) {
-                            cached = parsed.value;
+                    const candidates = [
+                        cacheKey,
+                        `tiktrack_${cacheKey}`,
+                        legacyCacheKey,
+                        `tiktrack_${legacyCacheKey}`
+                    ];
+                    for (const candidate of candidates) {
+                        const stored = localStorage.getItem(candidate);
+                        if (stored !== null) {
+                            const parsed = JSON.parse(stored);
+                            if (parsed && typeof parsed === 'object' && parsed.hasOwnProperty('value')) {
+                                if (!parsed.timestamp || (Date.now() - parsed.timestamp) < 300000) {
+                                    cached = parsed.value;
+                                    break;
+                                }
+                            } else if (parsed !== null) {
+                                cached = parsed;
+                                break;
+                            }
                         }
                     }
                 } catch (e) {
@@ -487,6 +534,10 @@ class PreferencesCore {
                             layer: 'localStorage',
                             ttl: 300000
                         });
+                        // Remove legacy key if it exists
+                        if (legacyCacheKey !== cacheKey) {
+                            await window.UnifiedCacheManager.remove(legacyCacheKey);
+                        }
                     }
                     
                     return value;
@@ -534,7 +585,8 @@ class PreferencesCore {
         const finalUserId = userId || this.currentUserId;
         const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
         
-        const cacheKey = `all_preferences_${finalUserId}_${finalProfileId}`;
+        const cacheKey = this.buildAllPreferencesCacheKey(finalProfileId);
+        const legacyCacheKey = `all_preferences_${finalUserId}_${finalProfileId}`;
         
         // Check cache first via UnifiedCacheManager
         if (window.UnifiedCacheManager) {
@@ -545,6 +597,21 @@ class PreferencesCore {
             if (cached !== null) {
                 window.Logger.info('✅ Cache hit for all preferences', { page: "preferences-core-new" });
                 return cached;
+            }
+            if (legacyCacheKey !== cacheKey) {
+                const legacyCached = await window.UnifiedCacheManager.get(legacyCacheKey, {
+                    layer: 'localStorage',
+                    ttl: 300000
+                });
+                if (legacyCached !== null) {
+                    window.Logger.info('✅ Legacy cache hit for all preferences - migrating to Stage B-Lite key', { page: "preferences-core-new" });
+                    await window.UnifiedCacheManager.save(cacheKey, legacyCached, {
+                        layer: 'localStorage',
+                        ttl: 300000
+                    });
+                    await window.UnifiedCacheManager.remove(legacyCacheKey);
+                    return legacyCached;
+                }
             }
         }
         
@@ -588,11 +655,14 @@ class PreferencesCore {
             
             // Cache the result via UnifiedCacheManager
             if (window.UnifiedCacheManager) {
-                const cacheKeyForSave = `all_preferences_${finalUserId}_${effectiveProfileId}`;
+                const cacheKeyForSave = this.buildAllPreferencesCacheKey(effectiveProfileId);
                 await window.UnifiedCacheManager.save(cacheKeyForSave, result, {
                     layer: 'localStorage',
                     ttl: 300000
                 });
+                if (legacyCacheKey !== cacheKeyForSave) {
+                    await window.UnifiedCacheManager.remove(legacyCacheKey);
+                }
             }
             
             window.Logger.info(`✅ Loaded ${Object.keys(result, { page: "preferences-core-new" }).length} preferences`);
@@ -707,7 +777,15 @@ class PreferencesCore {
         
         // Invalidate all preferences cache via UnifiedCacheManager
         if (window.UnifiedCacheManager) {
-            await window.UnifiedCacheManager.remove(`all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`);
+            const profileForInvalidation = (profileId !== null && profileId !== undefined)
+                ? profileId
+                : (this.currentProfileId !== null ? this.currentProfileId : 0);
+            const allPrefsKey = this.buildAllPreferencesCacheKey(profileForInvalidation);
+            await window.UnifiedCacheManager.remove(allPrefsKey);
+            const legacyKey = `all_preferences_${userId || this.currentUserId}_${profileForInvalidation}`;
+            if (legacyKey !== allPrefsKey) {
+                await window.UnifiedCacheManager.remove(legacyKey);
+            }
         }
         
         window.Logger.info(`✅ Saved ${results.saved} preferences, ${results.errors} errors`, { page: "preferences-core-new" });
@@ -734,21 +812,24 @@ class PreferencesCore {
             profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
         
         // מוחק cache של preference בודד
-        const cacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
+        const cacheKey = this.buildPreferenceCacheKey(preferenceName, finalProfileId);
+        const legacyCacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
         if (window.UnifiedCacheManager) {
             // מוחק את ה-key עם prefix (tiktrack_)
             await window.UnifiedCacheManager.remove(cacheKey, { layer: 'localStorage' });
-            // מוחק גם את ה-key עם prefix
-            const prefixedKey = `tiktrack_${cacheKey}`;
-            await window.UnifiedCacheManager.remove(prefixedKey, { layer: 'localStorage' });
+            if (legacyCacheKey !== cacheKey) {
+                await window.UnifiedCacheManager.remove(legacyCacheKey, { layer: 'localStorage' });
+            }
         }
         
         // מוחק גם את all_preferences_* cache
-        const allPrefsKey = `all_preferences_${finalUserId}_${finalProfileId}`;
+        const allPrefsKey = this.buildAllPreferencesCacheKey(finalProfileId);
+        const legacyAllPrefsKey = `all_preferences_${finalUserId}_${finalProfileId}`;
         if (window.UnifiedCacheManager) {
             await window.UnifiedCacheManager.remove(allPrefsKey, { layer: 'localStorage' });
-            const prefixedAllPrefsKey = `tiktrack_${allPrefsKey}`;
-            await window.UnifiedCacheManager.remove(prefixedAllPrefsKey, { layer: 'localStorage' });
+            if (legacyAllPrefsKey !== allPrefsKey) {
+                await window.UnifiedCacheManager.remove(legacyAllPrefsKey, { layer: 'localStorage' });
+            }
         }
         
         window.Logger.info(`🧹 Invalidated preference cache: ${preferenceName}`, { page: "preferences-core-new" });
@@ -777,7 +858,8 @@ class PreferencesCore {
         const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
         
         // Cache key for group
-        const cacheKey = `preference_group_${groupName}_${finalUserId}_${finalProfileId}`;
+        const cacheKey = this.buildPreferenceGroupCacheKey(groupName, finalProfileId);
+        const legacyCacheKey = `preference_group_${groupName}_${finalUserId}_${finalProfileId}`;
         
         // Check cache
         if (window.UnifiedCacheManager) {
@@ -785,6 +867,22 @@ class PreferencesCore {
                 layer: 'localStorage',
                 ttl: 300000 // 5 minutes
             });
+            
+            if (cached === null && legacyCacheKey !== cacheKey) {
+                const legacyCached = await window.UnifiedCacheManager.get(legacyCacheKey, {
+                    layer: 'localStorage',
+                    ttl: 300000
+                });
+                if (legacyCached !== null) {
+                    window.Logger.debug(`🔄 Migrated legacy cache for group ${groupName}`, { page: "preferences-core-new" });
+                    await window.UnifiedCacheManager.save(cacheKey, legacyCached, {
+                        layer: 'localStorage',
+                        ttl: 300000
+                    });
+                    await window.UnifiedCacheManager.remove(legacyCacheKey);
+                    return legacyCached;
+                }
+            }
             
             if (cached !== null) {
                 window.Logger.debug(`🔍 Cache hit for group ${groupName}`, { page: "preferences-core-new" });
@@ -817,11 +915,14 @@ class PreferencesCore {
         
         // Save to cache
         if (window.UnifiedCacheManager) {
-            const cacheKeyForSave = `preference_group_${groupName}_${finalUserId}_${effectiveProfileId}`;
+            const cacheKeyForSave = this.buildPreferenceGroupCacheKey(groupName, effectiveProfileId);
             await window.UnifiedCacheManager.save(cacheKeyForSave, preferences, {
                 layer: 'localStorage',
                 ttl: 300000
             });
+            if (legacyCacheKey !== cacheKeyForSave) {
+                await window.UnifiedCacheManager.remove(legacyCacheKey);
+            }
         }
         
         window.Logger.info(`✅ Loaded ${Object.keys(preferences).length} preferences from group ${groupName}`, { page: "preferences-core-new" });
@@ -860,10 +961,14 @@ class PreferencesCore {
         const finalUserId = userId || this.currentUserId;
         const finalProfileId = (profileId !== null && profileId !== undefined) ? profileId : (this.currentProfileId !== null ? this.currentProfileId : 0);
         
-        const cacheKey = `preference_group_${groupName}_${finalUserId}_${finalProfileId}`;
+        const cacheKey = this.buildPreferenceGroupCacheKey(groupName, finalProfileId);
+        const legacyCacheKey = `preference_group_${groupName}_${finalUserId}_${finalProfileId}`;
         
         if (window.UnifiedCacheManager) {
             await window.UnifiedCacheManager.remove(cacheKey);
+            if (legacyCacheKey !== cacheKey) {
+                await window.UnifiedCacheManager.remove(legacyCacheKey);
+            }
             window.Logger.debug(`🧹 Cleared cache for group ${groupName}`, { page: "preferences-core-new" });
         }
     }

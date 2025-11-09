@@ -71,6 +71,21 @@ class SelectPopulatorService {
         return deps;
     }
     
+    static _buildPreferenceCacheKey(preferenceName, profileId) {
+        if (window.PreferencesCore?.buildPreferenceCacheKey) {
+            return window.PreferencesCore.buildPreferenceCacheKey(preferenceName, profileId);
+        }
+        if (window.UnifiedCacheManager?.buildPreferenceCacheKey) {
+            return window.UnifiedCacheManager.buildPreferenceCacheKey(preferenceName, profileId);
+        }
+        const normalizedProfile = profileId === null || profileId === undefined ? 'default' : String(profileId);
+        return `preference_${preferenceName}__profile_${normalizedProfile}`;
+    }
+    
+    static _buildLegacyPreferenceCacheKey(preferenceName, userId, profileId) {
+        return `preference_${preferenceName}_${userId}_${profileId}`;
+    }
+    
     static async _getPreferenceFromMemory(preferenceName, aliases = []) {
         console.log(`🔍 _getPreferenceFromMemory called for: ${preferenceName} with aliases:`, aliases);
         
@@ -88,31 +103,47 @@ class SelectPopulatorService {
                     console.log(`🔍 Looking for preference ${preferenceName} with userId=${userId}, profileId=${profileId}`);
                     
                     // Try multiple profile IDs in case preferences are saved for different profiles
-                    const profileIdsToTry = profileId !== 0 ? [profileId, 0] : [0];
+                    const profileIdsToTry = profileId !== 0 ? [profileId, 0, 'default'] : [0, 'default'];
                     
-                    for (const tryProfileId of profileIdsToTry) {
-                        const cacheKey = `preference_${preferenceName}_${userId}_${tryProfileId}`;
-                        console.log(`🔍 Trying cache key: tiktrack_${cacheKey}`);
+                    for (const tryProfileIdRaw of profileIdsToTry) {
+                        const tryProfileId = tryProfileIdRaw === 'default' ? null : tryProfileIdRaw;
+                        const cacheKey = this._buildPreferenceCacheKey(preferenceName, tryProfileId);
+                        const legacyCacheKey = this._buildLegacyPreferenceCacheKey(
+                            preferenceName,
+                            userId,
+                            tryProfileId === null ? 0 : tryProfileId
+                        );
+                        console.log(`🔍 Trying cache key: ${cacheKey}`);
                         
-                        // Try to get from cache synchronously - check both tiktrack_ prefix and without it
                         try {
-                            // Try tiktrack_ prefix first
-                            let cached = localStorage.getItem(`tiktrack_${cacheKey}`);
-                            if (cached) {
-                                const parsed = JSON.parse(cached);
-                                console.log(`✅ Found preference ${preferenceName} in UnifiedCache (profileId=${tryProfileId}):`, parsed);
-                                return parsed;
+                            if (deps.unifiedCacheManager) {
+                                const cachedValue = await window.UnifiedCacheManager.get(cacheKey, {
+                                    layer: 'localStorage',
+                                    ttl: 300000
+                                });
+                                if (cachedValue !== null && cachedValue !== undefined) {
+                                    console.log(`✅ Found preference ${preferenceName} via UnifiedCacheManager (profileId=${tryProfileIdRaw}):`, cachedValue);
+                                    return cachedValue?.value ?? cachedValue;
+                                }
                             }
                             
-                            // Try without prefix
-                            cached = localStorage.getItem(cacheKey);
-                            if (cached) {
-                                const parsed = JSON.parse(cached);
-                                console.log(`✅ Found preference ${preferenceName} in UnifiedCache (no prefix, profileId=${tryProfileId}):`, parsed);
-                                return parsed;
+                            const candidateKeys = [
+                                `tiktrack_${cacheKey}`,
+                                cacheKey,
+                                `tiktrack_${legacyCacheKey}`,
+                                legacyCacheKey
+                            ];
+                            
+                            for (const candidate of candidateKeys) {
+                                const stored = localStorage.getItem(candidate);
+                                if (stored) {
+                                    const parsed = JSON.parse(stored);
+                                    console.log(`✅ Found preference ${preferenceName} in localStorage (${candidate}, profileId=${tryProfileIdRaw}):`, parsed);
+                                    return parsed?.value ?? parsed;
+                                }
                             }
                         } catch (e) {
-                            console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName} (profileId=${tryProfileId}):`, e);
+                            console.log(`⚠️ Error reading from UnifiedCache for ${preferenceName} (profileId=${tryProfileIdRaw}):`, e);
                         }
                     }
                     

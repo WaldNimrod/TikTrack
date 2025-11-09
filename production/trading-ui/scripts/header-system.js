@@ -202,18 +202,18 @@ class HeaderSystem {
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
                       </a>
                       <ul class="submenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 240px; z-index: 1000; padding: 0; margin: 0; list-style: none;">
-                        <li><a href="#" onclick="clearCacheComplete(event)" 
-                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee; font-weight: bold;"
-                               title="ניקוי מלא: כל שכבות המטמון + HTTP Cache + רענון אוטומטי">🧹 ניקוי מטמון מלא (מומלץ)</a></li>
-                        <li><a href="#" onclick="clearUIState(event)" 
+                        <li><a href="#" data-cache-action="memory"
+                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee; font-weight: 500;"
+                               title="ניקוי שכבת הזיכרון בלבד (Memory)">🧠 ניקוי שכבת זיכרון</a></li>
+                        <li><a href="#" data-cache-action="local-storage"
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
-                               title="נקה העדפות UI בלבד">נקה העדפות UI</a></li>
-                        <li><a href="#" onclick="clearAllCacheForDevelopment(event)" 
-                               style="display: block; padding: 8px 12px; color: #666; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; font-style: italic;"
-                               title="ניקוי מהיר - שימושי לפיתוח">ניקוי מהיר (legacy)</a></li>
-                        <li><a href="#" onclick="hardReload(event)" 
-                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px;"
-                               title="רענון קשיח של העמוד (עוקף cache)">רענון קשיח</a></li>
+                               title="ניקוי מטמון localStorage (כולל העדפות פרופיל)">💽 ניקוי localStorage</a></li>
+                        <li><a href="#" data-cache-action="indexeddb"
+                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
+                               title="ניקוי המטמון המאוחסן ב-IndexedDB">🗃️ ניקוי IndexedDB</a></li>
+                        <li><a href="#" data-cache-action="full"
+                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; font-weight: bold;"
+                               title="ניקוי כל שכבות המטמון + רענון אוטומטי">🌀 ניקוי מלא + רענון</a></li>
                       </ul>
                     </li>
 
@@ -2723,9 +2723,17 @@ window.resetAllFilters = async function() {
     // Clear preference cache to ensure fresh values from database
     const filterPrefNames = ['defaultSearchFilter', 'defaultDateRangeFilter', 'defaultStatusFilter', 'defaultTypeFilter', 'default_trading_account'];
     for (const prefName of filterPrefNames) {
-      const cacheKey = `preference_${prefName}_1_0`; // user_id=1, profile_id=0
+      const cacheKey = window.PreferencesCore?.buildPreferenceCacheKey
+        ? window.PreferencesCore.buildPreferenceCacheKey(prefName, 0)
+        : (window.UnifiedCacheManager?.buildPreferenceCacheKey
+            ? window.UnifiedCacheManager.buildPreferenceCacheKey(prefName, 0)
+            : `preference_${prefName}__profile_0`);
+      const legacyKey = `preference_${prefName}_1_0`;
       if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
         await window.UnifiedCacheManager.remove(cacheKey, { layer: 'localStorage' });
+        if (legacyKey !== cacheKey) {
+          await window.UnifiedCacheManager.remove(legacyKey, { layer: 'localStorage' });
+        }
         console.log(`🗑️ Cleared cache for ${prefName}`);
       }
     }

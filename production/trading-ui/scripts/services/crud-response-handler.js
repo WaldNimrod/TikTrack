@@ -22,6 +22,28 @@
 // ===== CRUD RESPONSE HANDLER =====
 
 class CRUDResponseHandler {
+    static ENTITY_CACHE_KEY_MAP = {
+        trades: ['trade-data', 'trades-data', 'positions', 'portfolio', 'dashboard-data'],
+        trade_plans: ['trade-plan', 'trade_plans', 'strategy-'],
+        alerts: ['alerts-data', 'dashboard-data'],
+        executions: ['executions-data', 'positions', 'portfolio', 'dashboard-data'],
+        tickers: ['tickers-data', 'market-data', 'dashboard-data'],
+        trading_accounts: ['accounts-data', 'account-activity', 'portfolio', 'dashboard-data'],
+        cash_flows: ['cash_flows', 'account-balance', 'dashboard-data'],
+        notes: ['notes-data', 'linked-items'],
+        preferences: ['preference_', 'all_preferences_', 'preference_group_']
+    };
+    static ENTITY_GLOBAL_DATA_MAP = {
+        trades: 'tradesData',
+        trade_plans: 'tradePlansData',
+        alerts: 'alertsData',
+        executions: 'executionsData',
+        tickers: 'tickersData',
+        trading_accounts: 'trading_accountsData',
+        cash_flows: 'cashFlowsData',
+        notes: 'notesData',
+        preferences: 'currentPreferences'
+    };
     /**
      * טיפול בתגובת שמירה (POST)
      * 
@@ -666,11 +688,16 @@ class CRUDResponseHandler {
             const keys = await window.UnifiedCacheManager.getAllKeys();
             console.log(`🔥 clearEntityCache - All keys:`, keys);
             
-            const entityKeys = keys.filter(k => 
-                k.startsWith(`${entityType}_`) || 
-                k.startsWith(`all_${entityType}`) ||
-                k.includes(entityType)
-            );
+            const patterns = this.ENTITY_CACHE_KEY_MAP[entityType] || [entityType];
+            const entityKeys = keys.filter((key) => {
+                return patterns.some((pattern) => {
+                    if (pattern.includes('*')) {
+                        const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+                        return regex.test(key);
+                    }
+                    return key.includes(pattern);
+                });
+            });
             
             console.log(`🔥 clearEntityCache - Entity keys to remove:`, entityKeys);
             
@@ -747,12 +774,40 @@ class CRUDResponseHandler {
             if (loadFunction && typeof loadFunction === 'function') {
                 await loadFunction();
                 console.log(`✅ רוען טבלה עבור ${entityType}`);
+                await this.cacheEntityDataset(entityType);
             } else {
                 console.warn(`⚠️ לא נמצאה פונקציית טעינה עבור ${entityType}`);
             }
 
         } catch (error) {
             console.error(`❌ שגיאה ברענון ${entityType}:`, error);
+        }
+    }
+
+    /**
+     * שמירת מערך נתונים אל UnifiedCacheManager לאחר רענון ישות
+     */
+    static async cacheEntityDataset(entityType) {
+        if (!this._isUnifiedCacheManagerAvailable()) {
+            return;
+        }
+
+        const globalDataKey = this.ENTITY_GLOBAL_DATA_MAP[entityType];
+        if (!globalDataKey) {
+            return;
+        }
+
+        const dataset = window[globalDataKey];
+        if (!dataset) {
+            return;
+        }
+
+        try {
+            const cacheKey = entityType.endsWith('-data') ? entityType : `${entityType}-data`;
+            await window.UnifiedCacheManager.save(cacheKey, dataset, { layer: 'memory', ttl: 60000 });
+            console.log(`💾 cacheEntityDataset saved ${cacheKey} via UnifiedCacheManager`);
+        } catch (error) {
+            console.warn(`⚠️ Failed to cache dataset for ${entityType}`, error);
         }
     }
 

@@ -133,3 +133,69 @@ def get_cache_changes_stats():
             'error': str(e)
         }), 500
 
+
+@cache_changes_bp.route('/log', methods=['POST'])
+def log_cache_action():
+    """
+    Log a cache clearing action triggered from the frontend cache menu (Stage B-Lite).
+
+    Payload example:
+        {
+            "action": "memory",
+            "layers": ["memory"],
+            "stage": "B-Lite",
+            "metadata": {
+                "profileId": 4,
+                "userId": 1,
+                "page": "/preferences",
+                "triggeredAt": "2025-02-11T10:15:20.123Z"
+            }
+        }
+    """
+    from config.logging import get_cache_logger
+
+    try:
+        payload = request.get_json(silent=True) or {}
+        action = payload.get('action')
+        layers = payload.get('layers', [])
+        stage = payload.get('stage', 'unknown')
+        metadata = payload.get('metadata', {})
+
+        if not action:
+            return jsonify({
+                'status': 'error',
+                'message': 'Missing cache action identifier'
+            }), 400
+
+        cache_logger = get_cache_logger()
+        cache_logger.info(
+            '🧹 Frontend cache action',
+            extra={
+                'action': action,
+                'layers': layers,
+                'stage': stage,
+                'metadata': metadata
+            }
+        )
+
+        try:
+            from services.cache_changes_tracker import cache_changes_tracker
+
+            tracker_keys = [f'frontend:{layer}' for layer in layers] or [f'frontend:{action}']
+            cache_changes_tracker.log_change(
+                keys=tracker_keys,
+                reason=f'Frontend cache menu action: {action}',
+                created_by='frontend_cache_menu'
+            )
+        except Exception as tracker_error:
+            logger.warning(f"⚠️ Failed to log cache action to tracker: {tracker_error}")
+
+        return jsonify({'status': 'success'}), 200
+
+    except Exception as e:
+        logger.error(f"Error logging cache action: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+

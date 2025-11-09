@@ -145,7 +145,7 @@ class BaseImportConnector(ABC):
 
 - **זיהוי פורמט**: חיפוש שורות "Trades,Data,Order"
 - **פרסינג**: חילוץ עמודות IBKR סטנדרטיות
-- **נורמליזציה**: המרה לפורמט אחיד עם אובייקטי `datetime` מודעים לאיזור הזמן (UTC)
+- **נורמליזציה**: המרה לפורמט אחיד
 - **external_id**: `"{date}_{symbol}_{quantity}_{price}"`
 
 ### Demo Connector
@@ -155,12 +155,11 @@ class BaseImportConnector(ABC):
 - **פורמט**: CSV פשוט עם עמודות: symbol, action, date, quantity, price, fee
 - **external_id**: `"demo_{row_number}"`
 
-### סטנדרט תאריכים (DateEnvelope) – עדכון 2026
+### סטנדרט תאריכים (DateEnvelope)
 
-- הקונקטורים (`ibkr`, `demo`) מחזירים תאריכים כ־`datetime` מודעים ל־UTC בלבד.  
-- ה-`ImportOrchestrator` מזרים את כל המידע דרך `DateNormalizationService`, כך שכל נתון שנשמר ב-`ImportSession.summary_data`, ב־Live Reports או מוחזר מה-API כבר עטוף ב־**DateEnvelope** המלא (`utc`, `epochMs`, `local`, `timezone`, `display`).  
-- נקודות הקצה ב-`Backend/routes/api/user_data_import.py` מתאימות את ה-Envelope לאיזור הזמן של המשתמש באמצעות `DateNormalizationService.resolve_timezone`.  
-- ה-UI משתמש בפונקציות העזר `renderImportDate()` (עיבוד תאריך ל־DateEnvelope) ו-`showImportUserDataNotification()` (עם עטיפת תאימות `showNotification`) בתוך `trading-ui/scripts/import-user-data.js`, כדי להציג את התאריכים באופן אחיד ולכבד את ההעדפות (timezone) של המשתמש ולמנוע לולאות רקורסיה במערכת ההודעות.
+- הקונקטורים מחזירים `datetime` מודע לאיזור זמן (UTC), וה-`ImportOrchestrator` ממיר אותם ל-**DateEnvelope** באמצעות `DateNormalizationService`.
+- נקודות הקצה ב-`production/Backend/routes/api/user_data_import.py` מחשבות את איזור הזמן של המשתמש ומריצות `_project_storage_payload` לפני החזרת JSON.
+- ה-UI (ב-`production/trading-ui/scripts/import-user-data.js`) משתמש בפונקציות `renderImportDate()` ו-`showImportUserDataNotification()` כדי להציג תאריכים בהתאם להעדפות המשתמש ולמנוע לולאות במערכת ההודעות.
 
 ## שירותים
 

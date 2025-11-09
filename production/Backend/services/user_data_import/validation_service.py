@@ -10,9 +10,11 @@ Last Updated: 2025-01-16
 """
 
 from typing import List, Dict, Any, Optional, Tuple
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 from sqlalchemy.orm import Session
+
+from services.date_normalization_service import DateNormalizationService
 
 # Import models
 try:
@@ -34,9 +36,10 @@ class ValidationService:
     - Format validation
     """
     
-    def __init__(self, db_session: Session = None):
+    def __init__(self, db_session: Session = None, date_normalizer: Optional[DateNormalizationService] = None):
         """Initialize the validation service"""
         self.db_session = db_session
+        self.date_normalizer = date_normalizer or DateNormalizationService()
         self.validation_rules = {
             'symbol': self._validate_symbol,
             'action': self._validate_action,
@@ -174,23 +177,26 @@ class ValidationService:
             errors.append("Date is required")
             return errors
         
-        if not isinstance(value, str):
-            errors.append("Date must be a string")
+        normalized_dt = self._coerce_to_datetime(value)
+
+        if normalized_dt is None:
+            # Provide a clearer error depending on the payload type
+            if isinstance(value, dict):
+                errors.append("Date envelope is missing required fields (utc/epochMs)")
+            else:
+                errors.append("Date must be a valid ISO string or DateEnvelope")
             return errors
+
+        # Ensure timezone awareness (treat as UTC if naive)
+        if normalized_dt.tzinfo is None:
+            normalized_dt = normalized_dt.replace(tzinfo=timezone.utc)
         
-        try:
-            # Try to parse ISO format
-            dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
-            
-            # Check if date is reasonable (not too far in past/future)
-            now = datetime.now()
-            if dt.year < 1900:
-                errors.append("Date too far in the past")
-            elif dt.year > now.year + 1:
-                errors.append("Date too far in the future")
-                
-        except ValueError:
-            errors.append(f"Invalid date format: {value}")
+        # Check if date is reasonable (not too far in past/future)
+        now = datetime.now(timezone.utc)
+        if normalized_dt.year < 1900:
+            errors.append("Date too far in the past")
+        elif normalized_dt.year > now.year + 1:
+            errors.append("Date too far in the future")
         
         return errors
     
@@ -216,6 +222,26 @@ class ValidationService:
             errors.append(f"Invalid quantity: {value}")
         
         return errors
+
+    def _coerce_to_datetime(self, value: Any) -> Optional[datetime]:
+        """
+        Convert supported date inputs (ISO string or DateEnvelope) into datetime.
+        """
+        if value is None:
+            return None
+
+        if isinstance(value, datetime):
+            return value
+
+        try:
+            normalized = self.date_normalizer.normalize_input_payload({'date': value})
+            candidate = normalized.get('date') if isinstance(normalized, dict) else None
+            if isinstance(candidate, datetime):
+                return candidate
+        except Exception as exc:
+            logger.debug(f"Failed to normalize date value '{value}': {exc}")
+
+        return None
     
     def _validate_price(self, value: Any, record: Dict[str, Any]) -> List[str]:
         """Validate price field"""

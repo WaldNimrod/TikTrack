@@ -12,7 +12,7 @@ Last Updated: 2025-01-16
 """
 
 from typing import List, Dict, Any, Optional, Tuple
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 import os
 import json
@@ -27,6 +27,7 @@ from .duplicate_detection_service import DuplicateDetectionService
 from services.user_data_import.report_generator import ImportReportGenerator
 from connectors.user_data_import.ibkr_connector import IBKRConnector
 from connectors.user_data_import.demo_connector import DemoConnector
+from services.date_normalization_service import DateNormalizationService
 
 from config.logging import get_logger
 logger = get_logger(__name__)
@@ -55,6 +56,7 @@ class ImportOrchestrator:
         self.validation_service = ValidationService(db_session)
         self.duplicate_detection_service = DuplicateDetectionService(db_session)
         self.report_generator = ImportReportGenerator()
+        self.utc_normalizer = DateNormalizationService("UTC")
         
         # Available connectors
         self.connectors = {
@@ -91,7 +93,7 @@ class ImportOrchestrator:
                     "session_info": {
                         "session_id": session_id,
                         "user_id": user_id,
-                        "created_at": datetime.now().isoformat(),
+                        "created_at": self.utc_normalizer.now_envelope(),
                         "report_version": "1.0"
                     },
                     "steps": {},
@@ -104,8 +106,8 @@ class ImportOrchestrator:
             
             # Update current step
             report["steps"][step] = {
-                "timestamp": datetime.now().isoformat(),
-                "data": data or {}
+                "timestamp": self.utc_normalizer.now_envelope(),
+                "data": self.utc_normalizer.normalize_output(data) if data else {}
             }
             
             # Update progress
@@ -298,8 +300,30 @@ class ImportOrchestrator:
             
             # Prepare analysis results for API response (detailed)
             # Calculate missing ticker records count
-            missing_tickers = validation_result['missing_tickers']
-            missing_ticker_symbols = [ticker['symbol'] for ticker in missing_tickers] if isinstance(missing_tickers[0], dict) else missing_tickers
+            raw_missing_tickers = validation_result.get('missing_tickers') or []
+            if isinstance(raw_missing_tickers, (list, tuple, set)):
+                missing_tickers = [item for item in raw_missing_tickers if item not in (None, '')]
+            elif raw_missing_tickers in (None, ''):
+                missing_tickers = []
+            else:
+                missing_tickers = [raw_missing_tickers]
+
+            first_missing_entry = next(
+                (item for item in missing_tickers if item is not None),
+                None
+            )
+
+            if isinstance(first_missing_entry, dict):
+                missing_ticker_symbols = [
+                    ticker.get('symbol')
+                    for ticker in missing_tickers
+                    if isinstance(ticker, dict) and ticker.get('symbol')
+                ]
+            else:
+                missing_ticker_symbols = [
+                    str(symbol) for symbol in missing_tickers
+                    if isinstance(symbol, str) and symbol
+                ]
             missing_ticker_records = 0
             for record in validation_result['valid_records']:
                 if record.get('symbol') in missing_ticker_symbols:
@@ -307,7 +331,9 @@ class ImportOrchestrator:
             
             logger.info(f"📊 Missing ticker analysis: {len(missing_tickers)} missing tickers, {missing_ticker_records} records with missing tickers")
             
-            analysis_results = {
+            analysis_timestamp = datetime.now(timezone.utc)
+
+            analysis_results_raw = {
                 'total_records': session.total_records,
                 'parsed_records': len(raw_records),
                 'normalized_records': len(normalization_result['normalized_records']),
@@ -321,30 +347,34 @@ class ImportOrchestrator:
                 'normalization_errors': normalization_result['errors'],
                 'validation_errors': validation_result['validation_errors'],
                 'duplicate_details': duplicate_result,
-                'analysis_timestamp': datetime.now().isoformat()
+                'analysis_timestamp': analysis_timestamp
             }
+
+            analysis_results_storage = self.utc_normalizer.normalize_output(analysis_results_raw)
             
             # Save only essential summary data to database (not detailed results)
-            missing_tickers_data = validation_result.get('missing_tickers', [])
+            missing_tickers_data = missing_tickers
             logger.info(f"🔍 Missing tickers from validation_result: {missing_tickers_data}")
             
-            summary_data = {
+            summary_data_raw = {
                 'total_records': session.total_records,
                 'valid_records': len(validation_result['valid_records']),
                 'invalid_records': len(validation_result['invalid_records']),
                 'duplicate_records': len(duplicate_result['within_file_duplicates']),
                 'existing_records': len(duplicate_result['existing_records']),
                 'missing_tickers': missing_tickers_data,
-                'analysis_timestamp': datetime.now().isoformat(),
+                'analysis_timestamp': analysis_timestamp,
                 # Add detailed data for step 4
                 'normalization_errors': normalization_result.get('errors', []),
-                'validation_errors': validation_result.get('errors', []),
+                'validation_errors': validation_result.get('validation_errors', []),
                 'duplicate_details': duplicate_result
             }
-            logger.info(f"📊 Summary data before saving: missing_tickers={summary_data.get('missing_tickers')}")
+
+            summary_data_storage = self.utc_normalizer.normalize_output(summary_data_raw)
+            logger.info(f"📊 Summary data before saving: missing_tickers={summary_data_storage.get('missing_tickers')}")
             
             # Update session with minimal data
-            session.add_summary_data(summary_data)
+            session.add_summary_data(summary_data_storage)
             session.update_status('ready')
             self.db_session.commit()
             
@@ -352,7 +382,7 @@ class ImportOrchestrator:
             try:
                 from services.advanced_cache_service import advanced_cache_service
                 cache_key = f"import_session_{session_id}_summary"
-                advanced_cache_service.set(cache_key, summary_data, ttl=3600)  # 1 hour TTL
+                advanced_cache_service.set(cache_key, summary_data_storage, ttl=3600)  # 1 hour TTL
                 logger.info(f"✅ Saved summary_data to advanced_cache_service: {cache_key}")
             except Exception as e:
                 logger.error(f"❌ Failed to save to advanced_cache_service: {str(e)}")
@@ -363,18 +393,18 @@ class ImportOrchestrator:
                 session_id=session.id,
                 user_id=user_id,
                 step="analysis",
-                data=analysis_results
+                data=analysis_results_storage
             )
             
             logger.info("🎉 [File Analysis] Analysis completed successfully", 
-                       extra={'session_id': session_id, 'total_records': analysis_results['total_records'], 
-                             'valid_records': analysis_results['valid_records'], 
-                             'duplicate_records': analysis_results['duplicate_records'],
-                             'missing_tickers_count': len(analysis_results['missing_tickers'])})
+                       extra={'session_id': session_id, 'total_records': analysis_results_raw['total_records'], 
+                             'valid_records': analysis_results_raw['valid_records'], 
+                             'duplicate_records': analysis_results_raw['duplicate_records'],
+                             'missing_tickers_count': len(analysis_results_raw['missing_tickers'])})
             
             return {
                 'success': True,
-                'analysis_results': analysis_results,
+                'analysis_results': analysis_results_raw,
                 'session_status': session.status
             }
             
@@ -454,10 +484,27 @@ class ImportOrchestrator:
             
             # Prepare records for import (clean records only, excluding missing tickers)
             clean_records = duplicate_result['clean_records']
-            missing_tickers = validation_result.get('missing_tickers', [])
+            raw_missing_tickers_preview = validation_result.get('missing_tickers') or []
+            if isinstance(raw_missing_tickers_preview, (list, tuple, set)):
+                missing_tickers = [
+                    item for item in raw_missing_tickers_preview
+                    if item not in (None, '')
+                ]
+            elif raw_missing_tickers_preview in (None, ''):
+                missing_tickers = []
+            else:
+                missing_tickers = [raw_missing_tickers_preview]
+
+            missing_ticker_symbols = []
+            for entry in missing_tickers:
+                if isinstance(entry, dict):
+                    symbol = entry.get('symbol')
+                    if symbol:
+                        missing_ticker_symbols.append(symbol)
+                elif isinstance(entry, str) and entry:
+                    missing_ticker_symbols.append(entry)
             
             # Filter out records with missing tickers from clean_records
-            missing_ticker_symbols = [ticker['symbol'] for ticker in missing_tickers] if isinstance(missing_tickers[0], dict) else missing_tickers
             original_clean_count = len(clean_records)
             clean_records = [
                 record for record in clean_records 
@@ -478,8 +525,6 @@ class ImportOrchestrator:
                 })
             
             # Add records with missing tickers
-            missing_tickers = validation_result.get('missing_tickers', [])
-            missing_ticker_symbols = [ticker['symbol'] for ticker in missing_tickers] if isinstance(missing_tickers[0], dict) else missing_tickers
             valid_records = validation_result['valid_records']
             for record in valid_records:
                 if record.get('symbol') in missing_ticker_symbols:
@@ -528,7 +573,7 @@ class ImportOrchestrator:
             
             # Generate preview data
             logger.info("🔄 Generating preview data...")
-            preview_data = {
+            preview_data_raw = {
                 'records_to_import': [
                     {
                         'symbol': record['record'].get('symbol'),
@@ -572,13 +617,14 @@ class ImportOrchestrator:
             
             # Update session with preview data
             logger.info("🔄 Updating session with preview data...")
-            session.add_summary_data({'preview_data': preview_data})
+            preview_data_storage = self.utc_normalizer.normalize_output(preview_data_raw)
+            session.add_summary_data({'preview_data': preview_data_storage})
             
-            logger.info(f"✅ Preview generated successfully: {len(preview_data['records_to_import'])} to import, {len(preview_data['records_to_skip'])} to skip")
+            logger.info(f"✅ Preview generated successfully: {len(preview_data_raw['records_to_import'])} to import, {len(preview_data_raw['records_to_skip'])} to skip")
             
             return {
                 'success': True,
-                'preview_data': preview_data,
+                'preview_data': preview_data_raw,
                 'session_id': session_id
             }
             
@@ -947,7 +993,7 @@ class ImportOrchestrator:
                 if (skip_record.get('record_index') == record_index and 
                     skip_record.get('reason') == duplicate_type):
                     skip_record['rejected'] = True
-                    skip_record['rejected_at'] = datetime.utcnow().isoformat()
+                    skip_record['rejected_at'] = self.utc_normalizer.now_envelope()
                     break
             
             # Cache updated preview data

@@ -4,7 +4,7 @@
 
 The Entity Relationship Schema is a centralized, configuration-based system for managing relationships between entities in the TikTrack system. It replaces the previous Strategy Pattern approach with a unified, maintainable architecture.
 
-**Version**: 1.1.0  
+**Version**: 1.2.0  
 **Date**: 2025-01-12  
 **Status**: Production Ready
 

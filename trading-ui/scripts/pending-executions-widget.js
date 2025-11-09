@@ -1,293 +1,395 @@
 /**
- * Pending Executions Widget
- * מציג עסקאות הדורשות שיוך לטרייד בדף הבית
- * 
- * Created: 2025-10-14
- * Updated: 2025-01-29
- * Version: 2.0
+ * Pending Execution Highlights Widget
+ * ===================================
+ * מציג "להיטים" מומלצים לשיוך מהיר בעמוד הבית.
+ * משתמש במערכות הכלליות: FieldRendererService, NotificationSystem, ModalManagerV2.
  */
 
-// ========================================
-// Global Variables
-// ========================================
+(function () {
+    const HIGHLIGHTS_ENDPOINT = '/api/executions/pending-assignment/highlights';
+    const ASSIGN_ENDPOINT = (executionId) => `/api/executions/${executionId}`;
+    const AUTO_REFRESH_INTERVAL = 30000; // 30 seconds
+    const DISMISSED_CACHE_KEY = 'pending-execution-highlights-dismissed';
+    const DISMISSED_TTL_SECONDS = 3600; // 1 hour
 
-let pendingExecutionsData = [];
+    const SELECTORS = {
+        card: '#pendingExecutionsHighlightsCard',
+        list: '#pendingExecutionsHighlightsList',
+        count: '#pendingExecutionsHighlightsCount',
+        loading: '#pendingExecutionsHighlightsLoading',
+        empty: '#pendingExecutionsHighlightsEmpty',
+        error: '#pendingExecutionsHighlightsError'
+    };
 
-// ========================================
-// Main Functions
-// ========================================
+    const PendingExecutionsHighlights = {
+        state: {
+            items: [],
+            isLoading: false,
+            dismissed: new Set(),
+            autoRefreshTimer: null
+        },
 
-/**
- * טעינת עסקאות הדורשות שיוך
- */
-async function loadPendingExecutions() {
-    try {
-        window.Logger?.info('🔄 Loading pending executions...', { page: "index" });
-        
-        const response = await fetch('/api/executions/pending-assignment');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        
-        if (result.status === 'success') {
-            const executions = result.data || [];
-            const count = executions.length;
-            
-            window.Logger?.info(`✅ Loaded ${count} pending executions`, { page: "index" });
-            
-            // שמירת הנתונים גלובלית
-            pendingExecutionsData = executions;
-            
-            // עדכון תצוגה
-            updatePendingExecutionsDisplay(executions, count);
-            
-        } else {
-            throw new Error(result.error?.message || 'Unknown API error');
-        }
-        
-    } catch (error) {
-        window.Logger?.error('❌ Error loading pending executions:', error, { page: "index" });
-        
-        // הצגת שגיאה בממשק
-        const container = document.getElementById('pendingExecutionsTableContainer');
-        if (container) {
-            container.innerHTML = `
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    שגיאה בטעינת עסקאות ממתינות: ${error.message}
-                </div>`;
-        }
-        
-        // עדכון מונה לשגיאה
-        const countElement = document.getElementById('pendingExecutionsCount');
-        if (countElement) {
-            countElement.textContent = '!';
-            countElement.className = 'badge bg-danger';
-        }
-        
-        // הודעת שגיאה (אם מערכת ההודעות זמינה)
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בטעינת עסקאות ממתינות לשיוך', error.message);
-        }
-    }
-}
+        init() {
+            this.cacheDom();
+            if (!this.dom.card) {
+                window.Logger?.warn('⚠️ Pending Executions highlights card not found', { page: 'index' });
+                return;
+            }
 
-/**
- * עדכון תצוגת עסקאות ממתינות
- */
-function updatePendingExecutionsDisplay(executions, count) {
-    // עדכון מונה
-    const countElement = document.getElementById('pendingExecutionsCount');
-    if (countElement) {
-        countElement.textContent = count;
-        countElement.className = count > 0 ? 'badge bg-warning' : 'badge bg-success';
-    }
-    
-    // עדכון תצוגה בהתאם למספר העסקאות
-    const messageElement = document.getElementById('pendingExecutionsMessage');
-    const tableContainer = document.getElementById('pendingExecutionsTableContainer');
-    
-    if (count === 0) {
-        // הצג הודעה "הכל תקין"
-        if (messageElement) {
-            messageElement.style.display = 'block';
-            messageElement.innerHTML = `
-                <i class="fas fa-check-circle text-success"></i>
-                <strong>הכל תקין!</strong> כל העסקאות משוייכות לטרייד.
+            this.loadDismissedExecutionIds();
+            this.fetchHighlights();
+            this.startAutoRefresh();
+
+            window.Logger?.info('📊 Pending Executions Highlights widget initialized', { page: 'index' });
+        },
+
+        cacheDom() {
+            this.dom = {
+                card: document.querySelector(SELECTORS.card),
+                list: document.querySelector(SELECTORS.list),
+                count: document.querySelector(SELECTORS.count),
+                loading: document.querySelector(SELECTORS.loading),
+                empty: document.querySelector(SELECTORS.empty),
+                error: document.querySelector(SELECTORS.error)
+            };
+        },
+
+        loadDismissedExecutionIds() {
+            try {
+                const cached = window.UnifiedCacheManager?.get(DISMISSED_CACHE_KEY);
+                if (Array.isArray(cached) && cached.length > 0) {
+                    this.state.dismissed = new Set(cached);
+                }
+            } catch (error) {
+                window.Logger?.warn('⚠️ Failed to load dismissed execution ids from cache', { error: error?.message }, { page: 'index' });
+            }
+        },
+
+        persistDismissedExecutionIds() {
+            try {
+                window.UnifiedCacheManager?.set(
+                    DISMISSED_CACHE_KEY,
+                    Array.from(this.state.dismissed),
+                    { ttl: DISMISSED_TTL_SECONDS }
+                );
+            } catch (error) {
+                window.Logger?.warn('⚠️ Failed to persist dismissed execution ids', { error: error?.message }, { page: 'index' });
+            }
+        },
+
+        setLoading(isLoading) {
+            this.state.isLoading = isLoading;
+            if (this.dom.loading) {
+                this.dom.loading.classList.toggle('d-none', !isLoading);
+            }
+        },
+
+        async fetchHighlights() {
+            this.setLoading(true);
+            this.hideError();
+
+            try {
+                const response = await fetch(HIGHLIGHTS_ENDPOINT, { headers: { 'Accept': 'application/json' } });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const payload = await response.json();
+                if (payload.status !== 'success') {
+                    throw new Error(payload?.error?.message || 'Unknown API error');
+                }
+
+                const data = Array.isArray(payload.data) ? payload.data : [];
+                const filtered = data.filter(item => !this.state.dismissed.has(item.execution_id));
+                this.state.items = filtered;
+
+                this.render();
+            } catch (error) {
+                window.Logger?.error('❌ Failed to load pending execution highlights', { error: error?.message }, { page: 'index' });
+                this.showError(error?.message || 'שגיאה בלתי צפויה בטעינת ההמלצות');
+            } finally {
+                this.setLoading(false);
+            }
+        },
+
+        render() {
+            this.updateCountBadge();
+
+            if (!this.dom.list) {
+                return;
+            }
+
+            if (!this.state.items.length) {
+                this.dom.list.innerHTML = '';
+                this.showEmptyState();
+                return;
+            }
+
+            const itemsHtml = this.state.items.map(item => this.renderHighlightItem(item)).join('');
+            this.dom.list.innerHTML = itemsHtml;
+
+            if (this.dom.empty) {
+                this.dom.empty.classList.add('d-none');
+            }
+
+            if (window.ButtonSystem?.initializeButtons) {
+                window.ButtonSystem.initializeButtons();
+            } else if (window.initializeButtons) {
+                window.initializeButtons();
+            }
+        },
+
+        renderHighlightItem(item) {
+            const execution = item.execution || {};
+            const suggestions = Array.isArray(item.suggestions) ? item.suggestions : [];
+            const primarySuggestion = item.primary_suggestion || suggestions[0] || null;
+            const additionalSuggestions = item.additional_suggestions ?? Math.max(suggestions.length - 1, 0);
+            const score = item.best_score ?? (primarySuggestion ? primarySuggestion.score : null);
+
+            const FieldRenderer = window.FieldRendererService;
+
+            const executionLink = FieldRenderer?.renderLinkedEntity('execution', execution.id, `#${execution.id}`, { short: true }) || `#${execution.id || '-'}`;
+            const tickerLink = FieldRenderer?.renderLinkedEntity('ticker', execution.ticker_id, execution.ticker_symbol, { short: true }) || execution.ticker_symbol || '-';
+            const actionBadge = FieldRenderer?.renderAction?.(execution.action) || `<span class="badge bg-secondary">${execution.action || '-'}</span>`;
+            const quantityDisplay = FieldRenderer?.renderShares?.(execution.quantity) || `<span class="text-muted">${execution.quantity ?? '-'}</span>`;
+            const executionDate = FieldRenderer?.renderExecutionDate?.(execution.date) || (FieldRenderer?.renderDate?.(execution.date, true) || '-');
+            const accountLabel = execution.account_name ? `<span class="badge rounded-pill bg-body-secondary text-body">${execution.account_name}</span>` : '';
+
+            const tradeLink = primarySuggestion
+                ? (FieldRenderer?.renderLinkedEntity('trade', primarySuggestion.trade_id, `#${primarySuggestion.trade_id}`, { short: true }) || `#${primarySuggestion.trade_id}`)
+                : '<span class="text-muted">אין טרייד מוצע</span>';
+
+            const tradeStatus = primarySuggestion && FieldRenderer?.renderStatus
+                ? FieldRenderer.renderStatus(primarySuggestion.status, 'trade')
+                : (primarySuggestion?.status || '');
+
+            const tradeSide = primarySuggestion && FieldRenderer?.renderSide
+                ? FieldRenderer.renderSide(primarySuggestion.side)
+                : (primarySuggestion?.side ? `<span class="badge bg-info text-dark">${primarySuggestion.side}</span>` : '');
+
+            const investmentType = primarySuggestion && FieldRenderer?.renderType
+                ? FieldRenderer.renderType(primarySuggestion.investment_type)
+                : (primarySuggestion?.investment_type ? `<span class="badge bg-light text-body">${primarySuggestion.investment_type}</span>` : '');
+
+            const tradeDate = primarySuggestion && FieldRenderer?.renderDate
+                ? FieldRenderer.renderDate(primarySuggestion.created_at, false)
+                : (primarySuggestion?.created_at || '-');
+
+            const matchReasons = primarySuggestion?.match_reasons
+                ? primarySuggestion.match_reasons.join(' • ')
+                : '';
+
+            const scoreBadge = typeof score === 'number'
+                ? `<span class="badge entity-trade">${score}</span>`
+                : '';
+
+            const additionalText = additionalSuggestions > 0
+                ? `<span class="text-muted small">+${additionalSuggestions} הצעות נוספות</span>`
+                : '';
+
+            const reasonsHtml = matchReasons
+                ? `<div class="text-muted small">${matchReasons}</div>`
+                : '';
+
+            const itemIdAttr = execution.id ? `data-execution-id="${execution.id}"` : '';
+
+            return `
+                <li class="list-group-item pending-highlight-item" ${itemIdAttr}>
+                    <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                        <div class="d-flex flex-column gap-1">
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                ${executionLink}
+                                ${actionBadge}
+                                ${tickerLink}
+                                ${quantityDisplay}
+                            </div>
+                            <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
+                                <span>${executionDate}</span>
+                                ${accountLabel}
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column align-items-end gap-1">
+                            ${scoreBadge}
+                            ${additionalText}
+                        </div>
+                    </div>
+                    <div class="bg-body-tertiary rounded-3 mt-3 p-3 d-flex flex-column gap-2">
+                        <div class="d-flex align-items-center flex-wrap gap-2">
+                            ${tradeLink}
+                            ${tradeStatus}
+                            ${tradeSide}
+                            ${investmentType}
+                        </div>
+                        <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
+                            <span>${tradeDate}</span>
+                            ${primarySuggestion?.account_name ? `<span>${primarySuggestion.account_name}</span>` : ''}
+                        </div>
+                        ${reasonsHtml}
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <button
+                            data-button-type="APPROVE"
+                            data-variant="small"
+                            data-text="אשר שיוך"
+                            data-onclick="PendingExecutionsHighlights.acceptSuggestion(${execution.id}, ${primarySuggestion?.trade_id || 'null'})"
+                            ${primarySuggestion ? '' : 'disabled'}
+                        ></button>
+                        <button
+                            data-button-type="DECLINE"
+                            data-variant="ghost"
+                            data-text="דחה"
+                            data-onclick="PendingExecutionsHighlights.rejectSuggestion(${execution.id})"
+                        ></button>
+                        <button
+                            data-button-type="VIEW"
+                            data-variant="ghost"
+                            data-text="פרטי ביצוע"
+                            data-onclick="PendingExecutionsHighlights.openExecutionDetails(${execution.id})"
+                        ></button>
+                        <button
+                            data-button-type="VIEW"
+                            data-variant="ghost"
+                            data-text="פרטי טרייד"
+                            data-onclick="PendingExecutionsHighlights.openTradeDetails(${primarySuggestion?.trade_id || 'null'})"
+                            ${primarySuggestion ? '' : 'disabled'}
+                        ></button>
+                    </div>
+                </li>
             `;
+        },
+
+        updateCountBadge() {
+            if (!this.dom.count) {
+                return;
+            }
+            const count = this.state.items.length;
+            this.dom.count.textContent = count.toString();
+            this.dom.count.classList.remove('bg-danger', 'bg-success', 'bg-warning');
+            this.dom.count.classList.add(count > 0 ? 'entity-execution' : 'bg-success');
+        },
+
+        showEmptyState() {
+            if (this.dom.empty) {
+                this.dom.empty.classList.remove('d-none');
+            }
+        },
+
+        showError(message) {
+            if (this.dom.error) {
+                this.dom.error.textContent = message;
+                this.dom.error.classList.remove('d-none');
+            }
+            if (this.dom.count) {
+                this.dom.count.textContent = '!';
+                this.dom.count.classList.remove('entity-execution', 'bg-success');
+                this.dom.count.classList.add('bg-danger');
+            }
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה בטעינת המלצות שיוך', message);
+            }
+        },
+
+        hideError() {
+            if (this.dom.error) {
+                this.dom.error.classList.add('d-none');
+            }
+        },
+
+        async acceptSuggestion(executionId, tradeId) {
+            if (!executionId || !tradeId) {
+                window.Logger?.warn('⚠️ Missing execution/trade id for acceptance', { executionId, tradeId }, { page: 'index' });
+                return;
+            }
+
+            try {
+                window.Logger?.info('✅ Accepting highlight suggestion', { executionId, tradeId }, { page: 'index' });
+                const response = await fetch(ASSIGN_ENDPOINT(executionId), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ trade_id: tradeId })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData?.error?.message || 'Failed to assign execution to trade');
+                }
+
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('שיוך הושלם', `ביצוע #${executionId} שויך לטרייד #${tradeId}`);
+                }
+
+                this.removeExecutionFromState(executionId);
+                this.fetchHighlights();
+            } catch (error) {
+                window.Logger?.error('❌ Failed to accept highlight suggestion', { error: error?.message, executionId, tradeId }, { page: 'index' });
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה בשיוך', error?.message || 'השיוך נכשל');
+                }
+            }
+        },
+
+        rejectSuggestion(executionId) {
+            if (!executionId) {
+                return;
+            }
+
+            window.Logger?.info('🚫 Highlight suggestion dismissed', { executionId }, { page: 'index' });
+            this.state.dismissed.add(executionId);
+            this.persistDismissedExecutionIds();
+            this.removeExecutionFromState(executionId);
+        },
+
+        removeExecutionFromState(executionId) {
+            this.state.items = this.state.items.filter(item => item.execution_id !== executionId);
+            this.render();
+        },
+
+        openExecutionDetails(executionId) {
+            if (!executionId) {
+                return;
+            }
+            if (typeof window.showEntityDetails === 'function') {
+                window.showEntityDetails('execution', executionId, { source: 'dashboard-widget' });
+            } else {
+                window.location.href = `/executions?highlight=${executionId}`;
+            }
+        },
+
+        openTradeDetails(tradeId) {
+            if (!tradeId) {
+                return;
+            }
+            if (typeof window.showEntityDetails === 'function') {
+                window.showEntityDetails('trade', tradeId, { source: 'dashboard-widget' });
+            } else {
+                window.location.href = `/trades?highlight=${tradeId}`;
+            }
+        },
+
+        startAutoRefresh() {
+            this.stopAutoRefresh();
+            this.state.autoRefreshTimer = window.setInterval(() => {
+                this.fetchHighlights();
+            }, AUTO_REFRESH_INTERVAL);
+        },
+
+        stopAutoRefresh() {
+            if (this.state.autoRefreshTimer) {
+                window.clearInterval(this.state.autoRefreshTimer);
+                this.state.autoRefreshTimer = null;
+            }
         }
-        if (tableContainer) {
-            tableContainer.style.display = 'none';
-        }
-    } else {
-        // הצג טבלה
-        if (messageElement) {
-            messageElement.style.display = 'none';
-        }
-        if (tableContainer) {
-            tableContainer.style.display = 'block';
-            renderPendingExecutionsTable(executions);
-        }
-    }
-}
+    };
 
-/**
- * רינדור טבלת עסקאות ממתינות
- */
-function renderPendingExecutionsTable(executions) {
-    const tableContainer = document.getElementById('pendingExecutionsTableContainer');
-    if (!tableContainer) {
-        window.Logger?.warn('⚠️ pendingExecutionsTableContainer not found', { page: "index" });
-        return;
-    }
-    
-    // יצירת הטבלה
-    const tableHTML = `
-        <div class="table-responsive">
-            <table class="data-table executions-table" id="pendingExecutionsTable">
-                <thead>
-                    <tr>
-                        <th>תאריך</th>
-                        <th>סוג</th>
-                        <th>כמות</th>
-                        <th>מחיר</th>
-                        <th>טיקר</th>
-                        <th>חשבון</th>
-                        <th>פעולות</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${executions.map(execution => renderPendingExecutionRow(execution)).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
-    
-    tableContainer.innerHTML = tableHTML;
-}
+    window.PendingExecutionsHighlights = PendingExecutionsHighlights;
 
-/**
- * רינדור שורה בטבלת עסקאות ממתינות
- */
-function renderPendingExecutionRow(execution) {
-    // עיצוב תאריך
-    const date = execution.date ? new Date(execution.date).toLocaleDateString('he-IL') : '-';
-    
-    // עיצוב סוג עסקה
-    const actionBadge = execution.action === 'buy' 
-        ? '<span class="badge bg-success">קניה</span>' 
-        : '<span class="badge bg-danger">מכירה</span>';
-    
-    // עיצוב טיקר
-    const tickerSymbol = execution.ticker_symbol || execution.symbol || 'לא מוגדר';
-    const tickerBadge = `
-        <span class="linked-badge entity-ticker pending-assignment" 
-              title="עסקה ממתינה לשיוך לטרייד">
-            ${tickerSymbol}
-        </span>`;
-    
-    // פורמט מחיר
-    const price = execution.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-';
-    
-    // תוכן השורה
-    return `
-        <tr data-execution-id="${execution.id}">
-            <td>${date}</td>
-            <td>${actionBadge}</td>
-            <td>${execution.quantity || '-'}</td>
-            <td>${price}</td>
-            <td>${tickerBadge}</td>
-            <td>${execution.account_name || '-'}</td>
-            <td class="actions-cell">
-                <button class="btn btn-sm btn-outline-primary" 
-                        onclick="editExecutionFromWidget(${execution.id})" 
-                        title="ערוך עסקה">
-                    ✏️
-                </button>
-                <button class="btn btn-sm btn-outline-danger" 
-                        onclick="deleteExecutionFromWidget(${execution.id})" 
-                        title="מחק עסקה">
-                    🗑️
-                </button>
-                <button class="btn btn-sm btn-outline-success" 
-                        onclick="goToExecutionsPage(${execution.id})" 
-                        title="עבור לדף עסקאות">
-                    🔗
-                </button>
-            </td>
-        </tr>
-    `;
-}
+    window.refreshPendingExecutionsWidget = () => {
+        PendingExecutionsHighlights.fetchHighlights();
+    };
 
-// ========================================
-// Action Functions
-// ========================================
+    window.initializePendingExecutionsWidget = () => {
+        PendingExecutionsHighlights.init();
+    };
 
-/**
- * עריכת עסקה מהוידג'ט
- */
-function editExecutionFromWidget(executionId) {
-    window.Logger?.info(`✏️ Editing execution ${executionId} from widget`, { page: "index" });
-    
-    // מעבר לדף עסקאות ופתיחת עריכה
-    const url = `/executions?edit=${executionId}`;
-    window.location.href = url;
-}
-
-/**
- * מחיקת עסקה מהוידג'ט
- */
-function deleteExecutionFromWidget(executionId) {
-    window.Logger?.info(`🗑️ Deleting execution ${executionId} from widget`, { page: "index" });
-    
-    // בדיקה אם יש פונקציה גלובלית למחיקה
-    if (typeof window.deleteExecution === 'function') {
-        window.deleteExecution(executionId);
-        
-        // רענון הוידג'ט אחרי מחיקה
-        setTimeout(() => {
-            loadPendingExecutions();
-        }, 500);
-    } else {
-        // אם אין פונקציה גלובלית - מעבר לדף עסקאות
-        goToExecutionsPage(executionId);
-    }
-}
-
-/**
- * מעבר לדף עסקאות עם הדגשת עסקה ספציפית
- */
-function goToExecutionsPage(executionId = null) {
-    const url = executionId ? `/executions?highlight=${executionId}` : '/executions';
-    window.location.href = url;
-}
-
-/**
- * רענון וידג'ט עסקאות ממתינות
- */
-function refreshPendingExecutionsWidget() {
-    window.Logger?.info('🔄 Refreshing pending executions widget...', { page: "index" });
-    loadPendingExecutions();
-}
-
-// ========================================
-// Global Exports
-// ========================================
-
-// הפיכת הפונקציות לגלובליות
-window.loadPendingExecutions = loadPendingExecutions;
-window.refreshPendingExecutionsWidget = refreshPendingExecutionsWidget;
-window.editExecutionFromWidget = editExecutionFromWidget;
-window.deleteExecutionFromWidget = deleteExecutionFromWidget;
-window.goToExecutionsPage = goToExecutionsPage;
-
-// ========================================
-// Auto-Initialization
-// ========================================
-
-// אתחול דרך UnifiedAppInitializer
-window.initializePendingExecutionsWidget = () => {
-    window.Logger?.info('📊 Pending Executions Widget initialized', { page: "index" });
-    
-    // בדיקה שהאלמנטים קיימים
-    const countElement = document.getElementById('pendingExecutionsCount');
-    const containerElement = document.getElementById('pendingExecutionsTableContainer');
-    
-    if (countElement && containerElement) {
-        // טעינה ראשונית
-        loadPendingExecutions();
-        
-        // רענון כל 30 שניות
-        setInterval(loadPendingExecutions, 30000);
-        
-        window.Logger?.info('✅ Pending Executions Widget auto-refresh enabled (30s)', { page: "index" });
-    } else {
-        window.Logger?.warn('⚠️ Pending Executions Widget elements not found - widget disabled', { page: "index" });
-    }
-};
-
-window.Logger?.info('📊 Pending Executions Widget script loaded', { page: "index" });
-
+    window.Logger?.info('📊 Pending Executions Highlights script loaded', { page: 'index' });
+})();

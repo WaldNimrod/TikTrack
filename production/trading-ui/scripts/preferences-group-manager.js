@@ -24,6 +24,81 @@ class PreferencesGroupManager {
             'section6': 'colors_unified',
             'section7': 'chart_settings_unified'
         };
+        this.currentUserId = 1;
+        this.currentProfileId = null;
+        this.valueMappings = {
+            defaultStatusFilter: {
+                toEnglish: {
+                    'פתוח': 'open',
+                    'סגור': 'closed',
+                    'מבוטל': 'cancelled',
+                    'בוטל': 'cancelled',
+                    'הכל': 'all',
+                    'הכול': 'all',
+                    'open': 'open',
+                    'closed': 'closed',
+                    'cancelled': 'cancelled',
+                    'canceled': 'cancelled',
+                    'all': 'all'
+                }
+            },
+            defaultTypeFilter: {
+                toEnglish: {
+                    'Swing': 'swing',
+                    'סווינג': 'swing',
+                    'השקעה': 'investment',
+                    'Investment': 'investment',
+                    'פסיבי': 'passive',
+                    'Passive': 'passive',
+                    'הכל': 'all',
+                    'הכול': 'all',
+                    'swing': 'swing',
+                    'investment': 'investment',
+                    'passive': 'passive',
+                    'all': 'all'
+                }
+            },
+            defaultDateRangeFilter: {
+                toEnglish: {
+                    'היום': 'today',
+                    'אתמול': 'yesterday',
+                    'השבוע': 'this_week',
+                    'החודש': 'this_month',
+                    'השנה': 'this_year',
+                    'השבוע שעבר': 'last_week',
+                    'השנה שעברה': 'last_year',
+                    'החודש שעבר': 'last_month',
+                    '7 ימים אחרונים': 'last_7_days',
+                    '30 ימים אחרונים': 'last_30_days',
+                    '90 ימים אחרונים': 'last_90_days',
+                    'מותאם אישית': 'custom',
+                    'כל זמן': 'all',
+                    'הכל': 'all',
+                    'הכול': 'all',
+                    'today': 'today',
+                    'yesterday': 'yesterday',
+                    'this_week': 'this_week',
+                    'this_month': 'this_month',
+                    'this_year': 'this_year',
+                    'last_week': 'last_week',
+                    'last_year': 'last_year',
+                    'last_month': 'last_month',
+                    'last_7_days': 'last_7_days',
+                    'last_30_days': 'last_30_days',
+                    'last_90_days': 'last_90_days',
+                    'custom': 'custom',
+                    'all': 'all'
+                }
+            },
+            defaultSearchFilter: {
+                toEnglish: {
+                    'הכל': 'all',
+                    'הכול': 'all',
+                    '': '',
+                    'all': 'all'
+                }
+            }
+        };
     }
     
     /**
@@ -131,13 +206,42 @@ class PreferencesGroupManager {
                 if (field.type === 'checkbox') {
                     field.checked = preferences[prefName] === 'true' || preferences[prefName] === true;
                 } else {
-                    field.value = preferences[prefName];
+                    const normalizedValue = this.normalizePreferenceValue(prefName, preferences[prefName], 'toEnglish');
+                    const previousValue = field.value;
+                    field.value = normalizedValue;
+                    
+                    if (field.value !== normalizedValue && preferences[prefName] !== undefined && preferences[prefName] !== null) {
+                        field.value = preferences[prefName];
+                    }
+                    
+                    if (field.value === '' && previousValue !== '') {
+                        field.value = previousValue;
+                    }
                 }
                 populatedCount++;
             }
         });
         
         window.Logger?.debug(`Populated ${populatedCount} fields in section ${sectionId}`, { page: "preferences-group-manager" });
+    }
+    
+    normalizePreferenceValue(prefName, value, direction = 'toEnglish') {
+        if (value === null || value === undefined) {
+            return value;
+        }
+        
+        if (!Object.prototype.hasOwnProperty.call(this.valueMappings, prefName)) {
+            return value;
+        }
+        
+        const normalizedValue = String(value).trim();
+        const mapping = this.valueMappings[prefName].toEnglish || {};
+        
+        if (direction === 'toEnglish') {
+            return mapping[normalizedValue] || normalizedValue;
+        }
+        
+        return mapping[normalizedValue] || normalizedValue;
     }
     
     /**
@@ -224,7 +328,7 @@ class PreferencesGroupManager {
             if (input.type === 'checkbox') {
                 formData[name] = input.checked ? 'true' : 'false';
             } else {
-                formData[name] = input.value;
+                formData[name] = this.normalizePreferenceValue(name, input.value, 'toEnglish');
             }
         });
         

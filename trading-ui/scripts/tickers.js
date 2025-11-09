@@ -1775,7 +1775,6 @@ function updateTickersTable(tickers) {
                           if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
                           const result = window.createActionsMenu([
                             { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
-                            { type: 'LINK', onclick: `window.viewLinkedItemsForTicker(${ticker.id})`, title: 'פריטים מקושרים' },
                             { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})`, title: 'ערוך' },
                             { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' },
                             { type: 'DELETE', onclick: `deleteTicker(${ticker.id})`, title: 'מחק' }
@@ -1787,9 +1786,6 @@ function updateTickersTable(tickers) {
                             <button data-button-type="VIEW" data-variant="small" 
                                     data-onclick="window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })" 
                                     data-text="" title="צפה בפרטי טיקר"></button>
-                            <button data-button-type="LINK" data-variant="small" 
-                                    data-onclick="window.viewLinkedItemsForTicker(${ticker.id})" 
-                                    data-text="" title="פריטים מקושרים"></button>
                             <button data-button-type="EDIT" data-variant="small" 
                                     data-onclick="window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})" 
                                     data-text="" title="ערוך"></button>

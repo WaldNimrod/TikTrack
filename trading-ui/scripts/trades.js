@@ -711,7 +711,6 @@ async function updateTradesTable(trades) {
             }
             const result = window.createActionsMenu([
               { type: 'VIEW', onclick: `window.showEntityDetails('trade', ${trade.id}, { mode: 'view' })`, title: 'צפה בפרטים' },
-              { type: 'LINK', onclick: `viewLinkedItemsForTrade(${trade.id})`, title: 'קישור' },
               { type: 'EDIT', onclick: `editTradeRecord('${trade.id}')`, title: 'ערוך' },
               { type: 'CANCEL', onclick: `cancelTradeRecord('${trade.id}')`, title: 'בטל' },
               { type: 'DELETE', onclick: `deleteTradeRecord('${trade.id}')`, title: 'מחק' }

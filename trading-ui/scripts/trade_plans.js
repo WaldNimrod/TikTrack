@@ -2491,7 +2491,6 @@ function updateTradePlansTable(trade_plans) {
             try {
               const result = window.createActionsMenu([
                 { type: 'VIEW', onclick: `window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })`, title: 'צפה בפרטי תכנון' },
-                { type: 'LINK', onclick: `if (typeof window.viewLinkedItemsForTradePlan === 'function') { window.viewLinkedItemsForTradePlan(${design.id}); }`, title: 'קישור' },
                 { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', ${design.id})`, title: 'ערוך' },
                 { type: 'CANCEL', onclick: `if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }`, title: 'בטל' },
                 { type: 'DELETE', onclick: `if (typeof window.deleteTradePlan === 'function') { window.deleteTradePlan(${design.id}); }`, title: 'מחק' }

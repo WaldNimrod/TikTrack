@@ -137,7 +137,6 @@
                         <div class="table-actions">
                             <button data-button-type="ADD" data-entity-type="execution" data-variant="full" data-onclick="window.showModalSafe('executionsModal','add')" data-text="הוסף ביצוע" id="addExecutionBtn" title="הוסף ביצוע חדש"></button>
                             <button data-button-type="IMPORT" data-variant="full" data-onclick="openImportUserDataModal()" data-text="📥 ייבוא נתוני משתמש" title="ייבוא ביצועים מקובץ CSV"></button>
-                            <button data-button-type="CLEAR" data-variant="small" data-onclick="clearNewExecutionHighlights()" data-text="🧹 נקה הדגשה" title="נקה הדגשת רשומות חדשות" style="display: none;" id="clearHighlightsBtn"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
                     </div>
@@ -173,28 +172,23 @@
                                                 מחיר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
-                                        <th class="col-pnl">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 5)">
-                                                P&L <span class="sort-icon">↕</span>
-                                            </button>
-                                        </th>
                                         <th class="col-realized-pl">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 6)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 5)">
                                                 Realized P/L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-mtm-pl">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 7)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 6)">
                                                 MTM P/L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-execution-date">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 8)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 7)">
                                                 תאריך <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-source">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 9)">מקור <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 8)">מקור <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-items">
                                         </th>
@@ -202,7 +196,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="11" class="loading">טוען עסקעות...</td>
+                                        <td colspan="10" class="loading">טוען עסקעות...</td>
                                     </tr>
                                 </tbody>
                             </table>

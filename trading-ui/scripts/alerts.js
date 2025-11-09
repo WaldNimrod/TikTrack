@@ -721,7 +721,6 @@ function updateAlertsTable(alerts) {
               if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
               const result = window.createActionsMenu([
                 { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
-                { type: 'LINK', onclick: `viewLinkedItemsForAlert(${alert.id})`, title: 'צפה בפריטים מקושרים' },
                 { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
                 { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
                 { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }

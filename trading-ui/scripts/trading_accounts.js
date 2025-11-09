@@ -705,13 +705,11 @@ function updateTradingAccountsTable(trading_accounts) {
         <td class="actions-cell">
           ${window.createActionsMenu ? window.createActionsMenu([
             { type: 'VIEW', onclick: `window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })`, title: 'צפה בפרטי חשבון מסחר' },
-            { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${tradingAccount.id})`, title: 'פריטים מקושרים' },
             { type: 'EDIT', onclick: `window.showEditTradingAccountModalById(${tradingAccount.id})`, title: 'ערוך' },
             { type: tradingAccount.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account && window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account(${tradingAccount.id})`, title: tradingAccount.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
             { type: 'DELETE', onclick: `window.deleteTradingAccountWithLinkedItemsCheck && window.deleteTradingAccountWithLinkedItemsCheck(${tradingAccount.id})`, title: 'מחק' }
           ]) : `
           <button data-button-type="VIEW" data-variant="small" data-onclick="window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })" title="צפה בפרטי חשבון מסחר"></button>
-          <button data-button-type="LINK" data-variant="small" data-onclick="window.showLinkedItemsModal && window.showLinkedItemsModal(linkedItemsData, 'tradingAccount', ${tradingAccount.id})" title="פריטים מקושרים"></button>
           <button data-button-type="EDIT" data-variant="small" data-onclick="window.showEditTradingAccountModalById(${tradingAccount.id})" title="ערוך"></button>
           <button data-button-type="${tradingAccount.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL'}" data-variant="small" data-onclick="window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account && window.${tradingAccount.status === 'cancelled' ? 'reactivate' : 'cancel'}Account(${tradingAccount.id})" title="${tradingAccount.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}"></button>
           <button data-button-type="DELETE" data-variant="small" data-onclick="window.deleteTradingAccountWithLinkedItemsCheck && window.deleteTradingAccountWithLinkedItemsCheck(${tradingAccount.id})" title="מחק"></button>

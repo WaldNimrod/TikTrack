@@ -1207,7 +1207,7 @@ async function updateExecutionsTableMain(executions) {
     .filter(id => !existingExecutionIds.has(id));
 
   if (executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center">לא נמצאו עסקעות</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center">לא נמצאו עסקעות</td></tr>';
     return;
   }
 
@@ -1340,8 +1340,7 @@ async function updateExecutionsTableMain(executions) {
                   onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                   title="פתח פרטי חשבון מסחר">${accountName}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
-                <td>$${execution.price}</td>
-                <td class="pl-cell">$0</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.price) : (execution.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-')}</td>
                 <td class="realized-pl-cell" data-realized-pl="${execution.realized_pl || ''}">
                     ${execution.realized_pl !== null && execution.realized_pl !== undefined ? 
                         (execution.realized_pl >= 0 ? 
@@ -1366,7 +1365,6 @@ async function updateExecutionsTableMain(executions) {
                         }
                         const result = window.createActionsMenu([
                           { type: 'VIEW', onclick: `window.showEntityDetails('execution', ${execution.id}, { mode: 'view' })`, title: 'צפה בפרטי עסקה' },
-                          { type: 'LINK', onclick: `window.viewLinkedItemsForExecution && window.viewLinkedItemsForExecution(${execution.id})`, title: 'פריטים מקושרים' },
                           { type: 'EDIT', onclick: `editExecution(${execution.id})`, title: 'ערוך' },
                           { type: 'DELETE', onclick: `deleteExecution(${execution.id})`, title: 'מחק' }
                         ]);
@@ -1394,22 +1392,18 @@ async function updateExecutionsTableMain(executions) {
       style.textContent = `
         .execution-row.newly-added {
           background-color: rgba(40, 167, 69, 0.2) !important;
-          border-left: 4px solid #28a745 !important;
           animation: fadeNewExecution 3s ease-out forwards;
         }
         
         @keyframes fadeNewExecution {
           0% {
             background-color: rgba(40, 167, 69, 0.3);
-            border-left-color: #28a745;
           }
           50% {
             background-color: rgba(40, 167, 69, 0.15);
-            border-left-color: #28a745;
           }
           100% {
             background-color: transparent;
-            border-left-color: transparent;
           }
         }
       `;
@@ -2569,9 +2563,9 @@ function updateExecutionsTableForTradeModal(executions) {
                 <td>${window.renderExecutionDate ? window.renderExecutionDate(execution.date) : execution.date}</td>
                 <td>${typeBadge}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
-                <td>$${execution.price.toFixed(2)}</td>
-                <td>$${execution.commission.toFixed(2)}</td>
-                <td>$${execution.total.toFixed(2)}</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.price) : (execution.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-')}</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.commission) : (execution.commission ? `$${parseFloat(execution.commission).toFixed(2)}` : '-')}</td>
+                <td>${window.formatPrice ? window.formatPrice(execution.total) : (execution.total ? `$${parseFloat(execution.total).toFixed(2)}` : '-')}</td>
                 <td>${statusBadge}</td>
             `;
 
@@ -3455,7 +3449,7 @@ async function deleteExecution(executionId) {
                                window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
                                ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
             const quantity = execution.quantity || '0';
-            const price = execution.price ? `$${execution.price}` : '$0';
+            const price = execution.price ? (window.formatPrice ? window.formatPrice(execution.price) : `$${parseFloat(execution.price).toFixed(2)}`) : '$0';
             const date = execution.date || execution.execution_date ? 
                          new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : 
                          'לא מוגדר';

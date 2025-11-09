@@ -660,7 +660,6 @@ function updateNotesTable(notes) {
                 if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
                 const result = window.createActionsMenu([
                   { type: 'VIEW', onclick: `window.showEntityDetails('note', ${note.id}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
-                  { type: 'LINK', onclick: `viewLinkedItemsForNote(${note.id})`, title: 'צפה בפריטים מקושרים' },
                   { type: 'EDIT', onclick: `editNote(${note.id})`, title: 'ערוך הערה' },
                   { type: 'DELETE', onclick: `deleteNote(${note.id})`, title: 'מחק הערה' }
                 ]);

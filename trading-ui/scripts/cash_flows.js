@@ -804,7 +804,6 @@ async function renderCashFlowsTable() {
         if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
         const result = window.createActionsMenu([
           { type: 'VIEW', onclick: `showEntityDetails('cash_flow', ${cashFlow.id})`, title: 'הצג פרטי המרה' },
-          { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, title: 'צפה בפריטים מקושרים' },
           { type: 'EDIT', onclick: `window.loadCurrencyExchange && window.loadCurrencyExchange('${exchangeId}').then(() => { window.ModalManagerV2 && window.ModalManagerV2.showModal('cashFlowModal', 'edit'); })`, title: 'ערוך המרת מטבע' },
           { type: 'DELETE', onclick: `window.deleteCurrencyExchange && window.deleteCurrencyExchange('${exchangeId}')`, title: 'מחק המרת מטבע' }
         ]);
@@ -814,7 +813,6 @@ async function renderCashFlowsTable() {
         if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
         const result = window.createActionsMenu([
           { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, title: 'הצג פרטי תזרים' },
-          { type: 'LINK', onclick: `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`, title: 'צפה בפריטים מקושרים' },
           { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${cashFlow.id})`, title: 'ערוך תזרים' },
           { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, title: 'מחק תזרים' }
         ]);
@@ -841,12 +839,6 @@ async function renderCashFlowsTable() {
             row.innerHTML = `
             <td class="col-account ticker-cell" data-account="${cashFlow.trading_account_id || accountName || ''}">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="btn btn-sm" 
-                      onclick="showEntityDetails('cash_flow', ${cashFlow.id})" 
-                      title="פרטי תזרים" 
-                      style="background-color: white; font-size: 0.8em;">
-                        🔗
-                    </button>
                     <span class="entity-trading_account-badge entity-account-badge" 
                           style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
                         ${accountName}

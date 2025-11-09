@@ -155,6 +155,12 @@ class BaseImportConnector(ABC):
 - **פורמט**: CSV פשוט עם עמודות: symbol, action, date, quantity, price, fee
 - **external_id**: `"demo_{row_number}"`
 
+### סטנדרט תאריכים (DateEnvelope)
+
+- הקונקטורים מחזירים `datetime` מודע לאיזור זמן (UTC), וה-`ImportOrchestrator` ממיר אותם ל-**DateEnvelope** באמצעות `DateNormalizationService`.
+- נקודות הקצה ב-`production/Backend/routes/api/user_data_import.py` מחשבות את איזור הזמן של המשתמש ומריצות `_project_storage_payload` לפני החזרת JSON.
+- ה-UI (ב-`production/trading-ui/scripts/import-user-data.js`) משתמש בפונקציות `renderImportDate()` ו-`showImportUserDataNotification()` כדי להציג תאריכים בהתאם להעדפות המשתמש ולמנוע לולאות במערכת ההודעות.
+
 ## שירותים
 
 ### Normalization Service
@@ -165,7 +171,13 @@ class BaseImportConnector(ABC):
 {
     "symbol": "AAPL",
     "action": "buy",                    # או "sell"
-    "date": "2025-09-03T09:35:18",     # ISO format
+    "date": {                          # DateEnvelope לאחר נורמליזציה
+        "utc": "2025-09-03T09:35:18Z",
+        "epochMs": 1757208918000,
+        "local": "2025-09-03T12:35:18+03:00",
+        "timezone": "Asia/Jerusalem",
+        "display": "03/09/2025 12:35"
+    },
     "quantity": 250,
     "price": 13.6,
     "fee": 1.2555,

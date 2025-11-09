@@ -757,7 +757,7 @@ async function renderCashFlowsTable() {
   tbody.innerHTML = '';
 
   if (!cashFlowsData || cashFlowsData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="11" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
     return;
   }
 
@@ -779,11 +779,18 @@ async function renderCashFlowsTable() {
     // קבלת סוג עם צבע
     let typeDisplay = isExchange ? '🔄 ' + getCashFlowTypeWithColor(cashFlow.type) : getCashFlowTypeWithColor(cashFlow.type);
     
-    // Add trade link indicator if trade_id exists
-    if (cashFlow.trade_id) {
-      const tradeSymbol = cashFlow.trade_ticker_symbol || '';
-      typeDisplay += ` <span class="badge bg-info" title="מקושר לטרייד #${cashFlow.trade_id}${tradeSymbol ? ' (' + tradeSymbol + ')' : ''}" style="font-size: 0.75em; margin-inline-start: 4px;">🔗</span>`;
-    }
+    // Trade column - show trade ID with link button if exists
+    const tradeCell = cashFlow.trade_id 
+      ? `<div style="display: flex; align-items: center; gap: 6px;">
+           <button class="btn btn-sm btn-outline-primary" 
+                   onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${cashFlow.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${cashFlow.trade_id}, 'view'); }" 
+                   title="פתח פרטי טרייד"
+                   style="padding: 2px 6px; font-size: 0.75em;">
+             🔗
+           </button>
+           <span>#${cashFlow.trade_id}</span>
+         </div>`
+      : '-';
 
     // עיצוב סכום עם יישור נכון וצביעה
     // For exchanges, we need to show both amounts (from -> to)
@@ -837,6 +844,9 @@ async function renderCashFlowsTable() {
         })();
 
             row.innerHTML = `
+            <td class="trade-cell" data-trade-id="${cashFlow.trade_id || ''}">
+                ${tradeCell}
+            </td>
             <td class="col-account ticker-cell" data-account="${cashFlow.trading_account_id || accountName || ''}">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span class="entity-trading_account-badge entity-account-badge" 

@@ -147,48 +147,53 @@
                             <table class="table table-hover" id="executionsTable" data-table-type="executions">
                                 <thead>
                                     <tr>
-                                        <th class="col-ticker">
+                                        <th class="col-trade">
                                             <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 0)">
+                                                טרייד <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-ticker">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 1)">
                                                 טיקר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-action">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 1)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 2)">
                                                 פעולה <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-account">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 2)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 3)">
                                                 חשבון מסחר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-quantity">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 3)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 4)">
                                                 כמות <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-price">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 4)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 5)">
                                                 מחיר <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-realized-pl">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 5)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 6)">
                                                 Realized P/L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-mtm-pl">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 6)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 7)">
                                                 MTM P/L <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-execution-date">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 7)">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 8)">
                                                 תאריך <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="col-source">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 8)">מקור <span class="sort-icon">↕</span></button>
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 9)">מקור <span class="sort-icon">↕</span></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-3-items">
                                         </th>
@@ -196,7 +201,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="10" class="loading">טוען עסקעות...</td>
+                                        <td colspan="11" class="loading">טוען עסקעות...</td>
                                     </tr>
                                 </tbody>
                             </table>

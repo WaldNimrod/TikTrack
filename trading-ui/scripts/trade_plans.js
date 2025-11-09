@@ -2189,7 +2189,38 @@ function _REMOVED_filterTradePlansData(filters) {
     const { startDate, endDate } = filters.dateRange;
     if (startDate && endDate) {
       filteredData = filteredData.filter(plan => {
-        const planDate = new Date(plan.created_at);
+        const envelope = window.dateUtils?.ensureDateEnvelope
+          ? window.dateUtils.ensureDateEnvelope(
+              plan.created_at_envelope ||
+              plan.createdAtEnvelope ||
+              plan.created_at ||
+              plan.createdAt ||
+              null
+            )
+          : (
+              plan.created_at_envelope ||
+              plan.createdAtEnvelope ||
+              plan.created_at ||
+              plan.createdAt ||
+              null
+            );
+        if (!envelope) {
+          return false;
+        }
+        const ms = window.dateUtils?.getEpochMilliseconds
+          ? window.dateUtils.getEpochMilliseconds(envelope)
+          : (() => {
+              try {
+                const obj = envelope instanceof Date ? envelope : new Date(envelope);
+                return obj.getTime();
+              } catch {
+                return null;
+              }
+            })();
+        if (ms === null || Number.isNaN(ms)) {
+          return false;
+        }
+        const planDate = new Date(ms);
         return planDate >= startDate && planDate <= endDate;
       });
     }
@@ -2328,23 +2359,6 @@ function updateTradePlansTable(trade_plans) {
 
     // Using global FieldRendererService for rendering - no need for local CSS classes
 
-    // Date correction - converting to Hebrew format
-    let dateDisplay = 'לא מוגדר';
-
-    if (design.created_at) {
-      try {
-        const dateObj = new Date(design.created_at);
-
-        if (!isNaN(dateObj.getTime())) {
-          dateDisplay = dateObj.toLocaleDateString('he-IL');
-        } else {
-          handleValidationError('date', 'תאריך לא תקין');
-        }
-      } catch (error) {
-        handleValidationError('date parsing', 'שגיאה בניתוח תאריך');
-      }
-    }
-
     // Type correction - ensuring a valid value is passed
     const typeDisplay = design.investment_type ? window.translateTradePlanType ? window.translateTradePlanType(design.investment_type) : design.investment_type : 'לא מוגדר';
     const sideDisplay = design.side === 'Long' ? 'Long' : 'Short';
@@ -2368,20 +2382,66 @@ function updateTradePlansTable(trade_plans) {
             ${tickerDisplay}
           </span>
         </td>
-        <td data-date="${design.created_at}">${(() => {
-          if (design.created_at) {
-            try {
-              const dateObj = new Date(design.created_at);
-              if (!isNaN(dateObj.getTime())) {
-                // פורמט מקוצר: DD/MM/YY
-                const day = dateObj.getDate().toString().padStart(2, '0');
-                const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-                const year = dateObj.getFullYear().toString().slice(-2);
-                return `<span class="date-text">${day}/${month}/${year}</span>`;
-              }
-            } catch (e) {
-              window.Logger.warn('Error parsing date:', design.created_at, e, { page: "trade_plans" });
+        <td data-date="${(() => {
+          const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+            ? window.dateUtils.ensureDateEnvelope(
+                design.created_at_envelope ||
+                design.createdAtEnvelope ||
+                design.created_at ||
+                design.createdAt ||
+                null
+              )
+            : (
+                design.created_at_envelope ||
+                design.createdAtEnvelope ||
+                design.created_at ||
+                design.createdAt ||
+                null
+              );
+          if (window.dateUtils?.getEpochMilliseconds) {
+            const ms = window.dateUtils.getEpochMilliseconds(createdEnvelope);
+            return ms || '';
+          }
+          if (createdEnvelope instanceof Date) {
+            return createdEnvelope.getTime();
+          }
+          try {
+            return createdEnvelope ? new Date(createdEnvelope).getTime() : '';
+          } catch {
+            return '';
+          }
+        })()}">${(() => {
+          const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+            ? window.dateUtils.ensureDateEnvelope(
+                design.created_at_envelope ||
+                design.createdAtEnvelope ||
+                design.created_at ||
+                design.createdAt ||
+                null
+              )
+            : (
+                design.created_at_envelope ||
+                design.createdAtEnvelope ||
+                design.created_at ||
+                design.createdAt ||
+                null
+              );
+          if (!createdEnvelope) {
+            return `<span class="date-text">-</span>`;
+          }
+          if (window.FieldRendererService?.renderDate) {
+            return `<span class="date-text">${window.FieldRendererService.renderDate(createdEnvelope, false)}</span>`;
+          }
+          if (window.dateUtils?.formatDate) {
+            return `<span class="date-text">${window.dateUtils.formatDate(createdEnvelope, { includeTime: false })}</span>`;
+          }
+          try {
+            const dateObj = createdEnvelope instanceof Date ? createdEnvelope : new Date(createdEnvelope);
+            if (!Number.isNaN(dateObj.getTime())) {
+              return `<span class="date-text">${dateObj.toLocaleDateString('he-IL')}</span>`;
             }
+          } catch (error) {
+            window.Logger?.warn('⚠️ trade plans date fallback failed', { error, created_at: design?.created_at }, { page: 'trade_plans' });
           }
           return `<span class="date-text">-</span>`;
         })()}</td>
@@ -3237,7 +3297,36 @@ async function deleteTradePlan(tradePlanId) {
                              tradePlan.status === 'closed' ? 'סגור' :
                              tradePlan.status === 'cancelled' ? 'מבוטל' : tradePlan.status || 'לא מוגדר';
             const amount = tradePlan.planned_amount ? `$${tradePlan.planned_amount}` : 'לא מוגדר';
-            const date = tradePlan.created_at ? new Date(tradePlan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+            const dateEnvelope = window.dateUtils?.ensureDateEnvelope
+              ? window.dateUtils.ensureDateEnvelope(
+                  tradePlan.created_at_envelope ||
+                  tradePlan.createdAtEnvelope ||
+                  tradePlan.created_at ||
+                  tradePlan.createdAt ||
+                  null
+                )
+              : (
+                  tradePlan.created_at_envelope ||
+                  tradePlan.createdAtEnvelope ||
+                  tradePlan.created_at ||
+                  tradePlan.createdAt ||
+                  null
+                );
+            let date = 'לא מוגדר';
+            if (dateEnvelope) {
+              if (window.dateUtils?.formatDate) {
+                date = window.dateUtils.formatDate(dateEnvelope, { includeTime: false });
+              } else {
+                try {
+                  const dateObj = dateEnvelope instanceof Date ? dateEnvelope : new Date(dateEnvelope);
+                  if (!Number.isNaN(dateObj.getTime())) {
+                    date = dateObj.toLocaleDateString('he-IL');
+                  }
+                } catch {
+                  date = 'לא מוגדר';
+                }
+              }
+            }
             
             tradePlanDetails = `${ticker} - ${sideText} ${typeText}, סטטוס: ${statusText}, סכום: ${amount}, תאריך: ${date}`;
         }

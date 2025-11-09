@@ -213,10 +213,6 @@
                 ? `<span class="text-muted small">+${additionalSuggestions} הצעות נוספות</span>`
                 : '';
 
-            const reasonsHtml = matchReasons
-                ? `<div class="text-muted small">${matchReasons}</div>`
-                : '';
-
             const itemIdAttr = execution.id ? `data-execution-id="${execution.id}"` : '';
 
             return `
@@ -267,7 +263,6 @@
                         <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
                             <span>${tradeDate}</span>
                         </div>
-                        ${reasonsHtml}
                     </div>
                 </li>
             `;

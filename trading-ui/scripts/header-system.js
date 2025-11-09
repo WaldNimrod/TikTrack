@@ -197,21 +197,25 @@ class HeaderSystem {
                     </li>
 
                     <li class="tiktrack-nav-item">
-                      <a href="#" class="tiktrack-nav-link" onclick="clearCacheForDevelopment(event)" 
+                      <a href="#" class="tiktrack-nav-link" data-onclick="CacheControlMenu.triggerAction('full', event)" 
                          title="ניקוי מטמון לפיתוח">
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
                       </a>
                       <ul class="submenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 240px; z-index: 1000; padding: 0; margin: 0; list-style: none;">
                         <li><a href="#" data-cache-action="memory"
+                               data-onclick="CacheControlMenu.triggerAction('memory', event)"
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee; font-weight: 500;"
                                title="ניקוי שכבת הזיכרון בלבד (Memory)">🧠 ניקוי שכבת זיכרון</a></li>
                         <li><a href="#" data-cache-action="local-storage"
+                               data-onclick="CacheControlMenu.triggerAction('local-storage', event)"
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
                                title="ניקוי מטמון localStorage (כולל העדפות פרופיל)">💽 ניקוי localStorage</a></li>
                         <li><a href="#" data-cache-action="indexeddb"
+                               data-onclick="CacheControlMenu.triggerAction('indexeddb', event)"
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
                                title="ניקוי המטמון המאוחסן ב-IndexedDB">🗃️ ניקוי IndexedDB</a></li>
                         <li><a href="#" data-cache-action="full"
+                               data-onclick="CacheControlMenu.triggerAction('full', event)"
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; font-weight: bold;"
                                title="ניקוי כל שכבות המטמון + רענון אוטומטי">🌀 ניקוי מלא + רענון</a></li>
                       </ul>

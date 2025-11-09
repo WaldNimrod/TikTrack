@@ -163,25 +163,6 @@
         }
     }
 
-    function handleMenuClick(event) {
-        event.preventDefault();
-        const actionKey = event.currentTarget.getAttribute('data-cache-action');
-        if (!actionKey) {
-            return;
-        }
-        performAction(actionKey);
-    }
-
-    function attachMenuHandlers() {
-        const elements = document.querySelectorAll('[data-cache-action]');
-        elements.forEach((element) => {
-            if (!element.__cacheControlBound) {
-                element.addEventListener('click', handleMenuClick);
-                element.__cacheControlBound = true;
-            }
-        });
-    }
-
     async function triggerAction(actionKey, event) {
         if (event) {
             event.preventDefault();
@@ -192,18 +173,11 @@
 
     const CacheControlMenu = {
         triggerAction,
-        attachMenuHandlers,
         logAction,
         getActiveProfileId
     };
 
     window.CacheControlMenu = CacheControlMenu;
-
-    if (document.readyState === 'interactive' || document.readyState === 'complete') {
-        attachMenuHandlers();
-    } else {
-        document.addEventListener('DOMContentLoaded', attachMenuHandlers, { once: true });
-    }
 
     // Override legacy global helpers to use the new Stage B-Lite actions
     window.clearCacheForDevelopment = async function(event) {

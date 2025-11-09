@@ -10,6 +10,7 @@ from typing import Dict, Any
 import logging
 import os
 import sqlite3
+from config.settings import DB_PATH  # Use production DB path
 
 logger = logging.getLogger(__name__)
 
@@ -17,11 +18,8 @@ logger = logging.getLogger(__name__)
 user_preferences_list_bp = Blueprint('user_preferences_list', __name__, url_prefix='/api/user_preferences')
 
 def get_db_connection():
-    """Get database connection"""
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
-    
-    conn = sqlite3.connect(DB_PATH)
+    """Get database connection - uses production DB path from config"""
+    conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     return conn
 

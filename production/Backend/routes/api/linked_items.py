@@ -53,14 +53,11 @@ linked_items_bp = Blueprint('linked_items', __name__, url_prefix='/api/linked-it
 # Initialize base API (linked_items is complex, so we'll use it selectively)
 
 def get_db_connection():
-    """Get database connection"""
-    import os
+    """Get database connection - uses production DB path from config"""
     import sqlite3
+    from config.settings import DB_PATH  # Use production DB path
     
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
-    
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     return conn
 

@@ -372,6 +372,14 @@ async function loadTradesData() {
     } else if (typeof window.updatePageSummaryStats === 'function') {
       window.updatePageSummaryStats('trades', window.tradesData);
     }
+    
+    // Register table with UnifiedTableSystem after data is loaded
+    if (typeof window.registerTradesTables === 'function') {
+      window.registerTradesTables();
+    }
+
+    // Restore page state (filters, sort, sections, entity filters)
+    await restorePageState('trades');
 
   } catch (error) {
     if (typeof handleDataLoadError === 'function') {
@@ -873,23 +881,47 @@ function viewTradePlanDetails(tradePlanId) {
  */
 function editTradeRecord(tradeId) {
   try {
-  // עריכת טרייד
-  // מציאת הטרייד במערך
-  const trade = tradesData.find(t => t.id === tradeId);
-  if (trade) {
-    // Use ModalManagerV2 directly
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-      window.ModalManagerV2.showEditModal('tradesModal', 'trade', trade.id);
+    // עריכת טרייד
+    // מציאת הטרייד במערך - שימוש ב-window.tradesData (גלובלי) ולא tradesData (מקומי)
+    const trade = window.tradesData?.find(t => t.id === tradeId || t.id === parseInt(tradeId));
+    if (trade) {
+      // Use ModalManagerV2 directly
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('tradesModal', 'trade', trade.id);
+      } else {
+        window.Logger?.error('ModalManagerV2 לא זמין', { page: "trades" });
+        // Fallback: try to load trade data directly from API
+        if (window.EntityDetailsAPI && typeof window.EntityDetailsAPI.getEntityDetails === 'function') {
+          window.EntityDetailsAPI.getEntityDetails('trade', tradeId).then(entityData => {
+            if (entityData && window.ModalManagerV2) {
+              window.ModalManagerV2.showModal('tradesModal', 'edit', entityData);
+            }
+          }).catch(err => {
+            window.Logger?.error('Failed to load trade data for edit', { error: err, tradeId, page: "trades" });
+            window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני הטרייד');
+          });
+        }
+      }
     } else {
-      window.Logger?.error('ModalManagerV2 לא זמין', { page: "trades" });
-    }
-  } else {
-    if (typeof handleElementNotFound === 'function') {
-      handleElementNotFound('trade', 'CRITICAL');
-    } else {
-        // window.Logger.error('trade not found', { page: "trades" });
-    }
-    window.showErrorNotification('שגיאה', 'טרייד לא נמצא', 6000, 'system');
+      // Try to load trade data directly from API if not found locally
+      if (window.EntityDetailsAPI && typeof window.EntityDetailsAPI.getEntityDetails === 'function') {
+        window.Logger?.info('Trade not found locally, loading from API...', { tradeId, page: "trades" });
+        window.EntityDetailsAPI.getEntityDetails('trade', tradeId).then(entityData => {
+          if (entityData && window.ModalManagerV2) {
+            window.ModalManagerV2.showModal('tradesModal', 'edit', entityData);
+          } else {
+            window.showErrorNotification('שגיאה', 'טרייד לא נמצא', 6000, 'system');
+          }
+        }).catch(err => {
+          window.Logger?.error('Failed to load trade data for edit', { error: err, tradeId, page: "trades" });
+          window.showErrorNotification('שגיאה', 'טרייד לא נמצא', 6000, 'system');
+        });
+      } else {
+        if (typeof handleElementNotFound === 'function') {
+          handleElementNotFound('trade', 'CRITICAL');
+        }
+        window.showErrorNotification('שגיאה', 'טרייד לא נמצא', 6000, 'system');
+      }
     }
   } catch (error) {
     window.Logger.error('Error in editTradeRecord:', error, { tradeId, page: "trades" });
@@ -1211,6 +1243,70 @@ function addEditReminder() {
 /**
  * פונקציה להצגת מודל עריכת טרייד
  */
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('trades', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('trades');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for HTML onclick attributes
@@ -3276,4 +3372,37 @@ window.showEditTradeModal = function(tradeId) {
 window.saveTrade = saveTrade;
 window.deleteTrade = deleteTrade;
 window.performTradeDeletion = performTradeDeletion;
+
+/**
+ * Register trades table with UnifiedTableSystem
+ * This function registers the trades table for unified sorting and filtering
+ */
+window.registerTradesTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "trades" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register trades table
+    window.UnifiedTableSystem.registry.register('trades', {
+        dataGetter: () => {
+            return window.tradesData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateTradesTable === 'function') {
+                window.updateTradesTable(data);
+            }
+        },
+        tableSelector: '#tradesTable',
+        columns: getColumns('trades'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};
 

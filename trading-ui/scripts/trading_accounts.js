@@ -214,6 +214,9 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
       countElement.textContent = `${filteredTradingAccounts.length} חשבונות מסחר`;
     }
 
+    // Restore page state (filters, sort, sections, entity filters)
+    await restorePageState('trading_accounts');
+
     window.Logger.info('✅ loadTradingAccountsDataForTradingAccountsPage הושלם בהצלחה', { page: "trading_accounts" });
 
   } catch (error) {
@@ -2183,13 +2186,18 @@ async function saveTradingAccount() {
             throw new Error('Trading Account form not found');
         }
         
+        // Collect form data including hidden ID field (added in edit mode)
         const accountData = DataCollectionService.collectFormData({
+            id: { id: 'tradingAccountId', type: 'text' }, // Hidden ID field added in edit mode
             name: { id: 'accountName', type: 'text' },
             currency_id: { id: 'accountCurrency', type: 'int' }, // currency_id הוא integer - ID של מטבע
             opening_balance: { id: 'accountOpeningBalance', type: 'float', default: 0 },
             status: { id: 'accountStatus', type: 'text' },
             notes: { id: 'accountNotes', type: 'rich-text', default: null }
         });
+        
+        const accountId = accountData.id ? parseInt(accountData.id) : null;
+        const isEdit = !!accountId;
         
         // ולידציה מפורטת
         let hasErrors = false;
@@ -2234,17 +2242,13 @@ async function saveTradingAccount() {
             return;
         }
         
-        // Determine if this is add or edit
-        const formMode = form.dataset.modalMode || form.dataset.mode;
-        const isEdit = formMode === 'edit';
-        const accountId = form.dataset.accountId || form.dataset.entityId;
-        if (isEdit && !accountId) {
-            throw new Error('Missing trading account ID for update operation');
-        }
+        // In edit mode, preserve the original currency_id (cannot be changed)
         if (isEdit) {
-            const originalCurrencyId = form.dataset.originalCurrencyId;
-            if (originalCurrencyId) {
-                accountData.currency_id = parseInt(originalCurrencyId, 10);
+            // Get original account data to preserve currency_id
+            const originalAccount = (window.trading_accountsData || []).find(acc => acc.id === accountId);
+            if (originalAccount && originalAccount.currency_id) {
+                accountData.currency_id = parseInt(originalAccount.currency_id, 10);
+                console.log(`✅ Preserving original currency_id: ${accountData.currency_id} for account ${accountId}`);
             } else if (typeof accountData.currency_id !== 'undefined' && accountData.currency_id !== null) {
                 accountData.currency_id = parseInt(accountData.currency_id, 10);
             }
@@ -2254,13 +2258,16 @@ async function saveTradingAccount() {
         const url = isEdit ? `/api/trading-accounts/${accountId}` : '/api/trading-accounts';
         const method = isEdit ? 'PUT' : 'POST';
         
+        // Remove id from payload (not needed in API request body)
+        const { id, ...payload } = accountData;
+        
         // Send to API
         const response = await fetch(url, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(accountData)
+            body: JSON.stringify(payload)
         });
         
         // Use CRUDResponseHandler for consistent response handling
@@ -2399,6 +2406,70 @@ window.confirmDeleteTradingAccount = confirmDeleteTradingAccount;
 window.showOpenTradesWarning = showOpenTradesWarning;
 
 // ===== UNIFIED TABLE SYSTEM REGISTRATION =====
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('trading_accounts', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('trading_accounts');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
 /**
  * Register trading_accounts page tables with UnifiedTableSystem
  * This should be called after all scripts are loaded

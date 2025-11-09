@@ -137,6 +137,14 @@ window.loadNotesData = async function() {
     if (countElement) {
       countElement.textContent = `${window.notesData.length} הערות`;
     }
+    
+    // Register table with UnifiedTableSystem after data is loaded
+    if (typeof window.registerNotesTables === 'function') {
+      window.registerNotesTables();
+    }
+
+    // Restore page state (filters, sort, sections, entity filters)
+    await restorePageState('notes');
 
     window.Logger.info('✅ loadNotesData הושלם בהצלחה', { page: "notes" });
 
@@ -2257,6 +2265,103 @@ function replaceCurrentAttachment() {
 window.editNote = editNote;
 // Note: deleteNote and saveNote removed - using ModalManagerV2 and confirmDeleteNote instead
 // REMOVED: window.viewLinkedItems - use window.viewLinkedItems or window.viewLinkedItemsForNote from linked-items.js instead
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('notes', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('notes');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register notes table with UnifiedTableSystem
+ * This function registers the notes table for unified sorting and filtering
+ */
+window.registerNotesTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "notes" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register notes table
+    window.UnifiedTableSystem.registry.register('notes', {
+        dataGetter: () => {
+            return window.notesData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateNotesTable === 'function') {
+                window.updateNotesTable(data);
+            }
+        },
+        tableSelector: '#notesTable',
+        columns: getColumns('notes'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};
 window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (שורה 2240)', { page: "notes" });
 // ייצוא ישיר של הפונקציה המקורית - ללא wrapper כדי למנוע רקורסיה
 window.updateNotesTable = updateNotesTable;

@@ -2072,6 +2072,14 @@ async function loadTradePlansData() {
 
       // Update the table
       updateTradePlansTable(data);
+      
+      // Register table with UnifiedTableSystem after data is loaded
+      if (typeof window.registerTradePlansTables === 'function') {
+        window.registerTradePlansTables();
+      }
+
+      // Restore page state (filters, sort, sections, entity filters)
+      await restorePageState('trade_plans');
 
       return data;
     } else {
@@ -2101,6 +2109,14 @@ async function loadTradePlansData() {
       // Update the table
       window.Logger.info(`🔄 Updating table with ${data.length} trade plans...`, { page: "trade_plans" });
       updateTradePlansTable(data);
+      
+      // Register table with UnifiedTableSystem after data is loaded
+      if (typeof window.registerTradePlansTables === 'function') {
+        window.registerTradePlansTables();
+      }
+
+      // Restore page state (filters, sort, sections, entity filters)
+      await restorePageState('trade_plans');
       
       window.Logger.info(`✅ Loaded ${data.length} trade plans`, { page: "trade_plans" });
       return data;
@@ -3293,3 +3309,100 @@ async function performTradePlanDeletion(tradePlanId) {
 // Note: saveTradePlan already exported above
 window.loadTradePlanTickerInfo = loadTradePlanTickerInfo;
 window.displayTradePlanTickerInfo = displayTradePlanTickerInfo;
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('trade_plans', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('trade_plans');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register trade_plans table with UnifiedTableSystem
+ * This function registers the trade_plans table for unified sorting and filtering
+ */
+window.registerTradePlansTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "trade_plans" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register trade_plans table
+    window.UnifiedTableSystem.registry.register('trade_plans', {
+        dataGetter: () => {
+            return window.tradePlansData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateTradePlansTable === 'function') {
+                window.updateTradePlansTable(data);
+            }
+        },
+        tableSelector: '#trade_plansTable',
+        columns: getColumns('trade_plans'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};

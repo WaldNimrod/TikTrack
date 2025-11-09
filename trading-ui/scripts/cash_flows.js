@@ -147,6 +147,14 @@ async function loadCashFlowsData() {
     // עדכון הסטטיסטיקות
     updatePageSummaryStats();
     
+    // Register table with UnifiedTableSystem after data is loaded
+    if (typeof window.registerCashFlowsTables === 'function') {
+      window.registerCashFlowsTables();
+    }
+
+    // Restore page state (filters, sort, sections, entity filters)
+    await restorePageState('cash_flows');
+    
     console.log('✅ loadCashFlowsData: Loaded', data.length, 'cash flows');
     window.Logger.info(`✅ Loaded ${data.length} cash flows`, { page: 'cash_flows' });
   } catch (error) {
@@ -2633,3 +2641,100 @@ window.initializeExternalIdFields = initializeExternalIdFields;
 window.manageExternalIdField = manageExternalIdField;
 
 window.Logger.info('Cash Flows: All functions exported to global scope', { page: 'cash_flows' });
+
+/**
+ * Restore page state (filters, sort, sections, entity filters)
+ * @param {string} pageName - Page name
+ * @returns {Promise<void>}
+ */
+async function restorePageState(pageName) {
+  try {
+    // אתחול PageStateManager אם לא מאותחל
+    if (window.PageStateManager && !window.PageStateManager.initialized) {
+      await window.PageStateManager.initialize();
+    }
+
+    if (!window.PageStateManager || !window.PageStateManager.initialized) {
+      if (window.Logger) {
+        window.Logger.warn('⚠️ PageStateManager not available, skipping state restoration', { page: pageName });
+      }
+      return;
+    }
+
+    // מיגרציה של נתונים קיימים אם יש
+    await window.PageStateManager.migrateLegacyData(pageName);
+
+    // טעינת מצב מלא
+    const pageState = await window.PageStateManager.loadPageState(pageName);
+    if (!pageState) {
+      return; // אין מצב שמור
+    }
+
+    // שחזור פילטרים ראשיים
+    if (pageState.filters && window.filterSystem) {
+      window.filterSystem.currentFilters = { ...window.filterSystem.currentFilters, ...pageState.filters };
+      if (window.filterSystem.applyAllFilters) {
+        window.filterSystem.applyAllFilters();
+      }
+    }
+
+    // שחזור סידור
+    if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      const { columnIndex, direction } = pageState.sort;
+      if (typeof columnIndex === 'number' && columnIndex >= 0) {
+        await window.UnifiedTableSystem.sorter.sort('cash_flows', columnIndex);
+      }
+    } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
+      // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('cash_flows');
+    }
+
+    // שחזור סקשנים
+    if (pageState.sections && typeof window.restoreAllSectionStates === 'function') {
+      await window.restoreAllSectionStates();
+    }
+
+    // שחזור פילטרים פנימיים (entity filters) - מתבצע אוטומטית ב-entity-details-renderer
+
+    if (window.Logger) {
+      window.Logger.debug(`✅ Page state restored for "${pageName}"`, { page: pageName });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error(`❌ Error restoring page state for "${pageName}":`, error, { page: pageName });
+    }
+  }
+}
+
+/**
+ * Register cash_flows table with UnifiedTableSystem
+ * This function registers the cash_flows table for unified sorting and filtering
+ */
+window.registerCashFlowsTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "cash_flows" });
+        return;
+    }
+
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
+
+    // Register cash_flows table
+    window.UnifiedTableSystem.registry.register('cash_flows', {
+        dataGetter: () => {
+            return window.cashFlowsData || [];
+        },
+        updateFunction: (data) => {
+            if (typeof window.updateCashFlowsTable === 'function') {
+                window.updateCashFlowsTable(data);
+            }
+        },
+        tableSelector: '#cashFlowsTable',
+        columns: getColumns('cash_flows'),
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+    });
+};

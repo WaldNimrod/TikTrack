@@ -70,6 +70,46 @@
  * ========================================
  */
 
+// Ensure Logger fallback until logger-service.js initializes
+const __cacheManagerNoop = () => {};
+const __cacheManagerConsole = (typeof window !== 'undefined' && window.console) ? window.console : null;
+
+if (typeof window !== 'undefined') {
+    if (!window.Logger) {
+        window.Logger = {};
+    }
+
+    window.Logger.info = (typeof window.Logger.info === 'function')
+        ? window.Logger.info
+        : (__cacheManagerConsole && typeof __cacheManagerConsole.info === 'function'
+            ? __cacheManagerConsole.info.bind(__cacheManagerConsole)
+            : __cacheManagerNoop);
+
+    window.Logger.warn = (typeof window.Logger.warn === 'function')
+        ? window.Logger.warn
+        : (__cacheManagerConsole && typeof __cacheManagerConsole.warn === 'function'
+            ? __cacheManagerConsole.warn.bind(__cacheManagerConsole)
+            : __cacheManagerNoop);
+
+    window.Logger.error = (typeof window.Logger.error === 'function')
+        ? window.Logger.error
+        : (__cacheManagerConsole && typeof __cacheManagerConsole.error === 'function'
+            ? __cacheManagerConsole.error.bind(__cacheManagerConsole)
+            : __cacheManagerNoop);
+
+    window.Logger.debug = (typeof window.Logger.debug === 'function')
+        ? window.Logger.debug
+        : (__cacheManagerConsole && typeof __cacheManagerConsole.debug === 'function'
+            ? __cacheManagerConsole.debug.bind(__cacheManagerConsole)
+            : __cacheManagerNoop);
+
+    window.Logger.critical = (typeof window.Logger.critical === 'function')
+        ? window.Logger.critical
+        : (__cacheManagerConsole && typeof __cacheManagerConsole.error === 'function'
+            ? __cacheManagerConsole.error.bind(__cacheManagerConsole)
+            : __cacheManagerNoop);
+}
+
 // Cache Dependencies Configuration
 const CACHE_DEPENDENCIES = {
     // User Level

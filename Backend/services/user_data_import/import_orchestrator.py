@@ -228,6 +228,39 @@ class ImportOrchestrator:
                 'success': False,
                 'error': str(e)
             }
+
+    def _resolve_datetime(self, value: Any) -> Optional[datetime]:
+        """
+        Normalize date/time values (DateEnvelope, ISO string, datetime) to a datetime object.
+        """
+        if value is None:
+            return None
+
+        if isinstance(value, datetime):
+            return value
+
+        if isinstance(value, str):
+            cleaned = value.replace('Z', '+00:00')
+            try:
+                return datetime.fromisoformat(cleaned)
+            except ValueError:
+                try:
+                    return datetime.strptime(cleaned, '%Y-%m-%d')
+                except ValueError:
+                    return None
+
+        if isinstance(value, dict):
+            for key in ('utc', 'iso', 'value'):
+                if value.get(key):
+                    resolved = self._resolve_datetime(value[key])
+                    if resolved:
+                        return resolved
+            if value.get('local'):
+                resolved = self._resolve_datetime(value['local'])
+                if resolved:
+                    return resolved
+
+        return None
     
     def analyze_file(self, session_id: int) -> Dict[str, Any]:
         """
@@ -713,12 +746,10 @@ class ImportOrchestrator:
                     from models.execution import Execution
                     
                     # Convert date string to datetime object
-                    date_str = execution_data.get('date')
-                    if isinstance(date_str, str):
-                        from datetime import datetime as dt
-                        execution_date = dt.fromisoformat(date_str.replace('Z', '+00:00'))
-                    else:
-                        execution_date = date_str
+                    date_value = execution_data.get('date')
+                    execution_date = self._resolve_datetime(date_value)
+                    if not execution_date:
+                        raise ValueError(f"Invalid execution date: {date_value}")
                     
                     # Generate unique execution ID: filename + timestamp + original external_id
                     import_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')

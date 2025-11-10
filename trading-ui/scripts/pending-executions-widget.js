@@ -148,11 +148,14 @@
 
             const FieldRenderer = window.FieldRendererService;
 
-            const executionLink = FieldRenderer?.renderLinkedEntity('execution', execution.id, `#${execution.id}`, { short: true }) || `#${execution.id || '-'}`;
+            const executionBadge = '<span class="badge bg-light text-body">ביצוע</span>';
             const tickerLink = FieldRenderer?.renderLinkedEntity('ticker', execution.ticker_id, execution.ticker_symbol, { short: true }) || execution.ticker_symbol || '-';
             const actionBadge = FieldRenderer?.renderAction?.(execution.action) || `<span class="badge bg-secondary">${execution.action || '-'}</span>`;
             const quantityDisplay = FieldRenderer?.renderShares?.(execution.quantity) || `<span class="text-muted">${execution.quantity ?? '-'}</span>`;
             const executionDate = FieldRenderer?.renderExecutionDate?.(execution.date) || (FieldRenderer?.renderDate?.(execution.date, true) || '-');
+            const executionPrice = typeof FieldRenderer?.renderAmount === 'function'
+                ? FieldRenderer.renderAmount(execution.price, '$', 2, false)
+                : (execution.price ? `<span class="text-muted">$${parseFloat(execution.price).toFixed(2)}</span>` : '<span class="text-muted">-</span>');
             const sharedAccount = execution.trading_account_id || primarySuggestion?.trading_account_id
                 ? FieldRenderer?.renderLinkedEntity(
                     'trading_account',
@@ -164,7 +167,7 @@
                     ? `<span class="badge rounded-pill bg-body-secondary text-body">${execution.account_name || primarySuggestion?.account_name}</span>`
                     : '');
             const sharedTickerRow = `
-                <div class="d-flex align-items-center flex-wrap gap-3 text-muted small">
+                <div class="d-flex align-items-center flex-wrap gap-2 text-muted small flex-grow-1">
                     <div class="d-flex align-items-center gap-2">
                         <span class="entity-icon-circle">
                             <img src="images/icons/tickers.svg" alt="טיקר" />
@@ -180,9 +183,7 @@
                 </div>
             `;
 
-            const tradeLink = primarySuggestion
-                ? (FieldRenderer?.renderLinkedEntity('trade', primarySuggestion.trade_id, `#${primarySuggestion.trade_id}`, { short: true }) || `#${primarySuggestion.trade_id}`)
-                : '<span class="text-muted">אין טרייד מוצע</span>';
+            const tradeBadge = '<span class="badge bg-light text-body">טרייד</span>';
 
             const tradeStatus = primarySuggestion && FieldRenderer?.renderStatus
                 ? FieldRenderer.renderStatus(primarySuggestion.status, 'trade')
@@ -211,54 +212,92 @@
 
             const itemIdAttr = execution.id ? `data-execution-id="${execution.id}"` : '';
 
-            return `
-                <li class="list-group-item pending-highlight-item" ${itemIdAttr}>
+            const topRow = `
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
                     ${sharedTickerRow}
-                    <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
-                        <div class="d-flex flex-column gap-1">
-                            <div class="d-flex align-items-center flex-wrap gap-2">
-                                ${executionLink}
-                                ${actionBadge}
-                                ${quantityDisplay}
-                            </div>
-                            <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
-                                <span>${executionDate}</span>
-                            </div>
+                    <div class="d-flex flex-column align-items-end gap-2">
+                        <div class="d-flex flex-column align-items-end gap-1">
+                            ${scoreBadge}
+                            ${additionalText}
                         </div>
-                        <div class="d-flex flex-column align-items-end gap-2">
-                            <div class="d-flex flex-column align-items-end gap-1">
-                                ${scoreBadge}
-                                ${additionalText}
+                        <div class="d-flex flex-wrap gap-2 justify-content-end">
+                            <button
+                                data-button-type="APPROVE"
+                                data-variant="small"
+                                data-classes="btn btn-sm btn-outline-success table-btn-small"
+                                data-text="אשר שיוך"
+                                data-onclick="PendingExecutionsHighlights.acceptSuggestion(${execution.id}, ${primarySuggestion?.trade_id || 'null'})"
+                                ${primarySuggestion ? '' : 'disabled'}
+                            ></button>
+                            <button
+                                data-button-type="REJECT"
+                                data-variant="small"
+                                data-classes="btn btn-sm btn-outline-danger table-btn-small"
+                                data-text="דחה"
+                                data-onclick="PendingExecutionsHighlights.rejectSuggestion(${execution.id})"
+                            ></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const executionDetails = `
+                <div class="col-12 col-md-6">
+                    <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2 h-100 cursor-pointer" role="button" tabindex="0"
+                        onclick="PendingExecutionsHighlights.openExecutionDetails(${execution.id})"
+                        onkeypress="if(event.key==='Enter'){PendingExecutionsHighlights.openExecutionDetails(${execution.id});}">
+                        <div class="fw-semibold text-muted">פרטי ביצוע</div>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            ${executionBadge}
+                            ${actionBadge}
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            ${quantityDisplay}
+                            ${executionPrice}
+                        </div>
+                        <div class="text-muted small">
+                            ${executionDate}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const tradeDetails = primarySuggestion
+                ? `
+                    <div class="col-12 col-md-6">
+                        <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2 h-100 cursor-pointer" role="button" tabindex="0"
+                            onclick="PendingExecutionsHighlights.openTradeDetails(${primarySuggestion.trade_id})"
+                            onkeypress="if(event.key==='Enter'){PendingExecutionsHighlights.openTradeDetails(${primarySuggestion.trade_id});}">
+                            <div class="fw-semibold text-muted">פרטי טרייד</div>
+                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                ${tradeBadge}
+                                ${tradeStatus}
                             </div>
-                            <div class="d-flex flex-wrap gap-2 justify-content-end">
-                                <button
-                                    data-button-type="APPROVE"
-                                    data-variant="small"
-                                    data-classes="btn btn-sm btn-outline-success table-btn-small"
-                                    data-text="אשר שיוך"
-                                    data-onclick="PendingExecutionsHighlights.acceptSuggestion(${execution.id}, ${primarySuggestion?.trade_id || 'null'})"
-                                    ${primarySuggestion ? '' : 'disabled'}
-                                ></button>
-                                <button
-                                    data-button-type="REJECT"
-                                    data-variant="small"
-                                    data-classes="btn btn-sm btn-outline-danger table-btn-small"
-                                    data-text="דחה"
-                                    data-onclick="PendingExecutionsHighlights.rejectSuggestion(${execution.id})"
-                                ></button>
+                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                ${tradeSide}
+                                ${investmentType}
+                            </div>
+                            <div class="text-muted small">
+                                ${tradeDate}
                             </div>
                         </div>
                     </div>
-                    <div class="bg-body-tertiary rounded-3 mt-3 p-3 d-flex flex-column gap-2">
-                        <div class="d-flex align-items-center flex-wrap gap-2">
-                            ${tradeLink}
-                            ${tradeStatus}
-                            ${tradeSide}
-                            ${investmentType}
+                `
+                : `
+                    <div class="col-12 col-md-6">
+                        <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2 h-100">
+                            <div class="fw-semibold text-muted">פרטי טרייד</div>
+                            <span class="text-muted">אין טרייד מומלץ</span>
                         </div>
-                        <div class="d-flex align-items-center flex-wrap gap-2 text-muted small">
-                            <span>${tradeDate}</span>
-                        </div>
+                    </div>
+                `;
+
+            return `
+                <li class="list-group-item pending-highlight-item" ${itemIdAttr}>
+                    ${topRow}
+                    <div class="row g-2 mt-2 align-items-stretch">
+                        ${executionDetails}
+                        ${tradeDetails}
                     </div>
                 </li>
             `;
@@ -399,3 +438,4 @@
 
     window.Logger?.info('📊 Pending Executions Highlights script loaded', { page: 'index' });
 })();
+

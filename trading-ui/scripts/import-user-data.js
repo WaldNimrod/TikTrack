@@ -26,6 +26,13 @@ let previewData = null;
 let currencyCacheByCode = null;
 let tickersModalConfigPromise = null;
 
+function getApiErrorMessage(response, fallback = 'שגיאה לא ידועה') {
+    if (!response || typeof response !== 'object') {
+        return fallback;
+    }
+    return response.error || response.message || response.detail || response.details || fallback;
+}
+
 function renderImportDate(value, fallback = '') {
     try {
         if (typeof window.dateUtils?.ensureDateEnvelope === 'function') {
@@ -1516,28 +1523,193 @@ function displayAnalysisResults(results) {
 /**
  * Load problem resolution
  */
-function loadProblemResolution() {
+function toArray(value) {
+    if (value === undefined || value === null) {
+        return [];
+    }
+    return Array.isArray(value) ? value : [value];
+}
+
+function buildProblemResolutionFromAnalysis(results) {
+    if (!results) {
+        return null;
+    }
+
+    const summary = {
+        total_records: results.total_records || 0,
+        records_to_import: results.clean_records || 0,
+        records_to_skip: (results.invalid_records || 0) + (results.duplicate_records || 0) + (results.existing_records || 0),
+        import_rate: results.total_records ? Math.round(((results.clean_records || 0) / results.total_records) * 100) : 0,
+        missing_tickers: toArray(results.missing_tickers),
+        duplicate_records: results.duplicate_records || 0,
+        existing_records: results.existing_records || 0
+    };
+
+    const records_to_skip = [];
+    const duplicateDetails = results.duplicate_details || {};
+
+    toArray(duplicateDetails.within_file_duplicates).forEach((duplicate) => {
+        if (!duplicate || !duplicate.record) {
+            return;
+        }
+        records_to_skip.push({
+            record: duplicate.record,
+            reason: 'within_file_duplicate',
+            confidence_score: duplicate.confidence || duplicate.confidence_score || 0,
+            details: duplicate
+        });
+
+        toArray(duplicate.within_file_matches).forEach((match) => {
+            if (!match || !match.record) {
+                return;
+            }
+            records_to_skip.push({
+                record: match.record,
+                reason: 'within_file_duplicate_match',
+                confidence_score: match.confidence || match.confidence_score || 0,
+                details: match
+            });
+        });
+    });
+
+    toArray(duplicateDetails.existing_records).forEach((existing) => {
+        if (!existing || !existing.record) {
+            return;
+        }
+        records_to_skip.push({
+            record: existing.record,
+            reason: 'existing_record',
+            matches: existing.system_matches || existing.matches || []
+        });
+    });
+
+    toArray(results.validation_errors).forEach((validationError) => {
+        if (!validationError || !validationError.record) {
+            return;
+        }
+        records_to_skip.push({
+            record: validationError.record,
+            reason: 'validation_error',
+            details: validationError.errors || []
+        });
+    });
+
+    const missingTickerSymbols = summary.missing_tickers
+        .map((ticker) => (typeof ticker === 'string' ? ticker : ticker?.symbol))
+        .filter(Boolean);
+
+    toArray(results.valid_records).forEach((record) => {
+        if (record && record.symbol && missingTickerSymbols.includes(record.symbol)) {
+            records_to_skip.push({
+                record,
+                reason: 'missing_ticker',
+                missing_ticker: record.symbol
+            });
+        }
+    });
+
+    return {
+        summary,
+        records_to_skip
+    };
+}
+
+function buildPreviewFromAnalysis(results) {
+    if (!results) {
+        return null;
+    }
+
+    const problemData = buildProblemResolutionFromAnalysis(results);
+    if (!problemData) {
+        return null;
+    }
+
+    const duplicateDetails = results.duplicate_details || {};
+    const missingTickerSymbols = problemData.summary.missing_tickers
+        .map((ticker) => (typeof ticker === 'string' ? ticker : ticker?.symbol))
+        .filter(Boolean);
+
+    const cleanRecords = toArray(duplicateDetails.clean_records)
+        .map((entry) => (entry && entry.record ? entry.record : entry))
+        .filter(Boolean)
+        .filter((record) => !missingTickerSymbols.includes(record.symbol));
+
+    const records_to_import = cleanRecords.map((record) => ({
+        symbol: record.symbol || record.ticker || 'N/A',
+        action: record.action || record.type || 'N/A',
+        quantity: record.quantity ?? record.shares ?? null,
+        price: record.price ?? null,
+        fee: record.fee ?? record.commission ?? null,
+        date: record.date,
+        realized_pl: record.realized_pl,
+        mtm_pl: record.mtm_pl,
+        external_id: record.external_id
+    }));
+
+    const records_to_skip = problemData.records_to_skip.map((item) => ({
+        ...item,
+        reason: item.reason || 'unknown'
+    }));
+
+    const total_records = results.total_records || (records_to_import.length + records_to_skip.length);
+    const summary = {
+        ...problemData.summary,
+        total_records,
+        records_to_import: records_to_import.length,
+        records_to_skip: records_to_skip.length,
+        import_rate: total_records > 0 ? Math.round((records_to_import.length / total_records) * 100) : 0
+    };
+
+    return {
+        records_to_import,
+        records_to_skip,
+        summary
+    };
+}
+
+async function loadProblemResolution() {
     if (!currentSessionId) {
         showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
         return;
     }
-    
-    fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
-        method: 'GET'
-    })
-    .then(response => response.json())
-    .then(data => {
+
+    const analysisFallback = buildProblemResolutionFromAnalysis(analysisResults);
+
+    try {
+        const response = await fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
+            method: 'GET'
+        });
+        const data = await response.json();
+
         if (data.success || data.status === 'success') {
             previewData = data.preview_data;
             displayProblemResolutionDetailed(data.preview_data);
-    } else {
-            showImportUserDataNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
+            return;
         }
-    })
-    .catch(error => {
-        window.Logger.error('Problem resolution error:', error);
-        showImportUserDataNotification('שגיאה בטעינת נתוני בעיות', 'error');
-    });
+
+        window.Logger.warn('[Import Modal] Preview data unavailable, falling back to analysis results', {
+            status: data.status,
+            error: data.error || data.message,
+            page: 'import-user-data'
+        });
+        showImportUserDataNotification('לא ניתן לטעון את נתוני הפתרון המלאים. מוצגים נתוני ניתוח זמניים.', 'warning');
+    } catch (error) {
+        window.Logger.error('Problem resolution fetch error - using analysis fallback', {
+            error: error.message,
+            page: 'import-user-data'
+        });
+        showImportUserDataNotification('שגיאה בטעינת נתוני פתרון. מוצגים נתוני ניתוח זמניים.', 'warning');
+    }
+
+    if (analysisFallback) {
+        displayProblemResolutionDetailed({
+            summary: analysisFallback.summary,
+            records_to_skip: analysisFallback.records_to_skip,
+            records_to_import: []
+        });
+    } else {
+        showImportUserDataNotification('לא נמצאו נתוני ניתוח להצגה.', 'error');
+    }
 }
 
 /**
@@ -1658,15 +1830,38 @@ function loadPreviewData() {
             });
         } else {
             window.Logger.error('[Import Modal] Failed to load preview data', { 
-                error: data.error, 
+                error: data.error || data.message, 
                 page: 'import-user-data' 
             });
-            showImportUserDataNotification(`שגיאה בטעינת תצוגה מקדימה: ${data.error}`, 'error');
+            const apiMessage = getApiErrorMessage(data, 'שגיאה לא ידועה בתצוגה מקדימה');
+            showImportUserDataNotification(`שגיאה בטעינת תצוגה מקדימה: ${apiMessage}`, 'warning');
+            const analysisFallback = buildPreviewFromAnalysis(analysisResults);
+            if (analysisFallback) {
+                previewData = analysisFallback;
+                displayPreviewData(analysisFallback);
+                displayConfirmationData(analysisResults, analysisFallback);
+                window.Logger.warn('[Import Modal] Using analysis-based preview fallback', {
+                    page: 'import-user-data'
+                });
+            } else {
+                showImportUserDataNotification('לא נמצאו נתוני ניתוח להצגה בתצוגה מקדימה.', 'error');
+            }
         }
     })
     .catch(error => {
         window.Logger.error('[Import Modal] Preview data error:', error);
-        showImportUserDataNotification('שגיאה בטעינת תצוגה מקדימה', 'error');
+        showImportUserDataNotification('שגיאה בטעינת תצוגה מקדימה', 'warning');
+        const analysisFallback = buildPreviewFromAnalysis(analysisResults);
+        if (analysisFallback) {
+            previewData = analysisFallback;
+            displayPreviewData(analysisFallback);
+            displayConfirmationData(analysisResults, analysisFallback);
+            window.Logger.warn('[Import Modal] Using analysis-based preview fallback after fetch error', {
+                page: 'import-user-data'
+            });
+        } else {
+            showImportUserDataNotification('לא נמצאו נתוני ניתוח להצגה בתצוגה מקדימה.', 'error');
+        }
     });
 }
 
@@ -2181,7 +2376,8 @@ function performImport(generateReport = false) {
                 window.loadExecutionsData();
             }
     } else {
-            showImportUserDataNotification(`שגיאה בייבוא: ${data.error}`, 'error');
+            const apiMessage = getApiErrorMessage(data, 'שגיאה לא ידועה בייבוא');
+            showImportUserDataNotification(`שגיאה בייבוא: ${apiMessage}`, 'error');
         }
     })
     .catch(error => {

@@ -1713,6 +1713,28 @@ function updateTickersSummaryStats(tickers) {
  */
 function updateTickersTable(tickers) {
   try {
+    const toFiniteNumber = (value) => {
+      if (value === null || value === undefined || value === '' || value === 'N/A') {
+        return null;
+      }
+      const numericValue = typeof value === 'number' ? value : parseFloat(value);
+      return Number.isFinite(numericValue) ? numericValue : null;
+    };
+    const parseValidDate = (value) => {
+      if (!value) {
+        return null;
+      }
+      if (value instanceof Date) {
+        return Number.isNaN(value.getTime()) ? null : value;
+      }
+      if (typeof value === 'object') {
+        const nestedCandidate = value.local || value.utc || value.iso || value.timestamp;
+        return parseValidDate(nestedCandidate);
+      }
+      const candidate = new Date(value);
+      return Number.isNaN(candidate.getTime()) ? null : candidate;
+    };
+
     // מציאת ה-tbody
     let tbody = document.querySelector('table[data-table-type="tickers"] tbody');
 
@@ -1739,6 +1761,20 @@ function updateTickersTable(tickers) {
 
       // קבלת סמל מטבע
       const currencySymbol = getCurrencySymbol(ticker.currency_id);
+      const priceValue = toFiniteNumber(ticker.current_price);
+      const changePercentValue = toFiniteNumber(ticker.change_percent);
+      const volumeValue = toFiniteNumber(ticker.volume);
+      const updatedAtDate = parseValidDate(ticker.yahoo_updated_at);
+
+      const priceHtml = (typeof window.renderAmount === 'function' && priceValue !== null)
+        ? window.renderAmount(priceValue, currencySymbol, 2, false)
+        : (priceValue !== null ? `${currencySymbol || ''}${priceValue.toFixed(2)}` : 'N/A');
+
+      const changePercentHtml = (typeof window.renderNumericValue === 'function' && changePercentValue !== null)
+        ? window.renderNumericValue(changePercentValue, '%', true)
+        : (changePercentValue !== null
+            ? `${changePercentValue >= 0 ? '+' : ''}${changePercentValue.toFixed(2)}%`
+            : 'N/A');
 
       // קבלת עיצוב סוג טיקר
       const typeStyle = getTickerTypeStyle(ticker.type);
@@ -1747,32 +1783,20 @@ function updateTickersTable(tickers) {
       // קבלת עיצוב סטטוס
       const statusStyle = getTickerStatusStyle(ticker.status);
       const statusLabel = getTickerStatusLabel(ticker.status);
+      const statusHtml = (typeof window.renderStatus === 'function')
+        ? window.renderStatus(ticker.status, 'ticker')
+        : `<span class="status-badge entity-badge-base" style="background-color: ${statusStyle.backgroundColor}; color: ${statusStyle.color};">
+              ${statusLabel}
+           </span>`;
 
       // נתוני מחירים מהשירות החיצוני
-      const currentPrice = ticker.current_price || 'N/A';
-      const changePercent = ticker.change_percent || 0;
-      const volume = ticker.volume || 'N/A';
-      const updatedAtDisplay = ticker.yahoo_updated_at || 'N/A';
-      
-      // לוגים לדיבוג
-      if (ticker.symbol === 'AAPL') {
-        window.Logger.debug(`🔍 Debug AAPL:`, {
-          current_price: ticker.current_price,
-          change_percent: ticker.change_percent,
-          volume: ticker.volume,
-          yahoo_updated_at: ticker.yahoo_updated_at
-        }, { page: "tickers" });
-      }
-
-      // עיצוב שינוי אחוזים
-      const changeColor = changePercent >= 0 ? '#28a745' : '#dc3545';
-      const changeSign = changePercent >= 0 ? '+' : '';
-      const changeDisplay = (changePercent !== 'N/A' && changePercent !== null && changePercent !== undefined) ?
-        `${changeSign}${changePercent.toFixed(2)}%` : 'N/A';
-      
-      // עיגול מחיר לעד 2 ספרות אחרי הנקודה
-      const formattedPrice = (currentPrice !== 'N/A' && currentPrice !== null && currentPrice !== undefined) ?
-        `$${parseFloat(currentPrice).toFixed(2)}` : 'N/A';
+      const updatedAtDisplay = updatedAtDate ? updatedAtDate.toLocaleString('he-IL') : 'N/A';
+      const updatedAtIso = updatedAtDate ? updatedAtDate.toISOString().split('T')[0] : '';
+      const updatedAtCellContent = updatedAtDate
+        ? (typeof window.renderDate === 'function'
+            ? window.renderDate(updatedAtDate, true)
+            : `${updatedAtDate.toLocaleDateString('he-IL')} ${updatedAtDate.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}`)
+        : 'N/A';
 
       return `
                 <tr>
@@ -1783,13 +1807,17 @@ function updateTickersTable(tickers) {
                             <strong>${ticker.symbol || 'N/A'}</strong>
                         </span>
                     </td>
-                    <td class="table-cell-center numeric-ltr" title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor};" dir="ltr">${formattedPrice}</td>
-                    <td class="table-cell-center numeric-ltr" title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor};" dir="ltr">${changeDisplay}</td>
-                    <td class="table-cell-center numeric-ltr" title="${volume !== 'N/A' ? `נפח: ${volume}` : 'אין נתוני נפח'}" dir="ltr">${window.renderVolume ? window.renderVolume(volume, true) : volume}</td>
+                    <td class="table-cell-center numeric-ltr" title="${priceValue !== null ? `מחיר נוכחי: ${currencySymbol || ''}${priceValue.toFixed(2)}` : 'אין נתוני מחיר'}" dir="ltr">
+                        ${priceHtml}
+                    </td>
+                    <td class="table-cell-center numeric-ltr" title="${changePercentValue !== null ? `שינוי יומי: ${changePercentValue.toFixed(2)}%` : 'אין נתוני שינוי'}" dir="ltr">
+                        ${changePercentHtml}
+                    </td>
+                    <td class="table-cell-center numeric-ltr" title="${volumeValue !== null ? `נפח: ${volumeValue.toLocaleString('he-IL')}` : 'אין נתוני נפח'}" dir="ltr">
+                        ${window.renderVolume ? window.renderVolume(volumeValue, true) : (volumeValue !== null ? volumeValue.toLocaleString('he-IL') : 'N/A')}
+                    </td>
                     <td class="status-cell" data-status="${ticker.status || ''}" title="${statusLabel}">
-                        <span class="status-badge entity-badge-base" style="background-color: ${statusStyle.backgroundColor}; color: ${statusStyle.color};">
-                            ${statusLabel}
-                        </span>
+                        ${statusHtml}
                     </td>
                     <td class="type-cell" data-type="${ticker.type || ''}" title="${typeLabel}">
                         <span class="badge-type entity-badge-base" style="background-color: ${typeStyle.backgroundColor}; color: ${typeStyle.color};">
@@ -1800,8 +1828,8 @@ function updateTickersTable(tickers) {
                     <td class="table-cell-center" title="${ticker.currency_id ? `מטבע: ${getCurrencySymbol(ticker.currency_id)}` : 'אין נתוני מטבע'}">
                         ${window.renderCurrency ? window.renderCurrency(ticker.currency_id, ticker.currency_name, getCurrencySymbol(ticker.currency_id)) : getCurrencySymbol(ticker.currency_id)}
                     </td>
-                    <td class="date-cell table-cell-center" data-date="${ticker.yahoo_updated_at ? new Date(ticker.yahoo_updated_at).toISOString().split('T')[0] : ''}" title="${ticker.yahoo_updated_at ? `עודכן: ${new Date(ticker.yahoo_updated_at).toLocaleString('he-IL')}` : 'אין נתוני עדכון'}">
-                        ${ticker.yahoo_updated_at ? (window.formatShortDate ? window.formatShortDate(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleDateString('he-IL')) + ' ' + (window.formatTimeOnly ? window.formatTimeOnly(ticker.yahoo_updated_at) : new Date(ticker.yahoo_updated_at).toLocaleTimeString('he-IL', {hour: '2-digit', minute: '2-digit'})) : 'N/A'}
+                    <td class="date-cell table-cell-center" data-date="${updatedAtIso}" title="${updatedAtDate ? `עודכן: ${updatedAtDisplay}` : 'אין נתוני עדכון'}">
+                        ${updatedAtCellContent}
                     </td>
                     <td class="actions-cell">
                         ${(() => {

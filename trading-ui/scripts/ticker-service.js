@@ -590,20 +590,50 @@ window.tickerService = {
 // ===== CRUD OPERATIONS =====
 
 function resolveFieldId(candidateIds, fallbackId) {
-  if (Array.isArray(candidateIds)) {
-    for (const candidate of candidateIds) {
-      if (candidate && document.getElementById(candidate)) {
+  const ids = Array.isArray(candidateIds) ? candidateIds : [candidateIds];
+  const activeModal =
+    document.querySelector('.modal.show') ||
+    document.getElementById('tickersModal') ||
+    null;
+
+  for (const candidate of ids) {
+    if (!candidate) {
+      continue;
+    }
+
+    const byId = document.getElementById(candidate);
+    if (byId) {
+      return candidate;
+    }
+
+    if (activeModal) {
+      const scopedById = activeModal.querySelector(`#${candidate}`);
+      if (scopedById) {
         return candidate;
       }
+
+      const scopedByName = activeModal.querySelector(`[name="${candidate}"]`);
+      if (scopedByName) {
+        if (!scopedByName.id) {
+          const generatedId = `${candidate}__resolved`;
+          scopedByName.id = document.getElementById(generatedId)
+            ? `${generatedId}_${Date.now()}`
+            : generatedId;
+        }
+        return scopedByName.id;
+      }
     }
-    return candidateIds[0] || fallbackId;
   }
 
-  if (typeof candidateIds === 'string') {
-    return candidateIds;
+  if (fallbackId) {
+    return fallbackId;
   }
 
-  return fallbackId;
+  if (Array.isArray(candidateIds) && candidateIds.length > 0) {
+    return candidateIds[0];
+  }
+
+  return undefined;
 }
 
 /**
@@ -703,7 +733,7 @@ async function saveTicker() {
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: 'addTickerModal',
+      modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
       apiUrl: '/api/tickers/',
       entityName: 'טיקר'

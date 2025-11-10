@@ -23,6 +23,52 @@ window.PaginationSystem = {
     
     // Active pagination instances
     instances: new Map(),
+
+    /**
+     * Resolve table type by table id
+     * @param {string} tableId
+     * @returns {string|null}
+     */
+    resolveTableType: function(tableId) {
+        if (!tableId || typeof document === 'undefined') {
+            return null;
+        }
+
+        const tableElement = document.getElementById(tableId);
+        if (!tableElement) {
+            return window.TableDataRegistry?.resolveTableType?.(tableId) || null;
+        }
+
+        const directType = tableElement.getAttribute('data-table-type');
+        if (directType) {
+            return directType;
+        }
+
+        const container = tableElement.closest('[data-table-type]');
+        if (container) {
+            return container.getAttribute('data-table-type');
+        }
+
+        return window.TableDataRegistry?.resolveTableType?.(tableId) || null;
+    },
+
+    /**
+     * Register table in registry when available
+     * @param {string} tableType
+     * @param {string} tableId
+     * @param {string} source
+     */
+    registerTableInRegistry: function(tableType, tableId, source = 'pagination-system') {
+        if (!window.TableDataRegistry || tableType === null) {
+            return;
+        }
+
+        window.TableDataRegistry.registerTable({
+            tableType,
+            tableId,
+            source,
+        });
+    },
     
     /**
      * יצירת instance חדש של pagination
@@ -31,6 +77,7 @@ window.PaginationSystem = {
      * @returns {Object} - instance של pagination
      */
     create: function(tableId, options = {}) {
+        const resolvedTableType = options.tableType || this.resolveTableType(tableId);
         const config = {
             tableId: tableId,
             pageSize: options.pageSize || this.defaultPageSize,
@@ -41,6 +88,10 @@ window.PaginationSystem = {
             showNavigation: options.showNavigation !== false,
             onPageChange: options.onPageChange || null,
             onPageSizeChange: options.onPageSizeChange || null,
+            onAfterRender: options.onAfterRender || null,
+            onFilteredDataChange: options.onFilteredDataChange || null,
+            useRegistry: options.useRegistry !== false,
+            tableType: resolvedTableType,
             data: options.data || [],
             currentPage: 1
         };
@@ -48,6 +99,15 @@ window.PaginationSystem = {
         const instance = new PaginationInstance(config);
         this.instances.set(tableId, instance);
         
+        if (config.useRegistry && window.TableDataRegistry) {
+            this.registerTableInRegistry(config.tableType, tableId);
+            window.TableDataRegistry.setFullData(config.tableType || tableId, config.data, { tableId });
+            window.TableDataRegistry.setFilteredData(config.tableType || tableId, config.data, {
+                tableId,
+                skipPageReset: true,
+            });
+        }
+
         return instance;
     },
     
@@ -80,6 +140,7 @@ class PaginationInstance {
         this.config = config;
         this.data = config.data || [];
         this.filteredData = [...this.data];
+        this.tableType = config.tableType || config.tableId || null;
         this.currentPage = config.currentPage || 1;
         this.pageSize = config.pageSize || 20;
         this.totalPages = 0;
@@ -106,6 +167,17 @@ class PaginationInstance {
         
         this.calculatePages();
         this.render();
+
+        if (this.config.useRegistry && window.TableDataRegistry) {
+            window.TableDataRegistry.setFullData(this.tableType || this.config.tableId, this.data, {
+                tableId: this.config.tableId,
+                resetFiltered: false,
+            });
+            window.TableDataRegistry.setFilteredData(this.tableType || this.config.tableId, this.filteredData, {
+                tableId: this.config.tableId,
+                skipPageReset: true,
+            });
+        }
     }
     
     /**
@@ -133,6 +205,18 @@ class PaginationInstance {
         const endIndex = startIndex + this.pageSize;
         return this.filteredData.slice(startIndex, endIndex);
     }
+
+    /**
+     * קבלת הנתונים המסוננים (filtered)
+     * @param {boolean} [asReference=false] - האם להחזיר רפרנס ישיר
+     * @returns {Array}
+     */
+    getFilteredData(asReference = false) {
+        if (asReference) {
+            return this.filteredData;
+        }
+        return [...this.filteredData];
+    }
     
     /**
      * עדכון נתונים
@@ -144,6 +228,19 @@ class PaginationInstance {
         this.currentPage = 1;
         this.calculatePages();
         this.render();
+
+        if (this.config.useRegistry && window.TableDataRegistry) {
+            window.TableDataRegistry.setFullData(this.tableType || this.config.tableId, this.data, {
+                tableId: this.config.tableId,
+                resetFiltered: false,
+            });
+            window.TableDataRegistry.setFilteredData(this.tableType || this.config.tableId, this.filteredData, {
+                tableId: this.config.tableId,
+                skipPageReset: true,
+            });
+        }
+
+        this.notifyFilteredDataChange();
     }
     
     /**
@@ -159,6 +256,14 @@ class PaginationInstance {
         this.currentPage = 1;
         this.calculatePages();
         this.render();
+
+        if (this.config.useRegistry && window.TableDataRegistry) {
+            window.TableDataRegistry.setFilteredData(this.tableType || this.config.tableId, this.filteredData, {
+                tableId: this.config.tableId,
+            });
+        }
+
+        this.notifyFilteredDataChange();
     }
     
     /**
@@ -229,6 +334,23 @@ class PaginationInstance {
         
         // Insert after table
         table.parentNode.insertBefore(paginationContainer, table.nextSibling);
+
+        const pageData = this.getCurrentPageData();
+
+        if (this.config.useRegistry && window.TableDataRegistry) {
+            window.TableDataRegistry.setPageData(this.tableType || this.config.tableId, pageData, {
+                tableId: this.config.tableId,
+                pageInfo: {
+                    currentPage: this.currentPage,
+                    totalPages: this.totalPages,
+                    pageSize: this.pageSize,
+                    totalItems: this.totalItems,
+                    filteredItems: this.filteredData.length,
+                },
+            });
+        }
+
+        this.notifyAfterRender(pageData);
     }
     
     /**
@@ -312,6 +434,53 @@ class PaginationInstance {
      */
     destroy() {
         this.removePagination();
+    }
+
+    /**
+     * Notify external listeners about filtered data changes
+     * @private
+     */
+    notifyFilteredDataChange() {
+        if (typeof this.config.onFilteredDataChange === 'function') {
+            try {
+                this.config.onFilteredDataChange({
+                    tableId: this.config.tableId,
+                    tableType: this.tableType,
+                    filteredData: [...this.filteredData],
+                    totalItems: this.totalItems,
+                    filteredItems: this.filteredData.length,
+                });
+            } catch (error) {
+                console.warn('PaginationInstance.onFilteredDataChange failed:', error);
+            }
+        }
+    }
+
+    /**
+     * Notify after render hook
+     * @param {Array} pageData
+     * @private
+     */
+    notifyAfterRender(pageData) {
+        if (typeof this.config.onAfterRender === 'function') {
+            try {
+                this.config.onAfterRender({
+                    tableId: this.config.tableId,
+                    tableType: this.tableType,
+                    pageData: [...pageData],
+                    filteredData: this.getFilteredData(),
+                    pagination: {
+                        currentPage: this.currentPage,
+                        totalPages: this.totalPages,
+                        pageSize: this.pageSize,
+                        totalItems: this.totalItems,
+                        filteredItems: this.filteredData.length,
+                    },
+                });
+            } catch (error) {
+                console.warn('PaginationInstance.onAfterRender failed:', error);
+            }
+        }
     }
 }
 

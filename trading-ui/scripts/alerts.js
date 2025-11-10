@@ -118,6 +118,7 @@ window.loadAlertsData = window.loadAlertsData || function() {
 // Guard to prevent multiple simultaneous calls
 let loadAlertsDataInProgress = false;
 let loadAlertsDataPromise = null;
+let alertsPaginationInstance = null;
 
 /**
  * Load alerts data from server
@@ -156,7 +157,7 @@ window.loadAlertsData = async function() {
       // עדכון הטבלה
       if (typeof window.updateAlertsTable === 'function') {
         window.Logger.info('📊 מעדכן את טבלת ההתראות', { page: "alerts" });
-        window.updateAlertsTable(window.alertsData);
+        await window.updateAlertsTable(window.alertsData);
       } else {
         window.Logger.warn('⚠️ updateAlertsTable לא זמין', { page: "alerts" });
       }
@@ -416,7 +417,7 @@ function getConditionSourceDisplay(alert) {
   }
 }
 
-function updateAlertsTable(alerts) {
+function renderAlertsTableRows(alerts) {
   try {
     const tbody = document.querySelector('#alertsTable tbody');
     if (!tbody) {
@@ -918,6 +919,45 @@ function updateAlertsTable(alerts) {
       window.showErrorNotification('שגיאה בעדכון טבלת התראות', error.message);
     }
   }
+}
+
+async function updateAlertsTable(alerts, options = {}) {
+  const { skipPagination = false } = options;
+  const safeAlerts = Array.isArray(alerts) ? alerts : [];
+
+  if (!skipPagination && typeof window.updateTableWithPagination === 'function') {
+    try {
+      alertsPaginationInstance = await window.updateTableWithPagination({
+        tableId: 'alertsTable',
+        tableType: 'alerts',
+        data: safeAlerts,
+        render: async (pageData, context) => {
+          renderAlertsTableRows(pageData);
+          if (window.setPageTableData) {
+            window.setPageTableData('alerts', pageData, {
+              tableId: 'alertsTable',
+              pageInfo: context?.pageInfo,
+            });
+          }
+        },
+        onFilteredDataChange: ({ filteredData }) => {
+          if (typeof window.updateAlertsSummary === 'function') {
+            window.updateAlertsSummary(Array.isArray(filteredData) ? filteredData : []);
+          }
+        },
+      });
+      return;
+    } catch (error) {
+      window.Logger?.warn('updateAlertsTable pagination fallback triggered', { error, page: 'alerts' });
+    }
+  }
+
+  if (window.setTableData) {
+    window.setTableData('alerts', safeAlerts, { tableId: 'alertsTable' });
+    window.setFilteredTableData?.('alerts', safeAlerts, { tableId: 'alertsTable', skipPageReset: true });
+  }
+
+  renderAlertsTableRows(safeAlerts);
 }
 
 /**
@@ -2792,17 +2832,21 @@ window.updateAlertsSummary = updateAlertsSummary;
  * @param {Array} alerts - מערך התראות
  */
 function updateAlertsSummary(alerts) {
-  window.Logger.info('📊 מעדכן סטטיסטיקות התראות:', alerts ? alerts.length : 0, 'התראות', { page: "alerts" });
+  const alertsArray = Array.isArray(alerts)
+    ? alerts
+    : (window.TableDataRegistry ? window.TableDataRegistry.getFilteredData('alerts') : window.alertsData || []);
+
+  window.Logger.info('📊 מעדכן סטטיסטיקות התראות:', alertsArray ? alertsArray.length : 0, 'התראות', { page: "alerts" });
   
-  if (!alerts || !Array.isArray(alerts)) {
-    window.Logger.warn('⚠️ alerts parameter is not available or not an array', { page: "alerts" });
+  if (!alertsArray || !Array.isArray(alertsArray)) {
+    window.Logger.warn('⚠️ alerts data is not available or not an array', { page: "alerts" });
     return;
   }
 
   // חישוב סטטיסטיקות
-  const totalAlerts = alerts.length;
-  const activeAlerts = alerts.filter(alert => alert.status === 'open').length;
-  const newAlerts = alerts.filter(alert => alert.is_triggered === 'new').length;
+  const totalAlerts = alertsArray.length;
+  const activeAlerts = alertsArray.filter(alert => alert.status === 'open').length;
+  const newAlerts = alertsArray.filter(alert => alert.is_triggered === 'new').length;
   
   // התראות היום
   const now = new Date();
@@ -2849,7 +2893,7 @@ function updateAlertsSummary(alerts) {
     return dateObj.getTime();
   };
 
-  const todayAlerts = alerts.filter(alert => {
+  const todayAlerts = alertsArray.filter(alert => {
     const createdMs = getCreatedMs(alert);
     if (createdMs === null) {return false;}
     const createdDate = new Date(createdMs);
@@ -2857,7 +2901,7 @@ function updateAlertsSummary(alerts) {
   }).length;
   
   // התראות השבוע
-  const weekAlerts = alerts.filter(alert => {
+  const weekAlerts = alertsArray.filter(alert => {
     const createdMs = getCreatedMs(alert);
     if (createdMs === null) {return false;}
     const createdDate = new Date(createdMs);

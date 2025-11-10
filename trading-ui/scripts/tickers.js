@@ -290,6 +290,7 @@ if (!window.currenciesLoaded) {
 
 }
 let tickersData = window.tickersData;
+let tickersPaginationInstance = null;
 
 
 // מפת צבעים לסוגי טיקרים
@@ -1658,7 +1659,7 @@ async function loadTickersData() {
     await updateActiveTradesField();
 
     // עדכון הטבלה (אחרי עדכון active_trades)
-    updateTickersTable(tickersData);
+    await updateTickersTable(tickersData);
 
     // עדכון סטטיסטיקות סיכום
     updateTickersSummaryStats(tickersData);
@@ -1686,11 +1687,15 @@ async function loadTickersData() {
  * עדכון סטטיסטיקות סיכום טיקרים
  */
 function updateTickersSummaryStats(tickers) {
+  const tickersArray = Array.isArray(tickers)
+    ? tickers
+    : (window.TableDataRegistry ? window.TableDataRegistry.getFilteredData('tickers') : window.tickersData || []);
+
   try {
     // מערכת מאוחדת לסיכום נתונים
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
       const config = window.INFO_SUMMARY_CONFIGS.tickers;
-      window.InfoSummarySystem.calculateAndRender(tickers, config);
+      window.InfoSummarySystem.calculateAndRender(tickersArray, config);
     } else {
       // מערכת סיכום נתונים לא זמינה
       const summaryStatsElement = document.getElementById('summaryStats');
@@ -1711,7 +1716,7 @@ function updateTickersSummaryStats(tickers) {
 /**
  * עדכון טבלת טיקרים - גרסה פשוטה
  */
-function updateTickersTable(tickers) {
+function renderTickersTableRows(tickers) {
   try {
     const toFiniteNumber = (value) => {
       if (value === null || value === undefined || value === '' || value === 'N/A') {
@@ -1891,6 +1896,45 @@ function updateTickersTable(tickers) {
   } catch (error) {
     handleSystemError(error, 'עדכון טבלת טיקרים');
   }
+}
+
+async function updateTickersTable(tickers, options = {}) {
+  const { skipPagination = false } = options;
+  const safeTickers = Array.isArray(tickers) ? tickers : [];
+
+  if (!skipPagination && typeof window.updateTableWithPagination === 'function') {
+    try {
+      tickersPaginationInstance = await window.updateTableWithPagination({
+        tableId: 'tickersTable',
+        tableType: 'tickers',
+        data: safeTickers,
+        render: async (pageData, context) => {
+          renderTickersTableRows(pageData);
+          if (window.setPageTableData) {
+            window.setPageTableData('tickers', pageData, {
+              tableId: 'tickersTable',
+              pageInfo: context?.pageInfo,
+            });
+          }
+        },
+        onFilteredDataChange: ({ filteredData }) => {
+          if (typeof window.updateTickersSummaryStats === 'function') {
+            window.updateTickersSummaryStats(Array.isArray(filteredData) ? filteredData : []);
+          }
+        },
+      });
+      return;
+    } catch (error) {
+      window.Logger?.warn('updateTickersTable pagination fallback triggered', { error, page: 'tickers' });
+    }
+  }
+
+  if (window.setTableData) {
+    window.setTableData('tickers', safeTickers, { tableId: 'tickersTable' });
+    window.setFilteredTableData?.('tickers', safeTickers, { tableId: 'tickersTable', skipPageReset: true });
+  }
+
+  renderTickersTableRows(safeTickers);
 }
 
 
@@ -2416,7 +2460,7 @@ async function refreshYahooFinanceData() {
     if (externalData) {
       // עדכון הנתונים הגלובליים והטבלה (כולל מבוטלים)
       window.tickersData = externalDataService.updateTickersWithExternalData(window.tickersData, externalData);
-      updateTickersTable(window.tickersData);
+      await updateTickersTable(window.tickersData);
       
       // עדכון סטטיסטיקות סיכום
       updateTickersSummaryStats(window.tickersData);

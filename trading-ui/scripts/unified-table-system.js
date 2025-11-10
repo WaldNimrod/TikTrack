@@ -84,6 +84,19 @@ class TableRegistry {
       filterable: config.filterable !== false,
       ...config
     });
+
+    if (window.TableDataRegistry) {
+      let tableId = null;
+      if (config.tableSelector.startsWith('#')) {
+        tableId = config.tableSelector.substring(1);
+      }
+
+      window.TableDataRegistry.registerTable({
+        tableType,
+        tableId,
+        source: 'unified-table-system',
+      });
+    }
   }
 
   /**
@@ -191,7 +204,16 @@ class TableSorter {
       }
 
       // קבלת נתונים
-      const data = config.dataGetter();
+      let data = config.dataGetter();
+      if ((!Array.isArray(data) || data.length === 0) && window.TableDataRegistry) {
+        const registryData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
+        if (Array.isArray(registryData) && registryData.length > 0) {
+          data = registryData;
+        }
+      }
+      if (!Array.isArray(data)) {
+        data = [];
+      }
       if (!Array.isArray(data)) {
         if (window.Logger) {
           window.Logger.warn(`TableSorter.sort: dataGetter for "${tableType}" did not return an array`, { page: "unified-table-system" });

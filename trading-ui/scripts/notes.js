@@ -746,20 +746,23 @@ function updateNotesTable(notes) {
  * @param {Array} notes - Array of notes to summarize
  */
 function updateNotesSummary(notes) {
+  const notesArray = Array.isArray(notes)
+    ? notes
+    : (window.TableDataRegistry ? window.TableDataRegistry.getFilteredData('notes') : window.notesData || []);
   try {
     // שמירת המספר המקורי לחיפוש
-    window.originalNotesCount = notes.length;
+  window.originalNotesCount = notesArray.length;
 
   // עדכון table-count
   const tableCountElement = document.querySelector('.table-count');
   if (tableCountElement) {
-    tableCountElement.textContent = `${notes.length} הערות`;
+    tableCountElement.textContent = `${notesArray.length} הערות`;
   }
 
   // מערכת מאוחדת לסיכום נתונים
   if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
     const config = window.INFO_SUMMARY_CONFIGS.notes;
-    window.InfoSummarySystem.calculateAndRender(notes, config);
+    window.InfoSummarySystem.calculateAndRender(notesArray, config);
   } else {
     // מערכת סיכום נתונים לא זמינה
     const summaryStatsElement = document.getElementById('summaryStats');

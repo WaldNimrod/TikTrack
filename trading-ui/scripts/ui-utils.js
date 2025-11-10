@@ -1830,19 +1830,33 @@ async function loadSectionStates() {
 function updatePageSummaryStats(pageName, data, countElementId = null) {
   try {
     // Using filtered data if available, otherwise provided data
-    const dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
+    let dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
+
+    if (window.TableDataRegistry) {
+      const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
+      if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
+        dataToUse = registryFiltered;
+      } else {
+        const registryFull = window.TableDataRegistry.getFullData(pageName);
+        if ((!Array.isArray(dataToUse) || dataToUse.length === 0) && Array.isArray(registryFull) && registryFull.length > 0) {
+          dataToUse = registryFull;
+        }
+      }
+    }
+
+    const summaryData = Array.isArray(dataToUse) ? dataToUse : [];
     
     // מערכת מאוחדת לסיכום נתונים
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
       const config = window.INFO_SUMMARY_CONFIGS[pageName];
       if (config) {
-        window.InfoSummarySystem.calculateAndRender(dataToUse, config);
+        window.InfoSummarySystem.calculateAndRender(summaryData, config);
         
         // עדכון מספר הרשומות בטבלה (אם סופק ID)
         if (countElementId) {
           const countElement = document.getElementById(countElementId);
           if (countElement) {
-            countElement.textContent = `${dataToUse.length} רשומות`;
+            countElement.textContent = `${summaryData.length} רשומות`;
           }
         }
       } else {

@@ -212,10 +212,10 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
     if (columnKey === 'change_percent') {
       const aNum = typeof aValue === 'number' ? aValue : parseFloat(aValue) || 0;
       const bNum = typeof bValue === 'number' ? bValue : parseFloat(bValue) || 0;
-
+      
       if (aNum > 0 && bNum < 0) return -1;
       if (aNum < 0 && bNum > 0) return 1;
-
+      
       return aNum - bNum;
     }
   }
@@ -888,6 +888,15 @@ window.tables = {
   getCustomSortValue: getCustomSortValue,
   closeModal: window.closeModal,
   getDefaultColumnDefs: window.getDefaultColumnDefs,
+  setTableData: window.setTableData,
+  setFilteredTableData: window.setFilteredTableData,
+  setPageTableData: window.setPageTableData,
+  getFullTableData: window.getFullTableData,
+  getFilteredTableData: window.getFilteredTableData,
+  getPageTableData: window.getPageTableData,
+  getTableDataCounts: window.getTableDataCounts,
+  getTableDataSummary: window.getTableDataSummary,
+  ensureTablePagination: window.ensureTablePagination,
 };
 
 // NOTE: window.sortTable is already defined above (line 450) with the correct signature
@@ -1061,6 +1070,212 @@ window.saveTableDataToCache = async function(tableId, data, filters = {}) {
     console.error(`❌ Failed to save table ${tableId} to cache:`, error);
     return false;
   }
+};
+
+/**
+ * ===== TABLE DATA REGISTRY HELPERS =====
+ */
+window.setTableData = function(tableIdentifier, data, options = {}) {
+  if (!window.TableDataRegistry) {
+    return Array.isArray(data) ? [...data] : [];
+  }
+
+  return window.TableDataRegistry.setFullData(tableIdentifier, data, options);
+};
+
+window.setFilteredTableData = function(tableIdentifier, data, options = {}) {
+  if (!window.TableDataRegistry) {
+    return Array.isArray(data) ? [...data] : [];
+  }
+
+  return window.TableDataRegistry.setFilteredData(tableIdentifier, data, options);
+};
+
+window.setPageTableData = function(tableIdentifier, data, options = {}) {
+  if (!window.TableDataRegistry) {
+    return Array.isArray(data) ? [...data] : [];
+  }
+
+  return window.TableDataRegistry.setPageData(tableIdentifier, data, options);
+};
+
+window.getFullTableData = function(tableIdentifier, options = {}) {
+  if (!window.TableDataRegistry) {
+    return [];
+  }
+
+  return window.TableDataRegistry.getFullData(tableIdentifier, options);
+};
+
+window.getFilteredTableData = function(tableIdentifier, options = {}) {
+  if (!window.TableDataRegistry) {
+    return [];
+  }
+
+  return window.TableDataRegistry.getFilteredData(tableIdentifier, options);
+};
+
+window.getPageTableData = function(tableIdentifier, options = {}) {
+  if (!window.TableDataRegistry) {
+    return [];
+  }
+
+  return window.TableDataRegistry.getPageData(tableIdentifier, options);
+};
+
+window.getTableDataCounts = function(tableIdentifier) {
+  if (!window.TableDataRegistry) {
+    return { total: 0, filtered: 0, page: 0 };
+  }
+
+  return window.TableDataRegistry.getCounts(tableIdentifier);
+};
+
+window.getTableDataSummary = function(tableIdentifier) {
+  if (!window.TableDataRegistry) {
+    return null;
+  }
+
+  return window.TableDataRegistry.getSummary(tableIdentifier);
+};
+
+window.ensureTablePagination = function(tableId, options = {}) {
+  if (!window.PaginationSystem) {
+    console.warn('⚠️ PaginationSystem not available');
+    return null;
+  }
+
+  const existing = window.getPagination(tableId);
+  if (existing) {
+    if (options.tableType && !existing.tableType) {
+      existing.tableType = options.tableType;
+      existing.config.tableType = options.tableType;
+    }
+
+    if (typeof options.onAfterRender === 'function') {
+      existing.config.onAfterRender = options.onAfterRender;
+    }
+
+    if (typeof options.onFilteredDataChange === 'function') {
+      existing.config.onFilteredDataChange = options.onFilteredDataChange;
+    }
+
+    if (typeof options.pageSize === 'number' && existing.pageSize !== options.pageSize) {
+      existing.setPageSize(options.pageSize);
+    }
+
+    return existing;
+  }
+
+  return window.createPagination(tableId, options);
+};
+
+/**
+ * Apply unified pagination workflow for a table
+ * @param {Object} options
+ * @param {string} options.tableId - מזהה הטבלה (ID attribute)
+ * @param {string} [options.tableType] - סוג הטבלה (data-table-type)
+ * @param {Array} [options.data] - מערך הנתונים המלא לעדכון
+ * @param {Function} options.render - פונקציית רינדור המקבלת (pageData, context)
+ * @param {number} [options.pageSize] - גודל עמוד ראשוני
+ * @param {Function} [options.onFilteredDataChange] - Callback נוסף בעת שינוי נתונים מסוננים
+ * @param {boolean} [options.skipRegistry=false] - האם לדלג על עדכון TableDataRegistry
+ * @returns {Promise<Object|null>} instance של Pagination או null אם לא זמין
+ */
+window.updateTableWithPagination = async function({
+  tableId,
+  tableType,
+  data = [],
+  render,
+  pageSize,
+  onFilteredDataChange,
+  skipRegistry = false,
+} = {}) {
+  if (!tableId) {
+    throw new Error('updateTableWithPagination requires tableId');
+  }
+
+  if (typeof render !== 'function') {
+    throw new Error('updateTableWithPagination requires render callback');
+  }
+
+  const safeData = Array.isArray(data) ? data : [];
+  const resolvedTableType = tableType || window.TableDataRegistry?.resolveTableType?.(tableId) || null;
+  const tableIdentifier = resolvedTableType || tableId;
+
+  if (!skipRegistry && window.TableDataRegistry) {
+    window.TableDataRegistry.setFullData(tableIdentifier, safeData, {
+      tableId,
+      resetFiltered: false,
+    });
+  }
+
+  const pagination = window.ensureTablePagination(tableId, {
+    tableType: resolvedTableType,
+    pageSize,
+    onAfterRender: async ({ pageData, pagination: paginationInfo }) => {
+      try {
+        await render(pageData, {
+          skipPagination: true,
+          pageInfo: paginationInfo,
+          tableId,
+          tableType: resolvedTableType,
+        });
+      } catch (error) {
+        console.warn(`updateTableWithPagination: render callback failed for table ${tableId}`, error);
+      }
+    },
+    onFilteredDataChange: (payload) => {
+      if (window.TableDataRegistry && !skipRegistry) {
+        window.TableDataRegistry.setFilteredData(tableIdentifier, payload.filteredData, {
+          tableId,
+          skipPageReset: true,
+        });
+      }
+
+      if (typeof onFilteredDataChange === 'function') {
+        try {
+          onFilteredDataChange(payload);
+        } catch (callbackError) {
+          console.warn(`updateTableWithPagination: onFilteredDataChange callback failed for table ${tableId}`, callbackError);
+        }
+      }
+    },
+  });
+
+  if (pagination) {
+    pagination.setData(safeData);
+    const initialPageData = pagination.getCurrentPageData();
+    await render(initialPageData, {
+      skipPagination: true,
+      pageInfo: {
+        currentPage: pagination.currentPage,
+        totalPages: pagination.totalPages,
+        pageSize: pagination.pageSize,
+        totalItems: pagination.totalItems,
+        filteredItems: pagination.filteredData.length,
+      },
+      tableId,
+      tableType: resolvedTableType,
+    });
+    return pagination;
+  }
+
+  // Pagination system unavailable - render full dataset
+  await render(safeData, {
+    skipPagination: true,
+    pageInfo: {
+      currentPage: 1,
+      totalPages: 1,
+      pageSize: safeData.length,
+      totalItems: safeData.length,
+      filteredItems: safeData.length,
+    },
+    tableId,
+    tableType: resolvedTableType,
+  });
+
+  return null;
 };
 
 /**

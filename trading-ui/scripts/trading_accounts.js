@@ -180,13 +180,7 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function() {
     window.Logger.info('🔍 נתונים מסוננים:', filteredTradingAccounts.length, 'חשבונות מסחר', { page: "trading_accounts" });
     window.filteredTradingAccountsData = filteredTradingAccounts;
 
-    // עדכון הטבלה
-    if (typeof window.updateTradingAccountsTable === 'function') {
-      window.Logger.info('📊 מעדכן את טבלת החשבונות המסחר', { page: "trading_accounts" });
-      window.updateTradingAccountsTable(filteredTradingAccounts);
-    } else {
-      window.Logger.warn('⚠️ updateTradingAccountsTable לא זמין', { page: "trading_accounts" });
-    }
+    await syncTradingAccountsPagination(filteredTradingAccounts);
 
     // Initialize account activity system with default account selection
     if (typeof window.initAccountActivity === 'function') {
@@ -274,6 +268,7 @@ window.trading_accountsData = [];
 window.trading_accountsLoaded = false;
 window.currenciesData = [];
 window.currenciesLoaded = false;
+let tradingAccountsPaginationInstance = null;
 
 // פונקציה לטעינת מטבעות מהשרת
 async function loadCurrenciesFromServer() {
@@ -633,6 +628,49 @@ function enrichAccountsWithBalances(accounts, balancesMap) {
   });
 }
 
+async function syncTradingAccountsPagination(accountsData) {
+  const safeAccounts = Array.isArray(accountsData) ? accountsData : [];
+
+  if (typeof window.updateTableWithPagination === 'function') {
+    try {
+      tradingAccountsPaginationInstance = await window.updateTableWithPagination({
+        tableId: 'accountsTable',
+        tableType: 'trading_accounts',
+        data: safeAccounts,
+        render: async (pageData, context) => {
+          updateTradingAccountsTable(pageData);
+          if (window.setPageTableData) {
+            window.setPageTableData('trading_accounts', pageData, {
+              tableId: 'accountsTable',
+              pageInfo: context?.pageInfo,
+            });
+          }
+        },
+        onFilteredDataChange: ({ filteredData }) => {
+          if (typeof window.updateTradingAccountsSummary === 'function') {
+            window.updateTradingAccountsSummary(Array.isArray(filteredData) ? filteredData : []);
+          }
+          const countElement = document.getElementById('accountsCount');
+          if (countElement) {
+            const count = Array.isArray(filteredData) ? filteredData.length : 0;
+            countElement.textContent = `${count} חשבונות מסחר`;
+          }
+        },
+      });
+      return;
+    } catch (error) {
+      window.Logger?.warn('syncTradingAccountsPagination: falling back to direct render', { error, page: 'trading_accounts' });
+    }
+  }
+
+  if (window.setTableData) {
+    window.setTableData('trading_accounts', safeAccounts, { tableId: 'accountsTable' });
+    window.setFilteredTableData?.('trading_accounts', safeAccounts, { tableId: 'accountsTable', skipPageReset: true });
+  }
+
+  updateTradingAccountsTable(safeAccounts);
+}
+
 /**
  * Update trading accounts table
  * @function updateTradingAccountsTable
@@ -755,22 +793,26 @@ function updateTradingAccountsTable(trading_accounts) {
  * @returns {void}
  */
 async function updateTradingAccountsSummary(trading_accounts) {
-  console.log('🔍 updateTradingAccountsSummary called with:', { count: trading_accounts?.length, hasSystem: !!window.InfoSummarySystem, hasConfigs: !!window.INFO_SUMMARY_CONFIGS });
+  const accountsArray = Array.isArray(trading_accounts)
+    ? trading_accounts
+    : (window.TableDataRegistry ? window.TableDataRegistry.getFilteredData('trading_accounts') : window.trading_accountsData || []);
+
+  console.log('🔍 updateTradingAccountsSummary called with:', { count: accountsArray?.length, hasSystem: !!window.InfoSummarySystem, hasConfigs: !!window.INFO_SUMMARY_CONFIGS });
   try {
     // מערכת מאוחדת לסיכום נתונים
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
       const config = window.INFO_SUMMARY_CONFIGS.trading_accounts;
       console.log('✅ Using InfoSummarySystem with config:', config);
-      await window.InfoSummarySystem.calculateAndRender(trading_accounts, config);
+      await window.InfoSummarySystem.calculateAndRender(accountsArray, config);
     } else {
       console.warn('⚠️ InfoSummarySystem not available, using fallback');
       // מערכת סיכום נתונים לא זמינה - חישוב ידני
       const summaryStatsElement = document.getElementById('summaryStats');
-      if (summaryStatsElement && trading_accounts) {
+      if (summaryStatsElement && accountsArray) {
         // חישוב סטטיסטיקות בסיסיות
-        const totalAccounts = trading_accounts.length;
-        const activeAccounts = trading_accounts.filter(acc => acc.status === 'open').length;
-        const openAccounts = trading_accounts.filter(acc => acc.status === 'open').length;
+        const totalAccounts = accountsArray.length;
+        const activeAccounts = accountsArray.filter(acc => acc.status === 'open').length;
+        const openAccounts = accountsArray.filter(acc => acc.status === 'open').length;
         
         // טעינת יתרות מכל החשבונות (עם טיפול בשגיאות)
         let balancesMap = window.tradingAccountsBalancesMap instanceof Map ? window.tradingAccountsBalancesMap : new Map();
@@ -778,8 +820,8 @@ async function updateTradingAccountsSummary(trading_accounts) {
           balancesMap = new Map();
         }
 
-        if (balancesMap.size === 0 && trading_accounts.length > 0) {
-          const accountIds = trading_accounts.map(acc => acc.id);
+        if (balancesMap.size === 0 && accountsArray.length > 0) {
+          const accountIds = accountsArray.map(acc => acc.id);
           try {
             if (typeof window.loadAccountBalancesBatch === 'function') {
               balancesMap = await window.loadAccountBalancesBatch(accountIds);
@@ -811,7 +853,7 @@ async function updateTradingAccountsSummary(trading_accounts) {
           }
         };
         
-        trading_accounts.forEach(account => {
+        accountsArray.forEach(account => {
           const balanceData = balancesMap.get(account.id);
           if (balanceData) {
             totalBaseCurrencyBalance += balanceData.base_currency_total || 0;

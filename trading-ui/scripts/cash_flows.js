@@ -122,7 +122,7 @@ async function loadCashFlowsData() {
     
     console.log('🔥 loadCashFlowsData: Calling updateCashFlowsTable...');
     // עדכון הטבלה (ראשוני לפני החלת סידור ברירת מחדל/מצב שמור)
-    updateCashFlowsTable(data);
+    await syncCashFlowsPagination(data);
     console.log('🔥 loadCashFlowsData: updateCashFlowsTable completed');
     
     // החלת סידור ברירת מחדל לפי מערכת המיון הכללית (תאריך יורד כברירת מחדל)
@@ -290,6 +290,7 @@ if (!window.cashFlowsData) {
   window.cashFlowsData = [];
 }
 let cashFlowsData = window.cashFlowsData;
+let cashFlowsPaginationInstance = null;
 let tradingAccountsData = [];
 
 /**
@@ -921,6 +922,49 @@ function updatePageSummaryStats() {
       page: 'cash_flows' 
     });
   }
+}
+
+async function syncCashFlowsPagination(cashFlows) {
+  const safeCashFlows = Array.isArray(cashFlows) ? cashFlows : [];
+
+  if (typeof window.updateTableWithPagination === 'function') {
+    try {
+      cashFlowsPaginationInstance = await window.updateTableWithPagination({
+        tableId: 'cashFlowsTable',
+        tableType: 'cash_flows',
+        data: safeCashFlows,
+        render: async (pageData, context) => {
+          await updateCashFlowsTable(pageData);
+          if (window.setPageTableData) {
+            window.setPageTableData('cash_flows', pageData, {
+              tableId: 'cashFlowsTable',
+              pageInfo: context?.pageInfo,
+            });
+          }
+        },
+        onFilteredDataChange: ({ filteredData }) => {
+          cashFlowsData = Array.isArray(filteredData) ? filteredData : [];
+          if (typeof updatePageSummaryStats === 'function') {
+            updatePageSummaryStats();
+          }
+          const countElement = document.querySelector('.table-count');
+          if (countElement) {
+            countElement.textContent = `${cashFlowsData.length} תזרימים`;
+          }
+        },
+      });
+      return;
+    } catch (error) {
+      window.Logger?.warn('syncCashFlowsPagination: falling back to direct render', { error, page: 'cash_flows' });
+    }
+  }
+
+  if (window.setTableData) {
+    window.setTableData('cash_flows', safeCashFlows, { tableId: 'cashFlowsTable' });
+    window.setFilteredTableData?.('cash_flows', safeCashFlows, { tableId: 'cashFlowsTable', skipPageReset: true });
+  }
+
+  await updateCashFlowsTable(safeCashFlows);
 }
 
 // פונקציות הועברו ל-translation-utils.js:

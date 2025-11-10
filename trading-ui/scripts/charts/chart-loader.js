@@ -24,7 +24,8 @@ class ChartLoader {
     constructor() {
         this.isLoaded = false;
         this.loadPromise = null;
-        this.version = '3.9.1';
+        this.version = '4.4.0';
+        this.scriptId = 'tiktrack-chartjs';
     }
 
     /**
@@ -54,33 +55,54 @@ class ChartLoader {
      */
     async _loadChartJs() {
         try {
-            // Check if Chart.js is already loaded
             if (typeof Chart !== 'undefined') {
                 console.log('✅ Chart.js already loaded');
+                this._configureDefaults();
                 this.isLoaded = true;
                 return true;
             }
 
-            // Wait for Chart.js to be available from CDN
-            let attempts = 0;
-            const maxAttempts = 50; // 5 seconds max wait
-            
-            while (typeof Chart === 'undefined' && attempts < maxAttempts) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                attempts++;
+            let script = document.getElementById(this.scriptId);
+            if (!script) {
+                script = document.createElement('script');
+                script.id = this.scriptId;
+                script.src = `https://cdn.jsdelivr.net/npm/chart.js@${this.version}/dist/chart.umd.min.js`;
+                script.async = true;
+                script.dataset.loaded = 'false';
+                document.head.appendChild(script);
+                console.log('⬇️ Loading Chart.js from CDN');
             }
+
+            await new Promise((resolve, reject) => {
+                const target = document.getElementById(this.scriptId);
+                if (!target) {
+                    reject(new Error('Chart.js script element missing after injection'));
+                    return;
+                }
+
+                if (target.dataset.loaded === 'true' && typeof Chart !== 'undefined') {
+                    resolve();
+                    return;
+                }
+
+                const handleLoad = () => {
+                    target.dataset.loaded = 'true';
+                    resolve();
+                };
+                const handleError = (error) => {
+                    reject(error || new Error('Failed to load Chart.js'));
+                };
+
+                target.addEventListener('load', handleLoad, { once: true });
+                target.addEventListener('error', handleError, { once: true });
+            });
 
             if (typeof Chart === 'undefined') {
-                throw new Error('Chart.js failed to load from CDN');
+                throw new Error('Chart.js failed to initialize after loading');
             }
 
-            // Verify Chart.js version
-            const chartVersion = Chart.version || 'unknown';
-            console.log(`✅ Chart.js loaded successfully (version: ${chartVersion})`);
-
-            // Configure Chart.js defaults
-            this._configureDefaults();
-
+            console.log(`✅ Chart.js loaded successfully (version: ${Chart.version || this.version})`);
+            this._configureDefaults();// configure defaults once loaded
             this.isLoaded = true;
             return true;
 

@@ -1967,30 +1967,10 @@
   };
 
   window.copyDetailedLogLocal = async function () {
-    try {
-        const detailedLog = await generateDetailedLog();
-        if (detailedLog) {
-            await navigator.clipboard.writeText(detailedLog);
-            if (window.showSuccessNotification) {
-                window.showSuccessNotification('לוג מפורט הועתק ללוח');
-            } else {
-                alert('לוג מפורט הועתק ללוח!');
-            }
-        } else {
-            if (window.showWarningNotification) {
-                window.showWarningNotification('אין לוג להעתקה');
-            } else {
-                alert('אין לוג להעתקה');
-            }
-        }
-    } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה בהעתקת הלוג');
-        } else {
-            alert('שגיאה בהעתקת הלוג');
-        }
+    if (window.externalDataDashboard) {
+      return window.externalDataDashboard.copyDetailedLog();
     }
+    return '';
   };
 
   window.ExternalDataDashboardActions = {

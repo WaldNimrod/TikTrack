@@ -70,6 +70,46 @@
  * ========================================
  */
 
+// Ensure Logger fallback until logger-service.js initializes
+const __cacheManagerNoop = () => {};
+const __cacheManagerConsole = (typeof window !== 'undefined' && window.console) ? window.console : null;
+
+if (typeof window !== 'undefined') {
+    if (!window.Logger) {
+        window.Logger = {};
+    }
+
+    window.Logger.info = (typeof window.Logger.info === 'function')
+        ? window.Logger.info
+        : (__cacheManagerConsole && typeof __cacheManagerConsole.info === 'function'
+            ? __cacheManagerConsole.info.bind(__cacheManagerConsole)
+            : __cacheManagerNoop);
+
+    window.Logger.warn = (typeof window.Logger.warn === 'function')
+        ? window.Logger.warn
+        : (__cacheManagerConsole && typeof __cacheManagerConsole.warn === 'function'
+            ? __cacheManagerConsole.warn.bind(__cacheManagerConsole)
+            : __cacheManagerNoop);
+
+    window.Logger.error = (typeof window.Logger.error === 'function')
+        ? window.Logger.error
+        : (__cacheManagerConsole && typeof __cacheManagerConsole.error === 'function'
+            ? __cacheManagerConsole.error.bind(__cacheManagerConsole)
+            : __cacheManagerNoop);
+
+    window.Logger.debug = (typeof window.Logger.debug === 'function')
+        ? window.Logger.debug
+        : (__cacheManagerConsole && typeof __cacheManagerConsole.debug === 'function'
+            ? __cacheManagerConsole.debug.bind(__cacheManagerConsole)
+            : __cacheManagerNoop);
+
+    window.Logger.critical = (typeof window.Logger.critical === 'function')
+        ? window.Logger.critical
+        : (__cacheManagerConsole && typeof __cacheManagerConsole.error === 'function'
+            ? __cacheManagerConsole.error.bind(__cacheManagerConsole)
+            : __cacheManagerNoop);
+}
+
 // Cache Dependencies Configuration
 const CACHE_DEPENDENCIES = {
     // User Level
@@ -2306,6 +2346,42 @@ UnifiedCacheManager.prototype.clearAllCacheDetailed = async function(options = {
                     10000,
                     'system'
                 );
+            }
+
+            // Auto refresh / hard reload if requested (Stage B-Lite requirement)
+            const shouldAutoRefresh = options.autoRefresh !== false;
+            if (shouldAutoRefresh) {
+                const delayMs = Number.isFinite(options.reloadDelayMs)
+                    ? options.reloadDelayMs
+                    : (options.hardReload ? 2000 : 1500);
+
+                window.Logger.info('🔄 Scheduling page reload after cache clear', {
+                    delayMs,
+                    hardReload: options.hardReload !== false,
+                    page: 'unified-cache-manager'
+                });
+
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification(
+                        `המטמון נוקה בהצלחה. העמוד ירוענן בעוד ${(delayMs / 1000).toFixed(1)} שניות...`,
+                        'info',
+                        'ריענון עמוד',
+                        delayMs + 500,
+                        'system'
+                    );
+                }
+
+                setTimeout(() => {
+                    try {
+                        if (options.hardReload !== false && typeof window.hardReload === 'function') {
+                            window.hardReload();
+                        } else {
+                            window.location.reload();
+                        }
+                    } catch (reloadError) {
+                        window.Logger.error('❌ Failed to reload page after cache clear', reloadError, { page: 'unified-cache-manager' });
+                    }
+                }, delayMs);
             }
         } else {
             // Show error notification

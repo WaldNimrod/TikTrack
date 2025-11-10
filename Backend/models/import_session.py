@@ -48,7 +48,7 @@ class ImportSession(BaseModel):
     skipped_records = Column(Integer, default=0, nullable=False, 
                             comment="Records skipped due to errors/duplicates")
     status = Column(String(20), default='analyzing', nullable=False, 
-                   comment="Session status: analyzing, ready, importing, completed, failed")
+                   comment="Session status: created, analyzing, ready, importing, completed, failed, cancelled")
     summary_data = Column(JSON, nullable=True, 
                          comment="Detailed analysis results and preview data")
     completed_at = Column(DateTime, nullable=True, 
@@ -141,7 +141,7 @@ class ImportSession(BaseModel):
         Returns:
             bool: True if status was updated, False otherwise
         """
-        valid_statuses = ['analyzing', 'ready', 'importing', 'completed', 'failed']
+        valid_statuses = ['created', 'analyzing', 'ready', 'importing', 'completed', 'failed', 'cancelled']
         
         if new_status not in valid_statuses:
             return False
@@ -150,7 +150,7 @@ class ImportSession(BaseModel):
             self.status = new_status
             
             # Set completed_at when status changes to completed or failed
-            if new_status in ['completed', 'failed']:
+            if new_status in ['completed', 'failed', 'cancelled']:
                 self.completed_at = datetime.now()
             
             return True

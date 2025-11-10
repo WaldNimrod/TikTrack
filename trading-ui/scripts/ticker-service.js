@@ -589,9 +589,56 @@ window.tickerService = {
 
 // ===== CRUD OPERATIONS =====
 
+function resolveFieldId(candidateIds, fallbackId) {
+  const ids = Array.isArray(candidateIds) ? candidateIds : [candidateIds];
+  const activeModal =
+    document.querySelector('.modal.show') ||
+    document.getElementById('tickersModal') ||
+    null;
+
+  for (const candidate of ids) {
+    if (!candidate) {
+      continue;
+    }
+
+    const byId = document.getElementById(candidate);
+    if (byId) {
+      return candidate;
+    }
+
+    if (activeModal) {
+      const scopedById = activeModal.querySelector(`#${candidate}`);
+      if (scopedById) {
+        return candidate;
+      }
+
+      const scopedByName = activeModal.querySelector(`[name="${candidate}"]`);
+      if (scopedByName) {
+        if (!scopedByName.id) {
+          const generatedId = `${candidate}__resolved`;
+          scopedByName.id = document.getElementById(generatedId)
+            ? `${generatedId}_${Date.now()}`
+            : generatedId;
+        }
+        return scopedByName.id;
+      }
+    }
+  }
+
+  if (fallbackId) {
+    return fallbackId;
+  }
+
+  if (Array.isArray(candidateIds) && candidateIds.length > 0) {
+    return candidateIds[0];
+  }
+
+  return undefined;
+}
+
 /**
  * שמירת טיקר חדש
- * 
+ *
  * Note: updated_at field is NOT set during creation - it's reserved for future pricing system updates
  */
 /**
@@ -601,13 +648,19 @@ window.tickerService = {
  * @returns {Promise<void>}
  */
 async function saveTicker() {
+  const symbolFieldId = resolveFieldId(['tickerSymbol', 'addTickerSymbol']);
+  const nameFieldId = resolveFieldId(['tickerName', 'addTickerName']);
+  const typeFieldId = resolveFieldId(['tickerType', 'addTickerType']);
+  const currencyFieldId = resolveFieldId(['tickerCurrency', 'addTickerCurrency']);
+  const remarksFieldId = resolveFieldId(['tickerRemarks', 'addTickerRemarks']);
+
   // איסוף נתונים מהטופס באמצעות DataCollectionService
   const tickerData = DataCollectionService.collectFormData({
-    symbol: { id: 'addTickerSymbol', type: 'text' },
-    name: { id: 'addTickerName', type: 'text' },
-    type: { id: 'addTickerType', type: 'text' },
-    currency_id: { id: 'addTickerCurrency', type: 'int' },
-    remarks: { id: 'addTickerRemarks', type: 'text' }
+    symbol: { id: symbolFieldId, type: 'text' },
+    name: { id: nameFieldId, type: 'text' },
+    type: { id: typeFieldId, type: 'text' },
+    currency_id: { id: currencyFieldId, type: 'int' },
+    remarks: { id: remarksFieldId, type: 'text' }
   });
 
   const symbol = tickerData.symbol?.trim().toUpperCase() || '';
@@ -680,7 +733,7 @@ async function saveTicker() {
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: 'addTickerModal',
+      modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
       apiUrl: '/api/tickers/',
       entityName: 'טיקר'

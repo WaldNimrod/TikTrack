@@ -249,31 +249,19 @@ class DuplicateDetectionService:
                 score += 1
         
         # Check date match - same day AND within 5 minutes time window
-        if (record1.get('date') and record2.get('date')):
+        if record1.get('date') and record2.get('date'):
             try:
-                # Handle both date objects and date strings
-                if hasattr(record1['date'], 'date'):
-                    date1 = record1['date']
-                elif isinstance(record1['date'], str):
-                    date1 = datetime.fromisoformat(record1['date'].replace('Z', '+00:00'))
-                else:
-                    date1 = record1['date']
-                
-                if hasattr(record2['date'], 'date'):
-                    date2 = record2['date']
-                elif isinstance(record2['date'], str):
-                    date2 = datetime.fromisoformat(record2['date'].replace('Z', '+00:00'))
-                else:
-                    date2 = record2['date']
-                
-                # Check if dates are on the same day AND within 5 minutes of each other
-                same_day = date1.date() == date2.date()
-                time_diff = abs((date1 - date2).total_seconds())
-                within_5_minutes = time_diff <= 300  # 5 minutes = 300 seconds
-                
-                if same_day and within_5_minutes:
-                    score += 1
-            except (ValueError, TypeError, AttributeError):
+                date1 = self._resolve_datetime(record1.get('date'))
+                date2 = self._resolve_datetime(record2.get('date'))
+
+                if date1 and date2:
+                    same_day = date1.date() == date2.date()
+                    time_diff = abs((date1 - date2).total_seconds())
+                    within_5_minutes = time_diff <= 300  # 5 minutes = 300 seconds
+
+                    if same_day and within_5_minutes:
+                        score += 1
+            except Exception:
                 pass
         
         # Check action match
@@ -312,20 +300,12 @@ class DuplicateDetectionService:
                 
                 # Parse dates and get range
                 parsed_dates = []
-                for date_str in dates:
-                    try:
-                        if isinstance(date_str, str):
-                            # Handle different date formats
-                            if 'T' in date_str:
-                                parsed_date = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-                            else:
-                                parsed_date = datetime.strptime(date_str, '%Y-%m-%d')
-                        else:
-                            parsed_date = date_str
-                        parsed_dates.append(parsed_date)
-                    except (ValueError, TypeError) as e:
-                        logger.warning(f"Failed to parse date {date_str}: {e}")
-                        continue
+        for date_value in dates:
+            parsed_date = self._resolve_datetime(date_value)
+            if parsed_date:
+                parsed_dates.append(parsed_date)
+            else:
+                logger.warning(f"Failed to parse date {date_value}")
                 
                 if not parsed_dates:
                     logger.warning("No valid dates found in records")
@@ -392,6 +372,41 @@ class DuplicateDetectionService:
         except Exception as e:
             logger.error(f"Failed to query existing executions: {str(e)}")
             return []  # Return empty list, not None
+
+    def _resolve_datetime(self, value: Any) -> Optional[datetime]:
+        """
+        Normalize various date representations into a timezone-aware datetime.
+        """
+        if value is None:
+            return None
+
+        if isinstance(value, datetime):
+            return value
+
+        if isinstance(value, str):
+            try:
+                cleaned = value.replace('Z', '+00:00')
+                return datetime.fromisoformat(cleaned)
+            except ValueError:
+                try:
+                    return datetime.strptime(value, '%Y-%m-%d')
+                except ValueError:
+                    return None
+
+        if isinstance(value, dict):
+            # DateEnvelope format
+            for key in ('utc', 'iso', 'value'):
+                if value.get(key):
+                    resolved = self._resolve_datetime(value[key])
+                    if resolved:
+                        return resolved
+            # Some envelopes might include nested dicts under 'local'
+            if value.get('local'):
+                resolved = self._resolve_datetime(value['local'])
+                if resolved:
+                    return resolved
+
+        return None
     
     def _classify_duplicate_type(self, within_file_matches: List[Dict[str, Any]], 
                                 existing_matches: List[Dict[str, Any]]) -> str:

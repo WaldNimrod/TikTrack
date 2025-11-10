@@ -28,6 +28,7 @@ from services.user_data_import.report_generator import ImportReportGenerator
 from connectors.user_data_import.ibkr_connector import IBKRConnector
 from connectors.user_data_import.demo_connector import DemoConnector
 from services.date_normalization_service import DateNormalizationService
+from services.advanced_cache_service import advanced_cache_service
 
 from config.logging import get_logger
 logger = get_logger(__name__)
@@ -673,184 +674,275 @@ class ImportOrchestrator:
     
     def execute_import(self, session_id: int) -> Dict[str, Any]:
         """
-        Execute the import process.
-        
-        Args:
-            session_id: Import session ID
-            
-        Returns:
-            Dict[str, Any]: Import execution results
+        Execute the import process and persist executions.
         """
         try:
-            logger.info(f"🔍 Starting execute_import for session {session_id} - NEW CODE VERSION!")
+            logger.info(f"🔍 Starting execute_import for session {session_id}")
             
-            # Get session
-            session = self.db_session.query(ImportSession).filter(
+            import_session = self.db_session.query(ImportSession).filter(
                 ImportSession.id == session_id
             ).first()
             
-            if not session:
+            if not import_session:
+                logger.error(f"❌ Session {session_id} not found")
                 return {'success': False, 'error': 'Session not found'}
             
-            if session.status != 'ready':
+            if import_session.status not in ['ready', 'importing']:
+                logger.warning(f"⚠️ Session {session_id} is not ready for import (status={import_session.status})")
                 return {'success': False, 'error': 'Session not ready for import'}
             
-            # Update status to importing
-            session.update_status('importing')
+            import_session.update_status('importing')
+            self.db_session.flush()
             
-            # Get preview data by regenerating it
             preview_result = self.generate_preview(session_id)
             if not preview_result['success']:
-                return {'success': False, 'error': 'Failed to generate preview data'}
+                error_message = preview_result.get('error', 'Failed to generate preview data')
+                logger.error(f"❌ Failed to regenerate preview for session {session_id}: {error_message}")
+                import_session.update_status('failed')
+                self.db_session.commit()
+                return {'success': False, 'error': error_message}
             
             preview_data = preview_result['preview_data']
+            records_to_import = preview_data.get('records_to_import', []) or []
+            logger.info(f"📦 Session {session_id}: {len(records_to_import)} records ready for enrichment")
             
-            # Import clean records
-            records_to_import = preview_data.get('records_to_import', [])
-            imported_count = 0
-            import_errors = []
+            if not records_to_import:
+                logger.warning(f"⚠️ No records_to_import found for session {session_id}")
+                import_session.imported_records = 0
+                import_session.skipped_records = len(preview_data.get('records_to_skip', []))
+                import_session.update_status('failed')
+                self.db_session.commit()
+                return {
+                    'success': False,
+                    'error': 'No records available for import. Resolve validation issues or add missing tickers before retrying.',
+                    'import_errors': ['No records available for import after preview regeneration.']
+                }
             
-            logger.info(f"🔍 DEBUG: records_to_import count: {len(records_to_import)}")
-            logger.info(f"🔍 DEBUG: preview_data keys: {list(preview_data.keys())}")
-            
-            # Enrich records with ticker_ids
-            logger.info(f"🔄 Enriching {len(records_to_import)} records with ticker_ids...")
+            from sqlalchemy import func
+            from models.execution import Execution
             from services.ticker_service import TickerService
+            
+            initial_execution_count = self.db_session.query(func.count(Execution.id)).scalar() or 0
+            
             enriched_records = TickerService.enrich_records_with_ticker_ids(
                 self.db_session, records_to_import
             )
-            logger.info(f"✅ Enriched {len(enriched_records)} records with ticker_ids")
+            logger.info(f"✅ Session {session_id}: {len(enriched_records)} records enriched with ticker IDs")
             
-            # Group executions by ticker_id for trade creation
-            from collections import defaultdict
-            executions_by_ticker = defaultdict(list)
+            if not enriched_records:
+                logger.warning(f"⚠️ Enrichment returned zero records for session {session_id}")
+                import_session.imported_records = 0
+                import_session.skipped_records = len(preview_data.get('records_to_skip', []))
+                import_session.update_status('failed')
+                self.db_session.commit()
+                return {
+                    'success': False,
+                    'error': 'No records were ready for import after enrichment. Ensure all tickers exist in the system.',
+                    'import_errors': ['Ticker enrichment failed for all records.']
+                }
             
-            logger.info(f"🔍 DEBUG: Processing {len(enriched_records)} enriched records")
-            for i, record_data in enumerate(enriched_records):
-                ticker_id = record_data.get('ticker_id')
-                logger.info(f"🔍 DEBUG: Record {i}: ticker_id={ticker_id}, symbol={record_data.get('symbol')}")
-                if ticker_id:
-                    executions_by_ticker[ticker_id].append(record_data)
-                else:
-                    logger.warning(f"⚠️ Skipping record without ticker_id: {record_data.get('symbol')}")
+            imported_count = 0
+            import_errors: List[str] = []
             
-            logger.info(f"📊 Grouped executions into {len(executions_by_ticker)} tickers")
-            logger.info(f"🔍 DEBUG: executions_by_ticker keys: {list(executions_by_ticker.keys())}")
-            
-            # Create executions only (no trades)
-            logger.info(f"🔍 DEBUG: Creating executions for {len(enriched_records)} records")
-            for i, execution_data in enumerate(enriched_records):
+            for index, execution_data in enumerate(enriched_records):
                 try:
-                    logger.info(f"🔍 DEBUG: Creating execution {i}: ticker_id={execution_data.get('ticker_id')}, symbol={execution_data.get('symbol')}")
-                    
-                    from models.execution import Execution
-                    
-                    # Convert date string to datetime object
-                    date_value = execution_data.get('date')
-                    execution_date = self._resolve_datetime(date_value)
+                    execution_date = self._resolve_datetime(execution_data.get('date'))
                     if not execution_date:
-                        raise ValueError(f"Invalid execution date: {date_value}")
+                        raise ValueError(f"Invalid execution date: {execution_data.get('date')}")
                     
-                    # Generate unique execution ID: filename + timestamp + original external_id
+                    filename = import_session.file_name or 'unknown_file'
                     import_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-                    filename = session.file_name or 'unknown_file'
                     unique_execution_id = f"{filename}_{import_timestamp}_{execution_data.get('external_id', 'exec')}"
                     
                     execution = Execution(
                         ticker_id=execution_data.get('ticker_id'),
-                        trading_account_id=session.trading_account_id,
-                        trade_id=None,  # No trade association - executions can exist independently
+                        trading_account_id=import_session.trading_account_id,
+                        trade_id=None,
                         action=execution_data.get('action'),
                         quantity=execution_data.get('quantity'),
                         price=execution_data.get('price'),
                         fee=execution_data.get('fee', 0),
                         date=execution_date,
                         external_id=unique_execution_id,
-                        source='ibkr_import',  # Fixed source for IBKR imports
+                        source='ibkr_import',
                         realized_pl=execution_data.get('realized_pl'),
                         mtm_pl=execution_data.get('mtm_pl'),
-                        created_at=datetime.now()
+                        created_at=datetime.utcnow()
                     )
                     self.db_session.add(execution)
                     imported_count += 1
-                    
-                    logger.info(f"✅ Created execution {i+1} for ticker_id {execution_data.get('ticker_id')}")
-                    
-                except Exception as e:
-                    logger.error(f"❌ Failed to create execution {i}: {str(e)}")
-                    import_errors.append(f"Failed to create execution {i}: {str(e)}")
+                except Exception as record_error:
+                    logger.error(f"❌ Failed to prepare execution #{index + 1}: {record_error}", exc_info=True)
+                    import_errors.append(f"Execution #{index + 1} failed: {record_error}")
             
-            # Commit all changes
+            if imported_count == 0:
+                raise ValueError("No execution records were created during import.")
+            
+            import_session.imported_records = imported_count
+            import_session.skipped_records = len(preview_data.get('records_to_skip', []))
+            
+            self.db_session.flush()
+            current_execution_count = self.db_session.query(func.count(Execution.id)).scalar() or 0
+            actual_inserted = current_execution_count - initial_execution_count
+            
+            if actual_inserted != imported_count:
+                raise ValueError(
+                    f"Imported {imported_count} records but detected {actual_inserted} new executions in database."
+                )
+            
+            import_session.update_status('completed')
             self.db_session.commit()
-            logger.info(f"✅ Successfully imported {imported_count} executions")
+            logger.info(f"✅ Session {session_id}: imported {imported_count} executions successfully")
             
-            # Invalidate cache after successful import
+            if import_errors:
+                logger.warning(f"⚠️ Session {session_id} completed with warnings: {import_errors}")
+            
             try:
-                from services.advanced_cache_service import AdvancedCacheService
-                cache_service = AdvancedCacheService()
-                cache_service.invalidate_pattern('executions')
-                cache_service.invalidate_pattern('trades')
-                cache_service.invalidate_pattern('dashboard')
-                logger.info("✅ Cache invalidated after import")
-            except Exception as e:
-                logger.warning(f"⚠️ Failed to invalidate cache: {str(e)}")
-            
-            # Update session
-            session.imported_records = imported_count
-            session.skipped_records = len(preview_data.get('records_to_skip', []))
-            session.update_status('completed')
-            
-            # Save original file to server
-            user_id = 1  # TODO: Get actual user ID from session/auth
-            file_content = session.get_summary_data('file_content')
-            file_name = session.file_name
+                advanced_cache_service.invalidate_pattern('executions')
+                advanced_cache_service.invalidate_pattern('trades')
+                advanced_cache_service.invalidate_pattern('dashboard')
+                logger.info(f"♻️ Cache invalidated after import for session {session_id}")
+            except Exception as cache_error:
+                logger.warning(f"⚠️ Cache invalidation failed after import: {cache_error}")
             
             try:
                 saved_file_path = self.report_generator.save_import_file(
-                    user_id=user_id,
+                    user_id=1,
                     session_id=session_id,
-                    file_content=file_content,
-                    file_name=file_name,
+                    file_content=import_session.get_summary_data('file_content'),
+                    file_name=import_session.file_name,
                     status='completed'
                 )
-                logger.info(f"Saved import file: {saved_file_path}")
-            except Exception as e:
-                logger.error(f"Failed to save import file: {str(e)}")
-                # Don't fail the import if file saving fails
+                logger.info(f"🗂️ Saved import file for session {session_id}: {saved_file_path}")
+            except Exception as save_error:
+                logger.error(f"Failed to save import file after completion: {save_error}")
             
             return {
                 'success': True,
                 'imported_count': imported_count,
                 'skipped_count': len(preview_data.get('records_to_skip', [])),
                 'import_errors': import_errors,
-                'session_status': session.status
+                'session_status': import_session.status
             }
+        
+        except Exception as error:
+            logger.error(f"Failed to execute import for session {session_id}: {error}", exc_info=True)
+            self.db_session.rollback()
             
-        except Exception as e:
-            logger.error(f"Failed to execute import: {str(e)}")
-            session.update_status('failed')
-            
-            # Save original file even if import failed
             try:
-                user_id = 1  # TODO: Get actual user ID from session/auth
-                file_content = session.get_summary_data('file_content')
-                file_name = session.file_name
-                
+                failure_session = self.db_session.query(ImportSession).filter(
+                    ImportSession.id == session_id
+                ).first()
+                if failure_session:
+                    failure_session.update_status('failed')
+                    self.db_session.commit()
+            except Exception as status_error:
+                logger.error(f"Failed to update session status after error: {status_error}", exc_info=True)
+                self.db_session.rollback()
+            
+            try:
+                file_content = None
+                file_name = None
+                if 'import_session' in locals():
+                    file_content = import_session.get_summary_data('file_content')
+                    file_name = import_session.file_name
                 saved_file_path = self.report_generator.save_import_file(
-                    user_id=user_id,
+                    user_id=1,
                     session_id=session_id,
                     file_content=file_content,
                     file_name=file_name,
                     status='failed'
                 )
-                logger.info(f"Saved import file (failed): {saved_file_path}")
+                logger.info(f"🗂️ Saved import file for failed session {session_id}: {saved_file_path}")
             except Exception as save_error:
-                logger.error(f"Failed to save import file after error: {str(save_error)}")
+                logger.error(f"Failed to save import file after failure: {save_error}")
             
             return {
                 'success': False,
-                'error': str(e)
+                'error': str(error)
             }
+
+    def reset_session(self, session_id: int) -> Dict[str, Any]:
+        """
+        Reset (cancel) an import session and remove cached data.
+        """
+        logger.info(f"🔄 Resetting import session {session_id} and cancelling all active sessions")
+        
+        try:
+            active_statuses = ['created', 'analyzing', 'ready', 'importing']
+            active_sessions = self.db_session.query(ImportSession).filter(
+                ImportSession.status.in_(active_statuses)
+            ).all()
+            
+            if not active_sessions:
+                logger.info("ℹ️ No active import sessions found to cancel")
+                return {'success': True, 'cancelled_sessions': []}
+            
+            cancelled_sessions = []
+            cancellation_timestamp = datetime.now(timezone.utc).isoformat()
+            cancellation_reason = f'Reset triggered via session {session_id}'
+            
+            for active_session in active_sessions:
+                try:
+                    cache_keys = [
+                        f"import_session_{active_session.id}_summary",
+                        f"import_session_{active_session.id}_analysis",
+                        f"import_session_{active_session.id}_preview"
+                    ]
+                    for cache_key in cache_keys:
+                        try:
+                            advanced_cache_service.delete(cache_key)
+                        except Exception as cache_error:
+                            logger.debug(
+                                "Cache cleanup failed for session %s: %s",
+                                active_session.id,
+                                cache_error
+                            )
+                    
+                    # Add cancellation metadata and mark as cancelled
+                    metadata = {
+                        'cancelled_at': cancellation_timestamp,
+                        'cancelled_reason': cancellation_reason
+                    }
+                    try:
+                        active_session.add_summary_data(metadata)
+                    except Exception as summary_error:
+                        logger.debug(
+                            "Failed to persist cancellation metadata for session %s: %s",
+                            active_session.id,
+                            summary_error
+                        )
+                    
+                    if active_session.update_status('cancelled'):
+                        cancelled_sessions.append(active_session.id)
+                    else:
+                        # If status did not change (already cancelled/completed), skip adding to list
+                        logger.debug(
+                            "Session %s status unchanged during cancellation (current status: %s)",
+                            active_session.id,
+                            active_session.status
+                        )
+                except Exception as session_error:
+                    logger.error(
+                        "Failed to cancel session %s during reset cascade: %s",
+                        active_session.id,
+                        session_error,
+                        exc_info=True
+                    )
+            
+            self.db_session.commit()
+            
+            logger.info("✅ Cancelled %d active import sessions", len(cancelled_sessions))
+            
+            return {
+                'success': True,
+                'cancelled_sessions': cancelled_sessions
+            }
+        
+        except Exception as error:
+            self.db_session.rollback()
+            logger.error(f"Failed to reset session {session_id}: {error}", exc_info=True)
+            return {'success': False, 'error': str(error)}
     
     def get_session_status(self, session_id: int) -> Dict[str, Any]:
         """

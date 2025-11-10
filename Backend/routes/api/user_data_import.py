@@ -18,6 +18,7 @@ from typing import Dict, Any
 
 from config.database import get_db
 from services.user_data_import import ImportOrchestrator
+from services.user_data_import.session_manager import ImportSessionManager
 from models.import_session import ImportSession
 from models.trading_account import TradingAccount
 
@@ -329,6 +330,48 @@ def get_session(session_id: int):
         return jsonify({
             'status': 'error',
             'message': f'Failed to get session: {str(e)}'
+        }), 500
+
+@user_data_import_bp.route('/sessions/active', methods=['GET'])
+def get_active_import_session():
+    """
+    Get the latest active import session (ready/importing/analyzing).
+    """
+    try:
+        statuses_param = request.args.get('statuses')
+        if statuses_param:
+            statuses = [status.strip() for status in statuses_param.split(',') if status.strip()]
+        else:
+            statuses = None
+        
+        db_session = next(get_db())
+        try:
+            manager = ImportSessionManager(db_session)
+            session = manager.get_latest_active_session(statuses)
+            
+            if not session:
+                return jsonify({
+                    'success': True,
+                    'session': None
+                }), 200
+            
+            session_dict = session.to_dict()
+            summary_stats = session.get_summary_stats()
+            
+            return jsonify({
+                'success': True,
+                'session': session_dict,
+                'summary': summary_stats
+            }), 200
+        
+        finally:
+            db_session.close()
+    
+    except Exception as e:
+        logger.error(f"Failed to fetch active import session: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to fetch active session: {str(e)}'
         }), 500
 
 @user_data_import_bp.route('/session/<int:session_id>/preview', methods=['GET'])
@@ -678,6 +721,39 @@ def execute_import(session_id: int):
         return jsonify({
             'status': 'error',
             'message': f'Import execution failed: {str(e)}'
+        }), 500
+
+@user_data_import_bp.route('/session/<int:session_id>/reset', methods=['POST'])
+def reset_import_session(session_id: int):
+    """
+    Reset (cancel) an import session and clear cached artifacts.
+    """
+    try:
+        db_session = next(get_db())
+        try:
+            orchestrator = ImportOrchestrator(db_session)
+            result = orchestrator.reset_session(session_id)
+            
+            if not result['success']:
+                status_code = 404 if result.get('error') == 'Session not found' else 400
+                return jsonify({
+                    'status': 'error',
+                    'message': result.get('error', 'Failed to reset session')
+                }), status_code
+            
+            return jsonify({
+                'status': 'success',
+                'cancelled_sessions': result.get('cancelled_sessions', [])
+            }), 200
+        
+        finally:
+            db_session.close()
+    
+    except Exception as e:
+        logger.error(f"Failed to reset import session {session_id}: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Failed to reset session: {str(e)}'
         }), 500
 
 @user_data_import_bp.route('/session/<int:session_id>/status', methods=['GET'])

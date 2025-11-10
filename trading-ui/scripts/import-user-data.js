@@ -25,12 +25,381 @@ let analysisResults = null;
 let previewData = null;
 let currencyCacheByCode = null;
 let tickersModalConfigPromise = null;
+let activeSessionInfo = null;
+const ACTIVE_SESSION_STORAGE_KEY = 'tiktrack_import_user_data_session';
+const ACTIVE_SESSION_SOURCE = 'import-user-data';
+let importModalBootstrapInstance = null;
+
+function updateResetSessionButtonState() {
+    const resetButton = document.getElementById('resetImportSessionBtn');
+    if (!resetButton) {
+        return;
+    }
+    resetButton.disabled = !currentSessionId;
+    updateActiveSessionIndicator();
+}
 
 function getApiErrorMessage(response, fallback = 'שגיאה לא ידועה') {
     if (!response || typeof response !== 'object') {
         return fallback;
     }
     return response.error || response.message || response.detail || response.details || fallback;
+}
+
+function updateActiveSessionInfo(updates = {}) {
+    if (!currentSessionId) {
+        activeSessionInfo = null;
+        updateActiveSessionIndicator();
+        clearStoredActiveSession();
+        return;
+    }
+    
+    const accountSelect = document.getElementById('tradingAccountSelect');
+    const connectorSelect = document.getElementById('connectorSelect');
+    
+    activeSessionInfo = {
+        ...(activeSessionInfo || {}),
+        sessionId: currentSessionId
+    };
+    
+    const fileName = updates.fileName ?? window.selectedFile?.name ?? activeSessionInfo.fileName ?? '';
+    const fileSize = updates.fileSize ?? window.selectedFile?.size ?? activeSessionInfo.fileSize ?? null;
+    const accountName = updates.accountName 
+        ?? accountSelect?.selectedOptions?.[0]?.text?.trim() 
+        ?? activeSessionInfo.accountName 
+        ?? '';
+    const accountIdValue = updates.accountId ?? selectedAccount ?? activeSessionInfo.accountId ?? null;
+    const connectorValue = updates.connector ?? selectedConnector ?? activeSessionInfo.connector ?? '';
+    const connectorName = updates.connectorName 
+        ?? connectorSelect?.selectedOptions?.[0]?.text?.trim() 
+        ?? activeSessionInfo.connectorName 
+        ?? '';
+    
+    activeSessionInfo.fileName = fileName;
+    activeSessionInfo.fileSize = fileSize;
+    activeSessionInfo.accountName = accountName;
+    activeSessionInfo.accountId = accountIdValue;
+    activeSessionInfo.connector = connectorValue;
+    activeSessionInfo.connectorName = connectorName;
+    
+    const countKeys = [
+        'totalRecords',
+        'readyRecords',
+        'skipRecords',
+        'missingTickers',
+        'missingTickerRecords',
+        'duplicateRecords',
+        'existingRecords'
+    ];
+    countKeys.forEach((key) => {
+        if (typeof updates[key] === 'number') {
+            activeSessionInfo[key] = updates[key];
+        } else if (activeSessionInfo[key] === undefined) {
+            activeSessionInfo[key] = 0;
+        }
+    });
+    
+    if (updates.provider) {
+        activeSessionInfo.provider = updates.provider;
+    } else if (!activeSessionInfo.provider && connectorName) {
+        activeSessionInfo.provider = connectorName;
+    }
+    
+    if (updates.status) {
+        activeSessionInfo.status = updates.status;
+    } else if (!activeSessionInfo.status) {
+        activeSessionInfo.status = 'ניתוח בתהליך';
+    }
+    
+    updateActiveSessionIndicator();
+    persistActiveSession();
+}
+
+function updateActiveSessionIndicator() {
+    const indicator = document.getElementById('activeSessionIndicator');
+    if (!indicator) {
+        return;
+    }
+    
+    if (!currentSessionId || !activeSessionInfo) {
+        indicator.style.display = 'none';
+        indicator.setAttribute('data-has-session', 'false');
+        return;
+    }
+    
+    indicator.style.display = 'block';
+    indicator.setAttribute('data-has-session', 'true');
+    
+    const sessionIdEl = document.getElementById('activeSessionIdValue');
+    const statusEl = document.getElementById('activeSessionStatusValue');
+    const fileEl = document.getElementById('activeSessionFileValue');
+    const accountEl = document.getElementById('activeSessionAccountValue');
+    const providerEl = document.getElementById('activeSessionProviderValue');
+    const totalRecordsEl = document.getElementById('activeSessionTotalRecords');
+    const readyRecordsEl = document.getElementById('activeSessionReadyRecords');
+    const skipRecordsEl = document.getElementById('activeSessionSkipRecords');
+    const missingTickersEl = document.getElementById('activeSessionMissingTickers');
+    const duplicateRecordsEl = document.getElementById('activeSessionDuplicateRecords');
+    const existingRecordsEl = document.getElementById('activeSessionExistingRecords');
+    
+    if (sessionIdEl) {
+        sessionIdEl.textContent = `#${activeSessionInfo.sessionId}`;
+    }
+    if (statusEl) {
+        statusEl.textContent = activeSessionInfo.status || 'לא זמין';
+    }
+    if (fileEl) {
+        const sizeLabel = activeSessionInfo.fileSize ? ` (${formatFileSize(activeSessionInfo.fileSize)})` : '';
+        fileEl.textContent = activeSessionInfo.fileName 
+            ? `${activeSessionInfo.fileName}${sizeLabel}`
+            : 'לא נבחר קובץ';
+    }
+    if (accountEl) {
+        accountEl.textContent = activeSessionInfo.accountName || 'לא נבחר חשבון';
+    }
+    if (providerEl) {
+        providerEl.textContent = activeSessionInfo.provider || 'לא נבחר ספק';
+    }
+    if (totalRecordsEl) {
+        totalRecordsEl.textContent = activeSessionInfo.totalRecords ?? 0;
+    }
+    if (readyRecordsEl) {
+        readyRecordsEl.textContent = activeSessionInfo.readyRecords ?? 0;
+    }
+    if (skipRecordsEl) {
+        skipRecordsEl.textContent = activeSessionInfo.skipRecords ?? 0;
+    }
+    if (missingTickersEl) {
+        missingTickersEl.textContent = activeSessionInfo.missingTickers ?? 0;
+    }
+    if (duplicateRecordsEl) {
+        duplicateRecordsEl.textContent = activeSessionInfo.duplicateRecords ?? 0;
+    }
+    if (existingRecordsEl) {
+        existingRecordsEl.textContent = activeSessionInfo.existingRecords ?? 0;
+    }
+}
+
+function updateActiveSessionFromAnalysis(results) {
+    if (!currentSessionId || !results) {
+        return;
+    }
+    
+    const missingTickerRecords = results.missing_ticker_records || 0;
+    const missingTickers = Array.isArray(results.missing_tickers)
+        ? results.missing_tickers.length
+        : (results.missing_tickers_count || 0);
+    const duplicateRecords = results.duplicate_records || 0;
+    const existingRecords = results.existing_records || 0;
+    const invalidRecords = results.invalid_records || 0;
+    const cleanRecords = results.clean_records || results.valid_records || 0;
+    const totalRecords = results.total_records || 0;
+    
+    const readyRecords = Math.max(0, cleanRecords - missingTickerRecords);
+    const skipRecords = duplicateRecords + existingRecords + missingTickerRecords + invalidRecords;
+    
+    updateActiveSessionInfo({
+        totalRecords,
+        readyRecords,
+        skipRecords,
+        missingTickers,
+        missingTickerRecords,
+        duplicateRecords,
+        existingRecords,
+        status: activeSessionInfo?.status || 'ניתוח הושלם'
+    });
+}
+
+function updateActiveSessionFromPreview(preview) {
+    if (!currentSessionId || !preview) {
+        return;
+    }
+    
+    const readyRecords = Array.isArray(preview.records_to_import)
+        ? preview.records_to_import.length
+        : (preview.summary?.records_to_import || activeSessionInfo?.readyRecords || 0);
+    
+    const skipRecords = Array.isArray(preview.records_to_skip)
+        ? preview.records_to_skip.length
+        : (preview.summary?.records_to_skip || activeSessionInfo?.skipRecords || 0);
+    
+    updateActiveSessionInfo({
+        readyRecords,
+        skipRecords,
+        status: 'תצוגה מקדימה מוכנה'
+    });
+}
+
+function mapSessionStatusToLabel(status) {
+    if (!status) {
+        return 'לא ידוע';
+    }
+    
+    const normalized = String(status).toLowerCase();
+    const statusMap = {
+        created: 'התקבל',
+        analyzing: 'ניתוח בתהליך',
+        ready: 'מוכן לייבוא',
+        importing: 'ייבוא פעיל',
+        completed: 'הושלם',
+        failed: 'נכשל',
+        cancelled: 'בוטל'
+    };
+    
+    return statusMap[normalized] || status;
+}
+
+function persistActiveSession() {
+    try {
+        if (!currentSessionId || !activeSessionInfo) {
+            clearStoredActiveSession();
+            return;
+        }
+        
+        const storedPayload = {
+            ...activeSessionInfo,
+            sessionId: currentSessionId,
+            persistedAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, JSON.stringify(storedPayload));
+    } catch (error) {
+        window.Logger?.warn?.('[Import Modal] Failed to persist active session info', { error: error?.message });
+    }
+}
+
+function clearStoredActiveSession() {
+    try {
+        localStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY);
+    } catch (error) {
+        window.Logger?.warn?.('[Import Modal] Failed to clear stored session info', { error: error?.message });
+    }
+}
+
+async function restoreActiveSessionFromStorage() {
+    let restoredFromStorage = false;
+    try {
+        const storedValue = localStorage.getItem(ACTIVE_SESSION_STORAGE_KEY);
+        if (!storedValue) {
+            updateActiveSessionIndicator();
+            return await fetchLatestActiveSession();
+        }
+        
+        const parsed = JSON.parse(storedValue);
+        if (!parsed?.sessionId) {
+            clearStoredActiveSession();
+            return await fetchLatestActiveSession();
+        }
+        
+        currentSessionId = parsed.sessionId;
+        window.currentSessionId = parsed.sessionId;
+        activeSessionInfo = parsed;
+        selectedAccount = parsed.accountId ?? null;
+        selectedConnector = parsed.connector ?? null;
+        if (parsed.fileName) {
+            window.selectedFile = window.selectedFile || { name: parsed.fileName, size: parsed.fileSize };
+        }
+        
+        updateActiveSessionIndicator();
+        updateResetSessionButtonState();
+        
+        restoredFromStorage = true;
+        await fetchExistingSessionDetails(parsed.sessionId);
+    } catch (error) {
+        window.Logger?.warn?.('[Import Modal] Failed to restore session from storage', { error: error?.message });
+        clearStoredActiveSession();
+    } finally {
+        if (!restoredFromStorage) {
+            await fetchLatestActiveSession();
+        }
+    }
+}
+
+async function fetchExistingSessionDetails(sessionId) {
+    try {
+        const response = await fetch(`/api/user-data-import/session/${sessionId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (!(data.success || data.status === 'success')) {
+            throw new Error(data.message || 'Session fetch failed');
+        }
+        
+        const session = data.session || {};
+        const summary = session.summary_data || session.summary || {};
+        
+        updateActiveSessionInfo({
+            status: mapSessionStatusToLabel(session.status),
+            totalRecords: summary.total_records ?? session.total_records ?? activeSessionInfo?.totalRecords ?? 0,
+            readyRecords: summary.records_to_import ?? session.imported_records ?? activeSessionInfo?.readyRecords ?? 0,
+            skipRecords: summary.records_to_skip ?? session.skipped_records ?? activeSessionInfo?.skipRecords ?? 0,
+            missingTickers: Array.isArray(summary.missing_tickers) ? summary.missing_tickers.length : activeSessionInfo?.missingTickers ?? 0,
+            duplicateRecords: summary.duplicate_records ?? activeSessionInfo?.duplicateRecords ?? 0,
+            existingRecords: summary.existing_records ?? activeSessionInfo?.existingRecords ?? 0,
+            provider: session.provider || activeSessionInfo?.provider
+        });
+    } catch (error) {
+        window.Logger?.warn?.('[Import Modal] Failed to fetch existing session details', { error: error?.message, sessionId });
+        if (currentSessionId === sessionId) {
+            currentSessionId = null;
+            window.currentSessionId = null;
+            activeSessionInfo = null;
+            updateResetSessionButtonState();
+            updateActiveSessionIndicator();
+        }
+        clearStoredActiveSession();
+    }
+}
+
+async function fetchLatestActiveSession() {
+    try {
+        const response = await fetch('/api/user-data-import/sessions/active');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (!(data.success || data.status === 'success')) {
+            throw new Error(data.message || 'Active session fetch failed');
+        }
+        
+        if (!data.session) {
+            return;
+        }
+        
+        const session = data.session;
+        const summary = data.summary || {};
+        
+        currentSessionId = session.id;
+        window.currentSessionId = session.id;
+        selectedAccount = session.trading_account_id ?? null;
+        const inferredConnector = typeof session.provider === 'string'
+            ? session.provider.toLowerCase()
+            : null;
+        selectedConnector = inferredConnector;
+        
+        updateActiveSessionInfo({
+            sessionId: session.id,
+            fileName: session.file_name,
+            accountId: session.trading_account_id,
+            provider: session.provider,
+            connector: inferredConnector,
+            connectorName: session.provider,
+            status: mapSessionStatusToLabel(session.status),
+            totalRecords: summary.total_records ?? session.total_records ?? 0,
+            readyRecords: summary.imported_records
+                ?? summary.records_to_import
+                ?? Math.max(0, (session.total_records || 0) - (session.skipped_records || 0)),
+            skipRecords: summary.records_to_skip ?? session.skipped_records ?? 0
+        });
+        
+        updateResetSessionButtonState();
+        await fetchExistingSessionDetails(session.id);
+    } catch (error) {
+        window.Logger?.debug?.('[Import Modal] No active session detected', { error: error?.message });
+    }
 }
 
 function renderImportDate(value, fallback = '') {
@@ -321,37 +690,73 @@ window.initializeImportUserDataModal = function() {
 async function openImportUserDataModal() {
     window.Logger.info('[Import Modal] Opening import modal', { page: 'import-user-data' });
     
-    // Reset state
+    const modal = document.getElementById('importUserDataModal');
+    if (!modal) {
+        window.Logger.error('[Import Modal] Modal element not found in DOM', { page: 'import-user-data' });
+        return;
+    }
+    
+    // Reset state before displaying
     resetImportModal();
     
-    // Show modal
-    const modal = document.getElementById('importUserDataModal');
-    if (modal) {
+    // Ensure listeners are initialized once
+    setupImportModalEventListeners();
+    
+    // Show modal using Bootstrap when available
+    if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+        importModalBootstrapInstance = bootstrap.Modal.getInstance(modal);
+        if (!importModalBootstrapInstance) {
+            importModalBootstrapInstance = new bootstrap.Modal(modal, {
+                backdrop: false,
+                keyboard: true
+            });
+        }
+        importModalBootstrapInstance.show();
+    } else {
+        // Fallback manual display
         modal.style.display = 'block';
         modal.classList.add('show');
         modal.setAttribute('aria-hidden', 'false');
-        
-        // Process buttons using centralized button system
-        if (window.processButtons) {
-            window.processButtons(modal);
-            window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
-        } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
-            window.advancedButtonSystem.processButtons(modal);
-            window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
-        } else if (window.initializeButtons) {
-            window.initializeButtons();
-            window.Logger.debug('[Import Modal] Buttons initialized via initializeButtons()', { page: 'import-user-data' });
+        document.body.classList.add('modal-open');
+    }
+    
+    // Process buttons using centralized button system
+    if (window.processButtons) {
+        window.processButtons(modal);
+        window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
+    } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+        window.advancedButtonSystem.processButtons(modal);
+        window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
+    } else if (window.initializeButtons) {
+        window.initializeButtons();
+        window.Logger.debug('[Import Modal] Buttons initialized via initializeButtons()', { page: 'import-user-data' });
+    }
+    
+    // Load accounts and restore active session state
+    await loadAccounts();
+    await restoreActiveSessionFromStorage();
+    
+    if (activeSessionInfo?.accountId) {
+        const accountSelect = modal.querySelector('#tradingAccountSelect');
+        if (accountSelect) {
+            setSelectValue(accountSelect, activeSessionInfo.accountId);
         }
-        
-        // Setup event listeners now that modal is visible
-        setupImportModalEventListeners();
-        
-        // Load accounts
-        await loadAccounts();
+    }
+    
+    if (activeSessionInfo?.connector) {
+        const connectorSelect = modal.querySelector('#connectorSelect');
+        if (connectorSelect) {
+            setSelectValue(connectorSelect, activeSessionInfo.connector);
+        }
     }
     
     // Initialize step 1
     goToStep(1);
+    
+    if (window.modalNavigationManager?.manageBackdrop) {
+        window.modalNavigationManager.manageBackdrop();
+        setTimeout(() => window.modalNavigationManager?.manageBackdrop(), 50);
+    }
 }
 
 /**
@@ -360,16 +765,36 @@ async function openImportUserDataModal() {
 function closeImportUserDataModal() {
     window.Logger.info('[Import Modal] Closing import modal', { page: 'import-user-data' });
     
-    // Hide modal
     const modal = document.getElementById('importUserDataModal');
-    if (modal) {
-        modal.style.display = 'none';
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
+    if (!modal) {
+        return;
     }
     
-    // Reset state
-    resetImportModal();
+    if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+        const instance = bootstrap.Modal.getInstance(modal) || importModalBootstrapInstance;
+        if (instance) {
+            instance.hide();
+        } else {
+            // Fallback if no instance exists yet
+            importModalBootstrapInstance = new bootstrap.Modal(modal, { backdrop: false, keyboard: true });
+            importModalBootstrapInstance.hide();
+        }
+    } else {
+        // Manual fallback
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        resetImportModal();
+    }
+    
+    if (window.modalNavigationManager?.manageBackdrop) {
+        setTimeout(() => window.modalNavigationManager.manageBackdrop(), 50);
+    }
 }
 
 /**
@@ -377,6 +802,7 @@ function closeImportUserDataModal() {
  */
 function resetImportModal() {
     currentSessionId = null;
+    window.currentSessionId = null;
     currentStep = 1;
     selectedFile = null;
     window.selectedFile = null; // Make it global
@@ -384,6 +810,7 @@ function resetImportModal() {
     selectedConnector = null;
     analysisResults = null;
     previewData = null;
+    activeSessionInfo = null;
     
     // Reset form elements
     const fileInput = document.getElementById('fileInput');
@@ -420,6 +847,139 @@ function resetImportModal() {
     
     // Reset analyze button
     updateAnalyzeButton();
+    updateResetSessionButtonState();
+    resetAnalysisDisplay();
+    resetPreviewDisplay();
+    clearProblemSections();
+    updateActiveSessionIndicator();
+}
+
+function finalizeImportReset(options = {}) {
+    const { clearCache = false, reason = 'import-user-data:reset' } = options;
+    clearStoredActiveSession();
+    resetImportModal();
+    goToStep(1);
+    
+    if (clearCache) {
+        clearImportCacheLayers({ reason });
+    }
+    
+    // Re-check for any remaining active sessions after backend reset
+    setTimeout(() => {
+        fetchLatestActiveSession()?.catch?.((error) => {
+            window.Logger?.debug?.('[Import Modal] Active session refetch after reset failed', {
+                error: error?.message
+            });
+        });
+    }, 300);
+}
+
+function resetAnalysisDisplay() {
+    const analysisCounters = {
+        totalRecords: '0',
+        validRecords: '0',
+        invalidRecords: '0',
+        duplicateRecords: '0',
+        missingTickersCount: '0',
+        missingTickerRecords: '0',
+        existingRecords: '0'
+    };
+    
+    Object.entries(analysisCounters).forEach(([elementId, value]) => {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = value;
+        }
+    });
+    
+    const problemResolutionSection = document.getElementById('problemResolutionSection');
+    if (problemResolutionSection) {
+        problemResolutionSection.style.display = 'none';
+    }
+}
+
+function resetPreviewDisplay() {
+    const previewCounters = {
+        previewImportCount: '0',
+        previewSkipCount: '0',
+        previewImportRate: '0%'
+    };
+    
+    Object.entries(previewCounters).forEach(([elementId, value]) => {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = value;
+        }
+    });
+    
+    const confirmationFields = {
+        confirmFileName: '',
+        confirmAccountName: '',
+        confirmTotalRecords: '',
+        confirmImportRecords: '',
+        confirmSkipRecords: ''
+    };
+    
+    Object.entries(confirmationFields).forEach(([elementId, value]) => {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = value;
+        }
+    });
+    
+    const tablePlaceholders = [
+        { elementId: 'importTableBody', columns: 8 },
+        { elementId: 'skipTableBody', columns: 9 }
+    ];
+    
+    tablePlaceholders.forEach(({ elementId, columns }) => {
+        const tableBody = document.getElementById(elementId);
+        if (tableBody) {
+            tableBody.innerHTML = `<tr><td colspan="${columns}">אין נתונים להצגה. העלה קובץ חדש להפעלת תהליך הייבוא.</td></tr>`;
+        }
+    });
+}
+
+function clearImportCacheLayers({ reason = 'import-user-data', autoRefresh = false } = {}) {
+    const layers = ['memory', 'localStorage', 'indexedDB'];
+    
+    try {
+        if (window.UnifiedCacheManager?.clearAllCache) {
+            const clearPromise = window.UnifiedCacheManager.clearAllCache({
+                layers: ['all'],
+                autoRefresh,
+                hardReload: autoRefresh,
+                source: reason
+            });
+            
+            if (clearPromise?.catch) {
+                clearPromise.catch(error => {
+                    window.Logger?.warn?.('[Import Modal] Unified cache clear failed', { error: error?.message, reason });
+                });
+            }
+        } else {
+            window.Logger?.warn?.('[Import Modal] UnifiedCacheManager not available for cache clearing', { reason });
+        }
+        
+        if (window.CacheControlMenu?.logAction) {
+            const logPromise = window.CacheControlMenu.logAction('full', layers, {
+                source: reason,
+                autoRefresh,
+                page: 'import-user-data'
+            });
+            
+            if (logPromise?.catch) {
+                logPromise.catch(error => {
+                    window.Logger?.warn?.('[Import Modal] Failed to log cache clear action', { error: error?.message, reason });
+                });
+            }
+        }
+    } catch (error) {
+        window.Logger?.error?.('[Import Modal] Cache clearing process raised an error', { error: error?.message, reason });
+    }
+    
+    // LEGACY (Stage A) cache clearing method - deprecated:
+    // window.clearCacheQuick(null, { source: reason });
 }
 
 /**
@@ -561,6 +1121,7 @@ function loadStep1Content() {
     // The HTML content is already in the DOM, just need to load accounts
     // Event listeners are already set up during initialization
     loadAccounts();
+    updateResetSessionButtonState();
 }
 
 /**
@@ -1442,6 +2003,19 @@ function analyzeFile() {
             window.currentSessionId = data.session_id; // Make it global
             analysisResults = data.analysis_results;
             
+            updateActiveSessionInfo({
+                status: 'ניתוח הושלם',
+                provider: data.provider,
+                fileName: selectedFile?.name,
+                fileSize: selectedFile?.size ?? null,
+                accountName: accountSelect?.selectedOptions?.[0]?.text?.trim(),
+                accountId: accountValue,
+                connector: connectorValue,
+                connectorName: connectorSelect?.selectedOptions?.[0]?.text?.trim()
+            });
+            updateActiveSessionFromAnalysis(data.analysis_results);
+            updateResetSessionButtonState();
+            
             // Display results
             displayAnalysisResults(data.analysis_results);
             
@@ -1515,6 +2089,7 @@ function displayAnalysisResults(results) {
         if (existingRecords) existingRecords.textContent = results.existing_records || 0; // Records that already exist in system
         
         window.Logger.info('[Import Modal] Analysis results displayed successfully', { page: 'import-user-data' });
+        updateActiveSessionFromAnalysis(results);
     } catch (error) {
         window.Logger.error('[Import Modal] Error displaying analysis results', { error: error.message, stack: error.stack, page: 'import-user-data' });
     }
@@ -1672,12 +2247,12 @@ async function loadProblemResolution() {
         showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
         return;
     }
-
+    
     const analysisFallback = buildProblemResolutionFromAnalysis(analysisResults);
 
     try {
         const response = await fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
-            method: 'GET'
+        method: 'GET'
         });
         const data = await response.json();
 
@@ -1797,6 +2372,8 @@ function displayPreviewData(data) {
         importRate, 
         page: 'import-user-data' 
     });
+    
+    updateActiveSessionFromPreview(data);
 }
 
 /**
@@ -2143,7 +2720,7 @@ async function openAddTickerModal(symbol, currency = 'USD') {
                     remarksField.value = '';
                 }
             }
-            return;
+        return;
         } catch (error) {
             window.Logger?.error('[Import Modal] Failed to open tickers modal via ModalManager', { error: error.message });
             showImportUserDataNotification('שגיאה בפתיחת מודול הטיקר', 'error');
@@ -2285,6 +2862,8 @@ function updateSummaryStats() {
     if (importCount) importCount.textContent = previewData.summary?.records_to_import || 0;
     if (skipCount) skipCount.textContent = previewData.summary?.records_to_skip || 0;
     if (importRate) importRate.textContent = `${previewData.summary?.import_rate || 0}%`;
+    
+    updateActiveSessionFromPreview(previewData);
 }
 
 /**
@@ -2356,33 +2935,181 @@ function performImport(generateReport = false) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success || data.status === 'success') {
-            showImportUserDataNotification('ייבוא הנתונים הושלם בהצלחה!', 'success');
+        const importedCount = Number(
+            data.imported_count ?? data.importedCount ?? 0
+        );
+        const skippedCount = Number(
+            data.skipped_count ?? data.skippedCount ?? 0
+        );
+        const importErrors = Array.isArray(data.import_errors)
+            ? data.import_errors
+            : (data.importErrors && Array.isArray(data.importErrors))
+                ? data.importErrors
+                : [];
+        const apiSucceeded = data.success === true || data.status === 'success';
+
+        if (apiSucceeded && importedCount > 0) {
+            let successMessage = `ייבוא הנתונים הושלם בהצלחה! נוספו ${importedCount} רשומות חדשות.`;
+            if (skippedCount > 0) {
+                successMessage += ` ${skippedCount} רשומות הושמטו (שגיאות/כפילויות).`;
+            }
+
+            showImportUserDataNotification(successMessage, 'success');
             closeImportUserDataModal();
             
-            // Clear cache to show new data - use centralized cache clearing
-            if (typeof window.clearCacheQuick === 'function') {
-                window.clearCacheQuick();
-            } else if (typeof window.clearAllCacheAdvanced === 'function') {
-                window.clearAllCacheAdvanced();
+            if (importErrors.length) {
+                const detailedMessage = importErrors
+                    .map((message, idx) => `• (${idx + 1}) ${message}`)
+                    .join('\n');
+                if (typeof window.showDetailedNotification === 'function') {
+                    window.showDetailedNotification(
+                        'ייבוא הושלם עם אזהרות',
+                        detailedMessage,
+                        'warning',
+                        12000,
+                        'import-user-data'
+                    );
+                } else {
+                    showImportUserDataNotification(
+                        'ייבוא הושלם עם אזהרות. פתח את לוג המערכת לפרטים.',
+                        'warning'
+                    );
+                }
             }
             
             if (generateReport && data.report_url) {
                 showImportUserDataNotification('דוח ייבוא זמין להורדה', 'info');
             }
             
-            // Refresh executions table if exists
+            // Clear cache to show new data - use centralized cache clearing
+            clearImportCacheLayers({ reason: 'import-user-data:execute' });
+            clearStoredActiveSession();
+            // LEGACY (pre Stage B-Lite) flow:
+            // if (typeof window.clearCacheQuick === 'function') {
+            //     window.clearCacheQuick(null, { source: 'import-user-data' });
+            // } else if (typeof window.clearAllCacheAdvanced === 'function') {
+            //     window.clearAllCacheAdvanced({ source: 'import-user-data' });
+            // }
+
             if (typeof window.loadExecutionsData === 'function') {
                 window.loadExecutionsData();
             }
-    } else {
-            const apiMessage = getApiErrorMessage(data, 'שגיאה לא ידועה בייבוא');
-            showImportUserDataNotification(`שגיאה בייבוא: ${apiMessage}`, 'error');
+            return;
+        }
+
+        const errorMessage = getApiErrorMessage(
+            data,
+            apiSucceeded && importedCount === 0
+                ? 'הייבוא הסתיים ללא רשומות חדשות. בדוק את נתוני הקובץ והמשך לטפל בבעיות.'
+                : 'שגיאה בייבוא הנתונים'
+        );
+
+        showImportUserDataNotification(`שגיאה בייבוא: ${errorMessage}`, 'error');
+
+        if (importErrors.length) {
+            const detailedMessage = importErrors
+                .map((message, idx) => `• (${idx + 1}) ${message}`)
+                .join('\n');
+            if (typeof window.showDetailedNotification === 'function') {
+                window.showDetailedNotification(
+                    'שגיאה בייבוא נתונים',
+                    detailedMessage,
+                    'error',
+                    15000,
+                    'import-user-data'
+                );
+            }
         }
     })
     .catch(error => {
         window.Logger.error('Import error:', error);
         showImportUserDataNotification('שגיאה בייבוא הנתונים', 'error');
+    });
+}
+
+function confirmResetImportSession() {
+    if (!currentSessionId) {
+        finalizeImportReset({ clearCache: true });
+        showImportUserDataNotification('לא נמצא סשן ייבוא פעיל. ניתן להתחיל תהליך חדש.', 'info');
+        return;
+    }
+
+    const confirmationMessage = 'הפעולה תאפס את סשן הייבוא הנוכחי, תנקה נתוני ביניים ומטמון, ותאפשר להתחיל תהליך חדש.\nהאם להמשיך?';
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'איפוס תהליך ייבוא',
+            confirmationMessage,
+            () => performResetImportSession(),
+            null,
+            'warning'
+        );
+    } else if (window.confirm(confirmationMessage)) {
+        performResetImportSession();
+    }
+}
+
+function performResetImportSession() {
+    const sessionId = currentSessionId;
+
+    if (!sessionId) {
+        finalizeImportReset({ clearCache: true });
+        showImportUserDataNotification('לא נמצא סשן ייבוא פעיל. ניתן להתחיל תהליך חדש.', 'info');
+        return;
+    }
+
+    showImportUserDataNotification('מאפס את סשן הייבוא...', 'info');
+
+    fetch(`/api/user-data-import/session/${sessionId}/reset`, {
+        method: 'POST'
+    })
+    .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        return { ok: response.ok, data };
+    })
+    .then(({ ok, data }) => {
+        const success = data?.success === true || data?.status === 'success';
+        const sessionNotFound = (data?.message || '').toLowerCase().includes('session not found');
+
+        if (success || sessionNotFound) {
+            const cancelledSessions = Array.isArray(data?.cancelled_sessions) ? data.cancelled_sessions.length : 0;
+            window.Logger?.info?.('[Import Modal] Reset request cancelled sessions', {
+                cancelledSessions,
+                sessionIds: data?.cancelled_sessions || []
+            });
+            showImportUserDataNotification('סשן הייבוא אופס בהצלחה. ניתן להתחיל תהליך חדש.', 'success');
+            finalizeImportReset({ clearCache: true });
+            return;
+        }
+
+        const errorMessage = getApiErrorMessage(data, 'נכשל באיפוס סשן הייבוא');
+        showImportUserDataNotification(`שגיאה באיפוס הייבוא: ${errorMessage}`, 'error');
+
+        const detailedErrors = Array.isArray(data?.errors) ? data.errors : null;
+        if (detailedErrors?.length && typeof window.showDetailedNotification === 'function') {
+            window.showDetailedNotification(
+                'פרטי שגיאה באיפוס ייבוא',
+                detailedErrors.map((item, idx) => `(${idx + 1}) ${item}`).join('\n'),
+                'error',
+                12000,
+                'import-user-data'
+            );
+        }
+    })
+    .catch(error => {
+        window.Logger?.error('[Import Modal] Failed to reset import session', { error: error?.message });
+        showImportUserDataNotification('שגיאה באיפוס הייבוא', 'error');
+        if (typeof window.showDetailedNotification === 'function') {
+            window.showDetailedNotification(
+                'שגיאה באיפוס הייבוא',
+                error?.message || 'שגיאה לא ידועה',
+                'error',
+                12000,
+                'import-user-data'
+            );
+        }
+    })
+    .finally(() => {
+        updateResetSessionButtonState();
     });
 }
 
@@ -2507,6 +3234,8 @@ function displayProblemResolutionDetailed(data) {
             displayExistingRecords(existingRecords);
         }
     }
+    
+    updateActiveSessionFromPreview(data);
 }
 
 /**
@@ -2679,6 +3408,7 @@ function refreshPreviewData() {
     .then(data => {
         if (data.success || data.status === 'success') {
             previewData = data.preview_data;
+            updateActiveSessionFromPreview(data.preview_data);
             // Refresh the current step display
             if (currentStep === 3) {
                 displayProblemResolutionDetailed(data.preview_data);
